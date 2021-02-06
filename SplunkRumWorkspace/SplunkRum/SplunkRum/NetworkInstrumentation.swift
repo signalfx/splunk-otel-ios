@@ -45,7 +45,7 @@ func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error: Error?)
     span.end()
 }
 
-func startHttpSpan(url: URL, method: String) -> Span {
+func startHttpSpan(url: URL, method: String) -> Span? {
     // FIXME constants for this stuff
     let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
     let span = tracer.spanBuilder(spanName: "HTTP "+method).startSpan()
@@ -53,6 +53,13 @@ func startHttpSpan(url: URL, method: String) -> Span {
     span.setAttribute(key: "http.url", value: url.absoluteString)
     span.setAttribute(key: "http.method", value: method)
     return span;
+}
+
+func startHttpSpan(request: URLRequest) -> Span? {
+    if request.url != nil {
+        return startHttpSpan(url: request.url!, method: request.httpMethod ?? "GET")
+    }
+    return nil;
 }
 
 extension URLSession {
@@ -63,7 +70,9 @@ extension URLSession {
         return swizzled_dataTask(with: url) {(data, response, error) in
             // FIXME try/catch equiv
             completionHandler(data, response, error)
-            endHttpSpan(span: span, data: data, response: response, error: error)
+            if span != nil {
+                endHttpSpan(span: span!, data: data, response: response, error: error)
+            }
         }
        }
     
@@ -71,10 +80,34 @@ extension URLSession {
         let span = startHttpSpan(url: url, method: "GET")
         return swizzled_dataTask(with: url) {(data, response, error) in
             // no user-provided callback, just our own
-            endHttpSpan(span: span, data: data, response: response, error: error)
+            if span != nil {
+                endHttpSpan(span: span!, data: data, response: response, error: error)
+            }
         }
        }
-
+/*
+     // FIXME work in progress; does not compile yet
+    @objc open func swizzled_dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        let span = startHttpSpan(request: request)
+        return swizzled_dataTask(with: request) {(data, response, error) in
+            // FIXME try/catch equiv
+            completionHandler(data, response, error)
+            if span != nil {
+                endHttpSpan(span: span!, data: data, response: response, error: error)
+            }
+        }
+       }
+    
+    @objc open func swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
+        let span = startHttpSpan(request: request)
+        return swizzled_dataTask(with: request) {(data, response, error) in
+            // no user-provided callback, just our own
+            if span != nil {
+                endHttpSpan(span: span!, data: data, response: response, error: error)
+            }
+        }
+       }
+*/
 }
 func initalizeNetworkInstrumentation() {
     // FIXME do this also to .emphemeral and results of the function .background(withIdentifier)
