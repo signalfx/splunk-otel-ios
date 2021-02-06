@@ -6,7 +6,7 @@ let serverTimingPattern = #"traceparent;desc=\"00-([0-9a-f]{32})-([0-9a-f]{16})-
 public func addLinkToSpan(span: Span, valStr: String) {
     // FIXME this is the worst regex interface I have ever seen in two+ decades of professional programming
     let regex = try! NSRegularExpression(pattern: serverTimingPattern)
-    let result = regex.matches(in:valStr, range:NSMakeRange(0, valStr.utf16.count))
+    let result = regex.matches(in: valStr, range: NSRange(location: 0, length: valStr.utf16.count))
     // per standard regex logic, number of matched segments is 3 (whole match plus two () captures)
     if result.count != 1 || result[0].numberOfRanges != 3 {
         return
@@ -18,18 +18,18 @@ public func addLinkToSpan(span: Span, valStr: String) {
     span.setAttribute(key: "link.spanId", value: spanId)
 }
 
-func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error:Error?) {
+func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error: Error?) {
     let hr: HTTPURLResponse? = response as? HTTPURLResponse
-    if (hr != nil) {
+    if hr != nil {
         span.setAttribute(key: "http.status_code", value: hr!.statusCode)
         // Blerg, looks like an iteration here since it is case sensitive and the case insensitive search assumes single value
         for (key, val) in hr!.allHeaderFields {
             let keyStr = key as? String
-            if (keyStr != nil) {
-                if (keyStr?.caseInsensitiveCompare("server-timing") == .orderedSame) {
+            if keyStr != nil {
+                if keyStr?.caseInsensitiveCompare("server-timing") == .orderedSame {
                     let valStr = val as? String
-                    if (valStr != nil) {
-                        if (valStr!.starts(with: "traceparent")) {
+                    if valStr != nil {
+                        if valStr!.starts(with: "traceparent") {
                             addLinkToSpan(span: span, valStr: valStr!)
                         }
                     }
@@ -37,7 +37,7 @@ func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error:Error?) 
             }
         }
     }
-    if (error != nil) {
+    if error != nil {
         span.setAttribute(key: "error", value: true)
         span.setAttribute(key: "error.message", value: error!.localizedDescription)
         // FIXME what else can be divined?
@@ -47,7 +47,7 @@ func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error:Error?) 
 
 extension URLSession {
     // FIXME repeat ad nauseum for all the public *Tasks, but also consider cases where no completion handler is provided
-    
+
     @objc open func swizzled_dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         print("swizzled_dataTask")
         let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
@@ -59,10 +59,10 @@ extension URLSession {
             print("got swizzled callback")
             // FIXME try/catch equiv
             completionHandler(data, response, error)
-            endHttpSpan(span:span, data:data, response:response, error:error)
+            endHttpSpan(span: span, data: data, response: response, error: error)
         }
        }
-    
+
 }
 func initalizeNetworkInstrumentation() {
     // FIXME do this also to .emphemeral and results of the function .background(withIdentifier)
@@ -71,7 +71,7 @@ func initalizeNetworkInstrumentation() {
     // This syntax is obnoxious to differentiate with:request from with:url
     let orig = class_getInstanceMethod(c, #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask))
     let swizzled = class_getInstanceMethod(c, #selector(URLSession.swizzled_dataTask(with:completionHandler:)))
-    if (swizzled != nil && orig != nil) {
+    if swizzled != nil && orig != nil {
         method_exchangeImplementations(orig!, swizzled!)
         print("swizzled the method")
     }

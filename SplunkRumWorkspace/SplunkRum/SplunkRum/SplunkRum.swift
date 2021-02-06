@@ -4,7 +4,6 @@ import OpenTelemetrySdk
 import ZipkinExporter
 import UIKit
 
-
 func reportExceptionSpan(e: NSException) throws {
     print(UIApplication.shared.windows[0].description)
     print(UIApplication.shared.windows[0].value(forKey: "recursiveDescription")!)
@@ -14,14 +13,14 @@ func reportExceptionSpan(e: NSException) throws {
     let span = tracer.spanBuilder(spanName: "UncaughtException").startSpan()
     span.setAttribute(key: "error", value: true)
     span.setAttribute(key: "error.name", value: e.name.rawValue)
-    if (e.reason != nil) {
+    if e.reason != nil {
         span.setAttribute(key: "error.message", value: e.reason!)
     }
     let stack = e.callStackSymbols.joined(separator: "\n")
-    if (!stack.isEmpty) {
+    if !stack.isEmpty {
         span.setAttribute(key: "error.stack", value: stack)
     }
-    
+
     // FIXME make instantenous, end time / EndSpanOptions (only way to do this is to pass now to start)
     span.end()
     // App likely crashing now; last-ditch effort to force-flush
@@ -36,31 +35,31 @@ func ourExceptionHandler(e: NSException) {
     } catch {
         // swallow e2
     }
-    if (oldExceptionHandler != nil) {
+    if oldExceptionHandler != nil {
         oldExceptionHandler!(e)
     }
 
 }
 
-class GlobalAttributesProcessor : SpanProcessor {
+class GlobalAttributesProcessor: SpanProcessor {
     var isStartRequired = true
-    
+
     var isEndRequired = false
-    
+
     var appName: String
     init() {
         let app = Bundle.main.infoDictionary?["CFBundleName"] as? String
-        if (app != nil) {
+        if app != nil {
             appName = app!
         } else {
             appName = "unknown-app"
         }
     }
-    
+
     func onStart(span: ReadableSpan) {
         span.setAttribute(key: "app", value: appName)
     }
-    
+
     func onEnd(span: ReadableSpan) { }
     func shutdown() { }
     func forceFlush() { }
@@ -74,15 +73,15 @@ public class SplunkRum {
         oldExceptionHandler = NSGetUncaughtExceptionHandler()
         NSSetUncaughtExceptionHandler(ourExceptionHandler(e:))
     }
-    
+
     private class func sendAppStartSpan() {
         let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
         // FIXME timestamps!
         // FIXME names for things
         let appStart = tracer.spanBuilder(spanName: "AppStart").startSpan()
         // FIXME wait this is just "iPhone" and not "iPhone 6s" or "iPhone8,1".  Why, Apple?
-        appStart.setAttribute(key: "device.model", value:UIDevice.current.model)
-        appStart.setAttribute(key: "os.version", value:UIDevice.current.systemVersion)
+        appStart.setAttribute(key: "device.model", value: UIDevice.current.model)
+        appStart.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
         appStart.end()
     }
     /**
@@ -113,8 +112,6 @@ public class SplunkRum {
     public class func error(e: Any) {
         // FIXME type switch and send error.
         // Likely types to support: NSException, NSError, String, String[]
-        
+
     }
 }
-
-

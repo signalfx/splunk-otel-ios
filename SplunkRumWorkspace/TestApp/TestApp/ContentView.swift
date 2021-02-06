@@ -8,31 +8,31 @@
 import SwiftUI
 
 struct ContentView: View {
-    func network() -> Void {
+    func network() {
         print("network!")
-        let url = URL(string:"http://127.0.0.1:7878/data")!
-        let task = URLSession.shared.dataTask(with: url) {(data, response:URLResponse?, error) in
+        let url = URL(string: "http://127.0.0.1:7878/data")!
+        let task = URLSession.shared.dataTask(with: url) {(data, _: URLResponse?, _) in
             guard let data = data else { return }
             print("got some data")
             print(data)
-            
+
         }
         task.resume()
     }
-    func throwy() -> Void {
+    func throwy() {
         NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil).raise()
         print("should not reach here")
     }
-    
+
     var body: some View {
-        Button(action:{
+        Button(action: {
             self.network()
         }) {
             Text("Network!")
         }
         Text("")
             .padding()
-        Button(action:{
+        Button(action: {
             self.throwy()
         }) {
             Text("Throw!")
