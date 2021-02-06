@@ -45,20 +45,32 @@ func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error: Error?)
     span.end()
 }
 
+func startHttpSpan(url: URL, method: String) -> Span {
+    // FIXME constants for this stuff
+    let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
+    let span = tracer.spanBuilder(spanName: "HTTP "+method).startSpan()
+    // FIXME http.method, try for http.response_content_length and http.request_content_length
+    span.setAttribute(key: "http.url", value: url.absoluteString)
+    span.setAttribute(key: "http.method", value: method)
+    return span;
+}
+
 extension URLSession {
     // FIXME repeat ad nauseum for all the public *Tasks, but also consider cases where no completion handler is provided
 
     @objc open func swizzled_dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        print("swizzled_dataTask")
-        let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
-        let span = tracer.spanBuilder(spanName: "HTTP GET").startSpan()
-        // FIXME http.method, try for http.response_content_length and http.request_content_length
-        span.setAttribute(key: "http.url", value: url.absoluteString)
-        span.setAttribute(key: "http.method", value: "GET") // for the request: variant this will be dynamic
+        let span = startHttpSpan(url: url, method: "GET")
         return swizzled_dataTask(with: url) {(data, response, error) in
-            print("got swizzled callback")
             // FIXME try/catch equiv
             completionHandler(data, response, error)
+            endHttpSpan(span: span, data: data, response: response, error: error)
+        }
+       }
+    
+    @objc open func swizzled_dataTask(with url: URL) -> URLSessionDataTask {
+        let span = startHttpSpan(url: url, method: "GET")
+        return swizzled_dataTask(with: url) {(data, response, error) in
+            // no user-provided callback, just our own
             endHttpSpan(span: span, data: data, response: response, error: error)
         }
        }
@@ -69,10 +81,22 @@ func initalizeNetworkInstrumentation() {
     // FIXME also use setImplementation and capture, rather than exchangeImpls
     let c = URLSession.self
     // This syntax is obnoxious to differentiate with:request from with:url
-    let orig = class_getInstanceMethod(c, #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask))
-    let swizzled = class_getInstanceMethod(c, #selector(URLSession.swizzled_dataTask(with:completionHandler:)))
+    var orig = class_getInstanceMethod(c, #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask))
+    var swizzled = class_getInstanceMethod(c, #selector(URLSession.swizzled_dataTask(with:completionHandler:)))
     if swizzled != nil && orig != nil {
         method_exchangeImplementations(orig!, swizzled!)
-        print("swizzled the method")
+    } else {
+        // FIXME logging
+        print("warning: couldn't swizzle 1")
     }
+    
+    // FIXME just copy+pasting for now to get a feel for how to factor this stuff
+    orig = class_getInstanceMethod(c, #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask))
+    swizzled = class_getInstanceMethod(c, #selector(URLSession.swizzled_dataTask(with:)))
+    if swizzled != nil && orig != nil {
+        method_exchangeImplementations(orig!, swizzled!)
+    } else {
+        print("warning: couldn't swizzle 2")
+    }
+
 }
