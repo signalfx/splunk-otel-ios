@@ -42,6 +42,33 @@ func ourExceptionHandler(e: NSException) {
 
 }
 
+class GlobalAttributesProcessor : SpanProcessor {
+    var isStartRequired = true
+    
+    var isEndRequired = false
+    
+    var appName: String
+    init() {
+        let app = Bundle.main.infoDictionary?["CFBundleName"] as? String
+        if (app != nil) {
+            appName = app!
+        } else {
+            appName = "unknown-app"
+        }
+    }
+    
+    func onStart(span: ReadableSpan) {
+        span.setAttribute(key: "app", value: appName)
+    }
+    
+    func onEnd(span: ReadableSpan) { }
+    func shutdown() { }
+    func forceFlush() { }
+}
+
+/**
+ Main class for initializing the SplunkRum agent.
+ */
 public class SplunkRum {
     static func initializeUncaughtExceptionReporting() {
         oldExceptionHandler = NSGetUncaughtExceptionHandler()
@@ -58,19 +85,29 @@ public class SplunkRum {
         appStart.setAttribute(key: "os.version", value:UIDevice.current.systemVersion)
         appStart.end()
     }
-    // FIXME options
-    public class func initialize() {
+    /**
+            Initialization function.  Call as early as possible in your application.
+                - Parameter beaconUrl: Destination for the captured data.
+     
+                - Parameter rumAuth: Publicly-visible `rumAuth` value.  Please do not paste any access token or auth value into here, as this will be visible to every user of your app
+     
+     */
+    // FIXME need more optional params, e.g.:
+        // app (override)
+        // globalAttributes
+        // ignoreURLs
+    // FIXME need secure beacons by default (with allowInsecureBeacon)
+    public class func initialize(beaconUrl: String, rumAuth: String) {
         print("SplunkRum.initialize")
         // FIXME more Otel initialization stuff
-        // FIXME need real config for zipkin, etc.
         // FIXME docload / appload!
-        let options = ZipkinTraceExporterOptions(endpoint: "http://127.0.0.1:9080/api/v2/spans", serviceName: "myservice")
+        let options = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
         let zipkin = ZipkinTraceExporter(options: options)
+        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: zipkin))
         initializeUncaughtExceptionReporting()
         initalizeNetworkInstrumentation()
         sendAppStartSpan()
-
         print("SplunkRum initialization done")
     }
     public class func error(e: Any) {

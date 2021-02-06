@@ -11,7 +11,7 @@ import SplunkRum
 @main
 struct TestAppApp: App {
     init() {
-        SplunkRum.initialize()
+        SplunkRum.initialize(beaconUrl: "http://127.0.0.1:9080/api/v2/spans", rumAuth: "FAKE_RUM_AUTH")
     }
     var body: some Scene {
         WindowGroup {
