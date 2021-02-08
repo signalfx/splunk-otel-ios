@@ -8,6 +8,19 @@
 import SwiftUI
 
 struct ContentView: View {
+    func networkRequest() {
+        print("network (req)!")
+        let url = URL(string: "http://127.0.0.1:7878/data")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "HEAD"
+        let task = URLSession.shared.dataTask(with: req) {(data, _: URLResponse?, _) in
+            guard let data = data else { return }
+            print("got some data")
+            print(data)
+
+        }
+        task.resume()
+    }
     func network() {
         print("network!")
         let url = URL(string: "http://127.0.0.1:7878/data")!
@@ -28,7 +41,7 @@ struct ContentView: View {
         Button(action: {
             self.network()
         }) {
-            Text("Network!")
+            Text("Network (url)!")
         }
         Text("")
             .padding()
@@ -36,6 +49,13 @@ struct ContentView: View {
             self.throwy()
         }) {
             Text("Throw!")
+        }
+        Text("")
+            .padding()
+        Button(action: {
+            self.networkRequest()
+        }) {
+            Text("Network (req)!")
         }
     }
 }
