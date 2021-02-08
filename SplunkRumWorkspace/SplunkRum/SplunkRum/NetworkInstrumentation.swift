@@ -48,7 +48,7 @@ func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error: Error?)
 func startHttpSpan(url: URL, method: String) -> Span? {
     // FIXME even without the hardcode, this is a hokey way to supress spans from the zipkin exporter
     if url.absoluteString.contains("auth=") {
-        return nil;
+        return nil
     }
     // FIXME constants for this stuff
     let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
@@ -56,14 +56,14 @@ func startHttpSpan(url: URL, method: String) -> Span? {
     // FIXME http.method, try for http.response_content_length and http.request_content_length
     span.setAttribute(key: "http.url", value: url.absoluteString)
     span.setAttribute(key: "http.method", value: method)
-    return span;
+    return span
 }
 
 func startHttpSpan(request: URLRequest) -> Span? {
     if request.url != nil {
         return startHttpSpan(url: request.url!, method: request.httpMethod ?? "GET")
     }
-    return nil;
+    return nil
 }
 
 extension URLSession {
@@ -79,7 +79,7 @@ extension URLSession {
             }
         }
        }
-    
+
     @objc open func swizzled_dataTask(with url: URL) -> URLSessionDataTask {
         let span = startHttpSpan(url: url, method: "GET")
         return swizzled_dataTask(with: url) {(data, response, error) in
@@ -89,7 +89,7 @@ extension URLSession {
             }
         }
        }
-    
+
     // rename objc view of func to allow "overloading"
     @objc(swizzledDataTaskWithRequest: completionHandler:) open func swizzled_dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         let span = startHttpSpan(request: request)
@@ -101,7 +101,7 @@ extension URLSession {
             }
         }
        }
-    
+
     @objc(swizzledDataTaskWithRequest:) open func swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
         let span = startHttpSpan(request: request)
         return swizzled_dataTask(with: request) {(data, response, error) in
@@ -125,7 +125,7 @@ func initalizeNetworkInstrumentation() {
         // FIXME logging
         print("warning: couldn't swizzle 1")
     }
-    
+
     // FIXME just copy+pasting for now to get a feel for how to factor this stuff
     orig = class_getInstanceMethod(c, #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask))
     swizzled = class_getInstanceMethod(c, #selector(URLSession.swizzled_dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask))
@@ -134,7 +134,7 @@ func initalizeNetworkInstrumentation() {
     } else {
         print("warning: couldn't swizzle 2")
     }
-    
+
     orig = class_getInstanceMethod(c, #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask))
     // @objc(overrrideName) requires a runtime lookup rather than a build-time lookup (seems like a bug in the compiler)
     swizzled = class_getInstanceMethod(c, NSSelectorFromString("swizzledDataTaskWithRequest:completionHandler:"))
@@ -143,7 +143,7 @@ func initalizeNetworkInstrumentation() {
     } else {
         print("warning: couldn't swizzle 3")
     }
-    
+
     orig = class_getInstanceMethod(c, #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask))
     swizzled = class_getInstanceMethod(c, NSSelectorFromString("swizzledDataTaskWithRequest:"))
     if swizzled != nil && orig != nil {
