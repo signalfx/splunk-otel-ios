@@ -42,6 +42,9 @@ func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error: Error?)
         span.setAttribute(key: "error.message", value: error!.localizedDescription)
         // FIXME what else can be divined?
     }
+    if data != nil {
+        span.setAttribute(key: "http.response_content_length_uncompressed", value: data!.count)
+    }
     span.end()
 }
 
