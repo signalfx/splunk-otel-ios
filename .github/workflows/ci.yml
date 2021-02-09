@@ -1,0 +1,14 @@
+name: Continuous Integration
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  full-build:
+    runs-on: macOS-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: fullbuild.sh 
+        run: ./fullbuild.sh
