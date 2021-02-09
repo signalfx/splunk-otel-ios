@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/grpc/grpc-swift.git",
         "state": {
           "branch": null,
-          "revision": "9e464a75079928366aa7041769a271fac89271bf",
-          "version": "1.0.0"
+          "revision": "b83ee1ee2caa0660eb02444977b9b6e353c2adbf",
+          "version": "1.0.0-alpha.12"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/open-telemetry/opentelemetry-swift",
         "state": {
           "branch": null,
-          "revision": "9f2be3e42f8c68c83f6b60494638bb7e89534b11",
-          "version": "0.4.0"
+          "revision": "42da6aeb3ef463da93f201849b2df6148c818b66",
+          "version": "0.5.0"
         }
       },
       {
@@ -26,6 +26,15 @@
           "branch": null,
           "revision": "18c1a35ca966236cee0c5a714a51a73ff33384c1",
           "version": "0.5.2"
+        }
+      },
+      {
+        "package": "swift-atomics",
+        "repositoryURL": "https://github.com/apple/swift-atomics.git",
+        "state": {
+          "branch": null,
+          "revision": "26e346cd64f6b92d4089e7fafe2f8e82f60ddb8c",
+          "version": "0.0.2"
         }
       },
       {
@@ -44,15 +53,6 @@
           "branch": null,
           "revision": "43931b7a7daf8120a487601530c8bc03ce711992",
           "version": "2.25.1"
-        }
-      },
-      {
-        "package": "swift-nio-extras",
-        "repositoryURL": "https://github.com/apple/swift-nio-extras.git",
-        "state": {
-          "branch": null,
-          "revision": "e5b5d191a80667a14827bfeb0ae4a511f7677942",
-          "version": "1.7.0"
         }
       },
       {

@@ -9,6 +9,18 @@ import XCTest
 import SplunkRum
 
 class TestSpan: Span {
+    var isRecording: Bool
+
+    var status: Status
+
+    var scope: Scope?
+
+    func end() {
+    }
+
+    func end(time: Date) {
+    }
+
     public var attrs: [String: String]
     func setAttribute(key: String, value: AttributeValue?) {
         attrs.updateValue(value!.description, forKey: key)
@@ -17,18 +29,15 @@ class TestSpan: Span {
     public init() {
         attrs = Dictionary()
         kind = .internal
-        isRecordingEvents = true
+        isRecording = true
         name = "test"
         description = "test"
         context = SpanContext.invalid
+        status = .unset
     }
     var kind: SpanKind
 
     var context: SpanContext
-
-    var isRecordingEvents: Bool
-
-    var status: Status?
 
     var name: String
 
@@ -42,12 +51,6 @@ class TestSpan: Span {
     }
 
     func addEvent(name: String, attributes: [String: AttributeValue], timestamp: Date) {
-    }
-
-    func addEvent<E>(event: E) where E: Event {
-    }
-
-    func addEvent<E>(event: E, timestamp: Date) where E: Event {
     }
 
     var description: String

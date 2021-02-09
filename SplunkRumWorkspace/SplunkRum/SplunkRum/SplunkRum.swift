@@ -56,7 +56,7 @@ class GlobalAttributesProcessor: SpanProcessor {
         }
     }
 
-    func onStart(span: ReadableSpan) {
+    func onStart(parentContext: SpanContext?, span: ReadableSpan) {
         span.setAttribute(key: "app", value: appName)
     }
 
