@@ -103,15 +103,14 @@ public class SplunkRum {
             Initialization function.  Call as early as possible in your application.
                 - Parameter beaconUrl: Destination for the captured data.
      
-                - Parameter rumAuth: Publicly-visible `rumAuth` value.  Please do not paste any access token or auth value into here, as this will be visible to every user of your app
+                - Parameter rumAuth: Publicly-visible `rumAuth` value.  Please do not paste any other access token or auth value into here, as this will be visible to every user of your app
+                - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
     // FIXME reentrant init (mark inited/prevent double-init)
-    // FIXME need secure beacons by default (with allowInsecureBeacon)
     public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
         print("SplunkRum.initialize")
         // FIXME more Otel initialization stuff
-        // FIXME docload / appload!
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             // FIXME error handling / API
             print("beaconUrl must be https or options: allowInsecureBeacon must be true")

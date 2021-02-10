@@ -85,6 +85,7 @@ extension URLSession {
         }
        }
 
+    // FIXME don't think this is right - delegate-based approach here may get overridden by completion hander?  Needs experimentation
     @objc open func swizzled_dataTask(with url: URL) -> URLSessionDataTask {
         let span = startHttpSpan(url: url, method: "GET")
         return swizzled_dataTask(with: url) {(data, response, error) in
