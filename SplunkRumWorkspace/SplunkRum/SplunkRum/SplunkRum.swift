@@ -66,6 +66,21 @@ class GlobalAttributesProcessor: SpanProcessor {
 }
 
 /**
+ Optional configuration for SplunkRum.initialize()
+ */
+public struct SplunkRumOptions {
+    public init(allowInsecureBeacon: Bool? = false) {
+        self.allowInsecureBeacon = allowInsecureBeacon
+    }
+
+    public var allowInsecureBeacon: Bool?
+    // FIXME need more optional params, e.g.:
+        // app (override)
+        // globalAttributes
+        // ignoreURLs
+}
+
+/**
  Main class for initializing the SplunkRum agent.
  */
 public class SplunkRum {
@@ -91,15 +106,17 @@ public class SplunkRum {
                 - Parameter rumAuth: Publicly-visible `rumAuth` value.  Please do not paste any access token or auth value into here, as this will be visible to every user of your app
      
      */
-    // FIXME need more optional params, e.g.:
-        // app (override)
-        // globalAttributes
-        // ignoreURLs
+    // FIXME reentrant init (mark inited/prevent double-init)
     // FIXME need secure beacons by default (with allowInsecureBeacon)
-    public class func initialize(beaconUrl: String, rumAuth: String) {
+    public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
         print("SplunkRum.initialize")
         // FIXME more Otel initialization stuff
         // FIXME docload / appload!
+        if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
+            // FIXME error handling / API
+            print("beaconUrl must be https or options: allowInsecureBeacon must be true")
+            return
+        }
         let options = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
         let zipkin = ZipkinTraceExporter(options: options)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
