@@ -11,18 +11,17 @@ public func addLinkToSpan(span: Span, valStr: String) {
     if result.count != 1 || result[0].numberOfRanges != 3 {
         return
     }
-    // FIXME more nil checks, etc. through here -> great candidate for unit testing
     let traceId = String(valStr[Range(result[0].range(at: 1), in: valStr)!])
     let spanId = String(valStr[Range(result[0].range(at: 2), in: valStr)!])
     span.setAttribute(key: "link.traceId", value: traceId)
     span.setAttribute(key: "link.spanId", value: spanId)
 }
 
-func endHttpSpan(span: Span?, data: Data?, response: URLResponse?, error: Error?) {
+func endHttpSpan(span: Span?, task: URLSessionTask) {
     if span == nil {
         return
     }
-    let hr: HTTPURLResponse? = response as? HTTPURLResponse
+    let hr: HTTPURLResponse? = task.response as? HTTPURLResponse
     if hr != nil {
         span!.setAttribute(key: "http.status_code", value: hr!.statusCode)
         // Blerg, looks like an iteration here since it is case sensitive and the case insensitive search assumes single value
@@ -40,15 +39,13 @@ func endHttpSpan(span: Span?, data: Data?, response: URLResponse?, error: Error?
             }
         }
     }
-    if error != nil {
+    if task.error != nil {
         span!.setAttribute(key: "error", value: true)
-        span!.setAttribute(key: "error.message", value: error!.localizedDescription)
+        span!.setAttribute(key: "error.message", value: task.error!.localizedDescription)
         // FIXME what else can be divined?
     }
-    // FIXME refactor to use task fields
-    if data != nil {
-        span!.setAttribute(key: "http.response_content_length_uncompressed", value: data!.count)
-    }
+    span!.setAttribute(key: "http.response_content_length_uncompressed", value: Int(task.countOfBytesReceived))
+    // FIXME experiment with countOfBytesSent for upload/POST tasks
     span!.end()
 }
 
@@ -79,16 +76,17 @@ class SessionTaskObserver: NSObject {
         if task == nil {
             return
         }
+        // FIXME debug why delegate form isn't producing spans at the moment
         var span = task2span.object(forKey: task) as? Span
         if span == nil {
             span = startHttpSpan(request: task!.originalRequest)
-            task2span.setObject(span, forKey: task)
+            if span != nil {
+                task2span.setObject(span, forKey: task)
+            }
         }
         if task!.state == .completed {
             endHttpSpan(span: span,
-                        data: nil,
-                        response: task!.response,
-                        error: task!.error)
+                        task: task!)
         }
     }
 }

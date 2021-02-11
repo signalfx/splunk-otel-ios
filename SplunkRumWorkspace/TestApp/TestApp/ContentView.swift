@@ -80,7 +80,7 @@ class MySessionDelegate: NSObject, URLSessionDelegate, URLSessionDataDelegate, U
 }
 
 struct ContentView: View {
-    weak var delegate: URLSessionDelegate? = MySessionDelegate()
+    var delegate: URLSessionDelegate? = MySessionDelegate()
     func networkRequest() {
         print("network (req)!")
         let url = URL(string: "http://127.0.0.1:7878/data")!
