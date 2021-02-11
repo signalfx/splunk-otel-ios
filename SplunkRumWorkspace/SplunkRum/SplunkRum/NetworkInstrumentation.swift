@@ -18,10 +18,13 @@ public func addLinkToSpan(span: Span, valStr: String) {
     span.setAttribute(key: "link.spanId", value: spanId)
 }
 
-func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error: Error?) {
+func endHttpSpan(span: Span?, data: Data?, response: URLResponse?, error: Error?) {
+    if span == nil {
+        return
+    }
     let hr: HTTPURLResponse? = response as? HTTPURLResponse
     if hr != nil {
-        span.setAttribute(key: "http.status_code", value: hr!.statusCode)
+        span!.setAttribute(key: "http.status_code", value: hr!.statusCode)
         // Blerg, looks like an iteration here since it is case sensitive and the case insensitive search assumes single value
         for (key, val) in hr!.allHeaderFields {
             let keyStr = key as? String
@@ -30,7 +33,7 @@ func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error: Error?)
                     let valStr = val as? String
                     if valStr != nil {
                         if valStr!.starts(with: "traceparent") {
-                            addLinkToSpan(span: span, valStr: valStr!)
+                            addLinkToSpan(span: span!, valStr: valStr!)
                         }
                     }
                 }
@@ -38,18 +41,24 @@ func endHttpSpan(span: Span, data: Data?, response: URLResponse?, error: Error?)
         }
     }
     if error != nil {
-        span.setAttribute(key: "error", value: true)
-        span.setAttribute(key: "error.message", value: error!.localizedDescription)
+        span!.setAttribute(key: "error", value: true)
+        span!.setAttribute(key: "error.message", value: error!.localizedDescription)
         // FIXME what else can be divined?
     }
+    // FIXME refactor to use task fields
     if data != nil {
-        span.setAttribute(key: "http.response_content_length_uncompressed", value: data!.count)
+        span!.setAttribute(key: "http.response_content_length_uncompressed", value: data!.count)
     }
-    span.end()
+    span!.end()
 }
 
-func startHttpSpan(url: URL, method: String) -> Span? {
-    // FIXME even without the hardcode, this is a hokey way to supress spans from the zipkin exporter
+func startHttpSpan(request: URLRequest?) -> Span? {
+    if request == nil || request?.url == nil {
+        return nil
+    }
+    let url = request!.url!
+    let method = request!.httpMethod ?? "GET"
+    // FIXME even without the hardcode, this is a terrible way to supress spans from the zipkin exporter
     if url.absoluteString.contains("auth=") {
         return nil
     }
@@ -61,12 +70,32 @@ func startHttpSpan(url: URL, method: String) -> Span? {
     span.setAttribute(key: "http.method", value: method)
     return span
 }
+class SessionTaskObserver: NSObject {
+    // FIXME multithreading here and with span api itself
+    let task2span = NSMapTable<URLSessionTask, AnyObject>.weakToStrongObjects()
 
-func startHttpSpan(request: URLRequest) -> Span? {
-    if request.url != nil {
-        return startHttpSpan(url: request.url!, method: request.httpMethod ?? "GET")
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        let task = object as? URLSessionTask
+        if task == nil {
+            return
+        }
+        var span = task2span.object(forKey: task) as? Span
+        if span == nil {
+            span = startHttpSpan(request: task!.originalRequest)
+            task2span.setObject(span, forKey: task)
+        }
+        if task!.state == .completed {
+            endHttpSpan(span: span,
+                        data: nil,
+                        response: task!.response,
+                        error: task!.error)
+        }
     }
-    return nil
+}
+let TheSessionTaskObserver = SessionTaskObserver() // stateless
+
+func wireUpTaskObserver(task: URLSessionTask) {
+    task.addObserver(TheSessionTaskObserver, forKeyPath: "state", options: .new, context: nil)
 }
 
 extension URLSession {
@@ -75,47 +104,28 @@ extension URLSession {
 
     // FIXME none of these actually check for http(s)-ness
     @objc open func swizzled_dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        let span = startHttpSpan(url: url, method: "GET")
-        return swizzled_dataTask(with: url) {(data, response, error) in
-            // FIXME try/catch equiv
-            completionHandler(data, response, error)
-            if span != nil {
-                endHttpSpan(span: span!, data: data, response: response, error: error)
-            }
-        }
+        let answer = swizzled_dataTask(with: url, completionHandler: completionHandler)
+        wireUpTaskObserver(task: answer)
+        return answer
        }
 
-    // FIXME don't think this is right - delegate-based approach here may get overridden by completion hander?  Needs experimentation
     @objc open func swizzled_dataTask(with url: URL) -> URLSessionDataTask {
-        let span = startHttpSpan(url: url, method: "GET")
-        return swizzled_dataTask(with: url) {(data, response, error) in
-            // no user-provided callback, just our own
-            if span != nil {
-                endHttpSpan(span: span!, data: data, response: response, error: error)
-            }
-        }
+        let answer = swizzled_dataTask(with: url)
+        wireUpTaskObserver(task: answer)
+        return answer
        }
 
     // rename objc view of func to allow "overloading"
     @objc(swizzledDataTaskWithRequest: completionHandler:) open func swizzled_dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        let span = startHttpSpan(request: request)
-        return swizzled_dataTask(with: request) {(data, response, error) in
-            // FIXME try/catch equiv
-            completionHandler(data, response, error)
-            if span != nil {
-                endHttpSpan(span: span!, data: data, response: response, error: error)
-            }
-        }
+        let answer = swizzled_dataTask(with: request, completionHandler: completionHandler)
+        wireUpTaskObserver(task: answer)
+        return answer
        }
 
     @objc(swizzledDataTaskWithRequest:) open func swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
-        let span = startHttpSpan(request: request)
-        return swizzled_dataTask(with: request) {(data, response, error) in
-            // no user-provided callback, just our own
-            if span != nil {
-                endHttpSpan(span: span!, data: data, response: response, error: error)
-            }
-        }
+        let answer = swizzled_dataTask(with: request)
+        wireUpTaskObserver(task: answer)
+        return answer
        }
 }
 
@@ -149,7 +159,7 @@ func initalizeNetworkInstrumentation() {
             swizzled: NSSelectorFromString("swizzledDataTaskWithRequest:completionHandler:"))
 
     swizzle(clazz: urlsession,
-            orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask),
+            orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDataTask),
             swizzled: NSSelectorFromString("swizzledDataTaskWithRequest:"))
 
 }
