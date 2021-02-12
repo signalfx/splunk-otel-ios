@@ -127,8 +127,29 @@ extension URLSession {
         return answer
        }
 
+    // uploads
     @objc open func swizzled_uploadTask(with: URLRequest, from: Data) -> URLSessionUploadTask {
         let answer = swizzled_uploadTask(with: with, from: from)
+        wireUpTaskObserver(task: answer)
+        return answer
+    }
+    @objc open func swizzled_uploadTask(with: URLRequest, from: Data, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+        let answer = swizzled_uploadTask(with: with, from: from, completionHandler: completionHandler)
+        wireUpTaskObserver(task: answer)
+        return answer
+    }
+    @objc open func swizzled_uploadTask(with: URLRequest, fromFile: URL) -> URLSessionUploadTask {
+        let answer = swizzled_uploadTask(with: with, fromFile: fromFile)
+        wireUpTaskObserver(task: answer)
+        return answer
+    }
+    @objc open func swizzled_uploadTask(with: URLRequest, fromFile: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+        let answer = swizzled_uploadTask(with: with, fromFile: fromFile, completionHandler: completionHandler)
+        wireUpTaskObserver(task: answer)
+        return answer
+    }
+    @objc open func swizzled_uploadTask(withStreamedRequest: URLRequest) -> URLSessionUploadTask {
+        let answer = swizzled_uploadTask(withStreamedRequest: withStreamedRequest)
         wireUpTaskObserver(task: answer)
         return answer
     }
@@ -170,5 +191,17 @@ func initalizeNetworkInstrumentation() {
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.uploadTask(with:from:)),
             swizzled: #selector(URLSession.swizzled_uploadTask(with:from:)))
+    swizzle(clazz: urlsession,
+            orig: #selector(URLSession.uploadTask(with:from:completionHandler:)),
+            swizzled: #selector(URLSession.swizzled_uploadTask(with:from:completionHandler:)))
+    swizzle(clazz: urlsession,
+            orig: #selector(URLSession.uploadTask(with:fromFile:)),
+            swizzled: #selector(URLSession.swizzled_uploadTask(with:fromFile:)))
+    swizzle(clazz: urlsession,
+            orig: #selector(URLSession.uploadTask(with:fromFile:completionHandler:)),
+            swizzled: #selector(URLSession.swizzled_uploadTask(with:fromFile:completionHandler:)))
+    swizzle(clazz: urlsession,
+            orig: #selector(URLSession.uploadTask(withStreamedRequest:)),
+            swizzled: #selector(URLSession.swizzled_uploadTask(withStreamedRequest:)))
 
 }
