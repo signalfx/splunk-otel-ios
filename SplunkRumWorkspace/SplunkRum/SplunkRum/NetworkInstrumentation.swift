@@ -45,7 +45,9 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
         // FIXME what else can be divined?
     }
     span!.setAttribute(key: "http.response_content_length_uncompressed", value: Int(task.countOfBytesReceived))
-    // FIXME experiment with countOfBytesSent for upload/POST tasks
+    if task.countOfBytesSent != 0 {
+        span!.setAttribute(key: "http.request_content_length", value: Int(task.countOfBytesSent))
+    }
     span!.end()
 }
 
@@ -62,7 +64,6 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     // FIXME constants for this stuff
     let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
     let span = tracer.spanBuilder(spanName: "HTTP "+method).startSpan()
-    // FIXME http.method, try for http.response_content_length and http.request_content_length
     span.setAttribute(key: "http.url", value: url.absoluteString)
     span.setAttribute(key: "http.method", value: method)
     return span
@@ -125,6 +126,12 @@ extension URLSession {
         wireUpTaskObserver(task: answer)
         return answer
        }
+
+    @objc open func swizzled_uploadTask(with: URLRequest, from: Data) -> URLSessionUploadTask {
+        let answer = swizzled_uploadTask(with: with, from: from)
+        wireUpTaskObserver(task: answer)
+        return answer
+    }
 }
 
 // FIXME use setImplementation and capture, rather than exchangeImpl
@@ -159,5 +166,9 @@ func initalizeNetworkInstrumentation() {
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDataTask),
             swizzled: NSSelectorFromString("swizzledDataTaskWithRequest:"))
+
+    swizzle(clazz: urlsession,
+            orig: #selector(URLSession.uploadTask(with:from:)),
+            swizzled: #selector(URLSession.swizzled_uploadTask(with:from:)))
 
 }

@@ -119,6 +119,13 @@ struct ContentView: View {
         }
         task.resume()
     }
+    func upload() {
+        print("upload")
+        let data = "this is my POST data".data(using: .utf8)!
+        var req = URLRequest(url: URL(string: "http://127.0.0.1:7878/data")!)
+        req.httpMethod = "POST"
+        URLSession.shared.uploadTask(with: req, from: data).resume()
+    }
 
     var body: some View {
         Button(action: {
@@ -146,6 +153,13 @@ struct ContentView: View {
             self.networkDelegate()
         }) {
             Text("Network (delegate)!")
+        }
+        Text("")
+            .padding()
+        Button(action: {
+            self.upload()
+        }) {
+            Text("upload!")
         }
     }
 }
