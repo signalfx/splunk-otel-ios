@@ -80,7 +80,7 @@ class MySessionDelegate: NSObject, URLSessionDelegate, URLSessionDataDelegate, U
 }
 
 struct ContentView: View {
-    var delegate: URLSessionDelegate? = MySessionDelegate()
+    let delegate: URLSessionDelegate? = MySessionDelegate()
     func networkRequest() {
         print("network (req)!")
         let url = URL(string: "http://127.0.0.1:7878/data")!
@@ -111,11 +111,12 @@ struct ContentView: View {
     }
     func networkDelegate() {
         let sess = URLSession(configuration: URLSessionConfiguration.default, delegate: delegate, delegateQueue: nil)
-        let task = sess.dataTask(with: URL(string: "http://127.0.0.1:7878/data")!)
-        do {
-            sleep(1)
+        let task = sess.dataTask(with: URL(string: "http://127.0.0.1:7878/data")!) {(data, _: URLResponse?, _) in
+            guard let data = data else { return }
+            print("got some data")
+            print(data)
+
         }
-        print("resume task now")
         task.resume()
     }
 

@@ -76,12 +76,12 @@ class SessionTaskObserver: NSObject {
         if task == nil {
             return
         }
-        // FIXME debug why delegate form isn't producing spans at the moment
-        var span = task2span.object(forKey: task) as? Span
+        let key = task!
+        var span = task2span.object(forKey: key) as? Span
         if span == nil {
             span = startHttpSpan(request: task!.originalRequest)
             if span != nil {
-                task2span.setObject(span, forKey: task)
+                task2span.setObject(span, forKey: key)
             }
         }
         if task!.state == .completed {
