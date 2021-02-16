@@ -14,6 +14,8 @@
 		86260EEA25CDC27F009F3CB1 /* libZipkinExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 86260EE925CDC27F009F3CB1 /* libZipkinExporter */; };
 		86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F0E25CDC407009F3CB1 /* SplunkRum.swift */; };
 		86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */; };
+		865A5CA125DC33EF003A1E5A /* NetworkInstrumentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */; };
+		865A5CA625DC34D8003A1E5A /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 865A5CA525DC34D8003A1E5A /* Swifter */; };
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +37,7 @@
 		86260ED425CDC1DE009F3CB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86260F0E25CDC407009F3CB1 /* SplunkRum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplunkRum.swift; sourceTree = "<group>"; };
 		86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerTimingTests.swift; sourceTree = "<group>"; };
+		865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentationTests.swift; sourceTree = "<group>"; };
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -54,6 +57,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				86260ECE25CDC1DE009F3CB1 /* SplunkRum.framework in Frameworks */,
+				865A5CA625DC34D8003A1E5A /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,6 +98,7 @@
 			children = (
 				86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */,
 				86260ED425CDC1DE009F3CB1 /* Info.plist */,
+				865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */,
 			);
 			path = SplunkRumTests;
 			sourceTree = "<group>";
@@ -149,6 +154,9 @@
 				86260ED025CDC1DE009F3CB1 /* PBXTargetDependency */,
 			);
 			name = SplunkRumTests;
+			packageProductDependencies = (
+				865A5CA525DC34D8003A1E5A /* Swifter */,
+			);
 			productName = SplunkRumTests;
 			productReference = 86260ECD25CDC1DE009F3CB1 /* SplunkRumTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -183,6 +191,7 @@
 			mainGroup = 86260EBA25CDC1DE009F3CB1;
 			packageReferences = (
 				86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */,
+				865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */,
 			);
 			productRefGroup = 86260EC525CDC1DE009F3CB1 /* Products */;
 			projectDirPath = "";
@@ -226,6 +235,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */,
+				865A5CA125DC33EF003A1E5A /* NetworkInstrumentationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -495,6 +505,14 @@
 				minimumVersion = 0.5.0;
 			};
 		};
+		865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/httpswift/swifter.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -512,6 +530,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = libZipkinExporter;
+		};
+		865A5CA525DC34D8003A1E5A /* Swifter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */;
+			productName = Swifter;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
