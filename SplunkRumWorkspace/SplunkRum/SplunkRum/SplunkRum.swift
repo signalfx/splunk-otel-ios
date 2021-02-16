@@ -99,6 +99,10 @@ public class SplunkRum {
         appStart.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
         appStart.end()
     }
+    // FIXME multithreading
+    static var initialized = false
+    static var initializing = false
+    
     /**
             Initialization function.  Call as early as possible in your application.
                 - Parameter beaconUrl: Destination for the captured data.
@@ -107,8 +111,16 @@ public class SplunkRum {
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
-    // FIXME reentrant init (mark inited/prevent double-init)
     public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
+        if (initialized || initializing) {
+            // FIXME error handling, logging, etc.
+            print("SplunkRum already initializ{ed,ing}")
+            return
+        }
+        initializing = true
+        defer {
+            initializing = false
+        }
         print("SplunkRum.initialize")
         // FIXME more Otel initialization stuff
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
@@ -123,6 +135,7 @@ public class SplunkRum {
         initializeUncaughtExceptionReporting()
         initalizeNetworkInstrumentation()
         sendAppStartSpan()
+        initialized = true
         print("SplunkRum initialization done")
     }
     public class func error(e: Any) {
