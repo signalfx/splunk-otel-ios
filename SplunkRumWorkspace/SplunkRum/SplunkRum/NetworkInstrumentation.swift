@@ -68,39 +68,39 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     span.setAttribute(key: "http.method", value: method)
     return span
 }
+
 class SessionTaskObserver: NSObject {
-    // FIXME multithreading here and with span api itself
-    let task2span = NSMapTable<URLSessionTask, AnyObject>.weakToStrongObjects()
+    var span: Span? = nil
+    override init() {
+        super.init()
+        observers.setObject(self, forKey: self)
+    }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         let task = object as? URLSessionTask
         if task == nil {
             return
         }
-        let key = task!
-        var span = task2span.object(forKey: key) as? Span
         if span == nil {
             span = startHttpSpan(request: task!.originalRequest)
-            if span != nil {
-                task2span.setObject(span, forKey: key)
-            }
         }
         if task!.state == .completed {
             endHttpSpan(span: span,
                         task: task!)
+            task!.removeObserver(self, forKeyPath: "state")
+            observers.removeObject(forKey: self)
         }
     }
 }
-let TheSessionTaskObserver = SessionTaskObserver() // stateless
+// FIXME multi-threading, cleaner way to do this?
+let observers = NSMapTable<SessionTaskObserver, SessionTaskObserver>.strongToStrongObjects()
 
 func wireUpTaskObserver(task: URLSessionTask) {
-    task.addObserver(TheSessionTaskObserver, forKeyPath: "state", options: .new, context: nil)
+    task.addObserver(SessionTaskObserver(), forKeyPath: "state", options: .new, context: nil)
 }
 
 extension URLSession {
-    // FIXME 6 downloadTask
-    // FIXME 5 uploadTask
-
+    
     // FIXME none of these actually check for http(s)-ness
     @objc open func swizzled_dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         let answer = swizzled_dataTask(with: url, completionHandler: completionHandler)
