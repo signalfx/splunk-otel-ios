@@ -14,6 +14,7 @@
 		86260EEA25CDC27F009F3CB1 /* libZipkinExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 86260EE925CDC27F009F3CB1 /* libZipkinExporter */; };
 		86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F0E25CDC407009F3CB1 /* SplunkRum.swift */; };
 		86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */; };
+		8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */; };
 		865A5CA125DC33EF003A1E5A /* NetworkInstrumentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */; };
 		865A5CA625DC34D8003A1E5A /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 865A5CA525DC34D8003A1E5A /* Swifter */; };
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
@@ -37,6 +38,7 @@
 		86260ED425CDC1DE009F3CB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86260F0E25CDC407009F3CB1 /* SplunkRum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplunkRum.swift; sourceTree = "<group>"; };
 		86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerTimingTests.swift; sourceTree = "<group>"; };
+		8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentationUtils.swift; sourceTree = "<group>"; };
 		865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentationTests.swift; sourceTree = "<group>"; };
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -89,6 +91,7 @@
 				86260EC725CDC1DE009F3CB1 /* SplunkRum.h */,
 				86260EC825CDC1DE009F3CB1 /* Info.plist */,
 				86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */,
+				8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -225,6 +228,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
 			);

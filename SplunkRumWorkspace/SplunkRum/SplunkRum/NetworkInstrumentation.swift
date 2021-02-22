@@ -70,7 +70,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 }
 
 class SessionTaskObserver: NSObject {
-    var span: Span? = nil
+    var span: Span?
     override init() {
         super.init()
         observers.setObject(self, forKey: self)
@@ -100,7 +100,7 @@ func wireUpTaskObserver(task: URLSessionTask) {
 }
 
 extension URLSession {
-    
+
     // FIXME none of these actually check for http(s)-ness
     @objc open func swizzled_dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         let answer = swizzled_dataTask(with: url, completionHandler: completionHandler)

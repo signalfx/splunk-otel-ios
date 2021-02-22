@@ -54,10 +54,12 @@ class GlobalAttributesProcessor: SpanProcessor {
         } else {
             appName = "unknown-app"
         }
+
     }
 
     func onStart(parentContext: SpanContext?, span: ReadableSpan) {
         span.setAttribute(key: "app", value: appName)
+        addPreSpanFields(span: span)
     }
 
     func onEnd(span: ReadableSpan) { }
@@ -102,7 +104,7 @@ public class SplunkRum {
     // FIXME multithreading
     static var initialized = false
     static var initializing = false
-    
+
     /**
             Initialization function.  Call as early as possible in your application.
                 - Parameter beaconUrl: Destination for the captured data.
@@ -112,7 +114,7 @@ public class SplunkRum {
      
      */
     public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
-        if (initialized || initializing) {
+        if initialized || initializing {
             // FIXME error handling, logging, etc.
             print("SplunkRum already initializ{ed,ing}")
             return
