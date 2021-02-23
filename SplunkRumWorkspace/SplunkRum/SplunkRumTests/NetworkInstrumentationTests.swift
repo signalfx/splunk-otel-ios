@@ -10,7 +10,7 @@ struct TestZipkinSpan: Decodable {
 class NetworkInstrumentationTests: XCTestCase {
     func testBasics() throws {
         try initializeTestEnvironment()
-        
+
         // Not going to exhaustively test all the api variations, particularly since
         // they all flow through the same bit of code
         URLSession.shared.dataTask(with: URL(string: "http://127.0.0.1:8989/data")!) { (_, _: URLResponse?, _) in

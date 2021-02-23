@@ -52,7 +52,7 @@ func reportErrorErrorSpan(e: Error) {
     let now = Date()
     let span = tracer.spanBuilder(spanName: "UncaughtException").setStartTime(time: now).startSpan()
     print("TYPE OF ERROR "+String(describing: type(of: e)))
-    span.setAttribute(key: "error", value: true)    
+    span.setAttribute(key: "error", value: true)
     let className = objectTypeName(o: e as NSObject)
     if className != nil {
         span.setAttribute(key: "error.name", value: className!)
@@ -73,4 +73,3 @@ func reportStringErrorSpan(e: String) {
     span.setAttribute(key: "error.message", value: e)
     span.end(time: now)
 }
-

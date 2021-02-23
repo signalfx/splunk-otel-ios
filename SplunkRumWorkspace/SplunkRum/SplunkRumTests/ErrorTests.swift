@@ -10,11 +10,11 @@ import XCTest
 import SplunkRum
 
 class ErrorTests: XCTestCase {
-    enum EnumError : Error {
+    enum EnumError: Error {
         case ExampleError
     }
-    class ClassError : Error {
-        
+    class ClassError: Error {
+
     }
     func testBasics() throws {
         try initializeTestEnvironment()
@@ -22,7 +22,7 @@ class ErrorTests: XCTestCase {
         SplunkRum.reportError(error: EnumError.ExampleError)
 //        SplunkRum.reportError(error: ClassError())
         SplunkRum.reportError(exception: NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil))
-        
+
         print("sleeping to wait for span batch, don't worry about the pause...")
         sleep(8)
         print(receivedSpans as Any)
@@ -35,7 +35,7 @@ class ErrorTests: XCTestCase {
         let eExc = receivedSpans.first(where: { (span) -> Bool in
             return span.tags["error.message"] == "Could not parse input"
         })
-        
+
         XCTAssertNotNil(eStr)
         XCTAssertEqual(eStr?.tags["error"], "true")
         XCTAssertEqual(eStr?.tags["error.name"], "String")
@@ -49,4 +49,3 @@ class ErrorTests: XCTestCase {
 
     }
 }
-
