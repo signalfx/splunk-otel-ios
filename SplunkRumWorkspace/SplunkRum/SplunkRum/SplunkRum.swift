@@ -4,43 +4,6 @@ import OpenTelemetrySdk
 import ZipkinExporter
 import UIKit
 
-func reportExceptionSpan(e: NSException) throws {
-    print(UIApplication.shared.windows[0].description)
-    print(UIApplication.shared.windows[0].value(forKey: "recursiveDescription")!)
-    // FIXME decide on instr name/version
-    // FIXME versioning in config somewhere
-    let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
-    let span = tracer.spanBuilder(spanName: "UncaughtException").startSpan()
-    span.setAttribute(key: "error", value: true)
-    span.setAttribute(key: "error.name", value: e.name.rawValue)
-    if e.reason != nil {
-        span.setAttribute(key: "error.message", value: e.reason!)
-    }
-    let stack = e.callStackSymbols.joined(separator: "\n")
-    if !stack.isEmpty {
-        span.setAttribute(key: "error.stack", value: stack)
-    }
-
-    // FIXME make instantenous, end time / EndSpanOptions (only way to do this is to pass now to start)
-    span.end()
-    // App likely crashing now; last-ditch effort to force-flush
-    OpenTelemetrySDK.instance.tracerProvider.forceFlush()
-}
-
-var oldExceptionHandler: ((NSException) -> Void)?
-func ourExceptionHandler(e: NSException) {
-    print("Got an exception")
-    do {
-        try reportExceptionSpan(e: e)
-    } catch {
-        // swallow e2
-    }
-    if oldExceptionHandler != nil {
-        oldExceptionHandler!(e)
-    }
-
-}
-
 class GlobalAttributesProcessor: SpanProcessor {
     var isStartRequired = true
 
@@ -86,11 +49,6 @@ public struct SplunkRumOptions {
  Main class for initializing the SplunkRum agent.
  */
 public class SplunkRum {
-    static func initializeUncaughtExceptionReporting() {
-        oldExceptionHandler = NSGetUncaughtExceptionHandler()
-        NSSetUncaughtExceptionHandler(ourExceptionHandler(e:))
-    }
-
     private class func processStartTime() throws -> Date {
         let name = "kern.proc.pid"
         var len: size_t = 4
@@ -168,9 +126,11 @@ public class SplunkRum {
         initialized = true
         print("SplunkRum initialization done")
     }
+    /**
+            Convenience function for reporting an error.
+            - Parameter e: May be a String, Error, or NSException.  Other types are ignored for now
+     */
     public class func error(e: Any) {
-        // FIXME type switch and send error.
-        // Likely types to support: NSException, NSError, String, String[]
-
+        reportErrorSpan(e: e)
     }
 }
