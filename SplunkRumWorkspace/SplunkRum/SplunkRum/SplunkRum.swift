@@ -128,9 +128,20 @@ public class SplunkRum {
     }
     /**
             Convenience function for reporting an error.
-            - Parameter e: May be a String, Error, or NSException.  Other types are ignored for now
      */
-    public class func error(e: Any) {
-        reportErrorSpan(e: e)
+    public class func reportError(string: String) {
+        reportStringErrorSpan(e: string)
+    }
+    /**
+            Convenience function for reporting an error.
+     */
+    public class func reportError(exception: NSException) {
+        reportExceptionErrorSpan(e: exception)
+    }
+    /**
+            Convenience function for reporting an error.
+     */
+    public class func reportError(error: Error) {
+        reportErrorErrorSpan(e: error)
     }
 }

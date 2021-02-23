@@ -9,7 +9,10 @@ import Foundation
 import OpenTelemetrySdk
 import OpenTelemetryApi
 
-func reportExceptionSpan(e: NSException) {
+// FIXME fix span names throughout
+// FIXME add component= to all spans
+// FIXME differentiate between reaching here from the uncaught handler vs manual SplunkRum.error call
+func reportExceptionErrorSpan(e: NSException) {
     // FIXME decide on instr name/version
     // FIXME versioning in config somewhere
     let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
@@ -32,7 +35,7 @@ func reportExceptionSpan(e: NSException) {
 var oldExceptionHandler: ((NSException) -> Void)?
 func ourExceptionHandler(e: NSException) {
     print("Got an exception")
-    reportExceptionSpan(e: e)
+    reportExceptionErrorSpan(e: e)
     if oldExceptionHandler != nil {
         oldExceptionHandler!(e)
     }
@@ -48,10 +51,14 @@ func reportErrorErrorSpan(e: Error) {
     let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
     let now = Date()
     let span = tracer.spanBuilder(spanName: "UncaughtException").setStartTime(time: now).startSpan()
-    span.setAttribute(key: "error", value: true)
+    print("TYPE OF ERROR "+String(describing: type(of: e)))
+    span.setAttribute(key: "error", value: true)    
     let className = objectTypeName(o: e as NSObject)
     if className != nil {
         span.setAttribute(key: "error.name", value: className!)
+    } else {
+        // FIXME try using this more often...
+        span.setAttribute(key: "error.name", value: String(describing: type(of: e)))
     }
     span.setAttribute(key: "error.message", value: e.localizedDescription)
     span.end(time: now)
@@ -67,20 +74,3 @@ func reportStringErrorSpan(e: String) {
     span.end(time: now)
 }
 
-func reportErrorSpan(e: Any) {
-    let eException = e as? NSException
-    if eException != nil {
-        reportExceptionSpan(e: eException!)
-        return
-    }
-    let eError = e as? Error
-    if eError != nil {
-        reportErrorErrorSpan(e: eError!)
-        return
-    }
-    let eString = e as? String
-    if eString != nil {
-        reportStringErrorSpan(e: eString!)
-    }
-
-}

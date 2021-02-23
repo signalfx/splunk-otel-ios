@@ -1,7 +1,5 @@
 import Foundation
 import XCTest
-import Swifter
-import SplunkRum
 
 // Fake span structure for JSONDecoder, only care about tags at the moment
 struct TestZipkinSpan: Decodable {
@@ -10,24 +8,9 @@ struct TestZipkinSpan: Decodable {
 }
 
 class NetworkInstrumentationTests: XCTestCase {
-    func testStuff() throws {
-        let server = HttpServer()
-        server["/data"] = { _ in
-            return HttpResponse.ok(.text("here is some data"))
-        }
-        var spans: [TestZipkinSpan]?
-        server["/v1/traces"] = { request in
-            spans = try! JSONDecoder().decode([TestZipkinSpan].self, from: Data(request.body))
-            return HttpResponse.ok(.text("ok"))
-        }
-        server["/error"] = { _ in
-            return HttpResponse.internalServerError
-        }
-        try server.start(8989)
-        defer { server.stop() }
-
-        SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: SplunkRumOptions(allowInsecureBeacon: true))
-
+    func testBasics() throws {
+        try initializeTestEnvironment()
+        
         // Not going to exhaustively test all the api variations, particularly since
         // they all flow through the same bit of code
         URLSession.shared.dataTask(with: URL(string: "http://127.0.0.1:8989/data")!) { (_, _: URLResponse?, _) in
@@ -40,18 +23,13 @@ class NetworkInstrumentationTests: XCTestCase {
         // FIXME config option to dial back the batch period
         print("sleeping to wait for span batch, don't worry about the pause...")
         sleep(8)
-        print(spans as Any)
-        let appStart = spans?.first(where: { (span) -> Bool in
-            return span.name == "AppStart"
-        })
-        let httpGet = spans?.first(where: { (span) -> Bool in
+        print(receivedSpans as Any)
+        let httpGet = receivedSpans.first(where: { (span) -> Bool in
             return span.name == "HTTP GET"
         })
-        let httpPost = spans?.first(where: { (span) -> Bool in
+        let httpPost = receivedSpans.first(where: { (span) -> Bool in
             return span.name == "HTTP POST"
         })
-        XCTAssertEqual(3, spans?.count)
-        XCTAssertNotNil(appStart) // FIXME might as well assert some of these too
 
         XCTAssertNotNil(httpGet)
         XCTAssertEqual(httpGet?.tags["http.url"], "http://127.0.0.1:8989/data")
