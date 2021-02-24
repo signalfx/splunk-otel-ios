@@ -27,7 +27,7 @@ private func addUIFields(span: ReadableSpan) {
         let vc = wins[wins.count-1].rootViewController
         if vc != nil {
             // FIXME demangle swift names
-            span.setAttribute(key: "screen.name", value: String(describing: type(of: vc)))
+            span.setAttribute(key: "screen.name", value: String(describing: type(of: vc!)))
             // FIXME SwiftUI UIHostingController vc when cast has a "rootView" var which does
             // not appear to be accessible generically
         }
