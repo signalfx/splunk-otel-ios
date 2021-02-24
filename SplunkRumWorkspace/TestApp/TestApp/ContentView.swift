@@ -118,6 +118,11 @@ struct ContentView: View {
         NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil).raise()
         print("should not reach here")
     }
+    func throwyBackgroundThread() {
+        DispatchQueue.global(qos: .background).async {
+            NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil).raise()
+        }
+    }
     func networkDelegate() {
         let sess = URLSession(configuration: URLSessionConfiguration.default, delegate: delegate, delegateQueue: nil)
         let task = sess.dataTask(with: URL(string: "http://127.0.0.1:7878/data")!) {(data, _: URLResponse?, _) in
@@ -137,38 +142,37 @@ struct ContentView: View {
     }
 
     var body: some View {
+        VStack {
         Button(action: {
             self.network()
         }) {
             Text("Network (url)!")
         }
-        Text("")
-            .padding()
         Button(action: {
             self.throwy()
         }) {
             Text("Throw!")
         }
-        Text("")
-            .padding()
+        Button(action: {
+            self.throwyBackgroundThread()
+        }) {
+            Text("Throw (bg)!")
+        }
         Button(action: {
             self.networkRequest()
         }) {
             Text("Network (req)!")
         }
-        Text("")
-            .padding()
         Button(action: {
             self.networkDelegate()
         }) {
             Text("Network (delegate)!")
         }
-        Text("")
-            .padding()
         Button(action: {
             self.upload()
         }) {
             Text("upload!")
+        }
         }
     }
 }

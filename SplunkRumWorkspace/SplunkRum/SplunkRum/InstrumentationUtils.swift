@@ -21,6 +21,7 @@ import OpenTelemetrySdk
 
 private func addUIFields(span: ReadableSpan) {
     // FIXME threading - SplunkRum initialization and AppStart can happen before UI is initialized
+    // FIXME threading even worse - must be used from main thread; probably need to listen for changes and cache (currently works but produces warning messages)
     let wins = UIApplication.shared.windows
     if !wins.isEmpty {
         // windows are arranged in z-order, with topmost (e.g. popover) being the last in array
