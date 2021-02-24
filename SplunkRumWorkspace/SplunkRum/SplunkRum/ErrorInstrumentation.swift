@@ -9,15 +9,11 @@ import Foundation
 import OpenTelemetrySdk
 import OpenTelemetryApi
 
-// FIXME fix span names throughout
-// FIXME add component= to all spans
-// FIXME differentiate between reaching here from the uncaught handler vs manual SplunkRum.error call
-func reportExceptionErrorSpan(e: NSException) {
-    // FIXME decide on instr name/version
-    // FIXME versioning in config somewhere
+// FIXME add component= to all spans?
+func reportExceptionErrorSpan(e: NSException, manuallyReported: Bool) {
     let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
     let now = Date()
-    let span = tracer.spanBuilder(spanName: "UncaughtException").setStartTime(time: now).startSpan()
+    let span = tracer.spanBuilder(spanName: manuallyReported ? "SplunkRum.reportError" : "UncaughtException").setStartTime(time: now).startSpan()
     span.setAttribute(key: "error", value: true)
     span.setAttribute(key: "error.name", value: e.name.rawValue)
     if e.reason != nil {
@@ -29,13 +25,15 @@ func reportExceptionErrorSpan(e: NSException) {
     }
     span.end(time: now)
     // App likely crashing now; last-ditch effort to force-flush
-    OpenTelemetrySDK.instance.tracerProvider.forceFlush()
+    if !manuallyReported {
+        OpenTelemetrySDK.instance.tracerProvider.forceFlush()
+    }
 }
 
 var oldExceptionHandler: ((NSException) -> Void)?
 func ourExceptionHandler(e: NSException) {
     print("Got an exception")
-    reportExceptionErrorSpan(e: e)
+    reportExceptionErrorSpan(e: e, manuallyReported: false)
     if oldExceptionHandler != nil {
         oldExceptionHandler!(e)
     }
@@ -50,16 +48,9 @@ func initializeUncaughtExceptionReporting() {
 func reportErrorErrorSpan(e: Error) {
     let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
     let now = Date()
-    let span = tracer.spanBuilder(spanName: "UncaughtException").setStartTime(time: now).startSpan()
-    print("TYPE OF ERROR "+String(describing: type(of: e)))
+    let span = tracer.spanBuilder(spanName: "SplunkRum.reportError").setStartTime(time: now).startSpan()
     span.setAttribute(key: "error", value: true)
-    let className = objectTypeName(o: e as NSObject)
-    if className != nil {
-        span.setAttribute(key: "error.name", value: className!)
-    } else {
-        // FIXME try using this more often...
-        span.setAttribute(key: "error.name", value: String(describing: type(of: e)))
-    }
+    span.setAttribute(key: "error.name", value: String(describing: type(of: e)))
     span.setAttribute(key: "error.message", value: e.localizedDescription)
     span.end(time: now)
 }
@@ -67,7 +58,7 @@ func reportErrorErrorSpan(e: Error) {
 func reportStringErrorSpan(e: String) {
     let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
     let now = Date()
-    let span = tracer.spanBuilder(spanName: "UncaughtException").setStartTime(time: now).startSpan()
+    let span = tracer.spanBuilder(spanName: "SplunkRum.reportError").setStartTime(time: now).startSpan()
     span.setAttribute(key: "error", value: true)
     span.setAttribute(key: "error.name", value: "String")
     span.setAttribute(key: "error.message", value: e)

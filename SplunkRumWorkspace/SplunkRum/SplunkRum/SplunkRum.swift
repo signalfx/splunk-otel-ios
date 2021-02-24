@@ -136,7 +136,7 @@ public class SplunkRum {
             Convenience function for reporting an error.
      */
     public class func reportError(exception: NSException) {
-        reportExceptionErrorSpan(e: exception)
+        reportExceptionErrorSpan(e: exception, manuallyReported: true)
     }
     /**
             Convenience function for reporting an error.
