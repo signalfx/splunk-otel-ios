@@ -138,6 +138,7 @@ public class SplunkRum {
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: zipkin))
         initializeUncaughtExceptionReporting()
         initalizeNetworkInstrumentation()
+        initalizeUIInstrumentation()
         sendAppStartSpan()
         initialized = true
         print("SplunkRum initialization done")

@@ -15,7 +15,23 @@
 		86D3D38C25E80649004DD939 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86D3D38A25E80649004DD939 /* LaunchScreen.storyboard */; };
 		86D3D39525E80D61004DD939 /* AViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39425E80D61004DD939 /* AViewController.swift */; };
 		86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39725E80DBC004DD939 /* BViewController.swift */; };
+		86D3D3A225E8240F004DD939 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86D3D3A125E8240F004DD939 /* SplunkRum.framework */; };
+		86D3D3A325E8240F004DD939 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 86D3D3A125E8240F004DD939 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		86D3D3A425E8240F004DD939 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				86D3D3A325E8240F004DD939 /* SplunkRum.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		86D3D37C25E80648004DD939 /* TestStoryboardApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestStoryboardApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -28,6 +44,7 @@
 		86D3D38D25E80649004DD939 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86D3D39425E80D61004DD939 /* AViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AViewController.swift; sourceTree = "<group>"; };
 		86D3D39725E80DBC004DD939 /* BViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BViewController.swift; sourceTree = "<group>"; };
+		86D3D3A125E8240F004DD939 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				86D3D3A225E8240F004DD939 /* SplunkRum.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +64,7 @@
 			children = (
 				86D3D37E25E80648004DD939 /* TestStoryboardApp */,
 				86D3D37D25E80648004DD939 /* Products */,
+				86D3D3A025E8240F004DD939 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,6 +92,14 @@
 			path = TestStoryboardApp;
 			sourceTree = "<group>";
 		};
+		86D3D3A025E8240F004DD939 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				86D3D3A125E8240F004DD939 /* SplunkRum.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -83,6 +110,7 @@
 				86D3D37825E80648004DD939 /* Sources */,
 				86D3D37925E80648004DD939 /* Frameworks */,
 				86D3D37A25E80648004DD939 /* Resources */,
+				86D3D3A425E8240F004DD939 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
