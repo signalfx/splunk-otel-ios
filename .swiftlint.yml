@@ -6,6 +6,7 @@ disabled_rules:
  - force_try
  - weak_delegate
  - block_based_kvo
+ - unused_optional_binding
 # Not really sure about a bunch of these, just turning most stuff in the 'performance' and 'lint' categories
 opt_in_rules:
  - unowned_variable_capture
@@ -13,13 +14,9 @@ opt_in_rules:
  - identical_operands
  - overridden_super_call
  - override_in_extension
- - private_action
- - private_outlet
- - prohibited_interface_builder
  - prohibited_super_call
  - quick_discouraged_call
  - required_enum_case
- - strong_iboutlet
  - contains_over_filter_count
  - contains_over_filter_is_empty
  - contains_over_first_not_nil

@@ -114,6 +114,9 @@ struct ContentView: View {
         }
         task.resume()
     }
+    func action() {
+        print("action")
+    }
     func throwy() {
         NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil).raise()
         print("should not reach here")
@@ -174,6 +177,9 @@ struct ContentView: View {
             Text("upload!")
         }
         }
+        Button(action: self.action, label: {
+            Text("Action")
+        })
     }
 }
 
