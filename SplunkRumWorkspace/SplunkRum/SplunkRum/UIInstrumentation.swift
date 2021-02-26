@@ -34,7 +34,7 @@ extension UIApplication {
 }
 
 func initalizeUIInstrumentation() {
-    NotificationCenter.default.addObserver(forName: nil, object: nil, queue: nil) { (using: Notification) in
+    let observer = NotificationCenter.default.addObserver(forName: nil, object: nil, queue: nil) { (using: Notification) in
         print("NC "+using.debugDescription)
     }
     swizzle(clazz: UIApplication.self, orig: #selector(UIApplication.sendAction(_:to:from:for:)), swizzled: #selector(UIApplication.swizzled_sendAction(_:to:from:for:)))

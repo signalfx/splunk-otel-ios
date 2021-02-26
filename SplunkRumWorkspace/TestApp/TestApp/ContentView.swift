@@ -16,7 +16,6 @@ limitations under the License.
 
 import SwiftUI
 
-
 struct ContentView: View {
     func networkRequest() {
         print("network (req)!")
@@ -34,9 +33,9 @@ struct ContentView: View {
     func hideKeyboard() {
         print("hideKeyboard")
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-        
+
     }
-    
+
     func throwy() {
         NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil).raise()
         print("should not reach here")
@@ -49,7 +48,7 @@ struct ContentView: View {
     @State var text = ""
     @State var toggle = true
     @State var isShowingModal = false
-    
+
     var body: some View {
         VStack {
             Button(action: {
