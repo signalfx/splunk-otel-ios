@@ -87,9 +87,11 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 
 class SessionTaskObserver: NSObject {
     var span: Span?
+    // Observers aren't kept alive by observing...
+    var extraRefToSelf: SessionTaskObserver?
     override init() {
         super.init()
-        observers.setObject(self, forKey: self)
+        extraRefToSelf = self
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
@@ -104,12 +106,10 @@ class SessionTaskObserver: NSObject {
             endHttpSpan(span: span,
                         task: task!)
             task!.removeObserver(self, forKeyPath: "state")
-            observers.removeObject(forKey: self)
+            extraRefToSelf = nil
         }
     }
 }
-// FIXME multi-threading, cleaner way to do this?
-let observers = NSMapTable<SessionTaskObserver, SessionTaskObserver>.strongToStrongObjects()
 
 func wireUpTaskObserver(task: URLSessionTask) {
     task.addObserver(SessionTaskObserver(), forKeyPath: "state", options: .new, context: nil)
