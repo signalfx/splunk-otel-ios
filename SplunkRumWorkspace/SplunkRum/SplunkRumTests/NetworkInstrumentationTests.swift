@@ -46,6 +46,9 @@ class NetworkInstrumentationTests: XCTestCase {
         let httpPost = receivedSpans.first(where: { (span) -> Bool in
             return span.name == "HTTP POST"
         })
+        let beacon = receivedSpans.first(where: { (span) -> Bool in
+            return span.tags["http.url"]?.contains("/v1/traces") ?? false
+        })
 
         XCTAssertNotNil(httpGet)
         XCTAssertEqual(httpGet?.tags["http.url"], "http://127.0.0.1:8989/data")
@@ -58,6 +61,8 @@ class NetworkInstrumentationTests: XCTestCase {
         XCTAssertEqual(httpPost?.tags["http.method"], "POST")
         XCTAssertEqual(httpPost?.tags["http.status_code"], "500")
         XCTAssertEqual(httpPost?.tags["http.request_content_length"], "11")
+
+        XCTAssertNil(beacon)
 
     }
 }

@@ -73,8 +73,8 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     }
     let url = request!.url!
     let method = request!.httpMethod ?? "GET"
-    // FIXME even without the hardcode, this is a terrible way to supress spans from the zipkin exporter
-    if url.absoluteString.contains("auth=") {
+    // Don't loop reporting on communication with the beacon
+    if SplunkRum.theBeaconUrl != nil && url.absoluteString.starts(with: SplunkRum.theBeaconUrl!) {
         return nil
     }
     // FIXME constants for this stuff
@@ -182,6 +182,7 @@ func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
         print("warning: could not swizzle "+NSStringFromSelector(orig))
     }
 }
+
 func initalizeNetworkInstrumentation() {
     // FIXME experiment with emphemeral and results of the function background(withIdentifier) -> same method impls?
     let urlsession = URLSession.self

@@ -107,6 +107,7 @@ public class SplunkRum {
     // FIXME multithreading
     static var initialized = false
     static var initializing = false
+    static var theBeaconUrl: String?
 
     /**
             Initialization function.  Call as early as possible in your application.
@@ -133,6 +134,7 @@ public class SplunkRum {
             print("beaconUrl must be https or options: allowInsecureBeacon must be true")
             return
         }
+        theBeaconUrl = beaconUrl
         let options = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
         let zipkin = ZipkinTraceExporter(options: options)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
