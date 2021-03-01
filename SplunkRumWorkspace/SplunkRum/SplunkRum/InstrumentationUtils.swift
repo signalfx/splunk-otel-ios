@@ -39,3 +39,9 @@ private func addUIFields(span: ReadableSpan) {
 func addPreSpanFields(span: ReadableSpan) {
     addUIFields(span: span)
 }
+
+func computeSplunkRumVersion() -> String {
+    let dict = Bundle(for: SplunkRum.self).infoDictionary
+    return dict?["CFBundleShortVersionString"] as? String ?? "unknown"
+}
+let SplunkRumVersionString = computeSplunkRumVersion()

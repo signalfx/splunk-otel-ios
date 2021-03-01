@@ -26,6 +26,7 @@ class GlobalAttributesProcessor: SpanProcessor {
     var isEndRequired = false
 
     var appName: String
+    var appVersion: String?
     init() {
         let app = Bundle.main.infoDictionary?["CFBundleName"] as? String
         if app != nil {
@@ -33,12 +34,17 @@ class GlobalAttributesProcessor: SpanProcessor {
         } else {
             appName = "unknown-app"
         }
+        appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
 
     }
 
     func onStart(parentContext: SpanContext?, span: ReadableSpan) {
         span.setAttribute(key: "app", value: appName)
+        if appVersion != nil {
+            span.setAttribute(key: "app.verson", value: appVersion!)
+        }
         span.setAttribute(key: "splunk.rumSessionId", value: getRumSessionId())
+        span.setAttribute(key: "splunk.rumVersion", value: SplunkRumVersionString)
         addPreSpanFields(span: span)
     }
 
@@ -66,44 +72,6 @@ public struct SplunkRumOptions {
  Main class for initializing the SplunkRum agent.
  */
 public class SplunkRum {
-    private class func processStartTime() throws -> Date {
-        let name = "kern.proc.pid"
-        var len: size_t = 4
-        var mib = [Int32](repeating: 0, count: 4)
-        var kp: kinfo_proc = kinfo_proc()
-        try mib.withUnsafeMutableBufferPointer { (mibBP: inout UnsafeMutableBufferPointer<Int32>) throws in
-            try name.withCString { (nbp: UnsafePointer<Int8>) throws in
-                guard sysctlnametomib(nbp, mibBP.baseAddress, &len) == 0 else {
-                    throw POSIXError(.EAGAIN)
-                }
-            }
-            mibBP[3] = getpid()
-            len =  MemoryLayout<kinfo_proc>.size
-            guard sysctl(mibBP.baseAddress, 4, &kp, &len, nil, 0) == 0 else {
-                throw POSIXError(.EAGAIN)
-            }
-        }
-        // Type casts to finally produce the answer
-        let startTime = kp.kp_proc.p_un.__p_starttime
-        let ti: TimeInterval = Double(startTime.tv_sec) + (Double(startTime.tv_usec) / 1e6)
-        return Date(timeIntervalSince1970: ti)
-    }
-    private class func sendAppStartSpan() {
-        let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
-        // FIXME timestamps!
-        // FIXME names for things
-        let appStart = tracer.spanBuilder(spanName: "AppStart").startSpan()
-        // FIXME wait this is just "iPhone" and not "iPhone 6s" or "iPhone8,1".  Why, Apple?
-        appStart.setAttribute(key: "device.model", value: UIDevice.current.model)
-        appStart.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
-        do {
-            let start = try processStartTime()
-            appStart.addEvent(name: "process.start", timestamp: start)
-        } catch {
-            // swallow
-        }
-        appStart.end()
-    }
     // FIXME multithreading
     static var initialized = false
     static var initializing = false

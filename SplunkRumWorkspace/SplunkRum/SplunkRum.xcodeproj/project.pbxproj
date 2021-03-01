@@ -14,6 +14,7 @@
 		86260EEA25CDC27F009F3CB1 /* libZipkinExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 86260EE925CDC27F009F3CB1 /* libZipkinExporter */; };
 		86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F0E25CDC407009F3CB1 /* SplunkRum.swift */; };
 		86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */; };
+		863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863A2F4125ED7BB100F3ECE0 /* AppStart.swift */; };
 		8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */; };
 		8654BCF825E54D340013F7F6 /* ErrorInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCF725E54D340013F7F6 /* ErrorInstrumentation.swift */; };
 		8654BCFC25E55E850013F7F6 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCFB25E55E850013F7F6 /* TestUtils.swift */; };
@@ -44,6 +45,7 @@
 		86260ED425CDC1DE009F3CB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86260F0E25CDC407009F3CB1 /* SplunkRum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplunkRum.swift; sourceTree = "<group>"; };
 		86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerTimingTests.swift; sourceTree = "<group>"; };
+		863A2F4125ED7BB100F3ECE0 /* AppStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStart.swift; sourceTree = "<group>"; };
 		8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentationUtils.swift; sourceTree = "<group>"; };
 		8654BCF725E54D340013F7F6 /* ErrorInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorInstrumentation.swift; sourceTree = "<group>"; };
 		8654BCFB25E55E850013F7F6 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 				8654BCF725E54D340013F7F6 /* ErrorInstrumentation.swift */,
 				86D3D39C25E82278004DD939 /* UIInstrumentation.swift */,
 				866192F325ED329E0035F08E /* Session.swift */,
+				863A2F4125ED7BB100F3ECE0 /* AppStart.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -248,6 +251,7 @@
 			files = (
 				8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
+				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
 				86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */,
@@ -416,6 +420,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SplunkRum;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -441,6 +446,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SplunkRum;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
