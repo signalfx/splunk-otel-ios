@@ -19,7 +19,7 @@ import OpenTelemetryApi
 
 let serverTimingPattern = #"traceparent;desc=\"00-([0-9a-f]{32})-([0-9a-f]{16})-01\""#
 
-public func addLinkToSpan(span: Span, valStr: String) {
+func addLinkToSpan(span: Span, valStr: String) {
     // FIXME this is the worst regex interface I have ever seen in two+ decades of professional programming
     let regex = try! NSRegularExpression(pattern: serverTimingPattern)
     let result = regex.matches(in: valStr, range: NSRange(location: 0, length: valStr.utf16.count))

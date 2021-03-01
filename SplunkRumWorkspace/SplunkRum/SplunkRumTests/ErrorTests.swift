@@ -52,19 +52,25 @@ class ErrorTests: XCTestCase {
         XCTAssertEqual(eStr?.name, "SplunkRum.reportError")
         XCTAssertEqual(eStr?.tags["error"], "true")
         XCTAssertEqual(eStr?.tags["error.name"], "String")
+        XCTAssertNotNil(eStr?.tags["splunk.rumSessionId"])
 
         XCTAssertNotNil(eExc)
         XCTAssertEqual(eExc?.name, "SplunkRum.reportError")
         XCTAssertEqual(eExc?.tags["error"], "true")
         XCTAssertEqual(eExc?.tags["error.name"], "IllegalFormatError")
+        XCTAssertNotNil(eExc?.tags["splunk.rumSessionId"])
 
         XCTAssertNotNil(eEnumErr)
         XCTAssertEqual(eEnumErr?.name, "SplunkRum.reportError")
         XCTAssertEqual(eEnumErr?.tags["error"], "true")
+        XCTAssertNotNil(eEnumErr?.tags["splunk.rumSessionId"])
 
         XCTAssertNotNil(eClassErr)
         XCTAssertEqual(eClassErr?.name, "SplunkRum.reportError")
         XCTAssertEqual(eClassErr?.tags["error"], "true")
+        XCTAssertNotNil(eClassErr?.tags["splunk.rumSessionId"])
+
+        XCTAssertEqual(eClassErr?.tags["splunk.rumSessionId"], eExc?.tags["splunk.rumSessionId"])
 
     }
 }

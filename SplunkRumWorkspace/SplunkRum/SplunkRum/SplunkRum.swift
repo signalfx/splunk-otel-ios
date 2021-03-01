@@ -38,6 +38,7 @@ class GlobalAttributesProcessor: SpanProcessor {
 
     func onStart(parentContext: SpanContext?, span: ReadableSpan) {
         span.setAttribute(key: "app", value: appName)
+        span.setAttribute(key: "splunk.rumSessionId", value: getRumSessionId())
         addPreSpanFields(span: span)
     }
 

@@ -16,7 +16,7 @@ limitations under the License.
 
 import OpenTelemetryApi
 import XCTest
-import SplunkRum
+@testable import SplunkRum
 
 class TestSpan: Span {
     var isRecording: Bool
