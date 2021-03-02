@@ -27,7 +27,6 @@ private func addUIFields(span: ReadableSpan) {
         // windows are arranged in z-order, with topmost (e.g. popover) being the last in array
         let vc = wins[wins.count-1].rootViewController
         if vc != nil {
-            // FIXME demangle swift names
             span.setAttribute(key: "screen.name", value: String(describing: type(of: vc!)))
             // FIXME SwiftUI UIHostingController vc when cast has a "rootView" var which does
             // not appear to be accessible generically
