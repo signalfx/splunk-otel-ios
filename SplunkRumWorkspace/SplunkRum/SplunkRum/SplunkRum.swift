@@ -78,7 +78,7 @@ public class SplunkRum {
     static var theBeaconUrl: String?
 
     /**
-            Initialization function.  Call as early as possible in your application.
+            Initialization function.  Call as early as possible in your application, but only on the main thread.
                 - Parameter beaconUrl: Destination for the captured data.
      
                 - Parameter rumAuth: Publicly-visible `rumAuth` value.  Please do not paste any other access token or auth value into here, as this will be visible to every user of your app
@@ -86,6 +86,10 @@ public class SplunkRum {
      
      */
     public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
+        if !Thread.isMainThread {
+            print("Please call SplunkRum.initialize only on the main thread")
+            return
+        }
         if initialized || initializing {
             // FIXME error handling, logging, etc.
             print("SplunkRum already initializ{ed,ing}")

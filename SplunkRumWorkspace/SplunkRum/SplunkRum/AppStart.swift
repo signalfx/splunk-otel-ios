@@ -48,6 +48,7 @@ func sendAppStartSpan() {
     let appStart = tracer.spanBuilder(spanName: "AppStart").startSpan()
     // FIXME wait this is just "iPhone" and not "iPhone 6s" or "iPhone8,1".  Why, Apple?
     appStart.setAttribute(key: "device.model", value: UIDevice.current.model)
+    print(UIDevice.current.name)
     appStart.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
     do {
         let start = try processStartTime()
