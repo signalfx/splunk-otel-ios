@@ -20,7 +20,7 @@ import OpenTelemetryApi
 let serverTimingPattern = #"traceparent;desc=\"00-([0-9a-f]{32})-([0-9a-f]{16})-01\""#
 
 func addLinkToSpan(span: Span, valStr: String) {
-    // FIXME this is the worst regex interface I have ever seen in two+ decades of professional programming
+    // This is the worst regex interface I have ever seen in two+ decades of professional programming
     let regex = try! NSRegularExpression(pattern: serverTimingPattern)
     let result = regex.matches(in: valStr, range: NSRange(location: 0, length: valStr.utf16.count))
     // per standard regex logic, number of matched segments is 3 (whole match plus two () captures)
@@ -58,7 +58,7 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
     if task.error != nil {
         span!.setAttribute(key: "error", value: true)
         span!.setAttribute(key: "error.message", value: task.error!.localizedDescription)
-        // FIXME what else can be divined?
+        span!.setAttribute(key: "error.name", value: String(describing: type(of: task.error!)))
     }
     span!.setAttribute(key: "http.response_content_length_uncompressed", value: Int(task.countOfBytesReceived))
     if task.countOfBytesSent != 0 {
