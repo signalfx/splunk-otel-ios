@@ -17,7 +17,11 @@ limitations under the License.
 
 import Foundation
 
-var rumSessionId = generateNewSessionId()
+let MAX_SESSION_AGE_SECONDS = 4 * 60 * 60
+
+private var rumSessionId = generateNewSessionId()
+private var sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
+private let dispatchQueue = DispatchQueue(label: "rumSessionId")
 
 func generateNewSessionId() -> String {
     var i=0
@@ -31,6 +35,11 @@ func generateNewSessionId() -> String {
 }
 
 func getRumSessionId() -> String {
-    // FIXME age out after, e.g. 4 hours
-    return rumSessionId
+    return dispatchQueue.sync {
+        if Date() > sessionIdExpiration {
+            sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
+            rumSessionId = generateNewSessionId()
+        }
+        return rumSessionId
+    }
 }
