@@ -77,8 +77,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     if SplunkRum.theBeaconUrl != nil && url.absoluteString.starts(with: SplunkRum.theBeaconUrl!) {
         return nil
     }
-    // FIXME constants for this stuff
-    let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
+    let tracer = buildTracer()
     let span = tracer.spanBuilder(spanName: "HTTP "+method).startSpan()
     span.setAttribute(key: "http.url", value: url.absoluteString)
     span.setAttribute(key: "http.method", value: method)

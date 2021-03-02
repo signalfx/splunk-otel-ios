@@ -42,7 +42,7 @@ private func processStartTime() throws -> Date {
     return Date(timeIntervalSince1970: ti)
 }
 func sendAppStartSpan() {
-    let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "ios", instrumentationVersion: "0.0.1")
+    let tracer = buildTracer()
     // FIXME timestamps!
     // FIXME names for things
     let appStart = tracer.spanBuilder(spanName: "AppStart").startSpan()
