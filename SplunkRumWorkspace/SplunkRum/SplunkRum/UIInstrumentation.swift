@@ -25,16 +25,16 @@ extension UIApplication {
                                         for event: UIEvent?) -> Bool {
         print("--- SEND ACTION")
         print(action)
-        print(target)
-        print(sender)
-        print(event)
+        print(target as Any)
+        print(sender as Any)
+        print(event as Any)
         print("---")
         return swizzled_sendAction(action, to: target, from: sender, for: event)
     }
 }
 
 func initalizeUIInstrumentation() {
-    let observer = NotificationCenter.default.addObserver(forName: nil, object: nil, queue: nil) { (using: Notification) in
+    _ = NotificationCenter.default.addObserver(forName: nil, object: nil, queue: nil) { (using: Notification) in
         print("NC "+using.debugDescription)
     }
     swizzle(clazz: UIApplication.self, orig: #selector(UIApplication.sendAction(_:to:from:for:)), swizzled: #selector(UIApplication.swizzled_sendAction(_:to:from:for:)))
