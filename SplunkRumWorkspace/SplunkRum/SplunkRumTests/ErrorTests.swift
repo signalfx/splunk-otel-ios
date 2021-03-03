@@ -72,5 +72,10 @@ class ErrorTests: XCTestCase {
 
         XCTAssertEqual(eClassErr?.tags["splunk.rumSessionId"], eExc?.tags["splunk.rumSessionId"])
 
+        let beacon = receivedSpans.first(where: { (span) -> Bool in
+            return span.tags["http.url"]?.contains("/v1/traces") ?? false
+        })
+        XCTAssertNil(beacon)
+
     }
 }

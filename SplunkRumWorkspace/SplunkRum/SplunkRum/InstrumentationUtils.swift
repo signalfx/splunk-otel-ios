@@ -48,3 +48,36 @@ let SplunkRumVersionString = computeSplunkRumVersion()
 func buildTracer() -> Tracer {
     return OpenTelemetry.instance.tracerProvider.get(instrumentationName: "splunk-ios", instrumentationVersion: SplunkRumVersionString)
 }
+
+class GlobalAttributesProcessor: SpanProcessor {
+    var isStartRequired = true
+
+    var isEndRequired = false
+
+    var appName: String
+    var appVersion: String?
+    init() {
+        let app = Bundle.main.infoDictionary?["CFBundleName"] as? String
+        if app != nil {
+            appName = app!
+        } else {
+            appName = "unknown-app"
+        }
+        appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+
+    }
+
+    func onStart(parentContext: SpanContext?, span: ReadableSpan) {
+        span.setAttribute(key: "app", value: appName)
+        if appVersion != nil {
+            span.setAttribute(key: "app.verson", value: appVersion!)
+        }
+        span.setAttribute(key: "splunk.rumSessionId", value: getRumSessionId())
+        span.setAttribute(key: "splunk.rumVersion", value: SplunkRumVersionString)
+        addPreSpanFields(span: span)
+    }
+
+    func onEnd(span: ReadableSpan) { }
+    func shutdown() { }
+    func forceFlush() { }
+}

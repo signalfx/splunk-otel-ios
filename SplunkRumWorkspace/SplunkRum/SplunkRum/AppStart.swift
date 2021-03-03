@@ -41,14 +41,30 @@ private func processStartTime() throws -> Date {
     let ti: TimeInterval = Double(startTime.tv_sec) + (Double(startTime.tv_usec) / 1e6)
     return Date(timeIntervalSince1970: ti)
 }
+
+// FIXME note that this returns things like "iPhone13,3" which means "iPhone 12 Pro" but the mapping isn't
+// -> one possible solution is https://github.com/devicekit/DeviceKit
+func getDeviceModel() -> String {
+    var systemInfo = utsname()
+    uname(&systemInfo)
+    let mirror = Mirror(reflecting: systemInfo.machine)
+    let model = mirror.children.reduce("") { id, element in
+        guard let value = element.value as? Int8, value != 0 else { return id }
+        return id + String(UnicodeScalar(UInt8(value)))
+    }
+    if model.isEmpty {
+        return "unknown"
+    }
+    return model
+}
+
 func sendAppStartSpan() {
     let tracer = buildTracer()
     // FIXME timestamps!
     // FIXME names for things
     let appStart = tracer.spanBuilder(spanName: "AppStart").startSpan()
     // FIXME wait this is just "iPhone" and not "iPhone 6s" or "iPhone8,1".  Why, Apple?
-    appStart.setAttribute(key: "device.model", value: UIDevice.current.model)
-    print(UIDevice.current.name)
+    appStart.setAttribute(key: "device.model", value: getDeviceModel())
     appStart.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
     do {
         let start = try processStartTime()

@@ -27,7 +27,6 @@ opt_in_rules:
  - first_where
  - flatmap_over_map_reduce
  - last_where
- - reduce_into
  - sorted_first_last
  - file_header
 
