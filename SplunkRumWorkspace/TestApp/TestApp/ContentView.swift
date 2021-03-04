@@ -45,6 +45,11 @@ struct ContentView: View {
             NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil).raise()
         }
     }
+    func hardCrash() {
+        let null = UnsafePointer<UInt8>(bitPattern: 0)
+        let derefNull = null!.pointee
+    }
+
     @State var text = ""
     @State var toggle = true
     @State var isShowingModal = false
@@ -60,6 +65,11 @@ struct ContentView: View {
                 self.throwyBackgroundThread()
             }) {
                 Text("Throw (bg)!")
+            }
+            Button(action: {
+                self.hardCrash()
+            }) {
+                Text("Hard crash")
             }
             Button(action: {
                 self.networkRequest()

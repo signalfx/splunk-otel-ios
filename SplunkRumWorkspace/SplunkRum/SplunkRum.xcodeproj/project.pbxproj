@@ -15,6 +15,8 @@
 		86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F0E25CDC407009F3CB1 /* SplunkRum.swift */; };
 		86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */; };
 		863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863A2F4125ED7BB100F3ECE0 /* AppStart.swift */; };
+		864F69A025F17BB400C8DA59 /* CrashReporter in Frameworks */ = {isa = PBXBuildFile; productRef = 864F699F25F17BB400C8DA59 /* CrashReporter */; };
+		864F69A425F17C2000C8DA59 /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864F69A325F17C2000C8DA59 /* CrashReporting.swift */; };
 		8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */; };
 		8654BCF825E54D340013F7F6 /* ErrorInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCF725E54D340013F7F6 /* ErrorInstrumentation.swift */; };
 		8654BCFC25E55E850013F7F6 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCFB25E55E850013F7F6 /* TestUtils.swift */; };
@@ -46,6 +48,7 @@
 		86260F0E25CDC407009F3CB1 /* SplunkRum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplunkRum.swift; sourceTree = "<group>"; };
 		86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerTimingTests.swift; sourceTree = "<group>"; };
 		863A2F4125ED7BB100F3ECE0 /* AppStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStart.swift; sourceTree = "<group>"; };
+		864F69A325F17C2000C8DA59 /* CrashReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporting.swift; sourceTree = "<group>"; };
 		8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentationUtils.swift; sourceTree = "<group>"; };
 		8654BCF725E54D340013F7F6 /* ErrorInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorInstrumentation.swift; sourceTree = "<group>"; };
 		8654BCFB25E55E850013F7F6 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
@@ -63,6 +66,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				86260EEA25CDC27F009F3CB1 /* libZipkinExporter in Frameworks */,
+				864F69A025F17BB400C8DA59 /* CrashReporter in Frameworks */,
 				86260EE625CDC27F009F3CB1 /* libOpenTelemetryApi in Frameworks */,
 				86260EE825CDC27F009F3CB1 /* libOpenTelemetrySdk in Frameworks */,
 			);
@@ -110,6 +114,7 @@
 				86D3D39C25E82278004DD939 /* UIInstrumentation.swift */,
 				866192F325ED329E0035F08E /* Session.swift */,
 				863A2F4125ED7BB100F3ECE0 /* AppStart.swift */,
+				864F69A325F17C2000C8DA59 /* CrashReporting.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -159,6 +164,7 @@
 				86260EE525CDC27F009F3CB1 /* libOpenTelemetryApi */,
 				86260EE725CDC27F009F3CB1 /* libOpenTelemetrySdk */,
 				86260EE925CDC27F009F3CB1 /* libZipkinExporter */,
+				864F699F25F17BB400C8DA59 /* CrashReporter */,
 			);
 			productName = SplunkRum;
 			productReference = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */;
@@ -216,6 +222,7 @@
 			packageReferences = (
 				86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */,
 				865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */,
+				864F699E25F17BB400C8DA59 /* XCRemoteSwiftPackageReference "plcrashreporter" */,
 			);
 			productRefGroup = 86260EC525CDC1DE009F3CB1 /* Products */;
 			projectDirPath = "";
@@ -251,6 +258,7 @@
 			files = (
 				8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
+				864F69A425F17C2000C8DA59 /* CrashReporting.swift in Sources */,
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
@@ -543,6 +551,14 @@
 				minimumVersion = 0.5.0;
 			};
 		};
+		864F699E25F17BB400C8DA59 /* XCRemoteSwiftPackageReference "plcrashreporter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/microsoft/plcrashreporter";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.8.1;
+			};
+		};
 		865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/httpswift/swifter.git";
@@ -568,6 +584,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = libZipkinExporter;
+		};
+		864F699F25F17BB400C8DA59 /* CrashReporter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 864F699E25F17BB400C8DA59 /* XCRemoteSwiftPackageReference "plcrashreporter" */;
+			productName = CrashReporter;
 		};
 		865A5CA525DC34D8003A1E5A /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;

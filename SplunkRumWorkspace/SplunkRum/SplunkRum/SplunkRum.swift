@@ -78,10 +78,11 @@ public class SplunkRum {
         let zipkin = ZipkinTraceExporter(options: options)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: zipkin))
+        sendAppStartSpan()
         initializeUncaughtExceptionReporting()
         initalizeNetworkInstrumentation()
         initalizeUIInstrumentation()
-        sendAppStartSpan()
+        initializeCrashReporting()
         initialized = true
         print("SplunkRum initialization done")
     }
