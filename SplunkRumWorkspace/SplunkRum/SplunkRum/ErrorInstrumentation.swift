@@ -50,6 +50,7 @@ func ourExceptionHandler(e: NSException) {
 }
 
 func initializeUncaughtExceptionReporting() {
+    // FIXME this doesn't do anything about the app adding an uncaught handler of its own after SplunkRum.init
     oldExceptionHandler = NSGetUncaughtExceptionHandler()
     NSSetUncaughtExceptionHandler(ourExceptionHandler(e:))
 }
