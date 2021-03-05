@@ -67,7 +67,7 @@ public class SplunkRum {
             initializing = false
         }
         print("SplunkRum.initialize")
-        // FIXME more Otel initialization stuff
+        // FIXME apply global attribute length cap
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             // FIXME error handling / API
             print("beaconUrl must be https or options: allowInsecureBeacon must be true")
