@@ -16,7 +16,7 @@ limitations under the License.
 
 import Foundation
 import XCTest
-import SplunkRum
+@testable import SplunkRum
 
 class ErrorTests: XCTestCase {
     enum EnumError: Error {
@@ -25,12 +25,16 @@ class ErrorTests: XCTestCase {
     class ClassError: Error {
 
     }
+
     func testBasics() throws {
+        let crashPath = Bundle(for: ErrorTests.self).url(forResource: "sample", withExtension: "plcrash")!
+        let crashData = try Data(contentsOf: crashPath)
         try initializeTestEnvironment()
         SplunkRum.reportError(string: "Test message")
         SplunkRum.reportError(error: EnumError.ExampleError)
         SplunkRum.reportError(error: ClassError())
         SplunkRum.reportError(exception: NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil))
+        try loadPendingCrashReport(crashData) // creates span for the saved crash report
 
         print("sleeping to wait for span batch, don't worry about the pause...")
         sleep(8)
@@ -46,6 +50,9 @@ class ErrorTests: XCTestCase {
         })
         let eExc = receivedSpans.first(where: { (span) -> Bool in
             return span.tags["error.message"] == "Could not parse input"
+        })
+        let crashReport = receivedSpans.first(where: { (span) -> Bool in
+            return span.name == "crash.report"
         })
 
         XCTAssertNotNil(eStr)
@@ -71,6 +78,15 @@ class ErrorTests: XCTestCase {
         XCTAssertNotNil(eClassErr?.tags["splunk.rumSessionId"])
 
         XCTAssertEqual(eClassErr?.tags["splunk.rumSessionId"], eExc?.tags["splunk.rumSessionId"])
+
+        XCTAssertNotNil(crashReport)
+        XCTAssertNotEqual(crashReport?.tags["splunk.rumSessionId"], crashReport?.tags["crash.rumSessionId"])
+        XCTAssertEqual(crashReport?.tags["crash.rumSessionId"], "355ecc42c29cf0b56c411f1eab9191d0")
+        XCTAssertEqual(crashReport?.tags["crash.address"], "140733995048756")
+        XCTAssertEqual(crashReport?.tags["error"], "true")
+        XCTAssertEqual(crashReport?.tags["error.name"], "SIGILL")
+
+        // FIXME flesh out asserts here
 
         let beacon = receivedSpans.first(where: { (span) -> Bool in
             return span.tags["http.url"]?.contains("/v1/traces") ?? false

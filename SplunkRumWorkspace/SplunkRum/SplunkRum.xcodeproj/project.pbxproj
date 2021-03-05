@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8616095E25F2BAD80014CBD1 /* sample.plcrash in Resources */ = {isa = PBXBuildFile; fileRef = 8616095D25F2BAD80014CBD1 /* sample.plcrash */; };
 		86260ECE25CDC1DE009F3CB1 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */; };
 		86260ED525CDC1DE009F3CB1 /* SplunkRum.h in Headers */ = {isa = PBXBuildFile; fileRef = 86260EC725CDC1DE009F3CB1 /* SplunkRum.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		86260EE625CDC27F009F3CB1 /* libOpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = 86260EE525CDC27F009F3CB1 /* libOpenTelemetryApi */; };
@@ -40,6 +41,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8616095D25F2BAD80014CBD1 /* sample.plcrash */ = {isa = PBXFileReference; lastKnownFileType = file; path = sample.plcrash; sourceTree = "<group>"; };
 		86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86260EC725CDC1DE009F3CB1 /* SplunkRum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SplunkRum.h; sourceTree = "<group>"; };
 		86260EC825CDC1DE009F3CB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 		86260ED125CDC1DE009F3CB1 /* SplunkRumTests */ = {
 			isa = PBXGroup;
 			children = (
+				8616095D25F2BAD80014CBD1 /* sample.plcrash */,
 				86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */,
 				86260ED425CDC1DE009F3CB1 /* Info.plist */,
 				865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */,
@@ -246,6 +249,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8616095E25F2BAD80014CBD1 /* sample.plcrash in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
