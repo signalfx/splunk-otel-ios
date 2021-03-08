@@ -25,10 +25,11 @@ import UIKit
  Optional configuration for SplunkRum.initialize()
  */
 public struct SplunkRumOptions {
-    public init(allowInsecureBeacon: Bool? = false, enableCrashReporting: Bool? = true, debug: Bool? = false) {
+    public init(allowInsecureBeacon: Bool? = false, enableCrashReporting: Bool? = true, debug: Bool? = false, globalAttributes: [String: Any]? = nil) {
         self.allowInsecureBeacon = allowInsecureBeacon
         self.enableCrashReporting = enableCrashReporting
         self.debug = debug
+        self.globalAttributes = globalAttributes
     }
     /**
             Allows non-https beaconUrls.  Default: false
@@ -42,10 +43,12 @@ public struct SplunkRumOptions {
             Turns on debug logging (including printouts of all spans)  Default: false
      */
     public var debug: Bool?
-    // FIXME need more optional params, e.g.:
-        // app (override)
-        // globalAttributes
-        // ignoreURLs
+    /**
+                    Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
+     */
+    public var globalAttributes: [String: Any]?
+
+    // FIXME ignoreURLs for http spans
 }
 
 /**
@@ -55,6 +58,7 @@ public class SplunkRum {
     // FIXME multithreading
     static var initialized = false
     static var initializing = false
+    static var configuredOptions: SplunkRumOptions?
     static var theBeaconUrl: String?
 
     /**
@@ -80,6 +84,7 @@ public class SplunkRum {
             initializing = false
         }
         print("SplunkRum.initialize")
+        configuredOptions = options
         // FIXME apply global attribute length cap
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             // FIXME error handling / API
@@ -89,7 +94,7 @@ public class SplunkRum {
         theBeaconUrl = beaconUrl
         let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
         let zipkin = ZipkinTraceExporter(options: exportOptions)
-        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
+        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor(options?.globalAttributes ?? nil))
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: zipkin))
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))

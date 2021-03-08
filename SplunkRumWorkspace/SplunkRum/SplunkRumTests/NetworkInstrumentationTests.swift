@@ -64,5 +64,11 @@ class NetworkInstrumentationTests: XCTestCase {
 
         XCTAssertNil(beacon)
 
+        // FIXME not a great place to shoehorn it currently, but checking the globalAttributes logic here
+        XCTAssertEqual("7", httpPost?.tags["intKey"])
+        XCTAssertEqual("1.5", httpPost?.tags["doubleKey"])
+        XCTAssertEqual("true", httpPost?.tags["boolKey"])
+        XCTAssertEqual("strVal", httpPost?.tags["strKey"])
+
     }
 }
