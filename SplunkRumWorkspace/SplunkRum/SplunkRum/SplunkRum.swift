@@ -18,19 +18,30 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 import ZipkinExporter
+import StdoutExporter
 import UIKit
 
 /**
  Optional configuration for SplunkRum.initialize()
  */
 public struct SplunkRumOptions {
-    public init(allowInsecureBeacon: Bool? = false, enableCrashReporting: Bool? = true) {
+    public init(allowInsecureBeacon: Bool? = false, enableCrashReporting: Bool? = true, debug: Bool? = false) {
         self.allowInsecureBeacon = allowInsecureBeacon
         self.enableCrashReporting = enableCrashReporting
+        self.debug = debug
     }
-
+    /**
+            Allows non-https beaconUrls.  Default: false
+     */
     public var allowInsecureBeacon: Bool?
+    /**
+                    Turns on the crash reporting with PLCrashReporter feature.  Default: true
+     */
     public var enableCrashReporting: Bool?
+    /**
+            Turns on debug logging (including printouts of all spans)  Default: false
+     */
+    public var debug: Bool?
     // FIXME need more optional params, e.g.:
         // app (override)
         // globalAttributes
@@ -80,6 +91,9 @@ public class SplunkRum {
         let zipkin = ZipkinTraceExporter(options: exportOptions)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: zipkin))
+        if options?.debug ?? false {
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
+        }
         sendAppStartSpan()
         initializeUncaughtExceptionReporting()
         initalizeNetworkInstrumentation()

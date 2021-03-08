@@ -15,6 +15,7 @@
 		86260EEA25CDC27F009F3CB1 /* libZipkinExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 86260EE925CDC27F009F3CB1 /* libZipkinExporter */; };
 		86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F0E25CDC407009F3CB1 /* SplunkRum.swift */; };
 		86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */; };
+		863044D325F6CA5A00E0F846 /* libStdoutExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 863044D225F6CA5A00E0F846 /* libStdoutExporter */; };
 		863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863A2F4125ED7BB100F3ECE0 /* AppStart.swift */; };
 		864F69A025F17BB400C8DA59 /* CrashReporter in Frameworks */ = {isa = PBXBuildFile; productRef = 864F699F25F17BB400C8DA59 /* CrashReporter */; };
 		864F69A425F17C2000C8DA59 /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864F69A325F17C2000C8DA59 /* CrashReporting.swift */; };
@@ -39,6 +40,19 @@
 			remoteInfo = SplunkRum;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		863044D125F6CA4000E0F846 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		8616095D25F2BAD80014CBD1 /* sample.plcrash */ = {isa = PBXFileReference; lastKnownFileType = file; path = sample.plcrash; sourceTree = "<group>"; };
@@ -70,6 +84,7 @@
 				86260EEA25CDC27F009F3CB1 /* libZipkinExporter in Frameworks */,
 				864F69A025F17BB400C8DA59 /* CrashReporter in Frameworks */,
 				86260EE625CDC27F009F3CB1 /* libOpenTelemetryApi in Frameworks */,
+				863044D325F6CA5A00E0F846 /* libStdoutExporter in Frameworks */,
 				86260EE825CDC27F009F3CB1 /* libOpenTelemetrySdk in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -92,6 +107,7 @@
 				86260EC625CDC1DE009F3CB1 /* SplunkRum */,
 				86260ED125CDC1DE009F3CB1 /* SplunkRumTests */,
 				86260EC525CDC1DE009F3CB1 /* Products */,
+				863044CD25F6CA4000E0F846 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -135,6 +151,13 @@
 			path = SplunkRumTests;
 			sourceTree = "<group>";
 		};
+		863044CD25F6CA4000E0F846 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -157,6 +180,7 @@
 				86260EC025CDC1DE009F3CB1 /* Sources */,
 				86260EC125CDC1DE009F3CB1 /* Frameworks */,
 				86260EC225CDC1DE009F3CB1 /* Resources */,
+				863044D125F6CA4000E0F846 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -168,6 +192,7 @@
 				86260EE725CDC27F009F3CB1 /* libOpenTelemetrySdk */,
 				86260EE925CDC27F009F3CB1 /* libZipkinExporter */,
 				864F699F25F17BB400C8DA59 /* CrashReporter */,
+				863044D225F6CA5A00E0F846 /* libStdoutExporter */,
 			);
 			productName = SplunkRum;
 			productReference = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */;
@@ -588,6 +613,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = libZipkinExporter;
+		};
+		863044D225F6CA5A00E0F846 /* libStdoutExporter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			productName = libStdoutExporter;
 		};
 		864F699F25F17BB400C8DA59 /* CrashReporter */ = {
 			isa = XCSwiftPackageProductDependency;
