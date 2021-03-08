@@ -24,11 +24,13 @@ import UIKit
  Optional configuration for SplunkRum.initialize()
  */
 public struct SplunkRumOptions {
-    public init(allowInsecureBeacon: Bool? = false) {
+    public init(allowInsecureBeacon: Bool? = false, enableCrashReporting: Bool? = true) {
         self.allowInsecureBeacon = allowInsecureBeacon
+        self.enableCrashReporting = enableCrashReporting
     }
 
     public var allowInsecureBeacon: Bool?
+    public var enableCrashReporting: Bool?
     // FIXME need more optional params, e.g.:
         // app (override)
         // globalAttributes
@@ -74,15 +76,17 @@ public class SplunkRum {
             return
         }
         theBeaconUrl = beaconUrl
-        let options = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
-        let zipkin = ZipkinTraceExporter(options: options)
+        let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
+        let zipkin = ZipkinTraceExporter(options: exportOptions)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: zipkin))
         sendAppStartSpan()
         initializeUncaughtExceptionReporting()
         initalizeNetworkInstrumentation()
         initalizeUIInstrumentation()
-        initializeCrashReporting()
+        if options?.enableCrashReporting ?? true {
+            initializeCrashReporting()
+        }
         initialized = true
         print("SplunkRum initialization done")
     }
