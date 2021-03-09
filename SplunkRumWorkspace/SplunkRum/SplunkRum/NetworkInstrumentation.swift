@@ -85,6 +85,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 }
 
 class SessionTaskObserver: NSObject {
+    // FIXME multithreading of task callbacks and state
     var span: Span?
     // Observers aren't kept alive by observing...
     var extraRefToSelf: SessionTaskObserver?
@@ -112,6 +113,7 @@ class SessionTaskObserver: NSObject {
 
 func wireUpTaskObserver(task: URLSessionTask) {
     task.addObserver(SessionTaskObserver(), forKeyPath: "state", options: .new, context: nil)
+    // FIXME would observe() be a better way to do this?
 }
 
 extension URLSession {
