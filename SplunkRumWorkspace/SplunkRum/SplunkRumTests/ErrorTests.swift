@@ -86,8 +86,6 @@ class ErrorTests: XCTestCase {
         XCTAssertEqual(crashReport?.tags["error"], "true")
         XCTAssertEqual(crashReport?.tags["error.name"], "SIGILL")
 
-        // FIXME flesh out asserts here
-
         let beacon = receivedSpans.first(where: { (span) -> Bool in
             return span.tags["http.url"]?.contains("/v1/traces") ?? false
         })

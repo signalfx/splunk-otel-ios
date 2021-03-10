@@ -33,12 +33,13 @@ func initializeCrashReporting() {
     crashReporter.customData = getRumSessionId().data(using: .utf8)
     let success = crashReporter.enable()
     print("PLCrashReporter enabled: "+success.description)
-
+    if !success {
+        return
+    }
     // Now for the pending report if there is one
     if !crashReporter.hasPendingCrashReport() {
         return
     }
-    print("**** FOUND pending crash report")
     do {
         let data = crashReporter.loadPendingCrashReportData()
         try loadPendingCrashReport(data)
@@ -52,9 +53,6 @@ func initializeCrashReporting() {
 func loadPendingCrashReport(_ data: Data!) throws {
     print(data?.count as Any)
     let report = try PLCrashReport(data: data)
-    // FIXME remove debugging printouts through here
-    let str = PLCrashReportTextFormatter.stringValue(for: report, with: PLCrashReportTextFormatiOS)
-    print(str!)
     let oldSessionId = String(decoding: report.customData, as: UTF8.self)
     print(oldSessionId)
     // Turn the report into a span
