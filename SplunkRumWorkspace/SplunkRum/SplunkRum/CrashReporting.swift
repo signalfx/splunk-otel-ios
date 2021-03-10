@@ -18,6 +18,8 @@ limitations under the License.
 import Foundation
 import CrashReporter
 
+var TheCrashReporter: PLCrashReporter?
+
 // FIXME this whole thing is slapped together; read through the docs some more and
 // understand all the choices and possibilities
 func initializeCrashReporting() {
@@ -29,13 +31,13 @@ func initializeCrashReporting() {
         return
     }
     let crashReporter = crashReporter_!
-    // FIXME rum session id changes
-    crashReporter.customData = getRumSessionId().data(using: .utf8)
     let success = crashReporter.enable()
     print("PLCrashReporter enabled: "+success.description)
     if !success {
         return
     }
+    TheCrashReporter = crashReporter
+    updateCrashReportSessionId()
     // Now for the pending report if there is one
     if !crashReporter.hasPendingCrashReport() {
         return
@@ -48,6 +50,12 @@ func initializeCrashReporting() {
         print("oh no")
     }
     crashReporter.purgePendingCrashReport()
+}
+
+func updateCrashReportSessionId() {
+    DispatchQueue.main.async {
+        TheCrashReporter?.customData = getRumSessionId().data(using: .utf8)
+    }
 }
 
 func loadPendingCrashReport(_ data: Data!) throws {

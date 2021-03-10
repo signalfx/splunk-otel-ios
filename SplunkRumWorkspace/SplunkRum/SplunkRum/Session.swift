@@ -39,6 +39,7 @@ func getRumSessionId() -> String {
         if Date() > sessionIdExpiration {
             sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
             rumSessionId = generateNewSessionId()
+            updateCrashReportSessionId() // odd coupling here but whatever
         }
         return rumSessionId
     }
