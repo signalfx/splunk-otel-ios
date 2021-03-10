@@ -179,8 +179,7 @@ func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
     if origM != nil && swizM != nil {
         method_exchangeImplementations(origM!, swizM!)
     } else {
-        // FIXME logging
-        print("warning: could not swizzle "+NSStringFromSelector(orig))
+        debug_log("warning: could not swizzle "+NSStringFromSelector(orig))
     }
 }
 

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		86043B7C25F93E3400A29788 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86043B7B25F93E3400A29788 /* Log.swift */; };
 		8616095E25F2BAD80014CBD1 /* sample.plcrash in Resources */ = {isa = PBXBuildFile; fileRef = 8616095D25F2BAD80014CBD1 /* sample.plcrash */; };
 		86260ECE25CDC1DE009F3CB1 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */; };
 		86260ED525CDC1DE009F3CB1 /* SplunkRum.h in Headers */ = {isa = PBXBuildFile; fileRef = 86260EC725CDC1DE009F3CB1 /* SplunkRum.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -55,6 +56,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		86043B7B25F93E3400A29788 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		8616095D25F2BAD80014CBD1 /* sample.plcrash */ = {isa = PBXFileReference; lastKnownFileType = file; path = sample.plcrash; sourceTree = "<group>"; };
 		86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86260EC725CDC1DE009F3CB1 /* SplunkRum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SplunkRum.h; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 				866192F325ED329E0035F08E /* Session.swift */,
 				863A2F4125ED7BB100F3ECE0 /* AppStart.swift */,
 				864F69A325F17C2000C8DA59 /* CrashReporting.swift */,
+				86043B7B25F93E3400A29788 /* Log.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -287,6 +290,7 @@
 			files = (
 				8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
+				86043B7C25F93E3400A29788 /* Log.swift in Sources */,
 				864F69A425F17C2000C8DA59 /* CrashReporting.swift in Sources */,
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,

@@ -71,24 +71,22 @@ public class SplunkRum {
      */
     public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
         if !Thread.isMainThread {
-            print("Please call SplunkRum.initialize only on the main thread")
+            print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
             return
         }
         if initialized || initializing {
-            // FIXME error handling, logging, etc.
-            print("SplunkRum already initializ{ed,ing}")
+            debug_log("SplunkRum already initializ{ed,ing}")
             return
         }
         initializing = true
         defer {
             initializing = false
         }
-        print("SplunkRum.initialize")
+        debug_log("SplunkRum.initialize")
         configuredOptions = options
         // FIXME apply global attribute length cap
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
-            // FIXME error handling / API
-            print("beaconUrl must be https or options: allowInsecureBeacon must be true")
+            print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
             return
         }
         theBeaconUrl = beaconUrl
@@ -106,7 +104,7 @@ public class SplunkRum {
             initializeCrashReporting()
         }
         initialized = true
-        print("SplunkRum initialization done")
+        print("SplunkRum.initialize() complete")
     }
     /**
             Convenience function for reporting an error.

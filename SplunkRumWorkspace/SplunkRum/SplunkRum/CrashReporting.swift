@@ -24,12 +24,12 @@ func initializeCrashReporting() {
     let config = PLCrashReporterConfig(signalHandlerType: .BSD, symbolicationStrategy: PLCrashReporterSymbolicationStrategy(rawValue: 0) /* none */)
     let crashReporter_ = PLCrashReporter(configuration: config)
     if crashReporter_ == nil {
-        print("Cannot enable PLCrashReporter")
+        debug_log("Cannot enable PLCrashReporter")
         return
     }
     let crashReporter = crashReporter_!
     let success = crashReporter.enable()
-    print("PLCrashReporter enabled: "+success.description)
+    debug_log("PLCrashReporter enabled: "+success.description)
     if !success {
         return
     }
@@ -39,13 +39,12 @@ func initializeCrashReporting() {
     if !crashReporter.hasPendingCrashReport() {
         return
     }
-    print("Had a pending crash report")
+    debug_log("Had a pending crash report")
     do {
         let data = crashReporter.loadPendingCrashReportData()
         try loadPendingCrashReport(data)
     } catch {
-        // FIXME error handling
-        print("oh no")
+        debug_log("Error loading crash report: \(error)")
     }
     crashReporter.purgePendingCrashReport()
 }
@@ -57,10 +56,9 @@ func updateCrashReportSessionId() {
 }
 
 func loadPendingCrashReport(_ data: Data!) throws {
-    print(data?.count as Any)
+    debug_log("Loading crash report of size \(data?.count as Any)")
     let report = try PLCrashReport(data: data)
     let oldSessionId = String(decoding: report.customData, as: UTF8.self)
-    print(oldSessionId)
     // Turn the report into a span
     let tracer = buildTracer()
     let now = Date()
