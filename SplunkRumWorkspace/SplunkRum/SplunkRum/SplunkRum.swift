@@ -100,7 +100,6 @@ public class SplunkRum {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
         }
         sendAppStartSpan()
-        initializeUncaughtExceptionReporting()
         initalizeNetworkInstrumentation()
         initalizeUIInstrumentation()
         if options?.enableCrashReporting ?? true {
@@ -119,7 +118,7 @@ public class SplunkRum {
             Convenience function for reporting an error.
      */
     public class func reportError(exception: NSException) {
-        reportExceptionErrorSpan(e: exception, manuallyReported: true)
+        reportExceptionErrorSpan(e: exception)
     }
     /**
             Convenience function for reporting an error.

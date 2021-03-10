@@ -20,7 +20,7 @@
 		864F69A025F17BB400C8DA59 /* CrashReporter in Frameworks */ = {isa = PBXBuildFile; productRef = 864F699F25F17BB400C8DA59 /* CrashReporter */; };
 		864F69A425F17C2000C8DA59 /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864F69A325F17C2000C8DA59 /* CrashReporting.swift */; };
 		8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */; };
-		8654BCF825E54D340013F7F6 /* ErrorInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCF725E54D340013F7F6 /* ErrorInstrumentation.swift */; };
+		8654BCF825E54D340013F7F6 /* ErrorReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCF725E54D340013F7F6 /* ErrorReporting.swift */; };
 		8654BCFC25E55E850013F7F6 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCFB25E55E850013F7F6 /* TestUtils.swift */; };
 		8654BD0025E561AE0013F7F6 /* ErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCFF25E561AE0013F7F6 /* ErrorTests.swift */; };
 		865A5CA125DC33EF003A1E5A /* NetworkInstrumentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */; };
@@ -66,7 +66,7 @@
 		863A2F4125ED7BB100F3ECE0 /* AppStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStart.swift; sourceTree = "<group>"; };
 		864F69A325F17C2000C8DA59 /* CrashReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporting.swift; sourceTree = "<group>"; };
 		8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentationUtils.swift; sourceTree = "<group>"; };
-		8654BCF725E54D340013F7F6 /* ErrorInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorInstrumentation.swift; sourceTree = "<group>"; };
+		8654BCF725E54D340013F7F6 /* ErrorReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorReporting.swift; sourceTree = "<group>"; };
 		8654BCFB25E55E850013F7F6 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		8654BCFF25E561AE0013F7F6 /* ErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorTests.swift; sourceTree = "<group>"; };
 		865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentationTests.swift; sourceTree = "<group>"; };
@@ -128,7 +128,7 @@
 				86260EC825CDC1DE009F3CB1 /* Info.plist */,
 				86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */,
 				8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */,
-				8654BCF725E54D340013F7F6 /* ErrorInstrumentation.swift */,
+				8654BCF725E54D340013F7F6 /* ErrorReporting.swift */,
 				86D3D39C25E82278004DD939 /* UIInstrumentation.swift */,
 				866192F325ED329E0035F08E /* Session.swift */,
 				863A2F4125ED7BB100F3ECE0 /* AppStart.swift */,
@@ -292,7 +292,7 @@
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
 				86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */,
-				8654BCF825E54D340013F7F6 /* ErrorInstrumentation.swift in Sources */,
+				8654BCF825E54D340013F7F6 /* ErrorReporting.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

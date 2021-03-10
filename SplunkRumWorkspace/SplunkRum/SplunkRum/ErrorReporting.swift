@@ -19,10 +19,10 @@ import OpenTelemetrySdk
 import OpenTelemetryApi
 
 // FIXME add component= to all spans?
-func reportExceptionErrorSpan(e: NSException, manuallyReported: Bool) {
+func reportExceptionErrorSpan(e: NSException) {
     let tracer = buildTracer()
     let now = Date()
-    let span = tracer.spanBuilder(spanName: manuallyReported ? "SplunkRum.reportError" : "UncaughtException").setStartTime(time: now).startSpan()
+    let span = tracer.spanBuilder(spanName: "SplunkRum.reportError").setStartTime(time: now).startSpan()
     span.setAttribute(key: "error", value: true)
     span.setAttribute(key: "error.name", value: e.name.rawValue)
     if e.reason != nil {
@@ -33,26 +33,6 @@ func reportExceptionErrorSpan(e: NSException, manuallyReported: Bool) {
         span.setAttribute(key: "error.stack", value: stack)
     }
     span.end(time: now)
-    // App likely crashing now; last-ditch effort to force-flush
-    if !manuallyReported {
-        OpenTelemetrySDK.instance.tracerProvider.forceFlush()
-    }
-}
-
-var oldExceptionHandler: ((NSException) -> Void)?
-func ourExceptionHandler(e: NSException) {
-    print("Got an exception")
-    reportExceptionErrorSpan(e: e, manuallyReported: false)
-    if oldExceptionHandler != nil {
-        oldExceptionHandler!(e)
-    }
-
-}
-
-func initializeUncaughtExceptionReporting() {
-    // FIXME this doesn't do anything about the app adding an uncaught handler of its own after SplunkRum.init
-    oldExceptionHandler = NSGetUncaughtExceptionHandler()
-    NSSetUncaughtExceptionHandler(ourExceptionHandler(e:))
 }
 
 func reportErrorErrorSpan(e: Error) {

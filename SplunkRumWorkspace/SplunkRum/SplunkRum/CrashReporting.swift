@@ -20,11 +20,8 @@ import CrashReporter
 
 var TheCrashReporter: PLCrashReporter?
 
-// FIXME this whole thing is slapped together; read through the docs some more and
-// understand all the choices and possibilities
 func initializeCrashReporting() {
-    // FIXME why does .mach crash with signal 5 (breakpoint)?
-    let config = PLCrashReporterConfig(signalHandlerType: .BSD, symbolicationStrategy: .all)
+    let config = PLCrashReporterConfig(signalHandlerType: .BSD, symbolicationStrategy: PLCrashReporterSymbolicationStrategy(rawValue: 0) /* none */)
     let crashReporter_ = PLCrashReporter(configuration: config)
     if crashReporter_ == nil {
         print("Cannot enable PLCrashReporter")
@@ -42,6 +39,7 @@ func initializeCrashReporting() {
     if !crashReporter.hasPendingCrashReport() {
         return
     }
+    print("Had a pending crash report")
     do {
         let data = crashReporter.loadPendingCrashReportData()
         try loadPendingCrashReport(data)
@@ -79,6 +77,10 @@ func loadPendingCrashReport(_ data: Data!) throws {
             span.setAttribute(key: "error.stack", value: crashedThreadToStack(report: report, thread: thread))
             break
         }
+    }
+    if report.hasExceptionInfo {
+        span.setAttribute(key: "error.name", value: report.exceptionInfo.exceptionName)
+        span.setAttribute(key: "error.message", value: report.exceptionInfo.exceptionReason)
     }
     span.end(time: now)
 }
