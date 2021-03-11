@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/grpc/grpc-swift.git",
         "state": {
           "branch": null,
-          "revision": "b83ee1ee2caa0660eb02444977b9b6e353c2adbf",
-          "version": "1.0.0-alpha.12"
+          "revision": "9e464a75079928366aa7041769a271fac89271bf",
+          "version": "1.0.0"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/open-telemetry/opentelemetry-swift",
         "state": {
           "branch": null,
-          "revision": "42da6aeb3ef463da93f201849b2df6148c818b66",
-          "version": "0.5.0"
+          "revision": "2356f1f5a3bc2063b1f5f1d66736b53c6762e371",
+          "version": "0.6.0"
         }
       },
       {
@@ -62,6 +62,15 @@
           "branch": null,
           "revision": "43931b7a7daf8120a487601530c8bc03ce711992",
           "version": "2.25.1"
+        }
+      },
+      {
+        "package": "swift-nio-extras",
+        "repositoryURL": "https://github.com/apple/swift-nio-extras.git",
+        "state": {
+          "branch": null,
+          "revision": "de1c80ad1fdff1ba772bcef6b392c3ef735f39a6",
+          "version": "1.8.0"
         }
       },
       {
