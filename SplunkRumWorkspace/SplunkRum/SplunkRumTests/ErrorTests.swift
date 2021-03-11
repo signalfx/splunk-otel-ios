@@ -18,6 +18,7 @@ import Foundation
 import XCTest
 @testable import SplunkRum
 
+// FIXME rewrite to use localSpans rather than receivedSpans
 class ErrorTests: XCTestCase {
     enum EnumError: Error {
         case ExampleError

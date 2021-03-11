@@ -17,6 +17,7 @@
 		86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F0E25CDC407009F3CB1 /* SplunkRum.swift */; };
 		86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */; };
 		863044D325F6CA5A00E0F846 /* libStdoutExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 863044D225F6CA5A00E0F846 /* libStdoutExporter */; };
+		8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8634EDC325FA86D20082819A /* LimitingExporter.swift */; };
 		863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863A2F4125ED7BB100F3ECE0 /* AppStart.swift */; };
 		864F69A025F17BB400C8DA59 /* CrashReporter in Frameworks */ = {isa = PBXBuildFile; productRef = 864F699F25F17BB400C8DA59 /* CrashReporter */; };
 		864F69A425F17C2000C8DA59 /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864F69A325F17C2000C8DA59 /* CrashReporting.swift */; };
@@ -65,6 +66,7 @@
 		86260ED425CDC1DE009F3CB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86260F0E25CDC407009F3CB1 /* SplunkRum.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplunkRum.swift; sourceTree = "<group>"; };
 		86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerTimingTests.swift; sourceTree = "<group>"; };
+		8634EDC325FA86D20082819A /* LimitingExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitingExporter.swift; sourceTree = "<group>"; };
 		863A2F4125ED7BB100F3ECE0 /* AppStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStart.swift; sourceTree = "<group>"; };
 		864F69A325F17C2000C8DA59 /* CrashReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporting.swift; sourceTree = "<group>"; };
 		8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentationUtils.swift; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				863A2F4125ED7BB100F3ECE0 /* AppStart.swift */,
 				864F69A325F17C2000C8DA59 /* CrashReporting.swift */,
 				86043B7B25F93E3400A29788 /* Log.swift */,
+				8634EDC325FA86D20082819A /* LimitingExporter.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -293,6 +296,7 @@
 				86043B7C25F93E3400A29788 /* Log.swift in Sources */,
 				864F69A425F17C2000C8DA59 /* CrashReporting.swift in Sources */,
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
+				8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
 				86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */,

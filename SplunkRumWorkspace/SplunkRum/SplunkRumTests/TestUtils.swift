@@ -17,14 +17,28 @@ limitations under the License.
 import Foundation
 import Swifter
 import SplunkRum
+import OpenTelemetrySdk
+import OpenTelemetryApi
 
 var receivedSpans: [TestZipkinSpan] = []
 let ServerPort = 8989
 var testEnvironmentInited = false
+var localSpans: [SpanData] = []
+
+class TestSpanExporter: SpanExporter {
+    func export(spans: [SpanData]) -> SpanExporterResultCode {
+        localSpans.append(contentsOf: spans)
+        return .success
+    }
+
+    func flush() -> SpanExporterResultCode { return .success }
+    func shutdown() { }
+}
 
 func initializeTestEnvironment() throws {
     if testEnvironmentInited {
         receivedSpans.removeAll()
+        localSpans.removeAll()
         return
     }
     testEnvironmentInited = true
@@ -42,5 +56,5 @@ func initializeTestEnvironment() throws {
     }
     try server.start(8989)
     SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: SplunkRumOptions(allowInsecureBeacon: true, globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true]))
-
+    OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: TestSpanExporter()))
 }

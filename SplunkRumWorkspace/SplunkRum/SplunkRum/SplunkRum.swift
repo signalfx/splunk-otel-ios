@@ -93,7 +93,7 @@ public class SplunkRum {
         let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
         let zipkin = ZipkinTraceExporter(options: exportOptions)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor(options?.globalAttributes ?? nil))
-        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: zipkin))
+        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: LimitingExporter(proxy: zipkin)))
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
         }

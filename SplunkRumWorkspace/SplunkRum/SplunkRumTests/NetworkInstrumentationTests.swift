@@ -23,6 +23,7 @@ struct TestZipkinSpan: Decodable {
     var tags: [String: String]
 }
 
+// FIXME rewrite to use localSpans rather than receivedSpans (and leave at least test using the full zipking export)
 class NetworkInstrumentationTests: XCTestCase {
     func testBasics() throws {
         try initializeTestEnvironment()
