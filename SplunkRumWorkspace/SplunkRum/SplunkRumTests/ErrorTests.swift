@@ -37,60 +37,57 @@ class ErrorTests: XCTestCase {
         SplunkRum.reportError(exception: NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil))
         try loadPendingCrashReport(crashData) // creates span for the saved crash report
 
-        print("sleeping to wait for span batch, don't worry about the pause...")
-        sleep(8)
-        print(receivedSpans as Any)
-        let eStr = receivedSpans.first(where: { (span) -> Bool in
-            return span.tags["error.message"] == "Test message"
+        print(localSpans as Any)
+        let eStr = localSpans.first(where: { (span) -> Bool in
+            return span.attributes["error.message"]?.description == "Test message"
         })
-        let eEnumErr = receivedSpans.first(where: { (span) -> Bool in
-            return (span.tags["error.message"]?.contains("EnumError") ?? false)
+        let eEnumErr = localSpans.first(where: { (span) -> Bool in
+            return (span.attributes["error.message"]?.description.contains("EnumError") ?? false)
         })
-        let eClassErr = receivedSpans.first(where: { (span) -> Bool in
-            return (span.tags["error.message"]?.contains("ClassError") ?? false)
+        let eClassErr = localSpans.first(where: { (span) -> Bool in
+            return (span.attributes["error.message"]?.description.contains("ClassError") ?? false)
         })
-        let eExc = receivedSpans.first(where: { (span) -> Bool in
-            return span.tags["error.message"] == "Could not parse input"
+        let eExc = localSpans.first(where: { (span) -> Bool in
+            return span.attributes["error.message"]?.description == "Could not parse input"
         })
-        let crashReport = receivedSpans.first(where: { (span) -> Bool in
+        let crashReport = localSpans.first(where: { (span) -> Bool in
             return span.name == "crash.report"
         })
 
         XCTAssertNotNil(eStr)
         XCTAssertEqual(eStr?.name, "SplunkRum.reportError")
-        XCTAssertEqual(eStr?.tags["error"], "true")
-        XCTAssertEqual(eStr?.tags["error.name"], "String")
-        XCTAssertNotNil(eStr?.tags["splunk.rumSessionId"])
+        XCTAssertEqual(eStr?.attributes["error"]?.description, "true")
+        XCTAssertEqual(eStr?.attributes["error.name"]?.description, "String")
+        XCTAssertNotNil(eStr?.attributes["splunk.rumSessionId"])
 
         XCTAssertNotNil(eExc)
         XCTAssertEqual(eExc?.name, "SplunkRum.reportError")
-        XCTAssertEqual(eExc?.tags["error"], "true")
-        XCTAssertEqual(eExc?.tags["error.name"], "IllegalFormatError")
-        XCTAssertNotNil(eExc?.tags["splunk.rumSessionId"])
+        XCTAssertEqual(eExc?.attributes["error"]?.description, "true")
+        XCTAssertEqual(eExc?.attributes["error.name"]?.description, "IllegalFormatError")
+        XCTAssertNotNil(eExc?.attributes["splunk.rumSessionId"])
 
         XCTAssertNotNil(eEnumErr)
         XCTAssertEqual(eEnumErr?.name, "SplunkRum.reportError")
-        XCTAssertEqual(eEnumErr?.tags["error"], "true")
-        XCTAssertNotNil(eEnumErr?.tags["splunk.rumSessionId"])
+        XCTAssertEqual(eEnumErr?.attributes["error"]?.description, "true")
+        XCTAssertNotNil(eEnumErr?.attributes["splunk.rumSessionId"])
 
         XCTAssertNotNil(eClassErr)
         XCTAssertEqual(eClassErr?.name, "SplunkRum.reportError")
-        XCTAssertEqual(eClassErr?.tags["error"], "true")
-        XCTAssertNotNil(eClassErr?.tags["splunk.rumSessionId"])
+        XCTAssertEqual(eClassErr?.attributes["error"]?.description, "true")
+        XCTAssertNotNil(eClassErr?.attributes["splunk.rumSessionId"])
 
-        XCTAssertEqual(eClassErr?.tags["splunk.rumSessionId"], eExc?.tags["splunk.rumSessionId"])
+        XCTAssertEqual(eClassErr?.attributes["splunk.rumSessionId"], eExc?.attributes["splunk.rumSessionId"])
 
         XCTAssertNotNil(crashReport)
-        XCTAssertNotEqual(crashReport?.tags["splunk.rumSessionId"], crashReport?.tags["crash.rumSessionId"])
-        XCTAssertEqual(crashReport?.tags["crash.rumSessionId"], "355ecc42c29cf0b56c411f1eab9191d0")
-        XCTAssertEqual(crashReport?.tags["crash.address"], "140733995048756")
-        XCTAssertEqual(crashReport?.tags["error"], "true")
-        XCTAssertEqual(crashReport?.tags["error.name"], "SIGILL")
+        XCTAssertNotEqual(crashReport?.attributes["splunk.rumSessionId"], crashReport?.attributes["crash.rumSessionId"])
+        XCTAssertEqual(crashReport?.attributes["crash.rumSessionId"]?.description, "355ecc42c29cf0b56c411f1eab9191d0")
+        XCTAssertEqual(crashReport?.attributes["crash.address"]?.description, "140733995048756")
+        XCTAssertEqual(crashReport?.attributes["error"]?.description, "true")
+        XCTAssertEqual(crashReport?.attributes["error.name"]?.description, "SIGILL")
 
         let beacon = receivedSpans.first(where: { (span) -> Bool in
             return span.tags["http.url"]?.contains("/v1/traces") ?? false
         })
         XCTAssertNil(beacon)
-
     }
 }
