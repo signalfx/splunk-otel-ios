@@ -18,7 +18,6 @@ import Foundation
 import XCTest
 @testable import SplunkRum
 
-// FIXME rewrite to use localSpans rather than receivedSpans
 class ErrorTests: XCTestCase {
     enum EnumError: Error {
         case ExampleError
@@ -84,10 +83,5 @@ class ErrorTests: XCTestCase {
         XCTAssertEqual(crashReport?.attributes["crash.address"]?.description, "140733995048756")
         XCTAssertEqual(crashReport?.attributes["error"]?.description, "true")
         XCTAssertEqual(crashReport?.attributes["error.name"]?.description, "SIGILL")
-
-        let beacon = receivedSpans.first(where: { (span) -> Bool in
-            return span.tags["http.url"]?.contains("/v1/traces") ?? false
-        })
-        XCTAssertNil(beacon)
     }
 }
