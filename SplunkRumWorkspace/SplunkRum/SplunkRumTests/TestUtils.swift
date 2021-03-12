@@ -49,7 +49,11 @@ func initializeTestEnvironment() throws {
     testEnvironmentInited = true
     let server = HttpServer()
     server["/data"] = { _ in
-        return HttpResponse.ok(.text("here is some data"))
+        let resp = HttpResponse.raw(200, "OK",
+                         ["Server-Timing": "traceparent;desc=\"00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01\""]) { writer throws in
+            try writer.write("here is some data".data(using: .utf8)!)
+        }
+        return resp
     }
     server["/v1/traces"] = { request in
         let spans = try! JSONDecoder().decode([TestZipkinSpan].self, from: Data(request.body))
