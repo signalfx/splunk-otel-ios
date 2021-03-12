@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import XCTest
+import Atomics
 
 // Fake span structure for JSONDecoder, only care about tags at the moment
 struct TestZipkinSpan: Decodable {
@@ -23,7 +24,6 @@ struct TestZipkinSpan: Decodable {
     var tags: [String: String]
 }
 
-// FIXME rewrite to use localSpans rather than receivedSpans (and leave at least test using the full zipking export)
 class NetworkInstrumentationTests: XCTestCase {
     func testBasics() throws {
         try initializeTestEnvironment()
@@ -37,39 +37,36 @@ class NetworkInstrumentationTests: XCTestCase {
         req.httpMethod = "POST"
         URLSession.shared.uploadTask(with: req, from: "sample data".data(using: .utf8)!).resume()
 
-        // FIXME config option to dial back the batch period
-        print("sleeping to wait for span batch, don't worry about the pause...")
-        sleep(8)
-        print(receivedSpans as Any)
-        let httpGet = receivedSpans.first(where: { (span) -> Bool in
+        // wait until spans recevied
+        var attempts = 0
+        while localSpans.count != 2 {
+            attempts += 1
+            if attempts > 10 {
+                XCTFail("never got enough localSpans")
+            }
+            print("sleep 1")
+            sleep(1)
+        }
+
+        print(localSpans as Any)
+        let httpGet = localSpans.first(where: { (span) -> Bool in
             return span.name == "HTTP GET"
         })
-        let httpPost = receivedSpans.first(where: { (span) -> Bool in
+        let httpPost = localSpans.first(where: { (span) -> Bool in
             return span.name == "HTTP POST"
-        })
-        let beacon = receivedSpans.first(where: { (span) -> Bool in
-            return span.tags["http.url"]?.contains("/v1/traces") ?? false
         })
 
         XCTAssertNotNil(httpGet)
-        XCTAssertEqual(httpGet?.tags["http.url"], "http://127.0.0.1:8989/data")
-        XCTAssertEqual(httpGet?.tags["http.method"], "GET")
-        XCTAssertEqual(httpGet?.tags["http.status_code"], "200")
-        XCTAssertEqual(httpGet?.tags["http.response_content_length_uncompressed"], "17")
+        XCTAssertEqual(httpGet?.attributes["http.url"]?.description, "http://127.0.0.1:8989/data")
+        XCTAssertEqual(httpGet?.attributes["http.method"]?.description, "GET")
+        XCTAssertEqual(httpGet?.attributes["http.status_code"]?.description, "200")
+        XCTAssertEqual(httpGet?.attributes["http.response_content_length_uncompressed"]?.description, "17")
 
         XCTAssertNotNil(httpPost)
-        XCTAssertEqual(httpPost?.tags["http.url"], "http://127.0.0.1:8989/error")
-        XCTAssertEqual(httpPost?.tags["http.method"], "POST")
-        XCTAssertEqual(httpPost?.tags["http.status_code"], "500")
-        XCTAssertEqual(httpPost?.tags["http.request_content_length"], "11")
-
-        XCTAssertNil(beacon)
-
-        // FIXME not a great place to shoehorn it currently, but checking the globalAttributes logic here
-        XCTAssertEqual("7", httpPost?.tags["intKey"])
-        XCTAssertEqual("1.5", httpPost?.tags["doubleKey"])
-        XCTAssertEqual("true", httpPost?.tags["boolKey"])
-        XCTAssertEqual("strVal", httpPost?.tags["strKey"])
+        XCTAssertEqual(httpPost?.attributes["http.url"]?.description, "http://127.0.0.1:8989/error")
+        XCTAssertEqual(httpPost?.attributes["http.method"]?.description, "POST")
+        XCTAssertEqual(httpPost?.attributes["http.status_code"]?.description, "500")
+        XCTAssertEqual(httpPost?.attributes["http.request_content_length"]?.description, "11")
 
     }
 }
