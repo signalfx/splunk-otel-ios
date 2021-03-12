@@ -48,7 +48,6 @@ class NetworkInstrumentationTests: XCTestCase {
             sleep(1)
         }
 
-        print(localSpans as Any)
         let httpGet = localSpans.first(where: { (span) -> Bool in
             return span.name == "HTTP GET"
         })

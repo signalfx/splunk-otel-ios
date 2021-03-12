@@ -37,7 +37,6 @@ class ErrorTests: XCTestCase {
         try loadPendingCrashReport(crashData) // creates span for the saved crash report
 
         XCTAssertEqual(localSpans.count, 5)
-        print(localSpans as Any)
         let eStr = localSpans.first(where: { (span) -> Bool in
             return span.attributes["error.message"]?.description == "Test message"
         })
