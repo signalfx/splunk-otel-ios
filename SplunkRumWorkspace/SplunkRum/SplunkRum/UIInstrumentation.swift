@@ -33,10 +33,44 @@ extension UIApplication {
     }
 }
 
+extension UIViewController {
+    @objc open func swizzled_loadView() {
+        print("SWIZZLED LOADVIEW "+String(describing: type(of: self)))
+        self.swizzled_loadView()
+    }
+    @objc open func swizzled_viewDidLoad() {
+        print("SWIZZLED VIEWDIDLOAD "+String(describing: type(of: self)))
+        self.swizzled_viewDidLoad()
+    }
+    @objc open func swizzled_viewWillAppear(_ animated: Bool) {
+        print("SWIZZLED VIEWWILLAPPEAR "+String(describing: type(of: self)))
+        self.swizzled_viewWillAppear(animated)
+    }
+    @objc open func swizzled_viewDidAppear(_ animated: Bool) {
+        print("SWIZZLED VIEWDIDAPPEAR "+String(describing: type(of: self)))
+        self.swizzled_viewDidAppear(animated)
+    }
+    @objc open func swizzled_viewWillDisappear(_ animated: Bool) {
+        print("SWIZZLED VIEWWILLDISAPPEAR "+String(describing: type(of: self)))
+        self.swizzled_viewWillDisappear(animated)
+    }
+    @objc open func swizzled_viewDidDisappear(_ animated: Bool) {
+        print("SWIZZLED VIEWDIDDISAPPEAR "+String(describing: type(of: self)))
+        self.swizzled_viewDidDisappear(animated)
+    }
+
+}
+
 func initalizeUIInstrumentation() {
-    _ = NotificationCenter.default.addObserver(forName: nil, object: nil, queue: nil) { (using: Notification) in
-        print("NC "+using.debugDescription)
+    _ = NotificationCenter.default.addObserver(forName: nil, object: nil, queue: nil) { (_: Notification) in
+        // print("NC "+using.debugDescription)
     }
     swizzle(clazz: UIApplication.self, orig: #selector(UIApplication.sendAction(_:to:from:for:)), swizzled: #selector(UIApplication.swizzled_sendAction(_:to:from:for:)))
+    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.loadView), swizzled: #selector(UIViewController.swizzled_loadView))
+    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidLoad), swizzled: #selector(UIViewController.swizzled_viewDidLoad))
+    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewWillAppear(_:)), swizzled: #selector(UIViewController.swizzled_viewWillAppear(_:)))
+    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidAppear(_:)), swizzled: #selector(UIViewController.swizzled_viewDidAppear(_:)))
+    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewWillDisappear(_:)), swizzled: #selector(UIViewController.swizzled_viewWillDisappear(_:)))
+    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidDisappear(_:)), swizzled: #selector(UIViewController.swizzled_viewDidDisappear(_:)))
 
 }
