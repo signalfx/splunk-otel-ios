@@ -19,16 +19,28 @@ import Foundation
 import UIKit
 
 extension UIApplication {
+    // FIXME will probably need to grow a config feature to silence chatty actions
+    // FIXME really only a reasonable solution for storyboard apps/components and not swiftui ones
     @objc open func swizzled_sendAction(_ action: Selector,
                                         to target: Any?,
                                         from sender: Any?,
                                         for event: UIEvent?) -> Bool {
-        print("--- SEND ACTION")
-        print(action)
-        print(target as Any)
-        print(sender as Any)
-        print(event as Any)
-        print("---")
+        let tracer = buildTracer()
+        let span = tracer.spanBuilder(spanName: action.description).startSpan()
+        var scope = tracer.setActive(span)
+        defer {
+            scope.close()
+            span.end()
+        }
+        if target != nil {
+            span.setAttribute(key: "target.type", value: String(describing: type(of: target!)))
+        }
+        if sender != nil {
+            span.setAttribute(key: "sender.type", value: String(describing: type(of: sender!)))
+        }
+        if event != nil {
+            span.setAttribute(key: "event.type", value: String(describing: type(of: event!)))
+        }
         return swizzled_sendAction(action, to: target, from: sender, for: event)
     }
 }

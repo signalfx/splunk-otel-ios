@@ -23,6 +23,16 @@ class ViewController: UIViewController, UITextFieldDelegate {
     @IBAction
     public func doClick() {
         print("click!")
+        let url = URL(string: "http://127.0.0.1:7878/data")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "HEAD"
+        let task = URLSession.shared.dataTask(with: req) {(data, _: URLResponse?, _) in
+            guard let data = data else { return }
+            print("got some data")
+            print(data)
+
+        }
+        task.resume()
     }
 
     @IBAction
