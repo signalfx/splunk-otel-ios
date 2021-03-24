@@ -19,10 +19,10 @@ let package = Package(
         .target(
             name: "SplunkRum",
             dependencies: [
-		.product(name: "OpenTelemetryApi", package:"opentelemetry-swift"),
-		.product(name: "OpenTelemetrySdk", package:"opentelemetry-swift"),
-		.product(name: "StdoutExporter", package:"opentelemetry-swift"),
-		.product(name: "ZipkinExporter", package:"opentelemetry-swift"),
+		.product(name: "libOpenTelemetryApi", package:"opentelemetry-swift"),
+		.product(name: "libOpenTelemetrySdk", package:"opentelemetry-swift"),
+		.product(name: "libStdoutExporter", package:"opentelemetry-swift"),
+		.product(name: "libZipkinExporter", package:"opentelemetry-swift"),
 		.product(name: "CrashReporter", package: "PLCrashReporter")
             ],
             path: "SplunkRumWorkspace/SplunkRum",
