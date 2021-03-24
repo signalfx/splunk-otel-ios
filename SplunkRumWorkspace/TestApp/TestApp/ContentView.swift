@@ -15,6 +15,8 @@ limitations under the License.
 */
 
 import SwiftUI
+import OpenTelemetryApi
+import OpenTelemetrySdk
 
 struct ContentView: View {
     func networkRequest() {
@@ -49,6 +51,12 @@ struct ContentView: View {
         let null = UnsafePointer<UInt8>(bitPattern: 0)
         let derefNull = null!.pointee
     }
+    func manualSpan() {
+        let span = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "manual").spanBuilder(spanName: "manualSpan").startSpan()
+        span.setAttribute(key: "manualKey", value: "manualValue")
+        span.end()
+
+    }
 
     @State var text = ""
     @State var toggle = true
@@ -75,6 +83,11 @@ struct ContentView: View {
                 self.networkRequest()
             }) {
                 Text("Network (req)!")
+            }
+            Button(action: {
+                self.manualSpan()
+            }) {
+                Text("Manual Span")
             }
         }
         HStack {

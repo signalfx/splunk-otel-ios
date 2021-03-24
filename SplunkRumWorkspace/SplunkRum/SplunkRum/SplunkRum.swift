@@ -19,7 +19,6 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 import ZipkinExporter
 import StdoutExporter
-import UIKit
 
 /**
  Optional configuration for SplunkRum.initialize()
