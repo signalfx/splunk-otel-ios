@@ -60,4 +60,26 @@ class UtilsTests: XCTestCase {
         XCTAssertEqual("7", localSpans[0].attributes["normalInt"]?.description ?? nil)
     }
 
+    func testSetGlobalAttributes() throws {
+        try initializeTestEnvironment()
+        SplunkRum.setGlobalAttributes( ["additionalKey": "additionalValue"] )
+        buildTracer().spanBuilder(spanName: "attrsTest").startSpan().end()
+        XCTAssertEqual(1, localSpans.count)
+        XCTAssertEqual("additionalValue", localSpans[0].attributes["additionalKey"]?.description ?? nil)
+        localSpans.removeAll()
+
+        SplunkRum.setGlobalAttributes( ["additionalKey": "changedValue"] )
+        buildTracer().spanBuilder(spanName: "attrsTest").startSpan().end()
+        XCTAssertEqual(1, localSpans.count)
+        XCTAssertEqual("changedValue", localSpans[0].attributes["additionalKey"]?.description ?? nil)
+        localSpans.removeAll()
+
+        SplunkRum.setGlobalAttributes( ["additionalKey": nil] )
+        buildTracer().spanBuilder(spanName: "attrsTest").startSpan().end()
+        XCTAssertEqual(1, localSpans.count)
+        XCTAssertEqual(nil, localSpans[0].attributes["additionalKey"]?.description ?? nil)
+        localSpans.removeAll()
+
+    }
+
 }

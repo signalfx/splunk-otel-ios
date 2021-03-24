@@ -60,8 +60,7 @@ class GlobalAttributesProcessor: SpanProcessor {
 
     var appName: String
     var appVersion: String?
-    var globalAttributes: [String: Any]?
-    init(_ globalAttributes: [String: Any]?) {
+    init() {
         let app = Bundle.main.infoDictionary?["CFBundleName"] as? String
         if app != nil {
             appName = app!
@@ -69,7 +68,6 @@ class GlobalAttributesProcessor: SpanProcessor {
             appName = "unknown-app"
         }
         appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-        self.globalAttributes = globalAttributes
     }
 
     func onStart(parentContext: SpanContext?, span: ReadableSpan) {
@@ -79,18 +77,20 @@ class GlobalAttributesProcessor: SpanProcessor {
         }
         span.setAttribute(key: "splunk.rumSessionId", value: getRumSessionId())
         span.setAttribute(key: "splunk.rumVersion", value: SplunkRumVersionString)
-        self.globalAttributes?.forEach({ (key: String, value: Any) in
-            switch value {
-            case is Int:
-                span.setAttribute(key: key, value: value as! Int)
-            case is String:
-                span.setAttribute(key: key, value: value as! String)
-            case is Double:
-                span.setAttribute(key: key, value: value as! Double)
-            case is Bool:
-                span.setAttribute(key: key, value: value as! Bool)
-            default:
-                nop()
+        globalAttributes.forEach({ (key: String, value: Any?) in
+            if value != nil {
+                switch value! {
+                case is Int:
+                    span.setAttribute(key: key, value: value! as! Int)
+                case is String:
+                    span.setAttribute(key: key, value: value! as! String)
+                case is Double:
+                    span.setAttribute(key: key, value: value! as! Double)
+                case is Bool:
+                    span.setAttribute(key: key, value: value! as! Bool)
+                default:
+                    nop()
+                }
             }
         })
         addPreSpanFields(span: span)

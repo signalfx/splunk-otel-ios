@@ -25,7 +25,7 @@ import UIKit
  Optional configuration for SplunkRum.initialize()
  */
 public struct SplunkRumOptions {
-    public init(allowInsecureBeacon: Bool? = false, enableCrashReporting: Bool? = true, debug: Bool? = false, globalAttributes: [String: Any]? = nil) {
+    public init(allowInsecureBeacon: Bool? = false, enableCrashReporting: Bool? = true, debug: Bool? = false, globalAttributes: [String: Any?]? = nil) {
         self.allowInsecureBeacon = allowInsecureBeacon
         self.enableCrashReporting = enableCrashReporting
         self.debug = debug
@@ -46,10 +46,11 @@ public struct SplunkRumOptions {
     /**
                     Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
      */
-    public var globalAttributes: [String: Any]?
+    public var globalAttributes: [String: Any?]?
 
     // FIXME ignoreURLs for http spans
 }
+var globalAttributes: [String: Any?] = [:]
 
 /**
  Main class for initializing the SplunkRum agent.
@@ -84,6 +85,9 @@ public class SplunkRum {
         }
         debug_log("SplunkRum.initialize")
         configuredOptions = options
+        if options?.globalAttributes != nil {
+            setGlobalAttributes(options!.globalAttributes!)
+        }
         // FIXME apply global attribute length cap
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
@@ -92,7 +96,7 @@ public class SplunkRum {
         theBeaconUrl = beaconUrl
         let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
         let zipkin = ZipkinTraceExporter(options: exportOptions)
-        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor(options?.globalAttributes ?? nil))
+        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: LimitingExporter(proxy: zipkin)))
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
@@ -106,6 +110,14 @@ public class SplunkRum {
         initialized = true
         print("SplunkRum.initialize() complete")
     }
+
+    /**
+            Query for the current session ID.  Session IDs can change during the usage of the app so caching this result is not advised.
+     */
+    public class func getSessionId() -> String {
+        return getRumSessionId()
+    }
+
     /**
             Convenience function for reporting an error.
      */
@@ -124,4 +136,18 @@ public class SplunkRum {
     public class func reportError(error: Error) {
         reportErrorErrorSpan(e: error)
     }
+
+    /**
+        Set or override  one or more global attributes.  Pass nil to remove an attribute; acceptable types are Int, Double, String, and Bool.  Other value types will be silently ignored.  Can only be called after SplunkRum.initialize()
+     */
+    public class func setGlobalAttributes(_ attributes: [String: Any?]) {
+        globalAttributes.merge(attributes) { (_, new) in
+            if new == nil {
+                return new
+            } else {
+                return new!
+            }
+        }
+    }
+
 }
