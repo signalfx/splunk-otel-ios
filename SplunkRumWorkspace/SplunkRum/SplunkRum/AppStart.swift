@@ -59,6 +59,7 @@ func getDeviceModel() -> String {
 }
 
 func sendAppStartSpan() {
+    // FIXME possibly send later in the startup sequence to include timings and name(s) for first non-launch screen
     let tracer = buildTracer()
     // FIXME timestamps!
     // FIXME names for things

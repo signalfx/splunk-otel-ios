@@ -74,7 +74,7 @@ class UtilsTests: XCTestCase {
         XCTAssertEqual("changedValue", localSpans[0].attributes["additionalKey"]?.description ?? nil)
         localSpans.removeAll()
 
-        SplunkRum.setGlobalAttributes( ["additionalKey": nil] )
+        SplunkRum.removeGlobalAttribute("additionalKey")
         buildTracer().spanBuilder(spanName: "attrsTest").startSpan().end()
         XCTAssertEqual(1, localSpans.count)
         XCTAssertEqual(nil, localSpans[0].attributes["additionalKey"]?.description ?? nil)

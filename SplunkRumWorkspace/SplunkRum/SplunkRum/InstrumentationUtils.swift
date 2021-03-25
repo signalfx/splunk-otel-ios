@@ -77,20 +77,18 @@ class GlobalAttributesProcessor: SpanProcessor {
         }
         span.setAttribute(key: "splunk.rumSessionId", value: getRumSessionId())
         span.setAttribute(key: "splunk.rumVersion", value: SplunkRumVersionString)
-        globalAttributes.forEach({ (key: String, value: Any?) in
-            if value != nil {
-                switch value! {
-                case is Int:
-                    span.setAttribute(key: key, value: value! as! Int)
-                case is String:
-                    span.setAttribute(key: key, value: value! as! String)
-                case is Double:
-                    span.setAttribute(key: key, value: value! as! Double)
-                case is Bool:
-                    span.setAttribute(key: key, value: value! as! Bool)
-                default:
-                    nop()
-                }
+        globalAttributes.forEach({ (key: String, value: Any) in
+            switch value {
+            case is Int:
+                span.setAttribute(key: key, value: value as! Int)
+            case is String:
+                span.setAttribute(key: key, value: value as! String)
+            case is Double:
+                span.setAttribute(key: key, value: value as! Double)
+            case is Bool:
+                span.setAttribute(key: key, value: value as! Bool)
+            default:
+                nop()
             }
         })
         addPreSpanFields(span: span)

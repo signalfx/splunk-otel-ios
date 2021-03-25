@@ -23,38 +23,59 @@ import StdoutExporter
 /**
  Optional configuration for SplunkRum.initialize()
  */
-public struct SplunkRumOptions {
-    public init(allowInsecureBeacon: Bool? = false, enableCrashReporting: Bool? = true, debug: Bool? = false, globalAttributes: [String: Any?]? = nil) {
+@objc public class SplunkRumOptions: NSObject {
+
+    /**
+        Default options
+     */
+    @objc public override init() {
+    }
+
+    /**
+        Memberwise initializer
+     */
+    @objc public init(allowInsecureBeacon: Bool = false, enableCrashReporting: Bool = true, debug: Bool = false, globalAttributes: [String: Any] = [:]) {
         self.allowInsecureBeacon = allowInsecureBeacon
         self.enableCrashReporting = enableCrashReporting
         self.debug = debug
         self.globalAttributes = globalAttributes
     }
     /**
+        Copy constructor
+     */
+    @objc public init(opts: SplunkRumOptions) {
+        self.allowInsecureBeacon = opts.allowInsecureBeacon
+        self.enableCrashReporting = opts.enableCrashReporting
+        self.debug = opts.debug
+        // FIXME another way to copy?
+        self.globalAttributes = [:].merging(opts.globalAttributes) { _, new in new }
+    }
+
+    /**
             Allows non-https beaconUrls.  Default: false
      */
-    public var allowInsecureBeacon: Bool?
+    @objc public var allowInsecureBeacon: Bool = false
     /**
                     Turns on the crash reporting with PLCrashReporter feature.  Default: true
      */
-    public var enableCrashReporting: Bool?
+    @objc public var enableCrashReporting: Bool = true
     /**
             Turns on debug logging (including printouts of all spans)  Default: false
      */
-    public var debug: Bool?
+    @objc public var debug: Bool = false
     /**
                     Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
      */
-    public var globalAttributes: [String: Any?]?
+    @objc public var globalAttributes: [String: Any] = [:]
 
     // FIXME ignoreURLs for http spans
 }
-var globalAttributes: [String: Any?] = [:]
+var globalAttributes: [String: Any] = [:]
 
 /**
  Main class for initializing the SplunkRum agent.
  */
-public class SplunkRum {
+@objc public class SplunkRum: NSObject {
     // FIXME multithreading
     static var initialized = false
     static var initializing = false
@@ -69,7 +90,7 @@ public class SplunkRum {
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
-    public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
+    @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
             return
@@ -83,9 +104,11 @@ public class SplunkRum {
             initializing = false
         }
         debug_log("SplunkRum.initialize")
-        configuredOptions = options
+        if options != nil {
+            configuredOptions = SplunkRumOptions(opts: options!)
+        }
         if options?.globalAttributes != nil {
-            setGlobalAttributes(options!.globalAttributes!)
+            setGlobalAttributes(options!.globalAttributes)
         }
         // FIXME apply global attribute length cap
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
@@ -113,40 +136,39 @@ public class SplunkRum {
     /**
             Query for the current session ID.  Session IDs can change during the usage of the app so caching this result is not advised.
      */
-    public class func getSessionId() -> String {
+    @objc public class func getSessionId() -> String {
         return getRumSessionId()
     }
 
     /**
             Convenience function for reporting an error.
      */
-    public class func reportError(string: String) {
+    @objc public class func reportError(string: String) {
         reportStringErrorSpan(e: string)
     }
     /**
             Convenience function for reporting an error.
      */
-    public class func reportError(exception: NSException) {
+    @objc public class func reportError(exception: NSException) {
         reportExceptionErrorSpan(e: exception)
     }
     /**
             Convenience function for reporting an error.
      */
-    public class func reportError(error: Error) {
+    @objc public class func reportError(error: Error) {
         reportErrorErrorSpan(e: error)
     }
 
     /**
-        Set or override  one or more global attributes.  Pass nil to remove an attribute; acceptable types are Int, Double, String, and Bool.  Other value types will be silently ignored.  Can only be called after SplunkRum.initialize()
+        Set or override  one or more global attributes; acceptable types are Int, Double, String, and Bool.  Other value types will be silently ignored.  Can only be called after SplunkRum.initialize()
      */
-    public class func setGlobalAttributes(_ attributes: [String: Any?]) {
+    @objc public class func setGlobalAttributes(_ attributes: [String: Any]) {
         globalAttributes.merge(attributes) { (_, new) in
-            if new == nil {
-                return new
-            } else {
-                return new!
-            }
+            return new
         }
+    }
+    @objc public class func removeGlobalAttribute(_ key: String) {
+        globalAttributes.removeValue(forKey: key)
     }
 
 }
