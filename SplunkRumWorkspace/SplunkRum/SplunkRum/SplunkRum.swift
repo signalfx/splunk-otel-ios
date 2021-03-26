@@ -123,12 +123,14 @@ var globalAttributes: [String: Any] = [:]
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
         }
+        let srInit = buildTracer().spanBuilder(spanName: "SplunkRum.initialize").startSpan()
         sendAppStartSpan()
         initalizeNetworkInstrumentation()
         initalizeUIInstrumentation()
         if options?.enableCrashReporting ?? true {
             initializeCrashReporting()
         }
+        srInit.end()
         initialized = true
         print("SplunkRum.initialize() complete")
     }

@@ -58,19 +58,49 @@ func getDeviceModel() -> String {
     return model
 }
 
-func sendAppStartSpan() {
-    // FIXME possibly send later in the startup sequence to include timings and name(s) for first non-launch screen
+var appStart: Span?
+
+func initializeAppStartupListeners() {
+    let events = [
+        UIApplication.didFinishLaunchingNotification,
+        UIApplication.willEnterForegroundNotification,
+        UIApplication.didBecomeActiveNotification
+    ]
+    var reportedEvents = Set<Notification.Name>()
+    events.forEach { event in
+        _ = NotificationCenter.default.addObserver(forName: event, object: nil, queue: nil) { (notif) in
+            print(notif.debugDescription)
+            if !reportedEvents.contains(event) {
+                reportedEvents.insert(event)
+                if appStart == nil {
+                    constructAppStartSpan()
+                }
+                appStart!.addEvent(name: event.rawValue)
+                if event == UIApplication.didBecomeActiveNotification {
+                    appStart!.end()
+                    appStart = nil
+                }
+            }
+        }
+    }
+}
+
+func constructAppStartSpan() {
     let tracer = buildTracer()
-    // FIXME timestamps!
-    // FIXME names for things
-    let appStart = tracer.spanBuilder(spanName: "AppStart").startSpan()
-    appStart.setAttribute(key: "device.model", value: getDeviceModel())
-    appStart.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
+    // FIXME more startup details?
+    // FIXME perhaps the span should start at processStartTime?
+    appStart = tracer.spanBuilder(spanName: "AppStart").startSpan()
+    appStart!.setAttribute(key: "device.model", value: getDeviceModel())
+    appStart!.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
     do {
         let start = try processStartTime()
-        appStart.addEvent(name: "process.start", timestamp: start)
+        appStart!.addEvent(name: "process.start", timestamp: start)
     } catch {
         // swallow
     }
-    appStart.end()
+
+}
+
+func sendAppStartSpan() {
+    initializeAppStartupListeners()
 }
