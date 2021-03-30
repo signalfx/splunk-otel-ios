@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 import UIKit
+import OpenTelemetryApi
 
 extension UIApplication {
     // FIXME will probably need to grow a config feature to silence chatty actions
@@ -73,7 +74,43 @@ extension UIViewController {
 
 }
 
+let Presentation2Span = NSMapTable<NSObject, SpanHolder>(keyOptions: NSPointerFunctions.Options.weakMemory, valueOptions: NSPointerFunctions.Options.strongMemory)
+
+class SpanHolder: NSObject {
+    let span: Span
+    init(_ span: Span) {
+        self.span = span
+    }
+}
+
+// FIXME one of these occurs during AppStart - perhaps it could become a child of that?
+func initializePresentationTransitionInstrumentation() {
+    let begin = Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification")
+    let end = Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification")
+
+    _ = NotificationCenter.default.addObserver(forName: begin, object: nil, queue: nil) { (notif) in
+        let notifObj = notif.object as? NSObject
+        if notifObj != nil {
+            let span = buildTracer().spanBuilder(spanName: "PresentationTransition").startSpan()
+            // FIXME better naming
+            span.setAttribute(key: "object.type", value: String(describing: type(of: notif.object!)))
+            Presentation2Span.setObject(SpanHolder(span), forKey: notifObj)
+        }
+
+    }
+    _ = NotificationCenter.default.addObserver(forName: end, object: nil, queue: nil) { (notif) in
+        let notifObj = notif.object as? NSObject
+        if notifObj != nil {
+            let spanHolder = Presentation2Span.object(forKey: notifObj)
+            if spanHolder != nil {
+                spanHolder?.span.end()
+            }
+        }
+    }
+}
+
 func initalizeUIInstrumentation() {
+    initializePresentationTransitionInstrumentation()
     _ = NotificationCenter.default.addObserver(forName: nil, object: nil, queue: nil) { (_: Notification) in
         // print("NC "+using.debugDescription)
     }

@@ -58,6 +58,7 @@ func getDeviceModel() -> String {
     return model
 }
 
+// FIXME want a better timeline breakdown for the app start sequence - and proper parentId too
 var appStart: Span?
 
 func initializeAppStartupListeners() {
