@@ -68,12 +68,9 @@ func loadPendingCrashReport(_ data: Data!) throws {
     span.addEvent(name: "crash.timestamp", timestamp: report.systemInfo.timestamp)
     span.setAttribute(key: "error.name", value: report.signalInfo.name)
     span.setAttribute(key: "crash.address", value: report.signalInfo.address.description)
-    for case let thread as PLCrashReportThreadInfo in report.threads {
-        // FIXME swiftlint:disable:next for_where
-        if thread.crashed {
-            span.setAttribute(key: "error.stack", value: crashedThreadToStack(report: report, thread: thread))
-            break
-        }
+    for case let thread as PLCrashReportThreadInfo in report.threads where thread.crashed {
+        span.setAttribute(key: "error.stack", value: crashedThreadToStack(report: report, thread: thread))
+        break
     }
     if report.hasExceptionInfo {
         span.setAttribute(key: "error.name", value: report.exceptionInfo.exceptionName)

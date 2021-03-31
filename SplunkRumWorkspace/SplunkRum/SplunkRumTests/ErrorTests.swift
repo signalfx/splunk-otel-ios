@@ -83,5 +83,6 @@ class ErrorTests: XCTestCase {
         XCTAssertEqual(crashReport?.attributes["crash.address"]?.description, "140733995048756")
         XCTAssertEqual(crashReport?.attributes["error"]?.description, "true")
         XCTAssertEqual(crashReport?.attributes["error.name"]?.description, "SIGILL")
+        XCTAssertTrue(crashReport?.attributes["error.stack"]?.description.contains("UIKitCore") ?? false)
     }
 }
