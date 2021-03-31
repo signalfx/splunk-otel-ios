@@ -42,22 +42,6 @@ private func processStartTime() throws -> Date {
     return Date(timeIntervalSince1970: ti)
 }
 
-// FIXME note that this returns things like "iPhone13,3" which means "iPhone 12 Pro" but the mapping isn't available in the stdlib
-// -> one possible solution is https://github.com/devicekit/DeviceKit
-func getDeviceModel() -> String {
-    var systemInfo = utsname()
-    uname(&systemInfo)
-    let mirror = Mirror(reflecting: systemInfo.machine)
-    let model = mirror.children.reduce("") { id, element in
-        guard let value = element.value as? Int8, value != 0 else { return id }
-        return id + String(UnicodeScalar(UInt8(value)))
-    }
-    if model.isEmpty {
-        return "unknown"
-    }
-    return model
-}
-
 var appStart: Span?
 var appStartScope: Scope?
 
@@ -101,8 +85,6 @@ func constructAppStartSpan() {
     let tracer = buildTracer()
     // FIXME more startup details?
     appStart = tracer.spanBuilder(spanName: "AppStart").setStartTime(time: spanStart).startSpan()
-    appStart!.setAttribute(key: "device.model", value: getDeviceModel())
-    appStart!.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
     if procStart != nil {
         appStart!.addEvent(name: "process.start", timestamp: procStart!)
     }

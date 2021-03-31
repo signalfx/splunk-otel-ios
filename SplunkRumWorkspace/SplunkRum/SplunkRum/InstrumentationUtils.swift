@@ -38,6 +38,22 @@ func addPreSpanFields(span: ReadableSpan) {
     addUIFields(span: span)
 }
 
+// FIXME note that this returns things like "iPhone13,3" which means "iPhone 12 Pro" but the mapping isn't available in the stdlib
+// -> one possible solution is https://github.com/devicekit/DeviceKit
+func computeDeviceModel() -> String {
+    var systemInfo = utsname()
+    uname(&systemInfo)
+    let mirror = Mirror(reflecting: systemInfo.machine)
+    let model = mirror.children.reduce("") { id, element in
+        guard let value = element.value as? Int8, value != 0 else { return id }
+        return id + String(UnicodeScalar(UInt8(value)))
+    }
+    if model.isEmpty {
+        return "unknown"
+    }
+    return model
+}
+
 func computeSplunkRumVersion() -> String {
     let dict = Bundle(for: SplunkRum.self).infoDictionary
     return dict?["CFBundleShortVersionString"] as? String ?? "unknown"
@@ -57,8 +73,9 @@ class GlobalAttributesProcessor: SpanProcessor {
 
     var isEndRequired = false
 
-    var appName: String
-    var appVersion: String?
+    let appName: String
+    let appVersion: String?
+    let deviceModel: String
     init() {
         let app = Bundle.main.infoDictionary?["CFBundleName"] as? String
         if app != nil {
@@ -67,6 +84,7 @@ class GlobalAttributesProcessor: SpanProcessor {
             appName = "unknown-app"
         }
         appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        deviceModel = computeDeviceModel()
     }
 
     func onStart(parentContext: SpanContext?, span: ReadableSpan) {
@@ -76,6 +94,8 @@ class GlobalAttributesProcessor: SpanProcessor {
         }
         span.setAttribute(key: "splunk.rumSessionId", value: getRumSessionId())
         span.setAttribute(key: "splunk.rumVersion", value: SplunkRumVersionString)
+        span.setAttribute(key: "device.model", value: deviceModel)
+        span.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
         globalAttributes.forEach({ (key: String, value: Any) in
             switch value {
             case is Int:
