@@ -42,7 +42,7 @@ private func processStartTime() throws -> Date {
     return Date(timeIntervalSince1970: ti)
 }
 
-// FIXME note that this returns things like "iPhone13,3" which means "iPhone 12 Pro" but the mapping isn't
+// FIXME note that this returns things like "iPhone13,3" which means "iPhone 12 Pro" but the mapping isn't available in the stdlib
 // -> one possible solution is https://github.com/devicekit/DeviceKit
 func getDeviceModel() -> String {
     var systemInfo = utsname()
@@ -68,7 +68,6 @@ func initializeAppStartupListeners() {
         UIApplication.didBecomeActiveNotification
     ]
     var reportedEvents = Set<Notification.Name>()
-    // FIXME clean way to have these be only-once listeners
     events.forEach { event in
         _ = NotificationCenter.default.addObserver(forName: event, object: nil, queue: nil) { (notif) in
             print(notif.debugDescription)

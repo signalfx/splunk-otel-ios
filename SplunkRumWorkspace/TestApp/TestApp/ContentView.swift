@@ -91,7 +91,6 @@ struct ContentView: View {
             }
         }
         HStack {
-            // FIXME not popping up keyboard?
             TextField("Text", text: $text)
                 .padding()
                 .keyboardType(.numberPad)
@@ -103,7 +102,7 @@ struct ContentView: View {
             Toggle(isOn: $toggle) {
                 Text("Toggle")
             }
-            // FIXME make it go away
+            // Perhaps add a button to dismiss it
             Button("Modal") {
                 isShowingModal.toggle()
             }.sheet(isPresented: $isShowingModal, content: {

@@ -83,7 +83,6 @@ class SpanHolder: NSObject {
     }
 }
 
-// FIXME one of these occurs during AppStart - perhaps it could become a child of that?
 func initializePresentationTransitionInstrumentation() {
     let begin = Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification")
     let end = Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification")

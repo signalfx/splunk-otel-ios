@@ -47,7 +47,7 @@ import StdoutExporter
         self.allowInsecureBeacon = opts.allowInsecureBeacon
         self.enableCrashReporting = opts.enableCrashReporting
         self.debug = opts.debug
-        // FIXME another way to copy?
+        // shallow copy of the map
         self.globalAttributes = [:].merging(opts.globalAttributes) { _, new in new }
     }
 
@@ -113,7 +113,6 @@ var splunkRumInitializeCalledTime = Date()
         if options?.globalAttributes != nil {
             setGlobalAttributes(options!.globalAttributes)
         }
-        // FIXME apply global attribute length cap
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
             return
