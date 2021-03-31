@@ -71,6 +71,8 @@ import StdoutExporter
     // FIXME ignoreURLs for http spans
 }
 var globalAttributes: [String: Any] = [:]
+let splunkLibraryLoadTime = Date()
+var splunkRumInitializeCalledTime = Date()
 
 /**
  Main class for initializing the SplunkRum agent.
@@ -99,6 +101,7 @@ var globalAttributes: [String: Any] = [:]
             debug_log("SplunkRum already initializ{ed,ing}")
             return
         }
+        splunkRumInitializeCalledTime = Date()
         initializing = true
         defer {
             initializing = false
@@ -123,8 +126,11 @@ var globalAttributes: [String: Any] = [:]
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
         }
-        let srInit = buildTracer().spanBuilder(spanName: "SplunkRum.initialize").startSpan()
         sendAppStartSpan()
+        let srInit = buildTracer()
+            .spanBuilder(spanName: "SplunkRum.initialize")
+            .setStartTime(time: splunkRumInitializeCalledTime)
+            .startSpan()
         initalizeNetworkInstrumentation()
         initalizeUIInstrumentation()
         if options?.enableCrashReporting ?? true {

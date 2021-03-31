@@ -58,8 +58,8 @@ func getDeviceModel() -> String {
     return model
 }
 
-// FIXME want a better timeline breakdown for the app start sequence - and proper parentId too
 var appStart: Span?
+var appStartScope: Scope?
 
 func initializeAppStartupListeners() {
     let events = [
@@ -68,18 +68,21 @@ func initializeAppStartupListeners() {
         UIApplication.didBecomeActiveNotification
     ]
     var reportedEvents = Set<Notification.Name>()
+    // FIXME clean way to have these be only-once listeners
     events.forEach { event in
         _ = NotificationCenter.default.addObserver(forName: event, object: nil, queue: nil) { (notif) in
             print(notif.debugDescription)
             if !reportedEvents.contains(event) {
                 reportedEvents.insert(event)
                 if appStart == nil {
-                    constructAppStartSpan()
+                    return
                 }
                 appStart!.addEvent(name: event.rawValue)
                 if event == UIApplication.didBecomeActiveNotification {
                     appStart!.end()
+                    appStartScope!.close()
                     appStart = nil
+                    appStartScope = nil
                 }
             }
         }
@@ -87,21 +90,28 @@ func initializeAppStartupListeners() {
 }
 
 func constructAppStartSpan() {
-    let tracer = buildTracer()
-    // FIXME more startup details?
-    // FIXME perhaps the span should start at processStartTime?
-    appStart = tracer.spanBuilder(spanName: "AppStart").startSpan()
-    appStart!.setAttribute(key: "device.model", value: getDeviceModel())
-    appStart!.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
+    var spanStart = splunkLibraryLoadTime
+    var procStart: Date?
     do {
-        let start = try processStartTime()
-        appStart!.addEvent(name: "process.start", timestamp: start)
+        procStart = try processStartTime()
+        spanStart = procStart!
     } catch {
         // swallow
     }
 
+    let tracer = buildTracer()
+    // FIXME more startup details?
+    appStart = tracer.spanBuilder(spanName: "AppStart").setStartTime(time: spanStart).startSpan()
+    appStart!.setAttribute(key: "device.model", value: getDeviceModel())
+    appStart!.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
+    if procStart != nil {
+        appStart!.addEvent(name: "process.start", timestamp: procStart!)
+    }
+    // This is strange looking but I want all the initial spans that happen before didBecomeActive to be kids of the AppStart.  scope is closed at didBecomeActive
+    appStartScope = tracer.setActive(appStart!)
 }
 
 func sendAppStartSpan() {
+    constructAppStartSpan()
     initializeAppStartupListeners()
 }
