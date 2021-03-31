@@ -17,9 +17,9 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fVi-nV-xoq">
-                                <rect key="frame" x="51" y="85" width="46" height="30"/>
+                                <rect key="frame" x="55" y="85" width="39" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
+                                <state key="normal" title="HTTP"/>
                                 <connections>
                                     <action selector="doClick" destination="BYZ-38-t0r" eventType="touchUpInside" id="h2h-nh-41X"/>
                                 </connections>
@@ -49,6 +49,14 @@
                                     <segue destination="Mfa-5m-GLx" kind="popoverPresentation" popoverAnchorView="rfo-Bj-Gmd" id="cwY-UE-kCI">
                                         <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                                     </segue>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eaT-o0-ahJ">
+                                <rect key="frame" x="54" y="115" width="41" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Crash"/>
+                                <connections>
+                                    <action selector="crashIt" destination="BYZ-38-t0r" eventType="touchUpInside" id="tbo-fW-gV4"/>
                                 </connections>
                             </button>
                         </subviews>

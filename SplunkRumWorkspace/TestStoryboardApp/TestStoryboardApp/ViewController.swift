@@ -39,6 +39,12 @@ class ViewController: UIViewController, UITextFieldDelegate {
     public func anotherAction() {
         print("another action")
     }
+    @IBAction
+    public func crashIt() {
+        print("crash coming...")
+        let null = UnsafePointer<UInt8>(bitPattern: 0)
+        let derefNull = null!.pointee
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
