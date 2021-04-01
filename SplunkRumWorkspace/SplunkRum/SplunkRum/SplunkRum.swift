@@ -174,8 +174,16 @@ var splunkRumInitializeCalledTime = Date()
             return new
         }
     }
+    /**
+            Remove the global attribute with the specified key
+     */
     @objc public class func removeGlobalAttribute(_ key: String) {
         globalAttributes.removeValue(forKey: key)
+    }
+    /**
+            FIXME unimplemented API for manually specifying screen name
+     */
+    @objc public class func setScreenName(_ name: String) {
     }
 
 }
