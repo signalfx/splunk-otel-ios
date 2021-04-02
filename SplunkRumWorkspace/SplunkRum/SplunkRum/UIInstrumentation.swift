@@ -23,10 +23,10 @@ import OpenTelemetrySdk
 extension UIApplication {
     // FIXME will probably need to grow a config feature to silence chatty actions
     // FIXME really only a reasonable solution for storyboard apps/components and not swiftui ones
-    @objc open func swizzled_sendAction(_ action: Selector,
-                                        to target: Any?,
-                                        from sender: Any?,
-                                        for event: UIEvent?) -> Bool {
+    @objc open func splunk_swizzled_sendAction(_ action: Selector,
+                                               to target: Any?,
+                                               from sender: Any?,
+                                               for event: UIEvent?) -> Bool {
         updateUIFields()
         let tracer = buildTracer()
         let span = tracer.spanBuilder(spanName: action.description).startSpan()
@@ -44,38 +44,22 @@ extension UIApplication {
         if event != nil {
             span.setAttribute(key: "event.type", value: String(describing: type(of: event!)))
         }
-        return swizzled_sendAction(action, to: target, from: sender, for: event)
+        return splunk_swizzled_sendAction(action, to: target, from: sender, for: event)
     }
 }
 
-// FIXME dredge out all these debug logging
 extension UIViewController {
-    @objc open func swizzled_loadView() {
-        print("SWIZZLED LOADVIEW "+String(describing: type(of: self)))
-        self.swizzled_loadView()
-    }
-    @objc open func swizzled_viewDidLoad() {
+    @objc open func splunk_swizzled_viewDidLoad() {
         updateUIFields()
-        print("SWIZZLED VIEWDIDLOAD "+String(describing: type(of: self)))
-        self.swizzled_viewDidLoad()
+        self.splunk_swizzled_viewDidLoad()
     }
-    @objc open func swizzled_viewWillAppear(_ animated: Bool) {
-        print("SWIZZLED VIEWWILLAPPEAR "+String(describing: type(of: self)))
-        self.swizzled_viewWillAppear(animated)
-    }
-    @objc open func swizzled_viewDidAppear(_ animated: Bool) {
+    @objc open func splunk_swizzled_viewDidAppear(_ animated: Bool) {
         updateUIFields()
-        print("SWIZZLED VIEWDIDAPPEAR "+String(describing: type(of: self)))
-        self.swizzled_viewDidAppear(animated)
+        self.splunk_swizzled_viewDidAppear(animated)
     }
-    @objc open func swizzled_viewWillDisappear(_ animated: Bool) {
-        print("SWIZZLED VIEWWILLDISAPPEAR "+String(describing: type(of: self)))
-        self.swizzled_viewWillDisappear(animated)
-    }
-    @objc open func swizzled_viewDidDisappear(_ animated: Bool) {
+    @objc open func splunk_swizzled_viewDidDisappear(_ animated: Bool) {
         updateUIFields()
-        print("SWIZZLED VIEWDIDDISAPPEAR "+String(describing: type(of: self)))
-        self.swizzled_viewDidDisappear(animated)
+        self.splunk_swizzled_viewDidDisappear(animated)
     }
 
 }
@@ -162,15 +146,10 @@ private func updateUIFields() {
 
 func initalizeUIInstrumentation() {
     initializePresentationTransitionInstrumentation()
-    _ = NotificationCenter.default.addObserver(forName: nil, object: nil, queue: nil) { (_: Notification) in
-        // print("NC "+using.debugDescription)
-    }
-    swizzle(clazz: UIApplication.self, orig: #selector(UIApplication.sendAction(_:to:from:for:)), swizzled: #selector(UIApplication.swizzled_sendAction(_:to:from:for:)))
-    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.loadView), swizzled: #selector(UIViewController.swizzled_loadView))
-    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidLoad), swizzled: #selector(UIViewController.swizzled_viewDidLoad))
-    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewWillAppear(_:)), swizzled: #selector(UIViewController.swizzled_viewWillAppear(_:)))
-    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidAppear(_:)), swizzled: #selector(UIViewController.swizzled_viewDidAppear(_:)))
-    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewWillDisappear(_:)), swizzled: #selector(UIViewController.swizzled_viewWillDisappear(_:)))
-    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidDisappear(_:)), swizzled: #selector(UIViewController.swizzled_viewDidDisappear(_:)))
+
+    swizzle(clazz: UIApplication.self, orig: #selector(UIApplication.sendAction(_:to:from:for:)), swizzled: #selector(UIApplication.splunk_swizzled_sendAction(_:to:from:for:)))
+    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidLoad), swizzled: #selector(UIViewController.splunk_swizzled_viewDidLoad))
+    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidAppear(_:)), swizzled: #selector(UIViewController.splunk_swizzled_viewDidAppear(_:)))
+    swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidDisappear(_:)), swizzled: #selector(UIViewController.splunk_swizzled_viewDidDisappear(_:)))
 
 }

@@ -119,54 +119,54 @@ func wireUpTaskObserver(task: URLSessionTask) {
 extension URLSession {
 
     // FIXME none of these actually check for http(s)-ness
-    @objc open func swizzled_dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        let answer = swizzled_dataTask(with: url, completionHandler: completionHandler)
+    @objc open func splunk_swizzled_dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        let answer = splunk_swizzled_dataTask(with: url, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
-    @objc open func swizzled_dataTask(with url: URL) -> URLSessionDataTask {
-        let answer = swizzled_dataTask(with: url)
+    @objc open func splunk_swizzled_dataTask(with url: URL) -> URLSessionDataTask {
+        let answer = splunk_swizzled_dataTask(with: url)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
     // rename objc view of func to allow "overloading"
-    @objc(swizzledDataTaskWithRequest: completionHandler:) open func swizzled_dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        let answer = swizzled_dataTask(with: request, completionHandler: completionHandler)
+    @objc(swizzledDataTaskWithRequest: completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        let answer = splunk_swizzled_dataTask(with: request, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
-    @objc(swizzledDataTaskWithRequest:) open func swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
-        let answer = swizzled_dataTask(with: request)
+    @objc(swizzledDataTaskWithRequest:) open func splunk_swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
+        let answer = splunk_swizzled_dataTask(with: request)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
     // uploads
-    @objc open func swizzled_uploadTask(with: URLRequest, from: Data) -> URLSessionUploadTask {
-        let answer = swizzled_uploadTask(with: with, from: from)
+    @objc open func splunk_swizzled_uploadTask(with: URLRequest, from: Data) -> URLSessionUploadTask {
+        let answer = splunk_swizzled_uploadTask(with: with, from: from)
         wireUpTaskObserver(task: answer)
         return answer
     }
-    @objc open func swizzled_uploadTask(with: URLRequest, from: Data, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
-        let answer = swizzled_uploadTask(with: with, from: from, completionHandler: completionHandler)
+    @objc open func splunk_swizzled_uploadTask(with: URLRequest, from: Data, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+        let answer = splunk_swizzled_uploadTask(with: with, from: from, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
     }
-    @objc open func swizzled_uploadTask(with: URLRequest, fromFile: URL) -> URLSessionUploadTask {
-        let answer = swizzled_uploadTask(with: with, fromFile: fromFile)
+    @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: URL) -> URLSessionUploadTask {
+        let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile)
         wireUpTaskObserver(task: answer)
         return answer
     }
-    @objc open func swizzled_uploadTask(with: URLRequest, fromFile: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
-        let answer = swizzled_uploadTask(with: with, fromFile: fromFile, completionHandler: completionHandler)
+    @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+        let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
     }
-    @objc open func swizzled_uploadTask(withStreamedRequest: URLRequest) -> URLSessionUploadTask {
-        let answer = swizzled_uploadTask(withStreamedRequest: withStreamedRequest)
+    @objc open func splunk_swizzled_uploadTask(withStreamedRequest: URLRequest) -> URLSessionUploadTask {
+        let answer = splunk_swizzled_uploadTask(withStreamedRequest: withStreamedRequest)
         wireUpTaskObserver(task: answer)
         return answer
     }
@@ -191,11 +191,11 @@ func initalizeNetworkInstrumentation() {
     // This syntax is obnoxious to differentiate with:request from with:url
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask),
-            swizzled: #selector(URLSession.swizzled_dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask))
+            swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask))
 
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask),
-            swizzled: #selector(URLSession.swizzled_dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask))
+            swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask))
 
     // @objc(overrrideName) requires a runtime lookup rather than a build-time lookup (seems like a bug in the compiler)
     swizzle(clazz: urlsession,
@@ -208,18 +208,18 @@ func initalizeNetworkInstrumentation() {
 
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.uploadTask(with:from:)),
-            swizzled: #selector(URLSession.swizzled_uploadTask(with:from:)))
+            swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:from:)))
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.uploadTask(with:from:completionHandler:)),
-            swizzled: #selector(URLSession.swizzled_uploadTask(with:from:completionHandler:)))
+            swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:from:completionHandler:)))
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.uploadTask(with:fromFile:)),
-            swizzled: #selector(URLSession.swizzled_uploadTask(with:fromFile:)))
+            swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:fromFile:)))
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.uploadTask(with:fromFile:completionHandler:)),
-            swizzled: #selector(URLSession.swizzled_uploadTask(with:fromFile:completionHandler:)))
+            swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:fromFile:completionHandler:)))
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.uploadTask(withStreamedRequest:)),
-            swizzled: #selector(URLSession.swizzled_uploadTask(withStreamedRequest:)))
+            swizzled: #selector(URLSession.splunk_swizzled_uploadTask(withStreamedRequest:)))
 
 }
