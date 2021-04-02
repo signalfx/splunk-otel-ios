@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "DeviceKit",
+        "repositoryURL": "https://github.com/devicekit/DeviceKit",
+        "state": {
+          "branch": null,
+          "revision": "4cf9f057db69104851634269f7839f8d0bd346a3",
+          "version": "4.3.0"
+        }
+      },
+      {
         "package": "grpc-swift",
         "repositoryURL": "https://github.com/grpc/grpc-swift.git",
         "state": {

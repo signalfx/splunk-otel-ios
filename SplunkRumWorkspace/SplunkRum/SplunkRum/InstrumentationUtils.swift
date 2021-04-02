@@ -18,25 +18,16 @@ import Foundation
 import UIKit
 import OpenTelemetryApi
 import OpenTelemetrySdk
+import DeviceKit
 
 func addPreSpanFields(span: ReadableSpan) {
     addUIFields(span: span)
 }
 
-// FIXME note that this returns things like "iPhone13,3" which means "iPhone 12 Pro" but the mapping isn't available in the stdlib
-// -> one possible solution is https://github.com/devicekit/DeviceKit
 func computeDeviceModel() -> String {
-    var systemInfo = utsname()
-    uname(&systemInfo)
-    let mirror = Mirror(reflecting: systemInfo.machine)
-    let model = mirror.children.reduce("") { id, element in
-        guard let value = element.value as? Int8, value != 0 else { return id }
-        return id + String(UnicodeScalar(UInt8(value)))
-    }
-    if model.isEmpty {
-        return "unknown"
-    }
-    return model
+    // Using DeviceKit for this because the native apis for these things don't return
+    // convenient identifiers like "iPhone6s"
+    return Device.current.description
 }
 
 func computeSplunkRumVersion() -> String {
