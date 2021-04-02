@@ -72,6 +72,9 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         return nil
     }
     let url = request!.url!
+    if !(url.scheme?.lowercased().starts(with: "http") ?? false) {
+        return nil
+    }
     let method = request!.httpMethod ?? "GET"
     // Don't loop reporting on communication with the beacon
     if SplunkRum.theBeaconUrl != nil && url.absoluteString.starts(with: SplunkRum.theBeaconUrl!) {
@@ -113,12 +116,9 @@ class SessionTaskObserver: NSObject {
 
 func wireUpTaskObserver(task: URLSessionTask) {
     task.addObserver(SessionTaskObserver(), forKeyPath: "state", options: .new, context: nil)
-    // FIXME would observe() be a better way to do this?
 }
 
 extension URLSession {
-
-    // FIXME none of these actually check for http(s)-ness
     @objc open func splunk_swizzled_dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: url, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
