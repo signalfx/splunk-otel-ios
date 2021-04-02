@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 import UIKit
 import OpenTelemetryApi
+import OpenTelemetrySdk
 
 extension UIApplication {
     // FIXME will probably need to grow a config feature to silence chatty actions
@@ -26,6 +27,7 @@ extension UIApplication {
                                         to target: Any?,
                                         from sender: Any?,
                                         for event: UIEvent?) -> Bool {
+        updateUIFields()
         let tracer = buildTracer()
         let span = tracer.spanBuilder(spanName: action.description).startSpan()
         var scope = tracer.setActive(span)
@@ -46,12 +48,14 @@ extension UIApplication {
     }
 }
 
+// FIXME dredge out all these debug logging
 extension UIViewController {
     @objc open func swizzled_loadView() {
         print("SWIZZLED LOADVIEW "+String(describing: type(of: self)))
         self.swizzled_loadView()
     }
     @objc open func swizzled_viewDidLoad() {
+        updateUIFields()
         print("SWIZZLED VIEWDIDLOAD "+String(describing: type(of: self)))
         self.swizzled_viewDidLoad()
     }
@@ -60,6 +64,7 @@ extension UIViewController {
         self.swizzled_viewWillAppear(animated)
     }
     @objc open func swizzled_viewDidAppear(_ animated: Bool) {
+        updateUIFields()
         print("SWIZZLED VIEWDIDAPPEAR "+String(describing: type(of: self)))
         self.swizzled_viewDidAppear(animated)
     }
@@ -68,6 +73,7 @@ extension UIViewController {
         self.swizzled_viewWillDisappear(animated)
     }
     @objc open func swizzled_viewDidDisappear(_ animated: Bool) {
+        updateUIFields()
         print("SWIZZLED VIEWDIDDISAPPEAR "+String(describing: type(of: self)))
         self.swizzled_viewDidDisappear(animated)
     }
@@ -98,14 +104,60 @@ func initializePresentationTransitionInstrumentation() {
 
     }
     _ = NotificationCenter.default.addObserver(forName: end, object: nil, queue: nil) { (notif) in
+        updateUIFields()
         let notifObj = notif.object as? NSObject
         if notifObj != nil {
             let spanHolder = Presentation2Span.object(forKey: notifObj)
             if spanHolder != nil {
+                // screenName may have changed now that the view has appeared; update new screen name
+                spanHolder?.span.setAttribute(key: "screen.name", value: screenName)
                 spanHolder?.span.end()
             }
         }
     }
+}
+
+func addUIFields(span: ReadableSpan) {
+    updateUIFields()
+    // Note that this may be called from threads other than main (e.g., background thread
+    // creating span); hence trying to update cached values whenever we can and simply using
+    // them here
+    span.setAttribute(key: "screen.name", value: screenName)
+}
+
+private var screenName: String = "unknown"
+
+private func pickVC(_ vc: UIViewController?) -> UIViewController? {
+    if vc == nil {
+        return nil
+    }
+    if vc!.presentedViewController != nil {
+        return pickVC(vc!.presentedViewController)
+    }
+    if let tabVC = vc as? UITabBarController {
+        if tabVC.selectedViewController != nil {
+            return pickVC(tabVC.selectedViewController)
+        }
+    }
+    return vc
+}
+
+private func updateUIFields() {
+    if !Thread.current.isMainThread {
+        return
+    }
+    let wins = UIApplication.shared.windows
+    print(wins)
+    if !wins.isEmpty {
+        // windows are arranged in z-order, with topmost (e.g. popover) being the last in array
+        let vc = pickVC(wins[wins.count-1].rootViewController)
+        if vc != nil {
+            // FIXME SwiftUI UIHostingController vc when cast has a "rootView" var which does
+            // not appear to be accessible generically
+            screenName = String(describing: type(of: vc!))
+        }
+    }
+    // FIXME others?
 }
 
 func initalizeUIInstrumentation() {
