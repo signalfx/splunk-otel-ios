@@ -109,7 +109,8 @@ func addUIFields(span: ReadableSpan) {
     span.setAttribute(key: "screen.name", value: screenName)
 }
 
-private var screenName: String = "unknown"
+var screenName: String = "unknown"
+var screenNameManuallySet = false
 
 private func pickVC(_ vc: UIViewController?) -> UIViewController? {
     if vc == nil {
@@ -128,6 +129,9 @@ private func pickVC(_ vc: UIViewController?) -> UIViewController? {
 
 private func updateUIFields() {
     if !Thread.current.isMainThread {
+        return
+    }
+    if screenNameManuallySet {
         return
     }
     let wins = UIApplication.shared.windows

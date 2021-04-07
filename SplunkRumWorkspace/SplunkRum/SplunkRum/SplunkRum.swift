@@ -180,10 +180,14 @@ var splunkRumInitializeCalledTime = Date()
     @objc public class func removeGlobalAttribute(_ key: String) {
         globalAttributes.removeValue(forKey: key)
     }
+
     /**
-            FIXME unimplemented API for manually specifying screen name
+            Specifies a better screen.name value.  CAUTION - if you use this API, you must use it everywhere;
+        specifying any screen name manually will cause our automatic name choice (based on ViewController type name) to never be used again. In other words, if you use this once, you need to think through all the places where you'd like the screen name to be changed.
      */
     @objc public class func setScreenName(_ name: String) {
+        screenNameManuallySet = true
+        screenName = name
     }
 
 }
