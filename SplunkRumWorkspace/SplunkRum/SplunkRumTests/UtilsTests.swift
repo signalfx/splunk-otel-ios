@@ -99,6 +99,24 @@ class UtilsTests: XCTestCase {
         localSpans.removeAll()
         _ = le.export(spans: rawSpans)
         XCTAssertEqual(1, localSpans.count)
+    }
+
+    func testRejectingLimitingExporter() throws {
+        try initializeTestEnvironment()
+        // This test is shaped kinda funny since we can't construct SpanData() directly
+        buildTracer().spanBuilder(spanName: "rejectTest").startSpan().end()
+        buildTracer().spanBuilder(spanName: "regularTest").startSpan().end()
+        XCTAssertEqual(2, localSpans.count)
+        let rawSpans = localSpans
+        localSpans.removeAll()
+
+        let le = LimitingExporter(proxy: TestSpanExporter()) // rewrites into localSpans; yes, this is weird
+        le.setRejectionFilter { spanData in
+            return spanData.name == "rejectTest"
+        }
+        _ = le.export(spans: rawSpans)
+        XCTAssertEqual(1, localSpans.count)
+        XCTAssertEqual(localSpans[0].name, "regularTest")
 
     }
 

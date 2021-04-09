@@ -21,7 +21,6 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 
 extension UIApplication {
-    // FIXME will probably need to grow a config feature to silence chatty actions
     // FIXME really only a reasonable solution for storyboard apps/components and not swiftui ones
     @objc open func splunk_swizzled_sendAction(_ action: Selector,
                                                to target: Any?,
