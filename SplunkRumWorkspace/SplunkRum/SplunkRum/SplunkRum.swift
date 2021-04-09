@@ -76,7 +76,6 @@ var splunkRumInitializeCalledTime = Date()
  Main class for initializing the SplunkRum agent.
  */
 @objc public class SplunkRum: NSObject {
-    // FIXME multithreading
     static var initialized = false
     static var initializing = false
     static var configuredOptions: SplunkRumOptions?

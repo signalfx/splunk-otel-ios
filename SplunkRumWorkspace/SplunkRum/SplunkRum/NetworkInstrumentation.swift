@@ -89,16 +89,20 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 }
 
 class SessionTaskObserver: NSObject {
-    // FIXME multithreading of task callbacks and state
     var span: Span?
     // Observers aren't kept alive by observing...
     var extraRefToSelf: SessionTaskObserver?
+    var lock: NSLock = NSLock()
     override init() {
         super.init()
         extraRefToSelf = self
     }
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        lock.lock()
+        defer {
+            lock.unlock()
+        }
         let task = object as? URLSessionTask
         if task == nil {
             return
