@@ -30,6 +30,7 @@ extension UIApplication {
         updateUIFields()
         let tracer = buildTracer()
         let span = tracer.spanBuilder(spanName: action.description).startSpan()
+        span.setAttribute(key: "component", value: "ui")
         var scope = tracer.setActive(span)
         defer {
             scope.close()
@@ -81,6 +82,7 @@ func initializePresentationTransitionInstrumentation() {
         let notifObj = notif.object as? NSObject
         if notifObj != nil {
             let span = buildTracer().spanBuilder(spanName: "PresentationTransition").startSpan()
+            span.setAttribute(key: "component", value: "ui")
             // FIXME better naming
             span.setAttribute(key: "object.type", value: String(describing: type(of: notif.object!)))
             Presentation2Span.setObject(SpanHolder(span), forKey: notifObj)

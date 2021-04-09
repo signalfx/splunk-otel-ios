@@ -62,12 +62,14 @@ class NetworkInstrumentationTests: XCTestCase {
         XCTAssertEqual(httpGet?.attributes["http.response_content_length_uncompressed"]?.description, "17")
         XCTAssertEqual(httpGet?.attributes["link.traceId"]?.description, "0af7651916cd43dd8448eb211c80319c")
         XCTAssertEqual(httpGet?.attributes["link.spanId"]?.description, "b7ad6b7169203331")
+        XCTAssertEqual(httpGet?.attributes["component"]?.description, "http")
 
         XCTAssertNotNil(httpPost)
         XCTAssertEqual(httpPost?.attributes["http.url"]?.description, "http://127.0.0.1:8989/error")
         XCTAssertEqual(httpPost?.attributes["http.method"]?.description, "POST")
         XCTAssertEqual(httpPost?.attributes["http.status_code"]?.description, "500")
         XCTAssertEqual(httpPost?.attributes["http.request_content_length"]?.description, "11")
+        XCTAssertEqual(httpPost?.attributes["component"]?.description, "http")
 
     }
 }

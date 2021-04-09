@@ -130,6 +130,7 @@ var splunkRumInitializeCalledTime = Date()
             .spanBuilder(spanName: "SplunkRum.initialize")
             .setStartTime(time: splunkRumInitializeCalledTime)
             .startSpan()
+        srInit.setAttribute(key: "component", value: "appstart")
         initalizeNetworkInstrumentation()
         initalizeUIInstrumentation()
         if options?.enableCrashReporting ?? true {

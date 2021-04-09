@@ -85,6 +85,7 @@ func constructAppStartSpan() {
     let tracer = buildTracer()
     // FIXME more startup details?
     appStart = tracer.spanBuilder(spanName: "AppStart").setStartTime(time: spanStart).startSpan()
+    appStart!.setAttribute(key: "component", value: "appstart")
     if procStart != nil {
         appStart!.addEvent(name: "process.start", timestamp: procStart!)
     }

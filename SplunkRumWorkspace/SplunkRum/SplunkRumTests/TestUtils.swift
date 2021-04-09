@@ -81,6 +81,7 @@ func initializeTestEnvironment() throws {
 
     XCTAssertNotNil(srInit)
     // FIXME not a great place to shoehorn it currently, but checking the globalAttributes logic here
+    XCTAssertEqual("appstart", srInit?.tags["component"]?.description)
     XCTAssertEqual("7", srInit?.tags["intKey"])
     XCTAssertEqual("1.5", srInit?.tags["doubleKey"])
     XCTAssertEqual("true", srInit?.tags["boolKey"])

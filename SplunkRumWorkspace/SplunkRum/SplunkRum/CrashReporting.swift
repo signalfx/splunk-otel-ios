@@ -63,6 +63,7 @@ func loadPendingCrashReport(_ data: Data!) throws {
     let tracer = buildTracer()
     let now = Date()
     let span = tracer.spanBuilder(spanName: "crash.report").setStartTime(time: now).setNoParent().startSpan()
+    span.setAttribute(key: "component", value: "error")
     span.setAttribute(key: "crash.rumSessionId", value: oldSessionId)
     span.setAttribute(key: "error", value: true)
     span.addEvent(name: "crash.timestamp", timestamp: report.systemInfo.timestamp)

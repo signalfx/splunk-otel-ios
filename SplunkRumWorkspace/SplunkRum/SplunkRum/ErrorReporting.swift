@@ -18,11 +18,11 @@ import Foundation
 import OpenTelemetrySdk
 import OpenTelemetryApi
 
-// FIXME add component= to all spans?
 func reportExceptionErrorSpan(e: NSException) {
     let tracer = buildTracer()
     let now = Date()
     let span = tracer.spanBuilder(spanName: "SplunkRum.reportError").setStartTime(time: now).startSpan()
+    span.setAttribute(key: "component", value: "error")
     span.setAttribute(key: "error", value: true)
     span.setAttribute(key: "error.name", value: e.name.rawValue)
     if e.reason != nil {
@@ -39,6 +39,7 @@ func reportErrorErrorSpan(e: Error) {
     let tracer = buildTracer()
     let now = Date()
     let span = tracer.spanBuilder(spanName: "SplunkRum.reportError").setStartTime(time: now).startSpan()
+    span.setAttribute(key: "component", value: "error")
     span.setAttribute(key: "error", value: true)
     span.setAttribute(key: "error.name", value: String(describing: type(of: e)))
     span.setAttribute(key: "error.message", value: e.localizedDescription)
@@ -49,6 +50,7 @@ func reportStringErrorSpan(e: String) {
     let tracer = buildTracer()
     let now = Date()
     let span = tracer.spanBuilder(spanName: "SplunkRum.reportError").setStartTime(time: now).startSpan()
+    span.setAttribute(key: "component", value: "error")
     span.setAttribute(key: "error", value: true)
     span.setAttribute(key: "error.name", value: "String")
     span.setAttribute(key: "error.message", value: e)

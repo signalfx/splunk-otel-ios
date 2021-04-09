@@ -58,21 +58,25 @@ class ErrorTests: XCTestCase {
         XCTAssertEqual(eStr?.attributes["error"]?.description, "true")
         XCTAssertEqual(eStr?.attributes["error.name"]?.description, "String")
         XCTAssertNotNil(eStr?.attributes["splunk.rumSessionId"])
+        XCTAssertEqual(eStr?.attributes["component"]?.description, "error")
 
         XCTAssertNotNil(eExc)
         XCTAssertEqual(eExc?.name, "SplunkRum.reportError")
         XCTAssertEqual(eExc?.attributes["error"]?.description, "true")
         XCTAssertEqual(eExc?.attributes["error.name"]?.description, "IllegalFormatError")
         XCTAssertNotNil(eExc?.attributes["splunk.rumSessionId"])
+        XCTAssertEqual(eExc?.attributes["component"]?.description, "error")
 
         XCTAssertNotNil(eEnumErr)
         XCTAssertEqual(eEnumErr?.name, "SplunkRum.reportError")
         XCTAssertEqual(eEnumErr?.attributes["error"]?.description, "true")
         XCTAssertNotNil(eEnumErr?.attributes["splunk.rumSessionId"])
+        XCTAssertEqual(eEnumErr?.attributes["component"]?.description, "error")
 
         XCTAssertNotNil(eClassErr)
         XCTAssertEqual(eClassErr?.name, "SplunkRum.reportError")
         XCTAssertEqual(eClassErr?.attributes["error"]?.description, "true")
+        XCTAssertEqual(eClassErr?.attributes["component"]?.description, "error")
         XCTAssertNotNil(eClassErr?.attributes["splunk.rumSessionId"])
 
         XCTAssertEqual(eClassErr?.attributes["splunk.rumSessionId"], eExc?.attributes["splunk.rumSessionId"])
@@ -81,6 +85,7 @@ class ErrorTests: XCTestCase {
         XCTAssertNotEqual(crashReport?.attributes["splunk.rumSessionId"], crashReport?.attributes["crash.rumSessionId"])
         XCTAssertEqual(crashReport?.attributes["crash.rumSessionId"]?.description, "355ecc42c29cf0b56c411f1eab9191d0")
         XCTAssertEqual(crashReport?.attributes["crash.address"]?.description, "140733995048756")
+        XCTAssertEqual(crashReport?.attributes["component"]?.description, "error")
         XCTAssertEqual(crashReport?.attributes["error"]?.description, "true")
         XCTAssertEqual(crashReport?.attributes["error.name"]?.description, "SIGILL")
         XCTAssertTrue(crashReport?.attributes["error.stack"]?.description.contains("UIKitCore") ?? false)
