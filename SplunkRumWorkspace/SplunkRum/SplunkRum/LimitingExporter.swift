@@ -21,38 +21,61 @@ import OpenTelemetryApi
 
 // Performs two kinds of limiting:
 // - attribute value length limiting
-// - rate limiting by component type (FIXME unimplemented as yet)
+// - rate limiting by component type
 
 class LimitingExporter: SpanExporter {
     let MAX_ATTRIBUTE_LENGTH = 4096
-    let SPAN_RATE_LIMIT_PERIOD = 30 // seconds
+    static let SPAN_RATE_LIMIT_PERIOD = 30 // seconds
     let MAX_SPANS_PER_PERIOD_PER_COMPONENT = 100
 
     var proxy: SpanExporter
+    var component2counts: [String: Int] = [:]
+    var nextRateLimitReset = Date().addingTimeInterval(TimeInterval(LimitingExporter.SPAN_RATE_LIMIT_PERIOD))
 
     init(proxy: SpanExporter) {
         self.proxy = proxy
+    }
+
+    func rateLimit(_ span: SpanData) -> Bool {
+        let component = span.attributes["component"]?.description ?? "unknown"
+        var count = component2counts[component] ?? 0
+        count += 1
+        component2counts[component] = count
+        return count > MAX_SPANS_PER_PERIOD_PER_COMPONENT
     }
 
     func limit(_ spans: [SpanData]) -> [SpanData] {
         // FIXME performance mess of this
         var result: [SpanData] = []
         spans.forEach { span in
-            var toAdd = span
-            let newAttrs = span.attributes.mapValues { val -> AttributeValue in
-                let str = val.description
-                if str.count > MAX_ATTRIBUTE_LENGTH {
-                    return .string(String(str.prefix(MAX_ATTRIBUTE_LENGTH)))
+            if !rateLimit(span) {
+                var toAdd = span
+                let newAttrs = span.attributes.mapValues { val -> AttributeValue in
+                    let str = val.description
+                    if str.count > MAX_ATTRIBUTE_LENGTH {
+                        return .string(String(str.prefix(MAX_ATTRIBUTE_LENGTH)))
+                    }
+                    return val
                 }
-                return val
+                toAdd.settingAttributes(newAttrs)
+                result.append(toAdd)
             }
-            toAdd.settingAttributes(newAttrs)
-            result.append(toAdd)
         }
         return result
     }
 
+    func possiblyResetRateLimits(_ now: Date) {
+        if now.compare(nextRateLimitReset) == ComparisonResult.orderedDescending {
+            resetRateLimits()
+        }
+    }
+    func resetRateLimits() {
+        component2counts.removeAll()
+        nextRateLimitReset = Date().addingTimeInterval(TimeInterval(LimitingExporter.SPAN_RATE_LIMIT_PERIOD))
+    }
+
     func export(spans: [SpanData]) -> SpanExporterResultCode {
+        possiblyResetRateLimits(Date())
         return proxy.export(spans: limit(spans))
     }
 

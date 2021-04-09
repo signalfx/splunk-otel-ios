@@ -33,7 +33,7 @@ class UtilsTests: XCTestCase {
         }
     }
 
-    func testLimitingExporter() throws {
+    func testLengthLimitingExporter() throws {
         try initializeTestEnvironment()
         // This test is shaped kinda funny since we can't construct SpanData() directly
         let span = buildTracer().spanBuilder(spanName: "limitTest").startSpan()
@@ -58,6 +58,48 @@ class UtilsTests: XCTestCase {
         XCTAssertTrue(localSpans[0].attributes["longString"]?.description.count ?? 4097 <= 4096)
         XCTAssertEqual("normal", localSpans[0].attributes["normalString"]?.description ?? nil)
         XCTAssertEqual("7", localSpans[0].attributes["normalInt"]?.description ?? nil)
+    }
+
+    func testRateLimitingExporter() throws {
+        try initializeTestEnvironment()
+        // This test is shaped kinda funny since we can't construct SpanData() directly
+        var i = 0
+        while i < 102 {
+            let s = buildTracer().spanBuilder(spanName: "limitTest").startSpan()
+            s.setAttribute(key: "component", value: "test")
+            s.end()
+            i += 1
+        }
+        XCTAssertEqual(102, localSpans.count)
+        var rawSpans = localSpans
+        localSpans.removeAll()
+        let le = LimitingExporter(proxy: TestSpanExporter()) // rewrites into localSpans; yes, this is weird
+        _ = le.export(spans: rawSpans)
+        XCTAssertEqual(100, localSpans.count)
+        localSpans.removeAll()
+
+        // send one more, should still be dropped unless this test took over 30 seconds to run
+        let s = buildTracer().spanBuilder(spanName: "limitTest").startSpan()
+        s.setAttribute(key: "component", value: "test")
+        s.end()
+        XCTAssertEqual(1, localSpans.count)
+        rawSpans = localSpans
+        localSpans.removeAll()
+        _ = le.export(spans: rawSpans)
+        XCTAssertEqual(0, localSpans.count)
+
+        // reset the exporter by changing "now"
+        le.possiblyResetRateLimits(Date().addingTimeInterval(TimeInterval(LimitingExporter.SPAN_RATE_LIMIT_PERIOD+1)))
+        // send one more, should not be dropped
+        let s2 = buildTracer().spanBuilder(spanName: "limitTest").startSpan()
+        s2.setAttribute(key: "component", value: "test")
+        s2.end()
+        XCTAssertEqual(1, localSpans.count)
+        rawSpans = localSpans
+        localSpans.removeAll()
+        _ = le.export(spans: rawSpans)
+        XCTAssertEqual(1, localSpans.count)
+
     }
 
     func testSetGlobalAttributes() throws {
