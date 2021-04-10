@@ -110,7 +110,7 @@ class SessionTaskObserver: NSObject {
         if span == nil {
             span = startHttpSpan(request: task!.originalRequest)
         }
-        if task!.state == .completed {
+        if task!.state == .completed && extraRefToSelf != nil {
             endHttpSpan(span: span,
                         task: task!)
             task!.removeObserver(self, forKeyPath: "state")
