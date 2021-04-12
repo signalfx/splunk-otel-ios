@@ -20,6 +20,10 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 import DeviceKit
 
+func isUsefulString(_ s: String?) -> Bool {
+    return s != nil && !s!.isEmpty
+}
+
 func addPreSpanFields(span: ReadableSpan) {
     addUIFields(span: span)
 }
@@ -72,6 +76,12 @@ class GlobalAttributesProcessor: SpanProcessor {
         span.setAttribute(key: "splunk.rumVersion", value: SplunkRumVersionString)
         span.setAttribute(key: "device.model", value: deviceModel)
         span.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
+        // It would be nice to drop this field when the span-ending thread isn't the same...
+        if Thread.current.isMainThread {
+            span.setAttribute(key: "thread.name", value: "main")
+        } else if isUsefulString(Thread.current.name) {
+            span.setAttribute(key: "thread.name", value: Thread.current.name!)
+        }
         globalAttributes.forEach({ (key: String, value: Any) in
             switch value {
             case is Int:
