@@ -20,6 +20,7 @@ import UIKit
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
+// swiftlint:disable missing_docs
 extension UIApplication {
     // FIXME really only a reasonable solution for storyboard apps/components and not swiftui ones
     @objc open func splunk_swizzled_sendAction(_ action: Selector,

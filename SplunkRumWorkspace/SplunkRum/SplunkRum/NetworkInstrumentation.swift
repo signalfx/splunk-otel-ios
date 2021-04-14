@@ -123,6 +123,7 @@ func wireUpTaskObserver(task: URLSessionTask) {
     task.addObserver(SessionTaskObserver(), forKeyPath: "state", options: .new, context: nil)
 }
 
+// swiftlint:disable missing_docs
 extension URLSession {
     @objc open func splunk_swizzled_dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: url, completionHandler: completionHandler)
