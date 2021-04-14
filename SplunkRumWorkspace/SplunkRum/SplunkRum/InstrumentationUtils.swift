@@ -82,20 +82,7 @@ class GlobalAttributesProcessor: SpanProcessor {
         } else if isUsefulString(Thread.current.name) {
             span.setAttribute(key: "thread.name", value: Thread.current.name!)
         }
-        globalAttributes.forEach({ (key: String, value: Any) in
-            switch value {
-            case is Int:
-                span.setAttribute(key: key, value: value as! Int)
-            case is String:
-                span.setAttribute(key: key, value: value as! String)
-            case is Double:
-                span.setAttribute(key: key, value: value as! Double)
-            case is Bool:
-                span.setAttribute(key: key, value: value as! Bool)
-            default:
-                nop()
-            }
-        })
+        SplunkRum.addGlobalAttributesToSpan(span)
         addPreSpanFields(span: span)
     }
 

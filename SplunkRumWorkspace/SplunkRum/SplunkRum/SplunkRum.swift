@@ -76,6 +76,8 @@ import StdoutExporter
 
 }
 var globalAttributes: [String: Any] = [:]
+let globalAttributesLock = NSLock()
+
 let splunkLibraryLoadTime = Date()
 var splunkRumInitializeCalledTime = Date()
 
@@ -173,22 +175,63 @@ var splunkRumInitializeCalledTime = Date()
         reportErrorErrorSpan(e: error)
     }
 
+    // Threading strategy for globalAttributes is to hold lock and commit unchanging
+    // (after lock release) objects to the global reference.  Span iterators will get
+    // some self-consistent snapshot while modifications can take place "concurrently".
+
     /**
         Set or override  one or more global attributes; acceptable types are Int, Double, String, and Bool.  Other value types will be silently ignored.  Can only be called after SplunkRum.initialize()
      */
     @objc public class func setGlobalAttributes(_ attributes: [String: Any]) {
-        globalAttributes.merge(attributes) { (_, new) in
+        globalAttributesLock.lock()
+        defer {
+            globalAttributesLock.unlock()
+        }
+        let newAttrs = globalAttributes.merging(attributes) { (_, new) in
             return new
         }
+        globalAttributes = newAttrs
     }
     /**
             Remove the global attribute with the specified key
      */
     @objc public class func removeGlobalAttribute(_ key: String) {
-        globalAttributes.removeValue(forKey: key)
+        globalAttributesLock.lock()
+        defer {
+            globalAttributesLock.unlock()
+        }
+        var newAttrs = [:].merging(globalAttributes) { _, new in new }
+        newAttrs.removeValue(forKey: key)
+        globalAttributes = newAttrs
     }
 
-    /**
+    /*non-public*/ class func internalGetGlobalAttributes() -> [String: Any] {
+        globalAttributesLock.lock()
+        defer {
+            globalAttributesLock.unlock()
+        }
+        return globalAttributes
+    }
+
+    /*non-public*/ class func addGlobalAttributesToSpan(_ span: Span) {
+        let attrs = internalGetGlobalAttributes()
+        attrs.forEach({ (key: String, value: Any) in
+            switch value {
+            case is Int:
+                span.setAttribute(key: key, value: value as! Int)
+            case is String:
+                span.setAttribute(key: key, value: value as! String)
+            case is Double:
+                span.setAttribute(key: key, value: value as! Double)
+            case is Bool:
+                span.setAttribute(key: key, value: value as! Bool)
+            default:
+                nop()
+            }
+        })
+
+    }
+        /**
             Specifies a better screen.name value.  CAUTION - if you use this API, you must use it everywhere;
         specifying any screen name manually will cause our automatic name choice (based on ViewController type name) to never be used again. In other words, if you use this once, you need to think through all the places where you'd like the screen name to be changed.
      */
