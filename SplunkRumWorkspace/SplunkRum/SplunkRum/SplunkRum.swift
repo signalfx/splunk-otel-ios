@@ -232,10 +232,20 @@ var splunkRumInitializeCalledTime = Date()
 
     }
         /**
-            Specifies a better screen.name value.  CAUTION - if you use this API, you must use it everywhere;
+            Specifies a better screen.name value.
+     
+     **CAUTION** - if you use this API, you must use it everywhere;
         specifying any screen name manually will cause our automatic name choice (based on ViewController type name) to never be used again. In other words, if you use this once, you need to think through all the places where you'd like the screen name to be changed.
+     
+            
+     **This must be called from the main thread**.  Other usage will fail with a printed warning message in debug mode
+     
      */
     @objc public class func setScreenName(_ name: String) {
+        if !Thread.current.isMainThread {
+            debug_log("SplunkRum.setScreenName not called from main thread: "+Thread.current.debugDescription)
+            return
+        }
         screenNameManuallySet = true
         screenName = name
     }
