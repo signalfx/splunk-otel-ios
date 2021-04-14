@@ -6,7 +6,7 @@ that can be added to an app that captures:
 - Crashes/unhandled exceptions via [PLCrashReporter](https://github.com/microsoft/plcrashreporter)
 - HTTP requests, via `URLSession` instrumentation
 - Application startup information
-- FIXME others as added
+- UI activity - screen name (typically ViewController name), actions, and PresentationTransitions
 
 ## Getting Started
 
