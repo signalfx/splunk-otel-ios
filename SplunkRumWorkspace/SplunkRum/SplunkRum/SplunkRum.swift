@@ -35,6 +35,7 @@ import StdoutExporter
         Memberwise initializer
      */
     @objc public init(allowInsecureBeacon: Bool = false, enableCrashReporting: Bool = true, debug: Bool = false, globalAttributes: [String: Any] = [:]) {
+        // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.enableCrashReporting = enableCrashReporting
         self.debug = debug
@@ -67,6 +68,12 @@ import StdoutExporter
                     Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
      */
     @objc public var globalAttributes: [String: Any] = [:]
+
+    /**
+    Sets a filter that rejects (drops) spans.  The closure passed should return true if the span should be rejected (not sent / dropped) and false otherwise
+    */
+   public var spanRejectionFilter: ((SpanData) -> Bool)?
+
 }
 var globalAttributes: [String: Any] = [:]
 let splunkLibraryLoadTime = Date()
@@ -119,7 +126,7 @@ var splunkRumInitializeCalledTime = Date()
         let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
         let zipkin = ZipkinTraceExporter(options: exportOptions)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
-        limitingExporter = LimitingExporter(proxy: zipkin)
+        limitingExporter = LimitingExporter(proxy: zipkin, rejectionFilter: options?.spanRejectionFilter ?? nil)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limitingExporter!))
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
@@ -188,13 +195,6 @@ var splunkRumInitializeCalledTime = Date()
     @objc public class func setScreenName(_ name: String) {
         screenNameManuallySet = true
         screenName = name
-    }
-
-    /**
-     Sets a filter that rejects (drops) spans.  The closure passed should return true if the span should be rejected (not sent / dropped) and false otherwise
-     */
-    public class func setSpanRejectionFilter(_ filter: @escaping (SpanData) -> Bool) {
-        limitingExporter?.setRejectionFilter(filter)
     }
 
 }

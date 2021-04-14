@@ -52,7 +52,7 @@ class UtilsTests: XCTestCase {
         let rawSpans = localSpans
         XCTAssertTrue(rawSpans[0].attributes["longString"]?.description.count ?? 0 > 4096)
         localSpans.removeAll()
-        let le = LimitingExporter(proxy: TestSpanExporter()) // rewrites into localSpans; yes, this is weird
+        let le = LimitingExporter(proxy: TestSpanExporter(), rejectionFilter: nil) // rewrites into localSpans; yes, this is weird
         _ = le.export(spans: rawSpans)
         XCTAssertEqual(1, localSpans.count)
         XCTAssertTrue(localSpans[0].attributes["longString"]?.description.count ?? 4097 <= 4096)
@@ -73,7 +73,7 @@ class UtilsTests: XCTestCase {
         XCTAssertEqual(102, localSpans.count)
         var rawSpans = localSpans
         localSpans.removeAll()
-        let le = LimitingExporter(proxy: TestSpanExporter()) // rewrites into localSpans; yes, this is weird
+        let le = LimitingExporter(proxy: TestSpanExporter(), rejectionFilter: nil) // rewrites into localSpans; yes, this is weird
         _ = le.export(spans: rawSpans)
         XCTAssertEqual(100, localSpans.count)
         localSpans.removeAll()
@@ -110,8 +110,8 @@ class UtilsTests: XCTestCase {
         let rawSpans = localSpans
         localSpans.removeAll()
 
-        let le = LimitingExporter(proxy: TestSpanExporter()) // rewrites into localSpans; yes, this is weird
-        le.setRejectionFilter { spanData in
+        // rewrites into localSpans; yes, this is weird
+        let le = LimitingExporter(proxy: TestSpanExporter()) { spanData in
             return spanData.name == "rejectTest"
         }
         _ = le.export(spans: rawSpans)

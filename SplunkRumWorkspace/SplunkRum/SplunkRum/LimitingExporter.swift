@@ -29,13 +29,14 @@ class LimitingExporter: SpanExporter {
     static let SPAN_RATE_LIMIT_PERIOD = 30 // seconds
     let MAX_SPANS_PER_PERIOD_PER_COMPONENT = 100
 
-    var proxy: SpanExporter
+    let proxy: SpanExporter
     var component2counts: [String: Int] = [:]
     var nextRateLimitReset = Date().addingTimeInterval(TimeInterval(LimitingExporter.SPAN_RATE_LIMIT_PERIOD))
-    var rejectionFilter: ((SpanData) -> Bool)?
+    let rejectionFilter: ((SpanData) -> Bool)?
 
-    init(proxy: SpanExporter) {
+    init(proxy: SpanExporter, rejectionFilter: ((SpanData) -> Bool)?) {
         self.proxy = proxy
+        self.rejectionFilter = rejectionFilter
     }
 
     // Returns true if span should be dropped
@@ -45,10 +46,6 @@ class LimitingExporter: SpanExporter {
         count += 1
         component2counts[component] = count
         return count > MAX_SPANS_PER_PERIOD_PER_COMPONENT
-    }
-
-    func setRejectionFilter(_ filter: @escaping (SpanData) -> Bool) {
-        rejectionFilter = filter
     }
 
     // Returns true if span should be rejected
