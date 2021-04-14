@@ -21,7 +21,7 @@ let MAX_SESSION_AGE_SECONDS = 4 * 60 * 60
 
 private var rumSessionId = generateNewSessionId()
 private var sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
-private let dispatchQueue = DispatchQueue(label: "rumSessionId")
+private let sessionIdLock = NSLock()
 
 func generateNewSessionId() -> String {
     var i=0
@@ -35,12 +35,14 @@ func generateNewSessionId() -> String {
 }
 
 func getRumSessionId() -> String {
-    return dispatchQueue.sync {
-        if Date() > sessionIdExpiration {
-            sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
-            rumSessionId = generateNewSessionId()
-            updateCrashReportSessionId() // odd coupling here but whatever
-        }
-        return rumSessionId
+    sessionIdLock.lock()
+    defer {
+        sessionIdLock.unlock()
     }
+    if Date() > sessionIdExpiration {
+        sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
+        rumSessionId = generateNewSessionId()
+        updateCrashReportSessionId() // odd coupling here but whatever
+    }
+    return rumSessionId
 }
