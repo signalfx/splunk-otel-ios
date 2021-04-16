@@ -124,7 +124,11 @@ var splunkRumInitializeCalledTime = Date()
             print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
             return
         }
-        theBeaconUrl = beaconUrl
+        if rumAuth.isEmpty {
+            theBeaconUrl = beaconUrl
+        } else {
+            theBeaconUrl = beaconUrl + "?auth="+rumAuth
+        }
         let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
         let zipkin = ZipkinTraceExporter(options: exportOptions)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
