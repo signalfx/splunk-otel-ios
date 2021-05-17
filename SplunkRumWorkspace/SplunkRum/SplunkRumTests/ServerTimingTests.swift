@@ -23,7 +23,7 @@ class TestSpan: Span {
 
     var status: Status
 
-    var scope: Scope?
+//    var scope: Scope?
 
     func end() {
     }
@@ -42,7 +42,7 @@ class TestSpan: Span {
         isRecording = true
         name = "test"
         description = "test"
-        context = SpanContext.invalid
+        context = OpenTelemetry.instance.contextProvider.activeSpan!.context
         status = .unset
     }
     var kind: SpanKind

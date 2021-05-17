@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/open-telemetry/opentelemetry-swift",
         "state": {
           "branch": null,
-          "revision": "2356f1f5a3bc2063b1f5f1d66736b53c6762e371",
-          "version": "0.6.0"
+          "revision": "9cd94311069ec45d064ac52774d8c42e7a97c512",
+          "version": "1.0.0"
         }
       },
       {
@@ -62,6 +62,15 @@
           "branch": null,
           "revision": "173f567a2dfec11d74588eea82cecea555bdc0bc",
           "version": "1.4.0"
+        }
+      },
+      {
+        "package": "swift-metrics",
+        "repositoryURL": "https://github.com/apple/swift-metrics.git",
+        "state": {
+          "branch": null,
+          "revision": "e382458581b05839a571c578e90060fff499f101",
+          "version": "2.1.1"
         }
       },
       {

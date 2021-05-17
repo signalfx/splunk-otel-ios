@@ -68,7 +68,7 @@ func calculateTax() {
 ## Version information
 
 - This library works on iOS 11 and up
-- This library incorporates [opentelemetry-swift](https://github.com/open-telemetry/opentelemetry-swift) v0.6
+- This library incorporates [opentelemetry-swift](https://github.com/open-telemetry/opentelemetry-swift) v1.0.0
 
 ## Building and contributing
 

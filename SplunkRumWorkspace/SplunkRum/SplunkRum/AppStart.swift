@@ -43,7 +43,6 @@ private func processStartTime() throws -> Date {
 }
 
 var appStart: Span?
-var appStartScope: Scope?
 
 func initializeAppStartupListeners() {
     let events = [
@@ -63,9 +62,8 @@ func initializeAppStartupListeners() {
                 appStart!.addEvent(name: event.rawValue)
                 if event == UIApplication.didBecomeActiveNotification {
                     appStart!.end()
-                    appStartScope!.close()
+                    OpenTelemetry.instance.contextProvider.removeContextForSpan(appStart!)
                     appStart = nil
-                    appStartScope = nil
                 }
             }
         }
@@ -90,7 +88,7 @@ func constructAppStartSpan() {
         appStart!.addEvent(name: "process.start", timestamp: procStart!)
     }
     // This is strange looking but I want all the initial spans that happen before didBecomeActive to be kids of the AppStart.  scope is closed at didBecomeActive
-    appStartScope = tracer.setActive(appStart!)
+    OpenTelemetry.instance.contextProvider.setActiveSpan(appStart!)
 }
 
 func sendAppStartSpan() {

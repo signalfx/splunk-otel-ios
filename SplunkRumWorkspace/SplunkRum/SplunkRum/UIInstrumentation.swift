@@ -31,9 +31,9 @@ extension UIApplication {
         let tracer = buildTracer()
         let span = tracer.spanBuilder(spanName: action.description).startSpan()
         span.setAttribute(key: "component", value: "ui")
-        var scope = tracer.setActive(span)
+        OpenTelemetry.instance.contextProvider.setActiveSpan(span)
         defer {
-            scope.close()
+            OpenTelemetry.instance.contextProvider.removeContextForSpan(span)
             span.end()
         }
         if target != nil {
