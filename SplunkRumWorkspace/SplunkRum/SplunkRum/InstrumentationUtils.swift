@@ -74,7 +74,7 @@ class GlobalAttributesProcessor: SpanProcessor {
         }
         span.setAttribute(key: "splunk.rumSessionId", value: getRumSessionId())
         span.setAttribute(key: "splunk.rumVersion", value: SplunkRumVersionString)
-        span.setAttribute(key: "device.model", value: deviceModel)
+        span.setAttribute(key: "device.model.name", value: deviceModel)
         span.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
         // It would be nice to drop this field when the span-ending thread isn't the same...
         if Thread.current.isMainThread {
