@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "SplunkRum", targets: ["SplunkRum"])
     ],
     dependencies: [
-        .package(name: "opentelemetry-swift", url:"https://github.com/open-telemetry/opentelemetry-swift", from: "0.6.0"),
+        .package(name: "opentelemetry-swift", url:"https://github.com/open-telemetry/opentelemetry-swift", from: "1.0.0"),
         .package(name: "PLCrashReporter", url:"https://github.com/microsoft/plcrashreporter", from: "1.8.1"),
 	.package(url: "https://github.com/devicekit/DeviceKit.git", from: "4.3.0"),
     ],
