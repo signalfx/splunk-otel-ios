@@ -52,3 +52,4 @@ file_header:
 
 excluded:
  - "Package.swift"
+ - .build
