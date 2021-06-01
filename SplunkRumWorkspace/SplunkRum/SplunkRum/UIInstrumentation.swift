@@ -29,8 +29,9 @@ extension UIApplication {
                                                for event: UIEvent?) -> Bool {
         updateUIFields()
         let tracer = buildTracer()
-        let span = tracer.spanBuilder(spanName: action.description).startSpan()
+        let span = tracer.spanBuilder(spanName: "action").startSpan()
         span.setAttribute(key: "component", value: "ui")
+        span.setAttribute(key: "action.name", value: action.description)
         OpenTelemetry.instance.contextProvider.setActiveSpan(span)
         defer {
             OpenTelemetry.instance.contextProvider.removeContextForSpan(span)
@@ -82,6 +83,8 @@ func initializePresentationTransitionInstrumentation() {
         let notifObj = notif.object as? NSObject
         if notifObj != nil {
             let span = buildTracer().spanBuilder(spanName: "PresentationTransition").startSpan()
+            // captured at beginning since it will possibly/likely change
+            span.setAttribute(key: "last.screen.name", value: screenName)
             span.setAttribute(key: "component", value: "ui")
             // FIXME better naming
             span.setAttribute(key: "object.type", value: String(describing: type(of: notif.object!)))

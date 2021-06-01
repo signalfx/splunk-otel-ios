@@ -67,15 +67,15 @@ func loadPendingCrashReport(_ data: Data!) throws {
     span.setAttribute(key: "crash.rumSessionId", value: oldSessionId)
     span.setAttribute(key: "error", value: true)
     span.addEvent(name: "crash.timestamp", timestamp: report.systemInfo.timestamp)
-    span.setAttribute(key: "error.name", value: report.signalInfo.name)
+    span.setAttribute(key: "exception.type", value: report.signalInfo.name)
     span.setAttribute(key: "crash.address", value: report.signalInfo.address.description)
     for case let thread as PLCrashReportThreadInfo in report.threads where thread.crashed {
-        span.setAttribute(key: "error.stack", value: crashedThreadToStack(report: report, thread: thread))
+        span.setAttribute(key: "exception.stacktrace", value: crashedThreadToStack(report: report, thread: thread))
         break
     }
     if report.hasExceptionInfo {
-        span.setAttribute(key: "error.name", value: report.exceptionInfo.exceptionName)
-        span.setAttribute(key: "error.message", value: report.exceptionInfo.exceptionReason)
+        span.setAttribute(key: "exception.type", value: report.exceptionInfo.exceptionName)
+        span.setAttribute(key: "exception.message", value: report.exceptionInfo.exceptionReason)
     }
     span.end(time: now)
 }

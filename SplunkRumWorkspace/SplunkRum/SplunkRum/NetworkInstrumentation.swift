@@ -57,8 +57,8 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
     }
     if task.error != nil {
         span!.setAttribute(key: "error", value: true)
-        span!.setAttribute(key: "error.message", value: task.error!.localizedDescription)
-        span!.setAttribute(key: "error.name", value: String(describing: type(of: task.error!)))
+        span!.setAttribute(key: "exception.message", value: task.error!.localizedDescription)
+        span!.setAttribute(key: "exception.type", value: String(describing: type(of: task.error!)))
     }
     span!.setAttribute(key: "http.response_content_length_uncompressed", value: Int(task.countOfBytesReceived))
     if task.countOfBytesSent != 0 {

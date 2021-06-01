@@ -38,46 +38,48 @@ class ErrorTests: XCTestCase {
 
         XCTAssertEqual(localSpans.count, 5)
         let eStr = localSpans.first(where: { (span) -> Bool in
-            return span.attributes["error.message"]?.description == "Test message"
+            return span.attributes["exception.message"]?.description == "Test message"
         })
         let eEnumErr = localSpans.first(where: { (span) -> Bool in
-            return (span.attributes["error.message"]?.description.contains("EnumError") ?? false)
+            return (span.attributes["exception.message"]?.description.contains("EnumError") ?? false)
         })
         let eClassErr = localSpans.first(where: { (span) -> Bool in
-            return (span.attributes["error.message"]?.description.contains("ClassError") ?? false)
+            return (span.attributes["exception.message"]?.description.contains("ClassError") ?? false)
         })
         let eExc = localSpans.first(where: { (span) -> Bool in
-            return span.attributes["error.message"]?.description == "Could not parse input"
+            return span.attributes["exception.message"]?.description == "Could not parse input"
         })
         let crashReport = localSpans.first(where: { (span) -> Bool in
             return span.name == "crash.report"
         })
 
         XCTAssertNotNil(eStr)
-        XCTAssertEqual(eStr?.name, "SplunkRum.reportError")
+        XCTAssertEqual(eStr?.name, "SplunkRum.reportError(String)")
         XCTAssertEqual(eStr?.attributes["error"]?.description, "true")
-        XCTAssertEqual(eStr?.attributes["error.name"]?.description, "String")
+        XCTAssertEqual(eStr?.attributes["exception.type"]?.description, "String")
         XCTAssertNotNil(eStr?.attributes["splunk.rumSessionId"])
         XCTAssertEqual(eStr?.attributes["component"]?.description, "error")
 
         XCTAssertNotNil(eExc)
-        XCTAssertEqual(eExc?.name, "SplunkRum.reportError")
+        XCTAssertEqual(eExc?.name, "IllegalFormatError")
         XCTAssertEqual(eExc?.attributes["error"]?.description, "true")
-        XCTAssertEqual(eExc?.attributes["error.name"]?.description, "IllegalFormatError")
+        XCTAssertEqual(eExc?.attributes["exception.type"]?.description, "IllegalFormatError")
         XCTAssertNotNil(eExc?.attributes["splunk.rumSessionId"])
         XCTAssertEqual(eExc?.attributes["component"]?.description, "error")
 
         XCTAssertNotNil(eEnumErr)
-        XCTAssertEqual(eEnumErr?.name, "SplunkRum.reportError")
+        XCTAssertEqual(eEnumErr?.name, "EnumError")
         XCTAssertEqual(eEnumErr?.attributes["error"]?.description, "true")
+        XCTAssertEqual(eEnumErr?.attributes["exception.type"]?.description, "EnumError")
         XCTAssertNotNil(eEnumErr?.attributes["splunk.rumSessionId"])
         XCTAssertEqual(eEnumErr?.attributes["component"]?.description, "error")
 
         XCTAssertNotNil(eClassErr)
-        XCTAssertEqual(eClassErr?.name, "SplunkRum.reportError")
+        XCTAssertEqual(eClassErr?.name, "ClassError")
         XCTAssertEqual(eClassErr?.attributes["error"]?.description, "true")
         XCTAssertEqual(eClassErr?.attributes["component"]?.description, "error")
         XCTAssertNotNil(eClassErr?.attributes["splunk.rumSessionId"])
+        XCTAssertEqual(eClassErr?.attributes["exception.type"]?.description, "ClassError")
 
         XCTAssertEqual(eClassErr?.attributes["splunk.rumSessionId"], eExc?.attributes["splunk.rumSessionId"])
 
@@ -87,7 +89,7 @@ class ErrorTests: XCTestCase {
         XCTAssertEqual(crashReport?.attributes["crash.address"]?.description, "140733995048756")
         XCTAssertEqual(crashReport?.attributes["component"]?.description, "error")
         XCTAssertEqual(crashReport?.attributes["error"]?.description, "true")
-        XCTAssertEqual(crashReport?.attributes["error.name"]?.description, "SIGILL")
-        XCTAssertTrue(crashReport?.attributes["error.stack"]?.description.contains("UIKitCore") ?? false)
+        XCTAssertEqual(crashReport?.attributes["exception.type"]?.description, "SIGILL")
+        XCTAssertTrue(crashReport?.attributes["exception.stacktrace"]?.description.contains("UIKitCore") ?? false)
     }
 }
