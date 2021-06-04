@@ -46,6 +46,7 @@ or
 | debug | Bool | Turns on/off internal debug logging | false |
 | allowInsecureBeacon | Bool | Allows http beacon urls | false |
 | globalAttributes | [String: Any] | Extra attributes to add to each reported span.  See also `setGlobalAttributes` | [:] |
+| enableCrashReporting | Bool | Turns on crash/unhandled exception reporting | true |
 
 ## Manual OpenTelemetry instrumentation
 
@@ -64,6 +65,23 @@ func calculateTax() {
   span.end() // or use defer for this
 }
 ```
+
+### Manual Error Reporting
+
+You can report handled errors/exceptions/messages with a convenience API:
+
+```swift
+SplunkRum.reportError(oops)
+```
+
+There are `reportError` overloads for `String`, `Error`, and `NSException`.
+
+### Managing Global Attributes
+
+Global attributes are key/value pairs added to all reported data.  This is useful for reporting app- or user-specfic
+values as tags.  For example, you might add `accountType={gold,silver,bronze}` to every span (piece of data) reported
+by the Splunk RUM library.  You can specify global attributes in the during `SplunkRum.initialize()` as `options.globalAttributes` or use
+`SplunkRum.setGlobalAttributes / SplunkRum.removeGlobalAttribute` at any point during your app's execution.
 
 ## Version information
 
