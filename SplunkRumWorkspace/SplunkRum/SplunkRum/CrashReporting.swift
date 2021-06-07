@@ -65,6 +65,8 @@ func loadPendingCrashReport(_ data: Data!) throws {
     let span = tracer.spanBuilder(spanName: "crash.report").setStartTime(time: now).setNoParent().startSpan()
     span.setAttribute(key: "component", value: "error")
     span.setAttribute(key: "crash.rumSessionId", value: oldSessionId)
+    // "marketing version" here matches up to our use of CFBundleShortVersionString
+    span.setAttribute(key: "crash.app.version", value: report.applicationInfo.applicationMarketingVersion)
     span.setAttribute(key: "error", value: true)
     span.addEvent(name: "crash.timestamp", timestamp: report.systemInfo.timestamp)
     span.setAttribute(key: "exception.type", value: report.signalInfo.name)
