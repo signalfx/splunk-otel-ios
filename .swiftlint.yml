@@ -9,6 +9,7 @@ disabled_rules:
  - unused_optional_binding
  - function_body_length
  - force_cast
+ - private_over_fileprivate
 # Not really sure about a bunch of these, just turning most stuff in the 'performance' and 'lint' categories
 opt_in_rules:
  - missing_docs

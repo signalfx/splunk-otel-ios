@@ -84,7 +84,7 @@ func initializePresentationTransitionInstrumentation() {
         if notifObj != nil {
             let span = buildTracer().spanBuilder(spanName: "PresentationTransition").startSpan()
             // captured at beginning since it will possibly/likely change
-            span.setAttribute(key: "last.screen.name", value: screenName)
+            span.setAttribute(key: "last.screen.name", value: getScreenName())
             span.setAttribute(key: "component", value: "ui")
             // FIXME better naming
             span.setAttribute(key: "object.type", value: String(describing: type(of: notif.object!)))
@@ -99,7 +99,7 @@ func initializePresentationTransitionInstrumentation() {
             let spanHolder = Presentation2Span.object(forKey: notifObj)
             if spanHolder != nil {
                 // screenName may have changed now that the view has appeared; update new screen name
-                spanHolder?.span.setAttribute(key: "screen.name", value: screenName)
+                spanHolder?.span.setAttribute(key: "screen.name", value: getScreenName())
                 spanHolder?.span.end()
             }
         }
@@ -111,11 +111,8 @@ func addUIFields(span: ReadableSpan) {
     // Note that this may be called from threads other than main (e.g., background thread
     // creating span); hence trying to update cached values whenever we can and simply using
     // them here
-    span.setAttribute(key: "screen.name", value: screenName)
+    span.setAttribute(key: "screen.name", value: getScreenName())
 }
-
-var screenName: String = "unknown"
-var screenNameManuallySet = false
 
 private func pickVC(_ vc: UIViewController?) -> UIViewController? {
     if vc == nil {
@@ -136,7 +133,7 @@ private func updateUIFields() {
     if !Thread.current.isMainThread {
         return
     }
-    if screenNameManuallySet {
+    if isScreenNameManuallySet() {
         return
     }
     let wins = UIApplication.shared.windows
@@ -147,7 +144,7 @@ private func updateUIFields() {
         if vc != nil {
             // FIXME SwiftUI UIHostingController vc when cast has a "rootView" var which does
             // not appear to be accessible generically
-            screenName = String(describing: type(of: vc!))
+            internal_manuallySetScreenName(String(describing: type(of: vc!)))
         }
     }
     // FIXME others?

@@ -250,8 +250,7 @@ var splunkRumInitializeCalledTime = Date()
             debug_log("SplunkRum.setScreenName not called from main thread: "+Thread.current.debugDescription)
             return
         }
-        screenNameManuallySet = true
-        screenName = name
+        internal_manuallySetScreenName(name)
     }
 
 }
