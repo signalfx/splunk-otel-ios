@@ -1,18 +1,80 @@
-# Bulding, testing, and contributing to this project
+# Contributing Guidelines
 
-## Building
+Thank you for your interest in contributing to our repository! Whether it's a bug
+report, new feature, question, or additional documentation, we greatly value
+feedback and contributions from our community. Read through this document
+before submitting any issues or pull requests to ensure we have all the
+necessary information to effectively respond to your bug report or
+contribution.
 
-Open SplunkRumWorkspace in Xcode; everything should be wired up correctly to
-run unit tests in SplunkRum or use one of the test apps to try things out.
+In addition to this document, please review our [Code of
+Conduct](CODE_OF_CONDUCT.md). For any code of conduct questions or comments
+please email oss@splunk.com.
 
-`./fullbuild.sh` is what the CI runs, and it requires `swiftlint`:
-`brew install swiftlint` or your local equivalent first.  This also runs
-the unit tests and can take a couple of minutes; be patient.
+## Reporting Bugs/Feature Requests
 
-Note that `swift build` will not work since the code depends on UIKit which is
-not available on the mac.
+We welcome you to use the GitHub issue tracker to report bugs or suggest
+features. When filing an issue, please check existing open, or recently closed,
+issues to make sure somebody else hasn't already reported the issue. Please try
+to include as much information as you can. Details like these are incredibly
+useful:
 
-## Community Contributions
+- A reproducible test case or series of steps
+- The version of our code being used
+- Any modifications you've made relevant to the bug
+- Anything unusual about your environment or deployment
+- Any known workarounds
 
-If you are not a Splunk employee and would like to contribute code to this project, please read and fill out the
-[Splunk CLA](https://www.splunk.com/en_us/form/contributions.html).
+When filing an issue, please do *NOT* include:
+
+- Internal identifiers such as JIRA tickets
+- Any sensitive information related to your environment, users, etc.
+
+## Reporting Security Issues
+
+See [SECURITY.md](SECURITY.md#reporting-security-issues) for detailed instructions.
+
+## Contributing via Pull Requests
+
+Contributions via Pull Requests (PRs) are much appreciated. Before sending us a
+pull request, please ensure that:
+
+1. You are working against the latest source on the `main` branch.
+2. You check existing open, and recently merged, pull requests to make sure
+   someone else hasn't addressed the problem already.
+3. You open an issue to discuss any significant work - we would hate for your
+   time to be wasted.
+4. You submit PRs that are easy to review and ideally less 500 lines of code.
+   Multiple PRs can be submitted for larger contributions.
+
+To send us a pull request, please:
+
+1. Fork the repository.
+2. Modify the source; please ensure a single change per PR. If you also
+   reformat all the code, it will be hard for us to focus on your change.
+3. Ensure local tests pass and add new tests related to the contribution.
+4. Commit to your fork using clear commit messages.
+5. Send us a pull request, answering any default questions in the pull request
+   interface.
+6. Pay attention to any automated CI failures reported in the pull request, and
+   stay involved in the conversation.
+
+GitHub provides additional documentation on [forking a
+repository](https://help.github.com/articles/fork-a-repo/) and [creating a pull
+request](https://help.github.com/articles/creating-a-pull-request/).
+
+## Finding contributions to work on
+
+Looking at the existing issues is a great way to find something to contribute
+on. As our repositories, by default, use the default GitHub issue labels
+(enhancement/bug/duplicate/help wanted/invalid/question/wontfix), looking at
+any 'help wanted' issues is a great place to start.
+
+## Licensing
+
+See the [LICENSE](LICENSE) file for our repository's licensing. We will ask you to
+confirm the licensing of your contribution.
+
+We may ask you to sign a [Contributor License Agreement
+(CLA)](http://en.wikipedia.org/wiki/Contributor_License_Agreement) for larger
+changes.
