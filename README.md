@@ -83,6 +83,18 @@ values as tags.  For example, you might add `accountType={gold,silver,bronze}` t
 by the Splunk RUM library.  You can specify global attributes in the during `SplunkRum.initialize()` as `options.globalAttributes` or use
 `SplunkRum.setGlobalAttributes / SplunkRum.removeGlobalAttribute` at any point during your app's execution.
 
+### Manually changing screen names
+
+You can set `screen.name` manually with a simple line of code:
+
+```swift
+SplunkRum.setScreenName("AccountSettingsTab")
+```
+
+This name will hold until your next call to `setScreenName`.  **NOTE**: using `setScreenName` once
+disables automatic screen name instrumentation, to avoid overwriting your chosen name(s).  If you
+instrument your application to `setScreenName`, please do it everywhere.
+
 ## Version information
 
 - This library works on iOS 11 and up
