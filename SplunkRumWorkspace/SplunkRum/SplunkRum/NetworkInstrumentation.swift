@@ -189,9 +189,7 @@ func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
     }
 }
 
-// FIXME also instrument old-school NSURLConnection?
 func initalizeNetworkInstrumentation() {
-    // FIXME experiment with emphemeral and results of the function background(withIdentifier) -> same method impls?
     let urlsession = URLSession.self
 
     // This syntax is obnoxious to differentiate with:request from with:url

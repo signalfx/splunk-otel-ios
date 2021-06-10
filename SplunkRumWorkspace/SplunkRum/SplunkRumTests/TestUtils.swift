@@ -67,7 +67,6 @@ func initializeTestEnvironment() throws {
     SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true, globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true]))
     OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: TestSpanExporter()))
 
-    // FIXME config option to dial back the batch period
     print("sleeping to wait for span batch, don't worry about the pause...")
     sleep(8)
     // Should have received a SplunkRum.initialize; this will act as the only test for valid zipkin-on-the-wire
@@ -80,7 +79,7 @@ func initializeTestEnvironment() throws {
     XCTAssertNil(beacon)
 
     XCTAssertNotNil(srInit)
-    // FIXME not a great place to shoehorn it currently, but checking the globalAttributes logic here
+    // Checking the globalAttributes logic just once here
     XCTAssertEqual("appstart", srInit?.tags["component"]?.description)
     XCTAssertEqual("7", srInit?.tags["intKey"])
     XCTAssertEqual("1.5", srInit?.tags["doubleKey"])
