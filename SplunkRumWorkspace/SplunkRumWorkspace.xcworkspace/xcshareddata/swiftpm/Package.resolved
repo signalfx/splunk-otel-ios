@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/devicekit/DeviceKit",
         "state": {
           "branch": null,
-          "revision": "4cf9f057db69104851634269f7839f8d0bd346a3",
-          "version": "4.3.0"
+          "revision": "70f1564e4218f0b68b73a4a795cb31aee5696f08",
+          "version": "4.4.0"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/open-telemetry/opentelemetry-swift",
         "state": {
           "branch": null,
-          "revision": "9cd94311069ec45d064ac52774d8c42e7a97c512",
-          "version": "1.0.0"
+          "revision": "3a731edb3180bb63c9ff2435911234d6b3545c39",
+          "version": "1.0.1"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/microsoft/plcrashreporter",
         "state": {
           "branch": null,
-          "revision": "de6b8f9db4b2a0aa859a5507550a70548e4da936",
-          "version": "1.8.1"
+          "revision": "d747ab5de269cd44022bbe96ff9609d8626694ab",
+          "version": "1.9.0"
         }
       },
       {
