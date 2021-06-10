@@ -97,7 +97,7 @@ instrument your application to `setScreenName`, please do it everywhere.
 
 ## Version information
 
-- This library works on iOS 11 and up
+- This library is compatible with iOS 11 and up (and iPadOS 13 and up)
 - This library incorporates [opentelemetry-swift](https://github.com/open-telemetry/opentelemetry-swift) v1.0.0
 
 ## Building and contributing
