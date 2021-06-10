@@ -36,13 +36,18 @@ class NetworkInstrumentationTests: XCTestCase {
         var req = URLRequest(url: URL(string: "http://127.0.0.1:8989/error")!)
         req.httpMethod = "POST"
         URLSession.shared.uploadTask(with: req, from: "sample data".data(using: .utf8)!).resume()
+        let ephem = URLSession(configuration: URLSessionConfiguration.ephemeral)
+        var ephemReq = URLRequest(url: URL(string: "http://this.domain.willnotroute/")!)
+        ephemReq.httpMethod = "HEAD"
+        ephem.dataTask(with: ephemReq).resume()
 
         // wait until spans recevied
         var attempts = 0
-        while localSpans.count != 2 {
+        while localSpans.count != 3 {
             attempts += 1
             if attempts > 10 {
                 XCTFail("never got enough localSpans")
+                return
             }
             print("sleep 1")
             sleep(1)
@@ -53,6 +58,9 @@ class NetworkInstrumentationTests: XCTestCase {
         })
         let httpPost = localSpans.first(where: { (span) -> Bool in
             return span.name == "HTTP POST"
+        })
+        let httpHead = localSpans.first(where: { (span) -> Bool in
+            return span.name == "HTTP HEAD"
         })
 
         XCTAssertNotNil(httpGet)
@@ -71,5 +79,12 @@ class NetworkInstrumentationTests: XCTestCase {
         XCTAssertEqual(httpPost?.attributes["http.request_content_length"]?.description, "11")
         XCTAssertEqual(httpPost?.attributes["component"]?.description, "http")
 
+        XCTAssertNotNil(httpHead)
+        XCTAssertEqual(httpHead?.attributes["http.url"]?.description, "http://this.domain.willnotroute/")
+        XCTAssertEqual(httpHead?.attributes["error"]?.description, "true")
+        XCTAssertEqual(httpHead?.attributes["exception.type"]?.description, "NSURLError")
+        XCTAssertEqual(httpHead?.attributes["component"]?.description, "http")
+        // allow error message to vary but require a minimum length
+        XCTAssert((httpHead?.attributes["exception.message"]?.description.count ?? 0) > 10)
     }
 }
