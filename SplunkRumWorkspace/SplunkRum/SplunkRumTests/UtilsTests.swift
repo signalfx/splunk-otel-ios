@@ -142,4 +142,38 @@ class UtilsTests: XCTestCase {
 
     }
 
+    func testRetryExporter() throws {
+        try initializeTestEnvironment()
+        // This test is shaped kinda funny since we can't construct SpanData() directly
+        for _ in 1...50 {
+            buildTracer().spanBuilder(spanName: "test").startSpan().end()
+        }
+        XCTAssertEqual(50, localSpans.count)
+        let fiftySpans = localSpans
+        localSpans.removeAll()
+
+        let te = TestSpanExporter()
+        let re = RetryExporter(proxy: te)
+
+        // normal usage
+        _ = re.export(spans: fiftySpans)
+        XCTAssertEqual(50, localSpans.count)
+        localSpans.removeAll()
+
+        // now disconnected
+        te.exportSucceeds = false
+        _ = re.export(spans: fiftySpans)
+        _ = re.export(spans: fiftySpans)
+        _ = re.export(spans: fiftySpans)
+        _ = re.export(spans: fiftySpans)
+        XCTAssertEqual(0, localSpans.count)
+
+        // now reconnected; next export of 50 should send total of 150 (last 100 retried)
+        te.exportSucceeds = true
+        _ = re.export(spans: fiftySpans)
+        XCTAssertEqual(150, localSpans.count)
+        localSpans.removeAll()
+
+    }
+
 }

@@ -27,9 +27,15 @@ var testEnvironmentInited = false
 var localSpans: [SpanData] = []
 
 class TestSpanExporter: SpanExporter {
+    var exportSucceeds = true
+
     func export(spans: [SpanData]) -> SpanExporterResultCode {
-        localSpans.append(contentsOf: spans)
-        return .success
+        if exportSucceeds {
+            localSpans.append(contentsOf: spans)
+            return .success
+        } else {
+            return .failure
+        }
     }
 
     func flush() -> SpanExporterResultCode { return .success }

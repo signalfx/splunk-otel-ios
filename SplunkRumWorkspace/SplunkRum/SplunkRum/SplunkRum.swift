@@ -89,7 +89,6 @@ var splunkRumInitializeCalledTime = Date()
     static var initializing = false
     static var configuredOptions: SplunkRumOptions?
     static var theBeaconUrl: String?
-    static var limitingExporter: LimitingExporter?
 
     /**
             Initialization function.  Call as early as possible in your application, but only on the main thread.
@@ -129,11 +128,12 @@ var splunkRumInitializeCalledTime = Date()
         } else {
             theBeaconUrl = beaconUrl + "?auth="+rumAuth
         }
+        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
         let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
         let zipkin = ZipkinTraceExporter(options: exportOptions)
-        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
-        limitingExporter = LimitingExporter(proxy: zipkin, rejectionFilter: options?.spanRejectionFilter ?? nil)
-        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limitingExporter!))
+        let retry = RetryExporter(proxy: zipkin)
+        let limiting = LimitingExporter(proxy: retry, rejectionFilter: options?.spanRejectionFilter ?? nil)
+        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
         }
