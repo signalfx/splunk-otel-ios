@@ -145,6 +145,7 @@ var splunkRumInitializeCalledTime = Date()
         srInit.setAttribute(key: "component", value: "appstart")
         initalizeNetworkInstrumentation()
         initalizeUIInstrumentation()
+        // not initializeAppLifecycleInstrumentation, done at end of AppStart
         if options?.enableCrashReporting ?? true {
             initializeCrashReporting()
         }

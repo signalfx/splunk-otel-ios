@@ -64,6 +64,10 @@ func initializeAppStartupListeners() {
                     appStart!.end()
                     OpenTelemetry.instance.contextProvider.removeContextForSpan(appStart!)
                     appStart = nil
+                    // Because of heavy overlap and desired treatment of AppStart vs
+                    // ongoing app lifecycle stuff, initialize this now rather than
+                    // earlier to avoid double-reporting or more complex logic
+                    initializeAppLifecycleInstrumentation()
                 }
             }
         }
