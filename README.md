@@ -8,6 +8,8 @@ that can be added to an app that captures:
 - Application startup information
 - UI activity - screen name (typically ViewController name), actions, and PresentationTransitions
 
+> :construction: This project is currently in **BETA**.
+
 ## Getting Started
 
 To get started, import the package into your app, either through the Xcode menu
