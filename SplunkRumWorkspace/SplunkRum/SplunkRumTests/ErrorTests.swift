@@ -27,16 +27,13 @@ class ErrorTests: XCTestCase {
     }
 
     func testBasics() throws {
-        let crashPath = Bundle(for: ErrorTests.self).url(forResource: "sample", withExtension: "plcrash")!
-        let crashData = try Data(contentsOf: crashPath)
         try initializeTestEnvironment()
         SplunkRum.reportError(string: "Test message")
         SplunkRum.reportError(error: EnumError.ExampleError)
         SplunkRum.reportError(error: ClassError())
         SplunkRum.reportError(exception: NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil))
-        try loadPendingCrashReport(crashData) // creates span for the saved crash report
 
-        XCTAssertEqual(localSpans.count, 5)
+        XCTAssertEqual(localSpans.count, 4)
         let eStr = localSpans.first(where: { (span) -> Bool in
             return span.attributes["exception.message"]?.description == "Test message"
         })
@@ -48,9 +45,6 @@ class ErrorTests: XCTestCase {
         })
         let eExc = localSpans.first(where: { (span) -> Bool in
             return span.attributes["exception.message"]?.description == "Could not parse input"
-        })
-        let crashReport = localSpans.first(where: { (span) -> Bool in
-            return span.name == "crash.report"
         })
 
         XCTAssertNotNil(eStr)
@@ -83,13 +77,5 @@ class ErrorTests: XCTestCase {
 
         XCTAssertEqual(eClassErr?.attributes["splunk.rumSessionId"], eExc?.attributes["splunk.rumSessionId"])
 
-        XCTAssertNotNil(crashReport)
-        XCTAssertNotEqual(crashReport?.attributes["splunk.rumSessionId"], crashReport?.attributes["crash.rumSessionId"])
-        XCTAssertEqual(crashReport?.attributes["crash.rumSessionId"]?.description, "355ecc42c29cf0b56c411f1eab9191d0")
-        XCTAssertEqual(crashReport?.attributes["crash.address"]?.description, "140733995048756")
-        XCTAssertEqual(crashReport?.attributes["component"]?.description, "error")
-        XCTAssertEqual(crashReport?.attributes["error"]?.description, "true")
-        XCTAssertEqual(crashReport?.attributes["exception.type"]?.description, "SIGILL")
-        XCTAssertTrue(crashReport?.attributes["exception.stacktrace"]?.description.contains("UIKitCore") ?? false)
     }
 }

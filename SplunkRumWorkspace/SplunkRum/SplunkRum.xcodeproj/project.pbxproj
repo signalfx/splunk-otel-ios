@@ -10,7 +10,6 @@
 		86043B7C25F93E3400A29788 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86043B7B25F93E3400A29788 /* Log.swift */; };
 		8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8607AD4A267B9032004FAFFD /* AppLifecycle.swift */; };
 		8610004626178DB9008B972A /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8610004526178DB9008B972A /* DeviceKit */; };
-		8616095E25F2BAD80014CBD1 /* sample.plcrash in Resources */ = {isa = PBXBuildFile; fileRef = 8616095D25F2BAD80014CBD1 /* sample.plcrash */; };
 		8616CD5F266E673F0048980B /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8616CD5E266E673F0048980B /* ScreenName.swift */; };
 		86260ECE25CDC1DE009F3CB1 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */; };
 		86260ED525CDC1DE009F3CB1 /* SplunkRum.h in Headers */ = {isa = PBXBuildFile; fileRef = 86260EC725CDC1DE009F3CB1 /* SplunkRum.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -22,8 +21,6 @@
 		863044D325F6CA5A00E0F846 /* libStdoutExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 863044D225F6CA5A00E0F846 /* libStdoutExporter */; };
 		8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8634EDC325FA86D20082819A /* LimitingExporter.swift */; };
 		863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 863A2F4125ED7BB100F3ECE0 /* AppStart.swift */; };
-		864F69A025F17BB400C8DA59 /* CrashReporter in Frameworks */ = {isa = PBXBuildFile; productRef = 864F699F25F17BB400C8DA59 /* CrashReporter */; };
-		864F69A425F17C2000C8DA59 /* CrashReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864F69A325F17C2000C8DA59 /* CrashReporting.swift */; };
 		8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */; };
 		8654BCF825E54D340013F7F6 /* ErrorReporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCF725E54D340013F7F6 /* ErrorReporting.swift */; };
 		8654BCFC25E55E850013F7F6 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8654BCFB25E55E850013F7F6 /* TestUtils.swift */; };
@@ -63,7 +60,6 @@
 /* Begin PBXFileReference section */
 		86043B7B25F93E3400A29788 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		8607AD4A267B9032004FAFFD /* AppLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLifecycle.swift; sourceTree = "<group>"; };
-		8616095D25F2BAD80014CBD1 /* sample.plcrash */ = {isa = PBXFileReference; lastKnownFileType = file; path = sample.plcrash; sourceTree = "<group>"; };
 		8616CD5E266E673F0048980B /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
 		86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86260EC725CDC1DE009F3CB1 /* SplunkRum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SplunkRum.h; sourceTree = "<group>"; };
@@ -74,7 +70,6 @@
 		86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerTimingTests.swift; sourceTree = "<group>"; };
 		8634EDC325FA86D20082819A /* LimitingExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LimitingExporter.swift; sourceTree = "<group>"; };
 		863A2F4125ED7BB100F3ECE0 /* AppStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStart.swift; sourceTree = "<group>"; };
-		864F69A325F17C2000C8DA59 /* CrashReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReporting.swift; sourceTree = "<group>"; };
 		8654BCEB25E423170013F7F6 /* InstrumentationUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentationUtils.swift; sourceTree = "<group>"; };
 		8654BCF725E54D340013F7F6 /* ErrorReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorReporting.swift; sourceTree = "<group>"; };
 		8654BCFB25E55E850013F7F6 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
@@ -93,7 +88,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				86260EEA25CDC27F009F3CB1 /* libZipkinExporter in Frameworks */,
-				864F69A025F17BB400C8DA59 /* CrashReporter in Frameworks */,
 				86260EE625CDC27F009F3CB1 /* libOpenTelemetryApi in Frameworks */,
 				863044D325F6CA5A00E0F846 /* libStdoutExporter in Frameworks */,
 				86260EE825CDC27F009F3CB1 /* libOpenTelemetrySdk in Frameworks */,
@@ -144,7 +138,6 @@
 				86D3D39C25E82278004DD939 /* UIInstrumentation.swift */,
 				866192F325ED329E0035F08E /* Session.swift */,
 				863A2F4125ED7BB100F3ECE0 /* AppStart.swift */,
-				864F69A325F17C2000C8DA59 /* CrashReporting.swift */,
 				86043B7B25F93E3400A29788 /* Log.swift */,
 				8634EDC325FA86D20082819A /* LimitingExporter.swift */,
 				8616CD5E266E673F0048980B /* ScreenName.swift */,
@@ -157,7 +150,6 @@
 		86260ED125CDC1DE009F3CB1 /* SplunkRumTests */ = {
 			isa = PBXGroup;
 			children = (
-				8616095D25F2BAD80014CBD1 /* sample.plcrash */,
 				86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */,
 				86260ED425CDC1DE009F3CB1 /* Info.plist */,
 				865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */,
@@ -208,7 +200,6 @@
 				86260EE525CDC27F009F3CB1 /* libOpenTelemetryApi */,
 				86260EE725CDC27F009F3CB1 /* libOpenTelemetrySdk */,
 				86260EE925CDC27F009F3CB1 /* libZipkinExporter */,
-				864F699F25F17BB400C8DA59 /* CrashReporter */,
 				863044D225F6CA5A00E0F846 /* libStdoutExporter */,
 				8610004526178DB9008B972A /* DeviceKit */,
 			);
@@ -268,7 +259,6 @@
 			packageReferences = (
 				86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */,
 				865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */,
-				864F699E25F17BB400C8DA59 /* XCRemoteSwiftPackageReference "plcrashreporter" */,
 				8610004426178DB9008B972A /* XCRemoteSwiftPackageReference "DeviceKit" */,
 			);
 			productRefGroup = 86260EC525CDC1DE009F3CB1 /* Products */;
@@ -293,7 +283,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8616095E25F2BAD80014CBD1 /* sample.plcrash in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,7 +297,6 @@
 				8616CD5F266E673F0048980B /* ScreenName.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
 				86043B7C25F93E3400A29788 /* Log.swift in Sources */,
-				864F69A425F17C2000C8DA59 /* CrashReporting.swift in Sources */,
 				865DBDD92677AA7B00EFE8D5 /* RetryExporter.swift in Sources */,
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
 				8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */,
@@ -614,14 +602,6 @@
 				version = 1.0.2;
 			};
 		};
-		864F699E25F17BB400C8DA59 /* XCRemoteSwiftPackageReference "plcrashreporter" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/microsoft/plcrashreporter";
-			requirement = {
-				kind = exactVersion;
-				version = 1.9.0;
-			};
-		};
 		865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/httpswift/swifter.git";
@@ -657,11 +637,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = libStdoutExporter;
-		};
-		864F699F25F17BB400C8DA59 /* CrashReporter */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 864F699E25F17BB400C8DA59 /* XCRemoteSwiftPackageReference "plcrashreporter" */;
-			productName = CrashReporter;
 		};
 		865A5CA525DC34D8003A1E5A /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;

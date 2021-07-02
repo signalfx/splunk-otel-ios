@@ -34,10 +34,9 @@ import StdoutExporter
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, enableCrashReporting: Bool = true, debug: Bool = false, globalAttributes: [String: Any] = [:]) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:]) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
-        self.enableCrashReporting = enableCrashReporting
         self.debug = debug
         self.globalAttributes = globalAttributes
     }
@@ -46,7 +45,6 @@ import StdoutExporter
      */
     @objc public init(opts: SplunkRumOptions) {
         self.allowInsecureBeacon = opts.allowInsecureBeacon
-        self.enableCrashReporting = opts.enableCrashReporting
         self.debug = opts.debug
         // shallow copy of the map
         self.globalAttributes = [:].merging(opts.globalAttributes) { _, new in new }
@@ -56,10 +54,6 @@ import StdoutExporter
             Allows non-https beaconUrls.  Default: false
      */
     @objc public var allowInsecureBeacon: Bool = false
-    /**
-                    Turns on the crash reporting with PLCrashReporter feature.  Default: true
-     */
-    @objc public var enableCrashReporting: Bool = true
     /**
             Turns on debug logging (including printouts of all spans)  Default: false
      */
@@ -146,9 +140,6 @@ var splunkRumInitializeCalledTime = Date()
         initalizeNetworkInstrumentation()
         initalizeUIInstrumentation()
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
-        if options?.enableCrashReporting ?? true {
-            initializeCrashReporting()
-        }
         srInit.end()
         initialized = true
         print("SplunkRum.initialize() complete")
