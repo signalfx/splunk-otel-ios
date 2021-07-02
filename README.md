@@ -3,7 +3,7 @@
 The Splunk RUM iOS agent provides a swift package
 that can be added to an app that captures:
 
-- Crashes/unhandled exceptions via [PLCrashReporter](https://github.com/microsoft/plcrashreporter)
+- Crashes/unhandled exceptions via [PLCrashReporter](https://github.com/microsoft/plcrashreporter) (temporarily disabled)
 - HTTP requests, via `URLSession` instrumentation
 - Application startup information
 - UI activity - screen name (typically ViewController name), actions, and PresentationTransitions
@@ -48,7 +48,6 @@ or
 | debug | Bool | Turns on/off internal debug logging | false |
 | allowInsecureBeacon | Bool | Allows http beacon urls | false |
 | globalAttributes | [String: Any] | Extra attributes to add to each reported span.  See also `setGlobalAttributes` | [:] |
-| enableCrashReporting | Bool | Turns on crash/unhandled exception reporting | true |
 
 ## Manual OpenTelemetry instrumentation
 
