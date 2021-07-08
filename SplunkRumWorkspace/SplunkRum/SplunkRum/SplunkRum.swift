@@ -153,6 +153,13 @@ var splunkRumInitializeCalledTime = Date()
     }
 
     /**
+     Adds a callback whenever the sessionId changes.
+     */
+    public class func addSessionIdChangeCallback(_ callback: @escaping (() -> Void)) {
+        addSessionIdCallback(callback)
+    }
+
+    /**
             Convenience function for reporting an error.
      */
     @objc public class func reportError(string: String) {
@@ -243,6 +250,13 @@ var splunkRumInitializeCalledTime = Date()
             return
         }
         internal_manuallySetScreenName(name)
+    }
+
+    /**
+        For debugging purposes; only has an effect if debug=true in configuration
+     */
+    public class func debugLog(_ msg: String) {
+        debug_log(msg)
     }
 
 }

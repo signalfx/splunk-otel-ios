@@ -22,6 +22,7 @@ let MAX_SESSION_AGE_SECONDS = 4 * 60 * 60
 private var rumSessionId = generateNewSessionId()
 private var sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
 private let sessionIdLock = NSLock()
+private var sessionIdCallbacks: [(() -> Void)] = []
 
 func generateNewSessionId() -> String {
     var i=0
@@ -34,14 +35,33 @@ func generateNewSessionId() -> String {
     return answer
 }
 
-func getRumSessionId() -> String {
+func addSessionIdCallback(_ callback: @escaping (() -> Void)) {
     sessionIdLock.lock()
     defer {
         sessionIdLock.unlock()
     }
+    sessionIdCallbacks.append(callback)
+}
+
+func getRumSessionId() -> String {
+    sessionIdLock.lock()
+    var unlocked = false
+    var callbacks: [(() -> Void)] = []
+    defer {
+        if !unlocked {
+            sessionIdLock.unlock()
+        }
+    }
     if Date() > sessionIdExpiration {
         sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
         rumSessionId = generateNewSessionId()
+        callbacks = sessionIdCallbacks
     }
+    sessionIdLock.unlock()
+    unlocked = true
+    for callback in callbacks {
+        callback()
+    }
+
     return rumSessionId
 }

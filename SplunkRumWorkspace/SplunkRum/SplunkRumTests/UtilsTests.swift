@@ -31,6 +31,11 @@ class UtilsTests: XCTestCase {
         for char in s1 {
             XCTAssertTrue(("0"..."9").contains(char) || ("a"..."f").contains(char))
         }
+        // FIXME need clean way to unit test session ID changes; at least make sure it doesn't explode right now
+        SplunkRum.addSessionIdChangeCallback {
+            print("called")
+        }
+        XCTAssertTrue(SplunkRum.getSessionId().count == 32)
     }
 
     func testLengthLimitingExporter() throws {
