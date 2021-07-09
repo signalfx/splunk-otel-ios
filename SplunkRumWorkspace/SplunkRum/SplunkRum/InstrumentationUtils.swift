@@ -34,12 +34,6 @@ func computeDeviceModel() -> String {
     return Device.current.description
 }
 
-func computeSplunkRumVersion() -> String {
-    let dict = Bundle(for: SplunkRum.self).infoDictionary
-    return dict?["CFBundleShortVersionString"] as? String ?? "unknown"
-}
-let SplunkRumVersionString = computeSplunkRumVersion()
-
 func buildTracer() -> Tracer {
     return OpenTelemetry.instance.tracerProvider.get(instrumentationName: "splunk-ios", instrumentationVersion: SplunkRumVersionString)
 }
