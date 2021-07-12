@@ -11,6 +11,7 @@
 		8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8607AD4A267B9032004FAFFD /* AppLifecycle.swift */; };
 		8610004626178DB9008B972A /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8610004526178DB9008B972A /* DeviceKit */; };
 		8616CD5F266E673F0048980B /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8616CD5E266E673F0048980B /* ScreenName.swift */; };
+		8624DAB5269CAE61005D65DE /* NetworkType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8624DAB4269CAE61005D65DE /* NetworkType.swift */; };
 		86260ECE25CDC1DE009F3CB1 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */; };
 		86260ED525CDC1DE009F3CB1 /* SplunkRum.h in Headers */ = {isa = PBXBuildFile; fileRef = 86260EC725CDC1DE009F3CB1 /* SplunkRum.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		86260EE625CDC27F009F3CB1 /* libOpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = 86260EE525CDC27F009F3CB1 /* libOpenTelemetryApi */; };
@@ -61,6 +62,7 @@
 		86043B7B25F93E3400A29788 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		8607AD4A267B9032004FAFFD /* AppLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLifecycle.swift; sourceTree = "<group>"; };
 		8616CD5E266E673F0048980B /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
+		8624DAB4269CAE61005D65DE /* NetworkType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkType.swift; sourceTree = "<group>"; };
 		86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86260EC725CDC1DE009F3CB1 /* SplunkRum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SplunkRum.h; sourceTree = "<group>"; };
 		86260EC825CDC1DE009F3CB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 				8616CD5E266E673F0048980B /* ScreenName.swift */,
 				865DBDD82677AA7B00EFE8D5 /* RetryExporter.swift */,
 				8607AD4A267B9032004FAFFD /* AppLifecycle.swift */,
+				8624DAB4269CAE61005D65DE /* NetworkType.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -301,6 +304,7 @@
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
 				8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
+				8624DAB5269CAE61005D65DE /* NetworkType.swift in Sources */,
 				8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
 				86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */,

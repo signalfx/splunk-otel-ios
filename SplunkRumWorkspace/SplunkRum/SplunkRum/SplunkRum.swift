@@ -140,6 +140,7 @@ var splunkRumInitializeCalledTime = Date()
             .startSpan()
         srInit.setAttribute(key: "component", value: "appstart")
         initalizeNetworkInstrumentation()
+        initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
