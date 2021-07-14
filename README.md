@@ -48,6 +48,7 @@ or
 | debug | Bool | Turns on/off internal debug logging | false |
 | allowInsecureBeacon | Bool | Allows http beacon urls | false |
 | globalAttributes | [String: Any] | Extra attributes to add to each reported span.  See also `setGlobalAttributes` | [:] |
+| environment | String? (optional) | Value for environment global attribute | `nil` |
 
 ## Manual OpenTelemetry instrumentation
 
