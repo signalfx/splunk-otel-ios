@@ -68,7 +68,15 @@ let SplunkRumVersionString = "0.1.1"
     /**
     Sets a filter that rejects (drops) spans.  The closure passed should return true if the span should be rejected (not sent / dropped) and false otherwise
     */
-   public var spanRejectionFilter: ((SpanData) -> Bool)?
+    public var spanRejectionFilter: ((SpanData) -> Bool)?
+
+    func toAttributeValue() -> String {
+        var answer = "debug: "+debug.description
+        if spanRejectionFilter != nil {
+            answer += ", spanRejectionFilter: set"
+        }
+        return answer
+    }
 
 }
 var globalAttributes: [String: Any] = [:]
@@ -139,6 +147,9 @@ var splunkRumInitializeCalledTime = Date()
             .setStartTime(time: splunkRumInitializeCalledTime)
             .startSpan()
         srInit.setAttribute(key: "component", value: "appstart")
+        if options != nil {
+            srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
+        }
         initalizeNetworkInstrumentation()
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
