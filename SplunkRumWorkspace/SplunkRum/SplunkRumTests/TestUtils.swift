@@ -91,6 +91,7 @@ func initializeTestEnvironment() throws {
     XCTAssertEqual("1.5", srInit?.tags["doubleKey"])
     XCTAssertEqual("true", srInit?.tags["boolKey"])
     XCTAssertEqual("strVal", srInit?.tags["strKey"])
+    XCTAssertNotNil(srInit?.tags["config_settings"])
 
     resetTestEnvironment()
 }
