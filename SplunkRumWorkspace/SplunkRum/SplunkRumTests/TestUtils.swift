@@ -70,7 +70,7 @@ func initializeTestEnvironment() throws {
         return HttpResponse.internalServerError
     }
     try server.start(8989)
-    SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true, globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true]))
+    SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true, globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true], environment: "env") )
     OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: TestSpanExporter()))
 
     print("sleeping to wait for span batch, don't worry about the pause...")
@@ -92,6 +92,7 @@ func initializeTestEnvironment() throws {
     XCTAssertEqual("true", srInit?.tags["boolKey"])
     XCTAssertEqual("strVal", srInit?.tags["strKey"])
     XCTAssertNotNil(srInit?.tags["config_settings"])
+    XCTAssertEqual("env", srInit?.tags["environment"])
 
     resetTestEnvironment()
 }

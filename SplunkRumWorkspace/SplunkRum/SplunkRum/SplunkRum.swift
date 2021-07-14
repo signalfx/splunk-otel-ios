@@ -36,11 +36,12 @@ let SplunkRumVersionString = "0.1.1"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:]) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
         self.globalAttributes = globalAttributes
+        self.environment = environment
     }
     /**
         Copy constructor
@@ -50,6 +51,7 @@ let SplunkRumVersionString = "0.1.1"
         self.debug = opts.debug
         // shallow copy of the map
         self.globalAttributes = [:].merging(opts.globalAttributes) { _, new in new }
+        self.environment = opts.environment
     }
 
     /**
@@ -64,6 +66,11 @@ let SplunkRumVersionString = "0.1.1"
                     Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
      */
     @objc public var globalAttributes: [String: Any] = [:]
+
+    /**
+        Sets a value for the "environment" global attribute
+     */
+    @objc public var environment: String?
 
     /**
     Sets a filter that rejects (drops) spans.  The closure passed should return true if the span should be rejected (not sent / dropped) and false otherwise
@@ -122,6 +129,9 @@ var splunkRumInitializeCalledTime = Date()
         }
         if options?.globalAttributes != nil {
             setGlobalAttributes(options!.globalAttributes)
+        }
+        if options?.environment != nil {
+            setGlobalAttributes(["environment": options!.environment!])
         }
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
