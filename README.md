@@ -3,10 +3,10 @@
 The Splunk RUM iOS agent provides a swift package
 that can be added to an app that captures:
 
-- Crashes/unhandled exceptions via [PLCrashReporter](https://github.com/microsoft/plcrashreporter) (temporarily disabled)
 - HTTP requests, via `URLSession` instrumentation
 - Application startup information
 - UI activity - screen name (typically ViewController name), actions, and PresentationTransitions
+- Crashes/unhandled exceptions via [SplunkRumCrashReporting](https://github.com/signalfx/splunk-otel-ios-crashreporting)
 
 > :construction: This project is currently in **BETA**.
 
@@ -24,6 +24,7 @@ To get started, import the package into your app, either through the Xcode menu
 You'll then need to initialize the library with the appropriate configuration parameters.
 
 ```swift
+// Swift example
 import SplunkRum
 ...
 // Your beaconUrl and rumAuth will be provided by your friendly Splunk representative
@@ -33,6 +34,7 @@ SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", ru
 or
 
 ```objectivec
+// Objective-C example
 @import SplunkRum;
 ...
 // Your beaconUrl and rumAuth will be provided by your friendly Splunk representative
@@ -49,6 +51,12 @@ or
 | allowInsecureBeacon | Bool | Allows http beacon urls | false |
 | globalAttributes | [String: Any] | Extra attributes to add to each reported span.  See also `setGlobalAttributes` | [:] |
 | environment | String? (optional) | Value for environment global attribute | `nil` |
+
+## Crash Reporting
+
+Crash reporting is provided via an optional package called
+[SplunkRumCrashReporting](https://github.com/signalfx/splunk-otel-ios-crashreporting).  Follow
+the instructions at that link to enable this feature.
 
 ## Manual OpenTelemetry instrumentation
 
