@@ -16,7 +16,7 @@ options to perform an iOS build.
 ## Releasing
 
 - Update the version string in the xcode project.
-- git tag x.y.z (exactly like the semver string, no "v" prefix, etc.)
+- git tag -s x.y.z (exactly like the semver string, no "v" prefix, etc.)
 - git push origin x.y.z
 
 ## Contributing
