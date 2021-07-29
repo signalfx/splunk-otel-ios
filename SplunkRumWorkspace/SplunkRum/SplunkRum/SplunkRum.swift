@@ -20,7 +20,7 @@ import OpenTelemetrySdk
 import ZipkinExporter
 import StdoutExporter
 
-let SplunkRumVersionString = "0.1.2"
+let SplunkRumVersionString = "0.2.0"
 
 /**
  Optional configuration for SplunkRum.initialize()
