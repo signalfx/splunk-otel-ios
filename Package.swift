@@ -12,8 +12,8 @@ let package = Package(
         .library(name: "SplunkRum", targets: ["SplunkRum"])
     ],
     dependencies: [
-        .package(name: "opentelemetry-swift", url:"https://github.com/open-telemetry/opentelemetry-swift", .exact("1.0.2")),
-	.package(url: "https://github.com/devicekit/DeviceKit.git", .exact("4.4.0")),
+        .package(name: "opentelemetry-swift", url:"https://github.com/open-telemetry/opentelemetry-swift", from: "1.0.2"),
+	.package(url: "https://github.com/devicekit/DeviceKit.git", from: "4.0.0"),
     ],
     targets: [
         .target(
