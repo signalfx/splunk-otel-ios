@@ -17,7 +17,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 
-let serverTimingPattern = #"traceparent;desc=\"00-([0-9a-f]{32})-([0-9a-f]{16})-01\""#
+let serverTimingPattern = #"traceparent;desc=['\"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['\"]"#
 
 func addLinkToSpan(span: Span, valStr: String) {
     // This is the worst regex interface I have ever seen in two+ decades of professional programming

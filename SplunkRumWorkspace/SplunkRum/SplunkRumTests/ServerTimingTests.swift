@@ -70,12 +70,17 @@ class TestSpan: Span {
 class ServerTimingTests: XCTestCase {
 
     func testBasicBehavior() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
         let span = TestSpan()
         addLinkToSpan(span: span, valStr: "traceparent;desc=\"00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01\"")
         XCTAssertEqual(span.attrs["link.spanId"], "b7ad6b7169203331")
         XCTAssertEqual(span.attrs["link.traceId"], "0af7651916cd43dd8448eb211c80319c")
+    }
+    func testSingleQuote() throws {
+        let span = TestSpan()
+        addLinkToSpan(span: span, valStr: "traceparent;desc='00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01'")
+        XCTAssertEqual(span.attrs["link.spanId"], "b7ad6b7169203331")
+        XCTAssertEqual(span.attrs["link.traceId"], "0af7651916cd43dd8448eb211c80319c")
+
     }
     func testDoesNotThrow() throws {
         let span = TestSpan()
