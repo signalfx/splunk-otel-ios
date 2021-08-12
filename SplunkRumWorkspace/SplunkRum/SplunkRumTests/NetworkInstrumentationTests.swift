@@ -33,6 +33,8 @@ class NetworkInstrumentationTests: XCTestCase {
         URLSession.shared.dataTask(with: URL(string: "http://127.0.0.1:8989/data")!) { (_, _: URLResponse?, _) in
             print("got /data")
         }.resume()
+        let ignored = URLRequest(url: URL(string: "http://127.0.0.1:8989/ignore_this")!)
+        URLSession.shared.dataTask(with: ignored).resume()
         var req = URLRequest(url: URL(string: "http://127.0.0.1:8989/error")!)
         req.httpMethod = "POST"
         URLSession.shared.uploadTask(with: req, from: "sample data".data(using: .utf8)!).resume()
@@ -43,7 +45,7 @@ class NetworkInstrumentationTests: XCTestCase {
 
         // wait until spans recevied
         var attempts = 0
-        while localSpans.count != 3 {
+        while localSpans.count < 3 {
             attempts += 1
             if attempts > 10 {
                 XCTFail("never got enough localSpans")
@@ -52,6 +54,7 @@ class NetworkInstrumentationTests: XCTestCase {
             print("sleep 1")
             sleep(1)
         }
+        XCTAssertEqual(localSpans.count, 3)
 
         let httpGet = localSpans.first(where: { (span) -> Bool in
             return span.name == "HTTP GET"

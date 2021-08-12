@@ -61,6 +61,9 @@ func initializeTestEnvironment() throws {
         }
         return resp
     }
+    server["/ignore_this"] = { _ in
+        return HttpResponse.ok(HttpResponseBody.text("OK"))
+    }
     server["/v1/traces"] = { request in
         let spans = try! JSONDecoder().decode([TestZipkinSpan].self, from: Data(request.body))
         receivedSpans.append(contentsOf: spans)
@@ -70,7 +73,14 @@ func initializeTestEnvironment() throws {
         return HttpResponse.internalServerError
     }
     try server.start(8989)
-    SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true, globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true], environment: "env") )
+    let options = SplunkRumOptions()
+    options.debug = true
+    options.allowInsecureBeacon = true
+    options.globalAttributes = ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true]
+    options.environment = "env"
+    options.ignoreURLs = try! NSRegularExpression(pattern: ".*ignore_this.*")
+
+    SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: options)
     OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: TestSpanExporter()))
 
     print("sleeping to wait for span batch, don't worry about the pause...")

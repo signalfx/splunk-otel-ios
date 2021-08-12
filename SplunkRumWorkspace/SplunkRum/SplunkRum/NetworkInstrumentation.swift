@@ -80,8 +80,15 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     }
     let method = request!.httpMethod ?? "GET"
     // Don't loop reporting on communication with the beacon
-    if SplunkRum.theBeaconUrl != nil && url.absoluteString.starts(with: SplunkRum.theBeaconUrl!) {
+    let absUrlString = url.absoluteString
+    if SplunkRum.theBeaconUrl != nil && absUrlString.starts(with: SplunkRum.theBeaconUrl!) {
         return nil
+    }
+    if SplunkRum.configuredOptions?.ignoreURLs != nil {
+        let result = SplunkRum.configuredOptions?.ignoreURLs?.matches(in: absUrlString, range: NSRange(location: 0, length: absUrlString.utf16.count))
+        if result?.count != 0 {
+            return nil
+        }
     }
     let tracer = buildTracer()
     let span = tracer.spanBuilder(spanName: "HTTP "+method).setSpanKind(spanKind: .client).startSpan()

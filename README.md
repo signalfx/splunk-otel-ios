@@ -50,7 +50,9 @@ or
 | debug | Bool | Turns on/off internal debug logging | false |
 | allowInsecureBeacon | Bool | Allows http beacon urls | false |
 | globalAttributes | [String: Any] | Extra attributes to add to each reported span.  See also `setGlobalAttributes` | [:] |
-| environment | String? (optional) | Value for environment global attribute | `nil` |
+| environment | String? | Value for environment global attribute | `nil` |
+| ignoreURLs | NSRegularExpression? | Regex of URLs to ignore when reporting HTTP activity | `nil` |
+| spanRejectionFilter | ((SpanData) -> Bool)? | Closure to drop/reject spans (when filter function returns true, span is ignored) | `nil` |
 
 ## Crash Reporting
 

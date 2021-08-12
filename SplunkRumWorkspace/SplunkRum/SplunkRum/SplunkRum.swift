@@ -36,12 +36,13 @@ let SplunkRumVersionString = "0.2.0"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
         self.globalAttributes = globalAttributes
         self.environment = environment
+        self.ignoreURLs = ignoreURLs
     }
     /**
         Copy constructor
@@ -52,6 +53,7 @@ let SplunkRumVersionString = "0.2.0"
         // shallow copy of the map
         self.globalAttributes = [:].merging(opts.globalAttributes) { _, new in new }
         self.environment = opts.environment
+        self.ignoreURLs = opts.ignoreURLs
     }
 
     /**
@@ -73,6 +75,11 @@ let SplunkRumVersionString = "0.2.0"
     @objc public var environment: String?
 
     /**
+     Do not create spans for HTTP requests whose URL matches this regex.
+     */
+    @objc public var ignoreURLs: NSRegularExpression?
+
+    /**
     Sets a filter that rejects (drops) spans.  The closure passed should return true if the span should be rejected (not sent / dropped) and false otherwise
     */
     public var spanRejectionFilter: ((SpanData) -> Bool)?
@@ -81,6 +88,9 @@ let SplunkRumVersionString = "0.2.0"
         var answer = "debug: "+debug.description
         if spanRejectionFilter != nil {
             answer += ", spanRejectionFilter: set"
+        }
+        if ignoreURLs != nil {
+            answer += ", ignoreUrls: "+ignoreURLs!.description
         }
         return answer
     }
