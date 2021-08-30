@@ -54,6 +54,8 @@ let SplunkRumVersionString = "0.2.1"
         self.globalAttributes = [:].merging(opts.globalAttributes) { _, new in new }
         self.environment = opts.environment
         self.ignoreURLs = opts.ignoreURLs
+        self.spanFilter = opts.spanFilter
+        self.showVCInstrumentation = opts.showVCInstrumentation
     }
 
     /**
@@ -84,6 +86,11 @@ let SplunkRumVersionString = "0.2.1"
     */
     public var spanFilter: ((SpanData) -> SpanData?)?
 
+    /**
+     Enable span creation for ViewController Show events.
+     */
+    @objc public var showVCInstrumentation: Bool = true
+
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
         if spanFilter != nil {
@@ -91,6 +98,9 @@ let SplunkRumVersionString = "0.2.1"
         }
         if ignoreURLs != nil {
             answer += ", ignoreUrls: "+ignoreURLs!.description
+        }
+        if !showVCInstrumentation {
+            answer += ", showVC: false"
         }
         return answer
     }

@@ -66,8 +66,6 @@ extension UIViewController {
 
 }
 
-let Presentation2Span = NSMapTable<NSObject, SpanHolder>(keyOptions: NSPointerFunctions.Options.weakMemory, valueOptions: NSPointerFunctions.Options.strongMemory)
-
 class SpanHolder: NSObject {
     let span: Span
     init(_ span: Span) {
@@ -75,36 +73,67 @@ class SpanHolder: NSObject {
     }
 }
 
-func initializePresentationTransitionInstrumentation() {
-    let begin = Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification")
-    let end = Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification")
-
-    _ = NotificationCenter.default.addObserver(forName: begin, object: nil, queue: nil) { (notif) in
-        let notifObj = notif.object as? NSObject
-        if notifObj != nil {
-            let span = buildTracer().spanBuilder(spanName: "PresentationTransition").startSpan()
-            // captured at beginning since it will possibly/likely change
-            span.setAttribute(key: "last.screen.name", value: getScreenName())
-            span.setAttribute(key: "component", value: "ui")
-            // FIXME better naming
-            span.setAttribute(key: "object.type", value: String(describing: type(of: notif.object!)))
-            Presentation2Span.setObject(SpanHolder(span), forKey: notifObj)
-        }
-
+class NotificationPairInstrumener {
+    let obj2Span = NSMapTable<NSObject, SpanHolder>(keyOptions: NSPointerFunctions.Options.weakMemory, valueOptions: NSPointerFunctions.Options.strongMemory)
+    let begin: String
+    let end: String
+    let spanName: String
+    init(begin: String, end: String, spanName: String) {
+        self.begin = begin
+        self.end = end
+        self.spanName = spanName
     }
-    _ = NotificationCenter.default.addObserver(forName: end, object: nil, queue: nil) { (notif) in
-        updateUIFields()
-        let notifObj = notif.object as? NSObject
-        if notifObj != nil {
-            let spanHolder = Presentation2Span.object(forKey: notifObj)
-            if spanHolder != nil {
-                // screenName may have changed now that the view has appeared; update new screen name
-                spanHolder?.span.setAttribute(key: "screen.name", value: getScreenName())
-                spanHolder?.span.end()
+    func start() {
+        let beginName = Notification.Name(rawValue: begin)
+        let endName = Notification.Name(rawValue: end)
+
+        _ = NotificationCenter.default.addObserver(forName: beginName, object: nil, queue: nil) { (notif) in
+            let notifObj = notif.object as? NSObject
+            if notifObj != nil {
+                let span = buildTracer().spanBuilder(spanName: self.spanName).startSpan()
+                // captured at beginning since it will possibly/likely change
+                span.setAttribute(key: "last.screen.name", value: getScreenName())
+                span.setAttribute(key: "component", value: "ui")
+                // FIXME better naming
+                span.setAttribute(key: "object.type", value: String(describing: type(of: notif.object!)))
+                self.obj2Span.setObject(SpanHolder(span), forKey: notifObj)
+            }
+
+        }
+        _ = NotificationCenter.default.addObserver(forName: endName, object: nil, queue: nil) { (notif) in
+            updateUIFields()
+            let notifObj = notif.object as? NSObject
+            if notifObj != nil {
+                let spanHolder = self.obj2Span.object(forKey: notifObj)
+                if spanHolder != nil {
+                    // screenName may have changed now that the view has appeared; update new screen name
+                    spanHolder?.span.setAttribute(key: "screen.name", value: getScreenName())
+                    spanHolder?.span.end()
+                }
             }
         }
+
     }
 }
+
+let PresentationTransitionInstrumenter = NotificationPairInstrumener(
+    begin: "UIPresentationControllerPresentationTransitionWillBeginNotification",
+    end: "UIPresentationControllerPresentationTransitionDidEndNotification",
+    spanName: "PresentationTransition")
+
+func initializePresentationTransitionInstrumentation() {
+    PresentationTransitionInstrumenter.start()
+}
+let ShowVCInstrumenter = NotificationPairInstrumener(
+    begin: "UINavigationControllerWillShowViewControllerNotification",
+    end: "UINavigationControllerDidShowViewControllerNotification",
+    spanName: "ShowVC")
+
+func initializeShowVCInstrumentation() {
+    ShowVCInstrumenter.start()
+}
+
+// FIXME possibly also use for segues/scenes?
 
 func addUIFields(span: ReadableSpan) {
     updateUIFields()
@@ -152,6 +181,9 @@ private func updateUIFields() {
 
 func initalizeUIInstrumentation() {
     initializePresentationTransitionInstrumentation()
+    if SplunkRum.configuredOptions?.showVCInstrumentation ?? true {
+        initializeShowVCInstrumentation()
+    }
 
     swizzle(clazz: UIApplication.self, orig: #selector(UIApplication.sendAction(_:to:from:for:)), swizzled: #selector(UIApplication.splunk_swizzled_sendAction(_:to:from:for:)))
     swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidLoad), swizzled: #selector(UIViewController.splunk_swizzled_viewDidLoad))
