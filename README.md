@@ -53,6 +53,8 @@ or
 | environment | String? | Value for environment global attribute | `nil` |
 | ignoreURLs | NSRegularExpression? | Regex of URLs to ignore when reporting HTTP activity | `nil` |
 | spanRejectionFilter | ((SpanData) -> SpanData?)? | Closure to modify or reject/ignore spans.  See example below.  | `nil` |
+| showVCInstrumentation | Bool | Enable span creation for ViewController Show events (not applicable to all UI frameworks/apps) | true |
+
 
 ## Crash Reporting
 
