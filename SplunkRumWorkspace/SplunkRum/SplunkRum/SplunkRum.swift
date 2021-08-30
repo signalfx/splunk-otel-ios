@@ -80,14 +80,14 @@ let SplunkRumVersionString = "0.2.1"
     @objc public var ignoreURLs: NSRegularExpression?
 
     /**
-    Sets a filter that rejects (drops) spans.  The closure passed should return true if the span should be rejected (not sent / dropped) and false otherwise
+    Sets a filter that can modify or reject spans.  You can modify attributes of each span or return nil to indicate that that span should be dropped (never sent on the wire).
     */
-    public var spanRejectionFilter: ((SpanData) -> Bool)?
+    public var spanFilter: ((SpanData) -> SpanData?)?
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
-        if spanRejectionFilter != nil {
-            answer += ", spanRejectionFilter: set"
+        if spanFilter != nil {
+            answer += ", spanFilter: set"
         }
         if ignoreURLs != nil {
             answer += ", ignoreUrls: "+ignoreURLs!.description
@@ -156,7 +156,7 @@ var splunkRumInitializeCalledTime = Date()
         let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
         let zipkin = ZipkinTraceExporter(options: exportOptions)
         let retry = RetryExporter(proxy: zipkin)
-        let limiting = LimitingExporter(proxy: retry, rejectionFilter: options?.spanRejectionFilter ?? nil)
+        let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))

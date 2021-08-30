@@ -57,7 +57,7 @@ class UtilsTests: XCTestCase {
         let rawSpans = localSpans
         XCTAssertTrue(rawSpans[0].attributes["longString"]?.description.count ?? 0 > 4096)
         localSpans.removeAll()
-        let le = LimitingExporter(proxy: TestSpanExporter(), rejectionFilter: nil) // rewrites into localSpans; yes, this is weird
+        let le = LimitingExporter(proxy: TestSpanExporter(), spanFilter: nil) // rewrites into localSpans; yes, this is weird
         _ = le.export(spans: rawSpans)
         XCTAssertEqual(1, localSpans.count)
         XCTAssertTrue(localSpans[0].attributes["longString"]?.description.count ?? 4097 <= 4096)
@@ -78,7 +78,7 @@ class UtilsTests: XCTestCase {
         XCTAssertEqual(102, localSpans.count)
         var rawSpans = localSpans
         localSpans.removeAll()
-        let le = LimitingExporter(proxy: TestSpanExporter(), rejectionFilter: nil) // rewrites into localSpans; yes, this is weird
+        let le = LimitingExporter(proxy: TestSpanExporter(), spanFilter: nil) // rewrites into localSpans; yes, this is weird
         _ = le.export(spans: rawSpans)
         XCTAssertEqual(100, localSpans.count)
         localSpans.removeAll()
@@ -106,7 +106,7 @@ class UtilsTests: XCTestCase {
         XCTAssertEqual(1, localSpans.count)
     }
 
-    func testRejectingLimitingExporter() throws {
+    func testRejectingFilter() throws {
         try initializeTestEnvironment()
         // This test is shaped kinda funny since we can't construct SpanData() directly
         buildTracer().spanBuilder(spanName: "rejectTest").startSpan().end()
@@ -117,11 +117,36 @@ class UtilsTests: XCTestCase {
 
         // rewrites into localSpans; yes, this is weird
         let le = LimitingExporter(proxy: TestSpanExporter()) { spanData in
-            return spanData.name == "rejectTest"
+            if spanData.name == "rejectTest" {
+                print("returning nil")
+                return nil
+            }
+            return spanData
         }
         _ = le.export(spans: rawSpans)
         XCTAssertEqual(1, localSpans.count)
         XCTAssertEqual(localSpans[0].name, "regularTest")
+    }
+
+    func testModifyingFilter() throws {
+        try initializeTestEnvironment()
+        // This test is shaped kinda funny since we can't construct SpanData() directly
+        buildTracer().spanBuilder(spanName: "regularTest").setAttribute(key: "key", value: "value1").startSpan().end()
+        XCTAssertEqual(1, localSpans.count)
+        let rawSpans = localSpans
+        localSpans.removeAll()
+
+        // rewrites into localSpans; yes, this is weird
+        let le = LimitingExporter(proxy: TestSpanExporter()) { spanData in
+            var d = spanData
+            var att = d.attributes
+            att["key"] = .string("value2")
+            return d.settingAttributes(att)
+        }
+        _ = le.export(spans: rawSpans)
+        XCTAssertEqual(1, localSpans.count)
+        XCTAssertEqual(localSpans[0].name, "regularTest")
+        XCTAssertEqual(localSpans[0].attributes["key"]?.description, "value2")
 
     }
 

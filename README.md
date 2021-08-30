@@ -52,7 +52,7 @@ or
 | globalAttributes | [String: Any] | Extra attributes to add to each reported span.  See also `setGlobalAttributes` | [:] |
 | environment | String? | Value for environment global attribute | `nil` |
 | ignoreURLs | NSRegularExpression? | Regex of URLs to ignore when reporting HTTP activity | `nil` |
-| spanRejectionFilter | ((SpanData) -> Bool)? | Closure to drop/reject spans (when filter function returns true, span is ignored) | `nil` |
+| spanRejectionFilter | ((SpanData) -> SpanData?)? | Closure to modify or reject/ignore spans.  See example below.  | `nil` |
 
 ## Crash Reporting
 
@@ -106,6 +106,22 @@ SplunkRum.setScreenName("AccountSettingsTab")
 This name will hold until your next call to `setScreenName`.  **NOTE**: using `setScreenName` once
 disables automatic screen name instrumentation, to avoid overwriting your chosen name(s).  If you
 instrument your application to `setScreenName`, please do it everywhere.
+
+### Span Filtering
+
+You can modify or reject spans with a `spanFilter` function (only supported in Swift, not Objective-C):
+
+```swift
+options.spanFilter = { spanData in
+  var spanData = spanData
+  if spanData.name == "DropThis" {
+    return nil // spans with this name will not be sent
+  }
+  var atts = spanData.attributes
+  atts["http.url"] = .string("redacted") // change values for all urls
+  return spanData.settingAttributes(atts)
+}
+```
 
 ## Version information
 
