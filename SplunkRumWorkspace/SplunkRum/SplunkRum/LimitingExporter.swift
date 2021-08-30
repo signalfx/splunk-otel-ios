@@ -32,11 +32,11 @@ class LimitingExporter: SpanExporter {
     let proxy: SpanExporter
     var component2counts: [String: Int] = [:]
     var nextRateLimitReset = Date().addingTimeInterval(TimeInterval(LimitingExporter.SPAN_RATE_LIMIT_PERIOD))
-    let rejectionFilter: ((SpanData) -> Bool)?
+    let spanFilter: ((SpanData) -> SpanData?)?
 
-    init(proxy: SpanExporter, rejectionFilter: ((SpanData) -> Bool)?) {
+    init(proxy: SpanExporter, spanFilter: ((SpanData) -> SpanData?)?) {
         self.proxy = proxy
-        self.rejectionFilter = rejectionFilter
+        self.spanFilter = spanFilter
     }
 
     // Returns true if span should be dropped
@@ -49,25 +49,30 @@ class LimitingExporter: SpanExporter {
     }
 
     // Returns true if span should be rejected
-    func reject(_ span: SpanData) -> Bool {
-        return rejectionFilter?(span) ?? false
+    func filter(_ span: SpanData) -> SpanData? {
+        if spanFilter != nil {
+            return spanFilter!(span)
+        }
+        return span
     }
 
     func limit(_ spans: [SpanData]) -> [SpanData] {
         // FIXME performance mess of this
         var result: [SpanData] = []
         spans.forEach { span in
-            if !rateLimit(span) && !reject(span) {
-                var toAdd = span
-                let newAttrs = span.attributes.mapValues { val -> AttributeValue in
-                    let str = val.description
-                    if str.count > MAX_ATTRIBUTE_LENGTH {
-                        return .string(String(str.prefix(MAX_ATTRIBUTE_LENGTH)))
+            if !rateLimit(span) {
+                var toAdd = filter(span)
+                if toAdd != nil {
+                    let newAttrs = toAdd!.attributes.mapValues { val -> AttributeValue in
+                        let str = val.description
+                        if str.count > MAX_ATTRIBUTE_LENGTH {
+                            return .string(String(str.prefix(MAX_ATTRIBUTE_LENGTH)))
+                        }
+                        return val
                     }
-                    return val
+                    toAdd!.settingAttributes(newAttrs)
+                    result.append(toAdd!)
                 }
-                toAdd.settingAttributes(newAttrs)
-                result.append(toAdd)
             }
         }
         return result
