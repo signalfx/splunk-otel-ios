@@ -6,7 +6,7 @@
 #
 #####################################################
 
-*.md @signalfx/docs
-*.rst @signalfx/docs
-docs/ @signalfx/docs
-README* @signalfx/docs @signalfx/gdi-specification-approvers @signalfx/gdi-specification-maintainers
+*.md @signalfx/docs @johnbley
+*.rst @signalfx/docs @johnbley
+docs/ @signalfx/docs @johnbley
+README* @signalfx/docs @johnbley
