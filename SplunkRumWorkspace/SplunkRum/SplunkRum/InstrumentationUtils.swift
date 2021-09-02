@@ -67,7 +67,7 @@ class GlobalAttributesProcessor: SpanProcessor {
             span.setAttribute(key: "app.version", value: appVersion!)
         }
         // glossing over iPadOS, watchOS, etc. here, knowing that the device model spells out reality
-        span.setAttribute(key: "os", value: "iOS")
+        span.setAttribute(key: "os.name", value: "iOS")
         span.setAttribute(key: "splunk.rumSessionId", value: getRumSessionId())
         span.setAttribute(key: "splunk.rumVersion", value: SplunkRumVersionString)
         span.setAttribute(key: "device.model.name", value: deviceModel)
