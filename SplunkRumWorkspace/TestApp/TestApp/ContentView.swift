@@ -32,6 +32,15 @@ struct ContentView: View {
         }
         task.resume()
     }
+    func downloadRequest() {
+        print("download!")
+        let url = URL(string: "http://www.splunk.com")!
+        var req = URLRequest(url: url)
+        let task = URLSession.shared.downloadTask(with: url) {(_:URL?, _: URLResponse?, _) in
+            print("download finished")
+        }
+        task.resume()
+    }
     func hideKeyboard() {
         print("hideKeyboard")
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
@@ -83,6 +92,11 @@ struct ContentView: View {
                 self.networkRequest()
             }) {
                 Text("Network (req)!")
+            }
+            Button(action: {
+                self.downloadRequest()
+            }) {
+                Text("Download")
             }
             Button(action: {
                 self.manualSpan()
