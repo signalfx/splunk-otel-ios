@@ -120,6 +120,7 @@ class SessionTaskObserver: NSObject {
         if span == nil {
             span = startHttpSpan(request: task!.originalRequest)
         }
+        // FIXME possibly also allow .canceling to close the span?
         if task!.state == .completed && extraRefToSelf != nil {
             endHttpSpan(span: span,
                         task: task!)
@@ -148,13 +149,13 @@ extension URLSession {
        }
 
     // rename objc view of func to allow "overloading"
-    @objc(swizzledDataTaskWithRequest: completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+    @objc(splunkSwizzledDataTaskWithRequest: completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: request, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
-    @objc(swizzledDataTaskWithRequest:) open func splunk_swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
+    @objc(splunkSwizzledDataTaskWithRequest:) open func splunk_swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: request)
         wireUpTaskObserver(task: answer)
         return answer
@@ -171,12 +172,12 @@ extension URLSession {
         wireUpTaskObserver(task: answer)
         return answer
     }
-    @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: URL) -> URLSessionUploadTask {
+    @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: NSURL) -> URLSessionUploadTask {
         let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile)
         wireUpTaskObserver(task: answer)
         return answer
     }
-    @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+    @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: NSURL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
         let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
@@ -186,6 +187,29 @@ extension URLSession {
         wireUpTaskObserver(task: answer)
         return answer
     }
+    // download tasks
+    @objc open func splunk_swizzled_downloadTask(with url: NSURL) -> URLSessionDownloadTask {
+        let answer = splunk_swizzled_downloadTask(with: url)
+        wireUpTaskObserver(task: answer)
+        return answer
+    }
+    @objc open func splunk_swizzled_downloadTask(with url: NSURL, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
+        let answer = splunk_swizzled_downloadTask(with: url, completionHandler: completionHandler)
+        wireUpTaskObserver(task: answer)
+        return answer
+       }
+
+    @objc(splunkSwizzledDownloadTaskWithRequest: completionHandler:) open func splunk_swizzled_downloadTask(with request: URLRequest, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
+        let answer = splunk_swizzled_downloadTask(with: request, completionHandler: completionHandler)
+        wireUpTaskObserver(task: answer)
+        return answer
+       }
+
+    @objc(splunkSwizzledDownloadTaskWithRequest:) open func splunk_swizzled_downloadTask(with request: URLRequest) -> URLSessionDataTask {
+        let answer = splunk_swizzled_downloadTask(with: request)
+        wireUpTaskObserver(task: answer)
+        return answer
+       }
 }
 
 // FIXME use setImplementation and capture, rather than exchangeImpl
@@ -214,12 +238,13 @@ func initalizeNetworkInstrumentation() {
     // @objc(overrrideName) requires a runtime lookup rather than a build-time lookup (seems like a bug in the compiler)
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask),
-            swizzled: NSSelectorFromString("swizzledDataTaskWithRequest:completionHandler:"))
+            swizzled: NSSelectorFromString("splunkSwizzledDataTaskWithRequest:completionHandler:"))
 
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDataTask),
-            swizzled: NSSelectorFromString("swizzledDataTaskWithRequest:"))
+            swizzled: NSSelectorFromString("splunkSwizzledDataTaskWithRequest:"))
 
+    // upload tasks
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.uploadTask(with:from:)),
             swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:from:)))
@@ -235,5 +260,20 @@ func initalizeNetworkInstrumentation() {
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.uploadTask(withStreamedRequest:)),
             swizzled: #selector(URLSession.splunk_swizzled_uploadTask(withStreamedRequest:)))
+
+    // download tasks
+    swizzle(clazz: urlsession,
+            orig: #selector(URLSession.downloadTask(with:) as (URLSession) -> (URL) -> URLSessionDownloadTask),
+            swizzled: #selector(URLSession.splunk_swizzled_downloadTask(with:) as (URLSession) -> (NSURL) -> URLSessionDownloadTask))
+    swizzle(clazz: urlsession,
+            orig: #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask),
+            swizzled: #selector(URLSession.splunk_swizzled_downloadTask(with:completionHandler:) as (URLSession) -> (NSURL, @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask))
+    swizzle(clazz: urlsession,
+            orig: #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask),
+            swizzled: NSSelectorFromString("splunkSwizzledDownloadTaskWithRequest:completionHandler:"))
+    swizzle(clazz: urlsession,
+            orig: #selector(URLSession.downloadTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDownloadTask),
+            swizzled: NSSelectorFromString("splunkSwizzledDownloadTaskWithRequest:"))
+    // FIXME figure out how to support the two ResumeData variants - state transfer is weird
 
 }
