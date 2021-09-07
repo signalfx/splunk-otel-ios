@@ -135,13 +135,13 @@ func wireUpTaskObserver(task: URLSessionTask) {
 
 // swiftlint:disable missing_docs
 extension URLSession {
-    @objc open func splunk_swizzled_dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+    @objc open func splunk_swizzled_dataTask(with url: NSURL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: url, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
-    @objc open func splunk_swizzled_dataTask(with url: URL) -> URLSessionDataTask {
+    @objc open func splunk_swizzled_dataTask(with url: NSURL) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: url)
         wireUpTaskObserver(task: answer)
         return answer
@@ -205,11 +205,11 @@ func initalizeNetworkInstrumentation() {
     // This syntax is obnoxious to differentiate with:request from with:url
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask),
-            swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask))
+            swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:completionHandler:) as (URLSession) -> (NSURL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask))
 
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask),
-            swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask))
+            swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:) as (URLSession) -> (NSURL) -> URLSessionDataTask))
 
     // @objc(overrrideName) requires a runtime lookup rather than a build-time lookup (seems like a bug in the compiler)
     swizzle(clazz: urlsession,
