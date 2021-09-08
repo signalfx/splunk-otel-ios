@@ -57,14 +57,12 @@ func initializeAppLifecycleInstrumentation() {
 }
 var activeSpan: SpanHolder?
 func lifecycleEvent(_ event: String) {
-    // FIXME implement
-    print("LIFECYCLE "+event)
     // these two start spans
     if event == "UIApplicationWillResignActiveNotification" ||
             event == "UIApplicationWillEnterForegroundNotification" {
         if activeSpan == nil {
             let span = buildTracer().spanBuilder(spanName: event == "UIApplicationWillResignActiveNotification" ? "ResignActive" : "EnterForeground").startSpan()
-            span.setAttribute(key: "component", value: "AppLifecycle")
+            span.setAttribute(key: "component", value: "app-lifecycle")
             activeSpan = SpanHolder(span)
         }
     }
@@ -78,6 +76,7 @@ func lifecycleEvent(_ event: String) {
     if event == "UIApplicationDidBecomeActiveNotification" ||
             event == "UIApplicationDidEnterBackgroundNotification" {
         activeSpan?.span.end()
+        activeSpan = nil
     }
 
     // this one gets its own special span

@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/signalfx/splunk-otel-ios",
         "state": {
           "branch": null,
-          "revision": "2666ac2d95637a2aa7cd1941bea1a5ea5d2658d2",
-          "version": "0.2.0"
+          "revision": "98dee79983e44c6ed0c2e54209873e9c53c88857",
+          "version": "0.3.0"
         }
       },
       {
