@@ -288,12 +288,23 @@ var splunkRumInitializeCalledTime = Date()
      **This must be called from the main thread**.  Other usage will fail with a printed warning message in debug mode
      
      */
-    @objc public class func setScreenName(_ name: String) {
+    @objc public class func setScreenName(_ name: String, createSpan: Bool = true) {
         if !Thread.current.isMainThread {
             debug_log("SplunkRum.setScreenName not called from main thread: "+Thread.current.debugDescription)
             return
         }
+        var lastScreenName = "unknown"
+        if createSpan {
+            lastScreenName = getScreenName()
+        }
         internal_manuallySetScreenName(name)
+        if createSpan {
+            let now = Date()
+            let span = buildTracer().spanBuilder(spanName: "setScreenName").setStartTime(time: now).startSpan()
+            span.setAttribute(key: "last.screen.name", value: lastScreenName)
+            span.setAttribute(key: "component", value: "ui")
+            span.end(time: now)
+        }
     }
 
     /**

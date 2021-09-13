@@ -55,7 +55,6 @@ or
 | spanRejectionFilter | ((SpanData) -> SpanData?)? | Closure to modify or reject/ignore spans.  See example below.  | `nil` |
 | showVCInstrumentation | Bool | Enable span creation for ViewController Show events (not applicable to all UI frameworks/apps) | true |
 
-
 ## Crash Reporting
 
 Crash reporting is provided via an optional package called
@@ -108,6 +107,9 @@ SplunkRum.setScreenName("AccountSettingsTab")
 This name will hold until your next call to `setScreenName`.  **NOTE**: using `setScreenName` once
 disables automatic screen name instrumentation, to avoid overwriting your chosen name(s).  If you
 instrument your application to `setScreenName`, please do it everywhere.
+
+`setScreenName` creates a span recording the change by default - use the optional parameter `createSpan:`
+if you wish to prevent this.
 
 ### Span Filtering
 
