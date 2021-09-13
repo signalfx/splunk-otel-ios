@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-    
 
 import XCTest
 import Swifter
@@ -27,6 +26,7 @@ var receivedSpans: [TestZipkinSpan] = []
 
 class SmokeTestUITests: XCTestCase {
 
+    // swiftlint:disable overridden_super_call
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
 
@@ -34,10 +34,6 @@ class SmokeTestUITests: XCTestCase {
         continueAfterFailure = false
 
         // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
     func testStartup() throws {
@@ -50,7 +46,7 @@ class SmokeTestUITests: XCTestCase {
             return HttpResponse.ok(.text("ok"))
         }
         try server.start(8989)
-        
+
         let app = XCUIApplication()
         app.launch()
         sleep(10)
@@ -59,7 +55,7 @@ class SmokeTestUITests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         print(receivedSpans)
         XCTAssert(receivedSpans.count > 1)
-        
+
     }
 
 }
