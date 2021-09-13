@@ -147,6 +147,14 @@ private func pickVC(_ vc: UIViewController?) -> UIViewController? {
     if vc == nil {
         return nil
     }
+    if let nav = vc as? UINavigationController {
+        if nav.visibleViewController != nil {
+            return pickVC(nav.visibleViewController)
+        }
+        if nav.topViewController != nil {
+            return pickVC(nav.topViewController)
+        }
+    }
     if vc!.presentedViewController != nil {
         return pickVC(vc!.presentedViewController)
     }
