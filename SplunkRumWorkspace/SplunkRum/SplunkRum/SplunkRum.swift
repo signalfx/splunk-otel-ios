@@ -302,6 +302,7 @@ var splunkRumInitializeCalledTime = Date()
             let now = Date()
             let span = buildTracer().spanBuilder(spanName: "setScreenName").setStartTime(time: now).startSpan()
             span.setAttribute(key: "last.screen.name", value: lastScreenName)
+            span.setAttribute(key: "component", value: "ui")
             span.end(time: now)
         }
     }
