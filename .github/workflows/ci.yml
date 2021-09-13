@@ -10,5 +10,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: fullbuild.sh 
+      - name: Full Build
         run: ./fullbuild.sh
+      - name: Smoke Test
+        run: ./smoketest.sh
