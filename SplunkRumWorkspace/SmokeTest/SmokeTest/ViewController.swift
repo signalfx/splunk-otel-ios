@@ -24,4 +24,9 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
 
+    @IBAction
+    func clickMe() {
+        print("I was clicked!")
+    }
+
 }

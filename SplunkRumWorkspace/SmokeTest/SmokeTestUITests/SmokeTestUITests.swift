@@ -18,7 +18,6 @@ limitations under the License.
 import XCTest
 import Swifter
 
-// "annotations":[{"value":"process.start","timestamp":1631578180579894}
 struct TestZipkinSpan: Decodable {
     var name: String
     var tags: [String: String]
@@ -42,6 +41,8 @@ class SmokeTestUITests: XCTestCase {
         // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
 
+    let SLEEP_TIME: UInt32 = 10 // batch is currently every 5 so this should be plenty
+
     func testStartup() throws {
         // UI tests must launch the application that they test.
         let server = HttpServer()
@@ -49,17 +50,19 @@ class SmokeTestUITests: XCTestCase {
             print("... server got spans")
             let spans = try! JSONDecoder().decode([TestZipkinSpan].self, from: Data(request.body))
             receivedSpans.append(contentsOf: spans)
+            spans.forEach({ span in
+                print(span)
+            })
             return HttpResponse.ok(.text("ok"))
         }
         try server.start(8989)
 
         let app = XCUIApplication()
         app.launch()
-        sleep(10)
+        sleep(SLEEP_TIME)
 
-        // Use recording to get started writing UI tests.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        print(receivedSpans)
+        // App start, initial presentation transition, etc.
+
         XCTAssert(receivedSpans.count > 2)
         let srInit = receivedSpans.first(where: { (span) -> Bool in
             return span.name == "SplunkRum.initialize"
@@ -87,7 +90,36 @@ class SmokeTestUITests: XCTestCase {
         XCTAssertNotNil(presTrans)
         XCTAssertEqual("ViewController", presTrans?.tags["screen.name"]?.description)
 
-        // FIXME interaction and screen name change
+        // Switch apps and back cycle
+        XCUIDevice.shared.press(XCUIDevice.Button.home)
+        print("pressed home button")
+        sleep(2)
+        app.activate()
+        print("app re-activated")
+        sleep(SLEEP_TIME)
+
+        let resign = receivedSpans.first(where: { (span) -> Bool in
+            return span.name == "ResignActive"
+        })
+        XCTAssertNotNil(resign)
+
+        let foreground = receivedSpans.first(where: { (span) -> Bool in
+            return span.name == "EnterForeground"
+        })
+        XCTAssertNotNil(foreground)
+        // should be in the same session
+        XCTAssertEqual(resign?.tags["splunk.rumSessionId"]?.description, foreground?.tags["splunk.rumSessionId"]?.description)
+
+        // IBAction
+        app.buttons["CLICK ME"].tap()
+        sleep(SLEEP_TIME)
+        let action = receivedSpans.first(where: { (span) -> Bool in
+            return span.name == "action"
+        })
+        XCTAssertNotNil(action)
+        XCTAssertEqual("clickMe", action?.tags["action.name"]?.description)
+
+        // FIXME multiple screens, pickVC cases, etc.
     }
 
 }
