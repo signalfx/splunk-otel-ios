@@ -65,7 +65,7 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
         span!.setAttribute(key: "http.request_content_length", value: Int(task.countOfBytesSent))
     }
     if hostConnectionType != nil {
-        span?.setAttribute(key: "host.connection.type", value: hostConnectionType!)
+        span?.setAttribute(key: "net.host.connection.type", value: hostConnectionType!)
     }
     span!.end()
 }
