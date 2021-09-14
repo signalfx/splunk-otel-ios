@@ -13,7 +13,6 @@
 		8645680226EFDE9F0059CF04 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8645680026EFDE9F0059CF04 /* Main.storyboard */; };
 		8645680426EFDE9F0059CF04 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8645680326EFDE9F0059CF04 /* Assets.xcassets */; };
 		8645680726EFDE9F0059CF04 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8645680526EFDE9F0059CF04 /* LaunchScreen.storyboard */; };
-		8645681226EFDEA00059CF04 /* SmokeTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8645681126EFDEA00059CF04 /* SmokeTestTests.swift */; };
 		8645681D26EFDEA00059CF04 /* SmokeTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */; };
 		8645682F26EFDEB50059CF04 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; };
 		8645683026EFDEB50059CF04 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -21,13 +20,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		8645680E26EFDEA00059CF04 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 864567EF26EFDE9F0059CF04 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 864567F626EFDE9F0059CF04;
-			remoteInfo = SmokeTest;
-		};
 		8645681926EFDEA00059CF04 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 864567EF26EFDE9F0059CF04 /* Project object */;
@@ -60,9 +52,6 @@
 		8645680326EFDE9F0059CF04 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8645680626EFDE9F0059CF04 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8645680826EFDE9F0059CF04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8645680D26EFDEA00059CF04 /* SmokeTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmokeTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		8645681126EFDEA00059CF04 /* SmokeTestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTestTests.swift; sourceTree = "<group>"; };
-		8645681326EFDEA00059CF04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8645681826EFDEA00059CF04 /* SmokeTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SmokeTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTestUITests.swift; sourceTree = "<group>"; };
 		8645681E26EFDEA00059CF04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -75,13 +64,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8645682F26EFDEB50059CF04 /* SplunkRum.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8645680A26EFDEA00059CF04 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,7 +82,6 @@
 			isa = PBXGroup;
 			children = (
 				864567F926EFDE9F0059CF04 /* SmokeTest */,
-				8645681026EFDEA00059CF04 /* SmokeTestTests */,
 				8645681B26EFDEA00059CF04 /* SmokeTestUITests */,
 				864567F826EFDE9F0059CF04 /* Products */,
 				8645682D26EFDEB50059CF04 /* Frameworks */,
@@ -111,7 +92,6 @@
 			isa = PBXGroup;
 			children = (
 				864567F726EFDE9F0059CF04 /* SmokeTest.app */,
-				8645680D26EFDEA00059CF04 /* SmokeTestTests.xctest */,
 				8645681826EFDEA00059CF04 /* SmokeTestUITests.xctest */,
 			);
 			name = Products;
@@ -129,15 +109,6 @@
 				8645680826EFDE9F0059CF04 /* Info.plist */,
 			);
 			path = SmokeTest;
-			sourceTree = "<group>";
-		};
-		8645681026EFDEA00059CF04 /* SmokeTestTests */ = {
-			isa = PBXGroup;
-			children = (
-				8645681126EFDEA00059CF04 /* SmokeTestTests.swift */,
-				8645681326EFDEA00059CF04 /* Info.plist */,
-			);
-			path = SmokeTestTests;
 			sourceTree = "<group>";
 		};
 		8645681B26EFDEA00059CF04 /* SmokeTestUITests */ = {
@@ -178,24 +149,6 @@
 			productReference = 864567F726EFDE9F0059CF04 /* SmokeTest.app */;
 			productType = "com.apple.product-type.application";
 		};
-		8645680C26EFDEA00059CF04 /* SmokeTestTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8645682426EFDEA00059CF04 /* Build configuration list for PBXNativeTarget "SmokeTestTests" */;
-			buildPhases = (
-				8645680926EFDEA00059CF04 /* Sources */,
-				8645680A26EFDEA00059CF04 /* Frameworks */,
-				8645680B26EFDEA00059CF04 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				8645680F26EFDEA00059CF04 /* PBXTargetDependency */,
-			);
-			name = SmokeTestTests;
-			productName = SmokeTestTests;
-			productReference = 8645680D26EFDEA00059CF04 /* SmokeTestTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		8645681726EFDEA00059CF04 /* SmokeTestUITests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8645682726EFDEA00059CF04 /* Build configuration list for PBXNativeTarget "SmokeTestUITests" */;
@@ -229,10 +182,6 @@
 					864567F626EFDE9F0059CF04 = {
 						CreatedOnToolsVersion = 12.4;
 					};
-					8645680C26EFDEA00059CF04 = {
-						CreatedOnToolsVersion = 12.4;
-						TestTargetID = 864567F626EFDE9F0059CF04;
-					};
 					8645681726EFDEA00059CF04 = {
 						CreatedOnToolsVersion = 12.4;
 						TestTargetID = 864567F626EFDE9F0059CF04;
@@ -256,7 +205,6 @@
 			projectRoot = "";
 			targets = (
 				864567F626EFDE9F0059CF04 /* SmokeTest */,
-				8645680C26EFDEA00059CF04 /* SmokeTestTests */,
 				8645681726EFDEA00059CF04 /* SmokeTestUITests */,
 			);
 		};
@@ -270,13 +218,6 @@
 				8645680726EFDE9F0059CF04 /* LaunchScreen.storyboard in Resources */,
 				8645680426EFDE9F0059CF04 /* Assets.xcassets in Resources */,
 				8645680226EFDE9F0059CF04 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8645680B26EFDEA00059CF04 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,14 +241,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8645680926EFDEA00059CF04 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8645681226EFDEA00059CF04 /* SmokeTestTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		8645681426EFDEA00059CF04 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -319,11 +252,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		8645680F26EFDEA00059CF04 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 864567F626EFDE9F0059CF04 /* SmokeTest */;
-			targetProxy = 8645680E26EFDEA00059CF04 /* PBXContainerItemProxy */;
-		};
 		8645681A26EFDEA00059CF04 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 864567F626EFDE9F0059CF04 /* SmokeTest */;
@@ -503,48 +431,6 @@
 			};
 			name = Release;
 		};
-		8645682526EFDEA00059CF04 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = SmokeTestTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SmokeTestTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SmokeTest.app/SmokeTest";
-			};
-			name = Debug;
-		};
-		8645682626EFDEA00059CF04 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = SmokeTestTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SmokeTestTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SmokeTest.app/SmokeTest";
-			};
-			name = Release;
-		};
 		8645682826EFDEA00059CF04 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -600,15 +486,6 @@
 			buildConfigurations = (
 				8645682226EFDEA00059CF04 /* Debug */,
 				8645682326EFDEA00059CF04 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		8645682426EFDEA00059CF04 /* Build configuration list for PBXNativeTarget "SmokeTestTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8645682526EFDEA00059CF04 /* Debug */,
-				8645682626EFDEA00059CF04 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
