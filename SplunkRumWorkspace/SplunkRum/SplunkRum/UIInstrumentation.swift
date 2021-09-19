@@ -169,7 +169,7 @@ private func pickVC(_ vc: UIViewController?) -> UIViewController? {
 private func pickWindow() -> UIWindow? {
     let app = UIApplication.shared
     // just using app.keyWindow is depcrecated now
-    let key = app.windows.first { $0.isKeyWindow }
+    let key = app.windows.last { $0.isKeyWindow }
     if key != nil {
         return key
     }
