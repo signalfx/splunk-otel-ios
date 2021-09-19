@@ -52,8 +52,7 @@ func initializeAppStartupListeners() {
     ]
     var reportedEvents = Set<Notification.Name>()
     events.forEach { event in
-        _ = NotificationCenter.default.addObserver(forName: event, object: nil, queue: nil) { (notif) in
-            print(notif.debugDescription)
+        _ = NotificationCenter.default.addObserver(forName: event, object: nil, queue: nil) { (_) in
             if !reportedEvents.contains(event) {
                 reportedEvents.insert(event)
                 if appStart == nil {

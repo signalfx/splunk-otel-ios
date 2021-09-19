@@ -166,6 +166,21 @@ private func pickVC(_ vc: UIViewController?) -> UIViewController? {
     return vc
 }
 
+private func pickWindow() -> UIWindow? {
+    let app = UIApplication.shared
+    // just using app.keyWindow is depcrecated now
+    let key = app.windows.first { $0.isKeyWindow }
+    if key != nil {
+        return key
+    }
+    let wins = app.windows
+    if !wins.isEmpty {
+        // windows are arranged in z-order, with topmost (e.g. popover) being the last in array
+        return wins[wins.count-1]
+    }
+    return nil
+}
+
 private func updateUIFields() {
     if !Thread.current.isMainThread {
         return
@@ -173,15 +188,14 @@ private func updateUIFields() {
     if isScreenNameManuallySet() {
         return
     }
-    let wins = UIApplication.shared.windows
-    print(wins)
-    if !wins.isEmpty {
+    let win = pickWindow()
+    if win != nil {
         // windows are arranged in z-order, with topmost (e.g. popover) being the last in array
-        let vc = pickVC(wins[wins.count-1].rootViewController)
+        let vc = pickVC(win!.rootViewController)
         if vc != nil {
             // FIXME SwiftUI UIHostingController vc when cast has a "rootView" var which does
             // not appear to be accessible generically
-            internal_manuallySetScreenName(String(describing: type(of: vc!)))
+            internal_setScreenName(String(describing: type(of: vc!)))
         }
     }
     // FIXME others?
