@@ -168,8 +168,10 @@ private func pickVC(_ vc: UIViewController?) -> UIViewController? {
 
 private func pickWindow() -> UIWindow? {
     let app = UIApplication.shared
-    if app.keyWindow != nil {
-        return app.keyWindow
+    // just using app.keyWindow is depcrecated now
+    let key = app.windows.first { $0.isKeyWindow }
+    if key != nil {
+        return key
     }
     let wins = app.windows
     if !wins.isEmpty {
