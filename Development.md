@@ -15,7 +15,7 @@ options to perform an iOS build.
 
 ## Releasing
 
-- Update the constant `SplunkRumVersionString` in `SplunkRum.swift`
+- Branch to vX.Y.Z.  Update the constant `SplunkRumVersionString` in `SplunkRum.swift`.  Merge this as usual.
 - git tag -s x.y.z (exactly like the semver string, no "v" prefix, etc.)
 - git push origin x.y.z
 
