@@ -13,7 +13,7 @@ that can be added to an app that captures:
 ## Getting Started
 
 To get started, import the package into your app, either through the Xcode menu
-`File -> Swift Packages -> Add Package Dependency` or through your `Package.swift`:
+(`File -> Swift Packages -> Add Package Dependency` or `File -> Add Packages`) or through your `Package.swift`:
 
 ```swift
 .package(url: "https://github.com/signalfx/splunk-otel-ios/", from: "0.1");
@@ -21,7 +21,8 @@ To get started, import the package into your app, either through the Xcode menu
 .target(name: "MyAwesomeApp", dependencies: ["SplunkRum"]),
 ```
 
-You'll then need to initialize the library with the appropriate configuration parameters.
+You'll then need to initialize the library with the appropriate configuration parameters.  The best place to do
+this is probably your `AppDelegate`'s `...didFinishLaunchingWithOptions:` method:
 
 ```swift
 // Swift example
