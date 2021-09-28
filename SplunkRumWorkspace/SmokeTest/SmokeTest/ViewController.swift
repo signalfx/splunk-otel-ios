@@ -16,8 +16,10 @@ limitations under the License.
 */
 
 import UIKit
+import WebKit
+import SplunkRum
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, WKUIDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +29,14 @@ class ViewController: UIViewController {
     @IBAction
     func clickMe() {
         print("I was clicked!")
+
+        let webview = WKWebView(frame: .zero)
+        webview.uiDelegate = self
+        let url = URL(string: "http://127.0.0.1:8989/page.html")
+        let req = URLRequest(url: url!)
+        view = webview
+        SplunkRum.integrateWithBrowserRum(webview)
+        webview.load(req)
     }
 
 }

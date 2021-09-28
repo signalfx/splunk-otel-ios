@@ -19,6 +19,7 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 import ZipkinExporter
 import StdoutExporter
+import WebKit
 
 let SplunkRumVersionString = "0.3.2"
 
@@ -312,6 +313,18 @@ var splunkRumInitializeCalledTime = Date()
      */
     public class func debugLog(_ msg: String) {
         debug_log(msg)
+    }
+
+    /**
+     Adds a window-level object to the WebKit WKWebView that allows browser SplunkRum to
+     see the native app's splunk.rumSessionId.  This allows us to integrate the data streams from the two
+     products.  Note that this exposes the (splunk) session ID to any page loaded through this view - it should
+     probably only be used for views which are definitely going to be instrumented by apps under your control, and not
+     ones that allow general browsing.  You should call this after the WKWebView is initialized but before it is
+     actually used.
+     */
+    @objc public class func integrateWithBrowserRum(_ view: WKWebView) {
+        integrateWebViewWithBrowserRum(view: view)
     }
 
 }
