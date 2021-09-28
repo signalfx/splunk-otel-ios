@@ -28,6 +28,7 @@ struct TestZipkinAnnotation: Decodable {
     var timestamp: Int64
 }
 var receivedSpans: [TestZipkinSpan] = []
+var receivedNativeSessionId: String?
 
 class SmokeTestUITests: XCTestCase {
 
@@ -53,6 +54,32 @@ class SmokeTestUITests: XCTestCase {
             spans.forEach({ span in
                 print(span)
             })
+            return HttpResponse.ok(.text("ok"))
+        }
+        server["/page.html"] = { _ in
+            let html = """
+                <div id="mydiv"></div>
+                <script>
+                    var text = "TEST MESSAGE<br>";
+                    try {
+                        var id = window.SplunkRumNative.getNativeSessionId();
+                        text += "SESSION ID IS "+id + "<br>";
+                        var idAgain = window.SplunkRumNative.getNativeSessionId();
+                        if (idAgain !== id) {
+                            text += "TEST ERROR SESSION ID CHANGED<br>";
+                        }
+                        fetch("http://127.0.0.1:8989/session?id="+id);
+                    } catch (e) {
+                        text += "TEST ERROR " + e.toString()+"<br>";
+                    }
+                    document.getElementById("mydiv").innerHTML = text;
+                </script>
+            """
+            return HttpResponse.ok(HttpResponseBody.html(html))
+        }
+        server["/session"] = { request in
+            receivedNativeSessionId = request.queryParams[0].1
+            print("received session ID from js: "+receivedNativeSessionId!)
             return HttpResponse.ok(.text("ok"))
         }
         try server.start(8989)
@@ -118,6 +145,10 @@ class SmokeTestUITests: XCTestCase {
         })
         XCTAssertNotNil(action)
         XCTAssertEqual("clickMe", action?.tags["action.name"]?.description)
+
+        // The webview should now have rendered the page with a session ID embedded in it, and posted that back to us
+        XCTAssertNotNil(receivedNativeSessionId)
+        XCTAssertEqual(appStart?.tags["splunk.rumSessionId"]?.description, receivedNativeSessionId)
 
         // FIXME multiple screens, pickVC cases, etc.
     }

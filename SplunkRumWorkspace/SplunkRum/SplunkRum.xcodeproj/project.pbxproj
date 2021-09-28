@@ -33,6 +33,7 @@
 		866192F825ED34750035F08E /* UtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866192F725ED34750035F08E /* UtilsTests.swift */; };
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
+		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 		866192F725ED34750035F08E /* UtilsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilsTests.swift; sourceTree = "<group>"; };
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
+		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +148,7 @@
 				865DBDD82677AA7B00EFE8D5 /* RetryExporter.swift */,
 				8607AD4A267B9032004FAFFD /* AppLifecycle.swift */,
 				8624DAB4269CAE61005D65DE /* NetworkType.swift */,
+				86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -304,6 +307,7 @@
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
 				8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
+				86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */,
 				8624DAB5269CAE61005D65DE /* NetworkType.swift in Sources */,
 				8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
