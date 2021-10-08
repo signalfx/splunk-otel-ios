@@ -6,7 +6,7 @@
 #
 #####################################################
 
-*.md @signalfx/docs @johnbley
-*.rst @signalfx/docs @johnbley
-docs/ @signalfx/docs @johnbley
-README* @signalfx/docs @johnbley
+*.md @signalfx/gdi-docs @johnbley
+*.rst @signalfx/gdi-docs @johnbley
+docs/ @signalfx/gdi-docs @johnbley
+README* @signalfx/gdi-docs @johnbley
