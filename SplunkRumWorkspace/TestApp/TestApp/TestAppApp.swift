@@ -16,13 +16,11 @@ limitations under the License.
 
 import SwiftUI
 import SplunkRum
-import SplunkRumCrashReporting
 
 @main
 struct TestAppApp: App {
     init() {
         SplunkRum.initialize(beaconUrl: "http://127.0.0.1:9080/api/v2/spans", rumAuth: "FAKE_RUM_AUTH", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true, globalAttributes: ["strKey": "Some string", "intkey": 7]))
-        SplunkRumCrashReporting.start()
     }
     var body: some Scene {
         WindowGroup {

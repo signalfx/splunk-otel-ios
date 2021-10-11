@@ -3,12 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		863B474926B2DA7E00524BA9 /* SplunkRum in Frameworks */ = {isa = PBXBuildFile; productRef = 863B474826B2DA7E00524BA9 /* SplunkRum */; };
-		863B474D26B2DA9C00524BA9 /* SplunkRumCrashReporting in Frameworks */ = {isa = PBXBuildFile; productRef = 863B474C26B2DA9C00524BA9 /* SplunkRumCrashReporting */; };
+		86AFA8742714AD6C0061A547 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86AFA8732714AD6C0061A547 /* SplunkRum.framework */; };
+		86AFA8752714AD6C0061A547 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 86AFA8732714AD6C0061A547 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		86D3D38025E80648004DD939 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D37F25E80648004DD939 /* AppDelegate.swift */; };
 		86D3D38225E80648004DD939 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D38125E80648004DD939 /* SceneDelegate.swift */; };
 		86D3D38425E80648004DD939 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D38325E80648004DD939 /* ViewController.swift */; };
@@ -19,7 +19,22 @@
 		86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39725E80DBC004DD939 /* BViewController.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		86AFA8762714AD6C0061A547 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				86AFA8752714AD6C0061A547 /* SplunkRum.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		86AFA8732714AD6C0061A547 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86D3D37C25E80648004DD939 /* TestStoryboardApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestStoryboardApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		86D3D37F25E80648004DD939 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		86D3D38125E80648004DD939 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -38,8 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				863B474926B2DA7E00524BA9 /* SplunkRum in Frameworks */,
-				863B474D26B2DA9C00524BA9 /* SplunkRumCrashReporting in Frameworks */,
+				86AFA8742714AD6C0061A547 /* SplunkRum.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,6 +96,7 @@
 		86D3D3A025E8240F004DD939 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				86AFA8732714AD6C0061A547 /* SplunkRum.framework */,
 				86D3D3A125E8240F004DD939 /* SplunkRum.framework */,
 			);
 			name = Frameworks;
@@ -97,6 +112,7 @@
 				86D3D37825E80648004DD939 /* Sources */,
 				86D3D37925E80648004DD939 /* Frameworks */,
 				86D3D37A25E80648004DD939 /* Resources */,
+				86AFA8762714AD6C0061A547 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -104,8 +120,6 @@
 			);
 			name = TestStoryboardApp;
 			packageProductDependencies = (
-				863B474826B2DA7E00524BA9 /* SplunkRum */,
-				863B474C26B2DA9C00524BA9 /* SplunkRumCrashReporting */,
 			);
 			productName = TestStoryboardApp;
 			productReference = 86D3D37C25E80648004DD939 /* TestStoryboardApp.app */;
@@ -135,8 +149,6 @@
 			);
 			mainGroup = 86D3D37325E80648004DD939;
 			packageReferences = (
-				863B474726B2DA7E00524BA9 /* XCRemoteSwiftPackageReference "splunk-otel-ios" */,
-				863B474B26B2DA9C00524BA9 /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */,
 			);
 			productRefGroup = 86D3D37D25E80648004DD939 /* Products */;
 			projectDirPath = "";
@@ -369,38 +381,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		863B474726B2DA7E00524BA9 /* XCRemoteSwiftPackageReference "splunk-otel-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/signalfx/splunk-otel-ios";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.2.0;
-			};
-		};
-		863B474B26B2DA9C00524BA9 /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/signalfx/splunk-otel-ios-crashreporting";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.2.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		863B474826B2DA7E00524BA9 /* SplunkRum */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 863B474726B2DA7E00524BA9 /* XCRemoteSwiftPackageReference "splunk-otel-ios" */;
-			productName = SplunkRum;
-		};
-		863B474C26B2DA9C00524BA9 /* SplunkRumCrashReporting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 863B474B26B2DA9C00524BA9 /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */;
-			productName = SplunkRumCrashReporting;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 86D3D37425E80648004DD939 /* Project object */;
 }
