@@ -38,33 +38,6 @@
         }
       },
       {
-        "package": "PLCrashReporter",
-        "repositoryURL": "https://github.com/microsoft/plcrashreporter",
-        "state": {
-          "branch": null,
-          "revision": "d747ab5de269cd44022bbe96ff9609d8626694ab",
-          "version": "1.9.0"
-        }
-      },
-      {
-        "package": "SplunkRum",
-        "repositoryURL": "https://github.com/signalfx/splunk-otel-ios",
-        "state": {
-          "branch": null,
-          "revision": "98dee79983e44c6ed0c2e54209873e9c53c88857",
-          "version": "0.3.0"
-        }
-      },
-      {
-        "package": "SplunkRumCrashReporting",
-        "repositoryURL": "https://github.com/signalfx/splunk-otel-ios-crashreporting",
-        "state": {
-          "branch": null,
-          "revision": "256525c542e993dd87b1c51fcad7988a998704c3",
-          "version": "0.2.0"
-        }
-      },
-      {
         "package": "swift-atomics",
         "repositoryURL": "https://github.com/apple/swift-atomics.git",
         "state": {
