@@ -3,13 +3,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "SplunkRum",
+    name: "SplunkOtel",
     platforms: [
         .iOS(.v11),
 	.macOS(.v10_13)
     ],
     products: [
-        .library(name: "SplunkRum", targets: ["SplunkRum"])
+        .library(name: "SplunkOtel", targets: ["SplunkOtel"])
     ],
     dependencies: [
         .package(name: "opentelemetry-swift", url:"https://github.com/open-telemetry/opentelemetry-swift", from: "1.0.2"),
@@ -17,7 +17,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "SplunkRum",
+            name: "SplunkOtel",
             dependencies: [
 		.product(name: "libOpenTelemetryApi", package:"opentelemetry-swift"),
 		.product(name: "libOpenTelemetrySdk", package:"opentelemetry-swift"),
