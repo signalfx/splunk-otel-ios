@@ -8,7 +8,7 @@ that can be added to an app that captures:
 - UI activity - screen name (typically ViewController name), actions, and PresentationTransitions
 - Crashes/unhandled exceptions via [SplunkRumCrashReporting](https://github.com/signalfx/splunk-otel-ios-crashreporting)
 
-> :construction: This project is currently in **BETA**.
+> :construction: This project is currently in **BETA**. It is **officially supported** by Splunk. However, breaking changes **MAY** be introduced.
 
 ## Getting Started
 
@@ -16,7 +16,7 @@ To get started, import the package into your app, either through the Xcode menu
 (`File -> Swift Packages -> Add Package Dependency` or `File -> Add Packages`) or through your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/signalfx/splunk-otel-ios/", from: "0.1");
+.package(url: "https://github.com/signalfx/splunk-otel-ios/", from: "0.4.0");
 ...
 .target(name: "MyAwesomeApp", dependencies: ["SplunkOtel"]),
 ```
