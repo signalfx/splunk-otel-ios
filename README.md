@@ -18,7 +18,7 @@ To get started, import the package into your app, either through the Xcode menu
 ```swift
 .package(url: "https://github.com/signalfx/splunk-otel-ios/", from: "0.1");
 ...
-.target(name: "MyAwesomeApp", dependencies: ["SplunkRum"]),
+.target(name: "MyAwesomeApp", dependencies: ["SplunkOtel"]),
 ```
 
 You'll then need to initialize the library with the appropriate configuration parameters.  The best place to do
@@ -26,7 +26,7 @@ this is probably your `AppDelegate`'s `...didFinishLaunchingWithOptions:` method
 
 ```swift
 // Swift example
-import SplunkRum
+import SplunkOtel
 ...
 // Your beaconUrl and rumAuth will be provided by your friendly Splunk representative
 SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "ABCD...")
@@ -36,7 +36,7 @@ or
 
 ```objectivec
 // Objective-C example
-@import SplunkRum;
+@import SplunkOtel;
 ...
 // Your beaconUrl and rumAuth will be provided by your friendly Splunk representative
 [SplunkRum initializeWithBeaconUrl: @"https://rum-ingest.us0.signalfx.com/v1/rum" rumAuth: @"ABCD..." options: nil];
