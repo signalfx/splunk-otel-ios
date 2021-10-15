@@ -146,6 +146,14 @@ class SmokeTestUITests: XCTestCase {
         XCTAssertNotNil(action)
         XCTAssertEqual("clickMe", action?.tags["action.name"]?.description)
 
+        // the click also caused a setScreenName which should produce a span
+        let screenName = receivedSpans.last(where: { (span) -> Bool in
+            return span.name == "screen name change"
+        })
+        XCTAssertNotNil(screenName)
+        XCTAssertEqual("ViewController", screenName?.tags["last.screen.name"]?.description)
+        XCTAssertEqual("CustomScreenName", screenName?.tags["screen.name"]?.description)
+
         // The webview should now have rendered the page with a session ID embedded in it, and posted that back to us
         XCTAssertNotNil(receivedNativeSessionId)
         XCTAssertEqual(appStart?.tags["splunk.rumSessionId"]?.description, receivedNativeSessionId)

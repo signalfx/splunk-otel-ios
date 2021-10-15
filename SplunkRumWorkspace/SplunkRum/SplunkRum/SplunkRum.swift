@@ -37,13 +37,14 @@ let SplunkRumVersionString = "0.4.0"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
         self.globalAttributes = globalAttributes
         self.environment = environment
         self.ignoreURLs = ignoreURLs
+        self.screenNameSpans = screenNameSpans
     }
     /**
         Copy constructor
@@ -57,6 +58,7 @@ let SplunkRumVersionString = "0.4.0"
         self.ignoreURLs = opts.ignoreURLs
         self.spanFilter = opts.spanFilter
         self.showVCInstrumentation = opts.showVCInstrumentation
+        self.screenNameSpans = opts.screenNameSpans
     }
 
     /**
@@ -92,6 +94,11 @@ let SplunkRumVersionString = "0.4.0"
      */
     @objc public var showVCInstrumentation: Bool = true
 
+    /**
+     Enable span creation for screen name changes
+     */
+    @objc public var screenNameSpans: Bool = true
+
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
         if spanFilter != nil {
@@ -102,6 +109,9 @@ let SplunkRumVersionString = "0.4.0"
         }
         if !showVCInstrumentation {
             answer += ", showVC: false"
+        }
+        if !screenNameSpans {
+            answer += ", screenNameSpans: false"
         }
         return answer
     }
@@ -289,23 +299,12 @@ var splunkRumInitializeCalledTime = Date()
      **This must be called from the main thread**.  Other usage will fail with a printed warning message in debug mode
      
      */
-    @objc public class func setScreenName(_ name: String, createSpan: Bool = true) {
+    @objc public class func setScreenName(_ name: String) {
         if !Thread.current.isMainThread {
             debug_log("SplunkRum.setScreenName not called from main thread: "+Thread.current.debugDescription)
             return
         }
-        var lastScreenName = "unknown"
-        if createSpan {
-            lastScreenName = getScreenName()
-        }
-        internal_manuallySetScreenName(name)
-        if createSpan {
-            let now = Date()
-            let span = buildTracer().spanBuilder(spanName: "setScreenName").setStartTime(time: now).startSpan()
-            span.setAttribute(key: "last.screen.name", value: lastScreenName)
-            span.setAttribute(key: "component", value: "ui")
-            span.end(time: now)
-        }
+        internal_setScreenName(name, true)
     }
 
     /**

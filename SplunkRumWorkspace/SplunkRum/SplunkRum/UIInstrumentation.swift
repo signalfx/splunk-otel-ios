@@ -195,7 +195,7 @@ private func updateUIFields() {
         if vc != nil {
             // FIXME SwiftUI UIHostingController vc when cast has a "rootView" var which does
             // not appear to be accessible generically
-            internal_setScreenName(String(describing: type(of: vc!)))
+            internal_setScreenName(String(describing: type(of: vc!)), false)
         }
     }
     // FIXME others?

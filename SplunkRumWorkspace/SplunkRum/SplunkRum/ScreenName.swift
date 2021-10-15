@@ -23,23 +23,35 @@ fileprivate var screenNameManuallySet = false
 // I could find in the stdlib
 fileprivate var lock = NSLock()
 
-// Assumes main thread
-func internal_setScreenName(_ newName: String) {
-    lock.lock()
-    defer {
-        lock.unlock()
-    }
-    screenName = newName
+func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
+    let now = Date()
+    let span = buildTracer().spanBuilder(spanName: "screen name change").setStartTime(time: now).startSpan()
+    span.setAttribute(key: "last.screen.name", value: oldName)
+    span.setAttribute(key: "component", value: "ui")
+    span.end(time: now)
 }
 
 // Assumes main thread
-func internal_manuallySetScreenName(_ newName: String) {
+func internal_setScreenName(_ newName: String, _ manual: Bool) {
+    var oldName: String?
+
     lock.lock()
-    defer {
-        lock.unlock()
+    if screenName != newName {
+        oldName = screenName
     }
-    screenNameManuallySet = true
-    screenName = newName
+    if manual {
+        screenNameManuallySet = true
+    }
+    // second guard against overwriting manual names
+    if manual || !screenNameManuallySet {
+        screenName = newName
+    }
+    lock.unlock()
+
+    // Don't emit the span under the lock
+    if oldName != nil && oldName! != "unknown" && (SplunkRum.configuredOptions?.screenNameSpans ?? true) {
+        emitScreenNameChangedSpan(oldName!, newName)
+    }
 }
 
 func isScreenNameManuallySet() -> Bool {

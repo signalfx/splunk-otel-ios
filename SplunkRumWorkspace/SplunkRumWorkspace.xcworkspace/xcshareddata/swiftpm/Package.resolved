@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/open-telemetry/opentelemetry-swift",
         "state": {
           "branch": null,
-          "revision": "7cabfc125f5c8fbd97b875ddb2b27241027a1f0b",
-          "version": "1.0.2"
+          "revision": "eec1f8f1eeec5cf96c3ff76378ec290156707326",
+          "version": "1.0.6"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/apple/swift-atomics.git",
         "state": {
           "branch": null,
-          "revision": "26e346cd64f6b92d4089e7fafe2f8e82f60ddb8c",
-          "version": "0.0.2"
+          "revision": "919eb1d83e02121cdb434c7bfc1f0c66ef17febe",
+          "version": "1.0.2"
         }
       },
       {
