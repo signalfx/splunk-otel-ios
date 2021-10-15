@@ -29,6 +29,7 @@ class ViewController: UIViewController, WKUIDelegate {
     @IBAction
     func clickMe() {
         print("I was clicked!")
+        SplunkRum.setScreenName("CustomScreenName")
 
         let webview = WKWebView(frame: .zero)
         webview.uiDelegate = self
