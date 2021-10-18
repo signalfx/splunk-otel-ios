@@ -126,6 +126,41 @@ options.spanFilter = { spanData in
 }
 ```
 
+## Integrate with Splunk Browser RUM
+
+Mobile RUM instrumentation and Browser RUM instrumentation can be used simultaneously 
+by sharing the `splunk.rumSessionId` between the native/iOS instrumentation and the 
+browser/web instrumentation. This allows you to see data from both your native app 
+and your web app combined in one stream.
+
+### Requirements
+
+- Your iOS app has at least one [WebKit `WKWebView`](https://developer.apple.com/documentation/webkit/wkwebview) object.
+- The website loaded in the WebView is instrumented using [Splunk Browser RUM](https://github.com/signalfx/splunk-otel-js-web).
+
+### Example
+
+See the following Swift snippet for an example of how to integrate with Splunk Browser RUM:
+
+```swift
+import WebKit
+import SplunkOtel
+
+...
+  /* 
+Make sure that the WebView instance only loads pages under 
+your control and instrumented with Splunk Browser RUM. The 
+integrateWithBrowserRum() method can expose the splunk.rumSessionId
+of your user to every site/page loaded in the WebView instance.
+*/
+  let webview: WKWebView = ...
+  SplunkRum.integrateWithBrowserRum(webview)
+```
+
+> :warning: **Warning**: Make sure that the WebView instance only loads pages under 
+your control and instrumented with Splunk Browser RUM. Calling 
+`SplunkRum.integrateWithBrowserRum()` exposes your user's `splunk.rumSessionId` 
+to every site/page loaded in the WebView instance.
 ## Version information
 
 - This library is compatible with iOS 11 and up (and iPadOS 13 and up)
