@@ -126,31 +126,41 @@ options.spanFilter = { spanData in
 }
 ```
 
-## Browser RUM Integration
+## Integrate with Splunk Browser RUM
 
-If your app has a WebKit `WKWebView` in it, **and** the site(s) it will visit are instrumented with
-[Splunk Browser RUM](https://github.com/signalfx/splunk-otel-js-web), then you can instrument the
-WebView to share the `splunk.rumSessionId` between the native/iOS instrumentation and the browser/web instrumentation.
-This will allow you to see data from both your native app and your web app combined in one stream.
+Mobile RUM instrumentation and Browser RUM instrumentation can be used simultaneously 
+by sharing the `splunk.rumSessionId` between the native/iOS instrumentation and the 
+browser/web instrumentation. This allows you to see data from both your native app 
+and your web app combined in one stream.
 
-:warning: Calling `SplunkRum.integrateWithBrowserRum()` exposes a javascript interface (`SplunkRumNative.getNativeSessionId()`)
-to every site/page loaded in the WebView instance.  This means that each page can read your user's
-`splunk.rumSessionId` (a random sequence of bytes).  While this does not expose any PII directly or indirectly,
-you may still want to carefully consider if your WebView instance will only view pages that you are certain
-are under your control **and** are instrumented with Splunk Browser RUM.  As such, this is an opt-in instrumentation
-instead of an automatic one.
+### Requirements
+
+- Your iOS app has at least one [WebKit `WKWebView`](https://developer.apple.com/documentation/webkit/wkwebview) object.
+- The website loaded in the WebView is instrumented using [Splunk Browser RUM](https://github.com/signalfx/splunk-otel-js-web).
+
+### Example
+
+See the following Swift snippet for an example of how to integrate with Splunk Browser RUM:
 
 ```swift
 import WebKit
 import SplunkOtel
 
 ...
-  // Make sure that you understand what site(s) this webview will visit!
-  // Please read the note above to understand the implications of calling this.
+  /* 
+Make sure that the WebView instance only loads pages under 
+your control and instrumented with Splunk Browser RUM. The 
+integrateWithBrowserRum() method can expose the splunk.rumSessionId
+of your user to every site/page loaded in the WebView instance.
+*/
   let webview: WKWebView = ...
   SplunkRum.integrateWithBrowserRum(webview)
 ```
 
+> :warning: **Warning**: Make sure that the WebView instance only loads pages under 
+your control and instrumented with Splunk Browser RUM. Calling 
+`SplunkRum.integrateWithBrowserRum()` exposes your user's `splunk.rumSessionId` 
+to every site/page loaded in the WebView instance.
 ## Version information
 
 - This library is compatible with iOS 11 and up (and iPadOS 13 and up)
