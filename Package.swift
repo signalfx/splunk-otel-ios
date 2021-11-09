@@ -19,10 +19,10 @@ let package = Package(
         .target(
             name: "SplunkOtel",
             dependencies: [
-		.product(name: "libOpenTelemetryApi", package:"opentelemetry-swift"),
-		.product(name: "libOpenTelemetrySdk", package:"opentelemetry-swift"),
-		.product(name: "libStdoutExporter", package:"opentelemetry-swift"),
-		.product(name: "libZipkinExporter", package:"opentelemetry-swift"),
+		.product(name: "OpenTelemetryApi", package:"opentelemetry-swift"),
+		.product(name: "OpenTelemetrySdk", package:"opentelemetry-swift"),
+		.product(name: "StdoutExporter", package:"opentelemetry-swift"),
+		.product(name: "ZipkinExporter", package:"opentelemetry-swift"),
 		.product(name: "DeviceKit", package: "DeviceKit")
             ],
             path: "SplunkRumWorkspace/SplunkRum",
