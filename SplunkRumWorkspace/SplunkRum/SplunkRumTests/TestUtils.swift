@@ -26,6 +26,26 @@ let ServerPort = 8989
 var testEnvironmentInited = false
 var localSpans: [SpanData] = []
 
+class TestSpanProcessor: SpanProcessor {
+    var isStartRequired: Bool
+    var isEndRequired: Bool
+    var exporter: SpanExporter
+    init(spanExporter: SpanExporter) {
+        self.exporter = spanExporter
+        isStartRequired = false
+        isEndRequired = true
+    }
+
+    func onStart(parentContext: SpanContext?, span: ReadableSpan) { }
+    func onEnd(span: ReadableSpan) {
+        exporter.export(spans: [span.toSpanData()])
+    }
+
+    func shutdown() { }
+    func forceFlush(timeout: TimeInterval?) { }
+
+}
+
 class TestSpanExporter: SpanExporter {
     var exportSucceeds = true
 
@@ -81,7 +101,7 @@ func initializeTestEnvironment() throws {
     options.ignoreURLs = try! NSRegularExpression(pattern: ".*ignore_this.*")
 
     SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: options)
-    OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: TestSpanExporter()))
+    OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(TestSpanProcessor(spanExporter: TestSpanExporter()))
 
     print("sleeping to wait for span batch, don't worry about the pause...")
     sleep(8)

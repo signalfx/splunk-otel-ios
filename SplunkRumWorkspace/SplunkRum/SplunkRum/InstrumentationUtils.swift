@@ -85,4 +85,5 @@ class GlobalAttributesProcessor: SpanProcessor {
     func onEnd(span: ReadableSpan) { }
     func shutdown() { }
     func forceFlush() { }
+    func forceFlush(timeout: TimeInterval?) { }
 }

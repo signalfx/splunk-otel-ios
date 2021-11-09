@@ -12,17 +12,17 @@ let package = Package(
         .library(name: "SplunkOtel", targets: ["SplunkOtel"])
     ],
     dependencies: [
-        .package(name: "opentelemetry-swift", url:"https://github.com/open-telemetry/opentelemetry-swift", from: "1.0.2"),
+        .package(name: "opentelemetry-swift", url:"https://github.com/open-telemetry/opentelemetry-swift", from: "1.1.0"),
 	.package(url: "https://github.com/devicekit/DeviceKit.git", from: "4.0.0"),
     ],
     targets: [
         .target(
             name: "SplunkOtel",
             dependencies: [
-		.product(name: "libOpenTelemetryApi", package:"opentelemetry-swift"),
-		.product(name: "libOpenTelemetrySdk", package:"opentelemetry-swift"),
-		.product(name: "libStdoutExporter", package:"opentelemetry-swift"),
-		.product(name: "libZipkinExporter", package:"opentelemetry-swift"),
+		.product(name: "OpenTelemetryApi", package:"opentelemetry-swift"),
+		.product(name: "OpenTelemetrySdk", package:"opentelemetry-swift"),
+		.product(name: "StdoutExporter", package:"opentelemetry-swift"),
+		.product(name: "ZipkinExporter", package:"opentelemetry-swift"),
 		.product(name: "DeviceKit", package: "DeviceKit")
             ],
             path: "SplunkRumWorkspace/SplunkRum",

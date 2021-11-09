@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/open-telemetry/opentelemetry-swift",
         "state": {
           "branch": null,
-          "revision": "eec1f8f1eeec5cf96c3ff76378ec290156707326",
-          "version": "1.0.6"
+          "revision": "3f9d9d7b754f750bb8a1655796064a39e54b311b",
+          "version": "1.1.0"
         }
       },
       {
