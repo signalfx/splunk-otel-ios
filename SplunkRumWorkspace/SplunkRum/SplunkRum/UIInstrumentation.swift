@@ -123,7 +123,11 @@ let PresentationTransitionInstrumenter = NotificationPairInstrumener(
 
 func initializePresentationTransitionInstrumentation() {
     PresentationTransitionInstrumenter.start()
+    _ = NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "_UIWindowSystemGestureStateChangedNotification"), object: nil, queue: nil) { (_) in
+        updateUIFields()
+    }
 }
+
 let ShowVCInstrumenter = NotificationPairInstrumener(
     begin: "UINavigationControllerWillShowViewControllerNotification",
     end: "UINavigationControllerDidShowViewControllerNotification",
@@ -155,13 +159,18 @@ private func pickVC(_ vc: UIViewController?) -> UIViewController? {
             return pickVC(nav.topViewController)
         }
     }
-    if vc!.presentedViewController != nil {
-        return pickVC(vc!.presentedViewController)
-    }
     if let tabVC = vc as? UITabBarController {
         if tabVC.selectedViewController != nil {
             return pickVC(tabVC.selectedViewController)
         }
+    }
+    if let page = vc as? UIPageViewController {
+        if page.viewControllers != nil && !page.viewControllers!.isEmpty {
+            return pickVC(page.viewControllers![0])
+        }
+    }
+    if vc!.presentedViewController != nil {
+        return pickVC(vc!.presentedViewController)
     }
     return vc
 }
