@@ -34,6 +34,8 @@
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
+		C882427E27ABAA3E00581627 /* ConnectionInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C882427D27ABAA3E00581627 /* ConnectionInstrumentation.swift */; };
+		C882428027ABAA6400581627 /* ConnectionInstrumentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C882427F27ABAA6400581627 /* ConnectionInstrumentationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +86,8 @@
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
+		C882427D27ABAA3E00581627 /* ConnectionInstrumentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionInstrumentation.swift; sourceTree = "<group>"; };
+		C882427F27ABAA6400581627 /* ConnectionInstrumentationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionInstrumentationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +137,7 @@
 		86260EC625CDC1DE009F3CB1 /* SplunkRum */ = {
 			isa = PBXGroup;
 			children = (
+				C882427D27ABAA3E00581627 /* ConnectionInstrumentation.swift */,
 				86260F0E25CDC407009F3CB1 /* SplunkRum.swift */,
 				86260EC725CDC1DE009F3CB1 /* SplunkRum.h */,
 				86260EC825CDC1DE009F3CB1 /* Info.plist */,
@@ -156,6 +161,7 @@
 		86260ED125CDC1DE009F3CB1 /* SplunkRumTests */ = {
 			isa = PBXGroup;
 			children = (
+				C882427F27ABAA6400581627 /* ConnectionInstrumentationTests.swift */,
 				86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */,
 				86260ED425CDC1DE009F3CB1 /* Info.plist */,
 				865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */,
@@ -307,6 +313,7 @@
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
 				8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
+				C882427E27ABAA3E00581627 /* ConnectionInstrumentation.swift in Sources */,
 				86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */,
 				8624DAB5269CAE61005D65DE /* NetworkType.swift in Sources */,
 				8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */,
@@ -322,6 +329,7 @@
 			files = (
 				8654BD0025E561AE0013F7F6 /* ErrorTests.swift in Sources */,
 				86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */,
+				C882428027ABAA6400581627 /* ConnectionInstrumentationTests.swift in Sources */,
 				8654BCFC25E55E850013F7F6 /* TestUtils.swift in Sources */,
 				866192F825ED34750035F08E /* UtilsTests.swift in Sources */,
 				865A5CA125DC33EF003A1E5A /* NetworkInstrumentationTests.swift in Sources */,
@@ -484,7 +492,7 @@
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -512,7 +520,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
-				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

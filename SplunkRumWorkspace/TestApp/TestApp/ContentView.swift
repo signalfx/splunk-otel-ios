@@ -22,8 +22,10 @@ struct ContentView: View {
     func networkRequest() {
         print("network (req)!")
         let url = URL(string: "http://127.0.0.1:7878/data")!
+      //  let url = URL(string: "https://mock.codes/200")!
+       
         var req = URLRequest(url: url)
-        req.httpMethod = "HEAD"
+        req.httpMethod = "HEAD"  //HEAD
         let task = URLSession.shared.dataTask(with: req) {(data, _: URLResponse?, _) in
             guard let data = data else { return }
             print("got some data")
@@ -66,7 +68,81 @@ struct ContentView: View {
         span.end()
 
     }
+    func callAsynchronousRequestConnection(){
+        print("NSURLConnection - Asynchronous Call")
+        
+        //method 1
+       
+     /* // let url = URL(string: "http://www.splunk.com")! // failure
+       let url = URL(string: "https://www.google.com")! //sucess but not proper data
+       // let url = URL(string: "http://127.0.0.1:7878/data")!  //sucess and proper data
+       var req = URLRequest(url: url)
+        req.httpMethod = "GET" // "GET"  //"HEAD"
+        
+        let connection : NSURLConnection = NSURLConnection(request: req as URLRequest, delegate: self,startImmediately: false)!
+        connection.start()*/
+        
+        //method 2
+      //  let url = URL(string: "https://www.google.com")!  // sucess but not proper data
+        // let url = URL(string: "http://www.splunk.com")! // failure
+       // let url = URL(string: "http://127.0.0.1:7878/data")!  //sucess and proper data
+        let url = URL(string: "https://mock.codes/200")!
+        var req = URLRequest(url: url)
+        req.httpMethod = "GET" //"GET" //"HEAD"
+        NSURLConnection.sendAsynchronousRequest(req, queue: OperationQueue.main) {(response, data, error) in
+            guard let data = data else { return }
+            print("got some data")
+            print(data)
+        }
+       
 
+        
+    }
+    
+    func callSynchronousRequestConnection(){
+        print("NSURLConnection - Synchronous Call")
+        
+        //method 1
+       
+     /* // let url = URL(string: "http://www.splunk.com")! // failure
+       let url = URL(string: "https://www.google.com")! //sucess but not proper data
+       // let url = URL(string: "http://127.0.0.1:7878/data")!  //sucess and proper data
+       var req = URLRequest(url: url)
+        req.httpMethod = "GET" // "GET"  //"HEAD"
+        
+        let connection : NSURLConnection = NSURLConnection(request: req as URLRequest, delegate: self,startImmediately: false)!
+        connection.start()*/
+        
+        //method 2
+        //let url = URL(string: "https://www.google.com")!  // sucess but not proper data
+        // let url = URL(string: "http://www.splunk.com")! // failure
+        let url = URL(string: "https://mock.codes/500")!
+      // let url = URL(string: "http://127.0.0.1:7878/data")!  //sucess and proper data
+        var req = URLRequest(url: url)
+        req.httpMethod = "GET" //"GET" //"HEAD"
+       
+        var response:URLResponse? = URLResponse()
+      //  var response: AutoreleasingUnsafeMutablePointer<URLResponse?>? = nil
+        
+        do{
+            let urlData = try NSURLConnection.sendSynchronousRequest(req, returning: &response)
+            if let httpResponse = response as? HTTPURLResponse {
+                print(httpResponse.statusCode)
+            }
+            print(urlData)
+            print(nsdataToJSON(data: urlData))
+            
+        }
+        catch (let error) {
+            print(error)
+        }
+        
+        
+        
+        
+    }
+
+    
     @State var text = ""
     @State var toggle = true
     @State var isShowingModal = false
@@ -103,6 +179,17 @@ struct ContentView: View {
             }) {
                 Text("Manual Span")
             }
+            Button(action: {
+                self.callAsynchronousRequestConnection()
+            }) {
+                Text("Connection-Asynchronous")
+            }
+            Button {
+                self.callSynchronousRequestConnection()
+            } label: {
+                Text("Connection-Synchronous")
+            }
+
         }
         HStack {
             TextField("Text", text: $text)
@@ -132,6 +219,17 @@ struct ContentView: View {
     }
 }
 
+// Convert from NSData to json object
+public func nsdataToJSON(data: Data) -> Any? {
+    
+    
+    
+    guard let deserializedValues = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) else { return false}
+        return deserializedValues
+       
+    
+    
+}
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
