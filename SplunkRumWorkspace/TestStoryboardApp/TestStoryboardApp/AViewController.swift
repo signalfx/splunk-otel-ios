@@ -30,21 +30,6 @@ class AViewController: UIViewController,NSURLConnectionDelegate,NSURLConnectionD
     @IBAction public func callAsynchronousWebService() {
         print("NSURLConnection - Call")
       
-        //method 1
-    /*  // let url = URL(string: "https://www.google.com")! //sucess check
-        let url = URL(string: "http://www.splunk.com")! // failure check
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-       
-        let connection : NSURLConnection = NSURLConnection(request: request as URLRequest, delegate: self,startImmediately: false)!
-        connection.start()*/
-        
-        
-        //method - 2
-       // let url = URL(string: "http://www.splunk.com")! // sucess,status = 200 check  req.httpMethod = "GET"
-        //let url = URL(string: "https://www.google.com")! //sucess , status = 200
-       // let url = URL(string: "https://mock.codes/200")!// sucess 500
-       
         let url = URL(string: "http://127.0.0.1:7878/data")!  //failure and get error
         var req = URLRequest(url: url)
         req.httpMethod = "HEAD"
@@ -57,26 +42,7 @@ class AViewController: UIViewController,NSURLConnectionDelegate,NSURLConnectionD
         @IBAction public func callSynchronousWebService() {
             print("NSURLConnection - Call")
           
-            //method 1
-        /*  // let url = URL(string: "https://www.google.com")! //sucess check
-            let url = URL(string: "http://www.splunk.com")! // failure check
-            var request = URLRequest(url: url)
-            request.httpMethod = "GET"
-           
-            let connection : NSURLConnection = NSURLConnection(request: request as URLRequest, delegate: self,startImmediately: false)!
-            connection.start()*/
-            
-            
-            //method - 2
-          //  let url = URL(string: "http://www.splunk.com")! // sucess check 200 req.httpMethod = "GET"
-           // let url = URL(string: "https://www.google.com")! //sucess but 200 not proper data
-            
-          //  let url = URL(string: "http://127.0.0.1:7878/data")!  //error check and proper data == "HEAD"
-          /*  let url = URL(string: "https://mock.codes/200")!// sucess 500
-            var req = URLRequest(url: url)
-            req.httpMethod = "GET"  //"GET" //"HEAD"*/
-            
-            //post method check
+           //post method check
             let url = URL(string: "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBdq5A4lktKz4herj2cxXum2TSAHiqeuAs")!// sucess 500
             var req = URLRequest(url: url)
             req.httpMethod = "POST"
@@ -97,24 +63,7 @@ class AViewController: UIViewController,NSURLConnectionDelegate,NSURLConnectionD
         
     }
    
-    func connection(_ connection: NSURLConnection, didFailWithError error: Error){
-        print("Error is there...")
-    }
     
-    // NSURLconnectiondatadelegate
-    func connection(connection: NSURLConnection, didReceiveResponse response: URLResponse)
-    {
-        self.data = NSMutableData()
-    }
-    
-    func connection(connection: NSURLConnection, didReceiveData data: NSData)
-    {
-        self.data.append(data as Data)
-    }
-    func connectionDidFinishLoading(connection: NSURLConnection)
-    {
-        print("connection finished")
-    }
     
     
 }

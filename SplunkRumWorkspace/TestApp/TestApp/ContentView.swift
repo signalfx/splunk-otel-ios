@@ -71,21 +71,6 @@ struct ContentView: View {
     func callAsynchronousRequestConnection(){
         print("NSURLConnection - Asynchronous Call")
         
-        //method 1
-       
-     /* // let url = URL(string: "http://www.splunk.com")! // failure
-       let url = URL(string: "https://www.google.com")! //sucess but not proper data
-       // let url = URL(string: "http://127.0.0.1:7878/data")!  //sucess and proper data
-       var req = URLRequest(url: url)
-        req.httpMethod = "GET" // "GET"  //"HEAD"
-        
-        let connection : NSURLConnection = NSURLConnection(request: req as URLRequest, delegate: self,startImmediately: false)!
-        connection.start()*/
-        
-        //method 2
-      //  let url = URL(string: "https://www.google.com")!  // sucess but not proper data
-        // let url = URL(string: "http://www.splunk.com")! // failure
-       // let url = URL(string: "http://127.0.0.1:7878/data")!  //sucess and proper data
         let url = URL(string: "https://mock.codes/200")!
         var req = URLRequest(url: url)
         req.httpMethod = "GET" //"GET" //"HEAD"
@@ -102,36 +87,13 @@ struct ContentView: View {
     func callSynchronousRequestConnection(){
         print("NSURLConnection - Synchronous Call")
         
-        //method 1
-       
-     /* // let url = URL(string: "http://www.splunk.com")! // failure
-       let url = URL(string: "https://www.google.com")! //sucess but not proper data
-       // let url = URL(string: "http://127.0.0.1:7878/data")!  //sucess and proper data
-       var req = URLRequest(url: url)
-        req.httpMethod = "GET" // "GET"  //"HEAD"
-        
-        let connection : NSURLConnection = NSURLConnection(request: req as URLRequest, delegate: self,startImmediately: false)!
-        connection.start()*/
-        
-        //method 2
-        //let url = URL(string: "https://www.google.com")!  // sucess but not proper data
-        // let url = URL(string: "http://www.splunk.com")! // failure
         let url = URL(string: "https://mock.codes/500")!
-      // let url = URL(string: "http://127.0.0.1:7878/data")!  //sucess and proper data
         var req = URLRequest(url: url)
         req.httpMethod = "GET" //"GET" //"HEAD"
        
         var response:URLResponse? = URLResponse()
-      //  var response: AutoreleasingUnsafeMutablePointer<URLResponse?>? = nil
-        
         do{
             let urlData = try NSURLConnection.sendSynchronousRequest(req, returning: &response)
-            if let httpResponse = response as? HTTPURLResponse {
-                print(httpResponse.statusCode)
-            }
-            print(urlData)
-            print(nsdataToJSON(data: urlData))
-            
         }
         catch (let error) {
             print(error)
@@ -222,13 +184,9 @@ struct ContentView: View {
 // Convert from NSData to json object
 public func nsdataToJSON(data: Data) -> Any? {
     
-    
-    
-    guard let deserializedValues = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) else { return false}
+     guard let deserializedValues = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) else { return false}
         return deserializedValues
        
-    
-    
 }
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
