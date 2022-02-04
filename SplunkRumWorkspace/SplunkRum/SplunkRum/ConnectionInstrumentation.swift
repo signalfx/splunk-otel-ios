@@ -85,6 +85,7 @@ func startConnectionSpan(request: URLRequest?) -> Span? {
     }
     return span
 }
+
 func endConnectionSpan(connection: NSURLConnection? ,status:String ,hr:HTTPURLResponse?,error: Error?,span : Span = OpenTelemetry.instance.contextProvider.activeSpan!) {
     if hr != nil {
         span.setAttribute(key: "http.status_code", value: hr!.statusCode)
