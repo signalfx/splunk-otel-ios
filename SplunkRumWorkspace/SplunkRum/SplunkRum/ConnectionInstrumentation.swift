@@ -75,7 +75,7 @@ func startConnectionSpan(request: URLRequest?) -> Span? {
         }
     }
     let tracer = buildTracer()
-    let span = tracer.spanBuilder(spanName: "HTTP "+method).setSpanKind(spanKind: .client).startSpan() 
+    let span = tracer.spanBuilder(spanName: "HTTP "+method).setSpanKind(spanKind: .client).startSpan()
     span.setAttribute(key: "component", value: "http")  //"NSURLConnection"
     span.setAttribute(key: "http.url", value: url.absoluteString)
     span.setAttribute(key: "http.method", value: method)
@@ -83,8 +83,6 @@ func startConnectionSpan(request: URLRequest?) -> Span? {
     if let body = request?.httpBody{
         span.setAttribute(key: "http.request_content_length", value: Int(body.count))
     }
-    
-     
     return span
 }
 func endConnectionSpan(connection: NSURLConnection? ,status:String ,hr:HTTPURLResponse?,error: Error?,span : Span = OpenTelemetry.instance.contextProvider.activeSpan!) {
