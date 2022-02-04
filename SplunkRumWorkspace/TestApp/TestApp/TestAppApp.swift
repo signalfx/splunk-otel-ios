@@ -22,7 +22,8 @@ import SplunkRum
 @main
 struct TestAppApp: App {
     init() {
-        SplunkRum.initialize(beaconUrl: "http://127.0.0.1:9080/api/v2/spans", rumAuth: "FAKE_RUM_AUTH", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true, globalAttributes: ["strKey": "Some string", "intkey": 7]))
+         SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true, globalAttributes: ["strKey": "Some string", "intkey": 7]))
+        
     }
     var body: some Scene {
         WindowGroup {
