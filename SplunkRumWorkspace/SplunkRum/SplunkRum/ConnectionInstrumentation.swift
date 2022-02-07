@@ -14,14 +14,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
-
 import Foundation
 import OpenTelemetryApi
-
-
-//MARK: - NSURLConnection Instrumentation -
-class ConnectionObserver: NSObject {
+// MARK: - NSURLConnection Instrumentation -
+/*class ConnectionObserver: NSObject {
     var span: Span?
     // Observers aren't kept alive by observing...
     var extraRefToSelf: ConnectionObserver?
@@ -31,7 +27,10 @@ class ConnectionObserver: NSObject {
         extraRefToSelf = self
     }
 
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+    override func observeValue(forKeyPath keyPath: String?,
+                               of object: Any?,
+                               change: [NSKeyValueChangeKey: Any]?,
+                               context: UnsafeMutableRawPointer?) {
         lock.lock()
         defer {
             lock.unlock()
@@ -45,15 +44,12 @@ class ConnectionObserver: NSObject {
             span?.setAttribute(key: "component", value: "NSURLConnection")
             OpenTelemetry.instance.contextProvider.setActiveSpan(span!)
         }
-        // FIXME possibly also allow .canceling to close the span?
+        // FIXMEs possibly also allow .canceling to close the span?
         if connection != nil  && extraRefToSelf != nil {
-          
-           // endConnectionSpan(span: span, connection: connection!)
-           // connection!.removeObserver(self, forKeyPath: "start")
-            extraRefToSelf = nil
+             extraRefToSelf = nil
         }
     }
-}
+}*/
 func startConnectionSpan(request: URLRequest?) -> Span? {
     if request == nil || request?.url == nil {
         return nil
@@ -69,28 +65,32 @@ func startConnectionSpan(request: URLRequest?) -> Span? {
         return nil
     }
     if SplunkRum.configuredOptions?.ignoreURLs != nil {
-        let result = SplunkRum.configuredOptions?.ignoreURLs?.matches(in: absUrlString, range: NSRange(location: 0, length: absUrlString.utf16.count))
+        let result = SplunkRum.configuredOptions?.ignoreURLs?
+            .matches(in: absUrlString, range: NSRange(location: 0,
+                                                      length: absUrlString.utf16.count))
         if result?.count != 0 {
             return nil
         }
     }
     let tracer = buildTracer()
     let span = tracer.spanBuilder(spanName: "HTTP "+method).setSpanKind(spanKind: .client).startSpan()
-    span.setAttribute(key: "component", value: "http")  //"NSURLConnection"
+    span.setAttribute(key: "component", value: "http")  // "NSURLConnection"
     span.setAttribute(key: "http.url", value: url.absoluteString)
     span.setAttribute(key: "http.method", value: method)
-    
-    if let body = request?.httpBody{
+    if let body = request?.httpBody {
         span.setAttribute(key: "http.request_content_length", value: Int(body.count))
     }
     return span
 }
 
-func endConnectionSpan(connection: NSURLConnection? ,status:String ,hr:HTTPURLResponse?,error: Error?,span : Span = OpenTelemetry.instance.contextProvider.activeSpan!) {
-    if hr != nil {
-        span.setAttribute(key: "http.status_code", value: hr!.statusCode)
-        // Blerg, looks like an iteration here since it is case sensitive and the case insensitive search assumes single value
-        for (key, val) in hr!.allHeaderFields {
+func endConnectionSpan(connection: NSURLConnection?,
+                       status: String,
+                       hresponse: HTTPURLResponse?,
+                       error: Error?,
+                       span: Span = OpenTelemetry.instance.contextProvider.activeSpan!) {
+    if hresponse != nil {
+        span.setAttribute(key: "http.status_code", value: hresponse!.statusCode)
+        for (key, val) in hresponse!.allHeaderFields {
             let keyStr = key as? String
             if keyStr != nil {
                 if keyStr?.caseInsensitiveCompare("server-timing") == .orderedSame {
@@ -109,16 +109,14 @@ func endConnectionSpan(connection: NSURLConnection? ,status:String ,hr:HTTPURLRe
         span.setAttribute(key: "exception.message", value: error!.localizedDescription)
         span.setAttribute(key: "exception.type", value: String(describing: type(of: error!)))
     }
-    
-    span.setAttribute(key: "http.response_content_length_uncompressed", value: Int(hr?.expectedContentLength ?? 0))
+    span.setAttribute(key: "http.response_content_length_uncompressed",
+                      value: Int(hresponse?.expectedContentLength ?? 0))
     if hostConnectionType != nil {
         span.setAttribute(key: "net.host.connection.type", value: hostConnectionType!)
     }
     span.end()
 }
-
-
-func swizzleClassMethod(clazz: AnyClass, orig: Selector, swizzled: Selector){
+func swizzleClassMethod(clazz: AnyClass, orig: Selector, swizzled: Selector) {
     let origM = class_getClassMethod(clazz, orig)
     let swizM = class_getClassMethod(clazz, swizzled)
     if origM != nil && swizM != nil {
@@ -126,70 +124,65 @@ func swizzleClassMethod(clazz: AnyClass, orig: Selector, swizzled: Selector){
     } else {
         debug_log("warning: could not swizzle "+NSStringFromSelector(orig))
     }
-    
 }
-
 func initalizeConnectionInstrumentation() {
     let connection = NSURLConnection.self
-    
-    swizzleClassMethod(clazz: connection, orig: #selector(NSURLConnection.sendAsynchronousRequest(_:queue:completionHandler:)), swizzled: #selector((NSURLConnection.splunk_swizzled_connection_sendAsynchronousRequest(request:queue:completionHandler:))))
-    
-    swizzleClassMethod(clazz: connection, orig: #selector(NSURLConnection.sendSynchronousRequest(_:returning:)), swizzled: #selector(NSURLConnection.splunk_swizzled_connection_sendSynchronousRequest(_:returning:)))
-    
+    swizzleClassMethod(clazz: connection,
+                       orig: #selector(NSURLConnection
+                                        .sendAsynchronousRequest(_:queue:completionHandler:)),
+                       swizzled: #selector((NSURLConnection.splunk_swizzled_connection_sendAsynchronousRequest(request:queue:completionHandler:))))
+    swizzleClassMethod(clazz: connection,
+                       orig: #selector(NSURLConnection
+                                        .sendSynchronousRequest(_:returning:)),
+                       swizzled: #selector(NSURLConnection.splunk_swizzled_connection_sendSynchronousRequest(_:returning:)))
 }
 
 // Convert from NSData to json object
 public func dataToJSON(data: Data) -> Any? {
-     guard let deserializedValues = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) else { return false}
+     guard let deserializedValues = try? JSONSerialization
+            .jsonObject(with: data,
+                        options: JSONSerialization
+                            .ReadingOptions.mutableContainers) else { return false}
         return deserializedValues
 }
 extension NSURLConnection {
-    
-    @objc open class func splunk_swizzled_connection_sendSynchronousRequest(_ request: URLRequest?, returning response: AutoreleasingUnsafeMutablePointer<URLResponse?> ) throws -> Data{
+    @objc open class func
+    splunk_swizzled_connection_sendSynchronousRequest
+    (_ request: URLRequest?, returning response: AutoreleasingUnsafeMutablePointer<URLResponse?> )
+    throws -> Data {
         print("inside swizzle sendSynchronous method")
         let span = startConnectionSpan(request: request)
         var status = "Sucess"
         var data = Data()
-       
-        do{
+        do {
             data = try splunk_swizzled_connection_sendSynchronousRequest(request, returning: response)
             if let httpResponse = response.pointee as? HTTPURLResponse {
                 print(httpResponse.statusCode)
                 if httpResponse.statusCode != 200 {
                     status = "Failure"
                 }
-                endConnectionSpan(connection: nil, status: status, hr: httpResponse, error: nil,span: span!)
+                endConnectionSpan(connection: nil, status: status, hresponse: httpResponse, error: nil, span: span!)
             }
-        
-        }
-        catch let error {
+        } catch let error {
             print(error)
-            endConnectionSpan(connection: nil, status: status, hr: nil, error: error ,span: span!)
-    
+            endConnectionSpan(connection: nil, status: status, hresponse: nil, error: error, span: span!)
         }
-        
-      return data
-       
+        return data
     }
-    
-    @objc open class func splunk_swizzled_connection_sendAsynchronousRequest(request: URLRequest, queue: OperationQueue,completionHandler: @escaping (URLResponse?, Data?, Error?) -> Void ){
+    @objc open class func
+    splunk_swizzled_connection_sendAsynchronousRequest
+    (request: URLRequest, queue: OperationQueue, completionHandler: @escaping (URLResponse?, Data?, Error?) -> Void ) {
         print("inside swizzle sendAsynchronous method")
         let span = startConnectionSpan(request: request)
-        return splunk_swizzled_connection_sendAsynchronousRequest(request: request, queue: queue) { response, data, error in
+        return splunk_swizzled_connection_sendAsynchronousRequest(request: request, queue: queue) {response, _, error in
             var status = "Sucess"
             if error != nil {
                 status = "Failure"
-                endConnectionSpan(connection: nil, status: status, hr: nil, error: error,span: span!)
+                endConnectionSpan(connection: nil, status: status, hresponse: nil, error: error, span: span!)
+            } else if response != nil {
+                guard let hresponse = response as? HTTPURLResponse else {return}
+                endConnectionSpan(connection: nil, status: status, hresponse: hresponse, error: nil, span: span!)
             }
-            else if response != nil {
-                guard let hr = response as? HTTPURLResponse else {return}
-                endConnectionSpan(connection: nil, status: status, hr: hr, error: nil,span: span!)
-            }
-            
         }
     }
-   
 }
-
-
-

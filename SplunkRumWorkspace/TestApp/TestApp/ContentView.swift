@@ -23,7 +23,7 @@ struct ContentView: View {
         print("network (req)!")
         let url = URL(string: "http://127.0.0.1:7878/data")!
         var req = URLRequest(url: url)
-        req.httpMethod = "HEAD"  //HEAD
+        req.httpMethod = "HEAD"
         let task = URLSession.shared.dataTask(with: req) {(data, _: URLResponse?, _) in
             guard let data = data else { return }
             print("got some data")
@@ -48,12 +48,17 @@ struct ContentView: View {
     }
 
     func throwy() {
-        NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil).raise()
+        NSException(name: NSExceptionName(rawValue: "IllegalFormatError"),
+                    reason: "Could not parse input",
+                    userInfo: nil).raise()
         print("should not reach here")
     }
     func throwyBackgroundThread() {
         DispatchQueue.global(qos: .background).async {
-            NSException(name: NSExceptionName(rawValue: "IllegalFormatError"), reason: "Could not parse input", userInfo: nil).raise()
+            NSException(name:
+                            NSExceptionName(rawValue: "IllegalFormatError"),
+                        reason: "Could not parse input",
+                        userInfo: nil).raise()
         }
     }
     func hardCrash() {
@@ -61,88 +66,76 @@ struct ContentView: View {
         let derefNull = null!.pointee
     }
     func manualSpan() {
-        let span = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "manual").spanBuilder(spanName: "manualSpan").startSpan()
+        let span = OpenTelemetrySDK.instance.tracerProvider
+            .get(instrumentationName: "manual")
+            .spanBuilder(spanName: "manualSpan")
+            .startSpan()
         span.setAttribute(key: "manualKey", value: "manualValue")
         span.end()
 
     }
-    func callAsynchronousRequestConnection(){
+    func callAsynchronousRequestConnection() {
         print("NSURLConnection - Asynchronous Call")
-        
         let url = URL(string: "https://mock.codes/200")!
         var req = URLRequest(url: url)
-        req.httpMethod = "GET" //"GET" //"HEAD"
-        NSURLConnection.sendAsynchronousRequest(req, queue: OperationQueue.main) {(response, data, error) in
+        req.httpMethod = "GET" // "GET" // "HEAD"
+        NSURLConnection.sendAsynchronousRequest(req, queue: OperationQueue.main) {(_, data, _) in
             guard let data = data else { return }
             print("got some data")
             print(data)
         }
-       
-
-        
-    }
-    
-    func callSynchronousRequestConnection(){
+   }
+  func callSynchronousRequestConnection() {
         print("NSURLConnection - Synchronous Call")
-        
         let url = URL(string: "https://mock.codes/500")!
         var req = URLRequest(url: url)
-        req.httpMethod = "GET" //"GET" //"HEAD"
-       
-        var response:URLResponse? = URLResponse()
-        
-        do{
+        req.httpMethod = "GET" // "GET" // "HEAD"
+        var response: URLResponse? = URLResponse()
+        do {
             let urlData = try NSURLConnection.sendSynchronousRequest(req, returning: &response)
-        }
-        catch (let error) {
+        } catch {
             print(error)
         }
-        
-        
-        
-        
-    }
-
-    
+   }
     @State var text = ""
     @State var toggle = true
     @State var isShowingModal = false
 
     var body: some View {
         VStack {
-            Button(action: {
+            Button {
                 self.throwy()
-            }) {
+            } label: {
                 Text("Throw!")
             }
-            Button(action: {
+            Button {
                 self.throwyBackgroundThread()
-            }) {
+            } label: {
                 Text("Throw (bg)!")
             }
-            Button(action: {
+            Button {
                 self.hardCrash()
-            }) {
+            } label: {
                 Text("Hard crash")
             }
-            Button(action: {
+            Button {
                 self.networkRequest()
-            }) {
+            } label: {
                 Text("Network (req)!")
             }
-            Button(action: {
+            Button {
                 self.downloadRequest()
-            }) {
+            } label: {
                 Text("Download")
             }
-            Button(action: {
+            Button {
                 self.manualSpan()
-            }) {
+            } label: {
                 Text("Manual Span")
             }
-            Button(action: {
+            Button {
                 self.callAsynchronousRequestConnection()
-            }) {
+            } label: {
                 Text("Connection-Asynchronous")
             }
             Button {
@@ -182,14 +175,9 @@ struct ContentView: View {
 
 // Convert from NSData to json object
 public func nsdataToJSON(data: Data) -> Any? {
-    
-    
-    
-    guard let deserializedValues = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) else { return false}
+    guard let deserializedValues = try? JSONSerialization
+            .jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) else { return false}
         return deserializedValues
-       
-    
-    
 }
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

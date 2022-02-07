@@ -14,41 +14,28 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
-
 import Foundation
 import XCTest
 import Atomics
-
-
-class ConnectionInstrumentationTests : XCTestCase {
-    
+class ConnectionInstrumentationTests: XCTestCase {
     func testConnection() throws {
         try initializeTestEnvironment()
-        
-      
         var req = URLRequest(url: URL(string: "http://127.0.0.1:8989/data")!)
         req.httpMethod = "GET"
-        NSURLConnection.sendAsynchronousRequest(req, queue: OperationQueue.main) {(response, data, error) in
+        NSURLConnection.sendAsynchronousRequest(req, queue: OperationQueue.main) {(_, _, _) in
            print("Got data..")
         }
-        
-        
-     
-        
         var reqerror = URLRequest(url: URL(string: "http://127.0.0.1:8989/error")!)
         reqerror.httpMethod = "POST"
-        NSURLConnection.sendAsynchronousRequest(reqerror, queue: OperationQueue.main) {(response, data, error) in
-            
+        NSURLConnection.sendAsynchronousRequest(reqerror, queue: OperationQueue.main) {(_, _, _) in
         }
-        
         var ephemReq = URLRequest(url: URL(string: "http://this.domain.willnotroute/")!)
         ephemReq.httpMethod = "HEAD"
-        NSURLConnection.sendAsynchronousRequest(ephemReq, queue: OperationQueue.main) {(response, data, error) in
-           
+        NSURLConnection.sendAsynchronousRequest(ephemReq, queue: OperationQueue.main) {(_, _, _) in
         }
-        
-        // wait until spans recevied
+        testHttpData()
+    }
+    func testHttpData() {
         var attempts = 0
         while localSpans.count < 3 {
             attempts += 1
@@ -60,7 +47,6 @@ class ConnectionInstrumentationTests : XCTestCase {
             sleep(1)
         }
         XCTAssertEqual(localSpans.count, 3)
-
         let httpGet = localSpans.first(where: { (span) -> Bool in
             return span.name == "HTTP GET"
         })
@@ -70,7 +56,6 @@ class ConnectionInstrumentationTests : XCTestCase {
         let httpHead = localSpans.first(where: { (span) -> Bool in
             return span.name == "HTTP HEAD"
         })
-
         XCTAssertNotNil(httpGet)
         XCTAssertEqual(httpGet?.attributes["http.url"]?.description, "http://127.0.0.1:8989/data")
         XCTAssertEqual(httpGet?.attributes["http.method"]?.description, "GET")
@@ -79,22 +64,17 @@ class ConnectionInstrumentationTests : XCTestCase {
         XCTAssertEqual(httpGet?.attributes["link.traceId"]?.description, "0af7651916cd43dd8448eb211c80319c")
         XCTAssertEqual(httpGet?.attributes["link.spanId"]?.description, "b7ad6b7169203331")
         XCTAssertEqual(httpGet?.attributes["component"]?.description, "http")
-
         XCTAssertNotNil(httpPost)
         XCTAssertEqual(httpPost?.attributes["http.url"]?.description, "http://127.0.0.1:8989/error")
         XCTAssertEqual(httpPost?.attributes["http.method"]?.description, "POST")
         XCTAssertEqual(httpPost?.attributes["http.status_code"]?.description, "500")
         XCTAssertEqual(httpPost?.attributes["http.request_content_length"]?.description, "11")
         XCTAssertEqual(httpPost?.attributes["component"]?.description, "http")
-
         XCTAssertNotNil(httpHead)
         XCTAssertEqual(httpHead?.attributes["http.url"]?.description, "http://this.domain.willnotroute/")
         XCTAssertEqual(httpHead?.attributes["error"]?.description, "true")
         XCTAssertEqual(httpHead?.attributes["exception.type"]?.description, "NSURLError")
         XCTAssertEqual(httpHead?.attributes["component"]?.description, "http")
-        // allow error message to vary but require a minimum length
         XCTAssert((httpHead?.attributes["exception.message"]?.description.count ?? 0) > 10)
-  
     }
-    
 }
