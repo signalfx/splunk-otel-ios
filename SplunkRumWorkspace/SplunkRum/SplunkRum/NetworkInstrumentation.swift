@@ -38,6 +38,8 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
         return
     }
     let hr: HTTPURLResponse? = task.response as? HTTPURLResponse
+    print("REsponse....")
+    print(hr?.url?.absoluteString as Any)
     if hr != nil {
         span!.setAttribute(key: "http.status_code", value: hr!.statusCode)
         // Blerg, looks like an iteration here since it is case sensitive and the case insensitive search assumes single value
@@ -68,9 +70,13 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
         span?.setAttribute(key: "net.host.connection.type", value: hostConnectionType!)
     }
     span!.end()
+    print("http span ENDED....")
 }
 
 func startHttpSpan(request: URLRequest?) -> Span? {
+    print("Request")
+    print("http span started....")
+    print(request?.url?.absoluteString as Any)
     if request == nil || request?.url == nil {
         return nil
     }
@@ -137,75 +143,100 @@ func wireUpTaskObserver(task: URLSessionTask) {
 // swiftlint:disable missing_docs
 extension URLSession {
     @objc open func splunk_swizzled_dataTask(with url: NSURL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        print("55555")
         let answer = splunk_swizzled_dataTask(with: url, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
     @objc open func splunk_swizzled_dataTask(with url: NSURL) -> URLSessionDataTask {
+        print("6666")
         let answer = splunk_swizzled_dataTask(with: url)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
     // rename objc view of func to allow "overloading"
-    @objc(splunkSwizzledDataTaskWithRequest: completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+   // @objc(splunkSwizzledDataTaskWithRequest:completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+    
+    @objc(splunkSwizzledDataTaskWithRequest:completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: ((Data?, URLResponse?, Error?) -> Void)?) -> URLSessionDataTask {
+        print("777777")
+        print(request.url?.absoluteString as Any)
+        if request.url?.absoluteString == "https://dl.google.com/geosdk/ios-latest" {
+            print("u r here..")
+        }
         let answer = splunk_swizzled_dataTask(with: request, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
     @objc(splunkSwizzledDataTaskWithRequest:) open func splunk_swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
+        print("8888888")
+        print(request.url?.absoluteString as Any)
+        if request.url?.absoluteString == "https://dl.google.com/geosdk/ios-latest" {
+            print("u r here..")
+        }
         let answer = splunk_swizzled_dataTask(with: request)
+       // let answer = splunk_swizzled_dataTask(with: request, completionHandler: nil)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
     // uploads
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, from: Data) -> URLSessionUploadTask {
+        print("9999999")
+        print(with.url?.absoluteString as Any)
         let answer = splunk_swizzled_uploadTask(with: with, from: from)
         wireUpTaskObserver(task: answer)
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, from: Data, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+        print("1010101010101")
         let answer = splunk_swizzled_uploadTask(with: with, from: from, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: NSURL) -> URLSessionUploadTask {
+        print("11 11 11 11")
         let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile)
         wireUpTaskObserver(task: answer)
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: NSURL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+        print("12 12 12 12")
         let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(withStreamedRequest: URLRequest) -> URLSessionUploadTask {
+        print("13 13 13 13")
         let answer = splunk_swizzled_uploadTask(withStreamedRequest: withStreamedRequest)
         wireUpTaskObserver(task: answer)
         return answer
     }
     // download tasks
     @objc open func splunk_swizzled_downloadTask(with url: NSURL) -> URLSessionDownloadTask {
+        print("11111111111111")
         let answer = splunk_swizzled_downloadTask(with: url)
         wireUpTaskObserver(task: answer)
         return answer
     }
     @objc open func splunk_swizzled_downloadTask(with url: NSURL, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
+        print("222222222222")
         let answer = splunk_swizzled_downloadTask(with: url, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
     @objc(splunkSwizzledDownloadTaskWithRequest: completionHandler:) open func splunk_swizzled_downloadTask(with request: URLRequest, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
+        print("3333333333333")
         let answer = splunk_swizzled_downloadTask(with: request, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
        }
 
     @objc(splunkSwizzledDownloadTaskWithRequest:) open func splunk_swizzled_downloadTask(with request: URLRequest) -> URLSessionDataTask {
+        print("4444444444444444")
         let answer = splunk_swizzled_downloadTask(with: request)
         wireUpTaskObserver(task: answer)
         return answer
