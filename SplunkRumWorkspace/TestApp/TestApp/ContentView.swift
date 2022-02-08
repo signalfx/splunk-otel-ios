@@ -18,6 +18,7 @@ import SwiftUI
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
+// swiftlint:disable missing_docs
 struct ContentView: View {
     func networkRequest() {
         print("network (req)!")

@@ -145,6 +145,8 @@ public func dataToJSON(data: Data) -> Any? {
                             .ReadingOptions.mutableContainers) else { return false}
         return deserializedValues
 }
+
+// swiftlint:disable missing_docs
 extension NSURLConnection {
     @objc open class func
     splunk_swizzled_connection_sendSynchronousRequest
