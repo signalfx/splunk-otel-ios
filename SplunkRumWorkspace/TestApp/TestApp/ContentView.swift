@@ -173,13 +173,6 @@ struct ContentView: View {
         }
     }
 }
-
-// Convert from NSData to json object
-public func nsdataToJSON(data: Data) -> Any? {
-    guard let deserializedValues = try? JSONSerialization
-            .jsonObject(with: data, options: JSONSerialization.ReadingOptions.mutableContainers) else { return false}
-        return deserializedValues
-}
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()

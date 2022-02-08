@@ -128,22 +128,12 @@ func swizzleClassMethod(clazz: AnyClass, orig: Selector, swizzled: Selector) {
 func initalizeConnectionInstrumentation() {
     let connection = NSURLConnection.self
     swizzleClassMethod(clazz: connection,
-                       orig: #selector(NSURLConnection
-                                        .sendAsynchronousRequest(_:queue:completionHandler:)),
-                       swizzled: #selector((NSURLConnection.splunk_swizzled_connection_sendAsynchronousRequest(request:queue:completionHandler:))))
+                       orig:
+                        #selector(NSURLConnection.sendAsynchronousRequest(_:queue:completionHandler:)),
+                       swizzled:#selector((NSURLConnection.splunk_swizzled_connection_sendAsynchronousRequest(request:queue:completionHandler:))))
     swizzleClassMethod(clazz: connection,
-                       orig: #selector(NSURLConnection
-                                        .sendSynchronousRequest(_:returning:)),
+                       orig: #selector(NSURLConnection.sendSynchronousRequest(_:returning:)),
                        swizzled: #selector(NSURLConnection.splunk_swizzled_connection_sendSynchronousRequest(_:returning:)))
-}
-
-// Convert from NSData to json object
-public func dataToJSON(data: Data) -> Any? {
-     guard let deserializedValues = try? JSONSerialization
-            .jsonObject(with: data,
-                        options: JSONSerialization
-                            .ReadingOptions.mutableContainers) else { return false}
-        return deserializedValues
 }
 
 // swiftlint:disable missing_docs
@@ -152,21 +142,18 @@ extension NSURLConnection {
     splunk_swizzled_connection_sendSynchronousRequest
     (_ request: URLRequest?, returning response: AutoreleasingUnsafeMutablePointer<URLResponse?> )
     throws -> Data {
-        print("inside swizzle sendSynchronous method")
         let span = startConnectionSpan(request: request)
         var status = "Sucess"
         var data = Data()
         do {
             data = try splunk_swizzled_connection_sendSynchronousRequest(request, returning: response)
             if let httpResponse = response.pointee as? HTTPURLResponse {
-                print(httpResponse.statusCode)
                 if httpResponse.statusCode != 200 {
                     status = "Failure"
                 }
                 endConnectionSpan(connection: nil, status: status, hresponse: httpResponse, error: nil, span: span!)
             }
         } catch let error {
-            print(error)
             endConnectionSpan(connection: nil, status: status, hresponse: nil, error: error, span: span!)
         }
         return data
@@ -174,7 +161,6 @@ extension NSURLConnection {
     @objc open class func
     splunk_swizzled_connection_sendAsynchronousRequest
     (request: URLRequest, queue: OperationQueue, completionHandler: @escaping (URLResponse?, Data?, Error?) -> Void ) {
-        print("inside swizzle sendAsynchronous method")
         let span = startConnectionSpan(request: request)
         return splunk_swizzled_connection_sendAsynchronousRequest(request: request, queue: queue) {response, _, error in
             var status = "Sucess"
