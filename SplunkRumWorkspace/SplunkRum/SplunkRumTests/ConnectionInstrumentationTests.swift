@@ -22,18 +22,15 @@ class ConnectionInstrumentationTests: XCTestCase {
         try initializeTestEnvironment()
         var req = URLRequest(url: URL(string: "http://127.0.0.1:8989/data")!)
         req.httpMethod = "GET"
-        NSURLConnection.sendAsynchronousRequest(req, queue: OperationQueue.main) {(_, _, _) in
-           print("Got data..")
-        }
+        var response: URLResponse? = URLResponse()
+        _ = try? NSURLConnection.sendSynchronousRequest(req, returning: &response)
         var reqerror = URLRequest(url: URL(string: "http://127.0.0.1:8989/error")!)
         reqerror.httpMethod = "POST"
-        NSURLConnection.sendAsynchronousRequest(reqerror, queue: OperationQueue.main) {(_, _, _) in
-        }
+        _ = try? NSURLConnection.sendSynchronousRequest(reqerror, returning: &response)
         var ephemReq = URLRequest(url: URL(string: "http://this.domain.willnotroute/")!)
         ephemReq.httpMethod = "HEAD"
-        NSURLConnection.sendAsynchronousRequest(ephemReq, queue: OperationQueue.main) {(_, _, _) in
-        }
-        testHttpData()
+        _ = try? NSURLConnection.sendSynchronousRequest(ephemReq, returning: &response)
+       testHttpData()
     }
     func testHttpData() {
         var attempts = 0
@@ -68,7 +65,7 @@ class ConnectionInstrumentationTests: XCTestCase {
         XCTAssertEqual(httpPost?.attributes["http.url"]?.description, "http://127.0.0.1:8989/error")
         XCTAssertEqual(httpPost?.attributes["http.method"]?.description, "POST")
         XCTAssertEqual(httpPost?.attributes["http.status_code"]?.description, "500")
-        XCTAssertEqual(httpPost?.attributes["http.request_content_length"]?.description, "11")
+        XCTAssertEqual(httpPost?.attributes["http.request_content_length"]?.description, "0")
         XCTAssertEqual(httpPost?.attributes["component"]?.description, "http")
         XCTAssertNotNil(httpHead)
         XCTAssertEqual(httpHead?.attributes["http.url"]?.description, "http://this.domain.willnotroute/")

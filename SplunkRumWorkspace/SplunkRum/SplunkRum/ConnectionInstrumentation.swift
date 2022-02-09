@@ -80,11 +80,13 @@ func startConnectionSpan(request: URLRequest?) -> Span? {
     if let body = request?.httpBody {
         span.setAttribute(key: "http.request_content_length", value: Int(body.count))
     }
+    else {
+        span.setAttribute(key: "http.request_content_length", value: Int(0))
+    }
     return span
 }
 
 func endConnectionSpan(connection: NSURLConnection?,
-                       status: String,
                        hresponse: HTTPURLResponse?,
                        error: Error?,
                        span: Span = OpenTelemetry.instance.contextProvider.activeSpan!) {
@@ -127,49 +129,51 @@ func swizzleClassMethod(clazz: AnyClass, orig: Selector, swizzled: Selector) {
 }
 func initalizeConnectionInstrumentation() {
     let connection = NSURLConnection.self
+    let swizSyncSel = #selector(NSURLConnection.splunk_swizzled_connection_sendSynchronousRequest(_:returning:))
+    let asySel =  #selector((NSURLConnection.splunk_swizzled_sendAsynchronousRequest(request:queue:completionHandler:)))
+
     swizzleClassMethod(clazz: connection,
-                       orig:
-                        #selector(NSURLConnection.sendAsynchronousRequest(_:queue:completionHandler:)),
-                       swizzled:#selector((NSURLConnection.splunk_swizzled_connection_sendAsynchronousRequest(request:queue:completionHandler:))))
+                       orig: #selector(NSURLConnection.sendAsynchronousRequest(_:queue:completionHandler:)),
+                       swizzled: asySel)
     swizzleClassMethod(clazz: connection,
                        orig: #selector(NSURLConnection.sendSynchronousRequest(_:returning:)),
-                       swizzled: #selector(NSURLConnection.splunk_swizzled_connection_sendSynchronousRequest(_:returning:)))
+                       swizzled: swizSyncSel)
 }
 
 // swiftlint:disable missing_docs
 extension NSURLConnection {
+    /**
+     Adds a callback whenever the sendSynchronousRequest called.
+     */
     @objc open class func
     splunk_swizzled_connection_sendSynchronousRequest
     (_ request: URLRequest?, returning response: AutoreleasingUnsafeMutablePointer<URLResponse?> )
     throws -> Data {
         let span = startConnectionSpan(request: request)
-        var status = "Sucess"
         var data = Data()
         do {
             data = try splunk_swizzled_connection_sendSynchronousRequest(request, returning: response)
             if let httpResponse = response.pointee as? HTTPURLResponse {
-                if httpResponse.statusCode != 200 {
-                    status = "Failure"
-                }
-                endConnectionSpan(connection: nil, status: status, hresponse: httpResponse, error: nil, span: span!)
+                endConnectionSpan(connection: nil, hresponse: httpResponse, error: nil, span: span!)
             }
         } catch let error {
-            endConnectionSpan(connection: nil, status: status, hresponse: nil, error: error, span: span!)
+            endConnectionSpan(connection: nil, hresponse: nil, error: error, span: span!)
         }
         return data
     }
+    /**
+     Adds a callback whenever the sendAsynchronousRequest called.
+     */
     @objc open class func
-    splunk_swizzled_connection_sendAsynchronousRequest
+    splunk_swizzled_sendAsynchronousRequest
     (request: URLRequest, queue: OperationQueue, completionHandler: @escaping (URLResponse?, Data?, Error?) -> Void ) {
         let span = startConnectionSpan(request: request)
-        return splunk_swizzled_connection_sendAsynchronousRequest(request: request, queue: queue) {response, _, error in
-            var status = "Sucess"
+        return splunk_swizzled_sendAsynchronousRequest(request: request, queue: queue) {response, _, error in
             if error != nil {
-                status = "Failure"
-                endConnectionSpan(connection: nil, status: status, hresponse: nil, error: error, span: span!)
+                endConnectionSpan(connection: nil, hresponse: nil, error: error, span: span!)
             } else if response != nil {
                 guard let hresponse = response as? HTTPURLResponse else {return}
-                endConnectionSpan(connection: nil, status: status, hresponse: hresponse, error: nil, span: span!)
+                endConnectionSpan(connection: nil, hresponse: hresponse, error: nil, span: span!)
             }
         }
     }
