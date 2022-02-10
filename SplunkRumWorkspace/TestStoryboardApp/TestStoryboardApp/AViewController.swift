@@ -19,10 +19,6 @@ import Foundation
 import UIKit
 
 class AViewController: UIViewController {
-    override func viewDidLoad() {
-           super.viewDidLoad()
-    }
-
     @IBAction public func aAction() {
         print("a action")
     }

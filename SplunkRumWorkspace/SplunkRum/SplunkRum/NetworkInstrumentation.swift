@@ -38,8 +38,6 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
         return
     }
     let hr: HTTPURLResponse? = task.response as? HTTPURLResponse
-    print("REsponse....")
-    print(hr?.url?.absoluteString as Any)
     if hr != nil {
         span!.setAttribute(key: "http.status_code", value: hr!.statusCode)
         // Blerg, looks like an iteration here since it is case sensitive and the case insensitive search assumes single value
@@ -70,13 +68,9 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
         span?.setAttribute(key: "net.host.connection.type", value: hostConnectionType!)
     }
     span!.end()
-    print("http span ENDED....")
 }
 
 func startHttpSpan(request: URLRequest?) -> Span? {
-    print("Request")
-    print("http span started....")
-    print(request?.url?.absoluteString as Any)
     if request == nil || request?.url == nil {
         return nil
     }
