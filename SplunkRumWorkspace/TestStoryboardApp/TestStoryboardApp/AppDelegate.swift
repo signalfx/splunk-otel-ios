@@ -19,7 +19,6 @@ import UIKit
 // Why not "import SplunkOtel"?  Because this links as a local framework, not as a swift package.
 // FIXMEs align the framework name and directory names with the swift package name at some point
 import SplunkRum
-import GoogleMaps
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -31,7 +30,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SplunkRum.initialize(beaconUrl: "http://127.0.0.1:9080/api/v2/spans",
                              rumAuth: "FAKE_RUM_AUTH",
                              options: SplunkRumOptions(allowInsecureBeacon: true, debug: true))
-        GMSServices.provideAPIKey("AIzaSyCBlTdA1j2D8x88PMVWG4NNM_PsBfeUj00")
         return true
     }
 
