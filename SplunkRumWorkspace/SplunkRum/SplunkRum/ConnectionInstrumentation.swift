@@ -79,8 +79,7 @@ func startConnectionSpan(request: URLRequest?) -> Span? {
     span.setAttribute(key: "http.method", value: method)
     if let body = request?.httpBody {
         span.setAttribute(key: "http.request_content_length", value: Int(body.count))
-    }
-    else {
+    } else {
         span.setAttribute(key: "http.request_content_length", value: Int(0))
     }
     return span
@@ -140,7 +139,9 @@ func initalizeConnectionInstrumentation() {
                        swizzled: swizSyncSel)
 }
 
-// swiftlint:disable missing_docs
+/**
+  Extension of NSURLConnection class for swizzled methods.
+ */
 extension NSURLConnection {
     /**
      Adds a callback whenever the sendSynchronousRequest called.
