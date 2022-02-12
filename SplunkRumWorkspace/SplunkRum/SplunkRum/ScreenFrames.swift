@@ -37,10 +37,7 @@ class ScreenFrames: NSObject {
     }
 
     @objc private func update() {
-       // print("refresh : \(CACurrentMediaTime())")
-        let actualFramesPerSecond = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
-        print("actualFramesPerSecond : \(String(format: "%.03f", actualFramesPerSecond))")
-
+       
         let currentTime: CFTimeInterval = CACurrentMediaTime()
         let timeElapsed: Double = currentTime - startedTime
 
@@ -52,9 +49,6 @@ class ScreenFrames: NSObject {
             frameCount = 0
             currentIteration = iteration
         }
-
-        let timeDiffBetweenUpdates: CFTimeInterval = currentTime - latestTimeUpdated
-        print("timeDiffBetweenUpdates : \(String(format: "%.03f", timeDiffBetweenUpdates))")
 
         latestTimeUpdated = currentTime
 
