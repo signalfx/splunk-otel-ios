@@ -69,7 +69,7 @@ func getRumSessionId() -> String {
         callback()
     }
     if isSessionIdChanged {
-        createSessionIdChangeSpan()
+       // createSessionIdChangeSpan()
     }
     return rumSessionId
 }
