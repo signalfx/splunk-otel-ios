@@ -17,13 +17,14 @@ limitations under the License.
 
 import Foundation
 
-let MAX_SESSION_AGE_SECONDS = 4 * 60 * 60
+let MAX_SESSION_AGE_SECONDS = 40   // 4 * 60 * 60
 
 private var rumSessionId = generateNewSessionId()
 private var sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
 private let sessionIdLock = NSLock()
 private var sessionIdCallbacks: [(() -> Void)] = []
 private var isSessionIdChanged = false
+private var oldRumSessionId = ""
 
 func generateNewSessionId() -> String {
     var i=0
@@ -33,7 +34,9 @@ func generateNewSessionId() -> String {
         let b = Int.random(in: 0..<256)
         answer += String(format: "%02x", b)
     }
-    isSessionIdChanged = true
+    if oldRumSessionId != "" { // firtst time id generated so it is not consider as session id changed
+        isSessionIdChanged = true
+    }
     return answer
 }
 
@@ -56,6 +59,7 @@ func getRumSessionId() -> String {
     }
     if Date() > sessionIdExpiration {
         sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
+        oldRumSessionId = rumSessionId
         rumSessionId = generateNewSessionId()
         callbacks = sessionIdCallbacks
     }
@@ -72,7 +76,7 @@ func getRumSessionId() -> String {
 func createSessionIdChangeSpan(){
     isSessionIdChanged = false
     let tracer = buildTracer()
-    let span = tracer.spanBuilder(spanName: "SessionID Change").setSpanKind(spanKind: .client).startSpan()
-    span.setAttribute(key: "startTime", value: "Date()")
+    let span = tracer.spanBuilder(spanName: "sessionId.change").setSpanKind(spanKind: .client).startSpan()
+    span.setAttribute(key: "splunk.rum.previous_session_id", value: oldRumSessionId)
     span.end()
 }
