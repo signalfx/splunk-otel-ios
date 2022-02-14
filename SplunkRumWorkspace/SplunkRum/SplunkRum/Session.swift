@@ -18,11 +18,11 @@ limitations under the License.
 import Foundation
 
 let MAX_SESSION_AGE_SECONDS = 4 * 60 * 60
-let MAX_SESSION_INACTIVE_AGE_SECONDS =  60    //15 * 60
+let MAXSESSIONINACTIVEAGESECONDS = 15 * 60
 
 private var rumSessionId = generateNewSessionId()
 private var sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
-private var sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_INACTIVE_AGE_SECONDS))
+private var sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(MAXSESSIONINACTIVEAGESECONDS))
 private let sessionIdLock = NSLock()
 private var sessionIdCallbacks: [(() -> Void)] = []
 
@@ -56,15 +56,15 @@ func getRumSessionId() -> String {
     }
     if Date() > sessionIdExpiration { // expire in 4 hours
         sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
-        sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_INACTIVE_AGE_SECONDS))
+        sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(MAXSESSIONINACTIVEAGESECONDS))
         rumSessionId = generateNewSessionId()
         callbacks = sessionIdCallbacks
     } else if Date() > sessionIdInActivityExpiration { // expire 15 min
-        sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_INACTIVE_AGE_SECONDS))
+        sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(MAXSESSIONINACTIVEAGESECONDS))
         rumSessionId = generateNewSessionId()
         callbacks = sessionIdCallbacks
     } else { // no timer expire but activity done on screen
-        sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_INACTIVE_AGE_SECONDS))
+        sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(MAXSESSIONINACTIVEAGESECONDS))
     }
     sessionIdLock.unlock()
     unlocked = true
@@ -73,4 +73,3 @@ func getRumSessionId() -> String {
     }
     return rumSessionId
 }
-
