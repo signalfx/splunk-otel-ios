@@ -69,7 +69,7 @@ func getRumSessionId() -> String {
         callback()
     }
     if isSessionIdChanged {
-       // createSessionIdChangeSpan()
+        createSessionIdChangeSpan()
     }
     return rumSessionId
 }
@@ -78,5 +78,6 @@ func createSessionIdChangeSpan(){
     let tracer = buildTracer()
     let span = tracer.spanBuilder(spanName: "sessionId.change").setSpanKind(spanKind: .client).startSpan()
     span.setAttribute(key: "splunk.rum.previous_session_id", value: oldRumSessionId)
+    // span.setAttribute(key: "component", value: "appstart")
     span.end()
 }
