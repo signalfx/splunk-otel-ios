@@ -52,7 +52,6 @@ class ViewController: UIViewController, WKUIDelegate,CLLocationManagerDelegate {
         let req = URLRequest(url: url!)
         view = webview
         SplunkRum.integrateWithBrowserRum(webview)
-        
         webview.load(req)
     }
     
@@ -70,10 +69,6 @@ func locationManager(_ manager: CLLocationManager, didUpdateLocations locations:
         let placemark = placemarks! as [CLPlacemark]
         if placemark.count>0{
             let placemark = placemarks![0]
-//            print(placemark.locality!)
-//            print(placemark.administrativeArea!)
-//            print(placemark.country!)
-
             self.lblAdd.text = "\(placemark.locality!), \(placemark.administrativeArea!), \(placemark.country!)"
         }
     }

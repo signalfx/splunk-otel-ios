@@ -22,10 +22,15 @@ import CoreLocation
 class Corelocation: NSObject, CLLocationManagerDelegate {
     
     var locationManager : CLLocationManager = CLLocationManager()
+    var latitude:String = String()
+    var longitude:String = String()
+    var locality:String = String()
+    var administrativeArea:String = String()
+    var country:String = String()
     
     
     override init() {
-        super.init()
+         super.init()
         rumMobileLocation()
     }
     
@@ -41,30 +46,44 @@ class Corelocation: NSObject, CLLocationManagerDelegate {
     }
     
     //MARK: - location delegate methods
-func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+  func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     let userLocation :CLLocation = locations[0] as CLLocation
     manager.delegate = nil;
-    //print("user latitude = \(userLocation.coordinate.latitude)")
-    //print("user longitude = \(userLocation.coordinate.longitude)")
+      self.latitude  = "\(userLocation.coordinate.latitude)"
+      self.longitude = "\(userLocation.coordinate.longitude)"
     let geocoder = CLGeocoder()
-    geocoder.reverseGeocodeLocation(userLocation) { (placemarks, error) in
+      geocoder.reverseGeocodeLocation(userLocation) { [self] (placemarks, error) in
         if (error != nil){
             print("error in reverseGeocode")
         }
         let placemark = placemarks! as [CLPlacemark]
         if placemark.count>0{
             let placemark = placemarks![0]
-            print(placemark.locality!)
-            print(placemark.administrativeArea!)
-            print(placemark.country!)
+            self.locality  = "\(placemark.locality!)"
+            self.administrativeArea  = "\(placemark.administrativeArea!)"
+            self.country  = "\(placemark.country!)"
 
         }
+        self.locationSpan()
     }
 
 }
-func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+  func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
     print("Error \(error)")
-}
+  }
     
+  func locationSpan() {
+        let tracer = buildTracer()
+        let now = Date()
+        let typeName = "SplunkRum.locationSpan"
+        let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
+        span.setAttribute(key: "component", value: "PresentationTransition")
+        span.setAttribute(key: "latitude", value: latitude)
+        span.setAttribute(key: "longitude", value: longitude)
+        span.setAttribute(key: "city", value: locality)
+        span.setAttribute(key: "country", value: country)
+        span.setAttribute(key: "localarea", value: administrativeArea)
+        span.end(time: now)
+    }
     
 }
