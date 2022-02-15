@@ -10,29 +10,13 @@
 		86AFA8742714AD6C0061A547 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86AFA8732714AD6C0061A547 /* SplunkRum.framework */; };
 		86AFA8752714AD6C0061A547 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 86AFA8732714AD6C0061A547 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		86D3D38025E80648004DD939 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D37F25E80648004DD939 /* AppDelegate.swift */; };
+		86D3D38225E80648004DD939 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D38125E80648004DD939 /* SceneDelegate.swift */; };
 		86D3D38425E80648004DD939 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D38325E80648004DD939 /* ViewController.swift */; };
 		86D3D38725E80648004DD939 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86D3D38525E80648004DD939 /* Main.storyboard */; };
 		86D3D38925E80649004DD939 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 86D3D38825E80649004DD939 /* Assets.xcassets */; };
 		86D3D38C25E80649004DD939 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86D3D38A25E80649004DD939 /* LaunchScreen.storyboard */; };
 		86D3D39525E80D61004DD939 /* AViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39425E80D61004DD939 /* AViewController.swift */; };
 		86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39725E80DBC004DD939 /* BViewController.swift */; };
-		C81E366027B0E42400475790 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365327B0E42300475790 /* libbz2.tbd */; };
-		C81E366127B0E42400475790 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365427B0E42300475790 /* SystemConfiguration.framework */; };
-		C81E366227B0E42400475790 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365527B0E42300475790 /* Metal.framework */; };
-		C81E366327B0E42400475790 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365627B0E42300475790 /* UIKit.framework */; };
-		C81E366427B0E42400475790 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365727B0E42300475790 /* CoreLocation.framework */; };
-		C81E366527B0E42400475790 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365827B0E42300475790 /* CoreTelephony.framework */; };
-		C81E366627B0E42400475790 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365927B0E42300475790 /* CoreImage.framework */; };
-		C81E366727B0E42400475790 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365A27B0E42300475790 /* CoreGraphics.framework */; };
-		C81E366827B0E42400475790 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365B27B0E42300475790 /* libc++.tbd */; };
-		C81E366927B0E42400475790 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365C27B0E42400475790 /* QuartzCore.framework */; };
-		C81E366A27B0E42400475790 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365D27B0E42400475790 /* CoreData.framework */; };
-		C81E366B27B0E42400475790 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365E27B0E42400475790 /* OpenGLES.framework */; };
-		C81E366C27B0E42400475790 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E365F27B0E42400475790 /* Accelerate.framework */; };
-		C81E366E27B0E46E00475790 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E366D27B0E46E00475790 /* CoreText.framework */; };
-		C81E367027B0E47800475790 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E366F27B0E47800475790 /* ImageIO.framework */; };
-		C81E367227B0E48600475790 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C81E367127B0E48600475790 /* GLKit.framework */; };
-		C81E369027B104A100475790 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81E368F27B104A100475790 /* SceneDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +37,7 @@
 		86AFA8732714AD6C0061A547 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86D3D37C25E80648004DD939 /* TestStoryboardApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestStoryboardApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		86D3D37F25E80648004DD939 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		86D3D38125E80648004DD939 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		86D3D38325E80648004DD939 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		86D3D38625E80648004DD939 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		86D3D38825E80649004DD939 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -61,23 +46,6 @@
 		86D3D39425E80D61004DD939 /* AViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AViewController.swift; sourceTree = "<group>"; };
 		86D3D39725E80DBC004DD939 /* BViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BViewController.swift; sourceTree = "<group>"; };
 		86D3D3A125E8240F004DD939 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C81E365327B0E42300475790 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
-		C81E365427B0E42300475790 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		C81E365527B0E42300475790 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
-		C81E365627B0E42300475790 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		C81E365727B0E42300475790 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
-		C81E365827B0E42300475790 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
-		C81E365927B0E42300475790 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
-		C81E365A27B0E42300475790 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		C81E365B27B0E42300475790 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
-		C81E365C27B0E42400475790 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		C81E365D27B0E42400475790 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		C81E365E27B0E42400475790 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
-		C81E365F27B0E42400475790 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
-		C81E366D27B0E46E00475790 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
-		C81E366F27B0E47800475790 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
-		C81E367127B0E48600475790 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
-		C81E368F27B104A100475790 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,22 +53,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C81E367227B0E48600475790 /* GLKit.framework in Frameworks */,
-				C81E367027B0E47800475790 /* ImageIO.framework in Frameworks */,
-				C81E366E27B0E46E00475790 /* CoreText.framework in Frameworks */,
-				C81E366027B0E42400475790 /* libbz2.tbd in Frameworks */,
-				C81E366127B0E42400475790 /* SystemConfiguration.framework in Frameworks */,
-				C81E366227B0E42400475790 /* Metal.framework in Frameworks */,
-				C81E366327B0E42400475790 /* UIKit.framework in Frameworks */,
-				C81E366427B0E42400475790 /* CoreLocation.framework in Frameworks */,
-				C81E366527B0E42400475790 /* CoreTelephony.framework in Frameworks */,
-				C81E366627B0E42400475790 /* CoreImage.framework in Frameworks */,
-				C81E366727B0E42400475790 /* CoreGraphics.framework in Frameworks */,
-				C81E366827B0E42400475790 /* libc++.tbd in Frameworks */,
-				C81E366927B0E42400475790 /* QuartzCore.framework in Frameworks */,
-				C81E366A27B0E42400475790 /* CoreData.framework in Frameworks */,
-				C81E366B27B0E42400475790 /* OpenGLES.framework in Frameworks */,
-				C81E366C27B0E42400475790 /* Accelerate.framework in Frameworks */,
 				86AFA8742714AD6C0061A547 /* SplunkRum.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -128,8 +80,8 @@
 		86D3D37E25E80648004DD939 /* TestStoryboardApp */ = {
 			isa = PBXGroup;
 			children = (
-				C81E368F27B104A100475790 /* SceneDelegate.swift */,
 				86D3D37F25E80648004DD939 /* AppDelegate.swift */,
+				86D3D38125E80648004DD939 /* SceneDelegate.swift */,
 				86D3D38325E80648004DD939 /* ViewController.swift */,
 				86D3D38525E80648004DD939 /* Main.storyboard */,
 				86D3D38825E80649004DD939 /* Assets.xcassets */,
@@ -144,22 +96,6 @@
 		86D3D3A025E8240F004DD939 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C81E367127B0E48600475790 /* GLKit.framework */,
-				C81E366F27B0E47800475790 /* ImageIO.framework */,
-				C81E366D27B0E46E00475790 /* CoreText.framework */,
-				C81E365F27B0E42400475790 /* Accelerate.framework */,
-				C81E365D27B0E42400475790 /* CoreData.framework */,
-				C81E365A27B0E42300475790 /* CoreGraphics.framework */,
-				C81E365927B0E42300475790 /* CoreImage.framework */,
-				C81E365727B0E42300475790 /* CoreLocation.framework */,
-				C81E365827B0E42300475790 /* CoreTelephony.framework */,
-				C81E365327B0E42300475790 /* libbz2.tbd */,
-				C81E365B27B0E42300475790 /* libc++.tbd */,
-				C81E365527B0E42300475790 /* Metal.framework */,
-				C81E365E27B0E42400475790 /* OpenGLES.framework */,
-				C81E365C27B0E42400475790 /* QuartzCore.framework */,
-				C81E365427B0E42300475790 /* SystemConfiguration.framework */,
-				C81E365627B0E42300475790 /* UIKit.framework */,
 				86AFA8732714AD6C0061A547 /* SplunkRum.framework */,
 				86D3D3A125E8240F004DD939 /* SplunkRum.framework */,
 			);
@@ -177,7 +113,6 @@
 				86D3D37925E80648004DD939 /* Frameworks */,
 				86D3D37A25E80648004DD939 /* Resources */,
 				86AFA8762714AD6C0061A547 /* Embed Frameworks */,
-				C8366A0727B3FAE400BAFCD1 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -237,36 +172,16 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		C8366A0727B3FAE400BAFCD1 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif which swiftlint >/dev/null; then  \nswiftlint\nelse  \necho \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		86D3D37825E80648004DD939 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C81E369027B104A100475790 /* SceneDelegate.swift in Sources */,
 				86D3D39525E80D61004DD939 /* AViewController.swift in Sources */,
 				86D3D38425E80648004DD939 /* ViewController.swift in Sources */,
 				86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */,
 				86D3D38025E80648004DD939 /* AppDelegate.swift in Sources */,
+				86D3D38225E80648004DD939 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,7 +210,6 @@
 		86D3D38E25E80649004DD939 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -344,22 +258,19 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = "";
 			};
 			name = Debug;
 		};
 		86D3D38F25E80649004DD939 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -402,14 +313,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = "";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -420,12 +329,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-				);
 				INFOPLIST_FILE = TestStoryboardApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -443,12 +347,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)",
-				);
 				INFOPLIST_FILE = TestStoryboardApp/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

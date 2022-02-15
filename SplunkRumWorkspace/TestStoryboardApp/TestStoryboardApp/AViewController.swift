@@ -19,6 +19,7 @@ import Foundation
 import UIKit
 
 class AViewController: UIViewController {
+
     @IBAction public func aAction() {
         print("a action")
     }
