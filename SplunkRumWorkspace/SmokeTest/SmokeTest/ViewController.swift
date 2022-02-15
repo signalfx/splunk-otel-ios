@@ -37,6 +37,7 @@ class ViewController: UIViewController, WKUIDelegate,CLLocationManagerDelegate {
 
             if CLLocationManager.locationServicesEnabled(){
                 locationManager.startUpdatingLocation()
+                SplunkRum.locationName(true)
             }
     }
 
@@ -51,16 +52,13 @@ class ViewController: UIViewController, WKUIDelegate,CLLocationManagerDelegate {
         let req = URLRequest(url: url!)
         view = webview
         SplunkRum.integrateWithBrowserRum(webview)
+        
         webview.load(req)
     }
     
     //MARK: - location delegate methods
 func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     let userLocation :CLLocation = locations[0] as CLLocation
-
-    print("user latitude = \(userLocation.coordinate.latitude)")
-    print("user longitude = \(userLocation.coordinate.longitude)")
-
     self.lblLat.text = "\(userLocation.coordinate.latitude)"
     self.lblLongi.text = "\(userLocation.coordinate.longitude)"
 
@@ -72,9 +70,9 @@ func locationManager(_ manager: CLLocationManager, didUpdateLocations locations:
         let placemark = placemarks! as [CLPlacemark]
         if placemark.count>0{
             let placemark = placemarks![0]
-            print(placemark.locality!)
-            print(placemark.administrativeArea!)
-            print(placemark.country!)
+//            print(placemark.locality!)
+//            print(placemark.administrativeArea!)
+//            print(placemark.country!)
 
             self.lblAdd.text = "\(placemark.locality!), \(placemark.administrativeArea!), \(placemark.country!)"
         }
