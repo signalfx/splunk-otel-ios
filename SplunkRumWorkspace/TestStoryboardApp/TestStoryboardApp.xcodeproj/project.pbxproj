@@ -17,6 +17,7 @@
 		86D3D38C25E80649004DD939 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86D3D38A25E80649004DD939 /* LaunchScreen.storyboard */; };
 		86D3D39525E80D61004DD939 /* AViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39425E80D61004DD939 /* AViewController.swift */; };
 		86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39725E80DBC004DD939 /* BViewController.swift */; };
+		C8E0056E27BBC0170082B6B4 /* SpanModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C8E0056C27BBC0170082B6B4 /* SpanModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -46,6 +47,7 @@
 		86D3D39425E80D61004DD939 /* AViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AViewController.swift; sourceTree = "<group>"; };
 		86D3D39725E80DBC004DD939 /* BViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BViewController.swift; sourceTree = "<group>"; };
 		86D3D3A125E8240F004DD939 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8E0056D27BBC0170082B6B4 /* SpanModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SpanModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 				86D3D38D25E80649004DD939 /* Info.plist */,
 				86D3D39425E80D61004DD939 /* AViewController.swift */,
 				86D3D39725E80DBC004DD939 /* BViewController.swift */,
+				C8E0056C27BBC0170082B6B4 /* SpanModel.xcdatamodeld */,
 			);
 			path = TestStoryboardApp;
 			sourceTree = "<group>";
@@ -178,6 +181,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				86D3D39525E80D61004DD939 /* AViewController.swift in Sources */,
+				C8E0056E27BBC0170082B6B4 /* SpanModel.xcdatamodeld in Sources */,
 				86D3D38425E80648004DD939 /* ViewController.swift in Sources */,
 				86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */,
 				86D3D38025E80648004DD939 /* AppDelegate.swift in Sources */,
@@ -381,6 +385,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		C8E0056C27BBC0170082B6B4 /* SpanModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				C8E0056D27BBC0170082B6B4 /* SpanModel.xcdatamodel */,
+			);
+			currentVersion = C8E0056D27BBC0170082B6B4 /* SpanModel.xcdatamodel */;
+			path = SpanModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 86D3D37425E80648004DD939 /* Project object */;
 }

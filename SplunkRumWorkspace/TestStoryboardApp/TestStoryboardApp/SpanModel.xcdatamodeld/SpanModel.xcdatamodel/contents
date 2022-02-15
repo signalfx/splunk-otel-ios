@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="20F71" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Span" representedClassName="Span" syncable="YES" codeGenerationType="class">
+        <attribute name="attributes" optional="YES" attributeType="String"/>
+        <attribute name="duration" optional="YES" attributeType="String"/>
+        <attribute name="parentSpanId" optional="YES" attributeType="String"/>
+        <attribute name="span" optional="YES" attributeType="String"/>
+        <attribute name="span_kind" optional="YES" attributeType="String"/>
+        <attribute name="spanId" optional="YES" attributeType="String"/>
+        <attribute name="start" optional="YES" attributeType="String"/>
+        <attribute name="traceFlags" optional="YES" attributeType="String"/>
+        <attribute name="traceId" optional="YES" attributeType="String"/>
+        <attribute name="traceState" optional="YES" attributeType="String"/>
+    </entity>
+    <elements>
+        <element name="Span" positionX="-63" positionY="-18" width="128" height="179"/>
+    </elements>
+</model>
