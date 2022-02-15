@@ -18,12 +18,26 @@ limitations under the License.
 import UIKit
 import WebKit
 import SplunkRum
+import CoreLocation
 
-class ViewController: UIViewController, WKUIDelegate {
-
+class ViewController: UIViewController, WKUIDelegate,CLLocationManagerDelegate {
+    
+    var locationManager:CLLocationManager!
+    @IBOutlet var lblLat:UILabel!
+    @IBOutlet var lblLongi:UILabel!
+    @IBOutlet var lblAdd:UILabel!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+            locationManager = CLLocationManager()
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager.requestAlwaysAuthorization()
+
+            if CLLocationManager.locationServicesEnabled(){
+                locationManager.startUpdatingLocation()
+            }
     }
 
     @IBAction
@@ -39,5 +53,36 @@ class ViewController: UIViewController, WKUIDelegate {
         SplunkRum.integrateWithBrowserRum(webview)
         webview.load(req)
     }
+    
+    //MARK: - location delegate methods
+func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    let userLocation :CLLocation = locations[0] as CLLocation
+
+    print("user latitude = \(userLocation.coordinate.latitude)")
+    print("user longitude = \(userLocation.coordinate.longitude)")
+
+    self.lblLat.text = "\(userLocation.coordinate.latitude)"
+    self.lblLongi.text = "\(userLocation.coordinate.longitude)"
+
+    let geocoder = CLGeocoder()
+    geocoder.reverseGeocodeLocation(userLocation) { (placemarks, error) in
+        if (error != nil){
+            print("error in reverseGeocode")
+        }
+        let placemark = placemarks! as [CLPlacemark]
+        if placemark.count>0{
+            let placemark = placemarks![0]
+            print(placemark.locality!)
+            print(placemark.administrativeArea!)
+            print(placemark.country!)
+
+            self.lblAdd.text = "\(placemark.locality!), \(placemark.administrativeArea!), \(placemark.country!)"
+        }
+    }
+
+}
+func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    print("Error \(error)")
+}
 
 }
