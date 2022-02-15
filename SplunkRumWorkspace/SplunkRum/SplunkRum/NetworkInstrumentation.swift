@@ -149,7 +149,7 @@ extension URLSession {
        }
 
     // rename objc view of func to allow "overloading"
-    @objc(splunkSwizzledDataTaskWithRequest: completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+    @objc(splunkSwizzledDataTaskWithRequest:completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: ((Data?, URLResponse?, Error?) -> Void)?) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: request, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
