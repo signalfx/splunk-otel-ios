@@ -22,6 +22,8 @@ import CoreLocation
 class Corelocation: NSObject, CLLocationManagerDelegate {
     
     var locationManager : CLLocationManager = CLLocationManager()
+    
+    
     override init() {
         super.init()
         rumMobileLocation()
@@ -41,10 +43,9 @@ class Corelocation: NSObject, CLLocationManagerDelegate {
     //MARK: - location delegate methods
 func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
     let userLocation :CLLocation = locations[0] as CLLocation
-
-    print("user latitude = \(userLocation.coordinate.latitude)")
-    print("user longitude = \(userLocation.coordinate.longitude)")
-
+    manager.delegate = nil;
+    //print("user latitude = \(userLocation.coordinate.latitude)")
+    //print("user longitude = \(userLocation.coordinate.longitude)")
     let geocoder = CLGeocoder()
     geocoder.reverseGeocodeLocation(userLocation) { (placemarks, error) in
         if (error != nil){
@@ -64,4 +65,6 @@ func locationManager(_ manager: CLLocationManager, didUpdateLocations locations:
 func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
     print("Error \(error)")
 }
+    
+    
 }
