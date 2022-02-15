@@ -17,10 +17,34 @@ limitations under the License.
 
 import Foundation
 import UIKit
+import SplunkRum
 
-class AViewController: UIViewController {
+class AViewController: UIViewController, NSURLConnectionDelegate, NSURLConnectionDataDelegate {
+    var data = NSMutableData()
 
     @IBAction public func aAction() {
         print("a action")
     }
-}
+    @IBAction public func callAsynchronousWebService() {
+        print("NSURLConnection - Call")
+        let url = URL(string: "http://127.0.0.1:7878/data")!  // failure and get error
+        var req = URLRequest(url: url)
+        req.httpMethod = "HEAD"
+        NSURLConnection.sendAsynchronousRequest(req, queue: OperationQueue.main) {(_, data, _) in
+            guard let data = data else { return }
+            print(data)
+        }
+    }
+    @IBAction public func callSynchronousWebService() {
+        print("NSURLConnection - Call")
+        // post method check
+        let url = URL(string: "https://www.google.com")! // sucess 500
+        var req = URLRequest(url: url)
+        req.httpMethod = "GET"
+        // let parameters = "email=dj@gmail.com&password=DhaJiv1!&returnSecureToken=true"
+        // let postData =  parameters.data(using: .utf8)
+        // req.httpBody = postData
+        var response: URLResponse? = URLResponse()
+        _ = try? NSURLConnection.sendSynchronousRequest(req, returning: &response)
+        }
+   }
