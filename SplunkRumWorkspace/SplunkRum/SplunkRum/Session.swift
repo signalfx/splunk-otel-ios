@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-let MAX_SESSION_AGE_SECONDS = 40   // 4 * 60 * 60
+let MAX_SESSION_AGE_SECONDS = 4 * 60 * 60
 
 private var rumSessionId = generateNewSessionId()
 private var sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
@@ -76,8 +76,7 @@ func getRumSessionId() -> String {
 func createSessionIdChangeSpan(){
     isSessionIdChanged = false
     let tracer = buildTracer()
-    let span = tracer.spanBuilder(spanName: "sessionId.change").setSpanKind(spanKind: .client).startSpan()
+    let span = tracer.spanBuilder(spanName: "sessionId.change").startSpan()
     span.setAttribute(key: "splunk.rum.previous_session_id", value: oldRumSessionId)
-    // span.setAttribute(key: "component", value: "appstart")
     span.end()
 }
