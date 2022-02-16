@@ -64,26 +64,12 @@ class Corelocation: NSObject, CLLocationManagerDelegate {
             self.country  = "\(placemark.country!)"
 
         }
-        self.locationSpan()
+        
     }
 
 }
   func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
     print("Error \(error)")
   }
-    
-  func locationSpan() {
-        let tracer = buildTracer()
-        let now = Date()
-        let typeName = "SplunkRum.locationSpan"
-        let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
-        span.setAttribute(key: "component", value: "PresentationTransition")
-        span.setAttribute(key: "latitude", value: latitude)
-        span.setAttribute(key: "longitude", value: longitude)
-        span.setAttribute(key: "city", value: locality)
-        span.setAttribute(key: "country", value: country)
-        span.setAttribute(key: "localarea", value: administrativeArea)
-        span.end(time: now)
-    }
-    
+        
 }
