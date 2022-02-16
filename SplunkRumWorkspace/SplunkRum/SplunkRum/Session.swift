@@ -34,7 +34,7 @@ func generateNewSessionId() -> String {
         let b = Int.random(in: 0..<256)
         answer += String(format: "%02x", b)
     }
-    if oldRumSessionId != "" { // firtst time id generated so it is not consider as session id changed
+    if !oldRumSessionId.isEmpty { // firtst time id generated so it is not consider as session id changed
         isSessionIdChanged = true
     }
     return answer
@@ -73,7 +73,7 @@ func getRumSessionId() -> String {
     }
     return rumSessionId
 }
-func createSessionIdChangeSpan(){
+func createSessionIdChangeSpan() {
     isSessionIdChanged = false
     let tracer = buildTracer()
     let span = tracer.spanBuilder(spanName: "sessionId.change").startSpan()
