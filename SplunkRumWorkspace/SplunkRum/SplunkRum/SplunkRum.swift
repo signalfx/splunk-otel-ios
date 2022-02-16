@@ -131,6 +131,7 @@ var splunkRumInitializeCalledTime = Date()
     static var initializing = false
     static var configuredOptions: SplunkRumOptions?
     static var theBeaconUrl: String?
+    static var locationData: Corelocation = Corelocation()
 
     /**
             Initialization function.  Call as early as possible in your application, but only on the main thread.
@@ -324,6 +325,10 @@ var splunkRumInitializeCalledTime = Date()
      */
     @objc public class func integrateWithBrowserRum(_ view: WKWebView) {
         integrateWebViewWithBrowserRum(view: view)
+    }
+    
+    @objc public class func locationName(_ userLatLong: Bool) {
+        locationData.rumMobileLocation()
     }
 
 }

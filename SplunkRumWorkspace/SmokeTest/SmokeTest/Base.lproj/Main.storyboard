@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -24,10 +25,41 @@
                                     <action selector="clickMe" destination="BYZ-38-t0r" eventType="touchUpInside" id="07Q-eK-HdY"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Longi" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QwV-fP-08j">
+                                <rect key="frame" x="186" y="443" width="42" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Lat" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jbG-tC-7mI">
+                                <rect key="frame" x="195" y="483.5" width="24" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="User Address" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RsD-Ek-C2g">
+                                <rect key="frame" x="155.5" y="524" width="103" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="jbG-tC-7mI" firstAttribute="top" secondItem="QwV-fP-08j" secondAttribute="bottom" constant="20" id="3fo-G0-gKS"/>
+                            <constraint firstItem="jbG-tC-7mI" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="5Ut-fd-oYQ"/>
+                            <constraint firstItem="QwV-fP-08j" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="Nib-Vo-Qyp"/>
+                            <constraint firstItem="RsD-Ek-C2g" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="V8j-mI-wyX"/>
+                            <constraint firstItem="RsD-Ek-C2g" firstAttribute="top" secondItem="jbG-tC-7mI" secondAttribute="bottom" constant="20" id="g39-Fq-1h0"/>
+                            <constraint firstItem="QwV-fP-08j" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="sjK-o3-GsM"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="lblAdd" destination="RsD-Ek-C2g" id="BdI-12-5CK"/>
+                        <outlet property="lblLat" destination="jbG-tC-7mI" id="Qv5-KV-7FP"/>
+                        <outlet property="lblLongi" destination="QwV-fP-08j" id="ZhZ-W7-Bzo"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
