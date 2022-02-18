@@ -62,7 +62,5 @@ func getRumSessionId() -> String {
     for callback in callbacks {
         callback()
     }
-
     return rumSessionId
 }
-
