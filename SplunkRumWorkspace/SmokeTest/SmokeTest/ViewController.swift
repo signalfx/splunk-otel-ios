@@ -20,21 +20,18 @@ import WebKit
 import SplunkRum
 import CoreLocation
 
-class ViewController: UIViewController, WKUIDelegate,CLLocationManagerDelegate {
-    
-    @IBOutlet var lblLat:UILabel!
-    @IBOutlet var lblLongi:UILabel!
-    @IBOutlet var lblAdd:UILabel!
-    var locationManager:CLLocationManager!
-    
+class ViewController: UIViewController, WKUIDelegate, CLLocationManagerDelegate {
+    @IBOutlet var lblLat: UILabel!
+    @IBOutlet var lblLongi: UILabel!
+    @IBOutlet var lblAdd: UILabel!
+    var locationManager: CLLocationManager!
     override func viewDidLoad() {
         super.viewDidLoad()
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestAlwaysAuthorization()
-
-        if CLLocationManager.locationServicesEnabled(){
+        if CLLocationManager.locationServicesEnabled() {
             locationManager.startUpdatingLocation()
             SplunkRum.locationName(true)
         }
@@ -53,20 +50,18 @@ class ViewController: UIViewController, WKUIDelegate,CLLocationManagerDelegate {
         SplunkRum.integrateWithBrowserRum(webview)
         webview.load(req)
     }
-    
-    //MARK: - location delegate methods
 func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-    let userLocation :CLLocation = locations[0] as CLLocation
+    let userLocation: CLLocation = locations[0] as CLLocation
     self.lblLat.text = "\(userLocation.coordinate.latitude)"
     self.lblLongi.text = "\(userLocation.coordinate.longitude)"
 
     let geocoder = CLGeocoder()
     geocoder.reverseGeocodeLocation(userLocation) { (placemarks, error) in
-        if (error != nil){
+        if error != nil {
             print("error in reverseGeocode")
         }
         let placemark = placemarks! as [CLPlacemark]
-        if placemark.count>0{
+        if placemark.count>0 {
             let placemark = placemarks![0]
             self.lblAdd.text = "\(placemark.locality!), \(placemark.administrativeArea!), \(placemark.country!)"
         }
