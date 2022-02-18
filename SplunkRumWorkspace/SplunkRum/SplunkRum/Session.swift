@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-let MAX_SESSION_AGE_SECONDS = 30 //4 * 60 * 60
+let MAX_SESSION_AGE_SECONDS = 4 * 60 * 60
 
 private var rumSessionId = generateNewSessionId()
 private var sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
