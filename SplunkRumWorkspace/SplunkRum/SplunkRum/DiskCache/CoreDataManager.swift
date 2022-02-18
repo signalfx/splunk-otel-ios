@@ -42,7 +42,11 @@ public class CoreDataManager {
             
             return container
         }()
+    
+    
+    
     //MARK:- Insert span in to DB
+
 public func insertSpanIntoDB(_ spans: [SpanData]) {
         let managedObject = persistentContainer.viewContext
 
@@ -55,6 +59,13 @@ public func insertSpanIntoDB(_ spans: [SpanData]) {
             print(str)
             // add try to convert str in to span data logic here
             span.setValue(String(describing: pendingSpan), forKey: "span")
+            
+            // new logic
+            // convert struct in to jsonstring then save to db
+//            let jsonStr = pendingSpan.toJson()
+//            print(jsonStr)
+//            let spandataFromJSON: SpanData? = instantiate(jsonString: jsonStr)
+//            print(spandataFromJSON!)
         }
        
         do {
@@ -83,7 +94,27 @@ public func fetchSpanFromDB() -> [SpanData] {
         return result
     }
 }
-
+//MARK: -
+/*extension SpanData: Encodable,Decodable {
+    public init(from decoder: Decoder) throws {
+        try! self.init(from: decoder)
+        print("decode")
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        print("Encode")
+    }
+    
+    func toJson()->String {
+        let jsonEncoder = JSONEncoder()
+        let jsonData = try! jsonEncoder.encode(self)
+        let jsonString = String(data: jsonData, encoding: .utf8)
+        return jsonString!
+    }
+}
+func instantiate<T: Decodable>(jsonString: String) -> T? {
+    return try? JSONDecoder().decode(T.self, from: jsonString.data(using: .utf8)!)
+}*/
 func getDocumentsDirectory() -> URL {
     let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
     let documentsDirectory = paths[0]
