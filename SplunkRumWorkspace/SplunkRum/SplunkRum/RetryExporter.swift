@@ -47,7 +47,7 @@ class RetryExporter: SpanExporter {
         }
     }
 
-    func export(spans: [SpanData]) -> SpanExporterResultCode {
+  /*  func export(spans: [SpanData]) -> SpanExporterResultCode {
         var result = attemptPendingExport()
         if result == .failure {
             addToPending(spans)
@@ -68,6 +68,43 @@ class RetryExporter: SpanExporter {
 
     func shutdown() {
         proxy.shutdown()
+    }*/
+    
+    func export(spans: [SpanData]) -> SpanExporterResultCode {
+        var result = attemptDBExport()
+        if result == .failure {
+            CoreDataManager.shared.insertSpanIntoDB(spans)
+            return .failure
+        }
+        result = proxy.export(spans: spans)
+        if result == .failure {
+            CoreDataManager.shared.insertSpanIntoDB(spans)
+            return .failure
+        }
+        return .success
     }
 
+    func flush() -> SpanExporterResultCode {
+        _ = attemptPendingExport()
+        return proxy.flush()
+    }
+
+    func shutdown() {
+        proxy.shutdown()
+    }
+    
+    // MARK:- attempt to export from DB
+    func attemptDBExport() -> SpanExporterResultCode {
+        let dbspans = CoreDataManager.shared.fetchSpanFromDB()
+        
+        if dbspans.isEmpty {
+            return .success
+        }
+        let result = proxy.export(spans: dbspans)
+        if result == .success {
+            // delete spans from db FLUSH FIFO or 4 h time logic.
+            
+        }
+        return result
+    }
 }

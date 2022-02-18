@@ -198,6 +198,7 @@ var splunkRumInitializeCalledTime = Date()
         srInit.end()
         initialized = true
         print("SplunkRum.initialize() complete")
+        print("Document directory path is \(getDocumentsDirectory())")
     }
 
     /**

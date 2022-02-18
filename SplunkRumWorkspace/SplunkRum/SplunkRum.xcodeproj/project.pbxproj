@@ -34,6 +34,8 @@
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
+		C891800027BE1700003EB742 /* Rum.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C8917FFE27BE1700003EB742 /* Rum.xcdatamodeld */; };
+		C891800927BE5B89003EB742 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C891800827BE5B89003EB742 /* CoreDataManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +86,8 @@
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
+		C8917FFF27BE1700003EB742 /* Rum.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Rum.xcdatamodel; sourceTree = "<group>"; };
+		C891800827BE5B89003EB742 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +137,7 @@
 		86260EC625CDC1DE009F3CB1 /* SplunkRum */ = {
 			isa = PBXGroup;
 			children = (
+				C8917FFD27BE16BA003EB742 /* DiskCache */,
 				86260F0E25CDC407009F3CB1 /* SplunkRum.swift */,
 				86260EC725CDC1DE009F3CB1 /* SplunkRum.h */,
 				86260EC825CDC1DE009F3CB1 /* Info.plist */,
@@ -171,6 +176,15 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C8917FFD27BE16BA003EB742 /* DiskCache */ = {
+			isa = PBXGroup;
+			children = (
+				C8917FFE27BE1700003EB742 /* Rum.xcdatamodeld */,
+				C891800827BE5B89003EB742 /* CoreDataManager.swift */,
+			);
+			path = DiskCache;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -303,7 +317,9 @@
 				8616CD5F266E673F0048980B /* ScreenName.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
 				86043B7C25F93E3400A29788 /* Log.swift in Sources */,
+				C891800927BE5B89003EB742 /* CoreDataManager.swift in Sources */,
 				865DBDD92677AA7B00EFE8D5 /* RetryExporter.swift in Sources */,
+				C891800027BE1700003EB742 /* Rum.xcdatamodeld in Sources */,
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
 				8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
@@ -652,6 +668,19 @@
 			productName = ZipkinExporter;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		C8917FFE27BE1700003EB742 /* Rum.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				C8917FFF27BE1700003EB742 /* Rum.xcdatamodel */,
+			);
+			currentVersion = C8917FFF27BE1700003EB742 /* Rum.xcdatamodel */;
+			path = Rum.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 86260EBB25CDC1DE009F3CB1 /* Project object */;
 }
