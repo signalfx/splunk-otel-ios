@@ -19,6 +19,9 @@ import Foundation
 import UIKit
 import OpenTelemetrySdk
 
+let INACTIVITY_SESSION_TIMEOUT_SECONDS = 15 * 60
+private var sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(INACTIVITY_SESSION_TIMEOUT_SECONDS))
+
 func initializeAppLifecycleInstrumentation() {
     /*
      Observed event sequences:
@@ -57,6 +60,7 @@ func initializeAppLifecycleInstrumentation() {
 }
 var activeSpan: SpanHolder?
 func lifecycleEvent(_ event: String) {
+    invalidateSession(event)
     // these two start spans
     if event == "UIApplicationWillResignActiveNotification" ||
             event == "UIApplicationWillEnterForegroundNotification" {
@@ -92,5 +96,15 @@ func lifecycleEvent(_ event: String) {
             event == "UIApplicationDidEnterBackgroundNotification" {
         OpenTelemetrySDK.instance.tracerProvider.forceFlush()
 
+    }
+}
+func invalidateSession(_ event: String) {
+    // 15 min inactivity then session time out
+    if event == "UIApplicationWillResignActiveNotification" {
+        sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(INACTIVITY_SESSION_TIMEOUT_SECONDS))
+    } else if event == "UIApplicationWillEnterForegroundNotification" {
+        if Date() > sessionIdInActivityExpiration { // expire 15 min
+            rumSessionId = generateNewSessionId()
+        }
     }
 }
