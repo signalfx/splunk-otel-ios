@@ -54,22 +54,9 @@ func locationManager(_ manager: CLLocationManager, didUpdateLocations locations:
     let userLocation: CLLocation = locations[0] as CLLocation
     self.lblLat.text = "\(userLocation.coordinate.latitude)"
     self.lblLongi.text = "\(userLocation.coordinate.longitude)"
-
-    let geocoder = CLGeocoder()
-    geocoder.reverseGeocodeLocation(userLocation) { (placemarks, error) in
-        if error != nil {
-            print("error in reverseGeocode")
-        }
-        let placemark = placemarks! as [CLPlacemark]
-        if placemark.count>0 {
-            let placemark = placemarks![0]
-            self.lblAdd.text = "\(placemark.locality!), \(placemark.administrativeArea!), \(placemark.country!)"
-        }
-    }
-
 }
 func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-    print("Error \(error)")
+    
 }
 
 }

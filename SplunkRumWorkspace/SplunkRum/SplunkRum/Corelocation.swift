@@ -51,25 +51,10 @@ class Corelocation: NSObject, CLLocationManagerDelegate {
     manager.delegate = nil;
       self.latitude  = "\(userLocation.coordinate.latitude)"
       self.longitude = "\(userLocation.coordinate.longitude)"
-      let geocoder = CLGeocoder()
-      geocoder.reverseGeocodeLocation(userLocation) { [self] (placemarks, error) in
-        if (error != nil){
-            print("error in reverseGeocode")
-        }
-        let placemark = placemarks! as [CLPlacemark]
-        if placemark.count>0{
-            let placemark = placemarks![0]
-            self.locality  = "\(placemark.locality!)"
-            self.administrativeArea  = "\(placemark.administrativeArea!)"
-            self.country  = "\(placemark.country!)"
-
-        }
-        
-    }
-
-}
+      
+  }
   func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-    print("Error \(error)")
+    
   }
         
 }
