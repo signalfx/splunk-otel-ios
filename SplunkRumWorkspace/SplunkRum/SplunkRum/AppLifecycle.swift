@@ -21,6 +21,7 @@ import OpenTelemetrySdk
 
 let INACTIVITY_SESSION_TIMEOUT_SECONDS = 15 * 60
 private var sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(INACTIVITY_SESSION_TIMEOUT_SECONDS))
+var Is_New_SessionID_For_In_Activity = false
 
 func initializeAppLifecycleInstrumentation() {
     /*
@@ -104,7 +105,8 @@ func invalidateSession(_ event: String) {
         sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(INACTIVITY_SESSION_TIMEOUT_SECONDS))
     } else if event == "UIApplicationWillEnterForegroundNotification" {
         if Date() > sessionIdInActivityExpiration { // expire 15 min
-            rumSessionId = generateNewSessionId()
+           Is_New_SessionID_For_In_Activity = true
+            _  = getRumSessionId()
         }
     }
 }

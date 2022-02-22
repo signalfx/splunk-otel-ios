@@ -19,7 +19,7 @@ import Foundation
 
 let MAX_SESSION_AGE_SECONDS = 4 * 60 * 60
 
-var rumSessionId = generateNewSessionId()
+private var rumSessionId = generateNewSessionId()
 private var sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
 private let sessionIdLock = NSLock()
 private var sessionIdCallbacks: [(() -> Void)] = []
@@ -56,6 +56,10 @@ func getRumSessionId() -> String {
         sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
         rumSessionId = generateNewSessionId()
         callbacks = sessionIdCallbacks
+    }
+    if Is_New_SessionID_For_In_Activity {
+        rumSessionId = generateNewSessionId()
+        Is_New_SessionID_For_In_Activity = false
     }
     sessionIdLock.unlock()
     unlocked = true
