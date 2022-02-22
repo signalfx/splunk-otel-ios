@@ -22,6 +22,14 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 import SwiftUI
 
+let FLUSH_OUT_TIME_SECONDS = 60   // 4 * 60 * 60  // 4 hours
+
+
+let Entity_name = "Pending"
+let TimeStampColumn = "created_at"
+
+
+
 public class CoreDataManager {
     public static let shared = CoreDataManager()
     let identifier: String  = "com.splunk.opentelemetry.SplunkRum"       // splunkrum framework bundle ID
@@ -49,56 +57,171 @@ public class CoreDataManager {
     //MARK:- Insert span in to DB
 
 public func insertSpanIntoDB(_ spans: [SpanData]) {
-        let managedObject = persistentContainer.viewContext
+    getStoreInformation()
+   
+    let spanArr : Array = [1,2,3,4]
+   // let spanArr : Array = [spans]
+    let managedObject = persistentContainer.viewContext
 
-        let spanEntity = NSEntityDescription.entity(forEntityName: "Pending", in: managedObject)!
+    let spanEntity = NSEntityDescription.entity(forEntityName: Entity_name, in: managedObject)!
+    
+    //let encodedData = NSKeyedArchiver.archivedData(withRootObject: spanArr)
+    let encodedData = NSKeyedArchiver.archivedData(withRootObject: spanArr)
+    let span = NSManagedObject(entity: spanEntity, insertInto: managedObject)
+    span.setValue(encodedData, forKey: "span")
+    span.setValue(Date(), forKey: TimeStampColumn)
+    do {
+        try managedObject.save()
         
-        //insert record logic
-        let span = NSManagedObject(entity: spanEntity, insertInto: managedObject)
-        for pendingSpan in spans {
-            let str = String(describing: pendingSpan)
-            print(str)
-            // add try to convert str in to span data logic here
-            span.setValue(String(describing: pendingSpan), forKey: "span")
+    } catch let error as NSError {
+        print("could not save. \(error) \(error.userInfo)")
+    }
+}
+    //MARK:- fetch span from DB
+public func fetchSpanFromDB() -> [SpanData] {
+    let managedObjectContext = persistentContainer.viewContext
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
+    let result = [SpanData]()
+    do {
+        let result1 = try managedObjectContext.fetch(fetchRequest) as! [Pending]
+        for data in result1 {
+           // guard let spanDataArray = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data.span!)) as? [SpanData] else { return [] }
+            guard let spanDataArray = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data.span!)) else { return [] }
+           
+            print("out put is/////////// \(spanDataArray)")
+           
+          
+        }
+    } catch {
+        print("failed")
+        return result
+    }
+    
+    
+    
+      /*  do {
+            //let  result1 = try managedObject.fetch(fetchRequest)
+            //print(result1)
+           let result1 = try managedObjectContext.fetch(fetchRequest) as! [Pending]
+            for data in result1 {
+                let d = String(describing: data.span ?? "")
+                print("\(d)")
+                
+                let T = String(describing: data.created_at)
+                print("\(T)")
+              
+            }
+        } catch {
+            print("failed")
+            return result
+        }*/
+        return result
+    }
+    /** flush out db after 4 h time out */
+    public func flushOutSpanAfterTimePeriod() {
+        print("Core Data Store at ......\(NSPersistentContainer.defaultDirectoryURL().absoluteString)")
+        let managedObjectContext = persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
+        // Add Predicate
+        let flushDBTime = Date().addingTimeInterval(TimeInterval(-FLUSH_OUT_TIME_SECONDS))
+        let predicate = NSPredicate(format: "\(TimeStampColumn) < %@", flushDBTime as CVarArg)
+        fetchRequest.predicate = predicate
+        
+        do {
+            let records = try managedObjectContext.fetch(fetchRequest) as! [Pending]
+
+            for record in records {
+                managedObjectContext.delete(record)
+            }
+
+        } catch {
+            print(error)
+        }
+        
+        do {
+            try managedObjectContext.save()
             
-            // new logic
-            // convert struct in to jsonstring then save to db
-           // let jsonStr = pendingSpan.toJson()
-           // print(jsonStr)
-           // let spandataFromJSON: SpanData? = instantiate(jsonString: jsonStr)
-          //  print(spandataFromJSON!)
+        } catch let error as NSError {
+            print("could not save. \(error) \(error.userInfo)")
+        }
+        
+        
+    }
+    // single spandata delete.
+    public func deleteSpanData(spans : [SpanData]) {
+        let managedObjectContext = persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
+        
+        for span in spans {
+            // Add Predicate
+            let predicate = NSPredicate(format: "span == %@", span as! CVarArg)
+            fetchRequest.predicate = predicate
+            
+            do {
+                let records = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
+
+                for record in records {
+                    managedObjectContext.delete(record)
+                }
+
+            } catch {
+                print(error)
+            }
         }
        
+        // save context.
         do {
-            try managedObject.save()
+            try managedObjectContext.save()
             
         } catch let error as NSError {
             print("could not save. \(error) \(error.userInfo)")
         }
     }
-    //MARK:- fetch span from DB
-public func fetchSpanFromDB() -> [SpanData] {
-        let managedObject = persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Pending")
-        let result = [SpanData]()
+    
+    public func timeWiseSorting() {
+        
+        let managedObjectContext = persistentContainer.viewContext
+        // Create Fetch Request
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
+
+        // Add Sort Descriptor
+        let sortDescriptor = NSSortDescriptor(key: TimeStampColumn, ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+
         do {
-            //let  result1 = try managedObject.fetch(fetchRequest)
-            //print(result1)
-           let result1 = try managedObject.fetch(fetchRequest) as! [Pending]
-            for data in result1 {
-                var d = String(describing: data.span ?? "")
-                print("\(d)")
-                d.remove(at: d.index(before: d.endIndex))
-                d = d.replacingOccurrences(of: "SpanData(", with: "")
-                print("now string is ////// \(d)")
-                print(d.toJSON() as Any)
+            let records = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
+
+            for record in records {
+                print(record.value(forKey: TimeStampColumn) ?? "no time")
             }
+
         } catch {
-            print("failed")
-            return result
+            print(error)
         }
-        return result
     }
+    /**get used space and free space information**/
+    public func getStoreInformation() {
+       // let documentsDirectory = getLibraryDirectory()
+        let defaultdirecotry = NSPersistentContainer.defaultDirectoryURL()
+        let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum.sqlite").absoluteString.removingPercentEncoding
+        
+        do {
+            let fileAttributes = try FileManager.default.attributesOfItem(atPath: persistentStorePath!) as NSDictionary
+            print("Persistent store size: \(String(describing: fileAttributes.object(forKey: FileAttributeKey.size))) bytes")
+        } catch {
+            print("FileAttribute error: \(error)")
+        }
+        
+        do {
+            let fileSystemAttributes = try FileManager.default.attributesOfFileSystem(forPath: persistentStorePath!) as NSDictionary
+            print("Free space on file system: \(String(describing: fileSystemAttributes.object(forKey:FileAttributeKey.systemFreeSize))) bytes")
+        } catch {
+            print("FileAttribute error: \(error)")
+        }
+        
+       
+    }
+    
 }
 //MARK: -
 extension String {
@@ -179,6 +302,11 @@ func getDocumentsDirectory() -> URL {
     let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
     let documentsDirectory = paths[0]
     return documentsDirectory
+}
+func getLibraryDirectory() -> URL {
+    let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+    let librarysDirectory = paths[0]
+    return librarysDirectory
 }
 /*extension SpanData {
    init(record: SpanData) {
