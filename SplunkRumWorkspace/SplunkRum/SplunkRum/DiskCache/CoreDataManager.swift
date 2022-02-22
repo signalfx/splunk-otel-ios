@@ -23,7 +23,7 @@ import OpenTelemetrySdk
 import SwiftUI
 
 let FLUSH_OUT_TIME_SECONDS = 60   // 4 * 60 * 60  // 4 hours
-
+let FLUSH_OUT_MAX_SIZE = 2e+7  // 20 MB
 
 let Entity_name = "Pending"
 let TimeStampColumn = "created_at"
@@ -40,10 +40,14 @@ public class CoreDataManager {
             let messageKitBundle = Bundle(identifier: self.identifier)
             let modelURL = messageKitBundle!.url(forResource: self.model, withExtension: "momd")!
             let managedObjectModel =  NSManagedObjectModel(contentsOf: modelURL)
-            
+        
+            let storedescription = NSPersistentStoreDescription(url: NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Rum.sqlite"))
+            storedescription.setOption(true as NSNumber, forKey: NSSQLiteManualVacuumOption)
+       
             let container = NSPersistentContainer(name: self.model, managedObjectModel: managedObjectModel!)
+            container.persistentStoreDescriptions = [storedescription]
             container.loadPersistentStores { (storeDescription, error) in
-                
+                 
                 if let err = error{
                     fatalError("Loading of store failed:\(err)")
                 }
@@ -52,12 +56,9 @@ public class CoreDataManager {
             return container
         }()
     
-    
-    
-    //MARK:- Insert span in to DB
-
+//MARK:- Insert span in to DB
 public func insertSpanIntoDB(_ spans: [SpanData]) {
-   // getStoreInformation()
+    getStoreInformation()
    
     let spanArr : Array = [1,2,3,4]
    // let spanArr : Array = [spans]
@@ -86,9 +87,11 @@ public func fetchSpanFromDB() -> [SpanData] {
         let result1 = try managedObjectContext.fetch(fetchRequest) as! [Pending]
         for data in result1 {
            // guard let spanDataArray = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data.span!)) as? [SpanData] else { return [] }
-            guard let spanDataArray = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data.span!)) else { return [] }
+            guard (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data.span!)) != nil else { return [] }
            
-            print("out put is/////////// \(spanDataArray)")
+           /* guard let spanDataArray = (try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data.span!)) else { return [] }
+           
+            print("out put is/////////// \(spanDataArray)")*/
            
           
         }
@@ -117,6 +120,7 @@ public func fetchSpanFromDB() -> [SpanData] {
         }*/
         return result
     }
+    //MARK: - Flush out logic -
     /** flush out db after 4 h time out */
     public func flushOutSpanAfterTimePeriod() {
         print("Core Data Store at ......\(NSPersistentContainer.defaultDirectoryURL().absoluteString)")
@@ -155,8 +159,48 @@ public func fetchSpanFromDB() -> [SpanData] {
         
         
     }
+    /** delete record of db if db size exceed then max size*/
+    public func flushDbIfSizeExceed() {
+        let dbsize = getPersistentStoreSize() as! Double
+        if dbsize > FLUSH_OUT_MAX_SIZE {
+            deleteSpanInFifoManner()
+        }
+    }
+    /**delete db record in FIFO manner and vaccume space**/
+    public func deleteSpanInFifoManner() {
+        getStoreInformation()
+        let managedObjectContext = persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
+        
+        // Add Sort Descriptor
+        let sortDescriptor = NSSortDescriptor(key: TimeStampColumn, ascending: true)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        fetchRequest.fetchLimit = 1000
+        
+        do {
+            let records = try managedObjectContext.fetch(fetchRequest) as! [Pending]
+
+            for record in records {
+                managedObjectContext.delete(record)
+            }
+
+        } catch {
+            print(error)
+        }
+        
+        do {
+            try managedObjectContext.save()
+            
+        } catch let error as NSError {
+            print("could not save. \(error) \(error.userInfo)")
+            
+        }
+        getStoreInformation()
+       
+    }
     // single spandata delete.
     public func deleteSpanData(spans : [SpanData]) {
+        getStoreInformation()
         let managedObjectContext = persistentContainer.newBackgroundContext()
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
         
@@ -208,6 +252,20 @@ public func fetchSpanFromDB() -> [SpanData] {
         }
     }
     /**get used space and free space information**/
+    public func getPersistentStoreSize()-> Any {
+        let defaultdirecotry = NSPersistentContainer.defaultDirectoryURL()
+        let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum.sqlite").path
+        
+        do {
+            let fileAttributes = try FileManager.default.attributesOfItem(atPath: persistentStorePath) as NSDictionary
+            print("Persistent store size: \(String(describing: fileAttributes.object(forKey: FileAttributeKey.size))) bytes")
+            return fileAttributes.object(forKey: FileAttributeKey.size) as Any
+        } catch {
+            print("FileAttribute error: \(error)")
+            return error
+        }
+        
+    }
     public func getStoreInformation() {
         let defaultdirecotry = NSPersistentContainer.defaultDirectoryURL()
         let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum.sqlite").path
@@ -324,9 +382,14 @@ extension NSManagedObjectContext {
     /// - Throws: An error if anything went wrong executing the batch deletion.
     public func executeAndMergeChanges(using batchDeleteRequest: NSBatchDeleteRequest) throws {
         batchDeleteRequest.resultType = .resultTypeObjectIDs
-        let result = try execute(batchDeleteRequest) as? NSBatchDeleteResult
-        let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: result?.result as? [NSManagedObjectID] ?? []]
-        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self])
+        do {
+            let result = try execute(batchDeleteRequest) as? NSBatchDeleteResult
+            let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: result?.result as? [NSManagedObjectID] ?? []]
+            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self])
+        } catch {
+            print(error)
+        }
+        
     }
 }
 /*extension SpanData {

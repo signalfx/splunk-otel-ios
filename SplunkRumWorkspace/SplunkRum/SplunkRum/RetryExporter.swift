@@ -102,7 +102,9 @@ class RetryExporter: SpanExporter {
     // MARK:- attempt to export from DB
     func attemptDBExport() -> SpanExporterResultCode {
         // just for testing...
-      //  CoreDataManager.shared.flushOutSpanAfterTimePeriod()
+       // CoreDataManager.shared.flushOutSpanAfterTimePeriod()
+       // CoreDataManager.shared.deleteSpanInFifoManner()
+        CoreDataManager.shared.flushDbIfSizeExceed()
         
         let dbspans = CoreDataManager.shared.fetchSpanFromDB()
         
