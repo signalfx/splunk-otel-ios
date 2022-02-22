@@ -23,7 +23,6 @@ private var rumSessionId = generateNewSessionId()
 private var sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
 private let sessionIdLock = NSLock()
 private var sessionIdCallbacks: [(() -> Void)] = []
-private var isSessionIdChanged = false
 private var oldRumSessionId = ""
 
 func generateNewSessionId() -> String {
@@ -33,9 +32,6 @@ func generateNewSessionId() -> String {
         i += 1
         let b = Int.random(in: 0..<256)
         answer += String(format: "%02x", b)
-    }
-    if !oldRumSessionId.isEmpty { // firtst time id generated so it is not consider as session id changed
-        isSessionIdChanged = true
     }
     return answer
 }
@@ -51,6 +47,7 @@ func addSessionIdCallback(_ callback: @escaping (() -> Void)) {
 func getRumSessionId() -> String {
     sessionIdLock.lock()
     var unlocked = false
+    var isSessionIdChanged = false
     var callbacks: [(() -> Void)] = []
     defer {
         if !unlocked {
@@ -61,6 +58,7 @@ func getRumSessionId() -> String {
         sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
         oldRumSessionId = rumSessionId
         rumSessionId = generateNewSessionId()
+        isSessionIdChanged = true
         callbacks = sessionIdCallbacks
     }
     sessionIdLock.unlock()
@@ -74,7 +72,6 @@ func getRumSessionId() -> String {
     return rumSessionId
 }
 func createSessionIdChangeSpan() {
-    isSessionIdChanged = false
     let now = Date()
     let tracer = buildTracer()
     let span = tracer.spanBuilder(spanName: "sessionId.change").setStartTime(time: now).startSpan()
