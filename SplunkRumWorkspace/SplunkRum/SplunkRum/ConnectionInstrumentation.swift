@@ -17,39 +17,6 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 // MARK: - NSURLConnection Instrumentation -
-/*class ConnectionObserver: NSObject {
-    var span: Span?
-    // Observers aren't kept alive by observing...
-    var extraRefToSelf: ConnectionObserver?
-    var lock: NSLock = NSLock()
-    override init() {
-        super.init()
-        extraRefToSelf = self
-    }
-
-    override func observeValue(forKeyPath keyPath: String?,
-                               of object: Any?,
-                               change: [NSKeyValueChangeKey: Any]?,
-                               context: UnsafeMutableRawPointer?) {
-        lock.lock()
-        defer {
-            lock.unlock()
-        }
-        let connection = object as? NSURLConnection
-        if connection == nil {
-            return
-        }
-        if span == nil {
-            span = startConnectionSpan(request: connection!.originalRequest)
-            span?.setAttribute(key: "component", value: "NSURLConnection")
-            OpenTelemetry.instance.contextProvider.setActiveSpan(span!)
-        }
-        // FIXMEs possibly also allow .canceling to close the span?
-        if connection != nil  && extraRefToSelf != nil {
-             extraRefToSelf = nil
-        }
-    }
-}*/
 func startConnectionSpan(request: URLRequest?) -> Span? {
     if request == nil || request?.url == nil {
         return nil
