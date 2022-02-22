@@ -131,8 +131,6 @@ var splunkRumInitializeCalledTime = Date()
     static var initializing = false
     static var configuredOptions: SplunkRumOptions?
     static var theBeaconUrl: String?
-    static var screenFrames: ScreenFrames = ScreenFrames()
-
     /**
             Initialization function.  Call as early as possible in your application, but only on the main thread.
                 - Parameter beaconUrl: Destination for the captured data.
@@ -195,7 +193,6 @@ var splunkRumInitializeCalledTime = Date()
         initalizeNetworkInstrumentation()
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
-        screenFrames.start()
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true

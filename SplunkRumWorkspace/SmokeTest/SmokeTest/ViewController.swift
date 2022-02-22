@@ -44,7 +44,7 @@ class ViewController: UIViewController, WKUIDelegate, UITableViewDelegate, UITab
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         }
     override func viewDidAppear(_ animated: Bool) {
-       sleep(2)
+      sleep(5)
     }
 
     @IBAction func clickMe() {

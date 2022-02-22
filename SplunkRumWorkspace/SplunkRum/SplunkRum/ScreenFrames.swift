@@ -22,58 +22,55 @@ import UIKit
 
 class ScreenFrames: NSObject {
     
-    private var previousFrameTimestamp: CFTimeInterval = CACurrentMediaTime()
-    private let frozenFrameThreshold: CFTimeInterval = 0.7
-    private let previousFrameInitalValue: CFTimeInterval = -1
+    
     private var isRunning = false
     private var displayLink: CADisplayLink?
-    private var slowFrameThreshold: CFTimeInterval = CACurrentMediaTime()
+    /// Anything less than 59 FPS is slow.
+    private var slowFrameThreshold:CFTimeInterval = 1.0 / 59.0;
+    private var frozenFrameThreshold:CFTimeInterval = 700.0 / 1000.0;
+    
+   /// The ideal time interval between screen refresh updates.
+    private var duration = CFTimeInterval()
+
+   /// The time value associated with the previous frame.
+    private var timestamp = CFTimeInterval()
+
+    /// The time value associated with the current frame.
+    private var targetTimestamp = CFTimeInterval()
+
+   /// Returns the time in seconds since the last frame was dispatched.
+    private var intervalSinceLastFrame = CFTimeInterval()
     
     override init() {
             super.init()
             isRunning = false
-               // If we can't get the frame rate we assume it is 60.
-            var maximumFramesPerSecond = 60.0
-
-        if #available(iOS 10.3, *) {
-            maximumFramesPerSecond = Double(UIScreen.main.maximumFramesPerSecond)
-        }
-        slowFrameThreshold = 1 / (maximumFramesPerSecond - 1)
-
-        print(slowFrameThreshold)
     }
     
-    func timestamp() -> CFTimeInterval {
-        return displayLink?.timestamp ?? 0
-    }
-    
-    func start() {
+    func startTracking() {
         isRunning = true
-        displayLink = CADisplayLink(target: self, selector: #selector(displayLinkCallback))
-        displayLink?.add(to: .main, forMode: RunLoop.Mode.common)
+        stopTracking() /// make sure to stop a previous running display link
+        let displayLink = CADisplayLink(target: self, selector: #selector(displayLinkCallback))
+        displayLink.preferredFramesPerSecond = 60
+        displayLink.add(to: .main, forMode: .common)
+        self.displayLink = displayLink
     }
     
-    func stop() {
+    func stopTracking() {
         isRunning = false
         displayLink?.invalidate()
     }
     
-    @objc func displayLinkCallback() {
-
-        let lastFrameTimestamp: CFTimeInterval = timestamp()
-            if previousFrameTimestamp == previousFrameInitalValue {
-                previousFrameTimestamp = lastFrameTimestamp
-                return
-            }
-
-        let frameDuration = lastFrameTimestamp - previousFrameTimestamp
-          // print(String(format: "%.02f", frameDuration))
-        if frameDuration > slowFrameThreshold && frameDuration <= frozenFrameThreshold {
-                reportSlowframe(e: frameDuration)
+    @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
+        
+        duration = displayLink.targetTimestamp - displayLink.timestamp
+        if (duration > slowFrameThreshold) {
+            stopTracking()
+            reportSlowframe(e: duration)
+            
         }
-
-        if frameDuration > frozenFrameThreshold {
-            reportSlowframe(e: frameDuration)
+        if (duration > frozenFrameThreshold) {
+            stopTracking()
+            reportfrozenframe(e: duration)
         }
  
      }
@@ -81,10 +78,20 @@ class ScreenFrames: NSObject {
     func reportSlowframe(e: CFTimeInterval) {
         let tracer = buildTracer()
         let now = Date()
-        let typeName = "slow.frame"
+        let typeName = "slowRenders"
         let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
         span.setAttribute(key: "component", value: "ui")
         span.setAttribute(key: "slow.frame", value: e)
+        span.end(time: now)
+    }
+    
+    func reportfrozenframe(e: CFTimeInterval) {
+        let tracer = buildTracer()
+        let now = Date()
+        let typeName = "frozenRenders"
+        let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
+        span.setAttribute(key: "component", value: "ui")
+        span.setAttribute(key: "frozen.frame", value: e)
         span.end(time: now)
     }
 
