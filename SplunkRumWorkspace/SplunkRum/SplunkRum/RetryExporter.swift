@@ -79,8 +79,14 @@ class RetryExporter: SpanExporter {
         result = proxy.export(spans: spans)
         if result == .failure {
             CoreDataManager.shared.insertSpanIntoDB(spans)
+            
+//            for _ in 0...100000 {
+//                CoreDataManager.shared.insertSpanIntoDB(spans)
+//            }
+//            CoreDataManager.shared.getStoreInformation()
             return .failure
         }
+        
         return .success
     }
 
@@ -96,7 +102,7 @@ class RetryExporter: SpanExporter {
     // MARK:- attempt to export from DB
     func attemptDBExport() -> SpanExporterResultCode {
         // just for testing...
-        CoreDataManager.shared.flushOutSpanAfterTimePeriod()
+      //  CoreDataManager.shared.flushOutSpanAfterTimePeriod()
         
         let dbspans = CoreDataManager.shared.fetchSpanFromDB()
         

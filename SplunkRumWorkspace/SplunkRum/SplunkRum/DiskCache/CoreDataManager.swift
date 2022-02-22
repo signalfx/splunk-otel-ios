@@ -57,11 +57,11 @@ public class CoreDataManager {
     //MARK:- Insert span in to DB
 
 public func insertSpanIntoDB(_ spans: [SpanData]) {
-    getStoreInformation()
+   // getStoreInformation()
    
     let spanArr : Array = [1,2,3,4]
    // let spanArr : Array = [spans]
-    let managedObject = persistentContainer.viewContext
+    let managedObject = persistentContainer.newBackgroundContext()
 
     let spanEntity = NSEntityDescription.entity(forEntityName: Entity_name, in: managedObject)!
     
@@ -79,7 +79,7 @@ public func insertSpanIntoDB(_ spans: [SpanData]) {
 }
     //MARK:- fetch span from DB
 public func fetchSpanFromDB() -> [SpanData] {
-    let managedObjectContext = persistentContainer.viewContext
+    let managedObjectContext = persistentContainer.newBackgroundContext()
     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
     let result = [SpanData]()
     do {
@@ -120,14 +120,22 @@ public func fetchSpanFromDB() -> [SpanData] {
     /** flush out db after 4 h time out */
     public func flushOutSpanAfterTimePeriod() {
         print("Core Data Store at ......\(NSPersistentContainer.defaultDirectoryURL().absoluteString)")
-        let managedObjectContext = persistentContainer.viewContext
+        let managedObjectContext = persistentContainer.newBackgroundContext()
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
         // Add Predicate
         let flushDBTime = Date().addingTimeInterval(TimeInterval(-FLUSH_OUT_TIME_SECONDS))
         let predicate = NSPredicate(format: "\(TimeStampColumn) < %@", flushDBTime as CVarArg)
         fetchRequest.predicate = predicate
         
+        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        
         do {
+           try managedObjectContext.executeAndMergeChanges(using: batchDeleteRequest)
+        } catch {
+            print(error)
+        }
+        
+        /*do {
             let records = try managedObjectContext.fetch(fetchRequest) as! [Pending]
 
             for record in records {
@@ -143,13 +151,13 @@ public func fetchSpanFromDB() -> [SpanData] {
             
         } catch let error as NSError {
             print("could not save. \(error) \(error.userInfo)")
-        }
+        }*/
         
         
     }
     // single spandata delete.
     public func deleteSpanData(spans : [SpanData]) {
-        let managedObjectContext = persistentContainer.viewContext
+        let managedObjectContext = persistentContainer.newBackgroundContext()
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
         
         for span in spans {
@@ -180,7 +188,7 @@ public func fetchSpanFromDB() -> [SpanData] {
     
     public func timeWiseSorting() {
         
-        let managedObjectContext = persistentContainer.viewContext
+        let managedObjectContext = persistentContainer.newBackgroundContext()
         // Create Fetch Request
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
 
@@ -201,20 +209,20 @@ public func fetchSpanFromDB() -> [SpanData] {
     }
     /**get used space and free space information**/
     public func getStoreInformation() {
-       // let documentsDirectory = getLibraryDirectory()
         let defaultdirecotry = NSPersistentContainer.defaultDirectoryURL()
-        let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum.sqlite").absoluteString.removingPercentEncoding
+        let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum.sqlite").path
         
         do {
-            let fileAttributes = try FileManager.default.attributesOfItem(atPath: persistentStorePath!) as NSDictionary
+            let fileAttributes = try FileManager.default.attributesOfItem(atPath: persistentStorePath) as NSDictionary
             print("Persistent store size: \(String(describing: fileAttributes.object(forKey: FileAttributeKey.size))) bytes")
         } catch {
             print("FileAttribute error: \(error)")
         }
         
         do {
-            let fileSystemAttributes = try FileManager.default.attributesOfFileSystem(forPath: persistentStorePath!) as NSDictionary
-            print("Free space on file system: \(String(describing: fileSystemAttributes.object(forKey:FileAttributeKey.systemFreeSize))) bytes")
+            let fileSystemAttributes = try FileManager.default.attributesOfFileSystem(forPath: persistentStorePath) as NSDictionary
+            print("Free space on Device: \(String(describing: fileSystemAttributes.object(forKey:FileAttributeKey.systemFreeSize))) bytes")
+            print("Size of Device: \(String(describing: fileSystemAttributes.object(forKey:FileAttributeKey.systemSize))) bytes")
         } catch {
             print("FileAttribute error: \(error)")
         }
@@ -307,6 +315,19 @@ func getLibraryDirectory() -> URL {
     let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
     let librarysDirectory = paths[0]
     return librarysDirectory
+}
+extension NSManagedObjectContext {
+    
+    /// Executes the given `NSBatchDeleteRequest` and directly merges the changes to bring the given managed object context up to date.
+    ///
+    /// - Parameter batchDeleteRequest: The `NSBatchDeleteRequest` to execute.
+    /// - Throws: An error if anything went wrong executing the batch deletion.
+    public func executeAndMergeChanges(using batchDeleteRequest: NSBatchDeleteRequest) throws {
+        batchDeleteRequest.resultType = .resultTypeObjectIDs
+        let result = try execute(batchDeleteRequest) as? NSBatchDeleteResult
+        let changes: [AnyHashable: Any] = [NSDeletedObjectsKey: result?.result as? [NSManagedObjectID] ?? []]
+        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self])
+    }
 }
 /*extension SpanData {
    init(record: SpanData) {
