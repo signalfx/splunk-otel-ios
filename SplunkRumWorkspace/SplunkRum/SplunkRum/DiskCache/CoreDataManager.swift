@@ -60,8 +60,8 @@ public class CoreDataManager {
 public func insertSpanIntoDB(_ spans: [SpanData]) {
     getStoreInformation()
    
-    let spanArr : Array = [1,2,3,4]
-   // let spanArr : Array = [spans]
+    //let spanArr : Array = [1,2,3,4]
+    let spanArr : Array = [spans]
     let managedObject = persistentContainer.newBackgroundContext()
 
     let spanEntity = NSEntityDescription.entity(forEntityName: Entity_name, in: managedObject)!
