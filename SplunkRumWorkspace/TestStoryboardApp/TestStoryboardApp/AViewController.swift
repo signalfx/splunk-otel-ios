@@ -38,18 +38,18 @@ class AViewController: UIViewController, NSURLConnectionDelegate, NSURLConnectio
     @IBAction public func callSynchronousWebService() {
         print("NSURLConnection - Call")
         // post method check
-        let url = URL(string: "http://127.0.0.1:7878/data")! // sucess 500 "https://www.google.com"
+        let url = URL(string: "https://www.google.com")! // sucess 500
         var req = URLRequest(url: url)
-        req.httpMethod = "HEAD"
+        req.httpMethod = "GET"
         // let parameters = "email=dj@gmail.com&password=DhaJiv1!&returnSecureToken=true"
         // let postData =  parameters.data(using: .utf8)
         // req.httpBody = postData
         var response: URLResponse? = URLResponse()
-        //_ = try? NSURLConnection.sendSynchronousRequest(req, returning: &response)
         do {
-            _ = try? NSURLConnection.sendSynchronousRequest(req, returning: &response)
+            let data = try NSURLConnection.sendSynchronousRequest(req, returning: &response)
+            print(data)
         } catch {
             print(error)
         }
-        }
+      }
    }

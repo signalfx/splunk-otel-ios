@@ -124,10 +124,11 @@ extension NSURLConnection {
             if let httpResponse = response.pointee as? HTTPURLResponse {
                 endConnectionSpan(connection: nil, hresponse: httpResponse, error: nil, span: span!)
             }
+            return data
         } catch let error {
             endConnectionSpan(connection: nil, hresponse: nil, error: error, span: span!)
+            throw error
         }
-        return data
     }
     /**
      Adds a callback whenever the sendAsynchronousRequest called.
