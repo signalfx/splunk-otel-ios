@@ -328,7 +328,9 @@ var splunkRumInitializeCalledTime = Date()
     }
     
     @objc public class func locationName(_ userLatLong: Bool) {
-        locationData.rumMobileLocation()
+        if userLatLong == true {
+           locationData.rumMobileLocation()
+        }
     }
 
 }
