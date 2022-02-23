@@ -23,7 +23,7 @@ import OpenTelemetrySdk
 import SwiftUI
 
 let FLUSH_OUT_TIME_SECONDS = 60   // 4 * 60 * 60  // 4 hours
-let FLUSH_OUT_MAX_SIZE = 2e+7  // 20 MB
+let FLUSH_OUT_MAX_SIZE = 21966080  // 20 MB
 
 let Entity_name = "Pending"
 let TimeStampColumn = "created_at"
@@ -161,7 +161,7 @@ public func fetchSpanFromDB() -> [SpanData] {
     }
     /** delete record of db if db size exceed then max size*/
     public func flushDbIfSizeExceed() {
-        let dbsize = getPersistentStoreSize() as! Double
+        let dbsize = getPersistentStoreSize() as! Int
         if dbsize > FLUSH_OUT_MAX_SIZE {
             deleteSpanInFifoManner()
         }
@@ -339,6 +339,10 @@ extension String {
         }
 }*/
 /*extension SpanData: Codable {
+    public init(from decoder: Decoder) throws {
+        print("decoder")
+    }
+    
    
    public func encode(to encoder: Encoder) throws {
         print("Encode")
