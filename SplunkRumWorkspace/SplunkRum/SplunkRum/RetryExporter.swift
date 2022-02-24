@@ -73,12 +73,14 @@ class RetryExporter: SpanExporter {
     func export(spans: [SpanData]) -> SpanExporterResultCode {
         var result = attemptDBExport()
         if result == .failure {
-            CoreDataManager.shared.insertSpanIntoDB(spans)
+           // CoreDataManager.shared.insertSpanIntoDB(spans) // as binary
+            CoreDataManager.shared.insertReadableSpabIntoDB(spans) // as string
             return .failure
         }
         result = proxy.export(spans: spans)
         if result == .failure {
-            CoreDataManager.shared.insertSpanIntoDB(spans)
+           // CoreDataManager.shared.insertSpanIntoDB(spans) // as binary
+            CoreDataManager.shared.insertReadableSpabIntoDB(spans) // as string
             
 //            for _ in 0...100000 {
 //                CoreDataManager.shared.insertSpanIntoDB(spans)
@@ -106,7 +108,8 @@ class RetryExporter: SpanExporter {
        // CoreDataManager.shared.deleteSpanInFifoManner()
         CoreDataManager.shared.flushDbIfSizeExceed()
         
-        let dbspans = CoreDataManager.shared.fetchSpanFromDB()
+       // let dbspans = CoreDataManager.shared.fetchSpanFromDB()
+        let dbspans = CoreDataManager.shared.fetchReadableSpanFromDB()
         
         if dbspans.isEmpty {
             return .success

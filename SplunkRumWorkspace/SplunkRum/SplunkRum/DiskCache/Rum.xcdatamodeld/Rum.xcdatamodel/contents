@@ -4,7 +4,12 @@
         <attribute name="created_at" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="span" optional="YES" attributeType="Binary"/>
     </entity>
+    <entity name="ReadableSpans" representedClassName="ReadableSpans" syncable="YES" codeGenerationType="class">
+        <attribute name="created_at" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="rSpan" optional="YES" attributeType="String"/>
+    </entity>
     <elements>
         <element name="Pending" positionX="-63" positionY="-18" width="128" height="59"/>
+        <element name="ReadableSpans" positionX="-63" positionY="0" width="128" height="59"/>
     </elements>
 </model>

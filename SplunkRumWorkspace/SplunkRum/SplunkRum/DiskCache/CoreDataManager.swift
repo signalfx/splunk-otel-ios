@@ -57,11 +57,70 @@ public class CoreDataManager {
         }()
     
 //MARK:- Insert span in to DB
+    public func insertReadableSpabIntoDB(_ spans: [SpanData]){
+        
+        let managedObject = persistentContainer.viewContext
+        let spanEntity = NSEntityDescription.entity(forEntityName: "ReadableSpans", in: managedObject)!
+        
+        //insert record logic
+        for pendingSpan in spans {
+            let span = NSManagedObject(entity: spanEntity, insertInto: managedObject)
+            let str = String(describing: pendingSpan)
+            print(str)
+            // add try to convert str in to span data logic here
+            span.setValue(String(describing: pendingSpan), forKey: "rSpan")
+            span.setValue(Date(), forKey: TimeStampColumn)
+            
+            // new logic
+            // convert struct in to jsonstring then save to db
+           // let jsonStr = pendingSpan.toJson()
+           // print(jsonStr)
+           // let spandataFromJSON: SpanData? = instantiate(jsonString: jsonStr)
+          //  print(spandataFromJSON!)
+            do {
+                try managedObject.save()
+                
+            } catch let error as NSError {
+                print("could not save. \(error) \(error.userInfo)")
+            }
+        }
+    }
+    public func fetchReadableSpanFromDB() -> [SpanData] {
+            let managedObjectContext = persistentContainer.viewContext
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ReadableSpans")
+            let result = [SpanData]()
+            do {
+                //let  result1 = try managedObject.fetch(fetchRequest)
+                //print(result1)
+               let result1 = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
+                for data in result1 {
+                    var d = String(describing: data.value(forKey: "rSpan")!)
+                    print("\(d)")
+                    
+                    let T = String(describing: data.value(forKey: "created_at")!)
+                    print("\(T)")
+                    d.remove(at: d.index(before: d.endIndex))
+                    d = d.replacingOccurrences(of: "SpanData(", with: "")
+                    print("now string is ////// \(d)")
+                   // print(d.toJSON() as Any)
+                    let encoder = JSONEncoder()
+                    if let jsonData = try? encoder.encode(d) {
+                        if let jsonString = String(data: jsonData, encoding: .utf8) {
+                            print(jsonString) //not proper json
+                        }
+                    }
+                }
+            } catch {
+                print("failed")
+                return result
+            }
+            return result
+        }
 public func insertSpanIntoDB(_ spans: [SpanData]) {
     getStoreInformation()
    
-    //let spanArr : Array = [1,2,3,4]
-    let spanArr : Array = [spans]
+    let spanArr : Array = [1,2,3,4]
+   // let spanArr : Array = [spans]
     let managedObject = persistentContainer.newBackgroundContext()
 
     let spanEntity = NSEntityDescription.entity(forEntityName: Entity_name, in: managedObject)!
@@ -419,4 +478,65 @@ extension NSManagedObjectContext {
        self.settingTotalAttributeCount(record.totalAttributeCount)
        // self.instrumentationLibraryInfo = InstrumentationLibraryInfo()
  }
+}*/
+/*extension SpanData {
+    public init(traceId: TraceId, spanId: SpanId, traceFlags: TraceFlags = TraceFlags(), traceState: TraceState = TraceState(), parentSpanId: SpanId? = nil, resource: Resource = Resource(), instrumentationLibraryInfo: InstrumentationLibraryInfo = InstrumentationLibraryInfo(), name: String, kind: SpanKind, startTime: Date, attributes: [String : AttributeValue] = [String: AttributeValue](), events: [SpanData.Event] = [Event](), links: [SpanData.Link] = [Link](), status: Status = .unset, endTime: Date, hasRemoteParent: Bool = false, hasEnded: Bool = false, totalRecordedEvents: Int = 0, totalRecordedLinks: Int = 0, totalAttributeCount: Int = 0) {
+        self.init(traceId: traceId, spanId: spanId, name: name, kind: kind, startTime: startTime, endTime: endTime)
+       
+        self.settingTraceFlags(traceFlags)
+        self.settingTraceState(traceState)
+        self.settingParentSpanId(parentSpanId!)
+        self.settingResource(resource)
+        self.settingAttributes(attributes)
+        self.settingEvents(events)
+        self.settingLinks(links)
+        self.settingStatus(status)
+        self.settingHasRemoteParent(hasRemoteParent)
+        self.settingHasEnded(hasEnded)
+        self.settingTotalRecordedEvents(totalRecordedEvents)
+        self.settingTotalRecordedLinks(totalRecordedLinks)
+        self.settingTotalAttributeCount(totalAttributeCount)
+    }
+}*/
+/*class SpanDataContainer : Codable {
+    var spandata: SpanData
+    
+    init(spandata: SpanData) {
+        self.spandata = spandata
+    }
+    required init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let traceId = try container.decode(TraceId.self, forKey: .traceId)
+            let spanId = try container.decode(SpanId.self, forKey: .spanId)
+        
+            spandata = SpanData(traceId: traceId, spanId: spanId, traceFlags: <#T##TraceFlags#>, traceState: <#T##TraceState#>, parentSpanId: <#T##SpanId?#>, resource: <#T##Resource#>, instrumentationLibraryInfo: <#T##InstrumentationLibraryInfo#>, name: <#T##String#>, kind: <#T##SpanKind#>, startTime: <#T##Date#>, attributes: <#T##[String : AttributeValue]#>, events: <#T##[SpanData.Event]#>, links: <#T##[SpanData.Link]#>, status: <#T##Status#>, endTime: <#T##Date#>, hasRemoteParent: <#T##Bool#>, hasEnded: <#T##Bool#>, totalRecordedEvents: <#T##Int#>, totalRecordedLinks: <#T##Int#>, totalAttributeCount: <#T##Int#>)
+            
+        }
+        
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+      //  try container.encode(spandata.traceId, forKey: .traceId) // Might want to make sure that the name is not nil here
+    }
+        
+        enum CodingKeys: String, CodingKey {
+            case traceId
+            case spanId
+            case traceFlags
+            case traceState
+            case parentSpanId
+            case resource
+            case instrumentationLibraryInfo
+            case name
+            case startTime
+            case attributes
+            case events
+            case links
+            case status
+            case endTime
+            case hasRemoteParent
+            case hasEnded
+            case totalRecordedEvents
+            case totalRecordedLinks
+            case totalAttributeCount
+        }
 }*/
