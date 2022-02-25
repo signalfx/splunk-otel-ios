@@ -21,12 +21,14 @@ import CoreData
 import OpenTelemetryApi
 import OpenTelemetrySdk
 import SwiftUI
+import ZipkinExporter
 
 let FLUSH_OUT_TIME_SECONDS = 60   // 4 * 60 * 60  // 4 hours
 let FLUSH_OUT_MAX_SIZE = 21966080  // 20 MB
 
 let Entity_name = "Pending"
 let TimeStampColumn = "created_at"
+let ENTITY_NAME = "PendingSpans"
 
 
 
@@ -56,20 +58,116 @@ public class CoreDataManager {
             return container
         }()
     
+    //MARK: - Insert seperate value -
+    public func insertSpanValue(_ spans: [SpanData]) {
+        let managedObjectContext = persistentContainer.viewContext
+        let spanEntity = NSEntityDescription.entity(forEntityName: ENTITY_NAME, in: managedObjectContext)!
+        for pendingSpan in spans {
+            let span = NSManagedObject(entity: spanEntity, insertInto: managedObjectContext)
+            let encoder = JSONEncoder()
+            if let jsonData = try? encoder.encode(pendingSpan.attributes) {
+                if let jsonString = String(data: jsonData, encoding: . utf8) {
+                    print(jsonString)
+                    span.setValue(jsonString, forKey: "attributes")
+                    
+                }
+            }
+            
+           
+            span.setValue(String(describing: pendingSpan.events), forKey: "events")
+            span.setValue(pendingSpan.endTime, forKey: "duration")
+            span.setValue(String(describing:pendingSpan.kind), forKey: "kind")
+            span.setValue(String(describing:pendingSpan.parentSpanId), forKey: "parentSpanId")
+            span.setValue(String(describing:pendingSpan.spanId), forKey: "spanId")
+            span.setValue(pendingSpan.name, forKey: "spanName")
+            span.setValue(pendingSpan.startTime, forKey: "start")
+            span.setValue(String(describing:pendingSpan.traceFlags), forKey: "traceFlags")
+            span.setValue(String(describing:pendingSpan.traceId), forKey: "traceId")
+            span.setValue(String(describing:pendingSpan.traceState), forKey: "traceState")
+            span.setValue(Date(), forKey: TimeStampColumn)  // this is used only for flush out
+           
+            // save in to db
+            do {
+                try managedObjectContext.save()
+            } catch let error as NSError {
+                print("could not save. \(error) \(error.userInfo)")
+            }
+        }
+    }
+   // public func fetchSpanValues() {
+    public func fetchSpanValues()->[SpanData] {
+        let managedObjectContext = persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: ENTITY_NAME)
+        var newSpans = [SpanData]()
+        do {
+            let spans = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
+            for span in spans as [NSManagedObject] {
+                print(span)
+                newSpans.append(createNewSpan(using: span))
+               // createNewSpan(using: span)
+            }
+        } catch {
+            print(error)
+        }
+        return newSpans
+   }
+    func createNewSpan(using spanInfo: NSManagedObject) -> SpanData {
+   // func createNewSpan(using spanInfo: NSManagedObject) {
+        let tracer = buildTracer()
+        let span = tracer.spanBuilder(spanName:spanInfo.value(forKey: "spanName") as! String).setStartTime(time: spanInfo.value(forKey: "start") as! Date).startSpan()
+       // span.addEvent(name: spanInfo.value(forKey: "events") as! String)
+        //.setSpanKind(spanKind: spanInfo.value(forKey: "kind") as! SpanKind )
+        let attributesDict = convertStringToDictionary(text: spanInfo.value(forKey: "attributes") as! String)
+        for dict in attributesDict! {
+          //  span.setAttribute(key: dict.key, value: dict.value as! String)
+            print(dict)
+        }
+        span.end(time: spanInfo.value(forKey: "duration") as! Date)
+        return (span as! RecordEventsReadableSpan).toSpanData()
+    }
+    func convertStringToDictionary(text: String) -> [String:AnyObject]? {
+        if let data = text.data(using: .utf8) {
+            do {
+                let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:AnyObject]
+                return json
+            } catch {
+                print("Something went wrong")
+            }
+        }
+        return nil
+    }
 //MARK:- Insert span in to DB
+    /*func encodeSpans(spans: [SpanData]) -> [ZipkinSpan] {
+        return spans.map { ZipkinConversionExtension.toZipkinSpan(otelSpan: $0, defaultLocalEndpoint: localEndPoint) }
+    }*/
     public func insertReadableSpabIntoDB(_ spans: [SpanData]){
         
         let managedObject = persistentContainer.viewContext
         let spanEntity = NSEntityDescription.entity(forEntityName: "ReadableSpans", in: managedObject)!
-        
+       // let spans = encodeSpans(spans: spans)
         //insert record logic
         for pendingSpan in spans {
             let span = NSManagedObject(entity: spanEntity, insertInto: managedObject)
-            let str = String(describing: pendingSpan)
+          
+            do {
+                let jsonEncoder = JSONEncoder()
+                let jsonData = try jsonEncoder.encode(SpanExporterData(span: pendingSpan))
+                if let json = String(data: jsonData, encoding: .utf8) {
+                    print(json)
+                    span.setValue(json, forKey: "rSpan")
+                    span.setValue(Date(), forKey: TimeStampColumn)
+                    
+                }
+            } catch {
+                print(error)
+            }
+            
+            
+          /*  let str = String(describing: pendingSpan)
             print(str)
             // add try to convert str in to span data logic here
             span.setValue(String(describing: pendingSpan), forKey: "rSpan")
-            span.setValue(Date(), forKey: TimeStampColumn)
+            span.setValue(Date(), forKey: TimeStampColumn)*/
             
             // new logic
             // convert struct in to jsonstring then save to db
@@ -85,6 +183,40 @@ public class CoreDataManager {
             }
         }
     }
+   
+        /*return SpanData(traceId: TraceId(),
+                               spanId: SpanId(),
+                               traceFlags: TraceFlags(),
+                               traceState: TraceState(),
+                               resource: Resource(),
+                               instrumentationLibraryInfo: InstrumentationLibraryInfo(),
+                               name: "spanName",
+                               kind: .server,
+                               startTime: Date(timeIntervalSinceReferenceDate: 3000),
+                               endTime: Date(timeIntervalSinceReferenceDate: 3001),
+                               hasRemoteParent: false)*/
+       
+   
+  
+  /*  public func export(spans: [SpanData]) {
+            Opentelemetry_Proto_Collector
+            let exportRequest = Opentelemetry_Proto_Collector_Trace_V1_ExportTraceServiceRequest.with {
+                $0.resourceSpans = SpanAdapter.toProtoResourceSpans(spanDataList: spans)
+            }
+            
+            do {
+                let jsonData = try exportRequest.jsonUTF8Data()
+                do {
+                    let span = try JSONDecoder().decode(OtlpSpan.self, from: jsonData)
+                    exportedSpans.append(span)
+                } catch {
+                    print("Decode Error: \(error)")
+                }
+                return .success
+            } catch {
+                return .failure
+            }
+        }*/
     public func fetchReadableSpanFromDB() -> [SpanData] {
             let managedObjectContext = persistentContainer.viewContext
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ReadableSpans")
@@ -94,21 +226,29 @@ public class CoreDataManager {
                 //print(result1)
                let result1 = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
                 for data in result1 {
-                    var d = String(describing: data.value(forKey: "rSpan")!)
+                    /*var d = String(describing: data.value(forKey: "rSpan")!)
                     print("\(d)")
                     
                     let T = String(describing: data.value(forKey: "created_at")!)
                     print("\(T)")
                     d.remove(at: d.index(before: d.endIndex))
                     d = d.replacingOccurrences(of: "SpanData(", with: "")
-                    print("now string is ////// \(d)")
-                   // print(d.toJSON() as Any)
-                    let encoder = JSONEncoder()
-                    if let jsonData = try? encoder.encode(d) {
-                        if let jsonString = String(data: jsonData, encoding: .utf8) {
-                            print(jsonString) //not proper json
-                        }
+                    print("now string is ////// \(d)")*/
+                    
+                    let jsonString = data.value(forKey: "rSpan")! as! String
+                    let jsonData = Data(jsonString.utf8)
+                    let decoder = JSONDecoder()
+
+                    do {
+                        let span = try decoder.decode(SpanExporterData.self, from: jsonData)
+                        print(span)
+                       // print("Stat time  == \(span.start as Date)")
+                       print("TraceID == \(TraceId(fromHexString: span.traceId))")
+                     //   result.append(SpanData(traceId:TraceId(fromHexString: span.traceId), spanId:SpanId(id: span.spanId as! UInt64), name:span.span, kind:SpanKind(rawValue: span.spanKind)!, startTime: span.start as Date, endTime:span.duration as! Date))
+                    } catch {
+                        print(error.localizedDescription)
                     }
+                  
                 }
             } catch {
                 print("failed")
@@ -220,10 +360,10 @@ public func fetchSpanFromDB() -> [SpanData] {
     }
     /** delete record of db if db size exceed then max size*/
     public func flushDbIfSizeExceed() {
-        let dbsize = getPersistentStoreSize() as! Int
+       /* let dbsize = getPersistentStoreSize() as! Int
         if dbsize > FLUSH_OUT_MAX_SIZE {
             deleteSpanInFifoManner()
-        }
+        }*/
     }
     /**delete db record in FIFO manner and vaccume space**/
     public func deleteSpanInFifoManner() {
@@ -454,6 +594,65 @@ extension NSManagedObjectContext {
         }
         
     }
+}
+//MARK: -
+class SpanExporterData: Encodable ,Decodable{
+    public let span: String
+    public let traceId: String
+    public let spanId: String
+    public let spanKind: String
+   // public let traceFlags: TraceFlags
+   // public let traceState: TraceState
+    public let parentSpanId: String?
+    public let start: Date
+    public let duration: TimeInterval
+   // public let attributes: [String: AttributeValue]
+
+    init(span: SpanData) {
+        self.span = span.name
+        self.traceId = span.traceId.hexString
+        self.spanId = span.spanId.hexString
+        self.spanKind = span.kind.rawValue
+      //  self.traceFlags = span.traceFlags
+      //  self.traceState = span.traceState
+        self.parentSpanId = span.parentSpanId?.hexString ?? SpanId.invalid.hexString
+        self.start = span.startTime
+        self.duration = span.endTime.timeIntervalSince(span.startTime)
+       // self.attributes = span.attributes
+    }
+    
+   /* enum CodingKeys: String, CodingKey {
+        case traceId
+        case spanId
+        case traceFlags
+        case traceState
+        case parentSpanId
+        case resource
+        case instrumentationLibraryInfo
+        case name
+        case start
+        case attributes
+        case events
+        case links
+        case status
+        case duration
+        case span
+        case spanKind
+        case hasRemoteParent
+        case hasEnded
+        case totalRecordedEvents
+        case totalRecordedLinks
+        case totalAttributeCount
+    }
+    
+    required init(from decoder:Decoder) throws {
+            let values = try decoder.container(keyedBy: CodingKeys.self)
+            span = try values.decode(String.self, forKey: .span)
+            traceId = try values.decode(String.self, forKey: .traceId)
+        }*/
+}
+func instantiate<T: Decodable>(jsonString: String) -> T? {
+    return try? JSONDecoder().decode(T.self, from: jsonString.data(using: .utf8)!)
 }
 /*extension SpanData {
    init(record: SpanData) {
