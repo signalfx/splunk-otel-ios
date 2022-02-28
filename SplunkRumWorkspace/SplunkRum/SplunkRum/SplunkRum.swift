@@ -37,7 +37,7 @@ let SplunkRumVersionString = "0.5.2"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, isNetworkInstrumentation: Bool = true) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -45,6 +45,7 @@ let SplunkRumVersionString = "0.5.2"
         self.environment = environment
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
+        self.isNetworkInstrumentation = isNetworkInstrumentation
     }
     /**
         Copy constructor
@@ -59,6 +60,7 @@ let SplunkRumVersionString = "0.5.2"
         self.spanFilter = opts.spanFilter
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
+        self.isNetworkInstrumentation = opts.isNetworkInstrumentation
     }
 
     /**
@@ -98,6 +100,12 @@ let SplunkRumVersionString = "0.5.2"
      Enable span creation for screen name changes
      */
     @objc public var screenNameSpans: Bool = true
+    
+    
+    /**
+     Enable NetworkInstrumentation span creation for https calls.
+     */
+    @objc public var isNetworkInstrumentation: Bool = true
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
@@ -191,7 +199,9 @@ var splunkRumInitializeCalledTime = Date()
         if options != nil {
             srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
         }
-        initalizeNetworkInstrumentation()
+        if options?.isNetworkInstrumentation == true{
+            initalizeNetworkInstrumentation()
+        }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
