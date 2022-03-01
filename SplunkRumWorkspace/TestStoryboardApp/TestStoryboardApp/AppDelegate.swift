@@ -20,7 +20,6 @@ import UIKit
 // FIXME align the framework name and directory names with the swift package name at some point
 import SplunkRum
 
-
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 

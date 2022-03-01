@@ -25,8 +25,6 @@ fileprivate var screenNameManuallySet = false
 // I could find in the stdlib
 fileprivate var lock = NSLock()
 
-
-
 func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
     let now = Date()
     let span = buildTracer().spanBuilder(spanName: "screen name change").setStartTime(time: now).startSpan()
