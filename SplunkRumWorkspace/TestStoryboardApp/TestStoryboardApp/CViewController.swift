@@ -14,15 +14,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+	
 
 import Foundation
 import UIKit
 
-class BViewController: UIViewController {
+class CViewController: UIViewController {
 
-    @IBAction public func bAction() {
-        print("b action")
-    }
     @IBAction public func Crash() {
         print("crash coming...")
         let null = UnsafePointer<UInt8>(bitPattern: 0)

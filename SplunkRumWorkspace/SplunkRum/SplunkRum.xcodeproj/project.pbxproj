@@ -34,6 +34,7 @@
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
+		C80CBD7D27C911AD00707BE8 /* SplunkOtelCrashReporting in Frameworks */ = {isa = PBXBuildFile; productRef = C80CBD7C27C911AD00707BE8 /* SplunkOtelCrashReporting */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +96,7 @@
 				869E0B8C273AC48B00EBDA52 /* ZipkinExporter in Frameworks */,
 				8610004626178DB9008B972A /* DeviceKit in Frameworks */,
 				869E0B8A273AC48000EBDA52 /* StdoutExporter in Frameworks */,
+				C80CBD7D27C911AD00707BE8 /* SplunkOtelCrashReporting in Frameworks */,
 				869E0B86273AC46B00EBDA52 /* OpenTelemetryApi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -208,6 +210,7 @@
 				869E0B87273AC47700EBDA52 /* OpenTelemetrySdk */,
 				869E0B89273AC48000EBDA52 /* StdoutExporter */,
 				869E0B8B273AC48B00EBDA52 /* ZipkinExporter */,
+				C80CBD7C27C911AD00707BE8 /* SplunkOtelCrashReporting */,
 			);
 			productName = SplunkRum;
 			productReference = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */;
@@ -266,6 +269,7 @@
 				86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */,
 				865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */,
 				8610004426178DB9008B972A /* XCRemoteSwiftPackageReference "DeviceKit" */,
+				C80CBD7B27C911AD00707BE8 /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */,
 			);
 			productRefGroup = 86260EC525CDC1DE009F3CB1 /* Products */;
 			projectDirPath = "";
@@ -618,6 +622,14 @@
 				version = 1.5.0;
 			};
 		};
+		C80CBD7B27C911AD00707BE8 /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/signalfx/splunk-otel-ios-crashreporting/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -650,6 +662,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = ZipkinExporter;
+		};
+		C80CBD7C27C911AD00707BE8 /* SplunkOtelCrashReporting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C80CBD7B27C911AD00707BE8 /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */;
+			productName = SplunkOtelCrashReporting;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

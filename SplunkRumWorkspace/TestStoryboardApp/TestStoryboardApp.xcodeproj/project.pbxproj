@@ -17,6 +17,7 @@
 		86D3D38C25E80649004DD939 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86D3D38A25E80649004DD939 /* LaunchScreen.storyboard */; };
 		86D3D39525E80D61004DD939 /* AViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39425E80D61004DD939 /* AViewController.swift */; };
 		86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39725E80DBC004DD939 /* BViewController.swift */; };
+		C80CBD7A27C8EEB400707BE8 /* CViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80CBD7927C8EEB400707BE8 /* CViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -46,6 +47,7 @@
 		86D3D39425E80D61004DD939 /* AViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AViewController.swift; sourceTree = "<group>"; };
 		86D3D39725E80DBC004DD939 /* BViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BViewController.swift; sourceTree = "<group>"; };
 		86D3D3A125E8240F004DD939 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C80CBD7927C8EEB400707BE8 /* CViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 				86D3D38D25E80649004DD939 /* Info.plist */,
 				86D3D39425E80D61004DD939 /* AViewController.swift */,
 				86D3D39725E80DBC004DD939 /* BViewController.swift */,
+				C80CBD7927C8EEB400707BE8 /* CViewController.swift */,
 			);
 			path = TestStoryboardApp;
 			sourceTree = "<group>";
@@ -181,6 +184,7 @@
 				86D3D38425E80648004DD939 /* ViewController.swift in Sources */,
 				86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */,
 				86D3D38025E80648004DD939 /* AppDelegate.swift in Sources */,
+				C80CBD7A27C8EEB400707BE8 /* CViewController.swift in Sources */,
 				86D3D38225E80648004DD939 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
