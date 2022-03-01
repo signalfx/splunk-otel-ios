@@ -70,4 +70,3 @@ func getScreenName() -> String {
     }
     return screenName
 }
-
