@@ -23,10 +23,4 @@ class BViewController: UIViewController {
     @IBAction public func bAction() {
         print("b action")
     }
-    @IBAction public func Crash() {
-        print("crash coming...")
-        let null = UnsafePointer<UInt8>(bitPattern: 0)
-        let derefNull = null!.pointee
-  
-    }
 }

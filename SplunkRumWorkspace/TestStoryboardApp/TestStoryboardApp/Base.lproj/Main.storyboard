@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -88,15 +87,6 @@
                                     <action selector="bAction" destination="hLz-ON-Bcx" eventType="touchUpInside" id="vjH-pB-mSq"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tTw-wG-2lC">
-                                <rect key="frame" x="54" y="406" width="205" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Crash "/>
-                                <connections>
-                                    <action selector="Crash" destination="hLz-ON-Bcx" eventType="touchUpInside" id="hhu-cY-FsX"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="cDd-yZ-94m"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -105,7 +95,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cbO-cY-hrb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1162.3188405797102" y="195.53571428571428"/>
+            <point key="canvasLocation" x="1163" y="196"/>
         </scene>
         <!--Item 1-->
         <scene sceneID="us9-vj-pw6">
@@ -116,12 +106,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kn3-ak-7wk">
-                                <rect key="frame" x="129" y="386" width="75" height="30"/>
+                                <rect key="frame" x="41" y="422" width="75" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="BUTTON A"/>
                                 <connections>
                                     <action selector="aAction" destination="prD-nr-5Ob" eventType="touchUpInside" id="kda-pk-yqY"/>
-                                    <segue destination="UXV-q6-T7G" kind="presentation" id="SpC-gH-gt5"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -133,32 +122,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Waz-Xv-aYt" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1163" y="-410"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="sba-gS-DeU">
-            <objects>
-                <viewController id="UXV-q6-T7G" customClass="CViewController" customModule="TestStoryboardApp" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="85u-XK-n5U">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="842"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0L2-7k-QO0">
-                                <rect key="frame" x="63" y="316" width="289" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Crash "/>
-                                <connections>
-                                    <action selector="Crash" destination="UXV-q6-T7G" eventType="touchUpInside" id="aC0-Kh-hgw"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="2yp-xd-Lyr"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="GIQ-qV-hkW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2019" y="-410"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="cY5-aF-ZwQ">
