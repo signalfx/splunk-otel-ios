@@ -17,7 +17,9 @@ limitations under the License.
 
 import Foundation
 
-fileprivate var screenName: String = "unknown"
+let userDefaults = UserDefaults.standard
+let SCREEN_NAME_KEY = "screenName"
+fileprivate var screenName: String = userDefaults.string(forKey: SCREEN_NAME_KEY) ?? "unknown"
 fileprivate var screenNameManuallySet = false
 // Yes, I assume there are swift libraries to do this sort of thing, but nothing
 // I could find in the stdlib
@@ -34,7 +36,6 @@ func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
 // Assumes main thread
 func internal_setScreenName(_ newName: String, _ manual: Bool) {
     var oldName: String?
-
     lock.lock()
     if screenName != newName {
         oldName = screenName
@@ -52,6 +53,7 @@ func internal_setScreenName(_ newName: String, _ manual: Bool) {
     if oldName != nil && oldName! != "unknown" && (SplunkRum.configuredOptions?.screenNameSpans ?? true) {
         emitScreenNameChangedSpan(oldName!, newName)
     }
+    userDefaults.set(screenName, forKey: SCREEN_NAME_KEY)
 }
 
 func isScreenNameManuallySet() -> Bool {
@@ -68,3 +70,4 @@ func getScreenName() -> String {
     }
     return screenName
 }
+
