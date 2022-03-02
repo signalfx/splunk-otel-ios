@@ -101,7 +101,6 @@ let SplunkRumVersionString = "0.5.2"
      */
     @objc public var screenNameSpans: Bool = true
     
-    
     /**
      Enable NetworkInstrumentation span creation for https calls.
      */
@@ -199,7 +198,7 @@ var splunkRumInitializeCalledTime = Date()
         if options != nil {
             srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
         }
-        if options?.isNetworkInstrumentation == true{
+        if options?.isNetworkInstrumentation == true {
             initalizeNetworkInstrumentation()
         }
         initializeNetworkTypeMonitoring()
