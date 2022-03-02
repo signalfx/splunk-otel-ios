@@ -58,7 +58,7 @@ or
 | spanRejectionFilter | ((SpanData) -> SpanData?)? | Closure to modify or reject/ignore spans.  See example below.  | `nil` |
 | showVCInstrumentation | Bool | Enable span creation for ViewController Show events (not applicable to all UI frameworks/apps) | true |
 | screenNameSpans | Bool | Enable span creation for changes to the screen name | true |
-| networkInstrumentation | Bool | Enable span creation for NetworkInstrumentation(HTTP activity) | true |
+| networkInstrumentation | Bool | Enable span creation for network activities | true |
 
 ## Crash Reporting
 

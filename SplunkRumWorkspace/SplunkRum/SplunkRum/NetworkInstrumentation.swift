@@ -198,8 +198,8 @@ extension URLSession {
         wireUpTaskObserver(task: answer)
         return answer
        }
-
-    @objc(splunkSwizzledDownloadTaskWithRequest: completionHandler:) open func splunk_swizzled_downloadTask(with request: URLRequest, completionHandler: ((URL?, URLResponse?, Error?) -> Void)?) -> URLSessionDownloadTask {
+    
+    @objc(splunkSwizzledDownloadTaskWithRequest: completionHandler:) open func splunk_swizzled_downloadTask(with request: URLRequest, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
         let answer = splunk_swizzled_downloadTask(with: request, completionHandler: completionHandler)
         wireUpTaskObserver(task: answer)
         return answer
