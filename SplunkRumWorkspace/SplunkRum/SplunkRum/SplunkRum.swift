@@ -37,7 +37,7 @@ let SplunkRumVersionString = "0.5.2"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, isNetworkInstrumentation: Bool = true) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, networkInstrumentation: Bool = true) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -45,7 +45,7 @@ let SplunkRumVersionString = "0.5.2"
         self.environment = environment
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
-        self.isNetworkInstrumentation = isNetworkInstrumentation
+        self.networkInstrumentation = networkInstrumentation
     }
     /**
         Copy constructor
@@ -60,7 +60,7 @@ let SplunkRumVersionString = "0.5.2"
         self.spanFilter = opts.spanFilter
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
-        self.isNetworkInstrumentation = opts.isNetworkInstrumentation
+        self.networkInstrumentation = opts.networkInstrumentation
     }
 
     /**
@@ -104,7 +104,7 @@ let SplunkRumVersionString = "0.5.2"
     /**
      Enable NetworkInstrumentation span creation for https calls.
      */
-    @objc public var isNetworkInstrumentation: Bool = true
+    @objc public var networkInstrumentation: Bool = true
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
@@ -198,7 +198,7 @@ var splunkRumInitializeCalledTime = Date()
         if options != nil {
             srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
         }
-        if options?.isNetworkInstrumentation == true {
+        if options?.networkInstrumentation ?? true {
             initalizeNetworkInstrumentation()
         }
         initializeNetworkTypeMonitoring()
