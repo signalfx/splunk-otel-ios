@@ -100,7 +100,7 @@ let SplunkRumVersionString = "0.5.2"
      Enable span creation for screen name changes
      */
     @objc public var screenNameSpans: Bool = true
-    
+
     /**
      Enable NetworkInstrumentation span creation for https calls.
      */
