@@ -14,21 +14,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import Foundation
 import QuartzCore
 import UIKit
 
 class ScreenFrames: NSObject {
-    
-    
+
     private var isRunning = false
     private var displayLink: CADisplayLink?
     /// Anything less than 59 FPS is slow.
-    private var slowFrameThreshold:CFTimeInterval = 1.0 / 59.0;
-    private var frozenFrameThreshold:CFTimeInterval = 700.0 / 1000.0;
-    
+    private var slowFrameThreshold: CFTimeInterval = 1.0 / 59.0
+    private var frozenFrameThreshold: CFTimeInterval = 700.0 / 1000.0
+
    /// The ideal time interval between screen refresh updates.
     private var duration = CFTimeInterval()
 
@@ -40,12 +38,12 @@ class ScreenFrames: NSObject {
 
    /// Returns the time in seconds since the last frame was dispatched.
     private var intervalSinceLastFrame = CFTimeInterval()
-    
+
     override init() {
             super.init()
             isRunning = false
     }
-    
+
     func startTracking() {
         isRunning = true
         stopTracking() /// make sure to stop a previous running display link
@@ -54,49 +52,45 @@ class ScreenFrames: NSObject {
         displayLink.add(to: .main, forMode: .common)
         self.displayLink = displayLink
     }
-    
+
     func stopTracking() {
         isRunning = false
         displayLink?.invalidate()
     }
-    
+
     @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
-        
+
         duration = displayLink.targetTimestamp - displayLink.timestamp
-        if (duration > slowFrameThreshold) {
+        if duration > slowFrameThreshold {
             stopTracking()
-            reportSlowframe(e: duration)
-            
+            reportSlowframe(slowFrame: duration)
+
         }
-        if (duration > frozenFrameThreshold) {
+        if duration > frozenFrameThreshold {
             stopTracking()
-            reportfrozenframe(e: duration)
+            reportfrozenframe(frozenFrame: duration)
         }
- 
+
      }
-    
-    func reportSlowframe(e: CFTimeInterval) {
+
+    func reportSlowframe(slowFrame: CFTimeInterval) {
         let tracer = buildTracer()
         let now = Date()
         let typeName = "slowRenders"
         let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
         span.setAttribute(key: "component", value: "ui")
-        span.setAttribute(key: "slow.frame", value: e)
+        span.setAttribute(key: "slow.frame", value: slowFrame)
         span.end(time: now)
     }
-    
-    func reportfrozenframe(e: CFTimeInterval) {
+
+    func reportfrozenframe(frozenFrame: CFTimeInterval) {
         let tracer = buildTracer()
         let now = Date()
         let typeName = "frozenRenders"
         let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
         span.setAttribute(key: "component", value: "ui")
-        span.setAttribute(key: "frozen.frame", value: e)
+        span.setAttribute(key: "frozen.frame", value: frozenFrame)
         span.end(time: now)
     }
 
 }
-
-
-
-
