@@ -38,22 +38,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        if !UIApplication.shared.connectedScenes.contains(where: { $0.activationState == .foregroundActive && $0 != scene }) {
+                    UIApplication.shared.delegate?.applicationDidBecomeActive?(.shared)
+                }
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
         // Called when the scene will move from an active state to an inactive state.
         // This may occur due to temporary interruptions (ex. an incoming phone call).
+        if !UIApplication.shared.connectedScenes.contains(where: { $0.activationState == .foregroundActive && $0 != scene }) {
+                    UIApplication.shared.delegate?.applicationWillResignActive?(.shared)
+                }
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
+        print("enter in foreground")
+        if !UIApplication.shared.connectedScenes.contains(where: { $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive }) {
+                   UIApplication.shared.delegate?.applicationWillEnterForeground?(.shared)
+               }
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+        print("enter in backgound")
+        if !UIApplication.shared.connectedScenes.contains(where: { $0.activationState == .foregroundActive || $0.activationState == .foregroundInactive }) {
+                    UIApplication.shared.delegate?.applicationDidEnterBackground?(.shared)
+                }
     }
 
 }

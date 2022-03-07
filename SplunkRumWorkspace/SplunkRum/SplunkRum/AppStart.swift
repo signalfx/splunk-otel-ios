@@ -48,7 +48,8 @@ func initializeAppStartupListeners() {
     let events = [
         UIApplication.didFinishLaunchingNotification,
         UIApplication.willEnterForegroundNotification,
-        UIApplication.didBecomeActiveNotification
+        UIApplication.didBecomeActiveNotification,
+        UIApplication.didEnterBackgroundNotification
     ]
     var reportedEvents = Set<Notification.Name>()
     events.forEach { event in
@@ -59,7 +60,7 @@ func initializeAppStartupListeners() {
                     return
                 }
                 appStart!.addEvent(name: event.rawValue)
-                if event == UIApplication.didBecomeActiveNotification {
+                if event == UIApplication.didBecomeActiveNotification || event == UIApplication.didEnterBackgroundNotification {
                     appStart!.end()
                     OpenTelemetry.instance.contextProvider.removeContextForSpan(appStart!)
                     appStart = nil
@@ -98,3 +99,15 @@ func sendAppStartSpan() {
     constructAppStartSpan()
     initializeAppStartupListeners()
 }
+/*func sendAppStartSpan() {
+    DispatchQueue.global(qos: .userInitiated).async {
+        print("Performing time consuming task in this background thread")
+        constructAppStartSpan()
+        initializeAppStartupListeners()
+        DispatchQueue.main.async {
+                // Task consuming task has completed
+                // Update UI from this block of code
+                print("Time consuming task has completed. From here we are allowed to update user interface.")
+            }
+    }
+}*/

@@ -178,25 +178,36 @@ var splunkRumInitializeCalledTime = Date()
         let zipkin = ZipkinTraceExporter(options: exportOptions)
         let retry = RetryExporter(proxy: zipkin)
         let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
-        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
-        if options?.debug ?? false {
-            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
+        DispatchQueue.global().async {
+            var backgroundTaskID = UIBackgroundTaskIdentifier(rawValue: 0)
+            backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "batch worker task") {
+            // End the task if time expires.
+            UIApplication.shared.endBackgroundTask(backgroundTaskID)
+            backgroundTaskID = UIBackgroundTaskIdentifier.invalid
+            }
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+            if options?.debug ?? false {
+                OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
+            }
+            sendAppStartSpan()
+            let srInit = buildTracer()
+                .spanBuilder(spanName: "SplunkRum.initialize")
+                .setStartTime(time: splunkRumInitializeCalledTime)
+                .startSpan()
+            srInit.setAttribute(key: "component", value: "appstart")
+            if options != nil {
+                srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
+            }
+            initalizeNetworkInstrumentation()
+            initializeNetworkTypeMonitoring()
+            initalizeUIInstrumentation()
+             // not initializeAppLifecycleInstrumentation, done at end of AppStart
+            srInit.end()
+            initialized = true
+            // End the task assertion.
+            UIApplication.shared.endBackgroundTask(backgroundTaskID)
+            backgroundTaskID = UIBackgroundTaskIdentifier.invalid
         }
-        sendAppStartSpan()
-        let srInit = buildTracer()
-            .spanBuilder(spanName: "SplunkRum.initialize")
-            .setStartTime(time: splunkRumInitializeCalledTime)
-            .startSpan()
-        srInit.setAttribute(key: "component", value: "appstart")
-        if options != nil {
-            srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
-        }
-        initalizeNetworkInstrumentation()
-        initializeNetworkTypeMonitoring()
-        initalizeUIInstrumentation()
-        // not initializeAppLifecycleInstrumentation, done at end of AppStart
-        srInit.end()
-        initialized = true
         print("SplunkRum.initialize() complete")
     }
 
