@@ -80,6 +80,7 @@ class ScreenFrames: NSObject {
         let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
         span.setAttribute(key: "component", value: "ui")
         span.setAttribute(key: "slow.frame", value: slowFrame)
+        span.setAttribute(key: "screen.name", value: getScreenName())
         span.end(time: now)
     }
 
@@ -90,6 +91,7 @@ class ScreenFrames: NSObject {
         let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
         span.setAttribute(key: "component", value: "ui")
         span.setAttribute(key: "frozen.frame", value: frozenFrame)
+        span.setAttribute(key: "screen.name", value: getScreenName())
         span.end(time: now)
     }
 
