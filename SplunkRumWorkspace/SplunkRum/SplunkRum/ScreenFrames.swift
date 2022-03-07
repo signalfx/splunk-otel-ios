@@ -48,7 +48,7 @@ class ScreenFrames: NSObject {
         isRunning = true
         stopTracking() /// make sure to stop a previous running display link
         let displayLink = CADisplayLink(target: self, selector: #selector(displayLinkCallback))
-        displayLink.preferredFramesPerSecond = 60
+        displayLink.preferredFramesPerSecond = SplunkRum.configuredOptions?.framesPerSecond ?? 0
         displayLink.add(to: .main, forMode: .common)
         self.displayLink = displayLink
     }
@@ -56,6 +56,7 @@ class ScreenFrames: NSObject {
     func stopTracking() {
         isRunning = false
         displayLink?.invalidate()
+        displayLink = nil
     }
 
     @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
