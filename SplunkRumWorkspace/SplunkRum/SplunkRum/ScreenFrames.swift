@@ -24,20 +24,12 @@ class ScreenFrames: NSObject {
     private var isRunning = false
     private var displayLink: CADisplayLink?
     /// Anything less than 59 FPS is slow.
-    private var slowFrameThreshold: CFTimeInterval = 1.0 / 59.0
-    private var frozenFrameThreshold: CFTimeInterval = 700.0 / 1000.0
+    private var slowFrameThreshold: CFTimeInterval = 16
+    private var frozenFrameThreshold: CFTimeInterval = 700
 
-   /// The ideal time interval between screen refresh updates.
-    private var duration = CFTimeInterval()
-
-   /// The time value associated with the previous frame.
-    private var timestamp = CFTimeInterval()
-
-    /// The time value associated with the current frame.
-    private var targetTimestamp = CFTimeInterval()
-
-   /// Returns the time in seconds since the last frame was dispatched.
-    private var intervalSinceLastFrame = CFTimeInterval()
+    private var slowCount: Int = 0
+    private var frozenCount: Int = 0
+    private var startedTime: CFTimeInterval = CACurrentMediaTime()
 
     override init() {
             super.init()
@@ -48,7 +40,7 @@ class ScreenFrames: NSObject {
         isRunning = true
         stopTracking() /// make sure to stop a previous running display link
         let displayLink = CADisplayLink(target: self, selector: #selector(displayLinkCallback))
-        displayLink.preferredFramesPerSecond = SplunkRum.configuredOptions?.framesPerSecond ?? 0
+        displayLink.preferredFramesPerSecond = SplunkRum.configuredOptions?.framesPerSecond ?? 0  /// (optional) if you do not define , then device uses maxFramesPS
         displayLink.add(to: .main, forMode: .common)
         self.displayLink = displayLink
     }
@@ -61,37 +53,40 @@ class ScreenFrames: NSObject {
 
     @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
 
-        duration = displayLink.targetTimestamp - displayLink.timestamp
-        if duration > slowFrameThreshold {
-            stopTracking()
-            reportSlowframe(slowFrame: duration)
+         if self.startedTime == 0.0 {
+            self.startedTime = CFAbsoluteTimeGetCurrent()
+            return
+         }
 
+         let currentTime: CFTimeInterval = CACurrentMediaTime()
+         let elapsedTime = currentTime - startedTime
+
+         let count = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
+
+        if elapsedTime > slowFrameThreshold {
+             stopTracking()
+             slowCount += Int(count)
         }
-        if duration > frozenFrameThreshold {
+        if elapsedTime > frozenFrameThreshold {
             stopTracking()
-            reportfrozenframe(frozenFrame: duration)
+            frozenCount += Int(count)
         }
 
+        if slowCount > 0 {
+            reportSlowframe(slowFrameCount: slowCount, name: "slowRenders")
+        }
+        if frozenCount > 0 {
+            reportSlowframe(slowFrameCount: frozenCount, name: "frozenRenders")
+        }
      }
 
-    func reportSlowframe(slowFrame: CFTimeInterval) {
+    func reportSlowframe(slowFrameCount: Int, name: String) {
         let tracer = buildTracer()
         let now = Date()
-        let typeName = "slowRenders"
+        let typeName = name
         let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
         span.setAttribute(key: "component", value: "ui")
-        span.setAttribute(key: "slow.frame", value: slowFrame)
-        span.setAttribute(key: "screen.name", value: getScreenName())
-        span.end(time: now)
-    }
-
-    func reportfrozenframe(frozenFrame: CFTimeInterval) {
-        let tracer = buildTracer()
-        let now = Date()
-        let typeName = "frozenRenders"
-        let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
-        span.setAttribute(key: "component", value: "ui")
-        span.setAttribute(key: "frozen.frame", value: frozenFrame)
+        span.setAttribute(key: "count", value: slowFrameCount)
         span.setAttribute(key: "screen.name", value: getScreenName())
         span.end(time: now)
     }
