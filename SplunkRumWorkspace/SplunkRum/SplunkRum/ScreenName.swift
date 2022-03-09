@@ -47,13 +47,13 @@ func internal_setScreenName(_ newName: String, _ manual: Bool) {
     if manual || !screenNameManuallySet {
         screenName = newName
     }
+    userDefaults.set(screenName, forKey: SCREEN_NAME_KEY)
     lock.unlock()
 
     // Don't emit the span under the lock
     if oldName != nil && oldName! != "unknown" && (SplunkRum.configuredOptions?.screenNameSpans ?? true) {
         emitScreenNameChangedSpan(oldName!, newName)
     }
-    userDefaults.set(screenName, forKey: SCREEN_NAME_KEY)
 }
 
 func isScreenNameManuallySet() -> Bool {
