@@ -37,7 +37,7 @@ let SplunkRumVersionString = "0.5.2"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, framesPerSecond: Int = 0) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -45,7 +45,6 @@ let SplunkRumVersionString = "0.5.2"
         self.environment = environment
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
-        self.framesPerSecond = framesPerSecond
     }
     /**
         Copy constructor
@@ -60,7 +59,6 @@ let SplunkRumVersionString = "0.5.2"
         self.spanFilter = opts.spanFilter
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
-        self.framesPerSecond = opts.framesPerSecond
     }
 
     /**
@@ -100,11 +98,6 @@ let SplunkRumVersionString = "0.5.2"
      Enable span creation for screen name changes
      */
     @objc public var screenNameSpans: Bool = true
-
-    /**
-     Defines the desired callback rate in frames-per-second for this display link.
-     */
-    @objc public var framesPerSecond: Int = 0
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
