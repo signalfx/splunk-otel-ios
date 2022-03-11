@@ -72,6 +72,3 @@ func getScreenName() -> String {
 func startScreenTracking() {
     screenFrames.startTracking()
 }
-func stopScreenTracking() {
-    screenFrames.stopTracking()
-}

@@ -23,12 +23,12 @@ class ScreenFrames: NSObject {
 
     private var isRunning = false
     private var displayLink: CADisplayLink?
-    /// Anything less than 59 FPS is slow.
-    private var slowFrameThreshold: CFTimeInterval = 16
-    private var frozenFrameThreshold: CFTimeInterval = 700
 
-    private var slowCount: Int = 0
-    private var frozenCount: Int = 0
+    private var slowFrameThreshold: CFTimeInterval = 1.0 / 59.0
+    private var frozenFrameThreshold: CFTimeInterval = 700.0 / 1000.0
+
+    private var frameCount: Int = 0
+    private var currentIteration: Int = 0
     private var startedTime: CFTimeInterval = CACurrentMediaTime()
 
     override init() {
@@ -56,27 +56,24 @@ class ScreenFrames: NSObject {
             self.startedTime = CFAbsoluteTimeGetCurrent()
             return
          }
-
          let currentTime: CFTimeInterval = CACurrentMediaTime()
          let elapsedTime = currentTime - startedTime
+         let iteration = Int(elapsedTime)
+         if currentIteration == iteration {
+           frameCount += 1
 
-         let count = 1 / (displayLink.targetTimestamp - displayLink.timestamp)
+         } else {
 
-        if elapsedTime > slowFrameThreshold {
-             stopTracking()
-             slowCount += Int(count)
-        }
-        if elapsedTime > frozenFrameThreshold {
-            stopTracking()
-            frozenCount += Int(count)
-        }
+             if elapsedTime > slowFrameThreshold {
+                 reportSlowframe(slowFrameCount: frameCount, name: "slowRenders")
+             }
 
-        if slowCount > 0 {
-            reportSlowframe(slowFrameCount: slowCount, name: "slowRenders")
-        }
-        if frozenCount > 0 {
-            reportSlowframe(slowFrameCount: frozenCount, name: "frozenRenders")
-        }
+             if elapsedTime > frozenFrameThreshold {
+                 reportSlowframe(slowFrameCount: frameCount, name: "frozenRenders")
+             }
+            frameCount = 0
+            currentIteration = iteration
+         }
      }
 
     func reportSlowframe(slowFrameCount: Int, name: String) {

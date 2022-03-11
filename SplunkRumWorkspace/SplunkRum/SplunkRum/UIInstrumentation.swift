@@ -62,7 +62,6 @@ extension UIViewController {
     }
     @objc open func splunk_swizzled_viewDidDisappear(_ animated: Bool) {
         updateUIFields()
-        stopScreenTracking()
         self.splunk_swizzled_viewDidDisappear(animated)
     }
 
