@@ -18,23 +18,12 @@ limitations under the License.
 import UIKit
 import WebKit
 import SplunkRum
-import CoreLocation
 
-class ViewController: UIViewController, WKUIDelegate, CLLocationManagerDelegate {
-    @IBOutlet var lblLat: UILabel!
-    @IBOutlet var lblLongi: UILabel!
-    @IBOutlet var lblAdd: UILabel!
-    var locationManager: CLLocationManager!
+class ViewController: UIViewController, WKUIDelegate {
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        locationManager = CLLocationManager()
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.requestAlwaysAuthorization()
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager.startUpdatingLocation()
-            SplunkRum.locationName(true)
-        }
+        // Do any additional setup after loading the view.
     }
 
     @IBAction
@@ -50,13 +39,5 @@ class ViewController: UIViewController, WKUIDelegate, CLLocationManagerDelegate 
         SplunkRum.integrateWithBrowserRum(webview)
         webview.load(req)
     }
-func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-    let userLocation: CLLocation = locations[0] as CLLocation
-    self.lblLat.text = "\(userLocation.coordinate.latitude)"
-    self.lblLongi.text = "\(userLocation.coordinate.longitude)"
-}
-func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-    
-}
 
 }

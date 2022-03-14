@@ -50,8 +50,7 @@ class GlobalAttributesProcessor: SpanProcessor {
     let appName: String
     let appVersion: String?
     let deviceModel: String
-    var locationData: Corelocation = Corelocation()
-    
+
     init() {
         let app = Bundle.main.infoDictionary?["CFBundleName"] as? String
         if app != nil {
@@ -74,8 +73,6 @@ class GlobalAttributesProcessor: SpanProcessor {
         span.setAttribute(key: "splunk.rumVersion", value: SplunkRumVersionString)
         span.setAttribute(key: "device.model.name", value: deviceModel)
         span.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
-        span.setAttribute(key: "location.lat", value: locationData.latitude)
-        span.setAttribute(key: "location.lon", value: locationData.longitude)
         // It would be nice to drop this field when the span-ending thread isn't the same...
         if Thread.current.isMainThread {
             span.setAttribute(key: "thread.name", value: "main")
