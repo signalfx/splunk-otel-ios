@@ -27,9 +27,11 @@ class ScreenFrames: NSObject {
     private var slowFrameThreshold: CFTimeInterval = 1.0 / 59.0
     private var frozenFrameThreshold: CFTimeInterval = 700.0 / 1000.0
 
-    private var frameCount: Int = 0
     private var currentIteration: Int = 0
     private var startedTime: CFTimeInterval = CACurrentMediaTime()
+
+    private var slowCount: Int = 0
+    private var frozenCount: Int = 0
 
     override init() {
             super.init()
@@ -56,22 +58,30 @@ class ScreenFrames: NSObject {
             self.startedTime = CFAbsoluteTimeGetCurrent()
             return
          }
+
          let currentTime: CFTimeInterval = CACurrentMediaTime()
+         let duration = displayLink.targetTimestamp - displayLink.timestamp
          let elapsedTime = currentTime - startedTime
          let iteration = Int(elapsedTime)
          if currentIteration == iteration {
-           frameCount += 1
+
+            if duration > frozenFrameThreshold {
+                frozenCount += 1
+             } else if duration > slowFrameThreshold {
+                slowCount += 1
+             }
 
          } else {
 
-             if elapsedTime > slowFrameThreshold {
-                 reportSlowframe(slowFrameCount: frameCount, name: "slowRenders")
+             if slowCount > 0 {
+                 reportSlowframe(slowFrameCount: slowCount, name: "slowRenders")
              }
 
-             if elapsedTime > frozenFrameThreshold {
-                 reportSlowframe(slowFrameCount: frameCount, name: "frozenRenders")
+             if frozenCount > 0 {
+                 reportSlowframe(slowFrameCount: frozenCount, name: "frozenRenders")
              }
-            frameCount = 0
+             slowCount = 0
+             frozenCount = 0
             currentIteration = iteration
          }
      }
