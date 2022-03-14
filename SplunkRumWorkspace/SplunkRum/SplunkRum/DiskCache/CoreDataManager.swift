@@ -23,7 +23,7 @@ import OpenTelemetrySdk
 import SwiftUI
 import ZipkinExporter
 
-let FLUSH_OUT_TIME_SECONDS = 60   // 4 * 60 * 60  // 4 hours
+let FLUSH_OUT_TIME_SECONDS = 4 * 60 * 60  // 4 hours
 let FLUSH_OUT_MAX_SIZE = 21966080  // 20 MB
 
 let Entity_name = "Pending"
@@ -111,15 +111,28 @@ public class CoreDataManager {
         }
         return newSpans
    }
+    
     func createNewSpan(using spanInfo: NSManagedObject) -> SpanData {
-   // func createNewSpan(using spanInfo: NSManagedObject) {
         let tracer = buildTracer()
         let span = tracer.spanBuilder(spanName:spanInfo.value(forKey: "spanName") as! String).setStartTime(time: spanInfo.value(forKey: "start") as! Date).startSpan()
-       // span.addEvent(name: spanInfo.value(forKey: "events") as! String)
+        span.addEvent(name: spanInfo.value(forKey: "events") as! String)
+       // span.context.spanId = SpanId(fromHexString: spanInfo.value(forKey: "spanId") as! String)
         //.setSpanKind(spanKind: spanInfo.value(forKey: "kind") as! SpanKind )
         let attributesDict = convertStringToDictionary(text: spanInfo.value(forKey: "attributes") as! String)
         for dict in attributesDict! {
-          //  span.setAttribute(key: dict.key, value: dict.value as! String)
+            let value = dict.value.allValues[0]
+            print("key == \(dict.key) , Value == \(value)")
+            if value is String {
+                span.setAttribute(key: dict.key, value: value as! String)
+            } else if dict.value is Int {
+                span.setAttribute(key: dict.key, value: value as! Int)
+            } else if dict.value is Double {
+                span.setAttribute(key: dict.key, value: value as! Double)
+            } else if dict.value is Bool {
+                span.setAttribute(key: dict.key, value: value as! Bool)
+            } else if dict.value is [String : Any] {
+                span.setAttribute(key: dict.key, value: value as? AttributeValue)
+            }
             print(dict)
         }
         span.end(time: spanInfo.value(forKey: "duration") as! Date)
@@ -324,7 +337,7 @@ public func fetchSpanFromDB() -> [SpanData] {
     public func flushOutSpanAfterTimePeriod() {
         print("Core Data Store at ......\(NSPersistentContainer.defaultDirectoryURL().absoluteString)")
         let managedObjectContext = persistentContainer.newBackgroundContext()
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: ENTITY_NAME)
         // Add Predicate
         let flushDBTime = Date().addingTimeInterval(TimeInterval(-FLUSH_OUT_TIME_SECONDS))
         let predicate = NSPredicate(format: "\(TimeStampColumn) < %@", flushDBTime as CVarArg)
@@ -369,7 +382,7 @@ public func fetchSpanFromDB() -> [SpanData] {
     public func deleteSpanInFifoManner() {
         getStoreInformation()
         let managedObjectContext = persistentContainer.viewContext
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity_name)
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: ENTITY_NAME)
         
         // Add Sort Descriptor
         let sortDescriptor = NSSortDescriptor(key: TimeStampColumn, ascending: true)

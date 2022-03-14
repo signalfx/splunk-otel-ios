@@ -120,6 +120,7 @@ class RetryExporter: SpanExporter {
         let result = proxy.export(spans: dbspans)
         if result == .success {
             // delete spans from db FLUSH FIFO or 4 h time logic.
+            CoreDataManager.shared.flushOutSpanAfterTimePeriod()
            
         }
         return result
