@@ -21,12 +21,13 @@ import SplunkRum
 
 class ViewController: UIViewController, WKUIDelegate {
 
-    override func viewDidAppear(_ animated: Bool) {
+    override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
     }
 
-    @IBAction func clickMe() {
+    @IBAction
+    func clickMe() {
         print("I was clicked!")
         SplunkRum.setScreenName("CustomScreenName")
 
