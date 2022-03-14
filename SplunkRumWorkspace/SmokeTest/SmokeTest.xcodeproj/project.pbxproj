@@ -10,13 +10,13 @@
 		864567FB26EFDE9F0059CF04 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864567FA26EFDE9F0059CF04 /* AppDelegate.swift */; };
 		864567FD26EFDE9F0059CF04 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864567FC26EFDE9F0059CF04 /* SceneDelegate.swift */; };
 		864567FF26EFDE9F0059CF04 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864567FE26EFDE9F0059CF04 /* ViewController.swift */; };
-		8645680226EFDE9F0059CF04 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8645680026EFDE9F0059CF04 /* Main.storyboard */; };
 		8645680426EFDE9F0059CF04 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8645680326EFDE9F0059CF04 /* Assets.xcassets */; };
 		8645680726EFDE9F0059CF04 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8645680526EFDE9F0059CF04 /* LaunchScreen.storyboard */; };
 		8645681D26EFDEA00059CF04 /* SmokeTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */; };
 		8645682F26EFDEB50059CF04 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; };
 		8645683026EFDEB50059CF04 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8645683426EFDED60059CF04 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 8645683326EFDED60059CF04 /* Swifter */; };
+		884C540A27DF4ACA0060ECE9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 884C540927DF4ACA0060ECE9 /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,7 +48,6 @@
 		864567FA26EFDE9F0059CF04 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		864567FC26EFDE9F0059CF04 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		864567FE26EFDE9F0059CF04 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		8645680126EFDE9F0059CF04 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8645680326EFDE9F0059CF04 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8645680626EFDE9F0059CF04 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8645680826EFDE9F0059CF04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -56,6 +55,7 @@
 		8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTestUITests.swift; sourceTree = "<group>"; };
 		8645681E26EFDEA00059CF04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8645682E26EFDEB50059CF04 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		884C540927DF4ACA0060ECE9 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,7 +103,7 @@
 				864567FA26EFDE9F0059CF04 /* AppDelegate.swift */,
 				864567FC26EFDE9F0059CF04 /* SceneDelegate.swift */,
 				864567FE26EFDE9F0059CF04 /* ViewController.swift */,
-				8645680026EFDE9F0059CF04 /* Main.storyboard */,
+				884C540927DF4ACA0060ECE9 /* Main.storyboard */,
 				8645680326EFDE9F0059CF04 /* Assets.xcassets */,
 				8645680526EFDE9F0059CF04 /* LaunchScreen.storyboard */,
 				8645680826EFDE9F0059CF04 /* Info.plist */,
@@ -215,9 +215,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				884C540A27DF4ACA0060ECE9 /* Main.storyboard in Resources */,
 				8645680726EFDE9F0059CF04 /* LaunchScreen.storyboard in Resources */,
 				8645680426EFDE9F0059CF04 /* Assets.xcassets in Resources */,
-				8645680226EFDE9F0059CF04 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,14 +260,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		8645680026EFDE9F0059CF04 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8645680126EFDE9F0059CF04 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		8645680526EFDE9F0059CF04 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
