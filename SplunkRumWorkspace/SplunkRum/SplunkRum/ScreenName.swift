@@ -49,7 +49,6 @@ func internal_setScreenName(_ newName: String, _ manual: Bool) {
     }
     callbacks = screenNameCallbacks
     lock.unlock()
-    
     for callback in callbacks {
         callback()
     }
