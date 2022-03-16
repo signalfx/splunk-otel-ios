@@ -33,7 +33,7 @@ class ScreenFrames: NSObject {
     private var slowCount: Int = 0
     private var frozenCount: Int = 0
     private var isFirstIteration: Bool = true
-    private var previousTimestamp:CFAbsoluteTime = CACurrentMediaTime()
+    private var previousTimestamp: CFAbsoluteTime = CACurrentMediaTime()
 
     override init() {
             super.init()
@@ -57,7 +57,7 @@ class ScreenFrames: NSObject {
     @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
 
          let currentTime: CFTimeInterval = CACurrentMediaTime()
-         if isFirstIteration{
+         if isFirstIteration {
             previousTimestamp = displayLink.targetTimestamp
             isFirstIteration = false
          }
@@ -81,6 +81,10 @@ class ScreenFrames: NSObject {
 
              if frozenCount > 0 {
                  reportSlowframe(slowFrameCount: frozenCount, name: "frozenRenders")
+             } else {
+                 if duration > frozenFrameThreshold {
+                     reportSlowframe(slowFrameCount: 1, name: "frozenRenders")
+                 }
              }
              slowCount = 0
              frozenCount = 0
