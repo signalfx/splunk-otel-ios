@@ -38,6 +38,7 @@ extension CLLocationManager {
       method_exchangeImplementations(originalCLLocationManagerMethod!,
                                      swizzledCLLocationManagerMethod!)
 }
+// swiftlint:disable missing_docs
 @objc open func splunk_set(delegate: CLLocationManagerDelegate?) {
     splunk_set(delegate: delegate)
     guard let delegate =  delegate else { return }
@@ -58,7 +59,7 @@ extension CLLocationManager {
        }
      }
   }
-
+// swiftlint:disable missing_docs
 @objc open func splunk_swizzled_didUpdateLocations(with manager: CLLocationManager, locations: [CLLocation]) {
     locations.forEach { (location) in
         SplunkRum.setGlobalAttributes(["location.lon": location.coordinate.longitude])
