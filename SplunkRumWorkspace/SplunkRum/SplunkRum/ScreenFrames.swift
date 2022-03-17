@@ -21,7 +21,6 @@ import UIKit
 
 class ScreenFrames: NSObject {
 
-    private var isRunning = false
     private var displayLink: CADisplayLink?
 
     private var slowFrameThreshold: CFTimeInterval = 1.0 / 59.0
@@ -35,13 +34,8 @@ class ScreenFrames: NSObject {
     private var isFirstIteration: Bool = true
     private var previousTimestamp: CFAbsoluteTime = CACurrentMediaTime()
 
-    override init() {
-            super.init()
-            isRunning = false
-    }
-
     func startTracking() {
-        isRunning = true
+
         stopTracking() /// make sure to stop a previous running display link
         let displayLink = CADisplayLink(target: self, selector: #selector(displayLinkCallback))
         displayLink.add(to: .main, forMode: .common)
@@ -49,13 +43,17 @@ class ScreenFrames: NSObject {
     }
 
     func stopTracking() {
-        isRunning = false
+
         displayLink?.invalidate()
         displayLink = nil
     }
 
     @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
 
+         let state = UIApplication.shared.applicationState
+         if state == .background || state == .inactive {
+            isFirstIteration = true
+         }
          let currentTime: CFTimeInterval = CACurrentMediaTime()
          if isFirstIteration {
             previousTimestamp = displayLink.targetTimestamp
