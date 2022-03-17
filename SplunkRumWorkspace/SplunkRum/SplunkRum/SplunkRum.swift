@@ -194,6 +194,7 @@ var splunkRumInitializeCalledTime = Date()
         initalizeNetworkInstrumentation()
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
+        initalizeLocationInstrumentation()
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
@@ -324,13 +325,6 @@ var splunkRumInitializeCalledTime = Date()
      */
     @objc public class func integrateWithBrowserRum(_ view: WKWebView) {
         integrateWebViewWithBrowserRum(view: view)
-    }
-    /**
-       To capture the user's longitude and latitude
-     */
-    @objc public class func locationAttribute(_ longitude: Double, _ latitude: Double) {
-        setGlobalAttributes(["location.lon": longitude])
-        setGlobalAttributes(["location.lat": latitude])
     }
 
 }
