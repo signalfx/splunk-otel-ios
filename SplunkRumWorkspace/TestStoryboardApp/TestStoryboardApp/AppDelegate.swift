@@ -25,47 +25,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        print("did finish launching....")
-        var procStart: Date?
-        do {
-            procStart = try processStartTime()
-            let localedatetime = procStart!.toLocalTime()
-            print("app start time == \(localedatetime)")
-        }
-        catch {
-        }
-            
-        DispatchQueue.main.asyncAfter(deadline: .now() + 180) {  // 3 min
-            SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true))
-         
-        }
-        //sleep(200) // 3.3 min
-        let now = Date().toLocalTime()
-        print("After splunk initlization time ==  \(now)")
-        
-          return true
-    }
-
-    func application(_ application: UIApplication,
-                     willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        print("will finish launching...")
+        SplunkRum.initialize(beaconUrl: "http://127.0.0.1:9080/api/v2/spans", rumAuth: "FAKE_RUM_AUTH", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true))
         return true
     }
-    
-    func applicationWillResignActive(_ application: UIApplication) {
-        print("app delegate will resign active")
-        SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true))
-     
-          
-    }
-    func applicationDidEnterBackground(_ application: UIApplication) {
-        print("app delegate enter in background")
-       
-     
-    }
-    func applicationWillEnterForeground(_ application: UIApplication) {
-        print("Enter in to foregroung")
-    }
+
     // MARK: UISceneSession Lifecycle
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
@@ -78,65 +41,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the user discards a scene session.
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
-    }
-
-    private func processStartTime() throws -> Date {
-        let name = "kern.proc.pid"
-        var len: size_t = 4
-        var mib = [Int32](repeating: 0, count: 4)
-        var kp: kinfo_proc = kinfo_proc()
-        try mib.withUnsafeMutableBufferPointer { (mibBP: inout UnsafeMutableBufferPointer<Int32>) throws in
-            try name.withCString { (nbp: UnsafePointer<Int8>) throws in
-                guard sysctlnametomib(nbp, mibBP.baseAddress, &len) == 0 else {
-                    throw POSIXError(.EAGAIN)
-                }
-            }
-            mibBP[3] = getpid()
-            len =  MemoryLayout<kinfo_proc>.size
-            guard sysctl(mibBP.baseAddress, 4, &kp, &len, nil, 0) == 0 else {
-                throw POSIXError(.EAGAIN)
-            }
-        }
-        // Type casts to finally produce the answer
-        let startTime = kp.kp_proc.p_un.__p_starttime
-        let ti: TimeInterval = Double(startTime.tv_sec) + (Double(startTime.tv_usec) / 1e6)
-        return Date(timeIntervalSince1970: ti)
-    }
-    func utcToLocal(dateStr: String) -> String? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "H:mm:ss"
-        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
-        
-        if let date = dateFormatter.date(from: dateStr) {
-            dateFormatter.timeZone = TimeZone.current
-            dateFormatter.dateFormat = "h:mm a"
-        
-            return dateFormatter.string(from: date)
-        }
-        return nil
-    }
-    func stringFromDate(date : Date)-> String {
-        let date = Date()
-        let dateFormatter = DateFormatter()
-        return dateFormatter.string(from: date)
-    }
-    
-    
-}
-extension Date {
-
-    // Convert local time to UTC (or GMT)
-    func toGlobalTime() -> Date {
-        let timezone = TimeZone.current
-        let seconds = -TimeInterval(timezone.secondsFromGMT(for: self))
-        return Date(timeInterval: seconds, since: self)
-    }
-
-    // Convert UTC (or GMT) to local time
-    func toLocalTime() -> Date {
-        let timezone = TimeZone.current
-        let seconds = TimeInterval(timezone.secondsFromGMT(for: self))
-        return Date(timeInterval: seconds, since: self)
     }
 
 }

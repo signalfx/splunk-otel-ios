@@ -99,15 +99,3 @@ func sendAppStartSpan() {
     constructAppStartSpan()
     initializeAppStartupListeners()
 }
-/*func sendAppStartSpan() {
-    DispatchQueue.global(qos: .userInitiated).async {
-        print("Performing time consuming task in this background thread")
-        constructAppStartSpan()
-        initializeAppStartupListeners()
-        DispatchQueue.main.async {
-                // Task consuming task has completed
-                // Update UI from this block of code
-                print("Time consuming task has completed. From here we are allowed to update user interface.")
-            }
-    }
-}*/
