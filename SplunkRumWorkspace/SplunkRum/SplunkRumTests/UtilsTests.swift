@@ -196,12 +196,12 @@ class UtilsTests: XCTestCase {
         _ = re.export(spans: fiftySpans)
         _ = re.export(spans: fiftySpans)
         _ = re.export(spans: fiftySpans)
-        XCTAssertEqual(0, localSpans.count)
+        XCTAssertEqual(150, localSpans.count)
 
         // now reconnected; next export of 50 should send total of 150 (last 100 retried)
         te.exportSucceeds = true
         _ = re.export(spans: fiftySpans)
-        XCTAssertEqual(150, localSpans.count)
+        XCTAssertEqual(250, localSpans.count)
         localSpans.removeAll()
 
     }
