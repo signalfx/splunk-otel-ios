@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import UIKit
-import CoreData
 // Why not "import SplunkOtel"?  Because this links as a local framework, not as a swift package.
 // FIXME align the framework name and directory names with the swift package name at some point
 import SplunkRum
@@ -26,9 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-       // SplunkRum.initialize(beaconUrl: "http://127.0.0.1:9080/api/v2/spans", rumAuth: "FAKE_RUM_AUTH", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true))
-        SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true))
-        
+        SplunkRum.initialize(beaconUrl: "http://127.0.0.1:9080/api/v2/spans", rumAuth: "FAKE_RUM_AUTH", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true))
         return true
     }
 
@@ -45,5 +42,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-    
+
 }
