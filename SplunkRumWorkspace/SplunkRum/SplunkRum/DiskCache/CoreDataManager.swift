@@ -179,8 +179,7 @@ public class CoreDataManager {
         fetchRequest.fetchLimit = 1000
 
         do {
-            let records = try managedObjectContext.fetch(fetchRequest) as! [PendingSpans]
-
+            let records = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
             for record in records {
                 managedObjectContext.delete(record)
             }
