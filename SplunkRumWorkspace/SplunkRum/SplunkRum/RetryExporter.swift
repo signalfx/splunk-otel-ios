@@ -29,40 +29,18 @@ class RetryExporter: SpanExporter {
         self.proxy = proxy
     }
 
-    func attemptPendingExport() -> SpanExporterResultCode {
-        if pending.isEmpty {
-            return .success
-        }
-        let result = proxy.export(spans: pending)
-        if result == .success {
-            pending.removeAll(keepingCapacity: true)
-        }
-        return result
-    }
-
-    func addToPending(_ spans: [SpanData]) {
-        pending.append(contentsOf: spans)
-        if pending.count > MAX_PENDING_SPANS {
-            pending.removeFirst(pending.count - MAX_PENDING_SPANS)
-        }
-    }
-
-    func export(spans: [SpanData]) -> SpanExporterResultCode {
-        var result = attemptPendingExport()
+  func export(spans: [SpanData]) -> SpanExporterResultCode {
+        var result = attemptDBExport()
+        result = proxy.export(spans: spans)  // call zipkinexporter
         if result == .failure {
-            addToPending(spans)
-            return .failure
-        }
-        result = proxy.export(spans: spans)
-        if result == .failure {
-            addToPending(spans)
+           CoreDataManager.shared.insertSpanValue(spans) // seperate values
             return .failure
         }
         return .success
     }
 
     func flush() -> SpanExporterResultCode {
-        _ = attemptPendingExport()
+        _ = attemptDBExport()
         return proxy.flush()
     }
 
@@ -70,4 +48,22 @@ class RetryExporter: SpanExporter {
         proxy.shutdown()
     }
 
+    // MARK: - attempt to export from DB
+    func attemptDBExport() -> SpanExporterResultCode {
+        // way 1 - delete span if size is exceeded.
+        CoreDataManager.shared.flushDbIfSizeExceed()
+                // OR
+        // way 2 -delete spans from db FLUSH FIFO or 4 h time logic.
+      // CoreDataManager.shared.flushOutSpanAfterTimePeriod()
+
+        let dbspans = CoreDataManager.shared.fetchSpanValues()
+
+        if dbspans.isEmpty {
+            return .success
+        } else {
+            // delete exported span only
+            CoreDataManager.shared.deleteSpanData(spans: dbspans)
+            return .success
+        }
+    }
 }
