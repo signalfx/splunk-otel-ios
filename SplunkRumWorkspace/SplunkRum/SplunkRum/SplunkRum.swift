@@ -193,6 +193,7 @@ var splunkRumInitializeCalledTime = Date()
         initalizeNetworkInstrumentation()
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
+        startScreenTracking()
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
