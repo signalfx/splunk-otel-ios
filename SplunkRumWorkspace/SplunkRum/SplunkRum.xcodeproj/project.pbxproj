@@ -34,6 +34,7 @@
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
+		88EE5FA927EE05FF0094DACE /* NotificationEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88EE5FA827EE05FF0094DACE /* NotificationEvents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +85,7 @@
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
+		88EE5FA827EE05FF0094DACE /* NotificationEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationEvents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +150,7 @@
 				865DBDD82677AA7B00EFE8D5 /* RetryExporter.swift */,
 				8607AD4A267B9032004FAFFD /* AppLifecycle.swift */,
 				8624DAB4269CAE61005D65DE /* NetworkType.swift */,
+				88EE5FA827EE05FF0094DACE /* NotificationEvents.swift */,
 				86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */,
 			);
 			path = SplunkRum;
@@ -313,6 +316,7 @@
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
 				86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */,
 				8654BCF825E54D340013F7F6 /* ErrorReporting.swift in Sources */,
+				88EE5FA927EE05FF0094DACE /* NotificationEvents.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
