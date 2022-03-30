@@ -108,7 +108,7 @@ public class CoreDataManager {
 
     func createNewSpan(using spanInfo: NSManagedObject) -> SpanData {
         let tracer = buildTracer()
-        // set span kind logic
+        // set span kind logic here
          let kind = spanInfo.value(forKey: "kind") as! String
          let span = tracer.spanBuilder(spanName: spanInfo.value(forKey: "spanName") as! String).setSpanKind(spanKind: SpanKind(rawValue: kind)!).setStartTime(time: spanInfo.value(forKey: "start") as! Date).startSpan()
         span.addEvent(name: spanInfo.value(forKey: "events") as! String)
