@@ -140,7 +140,12 @@ var splunkRumInitializeCalledTime = Date()
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
-    @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
+    @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil, sessionBaseSamplingRatio: Double = 1.0) {
+        if sessionBaseSamplingRatio >= 0.0 && sessionBaseSamplingRatio <= 1.0 {
+          _ = SessionBasedSampling(ratio: sessionBaseSamplingRatio)
+           SessionBasedSampling.sessionshouldSample()
+
+        }
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
             return

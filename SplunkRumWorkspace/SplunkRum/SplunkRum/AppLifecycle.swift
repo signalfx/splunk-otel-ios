@@ -107,6 +107,7 @@ func invalidateSession(_ event: String) {
         if Date() > sessionIdInActivityExpiration { // expire 15 min
            Is_New_SessionID_For_In_Activity = true
             _  = getRumSessionId()
+            SessionBasedSampling.sessionshouldSample()
         }
     }
 }
