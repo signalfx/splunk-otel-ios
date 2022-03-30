@@ -222,15 +222,9 @@ var splunkRumInitializeCalledTime = Date()
         addSessionIdCallback(callback)
     }
     /**
-            Query for the current screen name
-     */
-    @objc public class func getCurrentScreenName() -> String {
-        return getScreenName()
-    }
-    /**
      Adds a callback whenever the screen name changes.
      */
-    public class func addScreenNameChangeCallback(_ callback: @escaping (() -> Void)) {
+    public class func addScreenNameChangeCallback(_ callback: @escaping ((String) -> Void)) {
         addScreenNameCallback(callback)
     }
     /**

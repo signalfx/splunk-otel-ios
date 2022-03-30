@@ -17,12 +17,13 @@ limitations under the License.
 
 import Foundation
 
+let userDefaults = UserDefaults.standard
 fileprivate var screenName: String = "unknown"
 fileprivate var screenNameManuallySet = false
 // Yes, I assume there are swift libraries to do this sort of thing, but nothing
 // I could find in the stdlib
 fileprivate var lock = NSLock()
-private var screenNameCallbacks: [(() -> Void)] = []
+private var screenNameCallbacks: [((String) -> Void)] = []
 
 func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
     let now = Date()
@@ -35,7 +36,7 @@ func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
 // Assumes main thread
 func internal_setScreenName(_ newName: String, _ manual: Bool) {
     var oldName: String?
-    var callbacks: [(() -> Void)] = []
+    var callbacks: [((String) -> Void)] = []
     lock.lock()
     if screenName != newName {
         oldName = screenName
@@ -49,8 +50,9 @@ func internal_setScreenName(_ newName: String, _ manual: Bool) {
     }
     callbacks = screenNameCallbacks
     lock.unlock()
+
     for callback in callbacks {
-        callback()
+         callback(screenName)
     }
 
     // Don't emit the span under the lock
@@ -74,7 +76,7 @@ func getScreenName() -> String {
     return screenName
 }
 
-func addScreenNameCallback(_ callback: @escaping (() -> Void)) {
+func addScreenNameCallback(_ callback: @escaping ((String) -> Void)) {
     lock.lock()
     defer {
         lock.unlock()
