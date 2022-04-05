@@ -21,7 +21,6 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 import SwiftUI
 import ZipkinExporter
-//import CacheKit
 // import OpenTelemetryProtocolExporter
 
 let FLUSH_OUT_TIME_SECONDS = 100   // 4 * 60 * 60  // 4 hours
