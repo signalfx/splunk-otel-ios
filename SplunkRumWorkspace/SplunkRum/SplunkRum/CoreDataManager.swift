@@ -120,7 +120,6 @@ public class CoreDataManager {
 
         span.addEvent(name: spanInfo.value(forKey: "events") as! String)
        // span.context.spanId = SpanId(fromHexString: spanInfo.value(forKey: "spanId") as! String)
-        
         let attributesDict = convertStringToDictionary(text: spanInfo.value(forKey: "attributes") as! String)
         for dict in attributesDict! {
             let value = dict.value.allValues[0]
