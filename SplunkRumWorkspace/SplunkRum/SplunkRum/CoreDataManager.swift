@@ -21,6 +21,7 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 import SwiftUI
 import ZipkinExporter
+//import CacheKit
 // import OpenTelemetryProtocolExporter
 
 let FLUSH_OUT_TIME_SECONDS = 100   // 4 * 60 * 60  // 4 hours
@@ -32,8 +33,8 @@ let ENTITY_NAME = "PendingSpans"
 public class CoreDataManager {
     /** shared instance of class*/
     public static let shared = CoreDataManager()
-    let identifier: String  = "com.splunk.opentelemetry.SplunkRum"       // splunkrum framework bundle ID
-    let model: String       = "Rum1"                      // Model name
+    let identifier: String  = "com.splunk.CacheKit" // "com.splunk.opentelemetry.SplunkRum"       // splunkrum framework bundle ID
+    let model: String       = "Rum"                      // Model name
 
     lazy var persistentContainer: NSPersistentContainer = {
 
@@ -41,7 +42,7 @@ public class CoreDataManager {
             let modelURL = messageKitBundle!.url(forResource: self.model, withExtension: "momd")!
             let managedObjectModel =  NSManagedObjectModel(contentsOf: modelURL)
 
-            let storedescription = NSPersistentStoreDescription(url: NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Rum1.sqlite"))
+            let storedescription = NSPersistentStoreDescription(url: NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("Rum.sqlite"))
             storedescription.setOption(true as NSNumber, forKey: NSSQLiteManualVacuumOption)
 
             let container = NSPersistentContainer(name: self.model, managedObjectModel: managedObjectModel!)
@@ -270,7 +271,7 @@ public class CoreDataManager {
     /** Check that db is exist at given path */
     public func fileExistAtPath() -> Bool {
         let defaultdirecotry = NSPersistentContainer.defaultDirectoryURL()
-        let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum1.sqlite").path
+        let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum.sqlite").path
         let fileManager = FileManager.default
         return fileManager.fileExists(atPath: persistentStorePath)
     }
@@ -278,7 +279,7 @@ public class CoreDataManager {
     /**get used space and free space information**/
     public func getPersistentStoreSize()-> Any {
         let defaultdirecotry = NSPersistentContainer.defaultDirectoryURL()
-        let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum1.sqlite").path
+        let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum.sqlite").path
 
         do {
             let fileAttributes = try FileManager.default.attributesOfItem(atPath: persistentStorePath) as NSDictionary
@@ -293,7 +294,7 @@ public class CoreDataManager {
     /** To print db size for testing purpose when deleting records from db.*/
     public func getStoreInformation() {
         let defaultdirecotry = NSPersistentContainer.defaultDirectoryURL()
-        let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum1.sqlite").path
+        let persistentStorePath = defaultdirecotry.appendingPathComponent("Rum.sqlite").path
 
         do {
             let fileAttributes = try FileManager.default.attributesOfItem(atPath: persistentStorePath) as NSDictionary
