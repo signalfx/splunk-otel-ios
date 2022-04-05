@@ -34,7 +34,6 @@
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
-		C832DCD327FC252E006E0156 /* Rum1.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C832DCD127FC252E006E0156 /* Rum1.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,7 +84,6 @@
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
-		C832DCD227FC252E006E0156 /* Rum1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Rum1.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,7 +149,6 @@
 				8607AD4A267B9032004FAFFD /* AppLifecycle.swift */,
 				8624DAB4269CAE61005D65DE /* NetworkType.swift */,
 				86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */,
-				C832DCD127FC252E006E0156 /* Rum1.xcdatamodeld */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -315,7 +312,6 @@
 				8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
 				86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */,
-				C832DCD327FC252E006E0156 /* Rum1.xcdatamodeld in Sources */,
 				8654BCF825E54D340013F7F6 /* ErrorReporting.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -656,19 +652,6 @@
 			productName = ZipkinExporter;
 		};
 /* End XCSwiftPackageProductDependency section */
-
-/* Begin XCVersionGroup section */
-		C832DCD127FC252E006E0156 /* Rum1.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				C832DCD227FC252E006E0156 /* Rum1.xcdatamodel */,
-			);
-			currentVersion = C832DCD227FC252E006E0156 /* Rum1.xcdatamodel */;
-			path = Rum1.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodeld;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 86260EBB25CDC1DE009F3CB1 /* Project object */;
 }
