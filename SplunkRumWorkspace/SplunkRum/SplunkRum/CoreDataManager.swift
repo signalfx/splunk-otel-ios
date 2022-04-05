@@ -68,7 +68,6 @@ public class CoreDataManager {
                 if let jsonString = String(data: jsonData, encoding: . utf8) {
                    // print(jsonString)
                     span.setValue(jsonString, forKey: "attributes")
-
                 }
             }
 
