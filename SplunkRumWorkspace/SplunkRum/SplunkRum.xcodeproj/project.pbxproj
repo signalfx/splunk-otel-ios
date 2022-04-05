@@ -666,7 +666,7 @@
 			currentVersion = C832DCD227FC252E006E0156 /* Rum1.xcdatamodel */;
 			path = Rum1.xcdatamodeld;
 			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
+			versionGroupType = wrapper.xcdatamodeld;
 		};
 /* End XCVersionGroup section */
 	};
