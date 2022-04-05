@@ -35,8 +35,8 @@
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
 		C832DCD527FC4E04006E0156 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C832DCD427FC4E04006E0156 /* CoreDataManager.swift */; };
-		C832DCFF27FC67F7006E0156 /* CacheKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C832DCFD27FC67ED006E0156 /* CacheKit.framework */; platformFilter = ios; };
-		C832DD0027FC67F7006E0156 /* CacheKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C832DCFD27FC67ED006E0156 /* CacheKit.framework */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C832DD0327FC763B006E0156 /* CacheKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C832DD0227FC763B006E0156 /* CacheKit.framework */; platformFilter = ios; };
+		C832DD0427FC763B006E0156 /* CacheKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C832DD0227FC763B006E0156 /* CacheKit.framework */; platformFilter = ios; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +56,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C832DD0027FC67F7006E0156 /* CacheKit.framework in Embed Frameworks */,
+				C832DD0427FC763B006E0156 /* CacheKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -89,7 +89,7 @@
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
 		C832DCD427FC4E04006E0156 /* CoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
-		C832DCFD27FC67ED006E0156 /* CacheKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CacheKit.framework; path = "../../../../../../../Library/Developer/Xcode/DerivedData/CacheKit-fmscmzgqkkysmnhiarweoidlkhov/Build/Products/Debug-iphonesimulator/CacheKit.framework"; sourceTree = "<group>"; };
+		C832DD0227FC763B006E0156 /* CacheKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CacheKit.framework; path = ../CacheKit.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,7 +101,7 @@
 				869E0B8C273AC48B00EBDA52 /* ZipkinExporter in Frameworks */,
 				8610004626178DB9008B972A /* DeviceKit in Frameworks */,
 				869E0B8A273AC48000EBDA52 /* StdoutExporter in Frameworks */,
-				C832DCFF27FC67F7006E0156 /* CacheKit.framework in Frameworks */,
+				C832DD0327FC763B006E0156 /* CacheKit.framework in Frameworks */,
 				869E0B86273AC46B00EBDA52 /* OpenTelemetryApi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -140,7 +140,6 @@
 		86260EC625CDC1DE009F3CB1 /* SplunkRum */ = {
 			isa = PBXGroup;
 			children = (
-				C832DCFD27FC67ED006E0156 /* CacheKit.framework */,
 				C832DCD427FC4E04006E0156 /* CoreDataManager.swift */,
 				86260F0E25CDC407009F3CB1 /* SplunkRum.swift */,
 				86260EC725CDC1DE009F3CB1 /* SplunkRum.h */,
@@ -178,6 +177,7 @@
 		863044CD25F6CA4000E0F846 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C832DD0227FC763B006E0156 /* CacheKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
