@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.6
 
 import PackageDescription
 
@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "SplunkOtel", targets: ["SplunkOtel"])
     ],
     dependencies: [
-        .package(name: "opentelemetry-swift", url:"https://github.com/open-telemetry/opentelemetry-swift", from: "1.1.0"),
+        .package(url:"https://github.com/open-telemetry/opentelemetry-swift", from: "1.1.0"),
 	.package(url: "https://github.com/devicekit/DeviceKit.git", from: "4.0.0"),
     ],
     targets: [
@@ -29,7 +29,7 @@ let package = Package(
             exclude: [
 		"SplunkRumTests",
 		"SplunkRum/SplunkRum.h",
-		"SplunkRum/Info.plist"
+		"SplunkRum/Info.plist" 
             ],
             sources: [
                 "SplunkRum",
@@ -37,3 +37,4 @@ let package = Package(
         )
     ]
 )
+
