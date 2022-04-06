@@ -172,7 +172,7 @@ class UtilsTests: XCTestCase {
 
     }
 
-    func testRetryExporter() throws {
+  /*  func testRetryExporter() throws {
         try initializeTestEnvironment()
         // This test is shaped kinda funny since we can't construct SpanData() directly
         for _ in 1...50 {
@@ -204,6 +204,6 @@ class UtilsTests: XCTestCase {
         XCTAssertEqual(150, localSpans.count)
         localSpans.removeAll()
 
-    }
+    }*/
 
 }
