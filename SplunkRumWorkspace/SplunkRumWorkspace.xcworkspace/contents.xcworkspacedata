@@ -2,9 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:CacheKit.framework">
-   </FileRef>
-   <FileRef
       location = "group:SmokeTest/SmokeTest.xcodeproj">
    </FileRef>
    <FileRef
