@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.6
 
 import PackageDescription
 
@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "SplunkOtel", targets: ["SplunkOtel"])
     ],
     dependencies: [
-        .package(name: "opentelemetry-swift", url:"https://github.com/open-telemetry/opentelemetry-swift", from: "1.1.0"),
+        .package(url:"https://github.com/open-telemetry/opentelemetry-swift", from: "1.1.0"),
 	.package(url: "https://github.com/devicekit/DeviceKit.git", from: "4.0.0"),
     ],
     targets: [
