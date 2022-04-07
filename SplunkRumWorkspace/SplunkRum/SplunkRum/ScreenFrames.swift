@@ -48,11 +48,11 @@ class ScreenFrames: NSObject {
         displayLink = nil
     }
 
-    //timestamp: The time interval that represents when the last frame displayed
-    //targetTimestamp: TargetTimestamp is the time of the next frame to trigger the link
+    // timestamp: The time interval that represents when the last frame displayed
+    // targetTimestamp: TargetTimestamp is the time of the next frame to trigger the link
     @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
 
-        //In order to manage the long render time, after bringing the app back into the foreground.
+        // In order to manage the long render time, after bringing the app back into the foreground.
          let state = UIApplication.shared.applicationState
          if state == .background || state == .inactive {
             isFirstIteration = true
@@ -62,7 +62,7 @@ class ScreenFrames: NSObject {
             previousTimestamp = currentTime
             isFirstIteration = false
          }
-        //Report every slow frame as a span, in 1 second intervals, in which the count of slow frames is recorded.
+        // Report every slow frame as a span, in 1 second intervals, in which the count of slow frames is recorded.
          let duration = displayLink.timestamp - previousTimestamp
          previousTimestamp = displayLink.timestamp
          let elapsedTime = currentTime - startedTime
@@ -76,12 +76,6 @@ class ScreenFrames: NSObject {
              }
 
          } else {
-             
-             if duration > frozenFrameThreshold {
-                 frozenCount += 1
-              } else if duration > slowFrameThreshold {
-                 slowCount += 1
-              }
 
              if slowCount > 0 {
                  reportSlowframe(slowFrameCount: slowCount, name: "slowRenders")
@@ -96,6 +90,11 @@ class ScreenFrames: NSObject {
              }
              slowCount = 0
              frozenCount = 0
+             if duration > frozenFrameThreshold {
+                 frozenCount += 1
+              } else if duration > slowFrameThreshold {
+                 slowCount += 1
+              }
             currentIteration = iteration
          }
      }
