@@ -58,6 +58,8 @@ or
 | spanRejectionFilter | ((SpanData) -> SpanData?)? | Closure to modify or reject/ignore spans.  See example below.  | `nil` |
 | showVCInstrumentation | Bool | Enable span creation for ViewController Show events (not applicable to all UI frameworks/apps) | true |
 | screenNameSpans | Bool | Enable span creation for changes to the screen name | true |
+| slowFrameThreshold | CFTimeInterval | The SlowFrame Threshold is an optional configuration | 0.0169 |
+| frozenFrameThreshold | CFTimeInterval | The frozenFrame Threshold is an optional configuration | 0.7 |
 
 ## Crash Reporting
 

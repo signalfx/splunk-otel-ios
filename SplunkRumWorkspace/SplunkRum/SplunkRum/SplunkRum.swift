@@ -37,7 +37,7 @@ let SplunkRumVersionString = "0.5.2"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold:CFTimeInterval = 0.0169, frozenFrameThreshold:CFTimeInterval = 0.7) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -45,6 +45,8 @@ let SplunkRumVersionString = "0.5.2"
         self.environment = environment
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
+        self.slowFrameThreshold = slowFrameThreshold
+        self.frozenFrameThreshold = frozenFrameThreshold
     }
     /**
         Copy constructor
@@ -59,6 +61,8 @@ let SplunkRumVersionString = "0.5.2"
         self.spanFilter = opts.spanFilter
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
+        self.slowFrameThreshold = opts.slowFrameThreshold
+        self.frozenFrameThreshold = opts.frozenFrameThreshold
     }
 
     /**
@@ -98,6 +102,16 @@ let SplunkRumVersionString = "0.5.2"
      Enable span creation for screen name changes
      */
     @objc public var screenNameSpans: Bool = true
+    
+    /**
+     The SlowFrame Threshold is an optional configuration
+     */
+    @objc public var slowFrameThreshold: CFTimeInterval = 0.0169
+    
+    /**
+     The frozenFrame Threshold is an optional configuration
+     */
+    @objc public var frozenFrameThreshold: CFTimeInterval = 0.7
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
