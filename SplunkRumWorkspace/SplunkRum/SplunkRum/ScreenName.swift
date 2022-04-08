@@ -17,13 +17,12 @@ limitations under the License.
 
 import Foundation
 
-let userDefaults = UserDefaults.standard
 fileprivate var screenName: String = "unknown"
 fileprivate var screenNameManuallySet = false
 // Yes, I assume there are swift libraries to do this sort of thing, but nothing
 // I could find in the stdlib
 fileprivate var lock = NSLock()
-private var screenNameCallbacks: [((String) -> Void)] = []
+fileprivate var screenNameCallbacks: [((String) -> Void)] = []
 
 func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
     let now = Date()
