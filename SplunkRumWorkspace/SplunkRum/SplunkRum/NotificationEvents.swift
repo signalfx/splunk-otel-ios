@@ -45,3 +45,13 @@ class NotificationEvents {
             }
     }
 }
+func userNotificationCenterTap(userInfo: UNNotificationResponse) {
+    let userInf = userInfo.notification.request.content.userInfo
+    print(userInf)
+        let state = UIApplication.shared.applicationState
+        if state == .inactive || state == .background {
+            if let aps = userInf["aps"] as? NSDictionary {
+                print(aps)
+            }
+        }
+}

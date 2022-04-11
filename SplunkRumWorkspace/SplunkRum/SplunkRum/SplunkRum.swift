@@ -335,4 +335,8 @@ var splunkRumInitializeCalledTime = Date()
         integrateWebViewWithBrowserRum(view: view)
     }
 
+    @objc public class func notificationTab(_ userInfo: UNNotificationResponse) {
+        userNotificationCenterTap(userInfo: userInfo)
+    }
+
 }
