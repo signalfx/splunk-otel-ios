@@ -104,12 +104,12 @@ let SplunkRumVersionString = "0.5.2"
     @objc public var screenNameSpans: Bool = true
 
     /**
-     The SlowFrame Threshold is an optional configuration
+     The SlowFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as slow frames. User needs to provide this value in milliseconds.
      */
     @objc public var slowFrameThreshold: CFTimeInterval = 0.0169
 
     /**
-     The frozenFrame Threshold is an optional configuration
+     The frozenFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as frozen frames. User needs to provide this value in milliseconds.
      */
     @objc public var frozenFrameThreshold: CFTimeInterval = 0.7
 

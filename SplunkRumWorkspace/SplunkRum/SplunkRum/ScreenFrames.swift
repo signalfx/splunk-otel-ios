@@ -32,7 +32,7 @@ class ScreenFrames: NSObject {
     private var slowCount: Int = 0
     private var frozenCount: Int = 0
     private var isFirstIteration: Bool = true
-    private var previousTimestamp: CFAbsoluteTime = CACurrentMediaTime()
+    private var previousTimestamp: CFTimeInterval = CACurrentMediaTime()
 
     func startTracking() {
 
