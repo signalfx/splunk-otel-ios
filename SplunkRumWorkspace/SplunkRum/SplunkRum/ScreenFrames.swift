@@ -23,8 +23,8 @@ class ScreenFrames: NSObject {
 
     private var displayLink: CADisplayLink?
 
-    private var slowFrameThreshold: CFTimeInterval = SplunkRum.configuredOptions?.slowFrameThreshold ?? 0.0169
-    private var frozenFrameThreshold: CFTimeInterval = SplunkRum.configuredOptions?.frozenFrameThreshold ?? 0.7
+    private var slowFrameThreshold: CFTimeInterval = SplunkRum.configuredOptions?.slowFrameThreshold ?? 16.7
+    private var frozenFrameThreshold: CFTimeInterval = SplunkRum.configuredOptions?.frozenFrameThreshold ?? 700
 
     private var currentIteration: Int = 0
     private var startedTime: CFTimeInterval = CACurrentMediaTime()
@@ -35,7 +35,8 @@ class ScreenFrames: NSObject {
     private var previousTimestamp: CFTimeInterval = CACurrentMediaTime()
 
     func startTracking() {
-
+        frozenFrameThreshold = frozenFrameThreshold / 1000
+        slowFrameThreshold = slowFrameThreshold / 1000
         stopTracking() /// make sure to stop a previous running display link
         let displayLink = CADisplayLink(target: self, selector: #selector(displayLinkCallback))
         displayLink.add(to: .main, forMode: .common)
@@ -67,15 +68,14 @@ class ScreenFrames: NSObject {
          previousTimestamp = displayLink.timestamp
          let elapsedTime = currentTime - startedTime
          let iteration = Int(elapsedTime)
-         if currentIteration == iteration {
 
-            if duration > frozenFrameThreshold {
-                frozenCount += 1
-             } else if duration > slowFrameThreshold {
-                slowCount += 1
-             }
+         if duration > frozenFrameThreshold {
+            frozenCount += 1
+         } else if duration > slowFrameThreshold {
+            slowCount += 1
+         }
 
-         } else {
+         if currentIteration != iteration {
 
              if slowCount > 0 {
                  reportSlowframe(slowFrameCount: slowCount, name: "slowRenders")
@@ -90,12 +90,8 @@ class ScreenFrames: NSObject {
              }
              slowCount = 0
              frozenCount = 0
-             if duration > frozenFrameThreshold {
-                 frozenCount += 1
-              } else if duration > slowFrameThreshold {
-                 slowCount += 1
-              }
-            currentIteration = iteration
+             currentIteration = iteration
+
          }
      }
 
