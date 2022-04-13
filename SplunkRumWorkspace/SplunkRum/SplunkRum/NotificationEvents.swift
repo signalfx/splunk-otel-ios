@@ -25,7 +25,23 @@ func userNotificationCenterTap(userInfo: UNNotificationResponse) {
         let state = UIApplication.shared.applicationState
         if state == .inactive || state == .background {
             if let aps = userInf["aps"] as? NSDictionary {
-                print(aps)
+                    if let alert = aps["alert"] as? NSDictionary {
+                        if let message = alert["message"] as? String {
+                            print(message)
+                            reportNotificationTapSpan(apns: message)
+                        }
+                    }
             }
         }
 }
+func reportNotificationTapSpan(apns: String) {
+    let tracer = buildTracer()
+    let now = Date()
+    let typeName = "notificationTap"
+    let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
+    span.setAttribute(key: "component", value: "ui")
+    span.setAttribute(key: "screen.name", value: getScreenName())
+    span.setAttribute(key: "message", value: apns)
+    span.end(time: now)
+}
+
