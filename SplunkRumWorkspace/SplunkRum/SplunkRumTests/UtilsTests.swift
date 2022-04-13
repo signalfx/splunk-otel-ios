@@ -205,5 +205,11 @@ class UtilsTests: XCTestCase {
         localSpans.removeAll()
 
     }
+    
+    func testSessionBasedSampling() throws {
+        SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true, globalAttributes: [:], environment: nil, ignoreURLs: nil),sessionBaseSamplingRatio: 0.2)
+        XCTAssertTrue(SessionBasedSampling.probability >= 0.0 && SessionBasedSampling.probability <= 1.0)
+        XCTAssertEqual(SessionBasedSampling.probability, 0.2)
+    }
 
 }
