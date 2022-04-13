@@ -19,32 +19,6 @@ import Foundation
 import UserNotifications
 import UIKit
 
-class NotificationEvents {
-
-    @objc func receiveRemoteNotification(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-
-        }
-
-    private func swizzleDidReceiveRemoteNotification() {
-        let appDelegate = UIApplication.shared.delegate
-        let appDelegateClass: AnyClass? = object_getClass(appDelegate)
-
-            let originalSelector = #selector(UIApplicationDelegate.application(_:didReceiveRemoteNotification:fetchCompletionHandler:))
-            let swizzledSelector = #selector(NotificationEvents.self.receiveRemoteNotification(_:didReceiveRemoteNotification:fetchCompletionHandler:))
-
-            guard let swizzledMethod = class_getInstanceMethod(NotificationEvents.self, swizzledSelector) else {
-                return
-            }
-
-            if let originalMethod = class_getInstanceMethod(appDelegateClass, originalSelector) {
-                // exchange implementation
-                method_exchangeImplementations(originalMethod, swizzledMethod)
-            } else {
-                // add implementation
-                class_addMethod(appDelegateClass, swizzledSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
-            }
-    }
-}
 func userNotificationCenterTap(userInfo: UNNotificationResponse) {
     let userInf = userInfo.notification.request.content.userInfo
     print(userInf)
