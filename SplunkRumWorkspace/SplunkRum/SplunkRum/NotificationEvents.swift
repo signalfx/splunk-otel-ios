@@ -44,4 +44,3 @@ func reportNotificationTapSpan(apns: String) {
     span.setAttribute(key: "message", value: apns)
     span.end(time: now)
 }
-
