@@ -180,7 +180,7 @@ var splunkRumInitializeCalledTime = Date()
         let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
         if options?.debug ?? false {
-            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: false)))
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
         }
         sendAppStartSpan()
         let srInit = buildTracer()
@@ -198,7 +198,6 @@ var splunkRumInitializeCalledTime = Date()
         srInit.end()
         initialized = true
         print("SplunkRum.initialize() complete")
-        print("Document directory path is \(getDocumentsDirectory())")
     }
 
     /**
