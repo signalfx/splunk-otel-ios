@@ -21,13 +21,11 @@ import UIKit
 
 func userNotificationCenterTap(userInfo: UNNotificationResponse) {
     let userInf = userInfo.notification.request.content.userInfo
-    print(userInf)
         let state = UIApplication.shared.applicationState
         if state == .inactive || state == .background {
             if let aps = userInf["aps"] as? NSDictionary {
                     if let alert = aps["alert"] as? NSDictionary {
                         if let message = alert["message"] as? String {
-                            print(message)
                             reportNotificationTapSpan(apns: message)
                         }
                     }
