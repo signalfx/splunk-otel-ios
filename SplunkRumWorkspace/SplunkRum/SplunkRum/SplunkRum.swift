@@ -335,4 +335,11 @@ var splunkRumInitializeCalledTime = Date()
         integrateWebViewWithBrowserRum(view: view)
     }
 
+    /**
+       This check is to determine whether the splunkrum library has been initialized
+     */
+    public class func rumInitialize() -> Bool? {
+        return initialized
+    }
+
 }
