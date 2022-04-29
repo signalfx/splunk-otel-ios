@@ -150,12 +150,10 @@ var splunkRumInitializeCalledTime = Date()
     @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
-            initialized = false
             return false
         }
         if initialized || initializing {
             debug_log("SplunkRum already initializ{ed,ing}")
-            initialized = false
             return false
         }
         splunkRumInitializeCalledTime = Date()
@@ -175,7 +173,6 @@ var splunkRumInitializeCalledTime = Date()
         }
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
-            initialized = false
             return false
         }
         if rumAuth.isEmpty {
