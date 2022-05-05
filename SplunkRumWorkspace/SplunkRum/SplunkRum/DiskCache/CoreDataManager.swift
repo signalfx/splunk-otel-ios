@@ -254,7 +254,7 @@ public class CoreDataManager {
         }
 
     }
-    
+
     /**get count  of records */
     public func getRecordsCount() -> Int {
         var count = 0
