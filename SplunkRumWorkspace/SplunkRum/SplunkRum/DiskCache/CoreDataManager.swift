@@ -254,6 +254,18 @@ public class CoreDataManager {
         }
 
     }
+    public func getRecordsCount() -> Int {
+        var count = 0
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: ENTITY_NAME)
+        do {
+            let managedObjectContext = persistentContainer.viewContext
+            count = try managedObjectContext.count(for: fetchRequest)
+            return count
+        } catch {
+            print(error.localizedDescription)
+        }
+       return count
+    }
 }
 // MARK: -
 func getDocumentsDirectory() -> URL {
