@@ -202,6 +202,13 @@ class UtilsTests: XCTestCase {
         te.exportSucceeds = true
         _ = re.export(spans: fiftySpans)
         XCTAssertEqual(250, localSpans.count)
+
+        // check all serialized attributes
+        XCTAssertNotNil(localSpans[0].attributes)
+        XCTAssertNotNil(localSpans[0].kind)
+        XCTAssertNotNil(localSpans[0].startTime)
+        XCTAssertNotNil(localSpans[0].endTime)
+        XCTAssertNotNil(localSpans[0].spanId)
         localSpans.removeAll()
         XCTAssertEqual(0, CoreDataManager.shared.getRecordsCount())
     }
