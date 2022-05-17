@@ -138,7 +138,7 @@ var splunkRumInitializeCalledTime = Date()
     static var initializing = false
     static var configuredOptions: SplunkRumOptions?
     static var theBeaconUrl: String?
-
+    static var center = UNUserNotificationCenter.current()
     /**
             Initialization function.  Call as early as possible in your application, but only on the main thread.
                 - Parameter beaconUrl: Destination for the captured data.
@@ -203,6 +203,11 @@ var splunkRumInitializeCalledTime = Date()
         }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
+        isNotificationsEnabled { notificationEnabled in
+            if notificationEnabled {
+              swizzleDidReceiveRemoteNotification()
+            }
+        }
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
@@ -335,8 +340,10 @@ var splunkRumInitializeCalledTime = Date()
         integrateWebViewWithBrowserRum(view: view)
     }
 
-    @objc public class func notificationTab(_ userInfo: UNNotificationResponse) {
-        userNotificationCenterTap(userInfo: userInfo)
+    @objc public class func isNotificationsEnabled(completionHandler: @escaping (Bool) -> Void) {
+        center.getNotificationSettings { settings in
+            completionHandler(settings.soundSetting == .enabled)
+        }
     }
 
 }
