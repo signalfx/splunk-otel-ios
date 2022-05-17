@@ -48,19 +48,20 @@ func reportNotificationTapSpan(apns: String) {
     span.end(time: now)
 }
 func swizzleDidReceiveRemoteNotification() {
-
-    let appDelegate = UIApplication.shared.delegate
-    let appDelegateClass: AnyClass? = object_getClass(appDelegate)
-    let originalSelector = #selector(UNUserNotificationCenterDelegate.userNotificationCenter(_:didReceive:withCompletionHandler:))
-    let swizzledSelector = #selector(NotificationEvents.self.userNotificationCenterTap(_:didReceive:withCompletionHandler:))
-    guard let swizzledMethod = class_getInstanceMethod(NotificationEvents.self, swizzledSelector) else {
-        return
-    }
-    if let originalMethod = class_getInstanceMethod(appDelegateClass, originalSelector) {
-        // exchange implementation
-        method_exchangeImplementations(originalMethod, swizzledMethod)
-    } else {
-        // add implementation
-        class_addMethod(appDelegateClass, swizzledSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+    DispatchQueue.main.async {
+        let appDelegate = UIApplication.shared.delegate
+        let appDelegateClass: AnyClass? = object_getClass(appDelegate)
+        let originalSelector = #selector(UNUserNotificationCenterDelegate.userNotificationCenter(_:didReceive:withCompletionHandler:))
+        let swizzledSelector = #selector(NotificationEvents.self.userNotificationCenterTap(_:didReceive:withCompletionHandler:))
+        guard let swizzledMethod = class_getInstanceMethod(NotificationEvents.self, swizzledSelector) else {
+            return
+        }
+        if let originalMethod = class_getInstanceMethod(appDelegateClass, originalSelector) {
+            // exchange implementation
+            method_exchangeImplementations(originalMethod, swizzledMethod)
+        } else {
+            // add implementation
+            class_addMethod(appDelegateClass, swizzledSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+        }
     }
 }
