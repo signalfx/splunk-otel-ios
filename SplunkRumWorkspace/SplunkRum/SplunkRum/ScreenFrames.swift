@@ -83,11 +83,8 @@ class ScreenFrames: NSObject {
 
              if frozenCount > 0 {
                  reportSlowframe(slowFrameCount: frozenCount, name: "frozenRenders")
-             } else {
-                 if duration > frozenFrameThreshold {
-                     reportSlowframe(slowFrameCount: 1, name: "frozenRenders")
-                 }
              }
+
              slowCount = 0
              frozenCount = 0
              currentIteration = iteration
