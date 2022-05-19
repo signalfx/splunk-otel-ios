@@ -22,46 +22,41 @@ import UIKit
 class NotificationEvents {
 
     @objc func userNotificationCenterTap(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let userInfo = response.notification.request.content.userInfo
         let state = UIApplication.shared.applicationState
         if state == .inactive || state == .background {
-        if let aps = userInfo["aps"] as? NSDictionary {
-              if let alert = aps["alert"] as? NSDictionary {
-                     if let message = alert["message"] as? String {
-                            reportNotificationTapSpan(apns: message)
-                        }
-                }
-          }
-
+            let tracer = buildTracer()
+            let now = Date()
+            let typeName = "notificationTap"
+            let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
+            span.setAttribute(key: "component", value: "ui")
+            span.setAttribute(key: "screen.name", value: getScreenName())
+            span.end(time: now)
        }
 
     }
 }
-func reportNotificationTapSpan(apns: String) {
-    let tracer = buildTracer()
-    let now = Date()
-    let typeName = "notificationTap"
-    let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
-    span.setAttribute(key: "component", value: "ui")
-    span.setAttribute(key: "screen.name", value: getScreenName())
-    span.setAttribute(key: "message", value: apns)
-    span.end(time: now)
-}
+
 func swizzleDidReceiveRemoteNotification() {
     DispatchQueue.main.async {
-        let appDelegate = UIApplication.shared.delegate
-        let appDelegateClass: AnyClass? = object_getClass(appDelegate)
-        let originalSelector = #selector(UNUserNotificationCenterDelegate.userNotificationCenter(_:didReceive:withCompletionHandler:))
-        let swizzledSelector = #selector(NotificationEvents.self.userNotificationCenterTap(_:didReceive:withCompletionHandler:))
-        guard let swizzledMethod = class_getInstanceMethod(NotificationEvents.self, swizzledSelector) else {
-            return
-        }
-        if let originalMethod = class_getInstanceMethod(appDelegateClass, originalSelector) {
-            // exchange implementation
-            method_exchangeImplementations(originalMethod, swizzledMethod)
-        } else {
-            // add implementation
-            class_addMethod(appDelegateClass, swizzledSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
-        }
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil,
+        queue: OperationQueue.main, using: { _ in
+            if UIApplication.shared.isRegisteredForRemoteNotifications {
+                let appDelegate = UIApplication.shared.delegate
+                let appDelegateClass: AnyClass? = object_getClass(appDelegate)
+                let originalSelector = #selector(UNUserNotificationCenterDelegate.userNotificationCenter(_:didReceive:withCompletionHandler:))
+                let swizzledSelector = #selector(NotificationEvents.self.userNotificationCenterTap(_:didReceive:withCompletionHandler:))
+                guard let swizzledMethod = class_getInstanceMethod(NotificationEvents.self, swizzledSelector) else {
+                    return
+                }
+
+                if let originalMethod = class_getInstanceMethod(appDelegateClass, originalSelector) {
+                    // exchange implementation
+                    method_exchangeImplementations(originalMethod, swizzledMethod)
+                } else {
+                    // add implementation
+                    class_addMethod(appDelegateClass, swizzledSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+                }
+            }
+        })
     }
 }

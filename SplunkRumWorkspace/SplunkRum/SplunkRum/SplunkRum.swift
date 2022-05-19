@@ -203,11 +203,7 @@ var splunkRumInitializeCalledTime = Date()
         }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
-        isNotificationsEnabled { notificationEnabled in
-            if notificationEnabled {
-              swizzleDidReceiveRemoteNotification()
-            }
-        }
+        swizzleDidReceiveRemoteNotification()
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
@@ -338,12 +334,6 @@ var splunkRumInitializeCalledTime = Date()
      */
     @objc public class func integrateWithBrowserRum(_ view: WKWebView) {
         integrateWebViewWithBrowserRum(view: view)
-    }
-
-    @objc public class func isNotificationsEnabled(completionHandler: @escaping (Bool) -> Void) {
-        center.getNotificationSettings { settings in
-            completionHandler(settings.soundSetting == .enabled)
-        }
     }
 
 }
