@@ -62,8 +62,7 @@ extension CLLocationManager {
 // swiftlint:disable missing_docs
 @objc open func splunk_swizzled_didUpdateLocations(with manager: CLLocationManager, locations: [CLLocation]) {
     locations.forEach { (location) in
-        SplunkRum.setGlobalAttributes(["location.lon": location.coordinate.longitude])
-        SplunkRum.setGlobalAttributes(["location.lat": location.coordinate.latitude])
+        SplunkRum.setGlobalAttributes(["location": "location.lon \(location.coordinate.longitude)" + " " +  "location.lat \(location.coordinate.latitude)"])
     }
     splunk_swizzled_didUpdateLocations(with: manager, locations: locations)
  }
