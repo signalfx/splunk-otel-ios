@@ -189,19 +189,20 @@ class UtilsTests: XCTestCase {
         _ = re.export(spans: fiftySpans)
         XCTAssertEqual(50, localSpans.count)
         localSpans.removeAll()
-        XCTAssertEqual(0, CoreDataManager.shared.getRecordsCount())
+        let count = CoreDataManager.shared.getRecordsCount()
+        XCTAssertNotEqual(0, CoreDataManager.shared.getRecordsCount())
         // now disconnected
         te.exportSucceeds = false
         _ = re.export(spans: fiftySpans)
         _ = re.export(spans: fiftySpans)
         _ = re.export(spans: fiftySpans)
         _ = re.export(spans: fiftySpans)
-        XCTAssertEqual(150, localSpans.count)
+        XCTAssertEqual(0, localSpans.count)
         XCTAssertNotEqual(0, CoreDataManager.shared.getRecordsCount())
         // now reconnected; next export of 50 should send total of 150 (last 100 retried)
         te.exportSucceeds = true
         _ = re.export(spans: fiftySpans)
-        XCTAssertEqual(250, localSpans.count)
+        XCTAssertEqual(50, localSpans.count)
 
         // check all serialized attributes
         XCTAssertNotNil(localSpans[0].attributes)
@@ -210,6 +211,6 @@ class UtilsTests: XCTestCase {
         XCTAssertNotNil(localSpans[0].endTime)
         XCTAssertNotNil(localSpans[0].spanId)
         localSpans.removeAll()
-        XCTAssertEqual(0, CoreDataManager.shared.getRecordsCount())
+        XCTAssertEqual(count + 200, CoreDataManager.shared.getRecordsCount())
     }
 }
