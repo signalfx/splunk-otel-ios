@@ -24,6 +24,7 @@ import ZipkinExporter
 
 let FLUSH_OUT_TIME_SECONDS = 4 * 60 * 60  // 4 hours
 let FLUSH_OUT_MAX_SIZE = 21966080  // 20 MB
+let MAX_FETCH_SPANS = 2
 let TimeStampColumn = "created_at"
 let ENTITY_NAME = "PendingSpans"
 
@@ -82,18 +83,25 @@ public class CoreDataManager {
             span.setValue(String(describing: pendingSpan.traceState), forKey: "traceState")
             span.setValue(Date(), forKey: TimeStampColumn)  // this is used only for flush out
 
-            // save in to db
+            saveInToDb()
+        }
+    }
+    func saveInToDb() {
+        let managedObjectContext = persistentContainer.viewContext
+        managedObjectContext.performAndWait {
             do {
                 try managedObjectContext.save()
             } catch let error as NSError {
                 print("could not save. \(error) \(error.userInfo)")
             }
         }
+
     }
     /** Fetch span information from database and generate new span from it */
     public func fetchSpanValues() -> [SpanData] {
         let managedObjectContext = persistentContainer.viewContext
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: ENTITY_NAME)
+        fetchRequest.fetchLimit = MAX_FETCH_SPANS
         var newSpans = [SpanData]()
         do {
             let spans = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
@@ -180,25 +188,20 @@ public class CoreDataManager {
 
         do {
             let records = try managedObjectContext.fetch(fetchRequest) as! [NSManagedObject]
-            for record in records {
-                managedObjectContext.delete(record)
+            if records.count > 100 {
+                for record in records {
+                    managedObjectContext.delete(record)
+                }
             }
 
         } catch {
             print(error)
         }
-
-        do {
-            try managedObjectContext.save()
-
-        } catch let error as NSError {
-            print("could not save. \(error) \(error.userInfo)")
-
-        }
+        saveInToDb()
     }
     /** Delete single Span Data from DB*/
     public func deleteSpanData(spans: [SpanData]) {
-        let managedObjectContext = persistentContainer.newBackgroundContext()
+        let managedObjectContext = persistentContainer.viewContext
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: ENTITY_NAME)
 
         for span in spans {
@@ -222,14 +225,7 @@ public class CoreDataManager {
                 print(error)
             }
         }
-
-        // save context.
-        do {
-            try managedObjectContext.save()
-
-        } catch let error as NSError {
-            print("could not save. \(error) \(error.userInfo)")
-        }
+        saveInToDb()
     }
 
     /** Check that db is exist at given path */

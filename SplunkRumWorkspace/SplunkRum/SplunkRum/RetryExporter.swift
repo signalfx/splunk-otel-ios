@@ -30,8 +30,7 @@ class RetryExporter: SpanExporter {
     }
 
   func export(spans: [SpanData]) -> SpanExporterResultCode {
-        var result = attemptDBExport()
-        result = proxy.export(spans: spans)  // call zipkinexporter
+        let result = proxy.export(spans: spans)  // call zipkinexporter
         if result == .failure {
            CoreDataManager.shared.insertSpanValue(spans) // seperate values
             return .failure
@@ -40,7 +39,6 @@ class RetryExporter: SpanExporter {
     }
 
     func flush() -> SpanExporterResultCode {
-        _ = attemptDBExport()
         return proxy.flush()
     }
 

@@ -36,7 +36,29 @@ func initializeNetworkTypeMonitoring() {
                 } else {
                     hostConnectionType = nil
                 }
+                attemptCachedSpansExport()
             }
+        }
+    }
+
+}
+// MARK: - attempt to export from DB
+func attemptCachedSpansExport() {
+    // way 1 - delete span if size is exceeded.
+    CoreDataManager.shared.flushDbIfSizeExceed()
+            // OR
+    // way 2 -delete spans from db FLUSH FIFO or 4 h time logic.
+  // CoreDataManager.shared.flushOutSpanAfterTimePeriod()
+
+    let count = Double(CoreDataManager.shared.getRecordsCount())
+    let fetch_count = Int(ceil(count / Double(MAX_FETCH_SPANS)))
+
+    for _ in stride(from: 1, through: fetch_count, by: 1) {
+        let dbspans = CoreDataManager.shared.fetchSpanValues()
+
+        if !dbspans.isEmpty {
+            // delete exported span only
+            CoreDataManager.shared.deleteSpanData(spans: dbspans)
         }
     }
 
