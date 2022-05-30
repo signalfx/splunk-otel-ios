@@ -64,7 +64,7 @@ extension CLLocationManager {
     guard let locationValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
        SplunkRum.setGlobalAttributes(["location": "location.lon \(locationValue.longitude)" + " " +  "location.lat \(locationValue.latitude)"])
        manager.stopUpdatingLocation()
-       manager.delegate = nil;
+       manager.delegate = nil
     splunk_swizzled_didUpdateLocations(with: manager, locations: locations)
  }
 }
