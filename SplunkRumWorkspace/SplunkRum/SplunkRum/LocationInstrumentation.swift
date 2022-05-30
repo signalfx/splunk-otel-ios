@@ -61,9 +61,10 @@ extension CLLocationManager {
   }
 // swiftlint:disable missing_docs
 @objc open func splunk_swizzled_didUpdateLocations(with manager: CLLocationManager, locations: [CLLocation]) {
-    locations.forEach { (location) in
-        SplunkRum.setGlobalAttributes(["location": "location.lon \(location.coordinate.longitude)" + " " +  "location.lat \(location.coordinate.latitude)"])
-    }
+    guard let locationValue: CLLocationCoordinate2D = manager.location?.coordinate else { return }
+       SplunkRum.setGlobalAttributes(["location": "location.lon \(locationValue.longitude)" + " " +  "location.lat \(locationValue.latitude)"])
+       manager.stopUpdatingLocation()
+       manager.delegate = nil;
     splunk_swizzled_didUpdateLocations(with: manager, locations: locations)
  }
 }
