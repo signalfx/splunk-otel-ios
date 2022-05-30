@@ -37,7 +37,11 @@ let SplunkRumVersionString = "0.6.0"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, networkInstrumentation: Bool = true) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil,
+                      screenNameSpans: Bool = true,
+                      networkInstrumentation: Bool = true,
+                      enableDiskCache: Bool = false
+    ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -46,6 +50,7 @@ let SplunkRumVersionString = "0.6.0"
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
         self.networkInstrumentation = networkInstrumentation
+        self.enableDiskCache = enableDiskCache
     }
     /**
         Copy constructor
@@ -61,6 +66,7 @@ let SplunkRumVersionString = "0.6.0"
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
         self.networkInstrumentation = opts.networkInstrumentation
+        self.enableDiskCache = opts.enableDiskCache
     }
 
     /**
@@ -105,6 +111,8 @@ let SplunkRumVersionString = "0.6.0"
      Enable NetworkInstrumentation span creation for https calls.
      */
     @objc public var networkInstrumentation: Bool = true
+    
+    @objc public var enableDiskCache: Bool = false
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
@@ -181,11 +189,20 @@ var splunkRumInitializeCalledTime = Date()
             theBeaconUrl = beaconUrl + "?auth="+rumAuth
         }
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
-        let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
-        let zipkin = ZipkinTraceExporter(options: exportOptions)
-        let retry = RetryExporter(proxy: zipkin)
-        let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
-        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+        let exportOptions = ZipkinTraceExporterOptions(endpoint: theBeaconUrl!, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
+        
+        if options?.enableDiskCache ?? false {
+            let spanDb = SpanDb()
+            SpanFromDiskExport.start(spanDb: spanDb, endpoint: theBeaconUrl!)
+            let diskWriter = SpanToDiskExporter(spanDb: spanDb)
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: diskWriter))
+        } else {
+            let zipkin = ZipkinTraceExporter(options: exportOptions)
+            let retry = RetryExporter(proxy: zipkin)
+            let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+        }
+        
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
         }
