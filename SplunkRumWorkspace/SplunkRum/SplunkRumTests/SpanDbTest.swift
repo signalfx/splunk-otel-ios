@@ -44,6 +44,12 @@ func toTestSpan(json: String) -> TestZipkinSpan {
     try! JSONDecoder().decode(TestZipkinSpan.self, from: json.data(using: .utf8)!)
 }
 
+func deleteFile(_ path: String) throws {
+    if FileManager.default.fileExists(atPath: path) {
+        try FileManager.default.removeItem(atPath: path)
+    }
+}
+
 class SpanDbTest: XCTestCase {
     var dbPath: String?
 
