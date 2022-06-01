@@ -27,21 +27,11 @@ func rumOptions() -> SplunkRumOptions {
 }
 
 class DiskExportPipelineTest: XCTestCase {
-    let receiver = TestSpanReceiver()
-
-    override func setUpWithError() throws {
-        super.setUpWithError()
-        try receiver.start(9722)
-    }
-
-    override func tearDownWithError() throws {
-        super.tearDownWithError()
-        receiver.reset()
-    }
-
     func testExportPipeline() throws {
+        let receiver = TestSpanReceiver()
+        try receiver.start(9733)
         XCTAssertTrue(
-            SplunkRum.initialize(beaconUrl: "http://localhost:9722/v1/traces", rumAuth: "FAKE", options: rumOptions())
+            SplunkRum.initialize(beaconUrl: "http://localhost:9733/v1/traces", rumAuth: "FAKE", options: rumOptions())
         )
 
         buildTracer().spanBuilder(spanName: "test").startSpan().end()

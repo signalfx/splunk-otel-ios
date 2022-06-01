@@ -19,19 +19,10 @@ import XCTest
 @testable import SplunkRum
 
 class SpanFromDiskExporterTest: XCTestCase {
-    let receiver = TestSpanReceiver()
-
-    override func setUpWithError() throws {
-        try super.setUpWithError()
-        try receiver.start(9721)
-    }
-
-    override func tearDownWithError() {
-        super.tearDownWithError()
-        receiver.reset()
-    }
 
     func testExportingRemovesSpan() throws {
+        let receiver = TestSpanReceiver()
+        try receiver.start(9722)
         let db = SpanDb(path: ":memory:")
 
         _ = db.store(spans: [
@@ -39,7 +30,11 @@ class SpanFromDiskExporterTest: XCTestCase {
             makeSpan(name: "s2", timestamp: 2, tags: ["bar": "2"])
         ])
 
-        SpanFromDiskExport.start(spanDb: db, endpoint: "http://localhost:9721/v1/traces")
+        let stop = SpanFromDiskExport.start(spanDb: db, endpoint: "http://localhost:9722/v1/traces")
+
+        defer {
+            stop()
+        }
 
         var secondsWaited = 0
         while receiver.receivedSpans.isEmpty {
@@ -58,6 +53,9 @@ class SpanFromDiskExporterTest: XCTestCase {
     }
 
     func testFailedExportingDoesNotRemoveSpans() throws {
+        let receiver = TestSpanReceiver()
+        try receiver.start(9721)
+
         let db = SpanDb(path: ":memory:")
 
         _ = db.store(spans: [
@@ -65,7 +63,11 @@ class SpanFromDiskExporterTest: XCTestCase {
             makeSpan(name: "s2", timestamp: 2, tags: ["bar": "2"])
         ])
 
-        SpanFromDiskExport.start(spanDb: db, endpoint: "http://localhost:9721/oops")
+        let stop = SpanFromDiskExport.start(spanDb: db, endpoint: "http://localhost:9721/oops")
+
+        defer {
+            stop()
+        }
 
         var secondsWaited = 0
         while !receiver.receivedRequest {

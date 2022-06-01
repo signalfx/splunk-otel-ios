@@ -76,10 +76,17 @@ fileprivate func buildRequest(url: URL, data: Data) -> URLRequest {
 }
 
 class SpanFromDiskExport {
-    static func start(spanDb: SpanDb, endpoint: String) {
+    @discardableResult static func start(spanDb: SpanDb, endpoint: String) -> (() -> Void) {
         guard let url = URL(string: endpoint) else {
             print("Malformed endpoint URL: \(endpoint)")
-            return
+            return {}
+        }
+
+        var isRunning = true
+        let stopSem = DispatchSemaphore(value: 0)
+        let stop: () -> Void = {
+            isRunning = false
+            stopSem.wait()
         }
 
         let bandwidthTracker = BandwidthTracker()
@@ -91,9 +98,14 @@ class SpanFromDiskExport {
 
             defer {
                 bandwidthTracker.add(bytes: bytesSent, timeNanos: DispatchTime.now().rawValue)
-                DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(loopDelayMs), execute: {
-                    processSpans()
-                })
+
+                if isRunning {
+                    DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(loopDelayMs), execute: {
+                        processSpans()
+                    })
+                } else {
+                    stopSem.signal()
+                }
             }
 
             let bw = bandwidthTracker.bandwidth(timeNanosNow: DispatchTime.now().rawValue)
@@ -138,5 +150,7 @@ class SpanFromDiskExport {
         DispatchQueue.global().async {
             processSpans()
         }
+
+        return stop
     }
 }
