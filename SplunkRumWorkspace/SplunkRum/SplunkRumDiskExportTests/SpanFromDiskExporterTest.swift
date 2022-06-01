@@ -22,11 +22,11 @@ class SpanFromDiskExporterTest: XCTestCase {
     let receiver = TestSpanReceiver()
 
     override func setUpWithError() throws {
-        super.setUpWithError()
+        try super.setUpWithError()
         try receiver.start(9721)
     }
 
-    override func tearDownWithError() throws {
+    override func tearDownWithError() {
         super.tearDownWithError()
         receiver.reset()
     }

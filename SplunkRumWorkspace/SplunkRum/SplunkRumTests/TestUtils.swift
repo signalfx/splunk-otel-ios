@@ -49,7 +49,7 @@ class TestSpanProcessor: SpanProcessor {
 public class TestSpanExporter: SpanExporter {
     var exportSucceeds = true
 
-    func export(spans: [SpanData]) -> SpanExporterResultCode {
+    public func export(spans: [SpanData]) -> SpanExporterResultCode {
         if exportSucceeds {
             localSpans.append(contentsOf: spans)
             return .success
@@ -58,8 +58,8 @@ public class TestSpanExporter: SpanExporter {
         }
     }
 
-    func flush() -> SpanExporterResultCode { return .success }
-    func shutdown() { }
+    public func flush() -> SpanExporterResultCode { return .success }
+    public func shutdown() { }
 }
 
 func resetTestEnvironment() {

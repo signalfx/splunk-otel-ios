@@ -48,12 +48,12 @@ class SpanDbTest: XCTestCase {
     var dbPath: String?
 
     override func setUpWithError() throws {
-        super.setUpWithError()
+        try super.setUpWithError()
         dbPath = nil
     }
 
     override func tearDownWithError() throws {
-        super.tearDownWithError()
+        try super.tearDownWithError()
         if dbPath != nil {
             try deleteFile(dbPath!)
         }

@@ -33,13 +33,13 @@ class SpanToDiskExporter: SpanExporter {
         self.truncationCheckpoint = truncationCheckpoint
     }
 
-    func flush() -> SpanExporterResultCode {
+    public func flush() -> SpanExporterResultCode {
         return .success
     }
 
-    func shutdown() {}
+    public func shutdown() {}
 
-    func export(spans: [SpanData]) -> SpanExporterResultCode {
+    public func export(spans: [SpanData]) -> SpanExporterResultCode {
         if !db.ready() {
             return .failure
         }
