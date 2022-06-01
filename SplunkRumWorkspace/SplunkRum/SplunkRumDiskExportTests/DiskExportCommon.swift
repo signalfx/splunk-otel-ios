@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import Foundation
 import Swifter
@@ -33,7 +32,7 @@ class TestSpanReceiver {
     var receivedSpans: [TestZipkinSpan] = []
     var started = false
     var receivedRequest = false
-    
+
     init() {
         server["/v1/traces"] = { request in
             self.receivedRequest = true
@@ -41,33 +40,33 @@ class TestSpanReceiver {
             self.receivedSpans.append(contentsOf: spans)
             return HttpResponse.ok(.text("ok"))
         }
-        
+
         server["/oops"] = { _ in
             self.receivedRequest = true
             return HttpResponse.internalServerError
         }
     }
-    
+
     func start(_ port: UInt16) throws {
         if started {
             return
         }
-        
+
         try server.start(port)
         started = true
     }
-    
+
     func spans() -> [TestZipkinSpan] {
         return self.receivedSpans
     }
-    
+
     func reset() {
         self.receivedRequest = false
         self.receivedSpans = []
     }
 }
 
-func makeSpan(name: String, timestamp: UInt64, tags: [String : String] = [:]) -> ZipkinSpan {
+func makeSpan(name: String, timestamp: UInt64, tags: [String: String] = [:]) -> ZipkinSpan {
     ZipkinSpan(
         traceId: idgen.generateTraceId().hexString,
         parentId: nil,

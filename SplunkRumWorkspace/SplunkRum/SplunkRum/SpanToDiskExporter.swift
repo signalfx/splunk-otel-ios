@@ -14,9 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
-
-import Foundation
 
 import Foundation
 import OpenTelemetryApi
@@ -35,47 +32,47 @@ class SpanToDiskExporter: SpanExporter {
         self.maxFileSizeBytes = maxFileSizeBytes
         self.truncationCheckpoint = truncationCheckpoint
     }
-    
+
     func flush() -> SpanExporterResultCode {
-        return .success;
+        return .success
     }
-    
+
     func shutdown() {}
-    
+
     func export(spans: [SpanData]) -> SpanExporterResultCode {
         if !db.ready() {
             return .failure
         }
-        
+
         if !db.store(spans: ZipkinTransform.toZipkinSpans(spans: spans)) {
             return .failure
         }
-        
+
         let inserted = Int64(spans.count)
         checkpointCounter += inserted
-        
+
         // There might be a case where truncation checkpoint is never reached,
         // so do a size check / truncation after the first insert.
         if totalSpansInserted == 0 || checkpointCounter >= truncationCheckpoint {
             maybeTruncate()
         }
-        
+
         totalSpansInserted += inserted
-        
-        return .success;
+
+        return .success
     }
-    
+
     private func maybeTruncate() {
         guard let dbSize = db.getSize() else {
             return
         }
-        
+
         if dbSize < self.maxFileSizeBytes {
             return
         }
-        
+
         _ = db.truncate()
-        
+
         checkpointCounter = 0
     }
 }

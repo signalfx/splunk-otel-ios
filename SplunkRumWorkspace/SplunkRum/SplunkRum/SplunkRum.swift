@@ -111,7 +111,7 @@ let SplunkRumVersionString = "0.6.0"
      Enable NetworkInstrumentation span creation for https calls.
      */
     @objc public var networkInstrumentation: Bool = true
-    
+
     @objc public var enableDiskCache: Bool = false
 
     func toAttributeValue() -> String {
@@ -155,6 +155,7 @@ var splunkRumInitializeCalledTime = Date()
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
+    // swiftlint:disable:next cyclomatic_complexity
     @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
@@ -190,7 +191,7 @@ var splunkRumInitializeCalledTime = Date()
         }
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
         let exportOptions = ZipkinTraceExporterOptions(endpoint: theBeaconUrl!, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
-        
+
         if options?.enableDiskCache ?? false {
             let spanDb = SpanDb()
             SpanFromDiskExport.start(spanDb: spanDb, endpoint: theBeaconUrl!)
@@ -202,7 +203,7 @@ var splunkRumInitializeCalledTime = Date()
             let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
         }
-        
+
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
         }

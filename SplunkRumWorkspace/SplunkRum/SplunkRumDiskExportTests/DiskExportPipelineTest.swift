@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import XCTest
 @testable import SplunkRum
@@ -29,12 +28,14 @@ func rumOptions() -> SplunkRumOptions {
 
 class DiskExportPipelineTest: XCTestCase {
     let receiver = TestSpanReceiver()
-    
+
     override func setUpWithError() throws {
+        super.setUpWithError()
         try receiver.start(9722)
     }
 
     override func tearDownWithError() throws {
+        super.tearDownWithError()
         receiver.reset()
     }
 
@@ -42,11 +43,11 @@ class DiskExportPipelineTest: XCTestCase {
         XCTAssertTrue(
             SplunkRum.initialize(beaconUrl: "http://localhost:9722/v1/traces", rumAuth: "FAKE", options: rumOptions())
         )
-            
+
         buildTracer().spanBuilder(spanName: "test").startSpan().end()
-        
+
         sleep(11)
-            
+
         let spans = receiver.spans()
         XCTAssertGreaterThan(spans.count, 0)
         XCTAssertTrue(spans.contains(where: { s in

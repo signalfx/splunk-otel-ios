@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import XCTest
 @testable import SplunkRum
@@ -36,7 +35,7 @@ class BandwidthTrackerTest: XCTestCase {
         // The first byte sample should be discarded - only 1024 bytes transferred in the last 5 seconds
         XCTAssertEqual(tracker.bandwidth(timeNanosNow: ns(6_500)), 0.2048, accuracy: 0.01)
     }
-    
+
     func testMaxSamples() {
         let tracker = BandwidthTracker(timeWindowMillis: 6_000, maxSamples: 3)
         tracker.add(bytes: 8192, timeNanos: ns(0))

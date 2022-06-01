@@ -14,11 +14,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
+
+// Zipkin conversion code modified from https://github.com/open-telemetry/opentelemetry-swift/blob/main/Sources/Exporters/Zipkin/Implementation/ZipkinConversionExtension.swift
 
 class ZipkinEndpoint: Encodable {
     var serviceName: String
@@ -85,7 +86,7 @@ struct ZipkinSpan: Encodable {
         output["kind"] = kind
         output["timestamp"] = timestamp
         output["duration"] = duration
-        output["localEndpoint"] = ["serviceName":"myservice"]
+        output["localEndpoint"] = ["serviceName": "myservice"]
 
         if remoteEndpoint != nil {
             output["remoteEndpoint"] = remoteEndpoint!.write()
@@ -137,7 +138,7 @@ struct ZipkinTransform {
         var serviceName: String?
         var serviceNamespace: String?
     }
-    
+
     static func toZipkinSpans(spans: [SpanData]) -> [ZipkinSpan] {
         return spans.map { ZipkinTransform.toZipkinSpan(otelSpan: $0) }
     }

@@ -14,70 +14,70 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import XCTest
-
 @testable import SplunkRum
 
 class SpanFromDiskExporterTest: XCTestCase {
     let receiver = TestSpanReceiver()
 
     override func setUpWithError() throws {
+        super.setUpWithError()
         try receiver.start(9721)
     }
 
     override func tearDownWithError() throws {
+        super.tearDownWithError()
         receiver.reset()
     }
 
     func testExportingRemovesSpan() throws {
         let db = SpanDb(path: ":memory:")
-        
+
         _ = db.store(spans: [
-            makeSpan(name: "s1", timestamp: 1, tags: ["foo" : "1"]),
-            makeSpan(name: "s2", timestamp: 2, tags: ["bar" : "2"])
+            makeSpan(name: "s1", timestamp: 1, tags: ["foo": "1"]),
+            makeSpan(name: "s2", timestamp: 2, tags: ["bar": "2"])
         ])
-        
+
         SpanFromDiskExport.start(spanDb: db, endpoint: "http://localhost:9721/v1/traces")
-        
+
         var secondsWaited = 0
         while receiver.receivedSpans.isEmpty {
             sleep(1)
             secondsWaited += 1
-            
+
             if secondsWaited >= 10 {
-                XCTFail()
+                XCTFail("Timed out waiting for spans")
                 return
             }
         }
-        
+
         let spans = receiver.spans()
         XCTAssertEqual(spans.count, 2)
         XCTAssertEqual(db.fetchLatest(count: 10).count, 0)
     }
-    
+
     func testFailedExportingDoesNotRemoveSpans() throws {
         let db = SpanDb(path: ":memory:")
-        
+
         _ = db.store(spans: [
-            makeSpan(name: "s1", timestamp: 1, tags: ["foo" : "1"]),
-            makeSpan(name: "s2", timestamp: 2, tags: ["bar" : "2"])
+            makeSpan(name: "s1", timestamp: 1, tags: ["foo": "1"]),
+            makeSpan(name: "s2", timestamp: 2, tags: ["bar": "2"])
         ])
-        
+
         SpanFromDiskExport.start(spanDb: db, endpoint: "http://localhost:9721/oops")
-        
+
         var secondsWaited = 0
         while !receiver.receivedRequest {
             sleep(1)
             secondsWaited += 1
-            
+
             if secondsWaited >= 10 {
-                XCTFail()
+                XCTFail("Timed out waiting for spans")
                 return
             }
         }
-        
+
         let spans = receiver.spans()
         XCTAssertEqual(spans.count, 0)
         XCTAssertEqual(db.fetchLatest(count: 10).count, 2)
