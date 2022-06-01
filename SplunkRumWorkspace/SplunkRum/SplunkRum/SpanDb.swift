@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2021 Splunk Inc.
+Copyright 2022 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,22 +26,17 @@ fileprivate func sqliteError(code: Int32) -> String {
 fileprivate let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
 class SpanDb {
-    let databasePath: String;
-    var lock: NSLock = NSLock()
-    var db_: OpaquePointer?
-    var insertStmt_: OpaquePointer?
-    var fetchLatestStmt_: OpaquePointer?
-    var sizeStmt_: OpaquePointer?
-    var initialized: Bool = false
+    let databasePath: String
+    private var lock: NSLock = NSLock()
+    internal var db_: OpaquePointer? = nil
+    private var insertStmt_: OpaquePointer? = nil
+    private var fetchLatestStmt_: OpaquePointer? = nil
+    private var sizeStmt_: OpaquePointer? = nil
+    private var initialized: Bool = false
 
     init(path: String? = nil) {
-        databasePath = path ?? SpanDb.defaultPath()
+        self.databasePath = path ?? SpanDb.makeDatabasePath() ?? ":memory:"
         
-        print("Storage path \(databasePath)")
-        db_ = nil
-        insertStmt_ = nil
-        fetchLatestStmt_ = nil
-
         var status = sqlite3_open(databasePath, &db_)
         
         if status != SQLITE_OK {
@@ -72,7 +67,7 @@ class SpanDb {
             return
         }
         
-        status = sqlite3_prepare_v2(db, "SELECT rowid, data FROM span ORDER BY timestamp LIMIT ?", -1, &fetchLatestStmt_, nil)
+        status = sqlite3_prepare_v2(db, "SELECT rowid, data FROM span ORDER BY timestamp DESC LIMIT ?", -1, &fetchLatestStmt_, nil)
         
         if status != SQLITE_OK {
             print("Unable to create span fetch statement: \(sqliteError(code: status))")
@@ -91,6 +86,14 @@ class SpanDb {
         }
         
         initialized = true
+    }
+    
+    deinit {
+        initialized = false
+        sqlite3_finalize(sizeStmt_!)
+        sqlite3_finalize(fetchLatestStmt_!)
+        sqlite3_finalize(insertStmt_!)
+        sqlite3_close(db_!)
     }
     
     func ready() -> Bool {
@@ -189,7 +192,6 @@ class SpanDb {
             lock.unlock()
         }
         
-        print(query)
         let status = sqlite3_exec(db_!, query, nil, nil, nil)
         
         if status != SQLITE_OK {
@@ -200,9 +202,9 @@ class SpanDb {
         return true
     }
     
-    func truncate(maxDbSizeBytes: Int) {
+    func truncate() -> Bool {
         if !ready() {
-            return
+            return false
         }
         
         lock.lock()
@@ -210,20 +212,32 @@ class SpanDb {
             lock.unlock()
         }
         
+        // Delete the oldest 20% of spans
         let query = """
           DELETE FROM span WHERE rowid IN (
             SELECT rowid FROM span ORDER BY timestamp ASC LIMIT (
-              SELECT toggle * total / 5 FROM
-                (SELECT CASE WHEN pc * ps > \(maxDbSizeBytes) THEN 1 ELSE 0 END AS toggle
-                   FROM pragma_page_count(), pragma_page_size()),
-                (SELECT COUNT(*) AS total FROM span)
+              SELECT COUNT(*) / 5 FROM span
             )
           )
         """
         
         let db = db_!
-        sqlite3_exec(db, query, nil, nil, nil)
-        sqlite3_exec(db, "VACUUM", nil, nil, nil)
+        
+        var status = sqlite3_exec(db, query, nil, nil, nil)
+        
+        if status != SQLITE_OK {
+            print("Span deletion failed on truncate: \(sqliteError(code: status))")
+            return false
+        }
+        
+        status = sqlite3_exec(db, "VACUUM;", nil, nil, nil)
+        
+        if status != SQLITE_OK {
+            print("Vacuum failed: \(sqliteError(code: status))")
+            return false
+        }
+        
+        return true
     }
     
     func getSize() -> Int? {
@@ -239,15 +253,30 @@ class SpanDb {
         let stmt = sizeStmt_!
         sqlite3_reset(stmt)
         
-        if sqlite3_step(stmt) == SQLITE_ROW {
-            return Int(sqlite3_column_int(stmt, 0))
+        var dbSize = 0
+        while sqlite3_step(stmt) == SQLITE_ROW {
+            dbSize = Int(sqlite3_column_int(stmt, 0))
         }
         
-        return nil
+        return dbSize
     }
     
-    static func defaultPath() -> String {
+    static func makeDatabasePath() -> String? {
         let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
-        return paths[0].appendingPathComponent("SplunkRum.sqlite").absoluteString
+        
+        if paths.isEmpty {
+            return nil
+        }
+        
+        let dir = paths[0]
+        
+        do {
+            try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        } catch {
+            print("Unable to create application support directory \(dir): \(error)")
+            return nil
+        }
+        
+        return dir.appendingPathComponent("SplunkRum.sqlite").path
     }
 }

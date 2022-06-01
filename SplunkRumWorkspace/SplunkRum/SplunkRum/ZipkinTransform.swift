@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2021 Splunk Inc.
+Copyright 2022 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -60,10 +60,8 @@ struct ZipkinSpan: Encodable {
     var remoteEndpoint: ZipkinEndpoint?
     var annotations: [ZipkinAnnotation]
     var tags: [String: String]
-    var debug: Bool?
-    var shared: Bool?
 
-    init(traceId: String, parentId: String?, id: String, kind: String?, name: String, timestamp: UInt64, duration: UInt64?, remoteEndpoint: ZipkinEndpoint?, annotations: [ZipkinAnnotation], tags: [String: String], debug: Bool?, shared: Bool?) {
+    init(traceId: String, parentId: String?, id: String, kind: String?, name: String, timestamp: UInt64, duration: UInt64?, remoteEndpoint: ZipkinEndpoint?, annotations: [ZipkinAnnotation], tags: [String: String]) {
 
         self.traceId = traceId
         self.parentId = parentId
@@ -75,8 +73,6 @@ struct ZipkinSpan: Encodable {
         self.remoteEndpoint = remoteEndpoint
         self.annotations = annotations
         self.tags = tags
-        self.debug = debug
-        self.shared = shared
     }
 
     public func write() -> [String: Any] {
@@ -89,9 +85,7 @@ struct ZipkinSpan: Encodable {
         output["kind"] = kind
         output["timestamp"] = timestamp
         output["duration"] = duration
-        output["debug"] = debug
-        output["shared"] = shared
-        output["localEndpoint"] = ["serviceName":"app"]
+        output["localEndpoint"] = ["serviceName":"myservice"]
 
         if remoteEndpoint != nil {
             output["remoteEndpoint"] = remoteEndpoint!.write()
@@ -193,9 +187,7 @@ struct ZipkinTransform {
                           duration: otelSpan.endTime.timeIntervalSince(otelSpan.startTime).toMicroseconds,
                           remoteEndpoint: remoteEndpoint,
                           annotations: annotations,
-                          tags: attributeEnumerationState.tags,
-                          debug: nil,
-                          shared: nil)
+                          tags: attributeEnumerationState.tags)
     }
 
     static func EncodeSpanId(spanId: SpanId) -> String {

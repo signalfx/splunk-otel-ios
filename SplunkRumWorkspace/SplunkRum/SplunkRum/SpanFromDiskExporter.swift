@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2021 Splunk Inc.
+Copyright 2022 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,51 +19,7 @@ limitations under the License.
 import Foundation
 
 let MAX_CONTENT_LENGTH = 1024 * 512
-let MAX_BANDWIDTH_KB_PER_SECOND = 2.0
-
-class BandwidthTracker {
-    let maxSamples: Int
-    let timeWindowNanos: UInt64
-    var samples: [(Int, UInt64)] = []
-    
-    init(timeWindowMillis: UInt64 = 10_000, maxSamples: Int = 60) {
-        self.maxSamples = maxSamples
-        self.timeWindowNanos = timeWindowMillis * 1_000_000
-    }
-    
-    func add(bytes: Int, timeNanos: UInt64) {
-        if samples.count >= maxSamples {
-            samples.removeFirst()
-        }
-        
-        samples.append((bytes, timeNanos))
-    }
-    
-    /// Returns bandwidth in KiB/s
-    func bandwidth(timeNanosNow: UInt64) -> Double {
-        let samplesInWindow = samples.filter { (_, ts) in
-            timeNanosNow >= ts && timeNanosNow - ts <= timeWindowNanos
-        }
-        
-        if samplesInWindow.isEmpty {
-            return 0.0
-        }
-
-        let transferredBytes = samplesInWindow.reduce(0, { total, sample in
-            let (bytes, _) = sample
-            return total + bytes
-        })
-        
-        let dbgSamples = samplesInWindow.map { (b, ts) in
-            (b, Double(timeNanosNow - ts) / 1e9)
-        }
-        
-        let beginTime = timeNanosNow >= timeWindowNanos ? timeNanosNow - timeWindowNanos : 0
-        let intervalSeconds = Double(timeNanosNow - beginTime) / 1e9
-        print(dbgSamples)
-        return Double(transferredBytes) / 1024.0 / intervalSeconds
-    }
-}
+let MAX_BANDWIDTH_KB_PER_SECOND = 15.0
 
 fileprivate struct Payload {
     let content: Data
@@ -86,6 +42,30 @@ fileprivate func preparePayload(spans: [(Int64, String)], contentLengthLimit: In
     
     let content = Data("[\(payloadSpans.joined(separator: ","))]".utf8)
     return Payload(content: content, ids: ids)
+}
+
+fileprivate func shouldEraseSpans(_ response: URLResponse?) -> Bool {
+    if response == nil {
+        return true
+    }
+    
+    let resp = response as? HTTPURLResponse
+    
+    if resp == nil {
+        return true
+    }
+    
+    switch resp!.statusCode {
+        case 200...399:
+            return true
+        case 400, // bad request
+             406, // not acceptable
+             413, // payload too large
+             422: // unprocessable entity
+            return true
+        default:
+        return false
+    }
 }
 
 fileprivate func buildRequest(url: URL, data: Data) -> URLRequest {
@@ -118,10 +98,8 @@ class SpanFromDiskExport {
             }
             
             let bw = bandwidthTracker.bandwidth(timeNanosNow: DispatchTime.now().rawValue)
-            print("bandwidth: \(bw)")
             if bw > MAX_BANDWIDTH_KB_PER_SECOND {
                 loopDelayMs = 1_000
-                print("Exceeding bandwidth!!!")
                 return
             }
             
@@ -134,14 +112,13 @@ class SpanFromDiskExport {
             let payload = preparePayload(spans: spans, contentLengthLimit: MAX_CONTENT_LENGTH)
             let req = buildRequest(url: url, data: payload.content)
             
-            print("payload size \(payload.content.count)")
-            
             let sem = DispatchSemaphore(value: 0)
             
-            var success = false
-            let task = URLSession.shared.dataTask(with: req) { _, _, error in
-                if error == nil {
-                    success = true
+            var shouldErase = false
+            let task = URLSession.shared.dataTask(with: req) { _, resp, error in
+                // Error might even be nil when the error code clearly is not
+                if error == nil && shouldEraseSpans(resp) {
+                    shouldErase = true
                     // In case of a successful upload, go for another round.
                     // We are limited by bandwidth anyway, this provides an upload burst.
                     loopDelayMs = 50
@@ -154,7 +131,7 @@ class SpanFromDiskExport {
             task.resume()
             sem.wait()
             
-            if success {
+            if shouldErase {
                 _ = spanDb.erase(ids: payload.ids)
             }
         }

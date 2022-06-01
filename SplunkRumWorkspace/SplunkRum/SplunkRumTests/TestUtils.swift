@@ -46,7 +46,7 @@ class TestSpanProcessor: SpanProcessor {
 
 }
 
-class TestSpanExporter: SpanExporter {
+public class TestSpanExporter: SpanExporter {
     var exportSucceeds = true
 
     func export(spans: [SpanData]) -> SpanExporterResultCode {
@@ -67,7 +67,23 @@ func resetTestEnvironment() {
     localSpans.removeAll()
 }
 
-func initializeTestEnvironment() throws {
+func defaultRumOptions() -> SplunkRumOptions {
+    let options = SplunkRumOptions()
+    options.debug = true
+    options.allowInsecureBeacon = true
+    options.globalAttributes = ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true]
+    options.environment = "env"
+    options.ignoreURLs = try! NSRegularExpression(pattern: ".*ignore_this.*")
+    return options
+}
+
+func deleteFile(_ path: String) throws {
+    if FileManager.default.fileExists(atPath: path) {
+        try FileManager.default.removeItem(atPath: path)
+    }
+}
+
+func initializeTestEnvironment(options: SplunkRumOptions = defaultRumOptions()) throws {
     if testEnvironmentInited {
         resetTestEnvironment()
         return
@@ -93,12 +109,6 @@ func initializeTestEnvironment() throws {
         return HttpResponse.internalServerError
     }
     try server.start(8989)
-    let options = SplunkRumOptions()
-    options.debug = true
-    options.allowInsecureBeacon = true
-    options.globalAttributes = ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true]
-    options.environment = "env"
-    options.ignoreURLs = try! NSRegularExpression(pattern: ".*ignore_this.*")
 
     let rumInitialize = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: options)
     let isRUMInitialized = SplunkRum.isInitialized()

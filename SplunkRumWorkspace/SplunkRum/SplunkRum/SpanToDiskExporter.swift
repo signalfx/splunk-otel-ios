@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2021 Splunk Inc.
+Copyright 2022 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,17 +24,23 @@ import OpenTelemetrySdk
 
 class SpanToDiskExporter: SpanExporter {
     let db: SpanDb
+    let maxFileSizeBytes: Int64
+    // Count of spans to insert before checking whether truncation is necessary
+    let truncationCheckpoint: Int64
+    private var totalSpansInserted: Int64 = 0
+    private var checkpointCounter: Int64 = 0
 
-    init(spanDb: SpanDb) {
+    init(spanDb: SpanDb, maxFileSizeBytes: Int64 = 64 * 1024 * 1024, truncationCheckpoint: Int64 = 2048) {
         self.db = spanDb
+        self.maxFileSizeBytes = maxFileSizeBytes
+        self.truncationCheckpoint = truncationCheckpoint
     }
     
     func flush() -> SpanExporterResultCode {
         return .success;
     }
     
-    func shutdown() {
-    }
+    func shutdown() {}
     
     func export(spans: [SpanData]) -> SpanExporterResultCode {
         if !db.ready() {
@@ -45,8 +51,31 @@ class SpanToDiskExporter: SpanExporter {
             return .failure
         }
         
-        print("DB size: \(db.getSize()))
+        let inserted = Int64(spans.count)
+        checkpointCounter += inserted
+        
+        // There might be a case where truncation checkpoint is never reached,
+        // so do a size check / truncation after the first insert.
+        if totalSpansInserted == 0 || checkpointCounter >= truncationCheckpoint {
+            maybeTruncate()
+        }
+        
+        totalSpansInserted += inserted
         
         return .success;
+    }
+    
+    private func maybeTruncate() {
+        guard let dbSize = db.getSize() else {
+            return
+        }
+        
+        if dbSize < self.maxFileSizeBytes {
+            return
+        }
+        
+        _ = db.truncate()
+        
+        checkpointCounter = 0
     }
 }
