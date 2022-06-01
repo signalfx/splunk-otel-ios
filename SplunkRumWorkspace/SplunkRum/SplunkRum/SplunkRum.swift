@@ -195,8 +195,9 @@ var splunkRumInitializeCalledTime = Date()
         if options?.enableDiskCache ?? false {
             let spanDb = SpanDb()
             SpanFromDiskExport.start(spanDb: spanDb, endpoint: theBeaconUrl!)
-            let diskWriter = SpanToDiskExporter(spanDb: spanDb)
-            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: diskWriter))
+            let diskExporter = SpanToDiskExporter(spanDb: spanDb)
+            let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options?.spanFilter ?? nil)
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
         } else {
             let zipkin = ZipkinTraceExporter(options: exportOptions)
             let retry = RetryExporter(proxy: zipkin)
