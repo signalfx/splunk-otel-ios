@@ -78,7 +78,7 @@ class UtilsTests: XCTestCase {
         XCTAssertEqual(102, localSpans.count)
         var rawSpans = localSpans
         localSpans.removeAll()
-        let le = ThrottlingExporter(proxy: TestSpanExporter()) // rewrites into localSpans; yes, this is weird
+        let le = LimitingExporter(proxy: TestSpanExporter(), spanFilter: nil) // rewrites into localSpans; yes, this is weird
         _ = le.export(spans: rawSpans)
         XCTAssertEqual(100, localSpans.count)
         localSpans.removeAll()
@@ -94,7 +94,7 @@ class UtilsTests: XCTestCase {
         XCTAssertEqual(0, localSpans.count)
 
         // reset the exporter by changing "now"
-        le.possiblyResetRateLimits(Date().addingTimeInterval(TimeInterval(ThrottlingExporter.SPAN_RATE_LIMIT_PERIOD+1)))
+        le.possiblyResetRateLimits(Date().addingTimeInterval(TimeInterval(LimitingExporter.SPAN_RATE_LIMIT_PERIOD+1)))
         // send one more, should not be dropped
         let s2 = buildTracer().spanBuilder(spanName: "limitTest").startSpan()
         s2.setAttribute(key: "component", value: "test")
