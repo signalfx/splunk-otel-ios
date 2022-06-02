@@ -70,7 +70,7 @@ class SpanDbTest: XCTestCase {
         let db = SpanDb()
         dbPath = db.databasePath
         XCTAssertTrue(db.ready())
-        XCTAssertEqual(db.fetchLatest(count: 32).count, 0)
+        XCTAssertEqual(db.fetch(count: 32).count, 0)
     }
 
     func testSpanReadWrite() {
@@ -82,17 +82,18 @@ class SpanDbTest: XCTestCase {
 
         XCTAssertTrue(db.store(spans: zipkinSpans))
 
-        let storedSpans = db.fetchLatest(count: 32)
+        let storedSpans = db.fetch(count: 32)
         XCTAssertEqual(storedSpans.count, 2)
 
         let spans = storedSpans.map { (_, spanJson) in
             toTestSpan(json: spanJson)
         }
 
-        XCTAssertEqual(spans[0].name, "s2")
-        XCTAssertEqual(spans[0].tags, ["bar": "ios"])
-        XCTAssertEqual(spans[1].name, "s1")
-        XCTAssertEqual(spans[1].tags, ["foo": "42"])
+        XCTAssertEqual(spans[0].name, "s1")
+        XCTAssertEqual(spans[0].tags, ["foo": "42"])
+        XCTAssertEqual(spans[1].name, "s2")
+        XCTAssertEqual(spans[1].tags, ["bar": "ios"])
+
     }
 
     func testErase() {
@@ -104,7 +105,7 @@ class SpanDbTest: XCTestCase {
         ]
 
         XCTAssertTrue(db.store(spans: zipkinSpans))
-        var storedSpans = db.fetchLatest(count: 2)
+        var storedSpans = db.fetch(count: 2)
         XCTAssertEqual(storedSpans.count, 2)
 
         let (id, json) = storedSpans[1]
@@ -113,22 +114,22 @@ class SpanDbTest: XCTestCase {
 
         XCTAssertTrue(db.erase(ids: [id]))
 
-        storedSpans = db.fetchLatest(count: 10)
+        storedSpans = db.fetch(count: 10)
         XCTAssertEqual(storedSpans.count, 2)
 
         let spans = storedSpans.map({ (_, json) in
             toTestSpan(json: json)
         })
 
-        XCTAssertEqual(spans[0].name, "s3")
-        XCTAssertEqual(spans[1].name, "s1")
+        XCTAssertEqual(spans[0].name, "s1")
+        XCTAssertEqual(spans[1].name, "s3")
 
         let ids = storedSpans.map({ (id, _) in
             id
         })
 
         XCTAssertTrue(db.erase(ids: ids))
-        storedSpans = db.fetchLatest(count: 10)
+        storedSpans = db.fetch(count: 10)
         XCTAssertEqual(storedSpans.count, 0)
     }
 
@@ -139,10 +140,10 @@ class SpanDbTest: XCTestCase {
         ]
 
         XCTAssertTrue(db.store(spans: zipkinSpans))
-        XCTAssertEqual(db.fetchLatest(count: 10).count, 1)
+        XCTAssertEqual(db.fetch(count: 10).count, 1)
         XCTAssertTrue(db.erase(ids: [947539]))
 
-        let storedSpans = db.fetchLatest(count: 10)
+        let storedSpans = db.fetch(count: 10)
         XCTAssertEqual(storedSpans.count, 1)
     }
 
@@ -162,14 +163,14 @@ class SpanDbTest: XCTestCase {
         XCTAssertTrue(db.truncate())
 
         // Should now have 20% fewer rows
-        let storedSpans = db.fetchLatest(count: 10_000)
+        let storedSpans = db.fetch(count: 10_000)
         XCTAssertEqual(storedSpans.count, 8_000)
 
         let spans = storedSpans.map({ (_, json) in
             toTestSpan(json: json)
         })
-        XCTAssertEqual(spans.first!.name, "s10000")
-        XCTAssertEqual(spans.last!.name, "s2001")
+        XCTAssertEqual(spans.first!.name, "s2001")
+        XCTAssertEqual(spans.last!.name, "s10000")
 
         let sizeAfterTruncate = db.getSize()!
 
@@ -194,15 +195,15 @@ class SpanDbTest: XCTestCase {
 
         XCTAssertTrue(db.store(spans: zipkinSpans))
 
-        let storedSpans = db.fetchLatest(count: 32)
+        let storedSpans = db.fetch(count: 32)
         XCTAssertEqual(storedSpans.count, 2)
 
         let spans = storedSpans.map { (_, spanJson) in
             toTestSpan(json: spanJson)
         }
 
-        XCTAssertEqual(spans[0].name, "s2")
-        XCTAssertEqual(spans[1].name, "s1")
+        XCTAssertEqual(spans[0].name, "s1")
+        XCTAssertEqual(spans[1].name, "s2")
     }
 
 }

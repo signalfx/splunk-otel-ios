@@ -49,7 +49,7 @@ class SpanFromDiskExporterTest: XCTestCase {
 
         let spans = receiver.spans()
         XCTAssertEqual(spans.count, 2)
-        XCTAssertEqual(db.fetchLatest(count: 10).count, 0)
+        XCTAssertEqual(db.fetch(count: 10).count, 0)
     }
 
     func testFailedExportingDoesNotRemoveSpans() throws {
@@ -82,6 +82,6 @@ class SpanFromDiskExporterTest: XCTestCase {
 
         let spans = receiver.spans()
         XCTAssertEqual(spans.count, 0)
-        XCTAssertEqual(db.fetchLatest(count: 10).count, 2)
+        XCTAssertEqual(db.fetch(count: 10).count, 2)
     }
 }

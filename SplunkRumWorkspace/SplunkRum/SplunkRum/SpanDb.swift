@@ -29,7 +29,7 @@ class SpanDb {
     private var lock: NSLock = NSLock()
     internal var db_: OpaquePointer?
     private var insertStmt_: OpaquePointer?
-    private var fetchLatestStmt_: OpaquePointer?
+    private var fetchStmt_: OpaquePointer?
     private var sizeStmt_: OpaquePointer?
     private var initialized: Bool = false
 
@@ -66,7 +66,7 @@ class SpanDb {
             return
         }
 
-        status = sqlite3_prepare_v2(db, "SELECT rowid, data FROM span ORDER BY timestamp DESC LIMIT ?", -1, &fetchLatestStmt_, nil)
+        status = sqlite3_prepare_v2(db, "SELECT rowid, data FROM span ORDER BY timestamp ASC LIMIT ?", -1, &fetchStmt_, nil)
 
         if status != SQLITE_OK {
             print("Unable to create span fetch statement: \(sqliteError(code: status))")
@@ -90,7 +90,7 @@ class SpanDb {
     deinit {
         initialized = false
         sqlite3_finalize(sizeStmt_!)
-        sqlite3_finalize(fetchLatestStmt_!)
+        sqlite3_finalize(fetchStmt_!)
         sqlite3_finalize(insertStmt_!)
         sqlite3_close(db_!)
     }
@@ -149,7 +149,7 @@ class SpanDb {
         return true
     }
 
-    func fetchLatest(count: Int) -> [(Int64, String)] {
+    func fetch(count: Int) -> [(Int64, String)] {
         if !ready() {
             return []
         }
@@ -159,7 +159,7 @@ class SpanDb {
             lock.unlock()
         }
 
-        let stmt = fetchLatestStmt_!
+        let stmt = fetchStmt_!
         sqlite3_reset(stmt)
         sqlite3_bind_int(stmt, 1, Int32(count))
 

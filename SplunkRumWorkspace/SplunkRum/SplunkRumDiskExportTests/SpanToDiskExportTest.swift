@@ -30,7 +30,7 @@ class SpanToDiskExportTest: XCTestCase {
             makeSpanData("s2")
         ]
         XCTAssertEqual(exporter.export(spans: spans), SpanExporterResultCode.success)
-        let exportedSpans = db.fetchLatest(count: 10)
+        let exportedSpans = db.fetch(count: 10)
 
         XCTAssertEqual(exportedSpans.count, 2)
     }
@@ -46,7 +46,7 @@ class SpanToDiskExportTest: XCTestCase {
 
         XCTAssertTrue(db.store(spans: initialSpans))
         XCTAssertEqual(exporter.export(spans: [makeSpanData("s101")]), SpanExporterResultCode.success)
-        XCTAssertEqual(db.fetchLatest(count: 512).count, 81)
+        XCTAssertEqual(db.fetch(count: 512).count, 81)
     }
 
     func testTruncationAfterCheckpoint() {
@@ -62,7 +62,7 @@ class SpanToDiskExportTest: XCTestCase {
 
         XCTAssertEqual(exporter.export(spans: spans), SpanExporterResultCode.success)
         // First truncation will happen due to low max DB size
-        XCTAssertEqual(db.fetchLatest(count: 512).count, 40)
+        XCTAssertEqual(db.fetch(count: 512).count, 40)
 
         spans = []
         for _ in 1...100 {
@@ -72,7 +72,7 @@ class SpanToDiskExportTest: XCTestCase {
         XCTAssertEqual(exporter.export(spans: spans), SpanExporterResultCode.success)
 
         // Drop 20% of 140 spans
-        XCTAssertEqual(db.fetchLatest(count: 512).count, 112)
+        XCTAssertEqual(db.fetch(count: 512).count, 112)
     }
 
     func testNoTruncationWithLargeMaxSize() {
@@ -87,7 +87,7 @@ class SpanToDiskExportTest: XCTestCase {
         }
 
         XCTAssertEqual(exporter.export(spans: spans), SpanExporterResultCode.success)
-        XCTAssertEqual(db.fetchLatest(count: 512).count, 50)
+        XCTAssertEqual(db.fetch(count: 512).count, 50)
 
         spans = []
         for _ in 1...100 {
@@ -95,6 +95,6 @@ class SpanToDiskExportTest: XCTestCase {
             id += 1
         }
         XCTAssertEqual(exporter.export(spans: spans), SpanExporterResultCode.success)
-        XCTAssertEqual(db.fetchLatest(count: 512).count, 150)
+        XCTAssertEqual(db.fetch(count: 512).count, 150)
     }
 }

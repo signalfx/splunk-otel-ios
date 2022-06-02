@@ -114,7 +114,7 @@ class SpanFromDiskExport {
                 return
             }
 
-            let spans = spanDb.fetchLatest(count: 64)
+            let spans = spanDb.fetch(count: 64)
 
             if spans.isEmpty {
                 return
