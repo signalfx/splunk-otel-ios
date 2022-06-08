@@ -89,10 +89,15 @@ class SpanDb {
 
     deinit {
         initialized = false
-        sqlite3_finalize(sizeStmt_!)
-        sqlite3_finalize(fetchStmt_!)
-        sqlite3_finalize(insertStmt_!)
-        sqlite3_close(db_!)
+        let stmts = [sizeStmt_, fetchStmt_, insertStmt_]
+
+        for stmt in stmts where stmt != nil {
+            sqlite3_finalize(stmt!)
+        }
+
+        if db_ != nil {
+            sqlite3_close(db_!)
+        }
     }
 
     func ready() -> Bool {
