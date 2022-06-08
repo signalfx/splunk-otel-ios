@@ -82,5 +82,5 @@ func makeSpan(name: String, timestamp: UInt64, tags: [String: String] = [:]) -> 
 }
 
 func makeSpanData(_ name: String) -> SpanData {
-    SpanData(traceId: idgen.generateTraceId(), spanId: idgen.generateSpanId(), name: name, kind: .internal, startTime: Date.now, endTime: Date.now)
+    SpanData(traceId: idgen.generateTraceId(), spanId: idgen.generateSpanId(), name: name, kind: .internal, startTime: Date(), endTime: Date())
 }
