@@ -199,6 +199,9 @@ var splunkRumInitializeCalledTime = Date()
             let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options?.spanFilter ?? nil)
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
         } else {
+            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
+                SpanDb.deleteAtDefaultLocation()
+            }
             let zipkin = ZipkinTraceExporter(options: exportOptions)
             let retry = RetryExporter(proxy: zipkin)
             let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)

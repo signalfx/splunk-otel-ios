@@ -22,6 +22,8 @@ fileprivate func sqliteError(code: Int32) -> String {
     return String(cString: sqlite3_errstr(code))
 }
 
+fileprivate let DB_FILE = "SplunkRum.sqlite"
+
 fileprivate let SQLITE_TRANSIENT = unsafeBitCast(-1, to: sqlite3_destructor_type.self)
 
 class SpanDb {
@@ -265,14 +267,42 @@ class SpanDb {
         return dbSize
     }
 
-    static func makeDatabasePath() -> String? {
+    static func deleteAtDefaultLocation() {
+        let dir_ = SpanDb.defaultDirectory()
+
+        if dir_ == nil {
+            return
+        }
+
+        let path = dir_!.appendingPathComponent(DB_FILE).path
+
+        if FileManager.default.fileExists(atPath: path) {
+            do {
+                try FileManager.default.removeItem(atPath: path)
+            } catch {
+                log("failed to delete span database at path \(path): \(error)")
+            }
+        }
+    }
+
+    static func defaultDirectory() -> URL? {
         let paths = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
 
         if paths.isEmpty {
             return nil
         }
 
-        let dir = paths[0]
+        return paths[0]
+    }
+
+    static func makeDatabasePath() -> String? {
+        let dir_ = SpanDb.defaultDirectory()
+
+        if dir_ == nil {
+            return nil
+        }
+
+        let dir = dir_!
 
         do {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
@@ -281,6 +311,6 @@ class SpanDb {
             return nil
         }
 
-        return dir.appendingPathComponent("SplunkRum.sqlite").path
+        return dir.appendingPathComponent(DB_FILE).path
     }
 }

@@ -206,4 +206,17 @@ class SpanDbTest: XCTestCase {
         XCTAssertEqual(spans[1].name, "s2")
     }
 
+    func testDatabaseDeletion() throws {
+        let db = SpanDb()
+        let defaultDir = SpanDb.defaultDirectory()
+        XCTAssertTrue(defaultDir != nil)
+        XCTAssertEqual(
+            URL(fileURLWithPath: db.databasePath).deletingLastPathComponent(),
+            defaultDir!
+        )
+        XCTAssertTrue(FileManager.default.fileExists(atPath: db.databasePath))
+        SpanDb.deleteAtDefaultLocation()
+        XCTAssertFalse(FileManager.default.fileExists(atPath: db.databasePath))
+    }
+
 }
