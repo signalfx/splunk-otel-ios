@@ -39,7 +39,7 @@ class SpanDb {
         var status = sqlite3_open(databasePath, &db_)
 
         if status != SQLITE_OK {
-            print("Failure opening \(databasePath): \(sqliteError(code: status))")
+            log("failure opening \(databasePath): \(sqliteError(code: status))")
             return
         }
 
@@ -48,28 +48,28 @@ class SpanDb {
         status = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS span (timestamp INTEGER NOT NULL, data TEXT NOT NULL)", nil, nil, nil)
 
         if status != SQLITE_OK {
-            print("Unable to create span table: \(sqliteError(code: status))")
+            log("unable to create span table: \(sqliteError(code: status))")
             return
         }
 
         status = sqlite3_exec(db, "CREATE INDEX IF NOT EXISTS span_timestamp ON span (timestamp)", nil, nil, nil)
 
         if status != SQLITE_OK {
-            print("Unable to create span_timestamp index: \(sqliteError(code: status))")
+            log("unable to create span_timestamp index: \(sqliteError(code: status))")
             return
         }
 
         status = sqlite3_prepare_v2(db, "INSERT INTO span (timestamp, data) VALUES (?, ?)", -1, &insertStmt_, nil)
 
         if status != SQLITE_OK {
-            print("Unable to create span insert statement: \(sqliteError(code: status))")
+            log("unable to create span insert statement: \(sqliteError(code: status))")
             return
         }
 
         status = sqlite3_prepare_v2(db, "SELECT rowid, data FROM span ORDER BY timestamp ASC LIMIT ?", -1, &fetchStmt_, nil)
 
         if status != SQLITE_OK {
-            print("Unable to create span fetch statement: \(sqliteError(code: status))")
+            log("unable to create span fetch statement: \(sqliteError(code: status))")
             return
         }
 
@@ -80,7 +80,7 @@ class SpanDb {
                                     nil)
 
         if status != SQLITE_OK {
-            print("Unable to create DB size fetch statement: \(sqliteError(code: status))")
+            log("unable to create DB size fetch statement: \(sqliteError(code: status))")
             return
         }
 
@@ -130,7 +130,7 @@ class SpanDb {
         var status = sqlite3_exec(db, "BEGIN", nil, nil, nil)
 
         if status != SQLITE_OK {
-            print("Unable to begin span insertion: \(sqliteError(code: status))")
+            log("unable to begin span insertion: \(sqliteError(code: status))")
             return false
         }
 
@@ -147,7 +147,7 @@ class SpanDb {
         status = sqlite3_exec(db, "COMMIT", nil, nil, nil)
 
         if status != SQLITE_OK {
-            print("Span insertion failed: \(sqliteError(code: status))")
+            log("span insertion failed: \(sqliteError(code: status))")
             return false
         }
 
@@ -199,7 +199,7 @@ class SpanDb {
         let status = sqlite3_exec(db_!, query, nil, nil, nil)
 
         if status != SQLITE_OK {
-            print("Unable to delete spans: \(sqliteError(code: status))")
+            log("unable to delete spans: \(sqliteError(code: status))")
             return false
         }
 
@@ -230,14 +230,14 @@ class SpanDb {
         var status = sqlite3_exec(db, query, nil, nil, nil)
 
         if status != SQLITE_OK {
-            print("Span deletion failed on truncate: \(sqliteError(code: status))")
+            log("span deletion failed on truncate: \(sqliteError(code: status))")
             return false
         }
 
         status = sqlite3_exec(db, "VACUUM;", nil, nil, nil)
 
         if status != SQLITE_OK {
-            print("Vacuum failed: \(sqliteError(code: status))")
+            log("span database vacuum failed: \(sqliteError(code: status))")
             return false
         }
 
@@ -277,7 +277,7 @@ class SpanDb {
         do {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         } catch {
-            print("Unable to create application support directory \(dir): \(error)")
+            log("unable to create application support directory \(dir): \(error)")
             return nil
         }
 

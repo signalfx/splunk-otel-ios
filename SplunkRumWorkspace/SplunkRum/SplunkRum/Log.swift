@@ -19,6 +19,10 @@ import Foundation
 
 func debug_log(_ s: String) {
     if SplunkRum.configuredOptions?.debug ?? false {
-        print("SplunkRum: "+s)
+        log(s)
     }
+}
+
+func log(_ s: String) {
+    print("SplunkRum: " + s)
 }

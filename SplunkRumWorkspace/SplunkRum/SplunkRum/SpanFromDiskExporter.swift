@@ -78,7 +78,7 @@ fileprivate func buildRequest(url: URL, data: Data) -> URLRequest {
 class SpanFromDiskExport {
     @discardableResult static func start(spanDb: SpanDb, endpoint: String) -> (() -> Void) {
         guard let url = URL(string: endpoint) else {
-            print("Malformed endpoint URL: \(endpoint)")
+            log("malformed endpoint URL: \(endpoint)")
             return {}
         }
 
