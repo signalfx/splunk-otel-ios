@@ -21,7 +21,7 @@ import ZipkinExporter
 import StdoutExporter
 import WebKit
 
-let SplunkRumVersionString = "0.5.2"
+let SplunkRumVersionString = "0.6.0"
 
 /**
  Optional configuration for SplunkRum.initialize()
@@ -37,7 +37,7 @@ let SplunkRumVersionString = "0.5.2"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, networkInstrumentation: Bool = true) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -45,6 +45,7 @@ let SplunkRumVersionString = "0.5.2"
         self.environment = environment
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
+        self.networkInstrumentation = networkInstrumentation
     }
     /**
         Copy constructor
@@ -59,6 +60,7 @@ let SplunkRumVersionString = "0.5.2"
         self.spanFilter = opts.spanFilter
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
+        self.networkInstrumentation = opts.networkInstrumentation
     }
 
     /**
@@ -98,6 +100,11 @@ let SplunkRumVersionString = "0.5.2"
      Enable span creation for screen name changes
      */
     @objc public var screenNameSpans: Bool = true
+
+    /**
+     Enable NetworkInstrumentation span creation for https calls.
+     */
+    @objc public var networkInstrumentation: Bool = true
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
@@ -140,14 +147,14 @@ var splunkRumInitializeCalledTime = Date()
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
-    @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
+    @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
-            return
+            return false
         }
         if initialized || initializing {
             debug_log("SplunkRum already initializ{ed,ing}")
-            return
+            return false
         }
         splunkRumInitializeCalledTime = Date()
         initializing = true
@@ -166,7 +173,7 @@ var splunkRumInitializeCalledTime = Date()
         }
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
-            return
+            return false
         }
         if rumAuth.isEmpty {
             theBeaconUrl = beaconUrl
@@ -198,10 +205,12 @@ var splunkRumInitializeCalledTime = Date()
             if options != nil {
                 srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
             }
-            initalizeNetworkInstrumentation()
+            if options?.networkInstrumentation ?? true {
+                initalizeNetworkInstrumentation()
+            }
             initializeNetworkTypeMonitoring()
             initalizeUIInstrumentation()
-             // not initializeAppLifecycleInstrumentation, done at end of AppStart
+            // not initializeAppLifecycleInstrumentation, done at end of AppStart
             srInit.end()
             initialized = true
             // End the task assertion.
@@ -209,6 +218,8 @@ var splunkRumInitializeCalledTime = Date()
             backgroundTaskID = UIBackgroundTaskIdentifier.invalid
         }
         print("SplunkRum.initialize() complete")
+        return true
+
     }
 
     /**
@@ -335,6 +346,13 @@ var splunkRumInitializeCalledTime = Date()
      */
     @objc public class func integrateWithBrowserRum(_ view: WKWebView) {
         integrateWebViewWithBrowserRum(view: view)
+    }
+
+    /**
+       This check is to determine whether the splunkrum library has been initialized
+     */
+    @objc public class func isInitialized() -> Bool {
+        return initialized
     }
 
 }

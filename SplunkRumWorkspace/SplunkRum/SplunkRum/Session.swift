@@ -46,6 +46,8 @@ func addSessionIdCallback(_ callback: @escaping (() -> Void)) {
 func getRumSessionId() -> String {
     sessionIdLock.lock()
     var unlocked = false
+    var isSessionIdChanged = false
+    var oldRumSessionId = ""
     var callbacks: [(() -> Void)] = []
     defer {
         if !unlocked {
@@ -54,7 +56,9 @@ func getRumSessionId() -> String {
     }
     if Date() > sessionIdExpiration {
         sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
+        oldRumSessionId = rumSessionId
         rumSessionId = generateNewSessionId()
+        isSessionIdChanged = true
         callbacks = sessionIdCallbacks
     }
     sessionIdLock.unlock()
@@ -62,6 +66,15 @@ func getRumSessionId() -> String {
     for callback in callbacks {
         callback()
     }
-
+    if isSessionIdChanged {
+        createSessionIdChangeSpan(previousSessionId: oldRumSessionId)
+    }
     return rumSessionId
+}
+func createSessionIdChangeSpan(previousSessionId: String) {
+    let now = Date()
+    let tracer = buildTracer()
+    let span = tracer.spanBuilder(spanName: "sessionId.change").setStartTime(time: now).startSpan()
+    span.setAttribute(key: "splunk.rum.previous_session_id", value: previousSessionId)
+    span.end(time: now)
 }

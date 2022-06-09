@@ -100,7 +100,14 @@ func initializeTestEnvironment() throws {
     options.environment = "env"
     options.ignoreURLs = try! NSRegularExpression(pattern: ".*ignore_this.*")
 
-    SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: options)
+    let rumInitialize = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: options)
+    let isRUMInitialized = SplunkRum.isInitialized()
+    let initializeAgain = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: options)
+    let isStillInitialized = SplunkRum.isInitialized()
+    XCTAssertEqual(true, rumInitialize)
+    XCTAssertEqual(true, isRUMInitialized)
+    XCTAssertEqual(false, initializeAgain)
+    XCTAssertEqual(true, isStillInitialized)
     OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(TestSpanProcessor(spanExporter: TestSpanExporter()))
 
     print("sleeping to wait for span batch, don't worry about the pause...")
