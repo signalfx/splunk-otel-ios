@@ -37,10 +37,7 @@ let SplunkRumVersionString = "0.6.0"
     /**
         Memberwise initializer
      */
-    
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, networkInstrumentation: Bool = true) {
-
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold: CFTimeInterval = 16.7, frozenFrameThreshold: CFTimeInterval = 700) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold: CFTimeInterval = 16.7, frozenFrameThreshold: CFTimeInterval = 700,networkInstrumentation: Bool = true) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
