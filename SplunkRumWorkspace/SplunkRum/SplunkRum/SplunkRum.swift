@@ -79,7 +79,7 @@ let SplunkRumVersionString = "0.5.2"
     @objc public var globalAttributes: [String: Any] = [:]
 
     /**
-        Sets a value for the "environment" global attribute
+     Sets a value for the "environment" global attribute
      */
     @objc public var environment: String?
 
