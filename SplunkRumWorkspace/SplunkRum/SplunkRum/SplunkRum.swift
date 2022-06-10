@@ -80,7 +80,7 @@ let SplunkRumVersionString = "0.6.0"
      */
     @objc public var debug: Bool = false
     /**
-        Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
+            Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
      */
     @objc public var globalAttributes: [String: Any] = [:]
 
