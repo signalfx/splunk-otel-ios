@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swiftlint:disable force_cast
 import Foundation
 import QuartzCore
 import UIKit
@@ -34,7 +35,7 @@ class ScreenFrames: NSObject {
     private var isFirstIteration: Bool = true
     private var previousTimestamp: CFTimeInterval = CACurrentMediaTime()
 
-    // swiftlint:disable:next shorthand_operator
+    
     func startTracking() {
         frozenFrameThreshold = frozenFrameThreshold / 1000
         slowFrameThreshold = slowFrameThreshold / 1000
