@@ -15,11 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// swiftlint:disable force_cast
+
 import Foundation
 import QuartzCore
 import UIKit
 
+// swiftlint:disable shorthand_operator
 class ScreenFrames: NSObject {
 
     private var displayLink: CADisplayLink?
@@ -35,7 +36,6 @@ class ScreenFrames: NSObject {
     private var isFirstIteration: Bool = true
     private var previousTimestamp: CFTimeInterval = CACurrentMediaTime()
 
-    
     func startTracking() {
         frozenFrameThreshold = frozenFrameThreshold / 1000
         slowFrameThreshold = slowFrameThreshold / 1000
