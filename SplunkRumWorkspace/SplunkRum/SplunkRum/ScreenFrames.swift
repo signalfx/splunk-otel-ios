@@ -34,6 +34,7 @@ class ScreenFrames: NSObject {
     private var isFirstIteration: Bool = true
     private var previousTimestamp: CFTimeInterval = CACurrentMediaTime()
 
+    // swiftlint:disable:next shorthand_operator
     func startTracking() {
         frozenFrameThreshold = frozenFrameThreshold / 1000
         slowFrameThreshold = slowFrameThreshold / 1000
