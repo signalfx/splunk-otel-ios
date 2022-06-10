@@ -165,11 +165,6 @@ class SmokeTestUITests: XCTestCase {
         })
         XCTAssertNotNil(slowFrame)
 
-        let frozenFrame = receivedSpans.first(where: { (span) -> Bool in
-            return span.name == "frozenRenders"
-        })
-        XCTAssertNotNil(frozenFrame)
-
         // FIXME multiple screens, pickVC cases, etc.
 
     }
