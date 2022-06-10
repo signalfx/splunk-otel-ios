@@ -37,7 +37,7 @@ let SplunkRumVersionString = "0.6.0"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold: CFTimeInterval = 16.7, frozenFrameThreshold: CFTimeInterval = 700,networkInstrumentation: Bool = true) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold: CFTimeInterval = 16.7, frozenFrameThreshold: CFTimeInterval = 700, networkInstrumentation: Bool = true) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -119,7 +119,6 @@ let SplunkRumVersionString = "0.6.0"
      The frozenFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as frozen frames. User needs to provide this value in milliseconds.
      */
     @objc public var frozenFrameThreshold: CFTimeInterval = 700
-
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
