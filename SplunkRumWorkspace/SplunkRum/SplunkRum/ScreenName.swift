@@ -50,7 +50,7 @@ func internal_setScreenName(_ newName: String, _ manual: Bool) {
     lock.unlock()
 
     // Don't emit the span under the lock
-    if oldName != nil && oldName! != "unknown" && (SplunkRum.configuredOptions?.screenNameSpans ?? true) {
+    if oldName != nil && (SplunkRum.configuredOptions?.screenNameSpans ?? true) {
         emitScreenNameChangedSpan(oldName!, newName)
     }
 }

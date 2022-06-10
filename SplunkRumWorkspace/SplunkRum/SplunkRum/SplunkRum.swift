@@ -21,7 +21,7 @@ import ZipkinExporter
 import StdoutExporter
 import WebKit
 
-let SplunkRumVersionString = "0.5.2"
+let SplunkRumVersionString = "0.6.0"
 
 /**
  Optional configuration for SplunkRum.initialize()
@@ -37,6 +37,9 @@ let SplunkRumVersionString = "0.5.2"
     /**
         Memberwise initializer
      */
+    
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, networkInstrumentation: Bool = true) {
+
     @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold: CFTimeInterval = 16.7, frozenFrameThreshold: CFTimeInterval = 700) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
@@ -45,8 +48,10 @@ let SplunkRumVersionString = "0.5.2"
         self.environment = environment
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
+        self.networkInstrumentation = networkInstrumentation
         self.slowFrameThreshold = slowFrameThreshold
         self.frozenFrameThreshold = frozenFrameThreshold
+
     }
     /**
         Copy constructor
@@ -61,6 +66,7 @@ let SplunkRumVersionString = "0.5.2"
         self.spanFilter = opts.spanFilter
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
+        self.networkInstrumentation = opts.networkInstrumentation
         self.slowFrameThreshold = opts.slowFrameThreshold
         self.frozenFrameThreshold = opts.frozenFrameThreshold
     }
@@ -104,6 +110,10 @@ let SplunkRumVersionString = "0.5.2"
     @objc public var screenNameSpans: Bool = true
 
     /**
+     Enable NetworkInstrumentation span creation for https calls.
+     */
+    @objc public var networkInstrumentation: Bool = true
+     /**
      The SlowFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as slow frames. User needs to provide this value in milliseconds.
      */
     @objc public var slowFrameThreshold: CFTimeInterval = 16.7
@@ -112,6 +122,7 @@ let SplunkRumVersionString = "0.5.2"
      The frozenFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as frozen frames. User needs to provide this value in milliseconds.
      */
     @objc public var frozenFrameThreshold: CFTimeInterval = 700
+
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
@@ -152,14 +163,14 @@ var splunkRumInitializeCalledTime = Date()
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
-    @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
+    @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
-            return
+            return false
         }
         if initialized || initializing {
             debug_log("SplunkRum already initializ{ed,ing}")
-            return
+            return false
         }
         splunkRumInitializeCalledTime = Date()
         initializing = true
@@ -178,7 +189,7 @@ var splunkRumInitializeCalledTime = Date()
         }
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
-            return
+            return false
         }
         if rumAuth.isEmpty {
             theBeaconUrl = beaconUrl
@@ -203,7 +214,9 @@ var splunkRumInitializeCalledTime = Date()
         if options != nil {
             srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
         }
-        initalizeNetworkInstrumentation()
+        if options?.networkInstrumentation ?? true {
+            initalizeNetworkInstrumentation()
+        }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
         startScreenTracking()
@@ -211,6 +224,8 @@ var splunkRumInitializeCalledTime = Date()
         srInit.end()
         initialized = true
         print("SplunkRum.initialize() complete")
+        return true
+
     }
 
     /**
@@ -337,6 +352,13 @@ var splunkRumInitializeCalledTime = Date()
      */
     @objc public class func integrateWithBrowserRum(_ view: WKWebView) {
         integrateWebViewWithBrowserRum(view: view)
+    }
+
+    /**
+       This check is to determine whether the splunkrum library has been initialized
+     */
+    @objc public class func isInitialized() -> Bool {
+        return initialized
     }
 
 }
