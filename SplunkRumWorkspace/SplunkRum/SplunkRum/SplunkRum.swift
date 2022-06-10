@@ -133,7 +133,6 @@ let SplunkRumVersionString = "0.5.2"
 }
 var globalAttributes: [String: Any] = [:]
 let globalAttributesLock = NSLock()
-
 let splunkLibraryLoadTime = Date()
 var splunkRumInitializeCalledTime = Date()
 
