@@ -22,6 +22,7 @@ fileprivate var screenNameManuallySet = false
 // Yes, I assume there are swift libraries to do this sort of thing, but nothing
 // I could find in the stdlib
 fileprivate var lock = NSLock()
+fileprivate var screenFrames: ScreenFrames = ScreenFrames()
 
 func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
     let now = Date()
@@ -67,4 +68,7 @@ func getScreenName() -> String {
         lock.unlock()
     }
     return screenName
+}
+func startScreenTracking() {
+    screenFrames.startTracking()
 }

@@ -37,7 +37,10 @@ let SplunkRumVersionString = "0.6.0"
     /**
         Memberwise initializer
      */
+    
     @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, networkInstrumentation: Bool = true) {
+
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold: CFTimeInterval = 16.7, frozenFrameThreshold: CFTimeInterval = 700) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -46,6 +49,9 @@ let SplunkRumVersionString = "0.6.0"
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
         self.networkInstrumentation = networkInstrumentation
+        self.slowFrameThreshold = slowFrameThreshold
+        self.frozenFrameThreshold = frozenFrameThreshold
+
     }
     /**
         Copy constructor
@@ -61,6 +67,8 @@ let SplunkRumVersionString = "0.6.0"
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
         self.networkInstrumentation = opts.networkInstrumentation
+        self.slowFrameThreshold = opts.slowFrameThreshold
+        self.frozenFrameThreshold = opts.frozenFrameThreshold
     }
 
     /**
@@ -72,7 +80,7 @@ let SplunkRumVersionString = "0.6.0"
      */
     @objc public var debug: Bool = false
     /**
-                    Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
+        Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
      */
     @objc public var globalAttributes: [String: Any] = [:]
 
@@ -105,6 +113,16 @@ let SplunkRumVersionString = "0.6.0"
      Enable NetworkInstrumentation span creation for https calls.
      */
     @objc public var networkInstrumentation: Bool = true
+     /**
+     The SlowFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as slow frames. User needs to provide this value in milliseconds.
+     */
+    @objc public var slowFrameThreshold: CFTimeInterval = 16.7
+
+    /**
+     The frozenFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as frozen frames. User needs to provide this value in milliseconds.
+     */
+    @objc public var frozenFrameThreshold: CFTimeInterval = 700
+
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
@@ -138,7 +156,6 @@ var splunkRumInitializeCalledTime = Date()
     static var initializing = false
     static var configuredOptions: SplunkRumOptions?
     static var theBeaconUrl: String?
-
     /**
             Initialization function.  Call as early as possible in your application, but only on the main thread.
                 - Parameter beaconUrl: Destination for the captured data.
@@ -203,6 +220,7 @@ var splunkRumInitializeCalledTime = Date()
         }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
+        startScreenTracking()
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true

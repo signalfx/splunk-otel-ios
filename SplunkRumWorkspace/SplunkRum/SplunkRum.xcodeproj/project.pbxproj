@@ -34,6 +34,7 @@
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
+		884C541027DF84370060ECE9 /* ScreenFrames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884C540F27DF84370060ECE9 /* ScreenFrames.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +85,7 @@
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
+		884C540F27DF84370060ECE9 /* ScreenFrames.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenFrames.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +150,7 @@
 				865DBDD82677AA7B00EFE8D5 /* RetryExporter.swift */,
 				8607AD4A267B9032004FAFFD /* AppLifecycle.swift */,
 				8624DAB4269CAE61005D65DE /* NetworkType.swift */,
+				884C540F27DF84370060ECE9 /* ScreenFrames.swift */,
 				86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */,
 			);
 			path = SplunkRum;
@@ -302,6 +305,7 @@
 				8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */,
 				8616CD5F266E673F0048980B /* ScreenName.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
+				884C541027DF84370060ECE9 /* ScreenFrames.swift in Sources */,
 				86043B7C25F93E3400A29788 /* Log.swift in Sources */,
 				865DBDD92677AA7B00EFE8D5 /* RetryExporter.swift in Sources */,
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,

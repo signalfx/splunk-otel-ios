@@ -59,6 +59,8 @@ or
 | showVCInstrumentation | Bool | Enable span creation for ViewController Show events (not applicable to all UI frameworks/apps) | true |
 | screenNameSpans | Bool | Enable span creation for changes to the screen name | true |
 | networkInstrumentation | Bool | Enable span creation for network activities | true |
+| slowFrameThreshold | CFTimeInterval | The SlowFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as slow frames. User needs to provide this value in milliseconds. | 16.7ms |
+| frozenFrameThreshold | CFTimeInterval | The frozenFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as frozen frames. User needs to provide this value in milliseconds. | 700ms |
 
 ## Crash Reporting
 
