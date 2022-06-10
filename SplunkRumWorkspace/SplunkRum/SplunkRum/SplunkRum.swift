@@ -218,7 +218,6 @@ var splunkRumInitializeCalledTime = Date()
             backgroundTaskID = UIBackgroundTaskIdentifier.invalid
         }
         print("test for signed commit")
-        
         print("123")
         print("Conflict solved")
         print("SplunkRum.initialize() complete")
