@@ -217,7 +217,7 @@ var splunkRumInitializeCalledTime = Date()
             UIApplication.shared.endBackgroundTask(backgroundTaskID)
             backgroundTaskID = UIBackgroundTaskIdentifier.invalid
         }
-        print("SplunkRum.initialize() complete")
+        print("SplunkRum.initialize() complete.")
         return true
 
     }
