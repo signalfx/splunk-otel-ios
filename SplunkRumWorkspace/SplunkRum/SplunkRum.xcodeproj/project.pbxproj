@@ -34,10 +34,31 @@
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
+		E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */; };
+		E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */; };
+		E2ACB21D283F855C006A1475 /* SpanDb.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21C283F855C006A1475 /* SpanDb.swift */; };
+		E2ACB21F283F871D006A1475 /* ZipkinTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21E283F871D006A1475 /* ZipkinTransform.swift */; };
+		E2ACB22128451939006A1475 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E2ACB22028451903006A1475 /* libsqlite3.tbd */; };
+		E2AFD9E72846919C000F53BF /* BandwidthTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFD9E62846919C000F53BF /* BandwidthTracker.swift */; };
+		E2AFD9E9284691EE000F53BF /* BandwidthTrackerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFD9E8284691EE000F53BF /* BandwidthTrackerTest.swift */; };
+		E2AFD9EB28469C93000F53BF /* SpanDbTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFD9EA28469C93000F53BF /* SpanDbTest.swift */; };
+		E2AFD9F428473F7A000F53BF /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */; };
+		E2AFD9FF2847A397000F53BF /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = E2AFD9FE2847A397000F53BF /* Swifter */; };
+		E2AFDA032847A6A0000F53BF /* SpanToDiskExportTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFDA022847A6A0000F53BF /* SpanToDiskExportTest.swift */; };
+		E2AFDA052847C529000F53BF /* SpanFromDiskExporterTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFDA042847C529000F53BF /* SpanFromDiskExporterTest.swift */; };
+		E2AFDA072847C678000F53BF /* DiskExportCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFDA062847C678000F53BF /* DiskExportCommon.swift */; };
+		E2AFDA092847DAC8000F53BF /* DiskExportPipelineTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFDA082847DAC8000F53BF /* DiskExportPipelineTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		86260ECF25CDC1DE009F3CB1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 86260EBB25CDC1DE009F3CB1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 86260EC325CDC1DE009F3CB1;
+			remoteInfo = SplunkRum;
+		};
+		E2AFD9F528473F7A000F53BF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 86260EBB25CDC1DE009F3CB1 /* Project object */;
 			proxyType = 1;
@@ -84,6 +105,19 @@
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
+		E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanToDiskExporter.swift; sourceTree = "<group>"; };
+		E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanFromDiskExporter.swift; sourceTree = "<group>"; };
+		E2ACB21C283F855C006A1475 /* SpanDb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDb.swift; sourceTree = "<group>"; };
+		E2ACB21E283F871D006A1475 /* ZipkinTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZipkinTransform.swift; sourceTree = "<group>"; };
+		E2ACB22028451903006A1475 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/usr/lib/libsqlite3.tbd; sourceTree = DEVELOPER_DIR; };
+		E2AFD9E62846919C000F53BF /* BandwidthTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandwidthTracker.swift; sourceTree = "<group>"; };
+		E2AFD9E8284691EE000F53BF /* BandwidthTrackerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandwidthTrackerTest.swift; sourceTree = "<group>"; };
+		E2AFD9EA28469C93000F53BF /* SpanDbTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDbTest.swift; sourceTree = "<group>"; };
+		E2AFD9F028473F7A000F53BF /* SplunkRumDiskExportTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkRumDiskExportTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E2AFDA022847A6A0000F53BF /* SpanToDiskExportTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanToDiskExportTest.swift; sourceTree = "<group>"; };
+		E2AFDA042847C529000F53BF /* SpanFromDiskExporterTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanFromDiskExporterTest.swift; sourceTree = "<group>"; };
+		E2AFDA062847C678000F53BF /* DiskExportCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskExportCommon.swift; sourceTree = "<group>"; };
+		E2AFDA082847DAC8000F53BF /* DiskExportPipelineTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskExportPipelineTest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +125,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2ACB22128451939006A1475 /* libsqlite3.tbd in Frameworks */,
 				869E0B88273AC47700EBDA52 /* OpenTelemetrySdk in Frameworks */,
 				869E0B8C273AC48B00EBDA52 /* ZipkinExporter in Frameworks */,
 				8610004626178DB9008B972A /* DeviceKit in Frameworks */,
@@ -108,6 +143,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E2AFD9ED28473F7A000F53BF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E2AFD9F428473F7A000F53BF /* SplunkRum.framework in Frameworks */,
+				E2AFD9FF2847A397000F53BF /* Swifter in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -116,6 +160,7 @@
 			children = (
 				86260EC625CDC1DE009F3CB1 /* SplunkRum */,
 				86260ED125CDC1DE009F3CB1 /* SplunkRumTests */,
+				E2AFD9F128473F7A000F53BF /* SplunkRumDiskExportTests */,
 				86260EC525CDC1DE009F3CB1 /* Products */,
 				863044CD25F6CA4000E0F846 /* Frameworks */,
 			);
@@ -126,6 +171,7 @@
 			children = (
 				86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */,
 				86260ECD25CDC1DE009F3CB1 /* SplunkRumTests.xctest */,
+				E2AFD9F028473F7A000F53BF /* SplunkRumDiskExportTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -149,6 +195,11 @@
 				8607AD4A267B9032004FAFFD /* AppLifecycle.swift */,
 				8624DAB4269CAE61005D65DE /* NetworkType.swift */,
 				86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */,
+				E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */,
+				E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */,
+				E2ACB21C283F855C006A1475 /* SpanDb.swift */,
+				E2ACB21E283F871D006A1475 /* ZipkinTransform.swift */,
+				E2AFD9E62846919C000F53BF /* BandwidthTracker.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -162,6 +213,8 @@
 				8654BCFB25E55E850013F7F6 /* TestUtils.swift */,
 				8654BCFF25E561AE0013F7F6 /* ErrorTests.swift */,
 				866192F725ED34750035F08E /* UtilsTests.swift */,
+				E2AFD9E8284691EE000F53BF /* BandwidthTrackerTest.swift */,
+				E2AFD9EA28469C93000F53BF /* SpanDbTest.swift */,
 			);
 			path = SplunkRumTests;
 			sourceTree = "<group>";
@@ -169,8 +222,20 @@
 		863044CD25F6CA4000E0F846 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E2ACB22028451903006A1475 /* libsqlite3.tbd */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E2AFD9F128473F7A000F53BF /* SplunkRumDiskExportTests */ = {
+			isa = PBXGroup;
+			children = (
+				E2AFDA022847A6A0000F53BF /* SpanToDiskExportTest.swift */,
+				E2AFDA042847C529000F53BF /* SpanFromDiskExporterTest.swift */,
+				E2AFDA062847C678000F53BF /* DiskExportCommon.swift */,
+				E2AFDA082847DAC8000F53BF /* DiskExportPipelineTest.swift */,
+			);
+			path = SplunkRumDiskExportTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -234,6 +299,27 @@
 			productReference = 86260ECD25CDC1DE009F3CB1 /* SplunkRumTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		E2AFD9EF28473F7A000F53BF /* SplunkRumDiskExportTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E2AFD9F728473F7A000F53BF /* Build configuration list for PBXNativeTarget "SplunkRumDiskExportTests" */;
+			buildPhases = (
+				E2AFD9EC28473F7A000F53BF /* Sources */,
+				E2AFD9ED28473F7A000F53BF /* Frameworks */,
+				E2AFD9EE28473F7A000F53BF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E2AFD9F628473F7A000F53BF /* PBXTargetDependency */,
+			);
+			name = SplunkRumDiskExportTests;
+			packageProductDependencies = (
+				E2AFD9FE2847A397000F53BF /* Swifter */,
+			);
+			productName = SplunkRumDiskExportTests;
+			productReference = E2AFD9F028473F7A000F53BF /* SplunkRumDiskExportTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -250,6 +336,9 @@
 					86260ECC25CDC1DE009F3CB1 = {
 						CreatedOnToolsVersion = 12.4;
 						LastSwiftMigration = 1240;
+					};
+					E2AFD9EF28473F7A000F53BF = {
+						CreatedOnToolsVersion = 13.2.1;
 					};
 				};
 			};
@@ -273,6 +362,7 @@
 			targets = (
 				86260EC325CDC1DE009F3CB1 /* SplunkRum */,
 				86260ECC25CDC1DE009F3CB1 /* SplunkRumTests */,
+				E2AFD9EF28473F7A000F53BF /* SplunkRumDiskExportTests */,
 			);
 		};
 /* End PBXProject section */
@@ -292,6 +382,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E2AFD9EE28473F7A000F53BF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -302,8 +399,12 @@
 				8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */,
 				8616CD5F266E673F0048980B /* ScreenName.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
+				E2ACB21F283F871D006A1475 /* ZipkinTransform.swift in Sources */,
+				E2ACB21D283F855C006A1475 /* SpanDb.swift in Sources */,
 				86043B7C25F93E3400A29788 /* Log.swift in Sources */,
+				E2AFD9E72846919C000F53BF /* BandwidthTracker.swift in Sources */,
 				865DBDD92677AA7B00EFE8D5 /* RetryExporter.swift in Sources */,
+				E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */,
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
 				8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
@@ -311,6 +412,7 @@
 				8624DAB5269CAE61005D65DE /* NetworkType.swift in Sources */,
 				8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
+				E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */,
 				86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */,
 				8654BCF825E54D340013F7F6 /* ErrorReporting.swift in Sources */,
 			);
@@ -324,7 +426,20 @@
 				86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */,
 				8654BCFC25E55E850013F7F6 /* TestUtils.swift in Sources */,
 				866192F825ED34750035F08E /* UtilsTests.swift in Sources */,
+				E2AFD9E9284691EE000F53BF /* BandwidthTrackerTest.swift in Sources */,
 				865A5CA125DC33EF003A1E5A /* NetworkInstrumentationTests.swift in Sources */,
+				E2AFD9EB28469C93000F53BF /* SpanDbTest.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E2AFD9EC28473F7A000F53BF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E2AFDA052847C529000F53BF /* SpanFromDiskExporterTest.swift in Sources */,
+				E2AFDA092847DAC8000F53BF /* DiskExportPipelineTest.swift in Sources */,
+				E2AFDA032847A6A0000F53BF /* SpanToDiskExportTest.swift in Sources */,
+				E2AFDA072847C678000F53BF /* DiskExportCommon.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -335,6 +450,11 @@
 			isa = PBXTargetDependency;
 			target = 86260EC325CDC1DE009F3CB1 /* SplunkRum */;
 			targetProxy = 86260ECF25CDC1DE009F3CB1 /* PBXContainerItemProxy */;
+		};
+		E2AFD9F628473F7A000F53BF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 86260EC325CDC1DE009F3CB1 /* SplunkRum */;
+			targetProxy = E2AFD9F528473F7A000F53BF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -561,6 +681,44 @@
 			};
 			name = Release;
 		};
+		E2AFD9F828473F7A000F53BF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SplunkRumDiskExportTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E2AFD9F928473F7A000F53BF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SplunkRumDiskExportTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -587,6 +745,15 @@
 			buildConfigurations = (
 				86260EDC25CDC1DE009F3CB1 /* Debug */,
 				86260EDD25CDC1DE009F3CB1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E2AFD9F728473F7A000F53BF /* Build configuration list for PBXNativeTarget "SplunkRumDiskExportTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E2AFD9F828473F7A000F53BF /* Debug */,
+				E2AFD9F928473F7A000F53BF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -650,6 +817,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = ZipkinExporter;
+		};
+		E2AFD9FE2847A397000F53BF /* Swifter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */;
+			productName = Swifter;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

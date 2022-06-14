@@ -37,7 +37,11 @@ let SplunkRumVersionString = "0.6.0"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, networkInstrumentation: Bool = true) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil,
+                      screenNameSpans: Bool = true,
+                      networkInstrumentation: Bool = true,
+                      enableDiskCache: Bool = false
+    ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -46,6 +50,7 @@ let SplunkRumVersionString = "0.6.0"
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
         self.networkInstrumentation = networkInstrumentation
+        self.enableDiskCache = enableDiskCache
     }
     /**
         Copy constructor
@@ -61,6 +66,7 @@ let SplunkRumVersionString = "0.6.0"
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
         self.networkInstrumentation = opts.networkInstrumentation
+        self.enableDiskCache = opts.enableDiskCache
     }
 
     /**
@@ -106,6 +112,8 @@ let SplunkRumVersionString = "0.6.0"
      */
     @objc public var networkInstrumentation: Bool = true
 
+    @objc public var enableDiskCache: Bool = false
+
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
         if spanFilter != nil {
@@ -147,6 +155,7 @@ var splunkRumInitializeCalledTime = Date()
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
+    // swiftlint:disable:next cyclomatic_complexity
     @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
@@ -181,42 +190,44 @@ var splunkRumInitializeCalledTime = Date()
             theBeaconUrl = beaconUrl + "?auth="+rumAuth
         }
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
-        let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
-        let zipkin = ZipkinTraceExporter(options: exportOptions)
-        let retry = RetryExporter(proxy: zipkin)
-        let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
-       /* DispatchQueue.global().async {
-            var backgroundTaskID = UIBackgroundTaskIdentifier(rawValue: 0)
-            backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "batch worker task") {
-            // End the task if time expires.
-            UIApplication.shared.endBackgroundTask(backgroundTaskID)
-            backgroundTaskID = UIBackgroundTaskIdentifier.invalid
-            }*/
+        let exportOptions = ZipkinTraceExporterOptions(endpoint: theBeaconUrl!, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
+
+        if options?.enableDiskCache ?? false {
+            let spanDb = SpanDb()
+            SpanFromDiskExport.start(spanDb: spanDb, endpoint: theBeaconUrl!)
+            let diskExporter = SpanToDiskExporter(spanDb: spanDb)
+            let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options?.spanFilter ?? nil)
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
-            if options?.debug ?? false {
-                OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
+        } else {
+            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
+                SpanDb.deleteAtDefaultLocation()
             }
-            sendAppStartSpan()
-            let srInit = buildTracer()
-                .spanBuilder(spanName: "SplunkRum.initialize")
-                .setStartTime(time: splunkRumInitializeCalledTime)
-                .startSpan()
-            srInit.setAttribute(key: "component", value: "appstart")
-            if options != nil {
-                srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
-            }
-            if options?.networkInstrumentation ?? true {
-                initalizeNetworkInstrumentation()
-            }
-            initializeNetworkTypeMonitoring()
-            initalizeUIInstrumentation()
-            // not initializeAppLifecycleInstrumentation, done at end of AppStart
-            srInit.end()
-            initialized = true
-          /*  // End the task assertion.
-            UIApplication.shared.endBackgroundTask(backgroundTaskID)
-            backgroundTaskID = UIBackgroundTaskIdentifier.invalid
-        }*/
+            let zipkin = ZipkinTraceExporter(options: exportOptions)
+            let retry = RetryExporter(proxy: zipkin)
+            let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+        }
+
+        if options?.debug ?? false {
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
+        }
+        sendAppStartSpan()
+        let srInit = buildTracer()
+            .spanBuilder(spanName: "SplunkRum.initialize")
+            .setStartTime(time: splunkRumInitializeCalledTime)
+            .startSpan()
+        srInit.setAttribute(key: "component", value: "appstart")
+        if options != nil {
+            srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
+        }
+        if options?.networkInstrumentation ?? true {
+            initalizeNetworkInstrumentation()
+        }
+        initializeNetworkTypeMonitoring()
+        initalizeUIInstrumentation()
+        // not initializeAppLifecycleInstrumentation, done at end of AppStart
+        srInit.end()
+        initialized = true
         print("SplunkRum.initialize() complete")
         return true
 
