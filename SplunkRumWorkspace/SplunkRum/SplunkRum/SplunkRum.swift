@@ -185,13 +185,13 @@ var splunkRumInitializeCalledTime = Date()
         let zipkin = ZipkinTraceExporter(options: exportOptions)
         let retry = RetryExporter(proxy: zipkin)
         let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
-        DispatchQueue.global().async {
+       /* DispatchQueue.global().async {
             var backgroundTaskID = UIBackgroundTaskIdentifier(rawValue: 0)
             backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "batch worker task") {
             // End the task if time expires.
             UIApplication.shared.endBackgroundTask(backgroundTaskID)
             backgroundTaskID = UIBackgroundTaskIdentifier.invalid
-            }
+            }*/
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
             if options?.debug ?? false {
                 OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
@@ -213,10 +213,10 @@ var splunkRumInitializeCalledTime = Date()
             // not initializeAppLifecycleInstrumentation, done at end of AppStart
             srInit.end()
             initialized = true
-            // End the task assertion.
+          /*  // End the task assertion.
             UIApplication.shared.endBackgroundTask(backgroundTaskID)
             backgroundTaskID = UIBackgroundTaskIdentifier.invalid
-        }
+        }*/
         print("SplunkRum.initialize() complete")
         return true
 

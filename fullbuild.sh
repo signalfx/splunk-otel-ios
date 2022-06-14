@@ -2,7 +2,7 @@
 set -e
 swiftlint --strict
 xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SplunkRum -configuration Debug build
-#xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SplunkRum -configuration Debug test
+xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SplunkRum -configuration Debug test
 xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SplunkRum -configuration Release build
 
 # Now try to do a swift build to ensure that the package dependencies are properly in synch
