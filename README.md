@@ -59,6 +59,7 @@ or
 | showVCInstrumentation | Bool | Enable span creation for ViewController Show events (not applicable to all UI frameworks/apps) | true |
 | screenNameSpans | Bool | Enable span creation for changes to the screen name | true |
 | networkInstrumentation | Bool | Enable span creation for network activities | true |
+| enableDiskCache | Bool | Enable disk caching of exported spans. All spans will be written to disk and deleted on a successful export. The storage is capped at 64 MB. | false |
 
 ## Crash Reporting
 
