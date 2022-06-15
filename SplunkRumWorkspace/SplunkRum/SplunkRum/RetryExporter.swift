@@ -69,5 +69,4 @@ class RetryExporter: SpanExporter {
     func shutdown() {
         proxy.shutdown()
     }
-
 }
