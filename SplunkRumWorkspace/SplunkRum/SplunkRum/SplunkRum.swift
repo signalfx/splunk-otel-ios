@@ -21,7 +21,7 @@ import ZipkinExporter
 import StdoutExporter
 import WebKit
 
-let SplunkRumVersionString = "0.6.0"
+let SplunkRumVersionString = "0.7.0"
 
 /**
  Optional configuration for SplunkRum.initialize()
@@ -37,7 +37,8 @@ let SplunkRumVersionString = "0.6.0"
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold: CFTimeInterval = 16.7, frozenFrameThreshold: CFTimeInterval = 700, networkInstrumentation: Bool = true) {
+
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold: CFTimeInterval = 16.7, frozenFrameThreshold: CFTimeInterval = 700,networkInstrumentation: Bool = true,enableDiskCache: Bool = false) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -48,7 +49,7 @@ let SplunkRumVersionString = "0.6.0"
         self.networkInstrumentation = networkInstrumentation
         self.slowFrameThreshold = slowFrameThreshold
         self.frozenFrameThreshold = frozenFrameThreshold
-
+        self.enableDiskCache = enableDiskCache
     }
     /**
         Copy constructor
@@ -66,6 +67,7 @@ let SplunkRumVersionString = "0.6.0"
         self.networkInstrumentation = opts.networkInstrumentation
         self.slowFrameThreshold = opts.slowFrameThreshold
         self.frozenFrameThreshold = opts.frozenFrameThreshold
+        self.enableDiskCache = opts.enableDiskCache
     }
 
     /**
@@ -120,6 +122,10 @@ let SplunkRumVersionString = "0.6.0"
      */
     @objc public var frozenFrameThreshold: CFTimeInterval = 700
 
+
+    @objc public var enableDiskCache: Bool = false
+
+
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
         if spanFilter != nil {
@@ -159,6 +165,7 @@ var splunkRumInitializeCalledTime = Date()
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
+    // swiftlint:disable:next cyclomatic_complexity
     @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
@@ -193,11 +200,24 @@ var splunkRumInitializeCalledTime = Date()
             theBeaconUrl = beaconUrl + "?auth="+rumAuth
         }
         OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
-        let exportOptions = ZipkinTraceExporterOptions(endpoint: beaconUrl+"?auth="+rumAuth, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
-        let zipkin = ZipkinTraceExporter(options: exportOptions)
-        let retry = RetryExporter(proxy: zipkin)
-        let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
-        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+        let exportOptions = ZipkinTraceExporterOptions(endpoint: theBeaconUrl!, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
+
+        if options?.enableDiskCache ?? false {
+            let spanDb = SpanDb()
+            SpanFromDiskExport.start(spanDb: spanDb, endpoint: theBeaconUrl!)
+            let diskExporter = SpanToDiskExporter(spanDb: spanDb)
+            let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options?.spanFilter ?? nil)
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+        } else {
+            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
+                SpanDb.deleteAtDefaultLocation()
+            }
+            let zipkin = ZipkinTraceExporter(options: exportOptions)
+            let retry = RetryExporter(proxy: zipkin)
+            let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+        }
+
         if options?.debug ?? false {
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
         }

@@ -20,6 +20,20 @@
                ReferencedContainer = "container:SplunkRum.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E2AFD9EF28473F7A000F53BF"
+               BuildableName = "SplunkRumDiskExportTests.xctest"
+               BlueprintName = "SplunkRumDiskExportTests"
+               ReferencedContainer = "container:SplunkRum.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -36,6 +50,16 @@
                BlueprintIdentifier = "86260ECC25CDC1DE009F3CB1"
                BuildableName = "SplunkRumTests.xctest"
                BlueprintName = "SplunkRumTests"
+               ReferencedContainer = "container:SplunkRum.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E2AFD9EF28473F7A000F53BF"
+               BuildableName = "SplunkRumDiskExportTests.xctest"
+               BlueprintName = "SplunkRumDiskExportTests"
                ReferencedContainer = "container:SplunkRum.xcodeproj">
             </BuildableReference>
          </TestableReference>
