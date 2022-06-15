@@ -38,7 +38,7 @@ let SplunkRumVersionString = "0.7.0"
         Memberwise initializer
      */
 
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold: CFTimeInterval = 16.7, frozenFrameThreshold: CFTimeInterval = 700,networkInstrumentation: Bool = true,enableDiskCache: Bool = false) {
+    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil, screenNameSpans: Bool = true, slowFrameThreshold: CFTimeInterval = 16.7, frozenFrameThreshold: CFTimeInterval = 700, networkInstrumentation: Bool = true, enableDiskCache: Bool = false) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
         self.debug = debug
@@ -122,9 +122,7 @@ let SplunkRumVersionString = "0.7.0"
      */
     @objc public var frozenFrameThreshold: CFTimeInterval = 700
 
-
     @objc public var enableDiskCache: Bool = false
-
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
