@@ -1,16 +1,23 @@
-name: Continuous Integration
-on:
-  push:
-    branches: [main]
-  pull_request:
-
+name: CI-Test
+on: [push]
 jobs:
-  full-build:
-    runs-on: macOS-latest
+  test:
+    name: Test
+    runs-on: macos-latest
+    strategy:
+        matrix:
+          destination: ['platform=iOS Simulator,OS=15.2,name=iPhone 11 Pro']
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
-      - name: Full Build
-        run: ./fullbuild.sh
-      - name: Smoke Test
-        run: ./smoketest.sh
+        uses: actions/checkout@master
+      - name: Build
+        working-directory: SplunkRumWorkspace/
+        run: |
+          xcodebuild -workspace SplunkRumWorkspace.xcworkspace -scheme SmokeTest -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+        env: 
+         destination: ${{ matrix.destination }}
+      - name: Test
+        run: |
+          xcodebuild clean test -project SmokeTest.xcodeproj -scheme SmokeTest -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+        env: 
+         destination: ${{ matrix.destination }}
