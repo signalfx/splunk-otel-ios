@@ -9,7 +9,7 @@ jobs:
           destination: ['platform=iOS Simulator,OS=15.2,name=iPhone 11 Pro']
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@feature/APMI-1779-Automated-test-case
       - name: Build
         working-directory: SplunkRumWorkspace/
         run: |
