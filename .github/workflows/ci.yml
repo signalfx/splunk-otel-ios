@@ -1,18 +1,47 @@
 name: CI-Test
-on: [push] 
+on: [push]
+env:
+  SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
+  SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
+  resourceGroup: ${GITHUB_SHA}
 jobs:
-  test:
-    name: Test
-    runs-on: macos-latest
+  full-build:
+    runs-on: macOS-latest
     strategy:
         matrix:
-          destination: ['platform=iOS Simulator,OS=15.2,name=iPhone 11 Pro']
+         os: ['15.2', '15.4']
+         device: ['iPhone 13 Simulator', 'iPhone 8 Simulator']
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v1
         with:
           ref: feature/APMI-1779-Automated-test-case
-      - name: Build
-        working-directory: SplunkRumWorkspace/
+      #- name: Full Build
+        #run: ./fullbuild.sh
+      - name: Smoke Test
+        run: | 
+         ./smoketest.sh 
+      - name: uploading zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: SmokeTest
+          path: /Users/runner/work/splunk-otel-ios/splunk-otel-ios/SmokeTest.zip
+      - name: Uploading app on sauce lab
         run: |
-          xcodebuild -workspace SplunkRumWorkspace.xcworkspace -scheme SmokeTest -destination "platform=iOS Simulator,OS=15.2,name=iPhone 11 Pro" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+           cd /Users/runner/work/splunk-otel-ios/splunk-otel-ios/
+           ls
+           curl -u "${{secrets.SAUCE_USERNAME}}:${{secrets.SAUCE_ACCESS_KEY}}" --location \
+             --request POST 'https://api.us-west-1.saucelabs.com/v1/storage/upload' \
+             --form 'payload=@"SmokeTest.zip"' \
+             --form 'name="SmokeTest.zip"' \
+             --form 'description="'"${{ env.resourceGroup }}"'"'
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8 #install the python needed
+      - name: execute py script # run the run.py to get the latest data
+        working-directory: SplunkRumWorkspace
+        run: |
+            cd SmokeTest/
+            python3 -m pip install Appium-Python-Client
+            python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
