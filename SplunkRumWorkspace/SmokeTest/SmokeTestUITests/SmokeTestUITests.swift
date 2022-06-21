@@ -45,7 +45,7 @@ class SmokeTestUITests: XCTestCase {
 
     let SLEEP_TIME: UInt32 = 10 // batch is currently every 5 so this should be plenty
 
-    func testStartup() throws {
+    /*func testStartup() throws {
         // UI tests must launch the application that they test.
         let server = HttpServer()
         server["/"] = { request in
@@ -160,6 +160,6 @@ class SmokeTestUITests: XCTestCase {
         XCTAssertEqual(appStart?.tags["splunk.rumSessionId"]?.description, receivedNativeSessionId)
 
         // FIXME multiple screens, pickVC cases, etc.
-    }
+    }*/
 
 }
