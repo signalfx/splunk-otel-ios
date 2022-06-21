@@ -19,11 +19,13 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
+
 class RetryExporter: SpanExporter {
     let MAX_PENDING_SPANS = 100
 
     let proxy: SpanExporter
     var pending: [SpanData] = []
+    //var exportedSpans: [SpanData] = []
 
     init(proxy: SpanExporter) {
         self.proxy = proxy
@@ -58,15 +60,74 @@ class RetryExporter: SpanExporter {
             addToPending(spans)
             return .failure
         }
+       // exportedSpans.append(contentsOf: spans)
+        for span in spans {
+            getContentOfRecentTraceSegment(with:String(describing: span.traceId.hexString),name: span.name)
+        }
         return .success
     }
 
     func flush() -> SpanExporterResultCode {
         _ = attemptPendingExport()
+       // exportedSpans.removeAll()
         return proxy.flush()
     }
 
     func shutdown() {
         proxy.shutdown()
+    }
+    
+    func getContentOfRecentTraceSegment(with traceID:String,name:String){
+      //  let str2 = "https://api.us0.signalfx.com/v2/apm/trace/d1a8f3e2d7d3700c/latest" //get content of recent trace segment
+        let str = "https://api.us0.signalfx.com/v1/apm/trace/" + traceID + "/latest"
+        let url = URL(string: str)!
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        if sessiontoken == "" {
+            return
+        }
+        request.addValue("X-SF-Token", forHTTPHeaderField:sessiontoken)
+        
+       // let sem = DispatchSemaphore(value: 0)
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard error == nil else {
+                print("Error: error calling DELETE")
+                print(error!)
+                return
+            }
+            guard let data = data else {
+                print("Error: Did not receive data")
+                return
+            }
+            guard let response = response as? HTTPURLResponse, (200 ..< 299) ~= response.statusCode else {
+                print("Error: HTTP request failed for \(name)")
+                return
+            }
+            do {
+                guard let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                    print("Error: Cannot convert data to JSON")
+                    return
+                }
+                guard let prettyJsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted) else {
+                    print("Error: Cannot convert JSON object to Pretty JSON data")
+                    return
+                }
+                guard let prettyPrintedJson = String(data: prettyJsonData, encoding: .utf8) else {
+                    print("Error: Could print JSON in String")
+                    return
+                }
+                
+                print(prettyPrintedJson)
+            } catch {
+                print("Error: Trying to convert JSON data to string")
+                return
+            }
+        }
+        task.resume()
+       // sem.wait()
+        
     }
 }

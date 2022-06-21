@@ -22,6 +22,7 @@ struct TestZipkinSpan: Decodable {
     var name: String
     var tags: [String: String]
     var annotations: [TestZipkinAnnotation]
+   // var traceid: String
 }
 struct TestZipkinAnnotation: Decodable {
     var value: String

@@ -137,7 +137,7 @@ let globalAttributesLock = NSLock()
 
 let splunkLibraryLoadTime = Date()
 var splunkRumInitializeCalledTime = Date()
-
+public var sessiontoken:String = ""
 /**
  Main class for initializing the SplunkRum agent.
  */
@@ -233,6 +233,9 @@ var splunkRumInitializeCalledTime = Date()
 
     }
 
+    public class func setSessionToken(with token:String){
+        sessiontoken = token
+    }
     /**
             Query for the current session ID.  Session IDs can change during the usage of the app so caching this result is not advised.
      */
