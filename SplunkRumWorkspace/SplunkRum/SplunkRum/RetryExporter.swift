@@ -88,7 +88,7 @@ class RetryExporter: SpanExporter {
         if sessiontoken == "" {
             return
         }
-        request.addValue("X-SF-Token", forHTTPHeaderField:sessiontoken)
+        request.addValue("X-SF-Token", forHTTPHeaderField:"V6EDfCCxitN2TpkcBXxgBw") //jTcdKy6-HWklHVk9BZQF4g //sessiontoken
         
        // let sem = DispatchSemaphore(value: 0)
 

@@ -17,7 +17,6 @@
 		8645683026EFDEB50059CF04 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8645683426EFDED60059CF04 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 8645683326EFDED60059CF04 /* Swifter */; };
 		C85DBEB52859D19700DC46E2 /* CustomScreenNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEAD2859D19600DC46E2 /* CustomScreenNameVC.swift */; };
-		C85DBEB62859D19700DC46E2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEAE2859D19600DC46E2 /* ViewController.swift */; };
 		C85DBEB72859D19700DC46E2 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEAF2859D19600DC46E2 /* CustomCell.swift */; };
 		C85DBEB82859D19700DC46E2 /* WKWebViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB02859D19600DC46E2 /* WKWebViewVC.swift */; };
 		C85DBEB92859D19700DC46E2 /* NetworkRequestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB12859D19600DC46E2 /* NetworkRequestVC.swift */; };
@@ -280,7 +279,6 @@
 				C85DBEBC2859D19700DC46E2 /* RUMInitializationVC.swift in Sources */,
 				C85DBEBB2859D19700DC46E2 /* ScreenTrackVC.swift in Sources */,
 				C85DBEB82859D19700DC46E2 /* WKWebViewVC.swift in Sources */,
-				C85DBEB62859D19700DC46E2 /* ViewController.swift in Sources */,
 				C85DBEB52859D19700DC46E2 /* CustomScreenNameVC.swift in Sources */,
 				864567FB26EFDE9F0059CF04 /* AppDelegate.swift in Sources */,
 				C85DBEB92859D19700DC46E2 /* NetworkRequestVC.swift in Sources */,
