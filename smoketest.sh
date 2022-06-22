@@ -9,9 +9,8 @@ BUILD_FOLDER="work/splunk-otel-ios/splunk-otel-ios/SmokeBuild"
 BUILD_PATH="Build/Products/Debug-iphonesimulator"
 BUILD_NAME="SmokeTest.app"
 
-rm -rf ./build
 xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SmokeTest -configuration Debug -destination platform="iOS Simulator,id=$TEST_DEVICE" -derivedDataPath SmokeBuild
-cd ~/$BUILD_FOLDER/$BUILD_PATH
+zip ${GITHUB_WORKSPACE}/SmokeTest.zip $(find ~/$BUILD_FOLDER/$BUILD_PATH/$BUILD_NAME -type f)
+cd ${GITHUB_WORKSPACE}/
 ls
-zip ${GITHUB_WORKSPACE}/SmokeTest.zip $(find /Users/runner/work/splunk-otel-ios/splunk-otel-ios/SmokeBuild/Build/Products/Debug-iphonesimulator/SmokeTest.app -type f)
 pwd
