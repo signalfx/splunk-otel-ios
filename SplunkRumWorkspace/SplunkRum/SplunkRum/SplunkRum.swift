@@ -21,7 +21,7 @@ import ZipkinExporter
 import StdoutExporter
 import WebKit
 
-let SplunkRumVersionString = "0.7.0"
+let SplunkRumVersionString = "0.7.1"
 
 /**
  Optional configuration for SplunkRum.initialize()
