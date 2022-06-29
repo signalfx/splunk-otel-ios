@@ -11,6 +11,4 @@ BUILD_NAME="SmokeTest.app"
 
 xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SmokeTest -configuration Debug -destination platform="iOS Simulator,id=$TEST_DEVICE" -derivedDataPath SmokeBuild
 zip ${GITHUB_WORKSPACE}/SmokeTest.zip $(find ~/$BUILD_FOLDER/$BUILD_PATH/$BUILD_NAME -type f)
-cd ${GITHUB_WORKSPACE}/
-ls
 pwd
