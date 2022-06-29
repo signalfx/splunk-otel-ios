@@ -14,7 +14,11 @@ class RUMInitializationVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    
+        DispatchQueue.global(qos: .background).async {
+            let server = FileServer(port: 8080)
+            server.start()
+        }
+
     }
     
   

@@ -93,71 +93,10 @@ class rumSessionId: UIViewController,UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
             print("You tapped cell number \(indexPath.row).")
         let dic = self.receivedSpans[indexPath.row]
-        let traceid = dic.tags["splunk.rumSessionId"]?.description ?? "d1a8f3e2d7d3700c"
-        getContentOfRecentTraceSegment(with: traceid)
-    }
-    func getContentOfRecentTraceSegment(with traceID:String){
-      //  let str2 = "https://api.us0.signalfx.com/v2/apm/trace/d1a8f3e2d7d3700c/latest" //get content of recent trace segment
-        let url = URL(string: "https://api.us0.signalfx.com/v2/apm/trace/d1a8f3e2d7d3700c/latest")!
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("X-SF-Token", forHTTPHeaderField: "nF2sRwMTyB-is8WpcGQ72w")
-        
-        let sem = DispatchSemaphore(value: 0)
-
-        let task = URLSession.shared.dataTask(with: request) { _, _, error in
-            if error != nil {
-                print("failure")
-            } else {
-                print("success")
-            }
-            sem.signal()
-        }
-        task.resume()
-        sem.wait()
+        //let traceid = dic.tags["splunk.rumSessionId"]?.description ?? "d1a8f3e2d7d3700c"
         
     }
-   /* public func export(spans: [SpanData]) -> SpanExporterResultCode {
-      //  let str = "https://api.us0.signalfx.com/v2/apm/trace/d1a8f3e2d7d3700c/segments" //get all segment of trace id
-       // let str1 = "https://api.us0.signalfx.com/v2/apm/trace/d1a8f3e2d7d3700c/1610500200000'" //get content of trace segment
-        let str2 = "https://api.us0.signalfx.com/v2/apm/trace/d1a8f3e2d7d3700c/latest" //get content of recent trace segment
-        guard let url = URL(string: self.options.endpoint) else { return .failure }
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("X-SF-Token", forHTTPHeaderField: "nF2sRwMTyB-is8WpcGQ72w")
-        options.additionalHeaders.forEach {
-            request.addValue($0.value, forHTTPHeaderField: $0.key)
-        }
-        
-
-       /* let spans = encodeSpans(spans: spans)
-        do {
-            request.httpBody = try JSONEncoder().encode(spans)
-        } catch {
-            return .failure
-        }*/
-
-        var status: SpanExporterResultCode = .failure
-
-        let sem = DispatchSemaphore(value: 0)
-
-        let task = URLSession.shared.dataTask(with: request) { _, _, error in
-            if error != nil {
-                status = .failure
-            } else {
-                status = .success
-            }
-            sem.signal()
-        }
-        task.resume()
-        sem.wait()
-
-        return status
-    }*/
 
 }
 struct TestZipkinSpan: Decodable {

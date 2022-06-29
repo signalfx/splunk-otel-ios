@@ -28,6 +28,11 @@
 		C85DBEC52859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEC32859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift */; };
 		C85DBEC62859D2FE00DC46E2 /* CrashVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEC42859D2FE00DC46E2 /* CrashVC.swift */; };
 		C85DBEC82859D42F00DC46E2 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = C85DBEC72859D42F00DC46E2 /* Swifter */; };
+		C8CDFB88286B1A6700AA8E97 /* FileServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CDFB87286B1A6700AA8E97 /* FileServer.swift */; };
+		C8CDFB8B286B1A6E00AA8E97 /* FileWebRouteCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CDFB89286B1A6E00AA8E97 /* FileWebRouteCollection.swift */; };
+		C8CDFB8C286B1A6E00AA8E97 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CDFB8A286B1A6E00AA8E97 /* Notifications.swift */; };
+		C8CDFB8E286B1A7600AA8E97 /* URL+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CDFB8D286B1A7600AA8E97 /* URL+Extensions.swift */; };
+		C8CDFB91286B1AA300AA8E97 /* Vapor in Frameworks */ = {isa = PBXBuildFile; productRef = C8CDFB90286B1AA300AA8E97 /* Vapor */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +82,10 @@
 		C85DBEB42859D19700DC46E2 /* RUMInitializationVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RUMInitializationVC.swift; sourceTree = "<group>"; };
 		C85DBEC32859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreshOnViewDidloadVC.swift; sourceTree = "<group>"; };
 		C85DBEC42859D2FE00DC46E2 /* CrashVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashVC.swift; sourceTree = "<group>"; };
+		C8CDFB87286B1A6700AA8E97 /* FileServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileServer.swift; sourceTree = "<group>"; };
+		C8CDFB89286B1A6E00AA8E97 /* FileWebRouteCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileWebRouteCollection.swift; sourceTree = "<group>"; };
+		C8CDFB8A286B1A6E00AA8E97 /* Notifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
+		C8CDFB8D286B1A7600AA8E97 /* URL+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +96,7 @@
 				8645682F26EFDEB50059CF04 /* SplunkRum.framework in Frameworks */,
 				C85DBEBF2859D28000DC46E2 /* Alamofire in Frameworks */,
 				C85DBEC22859D29100DC46E2 /* AFNetworking in Frameworks */,
+				C8CDFB91286B1AA300AA8E97 /* Vapor in Frameworks */,
 				C85DBEC82859D42F00DC46E2 /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -124,6 +134,7 @@
 		864567F926EFDE9F0059CF04 /* SmokeTest */ = {
 			isa = PBXGroup;
 			children = (
+				C8CDFB86286B1A5C00AA8E97 /* Vapor */,
 				864567FA26EFDE9F0059CF04 /* AppDelegate.swift */,
 				C85DBEAF2859D19600DC46E2 /* CustomCell.swift */,
 				C85DBEAD2859D19600DC46E2 /* CustomScreenNameVC.swift */,
@@ -162,6 +173,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		C8CDFB86286B1A5C00AA8E97 /* Vapor */ = {
+			isa = PBXGroup;
+			children = (
+				C8CDFB87286B1A6700AA8E97 /* FileServer.swift */,
+				C8CDFB89286B1A6E00AA8E97 /* FileWebRouteCollection.swift */,
+				C8CDFB8D286B1A7600AA8E97 /* URL+Extensions.swift */,
+				C8CDFB8A286B1A6E00AA8E97 /* Notifications.swift */,
+			);
+			path = Vapor;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -183,6 +205,7 @@
 				C85DBEBE2859D28000DC46E2 /* Alamofire */,
 				C85DBEC12859D29100DC46E2 /* AFNetworking */,
 				C85DBEC72859D42F00DC46E2 /* Swifter */,
+				C8CDFB90286B1AA300AA8E97 /* Vapor */,
 			);
 			productName = SmokeTest;
 			productReference = 864567F726EFDE9F0059CF04 /* SmokeTest.app */;
@@ -240,6 +263,7 @@
 				8645683226EFDED60059CF04 /* XCRemoteSwiftPackageReference "swifter" */,
 				C85DBEBD2859D28000DC46E2 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				C85DBEC02859D29100DC46E2 /* XCRemoteSwiftPackageReference "AFNetworking" */,
+				C8CDFB8F286B1AA300AA8E97 /* XCRemoteSwiftPackageReference "vapor" */,
 			);
 			productRefGroup = 864567F826EFDE9F0059CF04 /* Products */;
 			projectDirPath = "";
@@ -277,15 +301,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				C85DBEBC2859D19700DC46E2 /* RUMInitializationVC.swift in Sources */,
+				C8CDFB8B286B1A6E00AA8E97 /* FileWebRouteCollection.swift in Sources */,
 				C85DBEBB2859D19700DC46E2 /* ScreenTrackVC.swift in Sources */,
 				C85DBEB82859D19700DC46E2 /* WKWebViewVC.swift in Sources */,
 				C85DBEB52859D19700DC46E2 /* CustomScreenNameVC.swift in Sources */,
 				864567FB26EFDE9F0059CF04 /* AppDelegate.swift in Sources */,
 				C85DBEB92859D19700DC46E2 /* NetworkRequestVC.swift in Sources */,
+				C8CDFB8E286B1A7600AA8E97 /* URL+Extensions.swift in Sources */,
 				C85DBEC52859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift in Sources */,
+				C8CDFB8C286B1A6E00AA8E97 /* Notifications.swift in Sources */,
 				C85DBEB72859D19700DC46E2 /* CustomCell.swift in Sources */,
 				864567FD26EFDE9F0059CF04 /* SceneDelegate.swift in Sources */,
 				C85DBEC62859D2FE00DC46E2 /* CrashVC.swift in Sources */,
+				C8CDFB88286B1A6700AA8E97 /* FileServer.swift in Sources */,
 				C85DBEBA2859D19700DC46E2 /* rumSessionId.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -575,6 +603,14 @@
 				kind = branch;
 			};
 		};
+		C8CDFB8F286B1AA300AA8E97 /* XCRemoteSwiftPackageReference "vapor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/vapor/vapor.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -597,6 +633,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8645683226EFDED60059CF04 /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
+		};
+		C8CDFB90286B1AA300AA8E97 /* Vapor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C8CDFB8F286B1AA300AA8E97 /* XCRemoteSwiftPackageReference "vapor" */;
+			productName = Vapor;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

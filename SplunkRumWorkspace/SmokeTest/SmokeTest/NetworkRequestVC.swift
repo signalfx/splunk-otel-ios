@@ -1,10 +1,3 @@
-//
-//  NetworkRequestVC.swift
-//  multipleiOS_Versions
-//
-//  Created by Piyush Patil on 31/03/22.
-//
-
 import UIKit
 import Alamofire
 import AFNetworking
@@ -103,7 +96,7 @@ class NetworkRequestVC: UIViewController {
         
         if strCompare == "URLSession" {
             
-            guard let url = URL(string: "https://jsonplaceholder.typicode.com/posts/1") else {
+            guard let url = URL(string: "https://my-json-server.typicode.com/typicode/demo/posts/1") else {
                         print("Error: cannot create URL")
                         return
                     }
@@ -228,7 +221,7 @@ class NetworkRequestVC: UIViewController {
         
         if strCompare == "URLSession" {
             //URLSessiongetCall
-            let url = URL(string: "http://www.stackoverflow.com")!
+            let url = URL(string: "https://www.splunk.com")!
             let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
                 guard let data = data else { return }
                 print("Get successfully")
@@ -238,7 +231,7 @@ class NetworkRequestVC: UIViewController {
             
         }else if strCompare == "Alamofire"{
             
-            let url = URL(string: "https://reqres.in/api/users/2")!
+            let url = URL(string: "https://www.splunk.com")!
             AF.request(url, method: .get, parameters: nil, encoding: URLEncoding.default, headers: nil)
                     .responseJSON(completionHandler: { response in
                         switch response.result {
@@ -251,7 +244,7 @@ class NetworkRequestVC: UIViewController {
             
         }else if strCompare == "AFNetworking"{
             
-                manager.get("http://api.androidhive.info/json/movies.json", parameters: nil,headers: nil,progress: nil, success: { (operation, responseObject) -> Void in
+                manager.get("https://www.splunk.com", parameters: nil,headers: nil,progress: nil, success: { (operation, responseObject) -> Void in
                     print(responseObject)
                     }, failure: nil)
            
@@ -355,4 +348,5 @@ class NetworkRequestVC: UIViewController {
         strCompare = ""
     }
 }
+
 
