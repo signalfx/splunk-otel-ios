@@ -44,5 +44,5 @@ jobs:
         run: |
             cd SmokeTest/
             python3 -m pip install Appium-Python-Client
-            python3 -m pip install -r Constant.py
+            python3 -m pip install requests
             python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
