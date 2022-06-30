@@ -1,4 +1,6 @@
 import unittest
+import os
+import sys
 from appium import webdriver
 from time import sleep
 from random import choice, randint
@@ -14,12 +16,9 @@ class HybridIOSTests(unittest.TestCase):
         caps = {}
         
         caps['platformName'] = 'iOS'
-        caps['appium:app'] = '/Users/shattimare/Desktop/py_scripts/SmokeTest.app' # The filename of the mobile app
-        caps['automationName'] = 'XCUITest'
-        caps['udid'] = 'FF055C29-DFF2-4605-B0BB-1069BC7F3E21'
-        caps['appium:deviceName'] = 'iPhone 13 Simulator'
-        caps['appium:platformVersion'] = '15.5'
-        caps['bundleId'] = 'com.splunk.opentelemetry.SmokeTest'
+        caps['appium:app'] = 'storage:filename=SmokeTest.zip' # The filename of the mobile app
+        caps['appium:deviceName'] = sys.argv[2]
+        caps['appium:platformVersion'] = sys.argv[1]
         caps['sauce:options'] = {}
         caps['sauce:options']['appiumVersion'] = '1.22.3'
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
