@@ -2,6 +2,7 @@ import unittest
 import os
 import sys
 from appium import webdriver
+from selenium.webdriver.common.by import By
 from time import sleep
 from random import choice, randint
 from datetime import datetime
@@ -134,8 +135,8 @@ class HybridIOSTests(unittest.TestCase):
     
 #     # Generating crash report on ViewDidload.
     def test_CrashOnViewLoadClick(self):
-        self.driver.find_element("Crash","q").click();
-        self.driver.find_element("Crash on ViewDidload","q").click();
+        self.driver.find_element(By.ID,"Crash").click();
+        self.driver.find_element(By.ID,"Crash on ViewDidload").click();
         
 #     # Generating crash report on button click.
 #     def test_ForceCrashClick(self):
