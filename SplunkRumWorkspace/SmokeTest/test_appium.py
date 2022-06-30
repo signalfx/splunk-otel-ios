@@ -133,9 +133,9 @@ class HybridIOSTests(unittest.TestCase):
 #         Constant.screen_track_validation()
     
 #     # Generating crash report on ViewDidload.
-      def test_CrashOnViewLoadClick(self):
-         self.driver.find_element("Crash","q").click();
-         self.driver.find_element("Crash on ViewDidload","q").click();
+    def test_CrashOnViewLoadClick(self):
+        self.driver.find_element("Crash","q").click();
+        self.driver.find_element("Crash on ViewDidload","q").click();
         
 #     # Generating crash report on button click.
 #     def test_ForceCrashClick(self):
