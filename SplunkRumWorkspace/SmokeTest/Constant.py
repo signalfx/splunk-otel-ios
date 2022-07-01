@@ -2,7 +2,7 @@ import requests
 import urllib.request
 from time import sleep
 
-LOG_FILE_URL = "http://localhost:8080/consolelog/logs.txt"
+LOG_FILE_URL = "https://localhost:8080/consolelog/logs.txt"
 
 INITIALIZE_SPAN = b'Span SplunkRum.initialize'
 APP_START_SPAN = b'Span AppStart'
