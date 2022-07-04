@@ -25,6 +25,7 @@ class HybridIOSTests(unittest.TestCase):
         caps['sauce:options']['appiumVersion'] = '1.22.3'
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
         caps['sauce:options']['name'] = 'Platform Configurator Job ' + currentTime
+        caps['sauce:options']['proxy'] = {"proxyType": "manual","httpProxy": "http://localhost:8080"}
         
         url = 'https://oauth-shraddha.hattimare-46ddf:8d45c406-3a39-4da8-9fb9-b890a255848c@ondemand.us-west-1.saucelabs.com:443/wd/hub'
         self.driver=webdriver.Remote(url,caps)
