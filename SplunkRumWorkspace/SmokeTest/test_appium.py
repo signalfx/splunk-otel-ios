@@ -154,7 +154,7 @@ class HybridIOSTests(unittest.TestCase):
         self.driver.find_element(By.ID,"post").click();
         Constant.method_post_validation()  
 
-        
+   
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(HybridIOSTests)
     unittest.TextTestRunner(verbosity=2).run(suite)
