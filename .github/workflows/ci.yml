@@ -31,10 +31,10 @@ jobs:
            cd /Users/runner/work/splunk-otel-ios/splunk-otel-ios/
            ls
            curl -u "${{secrets.SAUCE_USERNAME}}:${{secrets.SAUCE_ACCESS_KEY}}" --location \
-             --request POST 'https://api.us-west-1.saucelabs.com/v1/storage/upload' \
+             --request POST 'https://api.apac-southeast-1.saucelabs.com/v1/storage/upload' \
              --form 'payload=@"SmokeTest.zip"' \
              --form 'name="SmokeTest.zip"' \
-             --form 'description="'"${{ env.resourceGroup }}"'"'
+             --form 'description="'"${{ env.resourceGroup }}"'"'  
       - name: setup python
         uses: actions/setup-python@v2
         with:
