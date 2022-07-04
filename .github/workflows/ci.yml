@@ -3,8 +3,8 @@ on: [push]
 env:
   SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
   SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
-  SAUCE_PROXY: 'http://localhost:8080'
   SAUCE_PROXY_LOCALHOST: True
+  SAUCE_PROXY: 'http://localhost:8080'
   resourceGroup: ${GITHUB_SHA}
 jobs:
   full-build:
