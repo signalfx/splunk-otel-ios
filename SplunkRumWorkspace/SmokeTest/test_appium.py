@@ -146,17 +146,22 @@ class HybridIOSTests(unittest.TestCase):
 #         self.driver.find_element(By.ID,"Crash").click();
 #         self.driver.find_element(By.ID,"Force Crash on button Click").click();
     
-#     # Generating webview span.
-#     def test_WebViewClick(self):
-#         self.driver.find_element(By.ID,"WKWebView").click();
+    # Generating webview span.
+    def test_WebViewClick(self):
+        self.driver.find_element(By.ID,"WKWebView").click();
+        
     # URL Session Network POST API call and Network Span validation.
     def test_API_PostClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"URLSession").click();
         self.driver.find_element(By.ID,"post").click();
-        #Constant.method_post_validation()
+        Constant.method_post_validation()
    
    
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(HybridIOSTests)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    testRunner_result = unittest.TextTestRunner(verbosity=2).run(suite)
+    if testRunner_result.wasSuccessful():
+        exit(0)
+    else:
+        exit(1)
