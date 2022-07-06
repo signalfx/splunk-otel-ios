@@ -46,109 +46,115 @@ class HybridIOSTests(unittest.TestCase):
 #     def test_SDK_Initialize(self):
 #         Constant.sdk_initialize_validation()
 
+#     # URL Session Network POST API call and Network Span validation.
+#     def test_API_PostClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"URLSession").click();
+#         self.driver.find_element(By.ID,"post").click();
+#         #Constant.method_post_validation()
+
+#     # URL Session Network GET API call and Network Span validation.
+#     def test_API_GetClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"URLSession").click();
+#         self.driver.find_element(By.ID,"get").click();
+#         #Constant.method_get_validation()
+        
+#     # URL Session Network PUT API call and Network Span validation.    
+#     def test_API_PutClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"URLSession").click();
+#         self.driver.find_element(By.ID,"put").click();
+#         #Constant.method_put_validation()
+        
+#     # URL Session Network DELETE API call and Network Span validation.
+#     def test_API_DeleteClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"URLSession").click();
+#         self.driver.find_element(By.ID,"delete").click();
+#         #Constant.method_delete_validation()
+        
+#     # Alamofire Network POST API call and Network Span validation.
+#     def test_Alamofire_PostClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"Alamofire").click();
+#         self.driver.find_element(By.ID,"post").click();
+#         #Constant.method_post_validation()
+        
+#     # Alamofire Network GET API call and Network Span validation.  
+#     def test_Alamofire_GetClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"Alamofire").click();
+#         self.driver.find_element(By.ID,"get").click();
+#         #Constant.method_get_validation()
+        
+#     # Alamofire Network PUT API call and Network Span validation.
+#     def test_Alamofire_PutClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"Alamofire").click();
+#         self.driver.find_element(By.ID,"put").click();
+#         #Constant.method_put_validation()
+        
+#     # Alamofire Network DELETE API call and Network Span validation.   
+#     def test_Alamofire_DeleteClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"Alamofire").click();
+#         self.driver.find_element(By.ID,"delete").click();
+#         #Constant.method_delete_validation()
+        
+#     # AFNetworking Network POST API call and Network Span validation. 
+#     def test_AFNetworking_PostClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"AFNetworking").click();
+#         self.driver.find_element(By.ID,"post").click();
+#         #Constant.method_post_validation()
+        
+#     # AFNetworking Network GET API call and Network Span validation.   
+#     def test_AFNetworking_GetClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"AFNetworking").click();
+#         self.driver.find_element(By.ID,"get").click();
+#         #Constant.method_get_validation()
+        
+#     # AFNetworking Network PUT API call and Network Span validation.     
+#     def test_AFNetworking_PutClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"AFNetworking").click();
+#         self.driver.find_element(By.ID,"put").click();
+#         #Constant.method_put_validation()
+
+#     # AFNetworking Network DELETE API call and Network Span validation.     
+#     def test_AFNetworking_DeleteClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"AFNetworking").click();
+#         self.driver.find_element(By.ID,"delete").click();
+#         #Constant.method_delete_validation()
+        
+#     # Screen navigation span generation and validation.
+#     def test_ScreenTrackClick(self):
+#         self.driver.find_element(By.ID,"Screen-Track").click();
+#         self.driver.find_element(By.ID,"Custom Screen Name").click();
+#         #Constant.screen_track_validation()
+    
+#     # Generating crash report on ViewDidload.
+#     def test_CrashOnViewLoadClick(self):
+#         self.driver.find_element(By.ID,"Crash").click();
+#         #self.driver.find_element(By.ID,"Crash on ViewDidload").click();
+        
+#     # Generating crash report on button click.
+#     def test_ForceCrashClick(self):
+#         self.driver.find_element(By.ID,"Crash").click();
+#         self.driver.find_element(By.ID,"Force Crash on button Click").click();
+    
+#     # Generating webview span.
+#     def test_WebViewClick(self):
+#         self.driver.find_element(By.ID,"WKWebView").click();
     # URL Session Network POST API call and Network Span validation.
     def test_API_PostClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"URLSession").click();
         self.driver.find_element(By.ID,"post").click();
-        #Constant.method_post_validation()
-
-    # URL Session Network GET API call and Network Span validation.
-    def test_API_GetClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"URLSession").click();
-        self.driver.find_element(By.ID,"get").click();
-        #Constant.method_get_validation()
-        
-    # URL Session Network PUT API call and Network Span validation.    
-    def test_API_PutClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"URLSession").click();
-        self.driver.find_element(By.ID,"put").click();
-        #Constant.method_put_validation()
-        
-    # URL Session Network DELETE API call and Network Span validation.
-    def test_API_DeleteClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"URLSession").click();
-        self.driver.find_element(By.ID,"delete").click();
-        #Constant.method_delete_validation()
-        
-    # Alamofire Network POST API call and Network Span validation.
-    def test_Alamofire_PostClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"Alamofire").click();
-        self.driver.find_element(By.ID,"post").click();
-        #Constant.method_post_validation()
-        
-    # Alamofire Network GET API call and Network Span validation.  
-    def test_Alamofire_GetClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"Alamofire").click();
-        self.driver.find_element(By.ID,"get").click();
-        #Constant.method_get_validation()
-        
-    # Alamofire Network PUT API call and Network Span validation.
-    def test_Alamofire_PutClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"Alamofire").click();
-        self.driver.find_element(By.ID,"put").click();
-        #Constant.method_put_validation()
-        
-    # Alamofire Network DELETE API call and Network Span validation.   
-    def test_Alamofire_DeleteClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"Alamofire").click();
-        self.driver.find_element(By.ID,"delete").click();
-        #Constant.method_delete_validation()
-        
-    # AFNetworking Network POST API call and Network Span validation. 
-    def test_AFNetworking_PostClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"AFNetworking").click();
-        self.driver.find_element(By.ID,"post").click();
-        #Constant.method_post_validation()
-        
-    # AFNetworking Network GET API call and Network Span validation.   
-    def test_AFNetworking_GetClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"AFNetworking").click();
-        self.driver.find_element(By.ID,"get").click();
-        #Constant.method_get_validation()
-        
-    # AFNetworking Network PUT API call and Network Span validation.     
-    def test_AFNetworking_PutClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"AFNetworking").click();
-        self.driver.find_element(By.ID,"put").click();
-        #Constant.method_put_validation()
-
-    # AFNetworking Network DELETE API call and Network Span validation.     
-    def test_AFNetworking_DeleteClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"AFNetworking").click();
-        self.driver.find_element(By.ID,"delete").click();
-        #Constant.method_delete_validation()
-        
-    # Screen navigation span generation and validation.
-    def test_ScreenTrackClick(self):
-        self.driver.find_element(By.ID,"Screen-Track").click();
-        self.driver.find_element(By.ID,"Custom Screen Name").click();
-        #Constant.screen_track_validation()
-    
-    # Generating crash report on ViewDidload.
-    def test_CrashOnViewLoadClick(self):
-        self.driver.find_element(By.ID,"Crash").click();
-        #self.driver.find_element(By.ID,"Crash on ViewDidload").click();
-        
-    # Generating crash report on button click.
-    def test_ForceCrashClick(self):
-        self.driver.find_element(By.ID,"Crash").click();
-        self.driver.find_element(By.ID,"Force Crash on button Click").click();
-    
-    # Generating webview span.
-    def test_WebViewClick(self):
-        self.driver.find_element(By.ID,"WKWebView").click();
+        Constant.method_post_validation()
    
    
 if __name__ == "__main__":
