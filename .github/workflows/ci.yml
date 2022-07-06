@@ -48,9 +48,3 @@ jobs:
             python3 -m pip install Appium-Python-Client
             python3 -m pip install requests
             python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
-            if: always()
-            steps:
-                - uses: technote-space/workflow-conclusion-action@v2
-                - name: Check Job Status status and fail if they are red
-                if: env.WORKFLOW_CONCLUSION == 'failure'
-                  run: exit 1
