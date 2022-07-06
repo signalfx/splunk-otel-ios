@@ -105,7 +105,14 @@ class RUMInitializationVC: UIViewController {
         
     }
     @IBAction func terminateSpan(_ sender:Any){
-        exit(0)
+                if UIApplication.shared.applicationState == .active {
+                  UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+                  //UIApplication.shared.perform(#selector(NSXPCConnection.resume))
+                  //UIApplication.shared.perform(#selector(NSXPCConnection.invalidate))
+                  //exit(0)
+                    
+                }
+        
         //UIApplication.shared.perform(#selector(NSXPCConnection.resume))
     }
     /*
