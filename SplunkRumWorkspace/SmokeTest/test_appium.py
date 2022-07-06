@@ -134,7 +134,7 @@ class HybridIOSTests(unittest.TestCase):
     def test_ScreenTrackClick(self):
         self.driver.find_element(By.ID,"Screen-Track").click();
         self.driver.find_element(By.ID,"Custom Screen Name").click();
-        Constant.screen_track_validation()
+        #Constant.screen_track_validation()
     
     # Generating crash report on ViewDidload.
     def test_CrashOnViewLoadClick(self):
