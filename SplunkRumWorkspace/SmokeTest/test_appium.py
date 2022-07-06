@@ -123,32 +123,32 @@ class HybridIOSTests(unittest.TestCase):
         self.driver.find_element(By.ID,"put").click();
         #Constant.method_put_validation()
 
-    # AFNetworking Network DELETE API call and Network Span validation.     
-    def test_AFNetworking_DeleteClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"AFNetworking").click();
-        self.driver.find_element(By.ID,"delete").click();
-        #Constant.method_delete_validation()
+#     # AFNetworking Network DELETE API call and Network Span validation.     
+#     def test_AFNetworking_DeleteClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"AFNetworking").click();
+#         self.driver.find_element(By.ID,"delete").click();
+#         #Constant.method_delete_validation()
         
-    # Screen navigation span generation and validation.
-    def test_ScreenTrackClick(self):
-        self.driver.find_element(By.ID,"Screen-Track").click();
-        self.driver.find_element(By.ID,"Custom Screen Name").click();
-        #Constant.screen_track_validation()
+#     # Screen navigation span generation and validation.
+#     def test_ScreenTrackClick(self):
+#         self.driver.find_element(By.ID,"Screen-Track").click();
+#         self.driver.find_element(By.ID,"Custom Screen Name").click();
+#         #Constant.screen_track_validation()
     
-    # Generating crash report on ViewDidload.
-    def test_CrashOnViewLoadClick(self):
-        self.driver.find_element(By.ID,"Crash").click();
-        self.driver.find_element(By.ID,"Crash on ViewDidload").click();
+#     # Generating crash report on ViewDidload.
+#     def test_CrashOnViewLoadClick(self):
+#         self.driver.find_element(By.ID,"Crash").click();
+#         self.driver.find_element(By.ID,"Crash on ViewDidload").click();
         
-    # Generating crash report on button click.
-    def test_ForceCrashClick(self):
-        self.driver.find_element(By.ID,"Crash").click();
-        self.driver.find_element(By.ID,"Force Crash on button Click").click();
+#     # Generating crash report on button click.
+#     def test_ForceCrashClick(self):
+#         self.driver.find_element(By.ID,"Crash").click();
+#         self.driver.find_element(By.ID,"Force Crash on button Click").click();
     
-    # Generating webview span.
-    def test_WebViewClick(self):
-        self.driver.find_element(By.ID,"WKWebView").click();
+#     # Generating webview span.
+#     def test_WebViewClick(self):
+#         self.driver.find_element(By.ID,"WKWebView").click();
         
    
 if __name__ == "__main__":
