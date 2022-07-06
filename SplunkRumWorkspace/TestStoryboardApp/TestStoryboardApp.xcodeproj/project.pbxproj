@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -17,6 +17,7 @@
 		86D3D38C25E80649004DD939 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86D3D38A25E80649004DD939 /* LaunchScreen.storyboard */; };
 		86D3D39525E80D61004DD939 /* AViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39425E80D61004DD939 /* AViewController.swift */; };
 		86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39725E80DBC004DD939 /* BViewController.swift */; };
+		C89ED801286DD38A0014E09A /* SplunkOtelCrashReporting in Frameworks */ = {isa = PBXBuildFile; productRef = C89ED800286DD38A0014E09A /* SplunkOtelCrashReporting */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C89ED801286DD38A0014E09A /* SplunkOtelCrashReporting in Frameworks */,
 				86AFA8742714AD6C0061A547 /* SplunkRum.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -120,6 +122,7 @@
 			);
 			name = TestStoryboardApp;
 			packageProductDependencies = (
+				C89ED800286DD38A0014E09A /* SplunkOtelCrashReporting */,
 			);
 			productName = TestStoryboardApp;
 			productReference = 86D3D37C25E80648004DD939 /* TestStoryboardApp.app */;
@@ -149,6 +152,7 @@
 			);
 			mainGroup = 86D3D37325E80648004DD939;
 			packageReferences = (
+				C89ED7FF286DD38A0014E09A /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */,
 			);
 			productRefGroup = 86D3D37D25E80648004DD939 /* Products */;
 			projectDirPath = "";
@@ -242,6 +246,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DISABLE_DIAMOND_PROBLEM_DIAGNOSTIC = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -303,6 +308,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DISABLE_DIAMOND_PROBLEM_DIAGNOSTIC = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -381,6 +387,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C89ED7FF286DD38A0014E09A /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/signalfx/splunk-otel-ios-crashreporting";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C89ED800286DD38A0014E09A /* SplunkOtelCrashReporting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C89ED7FF286DD38A0014E09A /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */;
+			productName = SplunkOtelCrashReporting;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 86D3D37425E80648004DD939 /* Project object */;
 }

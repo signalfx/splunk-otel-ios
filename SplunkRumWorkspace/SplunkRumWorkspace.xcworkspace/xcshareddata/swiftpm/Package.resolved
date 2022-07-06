@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/vapor/async-kit.git",
         "state": {
           "branch": null,
-          "revision": "017dc7da68c1ec9f0f46fcd1a8002d14a5662732",
-          "version": "1.12.0"
+          "revision": "c3329e444bafbb12d1d312af9191be95348a8175",
+          "version": "1.13.0"
         }
       },
       {
@@ -92,12 +92,39 @@
         }
       },
       {
+        "package": "PLCrashReporter",
+        "repositoryURL": "https://github.com/microsoft/plcrashreporter",
+        "state": {
+          "branch": null,
+          "revision": "81cdec2b3827feb03286cb297f4c501a8eb98df1",
+          "version": "1.10.2"
+        }
+      },
+      {
         "package": "routing-kit",
         "repositoryURL": "https://github.com/vapor/routing-kit.git",
         "state": {
           "branch": null,
-          "revision": "9e181d685a3dec1eef1fc6dacf606af364f86d68",
-          "version": "4.5.0"
+          "revision": "ffac7b3a127ce1e85fb232f1a6271164628809ad",
+          "version": "4.6.0"
+        }
+      },
+      {
+        "package": "SplunkOtel",
+        "repositoryURL": "https://github.com/signalfx/splunk-otel-ios",
+        "state": {
+          "branch": "main",
+          "revision": "6baf05865e2be47fccd236cdc25bc15f1080d679",
+          "version": null
+        }
+      },
+      {
+        "package": "SplunkOtelCrashReporting",
+        "repositoryURL": "https://github.com/signalfx/splunk-otel-ios-crashreporting",
+        "state": {
+          "branch": null,
+          "revision": "bf40c0238d7e9d1f8ec53cce9349e05f383e39ae",
+          "version": "0.4.1"
         }
       },
       {
@@ -258,8 +285,8 @@
         "repositoryURL": "https://github.com/vapor/websocket-kit.git",
         "state": {
           "branch": null,
-          "revision": "09212f4c2b9ebdef00f04b913b57f5d77bc4ea62",
-          "version": "2.4.1"
+          "revision": "d8230eae70650652661f360f322db0cc22955b2f",
+          "version": "2.5.0"
         }
       }
     ]

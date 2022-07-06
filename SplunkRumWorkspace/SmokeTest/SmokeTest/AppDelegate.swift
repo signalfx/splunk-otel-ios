@@ -18,7 +18,8 @@ limitations under the License.
 import UIKit
 // Why not "import SplunkOtel"?  Because this links as a local framework, not as a swift package.
 // FIXME align the framework name and directory names with the swift package name at some point
-import SplunkRum
+import SplunkOtel
+import SplunkOtelCrashReporting
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -26,8 +27,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         redirectLogToDocuments()
-        SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true,
-            globalAttributes: [:], environment: nil, ignoreURLs: nil))
+       if  SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true)){
+           SplunkRumCrashReporting.start()
+       }
+        print("Fresh start....")
+//        SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum" , rumAuth: "nF2sRwMTyB-is8WpcGQ72w" ,options: SplunkRumOptions(debug: true))
+//         SplunkRumCrashReporting.start()
+        
         
         return true
     }
@@ -45,7 +51,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-    
+    func applicationWillTerminate(_ application: UIApplication){
+        print("terminate application")
+    }
     func redirectLogToDocuments() {
         let allPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
             let documentsDirectory = allPaths.first!

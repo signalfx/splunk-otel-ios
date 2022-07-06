@@ -464,7 +464,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="z2U-r1-Q2t">
-                                <rect key="frame" x="20" y="148" width="374" height="230"/>
+                                <rect key="frame" x="20" y="148" width="374" height="470"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3g3-ZV-leD">
                                         <rect key="frame" x="0.0" y="0.0" width="374" height="50"/>
@@ -522,6 +522,62 @@
                                             <action selector="webView:" destination="eGU-nc-ECH" eventType="touchUpInside" id="f3V-aE-MVY"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n3l-iD-hNS">
+                                        <rect key="frame" x="0.0" y="240" width="374" height="50"/>
+                                        <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="2x9-zN-hax"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Custom">
+                                            <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="customSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="1DS-9l-npu"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Fm-rE-Adc">
+                                        <rect key="frame" x="0.0" y="300" width="374" height="50"/>
+                                        <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="XOn-ff-nil"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Error">
+                                            <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="errorSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="FAl-t4-IX6"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5h2-SF-4sY">
+                                        <rect key="frame" x="0.0" y="360" width="374" height="50"/>
+                                        <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="C8h-vP-3m6"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="BackGround/ForeGround">
+                                            <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="resignActiveSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="ayO-tf-BVj"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8jV-q7-nw7">
+                                        <rect key="frame" x="0.0" y="420" width="374" height="50"/>
+                                        <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="jDs-ot-MnW"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Terminate">
+                                            <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="terminateSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="xhb-08-2Yt"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="3g3-ZV-leD" secondAttribute="trailing" id="1kJ-oq-Bl5"/>
@@ -543,6 +599,11 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="gGB-4e-7Wr"/>
+                    <connections>
+                        <outlet property="btnBgFg" destination="5h2-SF-4sY" id="cw1-zC-0w8"/>
+                        <outlet property="btnCustom" destination="n3l-iD-hNS" id="wVo-Nc-7RF"/>
+                        <outlet property="btnError" destination="2Fm-rE-Adc" id="m5f-mE-UFG"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rXM-Pk-eOx" sceneMemberID="firstResponder"/>
             </objects>

@@ -42,6 +42,8 @@ class FileServer: ObservableObject {
     init(port: Int) {
         self.port = port
         app = Application(.development)
+        app.http.server.configuration.hostname = "127.0.0.1"
+        app.http.server.configuration.port = port
     }
     
     func start() {
@@ -50,7 +52,8 @@ class FileServer: ObservableObject {
             app.delete("consolelog",":filename", use: deleteFileHandler)
             try app.run()
         } catch {
-            fatalError(error.localizedDescription)
+            //fatalError(error.localizedDescription)
+            print(error.localizedDescription)
         }
     }
     

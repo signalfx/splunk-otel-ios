@@ -21,7 +21,6 @@ class CrashVC: UIViewController {
     @IBAction func click_NextVC(_sender:Any) {
         btnCrashOnLoad.backgroundColor = UIColor.green
         btnForceCrash.backgroundColor = UIColor.systemGray5
-        
         let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "CreshOnViewDidloadVC") as? CreshOnViewDidloadVC
         self.navigationController?.pushViewController(vc!, animated: true)
     }
@@ -29,8 +28,9 @@ class CrashVC: UIViewController {
     @IBAction func click_Error(_sender:Any) {
         btnCrashOnLoad.backgroundColor = UIColor.systemGray5
         btnForceCrash.backgroundColor = UIColor.green
-        let null = UnsafePointer<UInt8>(bitPattern: 0)
-        let derefNull = null!.pointee
+        fatalError()
+       // let null = UnsafePointer<UInt8>(bitPattern: 0)
+       // let derefNull = null!.pointee
     }
     
     /*
