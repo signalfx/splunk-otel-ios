@@ -154,7 +154,7 @@ class HybridIOSTests(unittest.TestCase):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"URLSession").click();
         self.driver.find_element(By.ID,"post").click();
-        Constant.method_post_validation()
+        #Constant.method_post_validation()
    
    
 if __name__ == "__main__":
