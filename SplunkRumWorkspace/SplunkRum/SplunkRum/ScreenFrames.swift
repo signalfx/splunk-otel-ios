@@ -23,6 +23,7 @@ import UIKit
 class ScreenFrames: NSObject {
 
     private var displayLink: CADisplayLink?
+    fileprivate var slowFrameScreenName: String = "unknown"
 
     private var slowFrameThreshold: CFTimeInterval = SplunkRum.configuredOptions?.slowFrameThreshold ?? 16.7
     private var frozenFrameThreshold: CFTimeInterval = SplunkRum.configuredOptions?.frozenFrameThreshold ?? 700
@@ -72,18 +73,20 @@ class ScreenFrames: NSObject {
 
          if duration > frozenFrameThreshold {
             frozenCount += 1
+            slowFrameScreenName = getScreenName()
          } else if duration > slowFrameThreshold {
             slowCount += 1
+            slowFrameScreenName = getScreenName()
          }
 
          if currentIteration != iteration {
 
              if slowCount > 0 {
-                 reportSlowframe(slowFrameCount: slowCount, name: "slowRenders")
+                 reportSlowframe(slowFrameCount: slowCount, name: "slowRenders", screenName: slowFrameScreenName)
              }
 
              if frozenCount > 0 {
-                 reportSlowframe(slowFrameCount: frozenCount, name: "frozenRenders")
+                 reportSlowframe(slowFrameCount: frozenCount, name: "frozenRenders", screenName: slowFrameScreenName)
              }
 
              slowCount = 0
@@ -93,14 +96,14 @@ class ScreenFrames: NSObject {
          }
      }
 
-    func reportSlowframe(slowFrameCount: Int, name: String) {
+    func reportSlowframe(slowFrameCount: Int, name: String, screenName: String) {
         let tracer = buildTracer()
         let now = Date()
         let typeName = name
         let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
         span.setAttribute(key: "component", value: "ui")
         span.setAttribute(key: "count", value: slowFrameCount)
-        span.setAttribute(key: "screen.name", value: getScreenName())
+        span.setAttribute(key: "screen.name", value: screenName)
         span.end(time: now)
     }
 
