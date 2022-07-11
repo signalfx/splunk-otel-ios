@@ -9,7 +9,7 @@ from random import choice, randint
 from datetime import datetime
 import Constant
 
-class HybridIOSTests(unittest.TestCase):
+class IOSTests(unittest.TestCase):
 
     # set up appium
     def setUp(self):
@@ -40,99 +40,132 @@ class HybridIOSTests(unittest.TestCase):
         return
             
 
-    # Validating initializing, app start, and presentation span.
-#     def test_SDK_Initialize(self):
-#         Constant.sdk_initialize_validation()
+    ''' 
+    Validating initializing, app start, and presentation span.
+    '''
+    def test_SDK_Initialize(self):
+        sleep(10);
+        self.driver.find_element(By.ID,"SDK Initialize validation").click();
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "Success")),
+            message='Span validation failed',
+        )
 
-    # URL Session Network POST API call and Network Span validation.
+    ''' 
+    Generating the POST network request with the URLSession and Validating the network span data.
+    '''
     def test_API_PostClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"URLSession").click();
         self.driver.find_element(By.ID,"post").click();
-        #Constant.method_post_validation()
+        self.validate_span();
 
-    # URL Session Network GET API call and Network Span validation.
+    ''' 
+    Generating the GET network request with the URLSession and Validating the network span data.
+    '''
     def test_API_GetClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"URLSession").click();
         self.driver.find_element(By.ID,"get").click();
-        #Constant.method_get_validation()
-        
-    # URL Session Network PUT API call and Network Span validation.    
+        self.validate_span();
+
+    ''' 
+    Generating the PUT network request with the URLSession and Validating the network span data.
+    '''
     def test_API_PutClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"URLSession").click();
         self.driver.find_element(By.ID,"put").click();
-        #Constant.method_put_validation()
+        self.validate_span();
         
-    # URL Session Network DELETE API call and Network Span validation.
+    ''' 
+    Generating the DELETE network request with the URLSession and Validating the network span data.
+    '''
     def test_API_DeleteClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"URLSession").click();
         self.driver.find_element(By.ID,"delete").click();
-        #Constant.method_delete_validation()
+        self.validate_span();
         
-    # Alamofire Network POST API call and Network Span validation.
+    ''' 
+    Generating the POST network request with the Alamofire and Validating the network span data.
+    '''
     def test_Alamofire_PostClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"Alamofire").click();
         self.driver.find_element(By.ID,"post").click();
-        #Constant.method_post_validation()
+        self.validate_span();
         
-    # Alamofire Network GET API call and Network Span validation.  
+    ''' 
+    Generating the GET network request with the Alamofire and Validating the network span data.
+    '''    
     def test_Alamofire_GetClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"Alamofire").click();
         self.driver.find_element(By.ID,"get").click();
-        #Constant.method_get_validation()
+        self.validate_span();
         
-    # Alamofire Network PUT API call and Network Span validation.
+    ''' 
+    Generating the PUT network request with the Alamofire and Validating the network span data.
+    '''
     def test_Alamofire_PutClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"Alamofire").click();
         self.driver.find_element(By.ID,"put").click();
-        #Constant.method_put_validation()
+        self.validate_span();
         
-    # Alamofire Network DELETE API call and Network Span validation.   
+    ''' 
+    Generating the DELETE network request with the Alamofire and Validating the network span data.
+    '''   
     def test_Alamofire_DeleteClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"Alamofire").click();
         self.driver.find_element(By.ID,"delete").click();
-        #Constant.method_delete_validation()
+        self.validate_span();
         
-    # AFNetworking Network POST API call and Network Span validation. 
+    ''' 
+    Generating the POST network request with the AFNetworking and Validating the network span data.
+    ''' 
     def test_AFNetworking_PostClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"AFNetworking").click();
         self.driver.find_element(By.ID,"post").click();
-        #Constant.method_post_validation()
+        self.validate_span();
         
-    # AFNetworking Network GET API call and Network Span validation.   
+    ''' 
+    Generating the GET network request with the AFNetworking and Validating the network span data.
+    '''   
     def test_AFNetworking_GetClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"AFNetworking").click();
         self.driver.find_element(By.ID,"get").click();
-        #Constant.method_get_validation()
+        self.validate_span();
         
-    # AFNetworking Network PUT API call and Network Span validation.     
+    ''' 
+    Generating the PUT network request with the AFNetworking and Validating the network span data.
+    '''     
     def test_AFNetworking_PutClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"AFNetworking").click();
         self.driver.find_element(By.ID,"put").click();
-        #Constant.method_put_validation()
+        self.validate_span();
 
-    # AFNetworking Network DELETE API call and Network Span validation.     
+    ''' 
+    Generating the DELETE network request with the AFNetworking and Validating the network span data.
+    '''     
     def test_AFNetworking_DeleteClick(self):
         self.driver.find_element(By.ID,"Network Request").click();
         self.driver.find_element(By.ID,"AFNetworking").click();
         self.driver.find_element(By.ID,"delete").click();
-        #Constant.method_delete_validation()
-        
-    # Screen navigation span generation and validation.
+        self.validate_span();
+
+    ''' 
+    Generating the screen navigation data and Validating span data.
+    '''    
     def test_ScreenTrackClick(self):
         self.driver.find_element(By.ID,"Screen-Track").click();
         self.driver.find_element(By.ID,"Custom Screen Name").click();
-        #Constant.screen_track_validation()
+        self.validate_span();
     
     # Generating crash report on ViewDidload.
     def test_CrashOnViewLoadClick(self):
@@ -147,10 +180,18 @@ class HybridIOSTests(unittest.TestCase):
     # Generating webview span.
     def test_WebViewClick(self):
         self.driver.find_element(By.ID,"WKWebView").click();
+     
+    def validate_span(self):
+        sleep(10);
+        self.driver.find_element(By.ID,"Span Validation").click();
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "Success")),
+            message='Span validation failed',
+        )
         
    
 if __name__ == "__main__":
-    suite = unittest.TestLoader().loadTestsFromTestCase(HybridIOSTests)
+    suite = unittest.TestLoader().loadTestsFromTestCase(IOSTests)
     testRunner_result = unittest.TextTestRunner(verbosity=2).run(suite)
     if testRunner_result.wasSuccessful():
         exit(0)
