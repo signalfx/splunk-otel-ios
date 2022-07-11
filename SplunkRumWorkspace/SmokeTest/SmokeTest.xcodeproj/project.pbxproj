@@ -59,8 +59,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		685F9E232876F468005B92C5 /* NSTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSTask.h; sourceTree = "<group>"; };
-		685F9E242876F4C9005B92C5 /* SmokeTest-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SmokeTest-Bridging-Header.h"; sourceTree = "<group>"; };
 		685F9E2B2876FD7A005B92C5 /* SpanValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanValidation.swift; sourceTree = "<group>"; };
 		864567F726EFDE9F0059CF04 /* SmokeTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmokeTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		864567FA26EFDE9F0059CF04 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -151,8 +149,6 @@
 				8645680326EFDE9F0059CF04 /* Assets.xcassets */,
 				8645680526EFDE9F0059CF04 /* LaunchScreen.storyboard */,
 				8645680826EFDE9F0059CF04 /* Info.plist */,
-				685F9E232876F468005B92C5 /* NSTask.h */,
-				685F9E242876F4C9005B92C5 /* SmokeTest-Bridging-Header.h */,
 			);
 			path = SmokeTest;
 			sourceTree = "<group>";
@@ -479,7 +475,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SmokeTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/shattimare/Documents/shraddha/splunk-otel-ios/SplunkRumWorkspace/SmokeTest/SmokeTest/SmokeTest-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -500,7 +496,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SmokeTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "/Users/shattimare/Documents/shraddha/splunk-otel-ios/SplunkRumWorkspace/SmokeTest/SmokeTest/SmokeTest-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
