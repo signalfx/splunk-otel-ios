@@ -1,13 +1,14 @@
 from tkinter import constants
 import unittest
 import os
-import sys
 from appium import webdriver
-from selenium.webdriver.common.by import By
 from time import sleep
 from random import choice, randint
 from datetime import datetime
-import Constant
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import sys
 
 class IOSTests(unittest.TestCase):
 
