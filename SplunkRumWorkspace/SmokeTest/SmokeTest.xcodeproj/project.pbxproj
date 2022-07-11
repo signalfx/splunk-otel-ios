@@ -7,17 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		685F9E2C2876FD7A005B92C5 /* SpanValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F9E2B2876FD7A005B92C5 /* SpanValidation.swift */; };
 		864567FB26EFDE9F0059CF04 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864567FA26EFDE9F0059CF04 /* AppDelegate.swift */; };
 		864567FD26EFDE9F0059CF04 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864567FC26EFDE9F0059CF04 /* SceneDelegate.swift */; };
 		8645680226EFDE9F0059CF04 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8645680026EFDE9F0059CF04 /* Main.storyboard */; };
 		8645680426EFDE9F0059CF04 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8645680326EFDE9F0059CF04 /* Assets.xcassets */; };
 		8645680726EFDE9F0059CF04 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8645680526EFDE9F0059CF04 /* LaunchScreen.storyboard */; };
 		8645681D26EFDEA00059CF04 /* SmokeTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */; };
+		8645682F26EFDEB50059CF04 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; };
+		8645683026EFDEB50059CF04 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8645683426EFDED60059CF04 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 8645683326EFDED60059CF04 /* Swifter */; };
-		C82EB435286ED07E0049EBAD /* SplunkOtelCrashReporting in Frameworks */ = {isa = PBXBuildFile; productRef = C82EB434286ED07E0049EBAD /* SplunkOtelCrashReporting */; };
-		C82EB437286EF4E80049EBAD /* sample1.html in Resources */ = {isa = PBXBuildFile; fileRef = C82EB436286EF4E80049EBAD /* sample1.html */; };
-		C84AA9C7286DC19B0037F7D1 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; };
-		C84AA9C8286DC19B0037F7D1 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C85DBEB52859D19700DC46E2 /* CustomScreenNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEAD2859D19600DC46E2 /* CustomScreenNameVC.swift */; };
 		C85DBEB72859D19700DC46E2 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEAF2859D19600DC46E2 /* CustomCell.swift */; };
 		C85DBEB82859D19700DC46E2 /* WKWebViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB02859D19600DC46E2 /* WKWebViewVC.swift */; };
@@ -30,12 +29,9 @@
 		C85DBEC52859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEC32859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift */; };
 		C85DBEC62859D2FE00DC46E2 /* CrashVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEC42859D2FE00DC46E2 /* CrashVC.swift */; };
 		C85DBEC82859D42F00DC46E2 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = C85DBEC72859D42F00DC46E2 /* Swifter */; };
-		C8CDFB88286B1A6700AA8E97 /* FileServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CDFB87286B1A6700AA8E97 /* FileServer.swift */; };
-		C8CDFB8B286B1A6E00AA8E97 /* FileWebRouteCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CDFB89286B1A6E00AA8E97 /* FileWebRouteCollection.swift */; };
-		C8CDFB8C286B1A6E00AA8E97 /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CDFB8A286B1A6E00AA8E97 /* Notifications.swift */; };
-		C8CDFB8E286B1A7600AA8E97 /* URL+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CDFB8D286B1A7600AA8E97 /* URL+Extensions.swift */; };
-		C8CDFB91286B1AA300AA8E97 /* Vapor in Frameworks */ = {isa = PBXBuildFile; productRef = C8CDFB90286B1AA300AA8E97 /* Vapor */; };
-		C8DF3B8228745768005C5F84 /* SplunkOtel in Frameworks */ = {isa = PBXBuildFile; productRef = C8DF3B8128745768005C5F84 /* SplunkOtel */; };
+		C870619D287C4AB2008F081A /* SplunkOtel in Frameworks */ = {isa = PBXBuildFile; productRef = C870619C287C4AB2008F081A /* SplunkOtel */; };
+		C87061A0287C4AC0008F081A /* SplunkOtelCrashReporting in Frameworks */ = {isa = PBXBuildFile; productRef = C870619F287C4AC0008F081A /* SplunkOtelCrashReporting */; };
+		C87061A2287C4DBE008F081A /* sample1.html in Resources */ = {isa = PBXBuildFile; fileRef = C87061A1287C4DBE008F081A /* sample1.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,13 +45,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		C84AA9C9286DC19B0037F7D1 /* Embed Frameworks */ = {
+		8645683126EFDEB50059CF04 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C84AA9C8286DC19B0037F7D1 /* SplunkRum.framework in Embed Frameworks */,
+				8645683026EFDEB50059CF04 /* SplunkRum.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -63,6 +59,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		685F9E232876F468005B92C5 /* NSTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSTask.h; sourceTree = "<group>"; };
+		685F9E242876F4C9005B92C5 /* SmokeTest-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SmokeTest-Bridging-Header.h"; sourceTree = "<group>"; };
+		685F9E2B2876FD7A005B92C5 /* SpanValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanValidation.swift; sourceTree = "<group>"; };
 		864567F726EFDE9F0059CF04 /* SmokeTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmokeTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		864567FA26EFDE9F0059CF04 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		864567FC26EFDE9F0059CF04 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -74,10 +73,8 @@
 		8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTestUITests.swift; sourceTree = "<group>"; };
 		8645681E26EFDEA00059CF04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8645682E26EFDEB50059CF04 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C82EB436286EF4E80049EBAD /* sample1.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = sample1.html; sourceTree = "<group>"; };
 		C85DBEAC2859D19600DC46E2 /* iOSHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iOSHeader.h; sourceTree = "<group>"; };
 		C85DBEAD2859D19600DC46E2 /* CustomScreenNameVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomScreenNameVC.swift; sourceTree = "<group>"; };
-		C85DBEAE2859D19600DC46E2 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = ../../../../APMI1779/AutomateiOS_TestApp/AutomateiOS_TestApp/ViewController.swift; sourceTree = "<group>"; };
 		C85DBEAF2859D19600DC46E2 /* CustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
 		C85DBEB02859D19600DC46E2 /* WKWebViewVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewVC.swift; sourceTree = "<group>"; };
 		C85DBEB12859D19600DC46E2 /* NetworkRequestVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkRequestVC.swift; sourceTree = "<group>"; };
@@ -86,10 +83,7 @@
 		C85DBEB42859D19700DC46E2 /* RUMInitializationVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RUMInitializationVC.swift; sourceTree = "<group>"; };
 		C85DBEC32859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreshOnViewDidloadVC.swift; sourceTree = "<group>"; };
 		C85DBEC42859D2FE00DC46E2 /* CrashVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashVC.swift; sourceTree = "<group>"; };
-		C8CDFB87286B1A6700AA8E97 /* FileServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileServer.swift; sourceTree = "<group>"; };
-		C8CDFB89286B1A6E00AA8E97 /* FileWebRouteCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileWebRouteCollection.swift; sourceTree = "<group>"; };
-		C8CDFB8A286B1A6E00AA8E97 /* Notifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
-		C8CDFB8D286B1A7600AA8E97 /* URL+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "URL+Extensions.swift"; sourceTree = "<group>"; };
+		C87061A1287C4DBE008F081A /* sample1.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = sample1.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,12 +91,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C84AA9C7286DC19B0037F7D1 /* SplunkRum.framework in Frameworks */,
+				8645682F26EFDEB50059CF04 /* SplunkRum.framework in Frameworks */,
 				C85DBEBF2859D28000DC46E2 /* Alamofire in Frameworks */,
+				C870619D287C4AB2008F081A /* SplunkOtel in Frameworks */,
 				C85DBEC22859D29100DC46E2 /* AFNetworking in Frameworks */,
-				C8CDFB91286B1AA300AA8E97 /* Vapor in Frameworks */,
-				C8DF3B8228745768005C5F84 /* SplunkOtel in Frameworks */,
-				C82EB435286ED07E0049EBAD /* SplunkOtelCrashReporting in Frameworks */,
+				C87061A0287C4AC0008F081A /* SplunkOtelCrashReporting in Frameworks */,
 				C85DBEC82859D42F00DC46E2 /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -140,7 +133,6 @@
 		864567F926EFDE9F0059CF04 /* SmokeTest */ = {
 			isa = PBXGroup;
 			children = (
-				C8CDFB86286B1A5C00AA8E97 /* Vapor */,
 				864567FA26EFDE9F0059CF04 /* AppDelegate.swift */,
 				C85DBEAF2859D19600DC46E2 /* CustomCell.swift */,
 				C85DBEAD2859D19600DC46E2 /* CustomScreenNameVC.swift */,
@@ -151,14 +143,16 @@
 				C85DBEC32859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift */,
 				C85DBEB22859D19700DC46E2 /* rumSessionId.swift */,
 				C85DBEB32859D19700DC46E2 /* ScreenTrackVC.swift */,
-				C85DBEAE2859D19600DC46E2 /* ViewController.swift */,
 				C85DBEB02859D19600DC46E2 /* WKWebViewVC.swift */,
+				685F9E2B2876FD7A005B92C5 /* SpanValidation.swift */,
 				864567FC26EFDE9F0059CF04 /* SceneDelegate.swift */,
 				8645680026EFDE9F0059CF04 /* Main.storyboard */,
+				C87061A1287C4DBE008F081A /* sample1.html */,
 				8645680326EFDE9F0059CF04 /* Assets.xcassets */,
 				8645680526EFDE9F0059CF04 /* LaunchScreen.storyboard */,
-				C82EB436286EF4E80049EBAD /* sample1.html */,
 				8645680826EFDE9F0059CF04 /* Info.plist */,
+				685F9E232876F468005B92C5 /* NSTask.h */,
+				685F9E242876F4C9005B92C5 /* SmokeTest-Bridging-Header.h */,
 			);
 			path = SmokeTest;
 			sourceTree = "<group>";
@@ -180,17 +174,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		C8CDFB86286B1A5C00AA8E97 /* Vapor */ = {
-			isa = PBXGroup;
-			children = (
-				C8CDFB87286B1A6700AA8E97 /* FileServer.swift */,
-				C8CDFB89286B1A6E00AA8E97 /* FileWebRouteCollection.swift */,
-				C8CDFB8D286B1A7600AA8E97 /* URL+Extensions.swift */,
-				C8CDFB8A286B1A6E00AA8E97 /* Notifications.swift */,
-			);
-			path = Vapor;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -201,7 +184,7 @@
 				864567F326EFDE9F0059CF04 /* Sources */,
 				864567F426EFDE9F0059CF04 /* Frameworks */,
 				864567F526EFDE9F0059CF04 /* Resources */,
-				C84AA9C9286DC19B0037F7D1 /* Embed Frameworks */,
+				8645683126EFDEB50059CF04 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -212,9 +195,8 @@
 				C85DBEBE2859D28000DC46E2 /* Alamofire */,
 				C85DBEC12859D29100DC46E2 /* AFNetworking */,
 				C85DBEC72859D42F00DC46E2 /* Swifter */,
-				C8CDFB90286B1AA300AA8E97 /* Vapor */,
-				C82EB434286ED07E0049EBAD /* SplunkOtelCrashReporting */,
-				C8DF3B8128745768005C5F84 /* SplunkOtel */,
+				C870619C287C4AB2008F081A /* SplunkOtel */,
+				C870619F287C4AC0008F081A /* SplunkOtelCrashReporting */,
 			);
 			productName = SmokeTest;
 			productReference = 864567F726EFDE9F0059CF04 /* SmokeTest.app */;
@@ -272,9 +254,8 @@
 				8645683226EFDED60059CF04 /* XCRemoteSwiftPackageReference "swifter" */,
 				C85DBEBD2859D28000DC46E2 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				C85DBEC02859D29100DC46E2 /* XCRemoteSwiftPackageReference "AFNetworking" */,
-				C8CDFB8F286B1AA300AA8E97 /* XCRemoteSwiftPackageReference "vapor" */,
-				C82EB433286ED07E0049EBAD /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */,
-				C8DF3B8028745768005C5F84 /* XCRemoteSwiftPackageReference "splunk-otel-ios" */,
+				C870619B287C4AB2008F081A /* XCRemoteSwiftPackageReference "splunk-otel-ios" */,
+				C870619E287C4AC0008F081A /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */,
 			);
 			productRefGroup = 864567F826EFDE9F0059CF04 /* Products */;
 			projectDirPath = "";
@@ -293,7 +274,7 @@
 			files = (
 				8645680726EFDE9F0059CF04 /* LaunchScreen.storyboard in Resources */,
 				8645680426EFDE9F0059CF04 /* Assets.xcassets in Resources */,
-				C82EB437286EF4E80049EBAD /* sample1.html in Resources */,
+				C87061A2287C4DBE008F081A /* sample1.html in Resources */,
 				8645680226EFDE9F0059CF04 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -313,19 +294,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				C85DBEBC2859D19700DC46E2 /* RUMInitializationVC.swift in Sources */,
-				C8CDFB8B286B1A6E00AA8E97 /* FileWebRouteCollection.swift in Sources */,
+				685F9E2C2876FD7A005B92C5 /* SpanValidation.swift in Sources */,
 				C85DBEBB2859D19700DC46E2 /* ScreenTrackVC.swift in Sources */,
 				C85DBEB82859D19700DC46E2 /* WKWebViewVC.swift in Sources */,
 				C85DBEB52859D19700DC46E2 /* CustomScreenNameVC.swift in Sources */,
 				864567FB26EFDE9F0059CF04 /* AppDelegate.swift in Sources */,
 				C85DBEB92859D19700DC46E2 /* NetworkRequestVC.swift in Sources */,
-				C8CDFB8E286B1A7600AA8E97 /* URL+Extensions.swift in Sources */,
 				C85DBEC52859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift in Sources */,
-				C8CDFB8C286B1A6E00AA8E97 /* Notifications.swift in Sources */,
 				C85DBEB72859D19700DC46E2 /* CustomCell.swift in Sources */,
 				864567FD26EFDE9F0059CF04 /* SceneDelegate.swift in Sources */,
 				C85DBEC62859D2FE00DC46E2 /* CrashVC.swift in Sources */,
-				C8CDFB88286B1A6700AA8E97 /* FileServer.swift in Sources */,
 				C85DBEBA2859D19700DC46E2 /* rumSessionId.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -492,6 +470,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 75WR3897WH;
 				DISABLE_DIAMOND_PROBLEM_DIAGNOSTIC = YES;
 				INFOPLIST_FILE = SmokeTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -500,6 +479,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SmokeTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/shattimare/Documents/shraddha/splunk-otel-ios/SplunkRumWorkspace/SmokeTest/SmokeTest/SmokeTest-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -511,6 +491,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 75WR3897WH;
 				DISABLE_DIAMOND_PROBLEM_DIAGNOSTIC = YES;
 				INFOPLIST_FILE = SmokeTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -519,6 +500,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SmokeTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "/Users/shattimare/Documents/shraddha/splunk-otel-ios/SplunkRumWorkspace/SmokeTest/SmokeTest/SmokeTest-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -603,14 +585,6 @@
 				minimumVersion = 1.5.0;
 			};
 		};
-		C82EB433286ED07E0049EBAD /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/signalfx/splunk-otel-ios-crashreporting";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.4.1;
-			};
-		};
 		C85DBEBD2859D28000DC46E2 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire";
@@ -627,17 +601,17 @@
 				kind = branch;
 			};
 		};
-		C8CDFB8F286B1AA300AA8E97 /* XCRemoteSwiftPackageReference "vapor" */ = {
+		C870619B287C4AB2008F081A /* XCRemoteSwiftPackageReference "splunk-otel-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/vapor/vapor.git";
+			repositoryURL = "https://github.com/signalfx/splunk-otel-ios";
 			requirement = {
 				branch = main;
 				kind = branch;
 			};
 		};
-		C8DF3B8028745768005C5F84 /* XCRemoteSwiftPackageReference "splunk-otel-ios" */ = {
+		C870619E287C4AC0008F081A /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/signalfx/splunk-otel-ios";
+			repositoryURL = "https://github.com/signalfx/splunk-otel-ios-crashreporting";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -650,11 +624,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8645683226EFDED60059CF04 /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
-		};
-		C82EB434286ED07E0049EBAD /* SplunkOtelCrashReporting */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C82EB433286ED07E0049EBAD /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */;
-			productName = SplunkOtelCrashReporting;
 		};
 		C85DBEBE2859D28000DC46E2 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -671,15 +640,15 @@
 			package = 8645683226EFDED60059CF04 /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
 		};
-		C8CDFB90286B1AA300AA8E97 /* Vapor */ = {
+		C870619C287C4AB2008F081A /* SplunkOtel */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = C8CDFB8F286B1AA300AA8E97 /* XCRemoteSwiftPackageReference "vapor" */;
-			productName = Vapor;
-		};
-		C8DF3B8128745768005C5F84 /* SplunkOtel */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C8DF3B8028745768005C5F84 /* XCRemoteSwiftPackageReference "splunk-otel-ios" */;
+			package = C870619B287C4AB2008F081A /* XCRemoteSwiftPackageReference "splunk-otel-ios" */;
 			productName = SplunkOtel;
+		};
+		C870619F287C4AC0008F081A /* SplunkOtelCrashReporting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C870619E287C4AC0008F081A /* XCRemoteSwiftPackageReference "splunk-otel-ios-crashreporting" */;
+			productName = SplunkOtelCrashReporting;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

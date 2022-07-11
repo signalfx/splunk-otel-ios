@@ -296,8 +296,25 @@
                                     <action selector="AFnetworking:" destination="Uvf-Et-glv" eventType="touchUpInside" id="ANE-2s-Tac"/>
                                 </connections>
                             </button>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="n2g-kM-cDR">
+                                <rect key="frame" x="207" y="414" width="0.0" height="0.0"/>
+                                <subviews>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Success" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ESm-0K-Unf">
+                                        <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <color key="textColor" systemColor="systemGreenColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Failed" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e7E-kT-DoP">
+                                        <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <color key="textColor" systemColor="systemRedColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1zL-U2-Puc">
-                                <rect key="frame" x="20" y="324" width="374" height="180"/>
+                                <rect key="frame" x="20" y="374" width="374" height="180"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xzG-43-Jlt">
                                         <rect key="frame" x="339" y="5" width="30" height="30"/>
@@ -385,6 +402,20 @@
                                     <constraint firstItem="odf-04-BtX" firstAttribute="height" secondItem="bzx-ec-s1x" secondAttribute="height" id="zgR-QU-3Af"/>
                                 </constraints>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sgt-Nm-LWu">
+                                <rect key="frame" x="20" y="304" width="374" height="50"/>
+                                <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="a9v-Gp-6c2"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Span Validation">
+                                    <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="validateSpan:" destination="Uvf-Et-glv" eventType="touchUpInside" id="oaH-gl-NX7"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="ghl-xb-Tj5"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -393,10 +424,13 @@
                             <constraint firstItem="1zL-U2-Puc" firstAttribute="centerX" secondItem="ghl-xb-Tj5" secondAttribute="centerX" id="7rN-xA-I8P"/>
                             <constraint firstItem="FDC-kC-2rB" firstAttribute="leading" secondItem="Bw6-9C-1DZ" secondAttribute="leading" id="Kp7-qJ-mdA"/>
                             <constraint firstItem="1zL-U2-Puc" firstAttribute="leading" secondItem="ghl-xb-Tj5" secondAttribute="leading" constant="20" id="N0M-se-Ijy"/>
+                            <constraint firstItem="sgt-Nm-LWu" firstAttribute="top" secondItem="xAj-Z8-wFe" secondAttribute="bottom" constant="20" id="OgA-8Q-WCU"/>
                             <constraint firstItem="FDC-kC-2rB" firstAttribute="trailing" secondItem="Bw6-9C-1DZ" secondAttribute="trailing" id="RIx-LT-Cl9"/>
+                            <constraint firstItem="sgt-Nm-LWu" firstAttribute="trailing" secondItem="xAj-Z8-wFe" secondAttribute="trailing" id="Syg-OJ-UYj"/>
                             <constraint firstItem="ghl-xb-Tj5" firstAttribute="trailing" secondItem="1zL-U2-Puc" secondAttribute="trailing" constant="20" id="T4n-g3-OCR"/>
-                            <constraint firstItem="1zL-U2-Puc" firstAttribute="top" secondItem="xAj-Z8-wFe" secondAttribute="bottom" constant="40" id="WqK-oG-HU6"/>
+                            <constraint firstItem="n2g-kM-cDR" firstAttribute="centerX" secondItem="sgt-Nm-LWu" secondAttribute="centerX" id="TFI-uv-hw7"/>
                             <constraint firstItem="ghl-xb-Tj5" firstAttribute="trailing" secondItem="FDC-kC-2rB" secondAttribute="trailing" constant="20" id="YTB-LT-ti3"/>
+                            <constraint firstItem="1zL-U2-Puc" firstAttribute="top" secondItem="sgt-Nm-LWu" secondAttribute="bottom" constant="20" id="gdJ-KI-IfX"/>
                             <constraint firstItem="FDC-kC-2rB" firstAttribute="height" secondItem="Bw6-9C-1DZ" secondAttribute="height" id="hiS-e9-8bd"/>
                             <constraint firstItem="Bw6-9C-1DZ" firstAttribute="top" secondItem="FDC-kC-2rB" secondAttribute="bottom" constant="20" id="kK0-js-fmM"/>
                             <constraint firstItem="FDC-kC-2rB" firstAttribute="trailing" secondItem="xAj-Z8-wFe" secondAttribute="trailing" id="oCo-qY-uAP"/>
@@ -404,6 +438,8 @@
                             <constraint firstItem="FDC-kC-2rB" firstAttribute="height" secondItem="xAj-Z8-wFe" secondAttribute="height" id="oaa-1R-VWd"/>
                             <constraint firstItem="FDC-kC-2rB" firstAttribute="leading" secondItem="xAj-Z8-wFe" secondAttribute="leading" id="osc-Dt-fJW"/>
                             <constraint firstItem="FDC-kC-2rB" firstAttribute="leading" secondItem="ghl-xb-Tj5" secondAttribute="leading" constant="20" id="w26-Jv-8tZ"/>
+                            <constraint firstItem="sgt-Nm-LWu" firstAttribute="leading" secondItem="xAj-Z8-wFe" secondAttribute="leading" id="x7s-Fy-SO2"/>
+                            <constraint firstItem="n2g-kM-cDR" firstAttribute="top" secondItem="sgt-Nm-LWu" secondAttribute="bottom" constant="60" id="yqw-Fy-cA4"/>
                         </constraints>
                     </view>
                     <connections>
@@ -415,12 +451,14 @@
                         <outlet property="btnPost" destination="zur-Uk-J2L" id="dp2-dJ-w5k"/>
                         <outlet property="btnPut" destination="xDX-oL-z8D" id="kKW-KR-Ps1"/>
                         <outlet property="btnurlsession" destination="FDC-kC-2rB" id="YMA-bL-bVU"/>
+                        <outlet property="lblFailed" destination="e7E-kT-DoP" id="nzt-wm-yE3"/>
+                        <outlet property="lblSuccess" destination="ESm-0K-Unf" id="3Ux-sT-uuG"/>
                         <outlet property="networkCallView" destination="1zL-U2-Puc" id="JIk-vX-ljc"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bae-lj-2LI" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1681" y="90"/>
+            <point key="canvasLocation" x="1679.7101449275362" y="89.732142857142847"/>
         </scene>
         <!--Custom Screen NameVC-->
         <scene sceneID="qZm-5S-nPz">
@@ -436,14 +474,55 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="DqQ-b0-2rQ">
+                                <rect key="frame" x="207" y="298" width="0.0" height="0.0"/>
+                                <subviews>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Success" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ek3-3O-0Gr">
+                                        <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <color key="textColor" systemColor="systemGreenColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Failed" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fcw-YY-E5M">
+                                        <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <color key="textColor" systemColor="systemRedColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EgL-gC-xEX">
+                                <rect key="frame" x="20" y="188" width="374" height="50"/>
+                                <color key="backgroundColor" systemColor="systemBlueColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="DJ0-AK-CWD"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Span Validation">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="btnSpanValidation:" destination="i0F-8U-Uek" eventType="touchUpInside" id="DoG-pc-iKU"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="esp-93-rMT"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="DqQ-b0-2rQ" firstAttribute="top" secondItem="EgL-gC-xEX" secondAttribute="bottom" constant="60" id="Fj6-32-bDE"/>
+                            <constraint firstItem="EgL-gC-xEX" firstAttribute="leading" secondItem="esp-93-rMT" secondAttribute="leading" constant="20" id="HrV-fC-kBU"/>
                             <constraint firstItem="dtV-nX-7Ky" firstAttribute="top" secondItem="esp-93-rMT" secondAttribute="top" constant="50" id="RL8-vu-mZP"/>
+                            <constraint firstItem="DqQ-b0-2rQ" firstAttribute="centerX" secondItem="EgL-gC-xEX" secondAttribute="centerX" id="SQO-19-NBv"/>
+                            <constraint firstItem="esp-93-rMT" firstAttribute="trailing" secondItem="EgL-gC-xEX" secondAttribute="trailing" constant="20" id="f5e-zS-ZSg"/>
+                            <constraint firstItem="EgL-gC-xEX" firstAttribute="top" secondItem="dtV-nX-7Ky" secondAttribute="bottom" constant="70" id="oxO-ho-JLH"/>
                             <constraint firstItem="dtV-nX-7Ky" firstAttribute="centerX" secondItem="esp-93-rMT" secondAttribute="centerX" id="zX7-SA-5GQ"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="lblFailed" destination="Fcw-YY-E5M" id="EhM-dF-VgL"/>
+                        <outlet property="lblSuccess" destination="Ek3-3O-0Gr" id="8wW-aR-ATM"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uEa-oF-Him" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -464,7 +543,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="z2U-r1-Q2t">
-                                <rect key="frame" x="20" y="148" width="374" height="470"/>
+                                <rect key="frame" x="20" y="148" width="374" height="530"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3g3-ZV-leD">
                                         <rect key="frame" x="0.0" y="0.0" width="374" height="50"/>
@@ -522,60 +601,75 @@
                                             <action selector="webView:" destination="eGU-nc-ECH" eventType="touchUpInside" id="f3V-aE-MVY"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="n3l-iD-hNS">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bHv-ni-QPM">
                                         <rect key="frame" x="0.0" y="240" width="374" height="50"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="RnU-qD-3sG"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" title="SDK Initialize validation">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="btnSDKInitializeValidation:" destination="eGU-nc-ECH" eventType="touchUpInside" id="6Dj-qS-y29"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ymy-cD-lDo">
+                                        <rect key="frame" x="0.0" y="300" width="374" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="2x9-zN-hax"/>
+                                            <constraint firstAttribute="height" constant="50" id="DlM-lP-091"/>
                                         </constraints>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" title="Custom">
                                             <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
                                         </buttonConfiguration>
                                         <connections>
-                                            <action selector="customSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="1DS-9l-npu"/>
+                                            <action selector="customSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="fIk-FN-mBr"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2Fm-rE-Adc">
-                                        <rect key="frame" x="0.0" y="300" width="374" height="50"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iHA-hs-FJa">
+                                        <rect key="frame" x="0.0" y="360" width="374" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="XOn-ff-nil"/>
+                                            <constraint firstAttribute="height" constant="50" id="mm2-od-gvQ"/>
                                         </constraints>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" title="Error">
                                             <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
                                         </buttonConfiguration>
                                         <connections>
-                                            <action selector="errorSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="FAl-t4-IX6"/>
+                                            <action selector="errorSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="cq4-dB-Wcg"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5h2-SF-4sY">
-                                        <rect key="frame" x="0.0" y="360" width="374" height="50"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UQC-e9-Fgq">
+                                        <rect key="frame" x="0.0" y="420" width="374" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="C8h-vP-3m6"/>
+                                            <constraint firstAttribute="height" constant="50" id="xn9-CB-lbt"/>
                                         </constraints>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" title="BackGround/ForeGround">
                                             <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
                                         </buttonConfiguration>
                                         <connections>
-                                            <action selector="resignActiveSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="ayO-tf-BVj"/>
+                                            <action selector="resignActiveSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="OR7-wO-nS6"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8jV-q7-nw7">
-                                        <rect key="frame" x="0.0" y="420" width="374" height="50"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GsX-Jo-E7l">
+                                        <rect key="frame" x="0.0" y="480" width="374" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="50" id="jDs-ot-MnW"/>
+                                            <constraint firstAttribute="height" constant="50" id="uYI-cr-0rg"/>
                                         </constraints>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" title="Terminate">
                                             <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
                                         </buttonConfiguration>
                                         <connections>
-                                            <action selector="terminateSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="xhb-08-2Yt"/>
+                                            <action selector="terminateSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="U0h-tL-SES"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -587,6 +681,23 @@
                                     <constraint firstItem="3g3-ZV-leD" firstAttribute="leading" secondItem="z2U-r1-Q2t" secondAttribute="leading" id="q7h-ON-fvJ"/>
                                 </constraints>
                             </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="vA9-NB-3ep">
+                                <rect key="frame" x="207" y="708" width="0.0" height="0.0"/>
+                                <subviews>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Success" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QF6-eG-ht2">
+                                        <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <color key="textColor" systemColor="systemGreenColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Failed" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fRU-AB-EeJ">
+                                        <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <color key="textColor" systemColor="systemRedColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Nvy-hG-lYm"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -595,19 +706,23 @@
                             <constraint firstItem="itv-cN-eLj" firstAttribute="top" secondItem="Nvy-hG-lYm" secondAttribute="top" id="Xut-Xc-P4S"/>
                             <constraint firstItem="z2U-r1-Q2t" firstAttribute="leading" secondItem="Nvy-hG-lYm" secondAttribute="leading" constant="20" id="ilM-4Y-fj7"/>
                             <constraint firstItem="Nvy-hG-lYm" firstAttribute="trailing" secondItem="z2U-r1-Q2t" secondAttribute="trailing" constant="20" id="q0C-NL-hmK"/>
+                            <constraint firstItem="vA9-NB-3ep" firstAttribute="top" secondItem="z2U-r1-Q2t" secondAttribute="bottom" constant="30" id="qBF-Yp-1nU"/>
                             <constraint firstItem="itv-cN-eLj" firstAttribute="centerX" secondItem="Nvy-hG-lYm" secondAttribute="centerX" id="xO9-fi-UHb"/>
+                            <constraint firstItem="vA9-NB-3ep" firstAttribute="centerX" secondItem="z2U-r1-Q2t" secondAttribute="centerX" id="zeV-tn-sSV"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="gGB-4e-7Wr"/>
                     <connections>
-                        <outlet property="btnBgFg" destination="5h2-SF-4sY" id="cw1-zC-0w8"/>
-                        <outlet property="btnCustom" destination="n3l-iD-hNS" id="wVo-Nc-7RF"/>
-                        <outlet property="btnError" destination="2Fm-rE-Adc" id="m5f-mE-UFG"/>
+                        <outlet property="btnBgFg" destination="UQC-e9-Fgq" id="Ow1-Tb-qul"/>
+                        <outlet property="btnCustom" destination="ymy-cD-lDo" id="Hcj-Ud-9Pg"/>
+                        <outlet property="btnError" destination="iHA-hs-FJa" id="Df0-iw-aeb"/>
+                        <outlet property="lblFailed" destination="fRU-AB-EeJ" id="Oqg-iL-qfV"/>
+                        <outlet property="lblSuccess" destination="QF6-eG-ht2" id="XEp-Cn-tUz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rXM-Pk-eOx" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1042.0289855072465" y="90.401785714285708"/>
+            <point key="canvasLocation" x="846" y="82"/>
         </scene>
         <!--Cresh On View DidloadVC-->
         <scene sceneID="Rbh-bB-y4g">
@@ -630,6 +745,9 @@
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemGray5Color">
             <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
@@ -641,6 +759,9 @@
         </systemColor>
         <systemColor name="systemPinkColor">
             <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemRedColor">
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemYellowColor">
             <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

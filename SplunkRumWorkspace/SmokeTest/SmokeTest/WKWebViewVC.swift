@@ -8,13 +8,14 @@
 import UIKit
 import WebKit
 import SplunkRum
+import OpenTelemetrySdk
 
 class WKWebViewVC: UIViewController {
 
     @IBOutlet var web: WKWebView!
     
     override func viewDidLoad() {
-        super.viewDidLoad()        
+        super.viewDidLoad()
 //        let link = URL(string:"https://developer.apple.com/videos/play/wwdc2019/239/")!
 //        let request = URLRequest(url: link)
 //        SplunkRum.integrateWithBrowserRum(web)
@@ -35,9 +36,12 @@ class WKWebViewVC: UIViewController {
 
       //  webView.load(request)
         view = webView
+        let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
+        let span = tracer.spanBuilder(spanName: "WebView").startSpan()
         SplunkRum.setGlobalAttributes(["HTML-file-name" : name])
         SplunkRum.integrateWithBrowserRum(webView)
         webView.loadFileURL(htmlUrl, allowingReadAccessTo: htmlUrl)
+        span.end() // or use defer for this
 
         
     }
@@ -53,3 +57,4 @@ class WKWebViewVC: UIViewController {
     */
 
 }
+

@@ -6,27 +6,29 @@
 //
 
 import UIKit
-import SplunkRum
+import Foundation
 import OpenTelemetrySdk
 
-
 class RUMInitializationVC: UIViewController {
+    
+    @IBOutlet weak var lblSuccess: UILabel!
+    @IBOutlet weak var lblFailed: UILabel!
     @IBOutlet weak var btnCustom: UIButton!
     @IBOutlet weak var btnError: UIButton!
     @IBOutlet weak var btnBgFg: UIButton!
-    
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        DispatchQueue.global(qos: .background).async {
-            let server = FileServer(port: 8080)
-            server.start()
-        }
+    }
 
+    @IBAction func btnSDKInitializeValidation(_ sender: Any) {
+        DispatchQueue.main.async {
+            let status = sdk_initialize_validation()
+            self.lblSuccess.isHidden = !status
+            self.lblFailed.isHidden = status
+        }
     }
     
-  
-
     @IBAction func httpCall(_ sender:Any){
         let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "NetworkRequestVC") as? NetworkRequestVC
         self.navigationController?.pushViewController(vc!, animated: true)
@@ -50,8 +52,13 @@ class RUMInitializationVC: UIViewController {
         btnCustom.backgroundColor = UIColor.green
         btnError.backgroundColor = UIColor.systemGray5
         let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
-          let span = tracer.spanBuilder(spanName: "CustomSpan").startSpan()
-          span.end() // or use defer for this
+        let span = tracer.spanBuilder(spanName: "CustomSpan").startSpan()
+        span.end() // or use defer for this
+        DispatchQueue.main.async {
+            let status = customSpan_validation()
+            self.lblSuccess.isHidden = !status
+            self.lblFailed.isHidden = status
+        }
     }
     @IBAction func errorSpan(_ sender:Any){
         btnError.backgroundColor = UIColor.green
@@ -66,6 +73,11 @@ class RUMInitializationVC: UIViewController {
         catch CustomError.notFound {
              //SplunkRum.reportError(string: "File not exist.")
             self.reportStringErrorSpan(e: "File not exist.")
+            DispatchQueue.main.async {
+                let status = errorSpan_validation()
+                self.lblSuccess.isHidden = !status
+                self.lblFailed.isHidden = status
+            }
         }
         catch {
             //other error
@@ -93,27 +105,31 @@ class RUMInitializationVC: UIViewController {
     }
     @IBAction func resignActiveSpan(_ sender:Any){
         btnBgFg.backgroundColor = UIColor.green
-//        if UIApplication.shared.applicationState == .active {
-//            DispatchQueue.main.asyncAfter(deadline: .now()) {
-//                      UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
-//            }
-//        } else if UIApplication.shared.applicationState == .inactive {
-//            DispatchQueue.main.asyncAfter(deadline: .now()) {
-//                      UIApplication.shared.perform(#selector(NSXPCConnection.resume))
-//            }
-//        }
-        
+        DispatchQueue.main.async {
+            let status = resignActiveSpan_validation()
+            self.lblSuccess.isHidden = !status
+            self.lblFailed.isHidden = status
+        }
+    }
+    @IBAction func enterBGSpan(_ sender:Any){
+        btnBgFg.backgroundColor = UIColor.green
+        DispatchQueue.main.async {
+            let status = enterForeGroundSpan_validation()
+            self.lblSuccess.isHidden = !status
+            self.lblFailed.isHidden = status
+        }
     }
     @IBAction func terminateSpan(_ sender:Any){
-                if UIApplication.shared.applicationState == .active {
-                  UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
-                  //UIApplication.shared.perform(#selector(NSXPCConnection.resume))
-                  //UIApplication.shared.perform(#selector(NSXPCConnection.invalidate))
-                  //exit(0)
-                    
-                }
-        
-        //UIApplication.shared.perform(#selector(NSXPCConnection.resume))
+        let now = Date()
+        let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
+        let span = tracer.spanBuilder(spanName: "AppTerminating").setStartTime(time: now).startSpan()
+        span.setAttribute(key: "component", value: "AppLifecycle")
+        span.end(time: now)
+        DispatchQueue.main.async {
+            let status = appTerminateSpan_validation()
+            self.lblSuccess.isHidden = !status
+            self.lblFailed.isHidden = status
+        }
     }
     /*
     // MARK: - Navigation
@@ -141,7 +157,6 @@ struct Log: TextOutputStream {
         }
     }
 }
-
 enum CustomError : Error {
     case notFound
     case incorrectPassword
