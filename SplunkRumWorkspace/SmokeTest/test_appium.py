@@ -10,6 +10,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import sys
 
+BUNDLE_ID = 'com.splunk.opentelemetry.SmokeTest'
+
 class IOSTests(unittest.TestCase):
 
     # set up appium
