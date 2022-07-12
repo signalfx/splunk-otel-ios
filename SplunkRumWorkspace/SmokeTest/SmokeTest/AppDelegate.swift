@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 //        delete_logs()
-        redirectLogToDocuments()
+          redirectLogToDocuments()
 
         _ = SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true,
             globalAttributes: [:], environment: nil, ignoreURLs: nil))

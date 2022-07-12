@@ -8,6 +8,7 @@
 import UIKit
 import Foundation
 import OpenTelemetrySdk
+import SplunkRum
 
 class RUMInitializationVC: UIViewController {
     
@@ -15,7 +16,8 @@ class RUMInitializationVC: UIViewController {
     @IBOutlet weak var lblFailed: UILabel!
     @IBOutlet weak var btnCustom: UIButton!
     @IBOutlet weak var btnError: UIButton!
-    @IBOutlet weak var btnBgFg: UIButton!
+    @IBOutlet weak var btnResignActive: UIButton!
+    @IBOutlet weak var btnEnterForeground: UIButton!
     
     var buttonID = 0
 
@@ -26,6 +28,7 @@ class RUMInitializationVC: UIViewController {
     @IBAction func btnSDKInitializeValidation(_ sender: Any) {
         DispatchQueue.main.async {
             var status = false
+           // var lbl = String(self.buttonID)
             switch self.buttonID {
             case 0:
                 status = sdk_initialize_validation()
@@ -46,6 +49,9 @@ class RUMInitializationVC: UIViewController {
             }
             self.lblSuccess.isHidden = !status
             self.lblFailed.isHidden = status
+            
+//            self.lblSuccess.text = lbl
+//            self.lblFailed.text = lbl
         }
     }
     
@@ -66,6 +72,10 @@ class RUMInitializationVC: UIViewController {
     }
     
     @IBAction func webView(_ sender:Any){
+        let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
+        let span = tracer.spanBuilder(spanName: "WebView").startSpan()
+        SplunkRum.setGlobalAttributes(["HTML-file-name" : "sample1"])
+        span.end() // or use defer for this
         let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "WKWebViewVC") as? WKWebViewVC
         self.navigationController?.pushViewController(vc!, animated: true)
     }
@@ -73,6 +83,9 @@ class RUMInitializationVC: UIViewController {
         buttonID = 5
         btnCustom.backgroundColor = UIColor.green
         btnError.backgroundColor = UIColor.systemGray5
+        btnResignActive.backgroundColor = UIColor.systemGray5
+        btnEnterForeground.backgroundColor = UIColor.systemGray5
+        
         let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
         let span = tracer.spanBuilder(spanName: "CustomSpan").startSpan()
         span.end() // or use defer for this
@@ -82,6 +95,9 @@ class RUMInitializationVC: UIViewController {
         buttonID = 6
         btnError.backgroundColor = UIColor.green
         btnCustom.backgroundColor = UIColor.systemGray5
+        btnResignActive.backgroundColor = UIColor.systemGray5
+        btnEnterForeground.backgroundColor = UIColor.systemGray5
+       
 //        let exception: NSException = NSException(name:NSExceptionName(rawValue: "Error span"), reason:"reason", userInfo:nil)
 //        SplunkRum.reportError(exception: exception)
         do {
@@ -120,12 +136,19 @@ class RUMInitializationVC: UIViewController {
     }
     @IBAction func resignActiveSpan(_ sender:Any){
         buttonID = 7
-        btnBgFg.backgroundColor = UIColor.green
+        btnResignActive.backgroundColor = UIColor.green
+        btnError.backgroundColor = UIColor.systemGray5
+        btnCustom.backgroundColor = UIColor.systemGray5
+        btnEnterForeground.backgroundColor = UIColor.systemGray5
         
     }
     @IBAction func enterBGSpan(_ sender:Any){
         buttonID = 8
-        btnBgFg.backgroundColor = UIColor.green
+        btnEnterForeground.backgroundColor = UIColor.green
+        btnError.backgroundColor = UIColor.systemGray5
+        btnCustom.backgroundColor = UIColor.systemGray5
+        btnResignActive.backgroundColor = UIColor.systemGray5
+       
         
     }
     @IBAction func terminateSpan(_ sender:Any){

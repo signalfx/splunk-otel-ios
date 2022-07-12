@@ -151,7 +151,14 @@ func delete_logs() {
         print("Failed to delete logs...")
     }
 }
-
+func clear_logs() {
+    let text = ""
+    do {
+         try text.write(toFile: LOG_FILE_URL, atomically: false, encoding: .utf8)
+    } catch {
+         print(error)
+    }
+}
 func customSpan_validation()-> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -175,6 +182,7 @@ func errorSpan_validation()-> Bool {
 func resignActiveSpan_validation() -> Bool{
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
+    print(str)
     if str.contains(RESIGNACTIVE_SPAN){
         return true
     } else {

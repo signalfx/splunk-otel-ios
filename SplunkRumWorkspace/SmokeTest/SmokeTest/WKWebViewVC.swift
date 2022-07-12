@@ -13,6 +13,8 @@ import OpenTelemetrySdk
 class WKWebViewVC: UIViewController {
 
     @IBOutlet var web: WKWebView!
+    @IBOutlet weak var lblSuccess: UILabel!
+    @IBOutlet weak var lblFailed: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,28 +22,22 @@ class WKWebViewVC: UIViewController {
 //        let request = URLRequest(url: link)
 //        SplunkRum.integrateWithBrowserRum(web)
 //        web.load(request)
+       
         loadWebView(withFile: "sample1")
     
     }
     
     func loadWebView(withFile name : String){
         print("web view is loading using sample1.html....")
-        let webView = WKWebView(frame: .zero)
+       // let webView = WKWebView(frame: .zero)
         
         let htmlPath = Bundle.main.path(forResource: name, ofType: "html")
 
         let htmlUrl = URL(fileURLWithPath: htmlPath!)
-
-       // let request = URLRequest(url: htmlUrl)
-
-      //  webView.load(request)
-        view = webView
-        let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
-        let span = tracer.spanBuilder(spanName: "WebView").startSpan()
-        SplunkRum.setGlobalAttributes(["HTML-file-name" : name])
-        SplunkRum.integrateWithBrowserRum(webView)
-        webView.loadFileURL(htmlUrl, allowingReadAccessTo: htmlUrl)
-        span.end() // or use defer for this
+        // view = webView
+        SplunkRum.integrateWithBrowserRum(web)
+        web.loadFileURL(htmlUrl, allowingReadAccessTo: htmlUrl)
+        
 
         
     }
@@ -56,5 +52,13 @@ class WKWebViewVC: UIViewController {
     }
     */
 
+    @IBAction func btnSpanValidation(_ sender: Any) {
+        DispatchQueue.main.async {
+            let status = webViewSpan_validation()
+            self.lblSuccess.isHidden = !status
+            self.lblFailed.isHidden = status
+        }
+    }
+    
 }
 

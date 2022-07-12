@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Lb3-tq-7Zr">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <accessibilityOverrides isEnabled="YES"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
@@ -92,24 +93,64 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WzP-h0-RC6">
-                                <rect key="frame" x="20" y="64" width="374" height="778"/>
+                                <rect key="frame" x="20" y="64" width="374" height="683"/>
                                 <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Oja-hm-E46">
+                                <rect key="frame" x="20" y="753" width="374" height="36"/>
+                                <color key="backgroundColor" systemColor="systemBlueColor"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Span Validation">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="btnSpanValidation:" destination="GaV-9f-Gn1" eventType="touchUpInside" id="HBe-LQ-yVf"/>
+                                </connections>
+                            </button>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="IR8-Nj-p3K">
+                                <rect key="frame" x="207" y="802" width="0.0" height="30"/>
+                                <subviews>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Success" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3d4-63-Jl9">
+                                        <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <color key="textColor" systemColor="systemGreenColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Failed" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="P6m-SI-AYb">
+                                        <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <color key="textColor" systemColor="systemRedColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="teq-b1-Ppd"/>
+                                </constraints>
+                            </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Hj4-gi-wOC"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="WzP-h0-RC6" firstAttribute="leading" secondItem="Hj4-gi-wOC" secondAttribute="leading" constant="20" id="0aM-x5-sUo"/>
-                            <constraint firstItem="Hj4-gi-wOC" firstAttribute="bottom" secondItem="WzP-h0-RC6" secondAttribute="bottom" constant="20" id="JNT-EY-XnB"/>
-                            <constraint firstItem="WzP-h0-RC6" firstAttribute="top" secondItem="Hj4-gi-wOC" secondAttribute="top" constant="20" id="LhG-PO-Sh7"/>
-                            <constraint firstItem="Hj4-gi-wOC" firstAttribute="trailing" secondItem="WzP-h0-RC6" secondAttribute="trailing" constant="20" id="bE5-FI-9wL"/>
+                            <constraint firstItem="WzP-h0-RC6" firstAttribute="top" secondItem="Hj4-gi-wOC" secondAttribute="top" constant="20" id="7PY-aS-yYy"/>
+                            <constraint firstItem="Hj4-gi-wOC" firstAttribute="bottom" secondItem="IR8-Nj-p3K" secondAttribute="bottom" constant="30" id="8Ne-KA-Iry"/>
+                            <constraint firstItem="Oja-hm-E46" firstAttribute="leading" secondItem="Hj4-gi-wOC" secondAttribute="leading" constant="20" id="OoK-3f-OKF"/>
+                            <constraint firstItem="WzP-h0-RC6" firstAttribute="leading" secondItem="Hj4-gi-wOC" secondAttribute="leading" constant="20" id="Qgk-bo-9Ye"/>
+                            <constraint firstItem="IR8-Nj-p3K" firstAttribute="centerX" secondItem="Hj4-gi-wOC" secondAttribute="centerX" id="chM-iz-qze"/>
+                            <constraint firstItem="Hj4-gi-wOC" firstAttribute="trailing" secondItem="Oja-hm-E46" secondAttribute="trailing" constant="20" id="pZY-Fs-AXg"/>
+                            <constraint firstItem="IR8-Nj-p3K" firstAttribute="top" secondItem="Oja-hm-E46" secondAttribute="bottom" constant="13" id="qy3-lF-e4a"/>
+                            <constraint firstItem="Oja-hm-E46" firstAttribute="top" secondItem="WzP-h0-RC6" secondAttribute="bottom" constant="6" id="tmm-Yw-LFt"/>
+                            <constraint firstItem="Hj4-gi-wOC" firstAttribute="trailing" secondItem="WzP-h0-RC6" secondAttribute="trailing" constant="20" id="vmc-qO-bmz"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="lblFailed" destination="P6m-SI-AYb" id="TLT-qT-vSB"/>
+                        <outlet property="lblSuccess" destination="3d4-63-Jl9" id="cnZ-2q-MrE"/>
                         <outlet property="web" destination="WzP-h0-RC6" id="Mcj-s4-a4D"/>
                     </connections>
                 </viewController>
@@ -179,7 +220,7 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="CustomCell" rowHeight="80" id="Jtq-AN-g4E" customClass="CustomCell" customModule="SmokeTest" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="44.5" width="414" height="80"/>
+                                        <rect key="frame" x="0.0" y="50" width="414" height="80"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Jtq-AN-g4E" id="5jd-rg-ktN">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="80"/>
@@ -543,7 +584,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="z2U-r1-Q2t">
-                                <rect key="frame" x="20" y="148" width="374" height="530"/>
+                                <rect key="frame" x="20" y="148" width="374" height="590"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3g3-ZV-leD">
                                         <rect key="frame" x="0.0" y="0.0" width="374" height="50"/>
@@ -651,15 +692,29 @@
                                             <constraint firstAttribute="height" constant="50" id="xn9-CB-lbt"/>
                                         </constraints>
                                         <state key="normal" title="Button"/>
-                                        <buttonConfiguration key="configuration" style="plain" title="BackGround/ForeGround">
+                                        <buttonConfiguration key="configuration" style="plain" title="Resign Active">
                                             <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
                                         </buttonConfiguration>
                                         <connections>
                                             <action selector="resignActiveSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="OR7-wO-nS6"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GsX-Jo-E7l">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jjj-Co-oOX">
                                         <rect key="frame" x="0.0" y="480" width="374" height="50"/>
+                                        <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="50" id="O2V-Jd-8Hg"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Enter ForeGround">
+                                            <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="enterBGSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="gGo-ut-j9U"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GsX-Jo-E7l">
+                                        <rect key="frame" x="0.0" y="540" width="374" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="uYI-cr-0rg"/>
@@ -682,7 +737,7 @@
                                 </constraints>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="vA9-NB-3ep">
-                                <rect key="frame" x="207" y="708" width="0.0" height="0.0"/>
+                                <rect key="frame" x="207" y="768" width="0.0" height="0.0"/>
                                 <subviews>
                                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Success" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QF6-eG-ht2">
                                         <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>
@@ -713,9 +768,10 @@
                     </view>
                     <navigationItem key="navigationItem" id="gGB-4e-7Wr"/>
                     <connections>
-                        <outlet property="btnBgFg" destination="UQC-e9-Fgq" id="Ow1-Tb-qul"/>
                         <outlet property="btnCustom" destination="ymy-cD-lDo" id="Hcj-Ud-9Pg"/>
+                        <outlet property="btnEnterForeground" destination="jjj-Co-oOX" id="k6C-G3-3z7"/>
                         <outlet property="btnError" destination="iHA-hs-FJa" id="Df0-iw-aeb"/>
+                        <outlet property="btnResignActive" destination="UQC-e9-Fgq" id="7B8-wf-wPi"/>
                         <outlet property="lblFailed" destination="fRU-AB-EeJ" id="Oqg-iL-qfV"/>
                         <outlet property="lblSuccess" destination="QF6-eG-ht2" id="XEp-Cn-tUz"/>
                     </connections>
