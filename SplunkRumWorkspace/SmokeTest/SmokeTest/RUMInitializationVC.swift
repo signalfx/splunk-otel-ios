@@ -16,6 +16,8 @@ class RUMInitializationVC: UIViewController {
     @IBOutlet weak var btnCustom: UIButton!
     @IBOutlet weak var btnError: UIButton!
     @IBOutlet weak var btnBgFg: UIButton!
+    
+    var buttonID = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +25,25 @@ class RUMInitializationVC: UIViewController {
 
     @IBAction func btnSDKInitializeValidation(_ sender: Any) {
         DispatchQueue.main.async {
-            let status = sdk_initialize_validation()
+            var status = false
+            switch self.buttonID {
+            case 0:
+                status = sdk_initialize_validation()
+            case 2:
+                status = crashSpan_validation()
+            case 5:
+                status = customSpan_validation()
+            case 6:
+                status = errorSpan_validation()
+            case 7:
+                status = resignActiveSpan_validation()
+            case 8:
+                status = enterForeGroundSpan_validation()
+            case 9:
+                status = appTerminateSpan_validation()
+            default:
+                status = false
+            }
             self.lblSuccess.isHidden = !status
             self.lblFailed.isHidden = status
         }
@@ -35,6 +55,7 @@ class RUMInitializationVC: UIViewController {
     }
     
     @IBAction func forceCrash(_ sender:Any){
+        buttonID = 2
         let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "CrashVC") as? CrashVC
         self.navigationController?.pushViewController(vc!, animated: true)
     }
@@ -49,18 +70,16 @@ class RUMInitializationVC: UIViewController {
         self.navigationController?.pushViewController(vc!, animated: true)
     }
     @IBAction func customSpan(_ sender:Any){
+        buttonID = 5
         btnCustom.backgroundColor = UIColor.green
         btnError.backgroundColor = UIColor.systemGray5
         let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
         let span = tracer.spanBuilder(spanName: "CustomSpan").startSpan()
         span.end() // or use defer for this
-        DispatchQueue.main.async {
-            let status = customSpan_validation()
-            self.lblSuccess.isHidden = !status
-            self.lblFailed.isHidden = status
-        }
+        
     }
     @IBAction func errorSpan(_ sender:Any){
+        buttonID = 6
         btnError.backgroundColor = UIColor.green
         btnCustom.backgroundColor = UIColor.systemGray5
 //        let exception: NSException = NSException(name:NSExceptionName(rawValue: "Error span"), reason:"reason", userInfo:nil)
@@ -73,11 +92,7 @@ class RUMInitializationVC: UIViewController {
         catch CustomError.notFound {
              //SplunkRum.reportError(string: "File not exist.")
             self.reportStringErrorSpan(e: "File not exist.")
-            DispatchQueue.main.async {
-                let status = errorSpan_validation()
-                self.lblSuccess.isHidden = !status
-                self.lblFailed.isHidden = status
-            }
+        
         }
         catch {
             //other error
@@ -104,32 +119,23 @@ class RUMInitializationVC: UIViewController {
         }
     }
     @IBAction func resignActiveSpan(_ sender:Any){
+        buttonID = 7
         btnBgFg.backgroundColor = UIColor.green
-        DispatchQueue.main.async {
-            let status = resignActiveSpan_validation()
-            self.lblSuccess.isHidden = !status
-            self.lblFailed.isHidden = status
-        }
+        
     }
     @IBAction func enterBGSpan(_ sender:Any){
+        buttonID = 8
         btnBgFg.backgroundColor = UIColor.green
-        DispatchQueue.main.async {
-            let status = enterForeGroundSpan_validation()
-            self.lblSuccess.isHidden = !status
-            self.lblFailed.isHidden = status
-        }
+        
     }
     @IBAction func terminateSpan(_ sender:Any){
+        buttonID = 9
         let now = Date()
         let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
         let span = tracer.spanBuilder(spanName: "AppTerminating").setStartTime(time: now).startSpan()
         span.setAttribute(key: "component", value: "AppLifecycle")
         span.end(time: now)
-        DispatchQueue.main.async {
-            let status = appTerminateSpan_validation()
-            self.lblSuccess.isHidden = !status
-            self.lblFailed.isHidden = status
-        }
+        
     }
     /*
     // MARK: - Navigation
