@@ -178,7 +178,86 @@ class IOSTests(unittest.TestCase):
         WebDriverWait(self.driver, 5).until(
             EC.element_to_be_clickable((By.ID, "Success")),
             message='Span validation failed',
-        )    
+        )  
+        
+    ''' 
+    Validating Error/Exception span.
+    '''
+    def test_ErrorSpanClick(self):
+        self.driver.find_element(By.ID,"Error").click()
+        sleep(5)
+        self.driver.find_element(By.ID,"SDK Initialize validation").click()
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "Success")),
+            message='Span validation failed',
+        )
+
+    ''' 
+    Validating resignactive span.
+    '''
+    def test_ResignActiveSpanClick(self):
+        self.driver.find_element(By.ID,"BackGround/ForeGround").click()
+        self.driver.background_app(10)
+        self.driver.activate_app(BUNDLE_ID)
+        sleep(5)
+        self.driver.find_element(By.ID,"SDK Initialize validation").click()
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "Success")),
+            message='Span validation failed',
+        )
+
+    ''' 
+    Validating enterforeground span.
+    '''
+    def test_EnterForeGroundSpanClick(self):
+        self.driver.find_element(By.ID,"BackGround/ForeGround").click()
+        self.driver.background_app(10)
+        self.driver.activate_app(BUNDLE_ID)
+        sleep(5)
+        self.driver.find_element(By.ID,"SDK Initialize validation").click()
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "Success")),
+            message='Span validation failed',
+        )
+
+    ''' 
+    Validating webview span.
+    '''
+    def test_WebViewClick(self):
+        self.driver.find_element(By.ID,"WKWebView").click()
+        sleep(5)
+        self.driver.find_element(By.ID,"SDK Initialize validation").click()
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "Success")),
+            message='Span validation failed',
+        )
+
+    ''' 
+    Validating AppTerminate span.
+    '''
+    def test_AppTerminateSpanClick(self):
+        self.driver.find_element(By.ID,"Terminate").click()
+        sleep(5)
+        self.driver.find_element(By.ID,"SDK Initialize validation").click()
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "Success")),
+            message='Span validation failed',
+        )
+        
+    ''' 
+    Validating crash span.
+    '''
+    def test_CrashOnViewLoadClick(self):
+        self.driver.find_element(By.ID,"Crash").click();
+        self.driver.find_element(By.ID,"Crash on ViewDidload").click();
+        self.driver.activate_app(BUNDLE_ID)
+        sleep(5)
+        self.driver.find_element(By.ID,"SDK Initialize validation").click()
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "Success")),
+            message='Span validation failed',
+        )
+
      
     def validate_span(self):
         sleep(10);
