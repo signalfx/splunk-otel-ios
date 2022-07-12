@@ -86,7 +86,6 @@ func sdk_initialize_validation() -> Bool {
 func method_post_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
-    print(str)
     if str.contains(POST_SPAN) && str.contains(NETWORK_CALL_POST_URL) {
         return true
     } else {
