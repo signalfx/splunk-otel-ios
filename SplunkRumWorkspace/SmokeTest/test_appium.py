@@ -222,17 +222,18 @@ class IOSTests(unittest.TestCase):
 #             message='Span validation failed',
 #         )
 
-#     ''' 
-#     Validating webview span.
-#     '''
-#     def test_WebViewClick(self):
-#         self.driver.find_element(By.ID,"WKWebView").click()
-#         sleep(5)
-#         self.driver.find_element(By.ID,"SDK Initialize validation").click()
-#         WebDriverWait(self.driver, 5).until(
-#             EC.element_to_be_clickable((By.ID, "Success")),
-#             message='Span validation failed',
-#         )
+    ''' 
+    Validating webview span.
+    '''
+    def test_WebViewClick(self):
+        self.driver.find_element(By.ID,"WKWebView").click()
+        sleep(5)
+        self.driver.find_element(By.ID,"Span Validation").click();
+        WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "Success")),
+            message='Span validation failed',
+        )
+        
 
     ''' 
     Validating AppTerminate span.
