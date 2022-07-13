@@ -26,7 +26,7 @@ class RUMInitializationVC: UIViewController {
     }
 
     @IBAction func btnSDKInitializeValidation(_ sender: Any) {
-        DispatchQueue.main.async {
+       // DispatchQueue.main.async {
             var status = false
            // var lbl = String(self.buttonID)
             switch self.buttonID {
@@ -52,7 +52,7 @@ class RUMInitializationVC: UIViewController {
             
 //            self.lblSuccess.text = lbl
 //            self.lblFailed.text = lbl
-        }
+     //   }
     }
     
     @IBAction func httpCall(_ sender:Any){
