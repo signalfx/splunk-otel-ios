@@ -24,12 +24,10 @@ class RUMInitializationVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-
-    @IBAction func btnSDKInitializeValidation(_ sender: Any) {
-       // DispatchQueue.main.async {
-            var status = false
-           // var lbl = String(self.buttonID)
-            switch self.buttonID {
+    
+    func validateSpans() -> Bool{
+        var status = false
+        switch self.buttonID {
             case 0:
                 status = sdk_initialize_validation()
             case 2:
@@ -46,14 +44,52 @@ class RUMInitializationVC: UIViewController {
                 status = appTerminateSpan_validation()
             default:
                 status = false
+        }
+        return status
+    }
+
+    @IBAction func btnSDKInitializeValidation(_ sender: Any) {
+        
+        var status = validateSpans()
+        if !status {
+            // If it is failing check one more time
+            status = validateSpans()
+        }
+        self.lblSuccess.isHidden = !status
+        self.lblFailed.isHidden = status
+    }
+      
+   /* @IBAction func btnSDKInitializeValidation(_ sender: Any) {
+        DispatchQueue.main.async {
+            var status = false
+           // var lbl = String(self.buttonID)
+            switch self.buttonID {
+                case 0:
+                    status = sdk_initialize_validation()
+                case 2:
+                    status = crashSpan_validation()
+                case 5:
+                    status = customSpan_validation()
+                case 6:
+                    status = errorSpan_validation()
+                case 7:
+                    status = resignActiveSpan_validation()
+                case 8:
+                    status = enterForeGroundSpan_validation()
+                case 9:
+                    status = appTerminateSpan_validation()
+                default:
+                    status = false
             }
+        
+        
             self.lblSuccess.isHidden = !status
             self.lblFailed.isHidden = status
             
 //            self.lblSuccess.text = lbl
 //            self.lblFailed.text = lbl
-     //   }
-    }
+        }
+    }*/
     
     @IBAction func httpCall(_ sender:Any){
         let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "NetworkRequestVC") as? NetworkRequestVC
