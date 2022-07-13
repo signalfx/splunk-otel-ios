@@ -3,8 +3,6 @@ on: [push]
 env:
   SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
   SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
-  SAUCE_PROXY_LOCALHOST: True
-  SAUCE_PROXY: 'http://localhost:8080'
   resourceGroup: ${GITHUB_SHA}
 jobs:
   full-build:
@@ -12,7 +10,7 @@ jobs:
     strategy:
         matrix:
          os: ['15.0','15.2']
-         device: ['iPhone 13 Simulator','iPhone 7 Simulator']
+         device: ['iPhone 13 Simulator','iPhone 8 Simulator']
     steps:
       - name: Checkout
         uses: actions/checkout@v1
