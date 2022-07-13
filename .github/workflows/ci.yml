@@ -9,8 +9,8 @@ jobs:
     runs-on: macOS-latest
     strategy:
         matrix:
-         os: ['15.0','15.2']
-         device: ['iPhone 13 Simulator','iPhone 8 Simulator']
+         os: ['15.0']
+         device: ['iPhone 13 Simulator']
     steps:
       - name: Checkout
         uses: actions/checkout@v1
