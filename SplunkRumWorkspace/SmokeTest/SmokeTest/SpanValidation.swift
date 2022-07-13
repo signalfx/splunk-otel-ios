@@ -132,6 +132,8 @@ func read_log_file() -> (content:String,error:Bool) {
 
     if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
         let fileURL = dir.appendingPathComponent(file)
+        print("#########")
+        print(fileURL)
         do {
             let fileContent = try String(contentsOf: fileURL, encoding: .utf8)
             return (content:fileContent,error:false)
