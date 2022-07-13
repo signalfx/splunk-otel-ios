@@ -54,6 +54,10 @@ class RUMInitializationVC: UIViewController {
         if !status {
             // If it is failing check one more time
             status = validateSpans()
+            if !status {
+                // If it is failing check one more time
+                status = validateSpans()
+            }
         }
         self.lblSuccess.isHidden = !status
         self.lblFailed.isHidden = status
