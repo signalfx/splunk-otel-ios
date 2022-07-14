@@ -9,25 +9,16 @@ env:
 jobs:
   full-build:
     runs-on: macOS-latest
-    strategy:
-        matrix:
-         os: ['13.0','13.4']
-         device: ['iPhone XS Max Simulator','iPhone 8 Plus Simulator']
     steps:
       - name: Checkout
         uses: actions/checkout@v1
         with:
           ref: feature/APMI-1779-Automated-test-case
-      #- name: Full Build
-        #run: ./fullbuild.sh
+    
       - name: Smoke Test
         run: | 
          ./smoketest.sh 
-#       - name: uploading zip
-#         uses: actions/upload-artifact@v3
-#         with:
-#           name: SmokeTest
-#           path: /Users/runner/work/splunk-otel-ios/splunk-otel-ios/SmokeTest.zip
+
       - name: Uploading app on sauce lab
         run: |
            cd /Users/runner/work/splunk-otel-ios/splunk-otel-ios/
@@ -41,6 +32,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8 #install the python needed
+          
+  sauce-lab:
+    runs-on: macOS-latest
+    strategy:
+        matrix:
+         os: ['15.0',15.2]
+         device: ['iPhone 13 Simulator','iPhone 11 Simulator']
+    steps:
       - name: execute py script # run the run.py to get the latest data
         working-directory: SplunkRumWorkspace
         run: |
