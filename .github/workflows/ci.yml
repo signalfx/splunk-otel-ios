@@ -29,10 +29,10 @@ jobs:
              --form 'payload=@"SmokeTest.zip"' \
              --form 'name="SmokeTest.zip"' \
              --form 'description="'"${{ env.resourceGroup }}"'"'  
-      - name: setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8 #install the python needed
+#       - name: setup python
+#         uses: actions/setup-python@v2
+#         with:
+#           python-version: 3.8 #install the python needed
           
   sauce-lab:
     needs: build  
@@ -47,6 +47,10 @@ jobs:
         uses: actions/checkout@v1
         with:
           ref: feature/APMI-1779-Automated-test-case
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8 #install the python needed
   
       - name: execute py script # run the run.py to get the latest data
         working-directory: SplunkRumWorkspace
