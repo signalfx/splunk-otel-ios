@@ -8,6 +8,7 @@ env:
   resourceGroup: ${GITHUB_SHA}
 jobs:
   full-build:
+    name: full-build
     runs-on: macOS-latest
     steps:
       - name: Checkout
@@ -34,8 +35,10 @@ jobs:
           python-version: 3.8 #install the python needed
           
   sauce-lab:
+    needs: full-build
     runs-on: macOS-latest
     strategy:
+        fail-fast: false
         matrix:
          os: ['15.0',15.2]
          device: ['iPhone 13 Simulator','iPhone 11 Simulator']
