@@ -7,8 +7,8 @@ env:
   SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
   resourceGroup: ${GITHUB_SHA}
 jobs:
-  full-build:
-    name: full-build
+  build:
+    name: build
     runs-on: macOS-latest
     steps:
       - name: Checkout
@@ -35,7 +35,7 @@ jobs:
           python-version: 3.8 #install the python needed
           
   sauce-lab:
-    needs: full-build
+    needs: build
     runs-on: macOS-latest
     strategy:
         fail-fast: false
