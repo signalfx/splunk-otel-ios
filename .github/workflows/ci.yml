@@ -40,8 +40,8 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
-         os: ['15.0',15.2]
-         device: ['iPhone 13 Simulator','iPhone 11 Simulator']
+         os: ['13.0','13.4']
+         device: ['iPhone XS Max Simulator','iPhone 8 Plus Simulator']
     steps:
       - name: Checkout
         uses: actions/checkout@v1
