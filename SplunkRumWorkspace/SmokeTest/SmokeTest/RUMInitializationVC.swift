@@ -122,9 +122,9 @@ class RUMInitializationVC: UIViewController {
     @IBAction func customSpan(_ sender:Any){
         buttonID = 5
         btnCustom.backgroundColor = UIColor.green
-        btnError.backgroundColor = UIColor.systemGray5
-        btnResignActive.backgroundColor = UIColor.systemGray5
-        btnEnterForeground.backgroundColor = UIColor.systemGray5
+        btnError.backgroundColor = UIColor.gray
+        btnResignActive.backgroundColor = UIColor.gray
+        btnEnterForeground.backgroundColor = UIColor.gray
         
         let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
         let span = tracer.spanBuilder(spanName: "CustomSpan").startSpan()
@@ -134,9 +134,9 @@ class RUMInitializationVC: UIViewController {
     @IBAction func errorSpan(_ sender:Any){
         buttonID = 6
         btnError.backgroundColor = UIColor.green
-        btnCustom.backgroundColor = UIColor.systemGray5
-        btnResignActive.backgroundColor = UIColor.systemGray5
-        btnEnterForeground.backgroundColor = UIColor.systemGray5
+        btnCustom.backgroundColor = UIColor.gray
+        btnResignActive.backgroundColor = UIColor.gray
+        btnEnterForeground.backgroundColor = UIColor.gray
        
 //        let exception: NSException = NSException(name:NSExceptionName(rawValue: "Error span"), reason:"reason", userInfo:nil)
 //        SplunkRum.reportError(exception: exception)
@@ -177,17 +177,17 @@ class RUMInitializationVC: UIViewController {
     @IBAction func resignActiveSpan(_ sender:Any){
         buttonID = 7
         btnResignActive.backgroundColor = UIColor.green
-        btnError.backgroundColor = UIColor.systemGray5
-        btnCustom.backgroundColor = UIColor.systemGray5
-        btnEnterForeground.backgroundColor = UIColor.systemGray5
+        btnError.backgroundColor = UIColor.gray
+        btnCustom.backgroundColor = UIColor.gray
+        btnEnterForeground.backgroundColor = UIColor.gray
         
     }
     @IBAction func enterBGSpan(_ sender:Any){
         buttonID = 8
         btnEnterForeground.backgroundColor = UIColor.green
-        btnError.backgroundColor = UIColor.systemGray5
-        btnCustom.backgroundColor = UIColor.systemGray5
-        btnResignActive.backgroundColor = UIColor.systemGray5
+        btnError.backgroundColor = UIColor.gray
+        btnCustom.backgroundColor = UIColor.gray
+        btnResignActive.backgroundColor = UIColor.gray
        
         
     }

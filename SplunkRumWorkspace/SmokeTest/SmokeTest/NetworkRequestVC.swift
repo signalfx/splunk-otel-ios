@@ -59,8 +59,8 @@ class NetworkRequestVC: UIViewController {
         })
         
         btnurlsession.backgroundColor = UIColor.green
-        btnAlamofire.backgroundColor = UIColor.systemGray5
-        btnAFNetworking.backgroundColor = UIColor.systemGray5
+        btnAlamofire.backgroundColor = UIColor.gray
+        btnAFNetworking.backgroundColor = UIColor.gray
         reloadNetWorkCallView()
     }
     
@@ -70,9 +70,9 @@ class NetworkRequestVC: UIViewController {
                 options: .transitionCrossDissolve,
                 animations: {self.networkCallView.isHidden = false
         })
-        btnurlsession.backgroundColor = UIColor.systemGray5
+        btnurlsession.backgroundColor = UIColor.gray
         btnAlamofire.backgroundColor = UIColor.green
-        btnAFNetworking.backgroundColor = UIColor.systemGray5
+        btnAFNetworking.backgroundColor = UIColor.gray
         reloadNetWorkCallView()
     }
     
@@ -82,8 +82,8 @@ class NetworkRequestVC: UIViewController {
                           options: .transitionCrossDissolve,
                           animations: {self.networkCallView.isHidden = false
                       })
-        btnurlsession.backgroundColor = UIColor.systemGray5
-        btnAlamofire.backgroundColor = UIColor.systemGray5
+        btnurlsession.backgroundColor = UIColor.gray
+        btnAlamofire.backgroundColor = UIColor.gray
         btnAFNetworking.backgroundColor = UIColor.green
         reloadNetWorkCallView()
     }
