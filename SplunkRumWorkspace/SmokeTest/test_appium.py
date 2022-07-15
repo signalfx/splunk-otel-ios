@@ -25,7 +25,7 @@ class IOSTests(unittest.TestCase):
         caps['appium:deviceName'] = sys.argv[2]
         caps['appium:platformVersion'] = sys.argv[1]
         caps['sauce:options'] = {}
-        caps['sauce:options']['appiumVersion'] = '1.22.3'
+        #caps['sauce:options']['appiumVersion'] = '1.22.3'
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
         caps['sauce:options']['name'] = 'Platform Configurator Job ' + currentTime
         
@@ -54,113 +54,113 @@ class IOSTests(unittest.TestCase):
             message='Span validation failed',
         )
 
-    ''' 
-    Generating the POST network request with the URLSession and Validating the network span data.
-    '''
-    def test_API_PostClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"URLSession").click();
-        self.driver.find_element(By.ID,"post").click();
-        self.validate_span();
+#     ''' 
+#     Generating the POST network request with the URLSession and Validating the network span data.
+#     '''
+#     def test_API_PostClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"URLSession").click();
+#         self.driver.find_element(By.ID,"post").click();
+#         self.validate_span();
 
-    ''' 
-    Generating the GET network request with the URLSession and Validating the network span data.
-    '''
-    def test_API_GetClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"URLSession").click();
-        self.driver.find_element(By.ID,"get").click();
-        self.validate_span();
+#     ''' 
+#     Generating the GET network request with the URLSession and Validating the network span data.
+#     '''
+#     def test_API_GetClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"URLSession").click();
+#         self.driver.find_element(By.ID,"get").click();
+#         self.validate_span();
 
-    ''' 
-    Generating the PUT network request with the URLSession and Validating the network span data.
-    '''
-    def test_API_PutClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"URLSession").click();
-        self.driver.find_element(By.ID,"put").click();
-        self.validate_span();
+#     ''' 
+#     Generating the PUT network request with the URLSession and Validating the network span data.
+#     '''
+#     def test_API_PutClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"URLSession").click();
+#         self.driver.find_element(By.ID,"put").click();
+#         self.validate_span();
         
-    ''' 
-    Generating the DELETE network request with the URLSession and Validating the network span data.
-    '''
-    def test_API_DeleteClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"URLSession").click();
-        self.driver.find_element(By.ID,"delete").click();
-        self.validate_span();
+#     ''' 
+#     Generating the DELETE network request with the URLSession and Validating the network span data.
+#     '''
+#     def test_API_DeleteClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"URLSession").click();
+#         self.driver.find_element(By.ID,"delete").click();
+#         self.validate_span();
         
-    ''' 
-    Generating the POST network request with the Alamofire and Validating the network span data.
-    '''
-    def test_Alamofire_PostClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"Alamofire").click();
-        self.driver.find_element(By.ID,"post").click();
-        self.validate_span();
+#     ''' 
+#     Generating the POST network request with the Alamofire and Validating the network span data.
+#     '''
+#     def test_Alamofire_PostClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"Alamofire").click();
+#         self.driver.find_element(By.ID,"post").click();
+#         self.validate_span();
         
-    ''' 
-    Generating the GET network request with the Alamofire and Validating the network span data.
-    '''    
-    def test_Alamofire_GetClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"Alamofire").click();
-        self.driver.find_element(By.ID,"get").click();
-        self.validate_span();
+#     ''' 
+#     Generating the GET network request with the Alamofire and Validating the network span data.
+#     '''    
+#     def test_Alamofire_GetClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"Alamofire").click();
+#         self.driver.find_element(By.ID,"get").click();
+#         self.validate_span();
         
-    ''' 
-    Generating the PUT network request with the Alamofire and Validating the network span data.
-    '''
-    def test_Alamofire_PutClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"Alamofire").click();
-        self.driver.find_element(By.ID,"put").click();
-        self.validate_span();
+#     ''' 
+#     Generating the PUT network request with the Alamofire and Validating the network span data.
+#     '''
+#     def test_Alamofire_PutClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"Alamofire").click();
+#         self.driver.find_element(By.ID,"put").click();
+#         self.validate_span();
         
-    ''' 
-    Generating the DELETE network request with the Alamofire and Validating the network span data.
-    '''   
-    def test_Alamofire_DeleteClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"Alamofire").click();
-        self.driver.find_element(By.ID,"delete").click();
-        self.validate_span();
+#     ''' 
+#     Generating the DELETE network request with the Alamofire and Validating the network span data.
+#     '''   
+#     def test_Alamofire_DeleteClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"Alamofire").click();
+#         self.driver.find_element(By.ID,"delete").click();
+#         self.validate_span();
         
-    ''' 
-    Generating the POST network request with the AFNetworking and Validating the network span data.
-    ''' 
-    def test_AFNetworking_PostClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"AFNetworking").click();
-        self.driver.find_element(By.ID,"post").click();
-        self.validate_span();
+#     ''' 
+#     Generating the POST network request with the AFNetworking and Validating the network span data.
+#     ''' 
+#     def test_AFNetworking_PostClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"AFNetworking").click();
+#         self.driver.find_element(By.ID,"post").click();
+#         self.validate_span();
         
-    ''' 
-    Generating the GET network request with the AFNetworking and Validating the network span data.
-    '''   
-    def test_AFNetworking_GetClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"AFNetworking").click();
-        self.driver.find_element(By.ID,"get").click();
-        self.validate_span();
+#     ''' 
+#     Generating the GET network request with the AFNetworking and Validating the network span data.
+#     '''   
+#     def test_AFNetworking_GetClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"AFNetworking").click();
+#         self.driver.find_element(By.ID,"get").click();
+#         self.validate_span();
         
-    ''' 
-    Generating the PUT network request with the AFNetworking and Validating the network span data.
-    '''     
-    def test_AFNetworking_PutClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"AFNetworking").click();
-        self.driver.find_element(By.ID,"put").click();
-        self.validate_span();
+#     ''' 
+#     Generating the PUT network request with the AFNetworking and Validating the network span data.
+#     '''     
+#     def test_AFNetworking_PutClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"AFNetworking").click();
+#         self.driver.find_element(By.ID,"put").click();
+#         self.validate_span();
 
-    ''' 
-    Generating the DELETE network request with the AFNetworking and Validating the network span data.
-    '''     
-    def test_AFNetworking_DeleteClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"AFNetworking").click();
-        self.driver.find_element(By.ID,"delete").click();
-        self.validate_span();
+#     ''' 
+#     Generating the DELETE network request with the AFNetworking and Validating the network span data.
+#     '''     
+#     def test_AFNetworking_DeleteClick(self):
+#         self.driver.find_element(By.ID,"Network Request").click();
+#         self.driver.find_element(By.ID,"AFNetworking").click();
+#         self.driver.find_element(By.ID,"delete").click();
+#         self.validate_span();
 
     ''' 
     Generating the screen navigation data and Validating span data.
