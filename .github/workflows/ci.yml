@@ -29,10 +29,6 @@ jobs:
              --form 'payload=@"SmokeTest.zip"' \
              --form 'name="SmokeTest.zip"' \
              --form 'description="'"${{ env.resourceGroup }}"'"'  
-#       - name: setup python
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: 3.8 #install the python needed
           
   sauce-lab:
     needs: build  
@@ -40,8 +36,8 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
-         os: ['15.0']
-         device: ['iPhone SE (3rd generation) Simulator']
+         os: ['15.0','15.2']
+         device: ['iPhone 13 Simulator','iPhone 11 Simulator']
     steps:
       - name: Checkout
         uses: actions/checkout@v1
