@@ -25,11 +25,11 @@ class IOSTests(unittest.TestCase):
         caps['appium:deviceName'] = sys.argv[2]
         caps['appium:platformVersion'] = sys.argv[1]
         caps['sauce:options'] = {}
-        #caps['sauce:options']['appiumVersion'] = '1.22.3'
+        caps['sauce:options']['appiumVersion'] = '1.9.1'    #'1.22.3'
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
         caps['sauce:options']['name'] = 'Platform Configurator Job ' + currentTime
         #caps['USE_PREBUILT_WDA'] = 'true'
-        caps["idle-timeout"] = "180"
+        #caps["idle-timeout"] = "180"
         
         url = 'https://sso-splunk.saucelabs.com-shattimare:aee7320d-0d97-469d-a6a4-3d4c1ed6c5f0@ondemand.us-west-1.saucelabs.com:443/wd/hub'
         self.driver=webdriver.Remote(url,caps)
