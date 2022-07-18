@@ -234,10 +234,11 @@ class IOSTests(unittest.TestCase):
     def validate_more_spans(self):
         sleep(25)
         self.driver.find_element(By.ID,"SDK Initialize validation").click()
-        WebDriverWait(self.driver, 25).until(
-            EC.element_to_be_clickable((By.ID, "Success")),
-            message='Span validation failed',
-        )    
+        self.driver.find_element(By.ID,"Success")
+#         WebDriverWait(self.driver, 25).until(
+#             EC.element_to_be_clickable((By.ID, "Success")),
+#             message='Span validation failed',
+#         )    
         
    
 if __name__ == "__main__":
