@@ -8,6 +8,7 @@ from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from appium.webdriver.common.appiumby import AppiumBy
 import sys
 
 BUNDLE_ID = 'com.splunk.opentelemetry.SmokeTest'
@@ -25,7 +26,7 @@ class IOSTests(unittest.TestCase):
         caps['appium:deviceName'] = sys.argv[2]
         caps['appium:platformVersion'] = sys.argv[1]
         caps['sauce:options'] = {}
-        caps['sauce:options']['appiumVersion'] = '1.9.1'    #'1.22.3'
+        #caps['sauce:options']['appiumVersion'] = '1.9.1'    #'1.22.3'
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
         caps['sauce:options']['name'] = 'Platform Configurator Job ' + currentTime
         #caps['USE_PREBUILT_WDA'] = 'true'
@@ -235,9 +236,11 @@ class IOSTests(unittest.TestCase):
 #         )
         
     def validate_more_spans(self):
-        sleep(25)
-        self.driver.find_element(By.ID,"SDK Initialize validation").click()
-        self.driver.find_element(By.ID,"Success")
+        self.driver.find_element(AppiumBy.ACCESSIBILITY_ID,'SDK Initialize validation').click()
+        self.driver.find_element(AppiumBy.ACCESSIBILITY_ID,"Success1").click()
+#         sleep(25)
+#         self.driver.find_element(By.ID,"SDK Initialize validation").click()
+#         self.driver.find_element(By.ID,"Success")
 #         WebDriverWait(self.driver, 25).until(
 #             EC.element_to_be_clickable((By.ID, "Success")),
 #             message='Span validation failed',
