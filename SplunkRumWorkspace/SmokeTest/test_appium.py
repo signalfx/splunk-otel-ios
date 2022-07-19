@@ -38,9 +38,9 @@ class IOSTests(unittest.TestCase):
         self.driver=webdriver.Remote(url,caps)
     
 
-    def tearDown(self):
-        sleep(1)
-        self.driver.quit()
+#    def tearDown(self):
+#        sleep(1)
+#        self.driver.quit()
 
     #Loads every element in the current view.
     def load(self):
