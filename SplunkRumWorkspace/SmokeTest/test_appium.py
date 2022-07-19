@@ -50,6 +50,7 @@ class IOSTests(unittest.TestCase):
     '''
     def test_SDK_Initialize(self):
         self.validate_more_spans()
+        
 
 #     ''' 
 #     Generating the POST network request with the URLSession and Validating the network span data.
