@@ -55,11 +55,11 @@ class IOSTests(unittest.TestCase):
 #         self.validate_more_spans()
         
 
-#     ''' 
-#     Generating the POST network request with the URLSession and Validating the network span data.
-#     '''
-#     def test_API_PostClick(self):
-#         self.driver.find_element(By.ID,"Network Request").click();
+    ''' 
+    Generating the POST network request with the URLSession and Validating the network span data.
+    '''
+    def test_API_PostClick(self):
+        self.driver.find_element(By.ID,"Network Request").click();
 #         self.driver.find_element(By.ID,"URLSession").click();
 #         self.driver.find_element(By.ID,"post").click();
 #         self.validate_span();
