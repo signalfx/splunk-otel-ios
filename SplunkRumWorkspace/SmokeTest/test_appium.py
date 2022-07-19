@@ -237,8 +237,9 @@ class IOSTests(unittest.TestCase):
 #         )
         
     def validate_more_spans(self):
-        self.driver.find_element(AppiumBy.ACCESSIBILITY_ID,'SDK Initialize validation').click()
-        self.driver.find_element(AppiumBy.ACCESSIBILITY_ID,"Success1").click()
+        self.driver.find_element(By.IOS_CLASS_CHAIN, '**/XCUIElementTypeButton[`label == "SDK Initialize validation"`]').click()
+#         self.driver.find_element(AppiumBy.ACCESSIBILITY_ID,'SDK Initialize validation').click()
+#         self.driver.find_element(AppiumBy.ACCESSIBILITY_ID,"Success1").click()
 #         sleep(25)
 #         self.driver.find_element(By.ID,"SDK Initialize validation").click()
 #         self.driver.find_element(By.ID,"Success")
