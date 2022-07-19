@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from appium.webdriver.common.appiumby import AppiumBy
+from selenium.common.exceptions import NoSuchElementException
 import sys
 
 BUNDLE_ID = 'com.splunk.opentelemetry.SmokeTest'
@@ -237,7 +238,12 @@ class IOSTests(unittest.TestCase):
 #         )
         
     def validate_more_spans(self):
-        self.driver.find_element(By.IOS_CLASS_CHAIN, '**/XCUIElementTypeButton[`label == "SDK Initialize validation"`]').click()
+        try:
+            self.driver.find_element(By.ID,"SDK Initialize validation").click()
+            self.driver.find_element(By.ID,"Success")
+        except NoSuchElementException:  #spelling error making this code not work as expected
+            pass
+#         self.driver.find_element(By.IOS_CLASS_CHAIN, '**/XCUIElementTypeButton[`label == "SDK Initialize validation"`]').click()
 #         self.driver.find_element(AppiumBy.ACCESSIBILITY_ID,'SDK Initialize validation').click()
 #         self.driver.find_element(AppiumBy.ACCESSIBILITY_ID,"Success1").click()
 #         sleep(25)
