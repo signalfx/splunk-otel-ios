@@ -37,10 +37,9 @@ class IOSTests(unittest.TestCase):
         url = 'https://sso-splunk.saucelabs.com-shattimare:aee7320d-0d97-469d-a6a4-3d4c1ed6c5f0@ondemand.us-west-1.saucelabs.com:443/wd/hub'
         self.driver=webdriver.Remote(url,caps)
     
-
-   def tearDown(self):
-       sleep(1)
-       self.driver.quit()
+    def tearDown(self):
+        sleep(1)
+        self.driver.quit()
 
     #Loads every element in the current view.
     def load(self):
