@@ -584,7 +584,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="z2U-r1-Q2t">
-                                <rect key="frame" x="20" y="148" width="374" height="590"/>
+                                <rect key="frame" x="20" y="148" width="374" height="470"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3g3-ZV-leD">
                                         <rect key="frame" x="0.0" y="0.0" width="374" height="50"/>
@@ -685,8 +685,8 @@
                                             <action selector="errorSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="cq4-dB-Wcg"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UQC-e9-Fgq">
-                                        <rect key="frame" x="0.0" y="420" width="374" height="50"/>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UQC-e9-Fgq">
+                                        <rect key="frame" x="0.0" y="415" width="374" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="xn9-CB-lbt"/>
@@ -699,8 +699,8 @@
                                             <action selector="resignActiveSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="OR7-wO-nS6"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jjj-Co-oOX">
-                                        <rect key="frame" x="0.0" y="480" width="374" height="50"/>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jjj-Co-oOX">
+                                        <rect key="frame" x="0.0" y="415" width="374" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="O2V-Jd-8Hg"/>
@@ -714,7 +714,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GsX-Jo-E7l">
-                                        <rect key="frame" x="0.0" y="540" width="374" height="50"/>
+                                        <rect key="frame" x="0.0" y="420" width="374" height="50"/>
                                         <color key="backgroundColor" systemColor="systemGray5Color"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="50" id="uYI-cr-0rg"/>
@@ -737,7 +737,7 @@
                                 </constraints>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="vA9-NB-3ep">
-                                <rect key="frame" x="207" y="768" width="0.0" height="0.0"/>
+                                <rect key="frame" x="207" y="648" width="0.0" height="0.0"/>
                                 <subviews>
                                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Success" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QF6-eG-ht2">
                                         <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>
