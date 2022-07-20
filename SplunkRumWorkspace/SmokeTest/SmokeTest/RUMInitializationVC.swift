@@ -1,10 +1,3 @@
-//
-//  RUMInitializationVC.swift
-//  multipleiOS_Versions
-//
-//  Created by Piyush Patil on 31/03/22.
-//
-
 import UIKit
 import Foundation
 import OpenTelemetrySdk
@@ -49,7 +42,6 @@ class RUMInitializationVC: UIViewController {
     }
 
     @IBAction func btnSDKInitializeValidation(_ sender: Any) {
-        
         var status = validateSpans()
         if !status {
             // If it is failing check one more time
@@ -62,38 +54,6 @@ class RUMInitializationVC: UIViewController {
         self.lblSuccess.isHidden = !status
         self.lblFailed.isHidden = status
     }
-      
-   /* @IBAction func btnSDKInitializeValidation(_ sender: Any) {
-        DispatchQueue.main.async {
-            var status = false
-           // var lbl = String(self.buttonID)
-            switch self.buttonID {
-                case 0:
-                    status = sdk_initialize_validation()
-                case 2:
-                    status = crashSpan_validation()
-                case 5:
-                    status = customSpan_validation()
-                case 6:
-                    status = errorSpan_validation()
-                case 7:
-                    status = resignActiveSpan_validation()
-                case 8:
-                    status = enterForeGroundSpan_validation()
-                case 9:
-                    status = appTerminateSpan_validation()
-                default:
-                    status = false
-            }
-        
-        
-            self.lblSuccess.isHidden = !status
-            self.lblFailed.isHidden = status
-            
-//            self.lblSuccess.text = lbl
-//            self.lblFailed.text = lbl
-        }
-    }*/
     
     @IBAction func httpCall(_ sender:Any){
         let vc = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(withIdentifier: "NetworkRequestVC") as? NetworkRequestVC
@@ -138,8 +98,6 @@ class RUMInitializationVC: UIViewController {
         btnResignActive.backgroundColor = UIColor.gray
         btnEnterForeground.backgroundColor = UIColor.gray
        
-//        let exception: NSException = NSException(name:NSExceptionName(rawValue: "Error span"), reason:"reason", userInfo:nil)
-//        SplunkRum.reportError(exception: exception)
         do {
             let htmlPath = Bundle.main.path(forResource: "sample4", ofType: "html")
 
@@ -155,7 +113,6 @@ class RUMInitializationVC: UIViewController {
         }
     }
     func reportStringErrorSpan(e: String) {
-       // let tracer = buildTracer()
         let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
         let now = Date()
         let typeName = "SplunkRum.reportError(String)"

@@ -21,18 +21,17 @@ import UIKit
 import SplunkRum
 import SwiftUI
 
-let email = "shattimare@splunk.com"
-let pwd = "Password2@20202022"
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
+    var window: UIWindow?
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 //        delete_logs()
           redirectLogToDocuments()
 
         _ = SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true,
             globalAttributes: [:], environment: nil, ignoreURLs: nil))
-        
+
         return true
     }
 

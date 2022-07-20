@@ -47,7 +47,7 @@ let CRASH_SPAN = "Span SIGTRAP"
 let WEBVIEW_SPAN = "Span WebView"
 let BUNDLE_ID = "com.splunk.opentelemetry.SmokeTest"
 
-
+/* get path of log.txt file */
 func getLogFileURL() -> String {
     
     let allPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
@@ -57,6 +57,7 @@ func getLogFileURL() -> String {
     
 }
 
+/* screen name change span validation */
 func screen_track_validation() -> Bool {
     
     guard !(read_log_file().error) else {return false}
@@ -71,7 +72,7 @@ func screen_track_validation() -> Bool {
     
 }
 
-// Validating the RUM SDK initialize span.
+/* Validating the RUM SDK initialize span. */
 func sdk_initialize_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -83,6 +84,7 @@ func sdk_initialize_validation() -> Bool {
     }
 }
 
+/* network post method validation*/
 func method_post_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -94,6 +96,7 @@ func method_post_validation() -> Bool {
     }
 }
 
+/* network get method validation*/
 func method_get_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -105,6 +108,7 @@ func method_get_validation() -> Bool {
     }
 }
 
+/* network put method validation*/
 func method_put_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -116,6 +120,7 @@ func method_put_validation() -> Bool {
     }
 }
 
+/* network delete method validation*/
 func method_delete_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -127,6 +132,7 @@ func method_delete_validation() -> Bool {
     }
 }
 
+/* read content of log.txt file */
 func read_log_file() -> (content:String,error:Bool) {
     let file = "logs.txt"
 
@@ -145,6 +151,7 @@ func read_log_file() -> (content:String,error:Bool) {
 
 }
 
+/* delete log file*/
 func delete_logs() {
     do {
         try FileManager.default.removeItem(at: URL.init(fileURLWithPath: LOG_FILE_URL))
@@ -153,6 +160,7 @@ func delete_logs() {
         print("Failed to delete logs...")
     }
 }
+/* clear content of log file*/
 func clear_logs() {
     let text = ""
     do {
@@ -161,6 +169,8 @@ func clear_logs() {
          print(error)
     }
 }
+
+/* validate custom span */
 func customSpan_validation()-> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -171,6 +181,8 @@ func customSpan_validation()-> Bool {
         return false
     }
 }
+
+/* validate error/exception span */
 func errorSpan_validation()-> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -181,6 +193,8 @@ func errorSpan_validation()-> Bool {
         return false
     }
 }
+
+/* validate resign active span */
 func resignActiveSpan_validation() -> Bool{
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -192,6 +206,8 @@ func resignActiveSpan_validation() -> Bool{
         return false
     }
 }
+
+/* validate enter foreground span  */
 func enterForeGroundSpan_validation()-> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -202,6 +218,8 @@ func enterForeGroundSpan_validation()-> Bool {
         return false
     }
 }
+
+/* validate app termination span validation */
 func appTerminateSpan_validation()-> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
@@ -212,6 +230,8 @@ func appTerminateSpan_validation()-> Bool {
         return false
     }
 }
+
+/* crash span validation */
 func crashSpan_validation()-> Bool {
     let str = read_log_file().content
     if str.contains(CRASH_SPAN){
@@ -221,6 +241,8 @@ func crashSpan_validation()-> Bool {
         return false
     }
 }
+
+/* web view span validation */
 func webViewSpan_validation() -> Bool{
     let str = read_log_file().content
     if str.contains(WEBVIEW_SPAN){

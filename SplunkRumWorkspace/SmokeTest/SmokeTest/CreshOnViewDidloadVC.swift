@@ -1,10 +1,3 @@
-//
-//  CreshOnViewDidloadVC.swift
-//  multipleiOS_Versions
-//
-//  Created by Piyush Patil on 31/03/22.
-//
-
 import UIKit
 
 class CreshOnViewDidloadVC: UIViewController {

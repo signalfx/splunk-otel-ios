@@ -1,9 +1,3 @@
-//
-//  WKWebViewVC.swift
-//  multipleiOS_Versions
-//
-//  Created by Piyush Patil on 31/03/22.
-//
 
 import UIKit
 import WebKit
@@ -18,23 +12,14 @@ class WKWebViewVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        let link = URL(string:"https://developer.apple.com/videos/play/wwdc2019/239/")!
-//        let request = URLRequest(url: link)
-//        SplunkRum.integrateWithBrowserRum(web)
-//        web.load(request)
-       
         loadWebView(withFile: "sample1")
     
     }
     
     func loadWebView(withFile name : String){
         print("web view is loading using sample1.html....")
-       // let webView = WKWebView(frame: .zero)
-        
         let htmlPath = Bundle.main.path(forResource: name, ofType: "html")
-
         let htmlUrl = URL(fileURLWithPath: htmlPath!)
-        // view = webView
         SplunkRum.integrateWithBrowserRum(web)
         web.loadFileURL(htmlUrl, allowingReadAccessTo: htmlUrl)
         

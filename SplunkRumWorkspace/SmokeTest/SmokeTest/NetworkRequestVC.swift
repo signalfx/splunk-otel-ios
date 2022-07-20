@@ -1,10 +1,3 @@
-//
-//  NetworkRequestVC.swift
-//  multipleiOS_Versions
-//
-//  Created by Piyush Patil on 31/03/22.
-//
-
 import UIKit
 import Alamofire
 import AFNetworking
@@ -107,7 +100,6 @@ class NetworkRequestVC: UIViewController {
       returning the status of the span data validation.
         
      */
-    
     func checkSpanData() -> Bool {
         self.btnClose.sendActions(for: .touchUpInside)
         var status : Bool!
