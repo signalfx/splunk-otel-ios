@@ -31,8 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         _ = SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true,
             globalAttributes: [:], environment: nil, ignoreURLs: nil))
-
-        return true
+        
+       return true
     }
 
     // MARK: UISceneSession Lifecycle
@@ -50,7 +50,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func redirectLogToDocuments() {
-                
+        clear_logs()
         let allPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         let documentsDirectory = allPaths.first!
         let pathForLog = (documentsDirectory as NSString).appending("/logs.txt")

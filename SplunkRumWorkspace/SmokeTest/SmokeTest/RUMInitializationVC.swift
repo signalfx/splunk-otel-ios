@@ -82,9 +82,9 @@ class RUMInitializationVC: UIViewController {
     @IBAction func customSpan(_ sender:Any){
         buttonID = 5
         btnCustom.backgroundColor = UIColor.green
-        btnError.backgroundColor = UIColor.gray
-        btnResignActive.backgroundColor = UIColor.gray
-        btnEnterForeground.backgroundColor = UIColor.gray
+        btnError.backgroundColor = UIColor.lightGray
+        btnResignActive.backgroundColor = UIColor.lightGray
+        btnEnterForeground.backgroundColor = UIColor.lightGray
         
         let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
         let span = tracer.spanBuilder(spanName: "CustomSpan").startSpan()
@@ -94,9 +94,9 @@ class RUMInitializationVC: UIViewController {
     @IBAction func errorSpan(_ sender:Any){
         buttonID = 6
         btnError.backgroundColor = UIColor.green
-        btnCustom.backgroundColor = UIColor.gray
-        btnResignActive.backgroundColor = UIColor.gray
-        btnEnterForeground.backgroundColor = UIColor.gray
+        btnCustom.backgroundColor = UIColor.lightGray
+        btnResignActive.backgroundColor = UIColor.lightGray
+        btnEnterForeground.backgroundColor = UIColor.lightGray
        
         do {
             let htmlPath = Bundle.main.path(forResource: "sample4", ofType: "html")
@@ -134,28 +134,37 @@ class RUMInitializationVC: UIViewController {
     @IBAction func resignActiveSpan(_ sender:Any){
         buttonID = 7
         btnResignActive.backgroundColor = UIColor.green
-        btnError.backgroundColor = UIColor.gray
-        btnCustom.backgroundColor = UIColor.gray
-        btnEnterForeground.backgroundColor = UIColor.gray
+        btnError.backgroundColor = UIColor.lightGray
+        btnCustom.backgroundColor = UIColor.lightGray
+        btnEnterForeground.backgroundColor = UIColor.lightGray
+        span(with: "ResignActive")
         
     }
     @IBAction func enterBGSpan(_ sender:Any){
         buttonID = 8
         btnEnterForeground.backgroundColor = UIColor.green
-        btnError.backgroundColor = UIColor.gray
-        btnCustom.backgroundColor = UIColor.gray
-        btnResignActive.backgroundColor = UIColor.gray
-       
+        btnError.backgroundColor = UIColor.lightGray
+        btnCustom.backgroundColor = UIColor.lightGray
+        btnResignActive.backgroundColor = UIColor.lightGray
+        span(with: "EnterForeground")
         
     }
     @IBAction func terminateSpan(_ sender:Any){
         buttonID = 9
-        let now = Date()
+        span(with: "AppTerminating")
+        /*let now = Date()
         let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
         let span = tracer.spanBuilder(spanName: "AppTerminating").setStartTime(time: now).startSpan()
         span.setAttribute(key: "component", value: "AppLifecycle")
-        span.end(time: now)
+        span.end(time: now)*/
         
+    }
+    func span(with name:String) {
+        let now = Date()
+        let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "APMI-1779")
+        let span = tracer.spanBuilder(spanName: name).setStartTime(time: now).startSpan()
+        span.setAttribute(key: "component", value: "app-lifecycle")
+        span.end(time: now)
     }
     /*
     // MARK: - Navigation
