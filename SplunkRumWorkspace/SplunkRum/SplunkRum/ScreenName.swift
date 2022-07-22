@@ -22,6 +22,7 @@ fileprivate var screenNameManuallySet = false
 // Yes, I assume there are swift libraries to do this sort of thing, but nothing
 // I could find in the stdlib
 fileprivate var lock = NSLock()
+fileprivate var screenNameCallbacks: [((String) -> Void)] = []
 
 func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
     let now = Date()
@@ -34,7 +35,7 @@ func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
 // Assumes main thread
 func internal_setScreenName(_ newName: String, _ manual: Bool) {
     var oldName: String?
-
+    var callbacks: [((String) -> Void)] = []
     lock.lock()
     if screenName != newName {
         oldName = screenName
@@ -46,7 +47,12 @@ func internal_setScreenName(_ newName: String, _ manual: Bool) {
     if manual || !screenNameManuallySet {
         screenName = newName
     }
+    callbacks = screenNameCallbacks
     lock.unlock()
+
+    for callback in callbacks {
+         callback(screenName)
+    }
 
     // Don't emit the span under the lock
     if oldName != nil && (SplunkRum.configuredOptions?.screenNameSpans ?? true) {
@@ -67,4 +73,12 @@ func getScreenName() -> String {
         lock.unlock()
     }
     return screenName
+}
+
+func addScreenNameCallback(_ callback: @escaping ((String) -> Void)) {
+    lock.lock()
+    defer {
+        lock.unlock()
+    }
+    screenNameCallbacks.append(callback)
 }

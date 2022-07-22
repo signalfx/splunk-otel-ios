@@ -239,14 +239,18 @@ var splunkRumInitializeCalledTime = Date()
     @objc public class func getSessionId() -> String {
         return getRumSessionId()
     }
-
     /**
      Adds a callback whenever the sessionId changes.
      */
     public class func addSessionIdChangeCallback(_ callback: @escaping (() -> Void)) {
         addSessionIdCallback(callback)
     }
-
+    /**
+     Adds a callback whenever the screen name changes.
+     */
+    public class func addScreenNameChangeCallback(_ callback: @escaping ((String) -> Void)) {
+        addScreenNameCallback(callback)
+    }
     /**
             Convenience function for reporting an error.
      */
