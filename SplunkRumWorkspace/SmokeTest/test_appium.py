@@ -228,13 +228,27 @@ class IOSTests(unittest.TestCase):
     def validate_span(self):
         sleep(10);
         self.driver.find_element(By.ID,"Span Validation").click();
-        self.driver.find_element(By.ID,"Success")
+        #self.driver.find_element(By.ID,"Success")
+        try:
+            WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
+                EC.visibility_of_element_located((By.ID, "Success")),
+                message='Span validation failed',
+            )
+        except Exception as ex:
+            raise Exception('Exception') 
 
         
     def validate_more_spans(self):
         sleep(10)
         self.driver.find_element(By.ID,"SDK Initialize validation").click()
-        self.driver.find_element(By.ID,"Success")
+        #self.driver.find_element(By.ID,"Success")
+        try:
+            WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
+                EC.visibility_of_element_located((By.ID, "Success")),
+                message='Span validation failed',
+            )
+        except Exception as ex:
+            raise Exception('Exception')  
    
         
    
