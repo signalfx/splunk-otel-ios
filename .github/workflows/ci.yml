@@ -37,7 +37,7 @@ jobs:
         fail-fast: false
         matrix:
          os: ['12.4','12.2']
-         device: ['iPhone XR Simulator','iPhone 5s Simulator']
+         device: ['iPhone XR Simulator','iPhone 8 Simulator']
     steps:
       - name: Checkout
         uses: actions/checkout@v1
