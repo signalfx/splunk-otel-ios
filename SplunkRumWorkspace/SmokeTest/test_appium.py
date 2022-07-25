@@ -45,11 +45,11 @@ class IOSTests(unittest.TestCase):
         return
             
 
-    ''' 
-    Validating initializing, app start, and presentation span.
-    '''
-    def test_SDK_Initialize(self):
-        self.validate_more_spans()
+#     ''' 
+#     Validating initializing, app start, and presentation span.
+#     '''
+#     def test_SDK_Initialize(self):
+#         self.validate_more_spans()
         
 
     ''' 
@@ -160,13 +160,13 @@ class IOSTests(unittest.TestCase):
         self.driver.find_element(By.ID,"delete").click();
         self.validate_span();
 
-    ''' 
-    Generating the screen navigation data and Validating span data.
-    '''    
-    def test_ScreenTrackClick(self):
-        self.driver.find_element(By.ID,"Screen-Track").click();
-        self.driver.find_element(By.ID,"Custom Screen Name").click();
-        self.validate_span();
+#     ''' 
+#     Generating the screen navigation data and Validating span data.
+#     '''    
+#     def test_ScreenTrackClick(self):
+#         self.driver.find_element(By.ID,"Screen-Track").click();
+#         self.driver.find_element(By.ID,"Custom Screen Name").click();
+#         self.validate_span();
         
     ''' 
     Validating custom span.
@@ -208,21 +208,21 @@ class IOSTests(unittest.TestCase):
         self.validate_span()
         
 
-    ''' 
-    Validating AppTerminate span.
-    '''
-    def test_AppTerminateSpanClick(self):
-        self.driver.find_element(By.ID,"Terminate").click()
-        self.validate_more_spans()
+#     ''' 
+#     Validating AppTerminate span.
+#     '''
+#     def test_AppTerminateSpanClick(self):
+#         self.driver.find_element(By.ID,"Terminate").click()
+#         self.validate_more_spans()
         
-    ''' 
-    Validating crash span.
-    '''
-    def test_CrashOnViewLoadClick(self):
-        self.driver.find_element(By.ID,"Crash").click();
-        self.driver.find_element(By.ID,"Crash on ViewDidload").click();
-        self.driver.activate_app(BUNDLE_ID)
-        self.validate_more_spans()
+#     ''' 
+#     Validating crash span.
+#     '''
+#     def test_CrashOnViewLoadClick(self):
+#         self.driver.find_element(By.ID,"Crash").click();
+#         self.driver.find_element(By.ID,"Crash on ViewDidload").click();
+#         self.driver.activate_app(BUNDLE_ID)
+#         self.validate_more_spans()
 
      
     def validate_span(self):
