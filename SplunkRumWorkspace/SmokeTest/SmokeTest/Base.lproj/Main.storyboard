@@ -587,7 +587,7 @@
                                 <rect key="frame" x="0.0" y="128" width="414" height="734"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="z2U-r1-Q2t">
-                                        <rect key="frame" x="20" y="1" width="372.5" height="520"/>
+                                        <rect key="frame" x="20" y="1" width="372.5" height="572"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3g3-ZV-leD">
                                                 <rect key="frame" x="0.0" y="0.0" width="372.5" height="50"/>
@@ -730,8 +730,23 @@
                                                     <action selector="terminateSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="U0h-tL-SES"/>
                                                 </connections>
                                             </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2CV-Nj-UCE">
+                                                <rect key="frame" x="0.0" y="520" width="372.5" height="50"/>
+                                                <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="50" id="PiI-j3-NTg"/>
+                                                </constraints>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="plain" title="Span Validation">
+                                                    <fontDescription key="titleFontDescription" type="system" weight="semibold" pointSize="20"/>
+                                                </buttonConfiguration>
+                                                <connections>
+                                                    <action selector="btnSpanValidation:" destination="eGU-nc-ECH" eventType="touchUpInside" id="9Gn-oK-gt2"/>
+                                                    <action selector="terminateSpan:" destination="eGU-nc-ECH" eventType="touchUpInside" id="Ei5-vo-6Wz"/>
+                                                </connections>
+                                            </button>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="vA9-NB-3ep">
-                                                <rect key="frame" x="0.0" y="520" width="372.5" height="0.0"/>
+                                                <rect key="frame" x="0.0" y="572" width="372.5" height="0.0"/>
                                                 <subviews>
                                                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Success" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QF6-eG-ht2">
                                                         <rect key="frame" x="0.0" y="0.0" width="91.5" height="0.0"/>

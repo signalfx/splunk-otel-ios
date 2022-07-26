@@ -21,7 +21,6 @@ import UIKit
 import SplunkRum
 import SwiftUI
 
-
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
@@ -31,7 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         _ = SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true,
             globalAttributes: [:], environment: nil, ignoreURLs: nil))
-        
+
        return true
     }
 
@@ -48,7 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-    
+
     func redirectLogToDocuments() {
         clear_logs()
         let allPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
@@ -56,8 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let pathForLog = (documentsDirectory as NSString).appending("/logs.txt")
         print(pathForLog)
         freopen(pathForLog.cString(using: String.Encoding.ascii)!, "a+", stdout)
-        
-    }
-    
-}
 
+    }
+
+}

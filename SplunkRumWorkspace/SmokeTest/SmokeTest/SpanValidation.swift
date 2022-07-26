@@ -14,11 +14,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import Foundation
 
-var LOG_FILE_URL : String! {
+var LOG_FILE_URL: String! {
     return getLogFileURL()
 }
 
@@ -49,17 +48,17 @@ let BUNDLE_ID = "com.splunk.opentelemetry.SmokeTest"
 
 /* get path of log.txt file */
 func getLogFileURL() -> String {
-    
+
     let allPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
     let documentsDirectory = allPaths.first!
     let pathForLog = (documentsDirectory as NSString).appending("/logs.txt")
     return pathForLog
-    
+
 }
 
 /* screen name change span validation */
 func screen_track_validation() -> Bool {
-    
+
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
     print(str)
@@ -69,7 +68,7 @@ func screen_track_validation() -> Bool {
         print("No Logs found...")
         return false
     }
-    
+
 }
 
 /* Validating the RUM SDK initialize span. */
@@ -133,7 +132,7 @@ func method_delete_validation() -> Bool {
 }
 
 /* read content of log.txt file */
-func read_log_file() -> (content:String,error:Bool) {
+func read_log_file() -> (content: String, error: Bool) {
     let file = "logs.txt"
 
     if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
@@ -142,12 +141,11 @@ func read_log_file() -> (content:String,error:Bool) {
         print(fileURL)
         do {
             let fileContent = try String(contentsOf: fileURL, encoding: .utf8)
-            return (content:fileContent,error:false)
-        }
-        catch { print("not able to read logs")}
+            return (content:fileContent, error:false)
+        } catch { print("not able to read logs")}
     }
-    
-    return (content:"",error:true)
+
+    return (content:"", error:true)
 
 }
 
@@ -171,10 +169,10 @@ func clear_logs() {
 }
 
 /* validate custom span */
-func customSpan_validation()-> Bool {
+func customSpan_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
-    if str.contains(CUSTOM_SPAN){
+    if str.contains(CUSTOM_SPAN) {
         return true
     } else {
         print("No Logs found...")
@@ -183,10 +181,10 @@ func customSpan_validation()-> Bool {
 }
 
 /* validate error/exception span */
-func errorSpan_validation()-> Bool {
+func errorSpan_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
-    if str.contains(ERROR_SPAN){
+    if str.contains(ERROR_SPAN) {
         return true
     } else {
         print("No Logs found...")
@@ -195,11 +193,11 @@ func errorSpan_validation()-> Bool {
 }
 
 /* validate resign active span */
-func resignActiveSpan_validation() -> Bool{
+func resignActiveSpan_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
     print(str)
-    if str.contains(RESIGNACTIVE_SPAN){
+    if str.contains(RESIGNACTIVE_SPAN) {
         return true
     } else {
         print("No Logs found...")
@@ -208,10 +206,10 @@ func resignActiveSpan_validation() -> Bool{
 }
 
 /* validate enter foreground span  */
-func enterForeGroundSpan_validation()-> Bool {
+func enterForeGroundSpan_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
-    if str.contains(ENTERFOREGROUND_SPAN){
+    if str.contains(ENTERFOREGROUND_SPAN) {
         return true
     } else {
         print("No Logs found...")
@@ -220,10 +218,10 @@ func enterForeGroundSpan_validation()-> Bool {
 }
 
 /* validate app termination span validation */
-func appTerminateSpan_validation()-> Bool {
+func appTerminateSpan_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
-    if str.contains(APPTERMINATE_SPAN){
+    if str.contains(APPTERMINATE_SPAN) {
         return true
     } else {
         print("No Logs found...")
@@ -232,9 +230,9 @@ func appTerminateSpan_validation()-> Bool {
 }
 
 /* crash span validation */
-func crashSpan_validation()-> Bool {
+func crashSpan_validation() -> Bool {
     let str = read_log_file().content
-    if str.contains(CRASH_SPAN){
+    if str.contains(CRASH_SPAN) {
         return true
     } else {
         print("No Logs found...")
@@ -243,9 +241,9 @@ func crashSpan_validation()-> Bool {
 }
 
 /* web view span validation */
-func webViewSpan_validation() -> Bool{
+func webViewSpan_validation() -> Bool {
     let str = read_log_file().content
-    if str.contains(WEBVIEW_SPAN){
+    if str.contains(WEBVIEW_SPAN) {
         return true
     } else {
         print("No Logs found...")

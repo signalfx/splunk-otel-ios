@@ -137,7 +137,8 @@ let globalAttributesLock = NSLock()
 
 let splunkLibraryLoadTime = Date()
 var splunkRumInitializeCalledTime = Date()
-public var sessiontoken:String = ""
+// swiftlint:disable missing_docs
+public var sessiontoken: String = ""
 /**
  Main class for initializing the SplunkRum agent.
  */
@@ -233,7 +234,7 @@ public var sessiontoken:String = ""
 
     }
 
-    public class func setSessionToken(with token:String){
+    public class func setSessionToken(with token: String) {
         sessiontoken = token
     }
     /**

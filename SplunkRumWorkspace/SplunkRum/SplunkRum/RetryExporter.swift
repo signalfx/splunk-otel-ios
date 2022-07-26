@@ -19,7 +19,6 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-
 class RetryExporter: SpanExporter {
     let MAX_PENDING_SPANS = 100
 
@@ -71,5 +70,5 @@ class RetryExporter: SpanExporter {
     func shutdown() {
         proxy.shutdown()
     }
-    
+
 }
