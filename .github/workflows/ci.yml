@@ -14,15 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
         with:
-          ref: 'feature/APMI-1779-Automated-test-case'
-          
-#       - name: Full Build
-#         run: ./fullbuild.sh     
-    
+          ref: 'feature/APMI-1779-Automated-test-case'    
       - name: Smoke Test
         run: | 
          ./smoketest.sh 
-
       - name: Uploading app on sauce lab
         run: |
            cd /Users/runner/work/splunk-otel-ios/splunk-otel-ios/
