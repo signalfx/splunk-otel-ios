@@ -1,4 +1,4 @@
-name: CI-Test
+name: RUM
 on:
   pull_request:
   push:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
         with:
-          ref: feature/APMI-1779-Automated-test-case
+          ref: ${BRANCH_NAME}
     
       - name: Smoke Test
         run: | 
@@ -42,7 +42,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
         with:
-          ref: feature/APMI-1779-Automated-test-case
+          ref: ${BRANCH_NAME}
       - name: setup python
         uses: actions/setup-python@v2
         with:
@@ -53,5 +53,4 @@ jobs:
         run: |
             cd SmokeTest/
             python3 -m pip install Appium-Python-Client
-            #python3 -m pip install requests
             python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
