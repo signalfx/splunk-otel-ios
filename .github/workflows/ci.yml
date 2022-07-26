@@ -14,7 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
         with:
-          ref: ${BRANCH_NAME}
+          ref: ${GITHUB_HEAD_REF}
+          
+      - name: Full Build
+        run: ./fullbuild.sh     
     
       - name: Smoke Test
         run: | 
@@ -42,7 +45,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
         with:
-          ref: ${BRANCH_NAME}
+          ref: ${GITHUB_HEAD_REF}
+          
       - name: setup python
         uses: actions/setup-python@v2
         with:
