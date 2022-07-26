@@ -33,7 +33,7 @@ fileprivate var started = false
 class DiskExportPipelineTest: XCTestCase {
 
     override func setUpWithError() throws {
-        super.setUpWithError()
+        try super.setUpWithError()
         if started {
             receiver.reset()
             return
