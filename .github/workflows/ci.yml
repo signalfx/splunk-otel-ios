@@ -16,8 +16,8 @@ jobs:
         with:
           ref: 'feature/APMI-1779-Automated-test-case'
           
-      - name: Full Build
-        run: ./fullbuild.sh     
+#       - name: Full Build
+#         run: ./fullbuild.sh     
     
       - name: Smoke Test
         run: | 
@@ -54,7 +54,10 @@ jobs:
   
       - name: execute py script # run the run.py to get the latest data
         working-directory: SplunkRumWorkspace
-        run: |
-            cd SmokeTest/
-            python3 -m pip install Appium-Python-Client
-            python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
+        run: | 
+         ./pythonSetup.sh 
+         
+#         run: |
+#             cd SmokeTest/
+#             python3 -m pip install Appium-Python-Client
+#             python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
