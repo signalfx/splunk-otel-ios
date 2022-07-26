@@ -20,7 +20,6 @@
 		C85DBEB72859D19700DC46E2 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEAF2859D19600DC46E2 /* CustomCell.swift */; };
 		C85DBEB82859D19700DC46E2 /* WKWebViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB02859D19600DC46E2 /* WKWebViewVC.swift */; };
 		C85DBEB92859D19700DC46E2 /* NetworkRequestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB12859D19600DC46E2 /* NetworkRequestVC.swift */; };
-		C85DBEBA2859D19700DC46E2 /* rumSessionId.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB22859D19700DC46E2 /* rumSessionId.swift */; };
 		C85DBEBB2859D19700DC46E2 /* ScreenTrackVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB32859D19700DC46E2 /* ScreenTrackVC.swift */; };
 		C85DBEBC2859D19700DC46E2 /* RUMInitializationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB42859D19700DC46E2 /* RUMInitializationVC.swift */; };
 		C85DBEBF2859D28000DC46E2 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C85DBEBE2859D28000DC46E2 /* Alamofire */; };
@@ -74,7 +73,6 @@
 		C85DBEAF2859D19600DC46E2 /* CustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
 		C85DBEB02859D19600DC46E2 /* WKWebViewVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewVC.swift; sourceTree = "<group>"; };
 		C85DBEB12859D19600DC46E2 /* NetworkRequestVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkRequestVC.swift; sourceTree = "<group>"; };
-		C85DBEB22859D19700DC46E2 /* rumSessionId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = rumSessionId.swift; sourceTree = "<group>"; };
 		C85DBEB32859D19700DC46E2 /* ScreenTrackVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenTrackVC.swift; sourceTree = "<group>"; };
 		C85DBEB42859D19700DC46E2 /* RUMInitializationVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RUMInitializationVC.swift; sourceTree = "<group>"; };
 		C85DBEC32859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreshOnViewDidloadVC.swift; sourceTree = "<group>"; };
@@ -136,7 +134,6 @@
 				C85DBEB42859D19700DC46E2 /* RUMInitializationVC.swift */,
 				C85DBEC42859D2FE00DC46E2 /* CrashVC.swift */,
 				C85DBEC32859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift */,
-				C85DBEB22859D19700DC46E2 /* rumSessionId.swift */,
 				C85DBEB32859D19700DC46E2 /* ScreenTrackVC.swift */,
 				C85DBEB02859D19600DC46E2 /* WKWebViewVC.swift */,
 				685F9E2B2876FD7A005B92C5 /* SpanValidation.swift */,
@@ -294,7 +291,6 @@
 				C85DBEB72859D19700DC46E2 /* CustomCell.swift in Sources */,
 				864567FD26EFDE9F0059CF04 /* SceneDelegate.swift in Sources */,
 				C85DBEC62859D2FE00DC46E2 /* CrashVC.swift in Sources */,
-				C85DBEBA2859D19700DC46E2 /* rumSessionId.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
