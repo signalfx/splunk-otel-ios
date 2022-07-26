@@ -1,4 +1,4 @@
-name: CI-Test
+name: RUM
 on:
   pull_request:
   push:
@@ -13,9 +13,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-        with:
-          ref: feature/APMI-1779-Automated-test-case
-    
       - name: Smoke Test
         run: | 
          ./smoketest.sh 
@@ -30,24 +27,26 @@ jobs:
              --form 'description="'"${{ env.resourceGroup }}"'"' 
           
           
-#   sauce-lab:
-#     needs: build  
-#     runs-on: macOS-latest
-#     strategy:
-#         fail-fast: false
-#         matrix:
-#          os: ['12.4','12.2']
-#          device: ['iPhone XR Simulator','iPhone 8 Simulator']
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v1
+  sauce-lab:
+    needs: build  
+    runs-on: macOS-latest
+    strategy:
+        fail-fast: false
+        matrix:
+         os: ['12.4','12.2']
+         device: ['iPhone XR Simulator','iPhone 8 Simulator']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
           
-#       - name: setup python
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: 3.8 #install the python needed
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8 #install the python needed
   
-#       - name: execute py script # run the run.py to get the latest data
-#         working-directory: SplunkRumWorkspace
-#         run: | 
-#          ./pythonSetup.sh 
+      - name: execute py script # run the run.py to get the latest data
+        working-directory: SplunkRumWorkspace
+        run: | 
+         ./pythonSetup.sh 
+         
+          python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
