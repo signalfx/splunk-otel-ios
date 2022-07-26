@@ -9,7 +9,6 @@ from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from appium.webdriver.common.appiumby import AppiumBy
 from selenium.common.exceptions import NoSuchElementException
 import sys
 
@@ -17,41 +16,39 @@ BUNDLE_ID = 'com.splunk.opentelemetry.SmokeTest'
 
 class IOSTests(unittest.TestCase):
 
-    # set up appium
+    ''' 
+    Set up appium
+    '''
     def setUp(self):
         currentDate = datetime.now().strftime('%Y-%m-%d')
         currentTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         caps = {}
         
         caps['platformName'] = 'iOS'
-        caps['appium:app'] = 'storage:filename=SmokeTest.zip' # The filename of the mobile app
-        caps['appium:deviceName'] = sys.argv[2]
+        caps['appium:app'] = 'storage:filename=SmokeTest.zip' 
+        caps['appium:deviceName'] = sys.argv[2] 
         caps['appium:platformVersion'] = sys.argv[1]
         caps['sauce:options'] = {}
-        #caps['sauce:options']['appiumVersion'] = '1.9.1'    #'1.22.3'
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
         caps['sauce:options']['name'] = 'Platform Configurator Job ' + currentTime
    
         url = 'https://sso-splunk.saucelabs.com-shattimare:aee7320d-0d97-469d-a6a4-3d4c1ed6c5f0@ondemand.us-west-1.saucelabs.com:443/wd/hub'
         self.driver=webdriver.Remote(url,caps)
-    
+        
+    ''' 
+    Quit web driver.
+    ''' 
     def tearDown(self):
         sleep(1)
         self.driver.quit()
 
-    #Loads every element in the current view.
+    ''' 
+    Loads every element in the current view.
+    '''    
     def load(self):
         find_next = self.driver.find_element_by_xpath("//*")
         return
-            
-
-    ''' 
-    Validating initializing, app start, and presentation span.
-    '''
-    def test_SDK_Initialize(self):
-        self.validate_more_spans()
-        
-
+    
     ''' 
     Generating the POST network request with the URLSession and Validating the network span data.
     '''
@@ -160,13 +157,6 @@ class IOSTests(unittest.TestCase):
         self.driver.find_element(By.ID,"delete").click();
         self.validate_span();
 
-    ''' 
-    Generating the screen navigation data and Validating span data.
-    '''    
-    def test_ScreenTrackClick(self):
-        self.driver.find_element(By.ID,"Screen-Track").click();
-        self.driver.find_element(By.ID,"Custom Screen Name").click();
-        self.validate_span();
         
     ''' 
     Validating custom span.
@@ -207,47 +197,28 @@ class IOSTests(unittest.TestCase):
         self.driver.find_element(By.ID,"WKWebView").click()
         self.validate_span()
         
-
-    ''' 
-    Validating AppTerminate span.
-    '''
-    def test_AppTerminateSpanClick(self):
-        self.driver.find_element(By.ID,"Terminate").click()
-        self.validate_more_spans()
-        
-    ''' 
-    Validating crash span.
-    '''
-    def test_CrashOnViewLoadClick(self):
-        self.driver.find_element(By.ID,"Crash").click();
-        self.driver.find_element(By.ID,"Crash on ViewDidload").click();
-        self.driver.activate_app(BUNDLE_ID)
-        self.validate_more_spans()
-
      
     def validate_span(self):
-        sleep(10);
+        sleep(10);  #it takes time to generate spans.
         self.driver.find_element(By.ID,"Span Validation").click();
-        #self.driver.find_element(By.ID,"Success")
         try:
             WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
                 EC.visibility_of_element_located((By.ID, "Success")),
                 message='Span validation failed',
             )
         except Exception as ex:
-            raise Exception('Exception') 
+            raise Exception(ex) 
 
         
     def validate_more_spans(self):
-        sleep(10)
+        sleep(10) #it takes time to generate spans.
         self.driver.find_element(By.ID,"SDK Initialize validation").click()
-        #self.driver.find_element(By.ID,"Success")
         try:
             WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
                 EC.visibility_of_element_located((By.ID, "Success")),
                 message='Span validation failed',
             )
-        except TimeoutError:
+        except TimeoutException:
                 self.driver.find_element(By.ID,"Success")  
    
         
