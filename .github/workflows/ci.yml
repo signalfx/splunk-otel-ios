@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
         with:
-          ref: feature/APMI-1779-Automated-test-case
+          ref: 'feature/APMI-1779-Automated-test-case'
           
 #       - name: Full Build
 #         run: ./fullbuild.sh     
@@ -46,7 +46,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
         with:
-          ref: feature/APMI-1779-Automated-test-case
+          ref: 'feature/APMI-1779-Automated-test-case'
           
       - name: setup python
         uses: actions/setup-python@v2
