@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
         with:
-          ref: ${GITHUB_REF#refs/*/}
+          ref: feature/APMI-1779-Automated-test-case
           
 #       - name: Full Build
 #         run: ./fullbuild.sh     
@@ -46,7 +46,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
         with:
-          ref: ${GITHUB_REF#refs/*/}
+          ref: feature/APMI-1779-Automated-test-case
           
       - name: setup python
         uses: actions/setup-python@v2
@@ -57,8 +57,3 @@ jobs:
         working-directory: SplunkRumWorkspace
         run: | 
          ./pythonSetup.sh 
-         
-#         run: |
-#             cd SmokeTest/
-#             python3 -m pip install Appium-Python-Client
-#             python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
