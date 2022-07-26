@@ -46,7 +46,8 @@ jobs:
   
       - name: execute py script # run the run.py to get the latest data
         working-directory: SplunkRumWorkspace
+        
+          cd SmokeTest/
         run: | 
          ./pythonSetup.sh 
-         
           python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
