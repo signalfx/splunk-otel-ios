@@ -23,6 +23,9 @@ import WebKit
 
 let SplunkRumVersionString = "0.7.1"
 
+/**
+ Default maximum size of the disk cache in bytes.
+ */
 public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
 
 /**

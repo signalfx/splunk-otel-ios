@@ -27,7 +27,7 @@ struct TestZipkinSpan: Decodable {
     var tags: [String: String]
 }
 
-enum SpanReceiverError : Error {
+enum SpanReceiverError: Error {
     case timeout(String)
 }
 

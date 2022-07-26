@@ -30,10 +30,10 @@ func rumOptions() -> SplunkRumOptions {
 fileprivate let receiver = TestSpanReceiver()
 fileprivate var started = false
 
-
 class DiskExportPipelineTest: XCTestCase {
 
     override func setUpWithError() throws {
+        super.setUpWithError()
         if started {
             receiver.reset()
             return
@@ -48,7 +48,7 @@ class DiskExportPipelineTest: XCTestCase {
 
         started = true
     }
-    
+
     func testExportPipeline() throws {
         for _ in 1...32 {
             let span = buildTracer().spanBuilder(spanName: "large-span").startSpan()
