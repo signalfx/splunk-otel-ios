@@ -48,3 +48,5 @@ jobs:
         working-directory: SplunkRumWorkspace
         run: | 
          ./pythonSetup.sh 
+         
+          python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
