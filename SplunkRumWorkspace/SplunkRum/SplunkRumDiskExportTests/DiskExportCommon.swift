@@ -27,6 +27,10 @@ struct TestZipkinSpan: Decodable {
     var tags: [String: String]
 }
 
+enum SpanReceiverError : Error {
+    case timeout(String)
+}
+
 class TestSpanReceiver {
     let server = HttpServer()
     var receivedSpans: [TestZipkinSpan] = []
@@ -35,9 +39,9 @@ class TestSpanReceiver {
 
     init() {
         server["/v1/traces"] = { request in
-            self.receivedRequest = true
             let spans = try! JSONDecoder().decode([TestZipkinSpan].self, from: Data(request.body))
             self.receivedSpans.append(contentsOf: spans)
+            self.receivedRequest = true
             return HttpResponse.ok(.text("ok"))
         }
 
@@ -63,6 +67,20 @@ class TestSpanReceiver {
     func reset() {
         self.receivedRequest = false
         self.receivedSpans = []
+    }
+
+    func waitForSpans(timeoutSeconds: Int = 16) throws -> [TestZipkinSpan] {
+        var secondsWaited = 0
+        while !self.receivedRequest {
+            sleep(1)
+            secondsWaited += 1
+
+            if secondsWaited >= timeoutSeconds {
+                throw SpanReceiverError.timeout("Timed out waiting for spans")
+            }
+        }
+
+        return spans()
     }
 }
 

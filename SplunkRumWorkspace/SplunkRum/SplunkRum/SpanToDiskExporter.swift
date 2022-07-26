@@ -27,7 +27,7 @@ class SpanToDiskExporter: SpanExporter {
     private var totalSpansInserted: Int64 = 0
     private var checkpointCounter: Int64 = 0
 
-    init(spanDb: SpanDb, maxFileSizeBytes: Int64 = 64 * 1024 * 1024, truncationCheckpoint: Int64 = 2048) {
+    init(spanDb: SpanDb, maxFileSizeBytes: Int64 = 25 * 1024 * 1024, truncationCheckpoint: Int64 = 512) {
         self.db = spanDb
         self.maxFileSizeBytes = maxFileSizeBytes
         self.truncationCheckpoint = truncationCheckpoint

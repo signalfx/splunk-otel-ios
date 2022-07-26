@@ -69,18 +69,7 @@ class SpanFromDiskExporterTest: XCTestCase {
             stop()
         }
 
-        var secondsWaited = 0
-        while !receiver.receivedRequest {
-            sleep(1)
-            secondsWaited += 1
-
-            if secondsWaited >= 10 {
-                XCTFail("Timed out waiting for spans")
-                return
-            }
-        }
-
-        let spans = receiver.spans()
+        let spans = try receiver.waitForSpans()
         XCTAssertEqual(spans.count, 0)
         XCTAssertEqual(db.fetch(count: 10).count, 2)
     }

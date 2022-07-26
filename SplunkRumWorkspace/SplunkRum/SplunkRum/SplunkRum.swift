@@ -23,6 +23,8 @@ import WebKit
 
 let SplunkRumVersionString = "0.7.1"
 
+public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
+
 /**
  Optional configuration for SplunkRum.initialize()
  */
@@ -40,7 +42,8 @@ let SplunkRumVersionString = "0.7.1"
     @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil,
                       screenNameSpans: Bool = true,
                       networkInstrumentation: Bool = true,
-                      enableDiskCache: Bool = false
+                      enableDiskCache: Bool = false,
+                      spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES
     ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
@@ -51,6 +54,7 @@ let SplunkRumVersionString = "0.7.1"
         self.screenNameSpans = screenNameSpans
         self.networkInstrumentation = networkInstrumentation
         self.enableDiskCache = enableDiskCache
+        self.spanDiskCacheMaxSize = spanDiskCacheMaxSize
     }
     /**
         Copy constructor
@@ -67,6 +71,7 @@ let SplunkRumVersionString = "0.7.1"
         self.screenNameSpans = opts.screenNameSpans
         self.networkInstrumentation = opts.networkInstrumentation
         self.enableDiskCache = opts.enableDiskCache
+        self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
     }
 
     /**
@@ -112,7 +117,16 @@ let SplunkRumVersionString = "0.7.1"
      */
     @objc public var networkInstrumentation: Bool = true
 
+    /**
+     Enable caching created spans to disk. On successful exports the spans are deleted.
+     */
     @objc public var enableDiskCache: Bool = false
+
+    /**
+     Threshold in bytes from which spans will start to be dropped from the disk cache (oldest first).
+     Only applicable when disk caching is enabled.
+     */
+    @objc public var spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
@@ -195,7 +209,9 @@ var splunkRumInitializeCalledTime = Date()
         if options?.enableDiskCache ?? false {
             let spanDb = SpanDb()
             SpanFromDiskExport.start(spanDb: spanDb, endpoint: theBeaconUrl!)
-            let diskExporter = SpanToDiskExporter(spanDb: spanDb)
+            let diskExporter = SpanToDiskExporter(
+                spanDb: spanDb,
+                maxFileSizeBytes: options?.spanDiskCacheMaxSize ?? DEFAULT_DISK_CACHE_MAX_SIZE_BYTES)
             let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options?.spanFilter ?? nil)
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
         } else {
