@@ -1,7 +1,8 @@
 name: RUM
 on:
-  pull_request:
   push:
+    branches: [main]
+  pull_request:
 env:
   SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
   SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
@@ -48,6 +49,5 @@ jobs:
         working-directory: SplunkRumWorkspace
         
           cd SmokeTest/
-        run: | 
-         ./pythonSetup.sh 
+          python3 -m pip install Appium-Python-Client
           python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
