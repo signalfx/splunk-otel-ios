@@ -183,7 +183,6 @@ class NetworkRequestVC: UIViewController {
                             guard let prettyPrintedJson = String(data: prettyJsonData, encoding: .utf8) else {
                                 return
                             }
-
                         } catch {
                             return
                         }
