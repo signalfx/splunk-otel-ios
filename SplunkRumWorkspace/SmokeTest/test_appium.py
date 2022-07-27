@@ -212,7 +212,9 @@ class IOSTests(unittest.TestCase):
         
     def validate_more_spans(self):
         sleep(10) #it takes time to generate spans.
-        self.driver.find_element(By.ID,"SDK Initialize validation").click()
+        self.driver.execute_script('mobile: scroll', {'direction': 'down'})
+        el=self.driver.find_element(By.ID,"Span Validation")
+        el.click()
         try:
             WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
                 EC.visibility_of_element_located((By.ID, "Success")),
