@@ -184,7 +184,6 @@ class NetworkRequestVC: UIViewController {
                                 return
                             }
 
-                            
                         } catch {
                             return
                         }
