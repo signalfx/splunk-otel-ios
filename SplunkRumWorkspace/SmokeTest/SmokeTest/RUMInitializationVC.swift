@@ -143,7 +143,6 @@ class RUMInitializationVC: UIViewController {
     }
     func isFileAvailableAt(resourcePath: String) throws {
         if FileManager.default.fileExists(atPath: resourcePath) {
-            print("file is exist at path")
         } else {
             throw CustomError.notFound
         }
@@ -199,7 +198,6 @@ struct Log: TextOutputStream {
     func write(_ string: String) {
         let fm = FileManager.default
         let log = fm.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("log.txt")
-        print(log)
         if let handle = try? FileHandle(forWritingTo: log) {
             handle.seekToEndOfFile()
             handle.write(string.data(using: .utf8)!)

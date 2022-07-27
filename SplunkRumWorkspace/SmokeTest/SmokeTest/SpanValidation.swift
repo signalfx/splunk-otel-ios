@@ -61,11 +61,9 @@ func screen_track_validation() -> Bool {
 
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
-    print(str)
     if str.contains(SCREEN_CHANGE_SPAN) && str.contains(SHOWVC_SPAN) && str.contains(SCREEN_TRACK_VC) && str.contains(CUSTOME_SCREEN_TRACK_VC) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 
@@ -78,7 +76,6 @@ func sdk_initialize_validation() -> Bool {
     if str.contains(INITIALIZE_SPAN) && str.contains(APP_START_SPAN) && str.contains(PRESENTATION_SPAN) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -90,7 +87,6 @@ func method_post_validation() -> Bool {
     if str.contains(POST_SPAN) && str.contains(NETWORK_CALL_POST_URL) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -102,7 +98,6 @@ func method_get_validation() -> Bool {
     if str.contains(GET_SPAN) && str.contains(NETWORK_CALL_GET_URL) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -114,7 +109,6 @@ func method_put_validation() -> Bool {
     if str.contains(PUT_SPAN) && str.contains(NETWORK_CALL_PUT_URL) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -126,7 +120,6 @@ func method_delete_validation() -> Bool {
     if str.contains(DELETE_SPAN) && str.contains(NETWORK_CALL_DELETE_URL) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -137,12 +130,10 @@ func read_log_file() -> (content: String, error: Bool) {
 
     if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
         let fileURL = dir.appendingPathComponent(file)
-        print("#########")
-        print(fileURL)
         do {
             let fileContent = try String(contentsOf: fileURL, encoding: .utf8)
             return (content:fileContent, error:false)
-        } catch { print("not able to read logs")}
+        } catch { }
     }
 
     return (content:"", error:true)
@@ -153,10 +144,7 @@ func read_log_file() -> (content: String, error: Bool) {
 func delete_logs() {
     do {
         try FileManager.default.removeItem(at: URL.init(fileURLWithPath: LOG_FILE_URL))
-        print("All Logs are deleted...")
-    } catch {
-        print("Failed to delete logs...")
-    }
+    } catch {}
 }
 /* clear content of log file*/
 func clear_logs() {
@@ -175,7 +163,6 @@ func customSpan_validation() -> Bool {
     if str.contains(CUSTOM_SPAN) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -187,7 +174,6 @@ func errorSpan_validation() -> Bool {
     if str.contains(ERROR_SPAN) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -200,7 +186,6 @@ func resignActiveSpan_validation() -> Bool {
     if str.contains(RESIGNACTIVE_SPAN) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -212,7 +197,6 @@ func enterForeGroundSpan_validation() -> Bool {
     if str.contains(ENTERFOREGROUND_SPAN) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -224,7 +208,6 @@ func appTerminateSpan_validation() -> Bool {
     if str.contains(APPTERMINATE_SPAN) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -235,7 +218,6 @@ func crashSpan_validation() -> Bool {
     if str.contains(CRASH_SPAN) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }
@@ -246,7 +228,6 @@ func webViewSpan_validation() -> Bool {
     if str.contains(WEBVIEW_SPAN) {
         return true
     } else {
-        print("No Logs found...")
         return false
     }
 }

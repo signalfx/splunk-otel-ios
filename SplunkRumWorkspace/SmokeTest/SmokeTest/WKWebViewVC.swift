@@ -33,7 +33,6 @@ class WKWebViewVC: UIViewController {
     }
 
     func loadWebView(withFile name: String) {
-        print("web view is loading using sample1.html....")
         let htmlPath = Bundle.main.path(forResource: name, ofType: "html")
         let htmlUrl = URL(fileURLWithPath: htmlPath!)
         SplunkRum.integrateWithBrowserRum(web)

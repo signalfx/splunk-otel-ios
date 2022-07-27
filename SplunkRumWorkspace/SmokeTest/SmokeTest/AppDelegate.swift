@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //        delete_logs()
           redirectLogToDocuments()
 
-        _ = SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "nF2sRwMTyB-is8WpcGQ72w", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true,
+        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true,
             globalAttributes: [:], environment: nil, ignoreURLs: nil))
 
        return true
@@ -53,7 +53,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let allPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         let documentsDirectory = allPaths.first!
         let pathForLog = (documentsDirectory as NSString).appending("/logs.txt")
-        print(pathForLog)
         freopen(pathForLog.cString(using: String.Encoding.ascii)!, "a+", stdout)
 
     }
