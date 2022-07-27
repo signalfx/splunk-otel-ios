@@ -206,8 +206,8 @@ class IOSTests(unittest.TestCase):
                 EC.visibility_of_element_located((By.ID, "Success")),
                 message='Span validation failed',
             )
-        except Exception as ex:
-            raise Exception(ex) 
+        except TimeoutException:
+                self.driver.find_element(By.ID,"Success") 
 
         
     def validate_more_spans(self):
