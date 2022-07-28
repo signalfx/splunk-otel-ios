@@ -23,7 +23,7 @@ import UIKit
 class ScreenFrames: NSObject {
 
     private var displayLink: CADisplayLink?
-    fileprivate var slowFrameScreenName: String = "unknown"
+    var slowFrameInfo:[(frameCount: Int, slowFrameScreenName: String, frameType: String)] = []
 
     private var slowFrameThreshold: CFTimeInterval = SplunkRum.configuredOptions?.slowFrameThreshold ?? 16.7
     private var frozenFrameThreshold: CFTimeInterval = SplunkRum.configuredOptions?.frozenFrameThreshold ?? 700
@@ -73,22 +73,23 @@ class ScreenFrames: NSObject {
 
          if duration > frozenFrameThreshold {
             frozenCount += 1
-            slowFrameScreenName = getScreenName()
+             self.slowFrameInfo.append((frameCount:frozenCount, slowFrameScreenName:getScreenName(), frameType:"frozenRenders"))
+
          } else if duration > slowFrameThreshold {
             slowCount += 1
-            slowFrameScreenName = getScreenName()
+             self.slowFrameInfo.append((frameCount:slowCount, slowFrameScreenName:getScreenName(), frameType:"slowRenders"))
+
          }
 
          if currentIteration != iteration {
 
-             if slowCount > 0 {
-                 reportSlowframe(slowFrameCount: slowCount, name: "slowRenders", screenName: slowFrameScreenName)
+             for dict in slowFrameInfo {
+                 if dict.frameCount > 0 {
+                     reportSlowframe(slowFrameCount: dict.frameCount, name: dict.frameType, screenName: dict.slowFrameScreenName)
+                 }
              }
 
-             if frozenCount > 0 {
-                 reportSlowframe(slowFrameCount: frozenCount, name: "frozenRenders", screenName: slowFrameScreenName)
-             }
-
+             slowFrameInfo.removeAll()
              slowCount = 0
              frozenCount = 0
              currentIteration = iteration
