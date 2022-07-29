@@ -112,6 +112,7 @@ class IOSTests(unittest.TestCase):
         self.driver.find_element(By.ID,"put").click();
         self.validate_span();
         
+        
     ''' 
     Generating the DELETE network request with the Alamofire and Validating the network span data.
     '''   
