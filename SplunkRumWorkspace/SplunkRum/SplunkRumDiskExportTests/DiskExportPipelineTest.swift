@@ -23,25 +23,46 @@ func rumOptions() -> SplunkRumOptions {
     options.debug = true
     options.allowInsecureBeacon = true
     options.enableDiskCache = true
+    options.spanDiskCacheMaxSize = 4096 * 4
     return options
 }
 
+fileprivate let receiver = TestSpanReceiver()
+fileprivate var started = false
+
 class DiskExportPipelineTest: XCTestCase {
-    func testExportPipeline() throws {
-        let receiver = TestSpanReceiver()
+
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        if started {
+            receiver.reset()
+            return
+        }
         try receiver.start(9733)
+
+        SpanDb.deleteAtDefaultLocation()
+
         XCTAssertTrue(
             SplunkRum.initialize(beaconUrl: "http://localhost:9733/v1/traces", rumAuth: "FAKE", options: rumOptions())
         )
 
-        buildTracer().spanBuilder(spanName: "test").startSpan().end()
+        started = true
+    }
 
-        sleep(11)
+    func testExportPipeline() throws {
+        for _ in 1...32 {
+            let span = buildTracer().spanBuilder(spanName: "large-span").startSpan()
+            span.setAttribute(key: "large-attribute", value: String(repeating: "abcd", count: 256))
+            span.setAttribute(key: "large-attribute-2", value: String(repeating: "abcd", count: 256))
+            span.end()
+        }
 
-        let spans = receiver.spans()
+        let spans = try receiver.waitForSpans().filter { $0.name == "large-span" }
+        // Assert all spans were either exported or dropped from disk.
+        XCTAssertEqual(SpanDb().fetch(count: 32).count, 0)
+        // The exported size is less than we sent, this means remaining spans were dropped.
+        XCTAssertLessThan(spans.count, 32)
+        // And make sure we didn't receive an empty array
         XCTAssertGreaterThan(spans.count, 0)
-        XCTAssertTrue(spans.contains(where: { s in
-            s.name == "test"
-        }))
     }
 }
