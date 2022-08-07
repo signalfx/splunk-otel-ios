@@ -46,7 +46,9 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
                       screenNameSpans: Bool = true,
                       networkInstrumentation: Bool = true,
                       enableDiskCache: Bool = false,
-                      spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES
+                      spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES,
+                      slowFrameThreshold: CFTimeInterval = 16.7,
+                      frozenFrameThreshold: CFTimeInterval = 700
     ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
@@ -56,6 +58,8 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
         self.networkInstrumentation = networkInstrumentation
+        self.slowFrameThreshold = slowFrameThreshold
+        self.frozenFrameThreshold = frozenFrameThreshold
         self.enableDiskCache = enableDiskCache
         self.spanDiskCacheMaxSize = spanDiskCacheMaxSize
     }
@@ -73,6 +77,8 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
         self.networkInstrumentation = opts.networkInstrumentation
+        self.slowFrameThreshold = opts.slowFrameThreshold
+        self.frozenFrameThreshold = opts.frozenFrameThreshold
         self.enableDiskCache = opts.enableDiskCache
         self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
     }
@@ -86,12 +92,12 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      */
     @objc public var debug: Bool = false
     /**
-                    Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
+            Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
      */
     @objc public var globalAttributes: [String: Any] = [:]
 
     /**
-        Sets a value for the "environment" global attribute
+     Sets a value for the "environment" global attribute
      */
     @objc public var environment: String?
 
@@ -119,6 +125,15 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      Enable NetworkInstrumentation span creation for https calls.
      */
     @objc public var networkInstrumentation: Bool = true
+     /**
+     The SlowFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as slow frames. User needs to provide this value in milliseconds.
+     */
+    @objc public var slowFrameThreshold: CFTimeInterval = 16.7
+
+    /**
+     The frozenFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as frozen frames. User needs to provide this value in milliseconds.
+     */
+    @objc public var frozenFrameThreshold: CFTimeInterval = 700
 
     /**
      Enable caching created spans to disk. On successful exports the spans are deleted.
@@ -151,7 +166,6 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
 }
 var globalAttributes: [String: Any] = [:]
 let globalAttributesLock = NSLock()
-
 let splunkLibraryLoadTime = Date()
 var splunkRumInitializeCalledTime = Date()
 
@@ -163,7 +177,6 @@ var splunkRumInitializeCalledTime = Date()
     static var initializing = false
     static var configuredOptions: SplunkRumOptions?
     static var theBeaconUrl: String?
-
     /**
             Initialization function.  Call as early as possible in your application, but only on the main thread.
                 - Parameter beaconUrl: Destination for the captured data.
@@ -244,6 +257,7 @@ var splunkRumInitializeCalledTime = Date()
         }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
+        startScreenTracking()
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true

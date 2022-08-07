@@ -23,6 +23,7 @@ fileprivate var screenNameManuallySet = false
 // I could find in the stdlib
 fileprivate var lock = NSLock()
 fileprivate var screenNameCallbacks: [((String) -> Void)] = []
+fileprivate var screenFrames: ScreenFrames = ScreenFrames()
 
 func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
     let now = Date()
@@ -81,4 +82,8 @@ func addScreenNameCallback(_ callback: @escaping ((String) -> Void)) {
         lock.unlock()
     }
     screenNameCallbacks.append(callback)
+}
+
+func startScreenTracking() {
+    screenFrames.startTracking()
 }

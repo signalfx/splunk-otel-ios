@@ -29,6 +29,8 @@ struct TestZipkinAnnotation: Decodable {
 }
 var receivedSpans: [TestZipkinSpan] = []
 var receivedNativeSessionId: String?
+var displayLink: CADisplayLink!
+var lastTimestamp: CFTimeInterval = CACurrentMediaTime()
 
 class SmokeTestUITests: XCTestCase {
 
@@ -158,7 +160,13 @@ class SmokeTestUITests: XCTestCase {
         XCTAssertNotNil(receivedNativeSessionId)
         XCTAssertEqual(appStart?.tags["splunk.rumSessionId"]?.description, receivedNativeSessionId)
 
+        let slowFrame = receivedSpans.first(where: { (span) -> Bool in
+            return span.name == "slowRenders"
+        })
+        XCTAssertNotNil(slowFrame)
+
         // FIXME multiple screens, pickVC cases, etc.
+
     }
 
 }

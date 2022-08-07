@@ -61,6 +61,10 @@ or
 | networkInstrumentation | Bool | Enable span creation for network activities | true |
 | enableDiskCache | Bool | Enable disk caching of exported spans. All spans will be written to disk and deleted on a successful export. | false |
 | spanDiskCacheMaxSize | Int64 | Threshold in bytes from which spans will start to be dropped from the disk cache (oldest first). Only applicable when disk caching is enabled. | 25 MB |
+| slowFrameThreshold | CFTimeInterval | The SlowFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as slow frames. User needs to provide this value in milliseconds. | 16.7ms |
+| frozenFrameThreshold | CFTimeInterval | The frozenFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as frozen frames. User needs to provide this value in milliseconds. | 700ms |
+| enableDiskCache | Bool | Enable disk caching of exported spans. All spans will be written to disk and deleted on a successful export. The storage is capped at 64 MB. | false |
+
 
 ## Crash Reporting
 
