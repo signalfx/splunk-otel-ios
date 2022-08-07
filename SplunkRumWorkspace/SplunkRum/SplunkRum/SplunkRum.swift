@@ -128,12 +128,12 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      */
     @objc public var networkInstrumentation: Bool = true
      /**
-     The SlowFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as slow frames. User needs to provide this value in milliseconds.
+     Threshold, in milliseconds, from which to count a rendered frame as slow.
      */
     @objc public var slowFrameDetectionThresholdMs: Double = 16.7
 
     /**
-     The frozenFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as frozen frames. User needs to provide this value in milliseconds.
+     Threshold, in milliseconds, from which to count a rendered frame as frozen.
      */
     @objc public var frozenFrameDetectionThresholdMs: Double = 700
 
