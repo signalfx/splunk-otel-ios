@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swiftlint:disable file_length
+
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
@@ -47,8 +49,8 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
                       networkInstrumentation: Bool = true,
                       enableDiskCache: Bool = false,
                       spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES,
-                      slowFrameThreshold: CFTimeInterval = 16.7,
-                      frozenFrameThreshold: CFTimeInterval = 700
+                      slowFrameDetectionThresholdMs: Double = 16.7,
+                      frozenFrameDetectionThresholdMs: Double = 700
     ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
@@ -58,8 +60,8 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.ignoreURLs = ignoreURLs
         self.screenNameSpans = screenNameSpans
         self.networkInstrumentation = networkInstrumentation
-        self.slowFrameThreshold = slowFrameThreshold
-        self.frozenFrameThreshold = frozenFrameThreshold
+        self.slowFrameDetectionThresholdMs = slowFrameDetectionThresholdMs
+        self.frozenFrameDetectionThresholdMs = frozenFrameDetectionThresholdMs
         self.enableDiskCache = enableDiskCache
         self.spanDiskCacheMaxSize = spanDiskCacheMaxSize
     }
@@ -77,8 +79,8 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
         self.networkInstrumentation = opts.networkInstrumentation
-        self.slowFrameThreshold = opts.slowFrameThreshold
-        self.frozenFrameThreshold = opts.frozenFrameThreshold
+        self.slowFrameDetectionThresholdMs = opts.slowFrameDetectionThresholdMs
+        self.frozenFrameDetectionThresholdMs = opts.frozenFrameDetectionThresholdMs
         self.enableDiskCache = opts.enableDiskCache
         self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
     }
@@ -128,12 +130,12 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      /**
      The SlowFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as slow frames. User needs to provide this value in milliseconds.
      */
-    @objc public var slowFrameThreshold: CFTimeInterval = 16.7
+    @objc public var slowFrameDetectionThresholdMs: Double = 16.7
 
     /**
      The frozenFrame Threshold is an optional configuration that marks all the frames that took more than the specified time as frozen frames. User needs to provide this value in milliseconds.
      */
-    @objc public var frozenFrameThreshold: CFTimeInterval = 700
+    @objc public var frozenFrameDetectionThresholdMs: Double = 700
 
     /**
      Enable caching created spans to disk. On successful exports the spans are deleted.
@@ -257,7 +259,10 @@ var splunkRumInitializeCalledTime = Date()
         }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
-        startScreenTracking()
+        startSlowFrameDetector(
+            slowFrameDetectionThresholdMs: options?.slowFrameDetectionThresholdMs,
+            frozenFrameDetectionThresholdMs: options?.frozenFrameDetectionThresholdMs
+        )
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
@@ -402,5 +407,4 @@ var splunkRumInitializeCalledTime = Date()
     @objc public class func isInitialized() -> Bool {
         return initialized
     }
-
 }

@@ -139,10 +139,14 @@ class SmokeTestUITests: XCTestCase {
         // should be in the same session
         XCTAssertEqual(resign?.tags["splunk.rumSessionId"]?.description, foreground?.tags["splunk.rumSessionId"]?.description)
 
+        app.buttons["SMALL SLEEP"].tap()
+        app.buttons["LARGE SLEEP"].tap()
+
         // IBAction
         app.buttons["CLICK ME"].tap()
+
         sleep(SLEEP_TIME)
-        let action = receivedSpans.first(where: { (span) -> Bool in
+        let action = receivedSpans.last(where: { (span) -> Bool in
             return span.name == "action"
         })
         XCTAssertNotNil(action)
@@ -160,13 +164,21 @@ class SmokeTestUITests: XCTestCase {
         XCTAssertNotNil(receivedNativeSessionId)
         XCTAssertEqual(appStart?.tags["splunk.rumSessionId"]?.description, receivedNativeSessionId)
 
-        let slowFrame = receivedSpans.first(where: { (span) -> Bool in
+        let slowFrameSpan = receivedSpans.first(where: { (span) -> Bool in
             return span.name == "slowRenders"
         })
-        XCTAssertNotNil(slowFrame)
+        XCTAssertNotNil(slowFrameSpan)
+        XCTAssertGreaterThan(Int(slowFrameSpan?.tags["count"] ?? "0") ?? 0, 0)
+        XCTAssertEqual("ViewController", slowFrameSpan?.tags["screen.name"])
+
+        let frozenFrameSpan = receivedSpans.first(where: { (span) -> Bool in
+            return span.name == "frozenRenders"
+        })
+        XCTAssertNotNil(frozenFrameSpan)
+        XCTAssertGreaterThan(Int(frozenFrameSpan?.tags["count"] ?? "0") ?? 0, 0)
+        XCTAssertEqual("ViewController", frozenFrameSpan?.tags["screen.name"])
 
         // FIXME multiple screens, pickVC cases, etc.
-
     }
 
 }

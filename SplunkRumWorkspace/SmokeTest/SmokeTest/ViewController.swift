@@ -40,4 +40,13 @@ class ViewController: UIViewController, WKUIDelegate {
         webview.load(req)
     }
 
+    @IBAction
+    func smallSleep() {
+        usleep(100 * 1000) // 100 ms
+    }
+
+    @IBAction
+    func largeSleep() {
+        usleep(1000 * 1000) // 1000 ms
+    }
 }
