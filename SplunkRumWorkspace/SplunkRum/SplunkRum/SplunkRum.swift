@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swiftlint:disable file_length
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
@@ -38,7 +39,6 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      */
     @objc public override init() {
     }
-
     /**
         Memberwise initializer
      */
@@ -46,7 +46,9 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
                       screenNameSpans: Bool = true,
                       networkInstrumentation: Bool = true,
                       enableDiskCache: Bool = false,
-                      spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES
+                      spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES,
+                      slowFrameDetectionThresholdMs: Double = 16.7,
+                      frozenFrameDetectionThresholdMs: Double = 700
     ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
@@ -58,6 +60,8 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.networkInstrumentation = networkInstrumentation
         self.enableDiskCache = enableDiskCache
         self.spanDiskCacheMaxSize = spanDiskCacheMaxSize
+        self.slowFrameDetectionThresholdMs = slowFrameDetectionThresholdMs
+        self.frozenFrameDetectionThresholdMs = frozenFrameDetectionThresholdMs
     }
     /**
         Copy constructor
@@ -72,6 +76,8 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.spanFilter = opts.spanFilter
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
+        self.slowFrameDetectionThresholdMs = opts.slowFrameDetectionThresholdMs
+        self.frozenFrameDetectionThresholdMs = opts.frozenFrameDetectionThresholdMs
         self.networkInstrumentation = opts.networkInstrumentation
         self.enableDiskCache = opts.enableDiskCache
         self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
@@ -119,6 +125,16 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      Enable NetworkInstrumentation span creation for https calls.
      */
     @objc public var networkInstrumentation: Bool = true
+
+    /**
+     Threshold, in milliseconds, from which to count a rendered frame as slow.
+    */
+    @objc public var slowFrameDetectionThresholdMs: Double = 16.7
+
+    /**
+     Threshold, in milliseconds, from which to count a rendered frame as frozen.
+    */
+    @objc public var frozenFrameDetectionThresholdMs: Double = 700
 
     /**
      Enable caching created spans to disk. On successful exports the spans are deleted.
@@ -244,6 +260,10 @@ var splunkRumInitializeCalledTime = Date()
         }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
+        startSlowFrameDetector(
+                    slowFrameDetectionThresholdMs: options?.slowFrameDetectionThresholdMs,
+                    frozenFrameDetectionThresholdMs: options?.frozenFrameDetectionThresholdMs
+                )
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
@@ -388,5 +408,4 @@ var splunkRumInitializeCalledTime = Date()
     @objc public class func isInitialized() -> Bool {
         return initialized
     }
-
 }

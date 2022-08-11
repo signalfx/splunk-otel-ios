@@ -29,6 +29,8 @@ struct TestZipkinAnnotation: Decodable {
 }
 var receivedSpans: [TestZipkinSpan] = []
 var receivedNativeSessionId: String?
+var displayLink: CADisplayLink!
+var lastTimestamp: CFTimeInterval = CACurrentMediaTime()
 
 class SmokeTestUITests: XCTestCase {
 
@@ -137,10 +139,13 @@ class SmokeTestUITests: XCTestCase {
         // should be in the same session
         XCTAssertEqual(resign?.tags["splunk.rumSessionId"]?.description, foreground?.tags["splunk.rumSessionId"]?.description)
 
+        app.buttons["SMALL SLEEP"].tap()
+        app.buttons["LARGE SLEEP"].tap()
+
         // IBAction
         app.buttons["CLICK ME"].tap()
         sleep(SLEEP_TIME)
-        let action = receivedSpans.first(where: { (span) -> Bool in
+        let action = receivedSpans.last(where: { (span) -> Bool in
             return span.name == "action"
         })
         XCTAssertNotNil(action)
@@ -157,6 +162,20 @@ class SmokeTestUITests: XCTestCase {
         // The webview should now have rendered the page with a session ID embedded in it, and posted that back to us
         XCTAssertNotNil(receivedNativeSessionId)
         XCTAssertEqual(appStart?.tags["splunk.rumSessionId"]?.description, receivedNativeSessionId)
+
+        let slowFrameSpan = receivedSpans.first(where: { (span) -> Bool in
+            return span.name == "slowRenders"
+        })
+        XCTAssertNotNil(slowFrameSpan)
+        XCTAssertGreaterThan(Int(slowFrameSpan?.tags["count"] ?? "0") ?? 0, 0)
+        XCTAssertEqual("ViewController", slowFrameSpan?.tags["screen.name"])
+
+        let frozenFrameSpan = receivedSpans.first(where: { (span) -> Bool in
+            return span.name == "frozenRenders"
+        })
+        XCTAssertNotNil(frozenFrameSpan)
+        XCTAssertGreaterThan(Int(frozenFrameSpan?.tags["count"] ?? "0") ?? 0, 0)
+        XCTAssertEqual("ViewController", frozenFrameSpan?.tags["screen.name"])
 
         // FIXME multiple screens, pickVC cases, etc.
     }
