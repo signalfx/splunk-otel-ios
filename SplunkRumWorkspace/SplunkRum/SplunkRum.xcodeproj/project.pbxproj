@@ -34,6 +34,7 @@
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
+		88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88734FE528A55FB60035960F /* SlowFrameDetector.swift */; };
 		E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */; };
 		E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */; };
 		E2ACB21D283F855C006A1475 /* SpanDb.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21C283F855C006A1475 /* SpanDb.swift */; };
@@ -105,6 +106,7 @@
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
+		88734FE528A55FB60035960F /* SlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetector.swift; sourceTree = "<group>"; };
 		E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanToDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanFromDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21C283F855C006A1475 /* SpanDb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDb.swift; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 				86043B7B25F93E3400A29788 /* Log.swift */,
 				8634EDC325FA86D20082819A /* LimitingExporter.swift */,
 				8616CD5E266E673F0048980B /* ScreenName.swift */,
+				88734FE528A55FB60035960F /* SlowFrameDetector.swift */,
 				865DBDD82677AA7B00EFE8D5 /* RetryExporter.swift */,
 				8607AD4A267B9032004FAFFD /* AppLifecycle.swift */,
 				8624DAB4269CAE61005D65DE /* NetworkType.swift */,
@@ -396,6 +399,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */,
 				8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */,
 				8616CD5F266E673F0048980B /* ScreenName.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
