@@ -38,7 +38,6 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      */
     @objc public override init() {
     }
-
     /**
         Memberwise initializer
      */
