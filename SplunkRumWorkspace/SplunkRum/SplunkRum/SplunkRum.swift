@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// swiftlint:disable file_length
+
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
