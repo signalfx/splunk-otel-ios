@@ -29,8 +29,8 @@ extension UIApplication {
                                                for event: UIEvent?) -> Bool {
         updateUIFields()
         let tracer = buildTracer()
-        let span = tracer.spanBuilder(spanName: "action").startSpan()
-        span.setAttribute(key: "component", value: "ui")
+        let span = tracer.spanBuilder(spanName: Attribute.SPAN_NAME_ACTION).startSpan()
+        span.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.COMPONENT_UI)
         span.setAttribute(key: "action.name", value: action.description)
         OpenTelemetry.instance.contextProvider.setActiveSpan(span)
         defer {
@@ -92,8 +92,8 @@ class NotificationPairInstrumener {
             if notifObj != nil {
                 let span = buildTracer().spanBuilder(spanName: self.spanName).startSpan()
                 // captured at beginning since it will possibly/likely change
-                span.setAttribute(key: "last.screen.name", value: getScreenName())
-                span.setAttribute(key: "component", value: "ui")
+                span.setAttribute(key: Attribute.LAST_SCREEN_NAME_KEY, value: getScreenName())
+                span.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.COMPONENT_UI)
                 // FIXME better naming
                 span.setAttribute(key: "object.type", value: String(describing: type(of: notif.object!)))
                 self.obj2Span.setObject(SpanHolder(span), forKey: notifObj)
@@ -107,7 +107,7 @@ class NotificationPairInstrumener {
                 let spanHolder = self.obj2Span.object(forKey: notifObj)
                 if spanHolder != nil {
                     // screenName may have changed now that the view has appeared; update new screen name
-                    spanHolder?.span.setAttribute(key: "screen.name", value: getScreenName())
+                    spanHolder?.span.setAttribute(key: Attribute.SCREEN_NAME_KEY, value: getScreenName())
                     spanHolder?.span.end()
                 }
             }
@@ -119,7 +119,7 @@ class NotificationPairInstrumener {
 let PresentationTransitionInstrumenter = NotificationPairInstrumener(
     begin: "UIPresentationControllerPresentationTransitionWillBeginNotification",
     end: "UIPresentationControllerPresentationTransitionDidEndNotification",
-    spanName: "PresentationTransition")
+    spanName: Attribute.SPAN_NAME_PRESENTATION_TRANSITION)
 
 func initializePresentationTransitionInstrumentation() {
     PresentationTransitionInstrumenter.start()
@@ -131,7 +131,7 @@ func initializePresentationTransitionInstrumentation() {
 let ShowVCInstrumenter = NotificationPairInstrumener(
     begin: "UINavigationControllerWillShowViewControllerNotification",
     end: "UINavigationControllerDidShowViewControllerNotification",
-    spanName: "ShowVC")
+    spanName: Attribute.SPAN_NAME_SHOWVC)
 
 func initializeShowVCInstrumentation() {
     ShowVCInstrumenter.start()
@@ -144,7 +144,7 @@ func addUIFields(span: ReadableSpan) {
     // Note that this may be called from threads other than main (e.g., background thread
     // creating span); hence trying to update cached values whenever we can and simply using
     // them here
-    span.setAttribute(key: "screen.name", value: getScreenName())
+    span.setAttribute(key: Attribute.SCREEN_NAME_KEY, value: getScreenName())
 }
 
 private func pickVC(_ vc: UIViewController?) -> UIViewController? {

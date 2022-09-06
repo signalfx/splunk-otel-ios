@@ -49,6 +49,7 @@ class GlobalAttributesProcessor: SpanProcessor {
 
     let appName: String
     let appVersion: String?
+    let buildNumber: String?
     let deviceModel: String
     init() {
         let app = Bundle.main.infoDictionary?["CFBundleName"] as? String
@@ -58,6 +59,7 @@ class GlobalAttributesProcessor: SpanProcessor {
             appName = "unknown-app"
         }
         appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
         deviceModel = computeDeviceModel()
     }
 
@@ -65,6 +67,9 @@ class GlobalAttributesProcessor: SpanProcessor {
         span.setAttribute(key: "app", value: appName)
         if appVersion != nil {
             span.setAttribute(key: "app.version", value: appVersion!)
+        }
+        if buildNumber != nil {
+            span.setAttribute(key: "app.build.type", value: buildNumber!)
         }
         // glossing over iPadOS, watchOS, etc. here, knowing that the device model spells out reality
         span.setAttribute(key: "os.name", value: "iOS")

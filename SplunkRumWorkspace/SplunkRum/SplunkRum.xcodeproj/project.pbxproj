@@ -35,6 +35,8 @@
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
 		88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88734FE528A55FB60035960F /* SlowFrameDetector.swift */; };
+		88979F5F28C7128900FE0A30 /* SplunkRumOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88979F5E28C7128900FE0A30 /* SplunkRumOptions.swift */; };
+		88979F6128C7136900FE0A30 /* Attribute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88979F6028C7136900FE0A30 /* Attribute.swift */; };
 		E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */; };
 		E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */; };
 		E2ACB21D283F855C006A1475 /* SpanDb.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21C283F855C006A1475 /* SpanDb.swift */; };
@@ -107,6 +109,8 @@
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
 		88734FE528A55FB60035960F /* SlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetector.swift; sourceTree = "<group>"; };
+		88979F5E28C7128900FE0A30 /* SplunkRumOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkRumOptions.swift; sourceTree = "<group>"; };
+		88979F6028C7136900FE0A30 /* Attribute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attribute.swift; sourceTree = "<group>"; };
 		E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanToDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanFromDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21C283F855C006A1475 /* SpanDb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDb.swift; sourceTree = "<group>"; };
@@ -203,6 +207,8 @@
 				E2ACB21C283F855C006A1475 /* SpanDb.swift */,
 				E2ACB21E283F871D006A1475 /* ZipkinTransform.swift */,
 				E2AFD9E62846919C000F53BF /* BandwidthTracker.swift */,
+				88979F5E28C7128900FE0A30 /* SplunkRumOptions.swift */,
+				88979F6028C7136900FE0A30 /* Attribute.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -402,6 +408,7 @@
 				88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */,
 				8654BCEC25E423170013F7F6 /* InstrumentationUtils.swift in Sources */,
 				8616CD5F266E673F0048980B /* ScreenName.swift in Sources */,
+				88979F5F28C7128900FE0A30 /* SplunkRumOptions.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
 				E2ACB21F283F871D006A1475 /* ZipkinTransform.swift in Sources */,
 				E2ACB21D283F855C006A1475 /* SpanDb.swift in Sources */,
@@ -416,6 +423,7 @@
 				8624DAB5269CAE61005D65DE /* NetworkType.swift in Sources */,
 				8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
+				88979F6128C7136900FE0A30 /* Attribute.swift in Sources */,
 				E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */,
 				86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */,
 				8654BCF825E54D340013F7F6 /* ErrorReporting.swift in Sources */,
