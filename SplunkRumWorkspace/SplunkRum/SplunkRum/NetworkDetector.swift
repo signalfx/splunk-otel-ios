@@ -23,13 +23,13 @@ func NetworkDetector() {
     let networkInfo = CTTelephonyNetworkInfo()
 
     if #available(iOS 12.0, *) {
-
-        if let carrier = networkInfo.serviceSubscriberCellularProviders?.filter({ $0.value.carrierName != nil }).first?.value {
-            if carrier.mobileCountryCode != nil {
-                reportCarrierNameSpan(carrierName: carrier.carrierName!)
+        if let providers = CTTelephonyNetworkInfo().serviceSubscriberCellularProviders {
+               providers.forEach { (_, value) in
+                if value.mobileCountryCode != nil {
+                    reportCarrierNameSpan(carrierName: value.carrierName!)
+                }
             }
         }
-
     } else {
 
         let carriers = networkInfo.subscriberCellularProvider
