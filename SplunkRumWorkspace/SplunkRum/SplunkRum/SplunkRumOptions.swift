@@ -150,6 +150,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
        Enable the slow rendering detection feature.
      */
     @objc public var slowRenderingDetectionEnabled: Bool = true
+    
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
