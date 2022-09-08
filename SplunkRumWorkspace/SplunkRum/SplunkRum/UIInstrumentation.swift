@@ -19,6 +19,7 @@ import Foundation
 import UIKit
 import OpenTelemetryApi
 import OpenTelemetrySdk
+import CoreTelephony
 
 // swiftlint:disable missing_docs
 extension UIApplication {
