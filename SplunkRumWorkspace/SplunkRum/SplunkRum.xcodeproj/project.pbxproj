@@ -34,7 +34,7 @@
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
-		88582DF528C6258C0079B398 /* NetworkDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88582DF428C6258C0079B398 /* NetworkDetector.swift */; };
+		883C683028C9EC8E00095B8E /* Networkdetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 883C682F28C9EC8E00095B8E /* Networkdetector.swift */; };
 		88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88734FE528A55FB60035960F /* SlowFrameDetector.swift */; };
 		E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */; };
 		E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */; };
@@ -107,7 +107,7 @@
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
-		88582DF428C6258C0079B398 /* NetworkDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDetector.swift; sourceTree = "<group>"; };
+		883C682F28C9EC8E00095B8E /* Networkdetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Networkdetector.swift; sourceTree = "<group>"; };
 		88734FE528A55FB60035960F /* SlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetector.swift; sourceTree = "<group>"; };
 		E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanToDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanFromDiskExporter.swift; sourceTree = "<group>"; };
@@ -205,7 +205,7 @@
 				E2ACB21C283F855C006A1475 /* SpanDb.swift */,
 				E2ACB21E283F871D006A1475 /* ZipkinTransform.swift */,
 				E2AFD9E62846919C000F53BF /* BandwidthTracker.swift */,
-				88582DF428C6258C0079B398 /* NetworkDetector.swift */,
+				883C682F28C9EC8E00095B8E /* Networkdetector.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -416,7 +416,7 @@
 				8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
 				86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */,
-				88582DF528C6258C0079B398 /* NetworkDetector.swift in Sources */,
+				883C683028C9EC8E00095B8E /* Networkdetector.swift in Sources */,
 				8624DAB5269CAE61005D65DE /* NetworkType.swift in Sources */,
 				8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,

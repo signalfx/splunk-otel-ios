@@ -14,6 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+	
 
 import Foundation
 import CoreTelephony
@@ -23,7 +24,7 @@ func NetworkDetector() {
     let networkInfo = CTTelephonyNetworkInfo()
 
     if #available(iOS 12.0, *) {
-        if let providers = CTTelephonyNetworkInfo().serviceSubscriberCellularProviders {
+        if let providers = networkInfo.serviceSubscriberCellularProviders {
                providers.forEach { (_, value) in
                 if value.mobileCountryCode != nil {
                     reportCarrierNameSpan(carrierName: value.carrierName!)
