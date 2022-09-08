@@ -223,3 +223,34 @@ func initalizeUIInstrumentation() {
     swizzle(clazz: UIViewController.self, orig: #selector(UIViewController.viewDidDisappear(_:)), swizzled: #selector(UIViewController.splunk_swizzled_viewDidDisappear(_:)))
 
 }
+func NetworkDetector() {
+
+    let networkInfo = CTTelephonyNetworkInfo()
+
+    if #available(iOS 12.0, *) {
+        if let providers = networkInfo.serviceSubscriberCellularProviders {
+               providers.forEach { (_, value) in
+                if value.mobileCountryCode != nil {
+                    reportCarrierNameSpan(carrierName: value.carrierName!)
+                }
+            }
+        }
+    } else {
+
+        let carriers = networkInfo.subscriberCellularProvider
+        let mobileCarrierName = carriers?.carrierName
+        if mobileCarrierName != nil {
+            reportCarrierNameSpan(carrierName: mobileCarrierName!)
+        }
+    }
+}
+
+func reportCarrierNameSpan(carrierName: String) {
+    let tracer = buildTracer()
+    let now = Date()
+    let typeName = "Network"
+    let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
+    span.setAttribute(key: "component", value: "ui")
+    span.setAttribute(key: "carrierName", value: carrierName)
+    span.end(time: now)
+}
