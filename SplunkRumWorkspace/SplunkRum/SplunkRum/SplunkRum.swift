@@ -42,13 +42,18 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil,
+    @objc public init(allowInsecureBeacon: Bool = false,
+                      debug: Bool = false,
+                      globalAttributes: [String: Any] = [:],
+                      environment: String? = nil,
+                      ignoreURLs: NSRegularExpression? = nil,
                       screenNameSpans: Bool = true,
                       networkInstrumentation: Bool = true,
                       enableDiskCache: Bool = false,
                       spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES,
                       slowFrameDetectionThresholdMs: Double = 16.7,
-                      frozenFrameDetectionThresholdMs: Double = 700
+                      frozenFrameDetectionThresholdMs: Double = 700,
+                      sessionBaseSamplingRatio: Double = 1.0
     ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
@@ -62,6 +67,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.spanDiskCacheMaxSize = spanDiskCacheMaxSize
         self.slowFrameDetectionThresholdMs = slowFrameDetectionThresholdMs
         self.frozenFrameDetectionThresholdMs = frozenFrameDetectionThresholdMs
+        self.sessionBaseSamplingRatio = sessionBaseSamplingRatio
     }
     /**
         Copy constructor
@@ -81,6 +87,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.networkInstrumentation = opts.networkInstrumentation
         self.enableDiskCache = opts.enableDiskCache
         self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
+        self.sessionBaseSamplingRatio = opts.sessionBaseSamplingRatio
     }
 
     /**
@@ -147,6 +154,11 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      */
     @objc public var spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES
 
+    /**
+    Percentage of sessions to send spans / data.
+     */
+    @objc public var sessionBaseSamplingRatio: Double = 1.0
+
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
         if spanFilter != nil {
@@ -183,10 +195,8 @@ var splunkRumInitializeCalledTime = Date()
     /**
             Initialization function.  Call as early as possible in your application, but only on the main thread.
                 - Parameter beaconUrl: Destination for the captured data.
-     
                 - Parameter rumAuth: Publicly-visible `rumAuth` value.  Please do not paste any other access token or auth value into here, as this will be visible to every user of your app
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
-     
      */
     // swiftlint:disable:next cyclomatic_complexity
     @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
@@ -212,6 +222,13 @@ var splunkRumInitializeCalledTime = Date()
         }
         if options?.environment != nil {
             setGlobalAttributes(["environment": options!.environment!])
+        }
+        if options?.sessionBaseSamplingRatio != nil {
+            let samplingRatio = options!.sessionBaseSamplingRatio
+            if samplingRatio >= 0.0 && samplingRatio <= 1.0 {
+                _ = SessionBasedSampler(ratio: samplingRatio)
+                SessionBasedSampler.sessionShouldSample()
+            }
         }
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
