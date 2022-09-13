@@ -267,7 +267,6 @@ var splunkRumInitializeCalledTime = Date()
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
-        NetworkDetector()
         print("SplunkRum.initialize() complete")
         return true
 
