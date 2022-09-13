@@ -260,7 +260,6 @@ var splunkRumInitializeCalledTime = Date()
         }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
-        //networkDetector()
         startSlowFrameDetector(
                     slowFrameDetectionThresholdMs: options?.slowFrameDetectionThresholdMs,
                     frozenFrameDetectionThresholdMs: options?.frozenFrameDetectionThresholdMs
