@@ -7,9 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3475455C7915AC50E841EAFF /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866192F325ED329E0035F08E /* Session.swift */; };
 		347548AF5D4C726DADBF4594 /* SessionBasedSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347548C7D043FDD05F6DED81 /* SessionBasedSampler.swift */; };
-		34754ECAA58B9F34C4B69238 /* SessionBasedSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 347548C7D043FDD05F6DED81 /* SessionBasedSampler.swift */; };
 		86043B7C25F93E3400A29788 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86043B7B25F93E3400A29788 /* Log.swift */; };
 		8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8607AD4A267B9032004FAFFD /* AppLifecycle.swift */; };
 		8610004626178DB9008B972A /* DeviceKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8610004526178DB9008B972A /* DeviceKit */; };
@@ -439,8 +437,6 @@
 				E2AFD9E9284691EE000F53BF /* BandwidthTrackerTest.swift in Sources */,
 				865A5CA125DC33EF003A1E5A /* NetworkInstrumentationTests.swift in Sources */,
 				E2AFD9EB28469C93000F53BF /* SpanDbTest.swift in Sources */,
-				34754ECAA58B9F34C4B69238 /* SessionBasedSampler.swift in Sources */,
-				3475455C7915AC50E841EAFF /* Session.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

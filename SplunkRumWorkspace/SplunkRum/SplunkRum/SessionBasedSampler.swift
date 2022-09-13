@@ -25,7 +25,7 @@ class SessionBasedSampler {
         SessionBasedSampler.probability = ratio
     }
 
-    public class func sessionShouldSample() {
+    @discardableResult public class func sessionShouldSample() -> Bool {
         let samplingPercentage = SessionBasedSampler.probability
         let step = Double(1/samplingPercentage)
         let roundedStepValue = round(step * 10) / 10.0
@@ -37,7 +37,7 @@ class SessionBasedSampler {
         case 1.0:
             result = true
         default:
-            if floor(Double(SessionBasedSampler.sessionCount).truncatingRemainder(dividingBy: roundedStepValue)) == 0{
+            if floor(Double(SessionBasedSampler.sessionCount).truncatingRemainder(dividingBy: roundedStepValue)) == 0 {
                 result = true
             } else {
                 result = false
@@ -56,6 +56,8 @@ class SessionBasedSampler {
             SessionBasedSampler.sessionCount += 1
             SessionBasedSampler.startTimer()
         }
+        
+        return result
     }
 
     public class func startTimer() {
