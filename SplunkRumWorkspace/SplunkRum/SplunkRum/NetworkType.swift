@@ -22,7 +22,7 @@ import CoreTelephony
 
 @available(iOS 12.0, *)
 let networkMonitor = NWPathMonitor()
-let networkInfo = CTTelephonyNetworkInfo()
+let carrierInfo    = CTTelephonyNetworkInfo()
 var hostConnectionType: String?
 func initializeNetworkTypeMonitoring() {
     if #available(iOS 12.0, *) {
@@ -43,20 +43,20 @@ func initializeNetworkTypeMonitoring() {
 
 }
 
-func NetworkDetector() {
+func networkDetector() {
     if #available(iOS 12.0, *) {
-        if let providers = networkInfo.serviceSubscriberCellularProviders {
-               providers.forEach { (_, value) in
+        if let carrier = carrierInfo.serviceSubscriberCellularProviders {
+               carrier.forEach { (_, value) in
                 if value.mobileCountryCode != nil {
                     reportCarrierNameSpan(carrierName: value.carrierName!)
                 }
             }
         }
     } else {
-        let carriers = networkInfo.subscriberCellularProvider
-        let mobileCarrierName = carriers?.carrierName
-        if mobileCarrierName != nil {
-            reportCarrierNameSpan(carrierName: mobileCarrierName!)
+        let networkCarrier = carrierInfo.subscriberCellularProvider
+        let networkCarrierName = networkCarrier?.carrierName
+        if networkCarrierName != nil {
+            reportCarrierNameSpan(carrierName: networkCarrierName!)
         }
     }
 }
