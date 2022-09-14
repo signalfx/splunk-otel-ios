@@ -158,7 +158,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     Percentage of sessions to send spans / data.
      */
     @objc public var sessionBaseSamplingRatio: Double = 1.0
-    
+
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
         if spanFilter != nil {
