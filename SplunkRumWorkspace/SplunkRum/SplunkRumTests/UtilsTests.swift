@@ -206,6 +206,7 @@ class UtilsTests: XCTestCase {
 
     }
 
+    /**Test Initialization of SessionBasedSampler**/
     func testSessionBasedSamplingInitialization() throws {
         SplunkRum.initialized = false
         _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
