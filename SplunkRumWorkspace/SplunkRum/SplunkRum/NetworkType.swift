@@ -48,7 +48,7 @@ func networkDetector() {
         if let carrier = carrierInfo.serviceSubscriberCellularProviders {
                carrier.forEach { (_, value) in
                 if value.mobileCountryCode != nil {
-                    reportCarrierNameSpan(carrierName: value.carrierName!)
+                    reportCarrierNameSpan(networkCarrierName: value.carrierName!)
                 }
             }
         }
@@ -56,17 +56,17 @@ func networkDetector() {
         let networkCarrier = carrierInfo.subscriberCellularProvider
         let networkCarrierName = networkCarrier?.carrierName
         if networkCarrierName != nil {
-            reportCarrierNameSpan(carrierName: networkCarrierName!)
+            reportCarrierNameSpan(networkCarrierName: networkCarrierName!)
         }
     }
 }
 
-func reportCarrierNameSpan(carrierName: String) {
+func reportCarrierNameSpan(networkCarrierName: String) {
     let tracer = buildTracer()
     let now = Date()
     let typeName = "Network"
     let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
     span.setAttribute(key: "component", value: "ui")
-    span.setAttribute(key: "carrierName", value: carrierName)
+    span.setAttribute(key: "carrierName", value: networkCarrierName)
     span.end(time: now)
 }
