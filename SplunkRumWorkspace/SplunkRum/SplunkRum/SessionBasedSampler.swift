@@ -59,7 +59,6 @@ class SessionBasedSampler {
             SessionBasedSampler.sessionCount += 1
             SessionBasedSampler.startTimer()
         }
-        
         return result
     }
 
