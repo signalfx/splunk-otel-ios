@@ -221,6 +221,7 @@ class UtilsTests: XCTestCase {
         XCTAssertEqual(SessionBasedSampler.probability, 0.2)
     }
 
+    /**Test Sending All Spans**/
     func testSessionBasedSampling100Pct() throws {
         SplunkRum.initialized = false
         _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
@@ -236,6 +237,7 @@ class UtilsTests: XCTestCase {
         XCTAssertTrue(shouldSample)
     }
 
+    /**Tests Sending 0 Spans**/
     func testSessionBasedSampling0Pct() throws {
         SplunkRum.initialized = false
         _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
