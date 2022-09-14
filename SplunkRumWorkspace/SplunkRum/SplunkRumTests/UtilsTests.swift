@@ -207,6 +207,7 @@ class UtilsTests: XCTestCase {
     }
 
     func testSessionBasedSamplingInitialization() throws {
+        SplunkRum.initialized = false
         _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
                                  rumAuth: "FAKE_RUM_AUTH",
                                  options: SplunkRumOptions(allowInsecureBeacon: true,
@@ -221,6 +222,7 @@ class UtilsTests: XCTestCase {
     }
 
     func testSessionBasedSampling100Pct() throws {
+        SplunkRum.initialized = false
         _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
                                  rumAuth: "FAKE_RUM_AUTH",
                                  options: SplunkRumOptions(allowInsecureBeacon: true,
@@ -235,6 +237,7 @@ class UtilsTests: XCTestCase {
     }
 
     func testSessionBasedSampling0Pct() throws {
+        SplunkRum.initialized = false
         _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
                                  rumAuth: "FAKE_RUM_AUTH",
                                  options: SplunkRumOptions(allowInsecureBeacon: true,
