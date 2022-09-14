@@ -42,7 +42,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
                       screenNameSpans: Bool = true,
                       networkInstrumentation: Bool = true,
                       enableDiskCache: Bool = false,
-                      slowRenderingDetectionEnabled: Bool = true,
+                      slowRenderingDetectionEnabled: Bool = false,
                       spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES,
                       slowFrameDetectionThresholdMs: Double = 16.7,
                       frozenFrameDetectionThresholdMs: Double = 700
@@ -149,7 +149,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     /**
        Enable the slow rendering detection feature.
      */
-    @objc public var slowRenderingDetectionEnabled: Bool = true
+    @objc public var slowRenderingDetectionEnabled: Bool = false
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description

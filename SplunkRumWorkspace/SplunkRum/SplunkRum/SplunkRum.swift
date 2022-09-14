@@ -267,24 +267,21 @@ var splunkRumInitializeCalledTime = Date()
        This check is to determine whether the splunkrum library has been initialized
      */
     @objc public class func isInitialized() -> Bool {
-        return initialized
+          return initialized
     }
 
     /**
        Updates the current location. The latitude and longitude will be appended to every span and event.
      */
-    @objc public class func setLocation(location: CLLocationManager) {
-            if location.location != nil {
+    @objc public class func setLocation(latitude: Double, longitude: Double) {
+            setGlobalAttributes([Attribute.LOCATION_LONGITUDE_KEY: longitude])
+            setGlobalAttributes([Attribute.LOCATION_LATITUDE_KEY: latitude])
+    }
 
-                var currentLoc: CLLocation!
-                currentLoc = location.location
-                SplunkRum.setGlobalAttributes([Attribute.LOCATION_LONGITUDE_KEY: currentLoc.coordinate.longitude])
-                SplunkRum.setGlobalAttributes([Attribute.LOCATION_LATITUDE_KEY: currentLoc.coordinate.latitude])
-
-            } else {
-                SplunkRum.removeGlobalAttribute(Attribute.LOCATION_LONGITUDE_KEY)
-                SplunkRum.removeGlobalAttribute(Attribute.LOCATION_LATITUDE_KEY)
-            }
-
-        }
+    /**
+      Set up the deployment environment for RUM instance. This will be passed along as a span
+     */
+    @objc public class func deploymentEnvironment(environment: String) {
+            setGlobalAttributes([Attribute.DEPLOYMENT_ENVIRONMENT: environment])
+    }
 }
