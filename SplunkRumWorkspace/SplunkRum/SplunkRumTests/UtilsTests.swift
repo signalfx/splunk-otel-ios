@@ -208,6 +208,7 @@ class UtilsTests: XCTestCase {
 
     /**Test Initialization of SessionBasedSampler**/
     func testSessionBasedSamplingInitialization() throws {
+        // Forces RUM to reinitialze for test
         SplunkRum.initialized = false
         _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
                                  rumAuth: "FAKE_RUM_AUTH",
@@ -224,6 +225,7 @@ class UtilsTests: XCTestCase {
 
     /**Test Sending All Spans**/
     func testSessionBasedSampling100Pct() throws {
+        // Forces RUM to reinitialze for test
         SplunkRum.initialized = false
         _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
                                  rumAuth: "FAKE_RUM_AUTH",
@@ -240,6 +242,7 @@ class UtilsTests: XCTestCase {
 
     /**Tests Sending 0 Spans**/
     func testSessionBasedSampling0Pct() throws {
+        // Forces RUM to reinitialze for test
         SplunkRum.initialized = false
         _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
                                  rumAuth: "FAKE_RUM_AUTH",
