@@ -110,7 +110,7 @@ var splunkRumInitializeCalledTime = Date()
             .spanBuilder(spanName: Attribute.SPAN_NAME_SPLUNKRUM_INITIALIZE)
             .setStartTime(time: splunkRumInitializeCalledTime)
             .startSpan()
-        srInit.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.SPAN_NAME_APP_START)
+        srInit.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.COMPONENT_APP_START)
         if options != nil {
             srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
         }
