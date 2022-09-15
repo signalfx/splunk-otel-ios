@@ -149,7 +149,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      Only applicable when disk caching is enabled.
      */
     @objc public var spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES
-    
+
     /**
     Percentage of sessions to send spans / data.
      */
