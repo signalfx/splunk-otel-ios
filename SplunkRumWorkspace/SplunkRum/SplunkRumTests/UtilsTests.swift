@@ -270,14 +270,12 @@ class UtilsTests: XCTestCase {
                                                            ignoreURLs: nil,
                                                            sessionSamplingRatio: 0.5)
         )
-        
+
         var countSpans = 0
-        for _ in 1...100 {
-            if SessionBasedSampler.sessionShouldSample() {
-                countSpans += 1
-            }
+        for _ in 1...100 where SessionBasedSampler.sessionShouldSample() {
+            countSpans += 1
         }
-        
+
         let isInTargetRange = countSpans >= 40 && countSpans <= 60
         XCTAssertTrue(isInTargetRange)
     }
