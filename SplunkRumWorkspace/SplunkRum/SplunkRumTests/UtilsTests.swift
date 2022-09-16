@@ -217,7 +217,7 @@ class UtilsTests: XCTestCase {
                                                            globalAttributes: [:],
                                                            environment: nil,
                                                            ignoreURLs: nil,
-                                                           sessionBaseSamplingRatio: 0.2)
+                                                           sessionSamplingRatio: 0.2)
         )
         XCTAssertTrue(SessionBasedSampler.probability >= 0.0 && SessionBasedSampler.probability <= 1.0)
         XCTAssertEqual(SessionBasedSampler.probability, 0.2)
@@ -234,7 +234,7 @@ class UtilsTests: XCTestCase {
                                                            globalAttributes: [:],
                                                            environment: nil,
                                                            ignoreURLs: nil,
-                                                           sessionBaseSamplingRatio: 1.0)
+                                                           sessionSamplingRatio: 1.0)
         )
         let shouldSample = SessionBasedSampler.sessionShouldSample()
         XCTAssertTrue(shouldSample)
@@ -251,7 +251,7 @@ class UtilsTests: XCTestCase {
                                                            globalAttributes: [:],
                                                            environment: nil,
                                                            ignoreURLs: nil,
-                                                           sessionBaseSamplingRatio: 0.0)
+                                                           sessionSamplingRatio: 0.0)
         )
         let shouldSample = SessionBasedSampler.sessionShouldSample()
         XCTAssertFalse(shouldSample)

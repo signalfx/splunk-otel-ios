@@ -49,7 +49,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
                       spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES,
                       slowFrameDetectionThresholdMs: Double = 16.7,
                       frozenFrameDetectionThresholdMs: Double = 700,
-                      sessionBaseSamplingRatio: Double = 1.0
+                      sessionSamplingRatio: Double = 1.0
     ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
@@ -63,7 +63,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.spanDiskCacheMaxSize = spanDiskCacheMaxSize
         self.slowFrameDetectionThresholdMs = slowFrameDetectionThresholdMs
         self.frozenFrameDetectionThresholdMs = frozenFrameDetectionThresholdMs
-        self.sessionBaseSamplingRatio = sessionBaseSamplingRatio
+        self.sessionSamplingRatio = sessionBaseSamplingRatio
     }
     /**
         Copy constructor
@@ -83,7 +83,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.networkInstrumentation = opts.networkInstrumentation
         self.enableDiskCache = opts.enableDiskCache
         self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
-        self.sessionBaseSamplingRatio = opts.sessionBaseSamplingRatio
+        self.sessionSamplingRatio = opts.sessionSamplingRatio
     }
 
     /**
@@ -153,7 +153,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     /**
     Percentage of sessions to send spans / data.
      */
-    @objc public var sessionBaseSamplingRatio: Double = 1.0
+    @objc public var sessionSamplingRatio: Double = 1.0
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
@@ -221,8 +221,8 @@ var splunkRumInitializeCalledTime = Date()
         if options?.environment != nil {
             setGlobalAttributes(["environment": options!.environment!])
         }
-        if options?.sessionBaseSamplingRatio != nil {
-            let samplingRatio = options!.sessionBaseSamplingRatio
+        if options?.sessionSamplingRatio != nil {
+            let samplingRatio = options!.sessionSamplingRatio
             if samplingRatio >= 0.0 && samplingRatio <= 1.0 {
                 _ = SessionBasedSampler(ratio: samplingRatio)
                 SessionBasedSampler.sessionShouldSample()
