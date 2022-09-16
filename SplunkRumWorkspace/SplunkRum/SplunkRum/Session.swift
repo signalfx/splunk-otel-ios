@@ -61,6 +61,10 @@ func getRumSessionId() -> String {
         isSessionIdChanged = true
         callbacks = sessionIdCallbacks
     }
+    if IS_NEW_SESSION_ID_FOR_INACTIVITY {
+        rumSessionId = generateNewSessionId()
+        IS_NEW_SESSION_ID_FOR_INACTIVITY = false
+    }
     sessionIdLock.unlock()
     unlocked = true
     for callback in callbacks {
