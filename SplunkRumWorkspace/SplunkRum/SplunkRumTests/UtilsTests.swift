@@ -257,4 +257,28 @@ class UtilsTests: XCTestCase {
         XCTAssertFalse(shouldSample)
     }
 
+    /**Tests 50% we get roughly that amount*/
+    func testSessionBasedSampling50Pct() throws {
+        // Forces RUM to reinitialze for testing
+        SplunkRum.initialized = false
+        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
+                                 rumAuth: "FAKE_RUM_AUTH",
+                                 options: SplunkRumOptions(allowInsecureBeacon: true,
+                                                           debug: true,
+                                                           globalAttributes: [:],
+                                                           environment: nil,
+                                                           ignoreURLs: nil,
+                                                           sessionSamplingRatio: 0.5)
+        )
+        
+        var countSpans = 0
+        for _ in 1...100 {
+            if SessionBasedSampler.sessionShouldSample() {
+                countSpans += 1
+            }
+        }
+        
+        let isInTargetRange = countSpans >= 40 && countSpans <= 60
+        XCTAssertTrue(isInTargetRange)
+    }
 }

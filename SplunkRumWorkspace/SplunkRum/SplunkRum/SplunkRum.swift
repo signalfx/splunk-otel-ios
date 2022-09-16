@@ -63,7 +63,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.spanDiskCacheMaxSize = spanDiskCacheMaxSize
         self.slowFrameDetectionThresholdMs = slowFrameDetectionThresholdMs
         self.frozenFrameDetectionThresholdMs = frozenFrameDetectionThresholdMs
-        self.sessionSamplingRatio = sessionBaseSamplingRatio
+        self.sessionSamplingRatio = sessionSamplingRatio
     }
     /**
         Copy constructor
