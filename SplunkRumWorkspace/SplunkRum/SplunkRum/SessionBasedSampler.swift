@@ -47,27 +47,7 @@ class SessionBasedSampler {
         }
 
         OpenTelemetrySDK.instance.tracerProvider.updateActiveSampler(parentSampler)
-        if SessionBasedSampler.probability != 0.0 && SessionBasedSampler.probability != 1.0 {
-            SessionBasedSampler.sessionCount += 1
-            SessionBasedSampler.startTimer()
-        }
         return result
-    }
-
-    /**start timer**/
-    public class func startTimer() {
-        SessionBasedSampler.stopTimer()
-        guard self.timer == nil else { return }
-        self.timer = Timer.scheduledTimer(withTimeInterval: TimeInterval(MAX_SESSION_AGE_SECONDS), repeats: true) { _ in
-            SessionBasedSampler.sessionShouldSample()
-        }
-    }
-
-    /** stop timer*/
-    public class func stopTimer() {
-        guard timer != nil else { return }
-        timer?.invalidate()
-        timer = nil
     }
 
 }
