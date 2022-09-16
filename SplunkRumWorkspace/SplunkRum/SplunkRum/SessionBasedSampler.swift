@@ -20,7 +20,6 @@ import OpenTelemetryApi
 
 class SessionBasedSampler {
     static var probability: Double = 1.0
-    static var sessionCount: Int = 0
     static var timer: Timer?
 
     init(ratio: Double) {
@@ -29,9 +28,6 @@ class SessionBasedSampler {
 
     /**Check if session will be sampled or not.**/
     @discardableResult public class func sessionShouldSample() -> Bool {
-        let samplingPercentage = SessionBasedSampler.probability
-        let step = Double(1/samplingPercentage)
-        let roundedStepValue = round(step * 10) / 10.0
 
         var result = false
         switch SessionBasedSampler.probability {
@@ -40,11 +36,7 @@ class SessionBasedSampler {
         case 1.0:
             result = true
         default:
-            if floor(Double(SessionBasedSampler.sessionCount).truncatingRemainder(dividingBy: roundedStepValue)) == 0 {
-                result = true
-            } else {
-                result = false
-            }
+            result = Double.random(in: 0.0...1.0) <= SessionBasedSampler.probability
         }
 
         var parentSampler: Sampler
