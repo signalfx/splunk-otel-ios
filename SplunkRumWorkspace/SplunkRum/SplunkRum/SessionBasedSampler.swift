@@ -20,9 +20,13 @@ import OpenTelemetryApi
 
 class SessionBasedSampler {
     static var probability: Double = 1.0
+    private let sessionIdCallback: (() -> Void) = {
+        sessionShouldSample()
+    }
 
     init(ratio: Double) {
         SessionBasedSampler.probability = ratio
+        addSessionIdCallback(sessionIdCallback)
     }
 
     /**Check if session will be sampled or not.**/
