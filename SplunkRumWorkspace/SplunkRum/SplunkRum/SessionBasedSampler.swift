@@ -20,7 +20,6 @@ import OpenTelemetryApi
 
 class SessionBasedSampler {
     static var probability: Double = 1.0
-    static var timer: Timer?
 
     init(ratio: Double) {
         SessionBasedSampler.probability = ratio
