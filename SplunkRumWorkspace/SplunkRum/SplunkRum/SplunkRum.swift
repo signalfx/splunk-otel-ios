@@ -48,7 +48,8 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
                       enableDiskCache: Bool = false,
                       spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES,
                       slowFrameDetectionThresholdMs: Double = 16.7,
-                      frozenFrameDetectionThresholdMs: Double = 700
+                      frozenFrameDetectionThresholdMs: Double = 700,
+                      sessionSamplingRatio: Double = 1.0
     ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
@@ -62,6 +63,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.spanDiskCacheMaxSize = spanDiskCacheMaxSize
         self.slowFrameDetectionThresholdMs = slowFrameDetectionThresholdMs
         self.frozenFrameDetectionThresholdMs = frozenFrameDetectionThresholdMs
+        self.sessionSamplingRatio = sessionSamplingRatio
     }
     /**
         Copy constructor
@@ -81,6 +83,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.networkInstrumentation = opts.networkInstrumentation
         self.enableDiskCache = opts.enableDiskCache
         self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
+        self.sessionSamplingRatio = opts.sessionSamplingRatio
     }
 
     /**
@@ -147,6 +150,11 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      */
     @objc public var spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES
 
+    /**
+    Percentage of sessions to send spans / data.
+     */
+    @objc public var sessionSamplingRatio: Double = 1.0
+
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
         if spanFilter != nil {
@@ -212,6 +220,13 @@ var splunkRumInitializeCalledTime = Date()
         }
         if options?.environment != nil {
             setGlobalAttributes(["environment": options!.environment!])
+        }
+        if options?.sessionSamplingRatio != nil {
+            let samplingRatio = options!.sessionSamplingRatio
+            if samplingRatio >= 0.0 && samplingRatio <= 1.0 {
+                _ = SessionBasedSampler(ratio: samplingRatio)
+                SessionBasedSampler.sessionShouldSample()
+            }
         }
         if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
             print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")

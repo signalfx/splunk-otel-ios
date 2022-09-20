@@ -35,6 +35,7 @@
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
 		88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88734FE528A55FB60035960F /* SlowFrameDetector.swift */; };
+		D77058D428D36E350047D880 /* SessionBasedSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77058D328D36E350047D880 /* SessionBasedSampler.swift */; };
 		E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */; };
 		E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */; };
 		E2ACB21D283F855C006A1475 /* SpanDb.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21C283F855C006A1475 /* SpanDb.swift */; };
@@ -107,6 +108,7 @@
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
 		88734FE528A55FB60035960F /* SlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetector.swift; sourceTree = "<group>"; };
+		D77058D328D36E350047D880 /* SessionBasedSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionBasedSampler.swift; sourceTree = "<group>"; };
 		E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanToDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanFromDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21C283F855C006A1475 /* SpanDb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDb.swift; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 				E2ACB21C283F855C006A1475 /* SpanDb.swift */,
 				E2ACB21E283F871D006A1475 /* ZipkinTransform.swift */,
 				E2AFD9E62846919C000F53BF /* BandwidthTracker.swift */,
+				D77058D328D36E350047D880 /* SessionBasedSampler.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -407,6 +410,7 @@
 				E2ACB21D283F855C006A1475 /* SpanDb.swift in Sources */,
 				86043B7C25F93E3400A29788 /* Log.swift in Sources */,
 				E2AFD9E72846919C000F53BF /* BandwidthTracker.swift in Sources */,
+				D77058D428D36E350047D880 /* SessionBasedSampler.swift in Sources */,
 				865DBDD92677AA7B00EFE8D5 /* RetryExporter.swift in Sources */,
 				E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */,
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
