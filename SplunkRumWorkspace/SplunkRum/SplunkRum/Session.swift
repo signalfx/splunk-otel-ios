@@ -43,7 +43,7 @@ func addSessionIdCallback(_ callback: @escaping (() -> Void)) {
     sessionIdCallbacks.append(callback)
 }
 
-func getRumSessionId() -> String {
+func getRumSessionId(forceNewSessionId: Bool = false) -> String {
     sessionIdLock.lock()
     var unlocked = false
     var isSessionIdChanged = false
@@ -61,9 +61,8 @@ func getRumSessionId() -> String {
         isSessionIdChanged = true
         callbacks = sessionIdCallbacks
     }
-    if IS_NEW_SESSION_ID_FOR_INACTIVITY {
+    if forceNewSessionId {
         rumSessionId = generateNewSessionId()
-        IS_NEW_SESSION_ID_FOR_INACTIVITY = false
     }
     sessionIdLock.unlock()
     unlocked = true

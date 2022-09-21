@@ -20,8 +20,7 @@ import UIKit
 import OpenTelemetrySdk
 
 let INACTIVITY_SESSION_TIMEOUT_SECONDS = 15 * 60
-var IS_NEW_SESSION_ID_FOR_INACTIVITY = false
-private var sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(INACTIVITY_SESSION_TIMEOUT_SECONDS))
+private var sessionIdInactivityExpiration = Date().addingTimeInterval(TimeInterval(INACTIVITY_SESSION_TIMEOUT_SECONDS))
 
 // Constants for lifecyle events that are being observed
 private let UI_APPLICATION_WILL_RESIGN_ACTIVE_NOTIFICATION = "UIApplicationWillResignActiveNotification"
@@ -112,11 +111,10 @@ func lifecycleEvent(_ event: String) {
 func invalidateSession(_ event: String) {
     // 15 min inactivity then session time out
     if event == UI_APPLICATION_WILL_RESIGN_ACTIVE_NOTIFICATION {
-        sessionIdInActivityExpiration = Date().addingTimeInterval(TimeInterval(INACTIVITY_SESSION_TIMEOUT_SECONDS))
+        sessionIdInactivityExpiration = Date().addingTimeInterval(TimeInterval(INACTIVITY_SESSION_TIMEOUT_SECONDS))
     } else if event == UI_APPLICATION_WILL_ENTER_FOREGROUND_NOTIFICATION {
-        if Date() > sessionIdInActivityExpiration { // expire 15 min
-           IS_NEW_SESSION_ID_FOR_INACTIVITY = true
-            _  = getRumSessionId()
+        if Date() > sessionIdInactivityExpiration { // expire 15 min
+            _  = getRumSessionId(forceNewSessionId: true)
         }
     }
 }
