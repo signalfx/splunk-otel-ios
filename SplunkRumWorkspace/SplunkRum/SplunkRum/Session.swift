@@ -54,15 +54,12 @@ func getRumSessionId(forceNewSessionId: Bool = false) -> String {
             sessionIdLock.unlock()
         }
     }
-    if Date() > sessionIdExpiration {
+    if Date() > sessionIdExpiration || forceNewSessionId {
         sessionIdExpiration = Date().addingTimeInterval(TimeInterval(MAX_SESSION_AGE_SECONDS))
         oldRumSessionId = rumSessionId
         rumSessionId = generateNewSessionId()
         isSessionIdChanged = true
         callbacks = sessionIdCallbacks
-    }
-    if forceNewSessionId {
-        rumSessionId = generateNewSessionId()
     }
     sessionIdLock.unlock()
     unlocked = true
