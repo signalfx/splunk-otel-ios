@@ -17,3 +17,5 @@ limitations under the License.
 
 import Foundation
 import CoreTelephony
+
+var networkInfo = CTTelephonyNetworkInfo()
