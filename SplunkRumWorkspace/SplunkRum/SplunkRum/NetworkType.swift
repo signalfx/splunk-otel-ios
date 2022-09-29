@@ -19,7 +19,6 @@ import Foundation
 import SystemConfiguration
 import Network
 
-
 @available(iOS 12.0, *)
 let networkMonitor = NWPathMonitor()
 

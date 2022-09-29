@@ -36,7 +36,7 @@ struct ContentView: View {
         print("download!")
         let url = URL(string: "http://www.splunk.com")!
         var req = URLRequest(url: url)
-        let task = URLSession.shared.downloadTask(with: url) {(_:URL?, _: URLResponse?, _) in
+        let task = URLSession.shared.downloadTask(with: url) {(_: URL?, _: URLResponse?, _) in
             print("download finished")
         }
         task.resume()
