@@ -22,4 +22,3 @@ import CoreTelephony
 #else
    var networkInfo = CTTelephonyNetworkInfo()
 #endif
-
