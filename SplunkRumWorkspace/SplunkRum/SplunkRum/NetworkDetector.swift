@@ -17,5 +17,9 @@ limitations under the License.
 
 import Foundation
 import CoreTelephony
+#if targetEnvironment(simulator)
+    // Simulator
+#else
+   var networkInfo = CTTelephonyNetworkInfo()
+#endif
 
-var networkInfo = CTTelephonyNetworkInfo()
