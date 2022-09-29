@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import SystemConfiguration
 import Network
-import CoreTelephony
+
 
 @available(iOS 12.0, *)
 let networkMonitor = NWPathMonitor()
