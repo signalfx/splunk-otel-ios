@@ -48,7 +48,6 @@ func initializeNetworkTypeMonitoring() {
     }
 }
 
-
 func networkDetector() {
     if #available(iOS 12.0, *) {
         if let carrier = networkInfo.serviceSubscriberCellularProviders {
