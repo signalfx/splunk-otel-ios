@@ -67,6 +67,12 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
     if hostConnectionType != nil {
         span?.setAttribute(key: "net.host.connection.type", value: hostConnectionType!)
     }
+    if hostConnectionSubtype != nil {
+        span?.setAttribute(key: "net.host.connection.subtype", value: hostConnectionSubtype!)
+    }
+    if hostConnectionName != nil {
+        span?.setAttribute(key: "net.host.carrier.name", value: hostConnectionName!)
+    }
     span!.end()
 }
 
