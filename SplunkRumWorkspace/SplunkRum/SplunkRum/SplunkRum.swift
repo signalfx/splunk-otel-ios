@@ -24,155 +24,6 @@ import WebKit
 
 let SplunkRumVersionString = "0.8.0"
 
-/**
- Default maximum size of the disk cache in bytes.
- */
-public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
-
-/**
- Optional configuration for SplunkRum.initialize()
- */
-@objc public class SplunkRumOptions: NSObject {
-
-    /**
-        Default options
-     */
-    @objc public override init() {
-    }
-    /**
-        Memberwise initializer
-     */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil,
-                      screenNameSpans: Bool = true,
-                      networkInstrumentation: Bool = true,
-                      enableDiskCache: Bool = false,
-                      spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES,
-                      slowFrameDetectionThresholdMs: Double = 16.7,
-                      frozenFrameDetectionThresholdMs: Double = 700,
-                      sessionSamplingRatio: Double = 1.0
-    ) {
-        // rejectionFilter not specified to make it possible to call from objc
-        self.allowInsecureBeacon = allowInsecureBeacon
-        self.debug = debug
-        self.globalAttributes = globalAttributes
-        self.environment = environment
-        self.ignoreURLs = ignoreURLs
-        self.screenNameSpans = screenNameSpans
-        self.networkInstrumentation = networkInstrumentation
-        self.enableDiskCache = enableDiskCache
-        self.spanDiskCacheMaxSize = spanDiskCacheMaxSize
-        self.slowFrameDetectionThresholdMs = slowFrameDetectionThresholdMs
-        self.frozenFrameDetectionThresholdMs = frozenFrameDetectionThresholdMs
-        self.sessionSamplingRatio = sessionSamplingRatio
-    }
-    /**
-        Copy constructor
-     */
-    @objc public init(opts: SplunkRumOptions) {
-        self.allowInsecureBeacon = opts.allowInsecureBeacon
-        self.debug = opts.debug
-        // shallow copy of the map
-        self.globalAttributes = [:].merging(opts.globalAttributes) { _, new in new }
-        self.environment = opts.environment
-        self.ignoreURLs = opts.ignoreURLs
-        self.spanFilter = opts.spanFilter
-        self.showVCInstrumentation = opts.showVCInstrumentation
-        self.screenNameSpans = opts.screenNameSpans
-        self.slowFrameDetectionThresholdMs = opts.slowFrameDetectionThresholdMs
-        self.frozenFrameDetectionThresholdMs = opts.frozenFrameDetectionThresholdMs
-        self.networkInstrumentation = opts.networkInstrumentation
-        self.enableDiskCache = opts.enableDiskCache
-        self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
-        self.sessionSamplingRatio = opts.sessionSamplingRatio
-    }
-
-    /**
-            Allows non-https beaconUrls.  Default: false
-     */
-    @objc public var allowInsecureBeacon: Bool = false
-    /**
-            Turns on debug logging (including printouts of all spans)  Default: false
-     */
-    @objc public var debug: Bool = false
-    /**
-                    Specifies additional attributes to add to every span.  Acceptable value types are Int, Double, String, and Bool.  Other value types will be silently ignored
-     */
-    @objc public var globalAttributes: [String: Any] = [:]
-
-    /**
-        Sets a value for the "environment" global attribute
-     */
-    @objc public var environment: String?
-
-    /**
-     Do not create spans for HTTP requests whose URL matches this regex.
-     */
-    @objc public var ignoreURLs: NSRegularExpression?
-
-    /**
-    Sets a filter that can modify or reject spans.  You can modify attributes of each span or return nil to indicate that that span should be dropped (never sent on the wire).
-    */
-    public var spanFilter: ((SpanData) -> SpanData?)?
-
-    /**
-     Enable span creation for ViewController Show events.
-     */
-    @objc public var showVCInstrumentation: Bool = true
-
-    /**
-     Enable span creation for screen name changes
-     */
-    @objc public var screenNameSpans: Bool = true
-
-    /**
-     Enable NetworkInstrumentation span creation for https calls.
-     */
-    @objc public var networkInstrumentation: Bool = true
-
-    /**
-     Threshold, in milliseconds, from which to count a rendered frame as slow.
-    */
-    @objc public var slowFrameDetectionThresholdMs: Double = 16.7
-
-    /**
-     Threshold, in milliseconds, from which to count a rendered frame as frozen.
-    */
-    @objc public var frozenFrameDetectionThresholdMs: Double = 700
-
-    /**
-     Enable caching created spans to disk. On successful exports the spans are deleted.
-     */
-    @objc public var enableDiskCache: Bool = false
-
-    /**
-     Threshold in bytes from which spans will start to be dropped from the disk cache (oldest first).
-     Only applicable when disk caching is enabled.
-     */
-    @objc public var spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES
-
-    /**
-    Percentage of sessions to send spans / data.
-     */
-    @objc public var sessionSamplingRatio: Double = 1.0
-
-    func toAttributeValue() -> String {
-        var answer = "debug: "+debug.description
-        if spanFilter != nil {
-            answer += ", spanFilter: set"
-        }
-        if ignoreURLs != nil {
-            answer += ", ignoreUrls: "+ignoreURLs!.description
-        }
-        if !showVCInstrumentation {
-            answer += ", showVC: false"
-        }
-        if !screenNameSpans {
-            answer += ", screenNameSpans: false"
-        }
-        return answer
-    }
-
-}
 var globalAttributes: [String: Any] = [:]
 let globalAttributesLock = NSLock()
 
@@ -422,5 +273,20 @@ var splunkRumInitializeCalledTime = Date()
      */
     @objc public class func isInitialized() -> Bool {
         return initialized
+    }
+
+    /**
+       Updates the current location. The latitude and longitude will be appended to every span and event.
+     */
+    @objc public class func setLocation(latitude: Double, longitude: Double) {
+            setGlobalAttributes([Attribute.LOCATION_LONGITUDE_KEY: longitude])
+            setGlobalAttributes([Attribute.LOCATION_LATITUDE_KEY: latitude])
+    }
+
+    /**
+      Set up the deployment environment for RUM instance. This will be passed along as a span
+     */
+    @objc public class func deploymentEnvironment(environment: String) {
+            setGlobalAttributes([Attribute.DEPLOYMENT_ENVIRONMENT: environment])
     }
 }
