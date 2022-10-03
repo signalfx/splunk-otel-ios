@@ -125,10 +125,12 @@ var splunkRumInitializeCalledTime = Date()
         }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
-        startSlowFrameDetector(
-                    slowFrameDetectionThresholdMs: options?.slowFrameDetectionThresholdMs,
-                    frozenFrameDetectionThresholdMs: options?.frozenFrameDetectionThresholdMs
-                )
+        if options?.slowRenderingDetectionEnabled ?? true {
+            startSlowFrameDetector(
+                        slowFrameDetectionThresholdMs: options?.slowFrameDetectionThresholdMs,
+                        frozenFrameDetectionThresholdMs: options?.frozenFrameDetectionThresholdMs
+                    )
+        }
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
