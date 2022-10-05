@@ -69,7 +69,7 @@ var splunkRumInitializeCalledTime = Date()
             setGlobalAttributes(options!.globalAttributes)
         }
         if options?.environment != nil {
-            setGlobalAttributes(["environment": options!.environment!])
+            setGlobalAttributes([Attribute.DEPLOYMENT_ENVIRONMENT: options!.environment!])
         }
         if options?.sessionSamplingRatio != nil {
             let samplingRatio = options!.sessionSamplingRatio
@@ -113,10 +113,10 @@ var splunkRumInitializeCalledTime = Date()
         }
         sendAppStartSpan()
         let srInit = buildTracer()
-            .spanBuilder(spanName: "SplunkRum.initialize")
+            .spanBuilder(spanName: Attribute.SPAN_NAME_SPLUNKRUM_INITIALIZE)
             .setStartTime(time: splunkRumInitializeCalledTime)
             .startSpan()
-        srInit.setAttribute(key: "component", value: "appstart")
+        srInit.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.COMPONENT_APP_START)
         if options != nil {
             srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
         }
