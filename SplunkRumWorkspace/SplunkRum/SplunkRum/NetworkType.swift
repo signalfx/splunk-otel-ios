@@ -70,16 +70,11 @@ func networkDetector() {
  func getNetworkInfo() -> String? {
 
      if #available(iOS 12.0, *) {
-         guard let dict = networkInfo.serviceCurrentRadioAccessTechnology else {
-             return nil
+         let carrierInfo = networkInfo.serviceCurrentRadioAccessTechnology
+         guard let carrierTypeName = carrierInfo?.first?.value else {
+           return nil
          }
-         if dict.count != 0 {
-             let key = dict.keys.first!
-             let networkCarrierType = dict[key]
-             hostConnectionSubtype = networkCarrierType
-         } else {
-             return nil
-         }
+         hostConnectionSubtype = carrierTypeName
 
      } else {
          guard let carrierType = networkInfo.currentRadioAccessTechnology else {
