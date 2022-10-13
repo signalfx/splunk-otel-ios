@@ -94,11 +94,11 @@ class SlowFrameDetector: NSObject {
 
     func dumpFrames() {
         for (screenName, count) in self.slowFrames {
-            reportFrame(Attribute.SPAN_NAME_SLOWRENDERS, screenName, count)
+            reportFrame(Attribute.SpanName.SPAN_NAME_SLOWRENDERS, screenName, count)
         }
 
         for (screenName, count) in self.frozenFrames {
-            reportFrame(Attribute.SPAN_NAME_FROZENRENDERS, screenName, count)
+            reportFrame(Attribute.SpanName.SPAN_NAME_FROZENRENDERS, screenName, count)
         }
 
         self.slowFrames.removeAll()
@@ -109,9 +109,9 @@ class SlowFrameDetector: NSObject {
         let tracer = buildTracer()
         let now = Date()
         let span = tracer.spanBuilder(spanName: type).setStartTime(time: now).startSpan()
-        span.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.COMPONENT_UI)
+        span.setAttribute(key: Attribute.KeyValue.COMPONENT_KEY, value: Attribute.Component.COMPONENT_UI)
         span.setAttribute(key: "count", value: count)
-        span.setAttribute(key: Attribute.SCREEN_NAME_KEY, value: screenName)
+        span.setAttribute(key: Attribute.KeyValue.SCREEN_NAME_KEY, value: screenName)
         span.end(time: now)
     }
 }

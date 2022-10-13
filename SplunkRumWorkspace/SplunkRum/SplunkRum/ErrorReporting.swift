@@ -23,15 +23,15 @@ func reportExceptionErrorSpan(e: NSException) {
     let now = Date()
     let typeName = e.name.rawValue
     let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
-    span.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.COMPONENT_ERROR)
+    span.setAttribute(key: Attribute.KeyValue.COMPONENT_KEY, value: Attribute.Component.COMPONENT_ERROR)
     span.setAttribute(key: "error", value: true)
-    span.setAttribute(key: Attribute.ERROR_TYPE_KEY, value: typeName)
+    span.setAttribute(key: Attribute.KeyValue.ERROR_TYPE_KEY, value: typeName)
     if e.reason != nil {
-        span.setAttribute(key: Attribute.ERROR_MESSAGE_KEY, value: e.reason!)
+        span.setAttribute(key: Attribute.KeyValue.ERROR_MESSAGE_KEY, value: e.reason!)
     }
     let stack = e.callStackSymbols.joined(separator: "\n")
     if !stack.isEmpty {
-        span.setAttribute(key: Attribute.ERROR_STACKTRACE_KEY, value: stack)
+        span.setAttribute(key: Attribute.KeyValue.ERROR_STACKTRACE_KEY, value: stack)
     }
     span.end(time: now)
 }
@@ -41,10 +41,10 @@ func reportErrorErrorSpan(e: Error) {
     let now = Date()
     let typeName = String(describing: type(of: e))
     let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
-    span.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.COMPONENT_ERROR)
+    span.setAttribute(key: Attribute.KeyValue.COMPONENT_KEY, value: Attribute.Component.COMPONENT_ERROR)
     span.setAttribute(key: "error", value: true)
-    span.setAttribute(key: Attribute.ERROR_TYPE_KEY, value: typeName)
-    span.setAttribute(key: Attribute.ERROR_MESSAGE_KEY, value: e.localizedDescription)
+    span.setAttribute(key: Attribute.KeyValue.ERROR_TYPE_KEY, value: typeName)
+    span.setAttribute(key: Attribute.KeyValue.ERROR_MESSAGE_KEY, value: e.localizedDescription)
     span.end(time: now)
 }
 
@@ -53,9 +53,9 @@ func reportStringErrorSpan(e: String) {
     let now = Date()
     let typeName = "SplunkRum.reportError(String)"
     let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
-    span.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.COMPONENT_ERROR)
+    span.setAttribute(key: Attribute.KeyValue.COMPONENT_KEY, value: Attribute.Component.COMPONENT_ERROR)
     span.setAttribute(key: "error", value: true)
-    span.setAttribute(key: Attribute.ERROR_TYPE_KEY, value: "String")
-    span.setAttribute(key: Attribute.ERROR_MESSAGE_KEY, value: e)
+    span.setAttribute(key: Attribute.KeyValue.ERROR_TYPE_KEY, value: "String")
+    span.setAttribute(key: Attribute.KeyValue.ERROR_MESSAGE_KEY, value: e)
     span.end(time: now)
 }

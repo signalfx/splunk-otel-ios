@@ -29,8 +29,8 @@ func addLinkToSpan(span: Span, valStr: String) {
     }
     let traceId = String(valStr[Range(result[0].range(at: 1), in: valStr)!])
     let spanId = String(valStr[Range(result[0].range(at: 2), in: valStr)!])
-    span.setAttribute(key: Attribute.LINK_TRACE_ID_KEY, value: traceId)
-    span.setAttribute(key: Attribute.LINK_SPAN_ID_KEY, value: spanId)
+    span.setAttribute(key: Attribute.KeyValue.LINK_TRACE_ID_KEY, value: traceId)
+    span.setAttribute(key: Attribute.KeyValue.LINK_SPAN_ID_KEY, value: spanId)
 }
 
 func endHttpSpan(span: Span?, task: URLSessionTask) {
@@ -57,8 +57,8 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
     }
     if task.error != nil {
         span!.setAttribute(key: "error", value: true)
-        span!.setAttribute(key: Attribute.ERROR_MESSAGE_KEY, value: task.error!.localizedDescription)
-        span!.setAttribute(key: Attribute.ERROR_TYPE_KEY, value: String(describing: type(of: task.error!)))
+        span!.setAttribute(key: Attribute.KeyValue.ERROR_MESSAGE_KEY, value: task.error!.localizedDescription)
+        span!.setAttribute(key: Attribute.KeyValue.ERROR_TYPE_KEY, value: String(describing: type(of: task.error!)))
     }
     span!.setAttribute(key: "http.response_content_length_uncompressed", value: Int(task.countOfBytesReceived))
     if task.countOfBytesSent != 0 {
@@ -92,7 +92,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     }
     let tracer = buildTracer()
     let span = tracer.spanBuilder(spanName: "HTTP "+method).setSpanKind(spanKind: .client).startSpan()
-    span.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.COMPONENT_HTTP)
+    span.setAttribute(key: Attribute.KeyValue.COMPONENT_KEY, value: Attribute.Component.COMPONENT_HTTP)
     span.setAttribute(key: "http.url", value: url.absoluteString)
     span.setAttribute(key: "http.method", value: method)
     return span

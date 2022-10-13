@@ -69,7 +69,7 @@ var splunkRumInitializeCalledTime = Date()
             setGlobalAttributes(options!.globalAttributes)
         }
         if options?.environment != nil {
-            setGlobalAttributes([Attribute.DEPLOYMENT_ENVIRONMENT: options!.environment!])
+            setGlobalAttributes([Attribute.KeyValue.DEPLOYMENT_ENVIRONMENT: options!.environment!])
         }
         if options?.sessionSamplingRatio != nil {
             let samplingRatio = options!.sessionSamplingRatio
@@ -113,10 +113,10 @@ var splunkRumInitializeCalledTime = Date()
         }
         sendAppStartSpan()
         let srInit = buildTracer()
-            .spanBuilder(spanName: Attribute.SPAN_NAME_SPLUNKRUM_INITIALIZE)
+            .spanBuilder(spanName: Attribute.SpanName.SPAN_NAME_SPLUNKRUM_INITIALIZE)
             .setStartTime(time: splunkRumInitializeCalledTime)
             .startSpan()
-        srInit.setAttribute(key: Attribute.COMPONENT_KEY, value: Attribute.COMPONENT_APP_START)
+        srInit.setAttribute(key: Attribute.KeyValue.COMPONENT_KEY, value: Attribute.Component.COMPONENT_APP_START)
         if options != nil {
             srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
         }
@@ -280,14 +280,7 @@ var splunkRumInitializeCalledTime = Date()
        Updates the current location. The latitude and longitude will be appended to every span and event.
      */
     @objc public class func setLocation(latitude: Double, longitude: Double) {
-            setGlobalAttributes([Attribute.LOCATION_LONGITUDE_KEY: longitude])
-            setGlobalAttributes([Attribute.LOCATION_LATITUDE_KEY: latitude])
+        setGlobalAttributes([Attribute.KeyValue.LOCATION_LONGITUDE_KEY: longitude, Attribute.KeyValue.LOCATION_LATITUDE_KEY: latitude])
     }
 
-    /**
-      Set up the deployment environment for RUM instance. This will be passed along as a span
-     */
-    @objc public class func deploymentEnvironment(environment: String) {
-            setGlobalAttributes([Attribute.DEPLOYMENT_ENVIRONMENT: environment])
-    }
 }
