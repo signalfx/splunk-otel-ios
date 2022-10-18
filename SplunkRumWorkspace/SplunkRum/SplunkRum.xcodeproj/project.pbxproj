@@ -35,6 +35,7 @@
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
 		88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88734FE528A55FB60035960F /* SlowFrameDetector.swift */; };
+		88FCA96928FE9EAE00F89244 /* SplunkRumBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88FCA96828FE9EAE00F89244 /* SplunkRumBuilder.swift */; };
 		D77058D428D36E350047D880 /* SessionBasedSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77058D328D36E350047D880 /* SessionBasedSampler.swift */; };
 		E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */; };
 		E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */; };
@@ -108,6 +109,7 @@
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
 		88734FE528A55FB60035960F /* SlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetector.swift; sourceTree = "<group>"; };
+		88FCA96828FE9EAE00F89244 /* SplunkRumBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkRumBuilder.swift; sourceTree = "<group>"; };
 		D77058D328D36E350047D880 /* SessionBasedSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionBasedSampler.swift; sourceTree = "<group>"; };
 		E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanToDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanFromDiskExporter.swift; sourceTree = "<group>"; };
@@ -206,6 +208,7 @@
 				E2ACB21E283F871D006A1475 /* ZipkinTransform.swift */,
 				E2AFD9E62846919C000F53BF /* BandwidthTracker.swift */,
 				D77058D328D36E350047D880 /* SessionBasedSampler.swift */,
+				88FCA96828FE9EAE00F89244 /* SplunkRumBuilder.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -421,6 +424,7 @@
 				8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
 				E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */,
+				88FCA96928FE9EAE00F89244 /* SplunkRumBuilder.swift in Sources */,
 				86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */,
 				8654BCF825E54D340013F7F6 /* ErrorReporting.swift in Sources */,
 			);

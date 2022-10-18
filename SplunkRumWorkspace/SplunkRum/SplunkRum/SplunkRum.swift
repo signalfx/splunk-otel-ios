@@ -85,6 +85,15 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
         self.sessionSamplingRatio = opts.sessionSamplingRatio
     }
+    /**
+        The configured "beacon" URL for the RUM library.
+     */
+    @objc public var beaconUrl: String!
+
+    /**
+        The configured RUM access token for the library.
+     */
+    @objc public var rumToken: String!
 
     /**
             Allows non-https beaconUrls.  Default: false
@@ -284,6 +293,97 @@ var splunkRumInitializeCalledTime = Date()
         initialized = true
         print("SplunkRum.initialize() complete")
         return true
+
+    }
+
+    @objc public class func splunkRum_Initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) {
+        if !Thread.isMainThread {
+            print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
+            initialized = false
+            return
+        }
+        if initialized || initializing {
+            debug_log("SplunkRum already initializ{ed,ing}")
+            return
+        }
+        splunkRumInitializeCalledTime = Date()
+        initializing = true
+        defer {
+            initializing = false
+        }
+        debug_log("SplunkRum.initialize")
+        if options != nil {
+            configuredOptions = SplunkRumOptions(opts: options!)
+        }
+        if options?.globalAttributes != nil {
+            setGlobalAttributes(options!.globalAttributes)
+        }
+        if options?.environment != nil {
+            setGlobalAttributes(["environment": options!.environment!])
+        }
+        if options?.sessionSamplingRatio != nil {
+            let samplingRatio = options!.sessionSamplingRatio
+            if samplingRatio >= 0.0 && samplingRatio <= 1.0 {
+                _ = SessionBasedSampler(ratio: samplingRatio)
+                SessionBasedSampler.sessionShouldSample()
+            }
+        }
+        if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
+            print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
+            initialized = false
+            return
+        }
+        if rumAuth.isEmpty {
+            theBeaconUrl = beaconUrl
+        } else {
+            theBeaconUrl = beaconUrl + "?auth="+rumAuth
+        }
+        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
+        let exportOptions = ZipkinTraceExporterOptions(endpoint: theBeaconUrl!, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
+
+        if options?.enableDiskCache ?? false {
+            let spanDb = SpanDb()
+            SpanFromDiskExport.start(spanDb: spanDb, endpoint: theBeaconUrl!)
+            let diskExporter = SpanToDiskExporter(
+                spanDb: spanDb,
+                maxFileSizeBytes: options?.spanDiskCacheMaxSize ?? DEFAULT_DISK_CACHE_MAX_SIZE_BYTES)
+            let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options?.spanFilter ?? nil)
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+        } else {
+            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
+                SpanDb.deleteAtDefaultLocation()
+            }
+            let zipkin = ZipkinTraceExporter(options: exportOptions)
+            let retry = RetryExporter(proxy: zipkin)
+            let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+        }
+
+        if options?.debug ?? false {
+            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
+        }
+        sendAppStartSpan()
+        let srInit = buildTracer()
+            .spanBuilder(spanName: "SplunkRum.initialize")
+            .setStartTime(time: splunkRumInitializeCalledTime)
+            .startSpan()
+        srInit.setAttribute(key: "component", value: "appstart")
+        if options != nil {
+            srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
+        }
+        if options?.networkInstrumentation ?? true {
+            initalizeNetworkInstrumentation()
+        }
+        initializeNetworkTypeMonitoring()
+        initalizeUIInstrumentation()
+        startSlowFrameDetector(
+                    slowFrameDetectionThresholdMs: options?.slowFrameDetectionThresholdMs,
+                    frozenFrameDetectionThresholdMs: options?.frozenFrameDetectionThresholdMs
+                )
+        // not initializeAppLifecycleInstrumentation, done at end of AppStart
+        srInit.end()
+        initialized = true
+        print("SplunkRum.initialize() complete")
 
     }
 

@@ -25,8 +25,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true,
-            globalAttributes: [:], environment: nil, ignoreURLs: nil))
+//        SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true,
+//            globalAttributes: [:], environment: nil, ignoreURLs: nil))
+        _ = SplunkRumBuilder()
+            .setBeaconUrl(beaconUrl: "http://127.0.0.1:8989/")
+            .setRumToken(rumtoken: "FAKE_RUM_AUTH")
+            .setAllowInsecureBeacon(allowInsecure: true)
+            .setDebug(debug: true)
+            .setDeploymentEnvironment(environment: "Development")
+            .setEnableDiskCache(enableDiskCache: true)
+            .setNetworkInstrumentation(networkInstrumentation: true)
+            .setGlobalAttributes([:])
+            .build()
         return true
     }
 
