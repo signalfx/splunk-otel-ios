@@ -40,38 +40,38 @@ import StdoutExporter
      var spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES
      var sessionSamplingRatio: Double = 1.0
 
-    @objc public func setBeaconUrl(beaconUrl: String) -> SplunkRumBuilder {
+    @objc @discardableResult public func setBeaconUrl(beaconUrl: String) -> SplunkRumBuilder {
         self.beaconUrl = beaconUrl
         return self
     }
 
-    @objc public func setRumToken(rumtoken: String) -> SplunkRumBuilder {
+    @objc @discardableResult public func setRumToken(rumtoken: String) -> SplunkRumBuilder {
         self.rumToken = rumtoken
         return self
     }
 
-    @objc public func setAllowInsecureBeacon(allowInsecure: Bool) -> SplunkRumBuilder {
+    @objc @discardableResult public func setAllowInsecureBeacon(allowInsecure: Bool) -> SplunkRumBuilder {
         self.allowInsecureBeacon = allowInsecure
         return self
     }
 
-    @objc public func setDebug(debug: Bool) -> SplunkRumBuilder {
+    @objc @discardableResult public func setDebug(debug: Bool) -> SplunkRumBuilder {
         self.debug = debug
         return self
     }
 
-    @objc public func setGlobalAttributes(_ attributes: [String: Any]) -> SplunkRumBuilder {
+    @objc @discardableResult public func setGlobalAttributes(_ attributes: [String: Any]) -> SplunkRumBuilder {
         self.globalAttributes = attributes
         return self
     }
 
-    @objc public func setDeploymentEnvironment(environment: String) -> SplunkRumBuilder {
+    @objc @discardableResult public func setDeploymentEnvironment(environment: String) -> SplunkRumBuilder {
         self.environment = environment
         return self
 
     }
 
-    @objc public func setIgnoreURLs(ignoreURL: NSRegularExpression) -> SplunkRumBuilder {
+    @objc @discardableResult public func setIgnoreURLs(ignoreURL: NSRegularExpression) -> SplunkRumBuilder {
         self.ignoreURLs = ignoreURL
         return self
     }
@@ -81,37 +81,37 @@ import StdoutExporter
         return self
     }
 
-    @objc public func setShowVCInstrumentation(showVCInstrumentation: Bool) -> SplunkRumBuilder {
+    @objc @discardableResult public func setShowVCInstrumentation(showVCInstrumentation: Bool) -> SplunkRumBuilder {
         self.showVCInstrumentation = showVCInstrumentation
         return self
     }
 
-    @objc public func setScreenNameSpans(screenNameSpans: Bool) -> SplunkRumBuilder {
+    @objc @discardableResult public func setScreenNameSpans(screenNameSpans: Bool) -> SplunkRumBuilder {
         self.screenNameSpans = screenNameSpans
         return self
     }
 
-    @objc public func setNetworkInstrumentation(networkInstrumentation: Bool) -> SplunkRumBuilder {
+    @objc @discardableResult public func setNetworkInstrumentation(networkInstrumentation: Bool) -> SplunkRumBuilder {
         self.networkInstrumentation = networkInstrumentation
         return self
     }
 
-    @objc public func setSlowFrameRenders(duration: Double) -> SplunkRumBuilder {
+    @objc @discardableResult public func setSlowFrameRenders(duration: Double) -> SplunkRumBuilder {
         self.slowFrameDetectionThresholdMs = duration
         return self
     }
 
-    @objc public func setFrozenFrameRenders(duration: Double) -> SplunkRumBuilder {
+    @objc @discardableResult public func setFrozenFrameRenders(duration: Double) -> SplunkRumBuilder {
         self.frozenFrameDetectionThresholdMs = duration
         return self
     }
 
-    @objc public func setEnableDiskCache(enableDiskCache: Bool) -> SplunkRumBuilder {
+    @objc @discardableResult public func setEnableDiskCache(enableDiskCache: Bool) -> SplunkRumBuilder {
         self.enableDiskCache = enableDiskCache
         return self
     }
 
-    @objc public func build() -> SplunkRumOptions {
+    @objc @discardableResult public func build() -> SplunkRumOptions {
 
             let rumOptional = SplunkRumOptions()
                 rumOptional.beaconUrl = self.beaconUrl
