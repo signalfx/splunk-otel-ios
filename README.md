@@ -178,5 +178,5 @@ Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for instructions on building, r
 
 ## License
 
-This library is released under the terms of the Apache Softare License version 2.0.
+This library is licensed under the terms of the Apache Softare License version 2.0.
 See [the license file](./LICENSE) for more details.
