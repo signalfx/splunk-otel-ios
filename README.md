@@ -31,7 +31,10 @@ this is probably your `AppDelegate`'s `...didFinishLaunchingWithOptions:` method
 import SplunkOtel
 ...
 // Your beaconUrl and rumAuth will be provided by your friendly Splunk representative
-SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "ABCD...")
+let builder = SplunkRumBuilder()
+            .setBeaconUrl(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum")
+            .setRumToken(rumtoken: "ABCD...")
+            .build()
 ```
 
 or
@@ -41,9 +44,13 @@ or
 @import SplunkOtel;
 ...
 // Your beaconUrl and rumAuth will be provided by your friendly Splunk representative
-[SplunkRum initializeWithBeaconUrl: @"https://rum-ingest.us0.signalfx.com/v1/rum" rumAuth: @"ABCD..." options: nil];
+SplunkRumBuilder *builder = [[SplunkRumBuilder alloc] init];
+    [builder setBeaconUrlWithBeaconUrl:@"https://rum-ingest.us0.signalfx.com/v1/rum"];
+    [builder setRumTokenWithRumtoken:@"ABCD..."];
+    [builder build];
 ```
-
+ To check whether the RUM library has been initialized, call SplunkRum.isInitialized()
+ 
 ## Installation options
 
 | Option | Type | Notes | Default |
