@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-// swiftlint:disable cyclomatic_complexity
 import Foundation
 import OpenTelemetryApi
 
@@ -31,6 +30,32 @@ func addLinkToSpan(span: Span, valStr: String) {
     let spanId = String(valStr[Range(result[0].range(at: 2), in: valStr)!])
     span.setAttribute(key: "link.traceId", value: traceId)
     span.setAttribute(key: "link.spanId", value: spanId)
+
+    let networkInfo = getNetworkInfo()
+
+    if networkInfo.hostConnectionType != nil {
+        span.setAttribute(key: "net.host.connection.type", value: networkInfo.hostConnectionType!)
+    }
+
+    if networkInfo.hostConnectionSubType != nil {
+        span.setAttribute(key: "net.host.connection.subtype", value: networkInfo.hostConnectionSubType!)
+    }
+
+    if networkInfo.carrierName != nil {
+        span.setAttribute(key: "net.host.carrier.name", value: networkInfo.carrierName!)
+    }
+
+    if networkInfo.carrierCountryCode != nil {
+        span.setAttribute(key: "net.host.carrier.mcc", value: networkInfo.carrierCountryCode!)
+    }
+
+    if networkInfo.carrierNetworkCode != nil {
+        span.setAttribute(key: "net.host.carrier.mnc", value: networkInfo.carrierNetworkCode!)
+    }
+
+    if networkInfo.carrierIsoCountryCode != nil {
+        span.setAttribute(key: "net.host.carrier.icc", value: networkInfo.carrierIsoCountryCode!)
+    }
 }
 
 func endHttpSpan(span: Span?, task: URLSessionTask) {
@@ -63,15 +88,6 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
     span!.setAttribute(key: "http.response_content_length_uncompressed", value: Int(task.countOfBytesReceived))
     if task.countOfBytesSent != 0 {
         span!.setAttribute(key: "http.request_content_length", value: Int(task.countOfBytesSent))
-    }
-    if hostConnectionType != nil {
-        span!.setAttribute(key: "net.host.connection.type", value: hostConnectionType!)
-    }
-    if hostConnectionSubtype != nil {
-        span!.setAttribute(key: "net.host.connection.subtype", value: hostConnectionSubtype!)
-    }
-    if hostConnectionName != nil {
-        span!.setAttribute(key: "net.host.carrier.name", value: hostConnectionName!)
     }
     span!.end()
 }
