@@ -148,6 +148,8 @@ func initializeNetworkTypeMonitoring() {
                 } else {
                     setConnectionType(nil)
                 }
+            } else {
+                setConnectionType(nil)
             }
         }
 
