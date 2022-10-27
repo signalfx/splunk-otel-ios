@@ -30,12 +30,12 @@ struct NetworkInfo {
     var carrierName: String?
 }
 
+#if os(iOS) && !targetEnvironment(macCatalyst)
+fileprivate var currentNetInfo: NetworkInfo = NetworkInfo()
+fileprivate var netInfoLock = pthread_rwlock_t()
 @available(iOS 12.0, *)
 fileprivate let networkMonitor = NWPathMonitor()
 fileprivate let telephonyNetworkInfo = CTTelephonyNetworkInfo()
-
-fileprivate var netInfoLock = pthread_rwlock_t()
-fileprivate var currentNetInfo: NetworkInfo = NetworkInfo()
 
 private func setConnectionType(_ type: String?) {
     pthread_rwlock_wrlock(&netInfoLock)
@@ -103,6 +103,31 @@ private func shortTech(_ tech: String?) -> String? {
     return nil
 }
 
+func getNetworkInfo() -> NetworkInfo {
+    pthread_rwlock_rdlock(&netInfoLock)
+    var info = currentNetInfo
+    pthread_rwlock_unlock(&netInfoLock)
+
+    // swiftlint:disable unavailable_condition
+    if #available(iOS 12, *) {} else {
+        let netInfo = CTTelephonyNetworkInfo()
+        let carrier = netInfo.subscriberCellularProvider
+        if carrier != nil {
+            info.carrierName = carrier!.carrierName
+            info.carrierIsoCountryCode = carrier!.isoCountryCode
+            info.carrierNetworkCode = carrier!.mobileNetworkCode
+            info.carrierCountryCode = carrier!.mobileCountryCode
+        }
+
+        let technology = netInfo.currentRadioAccessTechnology
+        if technology != nil {
+            info.hostConnectionSubType = shortTech(technology)
+        }
+    }
+
+    return info
+}
+
 func initializeNetworkTypeMonitoring() {
     pthread_rwlock_init(&netInfoLock, nil)
     if #available(iOS 12.0, *) {
@@ -125,27 +150,9 @@ func initializeNetworkTypeMonitoring() {
         }
     }
 }
-
+#else
+func initializeNetworkTypeMonitoring() {}
 func getNetworkInfo() -> NetworkInfo {
-    pthread_rwlock_rdlock(&netInfoLock)
-    var info = currentNetInfo
-    pthread_rwlock_unlock(&netInfoLock)
-
-    if #available(iOS 12, *) {} else {
-        let netInfo = CTTelephonyNetworkInfo()
-        let carrier = netInfo.subscriberCellularProvider
-        if carrier != nil {
-            info.carrierName = carrier!.carrierName
-            info.carrierIsoCountryCode = carrier!.isoCountryCode
-            info.carrierNetworkCode = carrier!.mobileNetworkCode
-            info.carrierCountryCode = carrier!.mobileCountryCode
-        }
-
-        let technology = netInfo.currentRadioAccessTechnology
-        if technology != nil {
-            info.hostConnectionSubType = shortTech(technology)
-        }
-    }
-
-    return info
+    return NetworkInfo()
 }
+#endif
