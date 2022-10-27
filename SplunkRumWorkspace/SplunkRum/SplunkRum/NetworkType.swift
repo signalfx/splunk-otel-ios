@@ -43,6 +43,13 @@ private func setConnectionType(_ type: String?) {
         pthread_rwlock_unlock(&netInfoLock)
     }
     currentNetInfo.hostConnectionType = type
+
+    if type != "wifi" {
+        currentNetInfo.hostConnectionSubType = nil
+        currentNetInfo.carrierCountryCode = nil
+        currentNetInfo.carrierNetworkCode = nil
+        currentNetInfo.carrierIsoCountryCode = nil
+    }
 }
 
 private func setCarrierInfo(name: String?, technology: String?, countryCode: String?, networkCode: String?, isoCountryCode: String?) {
