@@ -131,7 +131,7 @@ func getNetworkInfo() -> NetworkInfo {
     var info = currentNetInfo
     pthread_rwlock_unlock(&netInfoLock)
 
-    if #unavailable(iOS 12) {
+    if #available(iOS 12, *) {} else {
         let netInfo = CTTelephonyNetworkInfo()
         let carrier = netInfo.subscriberCellularProvider
         if carrier != nil {
