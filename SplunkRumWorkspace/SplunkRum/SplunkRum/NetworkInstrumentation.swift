@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
+// swiftlint:disable cyclomatic_complexity
 import Foundation
 import OpenTelemetryApi
 
@@ -64,9 +64,6 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
     if task.countOfBytesSent != 0 {
         span!.setAttribute(key: "http.request_content_length", value: Int(task.countOfBytesSent))
     }
-    if hostConnectionType != nil {
-        span?.setAttribute(key: "net.host.connection.type", value: hostConnectionType!)
-    }
     span!.end()
 }
 
@@ -95,6 +92,33 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     span.setAttribute(key: "component", value: "http")
     span.setAttribute(key: "http.url", value: url.absoluteString)
     span.setAttribute(key: "http.method", value: method)
+
+    let networkInfo = getNetworkInfo()
+
+    if networkInfo.hostConnectionType != nil {
+        span.setAttribute(key: "net.host.connection.type", value: networkInfo.hostConnectionType!)
+    }
+
+    if networkInfo.hostConnectionSubType != nil {
+        span.setAttribute(key: "net.host.connection.subtype", value: networkInfo.hostConnectionSubType!)
+    }
+
+    if networkInfo.carrierName != nil {
+        span.setAttribute(key: "net.host.carrier.name", value: networkInfo.carrierName!)
+    }
+
+    if networkInfo.carrierCountryCode != nil {
+        span.setAttribute(key: "net.host.carrier.mcc", value: networkInfo.carrierCountryCode!)
+    }
+
+    if networkInfo.carrierNetworkCode != nil {
+        span.setAttribute(key: "net.host.carrier.mnc", value: networkInfo.carrierNetworkCode!)
+    }
+
+    if networkInfo.carrierIsoCountryCode != nil {
+        span.setAttribute(key: "net.host.carrier.icc", value: networkInfo.carrierIsoCountryCode!)
+    }
+
     return span
 }
 
