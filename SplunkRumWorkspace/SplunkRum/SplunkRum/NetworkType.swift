@@ -44,7 +44,7 @@ private func setConnectionType(_ type: String?) {
     }
     currentNetInfo.hostConnectionType = type
 
-    if type != "wifi" {
+    if type != "cell" {
         currentNetInfo.hostConnectionSubType = nil
         currentNetInfo.carrierCountryCode = nil
         currentNetInfo.carrierNetworkCode = nil
