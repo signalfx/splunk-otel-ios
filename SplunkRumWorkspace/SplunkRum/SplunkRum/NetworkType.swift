@@ -44,12 +44,6 @@ private func setConnectionType(_ type: String?) {
     }
     currentNetInfo.hostConnectionType = type
 
-    if type != "cell" {
-        currentNetInfo.hostConnectionSubType = nil
-        currentNetInfo.carrierCountryCode = nil
-        currentNetInfo.carrierNetworkCode = nil
-        currentNetInfo.carrierIsoCountryCode = nil
-    }
 }
 
 private func setCarrierInfo(name: String?, technology: String?, countryCode: String?, networkCode: String?, isoCountryCode: String?) {
@@ -58,11 +52,19 @@ private func setCarrierInfo(name: String?, technology: String?, countryCode: Str
         pthread_rwlock_unlock(&netInfoLock)
     }
 
-    currentNetInfo.carrierName = name
-    currentNetInfo.hostConnectionSubType = technology
-    currentNetInfo.carrierCountryCode = countryCode
-    currentNetInfo.carrierNetworkCode = networkCode
-    currentNetInfo.carrierIsoCountryCode = isoCountryCode
+    if currentNetInfo.hostConnectionType != "cell" {
+        currentNetInfo.hostConnectionSubType = nil
+        currentNetInfo.carrierCountryCode = nil
+        currentNetInfo.carrierNetworkCode = nil
+        currentNetInfo.carrierIsoCountryCode = nil
+        currentNetInfo.carrierName = nil
+    } else {
+        currentNetInfo.carrierName = name
+        currentNetInfo.hostConnectionSubType = technology
+        currentNetInfo.carrierCountryCode = countryCode
+        currentNetInfo.carrierNetworkCode = networkCode
+        currentNetInfo.carrierIsoCountryCode = isoCountryCode
+    }
 }
 
 @available(iOS 12.0, *)
