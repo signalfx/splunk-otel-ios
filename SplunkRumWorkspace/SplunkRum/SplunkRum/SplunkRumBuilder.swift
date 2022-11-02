@@ -111,7 +111,7 @@ import StdoutExporter
         return self
     }
 
-    @objc @discardableResult public func build() -> SplunkRumOptions {
+    @objc @discardableResult public func build() -> Bool {
 
             let rumOptional = SplunkRumOptions()
                 rumOptional.beaconUrl = self.beaconUrl
@@ -129,10 +129,6 @@ import StdoutExporter
                 rumOptional.ignoreURLs = self.ignoreURLs
                 rumOptional.enableDiskCache = self.enableDiskCache
 
-                if self.beaconUrl != nil || self.rumToken != nil {
-                  SplunkRum.splunkRum_Initialize(beaconUrl: self.beaconUrl, rumAuth: self.rumToken, options: rumOptional)
-                }
-
-                return rumOptional
+                return SplunkRum.initialize(beaconUrl: self.beaconUrl, rumAuth: self.rumToken, options: rumOptional)
     }
 }
