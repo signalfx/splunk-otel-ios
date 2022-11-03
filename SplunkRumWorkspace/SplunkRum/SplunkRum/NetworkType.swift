@@ -153,9 +153,10 @@ func initializeNetworkTypeMonitoring() {
             } else {
                 setConnectionType(nil)
             }
-          setCarrierInfo(telephonyNetworkInfo, identifier: telephonyNetworkInfo.serviceCurrentRadioAccessTechnology?.keys.first)
+
         }
 
+        setCarrierInfo(telephonyNetworkInfo, identifier: telephonyNetworkInfo.serviceCurrentRadioAccessTechnology?.keys.first)
         telephonyNetworkInfo.serviceSubscriberCellularProvidersDidUpdateNotifier = { identifier in
             setCarrierInfo(telephonyNetworkInfo, identifier: identifier)
         }
