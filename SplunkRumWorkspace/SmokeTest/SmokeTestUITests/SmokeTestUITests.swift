@@ -91,12 +91,13 @@ class SmokeTestUITests: XCTestCase {
         sleep(SLEEP_TIME)
 
         // App start, initial presentation transition, etc.
-
+        print(receivedSpans.count)
         XCTAssert(receivedSpans.count > 2)
         let srInit = receivedSpans.first(where: { (span) -> Bool in
             return span.name == "SplunkRum.initialize"
         })
         XCTAssertNotNil(srInit)
+        print("receivedSpans.count")
         let appStart = receivedSpans.first(where: { (span) -> Bool in
             return span.name == "AppStart"
         })
