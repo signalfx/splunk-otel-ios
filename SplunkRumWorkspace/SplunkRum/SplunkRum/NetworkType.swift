@@ -43,7 +43,6 @@ private func setConnectionType(_ type: String?) {
         pthread_rwlock_unlock(&netInfoLock)
     }
     currentNetInfo.hostConnectionType = type
-
 }
 
 private func setCarrierInfo(name: String?, technology: String?, countryCode: String?, networkCode: String?, isoCountryCode: String?) {
@@ -148,6 +147,7 @@ func initializeNetworkTypeMonitoring() {
                     setConnectionType("wifi")
                 } else if path.usesInterfaceType(.cellular) {
                     setConnectionType("cell")
+
                 } else {
                     setConnectionType(nil)
                 }
