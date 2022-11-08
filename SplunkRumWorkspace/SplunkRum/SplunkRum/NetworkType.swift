@@ -28,6 +28,7 @@ struct NetworkInfo {
     var carrierNetworkCode: String?
     var carrierIsoCountryCode: String?
     var carrierName: String?
+    var isMonitoring = false
 }
 
 #if os(iOS) && !targetEnvironment(macCatalyst)
@@ -51,19 +52,11 @@ private func setCarrierInfo(name: String?, technology: String?, countryCode: Str
         pthread_rwlock_unlock(&netInfoLock)
     }
 
-    if currentNetInfo.hostConnectionType != "cell" {
-        currentNetInfo.hostConnectionSubType = nil
-        currentNetInfo.carrierCountryCode = nil
-        currentNetInfo.carrierNetworkCode = nil
-        currentNetInfo.carrierIsoCountryCode = nil
-        currentNetInfo.carrierName = nil
-    } else {
         currentNetInfo.carrierName = name
         currentNetInfo.hostConnectionSubType = technology
         currentNetInfo.carrierCountryCode = countryCode
         currentNetInfo.carrierNetworkCode = networkCode
         currentNetInfo.carrierIsoCountryCode = isoCountryCode
-    }
 
 }
 
@@ -145,18 +138,20 @@ func initializeNetworkTypeMonitoring() {
             if path.status == .satisfied {
                 if path.usesInterfaceType(.wifi) {
                     setConnectionType("wifi")
+                    currentNetInfo.isMonitoring = false
                 } else if path.usesInterfaceType(.cellular) {
                     setConnectionType("cell")
-
+                    currentNetInfo.isMonitoring = true
                 } else {
                     setConnectionType(nil)
                 }
             } else {
                 setConnectionType(nil)
             }
-            setCarrierInfo(telephonyNetworkInfo, identifier: telephonyNetworkInfo.serviceCurrentRadioAccessTechnology?.keys.first)
+
         }
 
+        setCarrierInfo(telephonyNetworkInfo, identifier: telephonyNetworkInfo.serviceCurrentRadioAccessTechnology?.keys.first)
         telephonyNetworkInfo.serviceSubscriberCellularProvidersDidUpdateNotifier = { identifier in
             setCarrierInfo(telephonyNetworkInfo, identifier: identifier)
         }
