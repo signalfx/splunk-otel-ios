@@ -28,6 +28,7 @@ struct NetworkInfo {
     var carrierNetworkCode: String?
     var carrierIsoCountryCode: String?
     var carrierName: String?
+    var isMonitoring = false
 }
 
 #if os(iOS) && !targetEnvironment(macCatalyst)
@@ -49,6 +50,7 @@ private func setConnectionType(_ type: String?) {
         currentNetInfo.carrierCountryCode = nil
         currentNetInfo.carrierNetworkCode = nil
         currentNetInfo.carrierIsoCountryCode = nil
+        currentNetInfo.carrierName = nil
     }
 }
 
