@@ -423,4 +423,11 @@ var splunkRumInitializeCalledTime = Date()
     @objc public class func isInitialized() -> Bool {
         return initialized
     }
+
+    /**
+        Updates the current location. The latitude and longitude will be appended to every span and event.
+    */
+    @objc public class func setLocation(latitude: Double, longitude: Double) {
+        setGlobalAttributes(["location.lat": latitude, "location.long": longitude])
+    }
 }
