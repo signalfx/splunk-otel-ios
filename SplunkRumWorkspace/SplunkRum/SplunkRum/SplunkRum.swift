@@ -249,7 +249,7 @@ var splunkRumInitializeCalledTime = Date()
             let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options?.spanFilter ?? nil)
             OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
         } else {
-            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
+            DispatchQueue.global(qos: .background).async {
                 SpanDb.deleteAtDefaultLocation()
             }
             let zipkin = ZipkinTraceExporter(options: exportOptions)
@@ -276,9 +276,9 @@ var splunkRumInitializeCalledTime = Date()
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
         startSlowFrameDetector(
-                    slowFrameDetectionThresholdMs: options?.slowFrameDetectionThresholdMs,
-                    frozenFrameDetectionThresholdMs: options?.frozenFrameDetectionThresholdMs
-                )
+            slowFrameDetectionThresholdMs: options?.slowFrameDetectionThresholdMs,
+            frozenFrameDetectionThresholdMs: options?.frozenFrameDetectionThresholdMs
+        )
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
