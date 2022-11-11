@@ -44,7 +44,7 @@ class SmokeTestUITests: XCTestCase {
         // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
 
-    let SLEEP_TIME: UInt32 = 15 // batch is currently every 5 so this should be plenty
+    let SLEEP_TIME: UInt32 = 10 // batch is currently every 5 so this should be plenty
 
     func testStartup() throws {
         // UI tests must launch the application that they test.
