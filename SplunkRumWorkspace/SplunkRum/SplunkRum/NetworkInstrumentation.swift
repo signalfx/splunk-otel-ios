@@ -99,28 +99,24 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         span.setAttribute(key: "net.host.connection.type", value: networkInfo.hostConnectionType!)
     }
 
-    if networkInfo.isMonitoring {
+    if networkInfo.hostConnectionSubType != nil {
+        span.setAttribute(key: "net.host.connection.subtype", value: networkInfo.hostConnectionSubType!)
+    }
 
-        if networkInfo.hostConnectionSubType != nil {
-            span.setAttribute(key: "net.host.connection.subtype", value: networkInfo.hostConnectionSubType!)
-        }
+    if networkInfo.carrierName != nil {
+        span.setAttribute(key: "net.host.carrier.name", value: networkInfo.carrierName!)
+    }
 
-        if networkInfo.carrierName != nil {
-            span.setAttribute(key: "net.host.carrier.name", value: networkInfo.carrierName!)
-        }
+    if networkInfo.carrierCountryCode != nil {
+        span.setAttribute(key: "net.host.carrier.mcc", value: networkInfo.carrierCountryCode!)
+    }
 
-        if networkInfo.carrierCountryCode != nil {
-            span.setAttribute(key: "net.host.carrier.mcc", value: networkInfo.carrierCountryCode!)
-        }
+    if networkInfo.carrierNetworkCode != nil {
+        span.setAttribute(key: "net.host.carrier.mnc", value: networkInfo.carrierNetworkCode!)
+    }
 
-        if networkInfo.carrierNetworkCode != nil {
-            span.setAttribute(key: "net.host.carrier.mnc", value: networkInfo.carrierNetworkCode!)
-        }
-
-        if networkInfo.carrierIsoCountryCode != nil {
-            span.setAttribute(key: "net.host.carrier.icc", value: networkInfo.carrierIsoCountryCode!)
-        }
-
+    if networkInfo.carrierIsoCountryCode != nil {
+        span.setAttribute(key: "net.host.carrier.icc", value: networkInfo.carrierIsoCountryCode!)
     }
 
     return span
