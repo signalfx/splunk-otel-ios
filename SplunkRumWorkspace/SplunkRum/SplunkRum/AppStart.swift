@@ -42,39 +42,91 @@ private func processStartTime() throws -> Date {
     return Date(timeIntervalSince1970: ti)
 }
 
+var spanStart = splunkLibraryLoadTime
 var appStart: Span?
 
+/*
+ This blog post https://eisel.me/startup explains how we can check the ProcessInfo's `ActivePrewarm` environment flag to know if the application launch
+ sequence was initiated due to prewarming. We track that scenario with `isPrewarm`.
+ 
+ This also noted here on this discussion regarding iOS startup timing:
+ https://github.com/MobileNativeFoundation/discussions/discussions/146
+ */
+var isPrewarm: Bool = false
+/*
+ According to https://developer.apple.com/documentation/uikit/app_and_environment/responding_to_the_launch_of_your_app/about_the_app_launch_sequence/ :
+ "In iOS 15 and later, the system may, depending on device conditions,
+ prewarm your app — launch nonrunning application processes to reduce the amount of time the user waits before the app is usable."
+ */
+var prewarmAvailable: Bool {
+    if #available(iOS 15.0, *) {
+        return true
+    }
+    return false
+}
+
+// Abitrary time interval (10 mins) chosen as a threshold for totally invalid calculations
+var possibleAppStartTimingErrorThreshold: TimeInterval = 60 * 10
+
+/*
+ Used to track whether the application came into the foreground during startup from a background state.
+ There are many reason's why an application's launch sequence might be initiated and the app not be brought to the foreground.
+ One example might be a user notification response that can be handled in the background. This action triggers both
+ didFinishLaunchingNotification and didBecomeVisibleNotification. In a normal user initiated start, the application state when the
+ application is brought to the foreground is `inActive`. But in the notification response case, it will be `background`.
+ We can set this flag to do additional calculation adjustments.
+*/
+var wasBackgroundedBeforeWillEnterForeground: Bool = false
+
 func initializeAppStartupListeners() {
-    let events = [
-        UIApplication.didFinishLaunchingNotification,
-        UIApplication.willEnterForegroundNotification,
-        UIApplication.didBecomeActiveNotification
-    ]
-    var reportedEvents = Set<Notification.Name>()
-    events.forEach { event in
-        _ = NotificationCenter.default.addObserver(forName: event, object: nil, queue: nil) { (_) in
-            if !reportedEvents.contains(event) {
-                reportedEvents.insert(event)
-                if appStart == nil {
-                    return
-                }
-                appStart!.addEvent(name: event.rawValue)
-                if event == UIApplication.didBecomeActiveNotification {
-                    appStart!.end()
-                    OpenTelemetry.instance.contextProvider.removeContextForSpan(appStart!)
-                    appStart = nil
-                    // Because of heavy overlap and desired treatment of AppStart vs
-                    // ongoing app lifecycle stuff, initialize this now rather than
-                    // earlier to avoid double-reporting or more complex logic
-                    initializeAppLifecycleInstrumentation()
-                }
-            }
+    var didBecomeActiveNotificationToken: NSObjectProtocol?
+    didBecomeActiveNotificationToken = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { notification in
+        defer { NotificationCenter.default.removeObserver(didBecomeActiveNotificationToken!) }
+        
+        if isPrewarm && prewarmAvailable {
+            //TODO: if we have a prewarm of true, either toss it or use the startup time from the lib
         }
+        
+        if (Date().timeIntervalSince1970 - (spanStart.timeIntervalSince1970)) > possibleAppStartTimingErrorThreshold {
+            //TODO: if our calculation is still massive (some chosen threshold), ignore it
+        }
+        
+        if wasBackgroundedBeforeWillEnterForeground {
+            //TODO: if the didFinishLaunching notification came from a background state, the app was previously backgrounded.
+        }
+        
+        if appStart != nil {
+            appStart!.end()
+            OpenTelemetry.instance.contextProvider.removeContextForSpan(appStart!)
+            appStart = nil
+        }
+        // Because of heavy overlap and desired treatment of AppStart vs
+        // ongoing app lifecycle stuff, initialize this now rather than
+        // earlier to avoid double-reporting or more complex logic
+        initializeAppLifecycleInstrumentation()
+    }
+    
+    var didFinishLaunchingNotificationToken: NSObjectProtocol?
+    didFinishLaunchingNotificationToken = NotificationCenter.default.addObserver(forName: UIApplication.didFinishLaunchingNotification, object: nil, queue: .main) { notification in
+        appStart?.addEvent(name: notification.name.rawValue)
+        NotificationCenter.default.removeObserver(didFinishLaunchingNotificationToken!)
+    }
+    
+    var willEnterForegroundNotificationToken: NSObjectProtocol?
+    willEnterForegroundNotificationToken = NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { notification in
+        wasBackgroundedBeforeWillEnterForeground = UIApplication.shared.applicationState == .background
+        appStart?.addEvent(name: notification.name.rawValue)
+        NotificationCenter.default.removeObserver(willEnterForegroundNotificationToken!)
+    }
+    
+    var didBecomeVisibleNotificationToken: NSObjectProtocol?
+    didBecomeVisibleNotificationToken = NotificationCenter.default.addObserver(forName: UIWindow.didBecomeVisibleNotification, object: nil, queue: .main) { notification in
+        appStart?.addEvent(name: notification.name.rawValue)
+        NotificationCenter.default.removeObserver(didBecomeVisibleNotificationToken!)
     }
 }
 
 func constructAppStartSpan() {
-    var spanStart = splunkLibraryLoadTime
     var procStart: Date?
     do {
         procStart = try processStartTime()
@@ -87,14 +139,18 @@ func constructAppStartSpan() {
     // FIXME more startup details?
     appStart = tracer.spanBuilder(spanName: "AppStart").setStartTime(time: spanStart).startSpan()
     appStart!.setAttribute(key: "component", value: "appstart")
-    if procStart != nil {
-        appStart!.addEvent(name: "process.start", timestamp: procStart!)
+    if let procStart = procStart {
+        appStart!.addEvent(name: "process.start", timestamp: procStart)
     }
-    // This is strange looking but I want all the initial spans that happen before didBecomeActive to be kids of the AppStart.  scope is closed at didBecomeActive
+    if isPrewarm && prewarmAvailable {
+        appStart!.setAttribute(key: "process.prewarm", value: true)
+    }
+    // This is strange looking but I want all the initial spans that happen before didBecomeActive to be kids of the AppStart. Scope is closed at didBecomeActive
     OpenTelemetry.instance.contextProvider.setActiveSpan(appStart!)
 }
 
 func sendAppStartSpan() {
+    isPrewarm = ProcessInfo.processInfo.environment["ActivePrewarm"] == "1"
     constructAppStartSpan()
     initializeAppStartupListeners()
 }

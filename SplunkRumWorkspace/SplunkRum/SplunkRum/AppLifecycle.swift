@@ -96,7 +96,7 @@ func lifecycleEvent(_ event: String) {
     if event == UI_APPLICATION_WILL_TERMINATE_NOTIFICATION {
         let now = Date()
         let span = buildTracer().spanBuilder(spanName: "AppTerminating").setStartTime(time: now).startSpan()
-        span.setAttribute(key: "component", value: "AppLifecycle")
+        span.setAttribute(key: "component", value: "app-lifecycle")
         span.end(time: now)
     }
 
