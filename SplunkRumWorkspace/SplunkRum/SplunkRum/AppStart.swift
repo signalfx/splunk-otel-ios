@@ -80,21 +80,17 @@ var wasBackgroundedBeforeWillEnterForeground: Bool = false
 
 func initializeAppStartupListeners() {
     var didBecomeActiveNotificationToken: NSObjectProtocol?
-    didBecomeActiveNotificationToken = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { notification in
+    didBecomeActiveNotificationToken = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
         defer { NotificationCenter.default.removeObserver(didBecomeActiveNotificationToken!) }
-        
         if isPrewarm && prewarmAvailable {
-            //TODO: if we have a prewarm of true, either toss it or use the startup time from the lib
+            // TODO: if we have a prewarm of true, either toss it or use the startup time from the lib
         }
-        
         if (Date().timeIntervalSince1970 - (spanStart.timeIntervalSince1970)) > possibleAppStartTimingErrorThreshold {
-            //TODO: if our calculation is still massive (some chosen threshold), ignore it
+            // TODO: if our calculation is still massive (some chosen threshold), ignore it
         }
-        
         if wasBackgroundedBeforeWillEnterForeground {
-            //TODO: if the didFinishLaunching notification came from a background state, the app was previously backgrounded.
+            // TODO: if the didFinishLaunching notification came from a background state, the app was previously backgrounded.
         }
-        
         if appStart != nil {
             appStart!.end()
             OpenTelemetry.instance.contextProvider.removeContextForSpan(appStart!)
@@ -105,20 +101,17 @@ func initializeAppStartupListeners() {
         // earlier to avoid double-reporting or more complex logic
         initializeAppLifecycleInstrumentation()
     }
-    
     var didFinishLaunchingNotificationToken: NSObjectProtocol?
     didFinishLaunchingNotificationToken = NotificationCenter.default.addObserver(forName: UIApplication.didFinishLaunchingNotification, object: nil, queue: .main) { notification in
         appStart?.addEvent(name: notification.name.rawValue)
         NotificationCenter.default.removeObserver(didFinishLaunchingNotificationToken!)
     }
-    
     var willEnterForegroundNotificationToken: NSObjectProtocol?
     willEnterForegroundNotificationToken = NotificationCenter.default.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { notification in
         wasBackgroundedBeforeWillEnterForeground = UIApplication.shared.applicationState == .background
         appStart?.addEvent(name: notification.name.rawValue)
         NotificationCenter.default.removeObserver(willEnterForegroundNotificationToken!)
     }
-    
     var didBecomeVisibleNotificationToken: NSObjectProtocol?
     didBecomeVisibleNotificationToken = NotificationCenter.default.addObserver(forName: UIWindow.didBecomeVisibleNotification, object: nil, queue: .main) { notification in
         appStart?.addEvent(name: notification.name.rawValue)
