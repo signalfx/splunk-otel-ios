@@ -43,13 +43,6 @@ private func setConnectionType(_ type: String?) {
         pthread_rwlock_unlock(&netInfoLock)
     }
     currentNetInfo.hostConnectionType = type
-
-    if type != "cell" {
-        currentNetInfo.hostConnectionSubType = nil
-        currentNetInfo.carrierCountryCode = nil
-        currentNetInfo.carrierNetworkCode = nil
-        currentNetInfo.carrierIsoCountryCode = nil
-    }
 }
 
 private func setCarrierInfo(name: String?, technology: String?, countryCode: String?, networkCode: String?, isoCountryCode: String?) {
@@ -57,12 +50,21 @@ private func setCarrierInfo(name: String?, technology: String?, countryCode: Str
     defer {
         pthread_rwlock_unlock(&netInfoLock)
     }
+    if currentNetInfo.hostConnectionType != "cell" {
+        currentNetInfo.carrierName = nil
+        currentNetInfo.hostConnectionSubType = nil
+        currentNetInfo.carrierCountryCode = nil
+        currentNetInfo.carrierNetworkCode = nil
+        currentNetInfo.carrierIsoCountryCode = nil
 
-    currentNetInfo.carrierName = name
-    currentNetInfo.hostConnectionSubType = technology
-    currentNetInfo.carrierCountryCode = countryCode
-    currentNetInfo.carrierNetworkCode = networkCode
-    currentNetInfo.carrierIsoCountryCode = isoCountryCode
+    } else {
+        currentNetInfo.carrierName = name
+        currentNetInfo.hostConnectionSubType = technology
+        currentNetInfo.carrierCountryCode = countryCode
+        currentNetInfo.carrierNetworkCode = networkCode
+        currentNetInfo.carrierIsoCountryCode = isoCountryCode
+    }
+
 }
 
 @available(iOS 12.0, *)
@@ -151,9 +153,8 @@ func initializeNetworkTypeMonitoring() {
             } else {
                 setConnectionType(nil)
             }
-        }
-
         setCarrierInfo(telephonyNetworkInfo, identifier: telephonyNetworkInfo.serviceCurrentRadioAccessTechnology?.keys.first)
+    }
         telephonyNetworkInfo.serviceSubscriberCellularProvidersDidUpdateNotifier = { identifier in
             setCarrierInfo(telephonyNetworkInfo, identifier: identifier)
         }
