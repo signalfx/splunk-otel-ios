@@ -65,8 +65,8 @@ var prewarmAvailable: Bool {
     return false
 }
 
-// Abitrary time interval (10 mins) chosen as a threshold for totally invalid calculations
-var possibleAppStartTimingErrorThreshold: TimeInterval = 60 * 10
+// Time interval (5 mins) chosen as a threshold for totally invalid calculations
+var possibleAppStartTimingErrorThreshold: TimeInterval = 60 * 5
 
 /*
  Used to track whether the application came into the foreground during startup from a background state.
