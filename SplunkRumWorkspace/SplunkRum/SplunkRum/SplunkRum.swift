@@ -188,6 +188,7 @@ var splunkRumInitializeCalledTime = Date()
     static var configuredOptions: SplunkRumOptions?
     static var theBeaconUrl: String?
 
+    // swiftlint:disable:next orphaned_doc_comment
     /**
             Initialization function.  Call as early as possible in your application, but only on the main thread.
                 - Parameter beaconUrl: Destination for the captured data.
