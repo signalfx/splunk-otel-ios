@@ -71,8 +71,8 @@ var possibleAppStartTimingErrorThreshold: TimeInterval = 60 * 10
 /*
  Used to track whether the application came into the foreground during startup from a background state.
  There are many reason's why an application's launch sequence might be initiated and the app not be brought to the foreground.
- One example might be a user notification response that can be handled in the background. This action triggers both
- didFinishLaunchingNotification and didBecomeVisibleNotification. In a normal user initiated start, the application state when the
+ One example might be a user notification response that can be handled in the background. This action triggers the
+ didFinishLaunchingNotification. In a normal user initiated start, the application state when the
  application is brought to the foreground is `inActive`. But in the notification response case, it will be `background`.
  We can set this flag to do additional calculation adjustments.
 */
@@ -80,35 +80,40 @@ var wasBackgroundedBeforeWillEnterForeground: Bool = false
 
 func initializeAppStartupListeners() {
     let notifCenter = NotificationCenter.default
+
     // didBecomeActive
     var didBecomeActiveNotificationToken: NSObjectProtocol?
     let didBecomeActiveClosure: (Notification) -> Void = { notification in
+        // defering closure scope exit to clean up appStart, start lifecycle instrumentation, and remove observer.
         defer {
+            appStart = nil
+            // Because of heavy overlap and desired treatment of AppStart vs
+            // ongoing app lifecycle stuff, initialize this now rather than
+            // earlier to avoid double-reporting or more complex logic
+            initializeAppLifecycleInstrumentation()
+
             if let didBecomeActiveNotificationToken = didBecomeActiveNotificationToken {
                 notifCenter.removeObserver(didBecomeActiveNotificationToken)
             }
         }
-        if isPrewarm && prewarmAvailable {
-            // TODO: if we have a prewarm of true, either toss it or use the startup time from the lib
+
+        guard let appStart = appStart else { return }
+
+        // If we are prewarmed,
+        // the app was made active from the background,
+        // or we are over a nonsensical threshold, we do not report the appStart span.
+        if (isPrewarm && prewarmAvailable)
+            || wasBackgroundedBeforeWillEnterForeground
+            || (Date().timeIntervalSince1970 - (spanStart.timeIntervalSince1970)) > possibleAppStartTimingErrorThreshold {
+            OpenTelemetry.instance.contextProvider.removeContextForSpan(appStart)
+        } else {
+            appStart.addEvent(name: notification.name.rawValue)
+            appStart.end()
+            OpenTelemetry.instance.contextProvider.removeContextForSpan(appStart)
         }
-        if (Date().timeIntervalSince1970 - (spanStart.timeIntervalSince1970)) > possibleAppStartTimingErrorThreshold {
-            // TODO: if our calculation is still massive (some chosen threshold), ignore it
-        }
-        if wasBackgroundedBeforeWillEnterForeground {
-            // TODO: if the didFinishLaunching notification came from a background state, the app was previously backgrounded.
-        }
-        if appStart != nil {
-            appStart!.addEvent(name: notification.name.rawValue)
-            appStart!.end()
-            OpenTelemetry.instance.contextProvider.removeContextForSpan(appStart!)
-            appStart = nil
-        }
-        // Because of heavy overlap and desired treatment of AppStart vs
-        // ongoing app lifecycle stuff, initialize this now rather than
-        // earlier to avoid double-reporting or more complex logic
-        initializeAppLifecycleInstrumentation()
     }
     didBecomeActiveNotificationToken = notifCenter.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main, using: didBecomeActiveClosure)
+
     // didFinishLaunching
     var didFinishLaunchingNotificationToken: NSObjectProtocol?
     let didFinishLaunchingClosure: (Notification) -> Void = { notification in
@@ -118,6 +123,7 @@ func initializeAppStartupListeners() {
         }
     }
     didFinishLaunchingNotificationToken = notifCenter.addObserver(forName: UIApplication.didFinishLaunchingNotification, object: nil, queue: .main, using: didFinishLaunchingClosure)
+
     // willEnterForeground
     var willEnterForegroundNotificationToken: NSObjectProtocol?
     let willEnterForegroundClosure: (Notification) -> Void = { notification in
@@ -128,15 +134,6 @@ func initializeAppStartupListeners() {
         }
     }
     willEnterForegroundNotificationToken = notifCenter.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main, using: willEnterForegroundClosure)
-    // didBecomeVisible
-    var didBecomeVisibleNotificationToken: NSObjectProtocol?
-    let didBecomeVisibleClosure: (Notification) -> Void = { notification in
-        appStart?.addEvent(name: notification.name.rawValue)
-        if let didBecomeVisibleNotificationToken = didBecomeVisibleNotificationToken {
-            notifCenter.removeObserver(didBecomeVisibleNotificationToken)
-        }
-    }
-    didBecomeVisibleNotificationToken = notifCenter.addObserver(forName: UIWindow.didBecomeVisibleNotification, object: nil, queue: .main, using: didBecomeVisibleClosure)
 }
 
 func constructAppStartSpan() {
@@ -154,9 +151,6 @@ func constructAppStartSpan() {
     appStart!.setAttribute(key: "component", value: "appstart")
     if let procStart = procStart {
         appStart!.addEvent(name: "process.start", timestamp: procStart)
-    }
-    if isPrewarm && prewarmAvailable {
-        appStart!.setAttribute(key: "process.prewarm", value: true)
     }
     // This is strange looking but I want all the initial spans that happen before didBecomeActive to be kids of the AppStart. Scope is closed at didBecomeActive
     OpenTelemetry.instance.contextProvider.setActiveSpan(appStart!)
