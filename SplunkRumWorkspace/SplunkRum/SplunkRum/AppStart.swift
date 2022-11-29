@@ -109,7 +109,6 @@ func initializeAppStartupListeners() {
         } else {
             appStart.addEvent(name: notification.name.rawValue)
             appStart.end()
-            OpenTelemetry.instance.contextProvider.removeContextForSpan(appStart)
         }
     }
     didBecomeActiveNotificationToken = notifCenter.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main, using: didBecomeActiveClosure)
