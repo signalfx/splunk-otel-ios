@@ -196,7 +196,6 @@ var splunkRumInitializeCalledTime = Date()
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
-    // swiftlint:disable:next cyclomatic_complexity
     @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
