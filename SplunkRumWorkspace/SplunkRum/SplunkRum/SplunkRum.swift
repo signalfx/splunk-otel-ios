@@ -194,7 +194,7 @@ var splunkRumInitializeCalledTime = Date()
        - Parameter rumAuth: Publicly-visible `rumAuth` value.  Please do not paste any other access token or auth value into here, as this will be visible to every user of your app
        - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      */
-    // swiftlint:disable:next cyclomatic_complexity
+
     @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
