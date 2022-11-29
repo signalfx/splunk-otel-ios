@@ -194,7 +194,7 @@ var splunkRumInitializeCalledTime = Date()
        - Parameter rumAuth: Publicly-visible `rumAuth` value.  Please do not paste any other access token or auth value into here, as this will be visible to every user of your app
        - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      */
-
+    // swiftlint:disable cyclomatic_complexity
     @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
@@ -284,6 +284,7 @@ var splunkRumInitializeCalledTime = Date()
         return true
 
     }
+    // swiftlint:enable cyclomatic_complexity
 
     /**
             Query for the current session ID.  Session IDs can change during the usage of the app so caching this result is not advised.
