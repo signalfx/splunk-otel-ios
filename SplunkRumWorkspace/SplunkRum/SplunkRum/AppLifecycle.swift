@@ -103,7 +103,9 @@ func lifecycleEvent(_ event: String) {
     // these two attempt to send to the beacon
     if event == UI_APPLICATION_WILL_TERMINATE_NOTIFICATION ||
             event == UI_APPLICATION_DID_ENTER_BACKGROUND_NOTIFICATION {
-        OpenTelemetrySDK.instance.tracerProvider.forceFlush()
+        DispatchQueue.global(qos: .background).async {
+            OpenTelemetrySDK.instance.tracerProvider.forceFlush(timeout: 2)
+        }
 
     }
 }
