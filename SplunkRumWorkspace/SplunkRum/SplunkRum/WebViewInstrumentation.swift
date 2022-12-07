@@ -39,7 +39,7 @@ class WebViewInstrumentation: NSObject, WKScriptMessageHandler {
                     cachedSessionId: '\(lastSetSessionId)',
                     getNativeSessionId: function() {
                         try {
-                            window.webkit.messageHandlers.SplunkRumNativeUpdate.postMessage();
+                            window.webkit.messageHandlers.SplunkRumNativeUpdate.postMessage('').catch(function() {});
                         } catch (e) {
                             // ignored
                         }
