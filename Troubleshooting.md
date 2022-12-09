@@ -1,14 +1,15 @@
 
 # Troubleshooting 
 
-## Swift Static Libraries
+## "Could not build Objective-C module 'SQLite3'" error during build
 
-Up until Xcode 9, support for building Swift into static libraries was non-existent and use of dynamic frameworks was required.With CocoaPods 1.5.0, developers are no longer restricted into specifying use_frameworks! in their Podfile in order to install pods that use Swift. Interop with Objective-C should just work. However, if your Swift pod depends on an Objective-C, pod you will need to enable "modular headers" for that Objective-C pod.
+Up until Xcode 9, support for building Swift into static libraries was non-existent and use of dynamic frameworks was required. With CocoaPods 1.5.0, you are no longer restricted into specifying `use_frameworks!` in your Podfile in order to install pods that use Swift. Interoperability with Objective-C is now possible. If your Swift pod depends on an Objective-C pod, you need to enable modular headers for that Objective-C pod. See the next section for instructions..
 
-## Modular Headers
+## Modular headers
 
-if Swift pod depends on an Objective-C framework, a pod file needs to enable "modular headers" for that Objective-C pod
-There are multiple ways we can use modular headers based on project requirements.
+If a Swift pod depends on an Objective-C framework, a pod file requires "modular headers" for that Objective-C pod. 
+
+There are multiple ways to use modular headers based on project requirements:
 
 1.Comment use_frameworks! and add use_modular_headers!  in pod file
 
