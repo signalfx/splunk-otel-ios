@@ -121,115 +121,109 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     return span
 }
 
-class SessionTaskObserver: NSObject {
+class SessionTask: NSObject {
     var span: Span?
     // Observers aren't kept alive by observing...
-    var extraRefToSelf: SessionTaskObserver?
+    var extraRefToSelf: SessionTask?
     var lock: NSLock = NSLock()
     override init() {
         super.init()
         extraRefToSelf = self
     }
 
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        lock.lock()
-        defer {
-            lock.unlock()
-        }
-        let task = object as? URLSessionTask
-        if task == nil {
-            return
-        }
-        if span == nil {
-            span = startHttpSpan(request: task!.originalRequest)
-        }
-        // FIXME possibly also allow .canceling to close the span?
-        if task!.state == .completed && extraRefToSelf != nil {
-            endHttpSpan(span: span,
-                        task: task!)
-            task!.removeObserver(self, forKeyPath: "state")
-            extraRefToSelf = nil
+    func networkSpan(task: URLSessionTask) {
+        DispatchQueue.main.async {
+            if self.span == nil {
+                self.span = startHttpSpan(request: task.originalRequest)
+            }
+
+            if  self.extraRefToSelf != nil {
+                endHttpSpan(span: self.span, task: task)
+                self.extraRefToSelf = nil
+            }
         }
     }
+
 }
 
-func wireUpTaskObserver(task: URLSessionTask) {
-    task.addObserver(SessionTaskObserver(), forKeyPath: "state", options: .new, context: nil)
+func networkTask(task: URLSessionTask) {
+    let urlTask = SessionTask()
+     urlTask.networkSpan(task: task)
 }
 
 // swiftlint:disable missing_docs
 extension URLSession {
     @objc open func splunk_swizzled_dataTask(with url: NSURL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: url, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
        }
 
     @objc open func splunk_swizzled_dataTask(with url: NSURL) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: url)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
        }
 
     // rename objc view of func to allow "overloading"
     @objc(splunkSwizzledDataTaskWithRequest:completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: ((Data?, URLResponse?, Error?) -> Void)?) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: request, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
        }
 
     @objc(splunkSwizzledDataTaskWithRequest:) open func splunk_swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
         let answer = splunk_swizzled_dataTask(with: request)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
        }
 
     // uploads
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, from: Data) -> URLSessionUploadTask {
         let answer = splunk_swizzled_uploadTask(with: with, from: from)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, from: Data, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
         let answer = splunk_swizzled_uploadTask(with: with, from: from, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: NSURL) -> URLSessionUploadTask {
         let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: NSURL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
         let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(withStreamedRequest: URLRequest) -> URLSessionUploadTask {
         let answer = splunk_swizzled_uploadTask(withStreamedRequest: withStreamedRequest)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
     }
     // download tasks
     @objc open func splunk_swizzled_downloadTask(with url: NSURL) -> URLSessionDownloadTask {
         let answer = splunk_swizzled_downloadTask(with: url)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
     }
     @objc open func splunk_swizzled_downloadTask(with url: NSURL, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
         let answer = splunk_swizzled_downloadTask(with: url, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
        }
     @objc(splunkSwizzledDownloadTaskWithRequest: completionHandler:) open func splunk_swizzled_downloadTask(with request: URLRequest, completionHandler: ((URL?, URLResponse?, Error?) -> Void)?) -> URLSessionDownloadTask {
         let answer = splunk_swizzled_downloadTask(with: request, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
        }
 
     @objc(splunkSwizzledDownloadTaskWithRequest:) open func splunk_swizzled_downloadTask(with request: URLRequest) -> URLSessionDataTask {
         let answer = splunk_swizzled_downloadTask(with: request)
-        wireUpTaskObserver(task: answer)
+        networkTask(task: answer)
         return answer
        }
 }
