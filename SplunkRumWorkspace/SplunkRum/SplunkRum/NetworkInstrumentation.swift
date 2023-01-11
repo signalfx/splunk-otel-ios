@@ -121,111 +121,170 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     return span
 }
 
-class SessionTask: NSObject {
-    var span: Span?
-    // Observers aren't kept alive by observing...
-    var extraRefToSelf: SessionTask?
-    var lock: NSLock = NSLock()
-    override init() {
-        super.init()
-        extraRefToSelf = self
-    }
-
-    func networkSpan(task: URLSessionTask) {
-        DispatchQueue.main.async {
-            if self.span == nil {
-                self.span = startHttpSpan(request: task.originalRequest)
-            }
-
-            if  self.extraRefToSelf != nil {
-                endHttpSpan(span: self.span, task: task)
-                self.extraRefToSelf = nil
-            }
-        }
-    }
-
-}
-
-func networkTask(task: URLSessionTask) {
-    let urlTask = SessionTask()
-     urlTask.networkSpan(task: task)
-}
-
 // swiftlint:disable missing_docs
 extension URLSession {
+
     @objc open func splunk_swizzled_dataTask(with url: NSURL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        let answer = splunk_swizzled_dataTask(with: url, completionHandler: completionHandler)
-        networkTask(task: answer)
+        var span: Span?
+        var answer: URLSessionDataTask!
+        answer = splunk_swizzled_dataTask(with: url, completionHandler: { data, response, error in
+            endHttpSpan(span: span, task: answer)
+            completionHandler(data, response, error)
+        })
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
         return answer
        }
 
     @objc open func splunk_swizzled_dataTask(with url: NSURL) -> URLSessionDataTask {
-        let answer = splunk_swizzled_dataTask(with: url)
-        networkTask(task: answer)
+        var span: Span?
+        var answer: URLSessionDataTask!
+        answer = splunk_swizzled_dataTask(with: url) { (_, _, _) in
+                 endHttpSpan(span: span, task: answer)
+        }
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
+
         return answer
        }
 
     // rename objc view of func to allow "overloading"
     @objc(splunkSwizzledDataTaskWithRequest:completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: ((Data?, URLResponse?, Error?) -> Void)?) -> URLSessionDataTask {
-        let answer = splunk_swizzled_dataTask(with: request, completionHandler: completionHandler)
-        networkTask(task: answer)
+        var span: Span?
+        var answer: URLSessionDataTask!
+        answer = splunk_swizzled_dataTask(with: request, completionHandler: { data, response, error in
+                 endHttpSpan(span: span, task: answer)
+            completionHandler?(data, response, error)
+        })
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
+
         return answer
        }
 
     @objc(splunkSwizzledDataTaskWithRequest:) open func splunk_swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
-        let answer = splunk_swizzled_dataTask(with: request)
-        networkTask(task: answer)
+        var span: Span?
+        var answer: URLSessionDataTask!
+        answer = splunk_swizzled_dataTask(with: request) { (_, _, _) in
+                 endHttpSpan(span: span, task: answer)
+        }
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
+
         return answer
        }
 
-    // uploads
+    //  uploads  //
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, from: Data) -> URLSessionUploadTask {
-        let answer = splunk_swizzled_uploadTask(with: with, from: from)
-        networkTask(task: answer)
+        var span: Span?
+        var answer: URLSessionUploadTask!
+        answer = splunk_swizzled_uploadTask(with: with, from: from) { (_, _, _) in
+            endHttpSpan(span: span, task: answer)
+         }
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, from: Data, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
-        let answer = splunk_swizzled_uploadTask(with: with, from: from, completionHandler: completionHandler)
-        networkTask(task: answer)
+        var span: Span?
+        var answer: URLSessionUploadTask!
+         answer = splunk_swizzled_uploadTask(with: with, from: from, completionHandler: { data, response, error in
+             endHttpSpan(span: span, task: answer)
+             completionHandler(data, response, error)
+        })
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: NSURL) -> URLSessionUploadTask {
-        let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile)
-        networkTask(task: answer)
+        var span: Span?
+        var answer: URLSessionUploadTask!
+            answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile) { (_, _, _) in
+            endHttpSpan(span: span, task: answer)
+         }
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
+
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: NSURL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
-        let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile, completionHandler: completionHandler)
-        networkTask(task: answer)
+        var span: Span?
+        var answer: URLSessionUploadTask!
+            answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile, completionHandler: { data, response, error in
+             endHttpSpan(span: span, task: answer)
+             completionHandler(data, response, error)
+        })
+        if span == nil {
+            span = startHttpSpan(request: answer.originalRequest)
+        }
+
         return answer
     }
     @objc open func splunk_swizzled_uploadTask(withStreamedRequest: URLRequest) -> URLSessionUploadTask {
-        let answer = splunk_swizzled_uploadTask(withStreamedRequest: withStreamedRequest)
-        networkTask(task: answer)
+        // var span: Span?
+        var answer: URLSessionUploadTask!
+        answer = splunk_swizzled_uploadTask(withStreamedRequest: withStreamedRequest)
         return answer
     }
-    // download tasks
+
+    // download tasks //
     @objc open func splunk_swizzled_downloadTask(with url: NSURL) -> URLSessionDownloadTask {
-        let answer = splunk_swizzled_downloadTask(with: url)
-        networkTask(task: answer)
+        var span: Span?
+        var answer: URLSessionDownloadTask!
+            answer = splunk_swizzled_downloadTask(with: url) { (_, _, _) in
+            endHttpSpan(span: span, task: answer)
+        }
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
         return answer
     }
     @objc open func splunk_swizzled_downloadTask(with url: NSURL, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
-        let answer = splunk_swizzled_downloadTask(with: url, completionHandler: completionHandler)
-        networkTask(task: answer)
-        return answer
-       }
-    @objc(splunkSwizzledDownloadTaskWithRequest: completionHandler:) open func splunk_swizzled_downloadTask(with request: URLRequest, completionHandler: ((URL?, URLResponse?, Error?) -> Void)?) -> URLSessionDownloadTask {
-        let answer = splunk_swizzled_downloadTask(with: request, completionHandler: completionHandler)
-        networkTask(task: answer)
-        return answer
-       }
+       // let answer = splunk_swizzled_downloadTask(with: url, completionHandler: completionHandler)
+        var span: Span?
+        var answer: URLSessionDownloadTask!
+            answer = splunk_swizzled_downloadTask(with: url, completionHandler: { data, response, error in
+                 endHttpSpan(span: span, task: answer)
+                completionHandler(data, response, error)
+        })
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
 
-    @objc(splunkSwizzledDownloadTaskWithRequest:) open func splunk_swizzled_downloadTask(with request: URLRequest) -> URLSessionDataTask {
-        let answer = splunk_swizzled_downloadTask(with: request)
-        networkTask(task: answer)
         return answer
-       }
+    }
+    @objc(splunkSwizzledDownloadTaskWithRequest: completionHandler:) open func splunk_swizzled_downloadTask(with request: URLRequest, completionHandler: ((URL?, URLResponse?, Error?) -> Void)?) -> URLSessionDownloadTask {
+        var span: Span?
+        var answer: URLSessionDownloadTask!
+            answer = splunk_swizzled_downloadTask(with: request, completionHandler: { data, response, error in
+            endHttpSpan(span: span, task: answer)
+                completionHandler?(data, response, error)
+        })
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
+        return answer
+    }
+
+    @objc(splunkSwizzledDownloadTaskWithRequest:) open func splunk_swizzled_downloadTask(with request: URLRequest) -> URLSessionDownloadTask {
+        var span: Span?
+           var answer: URLSessionDownloadTask!
+            answer = splunk_swizzled_downloadTask(with: request) { (_, _, _) in
+            endHttpSpan(span: span, task: answer)
+        }
+        if span == nil {
+           span = startHttpSpan(request: answer.originalRequest)
+        }
+        return answer
+    }
+
 }
 
 // FIXME use setImplementation and capture, rather than exchangeImpl
@@ -290,6 +349,6 @@ func initalizeNetworkInstrumentation() {
     swizzle(clazz: urlsession,
             orig: #selector(URLSession.downloadTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDownloadTask),
             swizzled: NSSelectorFromString("splunkSwizzledDownloadTaskWithRequest:"))
-    // FIXME figure out how to support the two ResumeData variants - state transfer is weird
+  //   FIXME figure out how to support the two ResumeData variants - state transfer is weird
 
 }
