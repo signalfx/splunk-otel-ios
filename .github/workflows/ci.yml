@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches:
-      - 'main'
+      - 'compatibility-tests-on-multiple-iOS-versions-with-saucelabs'
   pull_request:
 env:
   SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
