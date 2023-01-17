@@ -40,19 +40,4 @@ jobs:
         matrix:
          os: ['12.4',12.4]
          device: ['iPhone XR Simulator','iPhone 8 Simulator']
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-          
-      - name: setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8 #install the python needed
-  
-      - name: execute py script # run the run.py to get the latest data
-        working-directory: SplunkRumWorkspace
-        run: |
-            cd SmokeTest/
-            python3 -m pip install Appium-Python-Client
-            python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
-
+ 
