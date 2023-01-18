@@ -23,9 +23,13 @@ import OpenTelemetrySdk
 class ViewController: UIViewController, WKUIDelegate {
 
     var buttonID = 0
+    @IBOutlet weak var lblSuccess: UILabel!
+    @IBOutlet weak var lblFailed: UILabel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.lblSuccess.isHidden = true
+        self.lblFailed.isHidden = true
         // Do any additional setup after loading the view.
     }
 
@@ -80,6 +84,22 @@ class ViewController: UIViewController, WKUIDelegate {
     func largeSleep() {
         usleep(1000 * 1000) // 1000 ms
         buttonID = 11
+    }
+    @IBAction func btnSpanValidation(_ sender: Any) {
+
+        var status = validateSpans()
+        if !status {
+            // If it is failing check one more time
+            status = validateSpans()
+            if !status {
+                // If it is failing check one more time
+                status = validateSpans()
+            }
+        }
+
+        self.lblSuccess.isHidden = !status
+        self.lblFailed.isHidden = status
+
     }
 
     func span(with name: String) {
