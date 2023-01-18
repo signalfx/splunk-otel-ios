@@ -58,6 +58,32 @@ class IOSTests(unittest.TestCase):
         self.driver.find_element(By.ID,"SMALL SLEEP").click();
         self.validate_span();
         
+    
+    def validate_span(self):
+        sleep(10);  #it takes time to generate spans.
+        self.driver.find_element(By.ID,"Span Validation").click();
+        try:
+            WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
+                EC.visibility_of_element_located((By.ID, "Success")),
+                message='Span validation failed',
+            )
+        except TimeoutException:
+                self.driver.find_element(By.ID,"Success")
+
+        
+    def validate_more_spans(self):
+        sleep(10) #it takes time to generate spans.
+        self.driver.execute_script('mobile: scroll', {'direction': 'down'})
+        el=self.driver.find_element(By.ID,"Span Validation")
+        el.click()
+        try:
+            WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
+                EC.visibility_of_element_located((By.ID, "Success")),
+                message='Span validation failed',
+            )
+        except TimeoutException:
+                self.driver.find_element(By.ID,"Success")
+        
         
     
 if __name__ == "__main__":
