@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import Foundation
 
@@ -149,8 +148,6 @@ func frozenframe_validation() -> Bool {
     }
 }
 
-
-
 /* read content of log.txt file */
 func read_log_file() -> (content: String, error: Bool) {
     let file = "logs.txt"
@@ -159,11 +156,11 @@ func read_log_file() -> (content: String, error: Bool) {
         let fileURL = dir.appendingPathComponent(file)
         do {
             let fileContent = try String(contentsOf: fileURL, encoding: .utf8)
-            return (content:fileContent, error:false)
+            return (content: fileContent, error: false)
         } catch { }
     }
 
-    return (content:"", error:true)
+    return (content: "", error: true)
 
 }
 

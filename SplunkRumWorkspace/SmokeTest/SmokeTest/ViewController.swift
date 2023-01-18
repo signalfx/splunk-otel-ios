@@ -23,12 +23,12 @@ import OpenTelemetrySdk
 class ViewController: UIViewController, WKUIDelegate {
 
     var buttonID = 0
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
     }
-    
+
     func validateSpans() -> Bool {
         var status = false
         switch self.buttonID {
