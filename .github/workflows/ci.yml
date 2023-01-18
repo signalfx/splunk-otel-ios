@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches:
-      - 'main'
+      - 'compatibility-tests-on-multiple-iOS-versions-with-saucelabs'
   pull_request:
 env:
   SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
@@ -40,10 +40,21 @@ jobs:
         matrix:
          os: ['12.4']
          device: ['iPhone XR Simulator']
-         
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+          
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8 #install the python needed
+  
+      - name: execute py script # run the run.py to get the latest data
+        working-directory: SplunkRumWorkspace
+        run: |
+            cd SmokeTest/
+            python3 -m pip install Appium-Python-Client
+            python3 SmokeTest_appium.py ${{ matrix.os }} "${{ matrix.device }}"    
           
 
    
