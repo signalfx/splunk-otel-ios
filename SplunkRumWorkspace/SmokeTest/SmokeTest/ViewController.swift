@@ -18,12 +18,42 @@ limitations under the License.
 import UIKit
 import WebKit
 import SplunkRum
+import OpenTelemetrySdk
 
 class ViewController: UIViewController, WKUIDelegate {
 
+    var buttonID = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+    }
+    
+    func validateSpans() -> Bool {
+        var status = false
+        switch self.buttonID {
+        case 0:
+            status = sdk_initialize_validation()
+        case 2:
+            status = crashSpan_validation()
+        case 5:
+            status = customSpan_validation()
+        case 6:
+            status = errorSpan_validation()
+        case 7:
+            status = resignActiveSpan_validation()
+        case 8:
+            status = enterForeGroundSpan_validation()
+        case 9:
+            status = appTerminateSpan_validation()
+        case 10:
+            status = slowFrame_validation()
+        case 11:
+            status = frozenframe_validation()
+        default:
+            status = false
+        }
+        return status
     }
 
     @IBAction
@@ -43,11 +73,20 @@ class ViewController: UIViewController, WKUIDelegate {
     @IBAction
     func smallSleep() {
         usleep(100 * 1000) // 100 ms
+        buttonID = 10
     }
 
     @IBAction
     func largeSleep() {
         usleep(1000 * 1000) // 1000 ms
+        buttonID = 11
     }
 
+    func span(with name: String) {
+        let now = Date()
+        let tracer = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "Sauce_labs")
+        let span = tracer.spanBuilder(spanName: name).setStartTime(time: now).startSpan()
+        span.setAttribute(key: "component", value: "app-lifecycle")
+        span.end(time: now)
+    }
 }

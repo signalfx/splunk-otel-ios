@@ -35,6 +35,30 @@ class IOSTests(unittest.TestCase):
         url = 'https://sso-splunk.saucelabs.com-piyushp:634514f6-3878-42e2-89b5-68c5158a4d4b@ondemand.us-west-1.saucelabs.com:443/wd/hub'
         self.driver=webdriver.Remote(url,caps)
         
+        
+    '''
+    Quit web driver.
+    '''
+    def tearDown(self):
+        sleep(1)
+        self.driver.quit()
+
+    '''
+    Loads every element in the current view.
+    '''
+    def load(self):
+        find_next = self.driver.find_element_by_xpath("//*")
+        return
+    
+    
+    '''
+    Generating the slowRenders span with the usleep(100 * 1000) and Validating the slowframe span data.
+    '''
+    def test_SlowFrame(self):
+        self.driver.find_element(By.ID,"SMALL SLEEP").click();
+        self.validate_span();
+        
+        
     
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(IOSTests)

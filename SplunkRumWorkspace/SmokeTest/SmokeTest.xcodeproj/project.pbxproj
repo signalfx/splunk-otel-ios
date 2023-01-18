@@ -17,6 +17,7 @@
 		8645682F26EFDEB50059CF04 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; };
 		8645683026EFDEB50059CF04 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8645683426EFDED60059CF04 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 8645683326EFDED60059CF04 /* Swifter */; };
+		88B2E77F2977EEC900FC3DC1 /* SpanValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B2E77E2977EEC900FC3DC1 /* SpanValidation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,7 @@
 		8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTestUITests.swift; sourceTree = "<group>"; };
 		8645681E26EFDEA00059CF04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8645682E26EFDEB50059CF04 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		88B2E77E2977EEC900FC3DC1 /* SpanValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanValidation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 				864567FA26EFDE9F0059CF04 /* AppDelegate.swift */,
 				864567FC26EFDE9F0059CF04 /* SceneDelegate.swift */,
 				864567FE26EFDE9F0059CF04 /* ViewController.swift */,
+				88B2E77E2977EEC900FC3DC1 /* SpanValidation.swift */,
 				8645680026EFDE9F0059CF04 /* Main.storyboard */,
 				8645680326EFDE9F0059CF04 /* Assets.xcassets */,
 				8645680526EFDE9F0059CF04 /* LaunchScreen.storyboard */,
@@ -235,6 +238,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88B2E77F2977EEC900FC3DC1 /* SpanValidation.swift in Sources */,
 				864567FF26EFDE9F0059CF04 /* ViewController.swift in Sources */,
 				864567FB26EFDE9F0059CF04 /* AppDelegate.swift in Sources */,
 				864567FD26EFDE9F0059CF04 /* SceneDelegate.swift in Sources */,
