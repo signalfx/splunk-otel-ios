@@ -9,7 +9,6 @@ env:
   SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
   resourceGroup: ${GITHUB_SHA}
 jobs:
-  full-build:
   build:
     name: build
     runs-on: macOS-latest
@@ -20,8 +19,6 @@ jobs:
         run: ./fullbuild.sh
       - name: Smoke Test
         run: ./smoketest.sh
-        run: |
-         ./smoketest.sh
       - name: Uploading app on sauce lab
         run: |
            cd /Users/runner/work/splunk-otel-ios/splunk-otel-ios/
