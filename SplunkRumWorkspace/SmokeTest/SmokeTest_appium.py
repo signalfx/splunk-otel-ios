@@ -40,7 +40,7 @@ class IOSTests(unittest.TestCase):
     Quit web driver.
     '''
     def tearDown(self):
-        sleep(1)
+        sleep(2)
         self.driver.quit()
 
     '''
@@ -52,15 +52,22 @@ class IOSTests(unittest.TestCase):
     
     
     '''
-    Generating the slowRenders span with the usleep(100 * 1000) and Validating the slowframe span data.
+    Generating the slowRenders span with the usleep(100 * 1000) 100ms and Validating the slowframe span data.
     '''
     def test_SlowFrame(self):
         self.driver.find_element(By.ID,"SMALL SLEEP").click();
         self.validate_span();
         
+    '''
+    Generating the frozenRenders span with the usleep(1000 * 1000) 1000ms and Validating the frozenframe span data.
+    '''
+    def test_FrozenFrame(self):
+        self.driver.find_element(By.ID,"LARGE SLEEP").click();
+        self.validate_span();
+        
     
     def validate_span(self):
-        sleep(10);  #it takes time to generate spans.
+        sleep(15);  #it takes time to generate spans.
         self.driver.find_element(By.ID,"Span Validation").click();
         try:
             WebDriverWait(self.driver, 10,5,NoSuchElementException).until(

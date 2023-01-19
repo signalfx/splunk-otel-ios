@@ -130,7 +130,7 @@ func method_delete_validation() -> Bool {
 func slowFrame_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
-    if str.contains(FrozenRenders_SPAN) {
+    if str.contains(SlowRenders_SPAN) {
         return true
     } else {
         return false
