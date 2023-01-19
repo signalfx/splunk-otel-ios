@@ -9,7 +9,8 @@ env:
   SAUCE_ACCESS_KEY: ${{secrets.SAUCE_ACCESS_KEY}}
   resourceGroup: ${GITHUB_SHA}
 jobs:
-  build:
+ full-build:
+   build:
     name: build
     runs-on: macOS-latest
     steps:
