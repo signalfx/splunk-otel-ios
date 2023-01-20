@@ -28,7 +28,6 @@ class IOSTests(unittest.TestCase):
         caps['appium:app'] = 'storage:filename=SmokeTest.zip' 
         caps['appium:deviceName'] = sys.argv[2] 
         caps['appium:platformVersion'] = sys.argv[1]
-        caps['appium:orientation'] = 'portrait'
         caps['sauce:options'] = {}
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
         caps['sauce:options']['name'] = 'Platform Configurator Job ' + currentTime
@@ -79,7 +78,7 @@ class IOSTests(unittest.TestCase):
 #        except TimeoutException:
 #                self.driver.find_element(By.ID,"Success")
 #
-#        
+#
 #    def validate_more_spans(self):
 #        sleep(10) #it takes time to generate spans.
 #        self.driver.execute_script('mobile: scroll', {'direction': 'down'})
