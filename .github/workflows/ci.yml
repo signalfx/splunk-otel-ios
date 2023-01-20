@@ -18,8 +18,7 @@ jobs:
       - name: Full Build
         run: ./fullbuild.sh
       - name: Smoke Test
-        run: | 
-         ./smoketest.sh 
+        run: ./smoketest.sh
       - name: Uploading app on sauce lab
         run: |
            cd /Users/runner/work/splunk-otel-ios/splunk-otel-ios/
@@ -28,12 +27,11 @@ jobs:
              --request POST 'https://api.us-west-1.saucelabs.com/v1/storage/upload' \
              --form 'payload=@"SmokeTest.zip"' \
              --form 'name="SmokeTest.zip"' \
-             --form 'description="'"${{ env.resourceGroup }}"'"' 
-          
-    
-    
-  sauce-lab:
-    needs: build  
+             --form 'description="'"${{ env.resourceGroup }}"'"'  
+
+            
+  sauce-lab:  
+    needs: build 
     runs-on: macOS-latest
     strategy:
         fail-fast: false
