@@ -36,7 +36,7 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
-         os: [12.3]
+         os: [12.2]
          device: ['iPhone 8 Simulator']
     steps:
       - name: Checkout
