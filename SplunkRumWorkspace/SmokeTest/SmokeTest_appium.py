@@ -25,15 +25,14 @@ class IOSTests(unittest.TestCase):
         caps = {}
         
         caps['platformName'] = 'iOS'
-        caps['appium:app'] = 'storage:filename=SmokeTest.zip' 
-        caps['appium:deviceName'] = 'iPhone 14 Pro'
-        caps['appium:platformVersion'] = '16'
+        caps['appium:app'] = 'storage:filename=SmokeTest.zip'
+        caps['appium:deviceName'] = sys.argv[2]
+        caps['appium:platformVersion'] = sys.argv[1]
         caps['appium:automationName'] = 'XCUITest'
         caps['sauce:options'] = {}
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
         caps['sauce:options']['name'] = 'Platform Configurator Job ' + currentTime
-        caps['sauce:options']['username'] = 'SAUCE_USERNAME'
-        caps['sauce:options']['accessKey'] = 'SAUCE_ACCESS_KEY'
+        
         
         url = 'https://sso-splunk.saucelabs.com-piyushp:634514f6-3878-42e2-89b5-68c5158a4d4b@ondemand.us-west-1.saucelabs.com:443/wd/hub'
         self.driver=webdriver.Remote(url,caps)
@@ -59,11 +58,9 @@ class IOSTests(unittest.TestCase):
     Generating the slowRenders span with the usleep(100 * 1000) 100ms and Validating the slowframe span data.
     '''
     def test_SlowFrame(self):
-    try:
         self.driver.find_element(By.ID,"SMALL SLEEP").click();
         self.validate_span();
-    except TimeoutException:
-        print("No element found")
+    
         
 #
 #    '''

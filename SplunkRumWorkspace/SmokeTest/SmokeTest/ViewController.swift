@@ -75,13 +75,13 @@ class ViewController: UIViewController, WKUIDelegate {
     @IBAction
     func smallSleep() {
         usleep(100 * 1000) // 100 ms
-        buttonID = 0
+        buttonID = 10
     }
 
     @IBAction
     func largeSleep() {
         usleep(1000 * 1000) // 1000 ms
-        buttonID = 0
+        buttonID = 11
     }
     @IBAction func btnSpanValidation(_ sender: Any) {
 
