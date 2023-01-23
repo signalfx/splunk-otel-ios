@@ -132,11 +132,11 @@ func read_log_file() -> (content: String, error: Bool) {
         let fileURL = dir.appendingPathComponent(file)
         do {
             let fileContent = try String(contentsOf: fileURL, encoding: .utf8)
-            return (content:fileContent, error:false)
+            return (content: fileContent, error: false)
         } catch { }
     }
 
-    return (content:"", error:true)
+    return (content: "", error: true)
 
 }
 
