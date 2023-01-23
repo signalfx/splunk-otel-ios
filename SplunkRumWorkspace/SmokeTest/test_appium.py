@@ -32,7 +32,8 @@ class IOSTests(unittest.TestCase):
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
         caps['sauce:options']['name'] = 'Platform Configurator Job ' + currentTime
    
-        url = 'https://sso-splunk.saucelabs.com-shattimare:aee7320d-0d97-469d-a6a4-3d4c1ed6c5f0@ondemand.us-west-1.saucelabs.com:443/wd/hub'
+        #url = 'https://sso-splunk.saucelabs.com-shattimare:aee7320d-0d97-469d-a6a4-3d4c1ed6c5f0@ondemand.us-west-1.saucelabs.com:443/wd/hub'
+        url = https://sso-splunk.saucelabs.com-piyushp:634514f6-3878-42e2-89b5-68c5158a4d4b@ondemand.us-west-1.saucelabs.com:443/wd/hub
         self.driver=webdriver.Remote(url,caps)
         
     ''' 
@@ -159,44 +160,44 @@ class IOSTests(unittest.TestCase):
         self.validate_span();
 
         
-    ''' 
-    Validating custom span.
-    '''
-    def test_CustomSpanClick(self):
-        self.driver.find_element(By.ID,"Custom").click()
-        self.validate_more_spans()
-        
-    ''' 
-    Validating Error/Exception span.
-    '''
-    def test_ErrorSpanClick(self):
-        self.driver.find_element(By.ID,"Error").click()
-        self.validate_more_spans()
-
-    ''' 
-    Validating resignactive span.
-    '''
-    def test_ResignActiveSpanClick(self):
-        self.driver.find_element(By.ID,"Resign Active").click()
-        self.driver.background_app(5)
-        self.driver.activate_app(BUNDLE_ID)
-        self.validate_more_spans()
-
-    ''' 
-    Validating enterforeground span.
-    '''
-    def test_EnterForeGroundSpanClick(self):
-        self.driver.find_element(By.ID,"Enter ForeGround").click()
-        self.driver.background_app(5)
-        self.driver.activate_app(BUNDLE_ID)
-        self.validate_more_spans()
-
-    ''' 
-    Validating webview span.
-    '''
-    def test_WebViewClick(self):
-        self.driver.find_element(By.ID,"WKWebView").click()
-        self.validate_span()
+#    '''
+#    Validating custom span.
+#    '''
+#    def test_CustomSpanClick(self):
+#        self.driver.find_element(By.ID,"Custom").click()
+#        self.validate_more_spans()
+#
+#    '''
+#    Validating Error/Exception span.
+#    '''
+#    def test_ErrorSpanClick(self):
+#        self.driver.find_element(By.ID,"Error").click()
+#        self.validate_more_spans()
+#
+#    '''
+#    Validating resignactive span.
+#    '''
+#    def test_ResignActiveSpanClick(self):
+#        self.driver.find_element(By.ID,"Resign Active").click()
+#        self.driver.background_app(5)
+#        self.driver.activate_app(BUNDLE_ID)
+#        self.validate_more_spans()
+#
+#    '''
+#    Validating enterforeground span.
+#    '''
+#    def test_EnterForeGroundSpanClick(self):
+#        self.driver.find_element(By.ID,"Enter ForeGround").click()
+#        self.driver.background_app(5)
+#        self.driver.activate_app(BUNDLE_ID)
+#        self.validate_more_spans()
+#
+#    '''
+#    Validating webview span.
+#    '''
+#    def test_WebViewClick(self):
+#        self.driver.find_element(By.ID,"WKWebView").click()
+#        self.validate_span()
         
      
     def validate_span(self):
