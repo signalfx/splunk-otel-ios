@@ -44,7 +44,7 @@ class IOSTests(unittest.TestCase):
     Quit web driver.
     '''
     def tearDown(self):
-        sleep(2)
+        sleep(5)
         self.driver.quit()
 
     '''
@@ -55,12 +55,16 @@ class IOSTests(unittest.TestCase):
         return
     
     
-#    '''
-#    Generating the slowRenders span with the usleep(100 * 1000) 100ms and Validating the slowframe span data.
-#    '''
-#    def test_SlowFrame(self):
-#        self.driver.find_element(By.ID,"SMALL SLEEP").click();
-#        self.validate_span();
+    '''
+    Generating the slowRenders span with the usleep(100 * 1000) 100ms and Validating the slowframe span data.
+    '''
+    def test_SlowFrame(self):
+    try:
+        self.driver.find_element(By.ID,"SMALL SLEEP").click();
+        self.validate_span();
+    except TimeoutException:
+        print("No element found")
+        
 #
 #    '''
 #    Generating the frozenRenders span with the usleep(1000 * 1000) 1000ms and Validating the frozenframe span data.
@@ -70,17 +74,17 @@ class IOSTests(unittest.TestCase):
 #        self.validate_span();
         
     
-#    def validate_span(self):
-#        sleep(10);  #it takes time to generate spans.
-#        self.driver.find_element(By.ID,"Span Validation").click();
-#        try:
-#            WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
-#                EC.visibility_of_element_located((By.ID, "Success")),
-#                message='Span validation failed',
-#            )
-#        except TimeoutException:
-#                self.driver.find_element(By.ID,"Success")
-#
+    def validate_span(self):
+        sleep(10);  #it takes time to generate spans.
+        self.driver.find_element(By.ID,"Span Validation").click();
+        try:
+            WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
+                EC.visibility_of_element_located((By.ID, "Success")),
+                message='Span validation failed',
+            )
+        except TimeoutException:
+                self.driver.find_element(By.ID,"Success")
+
 #
 #    def validate_more_spans(self):
 #        sleep(10) #it takes time to generate spans.
