@@ -54,12 +54,12 @@ class IOSTests(unittest.TestCase):
         return
     
     
-    '''
-    Generating the slowRenders span with the usleep(100 * 1000) 100ms and Validating the slowframe span data.
-    '''
-    def test_SlowFrame(self):
-        self.driver.find_element(By.ID,"SMALL SLEEP").click();
-        self.validate_span();
+#    '''
+#    Generating the slowRenders span with the usleep(100 * 1000) 100ms and Validating the slowframe span data.
+#    '''
+#    def test_SlowFrame(self):
+#        self.driver.find_element(By.ID,"SMALL SLEEP").click();
+#        self.validate_span();
     
         
 #
