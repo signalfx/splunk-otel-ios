@@ -7,7 +7,7 @@ set -x
 TEST_DEVICE=`xcrun xctrace list devices 2>&1  | grep iPhone | head -1  | sed 's/.*[([]//' | sed 's/.$//'`
 BUILD_FOLDER="work/splunk-otel-ios/splunk-otel-ios/SmokeBuild"
 BUILD_PATH="Build/Products/Debug-iphonesimulator"
-BUILD_NAME="SmokeTest"
+BUILD_NAME="SmokeTest.app"
 
 xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SmokeTest -configuration Debug test -destination platform="iOS Simulator,id=$TEST_DEVICE" -derivedDataPath SmokeBuild
 zip ${GITHUB_WORKSPACE}/SmokeTest.zip $(find ~/$BUILD_FOLDER/$BUILD_PATH/$BUILD_NAME -type f)
