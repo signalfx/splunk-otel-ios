@@ -63,10 +63,12 @@ class RetryExporter: SpanExporter {
 
     func flush() -> SpanExporterResultCode {
         _ = attemptPendingExport()
+       // exportedSpans.removeAll()
         return proxy.flush()
     }
 
     func shutdown() {
         proxy.shutdown()
     }
+
 }

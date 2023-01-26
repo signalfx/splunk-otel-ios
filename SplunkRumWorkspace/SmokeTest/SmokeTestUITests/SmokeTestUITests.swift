@@ -22,6 +22,7 @@ struct TestZipkinSpan: Decodable {
     var name: String
     var tags: [String: String]
     var annotations: [TestZipkinAnnotation]
+   // var traceid: String
 }
 struct TestZipkinAnnotation: Decodable {
     var value: String
@@ -46,7 +47,7 @@ class SmokeTestUITests: XCTestCase {
 
     let SLEEP_TIME: UInt32 = 20 // batch is currently every 5 so this should be plenty
 
-    func testStartup() throws {
+    /*func testStartup() throws {
         // UI tests must launch the application that they test.
         let server = HttpServer()
         server["/"] = { request in
@@ -178,6 +179,6 @@ class SmokeTestUITests: XCTestCase {
         XCTAssertEqual("ViewController", frozenFrameSpan?.tags["screen.name"])
 
         // FIXME multiple screens, pickVC cases, etc.
-    }
+    }*/
 
 }

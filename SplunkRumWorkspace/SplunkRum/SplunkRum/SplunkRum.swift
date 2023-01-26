@@ -178,7 +178,8 @@ let globalAttributesLock = NSLock()
 
 let splunkLibraryLoadTime = Date()
 var splunkRumInitializeCalledTime = Date()
-
+// swiftlint:disable missing_docs
+public var sessiontoken: String = ""
 /**
  Main class for initializing the SplunkRum agent.
  */
@@ -187,6 +188,7 @@ var splunkRumInitializeCalledTime = Date()
     static var initializing = false
     static var configuredOptions: SplunkRumOptions?
     static var theBeaconUrl: String?
+
 
     /**
             Initialization function.  Call as early as possible in your application, but only on the main thread.
@@ -197,6 +199,7 @@ var splunkRumInitializeCalledTime = Date()
      
      */
     @discardableResult
+    // swiftlint:disable:next cyclomatic_complexity
     @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
@@ -287,6 +290,9 @@ var splunkRumInitializeCalledTime = Date()
 
     }
 
+    public class func setSessionToken(with token: String) {
+        sessiontoken = token
+    }
     /**
             Query for the current session ID.  Session IDs can change during the usage of the app so caching this result is not advised.
      */
