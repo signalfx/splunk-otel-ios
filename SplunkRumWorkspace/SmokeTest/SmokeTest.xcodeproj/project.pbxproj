@@ -16,16 +16,7 @@
 		8645681D26EFDEA00059CF04 /* SmokeTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */; };
 		8645683026EFDEB50059CF04 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8645683426EFDED60059CF04 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 8645683326EFDED60059CF04 /* Swifter */; };
-		C85DBEB52859D19700DC46E2 /* CustomScreenNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEAD2859D19600DC46E2 /* CustomScreenNameVC.swift */; };
-		C85DBEB72859D19700DC46E2 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEAF2859D19600DC46E2 /* CustomCell.swift */; };
-		C85DBEB82859D19700DC46E2 /* WKWebViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB02859D19600DC46E2 /* WKWebViewVC.swift */; };
-		C85DBEB92859D19700DC46E2 /* NetworkRequestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB12859D19600DC46E2 /* NetworkRequestVC.swift */; };
-		C85DBEBB2859D19700DC46E2 /* ScreenTrackVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB32859D19700DC46E2 /* ScreenTrackVC.swift */; };
-		C85DBEBC2859D19700DC46E2 /* RUMInitializationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEB42859D19700DC46E2 /* RUMInitializationVC.swift */; };
-		C85DBEBF2859D28000DC46E2 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = C85DBEBE2859D28000DC46E2 /* Alamofire */; };
-		C85DBEC22859D29100DC46E2 /* AFNetworking in Frameworks */ = {isa = PBXBuildFile; productRef = C85DBEC12859D29100DC46E2 /* AFNetworking */; };
-		C85DBEC52859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEC32859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift */; };
-		C85DBEC62859D2FE00DC46E2 /* CrashVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85DBEC42859D2FE00DC46E2 /* CrashVC.swift */; };
+		8825B6242982DFFF0039784A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8825B6232982DFFF0039784A /* ViewController.swift */; };
 		C85DBEC82859D42F00DC46E2 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = C85DBEC72859D42F00DC46E2 /* Swifter */; };
 		C86BEB58287D427A0044129E /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C86BEB57287D427A0044129E /* SplunkRum.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C87061A2287C4DBE008F081A /* sample1.html in Resources */ = {isa = PBXBuildFile; fileRef = C87061A1287C4DBE008F081A /* sample1.html */; };
@@ -68,15 +59,7 @@
 		8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTestUITests.swift; sourceTree = "<group>"; };
 		8645681E26EFDEA00059CF04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8645682E26EFDEB50059CF04 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C85DBEAC2859D19600DC46E2 /* iOSHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iOSHeader.h; sourceTree = "<group>"; };
-		C85DBEAD2859D19600DC46E2 /* CustomScreenNameVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomScreenNameVC.swift; sourceTree = "<group>"; };
-		C85DBEAF2859D19600DC46E2 /* CustomCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
-		C85DBEB02859D19600DC46E2 /* WKWebViewVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewVC.swift; sourceTree = "<group>"; };
-		C85DBEB12859D19600DC46E2 /* NetworkRequestVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkRequestVC.swift; sourceTree = "<group>"; };
-		C85DBEB32859D19700DC46E2 /* ScreenTrackVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenTrackVC.swift; sourceTree = "<group>"; };
-		C85DBEB42859D19700DC46E2 /* RUMInitializationVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RUMInitializationVC.swift; sourceTree = "<group>"; };
-		C85DBEC32859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreshOnViewDidloadVC.swift; sourceTree = "<group>"; };
-		C85DBEC42859D2FE00DC46E2 /* CrashVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashVC.swift; sourceTree = "<group>"; };
+		8825B6232982DFFF0039784A /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		C86BEB57287D427A0044129E /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C87061A1287C4DBE008F081A /* sample1.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = sample1.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -87,8 +70,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C86BEB58287D427A0044129E /* SplunkRum.framework in Frameworks */,
-				C85DBEBF2859D28000DC46E2 /* Alamofire in Frameworks */,
-				C85DBEC22859D29100DC46E2 /* AFNetworking in Frameworks */,
 				C85DBEC82859D42F00DC46E2 /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -126,16 +107,8 @@
 		864567F926EFDE9F0059CF04 /* SmokeTest */ = {
 			isa = PBXGroup;
 			children = (
+				8825B6232982DFFF0039784A /* ViewController.swift */,
 				864567FA26EFDE9F0059CF04 /* AppDelegate.swift */,
-				C85DBEAF2859D19600DC46E2 /* CustomCell.swift */,
-				C85DBEAD2859D19600DC46E2 /* CustomScreenNameVC.swift */,
-				C85DBEAC2859D19600DC46E2 /* iOSHeader.h */,
-				C85DBEB12859D19600DC46E2 /* NetworkRequestVC.swift */,
-				C85DBEB42859D19700DC46E2 /* RUMInitializationVC.swift */,
-				C85DBEC42859D2FE00DC46E2 /* CrashVC.swift */,
-				C85DBEC32859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift */,
-				C85DBEB32859D19700DC46E2 /* ScreenTrackVC.swift */,
-				C85DBEB02859D19600DC46E2 /* WKWebViewVC.swift */,
 				685F9E2B2876FD7A005B92C5 /* SpanValidation.swift */,
 				864567FC26EFDE9F0059CF04 /* SceneDelegate.swift */,
 				8645680026EFDE9F0059CF04 /* Main.storyboard */,
@@ -183,8 +156,6 @@
 			);
 			name = SmokeTest;
 			packageProductDependencies = (
-				C85DBEBE2859D28000DC46E2 /* Alamofire */,
-				C85DBEC12859D29100DC46E2 /* AFNetworking */,
 				C85DBEC72859D42F00DC46E2 /* Swifter */,
 			);
 			productName = SmokeTest;
@@ -241,8 +212,6 @@
 			mainGroup = 864567EE26EFDE9F0059CF04;
 			packageReferences = (
 				8645683226EFDED60059CF04 /* XCRemoteSwiftPackageReference "swifter" */,
-				C85DBEBD2859D28000DC46E2 /* XCRemoteSwiftPackageReference "Alamofire" */,
-				C85DBEC02859D29100DC46E2 /* XCRemoteSwiftPackageReference "AFNetworking" */,
 			);
 			productRefGroup = 864567F826EFDE9F0059CF04 /* Products */;
 			projectDirPath = "";
@@ -280,17 +249,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C85DBEBC2859D19700DC46E2 /* RUMInitializationVC.swift in Sources */,
 				685F9E2C2876FD7A005B92C5 /* SpanValidation.swift in Sources */,
-				C85DBEBB2859D19700DC46E2 /* ScreenTrackVC.swift in Sources */,
-				C85DBEB82859D19700DC46E2 /* WKWebViewVC.swift in Sources */,
-				C85DBEB52859D19700DC46E2 /* CustomScreenNameVC.swift in Sources */,
 				864567FB26EFDE9F0059CF04 /* AppDelegate.swift in Sources */,
-				C85DBEB92859D19700DC46E2 /* NetworkRequestVC.swift in Sources */,
-				C85DBEC52859D2FE00DC46E2 /* CreshOnViewDidloadVC.swift in Sources */,
-				C85DBEB72859D19700DC46E2 /* CustomCell.swift in Sources */,
+				8825B6242982DFFF0039784A /* ViewController.swift in Sources */,
 				864567FD26EFDE9F0059CF04 /* SceneDelegate.swift in Sources */,
-				C85DBEC62859D2FE00DC46E2 /* CrashVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -571,22 +533,6 @@
 				minimumVersion = 1.5.0;
 			};
 		};
-		C85DBEBD2859D28000DC46E2 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-		C85DBEC02859D29100DC46E2 /* XCRemoteSwiftPackageReference "AFNetworking" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AFNetworking/AFNetworking";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -594,16 +540,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8645683226EFDED60059CF04 /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
-		};
-		C85DBEBE2859D28000DC46E2 /* Alamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C85DBEBD2859D28000DC46E2 /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = Alamofire;
-		};
-		C85DBEC12859D29100DC46E2 /* AFNetworking */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C85DBEC02859D29100DC46E2 /* XCRemoteSwiftPackageReference "AFNetworking" */;
-			productName = AFNetworking;
 		};
 		C85DBEC72859D42F00DC46E2 /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;
