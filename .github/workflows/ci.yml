@@ -2,7 +2,7 @@ name: RUM
 on:
   push:
     branches:
-      - 'feature/APMI-1779-Automated-test-case'
+      - 'Sauce-labs-iOS-Automation'
   pull_request:
 env:
   SAUCE_USERNAME: ${{secrets.SAUCE_USERNAME}}
