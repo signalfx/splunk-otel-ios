@@ -22,6 +22,7 @@ import SplunkRum
 class ViewController: UIViewController, WKUIDelegate {
 
     var buttonID = 0
+    @IBOutlet weak var lblSuccess: UILabel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,6 +83,7 @@ class ViewController: UIViewController, WKUIDelegate {
                 status = validateSpans()
             }
         }
+        self.lblSuccess.isHidden = !status
         usleep(1000 * 1000) // 1000 ms
     }
 
