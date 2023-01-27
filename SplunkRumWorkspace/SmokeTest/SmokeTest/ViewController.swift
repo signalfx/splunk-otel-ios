@@ -73,6 +73,15 @@ class ViewController: UIViewController, WKUIDelegate {
 
     @IBAction
     func largeSleep() {
+        var status = validateSpans()
+        if !status {
+            // If it is failing check one more time
+            status = validateSpans()
+            if !status {
+                // If it is failing check one more time
+                status = validateSpans()
+            }
+        }
         usleep(1000 * 1000) // 1000 ms
     }
 

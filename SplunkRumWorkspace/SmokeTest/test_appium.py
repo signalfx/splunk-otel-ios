@@ -201,7 +201,7 @@ class IOSTests(unittest.TestCase):
      
     def validate_span(self):
         sleep(10);  #it takes time to generate spans.
-        self.driver.find_element(By.ID,"Span Validation").click();
+        self.driver.find_element(By.ID,"LARGE SLEEP").click();
         try:
             WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
                 EC.visibility_of_element_located((By.ID, "Success")),
