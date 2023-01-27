@@ -55,6 +55,7 @@ class IOSTests(unittest.TestCase):
     '''
     def test_API_PostClick(self):
         self.driver.find_element(By.ID,"SMALL SLEEP").click();
+         self.validate_span();
         
 
 #    ''' 

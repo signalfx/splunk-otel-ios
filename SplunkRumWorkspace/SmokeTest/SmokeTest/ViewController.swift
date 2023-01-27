@@ -21,9 +21,34 @@ import SplunkRum
 
 class ViewController: UIViewController, WKUIDelegate {
 
+    var buttonID = 0
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+    }
+
+    func validateSpans() -> Bool {
+        var status = false
+        switch self.buttonID {
+        case 0:
+            status = sdk_initialize_validation()
+        case 2:
+            status = crashSpan_validation()
+        case 5:
+            status = customSpan_validation()
+        case 6:
+            status = errorSpan_validation()
+        case 7:
+            status = resignActiveSpan_validation()
+        case 8:
+            status = enterForeGroundSpan_validation()
+        case 9:
+            status = appTerminateSpan_validation()
+        default:
+            status = false
+        }
+        return status
     }
 
     @IBAction
@@ -42,6 +67,7 @@ class ViewController: UIViewController, WKUIDelegate {
 
     @IBAction
     func smallSleep() {
+        buttonID = 0
         usleep(100 * 1000) // 100 ms
     }
 
