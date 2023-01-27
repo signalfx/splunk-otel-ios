@@ -55,7 +55,7 @@ class IOSTests(unittest.TestCase):
     '''
     def test_API_PostClick(self):
         self.driver.find_element(By.ID,"SMALL SLEEP").click();
-         self.validate_span();
+#         self.validate_span();
         
 
 #    ''' 
@@ -191,12 +191,12 @@ class IOSTests(unittest.TestCase):
 #        self.driver.activate_app(BUNDLE_ID)
 #        self.validate_more_spans()
 #
-#    '''
-#    Validating webview span.
-#    '''
-#    def test_WebViewClick(self):
-#        self.driver.find_element(By.ID,"WKWebView").click()
-#        self.validate_span()
+    '''
+    Validating webview span.
+    '''
+    def test_WebViewClick(self):
+        self.driver.find_element(By.ID,"CLICK ME").click()
+        self.validate_span()
         
      
     def validate_span(self):
