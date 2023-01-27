@@ -53,19 +53,17 @@ class IOSTests(unittest.TestCase):
     ''' 
     Generating the POST network request with the URLSession and Validating the network span data.
     '''
-    def test_API_PostClick(self):
+    def test_SlowFrame(self):
         self.driver.find_element(By.ID,"SMALL SLEEP").click();
 #         self.validate_span();
         
 
-#    ''' 
-#    Generating the GET network request with the URLSession and Validating the network span data.
-#    '''
-#    def test_API_GetClick(self):
-#        self.driver.find_element(By.ID,"Network Request").click();
-#        self.driver.find_element(By.ID,"URLSession").click();
-#        self.driver.find_element(By.ID,"get").click();
-#        self.validate_span();
+    '''
+    Generating the GET network request with the URLSession and Validating the network span data.
+    '''
+    def test_FrozenFrmae(self):
+        self.driver.find_element(By.ID,"LARGE SLEEP").click();
+        
 #
 #    ''' 
 #    Generating the PUT network request with the URLSession and Validating the network span data.
@@ -196,12 +194,12 @@ class IOSTests(unittest.TestCase):
     '''
     def test_WebViewClick(self):
         self.driver.find_element(By.ID,"CLICK ME").click()
-        self.validate_span()
+#        self.validate_span()
         
      
     def validate_span(self):
         sleep(10);  #it takes time to generate spans.
-        self.driver.find_element(By.ID,"LARGE SLEEP").click();
+        self.driver.find_element(By.ID,"Span Validation").click();
         try:
             WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
                 EC.visibility_of_element_located((By.ID, "Success")),

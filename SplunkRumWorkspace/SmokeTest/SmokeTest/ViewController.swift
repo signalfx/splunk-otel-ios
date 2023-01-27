@@ -46,6 +46,10 @@ class ViewController: UIViewController, WKUIDelegate {
             status = enterForeGroundSpan_validation()
         case 9:
             status = appTerminateSpan_validation()
+        case 10:
+            status = slowFrame_validation()
+        case 11:
+            status = frozenframe_validation()
         default:
             status = false
         }
@@ -65,15 +69,7 @@ class ViewController: UIViewController, WKUIDelegate {
         SplunkRum.integrateWithBrowserRum(webview)
         webview.load(req)
     }
-
-    @IBAction
-    func smallSleep() {
-        buttonID = 0
-        usleep(100 * 1000) // 100 ms
-    }
-
-    @IBAction
-    func largeSleep() {
+    @IBAction func btnSpanValidation(_ sender: Any) {
         var status = validateSpans()
         if !status {
             // If it is failing check one more time
@@ -84,7 +80,18 @@ class ViewController: UIViewController, WKUIDelegate {
             }
         }
         self.lblSuccess.isHidden = !status
+    }
+
+    @IBAction
+    func smallSleep() {
+        usleep(100 * 1000) // 100 ms
+        buttonID = 10
+    }
+
+    @IBAction
+    func largeSleep() {
         usleep(1000 * 1000) // 1000 ms
+        buttonID = 11
     }
 
 }

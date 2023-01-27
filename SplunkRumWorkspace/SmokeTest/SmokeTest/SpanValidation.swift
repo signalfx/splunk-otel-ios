@@ -44,6 +44,8 @@ let ENTERFOREGROUND_SPAN = "Span EnterForeground"
 let APPTERMINATE_SPAN = "Span AppTerminating"
 let CRASH_SPAN = "Span SIGTRAP"
 let WEBVIEW_SPAN = "Span WebView"
+let FrozenRenders_SPAN = "Span frozenRenders"
+let SlowRenders_SPAN = "Span slowRenders"
 let BUNDLE_ID = "com.splunk.opentelemetry.SmokeTest"
 
 /* get path of log.txt file */
@@ -85,6 +87,28 @@ func method_post_validation() -> Bool {
     guard !(read_log_file().error) else {return false}
     let str = read_log_file().content
     if str.contains(POST_SPAN) && str.contains(NETWORK_CALL_POST_URL) {
+        return true
+    } else {
+        return false
+    }
+}
+
+/*  method for frozenframe validation*/
+func frozenframe_validation() -> Bool {
+    guard !(read_log_file().error) else {return false}
+    let str = read_log_file().content
+    if str.contains(FrozenRenders_SPAN) {
+        return true
+    } else {
+        return false
+    }
+}
+
+/*  method for slowframe validation*/
+func slowFrame_validation() -> Bool {
+    guard !(read_log_file().error) else {return false}
+    let str = read_log_file().content
+    if str.contains(SlowRenders_SPAN) {
         return true
     } else {
         return false
