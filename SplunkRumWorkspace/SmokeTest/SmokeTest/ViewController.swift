@@ -26,6 +26,7 @@ class ViewController: UIViewController, WKUIDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.lblSuccess.isHidden = true
         // Do any additional setup after loading the view.
     }
 
@@ -50,6 +51,8 @@ class ViewController: UIViewController, WKUIDelegate {
             status = slowFrame_validation()
         case 11:
             status = frozenframe_validation()
+        case 12:
+            status = webViewSpan_validation()
         default:
             status = false
         }
@@ -59,8 +62,8 @@ class ViewController: UIViewController, WKUIDelegate {
     @IBAction
     func clickMe() {
         print("I was clicked!")
+        buttonID = 12
         SplunkRum.setScreenName("CustomScreenName")
-        lblSuccess.textColor = UIColor.green
         let webview = WKWebView(frame: .zero)
         webview.uiDelegate = self
         let url = URL(string: "http://127.0.0.1:8989/page.html")
@@ -80,7 +83,7 @@ class ViewController: UIViewController, WKUIDelegate {
             }
         }
         lblSuccess.textColor = UIColor.green
-       // self.lblSuccess.isHidden = !status
+        self.lblSuccess.isHidden = !status
 
     }
 
@@ -88,14 +91,14 @@ class ViewController: UIViewController, WKUIDelegate {
     func smallSleep() {
         usleep(100 * 1000) // 100 ms
         buttonID = 10
-        lblSuccess.textColor = UIColor.green
+
     }
 
     @IBAction
     func largeSleep() {
         usleep(1000 * 1000) // 1000 ms
         buttonID = 11
-        lblSuccess.textColor = UIColor.green
+
     }
 
 }

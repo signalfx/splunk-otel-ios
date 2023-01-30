@@ -55,7 +55,7 @@ class IOSTests(unittest.TestCase):
     '''
     def test_SlowFrame(self):
         self.driver.find_element(By.ID,"SMALL SLEEP").click();
-
+        self.validate_span();
         
         
     '''
@@ -63,32 +63,19 @@ class IOSTests(unittest.TestCase):
     '''
     def test_FrozenFrmae(self):
         self.driver.find_element(By.ID,"LARGE SLEEP").click();
-        
+        self.validate_span();
         
     '''
     Validating webview span.
     '''
     def test_WebViewClick(self):
         self.driver.find_element(By.ID,"CLICK ME").click()
-
-      
-    '''
-    Validating span.
-    '''
-    def test_ValidSpan(self):
-        self.driver.find_element(By.ID,"Span Validation").click()
         
-     
+      
     def validate_span(self):
         sleep(10);  #it takes time to generate spans.
         self.driver.find_element(By.ID,"Span Validation").click();
-        try:
-            WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
-                EC.visibility_of_element_located((By.ID, "Success")),
-                message='Span validation failed',
-            )
-        except TimeoutException:
-                self.driver.find_element(By.ID,"Success") 
+        self.driver.find_element(By.ID,"Success")  
 
         
     def validate_more_spans(self):
