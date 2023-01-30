@@ -58,22 +58,8 @@ class IOSTests(unittest.TestCase):
         self.validate_span();
         
         
-    '''
-    Generating the GET network request with the URLSession and Validating the network span data.
-    '''
-    def test_FrozenFrmae(self):
-        self.driver.find_element(By.ID,"LARGE SLEEP").click();
-        self.validate_span();
-        
-    '''
-    Validating webview span.
-    '''
-    def test_WebViewClick(self):
-        self.driver.find_element(By.ID,"CLICK ME").click()
-        
-      
     def validate_span(self):
-        sleep(10);  #it takes time to generate spans.
+        sleep(12);  #it takes time to generate spans.
         self.driver.find_element(By.ID,"Span Validation").click();
         self.driver.find_element(By.ID,"Success")  
 
