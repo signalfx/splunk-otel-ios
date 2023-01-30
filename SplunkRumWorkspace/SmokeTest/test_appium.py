@@ -69,8 +69,13 @@ class IOSTests(unittest.TestCase):
     '''
     def test_WebViewClick(self):
         self.driver.find_element(By.ID,"CLICK ME").click()
-        self.validate_span()
-        
+#        self.validate_span()
+      
+    '''
+    Validating span.
+    '''
+    def test_WebViewClick(self):
+        self.driver.find_element(By.ID,"Span Validation").click()
      
     def validate_span(self):
         sleep(10);  #it takes time to generate spans.

@@ -79,7 +79,9 @@ class ViewController: UIViewController, WKUIDelegate {
                 status = validateSpans()
             }
         }
-        self.lblSuccess.isHidden = !status
+        lblSuccess.textColor = UIColor.green
+       // self.lblSuccess.isHidden = !status
+        
     }
 
     @IBAction
