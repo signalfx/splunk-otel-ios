@@ -60,7 +60,7 @@ class ViewController: UIViewController, WKUIDelegate {
     func clickMe() {
         print("I was clicked!")
         SplunkRum.setScreenName("CustomScreenName")
-
+        lblSuccess.textColor = UIColor.green
         let webview = WKWebView(frame: .zero)
         webview.uiDelegate = self
         let url = URL(string: "http://127.0.0.1:8989/page.html")
@@ -86,12 +86,14 @@ class ViewController: UIViewController, WKUIDelegate {
     func smallSleep() {
         usleep(100 * 1000) // 100 ms
         buttonID = 10
+        lblSuccess.textColor = UIColor.green
     }
 
     @IBAction
     func largeSleep() {
         usleep(1000 * 1000) // 1000 ms
         buttonID = 11
+        lblSuccess.textColor = UIColor.green
     }
 
 }
