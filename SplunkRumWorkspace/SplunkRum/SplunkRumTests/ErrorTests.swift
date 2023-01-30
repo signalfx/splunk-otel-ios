@@ -74,7 +74,6 @@ class ErrorTests: XCTestCase {
         XCTAssertEqual(eClassErr?.attributes["component"]?.description, "error")
         XCTAssertNotNil(eClassErr?.attributes["splunk.rumSessionId"])
         XCTAssertEqual(eClassErr?.attributes["exception.type"]?.description, "ClassError")
-
         XCTAssertEqual(eClassErr?.attributes["splunk.rumSessionId"], eExc?.attributes["splunk.rumSessionId"])
 
     }
