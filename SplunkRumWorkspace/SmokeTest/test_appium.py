@@ -55,27 +55,29 @@ class IOSTests(unittest.TestCase):
     '''
     def test_SlowFrame(self):
         self.driver.find_element(By.ID,"SMALL SLEEP").click();
-#         self.validate_span();
-        
 
+        
+        
     '''
     Generating the GET network request with the URLSession and Validating the network span data.
     '''
     def test_FrozenFrmae(self):
         self.driver.find_element(By.ID,"LARGE SLEEP").click();
         
+        
     '''
     Validating webview span.
     '''
     def test_WebViewClick(self):
         self.driver.find_element(By.ID,"CLICK ME").click()
-#        self.validate_span()
+
       
     '''
     Validating span.
     '''
-    def test_WebViewClick(self):
+    def test_ValidSpan(self):
         self.driver.find_element(By.ID,"Span Validation").click()
+        
      
     def validate_span(self):
         sleep(10);  #it takes time to generate spans.
@@ -102,8 +104,7 @@ class IOSTests(unittest.TestCase):
         except TimeoutException:
                 self.driver.find_element(By.ID,"Success")  
    
-        
-   
+    
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(IOSTests)
     testRunner_result = unittest.TextTestRunner(verbosity=2).run(suite)
