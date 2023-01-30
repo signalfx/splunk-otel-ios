@@ -69,7 +69,7 @@ class IOSTests(unittest.TestCase):
     '''
     def test_WebViewClick(self):
         self.driver.find_element(By.ID,"CLICK ME").click()
-#        self.validate_span()
+        self.validate_span()
         
      
     def validate_span(self):
