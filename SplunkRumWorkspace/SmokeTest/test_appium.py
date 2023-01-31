@@ -52,24 +52,30 @@ class IOSTests(unittest.TestCase):
         return
     
     ''' 
-    Generating the POST network request with the URLSession and Validating the network span data.
+    Validating the slowRenders span.
     '''
     def test_SlowFrame(self):
         self.driver.find_element(By.ID,"SMALL SLEEP").click();
         self.validate_span();
         
+    '''
+    Validating the frozenRenders span.
+    '''
+    def test_FrozenRenders(self):
+        self.driver.find_element(By.ID,"LARGE SLEEP").click();
+        self.validate_span();
         
-                
-#    '''
-#    Validating webview span.
-#    '''
-#    def test_WebViewClick(self):
-#        self.driver.find_element(By.ID,"WKWebView").click()
-#        self.validate_span()
+        
+    '''
+    Validating webview span.
+    '''
+    def test_WebViewClick(self):
+        self.driver.find_element(By.ID,"CLICK ME").click()
+        
 
 
     def validate_span(self):
-        sleep(10);  #it takes time to generate spans.
+        sleep(12);  #it takes time to generate spans.
         self.driver.find_element(By.ID,"Span Validation").click();
         try:
             WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
@@ -80,18 +86,6 @@ class IOSTests(unittest.TestCase):
                 self.driver.find_element(By.ID,"Success")
 
         
-    def validate_more_spans(self):
-        sleep(10) #it takes time to generate spans.
-        self.driver.execute_script('mobile: scroll', {'direction': 'down'})
-        el=self.driver.find_element(By.ID,"Span Validation")
-        el.click()
-        try:
-            WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
-                EC.visibility_of_element_located((By.ID, "Success")),
-                message='Span validation failed',
-            )
-        except TimeoutException:
-                self.driver.find_element(By.ID,"Success")  
    
     
 if __name__ == "__main__":
