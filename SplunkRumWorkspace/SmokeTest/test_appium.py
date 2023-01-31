@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 import sys
 
 BUNDLE_ID = 'com.splunk.opentelemetry.SmokeTest'
@@ -72,7 +73,7 @@ class IOSTests(unittest.TestCase):
         self.driver.find_element(By.ID,"Span Validation").click();
         try:
             WebDriverWait(self.driver, 10,5,NoSuchElementException).until(
-                EC.visibility_of_element_located((By.ID, "Success")),
+                EC.visibility_of_element_located((By.ID,"Success")),
                 message='Span validation failed',
             )
         except TimeoutException:
