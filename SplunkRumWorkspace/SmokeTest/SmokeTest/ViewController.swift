@@ -26,7 +26,6 @@ class ViewController: UIViewController, WKUIDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.lblSuccess.isHidden = true
         // Do any additional setup after loading the view.
     }
 
