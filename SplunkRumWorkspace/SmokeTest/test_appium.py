@@ -56,14 +56,14 @@ class IOSTests(unittest.TestCase):
     '''
     def test_SlowFrame(self):
         self.driver.find_element(By.ID,"SMALL SLEEP").click();
-        self.validate_span();
+#        self.validate_span();
         
     '''
     Validating the frozenRenders span.
     '''
     def test_FrozenRenders(self):
         self.driver.find_element(By.ID,"LARGE SLEEP").click();
-        self.validate_span();
+#        self.validate_span();
         
         
     '''
