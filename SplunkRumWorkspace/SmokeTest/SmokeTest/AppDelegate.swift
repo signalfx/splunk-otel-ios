@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           redirectLogToDocuments()
 
         _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH", options: SplunkRumOptions(allowInsecureBeacon: true, debug: true,
-            globalAttributes: [:], environment: nil, ignoreURLs: nil))
+            globalAttributes: [:], environment: nil, ignoreURLs: nil,slowFrameDetectionThresholdMs: 30))
 
        return true
     }
