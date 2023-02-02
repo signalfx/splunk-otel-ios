@@ -189,7 +189,6 @@ class RUMInitializationVC: UIViewController {
         buttonID = 10
 
     }
-    
 
 }
 struct Log: TextOutputStream {
