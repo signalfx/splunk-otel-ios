@@ -53,4 +53,5 @@ file_header:
 
 excluded:
  - "Package.swift"
+ - "Device.generated.swift"
  - .build
