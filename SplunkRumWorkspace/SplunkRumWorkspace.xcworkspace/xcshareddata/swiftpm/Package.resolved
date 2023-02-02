@@ -1,9 +1,27 @@
 {
   "pins" : [
     {
+      "identity" : "afnetworking",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AFNetworking/AFNetworking",
+      "state" : {
+        "branch" : "master",
+        "revision" : "d9f589cc2c1fe9d55eb5eea00558010afea7a41e"
+      }
+    },
+    {
+      "identity" : "alamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/Alamofire",
+      "state" : {
+        "branch" : "master",
+        "revision" : "f1f7a06f40c6aadb4beb2a78f380f9938d574fa7"
+      }
+    },
+    {
       "identity" : "devicekit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/devicekit/DeviceKit",
+      "location" : "https://github.com/devicekit/DeviceKit.git",
       "state" : {
         "revision" : "70f1564e4218f0b68b73a4a795cb31aee5696f08",
         "version" : "4.4.0"

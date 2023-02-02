@@ -17,6 +17,15 @@
 		8645683026EFDEB50059CF04 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8645683426EFDED60059CF04 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 8645683326EFDED60059CF04 /* Swifter */; };
 		8825B6242982DFFF0039784A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8825B6232982DFFF0039784A /* ViewController.swift */; };
+		88988301298B84EA00502E93 /* WKWebViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889882F9298B84E900502E93 /* WKWebViewVC.swift */; };
+		88988303298B84EA00502E93 /* RUMInitializationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889882FB298B84E900502E93 /* RUMInitializationVC.swift */; };
+		88988304298B84EA00502E93 /* CustomScreenNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889882FC298B84E900502E93 /* CustomScreenNameVC.swift */; };
+		88988305298B84EA00502E93 /* NetworkRequestVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889882FD298B84E900502E93 /* NetworkRequestVC.swift */; };
+		88988306298B84EA00502E93 /* ScreenTrackVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889882FE298B84E900502E93 /* ScreenTrackVC.swift */; };
+		88988307298B84EA00502E93 /* CreshOnViewDidloadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889882FF298B84E900502E93 /* CreshOnViewDidloadVC.swift */; };
+		88988308298B84EA00502E93 /* CrashVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88988300298B84EA00502E93 /* CrashVC.swift */; };
+		8898830B298B855F00502E93 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 8898830A298B855F00502E93 /* Alamofire */; };
+		8898830E298B862800502E93 /* AFNetworking in Frameworks */ = {isa = PBXBuildFile; productRef = 8898830D298B862800502E93 /* AFNetworking */; };
 		C85DBEC82859D42F00DC46E2 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = C85DBEC72859D42F00DC46E2 /* Swifter */; };
 		C86BEB58287D427A0044129E /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C86BEB57287D427A0044129E /* SplunkRum.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C87061A2287C4DBE008F081A /* sample1.html in Resources */ = {isa = PBXBuildFile; fileRef = C87061A1287C4DBE008F081A /* sample1.html */; };
@@ -60,6 +69,13 @@
 		8645681E26EFDEA00059CF04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8645682E26EFDEB50059CF04 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8825B6232982DFFF0039784A /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		889882F9298B84E900502E93 /* WKWebViewVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewVC.swift; sourceTree = "<group>"; };
+		889882FB298B84E900502E93 /* RUMInitializationVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RUMInitializationVC.swift; sourceTree = "<group>"; };
+		889882FC298B84E900502E93 /* CustomScreenNameVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomScreenNameVC.swift; sourceTree = "<group>"; };
+		889882FD298B84E900502E93 /* NetworkRequestVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkRequestVC.swift; sourceTree = "<group>"; };
+		889882FE298B84E900502E93 /* ScreenTrackVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenTrackVC.swift; sourceTree = "<group>"; };
+		889882FF298B84E900502E93 /* CreshOnViewDidloadVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreshOnViewDidloadVC.swift; sourceTree = "<group>"; };
+		88988300298B84EA00502E93 /* CrashVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashVC.swift; sourceTree = "<group>"; };
 		C86BEB57287D427A0044129E /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C87061A1287C4DBE008F081A /* sample1.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = sample1.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -69,8 +85,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8898830B298B855F00502E93 /* Alamofire in Frameworks */,
 				C86BEB58287D427A0044129E /* SplunkRum.framework in Frameworks */,
 				C85DBEC82859D42F00DC46E2 /* Swifter in Frameworks */,
+				8898830E298B862800502E93 /* AFNetworking in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,6 +125,13 @@
 		864567F926EFDE9F0059CF04 /* SmokeTest */ = {
 			isa = PBXGroup;
 			children = (
+				88988300298B84EA00502E93 /* CrashVC.swift */,
+				889882FF298B84E900502E93 /* CreshOnViewDidloadVC.swift */,
+				889882FC298B84E900502E93 /* CustomScreenNameVC.swift */,
+				889882FD298B84E900502E93 /* NetworkRequestVC.swift */,
+				889882FB298B84E900502E93 /* RUMInitializationVC.swift */,
+				889882FE298B84E900502E93 /* ScreenTrackVC.swift */,
+				889882F9298B84E900502E93 /* WKWebViewVC.swift */,
 				8825B6232982DFFF0039784A /* ViewController.swift */,
 				864567FA26EFDE9F0059CF04 /* AppDelegate.swift */,
 				685F9E2B2876FD7A005B92C5 /* SpanValidation.swift */,
@@ -157,6 +182,8 @@
 			name = SmokeTest;
 			packageProductDependencies = (
 				C85DBEC72859D42F00DC46E2 /* Swifter */,
+				8898830A298B855F00502E93 /* Alamofire */,
+				8898830D298B862800502E93 /* AFNetworking */,
 			);
 			productName = SmokeTest;
 			productReference = 864567F726EFDE9F0059CF04 /* SmokeTest.app */;
@@ -212,6 +239,8 @@
 			mainGroup = 864567EE26EFDE9F0059CF04;
 			packageReferences = (
 				8645683226EFDED60059CF04 /* XCRemoteSwiftPackageReference "swifter" */,
+				88988309298B855E00502E93 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				8898830C298B862700502E93 /* XCRemoteSwiftPackageReference "AFNetworking" */,
 			);
 			productRefGroup = 864567F826EFDE9F0059CF04 /* Products */;
 			projectDirPath = "";
@@ -249,9 +278,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88988306298B84EA00502E93 /* ScreenTrackVC.swift in Sources */,
+				88988304298B84EA00502E93 /* CustomScreenNameVC.swift in Sources */,
+				88988305298B84EA00502E93 /* NetworkRequestVC.swift in Sources */,
+				88988301298B84EA00502E93 /* WKWebViewVC.swift in Sources */,
 				685F9E2C2876FD7A005B92C5 /* SpanValidation.swift in Sources */,
 				864567FB26EFDE9F0059CF04 /* AppDelegate.swift in Sources */,
+				88988303298B84EA00502E93 /* RUMInitializationVC.swift in Sources */,
+				88988307298B84EA00502E93 /* CreshOnViewDidloadVC.swift in Sources */,
 				8825B6242982DFFF0039784A /* ViewController.swift in Sources */,
+				88988308298B84EA00502E93 /* CrashVC.swift in Sources */,
 				864567FD26EFDE9F0059CF04 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -533,6 +569,22 @@
 				minimumVersion = 1.5.0;
 			};
 		};
+		88988309298B855E00502E93 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		8898830C298B862700502E93 /* XCRemoteSwiftPackageReference "AFNetworking" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AFNetworking/AFNetworking";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -540,6 +592,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8645683226EFDED60059CF04 /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
+		};
+		8898830A298B855F00502E93 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88988309298B855E00502E93 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		8898830D298B862800502E93 /* AFNetworking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8898830C298B862700502E93 /* XCRemoteSwiftPackageReference "AFNetworking" */;
+			productName = AFNetworking;
 		};
 		C85DBEC72859D42F00DC46E2 /* Swifter */ = {
 			isa = XCSwiftPackageProductDependency;
