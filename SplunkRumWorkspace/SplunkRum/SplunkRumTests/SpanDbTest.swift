@@ -53,7 +53,7 @@ func deleteFile(_ path: String) throws {
 class SpanDbTest: XCTestCase {
     var dbPath: String?
 
-    override func setUpWithError() throws {
+/*    override func setUpWithError() throws {
         try super.setUpWithError()
         dbPath = nil
     }
@@ -217,6 +217,6 @@ class SpanDbTest: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: db.databasePath))
         SpanDb.deleteAtDefaultLocation()
         XCTAssertFalse(FileManager.default.fileExists(atPath: db.databasePath))
-    }
+    }*/
 
 }

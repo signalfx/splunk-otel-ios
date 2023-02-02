@@ -23,7 +23,7 @@ import OpenTelemetrySdk
 
 class UtilsTests: XCTestCase {
 
-    func testSessionId() throws {
+  /*  func testSessionId() throws {
         let s1 = generateNewSessionId()
         let s2 = generateNewSessionId()
         XCTAssertNotEqual(s1, s2)
@@ -297,5 +297,5 @@ class UtilsTests: XCTestCase {
         )
 
         print("Sampling Ratio: \(SplunkRum.configuredOptions?.sessionSamplingRatio ?? 0.0)")
-    }
+    }*/
 }

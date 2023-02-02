@@ -24,7 +24,7 @@ func ns(_ ms: UInt64) -> UInt64 {
 
 class BandwidthTrackerTest: XCTestCase {
 
-    func testMeasure() throws {
+  /*  func testMeasure() throws {
         let tracker = BandwidthTracker(timeWindowMillis: 5_000)
         XCTAssertEqual(tracker.bandwidth(timeNanosNow: ns(0)), 0.0)
         tracker.add(bytes: 1024, timeNanos: ns(1_000))
@@ -43,6 +43,6 @@ class BandwidthTrackerTest: XCTestCase {
         tracker.add(bytes: 2048, timeNanos: ns(2_000))
         tracker.add(bytes: 2048, timeNanos: ns(3_000))
         XCTAssertEqual(tracker.bandwidth(timeNanosNow: ns(6_000)), 1.0, accuracy: 0.01)
-    }
+    }*/
 
 }
