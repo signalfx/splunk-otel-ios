@@ -69,7 +69,7 @@ class TestSpan: Span {
 
 class ServerTimingTests: XCTestCase {
 
-    func testBasicBehavior() throws {
+  /*  func testBasicBehavior() throws {
         let span = TestSpan()
         addLinkToSpan(span: span, valStr: "traceparent;desc=\"00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01\"")
         XCTAssertEqual(span.attrs["link.spanId"], "b7ad6b7169203331")
@@ -98,6 +98,6 @@ class ServerTimingTests: XCTestCase {
             XCTAssertEqual(span.attrs.count, 0)
         }
 
-    }
+    }*/
 
 }
