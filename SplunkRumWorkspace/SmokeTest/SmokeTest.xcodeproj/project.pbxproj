@@ -16,7 +16,6 @@
 		8645681D26EFDEA00059CF04 /* SmokeTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */; };
 		8645683026EFDEB50059CF04 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8645682E26EFDEB50059CF04 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8645683426EFDED60059CF04 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 8645683326EFDED60059CF04 /* Swifter */; };
-		8825B6242982DFFF0039784A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8825B6232982DFFF0039784A /* ViewController.swift */; };
 		88988301298B84EA00502E93 /* WKWebViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889882F9298B84E900502E93 /* WKWebViewVC.swift */; };
 		88988303298B84EA00502E93 /* RUMInitializationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889882FB298B84E900502E93 /* RUMInitializationVC.swift */; };
 		88988304298B84EA00502E93 /* CustomScreenNameVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889882FC298B84E900502E93 /* CustomScreenNameVC.swift */; };
@@ -68,7 +67,6 @@
 		8645681C26EFDEA00059CF04 /* SmokeTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTestUITests.swift; sourceTree = "<group>"; };
 		8645681E26EFDEA00059CF04 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8645682E26EFDEB50059CF04 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8825B6232982DFFF0039784A /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		889882F9298B84E900502E93 /* WKWebViewVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WKWebViewVC.swift; sourceTree = "<group>"; };
 		889882FB298B84E900502E93 /* RUMInitializationVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RUMInitializationVC.swift; sourceTree = "<group>"; };
 		889882FC298B84E900502E93 /* CustomScreenNameVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomScreenNameVC.swift; sourceTree = "<group>"; };
@@ -132,7 +130,6 @@
 				889882FB298B84E900502E93 /* RUMInitializationVC.swift */,
 				889882FE298B84E900502E93 /* ScreenTrackVC.swift */,
 				889882F9298B84E900502E93 /* WKWebViewVC.swift */,
-				8825B6232982DFFF0039784A /* ViewController.swift */,
 				864567FA26EFDE9F0059CF04 /* AppDelegate.swift */,
 				685F9E2B2876FD7A005B92C5 /* SpanValidation.swift */,
 				864567FC26EFDE9F0059CF04 /* SceneDelegate.swift */,
@@ -286,7 +283,6 @@
 				864567FB26EFDE9F0059CF04 /* AppDelegate.swift in Sources */,
 				88988303298B84EA00502E93 /* RUMInitializationVC.swift in Sources */,
 				88988307298B84EA00502E93 /* CreshOnViewDidloadVC.swift in Sources */,
-				8825B6242982DFFF0039784A /* ViewController.swift in Sources */,
 				88988308298B84EA00502E93 /* CrashVC.swift in Sources */,
 				864567FD26EFDE9F0059CF04 /* SceneDelegate.swift in Sources */,
 			);
