@@ -30,15 +30,12 @@
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
-
+		8815F42B298BE1B500DA3A63 /* OpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8815F42A298BE1B500DA3A63 /* OpenTelemetryApi */; };
+		8815F42D298BE1B500DA3A63 /* OpenTelemetrySdk in Frameworks */ = {isa = PBXBuildFile; productRef = 8815F42C298BE1B500DA3A63 /* OpenTelemetrySdk */; };
+		8815F42F298BE1B500DA3A63 /* StdoutExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 8815F42E298BE1B500DA3A63 /* StdoutExporter */; };
+		8815F431298BE1B500DA3A63 /* ZipkinExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 8815F430298BE1B500DA3A63 /* ZipkinExporter */; };
 		88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88734FE528A55FB60035960F /* SlowFrameDetector.swift */; };
 		D77058D428D36E350047D880 /* SessionBasedSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77058D328D36E350047D880 /* SessionBasedSampler.swift */; };
-
-		C84AA9CB286DC2180037F7D1 /* OpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = C84AA9CA286DC2180037F7D1 /* OpenTelemetryApi */; };
-		C84AA9CD286DC2180037F7D1 /* OpenTelemetrySdk in Frameworks */ = {isa = PBXBuildFile; productRef = C84AA9CC286DC2180037F7D1 /* OpenTelemetrySdk */; };
-		C84AA9CF286DC2180037F7D1 /* StdoutExporter in Frameworks */ = {isa = PBXBuildFile; productRef = C84AA9CE286DC2180037F7D1 /* StdoutExporter */; };
-		C84AA9D1286DC2180037F7D1 /* ZipkinExporter in Frameworks */ = {isa = PBXBuildFile; productRef = C84AA9D0286DC2180037F7D1 /* ZipkinExporter */; };
-
 		E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */; };
 		E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */; };
 		E2ACB21D283F855C006A1475 /* SpanDb.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21C283F855C006A1475 /* SpanDb.swift */; };
@@ -133,11 +130,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2ACB22128451939006A1475 /* libsqlite3.tbd in Frameworks */,
-				C84AA9CF286DC2180037F7D1 /* StdoutExporter in Frameworks */,
-				C84AA9D1286DC2180037F7D1 /* ZipkinExporter in Frameworks */,
+				8815F42F298BE1B500DA3A63 /* StdoutExporter in Frameworks */,
+				8815F431298BE1B500DA3A63 /* ZipkinExporter in Frameworks */,
 				8610004626178DB9008B972A /* DeviceKit in Frameworks */,
-				C84AA9CB286DC2180037F7D1 /* OpenTelemetryApi in Frameworks */,
-				C84AA9CD286DC2180037F7D1 /* OpenTelemetrySdk in Frameworks */,
+				8815F42B298BE1B500DA3A63 /* OpenTelemetryApi in Frameworks */,
+				8815F42D298BE1B500DA3A63 /* OpenTelemetrySdk in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,10 +275,10 @@
 			name = SplunkRum;
 			packageProductDependencies = (
 				8610004526178DB9008B972A /* DeviceKit */,
-				C84AA9CA286DC2180037F7D1 /* OpenTelemetryApi */,
-				C84AA9CC286DC2180037F7D1 /* OpenTelemetrySdk */,
-				C84AA9CE286DC2180037F7D1 /* StdoutExporter */,
-				C84AA9D0286DC2180037F7D1 /* ZipkinExporter */,
+				8815F42A298BE1B500DA3A63 /* OpenTelemetryApi */,
+				8815F42C298BE1B500DA3A63 /* OpenTelemetrySdk */,
+				8815F42E298BE1B500DA3A63 /* StdoutExporter */,
+				8815F430298BE1B500DA3A63 /* ZipkinExporter */,
 			);
 			productName = SplunkRum;
 			productReference = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */;
@@ -361,9 +358,9 @@
 			);
 			mainGroup = 86260EBA25CDC1DE009F3CB1;
 			packageReferences = (
-				86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */,
 				865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */,
 				8610004426178DB9008B972A /* XCRemoteSwiftPackageReference "DeviceKit" */,
+				8815F429298BE1B500DA3A63 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */,
 			);
 			productRefGroup = 86260EC525CDC1DE009F3CB1 /* Products */;
 			projectDirPath = "";
@@ -782,20 +779,20 @@
 				version = 4.4.0;
 			};
 		};
-		86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/open-telemetry/opentelemetry-swift";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.4;
-			};
-		};
 		865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/httpswift/swifter.git";
 			requirement = {
 				kind = exactVersion;
 				version = 1.5.0;
+			};
+		};
+		8815F429298BE1B500DA3A63 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/open-telemetry/opentelemetry-swift";
+			requirement = {
+				kind = exactVersion;
+				version = 1.1.3;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -811,24 +808,24 @@
 			package = 865A5CA425DC34D8003A1E5A /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
 		};
-		C84AA9CA286DC2180037F7D1 /* OpenTelemetryApi */ = {
+		8815F42A298BE1B500DA3A63 /* OpenTelemetryApi */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			package = 8815F429298BE1B500DA3A63 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = OpenTelemetryApi;
 		};
-		C84AA9CC286DC2180037F7D1 /* OpenTelemetrySdk */ = {
+		8815F42C298BE1B500DA3A63 /* OpenTelemetrySdk */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			package = 8815F429298BE1B500DA3A63 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = OpenTelemetrySdk;
 		};
-		C84AA9CE286DC2180037F7D1 /* StdoutExporter */ = {
+		8815F42E298BE1B500DA3A63 /* StdoutExporter */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			package = 8815F429298BE1B500DA3A63 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = StdoutExporter;
 		};
-		C84AA9D0286DC2180037F7D1 /* ZipkinExporter */ = {
+		8815F430298BE1B500DA3A63 /* ZipkinExporter */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 86260EE425CDC27F009F3CB1 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			package = 8815F429298BE1B500DA3A63 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = ZipkinExporter;
 		};
 		E2AFD9FE2847A397000F53BF /* Swifter */ = {
