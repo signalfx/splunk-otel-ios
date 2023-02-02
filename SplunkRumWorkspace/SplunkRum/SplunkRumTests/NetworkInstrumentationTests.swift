@@ -17,7 +17,6 @@ limitations under the License.
 import Foundation
 import XCTest
 
-
 // Fake span structure for JSONDecoder, only care about tags at the moment
 struct TestZipkinSpan: Decodable {
     var name: String
