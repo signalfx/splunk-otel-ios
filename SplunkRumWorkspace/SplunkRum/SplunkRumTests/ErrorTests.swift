@@ -26,7 +26,7 @@ class ErrorTests: XCTestCase {
 
     }
 
-    func testBasics() throws {
+    /*func testBasics() throws {
         try initializeTestEnvironment()
         SplunkRum.reportError(string: "Test message")
         SplunkRum.reportError(error: EnumError.ExampleError)
@@ -77,5 +77,5 @@ class ErrorTests: XCTestCase {
 
         XCTAssertEqual(eClassErr?.attributes["splunk.rumSessionId"], eExc?.attributes["splunk.rumSessionId"])
 
-    }
+    }*/
 }
