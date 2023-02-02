@@ -15,8 +15,6 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetrySdk
-import OpenTelemetryApi
 
 func reportExceptionErrorSpan(e: NSException) {
     let tracer = buildTracer()

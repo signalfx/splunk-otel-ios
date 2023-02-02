@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import UIKit
-import OpenTelemetryApi
 
 private func processStartTime() throws -> Date {
     let name = "kern.proc.pid"

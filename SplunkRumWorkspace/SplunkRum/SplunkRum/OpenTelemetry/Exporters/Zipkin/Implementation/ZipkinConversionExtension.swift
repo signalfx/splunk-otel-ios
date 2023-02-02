@@ -1,122 +1,13 @@
-//
 /*
-Copyright 2022 Splunk Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ * Copyright The OpenTelemetry Authors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-// Zipkin conversion code modified from https://github.com/open-telemetry/opentelemetry-swift/blob/main/Sources/Exporters/Zipkin/Implementation/ZipkinConversionExtension.swift
-
-class ZipkinEndpoint: Encodable {
-    var serviceName: String
-    var ipv4: String?
-    var ipv6: String?
-    var port: Int?
-
-    public init(serviceName: String, ipv4: String? = nil, ipv6: String? = nil, port: Int? = nil) {
-        self.serviceName = serviceName
-        self.ipv4 = ipv4
-        self.ipv6 = ipv6
-        self.port = port
-    }
-
-    public func clone(serviceName: String) -> ZipkinEndpoint {
-        return ZipkinEndpoint(serviceName: serviceName, ipv4: ipv4, ipv6: ipv6, port: port)
-    }
-
-    public func write() -> [String: Any] {
-        var output = [String: Any]()
-
-        output["serviceName"] = serviceName
-        output["ipv4"] = ipv4
-        output["ipv6"] = ipv6
-        output["port"] = port
-
-        return output
-    }
-}
-
-struct ZipkinSpan: Encodable {
-    var traceId: String
-    var parentId: String?
-    var id: String
-    var kind: String?
-    var name: String
-    var timestamp: UInt64
-    var duration: UInt64?
-    var remoteEndpoint: ZipkinEndpoint?
-    var annotations: [ZipkinAnnotation]
-    var tags: [String: String]
-
-    init(traceId: String, parentId: String?, id: String, kind: String?, name: String, timestamp: UInt64, duration: UInt64?, remoteEndpoint: ZipkinEndpoint?, annotations: [ZipkinAnnotation], tags: [String: String]) {
-
-        self.traceId = traceId
-        self.parentId = parentId
-        self.id = id
-        self.kind = kind
-        self.name = name
-        self.timestamp = timestamp
-        self.duration = duration
-        self.remoteEndpoint = remoteEndpoint
-        self.annotations = annotations
-        self.tags = tags
-    }
-
-    public func write() -> [String: Any] {
-        var output = [String: Any]()
-
-        output["traceId"] = traceId
-        output["name"] = name
-        output["parentId"] = parentId
-        output["id"] = id
-        output["kind"] = kind
-        output["timestamp"] = timestamp
-        output["duration"] = duration
-        output["localEndpoint"] = ["serviceName": "myservice"]
-
-        if remoteEndpoint != nil {
-            output["remoteEndpoint"] = remoteEndpoint!.write()
-        }
-
-        if annotations.count > 0 {
-            let annotationsArray: [Any] = annotations.map {
-                var object = [String: Any]()
-                object["timestamp"] = $0.timestamp
-                object["value"] = $0.value
-                return object
-            }
-
-            output["annotations"] = annotationsArray
-        }
-
-        if tags.count > 0 {
-            output["tags"] = tags
-        }
-
-        return output
-    }
-}
-
-struct ZipkinAnnotation: Encodable {
-    var timestamp: UInt64
-    var value: String
-}
-
-struct ZipkinTransform {
+struct ZipkinConversionExtension {
     static let statusCode = "otel.status_code"
     static let statusErrorDescription = "error"
 
@@ -127,6 +18,7 @@ struct ZipkinTransform {
                                                          "http.host": 3,
                                                          "db.instance": 4]
 
+    static var localEndpointCache = [String: ZipkinEndpoint]()
     static var remoteEndpointCache = [String: ZipkinEndpoint]()
 
     static let defaultServiceName = "unknown_service:" + ProcessInfo.processInfo.processName
@@ -139,11 +31,7 @@ struct ZipkinTransform {
         var serviceNamespace: String?
     }
 
-    static func toZipkinSpans(spans: [SpanData]) -> [ZipkinSpan] {
-        return spans.map { ZipkinTransform.toZipkinSpan(otelSpan: $0) }
-    }
-
-    static func toZipkinSpan(otelSpan: SpanData, useShortTraceIds: Bool = false) -> ZipkinSpan {
+    static func toZipkinSpan(otelSpan: SpanData, defaultLocalEndpoint: ZipkinEndpoint, useShortTraceIds: Bool = false) -> ZipkinSpan {
         let parentId = otelSpan.parentSpanId?.hexString ?? SpanId.invalid.hexString
 
         var attributeEnumerationState = AttributeEnumerationState()
@@ -154,6 +42,15 @@ struct ZipkinTransform {
 
         otelSpan.resource.attributes.forEach {
             processResources(state: &attributeEnumerationState, key: $0.key, value: $0.value)
+        }
+
+        var localEndpoint = defaultLocalEndpoint
+
+        if let serviceName = attributeEnumerationState.serviceName, !serviceName.isEmpty, defaultServiceName != serviceName {
+            if localEndpointCache[serviceName] == nil {
+                localEndpointCache[serviceName] = defaultLocalEndpoint.clone(serviceName: serviceName)
+            }
+            localEndpoint = localEndpointCache[serviceName] ?? localEndpoint
         }
 
         if let serviceNamespace = attributeEnumerationState.serviceNamespace, !serviceNamespace.isEmpty {
@@ -179,16 +76,19 @@ struct ZipkinTransform {
 
         let annotations = otelSpan.events.map { processEvents(event: $0) }
 
-        return ZipkinSpan(traceId: ZipkinTransform.EncodeTraceId(traceId: otelSpan.traceId, useShortTraceIds: useShortTraceIds),
+        return ZipkinSpan(traceId: ZipkinConversionExtension.EncodeTraceId(traceId: otelSpan.traceId, useShortTraceIds: useShortTraceIds),
                           parentId: parentId,
-                          id: ZipkinTransform.EncodeSpanId(spanId: otelSpan.spanId),
-                          kind: ZipkinTransform.toSpanKind(otelSpan: otelSpan),
+                          id: ZipkinConversionExtension.EncodeSpanId(spanId: otelSpan.spanId),
+                          kind: ZipkinConversionExtension.toSpanKind(otelSpan: otelSpan),
                           name: otelSpan.name,
                           timestamp: otelSpan.startTime.timeIntervalSince1970.toMicroseconds,
                           duration: otelSpan.endTime.timeIntervalSince(otelSpan.startTime).toMicroseconds,
+                          localEndpoint: localEndpoint,
                           remoteEndpoint: remoteEndpoint,
                           annotations: annotations,
-                          tags: attributeEnumerationState.tags)
+                          tags: attributeEnumerationState.tags,
+                          debug: nil,
+                          shared: nil)
     }
 
     static func EncodeSpanId(spanId: SpanId) -> String {

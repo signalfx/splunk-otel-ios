@@ -15,8 +15,7 @@ limitations under the License.
 */
 
 import SwiftUI
-import OpenTelemetryApi
-import OpenTelemetrySdk
+import SplunkRum
 
 struct ContentView: View {
     func networkRequest() {
@@ -61,7 +60,8 @@ struct ContentView: View {
         let derefNull = null!.pointee
     }
     func manualSpan() {
-        let span = OpenTelemetrySDK.instance.tracerProvider.get(instrumentationName: "manual").spanBuilder(spanName: "manualSpan").startSpan()
+        let tracerProvider = OpenTelemetry.instance.tracerProvider as! TracerProviderSdk
+        let span = tracerProvider.get(instrumentationName: "manual").spanBuilder(spanName: "manualSpan").startSpan()
         span.setAttribute(key: "manualKey", value: "manualValue")
         span.end()
 

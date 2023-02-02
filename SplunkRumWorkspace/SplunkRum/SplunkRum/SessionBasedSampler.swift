@@ -15,8 +15,6 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetrySdk
-import OpenTelemetryApi
 
 class SessionBasedSampler {
     static var probability: Double = 1.0
@@ -44,12 +42,13 @@ class SessionBasedSampler {
 
         var parentSampler: Sampler
         if result {
-            parentSampler = OpenTelemetrySdk.Samplers.parentBased(root: Samplers.alwaysOn, remoteParentSampled: Samplers.alwaysOn, remoteParentNotSampled: Samplers.alwaysOn, localParentSampled: Samplers.alwaysOn, localParentNotSampled: Samplers.alwaysOn)
+            parentSampler = Samplers.parentBased(root: Samplers.alwaysOn, remoteParentSampled: Samplers.alwaysOn, remoteParentNotSampled: Samplers.alwaysOn, localParentSampled: Samplers.alwaysOn, localParentNotSampled: Samplers.alwaysOn)
         } else {
-            parentSampler = OpenTelemetrySdk.Samplers.parentBased(root: Samplers.alwaysOff, remoteParentSampled: Samplers.alwaysOff, remoteParentNotSampled: Samplers.alwaysOff, localParentSampled: Samplers.alwaysOff, localParentNotSampled: Samplers.alwaysOff)
+            parentSampler = Samplers.parentBased(root: Samplers.alwaysOff, remoteParentSampled: Samplers.alwaysOff, remoteParentNotSampled: Samplers.alwaysOff, localParentSampled: Samplers.alwaysOff, localParentNotSampled: Samplers.alwaysOff)
         }
 
-        OpenTelemetrySDK.instance.tracerProvider.updateActiveSampler(parentSampler)
+        let tracerProvider = OpenTelemetry.instance.tracerProvider as! TracerProviderSdk
+        tracerProvider.updateActiveSampler(parentSampler)
         return result
     }
 

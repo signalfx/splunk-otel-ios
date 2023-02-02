@@ -16,10 +16,6 @@ limitations under the License.
 
 // swiftlint:disable file_length
 import Foundation
-import OpenTelemetryApi
-import OpenTelemetrySdk
-import ZipkinExporter
-import StdoutExporter
 import WebKit
 
 let SplunkRumVersionString = "0.10.0"
@@ -212,6 +208,12 @@ var splunkRumInitializeCalledTime = Date()
             initializing = false
         }
         debug_log("SplunkRum.initialize")
+
+        let tracerProvider = TracerProviderBuilder()
+            .add(spanProcessor: GlobalAttributesProcessor())
+            .build()
+        OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
+
         if options != nil {
             configuredOptions = SplunkRumOptions(opts: options!)
         }
@@ -237,8 +239,6 @@ var splunkRumInitializeCalledTime = Date()
         } else {
             theBeaconUrl = beaconUrl + "?auth="+rumAuth
         }
-        OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(GlobalAttributesProcessor())
-        let exportOptions = ZipkinTraceExporterOptions(endpoint: theBeaconUrl!, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
 
         if options?.enableDiskCache ?? false {
             let spanDb = SpanDb()
@@ -247,19 +247,20 @@ var splunkRumInitializeCalledTime = Date()
                 spanDb: spanDb,
                 maxFileSizeBytes: options?.spanDiskCacheMaxSize ?? DEFAULT_DISK_CACHE_MAX_SIZE_BYTES)
             let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options?.spanFilter ?? nil)
-            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
         } else {
             DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
                 SpanDb.deleteAtDefaultLocation()
             }
+            let exportOptions = ZipkinTraceExporterOptions(endpoint: theBeaconUrl!, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
             let zipkin = ZipkinTraceExporter(options: exportOptions)
             let retry = RetryExporter(proxy: zipkin)
             let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
-            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
         }
 
         if options?.debug ?? false {
-            OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
+            tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
         }
         sendAppStartSpan()
         let srInit = buildTracer()
