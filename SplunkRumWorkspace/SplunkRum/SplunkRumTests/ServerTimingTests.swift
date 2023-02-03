@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import OpenTelemetryApi
 import XCTest
 @testable import SplunkRum
 
@@ -42,7 +41,10 @@ class TestSpan: Span {
         isRecording = true
         name = "test"
         description = "test"
-        context = OpenTelemetry.instance.contextProvider.activeSpan!.context
+        context = OpenTelemetry.instance.contextProvider.activeSpan?.context ?? SpanContext.create(traceId: TraceId.random(),
+                                                                                                   spanId: SpanId.random(),
+                                                                                                   traceFlags: TraceFlags(),
+                                                                                                   traceState: TraceState())
         status = .unset
     }
     var kind: SpanKind

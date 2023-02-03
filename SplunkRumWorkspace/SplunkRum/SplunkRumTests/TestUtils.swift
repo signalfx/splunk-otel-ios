@@ -17,8 +17,6 @@ limitations under the License.
 import Foundation
 import Swifter
 import SplunkRum
-import OpenTelemetrySdk
-import OpenTelemetryApi
 import XCTest
 
 var receivedSpans: [TestZipkinSpan] = []
@@ -108,7 +106,8 @@ func initializeTestEnvironment() throws {
     XCTAssertEqual(true, isRUMInitialized)
     XCTAssertEqual(false, initializeAgain)
     XCTAssertEqual(true, isStillInitialized)
-    OpenTelemetrySDK.instance.tracerProvider.addSpanProcessor(TestSpanProcessor(spanExporter: TestSpanExporter()))
+    let tracerProvider = OpenTelemetry.instance.tracerProvider as! TracerProviderSdk
+    tracerProvider.addSpanProcessor(TestSpanProcessor(spanExporter: TestSpanExporter()))
 
     print("sleeping to wait for span batch, don't worry about the pause...")
     sleep(8)

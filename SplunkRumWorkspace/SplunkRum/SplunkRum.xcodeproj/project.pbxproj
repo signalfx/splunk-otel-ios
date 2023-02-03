@@ -115,13 +115,13 @@
 		E27ABAEE2989590E0060C16D /* ComponentRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABA9B2989590D0060C16D /* ComponentRegistry.swift */; };
 		E27ABAEF2989590E0060C16D /* InstrumentationLibraryInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABA9C2989590D0060C16D /* InstrumentationLibraryInfo.swift */; };
 		E27ABAF2298A747F0060C16D /* Device.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABAF1298A747F0060C16D /* Device.generated.swift */; };
-		E27ABAFD298C12490060C16D /* ZipkinTraceExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABAF4298C12480060C16D /* ZipkinTraceExporter.swift */; };
-		E27ABAFE298C12490060C16D /* NetworkUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABAF6298C12480060C16D /* NetworkUtils.swift */; };
-		E27ABAFF298C12490060C16D /* ZipkinTraceExporterOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABAF7298C12480060C16D /* ZipkinTraceExporterOptions.swift */; };
-		E27ABB00298C12490060C16D /* ZipkinAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABAF9298C12480060C16D /* ZipkinAnnotation.swift */; };
-		E27ABB01298C12490060C16D /* ZipkinSpan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABAFA298C12480060C16D /* ZipkinSpan.swift */; };
-		E27ABB02298C12490060C16D /* ZipkinConversionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABAFB298C12480060C16D /* ZipkinConversionExtension.swift */; };
-		E27ABB03298C12490060C16D /* ZipkinEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABAFC298C12480060C16D /* ZipkinEndpoint.swift */; };
+		E27ABB0E298D10840060C16D /* ZipkinTraceExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB05298D10840060C16D /* ZipkinTraceExporter.swift */; };
+		E27ABB0F298D10840060C16D /* NetworkUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB07298D10840060C16D /* NetworkUtils.swift */; };
+		E27ABB10298D10840060C16D /* ZipkinTraceExporterOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB08298D10840060C16D /* ZipkinTraceExporterOptions.swift */; };
+		E27ABB11298D10840060C16D /* ZipkinAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB0A298D10840060C16D /* ZipkinAnnotation.swift */; };
+		E27ABB12298D10840060C16D /* ZipkinSpan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB0B298D10840060C16D /* ZipkinSpan.swift */; };
+		E27ABB13298D10840060C16D /* ZipkinConversionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB0C298D10840060C16D /* ZipkinConversionExtension.swift */; };
+		E27ABB14298D10840060C16D /* ZipkinEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB0D298D10840060C16D /* ZipkinEndpoint.swift */; };
 		E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */; };
 		E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */; };
 		E2ACB21D283F855C006A1475 /* SpanDb.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21C283F855C006A1475 /* SpanDb.swift */; };
@@ -278,13 +278,13 @@
 		E27ABA9B2989590D0060C16D /* ComponentRegistry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComponentRegistry.swift; sourceTree = "<group>"; };
 		E27ABA9C2989590D0060C16D /* InstrumentationLibraryInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstrumentationLibraryInfo.swift; sourceTree = "<group>"; };
 		E27ABAF1298A747F0060C16D /* Device.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.generated.swift; sourceTree = "<group>"; };
-		E27ABAF4298C12480060C16D /* ZipkinTraceExporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinTraceExporter.swift; sourceTree = "<group>"; };
-		E27ABAF6298C12480060C16D /* NetworkUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkUtils.swift; sourceTree = "<group>"; };
-		E27ABAF7298C12480060C16D /* ZipkinTraceExporterOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinTraceExporterOptions.swift; sourceTree = "<group>"; };
-		E27ABAF9298C12480060C16D /* ZipkinAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinAnnotation.swift; sourceTree = "<group>"; };
-		E27ABAFA298C12480060C16D /* ZipkinSpan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinSpan.swift; sourceTree = "<group>"; };
-		E27ABAFB298C12480060C16D /* ZipkinConversionExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinConversionExtension.swift; sourceTree = "<group>"; };
-		E27ABAFC298C12480060C16D /* ZipkinEndpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinEndpoint.swift; sourceTree = "<group>"; };
+		E27ABB05298D10840060C16D /* ZipkinTraceExporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinTraceExporter.swift; sourceTree = "<group>"; };
+		E27ABB07298D10840060C16D /* NetworkUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkUtils.swift; sourceTree = "<group>"; };
+		E27ABB08298D10840060C16D /* ZipkinTraceExporterOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinTraceExporterOptions.swift; sourceTree = "<group>"; };
+		E27ABB0A298D10840060C16D /* ZipkinAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinAnnotation.swift; sourceTree = "<group>"; };
+		E27ABB0B298D10840060C16D /* ZipkinSpan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinSpan.swift; sourceTree = "<group>"; };
+		E27ABB0C298D10840060C16D /* ZipkinConversionExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinConversionExtension.swift; sourceTree = "<group>"; };
+		E27ABB0D298D10840060C16D /* ZipkinEndpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinEndpoint.swift; sourceTree = "<group>"; };
 		E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanToDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanFromDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21C283F855C006A1475 /* SpanDb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDb.swift; sourceTree = "<group>"; };
@@ -417,7 +417,7 @@
 		E27ABA352989590D0060C16D /* Exporters */ = {
 			isa = PBXGroup;
 			children = (
-				E27ABAF3298C12480060C16D /* Zipkin */,
+				E27ABB04298D10840060C16D /* Zipkin */,
 				E27ABA362989590D0060C16D /* Stdout */,
 			);
 			path = Exporters;
@@ -671,33 +671,33 @@
 			path = DeviceKit;
 			sourceTree = "<group>";
 		};
-		E27ABAF3298C12480060C16D /* Zipkin */ = {
+		E27ABB04298D10840060C16D /* Zipkin */ = {
 			isa = PBXGroup;
 			children = (
-				E27ABAF4298C12480060C16D /* ZipkinTraceExporter.swift */,
-				E27ABAF5298C12480060C16D /* Utils */,
-				E27ABAF7298C12480060C16D /* ZipkinTraceExporterOptions.swift */,
-				E27ABAF8298C12480060C16D /* Implementation */,
+				E27ABB05298D10840060C16D /* ZipkinTraceExporter.swift */,
+				E27ABB06298D10840060C16D /* Utils */,
+				E27ABB08298D10840060C16D /* ZipkinTraceExporterOptions.swift */,
+				E27ABB09298D10840060C16D /* Implementation */,
 			);
 			name = Zipkin;
 			path = "../../../../../../opentelemetry-swift/Sources/Exporters/Zipkin";
 			sourceTree = "<group>";
 		};
-		E27ABAF5298C12480060C16D /* Utils */ = {
+		E27ABB06298D10840060C16D /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				E27ABAF6298C12480060C16D /* NetworkUtils.swift */,
+				E27ABB07298D10840060C16D /* NetworkUtils.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
 		};
-		E27ABAF8298C12480060C16D /* Implementation */ = {
+		E27ABB09298D10840060C16D /* Implementation */ = {
 			isa = PBXGroup;
 			children = (
-				E27ABAF9298C12480060C16D /* ZipkinAnnotation.swift */,
-				E27ABAFA298C12480060C16D /* ZipkinSpan.swift */,
-				E27ABAFB298C12480060C16D /* ZipkinConversionExtension.swift */,
-				E27ABAFC298C12480060C16D /* ZipkinEndpoint.swift */,
+				E27ABB0A298D10840060C16D /* ZipkinAnnotation.swift */,
+				E27ABB0B298D10840060C16D /* ZipkinSpan.swift */,
+				E27ABB0C298D10840060C16D /* ZipkinConversionExtension.swift */,
+				E27ABB0D298D10840060C16D /* ZipkinEndpoint.swift */,
 			);
 			path = Implementation;
 			sourceTree = "<group>";
@@ -864,9 +864,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E27ABB0E298D10840060C16D /* ZipkinTraceExporter.swift in Sources */,
 				88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */,
 				E27ABAE82989590E0060C16D /* EnvVarResource.swift in Sources */,
 				E27ABAD82989590E0060C16D /* ReadableSpan.swift in Sources */,
+				E27ABB12298D10840060C16D /* ZipkinSpan.swift in Sources */,
 				E27ABAE52989590E0060C16D /* TracerProviderSdk.swift in Sources */,
 				E27ABAE62989590E0060C16D /* ResourceAttributes.swift in Sources */,
 				E27ABADB2989590E0060C16D /* EnvironmentContextPropagator.swift in Sources */,
@@ -877,6 +879,7 @@
 				E27ABAA62989590D0060C16D /* DefaultTracerProvider.swift in Sources */,
 				8616CD5F266E673F0048980B /* ScreenName.swift in Sources */,
 				E27ABAA72989590D0060C16D /* TraceId.swift in Sources */,
+				E27ABB0F298D10840060C16D /* NetworkUtils.swift in Sources */,
 				E27ABADD2989590E0060C16D /* MultiSpanProcessor.swift in Sources */,
 				E27ABAB82989590E0060C16D /* TracestateUtils.swift in Sources */,
 				86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */,
@@ -889,6 +892,7 @@
 				E27ABABB2989590E0060C16D /* ContextPropagators.swift in Sources */,
 				E27ABAB22989590D0060C16D /* Status.swift in Sources */,
 				E27ABAB42989590D0060C16D /* TraceState.swift in Sources */,
+				E27ABB14298D10840060C16D /* ZipkinEndpoint.swift in Sources */,
 				E27ABAB02989590D0060C16D /* Tracer.swift in Sources */,
 				E27ABAEA2989590E0060C16D /* MillisClock.swift in Sources */,
 				E27ABAD32989590E0060C16D /* TracerSdk.swift in Sources */,
@@ -909,14 +913,11 @@
 				E27ABAC92989590E0060C16D /* JaegerBaggagePropagator.swift in Sources */,
 				E27ABAD12989590E0060C16D /* ArrayWithCapacity.swift in Sources */,
 				E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */,
-				E27ABAFE298C12490060C16D /* NetworkUtils.swift in Sources */,
 				E27ABAAE2989590D0060C16D /* SpanKind.swift in Sources */,
 				E27ABACD2989590E0060C16D /* EntryMetadata.swift in Sources */,
 				863A2F4225ED7BB100F3ECE0 /* AppStart.swift in Sources */,
 				E27ABABF2989590E0060C16D /* DefaultBaggageBuilder.swift in Sources */,
 				E27ABAA22989590D0060C16D /* Span.swift in Sources */,
-				E27ABB01298C12490060C16D /* ZipkinSpan.swift in Sources */,
-				E27ABAFF298C12490060C16D /* ZipkinTraceExporterOptions.swift in Sources */,
 				E27ABABC2989590E0060C16D /* DefaultContextPropagators.swift in Sources */,
 				8634EDC425FA86D20082819A /* LimitingExporter.swift in Sources */,
 				E27ABAC02989590E0060C16D /* DefaultBaggageManager.swift in Sources */,
@@ -932,15 +933,14 @@
 				E27ABAA92989590D0060C16D /* TextMapPropagator.swift in Sources */,
 				86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */,
 				E27ABACF2989590E0060C16D /* IdGenerator.swift in Sources */,
-				E27ABB03298C12490060C16D /* ZipkinEndpoint.swift in Sources */,
 				E27ABAEB2989590E0060C16D /* Locks.swift in Sources */,
 				E27ABAC22989590E0060C16D /* DefaultBaggage.swift in Sources */,
 				E27ABAE42989590E0060C16D /* SpanProcessor.swift in Sources */,
 				E27ABAA12989590D0060C16D /* TracerProvider.swift in Sources */,
 				E27ABAC62989590E0060C16D /* EmptyBaggageBuilder.swift in Sources */,
 				E27ABAC12989590E0060C16D /* BaggageManagerProvider.swift in Sources */,
+				E27ABB11298D10840060C16D /* ZipkinAnnotation.swift in Sources */,
 				E27ABAA52989590D0060C16D /* PropagatedSpanBuilder.swift in Sources */,
-				E27ABAFD298C12490060C16D /* ZipkinTraceExporter.swift in Sources */,
 				E27ABAB72989590E0060C16D /* SwiftExtensions.swift in Sources */,
 				E27ABAAD2989590D0060C16D /* SpanBuilder.swift in Sources */,
 				E27ABAC42989590E0060C16D /* BaggageBuilder.swift in Sources */,
@@ -949,17 +949,17 @@
 				E27ABAC32989590E0060C16D /* EntryValue.swift in Sources */,
 				8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */,
 				86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */,
+				E27ABB10298D10840060C16D /* ZipkinTraceExporterOptions.swift in Sources */,
 				E27ABAEF2989590E0060C16D /* InstrumentationLibraryInfo.swift in Sources */,
 				E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */,
 				E27ABAD62989590E0060C16D /* RecordEventsReadableSpan.swift in Sources */,
 				E27ABA9E2989590D0060C16D /* ContextManager.swift in Sources */,
 				E27ABAE12989590E0060C16D /* MultiSpanExporter.swift in Sources */,
-				E27ABB00298C12490060C16D /* ZipkinAnnotation.swift in Sources */,
 				E27ABAE92989590E0060C16D /* MonotonicClock.swift in Sources */,
 				E27ABACE2989590E0060C16D /* Baggage.swift in Sources */,
 				86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */,
-				E27ABB02298C12490060C16D /* ZipkinConversionExtension.swift in Sources */,
 				E27ABAB32989590D0060C16D /* TraceFlags.swift in Sources */,
+				E27ABB13298D10840060C16D /* ZipkinConversionExtension.swift in Sources */,
 				E27ABAE72989590E0060C16D /* Resource.swift in Sources */,
 				E27ABABE2989590E0060C16D /* BaggageManager.swift in Sources */,
 				E27ABAAA2989590D0060C16D /* BinaryFormattable.swift in Sources */,

@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import Swifter
-@testable import OpenTelemetrySdk
 @testable import SplunkRum
 
 fileprivate let idgen = RandomIdGenerator()

@@ -18,8 +18,6 @@ limitations under the License.
 import Foundation
 import XCTest
 @testable import SplunkRum
-import StdoutExporter
-import OpenTelemetrySdk
 
 class UtilsTests: XCTestCase {
 
