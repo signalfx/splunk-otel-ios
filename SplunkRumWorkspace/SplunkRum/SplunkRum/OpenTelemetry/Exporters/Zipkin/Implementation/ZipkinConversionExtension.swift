@@ -4,8 +4,6 @@
  */
 
 import Foundation
-import OpenTelemetryApi
-import OpenTelemetrySdk
 
 struct ZipkinConversionExtension {
     static let statusCode = "otel.status_code"
@@ -18,7 +16,6 @@ struct ZipkinConversionExtension {
                                                          "http.host": 3,
                                                          "db.instance": 4]
 
-    static var localEndpointCache = [String: ZipkinEndpoint]()
     static var remoteEndpointCache = [String: ZipkinEndpoint]()
 
     static let defaultServiceName = "unknown_service:" + ProcessInfo.processInfo.processName
@@ -31,7 +28,11 @@ struct ZipkinConversionExtension {
         var serviceNamespace: String?
     }
 
-    static func toZipkinSpan(otelSpan: SpanData, defaultLocalEndpoint: ZipkinEndpoint, useShortTraceIds: Bool = false) -> ZipkinSpan {
+    static func toZipkinSpans(spans: [SpanData]) -> [ZipkinSpan] {
+        return spans.map { ZipkinConversionExtension.toZipkinSpan(otelSpan: $0) }
+    }
+
+    static func toZipkinSpan(otelSpan: SpanData, useShortTraceIds: Bool = false) -> ZipkinSpan {
         let parentId = otelSpan.parentSpanId?.hexString ?? SpanId.invalid.hexString
 
         var attributeEnumerationState = AttributeEnumerationState()
@@ -42,15 +43,6 @@ struct ZipkinConversionExtension {
 
         otelSpan.resource.attributes.forEach {
             processResources(state: &attributeEnumerationState, key: $0.key, value: $0.value)
-        }
-
-        var localEndpoint = defaultLocalEndpoint
-
-        if let serviceName = attributeEnumerationState.serviceName, !serviceName.isEmpty, defaultServiceName != serviceName {
-            if localEndpointCache[serviceName] == nil {
-                localEndpointCache[serviceName] = defaultLocalEndpoint.clone(serviceName: serviceName)
-            }
-            localEndpoint = localEndpointCache[serviceName] ?? localEndpoint
         }
 
         if let serviceNamespace = attributeEnumerationState.serviceNamespace, !serviceNamespace.isEmpty {
@@ -83,12 +75,9 @@ struct ZipkinConversionExtension {
                           name: otelSpan.name,
                           timestamp: otelSpan.startTime.timeIntervalSince1970.toMicroseconds,
                           duration: otelSpan.endTime.timeIntervalSince(otelSpan.startTime).toMicroseconds,
-                          localEndpoint: localEndpoint,
                           remoteEndpoint: remoteEndpoint,
                           annotations: annotations,
-                          tags: attributeEnumerationState.tags,
-                          debug: nil,
-                          shared: nil)
+                          tags: attributeEnumerationState.tags)
     }
 
     static func EncodeSpanId(spanId: SpanId) -> String {

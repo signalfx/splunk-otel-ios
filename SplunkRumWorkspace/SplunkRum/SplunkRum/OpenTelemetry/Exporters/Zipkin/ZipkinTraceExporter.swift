@@ -4,7 +4,6 @@
  */
 
 import Foundation
-import OpenTelemetrySdk
 
 public class ZipkinTraceExporter: SpanExporter {
     public var options: ZipkinTraceExporterOptions
@@ -58,7 +57,7 @@ public class ZipkinTraceExporter: SpanExporter {
     }
 
     func encodeSpans(spans: [SpanData]) -> [ZipkinSpan] {
-        return spans.map { ZipkinConversionExtension.toZipkinSpan(otelSpan: $0, defaultLocalEndpoint: localEndPoint) }
+        return spans.map { ZipkinConversionExtension.toZipkinSpan(otelSpan: $0) }
     }
 
     static func getLocalZipkinEndpoint(name: String? = nil) -> ZipkinEndpoint {

@@ -5,22 +5,21 @@
 
 import Foundation
 
+fileprivate let defaultServiceName = "unknown_service:" + ProcessInfo.processInfo.processName
+
 struct ZipkinSpan: Encodable {
     var traceId: String
     var parentId: String?
     var id: String
     var kind: String?
     var name: String
-    var timestamp: UInt64?
+    var timestamp: UInt64
     var duration: UInt64?
-    var localEndpoint: ZipkinEndpoint?
     var remoteEndpoint: ZipkinEndpoint?
     var annotations: [ZipkinAnnotation]
     var tags: [String: String]
-    var debug: Bool?
-    var shared: Bool?
 
-    init(traceId: String, parentId: String?, id: String, kind: String?, name: String, timestamp: UInt64?, duration: UInt64?, localEndpoint: ZipkinEndpoint, remoteEndpoint: ZipkinEndpoint?, annotations: [ZipkinAnnotation], tags: [String: String], debug: Bool?, shared: Bool?) {
+    init(traceId: String, parentId: String?, id: String, kind: String?, name: String, timestamp: UInt64, duration: UInt64?, remoteEndpoint: ZipkinEndpoint?, annotations: [ZipkinAnnotation], tags: [String: String]) {
 
         self.traceId = traceId
         self.parentId = parentId
@@ -29,12 +28,9 @@ struct ZipkinSpan: Encodable {
         self.name = name
         self.timestamp = timestamp
         self.duration = duration
-        self.localEndpoint = localEndpoint
         self.remoteEndpoint = remoteEndpoint
         self.annotations = annotations
         self.tags = tags
-        self.debug = debug
-        self.shared = shared
     }
 
     public func write() -> [String: Any] {
@@ -47,15 +43,10 @@ struct ZipkinSpan: Encodable {
         output["kind"] = kind
         output["timestamp"] = timestamp
         output["duration"] = duration
-        output["debug"] = debug
-        output["shared"] = shared
-
-        if localEndpoint != nil {
-            output["localEndpoint"] = localEndpoint!.write()
-        }
+        output["localEndpoint"] = ["serviceName": defaultServiceName]
 
         if remoteEndpoint != nil {
-            output["localEndpoint"] = remoteEndpoint!.write()
+            output["remoteEndpoint"] = remoteEndpoint!.write()
         }
 
         if annotations.count > 0 {
