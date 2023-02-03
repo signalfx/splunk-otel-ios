@@ -202,6 +202,12 @@ var splunkRumInitializeCalledTime = Date()
             debug_log("SplunkRum already initializ{ed,ing}")
             return false
         }
+
+        if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
+            print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
+            return false
+        }
+
         splunkRumInitializeCalledTime = Date()
         initializing = true
         defer {
@@ -230,10 +236,7 @@ var splunkRumInitializeCalledTime = Date()
                 SessionBasedSampler.sessionShouldSample()
             }
         }
-        if !beaconUrl.starts(with: "https:") && options?.allowInsecureBeacon != true {
-            print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
-            return false
-        }
+
         if rumAuth.isEmpty {
             theBeaconUrl = beaconUrl
         } else {
