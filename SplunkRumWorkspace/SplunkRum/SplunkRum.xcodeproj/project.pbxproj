@@ -25,7 +25,7 @@
 		865A5CA625DC34D8003A1E5A /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = 865A5CA525DC34D8003A1E5A /* Swifter */; };
 		865DBDD92677AA7B00EFE8D5 /* RetryExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865DBDD82677AA7B00EFE8D5 /* RetryExporter.swift */; };
 		866192F425ED329E0035F08E /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866192F325ED329E0035F08E /* Session.swift */; };
-		866192F825ED34750035F08E /* UtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866192F725ED34750035F08E /* UtilsTests.swift */; };
+		866192F825ED34750035F08E /* MiscTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866192F725ED34750035F08E /* MiscTests.swift */; };
 		86AAAD4725CEC374001D1195 /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */; };
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
@@ -122,6 +122,7 @@
 		E27ABB29298D2DBD0060C16D /* ZipkinSpan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB22298D2DBD0060C16D /* ZipkinSpan.swift */; };
 		E27ABB2A298D2DBD0060C16D /* ZipkinConversionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB23298D2DBD0060C16D /* ZipkinConversionExtension.swift */; };
 		E27ABB2B298D2DBD0060C16D /* ZipkinEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB24298D2DBD0060C16D /* ZipkinEndpoint.swift */; };
+		E27ABB2D29910FE60060C16D /* SessionSamplingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB2C29910FE60060C16D /* SessionSamplingTests.swift */; };
 		E2ACB216283E3483006A1475 /* SpanToDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */; };
 		E2ACB21B283F852E006A1475 /* SpanFromDiskExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */; };
 		E2ACB21D283F855C006A1475 /* SpanDb.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2ACB21C283F855C006A1475 /* SpanDb.swift */; };
@@ -188,7 +189,7 @@
 		865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentationTests.swift; sourceTree = "<group>"; };
 		865DBDD82677AA7B00EFE8D5 /* RetryExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RetryExporter.swift; sourceTree = "<group>"; };
 		866192F325ED329E0035F08E /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
-		866192F725ED34750035F08E /* UtilsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilsTests.swift; sourceTree = "<group>"; };
+		866192F725ED34750035F08E /* MiscTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiscTests.swift; sourceTree = "<group>"; };
 		86AAAD4625CEC374001D1195 /* NetworkInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentation.swift; sourceTree = "<group>"; };
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
@@ -285,6 +286,7 @@
 		E27ABB22298D2DBD0060C16D /* ZipkinSpan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinSpan.swift; sourceTree = "<group>"; };
 		E27ABB23298D2DBD0060C16D /* ZipkinConversionExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinConversionExtension.swift; sourceTree = "<group>"; };
 		E27ABB24298D2DBD0060C16D /* ZipkinEndpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinEndpoint.swift; sourceTree = "<group>"; };
+		E27ABB2C29910FE60060C16D /* SessionSamplingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSamplingTests.swift; sourceTree = "<group>"; };
 		E2ACB215283E3483006A1475 /* SpanToDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanToDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21A283F852E006A1475 /* SpanFromDiskExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanFromDiskExporter.swift; sourceTree = "<group>"; };
 		E2ACB21C283F855C006A1475 /* SpanDb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDb.swift; sourceTree = "<group>"; };
@@ -389,9 +391,10 @@
 				865A5CA025DC33EF003A1E5A /* NetworkInstrumentationTests.swift */,
 				8654BCFB25E55E850013F7F6 /* TestUtils.swift */,
 				8654BCFF25E561AE0013F7F6 /* ErrorTests.swift */,
-				866192F725ED34750035F08E /* UtilsTests.swift */,
+				866192F725ED34750035F08E /* MiscTests.swift */,
 				E2AFD9E8284691EE000F53BF /* BandwidthTrackerTest.swift */,
 				E2AFD9EA28469C93000F53BF /* SpanDbTest.swift */,
+				E27ABB2C29910FE60060C16D /* SessionSamplingTests.swift */,
 			);
 			path = SplunkRumTests;
 			sourceTree = "<group>";
@@ -984,10 +987,11 @@
 				8654BD0025E561AE0013F7F6 /* ErrorTests.swift in Sources */,
 				86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */,
 				8654BCFC25E55E850013F7F6 /* TestUtils.swift in Sources */,
-				866192F825ED34750035F08E /* UtilsTests.swift in Sources */,
+				866192F825ED34750035F08E /* MiscTests.swift in Sources */,
 				E2AFD9E9284691EE000F53BF /* BandwidthTrackerTest.swift in Sources */,
 				865A5CA125DC33EF003A1E5A /* NetworkInstrumentationTests.swift in Sources */,
 				E2AFD9EB28469C93000F53BF /* SpanDbTest.swift in Sources */,
+				E27ABB2D29910FE60060C16D /* SessionSamplingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
