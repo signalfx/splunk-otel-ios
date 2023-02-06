@@ -54,5 +54,5 @@ file_header:
 excluded:
  - "Package.swift"
  - "SplunkRumWorkspace/SplunkRum/SplunkRum/OpenTelemetry"
- - "SplunkRumWorkspace/SplunkRum/SplunkRum/DeviceKit/Device.generated.swift"
+ - "SplunkRumWorkspace/SplunkRum/SplunkRum/DeviceKit"
  - .build

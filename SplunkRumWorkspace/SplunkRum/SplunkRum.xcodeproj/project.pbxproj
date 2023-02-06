@@ -114,7 +114,7 @@
 		E27ABAED2989590E0060C16D /* Clock.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABA9A2989590D0060C16D /* Clock.swift */; };
 		E27ABAEE2989590E0060C16D /* ComponentRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABA9B2989590D0060C16D /* ComponentRegistry.swift */; };
 		E27ABAEF2989590E0060C16D /* InstrumentationLibraryInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABA9C2989590D0060C16D /* InstrumentationLibraryInfo.swift */; };
-		E27ABAF2298A747F0060C16D /* Device.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABAF1298A747F0060C16D /* Device.generated.swift */; };
+		E27ABAF2298A747F0060C16D /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABAF1298A747F0060C16D /* Device.swift */; };
 		E27ABB25298D2DBD0060C16D /* ZipkinTraceExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB1C298D2DBD0060C16D /* ZipkinTraceExporter.swift */; };
 		E27ABB26298D2DBD0060C16D /* NetworkUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB1E298D2DBD0060C16D /* NetworkUtils.swift */; };
 		E27ABB27298D2DBD0060C16D /* ZipkinTraceExporterOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABB1F298D2DBD0060C16D /* ZipkinTraceExporterOptions.swift */; };
@@ -278,7 +278,7 @@
 		E27ABA9A2989590D0060C16D /* Clock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Clock.swift; sourceTree = "<group>"; };
 		E27ABA9B2989590D0060C16D /* ComponentRegistry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComponentRegistry.swift; sourceTree = "<group>"; };
 		E27ABA9C2989590D0060C16D /* InstrumentationLibraryInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InstrumentationLibraryInfo.swift; sourceTree = "<group>"; };
-		E27ABAF1298A747F0060C16D /* Device.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.generated.swift; sourceTree = "<group>"; };
+		E27ABAF1298A747F0060C16D /* Device.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		E27ABB1C298D2DBD0060C16D /* ZipkinTraceExporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinTraceExporter.swift; sourceTree = "<group>"; };
 		E27ABB1E298D2DBD0060C16D /* NetworkUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkUtils.swift; sourceTree = "<group>"; };
 		E27ABB1F298D2DBD0060C16D /* ZipkinTraceExporterOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZipkinTraceExporterOptions.swift; sourceTree = "<group>"; };
@@ -669,7 +669,7 @@
 		E27ABAF0298A747F0060C16D /* DeviceKit */ = {
 			isa = PBXGroup;
 			children = (
-				E27ABAF1298A747F0060C16D /* Device.generated.swift */,
+				E27ABAF1298A747F0060C16D /* Device.swift */,
 			);
 			path = DeviceKit;
 			sourceTree = "<group>";
@@ -927,7 +927,7 @@
 				E27ABAD52989590E0060C16D /* SpanLimits.swift in Sources */,
 				866192F425ED329E0035F08E /* Session.swift in Sources */,
 				E27ABAD72989590E0060C16D /* TracerProviderBuilder.swift in Sources */,
-				E27ABAF2298A747F0060C16D /* Device.generated.swift in Sources */,
+				E27ABAF2298A747F0060C16D /* Device.swift in Sources */,
 				E27ABACC2989590E0060C16D /* DefaultBaggageManagerProvider.swift in Sources */,
 				E27ABAEC2989590E0060C16D /* ExportResult.swift in Sources */,
 				E27ABADC2989590E0060C16D /* TracerSharedState.swift in Sources */,
