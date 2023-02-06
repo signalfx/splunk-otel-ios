@@ -21,6 +21,7 @@ import XCTest
 
 class MiscTests: XCTestCase {
     override func setUpWithError() throws {
+        super.setUpWithError()()
         try initializeTestEnvironment()
     }
 
@@ -64,7 +65,7 @@ class MiscTests: XCTestCase {
         XCTAssertEqual("normal", localSpans[0].attributes["normalString"]?.description ?? nil)
         XCTAssertEqual("7", localSpans[0].attributes["normalInt"]?.description ?? nil)
     }
-     
+
     func testRateLimitingExporter() throws {
         // This test is shaped kinda funny since we can't construct SpanData() directly
         var i = 0
@@ -166,7 +167,6 @@ class MiscTests: XCTestCase {
         XCTAssertEqual(nil, localSpans[0].attributes["additionalKey"]?.description ?? nil)
         localSpans.removeAll()
     }
-
 
     func testRetryExporter() throws {
         // This test is shaped kinda funny since we can't construct SpanData() directly
