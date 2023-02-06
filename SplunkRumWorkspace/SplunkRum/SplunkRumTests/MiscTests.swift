@@ -21,7 +21,7 @@ import XCTest
 
 class MiscTests: XCTestCase {
     override func setUpWithError() throws {
-        super.setUpWithError()()
+        try super.setUpWithError()
         try initializeTestEnvironment()
     }
 
