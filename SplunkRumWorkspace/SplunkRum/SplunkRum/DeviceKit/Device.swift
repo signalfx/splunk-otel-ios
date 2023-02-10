@@ -46,7 +46,7 @@ import UIKit
 ///         showError()
 ///     }
 ///
-public enum Device {
+enum Device {
   #if os(iOS)
     /// Device is an [iPod touch (5th generation)](https://support.apple.com/kb/SP657)
     ///
@@ -1682,7 +1682,7 @@ extension Device.BatteryState: Comparable {
   /// - parameter rhs: Another battery state.
   ///
   /// - returns: `true` iff they are equal, otherwise `false`
-  public static func == (lhs: Device.BatteryState, rhs: Device.BatteryState) -> Bool {
+  static func == (lhs: Device.BatteryState, rhs: Device.BatteryState) -> Bool {
     return lhs.description == rhs.description
   }
 
@@ -1692,7 +1692,7 @@ extension Device.BatteryState: Comparable {
   /// - parameter rhs: Another battery state.
   ///
   /// - returns: `true` if rhs is `.Full`, `false` when lhs is `.Full` otherwise their battery level is compared.
-  public static func < (lhs: Device.BatteryState, rhs: Device.BatteryState) -> Bool {
+  static func < (lhs: Device.BatteryState, rhs: Device.BatteryState) -> Bool {
     switch (lhs, rhs) {
     case (.full, _): return false // return false (even if both are `.Full` -> they are equal)
     case (_, .full): return true // lhs is *not* `.Full`, rhs is
