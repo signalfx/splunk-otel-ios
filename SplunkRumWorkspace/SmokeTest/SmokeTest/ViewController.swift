@@ -17,7 +17,7 @@ limitations under the License.
 
 import UIKit
 import WebKit
-import SplunkRum
+import SplunkOtel
 
 class ViewController: UIViewController, WKUIDelegate {
 

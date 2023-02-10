@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import SwiftUI
-import SplunkRum
+import SplunkOtel
 
 struct ContentView: View {
     func networkRequest() {

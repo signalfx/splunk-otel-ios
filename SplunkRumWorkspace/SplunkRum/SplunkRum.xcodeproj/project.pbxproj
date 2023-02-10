@@ -11,7 +11,7 @@
 		8607AD4B267B9032004FAFFD /* AppLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8607AD4A267B9032004FAFFD /* AppLifecycle.swift */; };
 		8616CD5F266E673F0048980B /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8616CD5E266E673F0048980B /* ScreenName.swift */; };
 		8624DAB5269CAE61005D65DE /* NetworkType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8624DAB4269CAE61005D65DE /* NetworkType.swift */; };
-		86260ECE25CDC1DE009F3CB1 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */; };
+		86260ECE25CDC1DE009F3CB1 /* SplunkOtel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86260EC425CDC1DE009F3CB1 /* SplunkOtel.framework */; };
 		86260ED525CDC1DE009F3CB1 /* SplunkRum.h in Headers */ = {isa = PBXBuildFile; fileRef = 86260EC725CDC1DE009F3CB1 /* SplunkRum.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		86260F0F25CDC407009F3CB1 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F0E25CDC407009F3CB1 /* SplunkRum.swift */; };
 		86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86260F1825CDC6C4009F3CB1 /* ServerTimingTests.swift */; };
@@ -130,7 +130,7 @@
 		E2AFD9E72846919C000F53BF /* BandwidthTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFD9E62846919C000F53BF /* BandwidthTracker.swift */; };
 		E2AFD9E9284691EE000F53BF /* BandwidthTrackerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFD9E8284691EE000F53BF /* BandwidthTrackerTest.swift */; };
 		E2AFD9EB28469C93000F53BF /* SpanDbTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFD9EA28469C93000F53BF /* SpanDbTest.swift */; };
-		E2AFD9F428473F7A000F53BF /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */; };
+		E2AFD9F428473F7A000F53BF /* SplunkOtel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86260EC425CDC1DE009F3CB1 /* SplunkOtel.framework */; };
 		E2AFD9FF2847A397000F53BF /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = E2AFD9FE2847A397000F53BF /* Swifter */; };
 		E2AFDA032847A6A0000F53BF /* SpanToDiskExportTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFDA022847A6A0000F53BF /* SpanToDiskExportTest.swift */; };
 		E2AFDA052847C529000F53BF /* SpanFromDiskExporterTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFDA042847C529000F53BF /* SpanFromDiskExporterTest.swift */; };
@@ -173,7 +173,7 @@
 		8607AD4A267B9032004FAFFD /* AppLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLifecycle.swift; sourceTree = "<group>"; };
 		8616CD5E266E673F0048980B /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
 		8624DAB4269CAE61005D65DE /* NetworkType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkType.swift; sourceTree = "<group>"; };
-		86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		86260EC425CDC1DE009F3CB1 /* SplunkOtel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkOtel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		86260EC725CDC1DE009F3CB1 /* SplunkRum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SplunkRum.h; sourceTree = "<group>"; };
 		86260EC825CDC1DE009F3CB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86260ECD25CDC1DE009F3CB1 /* SplunkRumTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkRumTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -314,7 +314,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86260ECE25CDC1DE009F3CB1 /* SplunkRum.framework in Frameworks */,
+				86260ECE25CDC1DE009F3CB1 /* SplunkOtel.framework in Frameworks */,
 				865A5CA625DC34D8003A1E5A /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -323,7 +323,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E2AFD9F428473F7A000F53BF /* SplunkRum.framework in Frameworks */,
+				E2AFD9F428473F7A000F53BF /* SplunkOtel.framework in Frameworks */,
 				E2AFD9FF2847A397000F53BF /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -345,7 +345,7 @@
 		86260EC525CDC1DE009F3CB1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */,
+				86260EC425CDC1DE009F3CB1 /* SplunkOtel.framework */,
 				86260ECD25CDC1DE009F3CB1 /* SplunkRumTests.xctest */,
 				E2AFD9F028473F7A000F53BF /* SplunkRumDiskExportTests.xctest */,
 			);
@@ -729,9 +729,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		86260EC325CDC1DE009F3CB1 /* SplunkRum */ = {
+		86260EC325CDC1DE009F3CB1 /* SplunkOtel */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 86260ED825CDC1DE009F3CB1 /* Build configuration list for PBXNativeTarget "SplunkRum" */;
+			buildConfigurationList = 86260ED825CDC1DE009F3CB1 /* Build configuration list for PBXNativeTarget "SplunkOtel" */;
 			buildPhases = (
 				86260EBF25CDC1DE009F3CB1 /* Headers */,
 				86260EC025CDC1DE009F3CB1 /* Sources */,
@@ -743,11 +743,11 @@
 			);
 			dependencies = (
 			);
-			name = SplunkRum;
+			name = SplunkOtel;
 			packageProductDependencies = (
 			);
 			productName = SplunkRum;
-			productReference = 86260EC425CDC1DE009F3CB1 /* SplunkRum.framework */;
+			productReference = 86260EC425CDC1DE009F3CB1 /* SplunkOtel.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		86260ECC25CDC1DE009F3CB1 /* SplunkRumTests */ = {
@@ -830,7 +830,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				86260EC325CDC1DE009F3CB1 /* SplunkRum */,
+				86260EC325CDC1DE009F3CB1 /* SplunkOtel */,
 				86260ECC25CDC1DE009F3CB1 /* SplunkRumTests */,
 				E2AFD9EF28473F7A000F53BF /* SplunkRumDiskExportTests */,
 			);
@@ -1011,12 +1011,12 @@
 /* Begin PBXTargetDependency section */
 		86260ED025CDC1DE009F3CB1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 86260EC325CDC1DE009F3CB1 /* SplunkRum */;
+			target = 86260EC325CDC1DE009F3CB1 /* SplunkOtel */;
 			targetProxy = 86260ECF25CDC1DE009F3CB1 /* PBXContainerItemProxy */;
 		};
 		E2AFD9F628473F7A000F53BF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 86260EC325CDC1DE009F3CB1 /* SplunkRum */;
+			target = 86260EC325CDC1DE009F3CB1 /* SplunkOtel */;
 			targetProxy = E2AFD9F528473F7A000F53BF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1162,7 +1162,7 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SplunkRum;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SplunkOtel;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
@@ -1191,7 +1191,7 @@
 					"@loader_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SplunkRum;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.SplunkOtel;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
@@ -1294,7 +1294,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		86260ED825CDC1DE009F3CB1 /* Build configuration list for PBXNativeTarget "SplunkRum" */ = {
+		86260ED825CDC1DE009F3CB1 /* Build configuration list for PBXNativeTarget "SplunkOtel" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				86260ED925CDC1DE009F3CB1 /* Debug */,

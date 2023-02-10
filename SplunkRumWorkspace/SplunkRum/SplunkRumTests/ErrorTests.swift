@@ -16,7 +16,7 @@ limitations under the License.
 
 import Foundation
 import XCTest
-@testable import SplunkRum
+@testable import SplunkOtel
 
 class ErrorTests: XCTestCase {
     enum EnumError: Error {
