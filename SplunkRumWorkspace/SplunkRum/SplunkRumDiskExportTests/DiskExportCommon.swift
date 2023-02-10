@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 import Swifter
-@testable import SplunkRum
+@testable import SplunkOtel
 
 fileprivate let idgen = RandomIdGenerator()
 

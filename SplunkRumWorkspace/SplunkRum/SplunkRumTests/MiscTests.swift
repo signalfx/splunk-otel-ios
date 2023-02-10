@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 import XCTest
-@testable import SplunkRum
+@testable import SplunkOtel
 
 class MiscTests: XCTestCase {
     override func setUpWithError() throws {

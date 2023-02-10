@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import XCTest
-@testable import SplunkRum
+@testable import SplunkOtel
 
 class TestSpan: Span {
     var isRecording: Bool
