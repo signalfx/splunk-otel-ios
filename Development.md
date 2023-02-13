@@ -1,5 +1,13 @@
 # Bulding, testing, and contributing to this project
 
+## Dependencies
+
+Due to Swift's package management not being compatible with CocoaPods and OpenTelemetry Swift not supporting it either, it was decided all dependencies would be included in-source.
+
+The list of dependencies can be found in `dependencies.txt` with a link to the repository and a specific commit.
+
+OpenTelemetry Swift is a minimal version where unnecessary parts are stripped out, meaning only Zipkin and Stdout exporters along with the tracing SDK are brought in.
+
 ## Building
 
 Open SplunkRumWorkspace in Xcode; everything should be wired up correctly to

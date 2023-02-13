@@ -16,8 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryApi
-import OpenTelemetrySdk
 
 class SpanToDiskExporter: SpanExporter {
     let db: SpanDb
@@ -44,7 +42,7 @@ class SpanToDiskExporter: SpanExporter {
             return .failure
         }
 
-        if !db.store(spans: ZipkinTransform.toZipkinSpans(spans: spans)) {
+        if !db.store(spans: ZipkinConversionExtension.toZipkinSpans(spans: spans)) {
             return .failure
         }
 

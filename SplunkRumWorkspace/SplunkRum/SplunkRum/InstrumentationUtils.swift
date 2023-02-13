@@ -16,9 +16,6 @@ limitations under the License.
 
 import Foundation
 import UIKit
-import OpenTelemetryApi
-import OpenTelemetrySdk
-import DeviceKit
 
 func isUsefulString(_ s: String?) -> Bool {
     return s != nil && !s!.isEmpty

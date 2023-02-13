@@ -17,8 +17,6 @@ limitations under the License.
 
 import Foundation
 import UIKit
-import OpenTelemetryApi
-import OpenTelemetrySdk
 
 // swiftlint:disable missing_docs
 extension UIApplication {

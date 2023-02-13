@@ -15,9 +15,7 @@ limitations under the License.
 */
 
 import SwiftUI
-// Why not "import SplunkOtel"?  Because this links as a local framework, not as a swift package.
-// FIXME align the framework name and directory names with the swift package name at some point
-import SplunkRum
+import SplunkOtel
 
 @main
 struct TestAppApp: App {

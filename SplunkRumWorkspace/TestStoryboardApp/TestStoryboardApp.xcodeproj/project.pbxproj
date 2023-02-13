@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		86AFA8742714AD6C0061A547 /* SplunkRum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 86AFA8732714AD6C0061A547 /* SplunkRum.framework */; };
-		86AFA8752714AD6C0061A547 /* SplunkRum.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 86AFA8732714AD6C0061A547 /* SplunkRum.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		86D3D38025E80648004DD939 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D37F25E80648004DD939 /* AppDelegate.swift */; };
 		86D3D38225E80648004DD939 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D38125E80648004DD939 /* SceneDelegate.swift */; };
 		86D3D38425E80648004DD939 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D38325E80648004DD939 /* ViewController.swift */; };
@@ -17,16 +15,18 @@
 		86D3D38C25E80649004DD939 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86D3D38A25E80649004DD939 /* LaunchScreen.storyboard */; };
 		86D3D39525E80D61004DD939 /* AViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39425E80D61004DD939 /* AViewController.swift */; };
 		86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39725E80DBC004DD939 /* BViewController.swift */; };
+		E27ABB4B29956D0D0060C16D /* SplunkOtel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27ABB4A29956D0D0060C16D /* SplunkOtel.framework */; };
+		E27ABB4C29956D0D0060C16D /* SplunkOtel.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E27ABB4A29956D0D0060C16D /* SplunkOtel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		86AFA8762714AD6C0061A547 /* Embed Frameworks */ = {
+		E27ABB4D29956D0D0060C16D /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				86AFA8752714AD6C0061A547 /* SplunkRum.framework in Embed Frameworks */,
+				E27ABB4C29956D0D0060C16D /* SplunkOtel.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -46,6 +46,7 @@
 		86D3D39425E80D61004DD939 /* AViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AViewController.swift; sourceTree = "<group>"; };
 		86D3D39725E80DBC004DD939 /* BViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BViewController.swift; sourceTree = "<group>"; };
 		86D3D3A125E8240F004DD939 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E27ABB4A29956D0D0060C16D /* SplunkOtel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkOtel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				86AFA8742714AD6C0061A547 /* SplunkRum.framework in Frameworks */,
+				E27ABB4B29956D0D0060C16D /* SplunkOtel.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +97,7 @@
 		86D3D3A025E8240F004DD939 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E27ABB4A29956D0D0060C16D /* SplunkOtel.framework */,
 				86AFA8732714AD6C0061A547 /* SplunkRum.framework */,
 				86D3D3A125E8240F004DD939 /* SplunkRum.framework */,
 			);
@@ -112,7 +114,7 @@
 				86D3D37825E80648004DD939 /* Sources */,
 				86D3D37925E80648004DD939 /* Frameworks */,
 				86D3D37A25E80648004DD939 /* Resources */,
-				86AFA8762714AD6C0061A547 /* Embed Frameworks */,
+				E27ABB4D29956D0D0060C16D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

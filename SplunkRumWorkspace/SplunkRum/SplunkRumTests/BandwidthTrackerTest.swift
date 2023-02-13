@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import XCTest
-@testable import SplunkRum
+@testable import SplunkOtel
 
 func ns(_ ms: UInt64) -> UInt64 {
     ms * 1_000_000

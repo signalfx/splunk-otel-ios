@@ -17,8 +17,7 @@ limitations under the License.
 
 import Foundation
 import XCTest
-@testable import OpenTelemetrySdk
-@testable import SplunkRum
+@testable import SplunkOtel
 
 class SpanToDiskExportTest: XCTestCase {
 

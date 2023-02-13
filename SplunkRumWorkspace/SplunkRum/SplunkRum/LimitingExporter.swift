@@ -16,8 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetrySdk
-import OpenTelemetryApi
 
 // Performs several kinds of limiting:
 // - attribute value length limiting

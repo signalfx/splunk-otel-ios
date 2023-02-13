@@ -16,8 +16,7 @@ limitations under the License.
 */
 
 import XCTest
-@testable import SplunkRum
-import OpenTelemetrySdk
+@testable import SplunkOtel
 
 func testDbPath(_ fileName: String = "SplunkRum.sqlite") -> String {
     FileManager.default.temporaryDirectory.appendingPathComponent("SplunkRum.sqlite").path

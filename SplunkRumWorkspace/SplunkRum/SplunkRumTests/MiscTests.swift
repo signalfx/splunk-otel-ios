@@ -17,11 +17,13 @@ limitations under the License.
 
 import Foundation
 import XCTest
-@testable import SplunkRum
-import StdoutExporter
-import OpenTelemetrySdk
+@testable import SplunkOtel
 
-class UtilsTests: XCTestCase {
+class MiscTests: XCTestCase {
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        try initializeTestEnvironment()
+    }
 
     func testSessionId() throws {
         let s1 = generateNewSessionId()
@@ -39,7 +41,6 @@ class UtilsTests: XCTestCase {
     }
 
     func testLengthLimitingExporter() throws {
-        try initializeTestEnvironment()
         // This test is shaped kinda funny since we can't construct SpanData() directly
         let span = buildTracer().spanBuilder(spanName: "limitTest").startSpan()
         var longString = "0123456789abcdef"
@@ -66,7 +67,6 @@ class UtilsTests: XCTestCase {
     }
 
     func testRateLimitingExporter() throws {
-        try initializeTestEnvironment()
         // This test is shaped kinda funny since we can't construct SpanData() directly
         var i = 0
         while i < 102 {
@@ -107,7 +107,6 @@ class UtilsTests: XCTestCase {
     }
 
     func testRejectingFilter() throws {
-        try initializeTestEnvironment()
         // This test is shaped kinda funny since we can't construct SpanData() directly
         buildTracer().spanBuilder(spanName: "rejectTest").startSpan().end()
         buildTracer().spanBuilder(spanName: "regularTest").startSpan().end()
@@ -129,7 +128,6 @@ class UtilsTests: XCTestCase {
     }
 
     func testModifyingFilter() throws {
-        try initializeTestEnvironment()
         // This test is shaped kinda funny since we can't construct SpanData() directly
         buildTracer().spanBuilder(spanName: "regularTest").setAttribute(key: "key", value: "value1").startSpan().end()
         XCTAssertEqual(1, localSpans.count)
@@ -151,7 +149,6 @@ class UtilsTests: XCTestCase {
     }
 
     func testSetGlobalAttributes() throws {
-        try initializeTestEnvironment()
         SplunkRum.setGlobalAttributes( ["additionalKey": "additionalValue"] )
         buildTracer().spanBuilder(spanName: "attrsTest").startSpan().end()
         XCTAssertEqual(1, localSpans.count)
@@ -169,11 +166,9 @@ class UtilsTests: XCTestCase {
         XCTAssertEqual(1, localSpans.count)
         XCTAssertEqual(nil, localSpans[0].attributes["additionalKey"]?.description ?? nil)
         localSpans.removeAll()
-
     }
 
     func testRetryExporter() throws {
-        try initializeTestEnvironment()
         // This test is shaped kinda funny since we can't construct SpanData() directly
         for _ in 1...50 {
             buildTracer().spanBuilder(spanName: "test").startSpan().end()
@@ -203,99 +198,5 @@ class UtilsTests: XCTestCase {
         _ = re.export(spans: fiftySpans)
         XCTAssertEqual(150, localSpans.count)
         localSpans.removeAll()
-
-    }
-
-    /**Test Initialization of SessionBasedSampler**/
-    func testSessionBasedSamplingInitialization() throws {
-        // Forces RUM to reinitialze for testing
-        SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil,
-                                                           sessionSamplingRatio: 0.2)
-        )
-        XCTAssertTrue(SessionBasedSampler.probability >= 0.0 && SessionBasedSampler.probability <= 1.0)
-        XCTAssertEqual(SessionBasedSampler.probability, 0.2)
-        resetRUM()
-    }
-
-    /**Test Sending All Spans**/
-    func testSessionBasedSampling100Pct() throws {
-        // Forces RUM to reinitialze for testing
-        SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil,
-                                                           sessionSamplingRatio: 1.0)
-        )
-        let shouldSample = SessionBasedSampler.sessionShouldSample()
-        XCTAssertTrue(shouldSample)
-        resetRUM()
-    }
-
-    /**Tests Sending 0 Spans**/
-    func testSessionBasedSampling0Pct() throws {
-        // Forces RUM to reinitialze for testing
-        SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil,
-                                                           sessionSamplingRatio: 0.0)
-        )
-        let shouldSample = SessionBasedSampler.sessionShouldSample()
-        XCTAssertFalse(shouldSample)
-        resetRUM()
-    }
-
-    /**Tests 50% we get roughly that amount*/
-    func testSessionBasedSampling50Pct() throws {
-        // Forces RUM to reinitialze for testing
-        SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil,
-                                                           sessionSamplingRatio: 0.5)
-        )
-
-        var countSpans = 0
-        for _ in 1...100 where SessionBasedSampler.sessionShouldSample() {
-            countSpans += 1
-        }
-
-        let isInTargetRange = countSpans >= 40 && countSpans <= 60
-        XCTAssertTrue(isInTargetRange)
-        resetRUM()
-    }
-
-    /**Needed to reset RUM to the defaults after sampling tests so other tests succeed.*/
-    private func resetRUM() {
-        SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil)
-        )
-
-        print("Sampling Ratio: \(SplunkRum.configuredOptions?.sessionSamplingRatio ?? 0.0)")
     }
 }

@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import UIKit
-import OpenTelemetrySdk
 
 let INACTIVITY_SESSION_TIMEOUT_SECONDS = 15 * 60
 private var sessionIdInactivityExpiration = Date().addingTimeInterval(TimeInterval(INACTIVITY_SESSION_TIMEOUT_SECONDS))
@@ -104,7 +103,7 @@ func lifecycleEvent(_ event: String) {
     if event == UI_APPLICATION_WILL_TERMINATE_NOTIFICATION ||
             event == UI_APPLICATION_DID_ENTER_BACKGROUND_NOTIFICATION {
         DispatchQueue.global(qos: .background).async {
-            OpenTelemetrySDK.instance.tracerProvider.forceFlush(timeout: 2)
+            (OpenTelemetry.instance.tracerProvider as! TracerProviderSdk).forceFlush(timeout: 2)
         }
 
     }
