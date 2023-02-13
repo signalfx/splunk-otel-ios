@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import XCTest
-@testable import SplunkRum
+@testable import SplunkOtel
 
 class SessionSamplingTests: XCTestCase {
 

@@ -16,7 +16,7 @@ limitations under the License.
 
 import Foundation
 import Swifter
-import SplunkRum
+import SplunkOtel
 import XCTest
 
 var receivedSpans: [TestZipkinSpan] = []
