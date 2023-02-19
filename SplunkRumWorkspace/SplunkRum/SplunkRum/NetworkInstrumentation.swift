@@ -1,5 +1,5 @@
 /*
-Copyright 2021 Splunk Inc.
+Copyright 2023 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,13 +31,10 @@ func addLinkToSpan(span: Span, valStr: String) {
     span.setAttribute(key: "link.spanId", value: spanId)
 }
 
-func endHttpSpan(span: Span?, task: URLSessionTask) {
-    if span == nil {
-        return
-    }
+func endHttpSpan(span: Span, task: URLSessionTask) {
     let hr: HTTPURLResponse? = task.response as? HTTPURLResponse
     if hr != nil {
-        span!.setAttribute(key: "http.status_code", value: hr!.statusCode)
+        span.setAttribute(key: "http.status_code", value: hr!.statusCode)
         // Blerg, looks like an iteration here since it is case sensitive and the case insensitive search assumes single value
         for (key, val) in hr!.allHeaderFields {
             let keyStr = key as? String
@@ -46,7 +43,7 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
                     let valStr = val as? String
                     if valStr != nil {
                         if valStr!.starts(with: "traceparent") {
-                            addLinkToSpan(span: span!, valStr: valStr!)
+                            addLinkToSpan(span: span, valStr: valStr!)
                         }
                     }
                 }
@@ -54,19 +51,23 @@ func endHttpSpan(span: Span?, task: URLSessionTask) {
         }
     }
     if task.error != nil {
-        span!.setAttribute(key: "error", value: true)
-        span!.setAttribute(key: "exception.message", value: task.error!.localizedDescription)
-        span!.setAttribute(key: "exception.type", value: String(describing: type(of: task.error!)))
+        span.setAttribute(key: "error", value: true)
+        span.setAttribute(key: "exception.message", value: task.error!.localizedDescription)
+        span.setAttribute(key: "exception.type", value: String(describing: type(of: task.error!)))
     }
-    span!.setAttribute(key: "http.response_content_length_uncompressed", value: Int(task.countOfBytesReceived))
+    span.setAttribute(key: "http.response_content_length_uncompressed", value: Int(task.countOfBytesReceived))
     if task.countOfBytesSent != 0 {
-        span!.setAttribute(key: "http.request_content_length", value: Int(task.countOfBytesSent))
+        span.setAttribute(key: "http.request_content_length", value: Int(task.countOfBytesSent))
     }
-    span!.end()
+    span.end()
+}
+
+func isSupportedTask(task: URLSessionTask) -> Bool {
+    return task is URLSessionDataTask || task is URLSessionDownloadTask || task is URLSessionUploadTask
 }
 
 func startHttpSpan(request: URLRequest?) -> Span? {
-    if request == nil || request?.url == nil {
+    if request?.url == nil {
         return nil
     }
     let url = request!.url!
@@ -120,117 +121,60 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     return span
 }
 
-class SessionTaskObserver: NSObject {
-    var span: Span?
-    // Observers aren't kept alive by observing...
-    var extraRefToSelf: SessionTaskObserver?
-    var lock: NSLock = NSLock()
-    override init() {
-        super.init()
-        extraRefToSelf = self
-    }
-
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
-        lock.lock()
-        defer {
-            lock.unlock()
-        }
-        let task = object as? URLSessionTask
-        if task == nil {
-            return
-        }
-        if span == nil {
-            span = startHttpSpan(request: task!.originalRequest)
-        }
-        // FIXME possibly also allow .canceling to close the span?
-        if task!.state == .completed && extraRefToSelf != nil {
-            endHttpSpan(span: span,
-                        task: task!)
-            task!.removeObserver(self, forKeyPath: "state")
-            extraRefToSelf = nil
-        }
-    }
-}
-
-func wireUpTaskObserver(task: URLSessionTask) {
-    task.addObserver(SessionTaskObserver(), forKeyPath: "state", options: .new, context: nil)
-}
+fileprivate var ASSOC_KEY_SPAN: UInt8 = 0
 
 // swiftlint:disable missing_docs
-extension URLSession {
-    @objc open func splunk_swizzled_dataTask(with url: NSURL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        let answer = splunk_swizzled_dataTask(with: url, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
-        return answer
-       }
+extension URLSessionTask {
+    @objc open func splunk_swizzled_setState(state: URLSessionTask.State) {
+        defer {
+            splunk_swizzled_setState(state: state)
+        }
 
-    @objc open func splunk_swizzled_dataTask(with url: NSURL) -> URLSessionDataTask {
-        let answer = splunk_swizzled_dataTask(with: url)
-        wireUpTaskObserver(task: answer)
-        return answer
-       }
+        if !isSupportedTask(task: self) {
+            return
+        }
 
-    // rename objc view of func to allow "overloading"
-    @objc(splunkSwizzledDataTaskWithRequest:completionHandler:) open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: ((Data?, URLResponse?, Error?) -> Void)?) -> URLSessionDataTask {
-        let answer = splunk_swizzled_dataTask(with: request, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
-        return answer
-       }
+        if state == URLSessionTask.State.running {
+            return
+        }
 
-    @objc(splunkSwizzledDataTaskWithRequest:) open func splunk_swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
-        let answer = splunk_swizzled_dataTask(with: request)
-        wireUpTaskObserver(task: answer)
-        return answer
-       }
+        if currentRequest?.url == nil {
+            return
+        }
 
-    // uploads
-    @objc open func splunk_swizzled_uploadTask(with: URLRequest, from: Data) -> URLSessionUploadTask {
-        let answer = splunk_swizzled_uploadTask(with: with, from: from)
-        wireUpTaskObserver(task: answer)
-        return answer
-    }
-    @objc open func splunk_swizzled_uploadTask(with: URLRequest, from: Data, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
-        let answer = splunk_swizzled_uploadTask(with: with, from: from, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
-        return answer
-    }
-    @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: NSURL) -> URLSessionUploadTask {
-        let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile)
-        wireUpTaskObserver(task: answer)
-        return answer
-    }
-    @objc open func splunk_swizzled_uploadTask(with: URLRequest, fromFile: NSURL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
-        let answer = splunk_swizzled_uploadTask(with: with, fromFile: fromFile, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
-        return answer
-    }
-    @objc open func splunk_swizzled_uploadTask(withStreamedRequest: URLRequest) -> URLSessionUploadTask {
-        let answer = splunk_swizzled_uploadTask(withStreamedRequest: withStreamedRequest)
-        wireUpTaskObserver(task: answer)
-        return answer
-    }
-    // download tasks
-    @objc open func splunk_swizzled_downloadTask(with url: NSURL) -> URLSessionDownloadTask {
-        let answer = splunk_swizzled_downloadTask(with: url)
-        wireUpTaskObserver(task: answer)
-        return answer
-    }
-    @objc open func splunk_swizzled_downloadTask(with url: NSURL, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
-        let answer = splunk_swizzled_downloadTask(with: url, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
-        return answer
-       }
-    @objc(splunkSwizzledDownloadTaskWithRequest: completionHandler:) open func splunk_swizzled_downloadTask(with request: URLRequest, completionHandler: ((URL?, URLResponse?, Error?) -> Void)?) -> URLSessionDownloadTask {
-        let answer = splunk_swizzled_downloadTask(with: request, completionHandler: completionHandler)
-        wireUpTaskObserver(task: answer)
-        return answer
-       }
+        let maybeSpan: Span? = objc_getAssociatedObject(self, &ASSOC_KEY_SPAN) as? Span
 
-    @objc(splunkSwizzledDownloadTaskWithRequest:) open func splunk_swizzled_downloadTask(with request: URLRequest) -> URLSessionDataTask {
-        let answer = splunk_swizzled_downloadTask(with: request)
-        wireUpTaskObserver(task: answer)
-        return answer
-       }
+        if maybeSpan == nil {
+            return
+        }
+
+        endHttpSpan(span: maybeSpan!, task: self)
+    }
+
+    @objc open func splunk_swizzled_resume() {
+        defer {
+            splunk_swizzled_resume()
+        }
+
+        if !isSupportedTask(task: self) {
+            return
+        }
+
+        if self.state == URLSessionTask.State.completed ||
+            self.state == URLSessionTask.State.canceling {
+            return
+        }
+
+        let existingSpan: Span? = objc_getAssociatedObject(self, &ASSOC_KEY_SPAN) as? Span
+
+        if existingSpan != nil {
+            return
+        }
+
+        startHttpSpan(request: currentRequest).map { span in
+            objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
+    }
 }
 
 // FIXME use setImplementation and capture, rather than exchangeImpl
@@ -244,57 +188,57 @@ func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
     }
 }
 
+func swizzledUrlSessionClasses() -> [AnyClass] {
+    let conf = URLSessionConfiguration.ephemeral
+    let session = URLSession(configuration: conf)
+    // The URL is just something parseable, since empty string can not be provided
+    let localDataTask = session.dataTask(with: URL(string: "https://splunkrum")!)
+
+    defer {
+        localDataTask.cancel()
+        session.finishTasksAndInvalidate()
+    }
+
+    let setStateSelector = NSSelectorFromString("setState:")
+
+    var classes: [AnyClass] = []
+    guard var currentClass: AnyClass = object_getClass(localDataTask) else { return classes }
+    var method = class_getInstanceMethod(currentClass, setStateSelector)
+
+    while method != nil {
+        let classResumeImp = method_getImplementation(method!)
+
+        let superClass: AnyClass? = currentClass.superclass()
+        let superClassMethod = class_getInstanceMethod(superClass, setStateSelector)
+        let superClassResumeImp = superClassMethod.map { method_getImplementation($0) }
+
+        if classResumeImp != superClassResumeImp {
+            classes.append(currentClass)
+        }
+
+        if superClass == nil {
+            return classes
+        }
+
+        currentClass = superClass!
+        method = superClassMethod
+    }
+
+    return classes
+}
+
+func swizzleUrlSession() {
+    let classes = swizzledUrlSessionClasses()
+
+    let setStateSelector = NSSelectorFromString("setState:")
+    let resumeSelector = NSSelectorFromString("resume")
+
+    for classToSwizzle in classes {
+        swizzle(clazz: classToSwizzle, orig: setStateSelector, swizzled: #selector(URLSessionTask.splunk_swizzled_setState(state:)))
+        swizzle(clazz: classToSwizzle, orig: resumeSelector, swizzled: #selector(URLSessionTask.splunk_swizzled_resume))
+    }
+}
+
 func initalizeNetworkInstrumentation() {
-    let urlsession = URLSession.self
-
-    // This syntax is obnoxious to differentiate with:request from with:url
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask),
-            swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:completionHandler:) as (URLSession) -> (NSURL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask))
-
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask),
-            swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:) as (URLSession) -> (NSURL) -> URLSessionDataTask))
-
-    // @objc(overrrideName) requires a runtime lookup rather than a build-time lookup (seems like a bug in the compiler)
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask),
-            swizzled: NSSelectorFromString("splunkSwizzledDataTaskWithRequest:completionHandler:"))
-
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDataTask),
-            swizzled: NSSelectorFromString("splunkSwizzledDataTaskWithRequest:"))
-
-    // upload tasks
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.uploadTask(with:from:)),
-            swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:from:)))
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.uploadTask(with:from:completionHandler:)),
-            swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:from:completionHandler:)))
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.uploadTask(with:fromFile:)),
-            swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:fromFile:)))
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.uploadTask(with:fromFile:completionHandler:)),
-            swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:fromFile:completionHandler:)))
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.uploadTask(withStreamedRequest:)),
-            swizzled: #selector(URLSession.splunk_swizzled_uploadTask(withStreamedRequest:)))
-
-    // download tasks
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.downloadTask(with:) as (URLSession) -> (URL) -> URLSessionDownloadTask),
-            swizzled: #selector(URLSession.splunk_swizzled_downloadTask(with:) as (URLSession) -> (NSURL) -> URLSessionDownloadTask))
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask),
-            swizzled: #selector(URLSession.splunk_swizzled_downloadTask(with:completionHandler:) as (URLSession) -> (NSURL, @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask))
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask),
-            swizzled: NSSelectorFromString("splunkSwizzledDownloadTaskWithRequest:completionHandler:"))
-    swizzle(clazz: urlsession,
-            orig: #selector(URLSession.downloadTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDownloadTask),
-            swizzled: NSSelectorFromString("splunkSwizzledDownloadTaskWithRequest:"))
-    // FIXME figure out how to support the two ResumeData variants - state transfer is weird
-
+    swizzleUrlSession()
 }
