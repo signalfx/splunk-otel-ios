@@ -20,10 +20,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Build xcframework
-        working-directory: SplunkRumWorkspace/SplunkRum
-        run: build_binaries.sh
+        working-directory: ./SplunkRumWorkspace/SplunkRum
+        run: ./build_binaries.sh
       - name: Upload xcframework
         uses: actions/upload-artifact@v3
         with:
           name: SplunkOtel.xcframework
-          path: SplunkRumWorkspace/SplunkRum/xcframeworks/SplunkOtel.xcframework
+          path: ./SplunkRumWorkspace/SplunkRum/xcframeworks/SplunkOtel.xcframework
