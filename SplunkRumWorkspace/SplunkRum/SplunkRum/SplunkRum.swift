@@ -22,7 +22,7 @@ import ZipkinExporter
 import StdoutExporter
 import WebKit
 
-let SplunkRumVersionString = "0.10.0"
+let SplunkRumVersionString = "0.10.1"
 
 /**
  Default maximum size of the disk cache in bytes.
