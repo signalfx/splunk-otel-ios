@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "SplunkOtel", targets: ["SplunkOtel"])
     ],
     dependencies: [
-        .package(name: "opentelemetry-swift", url:"https://github.com/open-telemetry/opentelemetry-swift", from: "1.1.4"),
+        .package(url: "https://github.com/open-telemetry/opentelemetry-swift", .exact("1.2.0")),
         .package(url: "https://github.com/devicekit/DeviceKit.git", from: "4.0.0"),
     ],
     targets: [
