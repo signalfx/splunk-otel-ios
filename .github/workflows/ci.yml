@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Print Swift version
+        run: swift --version
       - name: Build xcframework
         working-directory: ./SplunkRumWorkspace/SplunkRum
         run: ./build_binaries.sh
