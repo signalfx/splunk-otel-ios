@@ -123,7 +123,6 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 
 fileprivate var ASSOC_KEY_SPAN: UInt8 = 0
 
-// swiftlint:disable missing_docs
 extension URLSessionTask {
     @objc open func splunk_swizzled_setState(state: URLSessionTask.State) {
         defer {

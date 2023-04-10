@@ -132,6 +132,7 @@ func getNetworkInfo() -> NetworkInfo {
             info.hostConnectionSubType = shortTech(technology)
         }
     }
+    // swiftlint:enable unavailable_condition
 
     return info
 }
