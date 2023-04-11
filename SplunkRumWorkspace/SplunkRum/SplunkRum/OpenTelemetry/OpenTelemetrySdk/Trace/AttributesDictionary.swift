@@ -28,7 +28,7 @@ public struct AttributesDictionary {
         }
         set {
             if newValue == nil {
-                removeValueForKey(key: key)
+                _ = removeValueForKey(key: key)
             } else {
                 _ = updateValue(value: newValue!, forKey: key)
             }
@@ -80,11 +80,11 @@ public struct AttributesDictionary {
         }
     }
 
-    public mutating func removeValueForKey(key: String) {
+    public mutating func removeValueForKey(key: String) -> AttributeValue? {
         keys = keys.filter {
             $0 != key
         }
-        attributes.removeValue(forKey: key)
+        return attributes.removeValue(forKey: key)
     }
 
     public mutating func removeAll(keepCapacity: Int) {
