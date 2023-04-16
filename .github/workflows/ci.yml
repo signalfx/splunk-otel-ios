@@ -63,7 +63,7 @@ jobs:
             --request POST 'https://api.us-west-1.saucelabs.com/v1/storage/upload' \
             --form 'payload=@"SmokeTest.zip"' \
             --form 'name="SmokeTest.zip"' \
-            --form 'description="'"${{ GITHUB_SHA }}"'"'
+            --form 'description="'"$GITHUB_SHA"'"'
       - name: execute py script # run the run.py to get the latest data
         working-directory: SplunkRumWorkspace
         run: |
