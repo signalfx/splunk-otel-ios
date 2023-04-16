@@ -46,7 +46,6 @@ jobs:
       - name: Build for Sauce Labs
         run: |
           BUILD_FOLDER="work/splunk-otel-ios/splunk-otel-ios/SauceLabsTests"
-          ls -la $BUILD_FOLDER
           BUILD_PATH="Build/Products/Debug-iphonesimulator"
 
           xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace \
@@ -54,6 +53,7 @@ jobs:
             -configuration Debug \
             -destination 'platform=iOS Simulator,name=${{ matrix.device }},OS=${{ matrix.os }}' \
             -derivedDataPath SauceLabsTests
+          ls -la $BUILD_FOLDER
           zip ${GITHUB_WORKSPACE}/SmokeTest.zip $(find ~/$BUILD_FOLDER/$BUILD_PATH/SauceLabsTests.app -type f)
       - name: Upload test app to Sauce Labs
         run: |
