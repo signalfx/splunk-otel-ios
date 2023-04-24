@@ -68,7 +68,7 @@ jobs:
             --form 'description="'"$GITHUB_SHA"'"' | jq -r .item.id)
           echo "sl_file_id:$item_id"
           echo "sl_file_id=$item_id" >> $GITHUB_OUTPUT
-      - name: execute py script
+      - name: Run Sauce Labs test cases
         working-directory: SplunkRumWorkspace
         env:
           SAUCELABS_USER: ${{ secrets.SAUCELABS_USER }}
