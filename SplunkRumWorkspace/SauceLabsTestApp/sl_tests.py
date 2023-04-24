@@ -23,7 +23,7 @@ class IOSTests(unittest.TestCase):
         
         caps['platformName'] = 'iOS'
         caps['appium:app'] = 'storage:filename=SauceLabsTestApp.zip' 
-        caps['appium:deviceName'] = sys.argv[2] 
+        caps['appium:deviceName'] = "iPhone.*"
         caps['appium:platformVersion'] = sys.argv[1]
         caps['sauce:options'] = {}
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
@@ -32,7 +32,7 @@ class IOSTests(unittest.TestCase):
         sl_user = os.environ['SAUCELABS_USER']
         sl_key = os.environ['SAUCELABS_KEY']
         url = f'https://{sl_user}:{sl_key}@ondemand.us-west-1.saucelabs.com:443/wd/hub'
-        self.driver=webdriver.Remote(url,caps)
+        self.driver=webdriver.Remote(url, caps)
         
     def tearDown(self):
         sleep(1)
