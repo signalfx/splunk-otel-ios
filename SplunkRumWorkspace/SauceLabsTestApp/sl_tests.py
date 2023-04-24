@@ -20,10 +20,12 @@ class IOSTests(unittest.TestCase):
         currentDate = datetime.now().strftime('%Y-%m-%d')
         currentTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         caps = {}
+
+        sl_file_id = sys.argv[2]
         
         caps['platformName'] = 'iOS'
-        caps['appium:app'] = 'storage:filename=SauceLabsTestApp.zip' 
-        caps['appium:deviceName'] = "iPhone.*"
+        caps['appium:app'] = f'storage:{sl_file_id}'
+        caps['appium:deviceName'] = "iPhone Simulator"
         caps['appium:platformVersion'] = sys.argv[1]
         caps['sauce:options'] = {}
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
