@@ -56,6 +56,7 @@ jobs:
             -derivedDataPath SauceLabsTests
           zip ${GITHUB_WORKSPACE}/SauceLabsTestApp.zip $(find ~/$BUILD_FOLDER/$BUILD_PATH/SauceLabsTestApp.app -type f)
       - name: Upload test app to Sauce Labs
+        id: sl-upload
         run: |
           cd /Users/runner/work/splunk-otel-ios/splunk-otel-ios/
           ls
@@ -64,7 +65,7 @@ jobs:
             --request POST 'https://api.us-west-1.saucelabs.com/v1/storage/upload' \
             --form 'payload=@"SauceLabsTestApp.zip"' \
             --form 'name="SauceLabsTestApp.zip"' \
-            --form 'description="'"$GITHUB_SHA"'"' | jq .item.id)
+            --form 'description="'"$GITHUB_SHA"'"' | jq -r .item.id)
           echo "sl_file_id:$item_id"
           echo "sl_file_id=$item_id" >> $GITHUB_OUTPUT
       - name: execute py script
@@ -76,4 +77,4 @@ jobs:
             cd SauceLabsTestApp/
             python3 -m pip install Appium-Python-Client
             echo ${{ steps.vars.outputs.sl_file_id }} 
-            python3 sl_tests.py ${{ matrix.os }} ${{ steps.vars.outputs.sl_file_id }}
+            python3 sl_tests.py ${{ matrix.os }} ${{ steps.sl-upload.outputs.sl_file_id }}
