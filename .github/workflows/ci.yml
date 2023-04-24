@@ -65,7 +65,7 @@ jobs:
             --form 'payload=@"SauceLabsTestApp.zip"' \
             --form 'name="SauceLabsTestApp.zip"' \
             --form 'description="'"$GITHUB_SHA"'"' | jq .item.id)
-          echo "sl_file_id:$sl_file_id"
+          echo "sl_file_id:$item_id"
           echo "sl_file_id=$item_id" >> $GITHUB_OUTPUT
       - name: execute py script
         working-directory: SplunkRumWorkspace
@@ -75,4 +75,5 @@ jobs:
         run: |
             cd SauceLabsTestApp/
             python3 -m pip install Appium-Python-Client
-            python3 sl_tests.py ${{ matrix.os }} "${{ steps.vars.outputs.sl_file_id }}"
+            echo ${{ steps.vars.outputs.sl_file_id }} 
+            python3 sl_tests.py ${{ matrix.os }} ${{ steps.vars.outputs.sl_file_id }}
