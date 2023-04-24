@@ -65,6 +65,9 @@ jobs:
             --form 'description="'"$GITHUB_SHA"'"'
       - name: execute py script # run the run.py to get the latest data
         working-directory: SplunkRumWorkspace
+        env:
+          SAUCELABS_USER: ${{ secrets.SAUCELABS_USER }}
+          SAUCELABS_KEY: ${{ secrets.SAUCELABS_KEY }}
         run: |
             cd SauceLabsTestApp/
             python3 -m pip install Appium-Python-Client
