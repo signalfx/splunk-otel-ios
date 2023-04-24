@@ -22,9 +22,11 @@ class IOSTests(unittest.TestCase):
         caps = {}
 
         sl_file_id = sys.argv[2]
+        print("file id", sl_file_id)
         
         caps['platformName'] = 'iOS'
         caps['appium:app'] = f'storage:{sl_file_id}'
+        print(caps)
         caps['appium:deviceName'] = "iPhone Simulator"
         caps['appium:platformVersion'] = sys.argv[1]
         caps['sauce:options'] = {}
