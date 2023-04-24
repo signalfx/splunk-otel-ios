@@ -68,4 +68,4 @@ jobs:
         run: |
             cd SauceLabsTestApp/
             python3 -m pip install Appium-Python-Client
-            python3 test_appium.py ${{ matrix.os }} "${{ matrix.device }}"
+            python3 sl_tests.py ${{ matrix.os }} "${{ matrix.device }}"
