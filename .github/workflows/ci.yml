@@ -51,7 +51,7 @@ jobs:
           xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace \
             -scheme SauceLabsTestApp \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,OS=latest' \
+            -sdk iphonesimulator16.4 \
             -derivedDataPath SauceLabsTests
           zip ${GITHUB_WORKSPACE}/SauceLabsTestApp.zip $(find ~/$BUILD_FOLDER/$BUILD_PATH/SauceLabsTestApp.app -type f)
       - name: Upload test app to Sauce Labs
