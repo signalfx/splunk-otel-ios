@@ -1,5 +1,4 @@
 import unittest
-from lib2to3.pgen2 import driver
 import os
 from appium import webdriver
 from time import sleep
@@ -22,13 +21,12 @@ class IOSTests(unittest.TestCase):
         caps = {}
 
         sl_file_id = sys.argv[2]
-        print("file id", sl_file_id)
         
         caps['platformName'] = 'iOS'
         caps['appium:app'] = f'storage:{sl_file_id}'
-        print(caps)
         caps['appium:deviceName'] = "iPhone Simulator"
         caps['appium:platformVersion'] = sys.argv[1]
+        caps['appium:automationName'] = 'XCUITest'
         caps['sauce:options'] = {}
         caps['sauce:options']['build'] = 'Platform Configurator Build ' + currentDate
         caps['sauce:options']['name'] = 'Platform Configurator Job ' + currentTime
