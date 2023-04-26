@@ -48,7 +48,7 @@ class IOSTests(unittest.TestCase):
         return
     
     def test_API_PostClick(self):
-        self.driver.find_element(By.ID, "foobar").click()
+        self.driver.find_element(By.ID, "btn1").click()
      
     def validate_span(self):
         sleep(10);  #it takes time to generate spans.

@@ -5,6 +5,7 @@ struct ContentView: View {
         NavigationView {
             NavigationLink(destination: Text("second view")) {
                 Text("foobar")
+                    .accessibilityIdentifier("btn1")
             }
             VStack {
                 Image(systemName: "globe")
