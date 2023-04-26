@@ -40,7 +40,7 @@ class IOSTests(unittest.TestCase):
         self.driver.quit()
 
     def test_API_PostClick(self):
-        #self.driver.find_element(By.ID, "btn1").click()
+        print(self.driver.page_source)
         self.driver.find_element(By.NAME, "foobar").click()
      
     def validate_span(self):
