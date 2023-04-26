@@ -37,18 +37,11 @@ class IOSTests(unittest.TestCase):
         self.driver=webdriver.Remote(url, caps)
         
     def tearDown(self):
-        sleep(1)
         self.driver.quit()
 
-    ''' 
-    Loads every element in the current view.
-    '''    
-    def load(self):
-        find_next = self.driver.find_element_by_xpath("//*")
-        return
-    
     def test_API_PostClick(self):
-        self.driver.find_element(By.ID, "btn1").click()
+        #self.driver.find_element(By.ID, "btn1").click()
+        self.driver.find_element(By.NAME, "foobar").click()
      
     def validate_span(self):
         sleep(10);  #it takes time to generate spans.
