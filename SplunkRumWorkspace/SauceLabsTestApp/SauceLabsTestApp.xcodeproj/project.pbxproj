@@ -7,13 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E2098D6A29F9BE3D00F19A62 /* SplunkOtel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2098D6629F9BE2400F19A62 /* SplunkOtel.framework */; };
+		E2098D6B29F9BE3D00F19A62 /* SplunkOtel.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E2098D6629F9BE2400F19A62 /* SplunkOtel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E26323D329E822450077E2A4 /* SauceLabsTestAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26323D229E822450077E2A4 /* SauceLabsTestAppApp.swift */; };
 		E26323D529E822450077E2A4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26323D429E822450077E2A4 /* ContentView.swift */; };
 		E26323D729E822480077E2A4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26323D629E822480077E2A4 /* Assets.xcassets */; };
 		E26323DB29E822480077E2A4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26323DA29E822480077E2A4 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		E2098D6C29F9BE3D00F19A62 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E2098D6B29F9BE3D00F19A62 /* SplunkOtel.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		E2098D6629F9BE2400F19A62 /* SplunkOtel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkOtel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26323CF29E822450077E2A4 /* SauceLabsTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SauceLabsTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26323D229E822450077E2A4 /* SauceLabsTestAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SauceLabsTestAppApp.swift; sourceTree = "<group>"; };
 		E26323D429E822450077E2A4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -27,17 +44,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2098D6A29F9BE3D00F19A62 /* SplunkOtel.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E2098D6529F9BE2400F19A62 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E2098D6629F9BE2400F19A62 /* SplunkOtel.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E26323C629E822450077E2A4 = {
 			isa = PBXGroup;
 			children = (
 				E26323D129E822450077E2A4 /* SauceLabsTestApp */,
 				E26323D029E822450077E2A4 /* Products */,
+				E2098D6529F9BE2400F19A62 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -79,6 +106,7 @@
 				E26323CB29E822450077E2A4 /* Sources */,
 				E26323CC29E822450077E2A4 /* Frameworks */,
 				E26323CD29E822450077E2A4 /* Resources */,
+				E2098D6C29F9BE3D00F19A62 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

@@ -1,21 +1,20 @@
-//
-//  ContentView.swift
-//  SauceLabsTestApp
-//
-//  Created by Siim Kallas on 13/04/2023.
-//
-
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        NavigationView {
+            NavigationLink(destination: Text("second view")) {
+                Text("foobar")
+            }
+            VStack {
+                Image(systemName: "globe")
+                    .imageScale(.large)
+                    .foregroundColor(.accentColor)
+                Text("Hello, world!")
+                    .navigationTitle("Main screen")
+            }
+            .padding()
         }
-        .padding()
     }
 }
 

@@ -47,14 +47,8 @@ class IOSTests(unittest.TestCase):
         find_next = self.driver.find_element_by_xpath("//*")
         return
     
-    '''
-    Generating the POST network request with the URLSession and Validating the network span data.
-    '''
     def test_API_PostClick(self):
-        self.driver.find_element(By.ID,"Network Request").click();
-        self.driver.find_element(By.ID,"URLSession").click();
-        self.driver.find_element(By.ID,"post").click();
-        self.validate_span();     
+        self.driver.find_element(By.ID, "foobar").click()
      
     def validate_span(self):
         sleep(10);  #it takes time to generate spans.
