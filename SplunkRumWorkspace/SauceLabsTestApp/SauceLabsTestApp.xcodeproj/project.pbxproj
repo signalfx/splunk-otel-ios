@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		E2098D6A29F9BE3D00F19A62 /* SplunkOtel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2098D6629F9BE2400F19A62 /* SplunkOtel.framework */; };
 		E2098D6B29F9BE3D00F19A62 /* SplunkOtel.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E2098D6629F9BE2400F19A62 /* SplunkOtel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E2098D6F29F9CBBD00F19A62 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = E2098D6E29F9CBBD00F19A62 /* Swifter */; };
 		E26323D329E822450077E2A4 /* SauceLabsTestAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26323D229E822450077E2A4 /* SauceLabsTestAppApp.swift */; };
 		E26323D529E822450077E2A4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26323D429E822450077E2A4 /* ContentView.swift */; };
 		E26323D729E822480077E2A4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26323D629E822480077E2A4 /* Assets.xcassets */; };
@@ -45,6 +46,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2098D6A29F9BE3D00F19A62 /* SplunkOtel.framework in Frameworks */,
+				E2098D6F29F9CBBD00F19A62 /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -113,6 +115,9 @@
 			dependencies = (
 			);
 			name = SauceLabsTestApp;
+			packageProductDependencies = (
+				E2098D6E29F9CBBD00F19A62 /* Swifter */,
+			);
 			productName = SauceLabsTestApp;
 			productReference = E26323CF29E822450077E2A4 /* SauceLabsTestApp.app */;
 			productType = "com.apple.product-type.application";
@@ -141,6 +146,9 @@
 				Base,
 			);
 			mainGroup = E26323C629E822450077E2A4;
+			packageReferences = (
+				E2098D6D29F9CBBD00F19A62 /* XCRemoteSwiftPackageReference "swifter" */,
+			);
 			productRefGroup = E26323D029E822450077E2A4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -382,6 +390,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E2098D6D29F9CBBD00F19A62 /* XCRemoteSwiftPackageReference "swifter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/httpswift/swifter";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E2098D6E29F9CBBD00F19A62 /* Swifter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E2098D6D29F9CBBD00F19A62 /* XCRemoteSwiftPackageReference "swifter" */;
+			productName = Swifter;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E26323C729E822450077E2A4 /* Project object */;
 }

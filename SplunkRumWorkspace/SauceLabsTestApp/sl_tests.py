@@ -39,9 +39,13 @@ class IOSTests(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
 
-    def test_API_PostClick(self):
-        print(self.driver.page_source)
-        self.driver.find_element(By.NAME, "foobar").click()
+    def test_network_instrumentation(self):
+        self.driver.find_element(By.ID, "networkInstrTests").click()
+        self.driver.find_element(By.ID, "urlSessionTests").click()
+        WebDriverWait(self.driver, 10).until(
+            EC.text_to_be_present_in_element((By.ID, "testResult"), "success")
+        )
+
      
     def validate_span(self):
         sleep(10);  #it takes time to generate spans.
