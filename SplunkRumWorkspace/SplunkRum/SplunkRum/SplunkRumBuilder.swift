@@ -80,7 +80,7 @@ import Foundation
         self.screenNameSpans = enabled
         return self
     }
-    
+
     @discardableResult
     @objc
     public func networkInstrumentation(enabled: Bool) -> SplunkRumBuilder {
