@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 	
-
 import Foundation
 
 @objc public class SplunkRumBuilder: NSObject {
@@ -25,8 +24,8 @@ import Foundation
     private var allowInsecureBeacon: Bool = false
     private var debug: Bool = false
     private var globalAttributes: [String: Any] = [:]
-    private var environment: String? = nil
-    private var ignoreURLs: NSRegularExpression? = nil
+    private var environment: String?
+    private var ignoreURLs: NSRegularExpression?
     private var screenNameSpans: Bool = true
     private var networkInstrumentation: Bool = true
     private var enableDiskCache: Bool = false
