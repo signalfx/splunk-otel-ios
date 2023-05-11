@@ -14,11 +14,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
+
 import Foundation
 
 @objc public class SplunkRumBuilder: NSObject {
-    
+
     private var beaconUrl: String
     private var rumAuth: String
     private var allowInsecureBeacon: Bool = false
@@ -33,47 +33,47 @@ import Foundation
     private var slowFrameDetectionThresholdMs: Double = 16.7
     private var frozenFrameDetectionThresholdMs: Double = 700
     private var sessionSamplingRatio: Double = 1.0
-    
+
     public init(beaconUrl: String, rumAuth: String) {
         self.beaconUrl = beaconUrl
         self.rumAuth = rumAuth
     }
-    
+
     @discardableResult
     @objc
     public func allowInsecureBeacon(enabled: Bool) -> SplunkRumBuilder {
         self.allowInsecureBeacon = enabled
         return self
     }
-    
+
     @discardableResult
     @objc
     public func debugEnabled(enabled: Bool) -> SplunkRumBuilder {
         self.debug = enabled
         return self
     }
-    
+
     @discardableResult
     @objc
     public func globalAttributes(globalAttributes: [String: Any]) -> SplunkRumBuilder {
         self.globalAttributes = globalAttributes
         return self
     }
-    
+
     @discardableResult
     @objc
     public func environment(environment: String) -> SplunkRumBuilder {
         self.environment = environment
         return self
     }
-    
+
     @discardableResult
     @objc
     public func ignoreURLs(ignoreURLs: NSRegularExpression) -> SplunkRumBuilder {
         self.ignoreURLs = ignoreURLs
         return self
     }
-    
+
     @discardableResult
     @objc
     public func screenNameSpans(enabled: Bool) -> SplunkRumBuilder {
@@ -87,42 +87,42 @@ import Foundation
         self.networkInstrumentation = enabled
         return self
     }
-    
+
     @discardableResult
     @objc
     public func enableDiskCache(enabled: Bool) -> SplunkRumBuilder {
         self.enableDiskCache = enabled
         return self
     }
-    
+
     @discardableResult
     @objc
     public func spanDiskCacheMaxSize(size: Int64) -> SplunkRumBuilder {
         self.spanDiskCacheMaxSize = size
         return self
     }
-    
+
     @discardableResult
     @objc
     public func slowFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
         self.slowFrameDetectionThresholdMs = thresholdMs
         return self
     }
-    
+
     @discardableResult
     @objc
     public func frozenFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
         self.frozenFrameDetectionThresholdMs = thresholdMs
         return self
     }
-    
+
     @discardableResult
     @objc
     public func sessionSamplingRatio(samplingRatio: Double) -> SplunkRumBuilder {
         self.sessionSamplingRatio = samplingRatio
         return self
     }
-    
+
     @discardableResult
     @objc
     public func build() -> Bool {
