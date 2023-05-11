@@ -73,8 +73,8 @@ func lifecycleEvent(_ event: String) {
     if event == UI_APPLICATION_WILL_RESIGN_ACTIVE_NOTIFICATION ||
             event == UI_APPLICATION_WILL_ENTER_FOREGROUND_NOTIFICATION {
         if activeSpan == nil {
-            let span = buildTracer().spanBuilder(spanName: event == UI_APPLICATION_WILL_RESIGN_ACTIVE_NOTIFICATION ? "ResignActive" : "EnterForeground").startSpan()
-            span.setAttribute(key: "component", value: "app-lifecycle")
+            let span = buildTracer().spanBuilder(spanName: event == UI_APPLICATION_WILL_RESIGN_ACTIVE_NOTIFICATION ? Constants.SpanNames.RESIGNACTIVE : Constants.SpanNames.ENTER_FOREGROUND).startSpan()
+            span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "app-lifecycle")
             activeSpan = SpanHolder(span)
         }
     }
@@ -94,8 +94,8 @@ func lifecycleEvent(_ event: String) {
     // this one gets its own special span
     if event == UI_APPLICATION_WILL_TERMINATE_NOTIFICATION {
         let now = Date()
-        let span = buildTracer().spanBuilder(spanName: "AppTerminating").setStartTime(time: now).startSpan()
-        span.setAttribute(key: "component", value: "AppLifecycle")
+        let span = buildTracer().spanBuilder(spanName: Constants.SpanNames.APP_TERMINATING).setStartTime(time: now).startSpan()
+        span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "AppLifecycle")
         span.end(time: now)
     }
 

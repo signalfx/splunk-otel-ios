@@ -39,7 +39,7 @@ class LimitingExporter: SpanExporter {
 
     // Returns true if span should be dropped
     func rateLimit(_ span: SpanData) -> Bool {
-        let component = span.attributes["component"]?.description ?? "unknown"
+        let component = span.attributes[Constants.AttributeNames.COMPONENT]?.description ?? "unknown"
         var count = component2counts[component] ?? 0
         count += 1
         component2counts[component] = count

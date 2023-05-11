@@ -31,7 +31,9 @@ this is probably your `AppDelegate`'s `...didFinishLaunchingWithOptions:` method
 import SplunkOtel
 ...
 // Your beaconUrl and rumAuth will be provided by your friendly Splunk representative
-SplunkRum.initialize(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "ABCD...")
+SplunkRumBuilder(beaconUrl: "https://rum-ingest.us0.signalfx.com/v1/rum", rumAuth: "ABCD...")
+  // Call functions to configure additional options
+  .build()
 ```
 
 or
@@ -41,7 +43,9 @@ or
 @import SplunkOtel;
 ...
 // Your beaconUrl and rumAuth will be provided by your friendly Splunk representative
-[SplunkRum initializeWithBeaconUrl: @"https://rum-ingest.us0.signalfx.com/v1/rum" rumAuth: @"ABCD..." options: nil];
+SplunkRumBuilder *builder = [SplunkRumBuilder withBeaconUrl: @"https://rum-ingest.us0.signalfx.com/v1/rum" rumAuth: @"ABCD..."];
+// Call functions to configure additional options
+[builder build];
 ```
 
 ## Installation options

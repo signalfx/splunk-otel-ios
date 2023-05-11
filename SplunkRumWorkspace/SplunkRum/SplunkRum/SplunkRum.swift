@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import WebKit
 
-let SplunkRumVersionString = "0.10.0"
+let SplunkRumVersionString = "0.11.0"
 
 /**
  Default maximum size of the disk cache in bytes.
@@ -28,7 +28,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
 /**
  Optional configuration for SplunkRum.initialize()
  */
-@objc public class SplunkRumOptions: NSObject {
+@objc internal class SplunkRumOptions: NSObject {
 
     /**
         Default options
@@ -38,7 +38,11 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil,
+    @objc public init(allowInsecureBeacon: Bool = false,
+                      debug: Bool = false,
+                      globalAttributes: [String: Any] = [:],
+                      environment: String? = nil,
+                      ignoreURLs: NSRegularExpression? = nil,
                       screenNameSpans: Bool = true,
                       networkInstrumentation: Bool = true,
                       enableDiskCache: Bool = false,
@@ -169,6 +173,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     }
 
 }
+
 var globalAttributes: [String: Any] = [:]
 let globalAttributesLock = NSLock()
 
@@ -193,7 +198,7 @@ var splunkRumInitializeCalledTime = Date()
      
      */
     @discardableResult
-    @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
+    @objc internal class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
             return false
@@ -267,12 +272,12 @@ var splunkRumInitializeCalledTime = Date()
         }
         sendAppStartSpan()
         let srInit = buildTracer()
-            .spanBuilder(spanName: "SplunkRum.initialize")
+            .spanBuilder(spanName: Constants.SpanNames.SPLUNK_RUM_INITIALIZE)
             .setStartTime(time: splunkRumInitializeCalledTime)
             .startSpan()
-        srInit.setAttribute(key: "component", value: "appstart")
+        srInit.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "appstart")
         if options != nil {
-            srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
+            srInit.setAttribute(key: Constants.AttributeNames.CONFIG_SETTINGS, value: options!.toAttributeValue())
         }
         if options?.networkInstrumentation ?? true {
             initalizeNetworkInstrumentation()

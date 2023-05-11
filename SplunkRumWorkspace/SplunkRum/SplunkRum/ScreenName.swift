@@ -26,9 +26,9 @@ fileprivate var screenNameCallbacks: [((String) -> Void)] = []
 
 func emitScreenNameChangedSpan(_ oldName: String, _ newName: String) {
     let now = Date()
-    let span = buildTracer().spanBuilder(spanName: "screen name change").setStartTime(time: now).startSpan()
-    span.setAttribute(key: "last.screen.name", value: oldName)
-    span.setAttribute(key: "component", value: "ui")
+    let span = buildTracer().spanBuilder(spanName: Constants.SpanNames.SCREEN_NAME_CHANGE).setStartTime(time: now).startSpan()
+    span.setAttribute(key: Constants.AttributeNames.LAST_SCREEN_NAME, value: oldName)
+    span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "ui")
     span.end(time: now)
 }
 

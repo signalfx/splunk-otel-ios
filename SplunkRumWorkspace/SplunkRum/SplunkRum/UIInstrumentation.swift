@@ -26,22 +26,22 @@ extension UIApplication {
                                                for event: UIEvent?) -> Bool {
         updateUIFields()
         let tracer = buildTracer()
-        let span = tracer.spanBuilder(spanName: "action").startSpan()
-        span.setAttribute(key: "component", value: "ui")
-        span.setAttribute(key: "action.name", value: action.description)
+        let span = tracer.spanBuilder(spanName: Constants.SpanNames.ACTION).startSpan()
+        span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "ui")
+        span.setAttribute(key: Constants.AttributeNames.ACTION_NAME, value: action.description)
         OpenTelemetry.instance.contextProvider.setActiveSpan(span)
         defer {
             OpenTelemetry.instance.contextProvider.removeContextForSpan(span)
             span.end()
         }
         if target != nil {
-            span.setAttribute(key: "target.type", value: String(describing: type(of: target!)))
+            span.setAttribute(key: Constants.AttributeNames.TARGET_TYPE, value: String(describing: type(of: target!)))
         }
         if sender != nil {
-            span.setAttribute(key: "sender.type", value: String(describing: type(of: sender!)))
+            span.setAttribute(key: Constants.AttributeNames.SENDER_TYPE, value: String(describing: type(of: sender!)))
         }
         if event != nil {
-            span.setAttribute(key: "event.type", value: String(describing: type(of: event!)))
+            span.setAttribute(key: Constants.AttributeNames.EVENT_TYPE, value: String(describing: type(of: event!)))
         }
         return splunk_swizzled_sendAction(action, to: target, from: sender, for: event)
     }
@@ -89,10 +89,10 @@ class NotificationPairInstrumener {
             if notifObj != nil {
                 let span = buildTracer().spanBuilder(spanName: self.spanName).startSpan()
                 // captured at beginning since it will possibly/likely change
-                span.setAttribute(key: "last.screen.name", value: getScreenName())
-                span.setAttribute(key: "component", value: "ui")
+                span.setAttribute(key: Constants.AttributeNames.LAST_SCREEN_NAME, value: getScreenName())
+                span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "ui")
                 // FIXME better naming
-                span.setAttribute(key: "object.type", value: String(describing: type(of: notif.object!)))
+                span.setAttribute(key: Constants.AttributeNames.OBJECT_TYPE, value: String(describing: type(of: notif.object!)))
                 self.obj2Span.setObject(SpanHolder(span), forKey: notifObj)
             }
 
@@ -104,7 +104,7 @@ class NotificationPairInstrumener {
                 let spanHolder = self.obj2Span.object(forKey: notifObj)
                 if spanHolder != nil {
                     // screenName may have changed now that the view has appeared; update new screen name
-                    spanHolder?.span.setAttribute(key: "screen.name", value: getScreenName())
+                    spanHolder?.span.setAttribute(key: Constants.AttributeNames.SCREEN_NAME, value: getScreenName())
                     spanHolder?.span.end()
                 }
             }
@@ -116,7 +116,7 @@ class NotificationPairInstrumener {
 let PresentationTransitionInstrumenter = NotificationPairInstrumener(
     begin: "UIPresentationControllerPresentationTransitionWillBeginNotification",
     end: "UIPresentationControllerPresentationTransitionDidEndNotification",
-    spanName: "PresentationTransition")
+    spanName: Constants.SpanNames.PRESENTATION_TRANSITION)
 
 func initializePresentationTransitionInstrumentation() {
     PresentationTransitionInstrumenter.start()
@@ -128,7 +128,7 @@ func initializePresentationTransitionInstrumentation() {
 let ShowVCInstrumenter = NotificationPairInstrumener(
     begin: "UINavigationControllerWillShowViewControllerNotification",
     end: "UINavigationControllerDidShowViewControllerNotification",
-    spanName: "ShowVC")
+    spanName: Constants.SpanNames.SHOW_VC)
 
 func initializeShowVCInstrumentation() {
     ShowVCInstrumenter.start()
@@ -141,7 +141,7 @@ func addUIFields(span: ReadableSpan) {
     // Note that this may be called from threads other than main (e.g., background thread
     // creating span); hence trying to update cached values whenever we can and simply using
     // them here
-    span.setAttribute(key: "screen.name", value: getScreenName())
+    span.setAttribute(key: Constants.AttributeNames.SCREEN_NAME, value: getScreenName())
 }
 
 private func pickVC(_ vc: UIViewController?) -> UIViewController? {

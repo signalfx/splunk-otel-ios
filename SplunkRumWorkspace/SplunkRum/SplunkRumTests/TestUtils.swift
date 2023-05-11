@@ -91,16 +91,22 @@ func initializeTestEnvironment() throws {
         return HttpResponse.internalServerError
     }
     try server.start(8989)
-    let options = SplunkRumOptions()
-    options.debug = true
-    options.allowInsecureBeacon = true
-    options.globalAttributes = ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true]
-    options.environment = "env"
-    options.ignoreURLs = try! NSRegularExpression(pattern: ".*ignore_this.*")
 
-    let rumInitialize = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: options)
+    let rumInitialize = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE")
+        .allowInsecureBeacon(enabled: true)
+        .debugEnabled(enabled: true)
+        .globalAttributes(globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true])
+        .environment(environment: "env")
+        .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*ignore_this.*"))
+        .build()
     let isRUMInitialized = SplunkRum.isInitialized()
-    let initializeAgain = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: options)
+    let initializeAgain = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE")
+        .allowInsecureBeacon(enabled: true)
+        .debugEnabled(enabled: true)
+        .globalAttributes(globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true])
+        .environment(environment: "env")
+        .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*ignore_this.*"))
+        .build()
     let isStillInitialized = SplunkRum.isInitialized()
     XCTAssertEqual(true, rumInitialize)
     XCTAssertEqual(true, isRUMInitialized)
