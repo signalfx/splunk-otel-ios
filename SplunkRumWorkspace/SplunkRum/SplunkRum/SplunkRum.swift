@@ -183,6 +183,8 @@ var splunkRumInitializeCalledTime = Date()
 /**
  Main class for initializing the SplunkRum agent.
  */
+// Disable swiftlint body length check on this class.  Remove once the initialize function is removed.
+// swiftlint:disable type_body_length
 @objc public class SplunkRum: NSObject {
     static var initialized = false
     static var initializing = false
@@ -294,9 +296,8 @@ var splunkRumInitializeCalledTime = Date()
         initialized = true
         print("SplunkRum.initialize() complete")
         return true
-
     }
-    
+
     @discardableResult
     @objc internal class func create(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
