@@ -180,11 +180,11 @@ let globalAttributesLock = NSLock()
 let splunkLibraryLoadTime = Date()
 var splunkRumInitializeCalledTime = Date()
 
+// Disable swiftlint body length check on this class.  Remove once the initialize function is removed.
+// swiftlint:disable type_body_length
 /**
  Main class for initializing the SplunkRum agent.
  */
-// Disable swiftlint body length check on this class.  Remove once the initialize function is removed.
-// swiftlint:disable type_body_length
 @objc public class SplunkRum: NSObject {
     static var initialized = false
     static var initializing = false
@@ -541,3 +541,4 @@ var splunkRumInitializeCalledTime = Date()
         setGlobalAttributes(["location.lat": latitude, "location.long": longitude])
     }
 }
+// swiftlint:enable type_body_length
