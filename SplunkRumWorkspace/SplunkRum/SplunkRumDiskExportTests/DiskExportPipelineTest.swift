@@ -36,7 +36,7 @@ class DiskExportPipelineTest: XCTestCase {
         XCTAssertTrue(
             SplunkRumBuilder(beaconUrl: "http://localhost:9733/v1/traces", rumAuth: "FAKE")
                 .allowInsecureBeacon(enabled: true)
-                .debugEnabled(enabled: true)
+                .debug(enabled: true)
                 .enableDiskCache(enabled: true)
                 .spanDiskCacheMaxSize(size: 4096 * 4)
                 .build()

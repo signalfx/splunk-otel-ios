@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
             .allowInsecureBeacon(enabled: true)
-            .debugEnabled(enabled: true)
+            .debug(enabled: true)
             .globalAttributes(globalAttributes: [:])
             .build()
         return true

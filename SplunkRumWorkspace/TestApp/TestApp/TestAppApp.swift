@@ -22,7 +22,7 @@ struct TestAppApp: App {
     init() {
         SplunkRumBuilder(beaconUrl: "http://127.0.0.1:3001/", rumAuth: "FAKE_RUM_AUTH")
             .allowInsecureBeacon(enabled: true)
-            .debugEnabled(enabled: true)
+            .debug(enabled: true)
             .globalAttributes(globalAttributes: ["strKey": "Some string", "intkey": 7])
             .enableDiskCache(enabled: true)
             .build()

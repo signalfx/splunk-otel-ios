@@ -25,7 +25,7 @@ class SessionSamplingTests: XCTestCase {
         SplunkRum.initialized = false
         _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
             .allowInsecureBeacon(enabled: true)
-            .debugEnabled(enabled: true)
+            .debug(enabled: true)
             .globalAttributes(globalAttributes: [:])
             .sessionSamplingRatio(samplingRatio: 0.2)
             .build()
@@ -40,7 +40,7 @@ class SessionSamplingTests: XCTestCase {
         SplunkRum.initialized = false
         _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
             .allowInsecureBeacon(enabled: true)
-            .debugEnabled(enabled: true)
+            .debug(enabled: true)
             .globalAttributes(globalAttributes: [:])
             .sessionSamplingRatio(samplingRatio: 1.0)
             .build()
@@ -55,7 +55,7 @@ class SessionSamplingTests: XCTestCase {
         SplunkRum.initialized = false
         _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
             .allowInsecureBeacon(enabled: true)
-            .debugEnabled(enabled: true)
+            .debug(enabled: true)
             .globalAttributes(globalAttributes: [:])
             .sessionSamplingRatio(samplingRatio: 0.0)
             .build()
@@ -70,7 +70,7 @@ class SessionSamplingTests: XCTestCase {
         SplunkRum.initialized = false
         _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
             .allowInsecureBeacon(enabled: true)
-            .debugEnabled(enabled: true)
+            .debug(enabled: true)
             .globalAttributes(globalAttributes: [:])
             .sessionSamplingRatio(samplingRatio: 0.5)
             .build()
@@ -89,7 +89,7 @@ class SessionSamplingTests: XCTestCase {
         SplunkRum.initialized = false
         _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
             .allowInsecureBeacon(enabled: true)
-            .debugEnabled(enabled: true)
+            .debug(enabled: true)
             .globalAttributes(globalAttributes: [:])
             .build()
 

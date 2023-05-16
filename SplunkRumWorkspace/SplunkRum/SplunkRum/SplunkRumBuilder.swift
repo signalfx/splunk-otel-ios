@@ -48,7 +48,7 @@ import Foundation
 
     @discardableResult
     @objc
-    public func debugEnabled(enabled: Bool) -> SplunkRumBuilder {
+    public func debug(enabled: Bool) -> SplunkRumBuilder {
         self.debug = enabled
         return self
     }
@@ -126,7 +126,7 @@ import Foundation
     @discardableResult
     @objc
     public func build() -> Bool {
-        return SplunkRum.initialize(beaconUrl: self.beaconUrl,
+        return SplunkRum.create(beaconUrl: self.beaconUrl,
                                     rumAuth: self.rumAuth,
                                     options: .init(allowInsecureBeacon: self.allowInsecureBeacon,
                                                    debug: self.debug,

@@ -94,7 +94,7 @@ func initializeTestEnvironment() throws {
 
     let rumInitialize = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE")
         .allowInsecureBeacon(enabled: true)
-        .debugEnabled(enabled: true)
+        .debug(enabled: true)
         .globalAttributes(globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true])
         .environment(environment: "env")
         .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*ignore_this.*"))
@@ -102,7 +102,7 @@ func initializeTestEnvironment() throws {
     let isRUMInitialized = SplunkRum.isInitialized()
     let initializeAgain = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE")
         .allowInsecureBeacon(enabled: true)
-        .debugEnabled(enabled: true)
+        .debug(enabled: true)
         .globalAttributes(globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true])
         .environment(environment: "env")
         .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*ignore_this.*"))
