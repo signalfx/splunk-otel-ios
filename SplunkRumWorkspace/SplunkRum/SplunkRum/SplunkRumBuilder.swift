@@ -62,7 +62,7 @@ import Foundation
 
     @discardableResult
     @objc
-    public func environment(environment: String) -> SplunkRumBuilder {
+    public func deploymentEnvironment(environment: String) -> SplunkRumBuilder {
         self.environment = environment
         return self
     }
