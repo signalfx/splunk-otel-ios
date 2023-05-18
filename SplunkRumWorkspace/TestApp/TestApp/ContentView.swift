@@ -58,6 +58,7 @@ struct ContentView: View {
     func hardCrash() {
         let null = UnsafePointer<UInt8>(bitPattern: 0)
         let derefNull = null!.pointee
+        //Dvernon-test
     }
     func manualSpan() {
         let tracerProvider = OpenTelemetry.instance.tracerProvider as! TracerProviderSdk
