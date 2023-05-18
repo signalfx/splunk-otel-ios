@@ -15,6 +15,7 @@
 		86D3D38C25E80649004DD939 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 86D3D38A25E80649004DD939 /* LaunchScreen.storyboard */; };
 		86D3D39525E80D61004DD939 /* AViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39425E80D61004DD939 /* AViewController.swift */; };
 		86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39725E80DBC004DD939 /* BViewController.swift */; };
+		D7E6E0D02A165CAC00888C3E /* ObjCExample.m in Sources */ = {isa = PBXBuildFile; fileRef = D7E6E0CF2A165CAC00888C3E /* ObjCExample.m */; };
 		E27ABB4B29956D0D0060C16D /* SplunkOtel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E27ABB4A29956D0D0060C16D /* SplunkOtel.framework */; };
 		E27ABB4C29956D0D0060C16D /* SplunkOtel.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E27ABB4A29956D0D0060C16D /* SplunkOtel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
@@ -46,6 +47,8 @@
 		86D3D39425E80D61004DD939 /* AViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AViewController.swift; sourceTree = "<group>"; };
 		86D3D39725E80DBC004DD939 /* BViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BViewController.swift; sourceTree = "<group>"; };
 		86D3D3A125E8240F004DD939 /* SplunkRum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkRum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D7E6E0CF2A165CAC00888C3E /* ObjCExample.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ObjCExample.m; sourceTree = "<group>"; };
+		D7E6E0D12A165DB700888C3E /* ObjCExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ObjCExample.h; sourceTree = "<group>"; };
 		E27ABB4A29956D0D0060C16D /* SplunkOtel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkOtel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -84,6 +87,8 @@
 				86D3D37F25E80648004DD939 /* AppDelegate.swift */,
 				86D3D38125E80648004DD939 /* SceneDelegate.swift */,
 				86D3D38325E80648004DD939 /* ViewController.swift */,
+				D7E6E0CF2A165CAC00888C3E /* ObjCExample.m */,
+				D7E6E0D12A165DB700888C3E /* ObjCExample.h */,
 				86D3D38525E80648004DD939 /* Main.storyboard */,
 				86D3D38825E80649004DD939 /* Assets.xcassets */,
 				86D3D38A25E80649004DD939 /* LaunchScreen.storyboard */,
@@ -138,6 +143,7 @@
 				TargetAttributes = {
 					86D3D37B25E80648004DD939 = {
 						CreatedOnToolsVersion = 12.4;
+						LastSwiftMigration = 1430;
 					};
 				};
 			};
@@ -184,6 +190,7 @@
 				86D3D39825E80DBC004DD939 /* BViewController.swift in Sources */,
 				86D3D38025E80648004DD939 /* AppDelegate.swift in Sources */,
 				86D3D38225E80648004DD939 /* SceneDelegate.swift in Sources */,
+				D7E6E0D02A165CAC00888C3E /* ObjCExample.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -330,6 +337,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = TestStoryboardApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -338,6 +346,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.TestStoryboardApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "TestStoryboardApp/TestStoryboardApp-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -348,6 +358,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = TestStoryboardApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -356,6 +367,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.opentelemetry.TestStoryboardApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "TestStoryboardApp/TestStoryboardApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
