@@ -34,7 +34,7 @@ import Foundation
     private var frozenFrameDetectionThresholdMs: Double = 700
     private var sessionSamplingRatio: Double = 1.0
 
-    public init(beaconUrl: String, rumAuth: String) {
+    @objc public init(beaconUrl: String, rumAuth: String) {
         self.beaconUrl = beaconUrl
         self.rumAuth = rumAuth
     }
