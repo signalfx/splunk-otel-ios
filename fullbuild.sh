@@ -1,6 +1,19 @@
 #!/bin/bash
 set -ex
 swiftlint --strict
+
+# Make sure the version numbers on the podspec and SplunkRum.swift match
+echo "Check 3"
+rumVer="$(grep SplunkRumVersionString SplunkRumWorkspace/SplunkRum/SplunkRum/SplunkRum.swift | grep -o '[0-9]*\.[0-9]*\.[0-9]*')"
+podVer="$(grep s.version SplunkOtel.podspec | grep -o '[0-9]*\.[0-9]*\.[0-9]*')"
+if [ $podVer != $rumVer ]; then
+    echo "Error: The version numbers in SplunkOtel.podspec and SplunkRum.swift do not match"
+    exit 1
+fi
+
+# Check the podspec is valid
+pod lib lint SplunkOtel.podspec
+
 xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SplunkOtel -configuration Debug build
 xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SplunkOtel -configuration Debug test
 xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SplunkOtel -configuration Release build

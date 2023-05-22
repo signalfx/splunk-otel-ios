@@ -11,7 +11,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'SplunkOtel'  
-  s.version          = '0.1.0'  
+  s.version          = '0.10.0'  
   s.summary          = 'Splunk Open Telemetry pod for iOS' 
   s.description      = <<-DESC
 The Splunk RUM agent for iOS provides a Swift package that captures:
@@ -28,6 +28,7 @@ DESC
   s.license          = { :type => "Apache", :file => 'LICENSE' }
   s.author           = { 'Splunk' => 'www.splunk.com' }
   s.source           = { :git => 'https://github.com/signalfx/splunk-otel-ios.git', :tag => s.version.to_s }
+# Make sure the deployment target matches with Package.swift
   s.ios.deployment_target = '11.0'
   s.source_files = 'SplunkRumWorkspace/SplunkRum/SplunkRum/**/*.swift'
 end
