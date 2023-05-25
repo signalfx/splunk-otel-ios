@@ -38,6 +38,11 @@ class PublishedState: ObservableObject {
 }
 
 var globalState = PublishedState()
+let receiverUrl = "http://127.0.0.1:8989"
+
+func receiverEndpoint(_ route: String) -> String {
+    return "\(receiverUrl)\(route)"
+}
 
 @main
 struct SauceLabsTestAppApp: App {
@@ -52,6 +57,11 @@ struct SauceLabsTestAppApp: App {
             return HttpResponse.ok(.text("ok"))
         }
         
+        server["/upload"] = { request in
+            let body = String(decoding: Data(request.body), as: UTF8.self)
+            return HttpResponse.ok(.text(body))
+        }
+        
         server["/"] = { _ in
             return HttpResponse.ok(.text("hello"))
         }
@@ -59,7 +69,7 @@ struct SauceLabsTestAppApp: App {
         try! server.start(8989)
         
         SplunkRum.initialize(
-            beaconUrl: "http://127.0.0.1:8989/v1/traces",
+            beaconUrl: receiverEndpoint("/v1/traces"),
             rumAuth: "FAKE_RUM_AUTH",
             options: SplunkRumOptions(
                 allowInsecureBeacon: true,
