@@ -23,17 +23,20 @@ class SpanTests: XCTestCase {
     func testEventSpan() throws {
         // Forces RUM to reinitialze for testing
         SplunkRum.initialized = false
-        _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
-            .allowInsecureBeacon(enabled: true)
-            .debug(enabled: true)
-            .globalAttributes(globalAttributes: [:])
-            .build()
+        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
+                                 rumAuth: "FAKE_RUM_AUTH",
+                                 options: SplunkRumOptions(allowInsecureBeacon: true,
+                                                           debug: true,
+                                                           globalAttributes: [:],
+                                                           environment: nil,
+                                                           ignoreURLs: nil,
+                                                           sessionSamplingRatio: 0.5)
+                                 )
         
         let dictionary: NSDictionary = [
-            "attribute1" : "hello",
-            "attribute2" : "world!",
+            "attribute1":"hello",
+            "attribute2":"world!"
         ]
-        
         SplunkRum.reportEvent(name: "testEvent", attributes: dictionary)
     }
 }
