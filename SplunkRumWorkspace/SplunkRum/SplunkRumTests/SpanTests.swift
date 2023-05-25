@@ -31,7 +31,7 @@ class SpanTests: XCTestCase {
                                                            ignoreURLs: nil,
                                                            sessionSamplingRatio: 0.5)
                                  )
-        
+
         let dictionary: NSDictionary = [
                         "attribute1": "hello",
                         "attribute2": "world!"
