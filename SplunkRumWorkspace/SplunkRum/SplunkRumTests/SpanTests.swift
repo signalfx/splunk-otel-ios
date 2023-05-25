@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import XCTest
 @testable import SplunkOtel
@@ -34,8 +33,8 @@ class SpanTests: XCTestCase {
                                  )
         
         let dictionary: NSDictionary = [
-            "attribute1":"hello",
-            "attribute2":"world!"
+                        "attribute1": "hello",
+                        "attribute2": "world!"
         ]
         SplunkRum.reportEvent(name: "testEvent", attributes: dictionary)
     }
