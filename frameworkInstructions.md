@@ -11,15 +11,19 @@ Clone the `splunk-otel-ios` repo and open the `SplunkRumWorkspace.xcworkspace` f
 
 ## 2. Make archives
 
-Open the terminal and navigate to the SplunkRumWorkspace/SplunkRum directory. You should be in the same directory as the SplunkRum.xcodeproj file. Paste the following code into the terminal.
+Open the terminal and navigate to the directory where the `SplunkRum.xcodeproj` file is located, for example `SplunkRumWorkspace/SplunkRum`. 
 
+Run the following command to create a new archives directory with the file `SplunkRum-iOS.xcarchive` inside:
+
+```bash
     xcodebuild archive -project SplunkRum.xcodeproj -scheme SplunkOtel -destination "generic/platform=iOS" -archivePath "archives/SplunkRum-iOS"
+```
 
-This should create a new archives directory with the file `SplunkRum-iOS.xcarchive` inside it.
+Repeat the process for the simulator platform:
 
-Now repeat the process for the simulator platform:
-
+```bash
     xcodebuild archive -project SplunkRum.xcodeproj -scheme SplunkOtel -destination "generic/platform=iOS Simulator" -archivePath "archives/SplunkRum-iOS_Simulator"
+```
     
 ## 3. Make XCFramework
 
