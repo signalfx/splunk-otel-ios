@@ -9,7 +9,7 @@ Clone the `splunk-otel-ios` repo and open the `SplunkRumWorkspace.xcworkspace` f
 * Skip Install: No
 * Build Libraries for Distribution: Yes
 
-## 2. Make Archives
+## 2. Make archives
 
 Open the terminal and navigate to the SplunkRumWorkspace/SplunkRum directory. You should be in the same directory as the SplunkRum.xcodeproj file. Paste the following code into the terminal.
 
