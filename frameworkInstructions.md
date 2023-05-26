@@ -29,9 +29,9 @@ Repeat the process for the simulator platform:
 
 Run the following command to create a new archives directory with the file `SplunkRum-iOS.xcarchive`:
 
+```bash
     xcodebuild -create-xcframework -archive archives/SplunkRum-iOS.xcarchive -framework SplunkOtel.framework -archive archives/SplunkRum-iOS_Simulator.xcarchive -framework SplunkOtel.framework -output xcframeworks/SplunkOtel.xcframework
-
-This will create a new xcframeworks directory with the SplunkOtel.xcframework file inside of it.
+```
 
 ## 4. Importing the XCFramework into your project
 
