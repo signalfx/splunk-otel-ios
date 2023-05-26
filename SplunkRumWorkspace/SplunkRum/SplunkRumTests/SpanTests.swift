@@ -34,7 +34,8 @@ class SpanTests: XCTestCase {
 
         let dictionary: NSDictionary = [
                         "attribute1": "hello",
-                        "attribute2": "world!"
+                        "attribute2": "world!",
+                        "attribute3": 3
         ]
         SplunkRum.reportEvent(name: "testEvent", attributes: dictionary)
     }

@@ -332,11 +332,12 @@ var splunkRumInitializeCalledTime = Date()
      */
     @objc public class func reportEvent(name: String, attributes: NSDictionary) {
         let tracer = buildTracer()
+        let now = Date()
         let span = tracer.spanBuilder(spanName: name)
         for attribute in attributes {
-            span.setAttribute(key: attribute.key as! String, value: attribute.value as! String)
+            span.setAttribute(key: attribute.key as? String ?? "", value: AttributeValue(attribute.value) ?? AttributeValue("")!)
         }
-        span.startSpan().end()
+        span.startSpan().end(time: now)
     }
 
     // Threading strategy for globalAttributes is to hold lock and commit unchanging
