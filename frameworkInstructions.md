@@ -1,6 +1,6 @@
 # How to build an XCFramework
 
-If you would like to import Splunk Otel as a framework into your project, follow these steps:
+If you want to import Splunk Otel as a framework into your project, follow these steps:
 
 ## 1. Ensure the correct build settings.
 
