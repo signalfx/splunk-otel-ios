@@ -33,6 +33,6 @@ Run the following command to create a new archives directory with the file `Splu
     xcodebuild -create-xcframework -archive archives/SplunkRum-iOS.xcarchive -framework SplunkOtel.framework -archive archives/SplunkRum-iOS_Simulator.xcarchive -framework SplunkOtel.framework -output xcframeworks/SplunkOtel.xcframework
 ```
 
-## 4. Importing the XCFramework into your project
+## 4. Import the XCFramework into your project
 
-Open your project in XCode and drag and drop the SplunkOtel.xcframework into the project navigator. This should automatically import the framework. 
+Open your project in Xcode and drag the `SplunkOtel.xcframework` file into the project navigator. This automatically imports the framework. 
