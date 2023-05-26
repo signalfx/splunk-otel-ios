@@ -2,7 +2,7 @@
 
 If you want to import Splunk Otel as a framework into your project, follow these steps:
 
-## 1. Ensure the correct build settings.
+## 1. Check build settings
 
 Clone the splunk-otel-ios repo onto your local environment and open the SplunkRumWorkspace.xcworkspace file in XCode. Navigate to the Build Settings tab on the SplunkOtel target and ensure the following two settings are set:
 * Skip Install: No
