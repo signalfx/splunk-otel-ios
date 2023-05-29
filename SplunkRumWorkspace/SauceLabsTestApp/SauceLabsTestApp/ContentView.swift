@@ -17,20 +17,6 @@ limitations under the License.
 import SwiftUI
 import SplunkOtel
 
-struct TestButton: View {
-    @State var text = ""
-    @State var action: () -> Void
-
-    init(_ text: String, action: @escaping () -> Void) {
-        self.text = text
-        self.action = action
-    }
-
-    var body: some View {
-        Button(self.text, action: self.action)
-    }
-}
-
 enum TestStatus: CustomStringConvertible {
     case not_running, running, failure, timeout, success
 
