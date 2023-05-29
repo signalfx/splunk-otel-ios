@@ -10,6 +10,12 @@
 		E2098D6A29F9BE3D00F19A62 /* SplunkOtel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2098D6629F9BE2400F19A62 /* SplunkOtel.framework */; };
 		E2098D6B29F9BE3D00F19A62 /* SplunkOtel.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E2098D6629F9BE2400F19A62 /* SplunkOtel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E2098D6F29F9CBBD00F19A62 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = E2098D6E29F9CBBD00F19A62 /* Swifter */; };
+		E2098D712A1F98EB00F19A62 /* TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2098D702A1F98EB00F19A62 /* TestCase.swift */; };
+		E2098D732A1F993600F19A62 /* URLSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2098D722A1F993600F19A62 /* URLSessionTests.swift */; };
+		E2098D752A25485000F19A62 /* LifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2098D742A25485000F19A62 /* LifecycleTests.swift */; };
+		E2098D772A25487F00F19A62 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2098D762A25487F00F19A62 /* Utils.swift */; };
+		E2098D792A2548DC00F19A62 /* CustomSpanTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2098D782A2548DC00F19A62 /* CustomSpanTest.swift */; };
+		E2098D7B2A25510100F19A62 /* UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2098D7A2A25510000F19A62 /* UITests.swift */; };
 		E26323D329E822450077E2A4 /* SauceLabsTestAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26323D229E822450077E2A4 /* SauceLabsTestAppApp.swift */; };
 		E26323D529E822450077E2A4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26323D429E822450077E2A4 /* ContentView.swift */; };
 		E26323D729E822480077E2A4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26323D629E822480077E2A4 /* Assets.xcassets */; };
@@ -32,6 +38,12 @@
 
 /* Begin PBXFileReference section */
 		E2098D6629F9BE2400F19A62 /* SplunkOtel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkOtel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E2098D702A1F98EB00F19A62 /* TestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCase.swift; sourceTree = "<group>"; };
+		E2098D722A1F993600F19A62 /* URLSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionTests.swift; sourceTree = "<group>"; };
+		E2098D742A25485000F19A62 /* LifecycleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifecycleTests.swift; sourceTree = "<group>"; };
+		E2098D762A25487F00F19A62 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		E2098D782A2548DC00F19A62 /* CustomSpanTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSpanTest.swift; sourceTree = "<group>"; };
+		E2098D7A2A25510000F19A62 /* UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITests.swift; sourceTree = "<group>"; };
 		E26323CF29E822450077E2A4 /* SauceLabsTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SauceLabsTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26323D229E822450077E2A4 /* SauceLabsTestAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SauceLabsTestAppApp.swift; sourceTree = "<group>"; };
 		E26323D429E822450077E2A4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -86,6 +98,12 @@
 				E26323D629E822480077E2A4 /* Assets.xcassets */,
 				E26323D829E822480077E2A4 /* SauceLabsTestApp.entitlements */,
 				E26323D929E822480077E2A4 /* Preview Content */,
+				E2098D702A1F98EB00F19A62 /* TestCase.swift */,
+				E2098D722A1F993600F19A62 /* URLSessionTests.swift */,
+				E2098D742A25485000F19A62 /* LifecycleTests.swift */,
+				E2098D762A25487F00F19A62 /* Utils.swift */,
+				E2098D782A2548DC00F19A62 /* CustomSpanTest.swift */,
+				E2098D7A2A25510000F19A62 /* UITests.swift */,
 			);
 			path = SauceLabsTestApp;
 			sourceTree = "<group>";
@@ -176,7 +194,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E26323D529E822450077E2A4 /* ContentView.swift in Sources */,
+				E2098D7B2A25510100F19A62 /* UITests.swift in Sources */,
 				E26323D329E822450077E2A4 /* SauceLabsTestAppApp.swift in Sources */,
+				E2098D752A25485000F19A62 /* LifecycleTests.swift in Sources */,
+				E2098D792A2548DC00F19A62 /* CustomSpanTest.swift in Sources */,
+				E2098D732A1F993600F19A62 /* URLSessionTests.swift in Sources */,
+				E2098D712A1F98EB00F19A62 /* TestCase.swift in Sources */,
+				E2098D772A25487F00F19A62 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

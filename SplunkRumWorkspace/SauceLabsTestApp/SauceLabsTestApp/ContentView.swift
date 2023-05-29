@@ -42,240 +42,9 @@ struct TestLabel: View {
     }
 }
 
-struct TestsView<InnerView>: View where InnerView: View {
-    var status: TestStatus
-    var inner: InnerView
-    
-    var body: some View {
-        VStack {
-            inner
-                .onAppear {
-                    globalState.clear()
-                }
-            Spacer()
-            Text(self.status.description)
-                .background(labelColor())
-                .accessibilityIdentifier("testResult")
-        }
-    }
-    
-    func labelColor() -> Color {
-        switch status {
-            case .running: return .yellow
-            case .failure: return .red
-            case .success: return .green
-            default: return .white
-        }
-    }
-}
-
-func validNetworkSpan(span: TestZipkinSpan) -> Bool {
-    if span.tags["http.url"] != receiverEndpoint("/") {
-        return false
-    }
-    
-    if span.tags["http.method"] != "GET" {
-        return false
-    }
-    
-    if span.tags["http.status_code"] != "200" {
-        return false
-    }
-    
-    if span.tags["component"] != "http" {
-        return false
-    }
-    
-    return true
-}
-
 var testsTracker = TestsTracker()
 
 typealias TestFunction = (_ fail: @escaping () -> Void) -> Void
-
-class TestCase {
-    let name: String
-    var status: TestStatus = .not_running
-    var timeoutHandler: DispatchWorkItem?
-    
-    init(name: String) {
-        self.name = name
-        self.timeoutHandler = DispatchWorkItem(block: {
-            self.timeout()
-        })
-        
-        globalState.onSpan { span in
-            self.verify(span)
-            if self.status == .running {
-                self.success()
-            }
-        }
-        testsTracker.register(test: self)
-    }
-    
-    func run() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10, execute: self.timeoutHandler!)
-        self.status = .running
-        testsTracker.update(test: self)
-        
-        SplunkRum.setGlobalAttributes(["testname":self.name])
-        self.execute()
-        SplunkRum.removeGlobalAttribute("testname")
-    }
-    
-    func execute() {
-    }
-    
-    func verify(_ span: TestZipkinSpan) {
-    }
-    
-    func end(_ status: TestStatus) {
-        self.timeoutHandler?.cancel()
-        self.status = status
-        testsTracker.update(test: self)
-    }
-    
-    func fail() {
-        self.end(.failure)
-    }
-    
-    func timeout() {
-        self.end(.timeout)
-    }
-    
-    func success() {
-        self.end(.success)
-    }
-    
-    func matchesTest(_ span: TestZipkinSpan) -> Bool {
-        return span.tags["testname"] == self.name
-    }
-}
-
-class AppStartTest: TestCase {
-    init() {
-        super.init(name: "appStart")
-    }
-    
-    override func verify(_ span: TestZipkinSpan) {
-        if span.name != "AppStart" {
-            return
-        }
-        
-        if span.tags["component"] != "appstart" {
-            return self.fail()
-        }
-        
-        if span.tags["app"] != "SauceLabsTestApp" {
-            return self.fail()
-        }
-    }
-}
-
-class DataTaskWithCompletionHandlerTest: TestCase {
-    init() {
-        super.init(name: "URLSession.dataTaskWithCompletionHandler")
-    }
-    
-    override func execute() {
-        let url = URL(string: receiverEndpoint("/"))!
-            
-        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
-            if let data = data {
-                if String(decoding: data, as: UTF8.self) != "hello" {
-                    self.fail()
-                }
-            } else {
-                self.fail()
-            }
-        }
-        
-        task.resume()
-    }
-    
-    override func verify(_ span: TestZipkinSpan) {
-        if !matchesTest(span) {
-            return
-        }
-
-        if span.name != "HTTP GET" {
-            return
-        }
-                
-        if !validNetworkSpan(span: span) {
-            print("failing because not valid network span")
-            return self.fail()
-        }
-    }
-}
-
-class DataTaskTest: TestCase {
-    init() {
-        super.init(name: "URLSession.dataTask")
-    }
-    
-    override func execute() {
-        let url = URL(string: receiverEndpoint("/"))!
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            if let data = data {
-                if String(decoding: data, as: UTF8.self) != "hello" {
-                    self.fail()
-                }
-            } else {
-                self.fail()
-            }
-        }
-        task.resume()
-    }
-    
-    override func verify(_ span: TestZipkinSpan) {
-        if !matchesTest(span) {
-            return
-        }
-        
-        if span.name != "HTTP GET" {
-            return
-        }
-        
-        if !validNetworkSpan(span: span) {
-            return self.fail()
-        }
-    }
-}
-
-class UploadTaskTest: TestCase {
-    init() {
-        super.init(name: "URLSession.uploadTask")
-    }
-    
-    override func execute() {
-        let url = URL(string: receiverEndpoint("/upload"))!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        let uploadData = Data("foobar".utf8)
-        let task = URLSession.shared.uploadTask(with: request, from: uploadData) { data, response, error in
-            if let data = data {
-                if String(decoding: data, as: UTF8.self) != "foobar" {
-                    self.fail()
-                }
-            } else {
-                self.fail()
-            }
-        }
-        task.resume()
-    }
-    
-    override func verify(_ span: TestZipkinSpan) {
-        if !matchesTest(span) {
-            return
-        }
-        
-        if span.name != "HTTP POST" {
-            return
-        }
-    }
-}
 
 class TestsTracker: ObservableObject {
     @Published var testCases: [String:TestStatus] = [:]
@@ -305,11 +74,28 @@ struct TestResultsView: View {
     @ObservedObject private var tests = testsTracker
     
     var body: some View {
-        TestsView(status: tests.combinedStatus, inner: VStack {
-            ForEach(tests.testCases.keys.sorted(), id: \.self) { test in
-                TestLabel(text: test, status: tests.testCases[test] ?? .not_running)
+        VStack {
+            VStack {
+                ForEach(tests.testCases.keys.sorted(), id: \.self) { test in
+                    TestLabel(text: test, status: tests.testCases[test] ?? .not_running)
+                }
             }
-        })
+            Spacer()
+            Text(self.tests.combinedStatus.description)
+                .background(labelColor())
+                .accessibilityIdentifier("testResult")
+        }.onAppear {
+            ViewControllerShowTest().run()
+        }
+    }
+    
+    func labelColor() -> Color {
+        switch tests.combinedStatus {
+            case .running: return .yellow
+            case .failure: return .red
+            case .success: return .green
+            default: return .white
+        }
     }
 }
 
@@ -324,8 +110,11 @@ struct ContentView: View {
         .onAppear {
             let tests = [
                 AppStartTest(),
+                SplunkRumInitializeTest(),
+                CustomSpanTest(),
                 DataTaskTest(),
                 DataTaskWithCompletionHandlerTest(),
+                DownloadTaskTest(),
                 UploadTaskTest()
             ]
             

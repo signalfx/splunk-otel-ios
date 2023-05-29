@@ -12,13 +12,10 @@ struct TestZipkinSpan: Decodable {
 typealias SpanCallback = (TestZipkinSpan) -> Void
 
 class PublishedState: ObservableObject {
-    @Published var numSpans: Int = 0
-    var spans: [TestZipkinSpan] = []
     var listeners: [SpanCallback] = []
     
     func receiveSpans(spans: [TestZipkinSpan]) {
         DispatchQueue.main.async {
-            self.numSpans += spans.count
             for listener in self.listeners {
                 for span in spans {
                     listener(span)
@@ -26,12 +23,7 @@ class PublishedState: ObservableObject {
             }
         }
     }
-    
-    func clear() {
-        self.numSpans = 0
-        self.spans = []
-    }
-    
+
     func onSpan(_ on: @escaping SpanCallback) {
         self.listeners.append(on)
     }
@@ -46,7 +38,6 @@ func receiverEndpoint(_ route: String) -> String {
 
 @main
 struct SauceLabsTestAppApp: App {
-
     init() {
         let server = HttpServer()
 
