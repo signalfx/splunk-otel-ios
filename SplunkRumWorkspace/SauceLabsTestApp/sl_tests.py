@@ -17,15 +17,14 @@ class IOSTests(unittest.TestCase):
         
         caps['platformName'] = 'iOS'
         caps['appium:app'] = f'storage:{sl_file_id}'
-        caps['appium:deviceName'] = "iPhone Simulator"
+        caps['appium:deviceName'] = 'iPhone Simulator'
         caps['appium:platformVersion'] = sys.argv[1]
         caps['appium:automationName'] = 'XCUITest'
         caps['sauce:options'] = {}
         caps['sauce:options']['name'] = 'SplunkRum tests' + currentTime
-   
-        sl_user = os.environ['SAUCELABS_USER']
-        sl_key = os.environ['SAUCELABS_KEY']
-        url = f'https://{sl_user}:{sl_key}@ondemand.us-west-1.saucelabs.com:443/wd/hub'
+        caps['sauce:options']['accessKey'] = os.environ['SAUCELABS_KEY']
+        caps['sauce:options']['username'] = os.environ['SAUCELABS_USER']
+        url = f'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
         self.driver=webdriver.Remote(url, caps)
         
     def tearDown(self):
