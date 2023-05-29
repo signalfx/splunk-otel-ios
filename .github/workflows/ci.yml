@@ -29,12 +29,8 @@ jobs:
         with:
           name: SplunkOtel.xcframework
           path: ./SplunkRumWorkspace/SplunkRum/xcframeworks/SplunkOtel.xcframework
-  saucelabs-tests:
+  saucelabs-prepare:
     runs-on: macOS-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['13', '14', '15', '16']
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -67,6 +63,20 @@ jobs:
             --form 'description="'"$GITHUB_SHA"'"' | jq -r .item.id)
           echo "sl_file_id:$item_id"
           echo "sl_file_id=$item_id" >> $GITHUB_OUTPUT
+    outputs:
+      sl_file_id: ${{ steps.sl-upload.outputs.sl_file_id }}
+  saucelabs-tests:
+    runs-on: macOS-latest
+    needs: saucelabs-prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['13', '14', '15', '16']
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
       - name: Run Sauce Labs test cases
         working-directory: SplunkRumWorkspace
         env:
@@ -76,4 +86,4 @@ jobs:
             cd SauceLabsTestApp/
             python3 -m pip install Appium-Python-Client
             echo ${{ steps.vars.outputs.sl_file_id }} 
-            python3 sl_tests.py ${{ matrix.os }} ${{ steps.sl-upload.outputs.sl_file_id }}
+            python3 sl_tests.py ${{ matrix.os }} ${{ needs.saucelabs-prepare.outputs.sl_file_id }}
