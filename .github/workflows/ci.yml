@@ -73,6 +73,8 @@ jobs:
       matrix:
         os: ['13', '14', '15', '16']
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
