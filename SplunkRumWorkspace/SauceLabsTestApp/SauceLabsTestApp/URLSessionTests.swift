@@ -1,4 +1,3 @@
-//
 /*
 Copyright 2023 Splunk Inc.
 
@@ -14,32 +13,33 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import Foundation
-
 
 class DataTaskWithCompletionHandlerTest: TestCase {
     init() {
         super.init(name: "URLSession.dataTaskWithCompletionHandler")
     }
-    
+
     override func execute() {
         let url = URL(string: receiverEndpoint("/"))!
-            
-        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+
+        let task = URLSession.shared.dataTask(with: url) { (data, _, error) in
+            if error != nil {
+                return self.fail()
+            }
             if let data = data {
                 if String(decoding: data, as: UTF8.self) != "hello" {
-                    self.fail()
+                    return self.fail()
                 }
             } else {
                 self.fail()
             }
         }
-        
+
         task.resume()
     }
-    
+
     override func verify(_ span: TestZipkinSpan) {
         if !matchesTest(span) {
             return
@@ -48,7 +48,7 @@ class DataTaskWithCompletionHandlerTest: TestCase {
         if span.name != "HTTP GET" {
             return
         }
-                
+
         if !validNetworkSpan(span: span) {
             print("failing because not valid network span")
             return self.fail()
@@ -60,13 +60,16 @@ class DataTaskTest: TestCase {
     init() {
         super.init(name: "URLSession.dataTask")
     }
-    
+
     override func execute() {
         let url = URL(string: receiverEndpoint("/"))!
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        let task = URLSession.shared.dataTask(with: url) { data, _, error in
+            if error != nil {
+                return self.fail()
+            }
             if let data = data {
                 if String(decoding: data, as: UTF8.self) != "hello" {
-                    self.fail()
+                    return self.fail()
                 }
             } else {
                 self.fail()
@@ -74,16 +77,16 @@ class DataTaskTest: TestCase {
         }
         task.resume()
     }
-    
+
     override func verify(_ span: TestZipkinSpan) {
         if !matchesTest(span) {
             return
         }
-        
+
         if span.name != "HTTP GET" {
             return
         }
-        
+
         if !validNetworkSpan(span: span) {
             return self.fail()
         }
@@ -94,17 +97,21 @@ class UploadTaskTest: TestCase {
     init() {
         super.init(name: "URLSession.uploadTask")
     }
-    
+
     override func execute() {
         let url = URL(string: receiverEndpoint("/upload"))!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        
+
         let uploadData = Data("foobar".utf8)
-        let task = URLSession.shared.uploadTask(with: request, from: uploadData) { data, response, error in
+        let task = URLSession.shared.uploadTask(with: request, from: uploadData) { data, _, error in
+            if error != nil {
+                return self.fail()
+            }
+
             if let data = data {
                 if String(decoding: data, as: UTF8.self) != "foobar" {
-                    self.fail()
+                    return self.fail()
                 }
             } else {
                 self.fail()
@@ -112,12 +119,12 @@ class UploadTaskTest: TestCase {
         }
         task.resume()
     }
-    
+
     override func verify(_ span: TestZipkinSpan) {
         if !matchesTest(span) {
             return
         }
-        
+
         if span.name != "HTTP POST" {
             return
         }
@@ -128,14 +135,14 @@ class DownloadTaskTest: TestCase {
     init() {
         super.init(name: "URLSession.downloadTask")
     }
-    
+
     override func execute() {
         let url = URL(string: receiverEndpoint("/"))!
-        let task = URLSession.shared.downloadTask(with: url) { path, response, error in
+        let task = URLSession.shared.downloadTask(with: url) { path, _, error in
             if error != nil {
                 self.fail()
             }
-            
+
             if let path = path {
                 if let content = try? String(contentsOf: path) {
                     if content != "hello" {
@@ -150,16 +157,16 @@ class DownloadTaskTest: TestCase {
         }
         task.resume()
     }
-    
+
     override func verify(_ span: TestZipkinSpan) {
         if !matchesTest(span) {
             return
         }
-        
+
         if span.name != "HTTP GET" {
             return
         }
-        
+
         if !validNetworkSpan(span: span) {
             return self.fail()
         }

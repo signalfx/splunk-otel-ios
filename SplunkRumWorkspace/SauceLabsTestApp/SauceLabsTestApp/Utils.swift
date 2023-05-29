@@ -1,4 +1,3 @@
-//
 /*
 Copyright 2023 Splunk Inc.
 
@@ -14,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import Foundation
 
@@ -22,18 +20,18 @@ func validNetworkSpan(span: TestZipkinSpan) -> Bool {
     if span.tags["http.url"] != receiverEndpoint("/") {
         return false
     }
-    
+
     if span.tags["http.method"] != "GET" {
         return false
     }
-    
+
     if span.tags["http.status_code"] != "200" {
         return false
     }
-    
+
     if span.tags["component"] != "http" {
         return false
     }
-    
+
     return true
 }

@@ -1,10 +1,26 @@
+/*
+Copyright 2023 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import SwiftUI
 import SplunkOtel
 
 struct TestButton: View {
     @State var text = ""
     @State var action: () -> Void
-    
+
     init(_ text: String, action: @escaping () -> Void) {
         self.text = text
         self.action = action
@@ -17,14 +33,14 @@ struct TestButton: View {
 
 enum TestStatus: CustomStringConvertible {
     case not_running, running, failure, timeout, success
-    
+
     var description: String {
         switch self {
-            case .running: return "running"
-            case .failure: return "failure"
-            case .success: return "success"
-            case .timeout: return "timeout"
-            default: return "not yet running"
+        case .running: return "running"
+        case .failure: return "failure"
+        case .success: return "success"
+        case .timeout: return "timeout"
+        default: return "not yet running"
         }
     }
 }
@@ -32,7 +48,7 @@ enum TestStatus: CustomStringConvertible {
 struct TestLabel: View {
     var text = ""
     var status: TestStatus
-    
+
     var body: some View {
         HStack {
             Text(self.text).frame(maxWidth: .infinity, alignment: .leading).font(.system(size: 12))
@@ -47,22 +63,22 @@ var testsTracker = TestsTracker()
 typealias TestFunction = (_ fail: @escaping () -> Void) -> Void
 
 class TestsTracker: ObservableObject {
-    @Published var testCases: [String:TestStatus] = [:]
+    @Published var testCases: [String: TestStatus] = [:]
     @Published var combinedStatus: TestStatus = .running
-    
+
     func register(test: TestCase) {
         self.testCases[test.name] = test.status
     }
-    
+
     func update(test: TestCase) {
         self.testCases[test.name] = test.status
-        
+
         if combinedStatus == .running {
             if test.status == .failure || test.status == .timeout {
                 combinedStatus = .failure
                 return
             }
-            
+
             if testCases.values.allSatisfy({ $0 == .success }) {
                 combinedStatus = .success
             }
@@ -72,7 +88,7 @@ class TestsTracker: ObservableObject {
 
 struct TestResultsView: View {
     @ObservedObject private var tests = testsTracker
-    
+
     var body: some View {
         VStack {
             VStack {
@@ -88,13 +104,13 @@ struct TestResultsView: View {
             ViewControllerShowTest().run()
         }
     }
-    
+
     func labelColor() -> Color {
         switch tests.combinedStatus {
-            case .running: return .yellow
-            case .failure: return .red
-            case .success: return .green
-            default: return .white
+        case .running: return .yellow
+        case .failure: return .red
+        case .success: return .green
+        default: return .white
         }
     }
 }
@@ -117,7 +133,7 @@ struct ContentView: View {
                 DownloadTaskTest(),
                 UploadTaskTest()
             ]
-            
+
             for test in tests {
                 test.run()
             }

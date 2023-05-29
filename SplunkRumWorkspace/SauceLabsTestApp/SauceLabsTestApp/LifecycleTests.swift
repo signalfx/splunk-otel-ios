@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import Foundation
 
@@ -22,37 +21,36 @@ class AppStartTest: TestCase {
     init() {
         super.init(name: "appStart")
     }
-    
+
     override func verify(_ span: TestZipkinSpan) {
         if span.name != "AppStart" {
             return
         }
-        
+
         if span.tags["component"] != "appstart" {
             return self.fail()
         }
-        
+
         if span.tags["app"] != "SauceLabsTestApp" {
             return self.fail()
         }
     }
 }
 
-
 class SplunkRumInitializeTest: TestCase {
     init() {
         super.init(name: "initialize")
     }
-    
+
     override func verify(_ span: TestZipkinSpan) {
         if span.name != "SplunkRum.initialize" {
             return
         }
-        
+
         if span.tags["component"] != "appstart" {
             return self.fail()
         }
-        
+
         if span.tags["app"] != "SauceLabsTestApp" {
             return self.fail()
         }

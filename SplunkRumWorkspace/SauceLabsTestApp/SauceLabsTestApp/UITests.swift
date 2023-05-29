@@ -1,4 +1,3 @@
-//
 /*
 Copyright 2023 Splunk Inc.
 
@@ -14,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
 
 import Foundation
 
@@ -22,20 +20,20 @@ class ViewControllerShowTest: TestCase {
     init() {
         super.init(name: "showVC")
     }
-    
+
     override func verify(_ span: TestZipkinSpan) {
         if span.name != "ShowVC" {
             return
         }
-        
+
         if span.tags["component"] != "ui" {
             return self.fail()
         }
-        
+
         if span.tags["last.screen.name"] == nil {
             return self.fail()
         }
-        
+
         if span.tags["object.type"] == nil {
             return self.fail()
         }
