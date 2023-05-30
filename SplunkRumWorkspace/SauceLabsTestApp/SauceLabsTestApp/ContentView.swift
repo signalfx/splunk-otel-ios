@@ -84,8 +84,8 @@ struct TestResultsView: View {
             }
             Spacer()
             Text(self.tests.combinedStatus.description)
+                .accessibility(identifier: "test_result")
                 .background(labelColor())
-                .accessibility(identifier: "testResult")
         }.onAppear {
             ViewControllerShowTest().run()
         }

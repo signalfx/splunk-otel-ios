@@ -33,7 +33,7 @@ class IOSTests(unittest.TestCase):
     def test_spans(self):
         self.driver.find_element(By.ID, "results").click()
         WebDriverWait(self.driver, 10).until(
-            EC.text_to_be_present_in_element((By.ID, "testResult"), "success")
+            EC.text_to_be_present_in_element((By.ID, "test_result"), "success")
         )
 
 if __name__ == "__main__":
