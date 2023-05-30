@@ -20,10 +20,9 @@ import XCTest
 
 class SpanTests: XCTestCase {
     func testEventSpan() throws {
-        resetTestEnvironment()
-        SplunkRum.initialized = false
-        let _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE", options: nil)
+        try initializeTestEnvironment()
         let tracerProvider = OpenTelemetry.instance.tracerProvider as! TracerProviderSdk
+        tracerProvider.resetSpanProcessors()
         tracerProvider.addSpanProcessor(TestSpanProcessor(spanExporter: TestSpanExporter()))
         let dictionary: NSDictionary = [
                         "attribute1": "hello",
