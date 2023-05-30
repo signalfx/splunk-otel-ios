@@ -105,7 +105,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             NavigationLink(destination: TestResultsView()) {
-                Text("Results")
+                Text("results")
                     .accessibility(identifier: "results")
             }
         }
