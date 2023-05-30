@@ -28,12 +28,11 @@ class SpanTests: XCTestCase {
         ]
         SplunkRum.reportEvent(name: "testEvent", attributes: dictionary)
         XCTAssertEqual(localSpans.count, 1)
-        
+
         let testSpan = localSpans.first(where: { (span) -> Bool in
             return span.name == "testEvent"
         })
 
-        
         XCTAssertNotNil(testSpan)
         XCTAssertEqual(testSpan?.name, "testEvent")
         XCTAssertEqual(testSpan?.attributes["attribute1"]?.description, "hello")
