@@ -50,7 +50,6 @@ class DataTaskWithCompletionHandlerTest: TestCase {
         }
 
         if !validNetworkSpan(span: span) {
-            print("failing because not valid network span")
             return self.fail()
         }
     }

@@ -16,6 +16,8 @@
 		E2098D772A25487F00F19A62 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2098D762A25487F00F19A62 /* Utils.swift */; };
 		E2098D792A2548DC00F19A62 /* CustomSpanTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2098D782A2548DC00F19A62 /* CustomSpanTest.swift */; };
 		E2098D7B2A25510100F19A62 /* UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2098D7A2A25510000F19A62 /* UITests.swift */; };
+		E2098D7E2A26038500F19A62 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = E2098D7D2A26038500F19A62 /* Alamofire */; };
+		E2098D802A2603AA00F19A62 /* AlamofireTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2098D7F2A2603AA00F19A62 /* AlamofireTests.swift */; };
 		E26323D329E822450077E2A4 /* SauceLabsTestAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26323D229E822450077E2A4 /* SauceLabsTestAppApp.swift */; };
 		E26323D529E822450077E2A4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26323D429E822450077E2A4 /* ContentView.swift */; };
 		E26323D729E822480077E2A4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E26323D629E822480077E2A4 /* Assets.xcassets */; };
@@ -44,6 +46,7 @@
 		E2098D762A25487F00F19A62 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		E2098D782A2548DC00F19A62 /* CustomSpanTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSpanTest.swift; sourceTree = "<group>"; };
 		E2098D7A2A25510000F19A62 /* UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITests.swift; sourceTree = "<group>"; };
+		E2098D7F2A2603AA00F19A62 /* AlamofireTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireTests.swift; sourceTree = "<group>"; };
 		E26323CF29E822450077E2A4 /* SauceLabsTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SauceLabsTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26323D229E822450077E2A4 /* SauceLabsTestAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SauceLabsTestAppApp.swift; sourceTree = "<group>"; };
 		E26323D429E822450077E2A4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -57,6 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2098D7E2A26038500F19A62 /* Alamofire in Frameworks */,
 				E2098D6A29F9BE3D00F19A62 /* SplunkOtel.framework in Frameworks */,
 				E2098D6F29F9CBBD00F19A62 /* Swifter in Frameworks */,
 			);
@@ -104,6 +108,7 @@
 				E2098D762A25487F00F19A62 /* Utils.swift */,
 				E2098D782A2548DC00F19A62 /* CustomSpanTest.swift */,
 				E2098D7A2A25510000F19A62 /* UITests.swift */,
+				E2098D7F2A2603AA00F19A62 /* AlamofireTests.swift */,
 			);
 			path = SauceLabsTestApp;
 			sourceTree = "<group>";
@@ -135,6 +140,7 @@
 			name = SauceLabsTestApp;
 			packageProductDependencies = (
 				E2098D6E29F9CBBD00F19A62 /* Swifter */,
+				E2098D7D2A26038500F19A62 /* Alamofire */,
 			);
 			productName = SauceLabsTestApp;
 			productReference = E26323CF29E822450077E2A4 /* SauceLabsTestApp.app */;
@@ -166,6 +172,7 @@
 			mainGroup = E26323C629E822450077E2A4;
 			packageReferences = (
 				E2098D6D29F9CBBD00F19A62 /* XCRemoteSwiftPackageReference "swifter" */,
+				E2098D7C2A26038500F19A62 /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			productRefGroup = E26323D029E822450077E2A4 /* Products */;
 			projectDirPath = "";
@@ -201,6 +208,7 @@
 				E2098D732A1F993600F19A62 /* URLSessionTests.swift in Sources */,
 				E2098D712A1F98EB00F19A62 /* TestCase.swift in Sources */,
 				E2098D772A25487F00F19A62 /* Utils.swift in Sources */,
+				E2098D802A2603AA00F19A62 /* AlamofireTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,6 +434,14 @@
 				minimumVersion = 1.5.0;
 			};
 		};
+		E2098D7C2A26038500F19A62 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.6.4;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -433,6 +449,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E2098D6D29F9CBBD00F19A62 /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
+		};
+		E2098D7D2A26038500F19A62 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E2098D7C2A26038500F19A62 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -112,6 +112,7 @@ struct ContentView: View {
         .onAppear {
             let tests = [
                 AppStartTest(),
+                AlamofireRequestTest(),
                 SplunkRumInitializeTest(),
                 CustomSpanTest(),
                 DataTaskTest(),
