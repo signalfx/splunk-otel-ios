@@ -31,9 +31,9 @@ class IOSTests(unittest.TestCase):
         self.driver.quit()
 
     def test_spans(self):
-        self.driver.find_element(By.ACCESSIBILITY_ID, "results").tap()
+        self.driver.find_element(By.ID, "results").tap()
         WebDriverWait(self.driver, 20).until(
-            EC.text_to_be_present_in_element((By.ACCESSIBILITY_ID, "test_result"), "success")
+            EC.text_to_be_present_in_element((By.ID, "test_result"), "success")
         )
 
 if __name__ == "__main__":
