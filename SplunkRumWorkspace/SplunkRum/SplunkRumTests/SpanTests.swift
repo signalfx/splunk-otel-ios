@@ -20,23 +20,25 @@ import XCTest
 
 class SpanTests: XCTestCase {
     func testEventSpan() throws {
-        // Forces RUM to reinitialze for testing
-        SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil,
-                                                           sessionSamplingRatio: 0.5)
-                                 )
-
+        try initializeTestEnvironment()
         let dictionary: NSDictionary = [
                         "attribute1": "hello",
                         "attribute2": "world!",
                         "attribute3": 3
         ]
         SplunkRum.reportEvent(name: "testEvent", attributes: dictionary)
+        XCTAssertEqual(localSpans.count, 1)
+        
+        let testSpan = localSpans.first(where: { (span) -> Bool in
+            return span.name == "testEvent"
+        })
+
+        
+        XCTAssertNotNil(testSpan)
+        XCTAssertEqual(testSpan?.name, "testEvent")
+        XCTAssertEqual(testSpan?.attributes["attribute1"]?.description, "hello")
+        XCTAssertEqual(testSpan?.attributes["attribute2"]?.description, "world!")
+        XCTAssertEqual(testSpan?.attributes["attribute3"]?.description, "3")
+        XCTAssertEqual(testSpan?.startTime, testSpan?.endTime)
     }
 }

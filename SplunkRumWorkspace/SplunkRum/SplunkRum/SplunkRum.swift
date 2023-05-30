@@ -337,7 +337,7 @@ var splunkRumInitializeCalledTime = Date()
         for attribute in attributes {
             span.setAttribute(key: attribute.key as? String ?? "", value: AttributeValue(attribute.value) ?? AttributeValue("")!)
         }
-        span.startSpan().end(time: now)
+        span.setStartTime(time: now).startSpan().end(time: now)
     }
 
     // Threading strategy for globalAttributes is to hold lock and commit unchanging
