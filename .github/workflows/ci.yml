@@ -54,14 +54,11 @@ jobs:
         id: sl-upload
         run: |
           cd /Users/runner/work/splunk-otel-ios/splunk-otel-ios/
-          ls
-          jq --version
           item_id=$(curl -u "${{secrets.SAUCELABS_USER}}:${{secrets.SAUCELABS_KEY}}" --location \
             --request POST 'https://api.us-west-1.saucelabs.com/v1/storage/upload' \
             --form 'payload=@"SauceLabsTestApp.zip"' \
             --form 'name="SauceLabsTestApp.zip"' \
             --form 'description="'"$GITHUB_SHA"'"' | jq -r .item.id)
-          echo "sl_file_id:$item_id"
           echo "sl_file_id=$item_id" >> $GITHUB_OUTPUT
     outputs:
       sl_file_id: ${{ steps.sl-upload.outputs.sl_file_id }}
@@ -87,5 +84,4 @@ jobs:
         run: |
             cd SauceLabsTestApp/
             python3 -m pip install Appium-Python-Client
-            echo ${{ steps.vars.outputs.sl_file_id }} 
             python3 sl_tests.py ${{ matrix.os }} ${{ needs.saucelabs-prepare.outputs.sl_file_id }}
