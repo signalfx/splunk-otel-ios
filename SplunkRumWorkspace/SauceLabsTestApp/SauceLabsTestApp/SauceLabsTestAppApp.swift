@@ -53,8 +53,8 @@ func receiverEndpoint(_ route: String) -> String {
 }
 
 @main
-struct SauceLabsTestAppApp: App {
-    init() {
+struct SauceLabsTestApp {
+    static func main() {
         let server = HttpServer()
 
         server["/v1/traces"] = { request in
@@ -84,10 +84,45 @@ struct SauceLabsTestAppApp: App {
                 globalAttributes: [:]
             )
         )
+
+        if #available(iOS 14.0, *) {
+            TestApp.main()
+        } else {
+            UIApplicationMain(CommandLine.argc, CommandLine.unsafeArgv, nil, NSStringFromClass(AppDelegate.self))
+        }
     }
+}
+
+@available(iOS 14.0, *)
+struct TestApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+        }
+    }
+}
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        let config = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        config.delegateClass = SceneDelegate.self
+        return config
+    }
+}
+
+class SceneDelegate: NSObject, UIWindowSceneDelegate {
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        if #unavailable(iOS 14.0) {
+          let contentView = ContentView()
+
+          if let windowScene = scene as? UIWindowScene {
+              let window = UIWindow(windowScene: windowScene)
+              window.rootViewController = UIHostingController(rootView: contentView)
+              window.makeKeyAndVisible()
+              self.window = window
+          }
         }
     }
 }

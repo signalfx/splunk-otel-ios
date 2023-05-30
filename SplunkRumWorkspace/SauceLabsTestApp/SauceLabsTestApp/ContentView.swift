@@ -85,7 +85,7 @@ struct TestResultsView: View {
             Spacer()
             Text(self.tests.combinedStatus.description)
                 .background(labelColor())
-                .accessibilityIdentifier("testResult")
+                .accessibility(identifier: "testResult")
         }.onAppear {
             ViewControllerShowTest().run()
         }
@@ -106,7 +106,7 @@ struct ContentView: View {
         NavigationView {
             NavigationLink(destination: TestResultsView()) {
                 Text("Results")
-                    .accessibilityIdentifier("results")
+                    .accessibility(identifier: "results")
             }
         }
         .onAppear {
