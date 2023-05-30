@@ -71,7 +71,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['14', '15', '16']
+        os: ['13', '14', '15', '16']
     steps:
       - name: Checkout
         uses: actions/checkout@v3
