@@ -35,7 +35,7 @@ Second, make sure you are opening the app after a crash so the report is sent.
 
 ### Will this work side by side with other tools?
 
-Some other tools include similar functionality to Splunk Otel. In these cases, it can result in undefined behavior as they both attempt to leverage similar techniques in order to track and produce user usage data. It is best to use one tool for these purposes.
+Some other tools include similar functionality to Splunk RUM. In these cases, it can result in undefined behavior as they both attempt to leverage similar techniques in order to track and produce user usage data. It is best to use one tool for these purposes.
 
 For example, Firebase Performance Monitoring also performs some method swizzling for event tracking. Depending on the order agents are setup, behaviors could change. It is best to use one tool as using various tools leads to undefined behavior.
 
@@ -45,7 +45,7 @@ Crash reporting on iOS is an optional feature; please don't turn it on unless a 
 
 ### What should I do if Xcode fails to resolve package dependencies?
 
-If you use any of the [dependencies](../dependencies.txt) that Splunk Rum uses you will need to see if the versions can be resolved to their versioning rules.
+If you use any of the [dependencies](../dependencies.txt) that Splunk RUM uses you will need to see if the versions can be resolved to their versioning rules.
 
 Sometimes though, Xcode might fail to fetch a particular dependency and then present a dialog that it failed to resolve. If you see no potential versioning rule issue, it is best to just try adding the package again. Perhaps after closing and reopening Xcode.
 
@@ -53,7 +53,7 @@ Sometimes though, Xcode might fail to fetch a particular dependency and then pre
 
 Yes! Please check our available distributions for a newly added Cocoapod. If you wish to use the SPM distribution, you may, but will need to be aware that any potential overlap in dependencies will not be able to be resolved by Xcode or Cocoapods.
 
-For example if you use a Cocoapod that has a dependency that is also a dependency in Splunk Otel, you will likely get symbol collision.
+For example if you use a Cocoapod that has a dependency that is also a dependency in Splunk RUM, you will likely get symbol collision.
 
 It is also important that you add the SPM package to the app's project and not the Pods project in your workspace.
 
