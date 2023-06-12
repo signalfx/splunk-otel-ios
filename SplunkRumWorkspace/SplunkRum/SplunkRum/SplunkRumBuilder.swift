@@ -38,7 +38,7 @@ import Foundation
         self.beaconUrl = beaconUrl
         self.rumAuth = rumAuth
     }
-    
+
     @objc public init(realm: String, rumAuth: String) {
         self.beaconUrl = "https://rum-ingest.\(realm).signalfx.com/v1/rum"
         self.rumAuth = rumAuth
