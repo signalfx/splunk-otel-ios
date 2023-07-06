@@ -34,7 +34,6 @@ var lastTimestamp: CFTimeInterval = CACurrentMediaTime()
 
 class SmokeTestUITests: XCTestCase {
 
-    // swiftlint:disable overridden_super_call
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
 
@@ -43,7 +42,6 @@ class SmokeTestUITests: XCTestCase {
 
         // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
-    // swiftlint:enable overridden_super_call
 
     let SLEEP_TIME: UInt32 = 30 // batch is currently every 5 so this should be plenty
 

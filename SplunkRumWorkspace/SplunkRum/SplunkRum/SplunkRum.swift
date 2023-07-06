@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 import WebKit
 
+// Make sure the version numbers on the podspec and SplunkRum.swift match
 let SplunkRumVersionString = "0.10.0"
 
 /**
