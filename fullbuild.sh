@@ -3,7 +3,7 @@ set -ex
 swiftlint --strict
 
 # Make sure the version numbers on the podspec and SplunkRum.swift match
-echo "Check 3"
+echo "Checking that version numbers match"
 rumVer="$(grep SplunkRumVersionString SplunkRumWorkspace/SplunkRum/SplunkRum/SplunkRum.swift | grep -o '[0-9]*\.[0-9]*\.[0-9]*')"
 podVer="$(grep s.version SplunkOtel.podspec | grep -o '[0-9]*\.[0-9]*\.[0-9]*')"
 if [ $podVer != $rumVer ]; then
