@@ -31,6 +31,7 @@
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
 		88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88734FE528A55FB60035960F /* SlowFrameDetector.swift */; };
 		D77058D428D36E350047D880 /* SessionBasedSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77058D328D36E350047D880 /* SessionBasedSampler.swift */; };
+		D770630C2A1FA776009F5FA9 /* SpanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D770630B2A1FA776009F5FA9 /* SpanTests.swift */; };
 		D78995342A0C29CA009C9FB3 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78995332A0C29CA009C9FB3 /* Constants.swift */; };
 		D78995382A0D33AB009C9FB3 /* SplunkRumBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78995372A0D33AB009C9FB3 /* SplunkRumBuilder.swift */; };
 		E27ABA9D2989590D0060C16D /* StdoutExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABA372989590D0060C16D /* StdoutExporter.swift */; };
@@ -197,6 +198,7 @@
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
 		88734FE528A55FB60035960F /* SlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetector.swift; sourceTree = "<group>"; };
 		D77058D328D36E350047D880 /* SessionBasedSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionBasedSampler.swift; sourceTree = "<group>"; };
+		D770630B2A1FA776009F5FA9 /* SpanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanTests.swift; sourceTree = "<group>"; };
 		D78995332A0C29CA009C9FB3 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D78995372A0D33AB009C9FB3 /* SplunkRumBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkRumBuilder.swift; sourceTree = "<group>"; };
 		E27ABA372989590D0060C16D /* StdoutExporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StdoutExporter.swift; sourceTree = "<group>"; };
@@ -401,6 +403,7 @@
 				E2AFD9E8284691EE000F53BF /* BandwidthTrackerTest.swift */,
 				E2AFD9EA28469C93000F53BF /* SpanDbTest.swift */,
 				E27ABB2C29910FE60060C16D /* SessionSamplingTests.swift */,
+				D770630B2A1FA776009F5FA9 /* SpanTests.swift */,
 			);
 			path = SplunkRumTests;
 			sourceTree = "<group>";
@@ -992,6 +995,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D770630C2A1FA776009F5FA9 /* SpanTests.swift in Sources */,
 				8654BD0025E561AE0013F7F6 /* ErrorTests.swift in Sources */,
 				86260F1925CDC6C4009F3CB1 /* ServerTimingTests.swift in Sources */,
 				8654BCFC25E55E850013F7F6 /* TestUtils.swift in Sources */,

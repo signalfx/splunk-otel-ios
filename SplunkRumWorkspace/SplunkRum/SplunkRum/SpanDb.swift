@@ -47,6 +47,12 @@ class SpanDb {
 
         let db = db_!
 
+        status = sqlite3_exec(db, "PRAGMA journal_mode=WAL", nil, nil, nil)
+
+        if status != SQLITE_OK {
+            log("failure setting up WAL mode for span db: \(sqliteError(code: status))")
+        }
+
         status = sqlite3_exec(db, "CREATE TABLE IF NOT EXISTS span (timestamp INTEGER NOT NULL, data TEXT NOT NULL)", nil, nil, nil)
 
         if status != SQLITE_OK {
