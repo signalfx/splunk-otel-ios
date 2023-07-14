@@ -328,7 +328,9 @@ var splunkRumInitializeCalledTime = Date()
 
         configuredOptions = SplunkRumOptions(opts: options)
         setGlobalAttributes(options.globalAttributes)
-        setGlobalAttributes(["environment": options.environment!])
+        if let environment = options.environment {
+            setGlobalAttributes(["environment": environment])
+        }
 
         let samplingRatio = options.sessionSamplingRatio
         if samplingRatio >= 0.0 && samplingRatio <= 1.0 {
