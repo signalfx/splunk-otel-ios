@@ -328,6 +328,18 @@ var splunkRumInitializeCalledTime = Date()
     @objc public class func reportError(error: Error) {
         reportErrorErrorSpan(e: error)
     }
+    /**
+            Convenience function for reporting an event.
+     */
+    @objc public class func reportEvent(name: String, attributes: NSDictionary) {
+        let tracer = buildTracer()
+        let now = Date()
+        let span = tracer.spanBuilder(spanName: name)
+        for attribute in attributes {
+            span.setAttribute(key: attribute.key as? String ?? "", value: AttributeValue(attribute.value) ?? AttributeValue("")!)
+        }
+        span.setStartTime(time: now).startSpan().end(time: now)
+    }
 
     // Threading strategy for globalAttributes is to hold lock and commit unchanging
     // (after lock release) objects to the global reference.  Span iterators will get
