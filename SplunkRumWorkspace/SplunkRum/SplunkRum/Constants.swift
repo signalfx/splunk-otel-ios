@@ -17,12 +17,12 @@ limitations under the License.
 
 import Foundation
 
-struct Constants {
-    struct Globals {
+enum Constants {
+    enum Globals {
         static let INSTRUMENTATION_NAME = "splunk-ios"
         static let UNKNOWN_APP_NAME = "unknown-app"
     }
-    struct SpanNames {
+    enum SpanNames {
         static let SPLUNK_RUM_INITIALIZE = "SplunkRum.initialize"
         static let SESSION_ID_CHANGE = "sessionId.change"
         static let APP_START = "AppStart"
@@ -34,10 +34,10 @@ struct Constants {
         static let SCREEN_NAME_CHANGE = "screen name change"
         static let SHOW_VC = "ShowVC"
     }
-    struct EventNames {
+    enum EventNames {
         static let PROCESS_START = "process.start"
     }
-    struct AttributeNames {
+    enum AttributeNames {
         static let OS_NAME = "os.name"
         static let OS_VERSION = "os.version"
         static let DEVICE_MODEL_NAME = "device.model.name"
