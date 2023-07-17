@@ -33,7 +33,7 @@ import Foundation
     private var slowFrameDetectionThresholdMs: Double = 16.7
     private var frozenFrameDetectionThresholdMs: Double = 700
     private var sessionSamplingRatio: Double = 1.0
-    private var appName: String? = nil
+    private var appName: String?
 
     @objc public init(beaconUrl: String, rumAuth: String) {
         self.beaconUrl = beaconUrl
@@ -128,7 +128,7 @@ import Foundation
         self.sessionSamplingRatio = samplingRatio
         return self
     }
-    
+
     @discardableResult
     @objc
     public func setApplicationName(_ appName: String) -> SplunkRumBuilder {
