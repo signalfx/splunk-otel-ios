@@ -300,7 +300,7 @@ var splunkRumInitializeCalledTime = Date()
     }
 
     @discardableResult
-    @objc internal class func create(beaconUrl: String, rumAuth: String, options: SplunkRumOptions) -> Bool {
+    @objc internal class func create(beaconUrl: String, rumAuth: String, appName: String?, options: SplunkRumOptions) -> Bool {
         guard Thread.isMainThread else {
             print("SplunkRum: Please call SplunkRum.create only on the main thread")
             return false
@@ -322,7 +322,7 @@ var splunkRumInitializeCalledTime = Date()
         debug_log("SplunkRum.create")
 
         let tracerProvider = TracerProviderBuilder()
-            .add(spanProcessor: GlobalAttributesProcessor())
+            .add(spanProcessor: GlobalAttributesProcessor(appName: appName))
             .build()
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 

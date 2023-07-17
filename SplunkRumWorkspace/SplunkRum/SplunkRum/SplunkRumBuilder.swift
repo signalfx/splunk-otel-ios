@@ -132,18 +132,19 @@ import Foundation
     @objc
     public func build() -> Bool {
         return SplunkRum.create(beaconUrl: self.beaconUrl,
-                                    rumAuth: self.rumAuth,
-                                    options: .init(allowInsecureBeacon: self.allowInsecureBeacon,
-                                                   debug: self.debug,
-                                                   globalAttributes: self.globalAttributes,
-                                                   environment: self.environment,
-                                                   ignoreURLs: self.ignoreURLs,
-                                                   screenNameSpans: self.screenNameSpans,
-                                                   networkInstrumentation: self.networkInstrumentation,
-                                                   enableDiskCache: self.enableDiskCache,
-                                                   spanDiskCacheMaxSize: self.spanDiskCacheMaxSize,
-                                                   slowFrameDetectionThresholdMs: self.slowFrameDetectionThresholdMs,
-                                                   frozenFrameDetectionThresholdMs: self.frozenFrameDetectionThresholdMs,
-                                                   sessionSamplingRatio: self.sessionSamplingRatio))
+                                rumAuth: self.rumAuth,
+                                appName: nil,
+                                options: .init(allowInsecureBeacon: self.allowInsecureBeacon,
+                                               debug: self.debug,
+                                               globalAttributes: self.globalAttributes,
+                                               environment: self.environment,
+                                               ignoreURLs: self.ignoreURLs,
+                                               screenNameSpans: self.screenNameSpans,
+                                               networkInstrumentation: self.networkInstrumentation,
+                                               enableDiskCache: self.enableDiskCache,
+                                               spanDiskCacheMaxSize: self.spanDiskCacheMaxSize,
+                                               slowFrameDetectionThresholdMs: self.slowFrameDetectionThresholdMs,
+                                               frozenFrameDetectionThresholdMs: self.frozenFrameDetectionThresholdMs,
+                                               sessionSamplingRatio: self.sessionSamplingRatio))
     }
 }

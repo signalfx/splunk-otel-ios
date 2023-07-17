@@ -47,12 +47,14 @@ class GlobalAttributesProcessor: SpanProcessor {
     let appName: String
     let appVersion: String?
     let deviceModel: String
-    init() {
+    init(appName: String? = nil) {
         let app = Bundle.main.infoDictionary?["CFBundleName"] as? String
-        if app != nil {
-            appName = app!
+        if let name = appName {
+            self.appName = name
+        } else if let app = app {
+            self.appName = app
         } else {
-            appName = Constants.Globals.UNKNOWN_APP_NAME
+            self.appName = Constants.Globals.UNKNOWN_APP_NAME
         }
         let bundleVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
         let bundleShortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
