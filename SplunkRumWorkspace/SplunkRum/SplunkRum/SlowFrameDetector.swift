@@ -109,9 +109,9 @@ class SlowFrameDetector: NSObject {
         let tracer = buildTracer()
         let now = Date()
         let span = tracer.spanBuilder(spanName: type).setStartTime(time: now).startSpan()
-        span.setAttribute(key: "component", value: "ui")
-        span.setAttribute(key: "count", value: count)
-        span.setAttribute(key: "screen.name", value: screenName)
+        span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "ui")
+        span.setAttribute(key: Constants.AttributeNames.COUNT, value: count)
+        span.setAttribute(key: Constants.AttributeNames.SCREEN_NAME, value: screenName)
         span.end(time: now)
     }
 }

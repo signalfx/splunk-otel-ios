@@ -19,7 +19,7 @@ import Foundation
 import WebKit
 
 // Make sure the version numbers on the podspec and SplunkRum.swift match
-let SplunkRumVersionString = "0.10.0"
+let SplunkRumVersionString = "0.11.0"
 
 /**
  Default maximum size of the disk cache in bytes.
@@ -29,7 +29,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
 /**
  Optional configuration for SplunkRum.initialize()
  */
-@objc public class SplunkRumOptions: NSObject {
+@objc class SplunkRumOptions: NSObject {
 
     /**
         Default options
@@ -39,7 +39,11 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     /**
         Memberwise initializer
      */
-    @objc public init(allowInsecureBeacon: Bool = false, debug: Bool = false, globalAttributes: [String: Any] = [:], environment: String? = nil, ignoreURLs: NSRegularExpression? = nil,
+    @objc public init(allowInsecureBeacon: Bool = false,
+                      debug: Bool = false,
+                      globalAttributes: [String: Any] = [:],
+                      environment: String? = nil,
+                      ignoreURLs: NSRegularExpression? = nil,
                       screenNameSpans: Bool = true,
                       networkInstrumentation: Bool = true,
                       enableDiskCache: Bool = false,
@@ -170,12 +174,15 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     }
 
 }
+
 var globalAttributes: [String: Any] = [:]
 let globalAttributesLock = NSLock()
 
 let splunkLibraryLoadTime = Date()
 var splunkRumInitializeCalledTime = Date()
 
+// Disable swiftlint body length check on this class.  Remove once the initialize function is removed.
+// swiftlint:disable type_body_length
 /**
  Main class for initializing the SplunkRum agent.
  */
@@ -193,8 +200,9 @@ var splunkRumInitializeCalledTime = Date()
                 - Parameter options: Non-required configuration toggles for various features.  See SplunkRumOptions struct for details.
      
      */
+    @available(*, deprecated, message: "This method of initializing SplunkRum will be removed in a later version.  Use SplunkRumBuilder to initialize SplunkRum going forward.")
     @discardableResult
-    @objc public class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
+    @objc class func initialize(beaconUrl: String, rumAuth: String, options: SplunkRumOptions? = nil) -> Bool {
         if !Thread.isMainThread {
             print("SplunkRum: Please call SplunkRum.initialize only on the main thread")
             return false
@@ -268,12 +276,12 @@ var splunkRumInitializeCalledTime = Date()
         }
         sendAppStartSpan()
         let srInit = buildTracer()
-            .spanBuilder(spanName: "SplunkRum.initialize")
+            .spanBuilder(spanName: Constants.SpanNames.SPLUNK_RUM_INITIALIZE)
             .setStartTime(time: splunkRumInitializeCalledTime)
             .startSpan()
-        srInit.setAttribute(key: "component", value: "appstart")
+        srInit.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "appstart")
         if options != nil {
-            srInit.setAttribute(key: "config_settings", value: options!.toAttributeValue())
+            srInit.setAttribute(key: Constants.AttributeNames.CONFIG_SETTINGS, value: options!.toAttributeValue())
         }
         if options?.networkInstrumentation ?? true {
             initalizeNetworkInstrumentation()
@@ -288,6 +296,96 @@ var splunkRumInitializeCalledTime = Date()
         srInit.end()
         initialized = true
         print("SplunkRum.initialize() complete")
+        return true
+    }
+
+    @discardableResult
+    @objc internal class func create(beaconUrl: String, rumAuth: String, appName: String?, options: SplunkRumOptions) -> Bool {
+        guard Thread.isMainThread else {
+            print("SplunkRum: Please call SplunkRum.create only on the main thread")
+            return false
+        }
+        if initialized || initializing {
+            debug_log("SplunkRum already create{ed,ing}")
+            return false
+        }
+        guard beaconUrl.starts(with: "https:") || options.allowInsecureBeacon else {
+            print("SplunkRum: beaconUrl must be https or options: allowInsecureBeacon must be true")
+            return false
+        }
+
+        splunkRumInitializeCalledTime = Date()
+        initializing = true
+        defer {
+            initializing = false
+        }
+        debug_log("SplunkRum.create")
+
+        let tracerProvider = TracerProviderBuilder()
+            .add(spanProcessor: GlobalAttributesProcessor(appName: appName))
+            .build()
+        OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
+
+        configuredOptions = SplunkRumOptions(opts: options)
+        setGlobalAttributes(options.globalAttributes)
+        if let environment = options.environment {
+            setGlobalAttributes(["environment": environment])
+        }
+
+        let samplingRatio = options.sessionSamplingRatio
+        if samplingRatio >= 0.0 && samplingRatio <= 1.0 {
+            _ = SessionBasedSampler(ratio: samplingRatio)
+            SessionBasedSampler.sessionShouldSample()
+        }
+
+        if rumAuth.isEmpty {
+            theBeaconUrl = beaconUrl
+        } else {
+            theBeaconUrl = beaconUrl + "?auth="+rumAuth
+        }
+
+        if options.enableDiskCache {
+            let spanDb = SpanDb()
+            SpanFromDiskExport.start(spanDb: spanDb, endpoint: theBeaconUrl!)
+            let diskExporter = SpanToDiskExporter(
+                spanDb: spanDb,
+                maxFileSizeBytes: options.spanDiskCacheMaxSize)
+            let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options.spanFilter)
+            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+        } else {
+            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
+                SpanDb.deleteAtDefaultLocation()
+            }
+            let exportOptions = ZipkinTraceExporterOptions(endpoint: theBeaconUrl!, serviceName: "myservice") // FIXME control zipkin better to not emit unneeded fields
+            let zipkin = ZipkinTraceExporter(options: exportOptions)
+            let retry = RetryExporter(proxy: zipkin)
+            let limiting = LimitingExporter(proxy: retry, spanFilter: options.spanFilter)
+            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+        }
+
+        if options.debug {
+            tracerProvider.addSpanProcessor(SimpleSpanProcessor(spanExporter: StdoutExporter(isDebug: true)))
+        }
+        sendAppStartSpan()
+        let srInit = buildTracer()
+            .spanBuilder(spanName: Constants.SpanNames.SPLUNK_RUM_INITIALIZE)
+            .setStartTime(time: splunkRumInitializeCalledTime)
+            .startSpan()
+        srInit.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "appstart")
+        srInit.setAttribute(key: Constants.AttributeNames.CONFIG_SETTINGS, value: options.toAttributeValue())
+        if options.networkInstrumentation {
+            initalizeNetworkInstrumentation()
+        }
+        initializeNetworkTypeMonitoring()
+        initalizeUIInstrumentation()
+        startSlowFrameDetector(
+                    slowFrameDetectionThresholdMs: options.slowFrameDetectionThresholdMs,
+                    frozenFrameDetectionThresholdMs: options.frozenFrameDetectionThresholdMs
+                )
+        // not initializeAppLifecycleInstrumentation, done at end of AppStart
+        srInit.end()
+        initialized = true
+        print("SplunkRum.create() complete")
         return true
 
     }
@@ -448,3 +546,4 @@ var splunkRumInitializeCalledTime = Date()
         setGlobalAttributes(["location.lat": latitude, "location.long": longitude])
     }
 }
+// swiftlint:enable type_body_length

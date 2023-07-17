@@ -23,15 +23,12 @@ class SessionSamplingTests: XCTestCase {
     func testSessionBasedSamplingInitialization() throws {
         // Forces RUM to reinitialze for testing
         SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil,
-                                                           sessionSamplingRatio: 0.2)
-        )
+        _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
+            .allowInsecureBeacon(enabled: true)
+            .debug(enabled: true)
+            .globalAttributes(globalAttributes: [:])
+            .sessionSamplingRatio(samplingRatio: 0.2)
+            .build()
         XCTAssertTrue(SessionBasedSampler.probability >= 0.0 && SessionBasedSampler.probability <= 1.0)
         XCTAssertEqual(SessionBasedSampler.probability, 0.2)
         resetRUM()
@@ -41,15 +38,12 @@ class SessionSamplingTests: XCTestCase {
     func testSessionBasedSampling100Pct() throws {
         // Forces RUM to reinitialze for testing
         SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil,
-                                                           sessionSamplingRatio: 1.0)
-        )
+        _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
+            .allowInsecureBeacon(enabled: true)
+            .debug(enabled: true)
+            .globalAttributes(globalAttributes: [:])
+            .sessionSamplingRatio(samplingRatio: 1.0)
+            .build()
         let shouldSample = SessionBasedSampler.sessionShouldSample()
         XCTAssertTrue(shouldSample)
         resetRUM()
@@ -59,15 +53,12 @@ class SessionSamplingTests: XCTestCase {
     func testSessionBasedSampling0Pct() throws {
         // Forces RUM to reinitialze for testing
         SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil,
-                                                           sessionSamplingRatio: 0.0)
-        )
+        _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
+            .allowInsecureBeacon(enabled: true)
+            .debug(enabled: true)
+            .globalAttributes(globalAttributes: [:])
+            .sessionSamplingRatio(samplingRatio: 0.0)
+            .build()
         let shouldSample = SessionBasedSampler.sessionShouldSample()
         XCTAssertFalse(shouldSample)
         resetRUM()
@@ -77,16 +68,12 @@ class SessionSamplingTests: XCTestCase {
     func testSessionBasedSampling50Pct() throws {
         // Forces RUM to reinitialze for testing
         SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil,
-                                                           sessionSamplingRatio: 0.5)
-        )
-
+        _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
+            .allowInsecureBeacon(enabled: true)
+            .debug(enabled: true)
+            .globalAttributes(globalAttributes: [:])
+            .sessionSamplingRatio(samplingRatio: 0.5)
+            .build()
         var countSpans = 0
         for _ in 1...100 where SessionBasedSampler.sessionShouldSample() {
             countSpans += 1
@@ -100,14 +87,11 @@ class SessionSamplingTests: XCTestCase {
     /**Needed to reset RUM to the defaults after sampling tests so other tests succeed.*/
     private func resetRUM() {
         SplunkRum.initialized = false
-        _ = SplunkRum.initialize(beaconUrl: "http://127.0.0.1:8989/",
-                                 rumAuth: "FAKE_RUM_AUTH",
-                                 options: SplunkRumOptions(allowInsecureBeacon: true,
-                                                           debug: true,
-                                                           globalAttributes: [:],
-                                                           environment: nil,
-                                                           ignoreURLs: nil)
-        )
+        _ = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/", rumAuth: "FAKE_RUM_AUTH")
+            .allowInsecureBeacon(enabled: true)
+            .debug(enabled: true)
+            .globalAttributes(globalAttributes: [:])
+            .build()
 
         print("Sampling Ratio: \(SplunkRum.configuredOptions?.sessionSamplingRatio ?? 0.0)")
     }

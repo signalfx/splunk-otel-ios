@@ -1,5 +1,6 @@
+//
 /*
-Copyright 2021 Splunk Inc.
+Copyright 2023 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,23 +14,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+	
 
-import SwiftUI
-import SplunkOtel
+#ifndef Header_h
+#define Header_h
 
-@main
-struct TestAppApp: App {
-    init() {
-        SplunkRumBuilder(beaconUrl: "http://127.0.0.1:3001/", rumAuth: "FAKE_RUM_AUTH")
-            .allowInsecureBeacon(enabled: true)
-            .debug(enabled: true)
-            .globalAttributes(globalAttributes: ["strKey": "Some string", "intkey": 7])
-            .enableDiskCache(enabled: true)
-            .build()
-    }
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
-}
+
+#endif /* Header_h */
+
+@interface ObjCExample : NSObject
+- (void) buildRum;
+@end

@@ -385,6 +385,8 @@
 				E2ACB21C283F855C006A1475 /* SpanDb.swift */,
 				E2AFD9E62846919C000F53BF /* BandwidthTracker.swift */,
 				D77058D328D36E350047D880 /* SessionBasedSampler.swift */,
+				D78995332A0C29CA009C9FB3 /* Constants.swift */,
+				D78995372A0D33AB009C9FB3 /* SplunkRumBuilder.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -912,6 +914,7 @@
 				E27ABAE02989590E0060C16D /* SimpleSpanProcessor.swift in Sources */,
 				E27ABAC52989590E0060C16D /* Entry.swift in Sources */,
 				E27ABAAB2989590D0060C16D /* JaegerPropagator.swift in Sources */,
+				D78995342A0C29CA009C9FB3 /* Constants.swift in Sources */,
 				86043B7C25F93E3400A29788 /* Log.swift in Sources */,
 				E27ABADE2989590E0060C16D /* NoopSpanProcessor.swift in Sources */,
 				E2AFD9E72846919C000F53BF /* BandwidthTracker.swift in Sources */,
@@ -945,6 +948,7 @@
 				E27ABAEB2989590E0060C16D /* Locks.swift in Sources */,
 				E27ABAC22989590E0060C16D /* DefaultBaggage.swift in Sources */,
 				E27ABAE42989590E0060C16D /* SpanProcessor.swift in Sources */,
+				D78995382A0D33AB009C9FB3 /* SplunkRumBuilder.swift in Sources */,
 				E27ABAA12989590D0060C16D /* TracerProvider.swift in Sources */,
 				E27ABAC62989590E0060C16D /* EmptyBaggageBuilder.swift in Sources */,
 				E27ABAC12989590E0060C16D /* BaggageManagerProvider.swift in Sources */,

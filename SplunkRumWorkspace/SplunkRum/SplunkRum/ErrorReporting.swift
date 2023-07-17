@@ -21,15 +21,15 @@ func reportExceptionErrorSpan(e: NSException) {
     let now = Date()
     let typeName = e.name.rawValue
     let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
-    span.setAttribute(key: "component", value: "error")
-    span.setAttribute(key: "error", value: true)
-    span.setAttribute(key: "exception.type", value: typeName)
+    span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "error")
+    span.setAttribute(key: Constants.AttributeNames.ERROR, value: true)
+    span.setAttribute(key: Constants.AttributeNames.EXCEPTION_TYPE, value: typeName)
     if e.reason != nil {
-        span.setAttribute(key: "exception.message", value: e.reason!)
+        span.setAttribute(key: Constants.AttributeNames.EXCEPTION_MESSAGE, value: e.reason!)
     }
     let stack = e.callStackSymbols.joined(separator: "\n")
     if !stack.isEmpty {
-        span.setAttribute(key: "exception.stacktrace", value: stack)
+        span.setAttribute(key: Constants.AttributeNames.EXCEPTION_STACKTRACE, value: stack)
     }
     span.end(time: now)
 }
@@ -39,10 +39,10 @@ func reportErrorErrorSpan(e: Error) {
     let now = Date()
     let typeName = String(describing: type(of: e))
     let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
-    span.setAttribute(key: "component", value: "error")
-    span.setAttribute(key: "error", value: true)
-    span.setAttribute(key: "exception.type", value: typeName)
-    span.setAttribute(key: "exception.message", value: e.localizedDescription)
+    span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "error")
+    span.setAttribute(key: Constants.AttributeNames.ERROR, value: true)
+    span.setAttribute(key: Constants.AttributeNames.EXCEPTION_TYPE, value: typeName)
+    span.setAttribute(key: Constants.AttributeNames.EXCEPTION_MESSAGE, value: e.localizedDescription)
     span.end(time: now)
 }
 
@@ -51,9 +51,9 @@ func reportStringErrorSpan(e: String) {
     let now = Date()
     let typeName = "SplunkRum.reportError(String)"
     let span = tracer.spanBuilder(spanName: typeName).setStartTime(time: now).startSpan()
-    span.setAttribute(key: "component", value: "error")
-    span.setAttribute(key: "error", value: true)
-    span.setAttribute(key: "exception.type", value: "String")
-    span.setAttribute(key: "exception.message", value: e)
+    span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "error")
+    span.setAttribute(key: Constants.AttributeNames.ERROR, value: true)
+    span.setAttribute(key: Constants.AttributeNames.EXCEPTION_TYPE, value: "String")
+    span.setAttribute(key: Constants.AttributeNames.EXCEPTION_MESSAGE, value: e)
     span.end(time: now)
 }

@@ -32,7 +32,7 @@ func computeDeviceModel() -> String {
 }
 
 func buildTracer() -> Tracer {
-    return OpenTelemetry.instance.tracerProvider.get(instrumentationName: "splunk-ios", instrumentationVersion: SplunkRumVersionString)
+    return OpenTelemetry.instance.tracerProvider.get(instrumentationName: Constants.Globals.INSTRUMENTATION_NAME, instrumentationVersion: SplunkRumVersionString)
 }
 
 func nop() {
@@ -47,33 +47,37 @@ class GlobalAttributesProcessor: SpanProcessor {
     let appName: String
     let appVersion: String?
     let deviceModel: String
-    init() {
+    init(appName: String? = nil) {
         let app = Bundle.main.infoDictionary?["CFBundleName"] as? String
-        if app != nil {
-            appName = app!
+        if let name = appName {
+            self.appName = name
+        } else if let app = app {
+            self.appName = app
         } else {
-            appName = "unknown-app"
+            self.appName = Constants.Globals.UNKNOWN_APP_NAME
         }
-        appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        let bundleVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+        let bundleShortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        appVersion = bundleShortVersion ?? bundleVersion
         deviceModel = computeDeviceModel()
     }
 
     func onStart(parentContext: SpanContext?, span: ReadableSpan) {
-        span.setAttribute(key: "app", value: appName)
+        span.setAttribute(key: Constants.AttributeNames.APP, value: appName)
         if appVersion != nil {
-            span.setAttribute(key: "app.version", value: appVersion!)
+            span.setAttribute(key: Constants.AttributeNames.APP_VERSION, value: appVersion!)
         }
         // glossing over iPadOS, watchOS, etc. here, knowing that the device model spells out reality
-        span.setAttribute(key: "os.name", value: "iOS")
-        span.setAttribute(key: "splunk.rumSessionId", value: getRumSessionId())
-        span.setAttribute(key: "splunk.rumVersion", value: SplunkRumVersionString)
-        span.setAttribute(key: "device.model.name", value: deviceModel)
-        span.setAttribute(key: "os.version", value: UIDevice.current.systemVersion)
+        span.setAttribute(key: Constants.AttributeNames.OS_NAME, value: "iOS")
+        span.setAttribute(key: Constants.AttributeNames.SPLUNK_RUM_SESSION_ID, value: getRumSessionId())
+        span.setAttribute(key: Constants.AttributeNames.SPLUNK_RUM_VERSION, value: SplunkRumVersionString)
+        span.setAttribute(key: Constants.AttributeNames.DEVICE_MODEL_NAME, value: deviceModel)
+        span.setAttribute(key: Constants.AttributeNames.OS_VERSION, value: UIDevice.current.systemVersion)
         // It would be nice to drop this field when the span-ending thread isn't the same...
         if Thread.current.isMainThread {
-            span.setAttribute(key: "thread.name", value: "main")
+            span.setAttribute(key: Constants.AttributeNames.THREAD_NAME, value: "main")
         } else if isUsefulString(Thread.current.name) {
-            span.setAttribute(key: "thread.name", value: Thread.current.name!)
+            span.setAttribute(key: Constants.AttributeNames.THREAD_NAME, value: Thread.current.name!)
         }
         SplunkRum.addGlobalAttributesToSpan(span)
         addPreSpanFields(span: span)
