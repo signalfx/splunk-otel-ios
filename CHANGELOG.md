@@ -8,4 +8,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Version 0.11.0
 
-Deprecates the use of SplunkRum.initialize.  Use the SplunkRumBuilder going forward.
+* Deprecates the use of SplunkRum.initialize.  Use the SplunkRumBuilder going forward.
+* Adds reportEvent convenience function.
+* Adds ability to import project through cocoapods.
