@@ -1,4 +1,4 @@
-* @johnbley
+* @johnbley @dvernon-splunk @seemk
 
 #####################################################
 #
@@ -6,7 +6,7 @@
 #
 #####################################################
 
-*.md @signalfx/gdi-docs @johnbley
-*.rst @signalfx/gdi-docs @johnbley
-docs/ @signalfx/gdi-docs @johnbley
-README* @signalfx/gdi-docs @johnbley
+*.md @signalfx/gdi-docs @johnbley @dvernon-splunk @seemk
+*.rst @signalfx/gdi-docs @johnbley @dvernon-splunk @seemk
+docs/ @signalfx/gdi-docs @johnbley @dvernon-splunk @seemk
+README* @signalfx/gdi-docs @johnbley @dvernon-splunk @seemk
