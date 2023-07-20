@@ -62,6 +62,10 @@ You can manually instrument iOS applications for Splunk RUM using the iOS RUM ag
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for instructions on building, running tests, and so on.
 
+## Troubleshooting
+
+For troubleshooting issues with the Splunk OpenTelemetry iOS instrumentation, see [Troubleshoot iOS instrumentation for Splunk Observability Cloud](https://quickdraw.splunk.com/redirect/?product=Observability&version=current&location=rum.android.troubleshooting) in the official documentation. (Link to iOS troubleshooting doc coming soon)
+
 ## License
 
 This library is licensed under the terms of the Apache Softare License version 2.0.
