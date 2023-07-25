@@ -10,8 +10,8 @@
 
 <p align="center">
   <img alt="Stable" src="https://img.shields.io/badge/status-stable-informational?style=for-the-badge">
-  <a href="https://github.com/open-telemetry/opentelemetry-swift/releases/tag/1.5.1">
-    <img alt="OpenTelemetry Swift" src="https://img.shields.io/badge/otel-1.5.1-blueviolet?style=for-the-badge">
+  <a href="https://github.com/open-telemetry/opentelemetry-swift/releases/tag/1.5.0">
+    <img alt="OpenTelemetry Swift" src="https://img.shields.io/badge/otel-1.5.0-blueviolet?style=for-the-badge">
   </a>
   <a href="https://github.com/signalfx/gdi-specification/releases/tag/v1.5.0">
     <img alt="Splunk GDI specification" src="https://img.shields.io/badge/GDI-1.5.0-blueviolet?style=for-the-badge">
