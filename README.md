@@ -19,11 +19,8 @@
   <a href="https://github.com/signalfx/splunk-otel-ios/releases">
     <img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/signalfx/splunk-otel-ios?include_prereleases&style=for-the-badge">
   </a>
-  <a href="https://maven-badges.herokuapp.com/maven-central/com.splunk/splunk-otel-ios">
-    <img alt="Maven Central" src="https://img.shields.io/maven-central/v/com.splunk/splunk-otel-ios?style=for-the-badge">
-  </a>
-  <a href="https://github.com/signalfx/splunk-otel-ios/actions/workflows/main.yaml">
-    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/signalfx/splunk-otel-ios/main.yaml?branch=main&style=for-the-badge">
+  <a href="https://github.com/signalfx/splunk-otel-ios/actions/workflows/ci.yml">
+    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/signalfx/splunk-otel-ios/.github/workflows/ci.yml?branch=main&style=for-the-badge">
   </a>
 </p>
 
@@ -64,7 +61,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for instructions on building, running t
 
 ## Troubleshooting
 
-For troubleshooting issues with the Splunk OpenTelemetry iOS instrumentation, see [Troubleshoot iOS instrumentation for Splunk Observability Cloud](https://quickdraw.splunk.com/redirect/?product=Observability&version=current&location=rum.android.troubleshooting) in the official documentation. (Link to iOS troubleshooting doc coming soon)
+For troubleshooting issues with the Splunk OpenTelemetry iOS instrumentation, see [Troubleshoot iOS instrumentation for Splunk Observability Cloud](https://docs.splunk.com/Observability/gdi/get-data-in/rum/ios/troubleshooting.html) in the official documentation.
 
 ## License
 
