@@ -19,7 +19,7 @@ import Foundation
 import WebKit
 
 // Make sure the version numbers on the podspec and SplunkRum.swift match
-let SplunkRumVersionString = "0.11.0"
+let SplunkRumVersionString = "0.11.1"
 
 /**
  Default maximum size of the disk cache in bytes.
@@ -48,6 +48,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
                       networkInstrumentation: Bool = true,
                       enableDiskCache: Bool = false,
                       spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES,
+                      slowRenderingDetectionEnabled: Bool = true,
                       slowFrameDetectionThresholdMs: Double = 16.7,
                       frozenFrameDetectionThresholdMs: Double = 700,
                       sessionSamplingRatio: Double = 1.0
@@ -62,6 +63,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.networkInstrumentation = networkInstrumentation
         self.enableDiskCache = enableDiskCache
         self.spanDiskCacheMaxSize = spanDiskCacheMaxSize
+        self.slowRenderingDetectionEnabled = slowRenderingDetectionEnabled
         self.slowFrameDetectionThresholdMs = slowFrameDetectionThresholdMs
         self.frozenFrameDetectionThresholdMs = frozenFrameDetectionThresholdMs
         self.sessionSamplingRatio = sessionSamplingRatio
@@ -79,6 +81,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.spanFilter = opts.spanFilter
         self.showVCInstrumentation = opts.showVCInstrumentation
         self.screenNameSpans = opts.screenNameSpans
+        self.slowRenderingDetectionEnabled = opts.slowRenderingDetectionEnabled
         self.slowFrameDetectionThresholdMs = opts.slowFrameDetectionThresholdMs
         self.frozenFrameDetectionThresholdMs = opts.frozenFrameDetectionThresholdMs
         self.networkInstrumentation = opts.networkInstrumentation
@@ -129,6 +132,11 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      Enable NetworkInstrumentation span creation for https calls.
      */
     @objc public var networkInstrumentation: Bool = true
+
+    /**
+     Enable slow rendering detection. Slow rendering detection generates spans whenever it detects a slow or frozen frame render.
+     */
+    @objc public var slowRenderingDetectionEnabled: Bool = true
 
     /**
      Threshold, in milliseconds, from which to count a rendered frame as slow.
@@ -288,10 +296,12 @@ var splunkRumInitializeCalledTime = Date()
         }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
-        startSlowFrameDetector(
-                    slowFrameDetectionThresholdMs: options?.slowFrameDetectionThresholdMs,
-                    frozenFrameDetectionThresholdMs: options?.frozenFrameDetectionThresholdMs
-                )
+        if options?.slowRenderingDetectionEnabled ?? true {
+            startSlowFrameDetector(
+                slowFrameDetectionThresholdMs: options?.slowFrameDetectionThresholdMs,
+                frozenFrameDetectionThresholdMs: options?.frozenFrameDetectionThresholdMs
+            )
+        }
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
@@ -378,10 +388,12 @@ var splunkRumInitializeCalledTime = Date()
         }
         initializeNetworkTypeMonitoring()
         initalizeUIInstrumentation()
-        startSlowFrameDetector(
-                    slowFrameDetectionThresholdMs: options.slowFrameDetectionThresholdMs,
-                    frozenFrameDetectionThresholdMs: options.frozenFrameDetectionThresholdMs
-                )
+        if options.slowRenderingDetectionEnabled {
+            startSlowFrameDetector(
+                slowFrameDetectionThresholdMs: options.slowFrameDetectionThresholdMs,
+                frozenFrameDetectionThresholdMs: options.frozenFrameDetectionThresholdMs
+            )
+        }
         // not initializeAppLifecycleInstrumentation, done at end of AppStart
         srInit.end()
         initialized = true
