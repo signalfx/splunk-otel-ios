@@ -35,6 +35,7 @@ import Foundation
     private var frozenFrameDetectionThresholdMs: Double = 700
     private var sessionSamplingRatio: Double = 1.0
     private var appName: String?
+    private var spanSchedulingDelay: TimeInterval = 5.0
 
     @objc public init(beaconUrl: String, rumAuth: String) {
         self.beaconUrl = beaconUrl
@@ -146,6 +147,13 @@ import Foundation
 
     @discardableResult
     @objc
+    public func setSpanSchedulingDelay(seconds: TimeInterval) -> SplunkRumBuilder {
+        self.spanSchedulingDelay = seconds
+        return self
+    }
+
+    @discardableResult
+    @objc
     public func build() -> Bool {
         return SplunkRum.create(beaconUrl: self.beaconUrl,
                                 rumAuth: self.rumAuth,
@@ -162,6 +170,7 @@ import Foundation
                                                slowRenderingDetectionEnabled: self.slowRenderingDetectionEnabled,
                                                slowFrameDetectionThresholdMs: self.slowFrameDetectionThresholdMs,
                                                frozenFrameDetectionThresholdMs: self.frozenFrameDetectionThresholdMs,
-                                               sessionSamplingRatio: self.sessionSamplingRatio))
+                                               sessionSamplingRatio: self.sessionSamplingRatio,
+                                               spanSchedulingDelay: self.spanSchedulingDelay))
     }
 }

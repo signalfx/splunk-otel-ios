@@ -51,7 +51,8 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
                       slowRenderingDetectionEnabled: Bool = true,
                       slowFrameDetectionThresholdMs: Double = 16.7,
                       frozenFrameDetectionThresholdMs: Double = 700,
-                      sessionSamplingRatio: Double = 1.0
+                      sessionSamplingRatio: Double = 1.0,
+                      spanSchedulingDelay: TimeInterval = 5.0
     ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
@@ -88,6 +89,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.enableDiskCache = opts.enableDiskCache
         self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
         self.sessionSamplingRatio = opts.sessionSamplingRatio
+        self.spanSchedulingDelay = opts.spanSchedulingDelay
     }
 
     /**
@@ -163,6 +165,11 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     Percentage of sessions to send spans / data.
      */
     @objc public var sessionSamplingRatio: Double = 1.0
+
+    /**
+     Set the time interval between batch span sampling in seconds
+     */
+    @objc public var spanSchedulingDelay: TimeInterval = 5.0
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
@@ -267,7 +274,9 @@ var splunkRumInitializeCalledTime = Date()
                 spanDb: spanDb,
                 maxFileSizeBytes: options?.spanDiskCacheMaxSize ?? DEFAULT_DISK_CACHE_MAX_SIZE_BYTES)
             let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options?.spanFilter ?? nil)
-            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+            let delay = options?.spanSchedulingDelay ?? 5.0
+            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting,
+                                                               scheduleDelay: delay))
         } else {
             DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
                 SpanDb.deleteAtDefaultLocation()
@@ -276,7 +285,9 @@ var splunkRumInitializeCalledTime = Date()
             let zipkin = ZipkinTraceExporter(options: exportOptions)
             let retry = RetryExporter(proxy: zipkin)
             let limiting = LimitingExporter(proxy: retry, spanFilter: options?.spanFilter ?? nil)
-            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+            let delay = options?.spanSchedulingDelay ?? 5.0
+            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting,
+                                                               scheduleDelay: delay))
         }
 
         if options?.debug ?? false {
@@ -361,7 +372,9 @@ var splunkRumInitializeCalledTime = Date()
                 spanDb: spanDb,
                 maxFileSizeBytes: options.spanDiskCacheMaxSize)
             let limiting = LimitingExporter(proxy: diskExporter, spanFilter: options.spanFilter)
-            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+            let delay = options.spanSchedulingDelay
+            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting,
+                                                              scheduleDelay: delay))
         } else {
             DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
                 SpanDb.deleteAtDefaultLocation()
@@ -370,7 +383,9 @@ var splunkRumInitializeCalledTime = Date()
             let zipkin = ZipkinTraceExporter(options: exportOptions)
             let retry = RetryExporter(proxy: zipkin)
             let limiting = LimitingExporter(proxy: retry, spanFilter: options.spanFilter)
-            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting))
+            let delay = options.spanSchedulingDelay
+            tracerProvider.addSpanProcessor(BatchSpanProcessor(spanExporter: limiting,
+                                                              scheduleDelay: delay))
         }
 
         if options.debug {
