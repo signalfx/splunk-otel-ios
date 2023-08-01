@@ -1,3 +1,30 @@
+---
+
+<p align="center">
+  <strong>
+    <a href="CONTRIBUTING.md">Getting Involved</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="SECURITY.md">Security</a>
+  </strong>
+</p>
+
+<p align="center">
+  <img alt="Stable" src="https://img.shields.io/badge/status-stable-informational?style=for-the-badge">
+  <a href="https://github.com/open-telemetry/opentelemetry-swift/releases/tag/1.5.0">
+    <img alt="OpenTelemetry Swift" src="https://img.shields.io/badge/otel-1.5.0-blueviolet?style=for-the-badge">
+  </a>
+  <a href="https://github.com/signalfx/gdi-specification/releases/tag/v1.5.0">
+    <img alt="Splunk GDI specification" src="https://img.shields.io/badge/GDI-1.5.0-blueviolet?style=for-the-badge">
+  </a>
+  <a href="https://github.com/signalfx/splunk-otel-ios/releases">
+    <img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/signalfx/splunk-otel-ios?include_prereleases&style=for-the-badge">
+  </a>
+  <a href="https://github.com/signalfx/splunk-otel-ios/actions/workflows/ci.yml">
+    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/signalfx/splunk-otel-ios/.github/workflows/ci.yml?branch=main&style=for-the-badge">
+  </a>
+</p>
+
+---
 
 # Splunk RUM agent for iOS
 
@@ -31,6 +58,10 @@ You can manually instrument iOS applications for Splunk RUM using the iOS RUM ag
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for instructions on building, running tests, and so on.
+
+## Troubleshooting
+
+For troubleshooting issues with the Splunk OpenTelemetry iOS instrumentation, see [Troubleshoot iOS instrumentation for Splunk Observability Cloud](https://docs.splunk.com/Observability/gdi/get-data-in/rum/ios/troubleshooting.html) in the official documentation.
 
 ## License
 
