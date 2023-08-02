@@ -30,10 +30,12 @@ import Foundation
     private var networkInstrumentation: Bool = true
     private var enableDiskCache: Bool = false
     private var spanDiskCacheMaxSize: Int64 = DEFAULT_DISK_CACHE_MAX_SIZE_BYTES
+    private var slowRenderingDetectionEnabled: Bool = true
     private var slowFrameDetectionThresholdMs: Double = 16.7
     private var frozenFrameDetectionThresholdMs: Double = 700
     private var sessionSamplingRatio: Double = 1.0
     private var appName: String?
+    private var spanSchedulingDelay: TimeInterval = 5.0
 
     @objc public init(beaconUrl: String, rumAuth: String) {
         self.beaconUrl = beaconUrl
@@ -110,6 +112,13 @@ import Foundation
 
     @discardableResult
     @objc
+    public func slowRenderingDetectionEnabled(_ enabled: Bool) -> SplunkRumBuilder {
+        self.slowRenderingDetectionEnabled = enabled
+        return self
+    }
+
+    @discardableResult
+    @objc
     public func slowFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
         self.slowFrameDetectionThresholdMs = thresholdMs
         return self
@@ -138,6 +147,13 @@ import Foundation
 
     @discardableResult
     @objc
+    public func setSpanSchedulingDelay(seconds: TimeInterval) -> SplunkRumBuilder {
+        self.spanSchedulingDelay = seconds
+        return self
+    }
+
+    @discardableResult
+    @objc
     public func build() -> Bool {
         return SplunkRum.create(beaconUrl: self.beaconUrl,
                                 rumAuth: self.rumAuth,
@@ -151,8 +167,10 @@ import Foundation
                                                networkInstrumentation: self.networkInstrumentation,
                                                enableDiskCache: self.enableDiskCache,
                                                spanDiskCacheMaxSize: self.spanDiskCacheMaxSize,
+                                               slowRenderingDetectionEnabled: self.slowRenderingDetectionEnabled,
                                                slowFrameDetectionThresholdMs: self.slowFrameDetectionThresholdMs,
                                                frozenFrameDetectionThresholdMs: self.frozenFrameDetectionThresholdMs,
-                                               sessionSamplingRatio: self.sessionSamplingRatio))
+                                               sessionSamplingRatio: self.sessionSamplingRatio,
+                                               spanSchedulingDelay: self.spanSchedulingDelay))
     }
 }
