@@ -87,7 +87,9 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         }
     }
     let tracer = buildTracer()
-    let span = tracer.spanBuilder(spanName: "HTTP "+method).setSpanKind(spanKind: .client).startSpan()
+    let span = tracer.spanBuilder(spanName: "HTTP "+method).setSpanKind(spanKind: .client)
+        .setActive(true)
+        .startSpan()
     span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "http")
     span.setAttribute(key: Constants.AttributeNames.HTTP_URL, value: url.absoluteString)
     span.setAttribute(key: Constants.AttributeNames.HTTP_METHOD, value: method)

@@ -145,7 +145,10 @@ func constructAppStartSpan() {
 
     let tracer = buildTracer()
     // FIXME more startup details?
-    appStart = tracer.spanBuilder(spanName: Constants.SpanNames.APP_START).setStartTime(time: spanStart).startSpan()
+    appStart = tracer.spanBuilder(spanName: Constants.SpanNames.APP_START)
+        .setActive(true)
+        .setStartTime(time: spanStart)
+        .startSpan()
     appStart!.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "appstart")
     if let procStart = procStart {
         appStart!.addEvent(name: Constants.EventNames.PROCESS_START, timestamp: procStart)
