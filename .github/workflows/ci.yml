@@ -29,3 +29,16 @@ jobs:
         with:
           name: SplunkOtel.xcframework
           path: ./SplunkRumWorkspace/SplunkRum/xcframeworks/SplunkOtel.xcframework
+    check_links:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - name: Link Checker
+          uses: lycheeverse/lychee-action@v1.5.1
+          with:
+            fail: true
+    codecov:
+      runs-on: macos-latest
+      steps:
+        - name: Upload coverage to Codecov
+          uses: codecov/codecov-action@v1.2.1
