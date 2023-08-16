@@ -1,4 +1,4 @@
-* @johnbley @dvernon-splunk @seemk
+* @signalfx/gdi-ios-maintainers
 
 #####################################################
 #
@@ -6,7 +6,7 @@
 #
 #####################################################
 
-*.md @signalfx/gdi-docs @johnbley @dvernon-splunk @seemk
-*.rst @signalfx/gdi-docs @johnbley @dvernon-splunk @seemk
-docs/ @signalfx/gdi-docs @johnbley @dvernon-splunk @seemk
-README* @signalfx/gdi-docs @johnbley @dvernon-splunk @seemk
+*.md @signalfx/gdi-docs @signalfx/gdi-ios-maintainers
+*.rst @signalfx/gdi-docs @signalfx/gdi-ios-maintainers
+docs/ @signalfx/gdi-docs @signalfx/gdi-ios-maintainers
+README* @signalfx/gdi-docs @signalfx/gdi-ios-maintainers                                                        
