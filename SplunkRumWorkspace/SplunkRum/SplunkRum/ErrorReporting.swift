@@ -21,7 +21,6 @@ func reportExceptionErrorSpan(e: NSException) {
     let now = Date()
     let typeName = e.name.rawValue
     let span = tracer.spanBuilder(spanName: typeName)
-        .setActive(true)
         .setStartTime(time: now)
         .startSpan()
     span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "error")
@@ -42,7 +41,6 @@ func reportErrorErrorSpan(e: Error) {
     let now = Date()
     let typeName = String(describing: type(of: e))
     let span = tracer.spanBuilder(spanName: typeName)
-        .setActive(true)
         .setStartTime(time: now)
         .startSpan()
     span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "error")
@@ -57,7 +55,6 @@ func reportStringErrorSpan(e: String) {
     let now = Date()
     let typeName = "SplunkRum.reportError(String)"
     let span = tracer.spanBuilder(spanName: typeName)
-        .setActive(true)
         .setStartTime(time: now)
         .startSpan()
     span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "error")

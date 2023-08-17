@@ -87,7 +87,9 @@ class NotificationPairInstrumener {
         _ = NotificationCenter.default.addObserver(forName: beginName, object: nil, queue: nil) { (notif) in
             let notifObj = notif.object as? NSObject
             if notifObj != nil {
-                let span = buildTracer().spanBuilder(spanName: self.spanName).startSpan()
+                let span = buildTracer().spanBuilder(spanName: self.spanName)
+                    .setActive(true)
+                    .startSpan()
                 // captured at beginning since it will possibly/likely change
                 span.setAttribute(key: Constants.AttributeNames.LAST_SCREEN_NAME, value: getScreenName())
                 span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "ui")
