@@ -145,7 +145,7 @@ func constructAppStartSpan() {
 
     let tracer = buildTracer()
     // FIXME more startup details?
-    
+
     // I want all the initial spans that happen before didBecomeActive to be kids of the AppStart. Scope is closed at didBecomeActive
     appStart = tracer.spanBuilder(spanName: Constants.SpanNames.APP_START)
         .setActive(true)
