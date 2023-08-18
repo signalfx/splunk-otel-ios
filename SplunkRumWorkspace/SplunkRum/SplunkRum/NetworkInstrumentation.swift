@@ -41,7 +41,7 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
                let valStr = val as? String,
                keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
                valStr.contains("traceparent") {
-                addLinkToSpan(span: span, valStr: valStr!)
+                addLinkToSpan(span: span, valStr: valStr)
             }
         }
     }
