@@ -37,16 +37,11 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
         span.setAttribute(key: Constants.AttributeNames.HTTP_STATUS_CODE, value: hr!.statusCode)
         // Blerg, looks like an iteration here since it is case sensitive and the case insensitive search assumes single value
         for (key, val) in hr!.allHeaderFields {
-            let keyStr = key as? String
-            if keyStr != nil {
-                if keyStr?.caseInsensitiveCompare("server-timing") == .orderedSame {
-                    let valStr = val as? String
-                    if valStr != nil {
-                        if valStr!.starts(with: "traceparent") {
-                            addLinkToSpan(span: span, valStr: valStr!)
-                        }
-                    }
-                }
+            if let keyStr = key as? String,
+               let valStr = val as? String,
+               keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
+               valStr.contains("traceparent") {
+                addLinkToSpan(span: span, valStr: valStr)
             }
         }
     }
