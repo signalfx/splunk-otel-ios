@@ -89,7 +89,7 @@ class ServerTimingTests: XCTestCase {
         addLinkToSpan(span: span, valStr: "foo; bar=42, traceparent;desc=\"00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01\"")
         XCTAssertEqual(span.attrs["link.spanId"], "b7ad6b7169203331")
         XCTAssertEqual(span.attrs["link.traceId"], "0af7651916cd43dd8448eb211c80319c")
-        
+
         let span2 = TestSpan()
         addLinkToSpan(span: span2, valStr: "foo; bar=42, traceparent;desc=\"00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01\", origin; dur=1002")
         XCTAssertEqual(span2.attrs["link.spanId"], "b7ad6b7169203331")
