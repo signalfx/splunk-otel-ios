@@ -18,31 +18,33 @@ import Foundation
 
 struct BoolDecision: Decision {
     var isSampled: Bool
-    var attributes: [String : AttributeValue] = [:]
+    var attributes: [String: AttributeValue] = [:]
 }
 
 class SessionBasedSampler: Sampler {
-    
+
     var probability: Double = 1.0
     var currentlySampled: Bool?
     var lock: Lock = Lock()
-    
+
     init(ratio: Double) {
         probability = ratio
         observeSessionIdChange()
     }
-    
-    func shouldSample(parentContext: SpanContext?, traceId: TraceId, name: String, kind: SpanKind, attributes: [String : AttributeValue], parentLinks: [SpanData.Link]) -> Decision {
+
+    // swiftlint:disable function_parameter_count
+    func shouldSample(parentContext: SpanContext?, traceId: TraceId, name: String, kind: SpanKind, attributes: [String: AttributeValue], parentLinks: [SpanData.Link]) -> Decision {
         return lock.withLock({
             return self.getDecision()
         })
-        
+
     }
-    
+    // swiftlint:enable function_parameter_count
+
     var description: String {
         return "SessionBasedSampler, Ratio: \(probability)"
     }
-    
+
     private func observeSessionIdChange() {
         addSessionIdCallback { [weak self] in
             self?.lock.withLockVoid {
@@ -50,23 +52,23 @@ class SessionBasedSampler: Sampler {
             }
         }
     }
-    
+
     private func getDecision() -> Decision {
-        
+
         if let currentlySampled = self.currentlySampled {
             return BoolDecision(isSampled: currentlySampled)
         }
-        
+
         let isSampled = self.shouldSampleNewSession()
         self.currentlySampled = isSampled
         return BoolDecision(isSampled: isSampled)
     }
-    
+
     /**Check if session will be sampled or not.**/
     private func shouldSampleNewSession() -> Bool {
-        
+
         var result = false
-        
+
         switch probability {
         case 0.0:
             result = false
@@ -75,8 +77,8 @@ class SessionBasedSampler: Sampler {
         default:
             result = Double.random(in: 0.0...1.0) <= probability
         }
-        
+
         return result
     }
-    
+
 }

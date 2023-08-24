@@ -29,10 +29,10 @@ class SessionSamplingTests: XCTestCase {
             .globalAttributes(globalAttributes: [:])
             .sessionSamplingRatio(samplingRatio: 0.2)
             .build()
-        
+
         let provider = OpenTelemetry.instance.tracerProvider as! TracerProviderSdk
         let sampler = provider.getActiveSampler() as! SessionBasedSampler
-        
+
         XCTAssertTrue(sampler.probability >= 0.0 && sampler.probability <= 1.0)
         XCTAssertEqual(sampler.probability, 0.2)
         resetRUM()
@@ -48,11 +48,11 @@ class SessionSamplingTests: XCTestCase {
             .globalAttributes(globalAttributes: [:])
             .sessionSamplingRatio(samplingRatio: 1.0)
             .build()
-        
+
         let provider = OpenTelemetry.instance.tracerProvider as! TracerProviderSdk
         let sampler = provider.getActiveSampler() as! SessionBasedSampler
         let shouldSample = sampler.shouldSample(parentContext: nil, traceId: .random(), name: "Span Example", kind: .client, attributes: [:], parentLinks: [])
-        
+
         XCTAssertTrue(shouldSample.isSampled)
         resetRUM()
     }
@@ -67,11 +67,11 @@ class SessionSamplingTests: XCTestCase {
             .globalAttributes(globalAttributes: [:])
             .sessionSamplingRatio(samplingRatio: 0.0)
             .build()
-        
+
         let provider = OpenTelemetry.instance.tracerProvider as! TracerProviderSdk
         let sampler = provider.getActiveSampler() as! SessionBasedSampler
         let shouldSample = sampler.shouldSample(parentContext: nil, traceId: .random(), name: "Span Example", kind: .client, attributes: [:], parentLinks: [])
-        
+
         XCTAssertFalse(shouldSample.isSampled)
         resetRUM()
     }
@@ -86,16 +86,16 @@ class SessionSamplingTests: XCTestCase {
             .globalAttributes(globalAttributes: [:])
             .sessionSamplingRatio(samplingRatio: 0.5)
             .build()
-        
+
         let provider = OpenTelemetry.instance.tracerProvider as! TracerProviderSdk
         let sampler = provider.getActiveSampler() as! SessionBasedSampler
-        
+
         func testSampling() -> Bool {
             _ = getRumSessionId(forceNewSessionId: true)
             let shouldSample = sampler.shouldSample(parentContext: nil, traceId: .random(), name: "Span Example", kind: .client, attributes: [:], parentLinks: [])
             return shouldSample.isSampled
         }
-        
+
         var countSpans = 0
         for _ in 1...100 where testSampling() {
             countSpans += 1

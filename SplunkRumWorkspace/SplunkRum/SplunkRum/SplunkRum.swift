@@ -243,7 +243,7 @@ var splunkRumInitializeCalledTime = Date()
             .add(spanProcessor: GlobalAttributesProcessor())
             .with(sampler: SessionBasedSampler(ratio: options?.sessionSamplingRatio ?? 1.0))
             .build()
-        
+
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
         if options != nil {
@@ -341,7 +341,7 @@ var splunkRumInitializeCalledTime = Date()
             .add(spanProcessor: GlobalAttributesProcessor(appName: appName))
             .with(sampler: SessionBasedSampler(ratio: options.sessionSamplingRatio))
             .build()
-        
+
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
         configuredOptions = SplunkRumOptions(opts: options)
