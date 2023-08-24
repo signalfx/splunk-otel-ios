@@ -16,6 +16,11 @@ limitations under the License.
 
 import Foundation
 
+struct BoolDecision: Decision {
+    var isSampled: Bool
+    var attributes: [String : AttributeValue] = [:]
+}
+
 class SessionBasedSampler: Sampler {
     
     var probability: Double = 1.0
@@ -49,16 +54,16 @@ class SessionBasedSampler: Sampler {
     private func getDecision() -> Decision {
         
         if let currentlySampled = self.currentlySampled {
-            return self.getDecision(shouldSample: currentlySampled)
+            return self.getDecision(isSampled: currentlySampled)
         }
         
-        let newShouldSample = self.shouldSampleNewSession()
-        self.currentlySampled = newShouldSample
-        return self.getDecision(shouldSample: newShouldSample)
+        let isSampled = self.shouldSampleNewSession()
+        self.currentlySampled = isSampled
+        return self.getDecision(isSampled: isSampled)
     }
     
-    private func getDecision(shouldSample: Bool) -> Decision {
-        return shouldSample ? Samplers.alwaysOnDecision : Samplers.alwaysOffDecision
+    private func getDecision(isSampled: Bool) -> Decision {
+        return BoolDecision(isSampled: isSampled)
     }
     
     /**Check if session will be sampled or not.**/
