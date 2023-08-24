@@ -54,15 +54,11 @@ class SessionBasedSampler: Sampler {
     private func getDecision() -> Decision {
         
         if let currentlySampled = self.currentlySampled {
-            return self.getDecision(isSampled: currentlySampled)
+            return BoolDecision(isSampled: currentlySampled)
         }
         
         let isSampled = self.shouldSampleNewSession()
         self.currentlySampled = isSampled
-        return self.getDecision(isSampled: isSampled)
-    }
-    
-    private func getDecision(isSampled: Bool) -> Decision {
         return BoolDecision(isSampled: isSampled)
     }
     
