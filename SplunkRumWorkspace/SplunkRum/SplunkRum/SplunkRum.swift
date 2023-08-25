@@ -241,7 +241,9 @@ var splunkRumInitializeCalledTime = Date()
 
         let tracerProvider = TracerProviderBuilder()
             .add(spanProcessor: GlobalAttributesProcessor())
+            .with(sampler: SessionBasedSampler(ratio: options?.sessionSamplingRatio ?? 1.0))
             .build()
+
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
         if options != nil {
@@ -252,13 +254,6 @@ var splunkRumInitializeCalledTime = Date()
         }
         if options?.environment != nil {
             setGlobalAttributes(["environment": options!.environment!])
-        }
-        if options?.sessionSamplingRatio != nil {
-            let samplingRatio = options!.sessionSamplingRatio
-            if samplingRatio >= 0.0 && samplingRatio <= 1.0 {
-                _ = SessionBasedSampler(ratio: samplingRatio)
-                SessionBasedSampler.sessionShouldSample()
-            }
         }
 
         if rumAuth.isEmpty {
@@ -344,19 +339,15 @@ var splunkRumInitializeCalledTime = Date()
 
         let tracerProvider = TracerProviderBuilder()
             .add(spanProcessor: GlobalAttributesProcessor(appName: appName))
+            .with(sampler: SessionBasedSampler(ratio: options.sessionSamplingRatio))
             .build()
+
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
         configuredOptions = SplunkRumOptions(opts: options)
         setGlobalAttributes(options.globalAttributes)
         if let environment = options.environment {
             setGlobalAttributes(["environment": environment])
-        }
-
-        let samplingRatio = options.sessionSamplingRatio
-        if samplingRatio >= 0.0 && samplingRatio <= 1.0 {
-            _ = SessionBasedSampler(ratio: samplingRatio)
-            SessionBasedSampler.sessionShouldSample()
         }
 
         if rumAuth.isEmpty {

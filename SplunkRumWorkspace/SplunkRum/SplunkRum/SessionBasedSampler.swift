@@ -16,39 +16,68 @@ limitations under the License.
 
 import Foundation
 
-class SessionBasedSampler {
-    static var probability: Double = 1.0
-    private let sessionIdCallback: (() -> Void) = {
-        sessionShouldSample()
-    }
+struct BoolDecision: Decision {
+    var isSampled: Bool
+    var attributes: [String: AttributeValue] = [:]
+}
+
+class SessionBasedSampler: Sampler {
+
+    var probability: Double = 1.0
+    var currentlySampled: Bool?
+    var lock: Lock = Lock()
 
     init(ratio: Double) {
-        SessionBasedSampler.probability = ratio
-        addSessionIdCallback(sessionIdCallback)
+        probability = ratio
+        observeSessionIdChange()
+    }
+
+    // swiftlint:disable function_parameter_count
+    func shouldSample(parentContext: SpanContext?, traceId: TraceId, name: String, kind: SpanKind, attributes: [String: AttributeValue], parentLinks: [SpanData.Link]) -> Decision {
+        return lock.withLock({
+            return self.getDecision()
+        })
+
+    }
+    // swiftlint:enable function_parameter_count
+
+    var description: String {
+        return "SessionBasedSampler, Ratio: \(probability)"
+    }
+
+    private func observeSessionIdChange() {
+        addSessionIdCallback { [weak self] in
+            self?.lock.withLockVoid {
+                self?.currentlySampled = self?.shouldSampleNewSession()
+            }
+        }
+    }
+
+    private func getDecision() -> Decision {
+
+        if let currentlySampled = self.currentlySampled {
+            return BoolDecision(isSampled: currentlySampled)
+        }
+
+        let isSampled = self.shouldSampleNewSession()
+        self.currentlySampled = isSampled
+        return BoolDecision(isSampled: isSampled)
     }
 
     /**Check if session will be sampled or not.**/
-    @discardableResult public class func sessionShouldSample() -> Bool {
+    private func shouldSampleNewSession() -> Bool {
 
         var result = false
-        switch SessionBasedSampler.probability {
+
+        switch probability {
         case 0.0:
             result = false
         case 1.0:
             result = true
         default:
-            result = Double.random(in: 0.0...1.0) <= SessionBasedSampler.probability
+            result = Double.random(in: 0.0...1.0) <= probability
         }
 
-        var parentSampler: Sampler
-        if result {
-            parentSampler = Samplers.parentBased(root: Samplers.alwaysOn, remoteParentSampled: Samplers.alwaysOn, remoteParentNotSampled: Samplers.alwaysOn, localParentSampled: Samplers.alwaysOn, localParentNotSampled: Samplers.alwaysOn)
-        } else {
-            parentSampler = Samplers.parentBased(root: Samplers.alwaysOff, remoteParentSampled: Samplers.alwaysOff, remoteParentNotSampled: Samplers.alwaysOff, localParentSampled: Samplers.alwaysOff, localParentNotSampled: Samplers.alwaysOff)
-        }
-
-        let tracerProvider = OpenTelemetry.instance.tracerProvider as! TracerProviderSdk
-        tracerProvider.updateActiveSampler(parentSampler)
         return result
     }
 
