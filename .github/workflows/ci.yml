@@ -9,7 +9,7 @@ jobs:
     runs-on: macOS-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Full Build
         run: ./fullbuild.sh
       - name: Smoke Test
@@ -18,7 +18,7 @@ jobs:
     runs-on: macos-11
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Print Swift version
         run: swift --version
       - name: Build xcframework
