@@ -46,6 +46,7 @@ pull request, please ensure that:
    time to be wasted.
 4. You submit PRs that are easy to review and ideally less 500 lines of code.
    Multiple PRs can be submitted for larger contributions.
+5. Set up commit signing. Unsigned commits will not be accepted.
 
 To send us a pull request, please:
 
