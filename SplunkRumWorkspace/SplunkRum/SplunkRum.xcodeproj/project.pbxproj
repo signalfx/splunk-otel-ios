@@ -30,6 +30,7 @@
 		86D3D39D25E82278004DD939 /* UIInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86D3D39C25E82278004DD939 /* UIInstrumentation.swift */; };
 		86F2A5CF2702476000641068 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */; };
 		88734FE628A55FB60035960F /* SlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88734FE528A55FB60035960F /* SlowFrameDetector.swift */; };
+		B6A34D422AC60122000E4F2E /* TraceheaderInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A34D412AC60122000E4F2E /* TraceheaderInstrumentation.swift */; };
 		D77058D428D36E350047D880 /* SessionBasedSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77058D328D36E350047D880 /* SessionBasedSampler.swift */; };
 		D770630C2A1FA776009F5FA9 /* SpanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D770630B2A1FA776009F5FA9 /* SpanTests.swift */; };
 		D78995342A0C29CA009C9FB3 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78995332A0C29CA009C9FB3 /* Constants.swift */; };
@@ -197,6 +198,7 @@
 		86D3D39C25E82278004DD939 /* UIInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIInstrumentation.swift; sourceTree = "<group>"; };
 		86F2A5CE2702476000641068 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
 		88734FE528A55FB60035960F /* SlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetector.swift; sourceTree = "<group>"; };
+		B6A34D412AC60122000E4F2E /* TraceheaderInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraceheaderInstrumentation.swift; sourceTree = "<group>"; };
 		D77058D328D36E350047D880 /* SessionBasedSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionBasedSampler.swift; sourceTree = "<group>"; };
 		D770630B2A1FA776009F5FA9 /* SpanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanTests.swift; sourceTree = "<group>"; };
 		D78995332A0C29CA009C9FB3 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -387,6 +389,7 @@
 				D77058D328D36E350047D880 /* SessionBasedSampler.swift */,
 				D78995332A0C29CA009C9FB3 /* Constants.swift */,
 				D78995372A0D33AB009C9FB3 /* SplunkRumBuilder.swift */,
+				B6A34D412AC60122000E4F2E /* TraceheaderInstrumentation.swift */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -914,6 +917,7 @@
 				E27ABAE02989590E0060C16D /* SimpleSpanProcessor.swift in Sources */,
 				E27ABAC52989590E0060C16D /* Entry.swift in Sources */,
 				E27ABAAB2989590D0060C16D /* JaegerPropagator.swift in Sources */,
+				B6A34D422AC60122000E4F2E /* TraceheaderInstrumentation.swift in Sources */,
 				D78995342A0C29CA009C9FB3 /* Constants.swift in Sources */,
 				86043B7C25F93E3400A29788 /* Log.swift in Sources */,
 				E27ABADE2989590E0060C16D /* NoopSpanProcessor.swift in Sources */,

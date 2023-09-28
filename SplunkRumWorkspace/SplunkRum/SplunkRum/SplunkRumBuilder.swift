@@ -36,6 +36,7 @@ import Foundation
     private var sessionSamplingRatio: Double = 1.0
     private var appName: String?
     private var spanSchedulingDelay: TimeInterval = 5.0
+    private var enableTraceparentOnRequest: Bool = false
 
     @objc public init(beaconUrl: String, rumAuth: String) {
         self.beaconUrl = beaconUrl
@@ -151,6 +152,13 @@ import Foundation
         self.spanSchedulingDelay = seconds
         return self
     }
+    
+    @discardableResult
+    @objc
+    public func enableTraceparentOnRequest(_ enabled: Bool) -> SplunkRumBuilder {
+        self.enableTraceparentOnRequest = enabled
+        return self
+    }
 
     @discardableResult
     @objc
@@ -171,6 +179,7 @@ import Foundation
                                                slowFrameDetectionThresholdMs: self.slowFrameDetectionThresholdMs,
                                                frozenFrameDetectionThresholdMs: self.frozenFrameDetectionThresholdMs,
                                                sessionSamplingRatio: self.sessionSamplingRatio,
-                                               spanSchedulingDelay: self.spanSchedulingDelay))
+                                               spanSchedulingDelay: self.spanSchedulingDelay,
+                                               enableTraceparentOnRequest: self.enableTraceparentOnRequest))
     }
 }

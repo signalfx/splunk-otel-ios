@@ -52,7 +52,8 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
                       slowFrameDetectionThresholdMs: Double = 16.7,
                       frozenFrameDetectionThresholdMs: Double = 700,
                       sessionSamplingRatio: Double = 1.0,
-                      spanSchedulingDelay: TimeInterval = 5.0
+                      spanSchedulingDelay: TimeInterval = 5.0,
+                      enableTraceparentOnRequest: Bool = false
     ) {
         // rejectionFilter not specified to make it possible to call from objc
         self.allowInsecureBeacon = allowInsecureBeacon
@@ -68,6 +69,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.slowFrameDetectionThresholdMs = slowFrameDetectionThresholdMs
         self.frozenFrameDetectionThresholdMs = frozenFrameDetectionThresholdMs
         self.sessionSamplingRatio = sessionSamplingRatio
+        self.enableTraceparentOnRequest = enableTraceparentOnRequest
     }
     /**
         Copy constructor
@@ -90,6 +92,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.spanDiskCacheMaxSize = opts.spanDiskCacheMaxSize
         self.sessionSamplingRatio = opts.sessionSamplingRatio
         self.bspScheduleDelay = opts.bspScheduleDelay
+        self.enableTraceparentOnRequest = opts.enableTraceparentOnRequest
     }
 
     /**
@@ -170,6 +173,11 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      Set the maximum interval between 2 consecutive span exports
      */
     @objc public var bspScheduleDelay: TimeInterval = 5.0
+    
+    /**
+     Enable sending of traceparent in the header of outgoing requests.
+     */
+    @objc public var enableTraceparentOnRequest: Bool = false
 
     func toAttributeValue() -> String {
         var answer = "debug: "+debug.description
