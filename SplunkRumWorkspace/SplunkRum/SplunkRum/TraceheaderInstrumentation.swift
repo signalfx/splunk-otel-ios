@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
+
 /*
  Classes adapted from opentelemetry-swift URLSessionInstrumentation.swift, v1.7.0
  https://github.com/open-telemetry/opentelemetry-swift
@@ -24,7 +24,6 @@ import Foundation
 
 fileprivate var ASSOC_KEY_SPAN: UInt8 = 0
 fileprivate var idKey: Void?
-
 
 func swizzleUrlSessionTask() {
     URLSessionTask.injectIntoNSURLSessionCreateTaskMethods()
@@ -42,7 +41,7 @@ extension URLSessionTask {
             #selector(URLSession.uploadTask(withStreamedRequest:)),
             #selector(URLSession.downloadTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDownloadTask),
             #selector(URLSession.downloadTask(with:) as (URLSession) -> (URL) -> URLSessionDownloadTask),
-            #selector(URLSession.downloadTask(withResumeData:)),
+            #selector(URLSession.downloadTask(withResumeData:))
         ].forEach {
             let selector = $0
             guard let original = class_getInstanceMethod(cls, selector) else {
@@ -50,7 +49,7 @@ extension URLSessionTask {
                 return
             }
             var originalIMP: IMP?
-            
+
             let block: @convention(block) (URLSession, AnyObject) -> URLSessionTask = { session, argument in
                 if let url = argument as? URL {
                     let request = URLRequest(url: url)
@@ -62,11 +61,11 @@ extension URLSessionTask {
                         }
                     }
                 }
-                
+
                 let castedIMP = unsafeBitCast(originalIMP, to: (@convention(c) (URLSession, Selector, Any) -> URLSessionDataTask).self)
                 var task: URLSessionTask
                 let sessionTaskId = UUID().uuidString
-                
+
                 if let request = argument as? URLRequest, objc_getAssociatedObject(argument, &idKey) == nil {
                     var instrumentedRequest = request
                     startHttpSpan(request: instrumentedRequest).map { span in
@@ -76,8 +75,7 @@ extension URLSessionTask {
                     task = castedIMP(session, selector, instrumentedRequest)
                 } else {
                     task = castedIMP(session, selector, argument)
-                    if objc_getAssociatedObject(argument, &idKey) == nil, let currentRequest = task.currentRequest
-                    {
+                    if objc_getAssociatedObject(argument, &idKey) == nil, let currentRequest = task.currentRequest {
                         startHttpSpan(request: currentRequest).map { span in
                             objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
                         }
@@ -90,12 +88,12 @@ extension URLSessionTask {
             originalIMP = method_setImplementation(original, swizzledIMP)
         }
     }
-    
+
     fileprivate class func injectIntoNSURLSessionCreateTaskWithParameterMethods() {
         let cls = URLSession.self
         [
             #selector(URLSession.uploadTask(with:from:)),
-            #selector(URLSession.uploadTask(with:fromFile:)),
+            #selector(URLSession.uploadTask(with:fromFile:))
         ].forEach {
             let selector = $0
             guard let original = class_getInstanceMethod(cls, selector) else {
@@ -103,7 +101,7 @@ extension URLSessionTask {
                 return
             }
             var originalIMP: IMP?
-            
+
             let block: @convention(block) (URLSession, URLRequest, AnyObject) -> URLSessionTask = { session, request, argument in
                 let sessionTaskId = UUID().uuidString
                 let castedIMP = unsafeBitCast(originalIMP, to: (@convention(c) (URLSession, Selector, URLRequest, AnyObject) -> URLSessionDataTask).self)
@@ -120,7 +118,7 @@ extension URLSessionTask {
             originalIMP = method_setImplementation(original, swizzledIMP)
         }
     }
-    
+
     fileprivate class func injectIntoNSURLSessionAsyncDataAndDownloadTaskMethods() {
         let cls = URLSession.self
         [
@@ -128,7 +126,7 @@ extension URLSessionTask {
             #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask),
             #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask),
             #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask),
-            #selector(URLSession.downloadTask(withResumeData:completionHandler:)),
+            #selector(URLSession.downloadTask(withResumeData:completionHandler:))
         ].forEach {
             let selector = $0
             guard let original = class_getInstanceMethod(cls, selector) else {
@@ -136,12 +134,12 @@ extension URLSessionTask {
                 return
             }
             var originalIMP: IMP?
-            
+
             let block: @convention(block) (URLSession, AnyObject, ((Any?, URLResponse?, Error?) -> Void)?) -> URLSessionTask = { session, argument, completion in
-                
+
                 if let url = argument as? URL {
                     let request = URLRequest(url: url)
-                    
+
                     if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true {
                         if selector == #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask) {
                             if let completion = completion {
@@ -158,13 +156,13 @@ extension URLSessionTask {
                         }
                     }
                 }
-                
+
                 let castedIMP = unsafeBitCast(originalIMP, to: (@convention(c) (URLSession, Selector, Any, ((Any?, URLResponse?, Error?) -> Void)?) -> URLSessionDataTask).self)
                 var task: URLSessionTask!
                 let sessionTaskId = UUID().uuidString
-                
+
                 var completionBlock = completion
-                
+
                 if completionBlock != nil {
                     if objc_getAssociatedObject(argument, &idKey) == nil {
                         let completionWrapper: (Any?, URLResponse?, Error?) -> Void = { object, response, error in
@@ -183,7 +181,7 @@ extension URLSessionTask {
                         completionBlock = completionWrapper
                     }
                 }
-                
+
                 if let request = argument as? URLRequest, objc_getAssociatedObject(argument, &idKey) == nil {
                     var instrumentedRequest = request
                     startHttpSpan(request: instrumentedRequest).map { span in
@@ -207,12 +205,12 @@ extension URLSessionTask {
             originalIMP = method_setImplementation(original, swizzledIMP)
         }
     }
-    
+
     fileprivate class func injectIntoNSURLSessionAsyncUploadTaskMethods() {
         let cls = URLSession.self
         [
             #selector(URLSession.uploadTask(with:from:completionHandler:)),
-            #selector(URLSession.uploadTask(with:fromFile:completionHandler:)),
+            #selector(URLSession.uploadTask(with:fromFile:completionHandler:))
         ].forEach {
             let selector = $0
             guard let original = class_getInstanceMethod(cls, selector) else {
@@ -220,14 +218,14 @@ extension URLSessionTask {
                 return
             }
             var originalIMP: IMP?
-            
+
             let block: @convention(block) (URLSession, URLRequest, AnyObject, ((Any?, URLResponse?, Error?) -> Void)?) -> URLSessionTask = { session, request, argument, completion in
-                
+
                 let castedIMP = unsafeBitCast(originalIMP, to: (@convention(c) (URLSession, Selector, URLRequest, AnyObject, ((Any?, URLResponse?, Error?) -> Void)?) -> URLSessionDataTask).self)
-                
+
                 var task: URLSessionTask!
                 let sessionTaskId = UUID().uuidString
-                
+
                 var completionBlock = completion
                 if objc_getAssociatedObject(argument, &idKey) == nil {
                     let completionWrapper: (Any?, URLResponse?, Error?) -> Void = { object, response, error in
@@ -245,14 +243,14 @@ extension URLSessionTask {
                     }
                     completionBlock = completionWrapper
                 }
-                
+
                 var instrumentedRequest = request
                 startHttpSpan(request: instrumentedRequest).map { span in
                     instrumentedRequest.addValue(URLSessionTask.traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
                     objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
                 }
                 task = castedIMP(session, selector, instrumentedRequest, argument, completionBlock)
-                
+
                 URLSessionTask.setIdKey(value: sessionTaskId, for: task)
                 return task
             }
@@ -260,11 +258,11 @@ extension URLSessionTask {
             originalIMP = method_setImplementation(original, swizzledIMP)
         }
     }
-    
+
     fileprivate class func setIdKey(value: String, for task: URLSessionTask) {
         objc_setAssociatedObject(task, &idKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
-    
+
     fileprivate class func traceparentHeader(span: Span) -> String {
         let version = "00"
         let traceId = span.context.traceId.hexString

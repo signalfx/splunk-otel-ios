@@ -173,7 +173,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
      Set the maximum interval between 2 consecutive span exports
      */
     @objc public var bspScheduleDelay: TimeInterval = 5.0
-    
+
     /**
      Enable sending of traceparent in the header of outgoing requests.
      */

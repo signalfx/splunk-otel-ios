@@ -152,7 +152,7 @@ import Foundation
         self.spanSchedulingDelay = seconds
         return self
     }
-    
+
     @discardableResult
     @objc
     public func enableTraceparentOnRequest(_ enabled: Bool) -> SplunkRumBuilder {
