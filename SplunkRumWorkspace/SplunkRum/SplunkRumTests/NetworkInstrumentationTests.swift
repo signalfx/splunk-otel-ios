@@ -16,6 +16,7 @@ limitations under the License.
 
 import Foundation
 import XCTest
+@testable import SplunkOtel
 
 // Fake span structure for JSONDecoder, only care about tags at the moment
 struct TestZipkinSpan: Decodable {
@@ -26,6 +27,7 @@ struct TestZipkinSpan: Decodable {
 class NetworkInstrumentationTests: XCTestCase {
     func testBasics() throws {
         try initializeTestEnvironment()
+        initalizeNetworkInstrumentation()
 
         // Not going to exhaustively test all the api variations, particularly since
         // they all flow through the same bit of code
@@ -47,10 +49,10 @@ class NetworkInstrumentationTests: XCTestCase {
         while localSpans.count < 3 {
             attempts += 1
             if attempts > 10 {
-                XCTFail("never got enough localSpans")
+                XCTFail("never got enough localSpans: \(localSpans.count) recieved")
                 return
             }
-            print("sleep 1")
+            print("sleep \(attempts)")
             sleep(1)
         }
         XCTAssertEqual(localSpans.count, 3)

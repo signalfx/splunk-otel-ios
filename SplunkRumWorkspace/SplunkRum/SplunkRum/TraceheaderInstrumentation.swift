@@ -45,7 +45,7 @@ extension URLSessionTask {
         ].forEach {
             let selector = $0
             guard let original = class_getInstanceMethod(cls, selector) else {
-                print("injectInto failed")
+                print("injectInto \(selector.description) failed")
                 return
             }
             var originalIMP: IMP?
@@ -163,6 +163,7 @@ extension URLSessionTask {
 
                 var completionBlock = completion
 
+                //Completion Wrapper. Just logs an error and then calls the completion block, if there is one.
                 if completionBlock != nil {
                     if objc_getAssociatedObject(argument, &idKey) == nil {
                         let completionWrapper: (Any?, URLResponse?, Error?) -> Void = { object, response, error in
