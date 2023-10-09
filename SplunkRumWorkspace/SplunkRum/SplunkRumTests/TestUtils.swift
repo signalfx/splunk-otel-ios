@@ -65,7 +65,7 @@ func resetTestEnvironment() {
     localSpans.removeAll()
 }
 
-func initializeTestEnvironment() throws {
+func initializeTestEnvironment(enableTraceparent: Bool = false) throws {
     if testEnvironmentInited {
         resetTestEnvironment()
         return
@@ -98,7 +98,7 @@ func initializeTestEnvironment() throws {
         .globalAttributes(globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true])
         .deploymentEnvironment(environment: "env")
         .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*ignore_this.*"))
-        .enableTraceparentOnRequest(true)
+        .enableTraceparentOnRequest(enableTraceparent)
         .build()
     let isRUMInitialized = SplunkRum.isInitialized()
     let initializeAgain = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE")
@@ -107,7 +107,7 @@ func initializeTestEnvironment() throws {
         .globalAttributes(globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true])
         .deploymentEnvironment(environment: "env")
         .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*ignore_this.*"))
-        .enableTraceparentOnRequest(true)
+        .enableTraceparentOnRequest(enableTraceparent)
         .build()
     let isStillInitialized = SplunkRum.isInitialized()
     XCTAssertEqual(true, rumInitialize)

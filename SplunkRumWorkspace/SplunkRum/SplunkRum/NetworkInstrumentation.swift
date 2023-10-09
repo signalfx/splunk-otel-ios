@@ -16,6 +16,8 @@ limitations under the License.
 import Foundation
 
 let serverTimingPattern = #"traceparent;desc=['\"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['\"]"#
+var ASSOC_KEY_TRACE_REQ: Void?
+var ASSOC_KEY_SPAN: UInt8 = 0
 
 func addLinkToSpan(span: Span, valStr: String) {
     // This is the worst regex interface I have ever seen in two+ decades of professional programming
@@ -116,8 +118,6 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     return span
 }
 
-fileprivate var ASSOC_KEY_SPAN: UInt8 = 0
-
 extension URLSessionTask {
     @objc open func splunk_swizzled_setState(state: URLSessionTask.State) {
         defer {
@@ -161,8 +161,10 @@ extension URLSessionTask {
 
         let existingSpan: Span? = objc_getAssociatedObject(self, &ASSOC_KEY_SPAN) as? Span
 
-        if existingSpan != nil {
-            return
+        if existingSpan == nil {
+            startHttpSpan(request: currentRequest).map { span in
+                objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            }
         }
     }
 }
@@ -217,6 +219,27 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
     return classes
 }
 
+func swizzleUrlSessionTasks() {
+    //Data Tasks
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDataTask), swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:)))
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask), swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:completionHandler:)))
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask), swizzled: #selector(URLSession.splunk_swizzled_UrlDataTask(with:)))
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask), swizzled: #selector(URLSession.splunk_swizzled_UrlDataTask(with:completionHandler:)))
+    
+    //Upload Tasks
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.uploadTask(with:from:)), swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:from:)))
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.uploadTask(with:from:completionHandler:)), swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:from:completionHandler:)))
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.uploadTask(with:fromFile:)), swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:fromFile:)))
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.uploadTask(with:fromFile:completionHandler:)), swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:fromFile:completionHandler:)))
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.uploadTask(withStreamedRequest:)), swizzled: #selector(URLSession.splunk_swizzled_uploadTask(withStreamedRequest:)))
+    
+    //Download Tasks
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.downloadTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDownloadTask), swizzled: #selector(URLSession.splunk_swizzled_downloadTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDownloadTask))
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping @Sendable (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask), swizzled: #selector(URLSession.splunk_swizzled_downloadTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping @Sendable (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask))
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.downloadTask(with:) as (URLSession) -> (URL) -> URLSessionDownloadTask), swizzled: #selector(URLSession.splunk_swizzled_downloadTask(with:)))
+    swizzle(clazz: URLSession.self, orig: #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URL, @escaping @Sendable (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask), swizzled: #selector(URLSession.splunk_swizzled_downloadTask(with:completionHandler:)))
+}
+
 func swizzleUrlSession() {
     let classes = swizzledUrlSessionClasses()
 
@@ -231,5 +254,5 @@ func swizzleUrlSession() {
 
 func initalizeNetworkInstrumentation() {
     swizzleUrlSession()
-    swizzleUrlSessionTask()
+    swizzleUrlSessionTasks()
 }

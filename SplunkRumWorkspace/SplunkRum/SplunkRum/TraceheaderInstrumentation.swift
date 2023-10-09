@@ -22,253 +22,197 @@ limitations under the License.
 
 import Foundation
 
-fileprivate var ASSOC_KEY_SPAN: UInt8 = 0
-fileprivate var idKey: Void?
-
-func swizzleUrlSessionTask() {
-    URLSessionTask.injectIntoNSURLSessionCreateTaskMethods()
-    URLSessionTask.injectIntoNSURLSessionCreateTaskWithParameterMethods()
-    URLSessionTask.injectIntoNSURLSessionAsyncUploadTaskMethods()
-    URLSessionTask.injectIntoNSURLSessionAsyncDataAndDownloadTaskMethods()
-}
-
-extension URLSessionTask {
-    fileprivate class func injectIntoNSURLSessionCreateTaskMethods() {
-        let cls = URLSession.self
-        [
-            #selector(URLSession.dataTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDataTask),
-            #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask),
-            #selector(URLSession.uploadTask(withStreamedRequest:)),
-            #selector(URLSession.downloadTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDownloadTask),
-            #selector(URLSession.downloadTask(with:) as (URLSession) -> (URL) -> URLSessionDownloadTask),
-            #selector(URLSession.downloadTask(withResumeData:))
-        ].forEach {
-            let selector = $0
-            guard let original = class_getInstanceMethod(cls, selector) else {
-                print("injectInto \(selector.description) failed")
-                return
-            }
-            var originalIMP: IMP?
-
-            let block: @convention(block) (URLSession, AnyObject) -> URLSessionTask = { session, argument in
-                if let url = argument as? URL {
-                    let request = URLRequest(url: url)
-                    if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true {
-                        if selector == #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask) {
-                            return session.dataTask(with: request)
-                        } else {
-                            return session.downloadTask(with: request)
-                        }
-                    }
-                }
-
-                let castedIMP = unsafeBitCast(originalIMP, to: (@convention(c) (URLSession, Selector, Any) -> URLSessionDataTask).self)
-                var task: URLSessionTask
-                let sessionTaskId = UUID().uuidString
-
-                if let request = argument as? URLRequest, objc_getAssociatedObject(argument, &idKey) == nil {
-                    var instrumentedRequest = request
-                    startHttpSpan(request: instrumentedRequest).map { span in
-                        instrumentedRequest.addValue(URLSessionTask.traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
-                        objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-                    }
-                    task = castedIMP(session, selector, instrumentedRequest)
-                } else {
-                    task = castedIMP(session, selector, argument)
-                    if objc_getAssociatedObject(argument, &idKey) == nil, let currentRequest = task.currentRequest {
-                        startHttpSpan(request: currentRequest).map { span in
-                            objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-                        }
-                    }
-                }
-                URLSessionTask.setIdKey(value: sessionTaskId, for: task)
-                return task
-            }
-            let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-            originalIMP = method_setImplementation(original, swizzledIMP)
+extension URLSession {
+    @objc public enum TaskType: Int {
+        case data, download, upload
+    }
+    
+    //MARK: Data Tasks
+    @objc open func splunk_swizzled_dataTask(with request: URLRequest) -> URLSessionDataTask {
+        let noopHandler: @Sendable (Data?, URLResponse?, Error?) -> Void = { _,_,_ in }
+        if let task = injectedSessionTask(request: request, type: .data, completionHandler: noopHandler) as? URLSessionDataTask {
+            return task
         }
+        return splunk_swizzled_dataTask(with: request)
     }
-
-    fileprivate class func injectIntoNSURLSessionCreateTaskWithParameterMethods() {
-        let cls = URLSession.self
-        [
-            #selector(URLSession.uploadTask(with:from:)),
-            #selector(URLSession.uploadTask(with:fromFile:))
-        ].forEach {
-            let selector = $0
-            guard let original = class_getInstanceMethod(cls, selector) else {
-                print("injectInto \(selector.description) failed")
-                return
-            }
-            var originalIMP: IMP?
-
-            let block: @convention(block) (URLSession, URLRequest, AnyObject) -> URLSessionTask = { session, request, argument in
-                let sessionTaskId = UUID().uuidString
-                let castedIMP = unsafeBitCast(originalIMP, to: (@convention(c) (URLSession, Selector, URLRequest, AnyObject) -> URLSessionDataTask).self)
-                var instrumentedRequest = request
-                startHttpSpan(request: instrumentedRequest).map { span in
-                    instrumentedRequest.addValue(URLSessionTask.traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
-                    objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-                }
-                let task = castedIMP(session, selector, instrumentedRequest, argument)
-                URLSessionTask.setIdKey(value: sessionTaskId, for: task)
-                return task
-            }
-            let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-            originalIMP = method_setImplementation(original, swizzledIMP)
+    
+    @objc open func splunk_swizzled_dataTask(with request: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        if let task = injectedSessionTask(request: request, type: .data, completionHandler: completionHandler) as? URLSessionDataTask {
+            return task
         }
+        return splunk_swizzled_dataTask(with: request, completionHandler: completionHandler)
     }
 
-    fileprivate class func injectIntoNSURLSessionAsyncDataAndDownloadTaskMethods() {
-        let cls = URLSession.self
-        [
-            #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask),
-            #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask),
-            #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask),
-            #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask),
-            #selector(URLSession.downloadTask(withResumeData:completionHandler:))
-        ].forEach {
-            let selector = $0
-            guard let original = class_getInstanceMethod(cls, selector) else {
-                print("injectInto \(selector.description) failed")
-                return
-            }
-            var originalIMP: IMP?
-
-            let block: @convention(block) (URLSession, AnyObject, ((Any?, URLResponse?, Error?) -> Void)?) -> URLSessionTask = { session, argument, completion in
-
-                if let url = argument as? URL {
-                    let request = URLRequest(url: url)
-
-                    if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true {
-                        if selector == #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask) {
-                            if let completion = completion {
-                                return session.dataTask(with: request, completionHandler: completion)
-                            } else {
-                                return session.dataTask(with: request)
-                            }
-                        } else {
-                            if let completion = completion {
-                                return session.downloadTask(with: request, completionHandler: completion)
-                            } else {
-                                return session.downloadTask(with: request)
-                            }
-                        }
-                    }
-                }
-
-                let castedIMP = unsafeBitCast(originalIMP, to: (@convention(c) (URLSession, Selector, Any, ((Any?, URLResponse?, Error?) -> Void)?) -> URLSessionDataTask).self)
-                var task: URLSessionTask!
-                let sessionTaskId = UUID().uuidString
-
-                var completionBlock = completion
-
-                //Completion Wrapper. Just logs an error and then calls the completion block, if there is one.
-                if completionBlock != nil {
-                    if objc_getAssociatedObject(argument, &idKey) == nil {
-                        let completionWrapper: (Any?, URLResponse?, Error?) -> Void = { object, response, error in
-                            if let error = error {
-                                let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-                                print("Error injecting traceparent into selector: %@, status code: %@", error, status)
-                            } else {
-                                print("Error injecting traceparent into selector")
-                            }
-                            if let completion = completion {
-                                completion(object, response, error)
-                            } else {
-                                (session.delegate as? URLSessionTaskDelegate)?.urlSession?(session, task: task, didCompleteWithError: error)
-                            }
-                        }
-                        completionBlock = completionWrapper
-                    }
-                }
-
-                if let request = argument as? URLRequest, objc_getAssociatedObject(argument, &idKey) == nil {
-                    var instrumentedRequest = request
-                    startHttpSpan(request: instrumentedRequest).map { span in
-                        instrumentedRequest.addValue(URLSessionTask.traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
-                        objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-                    }
-                    task = castedIMP(session, selector, instrumentedRequest, completionBlock)
-                } else {
-                    task = castedIMP(session, selector, argument, completionBlock)
-                    if objc_getAssociatedObject(argument, &idKey) == nil,
-                       let currentRequest = task.currentRequest {
-                        startHttpSpan(request: currentRequest).map { span in
-                            objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-                        }
-                    }
-                }
-                URLSessionTask.setIdKey(value: sessionTaskId, for: task)
-                return task
-            }
-            let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-            originalIMP = method_setImplementation(original, swizzledIMP)
+    @objc open func splunk_swizzled_UrlDataTask(with url: URL) -> URLSessionDataTask {
+        let noopHandler: @Sendable (Data?, URLResponse?, Error?) -> Void = { _,_,_ in }
+        if let task = injectedSessionTask(request: URLRequest(url: url), type: .data, completionHandler: noopHandler) as? URLSessionDataTask {
+            return task
         }
+        return splunk_swizzled_UrlDataTask(with: url)
     }
-
-    fileprivate class func injectIntoNSURLSessionAsyncUploadTaskMethods() {
-        let cls = URLSession.self
-        [
-            #selector(URLSession.uploadTask(with:from:completionHandler:)),
-            #selector(URLSession.uploadTask(with:fromFile:completionHandler:))
-        ].forEach {
-            let selector = $0
-            guard let original = class_getInstanceMethod(cls, selector) else {
-                print("injectInto \(selector.description) failed")
-                return
-            }
-            var originalIMP: IMP?
-
-            let block: @convention(block) (URLSession, URLRequest, AnyObject, ((Any?, URLResponse?, Error?) -> Void)?) -> URLSessionTask = { session, request, argument, completion in
-
-                let castedIMP = unsafeBitCast(originalIMP, to: (@convention(c) (URLSession, Selector, URLRequest, AnyObject, ((Any?, URLResponse?, Error?) -> Void)?) -> URLSessionDataTask).self)
-
-                var task: URLSessionTask!
-                let sessionTaskId = UUID().uuidString
-
-                var completionBlock = completion
-                if objc_getAssociatedObject(argument, &idKey) == nil {
-                    let completionWrapper: (Any?, URLResponse?, Error?) -> Void = { object, response, error in
-                        if let error = error {
-                            let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-                            print("Error injecting traceparent into selector: %@, status code: %@", error, status)
-                        } else {
-                            print("Error injecting traceparent into selector")
-                        }
-                        if let completion = completion {
-                            completion(object, response, error)
-                        } else {
-                            (session.delegate as? URLSessionTaskDelegate)?.urlSession?(session, task: task, didCompleteWithError: error)
-                        }
-                    }
-                    completionBlock = completionWrapper
-                }
-
-                var instrumentedRequest = request
-                startHttpSpan(request: instrumentedRequest).map { span in
-                    instrumentedRequest.addValue(URLSessionTask.traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
-                    objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-                }
-                task = castedIMP(session, selector, instrumentedRequest, argument, completionBlock)
-
-                URLSessionTask.setIdKey(value: sessionTaskId, for: task)
-                return task
-            }
-            let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-            originalIMP = method_setImplementation(original, swizzledIMP)
+    
+    @objc open func splunk_swizzled_UrlDataTask(with url: URL, completionHandler: @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+        if let task = injectedSessionTask(request: URLRequest(url: url), type: .data, completionHandler: completionHandler) as? URLSessionDataTask {
+            return task
         }
+        return splunk_swizzled_UrlDataTask(with: url, completionHandler: completionHandler)
+    }
+    
+    //MARK: Upload Tasks
+    @objc open func splunk_swizzled_uploadTask(with request: URLRequest, from bodyData: Data) -> URLSessionUploadTask {
+        let sessionTaskId = UUID().uuidString
+        var task = splunk_swizzled_uploadTask(with: request, from: bodyData)
+        if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true,
+            objc_getAssociatedObject(request, &ASSOC_KEY_TRACE_REQ) == nil{
+            var instrumentedRequest = request
+            task = splunk_swizzled_uploadTask(with: instrumentedRequest, from: bodyData)
+            startHttpSpan(request: instrumentedRequest).map { span in
+                instrumentedRequest.addValue(traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
+                objc_setAssociatedObject(task, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            }
+        }
+        setTraceKey(value: sessionTaskId, for: task)
+        return task
+    }
+    
+    @objc open func splunk_swizzled_uploadTask(with request: URLRequest, from bodyData: Data, completionHandler: @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+        let sessionTaskId = UUID().uuidString
+        var task = splunk_swizzled_uploadTask(with: request, from: bodyData, completionHandler: completionHandler)
+        if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true,
+            objc_getAssociatedObject(request, &ASSOC_KEY_TRACE_REQ) == nil{
+            var instrumentedRequest = request
+            task = splunk_swizzled_uploadTask(with: instrumentedRequest, from: bodyData, completionHandler: completionHandler)
+            startHttpSpan(request: instrumentedRequest).map { span in
+                instrumentedRequest.addValue(traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
+                objc_setAssociatedObject(task, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            }
+        }
+        setTraceKey(value: sessionTaskId, for: task)
+        return task
+    }
+    
+    @objc open func splunk_swizzled_uploadTask(with request: URLRequest, fromFile fileURL: URL) -> URLSessionUploadTask {
+        let sessionTaskId = UUID().uuidString
+        var task = splunk_swizzled_uploadTask(with: request, fromFile: fileURL)
+        if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true,
+            objc_getAssociatedObject(request, &ASSOC_KEY_TRACE_REQ) == nil{
+            var instrumentedRequest = request
+            task = splunk_swizzled_uploadTask(with: instrumentedRequest, fromFile: fileURL)
+            startHttpSpan(request: instrumentedRequest).map { span in
+                instrumentedRequest.addValue(traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
+                objc_setAssociatedObject(task, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            }
+        }
+        setTraceKey(value: sessionTaskId, for: task)
+        return task
+    }
+    
+    @objc open func splunk_swizzled_uploadTask(with request: URLRequest, fromFile fileURL: URL, completionHandler: @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+        let sessionTaskId = UUID().uuidString
+        var task = splunk_swizzled_uploadTask(with: request, fromFile: fileURL, completionHandler: completionHandler)
+        if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true,
+            objc_getAssociatedObject(request, &ASSOC_KEY_TRACE_REQ) == nil{
+            var instrumentedRequest = request
+            task = splunk_swizzled_uploadTask(with: instrumentedRequest, fromFile: fileURL, completionHandler: completionHandler)
+            startHttpSpan(request: instrumentedRequest).map { span in
+                instrumentedRequest.addValue(traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
+                objc_setAssociatedObject(task, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            }
+        }
+        setTraceKey(value: sessionTaskId, for: task)
+        return task
+    }
+    
+    @objc open func splunk_swizzled_uploadTask(withStreamedRequest request: URLRequest) -> URLSessionUploadTask {
+        let noopHandler: @Sendable (URL?, URLResponse?, Error?) -> Void = { _,_,_ in }
+        if let task = injectedSessionTask(request: request, type: .upload, completionHandler: noopHandler) as? URLSessionUploadTask {
+            return task
+        }
+        return splunk_swizzled_uploadTask(withStreamedRequest: request)
+    }
+    
+    //MARK: Download Tasks
+    @objc open func splunk_swizzled_downloadTask(with request: URLRequest) -> URLSessionDownloadTask {
+        let noopHandler: @Sendable (URL?, URLResponse?, Error?) -> Void = { _,_,_ in }
+        if let task = injectedSessionTask(request: request, type: .download, completionHandler: noopHandler) as? URLSessionDownloadTask {
+            return task
+        }
+        return splunk_swizzled_downloadTask(with: request)
+    }
+    
+    @objc open func splunk_swizzled_downloadTask(with request: URLRequest, completionHandler: @escaping @Sendable (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
+        if let task = injectedSessionTask(request: request, type: .download, completionHandler: completionHandler) as? URLSessionDownloadTask {
+            return task
+        }
+        return splunk_swizzled_downloadTask(with: request, completionHandler: completionHandler)
+    }
+    
+    @objc open func splunk_swizzled_UrlDownloadTask(with url: URL) -> URLSessionDownloadTask {
+        let noopHandler: @Sendable (URL?, URLResponse?, Error?) -> Void = { _,_,_ in }
+        if let task = injectedSessionTask(request: URLRequest(url: url), type: .download, completionHandler: noopHandler) as? URLSessionDownloadTask {
+            return task
+        }
+        return splunk_swizzled_UrlDownloadTask(with: url)
+    }
+    
+    @objc open func splunk_swizzled_UrlDownloadTask(with url: URL, completionHandler: @escaping @Sendable (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
+        if let task = injectedSessionTask(request: URLRequest(url: url), type: .download, completionHandler: completionHandler) as? URLSessionDownloadTask {
+            return task
+        }
+        return splunk_swizzled_UrlDownloadTask(with: url, completionHandler: completionHandler)
+    }
+    
+    // MARK: Helper funcs
+    func injectedSessionTask<T>(request: URLRequest, type: TaskType, completionHandler: @escaping (@Sendable (T?, URLResponse?, Error?) -> Void)) -> URLSessionTask {
+        let sessionTaskId = UUID().uuidString
+        var task: URLSessionTask = callFunctionForTaskType(type: type, request: request, completionHandler: completionHandler)
+        
+        if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true,
+            objc_getAssociatedObject(request, &ASSOC_KEY_TRACE_REQ) == nil {
+            var instrumentedRequest = request
+            if let span = startHttpSpan(request: instrumentedRequest) {
+                instrumentedRequest.addValue(traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
+                objc_setAssociatedObject(task, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+                task = callFunctionForTaskType(type: type, request: instrumentedRequest, completionHandler: completionHandler)
+            }
+        }
+        setTraceKey(value: sessionTaskId, for: task)
+        return task
+    }
+    
+    fileprivate func setTraceKey(value: String, for task: URLSessionTask) {
+        objc_setAssociatedObject(task, &ASSOC_KEY_TRACE_REQ, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
-    fileprivate class func setIdKey(value: String, for task: URLSessionTask) {
-        objc_setAssociatedObject(task, &idKey, value, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-    }
-
-    fileprivate class func traceparentHeader(span: Span) -> String {
+    fileprivate func traceparentHeader(span: Span) -> String {
         let version = "00"
         let traceId = span.context.traceId.hexString
         let spanId = span.context.spanId.hexString
         let sampled = span.context.isSampled ? "01" : "00"
         return [version, traceId, spanId, sampled].joined(separator: "-")
+    }
+    /*
+    func callFunctionForTaskType(type: TaskType, request: URLRequest) -> URLSessionTask {
+        switch type {
+            case .data:
+                return splunk_swizzled_dataTask(with: request)
+            case .download:
+                return splunk_swizzled_downloadTask(with: request)
+            case .upload:
+                return splunk_swizzled_uploadTask(withStreamedRequest: request)
+        }
+    }
+    */
+    func callFunctionForTaskType<T>(type: TaskType, request: URLRequest, completionHandler: (@escaping @Sendable (T?, URLResponse?, Error?) -> Void)) -> URLSessionTask {
+        switch type {
+            case .data:
+                let handler = completionHandler as! @Sendable (Data?, URLResponse?, Error?) -> Void
+                return splunk_swizzled_dataTask(with: request, completionHandler: handler)
+            case .download:
+                let handler = completionHandler as! @Sendable (URL?, URLResponse?, Error?) -> Void
+                return splunk_swizzled_downloadTask(with: request, completionHandler: handler)
+            case .upload:
+                return splunk_swizzled_uploadTask(withStreamedRequest: request)
+        }
     }
 }
