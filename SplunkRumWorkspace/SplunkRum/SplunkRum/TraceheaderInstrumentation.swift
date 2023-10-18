@@ -63,13 +63,13 @@ extension URLSession {
         let sessionTaskId = UUID().uuidString
         var task = splunk_swizzled_uploadTask(with: request, from: bodyData)
         if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true,
-            objc_getAssociatedObject(request, &ASSOC_KEY_TRACE_REQ) == nil{
+            objc_getAssociatedObject(request, &ASSOC_KEY_TRACE_REQ) == nil {
             var instrumentedRequest = request
-            task = splunk_swizzled_uploadTask(with: instrumentedRequest, from: bodyData)
             startHttpSpan(request: instrumentedRequest).map { span in
                 instrumentedRequest.addValue(traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
                 objc_setAssociatedObject(task, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
             }
+            task = splunk_swizzled_uploadTask(with: instrumentedRequest, from: bodyData)
         }
         setTraceKey(value: sessionTaskId, for: task)
         return task
@@ -81,11 +81,11 @@ extension URLSession {
         if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true,
             objc_getAssociatedObject(request, &ASSOC_KEY_TRACE_REQ) == nil{
             var instrumentedRequest = request
-            task = splunk_swizzled_uploadTask(with: instrumentedRequest, from: bodyData, completionHandler: completionHandler)
             startHttpSpan(request: instrumentedRequest).map { span in
                 instrumentedRequest.addValue(traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
                 objc_setAssociatedObject(task, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
             }
+            task = splunk_swizzled_uploadTask(with: instrumentedRequest, from: bodyData, completionHandler: completionHandler)
         }
         setTraceKey(value: sessionTaskId, for: task)
         return task
@@ -97,11 +97,11 @@ extension URLSession {
         if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true,
             objc_getAssociatedObject(request, &ASSOC_KEY_TRACE_REQ) == nil{
             var instrumentedRequest = request
-            task = splunk_swizzled_uploadTask(with: instrumentedRequest, fromFile: fileURL)
             startHttpSpan(request: instrumentedRequest).map { span in
                 instrumentedRequest.addValue(traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
                 objc_setAssociatedObject(task, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
             }
+            task = splunk_swizzled_uploadTask(with: instrumentedRequest, fromFile: fileURL)
         }
         setTraceKey(value: sessionTaskId, for: task)
         return task
@@ -113,11 +113,11 @@ extension URLSession {
         if SplunkRum.configuredOptions?.enableTraceparentOnRequest == true,
             objc_getAssociatedObject(request, &ASSOC_KEY_TRACE_REQ) == nil{
             var instrumentedRequest = request
-            task = splunk_swizzled_uploadTask(with: instrumentedRequest, fromFile: fileURL, completionHandler: completionHandler)
             startHttpSpan(request: instrumentedRequest).map { span in
                 instrumentedRequest.addValue(traceparentHeader(span: span), forHTTPHeaderField: "traceparent")
                 objc_setAssociatedObject(task, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
             }
+            task = splunk_swizzled_uploadTask(with: instrumentedRequest, fromFile: fileURL, completionHandler: completionHandler)
         }
         setTraceKey(value: sessionTaskId, for: task)
         return task
@@ -191,18 +191,7 @@ extension URLSession {
         let sampled = span.context.isSampled ? "01" : "00"
         return [version, traceId, spanId, sampled].joined(separator: "-")
     }
-    /*
-    func callFunctionForTaskType(type: TaskType, request: URLRequest) -> URLSessionTask {
-        switch type {
-            case .data:
-                return splunk_swizzled_dataTask(with: request)
-            case .download:
-                return splunk_swizzled_downloadTask(with: request)
-            case .upload:
-                return splunk_swizzled_uploadTask(withStreamedRequest: request)
-        }
-    }
-    */
+
     func callFunctionForTaskType<T>(type: TaskType, request: URLRequest, completionHandler: (@escaping @Sendable (T?, URLResponse?, Error?) -> Void)) -> URLSessionTask {
         switch type {
             case .data:

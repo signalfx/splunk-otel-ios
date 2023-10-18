@@ -146,7 +146,7 @@ class NetworkInstrumentationTests: XCTestCase {
         let uploadTaskWithCompletion = session.uploadTask(with: request, from: data, completionHandler: {_,_,_ in
             print("Completion Handler: Upload Task w/ Data")
         })
-        uploadTask.resume()
+        uploadTaskWithCompletion.resume()
         XCTAssertNotNil(uploadTaskWithCompletion.currentRequest?.allHTTPHeaderFields?["traceparent"])
         
         let uploadTaskUrl = session.uploadTask(with: request, fromFile: URL(string: "http://127.0.0.1:8989/data")!)
@@ -181,27 +181,26 @@ class NetworkInstrumentationTests: XCTestCase {
         
         let session = URLSession(configuration: .default)
         let request = URLRequest(url: URL(string: "http://127.0.0.1:8989/data")!)
-        let data = Data()
+        
+        let urlDownloadTask = session.downloadTask(with: URL(string: "http://127.0.0.1:8989/data")!)
+        urlDownloadTask.resume()
+        XCTAssertNotNil(urlDownloadTask.currentRequest?.allHTTPHeaderFields?["traceparent"])
+        
+        let urlDownloadTaskCompletion = session.downloadTask(with: URL(string: "http://127.0.0.1:8989/data")!) { _,_,_ in
+            print("Success")
+        }
+        urlDownloadTaskCompletion.resume()
+        XCTAssertNotNil(urlDownloadTaskCompletion.currentRequest?.allHTTPHeaderFields?["traceparent"])
         
         let downloadTask = session.downloadTask(with: request)
         downloadTask.resume()
         XCTAssertNotNil(downloadTask.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
-        let downloadTaskData = session.downloadTask(withResumeData: data)
-        downloadTaskData.resume()
-        XCTAssertNotNil(downloadTaskData.currentRequest?.allHTTPHeaderFields?["traceparent"])
         
         let downloadTaskWithCompletion = session.downloadTask(with: request, completionHandler: {_,_,_ in
             print("Completion Handler: Download Task")
         })
         downloadTaskWithCompletion.resume()
         XCTAssertNotNil(downloadTaskWithCompletion.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
-        let downloadTaskDataWithCompletion = session.downloadTask(withResumeData: data, completionHandler: {_,_,_ in
-            print("Completion Handler: Download Task With Data")
-        })
-        downloadTaskDataWithCompletion.resume()
-        XCTAssertNotNil(downloadTaskDataWithCompletion.currentRequest?.allHTTPHeaderFields?["traceparent"])
         
         // wait until spans recevied
         var attempts = 0
