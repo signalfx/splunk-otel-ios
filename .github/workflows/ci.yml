@@ -6,7 +6,7 @@ on:
 
 jobs:
   full-build:
-    runs-on: macOS-12
+    runs-on: macos-12
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
@@ -17,7 +17,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.4
   xcframework:
-    runs-on: macos-11
+    runs-on: macos-12
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
@@ -32,7 +32,7 @@ jobs:
           name: SplunkOtel.xcframework
           path: ./SplunkRumWorkspace/SplunkRum/xcframeworks/SplunkOtel.xcframework
   check_links:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Link Checker
