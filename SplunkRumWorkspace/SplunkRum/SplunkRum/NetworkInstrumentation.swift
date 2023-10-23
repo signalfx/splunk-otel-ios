@@ -220,20 +220,20 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
 }
 
 func swizzleUrlSessionTasks() {
-    //Data Tasks
+    // Data Tasks
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDataTask), swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:)))
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask), swizzled: #selector(URLSession.splunk_swizzled_dataTask(with:completionHandler:)))
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.dataTask(with:) as (URLSession) -> (URL) -> URLSessionDataTask), swizzled: #selector(URLSession.splunk_swizzled_UrlDataTask(with:)))
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URL, @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask), swizzled: #selector(URLSession.splunk_swizzled_UrlDataTask(with:completionHandler:)))
-    
-    //Upload Tasks
+
+    // Upload Tasks
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.uploadTask(with:from:)), swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:from:)))
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.uploadTask(with:from:completionHandler:)), swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:from:completionHandler:)))
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.uploadTask(with:fromFile:)), swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:fromFile:)))
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.uploadTask(with:fromFile:completionHandler:)), swizzled: #selector(URLSession.splunk_swizzled_uploadTask(with:fromFile:completionHandler:)))
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.uploadTask(withStreamedRequest:)), swizzled: #selector(URLSession.splunk_swizzled_uploadTask(withStreamedRequest:)))
-    
-    //Download Tasks
+
+    // Download Tasks
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.downloadTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDownloadTask), swizzled: #selector(URLSession.splunk_swizzled_downloadTask(with:)))
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping @Sendable (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask), swizzled: #selector(URLSession.splunk_swizzled_downloadTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping @Sendable (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask))
     swizzle(clazz: URLSession.self, orig: #selector(URLSession.downloadTask(with:) as (URLSession) -> (URL) -> URLSessionDownloadTask), swizzled: #selector(URLSession.splunk_swizzled_UrlDownloadTask(with:)))

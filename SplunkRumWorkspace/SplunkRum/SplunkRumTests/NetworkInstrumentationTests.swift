@@ -92,29 +92,29 @@ class NetworkInstrumentationTests: XCTestCase {
         // allow error message to vary but require a minimum length
         XCTAssert((httpHead?.attributes["exception.message"]?.description.count ?? 0) > 10)
     }
-    
+
     func testDataTraceparentHeaders() throws {
         let server = HttpServer()
         try initializeTestEnvironment(server: server)
-        
+
         let session = URLSession(configuration: .default)
         let request = URLRequest(url: URL(string: "http://127.0.0.1:8989/data")!)
-        
+
         //Data Tasks
         let dataTask = session.dataTask(with: request)
         dataTask.resume()
         XCTAssertNotNil(dataTask.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
+
         let dataTaskCompletion = session.dataTask(with: request) { (_, _: URLResponse?, _) in
             print("Completion Handler: Data Task w/ Request")
         }
         dataTaskCompletion.resume()
         XCTAssertNotNil(dataTaskCompletion.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
+
         let dataTaskUrl = session.dataTask(with: URL(string: "http://127.0.0.1:8989/data")!)
         dataTaskUrl.resume()
         XCTAssertNotNil(dataTaskUrl.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
+
         let dataTaskUrlCompletion = session.dataTask(with: URL(string: "http://127.0.0.1:8989/data")!) { (_, _: URLResponse?, _) in
             print("Completion Handler: Data Task w/ URL")
         }
@@ -134,39 +134,39 @@ class NetworkInstrumentationTests: XCTestCase {
         }
         XCTAssertEqual(localSpans.count, 4)
     }
-    
+
     func testUploadTraceparentHeaders() throws {
         let server = HttpServer()
         try initializeTestEnvironment(server: server)
-        
+
         let session = URLSession(configuration: .default)
         let request = URLRequest(url: URL(string: "http://127.0.0.1:8989/data")!)
         let data = Data()
-        
+
         let uploadTask = session.uploadTask(with: request, from: data)
         uploadTask.resume()
         XCTAssertNotNil(uploadTask.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
-        let uploadTaskWithCompletion = session.uploadTask(with: request, from: data, completionHandler: {_,_,_ in
+
+        let uploadTaskWithCompletion = session.uploadTask(with: request, from: data, completionHandler: { _, _, _ in
             print("Completion Handler: Upload Task w/ Data")
         })
         uploadTaskWithCompletion.resume()
         XCTAssertNotNil(uploadTaskWithCompletion.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
+
         let uploadTaskUrl = session.uploadTask(with: request, fromFile: URL(string: "http://127.0.0.1:8989/data")!)
         uploadTaskUrl.resume()
         XCTAssertNotNil(uploadTaskUrl.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
-        let uploadTaskUrlWithCompletion = session.uploadTask(with: request, fromFile: URL(string: "http://127.0.0.1:8989/data")!, completionHandler: {_,_,_ in
+
+        let uploadTaskUrlWithCompletion = session.uploadTask(with: request, fromFile: URL(string: "http://127.0.0.1:8989/data")!, completionHandler: { _, _, _ in
             print("Completion Handler: Upload Task w/ URL")
         })
         uploadTaskUrlWithCompletion.resume()
         XCTAssertNotNil(uploadTaskUrlWithCompletion.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
+
         let uploadTaskStream = session.uploadTask(withStreamedRequest: request)
         uploadTaskStream.resume()
         XCTAssertNotNil(uploadTaskStream.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
+
         var attempts = 0
         while localSpans.count < 5 {
             attempts += 1
@@ -179,34 +179,34 @@ class NetworkInstrumentationTests: XCTestCase {
         }
         XCTAssertEqual(localSpans.count, 5)
     }
-    
+
     func testDownloadTraceparentHeaders() throws {
         let server = HttpServer()
         try initializeTestEnvironment(server: server)
-        
+
         let session = URLSession(configuration: .default)
         let request = URLRequest(url: URL(string: "http://127.0.0.1:8989/data")!)
-        
+
         let urlDownloadTask = session.downloadTask(with: URL(string: "http://127.0.0.1:8989/data")!)
         urlDownloadTask.resume()
         XCTAssertNotNil(urlDownloadTask.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
-        let urlDownloadTaskCompletion = session.downloadTask(with: URL(string: "http://127.0.0.1:8989/data")!) { _,_,_ in
+
+        let urlDownloadTaskCompletion = session.downloadTask(with: URL(string: "http://127.0.0.1:8989/data")!) { _, _, _ in
             print("Success")
         }
         urlDownloadTaskCompletion.resume()
         XCTAssertNotNil(urlDownloadTaskCompletion.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
+
         let downloadTask = session.downloadTask(with: request)
         downloadTask.resume()
         XCTAssertNotNil(downloadTask.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
-        let downloadTaskWithCompletion = session.downloadTask(with: request, completionHandler: {_,_,_ in
+
+        let downloadTaskWithCompletion = session.downloadTask(with: request, completionHandler: { _, _, _ in
             print("Completion Handler: Download Task")
         })
         downloadTaskWithCompletion.resume()
         XCTAssertNotNil(downloadTaskWithCompletion.currentRequest?.allHTTPHeaderFields?["traceparent"])
-        
+
         // wait until spans recevied
         var attempts = 0
         while localSpans.count < 4 {
