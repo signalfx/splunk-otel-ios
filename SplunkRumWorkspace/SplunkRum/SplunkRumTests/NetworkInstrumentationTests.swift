@@ -17,6 +17,7 @@ limitations under the License.
 import Foundation
 import XCTest
 @testable import SplunkOtel
+import Swifter
 
 // Fake span structure for JSONDecoder, only care about tags at the moment
 struct TestZipkinSpan: Decodable {
@@ -26,7 +27,8 @@ struct TestZipkinSpan: Decodable {
 
 class NetworkInstrumentationTests: XCTestCase {
     func testBasics() throws {
-        try initializeTestEnvironment()
+        let server = HttpServer()
+        try initializeTestEnvironment(server: server)
 
         // Not going to exhaustively test all the api variations, particularly since
         // they all flow through the same bit of code
@@ -92,7 +94,8 @@ class NetworkInstrumentationTests: XCTestCase {
     }
     
     func testDataTraceparentHeaders() throws {
-        try initializeTestEnvironment(enableTraceparent: true)
+        let server = HttpServer()
+        try initializeTestEnvironment(server: server)
         
         let session = URLSession(configuration: .default)
         let request = URLRequest(url: URL(string: "http://127.0.0.1:8989/data")!)
@@ -133,7 +136,8 @@ class NetworkInstrumentationTests: XCTestCase {
     }
     
     func testUploadTraceparentHeaders() throws {
-        try initializeTestEnvironment(enableTraceparent: true)
+        let server = HttpServer()
+        try initializeTestEnvironment(server: server)
         
         let session = URLSession(configuration: .default)
         let request = URLRequest(url: URL(string: "http://127.0.0.1:8989/data")!)
@@ -177,7 +181,8 @@ class NetworkInstrumentationTests: XCTestCase {
     }
     
     func testDownloadTraceparentHeaders() throws {
-        try initializeTestEnvironment(enableTraceparent: true)
+        let server = HttpServer()
+        try initializeTestEnvironment(server: server)
         
         let session = URLSession(configuration: .default)
         let request = URLRequest(url: URL(string: "http://127.0.0.1:8989/data")!)

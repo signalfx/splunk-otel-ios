@@ -65,13 +65,13 @@ func resetTestEnvironment() {
     localSpans.removeAll()
 }
 
-func initializeTestEnvironment(enableTraceparent: Bool = false) throws {
+func initializeTestEnvironment(server: HttpServer? = nil) throws {
     if testEnvironmentInited {
         resetTestEnvironment()
         return
     }
     testEnvironmentInited = true
-    let server = HttpServer()
+    let server = server ?? HttpServer()
     server["/data"] = { _ in
         let resp = HttpResponse.raw(200, "OK",
                          ["Server-Timing": "traceparent;desc=\"00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01\""]) { writer throws in
@@ -98,7 +98,7 @@ func initializeTestEnvironment(enableTraceparent: Bool = false) throws {
         .globalAttributes(globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true])
         .deploymentEnvironment(environment: "env")
         .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*ignore_this.*"))
-        .enableTraceparentOnRequest(enableTraceparent)
+        .enableTraceparentOnRequest(true)
         .build()
     let isRUMInitialized = SplunkRum.isInitialized()
     let initializeAgain = SplunkRumBuilder(beaconUrl: "http://127.0.0.1:8989/v1/traces", rumAuth: "FAKE")
@@ -107,7 +107,7 @@ func initializeTestEnvironment(enableTraceparent: Bool = false) throws {
         .globalAttributes(globalAttributes: ["strKey": "strVal", "intKey": 7, "doubleKey": 1.5, "boolKey": true])
         .deploymentEnvironment(environment: "env")
         .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*ignore_this.*"))
-        .enableTraceparentOnRequest(enableTraceparent)
+        .enableTraceparentOnRequest(true)
         .build()
     let isStillInitialized = SplunkRum.isInitialized()
     XCTAssertEqual(true, rumInitialize)
