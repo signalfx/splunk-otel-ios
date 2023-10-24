@@ -100,7 +100,7 @@ class NetworkInstrumentationTests: XCTestCase {
         let session = URLSession(configuration: .default)
         let request = URLRequest(url: URL(string: "http://127.0.0.1:8989/data")!)
 
-        //Data Tasks
+        // Data Tasks
         let dataTask = session.dataTask(with: request)
         dataTask.resume()
         XCTAssertNotNil(dataTask.currentRequest?.allHTTPHeaderFields?["traceparent"])
