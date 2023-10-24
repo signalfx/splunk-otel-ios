@@ -6,10 +6,10 @@ on:
 
 jobs:
   full-build:
-    runs-on: macOS-latest
+    runs-on: macos-12
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.1
       - name: Full Build
         run: ./fullbuild.sh
       - name: Smoke Test
@@ -17,24 +17,24 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3.1.4
   xcframework:
-    runs-on: macos-11
+    runs-on: macos-12
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.1
       - name: Print Swift version
         run: swift --version
       - name: Build xcframework
         working-directory: ./SplunkRumWorkspace/SplunkRum
         run: ./build_binaries.sh
       - name: Upload xcframework
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.3
         with:
           name: SplunkOtel.xcframework
           path: ./SplunkRumWorkspace/SplunkRum/xcframeworks/SplunkOtel.xcframework
   check_links:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.1
       - name: Link Checker
         uses: lycheeverse/lychee-action@v1.8.0
         with:
