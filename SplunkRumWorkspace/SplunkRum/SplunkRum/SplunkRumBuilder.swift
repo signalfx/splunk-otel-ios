@@ -36,6 +36,7 @@ import Foundation
     private var sessionSamplingRatio: Double = 1.0
     private var appName: String?
     private var spanSchedulingDelay: TimeInterval = 5.0
+    private var showVCInstrumentation: Bool = true
 
     @objc public init(beaconUrl: String, rumAuth: String) {
         self.beaconUrl = beaconUrl
@@ -79,6 +80,13 @@ import Foundation
     @objc
     public func ignoreURLs(ignoreURLs: NSRegularExpression) -> SplunkRumBuilder {
         self.ignoreURLs = ignoreURLs
+        return self
+    }
+
+    @discardableResult
+    @objc
+    public func showVCInstrumentation(_ show: Bool) -> SplunkRumBuilder {
+        self.showVCInstrumentation = show
         return self
     }
 
@@ -163,6 +171,7 @@ import Foundation
                                                globalAttributes: self.globalAttributes,
                                                environment: self.environment,
                                                ignoreURLs: self.ignoreURLs,
+                                               showVCInstrumentation: self.showVCInstrumentation,
                                                screenNameSpans: self.screenNameSpans,
                                                networkInstrumentation: self.networkInstrumentation,
                                                enableDiskCache: self.enableDiskCache,
