@@ -14,7 +14,7 @@
     <img alt="OpenTelemetry Swift" src="https://img.shields.io/badge/otel-1.5.0-blueviolet?style=for-the-badge">
   </a>
   <a href="https://github.com/signalfx/gdi-specification/releases/tag/v1.6.0">
-    <img alt="Splunk GDI specification" src="https://img.shields.io/badge/GDI-1.5.0-blueviolet?style=for-the-badge">
+    <img alt="Splunk GDI specification" src="https://img.shields.io/badge/GDI-1.6.0-blueviolet?style=for-the-badge">
   </a>
   <a href="https://github.com/signalfx/splunk-otel-ios/releases">
     <img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/signalfx/splunk-otel-ios?include_prereleases&style=for-the-badge">
