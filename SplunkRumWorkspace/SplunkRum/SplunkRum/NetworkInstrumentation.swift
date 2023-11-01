@@ -27,37 +27,32 @@ func addLinkToSpan(span: Span, valStr: String) {
     }
     let traceId = String(valStr[Range(result[0].range(at: 1), in: valStr)!])
     let spanId = String(valStr[Range(result[0].range(at: 2), in: valStr)!])
-    span.setAttribute(key: "link.traceId", value: traceId)
-    span.setAttribute(key: "link.spanId", value: spanId)
+    span.setAttribute(key: Constants.AttributeNames.LINK_TRACE_ID, value: traceId)
+    span.setAttribute(key: Constants.AttributeNames.LINK_SPAN_ID, value: spanId)
 }
 
 func endHttpSpan(span: Span, task: URLSessionTask) {
     let hr: HTTPURLResponse? = task.response as? HTTPURLResponse
     if hr != nil {
-        span.setAttribute(key: "http.status_code", value: hr!.statusCode)
+        span.setAttribute(key: Constants.AttributeNames.HTTP_STATUS_CODE, value: hr!.statusCode)
         // Blerg, looks like an iteration here since it is case sensitive and the case insensitive search assumes single value
         for (key, val) in hr!.allHeaderFields {
-            let keyStr = key as? String
-            if keyStr != nil {
-                if keyStr?.caseInsensitiveCompare("server-timing") == .orderedSame {
-                    let valStr = val as? String
-                    if valStr != nil {
-                        if valStr!.starts(with: "traceparent") {
-                            addLinkToSpan(span: span, valStr: valStr!)
-                        }
-                    }
-                }
+            if let keyStr = key as? String,
+               let valStr = val as? String,
+               keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
+               valStr.contains("traceparent") {
+                addLinkToSpan(span: span, valStr: valStr)
             }
         }
     }
     if task.error != nil {
-        span.setAttribute(key: "error", value: true)
-        span.setAttribute(key: "exception.message", value: task.error!.localizedDescription)
-        span.setAttribute(key: "exception.type", value: String(describing: type(of: task.error!)))
+        span.setAttribute(key: Constants.AttributeNames.ERROR, value: true)
+        span.setAttribute(key: Constants.AttributeNames.EXCEPTION_MESSAGE, value: task.error!.localizedDescription)
+        span.setAttribute(key: Constants.AttributeNames.EXCEPTION_TYPE, value: String(describing: type(of: task.error!)))
     }
-    span.setAttribute(key: "http.response_content_length_uncompressed", value: Int(task.countOfBytesReceived))
+    span.setAttribute(key: Constants.AttributeNames.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSESD, value: Int(task.countOfBytesReceived))
     if task.countOfBytesSent != 0 {
-        span.setAttribute(key: "http.request_content_length", value: Int(task.countOfBytesSent))
+        span.setAttribute(key: Constants.AttributeNames.HTTP_REQUEST_CONTENT_LENGTH, value: Int(task.countOfBytesSent))
     }
     span.end()
 }
@@ -88,34 +83,34 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     }
     let tracer = buildTracer()
     let span = tracer.spanBuilder(spanName: "HTTP "+method).setSpanKind(spanKind: .client).startSpan()
-    span.setAttribute(key: "component", value: "http")
-    span.setAttribute(key: "http.url", value: url.absoluteString)
-    span.setAttribute(key: "http.method", value: method)
+    span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "http")
+    span.setAttribute(key: Constants.AttributeNames.HTTP_URL, value: url.absoluteString)
+    span.setAttribute(key: Constants.AttributeNames.HTTP_METHOD, value: method)
 
     let networkInfo = getNetworkInfo()
 
     if networkInfo.hostConnectionType != nil {
-        span.setAttribute(key: "net.host.connection.type", value: networkInfo.hostConnectionType!)
+        span.setAttribute(key: Constants.AttributeNames.NET_HOST_CONNECTION_TYPE, value: networkInfo.hostConnectionType!)
     }
 
     if networkInfo.hostConnectionSubType != nil {
-        span.setAttribute(key: "net.host.connection.subtype", value: networkInfo.hostConnectionSubType!)
+        span.setAttribute(key: Constants.AttributeNames.NET_HOST_CONNECTION_SUBTYPE, value: networkInfo.hostConnectionSubType!)
     }
 
     if networkInfo.carrierName != nil {
-        span.setAttribute(key: "net.host.carrier.name", value: networkInfo.carrierName!)
+        span.setAttribute(key: Constants.AttributeNames.NET_HOST_CARRIER_NAME, value: networkInfo.carrierName!)
     }
 
     if networkInfo.carrierCountryCode != nil {
-        span.setAttribute(key: "net.host.carrier.mcc", value: networkInfo.carrierCountryCode!)
+        span.setAttribute(key: Constants.AttributeNames.NET_HOST_CARRIER_MCC, value: networkInfo.carrierCountryCode!)
     }
 
     if networkInfo.carrierNetworkCode != nil {
-        span.setAttribute(key: "net.host.carrier.mnc", value: networkInfo.carrierNetworkCode!)
+        span.setAttribute(key: Constants.AttributeNames.NET_HOST_CARRIER_MNC, value: networkInfo.carrierNetworkCode!)
     }
 
     if networkInfo.carrierIsoCountryCode != nil {
-        span.setAttribute(key: "net.host.carrier.icc", value: networkInfo.carrierIsoCountryCode!)
+        span.setAttribute(key: Constants.AttributeNames.NET_HOST_CARRIER_ICC, value: networkInfo.carrierIsoCountryCode!)
     }
 
     return span

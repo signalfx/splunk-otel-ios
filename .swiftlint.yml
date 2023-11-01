@@ -12,6 +12,7 @@ disabled_rules:
  - private_over_fileprivate
  - cyclomatic_complexity
  - missing_docs
+ - switch_case_alignment
 # Not really sure about a bunch of these, just turning most stuff in the 'performance' and 'lint' categories
 opt_in_rules:
  - unowned_variable_capture

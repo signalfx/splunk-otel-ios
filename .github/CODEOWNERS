@@ -1,4 +1,9 @@
-* @johnbley
+#  https://help.github.com/en/articles/about-code-owners
+#
+# Global Owners
+* @signalfx/gdi-ios-maintainers @signalfx/gdi-ios-approvers
+
+.github/CODEOWNERS @signalfx/gdi-ios-maintainers
 
 #####################################################
 #
@@ -6,7 +11,7 @@
 #
 #####################################################
 
-*.md @signalfx/gdi-docs @johnbley
-*.rst @signalfx/gdi-docs @johnbley
-docs/ @signalfx/gdi-docs @johnbley
-README* @signalfx/gdi-docs @johnbley
+*.md    @signalfx/gdi-ios-maintainers @signalfx/gdi-ios-approvers @signalfx/gdi-docs
+*.rst   @signalfx/gdi-ios-maintainers @signalfx/gdi-ios-approvers @signalfx/gdi-docs
+docs/   @signalfx/gdi-ios-maintainers @signalfx/gdi-ios-approvers @signalfx/gdi-docs
+README* @signalfx/gdi-ios-maintainers @signalfx/gdi-ios-approvers @signalfx/gdi-docs

@@ -74,7 +74,7 @@ func getRumSessionId(forceNewSessionId: Bool = false) -> String {
 func createSessionIdChangeSpan(previousSessionId: String) {
     let now = Date()
     let tracer = buildTracer()
-    let span = tracer.spanBuilder(spanName: "sessionId.change").setStartTime(time: now).startSpan()
-    span.setAttribute(key: "splunk.rum.previous_session_id", value: previousSessionId)
+    let span = tracer.spanBuilder(spanName: Constants.SpanNames.SESSION_ID_CHANGE).setStartTime(time: now).startSpan()
+    span.setAttribute(key: Constants.AttributeNames.SPLUNK_RUM_PREVIOUS_SESSION_ID, value: previousSessionId)
     span.end(time: now)
 }

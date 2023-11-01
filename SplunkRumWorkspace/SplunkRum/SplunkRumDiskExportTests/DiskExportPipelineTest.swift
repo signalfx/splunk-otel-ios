@@ -18,15 +18,6 @@ limitations under the License.
 import XCTest
 @testable import SplunkOtel
 
-func rumOptions() -> SplunkRumOptions {
-    let options = SplunkRumOptions()
-    options.debug = true
-    options.allowInsecureBeacon = true
-    options.enableDiskCache = true
-    options.spanDiskCacheMaxSize = 4096 * 4
-    return options
-}
-
 fileprivate let receiver = TestSpanReceiver()
 fileprivate var started = false
 
@@ -43,7 +34,12 @@ class DiskExportPipelineTest: XCTestCase {
         SpanDb.deleteAtDefaultLocation()
 
         XCTAssertTrue(
-            SplunkRum.initialize(beaconUrl: "http://localhost:9733/v1/traces", rumAuth: "FAKE", options: rumOptions())
+            SplunkRumBuilder(beaconUrl: "http://localhost:9733/v1/traces", rumAuth: "FAKE")
+                .allowInsecureBeacon(enabled: true)
+                .debug(enabled: true)
+                .enableDiskCache(enabled: true)
+                .spanDiskCacheMaxSize(size: 4096 * 4)
+                .build()
         )
 
         started = true

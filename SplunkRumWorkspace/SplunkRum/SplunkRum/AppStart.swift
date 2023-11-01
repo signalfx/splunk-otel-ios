@@ -145,10 +145,10 @@ func constructAppStartSpan() {
 
     let tracer = buildTracer()
     // FIXME more startup details?
-    appStart = tracer.spanBuilder(spanName: "AppStart").setStartTime(time: spanStart).startSpan()
-    appStart!.setAttribute(key: "component", value: "appstart")
+    appStart = tracer.spanBuilder(spanName: Constants.SpanNames.APP_START).setStartTime(time: spanStart).startSpan()
+    appStart!.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "appstart")
     if let procStart = procStart {
-        appStart!.addEvent(name: "process.start", timestamp: procStart)
+        appStart!.addEvent(name: Constants.EventNames.PROCESS_START, timestamp: procStart)
     }
     // This is strange looking but I want all the initial spans that happen before didBecomeActive to be kids of the AppStart. Scope is closed at didBecomeActive
     OpenTelemetry.instance.contextProvider.setActiveSpan(appStart!)
