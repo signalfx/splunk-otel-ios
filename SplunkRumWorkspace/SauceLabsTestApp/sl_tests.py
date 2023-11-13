@@ -25,7 +25,7 @@ class IOSTests(unittest.TestCase):
         caps['sauce:options']['accessKey'] = os.environ['SAUCELABS_KEY']
         caps['sauce:options']['username'] = os.environ['SAUCELABS_USER']
         url = f'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
-        self.driver=webdriver.Remote(url, caps)
+        self.driver=webdriver.Remote(url, desired_capabilities=caps)
         
     def tearDown(self):
         self.driver.quit()
