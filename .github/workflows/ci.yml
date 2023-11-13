@@ -85,7 +85,7 @@ jobs:
           SAUCELABS_KEY: ${{ secrets.SAUCELABS_KEY }}
         run: |
             cd SauceLabsTestApp/
-            python3 -m pip install Appium-Python-Client
+            python3 -m pip install Appium-Python-Client==2.11.1
             python3 sl_tests.py ${{ matrix.os }} ${{ needs.saucelabs-prepare.outputs.sl_file_id }}
   check_links:
     runs-on: ubuntu-22.04

@@ -3,7 +3,6 @@ import os
 from appium import webdriver
 from datetime import datetime
 from selenium.webdriver.common.by import By
-from selenium.webdriver.safari.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import sys
@@ -25,7 +24,7 @@ class IOSTests(unittest.TestCase):
             'name': 'SplunkRum tests' + currentTime,
             'accessKey': os.environ['SAUCELABS_KEY'],
             'username': os.environ['SAUCELABS_USER']
-	}
+	    }
         options.set_capability('sauce:options', sauce_options)
         url = f'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
         self.driver=webdriver.Remote(url, options=options)
