@@ -3,6 +3,7 @@ import os
 from appium import webdriver
 from datetime import datetime
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import sys
@@ -11,21 +12,23 @@ class IOSTests(unittest.TestCase):
 
     def setUp(self):
         currentTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        caps = {}
+        options = Options()
+        options.platform_name = 'iOS'
 
         sl_file_id = sys.argv[2]
         
-        caps['platformName'] = 'iOS'
-        caps['appium:app'] = f'storage:{sl_file_id}'
-        caps['appium:deviceName'] = 'iPhone Simulator'
-        caps['appium:platformVersion'] = sys.argv[1]
-        caps['appium:automationName'] = 'XCUITest'
-        caps['sauce:options'] = {}
-        caps['sauce:options']['name'] = 'SplunkRum tests' + currentTime
-        caps['sauce:options']['accessKey'] = os.environ['SAUCELABS_KEY']
-        caps['sauce:options']['username'] = os.environ['SAUCELABS_USER']
+        options.set_capability('appium:app', f'storage:{sl_file_id}')
+        options.set_capability('appium:deviceName', 'iPhone Simulator')
+        options.set_capability('appium:platformVersion', sys.argv[1])
+        options.set_capability('appium:automationName', 'XCUITest')
+        sauce_options = {
+            'name': 'SplunkRum tests' + currentTime,
+            'accessKey': os.environ['SAUCELABS_KEY'],
+            'username': os.environ['SAUCELABS_USER']
+	}
+        options.set_capability('sauce:options', sauce_options)
         url = f'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
-        self.driver=webdriver.Remote(url, desired_capabilities=caps)
+        self.driver=webdriver.Remote(url, options=options)
         
     def tearDown(self):
         self.driver.quit()
