@@ -75,15 +75,14 @@ struct SauceLabsTestApp {
 
         try! server.start(8989)
 
-        SplunkRum.initialize(
+        SplunkRumBuilder.init(
             beaconUrl: receiverEndpoint("/v1/traces"),
-            rumAuth: "FAKE_RUM_AUTH",
-            options: SplunkRumOptions(
-                allowInsecureBeacon: true,
-                debug: true,
-                globalAttributes: [:]
-            )
+            rumAuth: "FAKE_RUM_AUTH"
         )
+        .allowInsecureBeacon(enabled: true)
+        .debug(enabled: true)
+        .globalAttributes(globalAttributes: [:])
+        .build()
 
         if #available(iOS 14.0, *) {
             TestApp.main()
