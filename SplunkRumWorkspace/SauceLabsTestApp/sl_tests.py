@@ -3,7 +3,7 @@ import os
 from appium import webdriver
 from datetime import datetime
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.options import Options
+from selenium.webdriver.safari.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import sys
