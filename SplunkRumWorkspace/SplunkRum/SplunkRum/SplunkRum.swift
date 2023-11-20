@@ -19,7 +19,7 @@ import Foundation
 import WebKit
 
 // Make sure the version numbers on the podspec and SplunkRum.swift match
-let SplunkRumVersionString = "0.11.2"
+let SplunkRumVersionString = "0.11.3"
 
 /**
  Default maximum size of the disk cache in bytes.
@@ -44,6 +44,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
                       globalAttributes: [String: Any] = [:],
                       environment: String? = nil,
                       ignoreURLs: NSRegularExpression? = nil,
+                      showVCInstrumentation: Bool = true,
                       screenNameSpans: Bool = true,
                       networkInstrumentation: Bool = true,
                       enableDiskCache: Bool = false,
@@ -61,6 +62,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
         self.globalAttributes = globalAttributes
         self.environment = environment
         self.ignoreURLs = ignoreURLs
+        self.showVCInstrumentation = showVCInstrumentation
         self.screenNameSpans = screenNameSpans
         self.networkInstrumentation = networkInstrumentation
         self.enableDiskCache = enableDiskCache

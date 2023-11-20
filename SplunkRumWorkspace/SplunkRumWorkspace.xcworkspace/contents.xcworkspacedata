@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:SauceLabsTestApp/SauceLabsTestApp.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:SmokeTest/SmokeTest.xcodeproj">
    </FileRef>
    <FileRef
