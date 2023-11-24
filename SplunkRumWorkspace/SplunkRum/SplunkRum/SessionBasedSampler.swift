@@ -24,11 +24,13 @@ struct BoolDecision: Decision {
 class SessionBasedSampler: Sampler {
 
     var probability: Double = 1.0
+    var upperBound: UInt32 = 0xFFFFFFFF
     var currentlySampled: Bool?
     var lock: Lock = Lock()
 
     init(ratio: Double) {
         probability = ratio
+        upperBound = UInt32(floor(ratio * Double(upperBound)))
         observeSessionIdChange()
     }
 
@@ -48,25 +50,23 @@ class SessionBasedSampler: Sampler {
     private func observeSessionIdChange() {
         addSessionIdCallback { [weak self] in
             self?.lock.withLockVoid {
-                self?.currentlySampled = self?.shouldSampleNewSession()
+                self?.currentlySampled = self?.shouldSampleNewSession(sessionId: getRumSessionId())
             }
         }
     }
 
     private func getDecision() -> Decision {
-
         if let currentlySampled = self.currentlySampled {
             return BoolDecision(isSampled: currentlySampled)
         }
 
-        let isSampled = self.shouldSampleNewSession()
+        let isSampled = self.shouldSampleNewSession(sessionId: getRumSessionId())
         self.currentlySampled = isSampled
         return BoolDecision(isSampled: isSampled)
     }
 
     /**Check if session will be sampled or not.**/
-    private func shouldSampleNewSession() -> Bool {
-
+    private func shouldSampleNewSession(sessionId: String) -> Bool {
         var result = false
 
         switch probability {
@@ -75,10 +75,26 @@ class SessionBasedSampler: Sampler {
         case 1.0:
             result = true
         default:
-            result = Double.random(in: 0.0...1.0) <= probability
+            result = sessionIdValue(sessionId: sessionId) < self.upperBound
         }
 
         return result
     }
+}
 
+func sessionIdValue(sessionId: String) -> UInt32 {
+    if sessionId.count < 32 {
+        return 0
+    }
+
+    var acc: UInt32 = 0
+
+    for i in stride(from: 0, to: sessionId.count, by: 8) {
+        let beginIndex = sessionId.index(sessionId.startIndex, offsetBy: i)
+        let endIndex = sessionId.index(beginIndex, offsetBy: 8, limitedBy: sessionId.endIndex) ?? sessionId.endIndex
+        let val = UInt32(sessionId[beginIndex ..< endIndex], radix: 16) ?? 0
+        acc ^= val
+    }
+
+    return acc
 }
