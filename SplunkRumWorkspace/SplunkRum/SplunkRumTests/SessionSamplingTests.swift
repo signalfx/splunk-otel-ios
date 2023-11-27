@@ -38,6 +38,12 @@ class SessionSamplingTests: XCTestCase {
         resetRUM()
     }
 
+    func testSessionIdValue() throws {
+        // The result value is taken from the JS RUM SDK for the given input
+        let value = sessionIdValue(sessionId: "c06947ed1f53b1a69be3c6899bc11a3e")
+        XCTAssertEqual(value, 3742903036)
+    }
+
     /**Test Sending All Spans**/
     func testSessionBasedSampling100Pct() throws {
         // Forces RUM to reinitialze for testing
