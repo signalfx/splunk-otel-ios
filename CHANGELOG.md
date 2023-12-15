@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/signalfx/splunk-otel-ios/compare/0.11.2...HEAD)
+## Unreleased
 
 ### Added
 
@@ -20,6 +20,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 ### Security
+
+## [0.11.3](https://github.com/signalfx/splunk-otel-ios/releases/tag/0.11.3)
+
+### Added
+
+* Add option to toggle showVCInstrumentation [#179](https://github.com/signalfx/splunk-otel-ios/pull/179)
+
+### Fixed
+
+* Use session ID for source of randomness when making sampling decisions [#185](https://github.com/signalfx/splunk-otel-ios/pull/185)
 
 ## [0.11.2](https://github.com/signalfx/splunk-otel-ios/releases/tag/0.11.2)
 
