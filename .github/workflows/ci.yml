@@ -9,7 +9,7 @@ jobs:
     runs-on: macos-12
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4
       - name: Full Build
         run: ./fullbuild.sh
       - name: Smoke Test
@@ -20,7 +20,7 @@ jobs:
     runs-on: macos-12
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4
       - name: Print Swift version
         run: swift --version
       - name: Build xcframework
@@ -35,7 +35,7 @@ jobs:
     runs-on: macOS-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -73,7 +73,7 @@ jobs:
         os: ['14', '15', '16']
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -90,7 +90,7 @@ jobs:
   check_links:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4
       - name: Link Checker
         uses: lycheeverse/lychee-action@v1.9.3
         with:
