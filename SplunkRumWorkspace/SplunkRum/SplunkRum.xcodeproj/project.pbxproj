@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -34,6 +34,7 @@
 		D770630C2A1FA776009F5FA9 /* SpanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D770630B2A1FA776009F5FA9 /* SpanTests.swift */; };
 		D78995342A0C29CA009C9FB3 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78995332A0C29CA009C9FB3 /* Constants.swift */; };
 		D78995382A0D33AB009C9FB3 /* SplunkRumBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D78995372A0D33AB009C9FB3 /* SplunkRumBuilder.swift */; };
+		E269538B2BD2AECF008BF37A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E269538A2BD2AECF008BF37A /* PrivacyInfo.xcprivacy */; };
 		E27ABA9D2989590D0060C16D /* StdoutExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABA372989590D0060C16D /* StdoutExporter.swift */; };
 		E27ABA9E2989590D0060C16D /* ContextManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABA3A2989590D0060C16D /* ContextManager.swift */; };
 		E27ABA9F2989590D0060C16D /* ActivityContextManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27ABA3B2989590D0060C16D /* ActivityContextManager.swift */; };
@@ -201,6 +202,7 @@
 		D770630B2A1FA776009F5FA9 /* SpanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanTests.swift; sourceTree = "<group>"; };
 		D78995332A0C29CA009C9FB3 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D78995372A0D33AB009C9FB3 /* SplunkRumBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkRumBuilder.swift; sourceTree = "<group>"; };
+		E269538A2BD2AECF008BF37A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E27ABA372989590D0060C16D /* StdoutExporter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StdoutExporter.swift; sourceTree = "<group>"; };
 		E27ABA3A2989590D0060C16D /* ContextManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextManager.swift; sourceTree = "<group>"; };
 		E27ABA3B2989590D0060C16D /* ActivityContextManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityContextManager.swift; sourceTree = "<group>"; };
@@ -387,6 +389,7 @@
 				D77058D328D36E350047D880 /* SessionBasedSampler.swift */,
 				D78995332A0C29CA009C9FB3 /* Constants.swift */,
 				D78995372A0D33AB009C9FB3 /* SplunkRumBuilder.swift */,
+				E269538A2BD2AECF008BF37A /* PrivacyInfo.xcprivacy */,
 			);
 			path = SplunkRum;
 			sourceTree = "<group>";
@@ -851,6 +854,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E269538B2BD2AECF008BF37A /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
