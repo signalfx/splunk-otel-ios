@@ -31,5 +31,5 @@ DESC
 # Make sure the deployment target matches with Package.swift
   s.ios.deployment_target = '11.0'
   s.source_files = 'SplunkRumWorkspace/SplunkRum/SplunkRum/**/*.swift'
-  s.resource_bundles = {'SplunkRum' => ['SplunkRumWorkspace/SplunkRum/SplunkRum/PrivacyInfo.xcprivacy']}
+  s.resource_bundles = {'SplunkRum' => ['PrivacyInfo.xcprivacy']}
 end
