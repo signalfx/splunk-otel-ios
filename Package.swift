@@ -23,6 +23,9 @@ let package = Package(
             ],
             sources: [
                 "SplunkRum",
+            ],
+            resources: [
+                .process("PrivacyInfo.xcprivacy")
             ]
         )
     ]
