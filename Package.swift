@@ -25,7 +25,7 @@ let package = Package(
                 "SplunkRum",
             ],
             resources: [
-                .process("PrivacyInfo.xcprivacy")
+                .copy("SplunkRumWorkspace/SplunkRum/SplunkRum/PrivacyInfo.xcprivacy")
             ]
         )
     ]
