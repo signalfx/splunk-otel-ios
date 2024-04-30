@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -139,6 +139,7 @@
 		E2AFDA052847C529000F53BF /* SpanFromDiskExporterTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFDA042847C529000F53BF /* SpanFromDiskExporterTest.swift */; };
 		E2AFDA072847C678000F53BF /* DiskExportCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFDA062847C678000F53BF /* DiskExportCommon.swift */; };
 		E2AFDA092847DAC8000F53BF /* DiskExportPipelineTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2AFDA082847DAC8000F53BF /* DiskExportPipelineTest.swift */; };
+		E2E93B8A2BDFD23B007D1EEC /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E2E93B892BDFD23B007D1EEC /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -305,6 +306,7 @@
 		E2AFDA042847C529000F53BF /* SpanFromDiskExporterTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanFromDiskExporterTest.swift; sourceTree = "<group>"; };
 		E2AFDA062847C678000F53BF /* DiskExportCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskExportCommon.swift; sourceTree = "<group>"; };
 		E2AFDA082847DAC8000F53BF /* DiskExportPipelineTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskExportPipelineTest.swift; sourceTree = "<group>"; };
+		E2E93B892BDFD23B007D1EEC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = ../../PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -340,6 +342,7 @@
 		86260EBA25CDC1DE009F3CB1 = {
 			isa = PBXGroup;
 			children = (
+				E2E93B892BDFD23B007D1EEC /* PrivacyInfo.xcprivacy */,
 				86260EC625CDC1DE009F3CB1 /* SplunkRum */,
 				86260ED125CDC1DE009F3CB1 /* SplunkRumTests */,
 				E2AFD9F128473F7A000F53BF /* SplunkRumDiskExportTests */,
@@ -851,6 +854,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E2E93B8A2BDFD23B007D1EEC /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
