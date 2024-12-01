@@ -1,0 +1,2 @@
+https://github.com/devicekit/DeviceKit/commit/1291f3789e1a9d8142b949940d4baf0da611cb54
+https://github.com/open-telemetry/opentelemetry-swift/commit/fd2171eebddcea03dea61fb217256f1dead2ea7f
