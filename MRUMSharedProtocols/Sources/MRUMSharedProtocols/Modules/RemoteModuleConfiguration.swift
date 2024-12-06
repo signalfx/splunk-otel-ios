@@ -1,0 +1,35 @@
+//
+/*
+Copyright 2024 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import Foundation
+
+/// The basic protocol for remote configuration of the module.
+public protocol RemoteModuleConfiguration {
+
+    // MARK: - Module management
+
+    /// Indicates whether the Module is enabled.
+    var enabled: Bool { get }
+
+
+    // MARK: - Initialization
+
+    /// Initialize configuration from JSON data.
+    ///
+    /// - Parameter data: Raw `Data` with configuration in JSON format.
+    init?(from data: Data)
+}

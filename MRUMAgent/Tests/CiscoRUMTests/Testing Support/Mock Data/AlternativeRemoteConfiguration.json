@@ -1,0 +1,25 @@
+{
+    "configuration": {
+        "mrum": {
+            "enabled": true,
+            "maxSessionLength": 111,
+            "sessionTimeout": 111,
+
+            "sessionReplay": {
+                "enabled": true
+            },
+
+            "crashReporting": {
+                "enabled": true
+            },
+
+            "networkTracing": {
+                "enabled": true
+            },
+
+            "slowFrameDetector": {
+                "enabled": true
+            }
+        }
+    }
+}

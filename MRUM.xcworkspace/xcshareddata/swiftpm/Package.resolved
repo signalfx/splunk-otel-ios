@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "smartlook-ios-sdk-private",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:smartlook/smartlook-ios-sdk-private.git",
+      "state" : {
+        "branch" : "develop",
+        "revision" : "dcf32bba46bea84c6cdf55de62d8249fad24be25"
+      }
+    }
+  ],
+  "version" : 2
+}

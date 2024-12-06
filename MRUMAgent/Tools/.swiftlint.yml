@@ -1,0 +1,14 @@
+disabled_rules: # rule identifiers to exclude from running
+  - inclusive_language
+
+analyzer_rules:
+  - unused_declaration
+
+line_length:
+  warning: 160
+  
+identifier_name:
+  min_length: 2
+
+vertical_whitespace:
+  max_empty_lines: 2
