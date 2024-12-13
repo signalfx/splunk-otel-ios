@@ -83,6 +83,7 @@ jobs:
         env:
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
             cd SauceLabsTestApp/
             python3 -m pip install Appium-Python-Client==2.11.1
