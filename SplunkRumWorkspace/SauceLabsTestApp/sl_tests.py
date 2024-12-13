@@ -22,8 +22,8 @@ class IOSTests(unittest.TestCase):
         caps['appium:automationName'] = 'XCUITest'
         caps['sauce:options'] = {}
         caps['sauce:options']['name'] = 'SplunkRum tests' + currentTime
-        caps['sauce:options']['accessKey'] = os.environ['SAUCELABS_KEY']
-        caps['sauce:options']['username'] = os.environ['SAUCELABS_USER']
+        caps['sauce:options']['accessKey'] = os.environ['SAUCE_ACCESS_KEY']
+        caps['sauce:options']['username'] = os.environ['SAUCE_USERNAME']
         url = f'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
         self.driver=webdriver.Remote(url, caps)
 
