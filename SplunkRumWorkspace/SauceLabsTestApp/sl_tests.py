@@ -1,6 +1,6 @@
 import unittest
 import os
-from appium import webdriver
+from appium import webdriver as appiumdriver
 from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -22,10 +22,10 @@ class IOSTests(unittest.TestCase):
         caps['appium:automationName'] = 'XCUITest'
         caps['sauce:options'] = {}
         caps['sauce:options']['name'] = 'SplunkRum tests' + currentTime
-        caps['sauce:options']['accessKey'] = os.environ['SAUCELABS_KEY']
-        caps['sauce:options']['username'] = os.environ['SAUCELABS_USER']
-        url = f'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
-        self.driver=webdriver.Remote(url, caps)
+        caps['sauce:options']['accessKey'] = os.environ['SAUCE_ACCESS_KEY']
+        caps['sauce:options']['username'] = os.environ['SAUCE_USERNAME']
+        url = 'https://ondemand.us-west-1.saucelabs.com:443/wd/hub'
+        self.driver=appiumdriver.Remote(url, desired_capabilities=caps)
 
         
     def tearDown(self):
