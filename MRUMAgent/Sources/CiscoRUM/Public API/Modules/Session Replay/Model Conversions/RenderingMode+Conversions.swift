@@ -16,9 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 
-typealias MRUMSessionReplayRenderingMode = MRUMSessionReplay.RenderingMode
+typealias MRUMSessionReplayRenderingMode = CiscoSessionReplay.RenderingMode
 
 // Internal extension to convert `RenderingMode` proxy model to the underlying SessionReplay's `RenderingMode` model
 extension RenderingMode {

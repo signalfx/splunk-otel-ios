@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 @_implementationOnly import MRUMSharedProtocols
 
 /// Session Replay data events. Sends session replay blob with metadata.
@@ -30,7 +30,7 @@ class SessionReplayDataEvent: AgentEvent {
     ///   - metadata: `RecordMetadata` describing the session replay record.
     ///   - data: Session replay blob of type `Data`.
     ///   - sessionID: The `session ID` of a session in which the event occured. Optional so that we can see sessions with no session id in the backend.
-    public init(metadata: RecordMetadata, data: Data, sessionID: String?) {
+    public init(metadata: Metadata, data: Data, sessionID: String?) {
         super.init()
 
         // Event identification
@@ -39,9 +39,9 @@ class SessionReplayDataEvent: AgentEvent {
 
         // Event properties
         let timestamp = metadata.timestamp
-        let startTimestamp = metadata.timestamp.timeIntervalSince1970.nanoseconds
-        let endTimestamp = metadata.timestampEnd.timeIntervalSince1970.nanoseconds
-        let recordId = metadata.recordId
+        let startTimestamp = metadata.startUnixMs
+        let endTimestamp = metadata.endUnixMs
+        // let recordId = metadata.recordId
 
         if let sessionID {
             self.sessionID = sessionID
@@ -52,8 +52,8 @@ class SessionReplayDataEvent: AgentEvent {
 
         attributes = [
             "replay.start_timestamp": EventAttributeValue.int(startTimestamp),
-            "replay.end_timestamp": EventAttributeValue.int(endTimestamp),
-            "replay.record_id": EventAttributeValue.string(recordId)
+            "replay.end_timestamp": EventAttributeValue.int(endTimestamp)
+            // "replay.record_id": EventAttributeValue.string(recordId)
         ]
     }
 }

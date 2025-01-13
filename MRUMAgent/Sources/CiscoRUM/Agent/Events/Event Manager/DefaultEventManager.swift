@@ -19,7 +19,7 @@ import Foundation
 @_implementationOnly import MRUMCrashReports
 @_implementationOnly import MRUMLogger
 @_implementationOnly import MRUMOTel
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 @_implementationOnly import MRUMSharedProtocols
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.

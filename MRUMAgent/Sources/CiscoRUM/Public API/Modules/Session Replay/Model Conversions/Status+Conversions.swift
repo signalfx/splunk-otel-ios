@@ -16,9 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 
-typealias MRUMSessionReplayStatus = MRUMSessionReplay.Status
+typealias MRUMSessionReplayStatus = CiscoSessionReplay.Status
 
 // Internal extension to convert `Status` proxy model to the underlying SessionReplay's `Status` model
 extension SessionReplayStatus {

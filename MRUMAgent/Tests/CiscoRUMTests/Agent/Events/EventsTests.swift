@@ -17,7 +17,7 @@ limitations under the License.
 
 @testable import CiscoRUM
 @testable import MRUMOTel
-@testable import MRUMSessionReplay
+@testable import CiscoSessionReplay
 @testable import MRUMSharedProtocols
 
 import XCTest

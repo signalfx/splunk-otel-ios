@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 @testable import CiscoRUM
-import MRUMSessionReplay
+import CiscoSessionReplay
 
 final class SessionReplayTestBuilder {
 
@@ -24,7 +24,7 @@ final class SessionReplayTestBuilder {
 
     public static func buildDefault() -> CiscoRUM.SessionReplay {
         // Build Session Replay proxy with actual Session Replay module
-        let module = MRUMSessionReplay.SessionReplay.instance
+        let module = CiscoSessionReplay.SessionReplay.instance
         let moduleProxy = SessionReplay(for: module)
 
         return moduleProxy

@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 
 extension SessionReplay {
 
@@ -26,7 +26,7 @@ extension SessionReplay {
             RecordingMask(from: module.recordingMask)
         }
         set {
-            module.recordingMask = MRUMSessionReplay.RecordingMask(from: newValue)
+            module.recordingMask = CiscoSessionReplay.RecordingMask(from: newValue)
         }
     }
 
