@@ -107,7 +107,7 @@ extension SessionReplay {
             // to the module. Opening a new session in the module closes the old one and ends the current record.
             //
             // This ensures the current record will end before a new session exists in the agent.
-            self?.module.openNewSession()
+            // self?.module.openNewSession()
 
             // Log the change for easier debugging
             self?.internalLogger.log(level: .info) {
