@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import AppDOpenTelemetryProtocolExporterCommon
-import AppDSwiftProtobuf
+import OpenTelemetryProtocolExporterCommon
+import SwiftProtobuf
 import Foundation
 
 /// Basic implementation of exporters

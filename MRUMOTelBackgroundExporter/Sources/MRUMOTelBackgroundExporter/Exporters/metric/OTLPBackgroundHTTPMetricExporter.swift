@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import AppDOpenTelemetryProtocolExporterCommon
-import AppDOpenTelemetrySdk
+import OpenTelemetryProtocolExporterCommon
+import OpenTelemetrySdk
 import Foundation
 
 public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, MetricExporter {
@@ -57,7 +57,7 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
         return .success
     }
 
-    public func forceFlush(explicitTimeout: TimeInterval?) -> AppDOpenTelemetrySdk.ExportResult {
+    public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         let semaphore = DispatchSemaphore(value: 0)
 
         httpClient.flush {

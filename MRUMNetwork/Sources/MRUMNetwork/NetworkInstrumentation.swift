@@ -19,12 +19,11 @@ limitations under the License.
 import Foundation
 import MRUMSharedProtocols
 import MRUMLogger
-import AppDOpenTelemetryApi
-import AppDURLSessionInstrumentation
-import AppDOpenTelemetryProtocolExporterHttp
-import AppDOpenTelemetrySdk
-import AppDResourceExtension
-import AppDSignPostIntegration
+import OpenTelemetryApi
+import URLSessionInstrumentation
+import OpenTelemetrySdk
+import ResourceExtension
+import SignPostIntegration
 
 public class NetworkInstrumentation {
     

@@ -4,8 +4,8 @@
 
 import Foundation
 import MRUMSharedProtocols
-import AppDOpenTelemetryApi
-import AppDOpenTelemetrySdk
+import OpenTelemetryApi
+import OpenTelemetrySdk
 
 /// Builds OTel Resource object from AgentResources.
 extension Resource {

@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import AppDOpenTelemetrySdk
+@testable import OpenTelemetrySdk
 @testable import CiscoRUM
 @testable import MRUMOTel
 @testable import MRUMSharedProtocols
