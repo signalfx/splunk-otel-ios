@@ -25,8 +25,8 @@ limitations under the License.
     @_implementationOnly import MRUMNetwork
 #endif
 
-#if canImport(MRUMSessionReplay)
-    @_implementationOnly import MRUMSessionReplay
+#if canImport(CiscoSessionReplay)
+    @_implementationOnly import CiscoSessionReplay
     @_implementationOnly import MRUMSessionReplayProxy
 #endif
 
@@ -47,8 +47,8 @@ class DefaultModulesPool: AgentModulesPool {
         #endif
 
         // Session Replay
-        #if canImport(MRUMSessionReplay)
-            knownModules.append(MRUMSessionReplay.SessionReplay.self)
+        #if canImport(CiscoSessionReplay)
+            knownModules.append(CiscoSessionReplay.SessionReplay.self)
         #endif
 
         // Network Instrumentation

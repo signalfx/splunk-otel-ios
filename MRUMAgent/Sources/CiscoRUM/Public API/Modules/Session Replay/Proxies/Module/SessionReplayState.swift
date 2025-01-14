@@ -16,19 +16,19 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 
 /// The state object implements public API for the current state of the Session Replay module.
 final class SessionReplayState: SessionReplayModuleState {
 
     // MARK: - Internal
 
-    private(set) unowned var module: MRUMSessionReplay.SessionReplay
+    private(set) unowned var module: CiscoSessionReplay.SessionReplay
 
 
     // MARK: - Initialization
 
-    init(for module: MRUMSessionReplay.SessionReplay) {
+    init(for module: CiscoSessionReplay.SessionReplay) {
         self.module = module
     }
 

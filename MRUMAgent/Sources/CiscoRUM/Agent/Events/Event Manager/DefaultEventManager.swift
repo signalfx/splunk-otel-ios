@@ -19,7 +19,7 @@ import Foundation
 @_implementationOnly import MRUMCrashReports
 @_implementationOnly import MRUMLogger
 @_implementationOnly import MRUMOTel
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 @_implementationOnly import MRUMSharedProtocols
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
@@ -110,7 +110,7 @@ class DefaultEventManager: AgentEventManager {
         switch (metadata, data) {
 
         // Session Replay module data
-        case let (metadata as RecordMetadata, data as Data):
+        case let (metadata as Metadata, data as Data):
             let sessionID = agent.session.sessionId(for: metadata.timestamp)
             let event = SessionReplayDataEvent(metadata: metadata, data: data, sessionID: sessionID)
 

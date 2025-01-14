@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 
 /// The preferences object is a representation of the user's preferred settings.
 ///
@@ -32,7 +32,7 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
 
     // MARK: - Internal
 
-    unowned var module: MRUMSessionReplay.SessionReplay?
+    unowned var module: CiscoSessionReplay.SessionReplay?
 
 
     // MARK: - Initialization
@@ -41,7 +41,7 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
         module = nil
     }
 
-    init(for module: MRUMSessionReplay.SessionReplay?) {
+    init(for module: CiscoSessionReplay.SessionReplay?) {
         self.module = module
         renderingMode = RenderingMode(with: module?.preferences.renderingMode)
     }

@@ -16,13 +16,13 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 
 // MARK: - MRUMSessionReplay RecordingMask-related type conversions
 
-typealias MRUMSessionReplayRecordingMask = MRUMSessionReplay.RecordingMask
-typealias MRUMSessionReplayMaskElement = MRUMSessionReplay.MaskElement
-typealias MRUMSessionReplayMaskType = MRUMSessionReplay.MaskElement.MaskType
+typealias MRUMSessionReplayRecordingMask = CiscoSessionReplay.RecordingMask
+typealias MRUMSessionReplayMaskElement = CiscoSessionReplay.MaskElement
+typealias MRUMSessionReplayMaskType = CiscoSessionReplay.MaskElement.MaskType
 
 extension MRUMSessionReplayMaskType {
 

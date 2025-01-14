@@ -18,14 +18,14 @@ limitations under the License.
 import Foundation
 
 @_implementationOnly import MRUMLogger
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 
 /// The class implementing Session Replay public API.
 final class SessionReplay: SessionReplayModule {
 
     // MARK: - Internal
 
-    unowned let module: MRUMSessionReplay.SessionReplay
+    unowned let module: CiscoSessionReplay.SessionReplay
 
 
     // MARK: - Private
@@ -43,7 +43,7 @@ final class SessionReplay: SessionReplayModule {
 
     // MARK: - Initialization
 
-    init(for module: MRUMSessionReplay.SessionReplay) {
+    init(for module: CiscoSessionReplay.SessionReplay) {
         self.module = module
         internalLogger = InternalLogger(configuration: .agent(category: "SessionReplay Module"))
 
@@ -107,7 +107,7 @@ extension SessionReplay {
             // to the module. Opening a new session in the module closes the old one and ends the current record.
             //
             // This ensures the current record will end before a new session exists in the agent.
-            self?.module.openNewSession()
+            // self?.module.openNewSession()
 
             // Log the change for easier debugging
             self?.internalLogger.log(level: .info) {

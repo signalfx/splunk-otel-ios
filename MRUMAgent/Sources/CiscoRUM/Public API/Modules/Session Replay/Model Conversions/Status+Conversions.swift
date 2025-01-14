@@ -16,9 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 
-typealias MRUMSessionReplayStatus = MRUMSessionReplay.Status
+typealias MRUMSessionReplayStatus = CiscoSessionReplay.Status
 
 // Internal extension to convert `Status` proxy model to the underlying SessionReplay's `Status` model
 extension SessionReplayStatus {
@@ -41,7 +41,8 @@ extension SessionReplayStatus {
             return .notRecording(.notStarted)
 
         case .notRecording(.projectLimitReached):
-            return .notRecording(.projectLimitReached)
+            // TODO: validate - this changed from .projectLimitReached
+            return .notRecording(.notStarted)
 
         case .notRecording(.stopped):
             return .notRecording(.stopped)
@@ -76,8 +77,9 @@ extension SessionReplayStatus {
         case .notRecording(.notStarted):
             self = .notRecording(.notStarted)
 
-        case .notRecording(.projectLimitReached):
-            self = .notRecording(.projectLimitReached)
+        // TODO: validate - this changed from .projectLimitReached
+        // case .notRecording(.projectLimitReached):
+        //    self = .notRecording(.projectLimitReached)
 
         case .notRecording(.stopped):
             self = .notRecording(.stopped)
