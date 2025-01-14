@@ -15,15 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import AppDOpenTelemetryProtocolExporterCommon
-import AppDOpenTelemetrySdk
+import OpenTelemetryProtocolExporterCommon
+import OpenTelemetrySdk
 import Foundation
 
 public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogRecordExporter {
 
     // MARK: - Implementation LogRecordExporter protocol
 
-    public func export(logRecords: [AppDOpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval? = nil) -> AppDOpenTelemetrySdk.ExportResult {
+    public func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval? = nil) -> OpenTelemetrySdk.ExportResult {
         let body = Opentelemetry_Proto_Collector_Logs_V1_ExportLogsServiceRequest.with { request in
             request.resourceLogs = LogRecordAdapter.toProtoResourceRecordLog(logRecordList: logRecords)
         }
@@ -59,7 +59,7 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
         return .success
     }
 
-    public func forceFlush(explicitTimeout: TimeInterval?) -> AppDOpenTelemetrySdk.ExportResult {
+    public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         let semaphore = DispatchSemaphore(value: 0)
 
         httpClient.flush {

@@ -20,7 +20,11 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "MRUMOTelBackgroundExporter", path: "../MRUMOTelBackgroundExporter"),
-        .package(name: "MRUMLogger", path: "../MRUMLogger")
+        .package(name: "MRUMLogger", path: "../MRUMLogger"),
+        .package(
+            url: "https://github.com/open-telemetry/opentelemetry-swift",
+            exact: "1.12.1"
+        )
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -29,7 +33,11 @@ let package = Package(
             name: "MRUMOTel",
             dependencies: [
                 "MRUMOTelBackgroundExporter",
-                "MRUMLogger"
+                "MRUMLogger",
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
+                .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
+                .product(name: "ResourceExtension", package: "opentelemetry-swift"),
+                .product(name: "SignPostIntegration", package: "opentelemetry-swift")
             ]),
 
         .testTarget(

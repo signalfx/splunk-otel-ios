@@ -4,7 +4,7 @@
 
 import Foundation
 import MRUMSharedProtocols
-import AppDOpenTelemetryApi
+import OpenTelemetryApi
 
 extension AttributeValue {
     public init(_ eventAttributeValue: EventAttributeValue) {
@@ -19,7 +19,8 @@ extension AttributeValue {
             self = .double(eventAttributeValue)
 
         case let .data(eventAttributeValue):
-            self = .data(eventAttributeValue)
+            // ‼️ Placeholder solution
+            self = .string(eventAttributeValue.base64EncodedString())
         }
     }
 }

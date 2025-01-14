@@ -3,9 +3,9 @@
 //
 
 import Foundation
-import AppDOpenTelemetryApi
-import AppDOpenTelemetryProtocolExporterCommon
-import AppDOpenTelemetrySdk
+import OpenTelemetryApi
+import OpenTelemetryProtocolExporterCommon
+import OpenTelemetrySdk
 import MRUMSharedProtocols
 import MRUMOTelBackgroundExporter
 

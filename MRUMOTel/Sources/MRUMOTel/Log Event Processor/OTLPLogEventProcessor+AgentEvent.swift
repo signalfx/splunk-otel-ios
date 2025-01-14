@@ -3,7 +3,7 @@
 //
 
 import Foundation
-import AppDOpenTelemetryApi
+import OpenTelemetryApi
 import MRUMSharedProtocols
 
 extension OTLPLogEventProcessor {

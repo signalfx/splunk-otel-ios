@@ -16,9 +16,8 @@ limitations under the License.
 */
 
 import Foundation
-import AppDOpenTelemetryApi
-import AppDOpenTelemetryProtocolExporterHttp
-import AppDOpenTelemetrySdk
+import OpenTelemetryApi
+import OpenTelemetrySdk
 
 
 // Global convenience functions to maintain compatibility with legacy code
@@ -133,7 +132,7 @@ public class ScreenManager: NSObject {
 
     // TODO: Hook this up with the real OTEL code
     private func emitScreenNameChangedSpan(oldName: String, newName: String) {
-        //AppDOpenTelemetrySdk.emitScreenNameChangedSpan(oldName: oldName, newName: newName)
+        //OpenTelemetrySdk.emitScreenNameChangedSpan(oldName: oldName, newName: newName)
         print("calling emitScreenNameChangedSpan")
     }
 
