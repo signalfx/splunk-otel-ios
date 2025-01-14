@@ -17,7 +17,7 @@ limitations under the License.
 
 @testable import CiscoRUM
 @testable import MRUMOTel
-@testable import MRUMSessionReplay
+@testable import CiscoSessionReplay
 @testable import MRUMSharedProtocols
 
 import XCTest
@@ -139,14 +139,17 @@ final class EventsTests: XCTestCase {
         let timestamp = Date()
         let endTimestamp = Date()
 
-        let recordMetadata = RecordMetadata(
-            recordId: recordID,
-            recordIndex: 0,
-            timestamp: timestamp,
-            timestampEnd: endTimestamp,
-            replaySessionId: replaySessionID
-        )
-        let event = SessionReplayDataEvent(metadata: recordMetadata, data: sampleVideoData, sessionID: sessionID)
+        // let recordMetadata = RecordMetadata(
+        //    recordId: recordID,
+        //    recordIndex: 0,
+        //    timestamp: timestamp,
+        //    timestampEnd: endTimestamp,
+        //    replaySessionId: replaySessionID
+        // )
+
+        let datachunkMetadata = Metadata(startUnixMs: timestamp.timeIntervalSince1970 * 1000, endUnixMs: endTimestamp.timeIntervalSince1970 * 1000)
+
+        let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, sessionID: sessionID)
 
         let requestExpectation = XCTestExpectation(description: "Send request")
 

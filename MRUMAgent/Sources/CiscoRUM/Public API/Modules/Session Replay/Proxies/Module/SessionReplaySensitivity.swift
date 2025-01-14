@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 import UIKit
 
 /// The sensitivity object implements public API for the view element's sensitivity.
@@ -24,12 +24,12 @@ final class SessionReplaySensitivity: SessionReplayModuleSensitivity {
 
     // MARK: - Internal
 
-    private(set) unowned var module: MRUMSessionReplay.SessionReplay
+    private(set) unowned var module: CiscoSessionReplay.SessionReplay
 
 
     // MARK: - Initialization
 
-    init(for module: MRUMSessionReplay.SessionReplay) {
+    init(for module: CiscoSessionReplay.SessionReplay) {
         self.module = module
     }
 

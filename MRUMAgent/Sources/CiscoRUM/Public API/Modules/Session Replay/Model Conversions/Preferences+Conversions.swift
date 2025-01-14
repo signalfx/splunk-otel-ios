@@ -16,9 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 
-typealias MRUMSessionReplayPreferences = MRUMSessionReplay.Preferences
+typealias MRUMSessionReplayPreferences = CiscoSessionReplay.Preferences
 
 // Internal extensions to convert `SessionReplayModulePreferences` proxy model to
 // the underlying SessionReplay's `Preferences` model and vice versa.

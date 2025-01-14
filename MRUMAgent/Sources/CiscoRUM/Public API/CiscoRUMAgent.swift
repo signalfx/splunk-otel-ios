@@ -25,7 +25,7 @@ import Foundation
 @_implementationOnly import MRUMLogger
 @_implementationOnly import MRUMNetwork
 @_implementationOnly import MRUMOTel
-@_implementationOnly import MRUMSessionReplay
+@_implementationOnly import CiscoSessionReplay
 @_implementationOnly import MRUMSharedProtocols
 
 /// The class implementing MRUM Agent public API.
@@ -208,7 +208,7 @@ public class CiscoRUMAgent: ObservableObject {
 
     /// Perform operations specific to the SessionReplay module.
     private func customizeSessionReplay() {
-        let moduleType = MRUMSessionReplay.SessionReplay.self
+        let moduleType = CiscoSessionReplay.SessionReplay.self
         let sessionReplayModule = modulesManager?.module(ofType: moduleType)
 
         guard let sessionReplayModule else {

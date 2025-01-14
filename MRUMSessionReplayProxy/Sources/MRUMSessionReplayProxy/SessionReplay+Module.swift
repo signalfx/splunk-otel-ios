@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import MRUMSessionReplay
+import CiscoSessionReplay
 import MRUMSharedProtocols
 
 // IMPORTANT NOTES:
@@ -41,7 +41,11 @@ extension Data: ModuleEventData {}
 
 // Struct `RecordMetadata` describes event metadata.
 // This type must be unique in the module/agent space.
-extension RecordMetadata: ModuleEventMetadata {}
+extension Metadata: ModuleEventMetadata {
+    public var timestamp: Date {
+        Date(timeIntervalSince1970: Double(startUnixMs) / 1000.0)
+    }
+}
 
 
 // Minimal implementation that ensures protocol conformance.
@@ -92,7 +96,7 @@ extension SessionReplay: Module {
     public typealias Configuration = SessionReplayConfiguration
     public typealias RemoteConfiguration = SessionReplayRemoteConfiguration
 
-    public typealias EventMetadata = RecordMetadata
+    public typealias EventMetadata = Metadata
     public typealias EventData = Data
 
 
