@@ -117,7 +117,6 @@ final public class SlowFrameDetector {
                 await self?.dumpFrames()
             }
         }
-
     }
 
     private func stop() {
@@ -240,7 +239,6 @@ final public class SlowFrameDetector {
                 reportFrame("frozenRenders", screenName, count)
             }
         }
-
     }
 
     private func reportFrame(_ type: String, _ screenName: String, _ count: Int) {
@@ -258,6 +256,5 @@ final public class SlowFrameDetector {
         // span.setAttribute(key: Constants.AttributeNames.COUNT, value: count)
         // span.setAttribute(key: Constants.AttributeNames.SCREEN_NAME, value: screenName)
         // span.end(time: now)
-
     }
 }

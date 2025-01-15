@@ -64,7 +64,5 @@ public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
         slowFrameThresholdMilliseconds = root.configuration.mrum.slowFrameDetector.slowFrameDetectorThresholdMilliseconds
 
         frozenFrameThresholdMilliseconds = root.configuration.mrum.slowFrameDetector.frozenFrameDetectorThresholdMilliseconds
-
     }
-
 }

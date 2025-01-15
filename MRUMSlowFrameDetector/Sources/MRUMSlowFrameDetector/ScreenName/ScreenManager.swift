@@ -135,6 +135,5 @@ public class ScreenManager: NSObject {
         //OpenTelemetrySdk.emitScreenNameChangedSpan(oldName: oldName, newName: newName)
         print("calling emitScreenNameChangedSpan")
     }
-
 }
 
