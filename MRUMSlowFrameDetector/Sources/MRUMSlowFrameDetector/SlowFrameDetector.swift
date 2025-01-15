@@ -21,9 +21,9 @@ Adapted from SlowFrameDetector implementation at https://github.com/signalfx/spl
 
 
 import Foundation
+import MRUMSharedProtocols
 import QuartzCore
 import UIKit
-import MRUMSharedProtocols
 
 
 final public class SlowFrameDetector {
