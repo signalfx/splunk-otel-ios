@@ -50,6 +50,7 @@ public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
 
 
     // MARK: - Internal variables
+
     public var enabled: Bool
     package var slowFrameThresholdMilliseconds: CFTimeInterval
     package var frozenFrameThresholdMilliseconds: CFTimeInterval

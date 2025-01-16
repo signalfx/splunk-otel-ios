@@ -57,7 +57,7 @@ public func addScreenNameChangeCallback(_ callback: @escaping (String) -> Void) 
 
 
 
-// MARK - ScreenManager singleton
+// MARK: - ScreenManager singleton
 
 public class ScreenManager: NSObject {
 
@@ -71,13 +71,13 @@ public class ScreenManager: NSObject {
 
 
 
-    // MARK - Required initializer
+    // MARK: - Required initializer
 
     private override init() {}
 
 
 
-    // MARK - Public methods
+    // MARK: - Public methods
 
     public func setScreenName(_ newName: String, manual: Bool = false) {
         queue.sync {
@@ -117,7 +117,7 @@ public class ScreenManager: NSObject {
     }
 
 
-    // MARK - Private methods
+    // MARK: - Private methods
 
     private func notifyCallbacks(newName: String) {
         // Execute callbacks outside the queue to prevent deadlocks
