@@ -68,8 +68,7 @@ final public class SlowFrameDetector {
 
     // MARK: - SlowFrameDetector lifecycle
 
-    public required init() {    // For Module conformance
-    }
+    public required init() {} // For Module conformance
 
     deinit {
         stop()

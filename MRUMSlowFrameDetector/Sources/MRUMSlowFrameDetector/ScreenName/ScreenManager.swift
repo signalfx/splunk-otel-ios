@@ -65,7 +65,7 @@ public class ScreenManager: NSObject {
 
     private var _screenName: String = "unknown"
     private var _screenNameManuallySet: Bool = false
-    private var screenNameCallbacks:  [(String) -> Void] = []
+    private var screenNameCallbacks: [(String) -> Void] = []
 
     private let queue = DispatchQueue(label: "com.splunk.mrum.ios.screenManager.queue")
 
@@ -132,7 +132,7 @@ public class ScreenManager: NSObject {
 
     // TODO: Hook this up with the real OTEL code
     private func emitScreenNameChangedSpan(oldName: String, newName: String) {
-        //OpenTelemetrySdk.emitScreenNameChangedSpan(oldName: oldName, newName: newName)
+        // OpenTelemetrySdk.emitScreenNameChangedSpan(oldName: oldName, newName: newName)
         print("calling emitScreenNameChangedSpan")
     }
 }

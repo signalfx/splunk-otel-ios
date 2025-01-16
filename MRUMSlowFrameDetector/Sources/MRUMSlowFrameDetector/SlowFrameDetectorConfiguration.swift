@@ -18,8 +18,7 @@ limitations under the License.
 import Foundation
 import MRUMSharedProtocols
 
-public struct SlowFrameDetectorConfiguration: ModuleConfiguration {
-}
+public struct SlowFrameDetectorConfiguration: ModuleConfiguration {}
 
 public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
 
