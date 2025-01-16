@@ -73,7 +73,7 @@ public class ScreenManager: NSObject {
 
     // MARK: - Required initializer
 
-    private override init() {}
+    override private init() {}
 
 
 
