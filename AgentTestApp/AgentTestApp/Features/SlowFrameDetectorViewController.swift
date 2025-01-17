@@ -22,7 +22,7 @@ class SlowFrameDetectorViewController: UIViewController {
             Thread.sleep(forTimeInterval: 0.5)
         }
     }
-    
+
     @IBAction func frozenFramesClick(_ sender: UIButton) {
         // Sleep for 1 second on the main thread
         print("Sleeping for 2 seconds to force frozen frames")
