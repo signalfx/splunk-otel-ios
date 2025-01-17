@@ -55,5 +55,4 @@ extension SlowFrameDetector: Module {
     public func onPublish(data: @escaping (EventMetadataSlowFrameDetector, EventData) -> Void) {
         // TODO: Code TBD
     }
-
 }

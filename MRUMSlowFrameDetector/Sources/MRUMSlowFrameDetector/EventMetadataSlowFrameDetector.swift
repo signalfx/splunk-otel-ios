@@ -21,7 +21,7 @@ public struct EventMetadataSlowFrameDetector {
 
     // MARK: - Public
 
-    public var timestamp: Date = Date()
+    public var timestamp = Date()
 
     // MARK: - Internal
 

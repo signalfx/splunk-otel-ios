@@ -57,7 +57,7 @@ public func addScreenNameChangeCallback(_ callback: @escaping (String) -> Void) 
 
 
 
-// MARK - ScreenManager singleton
+// MARK: - ScreenManager singleton
 
 public class ScreenManager: NSObject {
 
@@ -65,19 +65,19 @@ public class ScreenManager: NSObject {
 
     private var _screenName: String = "unknown"
     private var _screenNameManuallySet: Bool = false
-    private var screenNameCallbacks:  [(String) -> Void] = []
+    private var screenNameCallbacks: [(String) -> Void] = []
 
     private let queue = DispatchQueue(label: "com.splunk.mrum.ios.screenManager.queue")
 
 
 
-    // MARK - Required initializer
+    // MARK: - Required initializer
 
-    private override init() {}
+    override private init() {}
 
 
 
-    // MARK - Public methods
+    // MARK: - Public methods
 
     public func setScreenName(_ newName: String, manual: Bool = false) {
         queue.sync {
@@ -117,7 +117,7 @@ public class ScreenManager: NSObject {
     }
 
 
-    // MARK - Private methods
+    // MARK: - Private methods
 
     private func notifyCallbacks(newName: String) {
         // Execute callbacks outside the queue to prevent deadlocks
@@ -132,9 +132,8 @@ public class ScreenManager: NSObject {
 
     // TODO: Hook this up with the real OTEL code
     private func emitScreenNameChangedSpan(oldName: String, newName: String) {
-        //OpenTelemetrySdk.emitScreenNameChangedSpan(oldName: oldName, newName: newName)
+        // OpenTelemetrySdk.emitScreenNameChangedSpan(oldName: oldName, newName: newName)
         print("calling emitScreenNameChangedSpan")
     }
-
 }
 

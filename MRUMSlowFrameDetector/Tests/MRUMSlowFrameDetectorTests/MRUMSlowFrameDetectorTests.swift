@@ -1,5 +1,5 @@
-import XCTest
 @testable import MRUMSlowFrameDetector
+import XCTest
 
 final class MRUMSlowFrameDetectorTests: XCTestCase {
     func testExample() throws {

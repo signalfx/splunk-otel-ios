@@ -11,21 +11,30 @@ let package = Package(
     products: [
         .library(
             name: "MRUMSlowFrameDetector",
-            targets: ["MRUMSlowFrameDetector"])
+            targets: [
+                "MRUMSlowFrameDetector"
+            ]
+        )
     ],
     dependencies: [
-        .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols"),
-        .package(name: "MRUMOTel", path: "../MRUMOTel")
+        .package(name: "MRUMSharedProtocols",
+                 path: "../MRUMSharedProtocols"),
+        .package(name: "MRUMOTel",
+                 path: "../MRUMOTel")
     ],
     targets: [
         .target(
             name: "MRUMSlowFrameDetector",
             dependencies: [
-                .product(name: "MRUMSharedProtocols", package: "MRUMSharedProtocols"),
-                .product(name: "MRUMOTel", package: "MRUMOTel")
-            ]),
+                .product(name: "MRUMSharedProtocols",
+                         package: "MRUMSharedProtocols"),
+                .product(name: "MRUMOTel",
+                         package: "MRUMOTel")
+            ]
+        ),
         .testTarget(
             name: "MRUMSlowFrameDetectorTests",
-            dependencies: ["MRUMSlowFrameDetector"])
+            dependencies: ["MRUMSlowFrameDetector"]
+        )
     ]
 )

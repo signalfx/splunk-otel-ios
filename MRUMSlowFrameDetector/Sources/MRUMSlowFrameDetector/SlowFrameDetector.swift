@@ -21,12 +21,12 @@ Adapted from SlowFrameDetector implementation at https://github.com/signalfx/spl
 
 
 import Foundation
+import MRUMSharedProtocols
 import QuartzCore
 import UIKit
-import MRUMSharedProtocols
 
 
-final public class SlowFrameDetector {
+public final class SlowFrameDetector {
 
     typealias FrameBuffer = [String: Int]
 
@@ -68,8 +68,7 @@ final public class SlowFrameDetector {
 
     // MARK: - SlowFrameDetector lifecycle
 
-    public required init() {    // For Module conformance
-    }
+    public required init() {} // For Module conformance
 
     deinit {
         stop()
@@ -83,7 +82,7 @@ final public class SlowFrameDetector {
             slowThresholdSeconds = config.slowFrameThresholdMilliseconds / 1e3
             frozenThresholdSeconds = config.frozenFrameThresholdMilliseconds / 1e3
         }
-        sfd.start();
+        sfd.start()
     }
 
     public func start() {
@@ -101,9 +100,9 @@ final public class SlowFrameDetector {
 
 
         // Stay on top of app lifecycle so we can pause things if needed
-        NotificationCenter.default.addObserver(self, selector: #selector(self.appWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: nil)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(self.appDidBecomeActive(notification:)), name: UIApplication.didBecomeActiveNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive(notification:)), name: UIApplication.didBecomeActiveNotification, object: nil)
 
 
         // Runs every frame to detect if any frame took longer than expected
@@ -117,7 +116,6 @@ final public class SlowFrameDetector {
                 await self?.dumpFrames()
             }
         }
-
     }
 
     private func stop() {
@@ -215,8 +213,7 @@ final public class SlowFrameDetector {
                 await self?.frozenFrames?.incrementFrames(self?.currentScreenName ?? "Unknown")
                 self?.displayLinkTask = nil
             }
-        }
-        else if isSlow {
+        } else if isSlow {
             displayLinkTask = Task { [weak self] in
                 await self?.slowFrames?.incrementFrames(self?.currentScreenName ?? "Unknown")
                 self?.displayLinkTask = nil
@@ -240,7 +237,6 @@ final public class SlowFrameDetector {
                 reportFrame("frozenRenders", screenName, count)
             }
         }
-
     }
 
     private func reportFrame(_ type: String, _ screenName: String, _ count: Int) {
@@ -258,6 +254,5 @@ final public class SlowFrameDetector {
         // span.setAttribute(key: Constants.AttributeNames.COUNT, value: count)
         // span.setAttribute(key: Constants.AttributeNames.SCREEN_NAME, value: screenName)
         // span.end(time: now)
-
     }
 }

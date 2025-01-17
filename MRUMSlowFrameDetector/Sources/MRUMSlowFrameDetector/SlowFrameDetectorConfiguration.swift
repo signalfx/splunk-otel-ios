@@ -18,8 +18,7 @@ limitations under the License.
 import Foundation
 import MRUMSharedProtocols
 
-public struct SlowFrameDetectorConfiguration: ModuleConfiguration {
-}
+public struct SlowFrameDetectorConfiguration: ModuleConfiguration {}
 
 public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
 
@@ -50,6 +49,7 @@ public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
 
 
     // MARK: - Internal variables
+
     public var enabled: Bool
     package var slowFrameThresholdMilliseconds: CFTimeInterval
     package var frozenFrameThresholdMilliseconds: CFTimeInterval
@@ -64,7 +64,5 @@ public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
         slowFrameThresholdMilliseconds = root.configuration.mrum.slowFrameDetector.slowFrameDetectorThresholdMilliseconds
 
         frozenFrameThresholdMilliseconds = root.configuration.mrum.slowFrameDetector.frozenFrameDetectorThresholdMilliseconds
-
     }
-
 }
