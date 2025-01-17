@@ -7,12 +7,12 @@
 
 import UIKit
 
-class ViewController : UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
-    // Data model: These strings will be the data for the table view cells and drive the seque
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+
+    // Data model: These strings will be the data for the table view cells and drive the segue
     //             Each array must have the same number of elements
-    let displayName: [String] = ["Network Calls", "Crashes", "Test API Sample Calls", "Sample Next Task"]        // Can be any descriptive text
-    let segueName: [String] = ["NetworkCalls", "Crashes", "TestApiCalls", "SlowFrameRenders", PlaceHolder"]               // Segues declared in the storyboard
+    let displayName: [String] = ["Network Calls", "Crashes", "Test API Sample Calls", "Sample Next Task"] // Can be any descriptive text
+    let segueName: [String] = ["NetworkCalls", "Crashes", "TestApiCalls", "SlowFrameRenders", "PlaceHolder"] //  Segues declared in the storyboard
 
     // cell reuse id (cells that scroll out of view can be reused)
     let cellReuseIdentifier = "cell"
