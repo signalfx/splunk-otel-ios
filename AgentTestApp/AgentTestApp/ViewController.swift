@@ -18,7 +18,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     let cellReuseIdentifier = "cell"
 
     // don't forget to hook this up from the storyboard
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet var tableView: UITableView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
