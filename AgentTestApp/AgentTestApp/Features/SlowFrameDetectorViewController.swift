@@ -7,9 +7,9 @@ import UIKit
 
 class SlowFrameDetectorViewController: UIViewController {
 
-    @IBOutlet weak var slowFramesButton: UIButton!
-    @IBOutlet weak var frozenFramesButton: UIButton!
-    @IBOutlet weak var beatingHeartView: SlowFrameBeatingHeartView!
+    @IBOutlet var slowFramesButton: UIButton!
+    @IBOutlet var frozenFramesButton: UIButton!
+    @IBOutlet var beatingHeartView: SlowFrameBeatingHeartView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
