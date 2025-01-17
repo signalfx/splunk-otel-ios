@@ -2,8 +2,8 @@
 //  MRUM SDK, © 2024 CISCO
 //
 
-import UIKit
 import SwiftUI
+import UIKit
 
 class SlowFrameDetectorViewController: UIViewController {
 
