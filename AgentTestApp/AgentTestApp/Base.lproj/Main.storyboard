@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7Hk-jl-eXN">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="7Hk-jl-eXN">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -58,6 +58,7 @@
                         <segue destination="3c3-jA-U3Z" kind="show" identifier="Crashes" id="Dsu-Kf-Ox9"/>
                         <segue destination="Xqp-MF-bVJ" kind="show" identifier="TestApiCalls" id="LdI-pp-FX3"/>
                         <segue destination="GJu-EY-m7h" kind="show" identifier="Crashes" id="xHt-0h-0Ur"/>
+                        <segue destination="VBl-p7-cVN" kind="show" id="SYQ-QU-pfj"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WeE-BH-P6e" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -446,6 +447,62 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kaA-FE-HwM" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1278.2608695652175" y="677.67857142857144"/>
+        </scene>
+        <!--Slow Frame Detector View Controller-->
+        <scene sceneID="IIK-5X-7Hc">
+            <objects>
+                <viewController id="VBl-p7-cVN" customClass="SlowFrameDetectorViewController" customModule="AgentTestApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="v16-Vh-cNW">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hXJ-VI-BDm">
+                                <rect key="frame" x="20" y="118" width="374" height="35"/>
+                                <color key="backgroundColor" systemColor="systemRedColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="35" id="exa-oW-6ug"/>
+                                </constraints>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Slow Frame Condition"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gya-8W-NUT">
+                                <rect key="frame" x="20" y="180" width="374" height="35"/>
+                                <color key="backgroundColor" systemColor="systemRedColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="35" id="Qjd-cc-wVg"/>
+                                </constraints>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Frozen Frame Condition"/>
+                            </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="M9G-zc-DZ7" customClass="SlowFrameBeatingHeartView" customModule="AgentTestApp" customModuleProvider="target">
+                                <rect key="frame" x="107" y="377" width="200" height="200"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="0Z0-0m-DDt"/>
+                                    <constraint firstAttribute="height" constant="200" id="Xg2-fa-FrJ"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="waZ-Zl-ctA"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="hXJ-VI-BDm" firstAttribute="top" secondItem="waZ-Zl-ctA" secondAttribute="top" constant="26" id="5uY-EE-T6I"/>
+                            <constraint firstItem="gya-8W-NUT" firstAttribute="leading" secondItem="waZ-Zl-ctA" secondAttribute="leading" constant="20" id="8HI-YW-vJZ"/>
+                            <constraint firstItem="M9G-zc-DZ7" firstAttribute="centerX" secondItem="waZ-Zl-ctA" secondAttribute="centerX" id="DdM-3d-Ns8"/>
+                            <constraint firstItem="hXJ-VI-BDm" firstAttribute="leading" secondItem="waZ-Zl-ctA" secondAttribute="leading" constant="20" id="HLy-VC-EQq"/>
+                            <constraint firstItem="waZ-Zl-ctA" firstAttribute="trailing" secondItem="gya-8W-NUT" secondAttribute="trailing" constant="20" id="Jtj-45-zNY"/>
+                            <constraint firstItem="M9G-zc-DZ7" firstAttribute="centerY" secondItem="waZ-Zl-ctA" secondAttribute="centerY" id="csp-4l-gxc"/>
+                            <constraint firstItem="waZ-Zl-ctA" firstAttribute="trailing" secondItem="hXJ-VI-BDm" secondAttribute="trailing" constant="20" id="gdK-qF-LMp"/>
+                            <constraint firstItem="gya-8W-NUT" firstAttribute="top" secondItem="hXJ-VI-BDm" secondAttribute="bottom" constant="27" id="uJv-zg-4RI"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="CUe-pG-h5R"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yo3-rd-9B1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1253.6231884057972" y="677.67857142857144"/>
         </scene>
     </scenes>
     <resources>

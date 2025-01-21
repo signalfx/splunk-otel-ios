@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		52705BE02D08FDF600445B8E /* SlowFrameBeatingHeartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52705BDF2D08FDF600445B8E /* SlowFrameBeatingHeartView.swift */; };
+		52705BE12D08FDF600445B8E /* SlowFrameDetectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52705BDE2D08FDF600445B8E /* SlowFrameDetectorViewController.swift */; };
 		BA188B202BA0C91B00DACB15 /* CrashesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA188B1E2BA0C91B00DACB15 /* CrashesViewController.swift */; };
 		BA188B212BA0C91B00DACB15 /* Crashes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA188B1F2BA0C91B00DACB15 /* Crashes.swift */; };
 		BA338B462B9A610600D2F3B6 /* TestApiCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA338B452B9A610600D2F3B6 /* TestApiCalls.swift */; };
@@ -38,6 +40,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		52705BDE2D08FDF600445B8E /* SlowFrameDetectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorViewController.swift; sourceTree = "<group>"; };
+		52705BDF2D08FDF600445B8E /* SlowFrameBeatingHeartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameBeatingHeartView.swift; sourceTree = "<group>"; };
 		BA188B1E2BA0C91B00DACB15 /* CrashesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashesViewController.swift; sourceTree = "<group>"; };
 		BA188B1F2BA0C91B00DACB15 /* Crashes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crashes.swift; sourceTree = "<group>"; };
 		BA338B452B9A610600D2F3B6 /* TestApiCalls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestApiCalls.swift; sourceTree = "<group>"; };
@@ -114,6 +118,8 @@
 				BA188B1E2BA0C91B00DACB15 /* CrashesViewController.swift */,
 				BA5E5A582B6864A60022CEB2 /* NetworkCalls.swift */,
 				BA5E5A5A2B6864A60022CEB2 /* NetworkCallsViewController.swift */,
+				52705BDE2D08FDF600445B8E /* SlowFrameDetectorViewController.swift */,
+				52705BDF2D08FDF600445B8E /* SlowFrameBeatingHeartView.swift */,
 				BA338B452B9A610600D2F3B6 /* TestApiCalls.swift */,
 				BA338B472B9A612400D2F3B6 /* TestApiCallsViewController.swift */,
 			);
@@ -200,6 +206,8 @@
 				BA188B212BA0C91B00DACB15 /* Crashes.swift in Sources */,
 				BA5E5A442B6859BC0022CEB2 /* AppDelegate.swift in Sources */,
 				BA5E5A5C2B6864A60022CEB2 /* NetworkCalls.swift in Sources */,
+				52705BE02D08FDF600445B8E /* SlowFrameBeatingHeartView.swift in Sources */,
+				52705BE12D08FDF600445B8E /* SlowFrameDetectorViewController.swift in Sources */,
 				BA5E5A462B6859BC0022CEB2 /* SceneDelegate.swift in Sources */,
 				BA188B202BA0C91B00DACB15 /* CrashesViewController.swift in Sources */,
 				BA5E5A5E2B6864A60022CEB2 /* NetworkCallsViewController.swift in Sources */,
