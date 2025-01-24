@@ -22,7 +22,7 @@ public struct EventMetadataCustomData {
 
     // MARK: - Public
 
-    public var timestamp: Date = Date()
+    public var timestamp = Date()
 
 
     // MARK: - Internal

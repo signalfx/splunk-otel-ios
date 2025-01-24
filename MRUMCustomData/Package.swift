@@ -12,7 +12,8 @@ let package = Package(
     products: [
         .library(
             name: "MRUMCustomData",
-            targets: ["MRUMCustomData"])
+            targets: ["MRUMCustomData"]
+        )
     ],
     dependencies: [
         .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols")
@@ -22,9 +23,11 @@ let package = Package(
             name: "MRUMCustomData",
             dependencies: [
                 "MRUMSharedProtocols"
-            ]),
+            ]
+        ),
         .testTarget(
             name: "MRUMCustomDataTests",
-            dependencies: ["MRUMCustomData"])
+            dependencies: ["MRUMCustomData"]
+        )
     ]
 )

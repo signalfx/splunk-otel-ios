@@ -20,12 +20,12 @@ import MRUMSharedProtocols
 
 protocol CustomDataRepresentable: PropertyList {}
 
-final public class CustomData {
+public final class CustomData {
 
 
     // MARK: - Private properties
 
-    private var config: CustomDataConfiguration = CustomDataConfiguration(enabled: true)
+    private var config = CustomDataConfiguration(enabled: true)
 
 
     // MARK: - CustomData lifecycle
