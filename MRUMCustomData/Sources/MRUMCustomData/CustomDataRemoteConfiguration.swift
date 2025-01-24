@@ -29,6 +29,6 @@ public struct CustomDataRemoteConfiguration: RemoteModuleConfiguration {
     // MARK: init()
 
     public init?(from data: Data) {
-        self.enabled = true
+        enabled = true
     }
 }
