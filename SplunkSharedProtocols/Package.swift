@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "MRUMSharedProtocols",
+    name: "SplunkSharedProtocols",
     platforms: [
         .iOS(.v13),
         .tvOS(.v13),
@@ -11,17 +11,17 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "MRUMSharedProtocols",
-            targets: ["MRUMSharedProtocols"]
+            name: "SplunkSharedProtocols",
+            targets: ["SplunkSharedProtocols"]
         )
     ],
     targets: [
         .target(
-            name: "MRUMSharedProtocols"
+            name: "SplunkSharedProtocols"
         ),
         .testTarget(
-            name: "MRUMSharedProtocolsTests",
-            dependencies: ["MRUMSharedProtocols"]
+            name: "SplunkSharedProtocolsTests",
+            dependencies: ["SplunkSharedProtocols"]
         )
     ]
 )

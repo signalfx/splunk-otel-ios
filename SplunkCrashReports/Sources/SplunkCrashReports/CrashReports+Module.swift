@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import MRUMSharedProtocols
+import SplunkSharedProtocols
 
 // `String` can be used as an event type that the module produces.
 // This is due to the fact the Crash Reports module serializes

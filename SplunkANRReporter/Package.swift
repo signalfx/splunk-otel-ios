@@ -14,13 +14,13 @@ let package = Package(
             targets: ["SplunkANRReporter"])
     ],
     dependencies: [
-        .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols")
+        .package(name: "SplunkSharedProtocols", path: "../SplunkSharedProtocols")
     ],
     targets: [
         .target(
             name: "SplunkANRReporter",
             dependencies: [
-                "MRUMSharedProtocols"
+                "SplunkSharedProtocols"
             ]),
         .testTarget(
             name: "SplunkANRReporterTests",

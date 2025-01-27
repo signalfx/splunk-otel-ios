@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSharedProtocols
+@_implementationOnly import SplunkSharedProtocols
 
 /// A shared state is a representation of view on current internal information.
 ///

@@ -26,7 +26,7 @@ import Foundation
 @_implementationOnly import SplunkNetwork
 @_implementationOnly import SplunkOpenTelemetry
 @_implementationOnly import CiscoSessionReplay
-@_implementationOnly import MRUMSharedProtocols
+@_implementationOnly import SplunkSharedProtocols
 
 /// The class implementing MRUM Agent public API.
 public class CiscoRUMAgent: ObservableObject {

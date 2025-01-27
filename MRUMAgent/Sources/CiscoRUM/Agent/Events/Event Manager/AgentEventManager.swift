@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSharedProtocols
+@_implementationOnly import SplunkSharedProtocols
 
 /// Event manager publishes Module data, sends other events to exporters.
 ///

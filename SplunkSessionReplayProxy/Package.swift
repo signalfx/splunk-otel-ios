@@ -18,14 +18,14 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols"),
+        .package(name: "SplunkSharedProtocols", path: "../SplunkSharedProtocols"),
         sessionReplayDependency()
     ],
     targets: [
         .target(
             name: "SplunkSessionReplayProxy",
             dependencies: [
-                "MRUMSharedProtocols",
+                "SplunkSharedProtocols",
                 .product(name: "CiscoSessionReplay", package: "smartlook-ios-sdk-private")
             ]
         ),

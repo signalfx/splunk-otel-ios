@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 @_implementationOnly import CiscoSessionReplay
-@_implementationOnly import MRUMSharedProtocols
+@_implementationOnly import SplunkSharedProtocols
 
 /// Session Replay data events. Sends session replay blob with metadata.
 class SessionReplayDataEvent: AgentEvent {

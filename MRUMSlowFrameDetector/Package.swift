@@ -17,8 +17,8 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(name: "MRUMSharedProtocols",
-                 path: "../MRUMSharedProtocols"),
+        .package(name: "SplunkSharedProtocols",
+                 path: "../SplunkSharedProtocols"),
         .package(name: "SplunkOpenTelemetry",
                  path: "../SplunkOpenTelemetry")
     ],
@@ -26,8 +26,8 @@ let package = Package(
         .target(
             name: "MRUMSlowFrameDetector",
             dependencies: [
-                .product(name: "MRUMSharedProtocols",
-                         package: "MRUMSharedProtocols"),
+                .product(name: "SplunkSharedProtocols",
+                         package: "SplunkSharedProtocols"),
                 .product(name: "SplunkOpenTelemetry",
                          package: "SplunkOpenTelemetry")
             ]

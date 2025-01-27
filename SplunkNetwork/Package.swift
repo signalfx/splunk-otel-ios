@@ -15,7 +15,7 @@ let package = Package(
             targets: ["SplunkNetwork"]),
     ],
     dependencies: [
-        .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols"),
+        .package(name: "SplunkSharedProtocols", path: "../SplunkSharedProtocols"),
         .package(name: "SplunkOpenTelemetry", path: "../SplunkOpenTelemetry")
     ],
     targets: [
@@ -24,7 +24,7 @@ let package = Package(
         .target(
             name: "SplunkNetwork",
             dependencies: [
-                "MRUMSharedProtocols",
+                "SplunkSharedProtocols",
                 "SplunkOpenTelemetry"
             ]),
         .testTarget(

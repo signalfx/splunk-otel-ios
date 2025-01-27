@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import MRUMSharedProtocols
+import SplunkSharedProtocols
 
 /// A dummy module skeleton for testing logic around modules.
 class SessionReplayTestModule {

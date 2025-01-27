@@ -4,7 +4,7 @@
 
 import Foundation
 import OpenTelemetryApi
-import MRUMSharedProtocols
+import SplunkSharedProtocols
 
 extension OTLPLogEventProcessor {
 

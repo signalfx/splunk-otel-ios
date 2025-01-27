@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import MRUMSharedProtocols
+import SplunkSharedProtocols
 
 
 final public class ANRReporter {

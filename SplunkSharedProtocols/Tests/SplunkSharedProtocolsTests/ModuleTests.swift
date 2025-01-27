@@ -15,10 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import MRUMSharedProtocols
+@testable import SplunkSharedProtocols
 import XCTest
 
-final class MRUMSharedProtocolsTests: XCTestCase {
+final class SplunkSharedProtocolsTests: XCTestCase {
 
     func testModuleProtocols() throws {
         // Constant Metadata, Data is generated at the start of the test.

@@ -18,7 +18,7 @@ limitations under the License.
 @testable import OpenTelemetrySdk
 @testable import CiscoRUM
 @testable import SplunkOpenTelemetry
-@testable import MRUMSharedProtocols
+@testable import SplunkSharedProtocols
 import XCTest
 
 

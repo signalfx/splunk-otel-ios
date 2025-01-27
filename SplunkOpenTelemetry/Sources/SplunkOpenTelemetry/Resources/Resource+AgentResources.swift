@@ -3,7 +3,7 @@
 //
 
 import Foundation
-import MRUMSharedProtocols
+import SplunkSharedProtocols
 import OpenTelemetryApi
 import OpenTelemetrySdk
 

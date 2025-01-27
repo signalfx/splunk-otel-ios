@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMSharedProtocols
+@_implementationOnly import SplunkSharedProtocols
 
 /// Defines the basic properties and behavior of the modules manager.
 ///

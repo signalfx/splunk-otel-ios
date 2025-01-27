@@ -6,7 +6,7 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
-import MRUMSharedProtocols
+import SplunkSharedProtocols
 import SplunkOpenTelemetryBackgroundExporter
 
 /// OTLPTraceProcessor initializes and uses OpenTelemetry Trace Provider.

@@ -18,7 +18,7 @@ let package = Package(
     dependencies: [
         .package(name: "ADCrashReporter", path: "../ADCrashReporter"),
         .package(name: "SplunkOpenTelemetry", path: "../SplunkOpenTelemetry"),
-        .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols")
+        .package(name: "SplunkSharedProtocols", path: "../SplunkSharedProtocols")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -28,7 +28,7 @@ let package = Package(
             dependencies: [
                 .product(name: "ADCrashReporter", package: "ADCrashReporter"),
                 .product(name: "SplunkOpenTelemetry", package: "SplunkOpenTelemetry"),
-                .product(name: "MRUMSharedProtocols", package: "MRUMSharedProtocols")
+                .product(name: "SplunkSharedProtocols", package: "SplunkSharedProtocols")
             ],
             cSettings: [
                 .define("PLCR_PRIVATE"),
@@ -38,6 +38,6 @@ let package = Package(
             ]),
         .testTarget(
             name: "SplunkCrashReportsTests",
-            dependencies: ["SplunkCrashReports", "MRUMSharedProtocols"]),
+            dependencies: ["SplunkCrashReports", "SplunkSharedProtocols"]),
     ]
 )

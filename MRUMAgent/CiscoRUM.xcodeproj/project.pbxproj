@@ -28,7 +28,7 @@
 		2AE43B4A2B861325002C4A98 /* SessionPulseEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B452B861325002C4A98 /* SessionPulseEvent.swift */; };
 		2AE43B4B2B861325002C4A98 /* SessionStartEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B462B861325002C4A98 /* SessionStartEvent.swift */; };
 		3384F2AD2AC879FD00512D79 /* CiscoRUMAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F2AC2AC879FD00512D79 /* CiscoRUMAgent.swift */; };
-		4B1B15162BB584D300BEFC4B /* MRUMSharedProtocols in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15152BB584D300BEFC4B /* MRUMSharedProtocols */; };
+		4B1B15162BB584D300BEFC4B /* SplunkSharedProtocols in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15152BB584D300BEFC4B /* SplunkSharedProtocols */; };
 		4B1B15192BB584E300BEFC4B /* SplunkSessionReplayProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15182BB584E300BEFC4B /* SplunkSessionReplayProxy */; };
 		4B1B151F2BB5858600BEFC4B /* SplunkOpenTelemetry in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B151E2BB5858600BEFC4B /* SplunkOpenTelemetry */; };
 		4B1B15222BB5859B00BEFC4B /* SplunkLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15212BB5859A00BEFC4B /* SplunkLogger */; };
@@ -274,7 +274,7 @@
 		E4570F812BAB243B002ED1DC /* API-1.0-NonOperationalProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-NonOperationalProxyTests.swift"; sourceTree = "<group>"; };
 		E4577D7A2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+SimulateBackground.swift"; sourceTree = "<group>"; };
 		E4577D7C2B9F5BE400DFA2C2 /* XCTestCase+SimulateNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+SimulateNotifications.swift"; sourceTree = "<group>"; };
-		E45F8C962BC5881E007AC144 /* MRUMSharedProtocols */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MRUMSharedProtocols; path = ../MRUMSharedProtocols; sourceTree = "<group>"; };
+		E45F8C962BC5881E007AC144 /* SplunkSharedProtocols */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkSharedProtocols; path = ../SplunkSharedProtocols; sourceTree = "<group>"; };
 		E45F8C972BC5886E007AC144 /* SplunkSessionReplayProxy */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkSessionReplayProxy; path = ../SplunkSessionReplayProxy; sourceTree = "<group>"; };
 		E45F8C982BC588AC007AC144 /* SplunkLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkLogger; path = ../SplunkLogger; sourceTree = "<group>"; };
 		E45F8C992BC588CE007AC144 /* SplunkOpenTelemetry */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkOpenTelemetry; path = ../SplunkOpenTelemetry; sourceTree = "<group>"; };
@@ -355,7 +355,7 @@
 				4B1B151F2BB5858600BEFC4B /* SplunkOpenTelemetry in Frameworks */,
 				4B1B15192BB584E300BEFC4B /* SplunkSessionReplayProxy in Frameworks */,
 				4B1B15222BB5859B00BEFC4B /* SplunkLogger in Frameworks */,
-				4B1B15162BB584D300BEFC4B /* MRUMSharedProtocols in Frameworks */,
+				4B1B15162BB584D300BEFC4B /* SplunkSharedProtocols in Frameworks */,
 				4B1B15252BB585AC00BEFC4B /* SplunkCrashReports in Frameworks */,
 				526659C32B7426B0003E878A /* SplunkANRReporter in Frameworks */,
 			);
@@ -825,7 +825,7 @@
 		E45F8C952BC5881E007AC144 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				E45F8C962BC5881E007AC144 /* MRUMSharedProtocols */,
+				E45F8C962BC5881E007AC144 /* SplunkSharedProtocols */,
 				E45F8C972BC5886E007AC144 /* SplunkSessionReplayProxy */,
 				E45F8C982BC588AC007AC144 /* SplunkLogger */,
 				E45F8C992BC588CE007AC144 /* SplunkOpenTelemetry */,
@@ -1200,7 +1200,7 @@
 			packageProductDependencies = (
 				BAD44D0C2B7878990069E54D /* SplunkNetwork */,
 				526659C22B7426B0003E878A /* SplunkANRReporter */,
-				4B1B15152BB584D300BEFC4B /* MRUMSharedProtocols */,
+				4B1B15152BB584D300BEFC4B /* SplunkSharedProtocols */,
 				4B1B15182BB584E300BEFC4B /* SplunkSessionReplayProxy */,
 				4B1B151E2BB5858600BEFC4B /* SplunkOpenTelemetry */,
 				4B1B15212BB5859A00BEFC4B /* SplunkLogger */,
@@ -1309,7 +1309,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check CiscoRUM directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger package\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMSharedProtocols package\ncd ../MRUMSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy package\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMSlowFrameDetector package\ncd ../MRUMSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork package\ncd ../SplunkNetwork/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
+			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check CiscoRUM directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger package\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols package\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy package\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMSlowFrameDetector package\ncd ../MRUMSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork package\ncd ../SplunkNetwork/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2349,9 +2349,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4B1B15152BB584D300BEFC4B /* MRUMSharedProtocols */ = {
+		4B1B15152BB584D300BEFC4B /* SplunkSharedProtocols */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = MRUMSharedProtocols;
+			productName = SplunkSharedProtocols;
 		};
 		4B1B15182BB584E300BEFC4B /* SplunkSessionReplayProxy */ = {
 			isa = XCSwiftPackageProductDependency;

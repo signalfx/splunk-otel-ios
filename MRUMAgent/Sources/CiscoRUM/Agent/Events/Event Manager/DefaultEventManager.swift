@@ -20,7 +20,7 @@ import Foundation
 @_implementationOnly import SplunkLogger
 @_implementationOnly import SplunkOpenTelemetry
 @_implementationOnly import CiscoSessionReplay
-@_implementationOnly import MRUMSharedProtocols
+@_implementationOnly import SplunkSharedProtocols
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
 ///

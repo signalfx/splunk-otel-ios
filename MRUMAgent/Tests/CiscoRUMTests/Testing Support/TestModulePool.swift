@@ -17,7 +17,7 @@ limitations under the License.
 
 @testable import CiscoRUM
 import Foundation
-import MRUMSharedProtocols
+import SplunkSharedProtocols
 
 /// The class implements the default pool of modules available for tests.
 class TestModulesPool: AgentModulesPool {

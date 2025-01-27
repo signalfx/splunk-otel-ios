@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import MRUMSharedProtocols
+import SplunkSharedProtocols
 
 // `Data` can be used as an event type that the module produces.
 extension Data: ModuleEventData {}

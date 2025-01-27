@@ -18,7 +18,7 @@ limitations under the License.
 @testable import CiscoRUM
 @testable import SplunkOpenTelemetry
 @testable import CiscoSessionReplay
-@testable import MRUMSharedProtocols
+@testable import SplunkSharedProtocols
 
 import XCTest
 
@@ -266,7 +266,7 @@ final class EventsTests: XCTestCase {
         }
     }
 
-    func checkEventBaseAttributes(_ event: MRUMSharedProtocols.Event) throws {
+    func checkEventBaseAttributes(_ event: SplunkSharedProtocols.Event) throws {
         XCTAssertNotNil(event.domain)
         XCTAssertNotNil(event.name)
         XCTAssertNotNil(event.instrumentationScope)

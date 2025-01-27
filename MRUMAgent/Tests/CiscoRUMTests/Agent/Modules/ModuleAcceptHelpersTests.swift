@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 @testable import CiscoRUM
-import MRUMSharedProtocols
+import SplunkSharedProtocols
 import XCTest
 
 final class ModuleAcceptHelpersTests: XCTestCase {
