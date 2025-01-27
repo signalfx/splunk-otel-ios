@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "MRUMOTel",
+    name: "SplunkOpenTelemetry",
     platforms: [
         .iOS(.v13),
         .tvOS(.v13),
@@ -13,13 +13,13 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "MRUMOTel",
+            name: "SplunkOpenTelemetry",
             targets: [
-                "MRUMOTel",
+                "SplunkOpenTelemetry",
             ]),
     ],
     dependencies: [
-        .package(name: "MRUMOTelBackgroundExporter", path: "../MRUMOTelBackgroundExporter"),
+        .package(name: "SplunkOpenTelemetryBackgroundExporter", path: "../SplunkOpenTelemetryBackgroundExporter"),
         .package(name: "SplunkLogger", path: "../SplunkLogger"),
         .package(
             url: "https://github.com/open-telemetry/opentelemetry-swift",
@@ -30,9 +30,9 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "MRUMOTel",
+            name: "SplunkOpenTelemetry",
             dependencies: [
-                "MRUMOTelBackgroundExporter",
+                "SplunkOpenTelemetryBackgroundExporter",
                 "SplunkLogger",
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
@@ -41,7 +41,7 @@ let package = Package(
             ]),
 
         .testTarget(
-            name: "MRUMOTelTests",
-            dependencies: ["MRUMOTel"]),
+            name: "SplunkOpenTelemetryTests",
+            dependencies: ["SplunkOpenTelemetry"]),
     ]
 )

@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 @_implementationOnly import SplunkCrashReports
 @_implementationOnly import SplunkLogger
-@_implementationOnly import MRUMOTel
+@_implementationOnly import SplunkOpenTelemetry
 @_implementationOnly import CiscoSessionReplay
 @_implementationOnly import MRUMSharedProtocols
 

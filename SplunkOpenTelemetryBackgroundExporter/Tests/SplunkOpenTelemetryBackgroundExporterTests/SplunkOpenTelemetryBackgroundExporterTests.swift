@@ -1,7 +1,7 @@
 import XCTest
-@testable import MRUMOTelBackgroundExporter
+@testable import SplunkOpenTelemetryBackgroundExporter
 
-final class MRUMOTelBackgroundExporterTests: XCTestCase {
+final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
 
     // MARK: - Should send tests
 

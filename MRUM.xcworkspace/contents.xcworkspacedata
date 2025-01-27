@@ -26,13 +26,13 @@
       location = "group:SplunkNetwork">
    </FileRef>
    <FileRef
-      location = "group:MRUMOTel">
+      location = "group:SplunkOpenTelemetry">
    </FileRef>
    <FileRef
       location = "group:SplunkLogger">
    </FileRef>
    <FileRef
-      location = "group:MRUMOTelBackgroundExporter">
+      location = "group:SplunkOpenTelemetryBackgroundExporter">
    </FileRef>
    <FileRef
       location = "group:ADCrashReporter">

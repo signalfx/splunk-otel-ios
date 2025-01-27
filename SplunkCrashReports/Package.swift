@@ -17,7 +17,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "ADCrashReporter", path: "../ADCrashReporter"),
-        .package(name: "MRUMOTel", path: "../MRUMOTel"),
+        .package(name: "SplunkOpenTelemetry", path: "../SplunkOpenTelemetry"),
         .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols")
     ],
     targets: [
@@ -27,7 +27,7 @@ let package = Package(
             name: "SplunkCrashReports",
             dependencies: [
                 .product(name: "ADCrashReporter", package: "ADCrashReporter"),
-                .product(name: "MRUMOTel", package: "MRUMOTel"),
+                .product(name: "SplunkOpenTelemetry", package: "SplunkOpenTelemetry"),
                 .product(name: "MRUMSharedProtocols", package: "MRUMSharedProtocols")
             ],
             cSettings: [

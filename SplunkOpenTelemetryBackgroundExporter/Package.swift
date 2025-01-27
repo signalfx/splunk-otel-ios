@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "MRUMOTelBackgroundExporter",
+    name: "SplunkOpenTelemetryBackgroundExporter",
     platforms: [
         .iOS(.v13),
         .tvOS(.v13),
@@ -13,9 +13,9 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "MRUMOTelBackgroundExporter",
+            name: "SplunkOpenTelemetryBackgroundExporter",
             targets: [
-                "MRUMOTelBackgroundExporter"
+                "SplunkOpenTelemetryBackgroundExporter"
             ])
     ],
     dependencies: [
@@ -29,7 +29,7 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "MRUMOTelBackgroundExporter",
+            name: "SplunkOpenTelemetryBackgroundExporter",
             dependencies: [
                 "SplunkLogger",
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
@@ -37,7 +37,7 @@ let package = Package(
             ]),
 
         .testTarget(
-            name: "MRUMOTelBackgroundExporterTests",
-            dependencies: ["MRUMOTelBackgroundExporter"])
+            name: "SplunkOpenTelemetryBackgroundExporterTests",
+            dependencies: ["SplunkOpenTelemetryBackgroundExporter"])
     ]
 )

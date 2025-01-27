@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 @testable import CiscoRUM
-@testable import MRUMOTel
+@testable import SplunkOpenTelemetry
 @testable import CiscoSessionReplay
 @testable import MRUMSharedProtocols
 

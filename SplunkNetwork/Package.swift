@@ -16,7 +16,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols"),
-        .package(name: "MRUMOTel", path: "../MRUMOTel")
+        .package(name: "SplunkOpenTelemetry", path: "../SplunkOpenTelemetry")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -25,7 +25,7 @@ let package = Package(
             name: "SplunkNetwork",
             dependencies: [
                 "MRUMSharedProtocols",
-                "MRUMOTel"
+                "SplunkOpenTelemetry"
             ]),
         .testTarget(
             name: "SplunkNetworkTests",

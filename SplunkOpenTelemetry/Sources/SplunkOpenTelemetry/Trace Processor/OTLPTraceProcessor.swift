@@ -7,7 +7,7 @@ import OpenTelemetryApi
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import MRUMSharedProtocols
-import MRUMOTelBackgroundExporter
+import SplunkOpenTelemetryBackgroundExporter
 
 /// OTLPTraceProcessor initializes and uses OpenTelemetry Trace Provider.
 ///

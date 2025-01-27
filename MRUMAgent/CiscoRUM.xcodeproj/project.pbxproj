@@ -30,7 +30,7 @@
 		3384F2AD2AC879FD00512D79 /* CiscoRUMAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F2AC2AC879FD00512D79 /* CiscoRUMAgent.swift */; };
 		4B1B15162BB584D300BEFC4B /* MRUMSharedProtocols in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15152BB584D300BEFC4B /* MRUMSharedProtocols */; };
 		4B1B15192BB584E300BEFC4B /* MRUMSessionReplayProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15182BB584E300BEFC4B /* MRUMSessionReplayProxy */; };
-		4B1B151F2BB5858600BEFC4B /* MRUMOTel in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B151E2BB5858600BEFC4B /* MRUMOTel */; };
+		4B1B151F2BB5858600BEFC4B /* SplunkOpenTelemetry in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B151E2BB5858600BEFC4B /* SplunkOpenTelemetry */; };
 		4B1B15222BB5859B00BEFC4B /* SplunkLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15212BB5859A00BEFC4B /* SplunkLogger */; };
 		4B1B15252BB585AC00BEFC4B /* SplunkCrashReports in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15242BB585AC00BEFC4B /* SplunkCrashReports */; };
 		4B2C8BBB2BCBE4A200C6E72F /* CrashReportsDataEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2C8BBA2BCBE4A200C6E72F /* CrashReportsDataEvent.swift */; };
@@ -277,7 +277,7 @@
 		E45F8C962BC5881E007AC144 /* MRUMSharedProtocols */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MRUMSharedProtocols; path = ../MRUMSharedProtocols; sourceTree = "<group>"; };
 		E45F8C972BC5886E007AC144 /* MRUMSessionReplayProxy */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MRUMSessionReplayProxy; path = ../MRUMSessionReplayProxy; sourceTree = "<group>"; };
 		E45F8C982BC588AC007AC144 /* SplunkLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkLogger; path = ../SplunkLogger; sourceTree = "<group>"; };
-		E45F8C992BC588CE007AC144 /* MRUMOTel */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MRUMOTel; path = ../MRUMOTel; sourceTree = "<group>"; };
+		E45F8C992BC588CE007AC144 /* SplunkOpenTelemetry */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkOpenTelemetry; path = ../SplunkOpenTelemetry; sourceTree = "<group>"; };
 		E45F8C9A2BC588E3007AC144 /* SplunkCrashReports */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkCrashReports; path = ../SplunkCrashReports; sourceTree = "<group>"; };
 		E45F8C9B2BC58911007AC144 /* SplunkANRReporter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkANRReporter; path = ../SplunkANRReporter; sourceTree = "<group>"; };
 		E46896292B21C85800727A6A /* CiscoRUMTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CiscoRUMTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -352,7 +352,7 @@
 			files = (
 				526521F62CB8937800DB3BB9 /* MRUMSlowFrameDetector in Frameworks */,
 				BAD44D0D2B7878990069E54D /* SplunkNetwork in Frameworks */,
-				4B1B151F2BB5858600BEFC4B /* MRUMOTel in Frameworks */,
+				4B1B151F2BB5858600BEFC4B /* SplunkOpenTelemetry in Frameworks */,
 				4B1B15192BB584E300BEFC4B /* MRUMSessionReplayProxy in Frameworks */,
 				4B1B15222BB5859B00BEFC4B /* SplunkLogger in Frameworks */,
 				4B1B15162BB584D300BEFC4B /* MRUMSharedProtocols in Frameworks */,
@@ -828,7 +828,7 @@
 				E45F8C962BC5881E007AC144 /* MRUMSharedProtocols */,
 				E45F8C972BC5886E007AC144 /* MRUMSessionReplayProxy */,
 				E45F8C982BC588AC007AC144 /* SplunkLogger */,
-				E45F8C992BC588CE007AC144 /* MRUMOTel */,
+				E45F8C992BC588CE007AC144 /* SplunkOpenTelemetry */,
 				E45F8C9A2BC588E3007AC144 /* SplunkCrashReports */,
 				E45F8C9B2BC58911007AC144 /* SplunkANRReporter */,
 				4B2CF88B2BC8875E005CFC35 /* SplunkNetwork */,
@@ -1202,7 +1202,7 @@
 				526659C22B7426B0003E878A /* SplunkANRReporter */,
 				4B1B15152BB584D300BEFC4B /* MRUMSharedProtocols */,
 				4B1B15182BB584E300BEFC4B /* MRUMSessionReplayProxy */,
-				4B1B151E2BB5858600BEFC4B /* MRUMOTel */,
+				4B1B151E2BB5858600BEFC4B /* SplunkOpenTelemetry */,
 				4B1B15212BB5859A00BEFC4B /* SplunkLogger */,
 				4B1B15242BB585AC00BEFC4B /* SplunkCrashReports */,
 				526521F52CB8937800DB3BB9 /* MRUMSlowFrameDetector */,
@@ -2357,9 +2357,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = MRUMSessionReplayProxy;
 		};
-		4B1B151E2BB5858600BEFC4B /* MRUMOTel */ = {
+		4B1B151E2BB5858600BEFC4B /* SplunkOpenTelemetry */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = MRUMOTel;
+			productName = SplunkOpenTelemetry;
 		};
 		4B1B15212BB5859A00BEFC4B /* SplunkLogger */ = {
 			isa = XCSwiftPackageProductDependency;

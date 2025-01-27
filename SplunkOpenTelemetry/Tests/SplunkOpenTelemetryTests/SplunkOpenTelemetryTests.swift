@@ -1,7 +1,7 @@
 import XCTest
-@testable import MRUMOTel
+@testable import SplunkOpenTelemetry
 
-final class MRUMOTelTests: XCTestCase {
+final class SplunkOpenTelemetryTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest

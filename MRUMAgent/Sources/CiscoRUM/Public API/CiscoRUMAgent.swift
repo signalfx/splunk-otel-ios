@@ -24,7 +24,7 @@ import Foundation
 #endif
 @_implementationOnly import SplunkLogger
 @_implementationOnly import SplunkNetwork
-@_implementationOnly import MRUMOTel
+@_implementationOnly import SplunkOpenTelemetry
 @_implementationOnly import CiscoSessionReplay
 @_implementationOnly import MRUMSharedProtocols
 
