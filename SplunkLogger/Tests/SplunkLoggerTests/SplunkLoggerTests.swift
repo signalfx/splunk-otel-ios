@@ -36,7 +36,7 @@ final class SplunkLoggerTests: XCTestCase {
     }
 
     func testShouldLogLevels_givenSilentVerbosity() throws {
-        configuration = InternalLoggerConfiguration(verbosity: .silent, subsystem: "cisco.rum.tests")
+        configuration = InternalLoggerConfiguration(verbosity: .silent, subsystem: "com.splunk.rum.tests")
         logger = NoopLogger(configuration: configuration)
 
         let shouldLogError = logger.shouldLog(at: .error)
@@ -49,7 +49,7 @@ final class SplunkLoggerTests: XCTestCase {
     }
 
     func testShouldLogLevels_givenStandardVerbosity() throws {
-        configuration = InternalLoggerConfiguration(verbosity: .standard, subsystem: "cisco.rum.tests")
+        configuration = InternalLoggerConfiguration(verbosity: .standard, subsystem: "com.splunk.rum.tests")
         logger = NoopLogger(configuration: configuration)
 
         let shouldLogError = logger.shouldLog(at: .error)
@@ -62,7 +62,7 @@ final class SplunkLoggerTests: XCTestCase {
     }
 
     func testShouldLogLevels_givenVerboseVerbosity() throws {
-        configuration = InternalLoggerConfiguration(verbosity: .verbose, subsystem: "cisco.rum.tests")
+        configuration = InternalLoggerConfiguration(verbosity: .verbose, subsystem: "com.splunk.rum.tests")
         logger = NoopLogger(configuration: configuration)
 
         let shouldLogError = logger.shouldLog(at: .error)

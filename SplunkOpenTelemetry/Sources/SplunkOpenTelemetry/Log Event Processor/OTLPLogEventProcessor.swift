@@ -32,7 +32,7 @@ public class OTLPLogEventProcessor: LogEventProcessor {
     private let loggerProvider: LoggerProvider
 
     // Internal Logger
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Cisco RUM OTel", category: "Logs"))
+    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk RUM OTel", category: "Logs"))
 
     // Logger background dispatch queues
     private let backgroundQueue = DispatchQueue(label: "com.SplunkOtel.LogEventProcessor", qos: .utility)

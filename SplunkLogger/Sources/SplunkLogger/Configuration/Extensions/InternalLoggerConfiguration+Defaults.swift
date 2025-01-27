@@ -37,10 +37,10 @@ public extension InternalLoggerConfiguration {
     }
 
 
-    /// Provides a default `InternalLoggerConfiguration` with the pre-specified subsystem to "Cisco RUM Agent" and a variable category.
+    /// Provides a default `InternalLoggerConfiguration` with the pre-specified subsystem to "Splunk RUM Agent" and a variable category.
     /// - Parameters:
     ///  - category: More finely-grained category of the logged subsystem.
-    static func agent(subsystem: String = "Cisco RUM Agent", category: String) -> InternalLoggerConfiguration {
+    static func agent(subsystem: String = "Splunk RUM Agent", category: String) -> InternalLoggerConfiguration {
         return InternalLoggerConfiguration(subsystem: subsystem, category: category)
     }
 }

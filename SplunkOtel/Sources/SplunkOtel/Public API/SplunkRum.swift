@@ -28,7 +28,7 @@ import Foundation
 @_implementationOnly import CiscoSessionReplay
 @_implementationOnly import SplunkSharedProtocols
 
-/// The class implementing MRUM Agent public API.
+/// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
 
     // MARK: - Internal properties
@@ -49,7 +49,7 @@ public class SplunkRum: ObservableObject {
     let appStateManager: AgentAppStateManager
     lazy var sharedState: AgentSharedState = DefaultSharedState(for: self)
 
-    let logger = InternalLogger(configuration: .default(subsystem: "Cisco RUM Agent"))
+    let logger = InternalLogger(configuration: .default(subsystem: "Splunk RUM Agent"))
 
 
     // MARK: - Internal (Modules Proxy)
@@ -178,7 +178,7 @@ public class SplunkRum: ObservableObject {
         agent.customizeModules()
 
         agent.logger.log {
-            "Cisco RUM Agent v\(Self.version)."
+            "Splunk RUM Agent v\(Self.version)."
         }
 
         return agent
