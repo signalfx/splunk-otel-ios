@@ -1,7 +1,7 @@
 import XCTest
-@testable import MRUMCrashReports
+@testable import SplunkCrashReports
 
-final class MRUMCrashReportsTests: XCTestCase {
+final class SplunkCrashReportsTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest

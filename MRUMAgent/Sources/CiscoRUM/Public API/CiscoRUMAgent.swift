@@ -19,8 +19,8 @@ import Combine
 import Foundation
 
 
-#if canImport(MRUMCrashReports)
-    @_implementationOnly import MRUMCrashReports
+#if canImport(SplunkCrashReports)
+    @_implementationOnly import SplunkCrashReports
 #endif
 @_implementationOnly import MRUMLogger
 @_implementationOnly import MRUMNetwork
@@ -234,8 +234,8 @@ public class CiscoRUMAgent: ObservableObject {
     /// Configure Crash Reports module with shared state.
     private func customizeCrashReports() {
     // swiftformat:disable indent
-    #if canImport(MRUMCrashReports)
-        let crashReportsModule = modulesManager?.module(ofType: MRUMCrashReports.CrashReports.self)
+    #if canImport(SplunkCrashReports)
+        let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
 
         // Assign an object providing the current state of the agent instance.
         // We need to do this because we need to read `appState` from the agent in the instance of a crash.

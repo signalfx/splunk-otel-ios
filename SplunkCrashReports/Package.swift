@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "MRUMCrashReports",
+    name: "SplunkCrashReports",
     platforms: [
         .iOS(.v13),
         .tvOS(.v13)
@@ -12,8 +12,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "MRUMCrashReports",
-            targets: ["MRUMCrashReports"]),
+            name: "SplunkCrashReports",
+            targets: ["SplunkCrashReports"]),
     ],
     dependencies: [
         .package(name: "ADCrashReporter", path: "../ADCrashReporter"),
@@ -24,7 +24,7 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "MRUMCrashReports",
+            name: "SplunkCrashReports",
             dependencies: [
                 .product(name: "ADCrashReporter", package: "ADCrashReporter"),
                 .product(name: "MRUMOTel", package: "MRUMOTel"),
@@ -37,7 +37,7 @@ let package = Package(
                 .headerSearchPath("Dependencies/protobuf-c")
             ]),
         .testTarget(
-            name: "MRUMCrashReportsTests",
-            dependencies: ["MRUMCrashReports", "MRUMSharedProtocols"]),
+            name: "SplunkCrashReportsTests",
+            dependencies: ["SplunkCrashReports", "MRUMSharedProtocols"]),
     ]
 )

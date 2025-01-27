@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMCrashReports
+@_implementationOnly import SplunkCrashReports
 @_implementationOnly import MRUMLogger
 @_implementationOnly import MRUMOTel
 @_implementationOnly import CiscoSessionReplay

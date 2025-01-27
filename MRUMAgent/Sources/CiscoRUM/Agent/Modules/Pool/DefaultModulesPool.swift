@@ -17,8 +17,8 @@ limitations under the License.
 
 @_implementationOnly import MRUMSharedProtocols
 
-#if canImport(MRUMCrashReports)
-    @_implementationOnly import MRUMCrashReports
+#if canImport(SplunkCrashReports)
+    @_implementationOnly import SplunkCrashReports
 #endif
 
 #if canImport(MRUMNetwork)
@@ -42,7 +42,7 @@ class DefaultModulesPool: AgentModulesPool {
         var knownModules = [any Module.Type]()
 
         // Crash reports
-        #if canImport(MRUMCrashReports)
+        #if canImport(SplunkCrashReports)
             knownModules.append(CrashReports.self)
         #endif
 

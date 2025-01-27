@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMCrashReports
+@_implementationOnly import SplunkCrashReports
 @_implementationOnly import MRUMSharedProtocols
 
 /// Crash Reports data event. Represents stringified Crash Report with metadata.

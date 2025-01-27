@@ -32,7 +32,7 @@
 		4B1B15192BB584E300BEFC4B /* MRUMSessionReplayProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15182BB584E300BEFC4B /* MRUMSessionReplayProxy */; };
 		4B1B151F2BB5858600BEFC4B /* MRUMOTel in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B151E2BB5858600BEFC4B /* MRUMOTel */; };
 		4B1B15222BB5859B00BEFC4B /* MRUMLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15212BB5859A00BEFC4B /* MRUMLogger */; };
-		4B1B15252BB585AC00BEFC4B /* MRUMCrashReports in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15242BB585AC00BEFC4B /* MRUMCrashReports */; };
+		4B1B15252BB585AC00BEFC4B /* SplunkCrashReports in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15242BB585AC00BEFC4B /* SplunkCrashReports */; };
 		4B2C8BBB2BCBE4A200C6E72F /* CrashReportsDataEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2C8BBA2BCBE4A200C6E72F /* CrashReportsDataEvent.swift */; };
 		4B6878C12B9F3B420024479A /* ConfigurationHandler+RequestErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6878C02B9F3B420024479A /* ConfigurationHandler+RequestErrorHandling.swift */; };
 		4BB680E52B7940C0000A54D4 /* SensitivityModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680CE2B7940C0000A54D4 /* SensitivityModifier.swift */; };
@@ -48,7 +48,7 @@
 		4BB680FF2B7A7A53000A54D4 /* API-1.0-ModuleProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680FD2B7A7A04000A54D4 /* API-1.0-ModuleProxyTests.swift */; };
 		52286CB52CD5404A001F8A31 /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52286CB42CD54045001F8A31 /* ScreenName.swift */; };
 		526521F62CB8937800DB3BB9 /* MRUMSlowFrameDetector in Frameworks */ = {isa = PBXBuildFile; productRef = 526521F52CB8937800DB3BB9 /* MRUMSlowFrameDetector */; };
-		526659C32B7426B0003E878A /* MRUMANRReporter in Frameworks */ = {isa = PBXBuildFile; productRef = 526659C22B7426B0003E878A /* MRUMANRReporter */; };
+		526659C32B7426B0003E878A /* SplunkANRReporter in Frameworks */ = {isa = PBXBuildFile; productRef = 526659C22B7426B0003E878A /* SplunkANRReporter */; };
 		BAD44D0D2B7878990069E54D /* MRUMNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = BAD44D0C2B7878990069E54D /* MRUMNetwork */; };
 		C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */; };
 		C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB02BA9D41E000CC11B /* AppStateManager.swift */; };
@@ -278,8 +278,8 @@
 		E45F8C972BC5886E007AC144 /* MRUMSessionReplayProxy */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MRUMSessionReplayProxy; path = ../MRUMSessionReplayProxy; sourceTree = "<group>"; };
 		E45F8C982BC588AC007AC144 /* MRUMLogger */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MRUMLogger; path = ../MRUMLogger; sourceTree = "<group>"; };
 		E45F8C992BC588CE007AC144 /* MRUMOTel */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MRUMOTel; path = ../MRUMOTel; sourceTree = "<group>"; };
-		E45F8C9A2BC588E3007AC144 /* MRUMCrashReports */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MRUMCrashReports; path = ../MRUMCrashReports; sourceTree = "<group>"; };
-		E45F8C9B2BC58911007AC144 /* MRUMANRReporter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = MRUMANRReporter; path = ../MRUMANRReporter; sourceTree = "<group>"; };
+		E45F8C9A2BC588E3007AC144 /* SplunkCrashReports */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkCrashReports; path = ../SplunkCrashReports; sourceTree = "<group>"; };
+		E45F8C9B2BC58911007AC144 /* SplunkANRReporter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkANRReporter; path = ../SplunkANRReporter; sourceTree = "<group>"; };
 		E46896292B21C85800727A6A /* CiscoRUMTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CiscoRUMTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E46896352B21CA0300727A6A /* UserDefaultsStoragePrefixTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsStoragePrefixTests.swift; sourceTree = "<group>"; };
 		E46896392B21CC7800727A6A /* NanoIDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NanoIDTests.swift; sourceTree = "<group>"; };
@@ -356,8 +356,8 @@
 				4B1B15192BB584E300BEFC4B /* MRUMSessionReplayProxy in Frameworks */,
 				4B1B15222BB5859B00BEFC4B /* MRUMLogger in Frameworks */,
 				4B1B15162BB584D300BEFC4B /* MRUMSharedProtocols in Frameworks */,
-				4B1B15252BB585AC00BEFC4B /* MRUMCrashReports in Frameworks */,
-				526659C32B7426B0003E878A /* MRUMANRReporter in Frameworks */,
+				4B1B15252BB585AC00BEFC4B /* SplunkCrashReports in Frameworks */,
+				526659C32B7426B0003E878A /* SplunkANRReporter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -829,8 +829,8 @@
 				E45F8C972BC5886E007AC144 /* MRUMSessionReplayProxy */,
 				E45F8C982BC588AC007AC144 /* MRUMLogger */,
 				E45F8C992BC588CE007AC144 /* MRUMOTel */,
-				E45F8C9A2BC588E3007AC144 /* MRUMCrashReports */,
-				E45F8C9B2BC58911007AC144 /* MRUMANRReporter */,
+				E45F8C9A2BC588E3007AC144 /* SplunkCrashReports */,
+				E45F8C9B2BC58911007AC144 /* SplunkANRReporter */,
 				4B2CF88B2BC8875E005CFC35 /* MRUMNetwork */,
 			);
 			name = Packages;
@@ -1199,12 +1199,12 @@
 			name = CiscoRUM;
 			packageProductDependencies = (
 				BAD44D0C2B7878990069E54D /* MRUMNetwork */,
-				526659C22B7426B0003E878A /* MRUMANRReporter */,
+				526659C22B7426B0003E878A /* SplunkANRReporter */,
 				4B1B15152BB584D300BEFC4B /* MRUMSharedProtocols */,
 				4B1B15182BB584E300BEFC4B /* MRUMSessionReplayProxy */,
 				4B1B151E2BB5858600BEFC4B /* MRUMOTel */,
 				4B1B15212BB5859A00BEFC4B /* MRUMLogger */,
-				4B1B15242BB585AC00BEFC4B /* MRUMCrashReports */,
+				4B1B15242BB585AC00BEFC4B /* SplunkCrashReports */,
 				526521F52CB8937800DB3BB9 /* MRUMSlowFrameDetector */,
 			);
 			productName = CiscoRUM;
@@ -1309,7 +1309,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check CiscoRUM directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMlogger package\ncd ../MRUMLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMSharedProtocols package\ncd ../MRUMSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMSessionReplayProxy package\ncd ../MRUMSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMCrashReports package\ncd ../MRUMCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMSlowFrameDetector package\ncd ../MRUMSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMNetwork package\ncd ../MRUMNetwork/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMANRReporter package\n# cd ../MRUMANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
+			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check CiscoRUM directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMlogger package\ncd ../MRUMLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMSharedProtocols package\ncd ../MRUMSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMSessionReplayProxy package\ncd ../MRUMSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMSlowFrameDetector package\ncd ../MRUMSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check MRUMNetwork package\ncd ../MRUMNetwork/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2365,17 +2365,17 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = MRUMLogger;
 		};
-		4B1B15242BB585AC00BEFC4B /* MRUMCrashReports */ = {
+		4B1B15242BB585AC00BEFC4B /* SplunkCrashReports */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = MRUMCrashReports;
+			productName = SplunkCrashReports;
 		};
 		526521F52CB8937800DB3BB9 /* MRUMSlowFrameDetector */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MRUMSlowFrameDetector;
 		};
-		526659C22B7426B0003E878A /* MRUMANRReporter */ = {
+		526659C22B7426B0003E878A /* SplunkANRReporter */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = MRUMANRReporter;
+			productName = SplunkANRReporter;
 		};
 		BAD44D0C2B7878990069E54D /* MRUMNetwork */ = {
 			isa = XCSwiftPackageProductDependency;
