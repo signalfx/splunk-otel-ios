@@ -22,7 +22,7 @@ struct LoggerPrefix {
 
     // MARK: - Static logger prefix
 
-    static let `default`: String = "com.cisco.rum"
+    static let `default`: String = "com.splunk.rum"
 
 
     // MARK: - Logger prefix

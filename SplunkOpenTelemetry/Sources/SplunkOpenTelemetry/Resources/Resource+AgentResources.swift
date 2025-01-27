@@ -44,7 +44,7 @@ extension Resource {
             ResourceAttributes.serviceVersion.rawValue: AttributeValue.string(serviceVersion),
 
             // SDK info
-            "com.appdynamics.agent.version": AttributeValue.string(agentVersion),
+            "com.splunk.rum.agent.version": AttributeValue.string(agentVersion),
 
             // Device info
             ResourceAttributes.deviceModelIdentifier.rawValue: AttributeValue.string(deviceModelIdentifier),

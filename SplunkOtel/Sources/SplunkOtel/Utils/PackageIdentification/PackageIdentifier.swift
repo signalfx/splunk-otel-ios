@@ -22,7 +22,7 @@ struct PackageIdentifier: PackageIdentification {
 
     // MARK: - Package identification
 
-    static var `default` = "com.cisco.mrum"
+    static var `default` = "com.splunk.rum"
 
 
     // MARK: - Package identification methods

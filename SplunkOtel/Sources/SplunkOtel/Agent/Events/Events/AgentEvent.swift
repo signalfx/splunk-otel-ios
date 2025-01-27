@@ -30,8 +30,8 @@ class AgentEvent: Event {
     var name: String = "mobile_event"
 
     /// Instrumentation scope, defines a module from which the event was generated.
-    /// Default value `com.cisco.mrum`, subclasses can override.
-    var instrumentationScope: String = "com.cisco.mrum"
+    /// Default value `com.splunk.rum`, subclasses can override.
+    var instrumentationScope: String = "com.splunk.rum"
 
 
     // MARK: - Event Properties
