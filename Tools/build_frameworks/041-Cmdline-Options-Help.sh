@@ -2,7 +2,7 @@
 
 function print_help {
     log ''
-    log 'Builds CiscoRUM 1.0 frameworks.'
+    log 'Builds SplunkOtel 1.0 frameworks.'
     log ''
 
     log ''

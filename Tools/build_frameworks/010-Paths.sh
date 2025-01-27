@@ -3,11 +3,11 @@
 # Various important paths used by the script.
 
 function mrum_project {
-    echo "${PROJECT_DIR}/MRUMAgent/CiscoRUM.xcodeproj"
+    echo "${PROJECT_DIR}/SplunkOtel/SplunkOtel.xcodeproj"
 }
 
 function mrum_workspace {
-    echo "${PROJECT_DIR}/MRUM.xcworkspace"
+    echo "${PROJECT_DIR}/Splunk.xcworkspace"
 }
 
 # Unique output folder of the script run.

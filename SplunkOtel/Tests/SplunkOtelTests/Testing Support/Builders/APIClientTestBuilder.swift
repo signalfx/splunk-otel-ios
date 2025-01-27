@@ -62,7 +62,7 @@ struct MockEndpoint: Endpoint {
 class URLProtocolMock: URLProtocol {
     static var testURLs = [String: Data]()
 
-    static let mainUrl = URL(string: "https://www.mrumagent.test")!
+    static let mainUrl = URL(string: "https://www.splunkotel.test")!
     static let testErrorPath = "error"
     static let testServerErrorPath = "testServerError"
 
