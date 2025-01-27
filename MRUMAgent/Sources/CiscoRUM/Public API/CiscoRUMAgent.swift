@@ -23,7 +23,7 @@ import Foundation
     @_implementationOnly import SplunkCrashReports
 #endif
 @_implementationOnly import SplunkLogger
-@_implementationOnly import MRUMNetwork
+@_implementationOnly import SplunkNetwork
 @_implementationOnly import MRUMOTel
 @_implementationOnly import CiscoSessionReplay
 @_implementationOnly import MRUMSharedProtocols
@@ -221,7 +221,7 @@ public class CiscoRUMAgent: ObservableObject {
 
     /// Configure Network module with shared state.
     private func customizeNetwork() {
-        let networkModule = modulesManager?.module(ofType: MRUMNetwork.NetworkInstrumentation.self)
+        let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
 
         // Assign an object providing the current state of the agent instance.
         // We need to do this because we need to read `sessionID` from the agent continuously.

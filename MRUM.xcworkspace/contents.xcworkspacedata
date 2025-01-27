@@ -23,7 +23,7 @@
       location = "group:MRUMSessionReplayProxy">
    </FileRef>
    <FileRef
-      location = "group:MRUMNetwork">
+      location = "group:SplunkNetwork">
    </FileRef>
    <FileRef
       location = "group:MRUMOTel">

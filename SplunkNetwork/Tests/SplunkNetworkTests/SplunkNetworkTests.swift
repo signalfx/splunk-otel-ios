@@ -1,7 +1,7 @@
 import XCTest
-@testable import MRUMNetwork
+@testable import SplunkNetwork
 
-final class MRUMNetworkTests: XCTestCase {
+final class SplunkNetworkTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest

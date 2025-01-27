@@ -21,8 +21,8 @@ limitations under the License.
     @_implementationOnly import SplunkCrashReports
 #endif
 
-#if canImport(MRUMNetwork)
-    @_implementationOnly import MRUMNetwork
+#if canImport(SplunkNetwork)
+    @_implementationOnly import SplunkNetwork
 #endif
 
 #if canImport(CiscoSessionReplay)
@@ -52,7 +52,7 @@ class DefaultModulesPool: AgentModulesPool {
         #endif
 
         // Network Instrumentation
-        #if canImport(MRUMNetwork)
+        #if canImport(SplunkNetwork)
             knownModules.append(NetworkInstrumentation.self)
         #endif
 

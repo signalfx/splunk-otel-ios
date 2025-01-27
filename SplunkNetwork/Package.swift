@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "MRUMNetwork",
+    name: "SplunkNetwork",
     platforms: [
         .iOS(.v13),
         .tvOS(.v13)
@@ -11,8 +11,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "MRUMNetwork",
-            targets: ["MRUMNetwork"]),
+            name: "SplunkNetwork",
+            targets: ["SplunkNetwork"]),
     ],
     dependencies: [
         .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols"),
@@ -22,13 +22,13 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "MRUMNetwork",
+            name: "SplunkNetwork",
             dependencies: [
                 "MRUMSharedProtocols",
                 "MRUMOTel"
             ]),
         .testTarget(
-            name: "MRUMNetworkTests",
-            dependencies: ["MRUMNetwork"]),
+            name: "SplunkNetworkTests",
+            dependencies: ["SplunkNetwork"]),
     ]
 )
