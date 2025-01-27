@@ -60,5 +60,5 @@ function mrum_tempdir {
         id_path_fragment=".${id}"
     fi
 
-    echo "$(mktemp -d -t "com.cisco.mrum.sdk-build${id_path_fragment}.$(date +'%Y-%m-%d-%H.%M.%S')")"
+    echo "$(mktemp -d -t "com.splunk.rum.sdk-build${id_path_fragment}.$(date +'%Y-%m-%d-%H.%M.%S')")"
 }

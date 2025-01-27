@@ -33,7 +33,7 @@ final class AgentTestBuilder {
 
     public static func build(with configuration: Configuration, session: AgentSession = DefaultSession()) throws -> SplunkRum {
         // Custom key-value storage instance with different keys for testing
-        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "com.cisco.mrum.test.")
+        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "com.splunk.rum.test.")
         let user = DefaultUser(storage: storage)
 
         let handler = ConfigurationHandler(

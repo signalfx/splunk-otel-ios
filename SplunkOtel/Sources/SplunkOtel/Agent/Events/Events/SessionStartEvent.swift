@@ -28,7 +28,7 @@ class SessionStartEvent: AgentEvent {
 
         // Event identification
         name = "session_start"
-        instrumentationScope = "com.cisco.mrum.agent"
+        instrumentationScope = "com.splunk.rum.agent"
 
         // Event properties
         self.sessionID = sessionID

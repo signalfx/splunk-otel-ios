@@ -23,7 +23,7 @@ final class UserDefaultsStoragePrefixTests: XCTestCase {
     // MARK: - Tests
 
     func testDefaultKeysPrefix() throws {
-        let defaultKeysPrefix = "com.cisco.mrum."
+        let defaultKeysPrefix = "com.splunk.rum."
 
         // Default prefix value
         let storage = UserDefaultsStorage()

@@ -36,7 +36,7 @@ class CrashReportsDataEvent: AgentEvent {
         // Event identification
         name = metadata.eventName
 
-        instrumentationScope = "com.cisco.mrum.crashreports"
+        instrumentationScope = "com.splunk.rum.crashreports"
 
         if let sessionID {
             self.sessionID = sessionID

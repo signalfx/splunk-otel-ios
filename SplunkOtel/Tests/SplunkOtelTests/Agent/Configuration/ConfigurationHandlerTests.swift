@@ -24,7 +24,7 @@ class ConfigurationHandlerTests: XCTestCase {
         let storeConfiguration = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)
 
         let storage = UserDefaultsStorage()
-        storage.keysPrefix = "com.cisco.mrum.test."
+        storage.keysPrefix = "com.splunk.rum.test."
         try storage.update(storeConfiguration, forKey: ConfigurationHandler.configurationStoreKey)
 
         let defaultConfig = try ConfigurationTestBuilder.buildDefault()
@@ -44,7 +44,7 @@ class ConfigurationHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Delayed execution")
 
         let storage = UserDefaultsStorage()
-        storage.keysPrefix = "com.cisco.mrum.test."
+        storage.keysPrefix = "com.splunk.rum.test."
 
         let defaultConfig = try ConfigurationTestBuilder.buildDefault()
         let dataResponse = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)

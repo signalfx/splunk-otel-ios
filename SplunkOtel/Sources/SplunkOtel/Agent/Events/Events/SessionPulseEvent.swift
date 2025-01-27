@@ -28,7 +28,7 @@ class SessionPulseEvent: AgentEvent {
 
         // Event identification
         name = "session_pulse"
-        instrumentationScope = "com.cisco.mrum.agent"
+        instrumentationScope = "com.splunk.rum.agent"
 
         // Event properties
         self.sessionID = sessionID

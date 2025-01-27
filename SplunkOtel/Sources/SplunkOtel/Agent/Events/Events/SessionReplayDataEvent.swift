@@ -35,7 +35,7 @@ class SessionReplayDataEvent: AgentEvent {
 
         // Event identification
         name = "session_replay_data"
-        instrumentationScope = "com.cisco.mrum.sessionreplay"
+        instrumentationScope = "com.splunk.rum.sessionreplay"
 
         // Event properties
         let timestamp = metadata.timestamp

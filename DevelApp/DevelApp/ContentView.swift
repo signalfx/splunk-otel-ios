@@ -24,7 +24,7 @@ struct ContentView: View {
 
     let sessionPublisher = NotificationCenter.default
         .publisher(
-            for: NSNotification.Name("com.cisco.mrum.session-did-reset")
+            for: NSNotification.Name("com.splunk.rum.session-did-reset")
         )
         .receive(on: DispatchQueue.main)
 

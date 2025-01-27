@@ -25,7 +25,7 @@ final public class ANRReporter {
     // MARK: - Private properties
 
     private let tuning = ANRTunableValues()
-    private let detectionQueue = DispatchQueue(label: "com.cisco.mrum.anr.background", qos: .background)
+    private let detectionQueue = DispatchQueue(label: "com.splunk.rum.anr.background", qos: .background)
     private var config: ANRReporterConfiguration = ANRReporterConfiguration(enabled: true)
     private var isMainThreadResponsive: Bool = false
     private var heartbeatTimer: Timer?
