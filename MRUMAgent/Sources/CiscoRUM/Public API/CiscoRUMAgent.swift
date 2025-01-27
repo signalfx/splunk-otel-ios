@@ -22,7 +22,7 @@ import Foundation
 #if canImport(SplunkCrashReports)
     @_implementationOnly import SplunkCrashReports
 #endif
-@_implementationOnly import MRUMLogger
+@_implementationOnly import SplunkLogger
 @_implementationOnly import MRUMNetwork
 @_implementationOnly import MRUMOTel
 @_implementationOnly import CiscoSessionReplay

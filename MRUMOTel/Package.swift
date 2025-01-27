@@ -20,7 +20,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "MRUMOTelBackgroundExporter", path: "../MRUMOTelBackgroundExporter"),
-        .package(name: "MRUMLogger", path: "../MRUMLogger"),
+        .package(name: "SplunkLogger", path: "../SplunkLogger"),
         .package(
             url: "https://github.com/open-telemetry/opentelemetry-swift",
             exact: "1.12.1"
@@ -33,7 +33,7 @@ let package = Package(
             name: "MRUMOTel",
             dependencies: [
                 "MRUMOTelBackgroundExporter",
-                "MRUMLogger",
+                "SplunkLogger",
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
                 .product(name: "ResourceExtension", package: "opentelemetry-swift"),

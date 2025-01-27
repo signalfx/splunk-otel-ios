@@ -29,7 +29,7 @@
       location = "group:MRUMOTel">
    </FileRef>
    <FileRef
-      location = "group:MRUMLogger">
+      location = "group:SplunkLogger">
    </FileRef>
    <FileRef
       location = "group:MRUMOTelBackgroundExporter">

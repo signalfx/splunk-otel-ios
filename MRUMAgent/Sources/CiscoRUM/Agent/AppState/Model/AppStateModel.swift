@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import MRUMLogger
+@_implementationOnly import SplunkLogger
 
 class AppStateModel {
 

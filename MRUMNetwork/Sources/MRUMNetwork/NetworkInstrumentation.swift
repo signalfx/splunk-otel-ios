@@ -18,7 +18,7 @@ limitations under the License.
 
 import Foundation
 import MRUMSharedProtocols
-import MRUMLogger
+import SplunkLogger
 import OpenTelemetryApi
 import URLSessionInstrumentation
 import OpenTelemetrySdk

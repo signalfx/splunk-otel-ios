@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import MRUMLogger
+import SplunkLogger
 
 // MARK: Default configuration
 

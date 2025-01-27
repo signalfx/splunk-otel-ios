@@ -8,7 +8,7 @@ import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import MRUMSharedProtocols
 import MRUMOTelBackgroundExporter
-import MRUMLogger
+import SplunkLogger
 
 /// OTLPLogEventProcessor sends OpenTelemetry Logs enriched with Resources via an instantiated background exporter.
 public class OTLPLogEventProcessor: LogEventProcessor {

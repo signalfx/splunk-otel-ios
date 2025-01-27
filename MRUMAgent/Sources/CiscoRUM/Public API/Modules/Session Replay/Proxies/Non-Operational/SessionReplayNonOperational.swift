@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@_implementationOnly import MRUMLogger
+@_implementationOnly import SplunkLogger
 
 /// The class implementing Session Replay public API in non-operational mode.
 ///

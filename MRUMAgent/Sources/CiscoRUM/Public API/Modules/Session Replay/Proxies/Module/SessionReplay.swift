@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-@_implementationOnly import MRUMLogger
+@_implementationOnly import SplunkLogger
 @_implementationOnly import CiscoSessionReplay
 
 /// The class implementing Session Replay public API.

@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "MRUMLogger",
+    name: "SplunkLogger",
     platforms: [
         .iOS(.v13),
         .tvOS(.v13),
@@ -11,17 +11,17 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "MRUMLogger",
-            targets: ["MRUMLogger"]
+            name: "SplunkLogger",
+            targets: ["SplunkLogger"]
         )
     ],
     targets: [
         .target(
-            name: "MRUMLogger"
+            name: "SplunkLogger"
         ),
         .testTarget(
-            name: "MRUMLoggerTests",
-            dependencies: ["MRUMLogger"]
+            name: "SplunkLoggerTests",
+            dependencies: ["SplunkLogger"]
         )
     ]
 )

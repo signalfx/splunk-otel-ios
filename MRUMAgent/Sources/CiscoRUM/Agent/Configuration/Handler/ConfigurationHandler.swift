@@ -17,7 +17,7 @@ limitations under the License.
 
 import Combine
 import Foundation
-@_implementationOnly import MRUMLogger
+@_implementationOnly import SplunkLogger
 
 final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
 

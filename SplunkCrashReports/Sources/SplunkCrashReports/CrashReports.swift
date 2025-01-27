@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 import MRUMSharedProtocols
-import MRUMLogger
+import SplunkLogger
 @_implementationOnly import ADCrashReporter
 
 public class CrashReports {

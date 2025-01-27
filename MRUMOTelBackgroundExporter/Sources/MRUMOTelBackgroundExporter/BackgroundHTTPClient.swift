@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import MRUMLogger
+import SplunkLogger
 
 /// Client for sending requests over HTTP.
 final class BackgroundHTTPClient: NSObject {

@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 
-@_implementationOnly import MRUMLogger
+@_implementationOnly import SplunkLogger
 import UIKit
 
 /// The class implementing public API for the view element's sensitivity in non-operational mode.

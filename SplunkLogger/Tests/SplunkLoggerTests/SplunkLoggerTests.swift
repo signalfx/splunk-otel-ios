@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import MRUMLogger
+@testable import SplunkLogger
 import XCTest
 
 struct NoopLogger: LoggerProvider, LoggerVerbosityValidator {
@@ -24,7 +24,7 @@ struct NoopLogger: LoggerProvider, LoggerVerbosityValidator {
     func log(level: LogLevel, isPrivate: Bool, message: String) {}
 }
 
-final class MRUMLoggerTests: XCTestCase {
+final class SplunkLoggerTests: XCTestCase {
     var logger: (LoggerProvider & LoggerVerbosityValidator)!
     var configuration: InternalLoggerConfiguration!
 
