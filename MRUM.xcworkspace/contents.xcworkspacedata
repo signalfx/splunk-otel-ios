@@ -41,7 +41,7 @@
       location = "group:SplunkANRReporter">
    </FileRef>
    <FileRef
-      location = "group:MRUMSlowFrameDetector">
+      location = "group:SplunkSlowFrameDetector">
    </FileRef>
    <FileRef
       location = "group:README.md">

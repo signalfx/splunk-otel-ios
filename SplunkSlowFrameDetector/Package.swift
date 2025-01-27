@@ -3,16 +3,16 @@
 import PackageDescription
 
 let package = Package(
-    name: "MRUMSlowFrameDetector",
+    name: "SplunkSlowFrameDetector",
     platforms: [
         .iOS(.v13),
         .tvOS(.v13)
     ],
     products: [
         .library(
-            name: "MRUMSlowFrameDetector",
+            name: "SplunkSlowFrameDetector",
             targets: [
-                "MRUMSlowFrameDetector"
+                "SplunkSlowFrameDetector"
             ]
         )
     ],
@@ -24,7 +24,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "MRUMSlowFrameDetector",
+            name: "SplunkSlowFrameDetector",
             dependencies: [
                 .product(name: "SplunkSharedProtocols",
                          package: "SplunkSharedProtocols"),
@@ -33,8 +33,8 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "MRUMSlowFrameDetectorTests",
-            dependencies: ["MRUMSlowFrameDetector"]
+            name: "SplunkSlowFrameDetectorTests",
+            dependencies: ["SplunkSlowFrameDetector"]
         )
     ]
 )

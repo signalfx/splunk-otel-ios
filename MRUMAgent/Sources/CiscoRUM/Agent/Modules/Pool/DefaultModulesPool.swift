@@ -30,8 +30,8 @@ limitations under the License.
     @_implementationOnly import SplunkSessionReplayProxy
 #endif
 
-#if canImport(MRUMSlowFrameDetector)
-    @_implementationOnly import MRUMSlowFrameDetector
+#if canImport(SplunkSlowFrameDetector)
+    @_implementationOnly import SplunkSlowFrameDetector
 #endif
 
 
@@ -57,7 +57,7 @@ class DefaultModulesPool: AgentModulesPool {
         #endif
 
         // Network Instrumentation
-        #if canImport(MRUMSlowFrameDetector)
+        #if canImport(SplunkSlowFrameDetector)
             knownModules.append(SlowFrameDetector.self)
         #endif
 

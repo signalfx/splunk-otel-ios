@@ -1,7 +1,7 @@
-@testable import MRUMSlowFrameDetector
+@testable import SplunkSlowFrameDetector
 import XCTest
 
-final class MRUMSlowFrameDetectorTests: XCTestCase {
+final class SplunkSlowFrameDetectorTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest
