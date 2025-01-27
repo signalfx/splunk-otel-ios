@@ -18,14 +18,14 @@ limitations under the License.
 import Foundation
 @_implementationOnly import CiscoSessionReplay
 
-typealias MRUMSessionReplayRenderingMode = CiscoSessionReplay.RenderingMode
+typealias SplunkSessionReplayRenderingMode = CiscoSessionReplay.RenderingMode
 
 // Internal extension to convert `RenderingMode` proxy model to the underlying SessionReplay's `RenderingMode` model
 extension RenderingMode {
 
     // MARK: - Computed properties
 
-    var srRenderingMode: MRUMSessionReplayRenderingMode {
+    var srRenderingMode: SplunkSessionReplayRenderingMode {
 
         switch self {
         case .native:
@@ -42,7 +42,7 @@ extension RenderingMode {
 
     // MARK: - Conversion init
 
-    init(with renderingMode: MRUMSessionReplayRenderingMode?) {
+    init(with renderingMode: SplunkSessionReplayRenderingMode?) {
 
         switch renderingMode {
         case .native:

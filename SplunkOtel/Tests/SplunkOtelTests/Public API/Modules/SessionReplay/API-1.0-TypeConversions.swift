@@ -31,7 +31,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
     /*
     func testRenderingModesToProxyConversion() throws {
         /* From module to proxy */
-        var moduleRenderingMode: MRUMSessionReplayRenderingMode = .default
+        var moduleRenderingMode: SplunkSessionReplayRenderingMode = .default
         var proxyRenderingMode: SplunkOtel.RenderingMode = .default
 
         // Test for all possible options
@@ -78,7 +78,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
     func testStatusToProxyConversion() throws {
         /* From module to proxy */
-        var moduleStatus: MRUMSessionReplayStatus = .recording
+        var moduleStatus: SplunkSessionReplayStatus = .recording
         var proxyStatus: SplunkOtel.SessionReplayStatus = .recording
 
 

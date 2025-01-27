@@ -18,14 +18,14 @@ limitations under the License.
 import Foundation
 @_implementationOnly import CiscoSessionReplay
 
-typealias MRUMSessionReplayStatus = CiscoSessionReplay.Status
+typealias SplunkSessionReplayStatus = CiscoSessionReplay.Status
 
 // Internal extension to convert `Status` proxy model to the underlying SessionReplay's `Status` model
 extension SessionReplayStatus {
 
     // MARK: - Computed properties
 
-    var srStatus: MRUMSessionReplayStatus {
+    var srStatus: SplunkSessionReplayStatus {
 
         switch self {
         case .recording:
@@ -62,7 +62,7 @@ extension SessionReplayStatus {
 
 extension SessionReplayStatus {
 
-    init(srStatus: MRUMSessionReplayStatus) {
+    init(srStatus: SplunkSessionReplayStatus) {
 
         switch srStatus {
         case .recording:

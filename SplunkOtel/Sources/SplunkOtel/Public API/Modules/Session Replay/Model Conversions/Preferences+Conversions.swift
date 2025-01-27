@@ -18,11 +18,11 @@ limitations under the License.
 import Foundation
 @_implementationOnly import CiscoSessionReplay
 
-typealias MRUMSessionReplayPreferences = CiscoSessionReplay.Preferences
+typealias SplunkSessionReplayPreferences = CiscoSessionReplay.Preferences
 
 // Internal extensions to convert `SessionReplayModulePreferences` proxy model to
 // the underlying SessionReplay's `Preferences` model and vice versa.
-extension MRUMSessionReplayPreferences {
+extension SplunkSessionReplayPreferences {
 
     // MARK: - Initialization conversion
 
@@ -40,7 +40,7 @@ extension SessionReplayModulePreferences {
 
     // MARK: - Initialization conversion
 
-    init(srPreferences: MRUMSessionReplayPreferences) {
+    init(srPreferences: SplunkSessionReplayPreferences) {
         let renderingMode = RenderingMode(with: srPreferences.renderingMode)
 
         self.init(renderingMode: renderingMode)

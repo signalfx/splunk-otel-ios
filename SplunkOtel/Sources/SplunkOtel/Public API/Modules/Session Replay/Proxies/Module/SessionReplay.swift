@@ -66,7 +66,7 @@ final class SessionReplay: SessionReplayModule {
             (preferences as? SessionReplayPreferences)?.module = module
 
             // Pass changes into the module
-            module.preferences = MRUMSessionReplayPreferences(preferences: preferences)
+            module.preferences = SplunkSessionReplayPreferences(preferences: preferences)
         }
     }
 

@@ -18,13 +18,13 @@ limitations under the License.
 import Foundation
 @_implementationOnly import CiscoSessionReplay
 
-// MARK: - MRUMSessionReplay RecordingMask-related type conversions
+// MARK: - SplunkSessionReplay RecordingMask-related type conversions
 
-typealias MRUMSessionReplayRecordingMask = CiscoSessionReplay.RecordingMask
-typealias MRUMSessionReplayMaskElement = CiscoSessionReplay.MaskElement
-typealias MRUMSessionReplayMaskType = CiscoSessionReplay.MaskElement.MaskType
+typealias SplunkSessionReplayRecordingMask = CiscoSessionReplay.RecordingMask
+typealias SplunkSessionReplayMaskElement = CiscoSessionReplay.MaskElement
+typealias SplunkSessionReplayMaskType = CiscoSessionReplay.MaskElement.MaskType
 
-extension MRUMSessionReplayMaskType {
+extension SplunkSessionReplayMaskType {
 
     // MARK: - MaskType conversion initialization
 
@@ -40,19 +40,19 @@ extension MRUMSessionReplayMaskType {
     }
 }
 
-extension MRUMSessionReplayMaskElement {
+extension SplunkSessionReplayMaskElement {
 
     // MARK: - MaskElement conversion initialization
 
     init(from maskElement: MaskElement) {
         let rect = maskElement.rect
-        let type = MRUMSessionReplayMaskType(from: maskElement.type)
+        let type = SplunkSessionReplayMaskType(from: maskElement.type)
 
         self.init(rect: rect, type: type)
     }
 }
 
-extension MRUMSessionReplayRecordingMask {
+extension SplunkSessionReplayRecordingMask {
 
     // MARK: - RecordingMasks conversion
 
@@ -66,7 +66,7 @@ extension MRUMSessionReplayRecordingMask {
 
         // Converts all contained elements
         let elements = recordingMask.elements.map { maskElement in
-            MRUMSessionReplayMaskElement(from: maskElement)
+            SplunkSessionReplayMaskElement(from: maskElement)
         }
 
         self.init(elements: elements)
@@ -77,7 +77,7 @@ extension MaskElement.MaskType {
 
     // MARK: - MaskType initialization
 
-    init(from maskType: MRUMSessionReplayMaskType) {
+    init(from maskType: SplunkSessionReplayMaskType) {
 
         switch maskType {
         case .erasing:
@@ -96,7 +96,7 @@ extension MaskElement {
 
     // MARK: - MaskElement initialization
 
-    init(from maskElement: MRUMSessionReplayMaskElement) {
+    init(from maskElement: SplunkSessionReplayMaskElement) {
         rect = maskElement.rect
         type = MaskType(from: maskElement.type)
     }
@@ -107,7 +107,7 @@ extension RecordingMask {
 
     // MARK: - RecordingMasks conversion
 
-    init?(from recordingMask: MRUMSessionReplayRecordingMask?) {
+    init?(from recordingMask: SplunkSessionReplayRecordingMask?) {
         guard
             let recordingMask = recordingMask,
             !recordingMask.elements.isEmpty
