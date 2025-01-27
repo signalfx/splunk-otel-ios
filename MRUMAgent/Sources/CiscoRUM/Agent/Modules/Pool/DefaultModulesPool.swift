@@ -27,7 +27,7 @@ limitations under the License.
 
 #if canImport(CiscoSessionReplay)
     @_implementationOnly import CiscoSessionReplay
-    @_implementationOnly import MRUMSessionReplayProxy
+    @_implementationOnly import SplunkSessionReplayProxy
 #endif
 
 #if canImport(MRUMSlowFrameDetector)

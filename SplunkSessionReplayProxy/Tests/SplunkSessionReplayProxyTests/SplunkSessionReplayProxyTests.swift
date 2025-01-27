@@ -1,7 +1,7 @@
-@testable import MRUMSessionReplayProxy
+@testable import SplunkSessionReplayProxy
 import XCTest
 
-final class MRUMSessionReplayProxyTests: XCTestCase {
+final class SplunkSessionReplayProxyTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest

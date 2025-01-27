@@ -20,7 +20,7 @@
       location = "group:SplunkCrashReports">
    </FileRef>
    <FileRef
-      location = "group:MRUMSessionReplayProxy">
+      location = "group:SplunkSessionReplayProxy">
    </FileRef>
    <FileRef
       location = "group:SplunkNetwork">

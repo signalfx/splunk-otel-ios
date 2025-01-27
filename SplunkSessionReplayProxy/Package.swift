@@ -5,7 +5,7 @@ import class Foundation.ProcessInfo
 import PackageDescription
 
 let package = Package(
-    name: "MRUMSessionReplayProxy",
+    name: "SplunkSessionReplayProxy",
     platforms: [
         .iOS(.v13),
         .tvOS(.v13),
@@ -13,8 +13,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "MRUMSessionReplayProxy",
-            targets: ["MRUMSessionReplayProxy"]
+            name: "SplunkSessionReplayProxy",
+            targets: ["SplunkSessionReplayProxy"]
         )
     ],
     dependencies: [
@@ -23,15 +23,15 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "MRUMSessionReplayProxy",
+            name: "SplunkSessionReplayProxy",
             dependencies: [
                 "MRUMSharedProtocols",
                 .product(name: "CiscoSessionReplay", package: "smartlook-ios-sdk-private")
             ]
         ),
         .testTarget(
-            name: "MRUMSessionReplayProxyTests",
-            dependencies: ["MRUMSessionReplayProxy"]
+            name: "SplunkSessionReplayProxyTests",
+            dependencies: ["SplunkSessionReplayProxy"]
         )
     ]
 )
