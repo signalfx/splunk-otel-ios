@@ -19,9 +19,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E46896282B21C85800727A6A"
-               BuildableName = "CiscoRUMTests.xctest"
-               BlueprintName = "CiscoRUMTests"
-               ReferencedContainer = "container:CiscoRUM.xcodeproj">
+               BuildableName = "SplunkOtelTests.xctest"
+               BlueprintName = "SplunkOtelTests"
+               ReferencedContainer = "container:SplunkOtel.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
