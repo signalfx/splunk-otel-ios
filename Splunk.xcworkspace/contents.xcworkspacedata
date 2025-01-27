@@ -11,7 +11,7 @@
       location = "group:DevelApp/DevelApp.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:MRUMAgent/CiscoRUM.xcodeproj">
+      location = "group:SplunkOtel/SplunkOtel.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:SplunkSharedProtocols">
