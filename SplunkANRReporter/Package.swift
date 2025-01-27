@@ -3,27 +3,27 @@
 import PackageDescription
 
 let package = Package(
-    name: "MRUMANRReporter",
+    name: "SplunkANRReporter",
     platforms: [
         .iOS(.v13),
         .tvOS(.v13)
     ],
     products: [
         .library(
-            name: "MRUMANRReporter",
-            targets: ["MRUMANRReporter"])
+            name: "SplunkANRReporter",
+            targets: ["SplunkANRReporter"])
     ],
     dependencies: [
         .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols")
     ],
     targets: [
         .target(
-            name: "MRUMANRReporter",
+            name: "SplunkANRReporter",
             dependencies: [
                 "MRUMSharedProtocols"
             ]),
         .testTarget(
-            name: "MRUMANRReporterTests",
-            dependencies: ["MRUMANRReporter"])
+            name: "SplunkANRReporterTests",
+            dependencies: ["SplunkANRReporter"])
     ]
 )

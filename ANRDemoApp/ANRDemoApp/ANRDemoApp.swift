@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import CiscoRUM
-import MRUMANRReporter
+import SplunkANRReporter
 import SwiftUI
 
 @main

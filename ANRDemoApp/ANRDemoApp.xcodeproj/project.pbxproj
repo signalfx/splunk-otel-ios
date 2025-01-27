@@ -154,7 +154,7 @@
 			);
 			mainGroup = 526D7E832B5A0E8B001183B8;
 			packageReferences = (
-				526E2D782B5B4C6300A7CEA4 /* XCLocalSwiftPackageReference "../MRUMANRReporter" */,
+				526E2D782B5B4C6300A7CEA4 /* XCLocalSwiftPackageReference "../SplunkANRReporter" */,
 			);
 			productRefGroup = 526D7E8D2B5A0E8B001183B8 /* Products */;
 			projectDirPath = "";
@@ -395,9 +395,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		526E2D782B5B4C6300A7CEA4 /* XCLocalSwiftPackageReference "../MRUMANRReporter" */ = {
+		526E2D782B5B4C6300A7CEA4 /* XCLocalSwiftPackageReference "../SplunkANRReporter" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../MRUMANRReporter;
+			relativePath = ../SplunkANRReporter;
 		};
 /* End XCLocalSwiftPackageReference section */
 	};

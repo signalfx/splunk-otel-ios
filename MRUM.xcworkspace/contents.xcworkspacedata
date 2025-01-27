@@ -38,7 +38,7 @@
       location = "group:ADCrashReporter">
    </FileRef>
    <FileRef
-      location = "group:MRUMANRReporter">
+      location = "group:SplunkANRReporter">
    </FileRef>
    <FileRef
       location = "group:MRUMSlowFrameDetector">
