@@ -27,7 +27,7 @@
 		2AE43B492B861325002C4A98 /* AgentEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B442B861325002C4A98 /* AgentEvent.swift */; };
 		2AE43B4A2B861325002C4A98 /* SessionPulseEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B452B861325002C4A98 /* SessionPulseEvent.swift */; };
 		2AE43B4B2B861325002C4A98 /* SessionStartEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B462B861325002C4A98 /* SessionStartEvent.swift */; };
-		3384F2AD2AC879FD00512D79 /* CiscoRUMAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F2AC2AC879FD00512D79 /* CiscoRUMAgent.swift */; };
+		3384F2AD2AC879FD00512D79 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F2AC2AC879FD00512D79 /* SplunkRum.swift */; };
 		4B1B15162BB584D300BEFC4B /* SplunkSharedProtocols in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15152BB584D300BEFC4B /* SplunkSharedProtocols */; };
 		4B1B15192BB584E300BEFC4B /* SplunkSessionReplayProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B15182BB584E300BEFC4B /* SplunkSessionReplayProxy */; };
 		4B1B151F2BB5858600BEFC4B /* SplunkOpenTelemetry in Frameworks */ = {isa = PBXBuildFile; productRef = 4B1B151E2BB5858600BEFC4B /* SplunkOpenTelemetry */; };
@@ -197,7 +197,7 @@
 		2AE43B452B861325002C4A98 /* SessionPulseEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionPulseEvent.swift; sourceTree = "<group>"; };
 		2AE43B462B861325002C4A98 /* SessionStartEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionStartEvent.swift; sourceTree = "<group>"; };
 		3384F2A22AC879E900512D79 /* CiscoRUM.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CiscoRUM.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		3384F2AC2AC879FD00512D79 /* CiscoRUMAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CiscoRUMAgent.swift; sourceTree = "<group>"; };
+		3384F2AC2AC879FD00512D79 /* SplunkRum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkRum.swift; sourceTree = "<group>"; };
 		4B2C8BBA2BCBE4A200C6E72F /* CrashReportsDataEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportsDataEvent.swift; sourceTree = "<group>"; };
 		4B2CF88B2BC8875E005CFC35 /* SplunkNetwork */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkNetwork; path = ../SplunkNetwork; sourceTree = "<group>"; };
 		4B536BF22B67FAFE004A6C7C /* Release-staticlib.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Release-staticlib.xcconfig"; sourceTree = "<group>"; };
@@ -1075,7 +1075,7 @@
 			children = (
 				E4134BA92BC6ABD700F0D2FC /* Model */,
 				4BB680CA2B7940C0000A54D4 /* Modules */,
-				3384F2AC2AC879FD00512D79 /* CiscoRUMAgent.swift */,
+				3384F2AC2AC879FD00512D79 /* SplunkRum.swift */,
 				E4F2E5012B172E9C006EBA69 /* API-1.0-Configuration.swift */,
 				E4F2E50F2B1737F2006EBA69 /* API-1.0-Session.swift */,
 				E4F2E5132B173D34006EBA69 /* API-1.0-State.swift */,
@@ -1331,7 +1331,7 @@
 				2AAD518E2BA97FD500710505 /* DefaultEventManager.swift in Sources */,
 				4BB680F22B7940C0000A54D4 /* API-1.0-SessionReplayModuleState.swift in Sources */,
 				C703FAB52BAB0D4A000CC11B /* AppStateEvent.swift in Sources */,
-				3384F2AD2AC879FD00512D79 /* CiscoRUMAgent.swift in Sources */,
+				3384F2AD2AC879FD00512D79 /* SplunkRum.swift in Sources */,
 				E4A708B32B9754B7002C692E /* RepeatingJob.swift in Sources */,
 				E4EE9ED42BA34A400000D594 /* SessionReplayNonOperationalState.swift in Sources */,
 				2AE43B492B861325002C4A98 /* AgentEvent.swift in Sources */,
