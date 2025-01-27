@@ -1,4 +1,4 @@
-# ``CiscoRUM/CiscoRUMAgent``
+# ``SplunkOtel/SplunkRum``
 
 ## Overview
 

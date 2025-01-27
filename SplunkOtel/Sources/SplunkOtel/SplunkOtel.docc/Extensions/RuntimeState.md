@@ -1,4 +1,4 @@
-# ``CiscoRUM/RuntimeState``
+# ``SplunkOtel/RuntimeState``
 
 ## Topics
 

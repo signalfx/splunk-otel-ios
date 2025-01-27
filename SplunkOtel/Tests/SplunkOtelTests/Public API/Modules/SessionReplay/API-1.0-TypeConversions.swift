@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import CiscoRUM
+@testable import SplunkOtel
 @testable import CiscoSessionReplay
 
 import XCTest
@@ -32,7 +32,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
     func testRenderingModesToProxyConversion() throws {
         /* From module to proxy */
         var moduleRenderingMode: MRUMSessionReplayRenderingMode = .default
-        var proxyRenderingMode: CiscoRUM.RenderingMode = .default
+        var proxyRenderingMode: SplunkOtel.RenderingMode = .default
 
         // Test for all possible options
         proxyRenderingMode = .init(with: moduleRenderingMode)
@@ -53,7 +53,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
     func testRenderingModesToModuleConversion() throws {
         /* From proxy to module */
-        var proxyRenderingMode: CiscoRUM.RenderingMode = .default
+        var proxyRenderingMode: SplunkOtel.RenderingMode = .default
         var srRenderingMode = proxyRenderingMode.srRenderingMode
         XCTAssertEqual(srRenderingMode, .default)
 
@@ -79,7 +79,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
     func testStatusToProxyConversion() throws {
         /* From module to proxy */
         var moduleStatus: MRUMSessionReplayStatus = .recording
-        var proxyStatus: CiscoRUM.SessionReplayStatus = .recording
+        var proxyStatus: SplunkOtel.SessionReplayStatus = .recording
 
 
         // Recording
@@ -119,7 +119,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
     func testStatusToModuleConversion() throws {
         /* From module to proxy */
-        var proxyStatus: CiscoRUM.SessionReplayStatus = .recording
+        var proxyStatus: SplunkOtel.SessionReplayStatus = .recording
         var srStatus = proxyStatus.srStatus
 
 

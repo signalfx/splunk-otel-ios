@@ -15,13 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import CiscoRUM
+@testable import SplunkOtel
 
 final class AgentTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func buildDefault() throws -> CiscoRUMAgent {
+    public static func buildDefault() throws -> SplunkRum {
         // We use prepared configuration
         let configuration = try ConfigurationTestBuilder.buildDefault()
 
@@ -31,7 +31,7 @@ final class AgentTestBuilder {
         return agent
     }
 
-    public static func build(with configuration: Configuration, session: AgentSession = DefaultSession()) throws -> CiscoRUMAgent {
+    public static func build(with configuration: Configuration, session: AgentSession = DefaultSession()) throws -> SplunkRum {
         // Custom key-value storage instance with different keys for testing
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "com.cisco.mrum.test.")
         let user = DefaultUser(storage: storage)
@@ -46,7 +46,7 @@ final class AgentTestBuilder {
         let appStateManager = AppStateManager(appStateModel: appStateModel)
 
         // Agent configured for tests
-        let agent = CiscoRUMAgent(
+        let agent = SplunkRum(
             configurationHandler: handler,
             user: user,
             session: session,

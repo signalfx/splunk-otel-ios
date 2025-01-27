@@ -1,4 +1,4 @@
-# ``CiscoRUM/Session``
+# ``SplunkOtel/Session``
 
 ## Topics
 

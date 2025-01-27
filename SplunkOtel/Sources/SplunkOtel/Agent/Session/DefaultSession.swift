@@ -49,7 +49,7 @@ class DefaultSession: AgentSession {
     // MARK: - Public
 
     /// The agent instance to which the session belongs.
-    public unowned var owner: CiscoRUMAgent?
+    public unowned var owner: SplunkRum?
 
     /// Defines the minimum session refresh interval (defined in seconds). Default value is 1 second.
     public var sessionRefreshInterval: Double = 1

@@ -41,7 +41,7 @@ protocol AgentEventManager {
     ///   - configuration: Agent Configuration object.
     ///   - agent: Agent object, used to obtain Session information and User information.
     ///   - eventsModel: Events model object to store persisted events metadata.
-    init(with configuration: AgentConfiguration, agent: CiscoRUMAgent, eventsModel: EventsModel)
+    init(with configuration: AgentConfiguration, agent: SplunkRum, eventsModel: EventsModel)
 
 
     // MARK: - Module Events

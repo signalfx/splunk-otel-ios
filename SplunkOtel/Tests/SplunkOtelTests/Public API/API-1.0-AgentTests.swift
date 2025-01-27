@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import CiscoRUM
+@testable import SplunkOtel
 import XCTest
 
 final class API10AgentTests: XCTestCase {
@@ -28,7 +28,7 @@ final class API10AgentTests: XCTestCase {
 
         // Agent install
         let configuration = try ConfigurationTestBuilder.buildDefault()
-        var agent: CiscoRUMAgent? = CiscoRUMAgent.install(with: configuration)
+        var agent: SplunkRum? = SplunkRum.install(with: configuration)
 
         // The agent should run after install
         let agentStatus = try XCTUnwrap(agent?.state.status)
@@ -36,7 +36,7 @@ final class API10AgentTests: XCTestCase {
         XCTAssertEqual(agentStatus, expectedStatus)
 
         // Another attempt to install should return an instance from the previous attempt
-        let anotherAgentInstance = CiscoRUMAgent.install(with: configuration)
+        let anotherAgentInstance = SplunkRum.install(with: configuration)
         XCTAssertTrue(agent === anotherAgentInstance)
 
         agent = nil

@@ -1,4 +1,4 @@
-# ``CiscoRUM``
+# ``SplunkOtel``
 
 Create better mobile app experiences for your users.
 
@@ -6,7 +6,7 @@ Create better mobile app experiences for your users.
 
 ### Essentials
 
-- ``CiscoRUMAgent``
+- ``SplunkRum``
 - ``Configuration``
 
 

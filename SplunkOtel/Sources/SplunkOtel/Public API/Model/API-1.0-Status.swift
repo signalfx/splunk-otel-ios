@@ -29,7 +29,7 @@ public enum Status: Equatable {
 
     /// The cause why the recording is currently not running.
     public enum Cause {
-        /// The CiscoRUM agent is not supported on the current platform.
+        /// The SplunkOtel agent is not supported on the current platform.
         case unsupportedPlatform
 
         /// Disabled by remote configuration.

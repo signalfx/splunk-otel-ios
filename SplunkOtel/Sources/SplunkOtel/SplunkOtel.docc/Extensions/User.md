@@ -1,4 +1,4 @@
-# ``CiscoRUM/User``
+# ``SplunkOtel/User``
 
 ## Topics
 

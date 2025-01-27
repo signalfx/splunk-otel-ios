@@ -42,7 +42,7 @@ class DefaultEventManager: AgentEventManager {
     var traceProcesssor: TraceProcessor
 
     // Agent reference
-    private unowned let agent: CiscoRUMAgent
+    private unowned let agent: SplunkRum
 
     // Logger
     private let logger = InternalLogger(configuration: .agent(category: "EventManager"))
@@ -56,7 +56,7 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Initialization
 
-    required init(with configuration: AgentConfiguration, agent: CiscoRUMAgent, eventsModel: EventsModel = EventsModel()) {
+    required init(with configuration: AgentConfiguration, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
         self.agent = agent
         self.eventsModel = eventsModel
 
@@ -67,7 +67,7 @@ class DefaultEventManager: AgentEventManager {
         // Will be used later by hybrid agents
         let hybridType: String? = nil
 
-        let agentVersion = CiscoRUMAgent.version
+        let agentVersion = SplunkRum.version
 
         // Build resources
         let resources = DefaultResources(

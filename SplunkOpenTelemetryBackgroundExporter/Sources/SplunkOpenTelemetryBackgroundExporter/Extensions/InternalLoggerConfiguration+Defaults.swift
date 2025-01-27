@@ -23,11 +23,11 @@ import SplunkLogger
 public extension InternalLoggerConfiguration {
 
     /// Provides a default `InternalLoggerConfiguration` with the pre-specified subsystem to
-    /// "CiscoRUM OTel Background Exporter" and a variable category.
+    /// "SplunkOtel OTel Background Exporter" and a variable category.
     ///
     /// - Parameters:
     ///  - category: More finely-grained category of the logged subsystem.
-    static func backgroundExporter(subsystem: String = "CiscoRUM OTel Background Exporter", category: String) -> InternalLoggerConfiguration {
+    static func backgroundExporter(subsystem: String = "SplunkOtel OTel Background Exporter", category: String) -> InternalLoggerConfiguration {
         return InternalLoggerConfiguration(subsystem: subsystem, category: category)
     }
 }

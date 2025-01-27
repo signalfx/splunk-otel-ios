@@ -22,12 +22,12 @@ public final class Session {
 
     // MARK: - Internal
 
-    private unowned let owner: CiscoRUMAgent
+    private unowned let owner: SplunkRum
 
 
     // MARK: - Initialization
 
-    init(for owner: CiscoRUMAgent) {
+    init(for owner: SplunkRum) {
         self.owner = owner
     }
 }

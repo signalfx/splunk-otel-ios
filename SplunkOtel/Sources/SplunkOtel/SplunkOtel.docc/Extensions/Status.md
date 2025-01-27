@@ -1,4 +1,4 @@
-# ``CiscoRUM/Status``
+# ``SplunkOtel/Status``
 
 ## Topics
 

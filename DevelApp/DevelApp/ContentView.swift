@@ -6,21 +6,21 @@
 //
 
 import SwiftUI
-import CiscoRUM
+import SplunkOtel
 
 struct ContentView: View {
 
     // MARK: - Versions
 
-    let agentVersion = CiscoRUMAgent.version
-    let agentAppVersion = CiscoRUMAgent.instance?.state.appVersion ?? "nil"
+    let agentVersion = SplunkRum.version
+    let agentAppVersion = SplunkRum.instance?.state.appVersion ?? "nil"
 
 
     // MARK: - Identifiers
 
-    let userId = CiscoRUMAgent.instance?.user.identifier ?? "nil"
-    @State private var sessionId = CiscoRUMAgent.instance?.session.currentSessionId ?? "nil"
-    @State private var agentStatus = CiscoRUMAgent.instance?.state.status ?? .notRunning(.notEnabled)
+    let userId = SplunkRum.instance?.user.identifier ?? "nil"
+    @State private var sessionId = SplunkRum.instance?.session.currentSessionId ?? "nil"
+    @State private var agentStatus = SplunkRum.instance?.state.status ?? .notRunning(.notEnabled)
 
     let sessionPublisher = NotificationCenter.default
         .publisher(

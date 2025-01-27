@@ -1,4 +1,4 @@
-# ``CiscoRUM/SessionReplayModule``
+# ``SplunkOtel/SessionReplayModule``
 
 ## Topics
 

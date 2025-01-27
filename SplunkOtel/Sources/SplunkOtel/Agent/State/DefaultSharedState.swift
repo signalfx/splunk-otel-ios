@@ -25,7 +25,7 @@ class DefaultSharedState: AgentSharedState {
 
     // MARK: - Internal
 
-    private unowned let owner: CiscoRUMAgent
+    private unowned let owner: SplunkRum
 
 
     // MARK: - General state
@@ -41,7 +41,7 @@ class DefaultSharedState: AgentSharedState {
 
     // MARK: - Initialization
 
-    init(for owner: CiscoRUMAgent) {
+    init(for owner: SplunkRum) {
         self.owner = owner
     }
 }

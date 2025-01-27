@@ -29,7 +29,7 @@ import Foundation
 @_implementationOnly import SplunkSharedProtocols
 
 /// The class implementing MRUM Agent public API.
-public class CiscoRUMAgent: ObservableObject {
+public class SplunkRum: ObservableObject {
 
     // MARK: - Internal properties
 
@@ -69,7 +69,7 @@ public class CiscoRUMAgent: ObservableObject {
     /// An singleton instance of the Agent library.
     ///
     /// This instance is used to access all the SDK functions.
-    public private(set) static var instance: CiscoRUMAgent?
+    public private(set) static var instance: SplunkRum?
 
 
     // MARK: - Public API
@@ -117,8 +117,8 @@ public class CiscoRUMAgent: ObservableObject {
     ///   - configuration: A configuration for the initial SDK setup.
     ///   - moduleConfigurations: An array of individual module-specific configurations.
     ///
-    /// - Returns: A newly initialized `CiscoRUMAgent` instance.
-    public static func install(with configuration: Configuration, moduleConfigurations: [Any]? = nil) -> CiscoRUMAgent {
+    /// - Returns: A newly initialized `SplunkRum` instance.
+    public static func install(with configuration: Configuration, moduleConfigurations: [Any]? = nil) -> SplunkRum {
         // Only one instance is allowed
         if let sharedInstance = instance {
             return sharedInstance
@@ -128,7 +128,7 @@ public class CiscoRUMAgent: ObservableObject {
         let configurationHandler = createConfigurationHandler(for: configuration)
 
         // Builds agent with default logic
-        let agent = CiscoRUMAgent(
+        let agent = SplunkRum(
             configurationHandler: configurationHandler,
             user: DefaultUser(),
             session: DefaultSession(),
@@ -154,7 +154,7 @@ public class CiscoRUMAgent: ObservableObject {
         // Initialize Event manager
         agent.eventManager = DefaultEventManager(with: configuration, agent: agent)
 
-        // Send session start event immediately as the session already started in the CiscoRUMAgent init method.
+        // Send session start event immediately as the session already started in the SplunkRum init method.
         agent.eventManager?.sendSessionStartEvent()
 
         // Starts connecting available modules to agent

@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import CiscoRUM
+@testable import SplunkOtel
 @testable import SplunkOpenTelemetry
 @testable import CiscoSessionReplay
 @testable import SplunkSharedProtocols
@@ -26,7 +26,7 @@ final class EventsTests: XCTestCase {
 
     // MARK: - Private
 
-    private var agent: CiscoRUMAgent?
+    private var agent: SplunkRum?
     private var sampleVideoData: Data?
 
 

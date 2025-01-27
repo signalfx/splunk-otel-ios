@@ -1,4 +1,4 @@
-# ``CiscoRUM/Configuration``
+# ``SplunkOtel/Configuration``
 
 ## Topics
 

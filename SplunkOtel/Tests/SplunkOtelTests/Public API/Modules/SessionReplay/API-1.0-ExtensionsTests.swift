@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import CiscoRUM
+@testable import SplunkOtel
 import XCTest
 
 final class SessionReplayAPI10ExtensionsTests: XCTestCase {
@@ -30,7 +30,7 @@ final class SessionReplayAPI10ExtensionsTests: XCTestCase {
 
         // Agent install with initialized Session Replay module (by default)
         let configuration = try ConfigurationTestBuilder.buildDefault()
-        let agent = CiscoRUMAgent.install(with: configuration)
+        let agent = SplunkRum.install(with: configuration)
 
         // Stop recording immediately (we don't need it)
         agent.sessionReplay.stop()
