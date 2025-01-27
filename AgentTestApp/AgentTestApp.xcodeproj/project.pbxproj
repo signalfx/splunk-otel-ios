@@ -13,8 +13,8 @@
 		BA188B212BA0C91B00DACB15 /* Crashes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA188B1F2BA0C91B00DACB15 /* Crashes.swift */; };
 		BA338B462B9A610600D2F3B6 /* TestApiCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA338B452B9A610600D2F3B6 /* TestApiCalls.swift */; };
 		BA338B482B9A612400D2F3B6 /* TestApiCallsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA338B472B9A612400D2F3B6 /* TestApiCallsViewController.swift */; };
-		BA4F272C2BA3A37200052600 /* CiscoRUM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA4F272B2BA3A37200052600 /* CiscoRUM.framework */; };
-		BA4F272D2BA3A37200052600 /* CiscoRUM.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BA4F272B2BA3A37200052600 /* CiscoRUM.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BA4F272C2BA3A37200052600 /* SplunkOtel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA4F272B2BA3A37200052600 /* SplunkOtel.framework */; };
+		BA4F272D2BA3A37200052600 /* SplunkOtel.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BA4F272B2BA3A37200052600 /* SplunkOtel.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BA5E5A442B6859BC0022CEB2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5E5A432B6859BC0022CEB2 /* AppDelegate.swift */; };
 		BA5E5A462B6859BC0022CEB2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5E5A452B6859BC0022CEB2 /* SceneDelegate.swift */; };
 		BA5E5A482B6859BC0022CEB2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5E5A472B6859BC0022CEB2 /* ViewController.swift */; };
@@ -32,7 +32,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				BA4F272D2BA3A37200052600 /* CiscoRUM.framework in Embed Frameworks */,
+				BA4F272D2BA3A37200052600 /* SplunkOtel.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -46,7 +46,7 @@
 		BA188B1F2BA0C91B00DACB15 /* Crashes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crashes.swift; sourceTree = "<group>"; };
 		BA338B452B9A610600D2F3B6 /* TestApiCalls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestApiCalls.swift; sourceTree = "<group>"; };
 		BA338B472B9A612400D2F3B6 /* TestApiCallsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestApiCallsViewController.swift; sourceTree = "<group>"; };
-		BA4F272B2BA3A37200052600 /* CiscoRUM.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CiscoRUM.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA4F272B2BA3A37200052600 /* SplunkOtel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkOtel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA5E5A402B6859BC0022CEB2 /* AgentTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgentTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA5E5A432B6859BC0022CEB2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BA5E5A452B6859BC0022CEB2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -64,7 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BA4F272C2BA3A37200052600 /* CiscoRUM.framework in Frameworks */,
+				BA4F272C2BA3A37200052600 /* SplunkOtel.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,7 +74,7 @@
 		BA4F272A2BA3A37200052600 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BA4F272B2BA3A37200052600 /* CiscoRUM.framework */,
+				BA4F272B2BA3A37200052600 /* SplunkOtel.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -376,7 +376,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.AppDynamics.AgentTestApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.AgentTestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -407,7 +407,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.AppDynamics.AgentTestApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.AgentTestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
