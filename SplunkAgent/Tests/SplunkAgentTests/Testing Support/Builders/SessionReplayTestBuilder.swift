@@ -15,14 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkOtel
+@testable import SplunkAgent
 import CiscoSessionReplay
 
 final class SessionReplayTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func buildDefault() -> SplunkOtel.SessionReplay {
+    public static func buildDefault() -> SplunkAgent.SessionReplay {
         // Build Session Replay proxy with actual Session Replay module
         let module = CiscoSessionReplay.SessionReplay.instance
         let moduleProxy = SessionReplay(for: module)

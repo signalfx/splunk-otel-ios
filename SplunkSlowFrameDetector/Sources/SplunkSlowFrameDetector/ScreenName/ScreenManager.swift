@@ -22,12 +22,12 @@ import OpenTelemetrySdk
 
 // Global convenience functions to maintain compatibility with legacy code
 
-// TODO: Consider lifting this up out of this module and into SplunkOtel
+// TODO: Consider lifting this up out of this module and into SplunkAgent
 //
 // we need some team input on this.
 //
 // For example, it might go under a new group "ScreenContent":
-// SplunkOtel ->
+// SplunkAgent ->
 //            Agent ->
 //                    ScreenContent ->
 //                                    ScreenName.swift

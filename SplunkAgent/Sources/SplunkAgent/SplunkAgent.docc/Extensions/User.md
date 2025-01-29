@@ -1,4 +1,4 @@
-# ``SplunkOtel/User``
+# ``SplunkAgent/User``
 
 ## Topics
 

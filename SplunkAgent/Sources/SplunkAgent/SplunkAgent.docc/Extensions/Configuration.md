@@ -1,4 +1,4 @@
-# ``SplunkOtel/Configuration``
+# ``SplunkAgent/Configuration``
 
 ## Topics
 

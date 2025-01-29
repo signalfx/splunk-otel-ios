@@ -1,4 +1,4 @@
-# ``SplunkOtel``
+# ``SplunkAgent``
 
 Create better mobile app experiences for your users.
 

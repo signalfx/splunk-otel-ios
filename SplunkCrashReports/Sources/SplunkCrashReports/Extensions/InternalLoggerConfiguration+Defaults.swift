@@ -23,11 +23,11 @@ import SplunkLogger
 public extension InternalLoggerConfiguration {
 
     /// Provides a default `InternalLoggerConfiguration` with the pre-specified subsystem to
-    /// "SplunkOtel Crash Reporter" and a variable category.
+    /// "SplunkAgent Crash Reporter" and a variable category.
     ///
     /// - Parameters:
     ///  - category: More finely-grained category of the logged subsystem.
-    static func crashReporter(subsystem: String = "SplunkOtel Crash Reporter", category: String) -> InternalLoggerConfiguration {
+    static func crashReporter(subsystem: String = "SplunkAgent Crash Reporter", category: String) -> InternalLoggerConfiguration {
         return InternalLoggerConfiguration(subsystem: subsystem, category: category)
     }
 }

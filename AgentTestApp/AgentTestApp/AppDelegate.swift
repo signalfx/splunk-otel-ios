@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import UIKit
-import SplunkOtel
+import SplunkAgent
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {

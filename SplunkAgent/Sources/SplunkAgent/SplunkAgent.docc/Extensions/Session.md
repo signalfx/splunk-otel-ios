@@ -1,4 +1,4 @@
-# ``SplunkOtel/Session``
+# ``SplunkAgent/Session``
 
 ## Topics
 

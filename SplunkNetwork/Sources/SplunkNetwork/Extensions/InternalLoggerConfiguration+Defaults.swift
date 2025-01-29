@@ -23,11 +23,11 @@ import SplunkLogger
 public extension InternalLoggerConfiguration {
 
     /// Provides a default `InternalLoggerConfiguration` with the pre-specified subsystem to
-    /// "SplunkOtel Network Instrumentation" and a variable category.
+    /// "SplunkAgent Network Instrumentation" and a variable category.
     ///
     /// - Parameters:
     ///  - category: More finely-grained category of the logged subsystem.
-    static func networkInstrumentation(subsystem: String = "SplunkOtel Network Instrumentation", category: String) -> InternalLoggerConfiguration {
+    static func networkInstrumentation(subsystem: String = "SplunkAgent Network Instrumentation", category: String) -> InternalLoggerConfiguration {
         return InternalLoggerConfiguration(subsystem: subsystem, category: category)
     }
 }

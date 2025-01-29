@@ -1,4 +1,4 @@
-# ``SplunkOtel/SessionReplayModule``
+# ``SplunkAgent/SessionReplayModule``
 
 ## Topics
 

@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkOtel
+@testable import SplunkAgent
 import Foundation
 
 final class APIClientTestBuilder {
@@ -62,7 +62,7 @@ struct MockEndpoint: Endpoint {
 class URLProtocolMock: URLProtocol {
     static var testURLs = [String: Data]()
 
-    static let mainUrl = URL(string: "https://www.splunkotel.test")!
+    static let mainUrl = URL(string: "https://www.SplunkAgent.test")!
     static let testErrorPath = "error"
     static let testServerErrorPath = "testServerError"
 

@@ -1,4 +1,4 @@
-# ``SplunkOtel/RuntimeState``
+# ``SplunkAgent/RuntimeState``
 
 ## Topics
 

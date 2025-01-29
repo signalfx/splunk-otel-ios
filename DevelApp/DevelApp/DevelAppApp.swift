@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import SplunkOtel
+import SplunkAgent
 
 @main
 struct DevelAppApp: App {

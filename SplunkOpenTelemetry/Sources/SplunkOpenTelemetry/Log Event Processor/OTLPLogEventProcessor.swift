@@ -35,7 +35,7 @@ public class OTLPLogEventProcessor: LogEventProcessor {
     private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk RUM OTel", category: "Logs"))
 
     // Logger background dispatch queues
-    private let backgroundQueue = DispatchQueue(label: "com.SplunkOtel.LogEventProcessor", qos: .utility)
+    private let backgroundQueue = DispatchQueue(label: "com.splunk.rum.LogEventProcessor", qos: .utility)
     
     // Stored properties for Unit tests
 #if DEBUG

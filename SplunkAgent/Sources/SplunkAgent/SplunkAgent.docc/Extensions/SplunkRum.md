@@ -1,4 +1,4 @@
-# ``SplunkOtel/SplunkRum``
+# ``SplunkAgent/SplunkRum``
 
 ## Overview
 

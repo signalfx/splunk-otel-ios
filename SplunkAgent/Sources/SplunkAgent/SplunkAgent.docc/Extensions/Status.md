@@ -1,4 +1,4 @@
-# ``SplunkOtel/Status``
+# ``SplunkAgent/Status``
 
 ## Topics
 
