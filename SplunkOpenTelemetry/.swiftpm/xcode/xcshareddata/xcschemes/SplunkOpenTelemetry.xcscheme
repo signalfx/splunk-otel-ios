@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1510"
+   LastUpgradeVersion = "1620"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      buildArchitectures = "Automatic">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -14,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "MRUMCrashReports"
-               BuildableName = "MRUMCrashReports"
-               BlueprintName = "MRUMCrashReports"
+               BlueprintIdentifier = "SplunkOpenTelemetry"
+               BuildableName = "SplunkOpenTelemetry"
+               BlueprintName = "SplunkOpenTelemetry"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,9 +34,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "MRUMCrashReportsTests"
-               BuildableName = "MRUMCrashReportsTests"
-               BlueprintName = "MRUMCrashReportsTests"
+               BlueprintIdentifier = "SplunkOpenTelemetryTests"
+               BuildableName = "SplunkOpenTelemetryTests"
+               BlueprintName = "SplunkOpenTelemetryTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -61,9 +62,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "MRUMCrashReports"
-            BuildableName = "MRUMCrashReports"
-            BlueprintName = "MRUMCrashReports"
+            BlueprintIdentifier = "SplunkOpenTelemetry"
+            BuildableName = "SplunkOpenTelemetry"
+            BlueprintName = "SplunkOpenTelemetry"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1500"
+   LastUpgradeVersion = "1620"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      buildArchitectures = "Automatic">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -14,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "MRUMNetwork"
-               BuildableName = "MRUMNetwork"
-               BlueprintName = "MRUMNetwork"
+               BlueprintIdentifier = "SplunkCrashReports"
+               BuildableName = "SplunkCrashReports"
+               BlueprintName = "SplunkCrashReports"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,6 +29,18 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
       shouldAutocreateTestPlan = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SplunkCrashReportsTests"
+               BuildableName = "SplunkCrashReportsTests"
+               BlueprintName = "SplunkCrashReportsTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -49,9 +62,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "MRUMNetwork"
-            BuildableName = "MRUMNetwork"
-            BlueprintName = "MRUMNetwork"
+            BlueprintIdentifier = "SplunkCrashReports"
+            BuildableName = "SplunkCrashReports"
+            BlueprintName = "SplunkCrashReports"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>

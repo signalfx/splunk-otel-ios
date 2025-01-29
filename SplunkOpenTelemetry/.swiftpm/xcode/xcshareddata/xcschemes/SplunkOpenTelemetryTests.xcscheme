@@ -1,26 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1520"
+   LastUpgradeVersion = "1620"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
-      <BuildActionEntries>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "MRUMSharedProtocols"
-               BuildableName = "MRUMSharedProtocols"
-               BlueprintName = "MRUMSharedProtocols"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </BuildActionEntry>
-      </BuildActionEntries>
+      buildImplicitDependencies = "YES"
+      buildArchitectures = "Automatic">
    </BuildAction>
    <TestAction
       buildConfiguration = "Debug"
@@ -33,9 +18,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "MRUMSharedProtocolsTests"
-               BuildableName = "MRUMSharedProtocolsTests"
-               BlueprintName = "MRUMSharedProtocolsTests"
+               BlueprintIdentifier = "SplunkOpenTelemetryTests"
+               BuildableName = "SplunkOpenTelemetryTests"
+               BlueprintName = "SplunkOpenTelemetryTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -58,15 +43,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "MRUMSharedProtocols"
-            BuildableName = "MRUMSharedProtocols"
-            BlueprintName = "MRUMSharedProtocols"
-            ReferencedContainer = "container:">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
