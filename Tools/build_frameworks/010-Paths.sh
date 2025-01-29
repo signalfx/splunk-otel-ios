@@ -3,7 +3,7 @@
 # Various important paths used by the script.
 
 function mrum_project {
-    echo "${PROJECT_DIR}/SplunkOtel/SplunkOtel.xcodeproj"
+    echo "${PROJECT_DIR}/SplunkAgent/SplunkAgent.xcodeproj"
 }
 
 function mrum_workspace {

@@ -2,7 +2,7 @@
 
 function print_help {
     log ''
-    log 'Builds SplunkOtel 1.0 frameworks.'
+    log 'Builds SplunkAgent 1.0 frameworks.'
     log ''
 
     log ''
