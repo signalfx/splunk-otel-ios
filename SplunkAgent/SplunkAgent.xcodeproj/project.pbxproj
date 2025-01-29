@@ -88,7 +88,7 @@
 		E4134BAB2BC6AC5400F0D2FC /* API-1.0-Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4134BAA2BC6AC5400F0D2FC /* API-1.0-Status.swift */; };
 		E41FB0932B90D873009F5CA6 /* DefaultSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41FB0922B90D873009F5CA6 /* DefaultSharedState.swift */; };
 		E42026A32B501304002C5F80 /* UserDefaultsStorageCRUDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42026A22B501304002C5F80 /* UserDefaultsStorageCRUDTests.swift */; };
-		E42634832BB44B0F003706A9 /* SplunkOtel.docc in Sources */ = {isa = PBXBuildFile; fileRef = E42634822BB44B0F003706A9 /* SplunkOtel.docc */; };
+		E42634832BB44B0F003706A9 /* SplunkAgent.docc in Sources */ = {isa = PBXBuildFile; fileRef = E42634822BB44B0F003706A9 /* SplunkAgent.docc */; };
 		E426CFAA2B28C18000094AC0 /* SessionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E426CFA82B28C18000094AC0 /* SessionsModel.swift */; };
 		E426CFAB2B28C18000094AC0 /* SessionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E426CFA92B28C18000094AC0 /* SessionItem.swift */; };
 		E43370D92B95C86F00102C2D /* DefaultSharedStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43370D82B95C86F00102C2D /* DefaultSharedStateTests.swift */; };
@@ -103,7 +103,7 @@
 		E4570F822BAB243B002ED1DC /* API-1.0-NonOperationalProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4570F812BAB243B002ED1DC /* API-1.0-NonOperationalProxyTests.swift */; };
 		E4577D7B2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4577D7A2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift */; };
 		E4577D7D2B9F5BE400DFA2C2 /* XCTestCase+SimulateNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4577D7C2B9F5BE400DFA2C2 /* XCTestCase+SimulateNotifications.swift */; };
-		E468962D2B21C85800727A6A /* SplunkOtel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3384F2A22AC879E900512D79 /* SplunkOtel.framework */; };
+		E468962D2B21C85800727A6A /* SplunkAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3384F2A22AC879E900512D79 /* SplunkAgent.framework */; };
 		E46896362B21CA0300727A6A /* UserDefaultsStoragePrefixTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46896352B21CA0300727A6A /* UserDefaultsStoragePrefixTests.swift */; };
 		E468963A2B21CC7800727A6A /* NanoIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46896392B21CC7800727A6A /* NanoIDTests.swift */; };
 		E468963D2B21D8D000727A6A /* API-1.0-UserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E468963C2B21D8D000727A6A /* API-1.0-UserTests.swift */; };
@@ -171,7 +171,7 @@
 			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 3384F2A12AC879E900512D79;
-			remoteInfo = SplunkOtel;
+			remoteInfo = SplunkAgent;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -196,7 +196,7 @@
 		2AE43B442B861325002C4A98 /* AgentEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentEvent.swift; sourceTree = "<group>"; };
 		2AE43B452B861325002C4A98 /* SessionPulseEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionPulseEvent.swift; sourceTree = "<group>"; };
 		2AE43B462B861325002C4A98 /* SessionStartEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionStartEvent.swift; sourceTree = "<group>"; };
-		3384F2A22AC879E900512D79 /* SplunkOtel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkOtel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3384F2A22AC879E900512D79 /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3384F2AC2AC879FD00512D79 /* SplunkRum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkRum.swift; sourceTree = "<group>"; };
 		4B2C8BBA2BCBE4A200C6E72F /* CrashReportsDataEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportsDataEvent.swift; sourceTree = "<group>"; };
 		4B2CF88B2BC8875E005CFC35 /* SplunkNetwork */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkNetwork; path = ../SplunkNetwork; sourceTree = "<group>"; };
@@ -261,7 +261,7 @@
 		E4134BAA2BC6AC5400F0D2FC /* API-1.0-Status.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-Status.swift"; sourceTree = "<group>"; };
 		E41FB0922B90D873009F5CA6 /* DefaultSharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSharedState.swift; sourceTree = "<group>"; };
 		E42026A22B501304002C5F80 /* UserDefaultsStorageCRUDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsStorageCRUDTests.swift; sourceTree = "<group>"; };
-		E42634822BB44B0F003706A9 /* SplunkOtel.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = SplunkOtel.docc; sourceTree = "<group>"; };
+		E42634822BB44B0F003706A9 /* SplunkAgent.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = SplunkAgent.docc; sourceTree = "<group>"; };
 		E426CFA82B28C18000094AC0 /* SessionsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionsModel.swift; sourceTree = "<group>"; };
 		E426CFA92B28C18000094AC0 /* SessionItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionItem.swift; sourceTree = "<group>"; };
 		E43370D82B95C86F00102C2D /* DefaultSharedStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSharedStateTests.swift; sourceTree = "<group>"; };
@@ -280,7 +280,7 @@
 		E45F8C992BC588CE007AC144 /* SplunkOpenTelemetry */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkOpenTelemetry; path = ../SplunkOpenTelemetry; sourceTree = "<group>"; };
 		E45F8C9A2BC588E3007AC144 /* SplunkCrashReports */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkCrashReports; path = ../SplunkCrashReports; sourceTree = "<group>"; };
 		E45F8C9B2BC58911007AC144 /* SplunkANRReporter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SplunkANRReporter; path = ../SplunkANRReporter; sourceTree = "<group>"; };
-		E46896292B21C85800727A6A /* SplunkOtelTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkOtelTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E46896292B21C85800727A6A /* SplunkAgentTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkAgentTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E46896352B21CA0300727A6A /* UserDefaultsStoragePrefixTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsStoragePrefixTests.swift; sourceTree = "<group>"; };
 		E46896392B21CC7800727A6A /* NanoIDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NanoIDTests.swift; sourceTree = "<group>"; };
 		E468963C2B21D8D000727A6A /* API-1.0-UserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-UserTests.swift"; sourceTree = "<group>"; };
@@ -365,7 +365,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E468962D2B21C85800727A6A /* SplunkOtel.framework in Frameworks */,
+				E468962D2B21C85800727A6A /* SplunkAgent.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -490,24 +490,24 @@
 		3384F2A32AC879E900512D79 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3384F2A22AC879E900512D79 /* SplunkOtel.framework */,
-				E46896292B21C85800727A6A /* SplunkOtelTests.xctest */,
+				3384F2A22AC879E900512D79 /* SplunkAgent.framework */,
+				E46896292B21C85800727A6A /* SplunkAgentTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		3384F2A42AC879E900512D79 /* SplunkOtel */ = {
+		3384F2A42AC879E900512D79 /* SplunkAgent */ = {
 			isa = PBXGroup;
 			children = (
 				E4F2E4F42B1727E8006EBA69 /* Public API */,
 				E4F2E4F82B172911006EBA69 /* Agent */,
 				E4F2E50A2B1734E9006EBA69 /* Utils */,
 				E4F2E4FC2B172985006EBA69 /* Extensions */,
-				E42634822BB44B0F003706A9 /* SplunkOtel.docc */,
+				E42634822BB44B0F003706A9 /* SplunkAgent.docc */,
 				E4036D052B75226700A9A7A7 /* PrivacyInfo.xcprivacy */,
 				2A30EE1B2BD7AECE008557DD /* NOTICES */,
 			);
-			path = SplunkOtel;
+			path = SplunkAgent;
 			sourceTree = "<group>";
 		};
 		4B536BF12B67FADC004A6C7C /* Configurations */ = {
@@ -836,7 +836,7 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
-		E468962A2B21C85800727A6A /* SplunkOtelTests */ = {
+		E468962A2B21C85800727A6A /* SplunkAgentTests */ = {
 			isa = PBXGroup;
 			children = (
 				E468964F2B220D8800727A6A /* Agent */,
@@ -845,13 +845,13 @@
 				E4374AFB2B4D885300E3C88E /* Testing Support */,
 				E46896342B21C9D300727A6A /* Utils */,
 			);
-			path = SplunkOtelTests;
+			path = SplunkAgentTests;
 			sourceTree = "<group>";
 		};
 		E46896332B21C8FF00727A6A /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				E468962A2B21C85800727A6A /* SplunkOtelTests */,
+				E468962A2B21C85800727A6A /* SplunkAgentTests */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -1037,7 +1037,7 @@
 		E4E9747A2B1643EE00ACB469 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				3384F2A42AC879E900512D79 /* SplunkOtel */,
+				3384F2A42AC879E900512D79 /* SplunkAgent */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -1182,9 +1182,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		3384F2A12AC879E900512D79 /* SplunkOtel */ = {
+		3384F2A12AC879E900512D79 /* SplunkAgent */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3384F2A92AC879E900512D79 /* Build configuration list for PBXNativeTarget "SplunkOtel" */;
+			buildConfigurationList = 3384F2A92AC879E900512D79 /* Build configuration list for PBXNativeTarget "SplunkAgent" */;
 			buildPhases = (
 				3384F29D2AC879E900512D79 /* Headers */,
 				E4F2E4F12B1721FF006EBA69 /* Swift Lint & Swift Format */,
@@ -1196,7 +1196,7 @@
 			);
 			dependencies = (
 			);
-			name = SplunkOtel;
+			name = SplunkAgent;
 			packageProductDependencies = (
 				BAD44D0C2B7878990069E54D /* SplunkNetwork */,
 				526659C22B7426B0003E878A /* SplunkANRReporter */,
@@ -1207,13 +1207,13 @@
 				4B1B15242BB585AC00BEFC4B /* SplunkCrashReports */,
 				526521F52CB8937800DB3BB9 /* SplunkSlowFrameDetector */,
 			);
-			productName = SplunkOtel;
-			productReference = 3384F2A22AC879E900512D79 /* SplunkOtel.framework */;
+			productName = SplunkAgent;
+			productReference = 3384F2A22AC879E900512D79 /* SplunkAgent.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		E46896282B21C85800727A6A /* SplunkOtelTests */ = {
+		E46896282B21C85800727A6A /* SplunkAgentTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E46896322B21C85800727A6A /* Build configuration list for PBXNativeTarget "SplunkOtelTests" */;
+			buildConfigurationList = E46896322B21C85800727A6A /* Build configuration list for PBXNativeTarget "SplunkAgentTests" */;
 			buildPhases = (
 				E46896252B21C85800727A6A /* Sources */,
 				E46896262B21C85800727A6A /* Frameworks */,
@@ -1224,9 +1224,9 @@
 			dependencies = (
 				E468962F2B21C85800727A6A /* PBXTargetDependency */,
 			);
-			name = SplunkOtelTests;
-			productName = SplunkOtelTests;
-			productReference = E46896292B21C85800727A6A /* SplunkOtelTests.xctest */;
+			name = SplunkAgentTests;
+			productName = SplunkAgentTests;
+			productReference = E46896292B21C85800727A6A /* SplunkAgentTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -1247,7 +1247,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 3384F29C2AC879E900512D79 /* Build configuration list for PBXProject "SplunkOtel" */;
+			buildConfigurationList = 3384F29C2AC879E900512D79 /* Build configuration list for PBXProject "SplunkAgent" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -1262,8 +1262,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3384F2A12AC879E900512D79 /* SplunkOtel */,
-				E46896282B21C85800727A6A /* SplunkOtelTests */,
+				3384F2A12AC879E900512D79 /* SplunkAgent */,
+				E46896282B21C85800727A6A /* SplunkAgentTests */,
 			);
 		};
 /* End PBXProject section */
@@ -1309,7 +1309,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check SplunkOtel directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger package\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols package\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy package\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector package\ncd ../SplunkSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork package\ncd ../SplunkNetwork/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
+			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check SplunkAgent directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger package\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols package\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy package\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector package\ncd ../SplunkSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork package\ncd ../SplunkNetwork/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1388,7 +1388,7 @@
 				E4AD34F62B56E4BB004976CA /* DefaultModulesManager.swift in Sources */,
 				4BB680E92B7940C0000A54D4 /* Status+Conversions.swift in Sources */,
 				E426CFAA2B28C18000094AC0 /* SessionsModel.swift in Sources */,
-				E42634832BB44B0F003706A9 /* SplunkOtel.docc in Sources */,
+				E42634832BB44B0F003706A9 /* SplunkAgent.docc in Sources */,
 				E4F2E5142B173D34006EBA69 /* API-1.0-State.swift in Sources */,
 				C73FF4882B6CE749009C53FF /* ConfigurationHandlerError.swift in Sources */,
 				C703FAB32BA9D424000CC11B /* AppState.swift in Sources */,
@@ -1474,7 +1474,7 @@
 /* Begin PBXTargetDependency section */
 		E468962F2B21C85800727A6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3384F2A12AC879E900512D79 /* SplunkOtel */;
+			target = 3384F2A12AC879E900512D79 /* SplunkAgent */;
 			targetProxy = E468962E2B21C85800727A6A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1638,7 +1638,7 @@
 				MARKETING_VERSION = 24.4.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtel;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgent;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = xros;
@@ -1688,7 +1688,7 @@
 				MARKETING_VERSION = 24.4.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtel;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgent;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = xros;
@@ -1797,7 +1797,7 @@
 				MARKETING_VERSION = 24.4.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtel;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgent;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = xros;
@@ -1825,7 +1825,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtelTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgentTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
@@ -1932,7 +1932,7 @@
 				MARKETING_VERSION = 24.4.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtel;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgent;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = xros;
@@ -1960,7 +1960,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtelTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgentTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
@@ -2074,7 +2074,7 @@
 				MARKETING_VERSION = 24.4.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtel;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgent;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = xros;
@@ -2103,7 +2103,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtelTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgentTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
@@ -2216,7 +2216,7 @@
 				MARKETING_VERSION = 24.4.1;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtel;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgent;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = xros;
@@ -2245,7 +2245,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtelTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgentTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
@@ -2270,7 +2270,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtelTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgentTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
@@ -2295,7 +2295,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkOtelTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAgentTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
@@ -2313,7 +2313,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3384F29C2AC879E900512D79 /* Build configuration list for PBXProject "SplunkOtel" */ = {
+		3384F29C2AC879E900512D79 /* Build configuration list for PBXProject "SplunkAgent" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3384F2A72AC879E900512D79 /* Debug */,
@@ -2326,7 +2326,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3384F2A92AC879E900512D79 /* Build configuration list for PBXNativeTarget "SplunkOtel" */ = {
+		3384F2A92AC879E900512D79 /* Build configuration list for PBXNativeTarget "SplunkAgent" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3384F2AA2AC879E900512D79 /* Debug */,
@@ -2339,7 +2339,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E46896322B21C85800727A6A /* Build configuration list for PBXNativeTarget "SplunkOtelTests" */ = {
+		E46896322B21C85800727A6A /* Build configuration list for PBXNativeTarget "SplunkAgentTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E46896302B21C85800727A6A /* Debug */,
