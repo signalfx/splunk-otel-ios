@@ -19,9 +19,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E46896282B21C85800727A6A"
-               BuildableName = "SplunkOtelTests.xctest"
-               BlueprintName = "SplunkOtelTests"
-               ReferencedContainer = "container:SplunkOtel.xcodeproj">
+               BuildableName = "SplunkAgentTests.xctest"
+               BlueprintName = "SplunkAgentTests"
+               ReferencedContainer = "container:SplunkAgent.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>

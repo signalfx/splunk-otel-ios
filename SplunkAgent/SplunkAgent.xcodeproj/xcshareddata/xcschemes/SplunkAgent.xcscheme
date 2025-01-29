@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3384F2A12AC879E900512D79"
-               BuildableName = "SplunkOtel.framework"
-               BlueprintName = "SplunkOtel"
-               ReferencedContainer = "container:SplunkOtel.xcodeproj">
+               BuildableName = "SplunkAgent.framework"
+               BlueprintName = "SplunkAgent"
+               ReferencedContainer = "container:SplunkAgent.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -50,9 +50,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3384F2A12AC879E900512D79"
-            BuildableName = "SplunkOtel.framework"
-            BlueprintName = "SplunkOtel"
-            ReferencedContainer = "container:SplunkOtel.xcodeproj">
+            BuildableName = "SplunkAgent.framework"
+            BlueprintName = "SplunkAgent"
+            ReferencedContainer = "container:SplunkAgent.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
