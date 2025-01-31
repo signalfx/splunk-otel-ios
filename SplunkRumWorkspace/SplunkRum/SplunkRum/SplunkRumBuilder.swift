@@ -48,6 +48,7 @@ import Foundation
         self.rumAuth = rumAuth
     }
 
+    @available(*, deprecated, message: "No longer supported.")
     @discardableResult
     @objc
     public func allowInsecureBeacon(enabled: Bool) -> SplunkRumBuilder {
@@ -111,6 +112,7 @@ import Foundation
         return self
     }
 
+    @available(*, deprecated, message: "No longer supported.")
     @discardableResult
     @objc
     public func spanDiskCacheMaxSize(size: Int64) -> SplunkRumBuilder {
@@ -153,6 +155,7 @@ import Foundation
         return self
     }
 
+    @available(*, deprecated, message: "No longer supported.")
     @discardableResult
     @objc
     public func setSpanSchedulingDelay(seconds: TimeInterval) -> SplunkRumBuilder {

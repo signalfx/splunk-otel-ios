@@ -39,6 +39,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     /**
         Memberwise initializer
      */
+    @available(*, deprecated, message: "No longer supported.")
     @objc public init(allowInsecureBeacon: Bool = false,
                       debug: Bool = false,
                       globalAttributes: [String: Any] = [:],
@@ -74,6 +75,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     /**
         Copy constructor
      */
+    @available(*, deprecated, message: "No longer supported.")
     @objc public init(opts: SplunkRumOptions) {
         self.allowInsecureBeacon = opts.allowInsecureBeacon
         self.debug = opts.debug
@@ -97,6 +99,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     /**
             Allows non-https beaconUrls.  Default: false
      */
+    @available(*, deprecated, message: "No longer supported.")
     @objc public var allowInsecureBeacon: Bool = false
     /**
             Turns on debug logging (including printouts of all spans)  Default: false
@@ -155,6 +158,7 @@ public let DEFAULT_DISK_CACHE_MAX_SIZE_BYTES: Int64 = 25 * 1024 * 1024
     /**
      Enable caching created spans to disk. On successful exports the spans are deleted.
      */
+    @available(*, deprecated, message: "No longer supported.")
     @objc public var enableDiskCache: Bool = false
 
     /**
@@ -419,6 +423,7 @@ var splunkRumInitializeCalledTime = Date()
     /**
      Adds a callback whenever the sessionId changes.
      */
+    @available(*, deprecated, message: "No longer supported.")
     public class func addSessionIdChangeCallback(_ callback: @escaping (() -> Void)) {
         addSessionIdCallback(callback)
     }
@@ -562,6 +567,7 @@ var splunkRumInitializeCalledTime = Date()
     /**
         Updates the current location. The latitude and longitude will be appended to every span and event.
     */
+    @available(*, deprecated, message: "No longer supported.")
     @objc public class func setLocation(latitude: Double, longitude: Double) {
         setGlobalAttributes(["location.lat": latitude, "location.long": longitude])
     }
