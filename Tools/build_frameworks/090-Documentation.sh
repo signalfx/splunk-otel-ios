@@ -161,12 +161,12 @@ function build_web_documentation {
     fi
 
     # Custom index files
-    local web_doc_ios_version_root_path="${web_doc_ios_version_path}/documentation/mrumagent/"
+    local web_doc_ios_version_root_path="${web_doc_ios_version_path}/documentation/splunkagent/"
     local web_doc_ios_path_index="${temp_web_build_dir_root}/webdoc/${web_doc_ios_path}/index.html"
     local web_doc_ios_version_path_index="${temp_web_build_dir}/index.html"
 
     # The original index.html returns a "not found" page,
-    # the real documentation root is at `documentation/mrumagent/`.
+    # the real documentation root is at `documentation/splunkagent/`.
     #
     # Because S3 does not allow straigthforward `/` redirect configuration,
     # redirect via <meta> header of a custom `index.html` is used.
@@ -179,7 +179,7 @@ echo "<!DOCTYPE html>
             <meta http-equiv=\"refresh\" content=\"0; url=/${web_doc_ios_version_root_path} \" />
         </head>
         <body>
-            <h1>CiscoRUM</h1>
+            <h1>SplunkAgent</h1>
             <p>Redirecting to
                 <a href=\"/${web_doc_ios_version_root_path}\">/${web_doc_ios_version_root_path}</a>
             </p>

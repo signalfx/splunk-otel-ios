@@ -24,7 +24,7 @@
             </objects>
             <point key="canvasLocation" x="-1278" y="-60"/>
         </scene>
-        <!--MRUM Agent Test App-->
+        <!--Splunk Agent Test App-->
         <scene sceneID="T5x-Ar-Mhl">
             <objects>
                 <viewController id="7b3-fw-ErM" customClass="ViewController" customModule="AgentTestApp" customModuleProvider="target" sceneMemberID="viewController">
@@ -50,7 +50,7 @@
                             <constraint firstItem="iWC-hH-2ft" firstAttribute="trailing" secondItem="sHo-tr-oZX" secondAttribute="trailing" id="lwD-27-KoA"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="MRUM Agent Test App" id="mxc-nE-onO"/>
+                    <navigationItem key="navigationItem" title="Splunk Agent Test App" id="mxc-nE-onO"/>
                     <connections>
                         <outlet property="tableView" destination="iWC-hH-2ft" id="0Xg-od-2RV"/>
                         <segue destination="Pc9-3A-SeM" kind="show" identifier="NetworkCalls" id="mxY-31-Ehe"/>

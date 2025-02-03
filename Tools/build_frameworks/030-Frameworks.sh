@@ -5,7 +5,7 @@
 # Frameworks to be build
 # These are by naming convention also names of the respective project build targets
 
-FRAMEWORK_ANALYTICS="CiscoRUM"
+FRAMEWORK_ANALYTICS="SplunkAgent"
 
 ALL_FRAMEWORKS=($FRAMEWORK_ANALYTICS)
 
@@ -72,7 +72,7 @@ function framework_package_name {
     assert_valid_framework ${framework}
 
     if [[ $framework == $FRAMEWORK_ANALYTICS ]]; then
-        echo "CiscoRUM"
+        echo "SplunkAgent"
     fi
 }
 
@@ -95,7 +95,7 @@ function zipped_xcframework_filename {
     assert_valid_framework ${framework}
 
     if [[ $framework == $FRAMEWORK_ANALYTICS ]]; then
-        echo "CiscoRUM-iOS-$(artifact_build_number $framework).zip"
+        echo "SplunkAgent-iOS-$(artifact_build_number $framework).zip"
     fi
 }
 
@@ -107,5 +107,5 @@ function zipped_xcframework_url {
     local artifact_version=$(artifact_build_number $framework)
     local file_name=$(zipped_xcframework_filename $framework)
 
-    echo "https://appdynamics.jfrog.io/ui/native/zip-hosted/mrum/CiscoRUM-iOS/${artifact_version}/${file_name}"
+    echo "https://appdynamics.jfrog.io/ui/native/zip-hosted/mrum/SplunkAgent-iOS/${artifact_version}/${file_name}"
 }

@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import UIKit
-import CiscoRUM
+import SplunkAgent
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        var agent = CiscoRUMAgent.install(with:
+        var agent = SplunkRum.install(with:
                                             Configuration(url: URL(string: "https://eum2-c0.saas.appd-test.com")!)
                    .appName("AgentTestApp")
                    .appVersion("1.0.0")

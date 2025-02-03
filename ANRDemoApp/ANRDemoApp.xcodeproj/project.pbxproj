@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,8 +15,8 @@
 		5264EE6E2B76F5F900F25C86 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5264EE692B76F5F900F25C86 /* Preview Assets.xcassets */; };
 		5264EE6F2B76F5F900F25C86 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5264EE6A2B76F5F900F25C86 /* ContentView.swift */; };
 		5264EE702B76F5F900F25C86 /* ANRDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5264EE6B2B76F5F900F25C86 /* ANRDemoApp.swift */; };
-		526E2D752B5B4BF300A7CEA4 /* CiscoRUM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 526E2D742B5B4BF300A7CEA4 /* CiscoRUM.framework */; };
-		526E2D762B5B4BF300A7CEA4 /* CiscoRUM.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 526E2D742B5B4BF300A7CEA4 /* CiscoRUM.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		526E2D752B5B4BF300A7CEA4 /* SplunkAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 526E2D742B5B4BF300A7CEA4 /* SplunkAgent.framework */; };
+		526E2D762B5B4BF300A7CEA4 /* SplunkAgent.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 526E2D742B5B4BF300A7CEA4 /* SplunkAgent.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,7 +26,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				526E2D762B5B4BF300A7CEA4 /* CiscoRUM.framework in Embed Frameworks */,
+				526E2D762B5B4BF300A7CEA4 /* SplunkAgent.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,7 +43,7 @@
 		5264EE6A2B76F5F900F25C86 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5264EE6B2B76F5F900F25C86 /* ANRDemoApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ANRDemoApp.swift; sourceTree = "<group>"; };
 		526D7E8C2B5A0E8B001183B8 /* ANRDemoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ANRDemoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		526E2D742B5B4BF300A7CEA4 /* CiscoRUM.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CiscoRUM.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		526E2D742B5B4BF300A7CEA4 /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,7 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				526E2D752B5B4BF300A7CEA4 /* CiscoRUM.framework in Frameworks */,
+				526E2D752B5B4BF300A7CEA4 /* SplunkAgent.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,7 +101,7 @@
 		526E2D732B5B4BF300A7CEA4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				526E2D742B5B4BF300A7CEA4 /* CiscoRUM.framework */,
+				526E2D742B5B4BF300A7CEA4 /* SplunkAgent.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -154,7 +154,7 @@
 			);
 			mainGroup = 526D7E832B5A0E8B001183B8;
 			packageReferences = (
-				526E2D782B5B4C6300A7CEA4 /* XCLocalSwiftPackageReference "../MRUMANRReporter" */,
+				526E2D782B5B4C6300A7CEA4 /* XCLocalSwiftPackageReference "../SplunkANRReporter" */,
 			);
 			productRefGroup = 526D7E8D2B5A0E8B001183B8 /* Products */;
 			projectDirPath = "";
@@ -321,7 +321,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ANRDemoApp/Preview Content\"";
-				DEVELOPMENT_TEAM = CGE964ZX4K;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -334,7 +334,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.appdynamics.ANRDemoApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.ANRDemoApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -350,7 +350,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"ANRDemoApp/Preview Content\"";
-				DEVELOPMENT_TEAM = CGE964ZX4K;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -363,7 +363,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.appdynamics.ANRDemoApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.ANRDemoApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -395,9 +395,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		526E2D782B5B4C6300A7CEA4 /* XCLocalSwiftPackageReference "../MRUMANRReporter" */ = {
+		526E2D782B5B4C6300A7CEA4 /* XCLocalSwiftPackageReference "../SplunkANRReporter" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../MRUMANRReporter;
+			relativePath = ../SplunkANRReporter;
 		};
 /* End XCLocalSwiftPackageReference section */
 	};

@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2A3A86852B56ACC00020CE80 /* CiscoRUM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A3A86842B56ACC00020CE80 /* CiscoRUM.framework */; };
-		2A3A86862B56ACC00020CE80 /* CiscoRUM.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2A3A86842B56ACC00020CE80 /* CiscoRUM.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2A3A86852B56ACC00020CE80 /* SplunkAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A3A86842B56ACC00020CE80 /* SplunkAgent.framework */; };
+		2A3A86862B56ACC00020CE80 /* SplunkAgent.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2A3A86842B56ACC00020CE80 /* SplunkAgent.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3384F28A2AC8795800512D79 /* DevelAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F2892AC8795800512D79 /* DevelAppApp.swift */; };
 		3384F28C2AC8795800512D79 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F28B2AC8795800512D79 /* ContentView.swift */; };
 		3384F28E2AC8795800512D79 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3384F28D2AC8795800512D79 /* Assets.xcassets */; };
@@ -22,7 +22,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				2A3A86862B56ACC00020CE80 /* CiscoRUM.framework in Embed Frameworks */,
+				2A3A86862B56ACC00020CE80 /* SplunkAgent.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -30,7 +30,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2A3A86842B56ACC00020CE80 /* CiscoRUM.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CiscoRUM.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2A3A86842B56ACC00020CE80 /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3384F2862AC8795800512D79 /* DevelApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DevelApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3384F2892AC8795800512D79 /* DevelAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevelAppApp.swift; sourceTree = "<group>"; };
 		3384F28B2AC8795800512D79 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -45,7 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A3A86852B56ACC00020CE80 /* CiscoRUM.framework in Frameworks */,
+				2A3A86852B56ACC00020CE80 /* SplunkAgent.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,7 +93,7 @@
 		3384F2AF2AC87A4300512D79 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2A3A86842B56ACC00020CE80 /* CiscoRUM.framework */,
+				2A3A86842B56ACC00020CE80 /* SplunkAgent.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -301,7 +301,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"DevelApp/Preview Content\"";
-				DEVELOPMENT_TEAM = CGE964ZX4K;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -321,7 +321,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.appdynamics.DevelApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.DevelApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
@@ -345,7 +345,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"DevelApp/Preview Content\"";
-				DEVELOPMENT_TEAM = CGE964ZX4K;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -365,7 +365,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.appdynamics.DevelApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.DevelApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";

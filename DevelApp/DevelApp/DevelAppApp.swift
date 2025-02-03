@@ -6,11 +6,11 @@
 //
 
 import SwiftUI
-import CiscoRUM
+import SplunkAgent
 
 @main
 struct DevelAppApp: App {
-    @StateObject var agent = CiscoRUMAgent.install(with:
+    @StateObject var agent = SplunkRum.install(with:
         Configuration(url: vanityUrl())
             .appName("smartlook-ios")
             .appVersion("1.0.0")

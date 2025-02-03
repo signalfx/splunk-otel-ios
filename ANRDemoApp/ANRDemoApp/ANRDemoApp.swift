@@ -15,13 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoRUM
-import MRUMANRReporter
+import SplunkAgent
+import SplunkANRReporter
 import SwiftUI
 
 @main
 struct ANRDemoApp: App {
-    @StateObject var agent = CiscoRUMAgent.install(with:
+    @StateObject var agent = SplunkRum.install(with:
         Configuration(url: URL(string: "https://smartlookdev2.saas.appd-test.com")!)
             .appName("smartlook-ios")
             .appVersion("1.0.0")
