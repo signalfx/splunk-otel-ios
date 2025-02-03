@@ -21,6 +21,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Security
 
+## [0.12.0](https://github.com/signalfx/splunk-otel-ios/releases/tag/0.12.0)
+
+### Deprecated
+
+* Mark deprecation for Location API, Change sessionId, Span scheduling, Insecure beacons [#242](https://github.com/signalfx/splunk-otel-ios/pull/242)
+
 ## [0.11.3](https://github.com/signalfx/splunk-otel-ios/releases/tag/0.11.3)
 
 ### Added
