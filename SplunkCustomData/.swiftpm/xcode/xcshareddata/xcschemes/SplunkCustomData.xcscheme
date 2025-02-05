@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "MRUMCustomData"
-               BuildableName = "MRUMCustomData"
-               BlueprintName = "MRUMCustomData"
+               BlueprintIdentifier = "SplunkCustomData"
+               BuildableName = "SplunkCustomData"
+               BlueprintName = "SplunkCustomData"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -49,9 +49,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "MRUMCustomData"
-            BuildableName = "MRUMCustomData"
-            BlueprintName = "MRUMCustomData"
+            BlueprintIdentifier = "SplunkCustomData"
+            BuildableName = "SplunkCustomData"
+            BlueprintName = "SplunkCustomData"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>

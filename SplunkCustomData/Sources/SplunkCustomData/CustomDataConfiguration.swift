@@ -16,19 +16,21 @@ limitations under the License.
 */
 
 import Foundation
-import MRUMSharedProtocols
+import SplunkSharedProtocols
 
-public struct CustomDataRemoteConfiguration: RemoteModuleConfiguration {
+public struct CustomDataConfiguration: ModuleConfiguration {
 
 
     // MARK: - Public
 
     public var enabled: Bool
+    public var threshold: CFTimeInterval
 
 
     // MARK: init()
 
-    public init?(from data: Data) {
-        enabled = true
+    public init(enabled: Bool, threshold: CFTimeInterval = 2.0) {
+        self.enabled = enabled
+        self.threshold = threshold
     }
 }

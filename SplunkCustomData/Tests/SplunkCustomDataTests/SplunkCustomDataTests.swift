@@ -15,10 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import MRUMCustomData
+@testable import SplunkCustomData
 import XCTest
 
-final class MRUMCustomDataTests: XCTestCase {
+final class SplunkCustomDataTests: XCTestCase {
     func testExample() throws {
         // XCTest Documentation
         // https://developer.apple.com/documentation/xctest

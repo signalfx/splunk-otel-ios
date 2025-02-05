@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "MRUMCustomData",
+    name: "SplunkCustomData",
     platforms: [
         .iOS(.v13),
         .tvOS(.v13),
@@ -11,23 +11,23 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "MRUMCustomData",
-            targets: ["MRUMCustomData"]
+            name: "SplunkCustomData",
+            targets: ["SplunkCustomData"]
         )
     ],
     dependencies: [
-        .package(name: "MRUMSharedProtocols", path: "../MRUMSharedProtocols")
+        .package(name: "SplunkSharedProtocols", path: "../SplunkSharedProtocols")
     ],
     targets: [
         .target(
-            name: "MRUMCustomData",
+            name: "SplunkCustomData",
             dependencies: [
-                "MRUMSharedProtocols"
+                "SplunkSharedProtocols"
             ]
         ),
         .testTarget(
-            name: "MRUMCustomDataTests",
-            dependencies: ["MRUMCustomData"]
+            name: "SplunkCustomDataTests",
+            dependencies: ["SplunkCustomData"]
         )
     ]
 )
