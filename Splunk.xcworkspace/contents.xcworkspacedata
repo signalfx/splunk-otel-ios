@@ -44,6 +44,9 @@
       location = "group:SplunkSlowFrameDetector">
    </FileRef>
    <FileRef
+      location = "group:SplunkCustomData">
+   </FileRef>
+   <FileRef
       location = "group:README.md">
    </FileRef>
 </Workspace>
