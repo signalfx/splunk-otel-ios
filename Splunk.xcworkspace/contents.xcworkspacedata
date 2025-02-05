@@ -47,6 +47,9 @@
       location = "group:SplunkCustomData">
    </FileRef>
    <FileRef
+      location = "group:SplunkErrorReporting">
+   </FileRef>
+   <FileRef
       location = "group:README.md">
    </FileRef>
 </Workspace>
