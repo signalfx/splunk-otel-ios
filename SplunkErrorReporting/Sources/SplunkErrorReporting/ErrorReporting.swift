@@ -18,7 +18,6 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-protocol ErrorReportingRepresentable: PropertyList {}
 
 public final class ErrorReporting {
 
@@ -38,9 +37,4 @@ public final class ErrorReporting {
 
     // MARK: - ErrorReporting Reporting
 
-    // This is a placeholder for temporary use only. Will be replaced by
-    // real data population and output.
-    private func reportCustom(data: ErrorReportingRepresentable) {
-        print(String(describing: data))
-    }
 }
