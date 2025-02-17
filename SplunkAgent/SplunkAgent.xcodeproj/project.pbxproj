@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1673CC2BA1F52600F85698 /* EventsModel.swift */; };
+		2A1C87FA2D63579000CA53EE /* SplunkAppStart in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1C87F92D63579000CA53EE /* SplunkAppStart */; };
 		2A30EE1C2BD7AEDD008557DD /* NOTICES in Resources */ = {isa = PBXBuildFile; fileRef = 2A30EE1B2BD7AECE008557DD /* NOTICES */; };
 		2AA52B492B8DF4CD00DF9373 /* EventsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA52B482B8DF4CD00DF9373 /* EventsTests.swift */; };
 		2AA52B4C2B8DF50300DF9373 /* v.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 2AA52B4B2B8DF50300DF9373 /* v.mp4 */; };
@@ -353,6 +354,7 @@
 				526521F62CB8937800DB3BB9 /* SplunkSlowFrameDetector in Frameworks */,
 				BAD44D0D2B7878990069E54D /* SplunkNetwork in Frameworks */,
 				4B1B151F2BB5858600BEFC4B /* SplunkOpenTelemetry in Frameworks */,
+				2A1C87FA2D63579000CA53EE /* SplunkAppStart in Frameworks */,
 				4B1B15192BB584E300BEFC4B /* SplunkSessionReplayProxy in Frameworks */,
 				4B1B15222BB5859B00BEFC4B /* SplunkLogger in Frameworks */,
 				4B1B15162BB584D300BEFC4B /* SplunkSharedProtocols in Frameworks */,
@@ -1206,6 +1208,7 @@
 				4B1B15212BB5859A00BEFC4B /* SplunkLogger */,
 				4B1B15242BB585AC00BEFC4B /* SplunkCrashReports */,
 				526521F52CB8937800DB3BB9 /* SplunkSlowFrameDetector */,
+				2A1C87F92D63579000CA53EE /* SplunkAppStart */,
 			);
 			productName = SplunkAgent;
 			productReference = 3384F2A22AC879E900512D79 /* SplunkAgent.framework */;
@@ -1309,7 +1312,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check SplunkAgent directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger package\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols package\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy package\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector package\ncd ../SplunkSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork package\ncd ../SplunkNetwork/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
+			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check SplunkAgent directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger package\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols package\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy package\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector package\ncd ../SplunkSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork package\ncd ../SplunkNetwork/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkAppStart package\ncd ../SplunkAppStart/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2355,6 +2358,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2A1C87F92D63579000CA53EE /* SplunkAppStart */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SplunkAppStart;
+		};
 		4B1B15152BB584D300BEFC4B /* SplunkSharedProtocols */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SplunkSharedProtocols;

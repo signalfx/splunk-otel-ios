@@ -34,6 +34,10 @@ limitations under the License.
     @_implementationOnly import SplunkSlowFrameDetector
 #endif
 
+#if canImport(SplunkAppStart)
+    @_implementationOnly import SplunkAppStart
+#endif
+
 
 /// The class implements the default pool of available modules.
 class DefaultModulesPool: AgentModulesPool {
@@ -59,6 +63,11 @@ class DefaultModulesPool: AgentModulesPool {
         // Network Instrumentation
         #if canImport(SplunkSlowFrameDetector)
             knownModules.append(SlowFrameDetector.self)
+        #endif
+
+        // App Start
+        #if canImport(SplunkAppStart)
+            knownModules.append(AppStart.self)
         #endif
 
         return knownModules
