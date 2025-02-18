@@ -15,15 +15,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkCustomData
-import XCTest
+import Foundation
+import SplunkSharedProtocols
 
-final class SplunkCustomDataTests: XCTestCase {
-    func testExample() throws {
-        // XCTest Documentation
-        // https://developer.apple.com/documentation/xctest
+public struct TrackedDataConfiguration: ModuleConfiguration {
 
-        // Defining Test Cases and Test Methods
-        // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
+
+    // MARK: - Public
+
+    public var enabled: Bool
+    public var threshold: CFTimeInterval
+
+
+    // MARK: init()
+
+    public init(enabled: Bool, threshold: CFTimeInterval = 2.0) {
+        self.enabled = enabled
+        self.threshold = threshold
     }
 }

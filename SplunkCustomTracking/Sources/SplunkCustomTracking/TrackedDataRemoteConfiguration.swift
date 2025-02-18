@@ -18,19 +18,17 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-public struct CustomDataConfiguration: ModuleConfiguration {
+public struct TrackedDataRemoteConfiguration: RemoteModuleConfiguration {
 
 
     // MARK: - Public
 
     public var enabled: Bool
-    public var threshold: CFTimeInterval
 
 
     // MARK: init()
 
-    public init(enabled: Bool, threshold: CFTimeInterval = 2.0) {
-        self.enabled = enabled
-        self.threshold = threshold
+    public init?(from data: Data) {
+        enabled = true
     }
 }

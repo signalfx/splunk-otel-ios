@@ -21,23 +21,23 @@ import SplunkSharedProtocols
 // `Data` can be used as an event type that the module produces.
 extension Data: ModuleEventData {}
 
-// Struct `EventMetadataCustomData` describes event metadata.
+// Struct `TrackedDataEventMetadata` describes event metadata.
 // This type must be unique in the module/agent space.
-extension EventMetadataCustomData: ModuleEventMetadata {
-    public static func == (lhs: EventMetadataCustomData, rhs: EventMetadataCustomData) -> Bool {
+extension TrackedDataEventMetadata: ModuleEventMetadata {
+    public static func == (lhs: TrackedDataEventMetadata, rhs: TrackedDataEventMetadata) -> Bool {
         lhs.id == rhs.id
     }
 }
 
-// Defines CustomData conformance to `Module` protocol
-// and implements methods that are missing in the original `CustomData`.
-extension CustomData: Module {
+// Defines TrackedData conformance to `Module` protocol
+// and implements methods that are missing in the original `TrackedData`.
+extension TrackedData: Module {
 
 
     // MARK: - Module types
 
-    public typealias Configuration = CustomDataConfiguration
-    public typealias RemoteConfiguration = CustomDataRemoteConfiguration
+    public typealias Configuration = TrackedDataConfiguration
+    public typealias RemoteConfiguration = TrackedDataRemoteConfiguration
 
     public typealias EventData = Data
 
@@ -45,7 +45,7 @@ extension CustomData: Module {
     // MARK: - Module methods
 
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
-        if let configuration = configuration as? CustomDataConfiguration {
+        if let configuration = configuration as? TrackedDataConfiguration {
             print("known configuration")
             print(configuration)
         }
@@ -58,7 +58,7 @@ extension CustomData: Module {
         // TODO: Code TBD
     }
 
-    public func onPublish(data: @escaping (EventMetadataCustomData, EventData) -> Void) {
+    public func onPublish(data: @escaping (TrackedDataEventMetadata, EventData) -> Void) {
         // TODO: Code TBD
     }
 }

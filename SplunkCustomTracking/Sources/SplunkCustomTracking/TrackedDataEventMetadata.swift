@@ -16,19 +16,16 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 
-public struct CustomDataRemoteConfiguration: RemoteModuleConfiguration {
+public struct TrackedDataEventMetadata {
 
 
     // MARK: - Public
 
-    public var enabled: Bool
+    public var timestamp = Date()
 
 
-    // MARK: init()
+    // MARK: - Internal
 
-    public init?(from data: Data) {
-        enabled = true
-    }
+    let id: String
 }

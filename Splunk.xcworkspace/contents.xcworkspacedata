@@ -14,6 +14,42 @@
       location = "group:SplunkAgent/SplunkAgent.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:SplunkSharedProtocols">
+   </FileRef>
+   <FileRef
+      location = "group:SplunkCrashReports">
+   </FileRef>
+   <FileRef
+      location = "group:SplunkSessionReplayProxy">
+   </FileRef>
+   <FileRef
+      location = "group:SplunkNetwork">
+   </FileRef>
+   <FileRef
+      location = "group:SplunkOpenTelemetry">
+   </FileRef>
+   <FileRef
+      location = "group:SplunkLogger">
+   </FileRef>
+   <FileRef
+      location = "group:SplunkOpenTelemetryBackgroundExporter">
+   </FileRef>
+   <FileRef
+      location = "group:ADCrashReporter">
+   </FileRef>
+   <FileRef
+      location = "group:SplunkANRReporter">
+   </FileRef>
+   <FileRef
+      location = "group:SplunkSlowFrameDetector">
+   </FileRef>
+   <FileRef
+      location = "group:SplunkCustomTracking">
+   </FileRef>
+   <FileRef
+      location = "group:SplunkErrorReporting">
+   </FileRef>
+   <FileRef
       location = "group:README.md">
    </FileRef>
 </Workspace>
