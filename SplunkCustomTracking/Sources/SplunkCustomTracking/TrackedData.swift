@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
+protocol TrackedDataRepresentable: PropertyList {}
 
 public final class TrackedData {
 
@@ -31,4 +32,15 @@ public final class TrackedData {
 
     public required init() {} // see install() in Module extension for startup tasks
 
+
+    // MARK: - TrackedData helper functions
+
+
+    // MARK: - TrackedData Reporting
+
+    // This is a placeholder for temporary use only. Will be replaced by
+    // real data population and output.
+    private func reportCustom(data: TrackedDataRepresentable) {
+        print(String(describing: data))
+    }
 }
