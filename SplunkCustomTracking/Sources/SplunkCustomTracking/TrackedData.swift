@@ -18,19 +18,17 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-public struct CustomDataConfiguration: ModuleConfiguration {
+
+public final class TrackedData {
 
 
-    // MARK: - Public
+    // MARK: - Private properties
 
-    public var enabled: Bool
-    public var threshold: CFTimeInterval
+    private var config = TrackedDataConfiguration(enabled: true)
 
 
-    // MARK: init()
+    // MARK: - TrackedData lifecycle
 
-    public init(enabled: Bool, threshold: CFTimeInterval = 2.0) {
-        self.enabled = enabled
-        self.threshold = threshold
-    }
+    public required init() {} // see install() in Module extension for startup tasks
+
 }

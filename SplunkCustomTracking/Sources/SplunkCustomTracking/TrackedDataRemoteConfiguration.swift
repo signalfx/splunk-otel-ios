@@ -18,17 +18,17 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-
-public final class CustomData {
-
-
-    // MARK: - Private properties
-
-    private var config = CustomDataConfiguration(enabled: true)
+public struct TrackedDataRemoteConfiguration: RemoteModuleConfiguration {
 
 
-    // MARK: - CustomData lifecycle
+    // MARK: - Public
 
-    public required init() {} // see install() in Module extension for startup tasks
+    public var enabled: Bool
 
+
+    // MARK: init()
+
+    public init?(from data: Data) {
+        enabled = true
+    }
 }
