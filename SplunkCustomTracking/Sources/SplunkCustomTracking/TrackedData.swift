@@ -16,16 +16,19 @@ limitations under the License.
 */
 
 import Foundation
-
-public struct EventMetadataCustomData {
-
-
-    // MARK: - Public
-
-    public var timestamp = Date()
+import SplunkSharedProtocols
 
 
-    // MARK: - Internal
+public final class TrackedData {
 
-    let id: String
+
+    // MARK: - Private properties
+
+    private var config = TrackedDataConfiguration(enabled: true)
+
+
+    // MARK: - TrackedData lifecycle
+
+    public required init() {} // see install() in Module extension for startup tasks
+
 }
