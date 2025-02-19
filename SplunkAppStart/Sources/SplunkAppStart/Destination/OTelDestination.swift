@@ -22,7 +22,37 @@ import SplunkSharedProtocols
 /// Creates and sends an OpenTelemetry span from supplied app start data.
 struct OTelDestination: AppStartDestination {
 
-    func send(type: AppStartType, start: Date, end: Date, sharedState: (any AgentSharedState)?) {
-        // TODO: DEMRUM-935
+    func send(type: AppStartType, start: Date, end: Date, sharedState: (any AgentSharedState)?, events: [String: Date]?) {
+        let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "splunk-app-start", instrumentationVersion: sharedState?.agentVersion)
+
+        let span = tracer.spanBuilder(spanName: "AppStart")
+            .setStartTime(time: start)
+            .startSpan()
+
+        span.setAttribute(key: "component", value: "appstart")
+        span.setAttribute(key: "start.type", value: typeIdentifier(for: type))
+
+        if let sessionID = sharedState?.sessionId {
+            span.setAttribute(key: "splunk.rumSessionId", value: sessionID)
+        }
+
+        span.setAttribute(key: "screen.name", value: "unknown")
+
+        events?.forEach { name, timestamp in
+            span.addEvent(name: name, timestamp: timestamp)
+        }
+
+        span.end(time: end)
+    }
+
+    private func typeIdentifier(for type: AppStartType) -> String {
+        switch type {
+        case .cold:
+            return "cold"
+        case .warm:
+            return "warm"
+        case .hot:
+            return "hot"
+        }
     }
 }

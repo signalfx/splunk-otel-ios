@@ -19,26 +19,29 @@ import Foundation
 import SplunkLogger
 import SplunkSharedProtocols
 
-/// Stores and prints results.
+/// Stores results for testing purposes and prints results.
 class DebugDestination: AppStartDestination {
 
     // Stored results
     var type: AppStartType?
     var startTime: Date?
     var endTime: Date?
+    var events: [String: Date]?
 
     // Internal Logger
     let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "AppStart"))
 
-    func send(type: AppStartType, start: Date, end: Date, sharedState: (any AgentSharedState)?) {
+    func send(type: AppStartType, start: Date, end: Date, sharedState: (any AgentSharedState)?, events: [String: Date]?) {
         self.type = type
+        self.events = events
+
         startTime = start
         endTime = end
 
         let duration = end.timeIntervalSince(start)
 
-        internalLogger.log(level: .warn) {
-            "Sending app start: \(type), duration: \(duration)s"
+        internalLogger.log(level: .info) {
+            "Sending app start: \(type), duration: \(duration)s, events: \(events?.debugDescription ?? "none")"
         }
     }
 }
