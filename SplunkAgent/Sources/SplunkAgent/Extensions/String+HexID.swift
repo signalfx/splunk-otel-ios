@@ -17,20 +17,19 @@ limitations under the License.
 
 import Foundation
 
-/// Defines default values for configuration
-struct ConfigurationDefaults {
+extension String {
 
-    static var appName: String? {
-        Bundle.main.bundleIdentifier
+    /// Creates a unique hex-encoded identifier.
+    ///
+    /// - Parameters:
+    ///   - length: A number of hex characters in the identifier. Default is `16`.
+    static func uniqueHexIdentifier(ofLength length: Int = 16) -> String {
+        var identifier = ""
+
+        for _ in 0 ..< length {
+            identifier += String(format: "%x", Int.random(in: 0 ..< 16))
+        }
+
+        return identifier
     }
-
-    static var appVersion: String? {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    }
-
-    static var sessionTimeout = 15.0 * 60.0 // 15 minutes
-
-    static var maxSessionLength = 4.0 * 60.0 * 60.0 // 4 hours
-
-    static var recordingEnabled = true
 }

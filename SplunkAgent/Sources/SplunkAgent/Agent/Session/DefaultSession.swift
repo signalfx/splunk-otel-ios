@@ -33,7 +33,7 @@ class DefaultSession: AgentSession {
     var refreshJob: RepeatingJob?
 
     private var sessionsModel: SessionsModel
-    private(set) lazy var currentSession: SessionItem = resumeSession()
+    private(set) lazy var currentSession: SessionItem = startSession()
 
     private var enterBackground: Date?
     private var leaveBackground: Date?
@@ -154,10 +154,8 @@ class DefaultSession: AgentSession {
 
     // MARK: - Business logic
 
-    // TODO: MRUM_AC-1457 (post GA): Reimplement session rotation after an app relaunch
-    /// ⚠️⚠️⚠️ This method currently forces a session rotation. This method in this current form should be called only once
-    /// when the Agent initializes. This method needs reimplementation.
-    func resumeSession() -> SessionItem {
+    /// Starts a new session by first purging old data, closing previous session and then starting a new session.
+    func startSession() -> SessionItem {
         // Before restoring the session,
         // we need to delete the outdated data
         sessionsModel.purge()
@@ -239,7 +237,7 @@ class DefaultSession: AgentSession {
 
     func createSession() -> SessionItem {
         let newSession = SessionItem(
-            id: String.uniqueIdentifier(),
+            id: String.uniqueHexIdentifier(ofLength: 32),
             start: Date()
         )
 
