@@ -23,7 +23,7 @@ import Foundation
 // - span rejection based on setRejectionFilter
 
 class LimitingExporter: SpanExporter {
-    let MAX_ATTRIBUTE_LENGTH = 4096
+    let MAX_ATTRIBUTE_LENGTH = 32768
     static let SPAN_RATE_LIMIT_PERIOD = 30 // seconds
     let MAX_SPANS_PER_PERIOD_PER_COMPONENT = 100
 
