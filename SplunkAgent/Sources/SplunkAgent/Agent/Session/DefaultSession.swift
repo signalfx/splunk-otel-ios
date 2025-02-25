@@ -239,7 +239,7 @@ class DefaultSession: AgentSession {
 
     func createSession() -> SessionItem {
         let newSession = SessionItem(
-            id: String.sessionIdentifier(),
+            id: String.uniqueIdentifier(),
             start: Date()
         )
 

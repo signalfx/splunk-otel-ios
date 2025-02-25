@@ -35,23 +35,4 @@ extension String {
 
         return identifier
     }
-
-    // TODO: update in DEMRUM-1043
-    static func sessionIdentifier() -> String {
-        let length = 32
-        let uniqueIdentifierCharactersSet = "abcdef0123456789"
-        let uniqueCharactersCount = uniqueIdentifierCharactersSet.count
-
-        var identifier = ""
-
-        while identifier.count != length {
-            let randomCharacterPosition = Int.random(in: 0 ..< uniqueCharactersCount)
-            let index = uniqueIdentifierCharactersSet.index(uniqueIdentifierCharactersSet.startIndex, offsetBy: randomCharacterPosition)
-            let randomCharacter = uniqueIdentifierCharactersSet[index]
-
-            identifier += String(randomCharacter)
-        }
-
-        return identifier
-    }
 }
