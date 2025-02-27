@@ -5,11 +5,13 @@ set -ex
 PATH=${PATH}:/opt/homebrew/bin/
 
 if which swiftlint >/dev/null; then
-    swiftlint
+   echo "Swiftlint installation found"
 else
   echo "warning: SwiftLint not installed, installing via Homebrew"
   brew install swiftlint
 fi
+
+swiftlint --strict
 
 # Make sure the version numbers on the podspec and SplunkRum.swift match
 echo "Checking that version numbers match"
