@@ -1,15 +1,13 @@
 #!/bin/bash
 set -ex
 
-# Check the PATH for Swiftlint
-if test -d "${HOME}/Documents/SwiftLint"; then
-  PATH="${HOME}/Documents/SwiftLint:${PATH}"
-fi
+# Add the PATH for Swiftlint
+export PATH="$PATH:/opt/homebrew/bin"
 
-export PATH
-
-if ! which swiftlint >/dev/null 2>&1; then
-    echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint" >&2
+if which swiftlint; then
+    swiftlint —-fix && swiftlint
+else
+  echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
 fi
 
 # Run Swiftlint
