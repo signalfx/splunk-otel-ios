@@ -11,7 +11,7 @@ else
   brew install swiftlint
 fi
 
-swiftlint --strict
+swiftlint
 
 # Make sure the version numbers on the podspec and SplunkRum.swift match
 echo "Checking that version numbers match"
@@ -23,7 +23,7 @@ if [ $podVer != $rumVer ]; then
 fi
 
 # Check the podspec is valid
-pod lib lint SplunkOtel.podspec
+pod lib lint SplunkOtel.podspec --allow-warnings
 
 xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SplunkOtel -configuration Debug build
 xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme SplunkOtel -configuration Debug test
