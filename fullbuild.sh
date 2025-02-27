@@ -1,5 +1,18 @@
 #!/bin/bash
 set -ex
+
+# Check the PATH for Swiftlint
+if test -d "${HOME}/Documents/SwiftLint"; then
+  PATH="${HOME}/Documents/SwiftLint:${PATH}"
+fi
+
+export PATH
+
+if ! which swiftlint >/dev/null 2>&1; then
+    echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint" >&2
+fi
+
+# Run Swiftlint
 swiftlint --strict
 
 # Make sure the version numbers on the podspec and SplunkRum.swift match
