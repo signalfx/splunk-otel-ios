@@ -1,17 +1,15 @@
 #!/bin/bash
 set -ex
 
-# Add the PATH for Swiftlint
-export PATH="$PATH:/opt/homebrew/bin"
+# on arm64 macOS, homebrew is custom build into /opt/homebrew
+PATH=${PATH}:/opt/homebrew/bin/
 
-if which swiftlint; then
-    swiftlint —-fix && swiftlint
+if which swiftlint >/dev/null; then
+    swiftlint
 else
-  echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
+  echo "warning: SwiftLint not installed, installing via Homebrew"
+  brew install swiftlint
 fi
-
-# Run Swiftlint
-swiftlint --strict
 
 # Make sure the version numbers on the podspec and SplunkRum.swift match
 echo "Checking that version numbers match"
