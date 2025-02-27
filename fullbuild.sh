@@ -31,9 +31,14 @@ xcodebuild -workspace SplunkRumWorkspace/SplunkRumWorkspace.xcworkspace -scheme 
 
 # Now try to do a swift build to ensure that the package dependencies are properly in synch
 rm -rf ./.build
-swift build -v -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphonesimulator --show-sdk-path`" -Xswiftc "-target" -Xswiftc "x86_64-apple-ios11.0-simulator"
-rm -rf ./.build
+SIMULATOR_SDK="$(xcode-select -p)/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
+SIMULATOR_TARGET="arm64-apple-ios17-simulator"
+swift build -v --sdk "$SIMULATOR_SDK" --triple "$SIMULATOR_TARGET" --scratch-path "./.build/$SIMULATOR_TARGET"
+
 # repeat targeting a real device
-swift build -v -Xswiftc "-sdk" -Xswiftc "`xcrun --sdk iphoneos --show-sdk-path`" -Xswiftc "-target" -Xswiftc "arm64-apple-ios14.0"
+rm -rf ./.build
+DEVICE_SDK="$(xcode-select -p)/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
+DEVICE_TARGET="arm64-apple-ios18.2"
+swift build -v --sdk "$DEVICE_SDK" --triple "$DEVICE_TARGET" --scratch-path "./.build/$DEVICE_TARGET"
 
 echo "========= Congratulations! ========="
