@@ -50,6 +50,11 @@ class DefaultModulesPool: AgentModulesPool {
             knownModules.append(CrashReports.self)
         #endif
 
+        // App Start
+        #if canImport(SplunkAppStart)
+            knownModules.append(AppStart.self)
+        #endif
+
         // Session Replay
         #if canImport(CiscoSessionReplay)
             knownModules.append(CiscoSessionReplay.SessionReplay.self)
@@ -63,11 +68,6 @@ class DefaultModulesPool: AgentModulesPool {
         // Network Instrumentation
         #if canImport(SplunkSlowFrameDetector)
             knownModules.append(SlowFrameDetector.self)
-        #endif
-
-        // App Start
-        #if canImport(SplunkAppStart)
-            knownModules.append(AppStart.self)
         #endif
 
         return knownModules
