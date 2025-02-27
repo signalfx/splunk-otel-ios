@@ -15,22 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
+import XCTest
 
-/// Defines default values for configuration
-struct ConfigurationDefaults {
+public class HexIDValidator {
 
-    static var appName: String? {
-        Bundle.main.bundleIdentifier
+    // MARK: - Basic checks
+
+    public static func checkFormat(_ identifier: String) throws {
+        let allowedCharacters = "abcdef0123456789"
+        let allowedCharactersSet = CharacterSet(charactersIn: allowedCharacters)
+
+        // Only allowed characters must be used for ID creation
+        let hasForbiddenCharacters = identifier.rangeOfCharacter(from: allowedCharactersSet.inverted) != nil
+        XCTAssertFalse(hasForbiddenCharacters)
     }
-
-    static var appVersion: String? {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    }
-
-    static var sessionTimeout = 15.0 * 60.0 // 15 minutes
-
-    static var maxSessionLength = 4.0 * 60.0 * 60.0 // 4 hours
-
-    static var recordingEnabled = true
 }
