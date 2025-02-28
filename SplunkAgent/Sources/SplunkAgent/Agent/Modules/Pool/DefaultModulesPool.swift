@@ -70,11 +70,6 @@ class DefaultModulesPool: AgentModulesPool {
             knownModules.append(SlowFrameDetector.self)
         #endif
 
-        // App Start
-        #if canImport(SplunkAppStart)
-            knownModules.append(AppStart.self)
-        #endif
-
         return knownModules
     }
 }
