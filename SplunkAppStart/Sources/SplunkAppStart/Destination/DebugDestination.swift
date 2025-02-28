@@ -22,6 +22,8 @@ import SplunkSharedProtocols
 /// Stores results for testing purposes and prints results.
 class DebugDestination: AppStartDestination {
 
+    // MARK: - Private
+
     // Stored results
     var type: AppStartType?
     var startTime: Date?
@@ -30,6 +32,9 @@ class DebugDestination: AppStartDestination {
 
     // Internal Logger
     let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "AppStart"))
+
+
+    // MARK: - Sending
 
     func send(type: AppStartType, start: Date, end: Date, sharedState: (any AgentSharedState)?, events: [String: Date]?) {
         self.type = type

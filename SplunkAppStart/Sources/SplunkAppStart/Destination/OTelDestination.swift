@@ -22,6 +22,8 @@ import SplunkSharedProtocols
 /// Creates and sends an OpenTelemetry span from supplied app start data.
 struct OTelDestination: AppStartDestination {
 
+    // MARK: - Sending
+
     func send(type: AppStartType, start: Date, end: Date, sharedState: (any AgentSharedState)?, events: [String: Date]?) {
         let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "splunk-app-start", instrumentationVersion: sharedState?.agentVersion)
 

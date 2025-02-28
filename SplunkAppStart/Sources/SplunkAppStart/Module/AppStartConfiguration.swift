@@ -18,13 +18,5 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-public struct AppStartConfiguration: ModuleConfiguration {
-
-    // MARK: - Public
-
-    public var enabled: Bool
-
-    public init(enabled: Bool) {
-        self.enabled = enabled
-    }
-}
+/// AppStart module configuration, minimal configuration for module conformance.
+public struct AppStartConfiguration: ModuleConfiguration {}
