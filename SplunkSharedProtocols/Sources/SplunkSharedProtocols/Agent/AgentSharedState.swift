@@ -27,6 +27,9 @@ public protocol AgentSharedState: AnyObject {
     /// Identification of the current session at the time of the creation of this state.
     var sessionId: String { get }
 
+    /// Agent version.
+    var agentVersion: String { get }
+
     /// Returns application state for the given timestamp.
     func applicationState(for timestamp: Date) -> String?
 }

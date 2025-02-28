@@ -21,6 +21,8 @@ import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import SplunkSharedProtocols
 import SplunkOpenTelemetryBackgroundExporter
+import StdoutExporter
+import ZipkinExporter
 
 /// OTLPTraceProcessor initializes and uses OpenTelemetry Trace Provider.
 ///
@@ -36,6 +38,7 @@ public class OTLPTraceProcessor: TraceProcessor {
     // MARK: - Initialization
     
     required public init(with baseURL: URL, resources: AgentResources) {
+        /* Using Zipkin for now
         let configuration = OtlpConfiguration()
         let envVarHeaders = [(String, String)]()
 
@@ -52,6 +55,17 @@ public class OTLPTraceProcessor: TraceProcessor {
                 
         // Initialise processor
         let spanProcessor = SimpleSpanProcessor(spanExporter: backgroundTraceExporter)
+         */
+
+        // TODO: determine exporter
+        let zipkinExportOptions = ZipkinTraceExporterOptions(endpoint: baseURL.absoluteString, serviceName: "myservice")
+        let zipkinExporter = ZipkinTraceExporter(options: zipkinExportOptions)
+        let spanProcessor = SimpleSpanProcessor(spanExporter: zipkinExporter)
+
+        // TODO: enable/disable based on DEMRUM-1403
+        let stdoutExporter = StdoutSpanExporter(isDebug: true)
+        let stdoutSpanProcessor = SimpleSpanProcessor(spanExporter: stdoutExporter)
+
         
         // Build Resources
         var resource = Resource()
@@ -61,6 +75,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         tracerProvider = TracerProviderBuilder()
             .with(resource: resource)
             .add(spanProcessor: spanProcessor)
+            .add(spanProcessor: stdoutSpanProcessor)
             .build()
         
         // Register default tracer provider

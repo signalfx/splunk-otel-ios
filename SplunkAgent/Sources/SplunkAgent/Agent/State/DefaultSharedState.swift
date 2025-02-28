@@ -34,6 +34,10 @@ class DefaultSharedState: AgentSharedState {
         owner.currentSession.currentSessionId
     }
 
+    var agentVersion: String {
+        SplunkRum.version
+    }
+
     func applicationState(for timestamp: Date) -> String? {
         owner.appStateManager.appState(for: timestamp)?.rawValue
     }

@@ -150,7 +150,9 @@ public final class AppStart {
 
         // Send app start if the type was determined
         if let determinedType, let startTime {
-            destination.send(type: determinedType, start: startTime, end: endTime, sharedState: sharedState)
+            let events = determinedType == .cold ? coldStartEvents(startTime: startTime) : nil
+
+            destination.send(type: determinedType, start: startTime, end: endTime, sharedState: sharedState, events: events)
 
             internalLogger.log(level: .debug) {
                 "App start log: determined app start type: \(determinedType.rawValue), start time: \(startTime), end time: \(endTime)."
@@ -166,5 +168,28 @@ public final class AppStart {
                 "Could not determine app start type, the agent was likely initialized later than receiving the didFinishLaunching notification."
             }
         }
+    }
+
+
+    // MARK: - Cold start events
+
+    private func coldStartEvents(startTime: Date) -> [String: Date] {
+        var events = [String: Date]()
+
+        events["process.start"] = startTime
+
+        if let didFinishLaunchingTimestamp {
+            events[UIApplication.didFinishLaunchingNotification.rawValue] = didFinishLaunchingTimestamp
+        }
+
+        if let willEnterForegroundTimestamp {
+            events[UIApplication.willEnterForegroundNotification.rawValue] = willEnterForegroundTimestamp
+        }
+
+        if let didBecomeActiveDate {
+            events[UIApplication.didBecomeActiveNotification.rawValue] = didBecomeActiveDate
+        }
+
+        return events
     }
 }
