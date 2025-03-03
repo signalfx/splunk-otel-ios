@@ -25,7 +25,12 @@ struct OTelDestination: AppStartDestination {
     // MARK: - Sending
 
     func send(type: AppStartType, start: Date, end: Date, sharedState: (any AgentSharedState)?, events: [String: Date]?) {
-        let tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "splunk-app-start", instrumentationVersion: sharedState?.agentVersion)
+        let tracer = OpenTelemetry.instance
+            .tracerProvider
+            .get(
+                instrumentationName: "splunk-app-start",
+                instrumentationVersion: sharedState?.agentVersion
+            )
 
         let span = tracer.spanBuilder(spanName: "AppStart")
             .setStartTime(time: start)
@@ -51,8 +56,10 @@ struct OTelDestination: AppStartDestination {
         switch type {
         case .cold:
             return "cold"
+
         case .warm:
             return "warm"
+
         case .hot:
             return "hot"
         }
