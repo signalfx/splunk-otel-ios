@@ -37,6 +37,11 @@ final class DefaultSessionTests: XCTestCase {
         XCTAssertEqual(resumedSessionItem.id, defaultSession.currentSessionId)
         XCTAssertNil(resumedSessionItem.closed)
 
+        // Check session id length
+        XCTAssertTrue(resumedSessionItem.id.count == 32)
+
+        // Check session id format
+        try HexIDValidator.checkFormat(resumedSessionItem.id)
 
         /* Rotate Session */
         defaultSession.rotateSession()
@@ -64,6 +69,7 @@ final class DefaultSessionTests: XCTestCase {
         XCTAssertEqual(sessionModel.sessions, matchedSessions)
     }
 
+    // TODO: Fix tests in DEMRUM-1489
     func testSessionForLogic() throws {
         var configuration = try ConfigurationTestBuilder.buildDefault()
         configuration.maxSessionLength = 5
