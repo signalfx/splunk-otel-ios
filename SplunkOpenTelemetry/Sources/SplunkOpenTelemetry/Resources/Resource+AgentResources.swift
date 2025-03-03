@@ -56,8 +56,13 @@ extension Resource {
             ResourceAttributes.serviceName.rawValue: AttributeValue.string(serviceName),
             ResourceAttributes.serviceVersion.rawValue: AttributeValue.string(serviceVersion),
 
+            // TODO: update in DEMRUM-1401
             // SDK info
-            "com.splunk.rum.agent.version": AttributeValue.string(agentVersion),
+            "splunk.rumVersion": AttributeValue.string(agentVersion),
+            "app.version": AttributeValue.string(serviceVersion),
+            "environment": AttributeValue.string("dev"),
+            "app": AttributeValue.string(agentResources.appName),
+            ResourceAttributes.deviceModelName.rawValue: AttributeValue.string(deviceModelIdentifier),
 
             // Device info
             ResourceAttributes.deviceModelIdentifier.rawValue: AttributeValue.string(deviceModelIdentifier),
@@ -68,7 +73,7 @@ extension Resource {
             ResourceAttributes.osName.rawValue: AttributeValue.string(osName),
             ResourceAttributes.osVersion.rawValue: AttributeValue.string(osVersion),
             ResourceAttributes.osDescription.rawValue: AttributeValue.string(osDescription),
-            ResourceAttributes.osType.rawValue: AttributeValue.string(osType),
+            ResourceAttributes.osType.rawValue: AttributeValue.string(osType)
         ]
 
         // Add required attributes to the resource

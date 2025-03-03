@@ -22,5 +22,5 @@ import SplunkSharedProtocols
 protocol AppStartDestination {
 
     /// Sends results into a destination.
-    func send(type: AppStartType, start: Date, end: Date, sharedState: AgentSharedState?)
+    func send(type: AppStartType, start: Date, end: Date, sharedState: AgentSharedState?, events: [String: Date]?)
 }

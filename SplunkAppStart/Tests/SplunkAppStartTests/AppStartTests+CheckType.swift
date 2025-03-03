@@ -19,7 +19,7 @@ limitations under the License.
 import XCTest
 
 extension AppStartTests {
-    
+
     /// Checks determined type in a destination matches checked type.
     func checkDeterminedType(_ checkedType: AppStartType, in destination: DebugDestination) throws {
         let type = try XCTUnwrap(destination.type)

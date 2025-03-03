@@ -65,7 +65,12 @@ final class AppStartTests: XCTestCase {
 
         simulateColdStartNotifications()
 
+        // Check type
         try checkDeterminedType(.cold, in: destination)
+
+        // Check events
+        let events = try XCTUnwrap(destination.events)
+        XCTAssertTrue(events.count >= 4)
     }
 
     func testPrewarmStart() throws {
