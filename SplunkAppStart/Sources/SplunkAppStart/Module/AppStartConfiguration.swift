@@ -16,20 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkSharedProtocols
 
-/// Internal protocol for sharing agent state with modules.
-///
-/// The Agent uses the protocol internally to manage Modules and their Events.
-public protocol AgentSharedState: AnyObject {
-
-    // MARK: - General state
-
-    /// Identification of the current session at the time of the creation of this state.
-    var sessionId: String { get }
-
-    /// Agent version.
-    var agentVersion: String { get }
-
-    /// Returns application state for the given timestamp.
-    func applicationState(for timestamp: Date) -> String?
-}
+/// AppStart module configuration, minimal configuration for module conformance.
+public struct AppStartConfiguration: ModuleConfiguration {}
