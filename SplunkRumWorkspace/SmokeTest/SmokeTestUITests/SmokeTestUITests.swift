@@ -122,12 +122,17 @@ class SmokeTestUITests: XCTestCase {
 
         // Switch apps and back cycle
         XCUIDevice.shared.press(XCUIDevice.Button.home)
-        print("pressed home button")
-        sleep(2)
-        app.activate()
-        print("app re-activated")
+        print("APP: Pressed home button")
         sleep(SLEEP_TIME)
-
+        app.activate()
+        print("APP: re-activated")
+        sleep(SLEEP_TIME)
+        
+        // Log received spans from the app
+        print("... server got spans")
+        receivedSpans.forEach { (span) in
+            print(span)
+        }
         let resign = receivedSpans.first(where: { (span) -> Bool in
             return span.name == "ResignActive"
         })
@@ -139,13 +144,20 @@ class SmokeTestUITests: XCTestCase {
         XCTAssertNotNil(foreground)
         // should be in the same session
         XCTAssertEqual(resign?.tags["splunk.rumSessionId"]?.description, foreground?.tags["splunk.rumSessionId"]?.description)
-
+        
+        print("APP: UI Actions")
         app.buttons["SMALL SLEEP"].tap()
         app.buttons["LARGE SLEEP"].tap()
 
         // IBAction
         app.buttons["CLICK ME"].tap()
         sleep(SLEEP_TIME)
+        
+        // Log received spans from the app
+        print("... server got spans")
+        receivedSpans.forEach { (span) in
+            print(span)
+        }
         let action = receivedSpans.last(where: { (span) -> Bool in
             return span.name == "action"
         })

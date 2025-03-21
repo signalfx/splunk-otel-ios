@@ -29,7 +29,7 @@ DESC
   s.author           = { 'Splunk' => 'www.splunk.com' }
   s.source           = { :git => 'https://github.com/signalfx/splunk-otel-ios.git', :tag => s.version.to_s }
 # Make sure the deployment target matches with Package.swift
-  s.ios.deployment_target = '11.0'
+  s.ios.deployment_target = '15.0'
   s.source_files = 'SplunkRumWorkspace/SplunkRum/SplunkRum/**/*.swift'
   s.resource_bundles = {'SplunkRum' => ['PrivacyInfo.xcprivacy']}
 end

@@ -1,12 +1,12 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.5
 
 import PackageDescription
 
 let package = Package(
     name: "SplunkOtel",
     platforms: [
-        .iOS(.v11),
-        .macOS(.v10_13)
+        .iOS(.v15),
+        .macOS(.v12)
     ],
     products: [
         .library(name: "SplunkOtel", targets: ["SplunkOtel"])
