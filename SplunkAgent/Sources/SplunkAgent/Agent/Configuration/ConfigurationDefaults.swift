@@ -28,9 +28,9 @@ struct ConfigurationDefaults {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     }
 
-    static var sessionTimeout = 900.0
+    static var sessionTimeout = 15.0 * 60.0 // 15 minutes
 
-    static var maxSessionLength = 3600.0
+    static var maxSessionLength = 4.0 * 60.0 * 60.0 // 4 hours
 
     static var recordingEnabled = true
 }

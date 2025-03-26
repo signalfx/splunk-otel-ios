@@ -8,9 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1673CC2BA1F52600F85698 /* EventsModel.swift */; };
+		2A1C87FA2D63579000CA53EE /* SplunkAppStart in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1C87F92D63579000CA53EE /* SplunkAppStart */; };
 		2A30EE1C2BD7AEDD008557DD /* NOTICES in Resources */ = {isa = PBXBuildFile; fileRef = 2A30EE1B2BD7AECE008557DD /* NOTICES */; };
 		2AA52B492B8DF4CD00DF9373 /* EventsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA52B482B8DF4CD00DF9373 /* EventsTests.swift */; };
 		2AA52B4C2B8DF50300DF9373 /* v.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 2AA52B4B2B8DF50300DF9373 /* v.mp4 */; };
+		2AAC95E32D6C7427004FAE2C /* String+HexID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAC95E22D6C741C004FAE2C /* String+HexID.swift */; };
+		2AAC95E42D6C7427004FAE2C /* String+HexID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAC95E22D6C741C004FAE2C /* String+HexID.swift */; };
+		2AAC95E62D6C7880004FAE2C /* HexIDValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAC95E52D6C787C004FAE2C /* HexIDValidator.swift */; };
+		2AAC95E82D6C78DF004FAE2C /* HexIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAC95E72D6C78DB004FAE2C /* HexIDTests.swift */; };
 		2AAD518E2BA97FD500710505 /* DefaultEventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAD518D2BA97FD500710505 /* DefaultEventManager.swift */; };
 		2AB51E972B7A670600307B77 /* SystemInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB51E942B7A670600307B77 /* SystemInfo.swift */; };
 		2AB51E982B7A670600307B77 /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB51E952B7A670600307B77 /* AppInfo.swift */; };
@@ -180,6 +185,9 @@
 		2A30EE1B2BD7AECE008557DD /* NOTICES */ = {isa = PBXFileReference; lastKnownFileType = text; path = NOTICES; sourceTree = "<group>"; };
 		2AA52B482B8DF4CD00DF9373 /* EventsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsTests.swift; sourceTree = "<group>"; };
 		2AA52B4B2B8DF50300DF9373 /* v.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = v.mp4; sourceTree = "<group>"; };
+		2AAC95E22D6C741C004FAE2C /* String+HexID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+HexID.swift"; sourceTree = "<group>"; };
+		2AAC95E52D6C787C004FAE2C /* HexIDValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexIDValidator.swift; sourceTree = "<group>"; };
+		2AAC95E72D6C78DB004FAE2C /* HexIDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexIDTests.swift; sourceTree = "<group>"; };
 		2AAD518D2BA97FD500710505 /* DefaultEventManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultEventManager.swift; sourceTree = "<group>"; };
 		2AB51E942B7A670600307B77 /* SystemInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemInfo.swift; sourceTree = "<group>"; };
 		2AB51E952B7A670600307B77 /* AppInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
@@ -353,6 +361,7 @@
 				526521F62CB8937800DB3BB9 /* SplunkSlowFrameDetector in Frameworks */,
 				BAD44D0D2B7878990069E54D /* SplunkNetwork in Frameworks */,
 				4B1B151F2BB5858600BEFC4B /* SplunkOpenTelemetry in Frameworks */,
+				2A1C87FA2D63579000CA53EE /* SplunkAppStart in Frameworks */,
 				4B1B15192BB584E300BEFC4B /* SplunkSessionReplayProxy in Frameworks */,
 				4B1B15222BB5859B00BEFC4B /* SplunkLogger in Frameworks */,
 				4B1B15162BB584D300BEFC4B /* SplunkSharedProtocols in Frameworks */,
@@ -816,6 +825,7 @@
 		E4374AFD2B4D887A00E3C88E /* Validators */ = {
 			isa = PBXGroup;
 			children = (
+				2AAC95E52D6C787C004FAE2C /* HexIDValidator.swift */,
 				E4374B022B4D923200E3C88E /* NanoIDValidator.swift */,
 				E4032E632B55278C003D4392 /* PersistentSessionsValidator.swift */,
 			);
@@ -885,6 +895,7 @@
 		E46896382B21CC4200727A6A /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				2AAC95E72D6C78DB004FAE2C /* HexIDTests.swift */,
 				E46896392B21CC7800727A6A /* NanoIDTests.swift */,
 				E44D73BD2B99B10600121EA4 /* XCTestCase+SimulateWait.swift */,
 				E4577D7A2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift */,
@@ -1132,6 +1143,7 @@
 		E4F2E4FC2B172985006EBA69 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				2AAC95E22D6C741C004FAE2C /* String+HexID.swift */,
 				E4F2E5272B179658006EBA69 /* String+NanoID.swift */,
 			);
 			path = Extensions;
@@ -1206,6 +1218,7 @@
 				4B1B15212BB5859A00BEFC4B /* SplunkLogger */,
 				4B1B15242BB585AC00BEFC4B /* SplunkCrashReports */,
 				526521F52CB8937800DB3BB9 /* SplunkSlowFrameDetector */,
+				2A1C87F92D63579000CA53EE /* SplunkAppStart */,
 			);
 			productName = SplunkAgent;
 			productReference = 3384F2A22AC879E900512D79 /* SplunkAgent.framework */;
@@ -1309,7 +1322,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check SplunkAgent directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger package\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols package\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy package\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector package\ncd ../SplunkSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork package\ncd ../SplunkNetwork/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
+			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check SplunkAgent directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger package\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols package\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy package\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector package\ncd ../SplunkSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork package\ncd ../SplunkNetwork/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkAppStart package\ncd ../SplunkAppStart/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1407,6 +1420,7 @@
 				C73FF4842B6CE749009C53FF /* AgentConfigurationHandler.swift in Sources */,
 				C73FF4982B6CE777009C53FF /* APIClientError.swift in Sources */,
 				C73FF4962B6CE777009C53FF /* APIClient.swift in Sources */,
+				2AAC95E32D6C7427004FAE2C /* String+HexID.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1429,6 +1443,7 @@
 				E4C3E5B72B6912E400661FA6 /* CrashReportsTestModule.swift in Sources */,
 				E46896512B220DBA00727A6A /* DefaultUserTests.swift in Sources */,
 				2AA52B492B8DF4CD00DF9373 /* EventsTests.swift in Sources */,
+				2AAC95E62D6C7880004FAE2C /* HexIDValidator.swift in Sources */,
 				E4577D7D2B9F5BE400DFA2C2 /* XCTestCase+SimulateNotifications.swift in Sources */,
 				2AE43AFF2B7B8376002C4A98 /* SystemInfoTests.swift in Sources */,
 				E40E0AF52B6BC35100D31EEF /* SessionReplayTestModuleTypes.swift in Sources */,
@@ -1441,6 +1456,8 @@
 				E468964C2B21EDB200727A6A /* API-1.0-SessionTests.swift in Sources */,
 				E468963D2B21D8D000727A6A /* API-1.0-UserTests.swift in Sources */,
 				E44D73BE2B99B10600121EA4 /* XCTestCase+SimulateWait.swift in Sources */,
+				2AAC95E42D6C7427004FAE2C /* String+HexID.swift in Sources */,
+				2AAC95E82D6C78DF004FAE2C /* HexIDTests.swift in Sources */,
 				E4EE9ECA2BA322F50000D594 /* SessionReplayTestBuilder.swift in Sources */,
 				E46896552B22102E00727A6A /* RuntimeStateTests.swift in Sources */,
 				2AE43B042B7BA352002C4A98 /* ResourcesTests.swift in Sources */,
@@ -2355,6 +2372,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2A1C87F92D63579000CA53EE /* SplunkAppStart */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SplunkAppStart;
+		};
 		4B1B15152BB584D300BEFC4B /* SplunkSharedProtocols */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SplunkSharedProtocols;

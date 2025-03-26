@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,23 +18,14 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
+/// AppStart remote configuration, minimal configuration for module conformance.
+public struct AppStartRemoteConfiguration: RemoteModuleConfiguration {
 
-public final class ErrorReporting {
+    // MARK: - Public
 
+    public var enabled: Bool
 
-    // MARK: - Private properties
-
-    private var config = ErrorReportingConfiguration(enabled: true)
-
-
-    // MARK: - ErrorReporting lifecycle
-
-    public required init() {} // see install() in Module extension for startup tasks
-
-
-    // MARK: - ErrorReporting helper functions
-
-
-    // MARK: - ErrorReporting Reporting
-
+    public init?(from data: Data) {
+        enabled = true
+    }
 }

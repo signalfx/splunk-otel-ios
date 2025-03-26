@@ -50,6 +50,9 @@
       location = "group:SplunkErrorReporting">
    </FileRef>
    <FileRef
+      location = "group:SplunkAppStart">
+   </FileRef>
+   <FileRef
       location = "group:README.md">
    </FileRef>
    <FileRef

@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,26 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-import SplunkSharedProtocols
+import XCTest
 
+public class HexIDValidator {
 
-public final class ErrorReporting {
+    // MARK: - Basic checks
 
+    public static func checkFormat(_ identifier: String) throws {
+        let allowedCharacters = "abcdef0123456789"
+        let allowedCharactersSet = CharacterSet(charactersIn: allowedCharacters)
 
-    // MARK: - Private properties
-
-    private var config = ErrorReportingConfiguration(enabled: true)
-
-
-    // MARK: - ErrorReporting lifecycle
-
-    public required init() {} // see install() in Module extension for startup tasks
-
-
-    // MARK: - ErrorReporting helper functions
-
-
-    // MARK: - ErrorReporting Reporting
-
+        // Only allowed characters must be used for ID creation
+        let hasForbiddenCharacters = identifier.rangeOfCharacter(from: allowedCharactersSet.inverted) != nil
+        XCTAssertFalse(hasForbiddenCharacters)
+    }
 }
