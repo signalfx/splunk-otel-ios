@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,23 +18,9 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
+/// Describes a destination into which the AppStart module sends it's results.
+protocol AppStartDestination {
 
-public final class ErrorReporting {
-
-
-    // MARK: - Private properties
-
-    private var config = ErrorReportingConfiguration(enabled: true)
-
-
-    // MARK: - ErrorReporting lifecycle
-
-    public required init() {} // see install() in Module extension for startup tasks
-
-
-    // MARK: - ErrorReporting helper functions
-
-
-    // MARK: - ErrorReporting Reporting
-
+    /// Sends results into a destination.
+    func send(type: AppStartType, start: Date, end: Date, sharedState: AgentSharedState?, events: [String: Date]?)
 }

@@ -61,6 +61,12 @@ public class NetworkInstrumentation {
 
         if let traceEndpointURL {
             let traceEndpoint = traceEndpointURL.absoluteString
+
+            // TODO: remove this condition when DEMRUM-1403 is implemented
+            if requestEndpoint.contains("signalfx.com/v1/rum") {
+                return false
+            }
+
             if requestEndpoint.contains(traceEndpoint) {
                 self.internalLogger.log(level: .debug) {
                     "Should Not Instrument Backend URL \(URLRequest.description)"

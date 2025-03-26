@@ -34,6 +34,10 @@ internal import SplunkSharedProtocols
     internal import SplunkSlowFrameDetector
 #endif
 
+#if canImport(SplunkAppStart)
+    @_implementationOnly import SplunkAppStart
+#endif
+
 
 /// The class implements the default pool of available modules.
 class DefaultModulesPool: AgentModulesPool {
@@ -44,6 +48,11 @@ class DefaultModulesPool: AgentModulesPool {
         // Crash reports
         #if canImport(SplunkCrashReports)
             knownModules.append(CrashReports.self)
+        #endif
+
+        // App Start
+        #if canImport(SplunkAppStart)
+            knownModules.append(AppStart.self)
         #endif
 
         // Session Replay

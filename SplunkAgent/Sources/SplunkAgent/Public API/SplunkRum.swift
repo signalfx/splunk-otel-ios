@@ -22,6 +22,7 @@ import Foundation
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
 #endif
+internal import SplunkAppStart
 internal import SplunkLogger
 internal import SplunkNetwork
 internal import SplunkOpenTelemetry
@@ -204,6 +205,7 @@ public class SplunkRum: ObservableObject {
         customizeCrashReports()
         customizeSessionReplay()
         customizeNetwork()
+        customizeAppStart()
     }
 
     /// Perform operations specific to the SessionReplay module.
@@ -245,6 +247,13 @@ public class SplunkRum: ObservableObject {
         crashReportsModule?.reportCrashIfPresent()
     #endif
     // swiftformat:enable indent
+    }
+
+    /// Configure App start module
+    private func customizeAppStart() {
+        let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
+
+        appStartModule?.sharedState = sharedState
     }
 
 

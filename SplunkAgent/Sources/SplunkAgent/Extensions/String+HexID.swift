@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,25 +16,20 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 
+extension String {
 
-public final class ErrorReporting {
+    /// Creates a unique hex-encoded identifier.
+    ///
+    /// - Parameters:
+    ///   - length: A number of hex characters in the identifier. Default is `16`.
+    static func uniqueHexIdentifier(ofLength length: Int = 16) -> String {
+        var identifier = ""
 
+        for _ in 0 ..< length {
+            identifier += String(format: "%x", Int.random(in: 0 ..< 16))
+        }
 
-    // MARK: - Private properties
-
-    private var config = ErrorReportingConfiguration(enabled: true)
-
-
-    // MARK: - ErrorReporting lifecycle
-
-    public required init() {} // see install() in Module extension for startup tasks
-
-
-    // MARK: - ErrorReporting helper functions
-
-
-    // MARK: - ErrorReporting Reporting
-
+        return identifier
+    }
 }
