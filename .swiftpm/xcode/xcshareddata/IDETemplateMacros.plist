@@ -1,6 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>FILEHEADER</key>
+	<string>
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,21 +21,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoSessionReplay
-import QuartzCore
-import UIKit
-
-public extension UIView {
-
-    /// Element sensitivity for the specified `UIView` instance.
-    ///
-    /// Assigning `nil` removes previously assigned explicit sensitivity.
-    var srSensitive: Bool? {
-        get {
-            SplunkRum.instance?.sessionReplay.sensitivity[self]
-        }
-        set {
-            SplunkRum.instance?.sessionReplay.sensitivity[self] = newValue
-        }
-    }
-}
+</string>
+</dict>
+</plist>

@@ -3,10 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B9642912D613D89009A2E7F /* SplunkAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9642902D613D89009A2E7F /* SplunkAgent.framework */; };
+		4B9642922D613D89009A2E7F /* SplunkAgent.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9642902D613D89009A2E7F /* SplunkAgent.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4B9642952D613D8D009A2E7F /* SplunkANRReporter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9642942D613D8D009A2E7F /* SplunkANRReporter.framework */; };
+		4B9642962D613D8D009A2E7F /* SplunkANRReporter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9642942D613D8D009A2E7F /* SplunkANRReporter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5201D83F2B7DAEE100A0E9E4 /* DemoSleepButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5201D83E2B7DAEE100A0E9E4 /* DemoSleepButton.swift */; };
 		5201D8412B7DB3B200A0E9E4 /* DemoSpoilerProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5201D8402B7DB3B200A0E9E4 /* DemoSpoilerProvider.swift */; };
 		5240AABC2B7E9E5200C543B7 /* DemoTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5240AABB2B7E9E5200C543B7 /* DemoTitle.swift */; };
@@ -15,18 +19,17 @@
 		5264EE6E2B76F5F900F25C86 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5264EE692B76F5F900F25C86 /* Preview Assets.xcassets */; };
 		5264EE6F2B76F5F900F25C86 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5264EE6A2B76F5F900F25C86 /* ContentView.swift */; };
 		5264EE702B76F5F900F25C86 /* ANRDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5264EE6B2B76F5F900F25C86 /* ANRDemoApp.swift */; };
-		526E2D752B5B4BF300A7CEA4 /* SplunkAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 526E2D742B5B4BF300A7CEA4 /* SplunkAgent.framework */; };
-		526E2D762B5B4BF300A7CEA4 /* SplunkAgent.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 526E2D742B5B4BF300A7CEA4 /* SplunkAgent.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		526E2D772B5B4BF300A7CEA4 /* Embed Frameworks */ = {
+		4B9642932D613D89009A2E7F /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				526E2D762B5B4BF300A7CEA4 /* SplunkAgent.framework in Embed Frameworks */,
+				4B9642962D613D8D009A2E7F /* SplunkANRReporter.framework in Embed Frameworks */,
+				4B9642922D613D89009A2E7F /* SplunkAgent.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -34,6 +37,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4B9642902D613D89009A2E7F /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B9642942D613D8D009A2E7F /* SplunkANRReporter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkANRReporter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5201D83E2B7DAEE100A0E9E4 /* DemoSleepButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoSleepButton.swift; sourceTree = "<group>"; };
 		5201D8402B7DB3B200A0E9E4 /* DemoSpoilerProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoSpoilerProvider.swift; sourceTree = "<group>"; };
 		5240AABB2B7E9E5200C543B7 /* DemoTitle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoTitle.swift; sourceTree = "<group>"; };
@@ -51,7 +56,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				526E2D752B5B4BF300A7CEA4 /* SplunkAgent.framework in Frameworks */,
+				4B9642952D613D8D009A2E7F /* SplunkANRReporter.framework in Frameworks */,
+				4B9642912D613D89009A2E7F /* SplunkAgent.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,6 +107,8 @@
 		526E2D732B5B4BF300A7CEA4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4B9642942D613D8D009A2E7F /* SplunkANRReporter.framework */,
+				4B9642902D613D89009A2E7F /* SplunkAgent.framework */,
 				526E2D742B5B4BF300A7CEA4 /* SplunkAgent.framework */,
 			);
 			name = Frameworks;
@@ -116,7 +124,7 @@
 				526D7E882B5A0E8B001183B8 /* Sources */,
 				526D7E892B5A0E8B001183B8 /* Frameworks */,
 				526D7E8A2B5A0E8B001183B8 /* Resources */,
-				526E2D772B5B4BF300A7CEA4 /* Embed Frameworks */,
+				4B9642932D613D89009A2E7F /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -154,7 +162,6 @@
 			);
 			mainGroup = 526D7E832B5A0E8B001183B8;
 			packageReferences = (
-				526E2D782B5B4C6300A7CEA4 /* XCLocalSwiftPackageReference "../SplunkANRReporter" */,
 			);
 			productRefGroup = 526D7E8D2B5A0E8B001183B8 /* Products */;
 			projectDirPath = "";
@@ -393,13 +400,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCLocalSwiftPackageReference section */
-		526E2D782B5B4C6300A7CEA4 /* XCLocalSwiftPackageReference "../SplunkANRReporter" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../SplunkANRReporter;
-		};
-/* End XCLocalSwiftPackageReference section */
 	};
 	rootObject = 526D7E842B5A0E8B001183B8 /* Project object */;
 }

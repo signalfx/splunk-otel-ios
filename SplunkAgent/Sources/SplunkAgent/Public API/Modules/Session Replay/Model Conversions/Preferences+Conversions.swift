@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import CiscoSessionReplay
+internal import CiscoSessionReplay
 
 typealias SplunkSessionReplayPreferences = CiscoSessionReplay.Preferences
 

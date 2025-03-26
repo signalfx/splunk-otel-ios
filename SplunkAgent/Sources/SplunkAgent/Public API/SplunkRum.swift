@@ -20,13 +20,13 @@ import Foundation
 
 
 #if canImport(SplunkCrashReports)
-    @_implementationOnly import SplunkCrashReports
+    internal import SplunkCrashReports
 #endif
-@_implementationOnly import SplunkLogger
-@_implementationOnly import SplunkNetwork
-@_implementationOnly import SplunkOpenTelemetry
-@_implementationOnly import CiscoSessionReplay
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkLogger
+internal import SplunkNetwork
+internal import SplunkOpenTelemetry
+internal import CiscoSessionReplay
+internal import SplunkSharedProtocols
 
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
