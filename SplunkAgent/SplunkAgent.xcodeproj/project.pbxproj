@@ -43,9 +43,7 @@
 		4B0F23A12D7A0B0C00EA575A /* OpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = 4B0F23A02D7A0B0C00EA575A /* OpenTelemetryApi */; };
 		4B0F23A32D7A0B0C00EA575A /* OpenTelemetrySdk in Frameworks */ = {isa = PBXBuildFile; productRef = 4B0F23A22D7A0B0C00EA575A /* OpenTelemetrySdk */; };
 		4B1CEA022D95748E00A8CCCE /* SplunkSessionReplayProxy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B96425F2D613A87009A2E7F /* SplunkSessionReplayProxy.framework */; platformFilters = (ios, maccatalyst, tvos, ); };
-		4B1CEA032D95748E00A8CCCE /* SplunkSessionReplayProxy.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4B96425F2D613A87009A2E7F /* SplunkSessionReplayProxy.framework */; platformFilters = (ios, maccatalyst, tvos, ); settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4B1CEA072D95749D00A8CCCE /* SplunkSessionReplayProxy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B96425F2D613A87009A2E7F /* SplunkSessionReplayProxy.framework */; platformFilters = (ios, maccatalyst, tvos, ); };
-		4B1CEA082D95749D00A8CCCE /* SplunkSessionReplayProxy.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4B96425F2D613A87009A2E7F /* SplunkSessionReplayProxy.framework */; platformFilters = (ios, maccatalyst, tvos, ); settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4B2C8BBB2BCBE4A200C6E72F /* CrashReportsDataEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2C8BBA2BCBE4A200C6E72F /* CrashReportsDataEvent.swift */; };
 		4B385B372D94C55B005CF4C9 /* SplunkAppStart.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B385B2F2D94C55A005CF4C9 /* SplunkAppStart.framework */; };
 		4B385B4D2D94C594005CF4C9 /* DebugDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B172D94C4EB005CF4C9 /* DebugDestination.swift */; };
@@ -497,28 +495,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4B1CEA062D95748E00A8CCCE /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				4B1CEA032D95748E00A8CCCE /* SplunkSessionReplayProxy.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B1CEA0B2D95749D00A8CCCE /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				4B1CEA082D95749D00A8CCCE /* SplunkSessionReplayProxy.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4BAA09D22D920DFC00B7D6AE /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2894,7 +2870,6 @@
 				3384F29E2AC879E900512D79 /* Sources */,
 				3384F29F2AC879E900512D79 /* Frameworks */,
 				3384F2A02AC879E900512D79 /* Resources */,
-				4B1CEA062D95748E00A8CCCE /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -3346,7 +3321,6 @@
 				E46896252B21C85800727A6A /* Sources */,
 				E46896262B21C85800727A6A /* Frameworks */,
 				E46896272B21C85800727A6A /* Resources */,
-				4B1CEA0B2D95749D00A8CCCE /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

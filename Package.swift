@@ -36,6 +36,9 @@ let package = Package(
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",
                 "SplunkNetwork",
+                "SplunkSlowFrameDetector",
+                "SplunkOpenTelemetry",
+                "SplunkANRReporter",
                 "SplunkAppStart"
             ],
             path: "SplunkAgent",
@@ -48,8 +51,14 @@ let package = Package(
         .testTarget(
             name: "SplunkAgentTests",
             dependencies: ["SplunkAgent"],
-            path: "SplunkAgent",
-            sources: ["Tests"]
+            path: "SplunkAgent/Tests",
+            resources: [
+                .copy("SplunkAgentTests/Testing Support/Assets/v.mp4"),
+                .copy("SplunkAgentTests/Testing Support/Mock Data/AlternativeRemoteConfiguration.json"),
+                .copy("SplunkAgentTests/Testing Support/Mock Data/RemoteConfiguration.json"),
+                .copy("SplunkAgentTests/Testing Support/Mock Data/RemoteError.json")
+            ],
+            swiftSettings: [.define("SPM_TESTS")]
         ),
         
         
@@ -117,14 +126,14 @@ let package = Package(
         .target(
             name: "SplunkSlowFrameDetector",
             dependencies: [
-                "SplunkSharedProtocols",
+                .byName(name: "SplunkSharedProtocols"),
                 "SplunkOpenTelemetry"
             ],
             path: "SplunkSlowFrameDetector/Sources"
         ),
         .testTarget(
             name: "SplunkSlowFrameDetectorTests",
-            dependencies: ["SplunkSlowFrameDetector"],
+            dependencies: ["SplunkSlowFrameDetector", "SplunkSharedProtocols"],
             path: "SplunkSlowFrameDetector/Tests"
         ),
         

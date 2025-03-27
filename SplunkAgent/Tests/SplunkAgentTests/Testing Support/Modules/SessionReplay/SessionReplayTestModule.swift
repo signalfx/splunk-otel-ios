@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+@testable import SplunkAgent
 import SplunkSharedProtocols
 
 /// A dummy module skeleton for testing logic around modules.
