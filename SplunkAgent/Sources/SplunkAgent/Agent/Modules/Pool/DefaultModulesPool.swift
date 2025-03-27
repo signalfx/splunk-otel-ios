@@ -35,7 +35,7 @@ internal import SplunkSharedProtocols
 #endif
 
 #if canImport(SplunkAppStart)
-    @_implementationOnly import SplunkAppStart
+    internal import SplunkAppStart
 #endif
 
 

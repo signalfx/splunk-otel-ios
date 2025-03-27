@@ -35,8 +35,8 @@ let package = Package(
                 "SplunkSharedProtocols",
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",
-                "SplunkNetwork"
-                
+                "SplunkNetwork",
+                "SplunkAppStart"
             ],
             path: "SplunkAgent",
             sources: ["Sources"],
@@ -224,7 +224,9 @@ let package = Package(
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
                 .product(name: "ResourceExtension", package: "opentelemetry-swift"),
-                .product(name: "SignPostIntegration", package: "opentelemetry-swift")
+                .product(name: "SignPostIntegration", package: "opentelemetry-swift"),
+                .product(name: "StdoutExporter", package: "opentelemetry-swift"),
+                .product(name: "ZipkinExporter", package: "opentelemetry-swift")
             ],
             path: "SplunkOpenTelemetry/Sources"
         ),
@@ -250,6 +252,29 @@ let package = Package(
             name: "SplunkOpenTelemetryBackgroundExporterTests",
             dependencies: ["SplunkOpenTelemetryBackgroundExporter"],
             path: "SplunkOpenTelemetryBackgroundExporter/Tests"
+        ),
+        
+        
+        // MARK: Splunk App Start
+        
+        .target(
+            name: "SplunkAppStart",
+            dependencies: [
+                "SplunkSharedProtocols",
+                "SplunkLogger",
+                "SplunkOpenTelemetry"
+            ],
+            path: "SplunkAppStart/Sources"
+        ),
+        .testTarget(
+            name: "SplunkAppStartTests",
+            dependencies: [
+                "SplunkAppStart",
+                "SplunkSharedProtocols",
+                "SplunkLogger",
+                "SplunkOpenTelemetry"
+            ],
+            path: "SplunkAppStart/Tests"
         ),
         
         
