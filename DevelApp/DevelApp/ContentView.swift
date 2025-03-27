@@ -71,7 +71,7 @@ struct ContentView: View {
                 }
 
             Text("Sensitive text")
-                .sessionReplaySensitive()
+//                .sessionReplaySensitive(true)
 
             Button {
                 fatalError("Test fatal error from DevelApp.")
