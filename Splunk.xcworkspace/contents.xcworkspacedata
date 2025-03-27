@@ -2,13 +2,13 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:AgentTestApp/AgentTestApp.xcodeproj">
+      location = "group:Applications/AgentTestApp/AgentTestApp.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:ANRDemoApp/ANRDemoApp.xcodeproj">
+      location = "group:Applications/ANRDemoApp/ANRDemoApp.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:DevelApp/DevelApp.xcodeproj">
+      location = "group:Applications/DevelApp/DevelApp.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:SplunkAgent/SplunkAgent.xcodeproj">
