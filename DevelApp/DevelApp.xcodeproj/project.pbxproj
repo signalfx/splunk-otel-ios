@@ -11,18 +11,18 @@
 		3384F28C2AC8795800512D79 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F28B2AC8795800512D79 /* ContentView.swift */; };
 		3384F28E2AC8795800512D79 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3384F28D2AC8795800512D79 /* Assets.xcassets */; };
 		3384F2922AC8795800512D79 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3384F2912AC8795800512D79 /* Preview Assets.xcassets */; };
-		4BAA05EB2D8F606B00B7D6AE /* SplunkAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BAA05EA2D8F606B00B7D6AE /* SplunkAgent.framework */; };
-		4BAA05EC2D8F606B00B7D6AE /* SplunkAgent.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4BAA05EA2D8F606B00B7D6AE /* SplunkAgent.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4B1CE9FD2D9554D100A8CCCE /* SplunkAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B1CE9FC2D9554D100A8CCCE /* SplunkAgent.framework */; };
+		4B1CE9FE2D9554D100A8CCCE /* SplunkAgent.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4B1CE9FC2D9554D100A8CCCE /* SplunkAgent.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4BAA05ED2D8F606B00B7D6AE /* Embed Frameworks */ = {
+		4B1CE9FF2D9554D100A8CCCE /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				4BAA05EC2D8F606B00B7D6AE /* SplunkAgent.framework in Embed Frameworks */,
+				4B1CE9FE2D9554D100A8CCCE /* SplunkAgent.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -37,7 +37,7 @@
 		3384F28F2AC8795800512D79 /* DevelApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DevelApp.entitlements; sourceTree = "<group>"; };
 		3384F2912AC8795800512D79 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3384F2AE2AC87A3B00512D79 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		4BAA05EA2D8F606B00B7D6AE /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B1CE9FC2D9554D100A8CCCE /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,7 +45,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BAA05EB2D8F606B00B7D6AE /* SplunkAgent.framework in Frameworks */,
+				4B1CE9FD2D9554D100A8CCCE /* SplunkAgent.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,7 +93,7 @@
 		3384F2AF2AC87A4300512D79 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4BAA05EA2D8F606B00B7D6AE /* SplunkAgent.framework */,
+				4B1CE9FC2D9554D100A8CCCE /* SplunkAgent.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -108,7 +108,7 @@
 				3384F2822AC8795800512D79 /* Sources */,
 				3384F2832AC8795800512D79 /* Frameworks */,
 				3384F2842AC8795800512D79 /* Resources */,
-				4BAA05ED2D8F606B00B7D6AE /* Embed Frameworks */,
+				4B1CE9FF2D9554D100A8CCCE /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
