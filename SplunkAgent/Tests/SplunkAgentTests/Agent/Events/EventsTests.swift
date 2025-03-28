@@ -256,8 +256,13 @@ final class EventsTests: XCTestCase {
     // MARK: - Helpers
 
     func loadSampleVideo() throws {
+        #if SPM_TESTS
+        let fileUrl = Bundle.module.url(forResource: "v", withExtension: "mp4")
+
+        #else
         let bundle = Bundle(for: EventsTests.self)
         let fileUrl = bundle.url(forResource: "v", withExtension: "mp4")
+        #endif
 
         if let fileUrl = fileUrl {
             let data = try Data(contentsOf: fileUrl)

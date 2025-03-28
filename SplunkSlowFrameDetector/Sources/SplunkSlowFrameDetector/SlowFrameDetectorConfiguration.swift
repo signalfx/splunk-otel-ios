@@ -51,8 +51,8 @@ public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
     // MARK: - Internal variables
 
     public var enabled: Bool
-    package var slowFrameThresholdMilliseconds: CFTimeInterval
-    package var frozenFrameThresholdMilliseconds: CFTimeInterval
+    var slowFrameThresholdMilliseconds: CFTimeInterval
+    var frozenFrameThresholdMilliseconds: CFTimeInterval
 
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {

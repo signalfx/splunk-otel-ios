@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import SplunkLogger
+internal import SplunkLogger
 
 #if os(iOS) || os(tvOS) || os(visionOS)
     import UIKit

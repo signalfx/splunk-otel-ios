@@ -15,27 +15,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkSharedProtocols
 
 #if canImport(SplunkCrashReports)
-    @_implementationOnly import SplunkCrashReports
+    internal import SplunkCrashReports
 #endif
 
 #if canImport(SplunkNetwork)
-    @_implementationOnly import SplunkNetwork
+    internal import SplunkNetwork
 #endif
 
 #if canImport(CiscoSessionReplay)
-    @_implementationOnly import CiscoSessionReplay
-    @_implementationOnly import SplunkSessionReplayProxy
+    internal import CiscoSessionReplay
+    internal import SplunkSessionReplayProxy
 #endif
 
 #if canImport(SplunkSlowFrameDetector)
-    @_implementationOnly import SplunkSlowFrameDetector
+    internal import SplunkSlowFrameDetector
 #endif
 
 #if canImport(SplunkAppStart)
-    @_implementationOnly import SplunkAppStart
+    internal import SplunkAppStart
 #endif
 
 

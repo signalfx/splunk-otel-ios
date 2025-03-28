@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import CiscoSessionReplay
+internal import CiscoSessionReplay
 
 typealias SplunkSessionReplayRenderingMode = CiscoSessionReplay.RenderingMode
 
@@ -33,9 +33,6 @@ extension RenderingMode {
 
         case .wireframe:
             return .wireframe
-
-        case .noRendering:
-            return .noRendering
         }
     }
 
@@ -50,9 +47,6 @@ extension RenderingMode {
 
         case .wireframe:
             self = .wireframe
-
-        case .noRendering:
-            self = .noRendering
 
         default:
             self = .default

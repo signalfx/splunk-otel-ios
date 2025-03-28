@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkSharedProtocols
 
 class DefaultModulesManager: AgentModulesManager {
 

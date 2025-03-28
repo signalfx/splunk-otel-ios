@@ -2,55 +2,16 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:AgentTestApp/AgentTestApp.xcodeproj">
+      location = "group:Applications/AgentTestApp/AgentTestApp.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:ANRDemoApp/ANRDemoApp.xcodeproj">
+      location = "group:Applications/ANRDemoApp/ANRDemoApp.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:DevelApp/DevelApp.xcodeproj">
+      location = "group:Applications/DevelApp/DevelApp.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:SplunkAgent/SplunkAgent.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkSharedProtocols">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkCrashReports">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkSessionReplayProxy">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkNetwork">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkOpenTelemetry">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkLogger">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkOpenTelemetryBackgroundExporter">
-   </FileRef>
-   <FileRef
-      location = "group:ADCrashReporter">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkANRReporter">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkSlowFrameDetector">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkCustomData">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkErrorReporting">
-   </FileRef>
-   <FileRef
-      location = "group:SplunkAppStart">
    </FileRef>
    <FileRef
       location = "group:README.md">

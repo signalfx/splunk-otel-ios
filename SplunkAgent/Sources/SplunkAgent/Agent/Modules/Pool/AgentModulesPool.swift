@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkSharedProtocols
 
 /// Defines the pool of available modules in the current run environment.
 protocol AgentModulesPool {

@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkSharedProtocols
 
 /// Session Pulse Event. Sent in constant intervals to keep a session alive.
 class SessionPulseEvent: AgentEvent {

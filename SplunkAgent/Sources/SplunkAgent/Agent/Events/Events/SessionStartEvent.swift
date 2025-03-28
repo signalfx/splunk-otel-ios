@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkSharedProtocols
 
 /// Session Start Event. Sent when a session starts.
 class SessionStartEvent: AgentEvent {

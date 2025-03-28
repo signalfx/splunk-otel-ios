@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkSharedProtocols
 
 /// Base Event class. Holds base event data, attributes and metadata. Subclasses should fill in all necessary data and attributes.
 class AgentEvent: Event {
