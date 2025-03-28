@@ -74,7 +74,7 @@ public extension Span {
         hasher.combine(context.spanId)
     }
 
-    static func == (lhs: Span, rhs: Span) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.context.spanId == rhs.context.spanId
     }
 }
