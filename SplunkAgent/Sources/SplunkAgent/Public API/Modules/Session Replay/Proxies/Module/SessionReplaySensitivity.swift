@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 
-@_implementationOnly import CiscoSessionReplay
+internal import CiscoSessionReplay
 import UIKit
 
 /// The sensitivity object implements public API for the view element's sensitivity.

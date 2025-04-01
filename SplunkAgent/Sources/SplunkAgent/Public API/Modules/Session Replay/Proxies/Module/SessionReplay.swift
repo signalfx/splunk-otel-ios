@@ -17,8 +17,8 @@ limitations under the License.
 
 import Foundation
 
-@_implementationOnly import SplunkLogger
-@_implementationOnly import CiscoSessionReplay
+internal import SplunkLogger
+internal import CiscoSessionReplay
 
 /// The class implementing Session Replay public API.
 final class SessionReplay: SessionReplayModule {

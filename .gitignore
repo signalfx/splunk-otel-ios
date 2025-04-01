@@ -32,6 +32,11 @@ xcuserdata/
 *.dSYM.zip
 *.dSYM
 
+# SPM
+.build/
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+
 # CocoaPods
 #
 # We recommend against adding the Pods directory to your .gitignore. However

@@ -16,11 +16,11 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import SplunkCrashReports
-@_implementationOnly import SplunkLogger
-@_implementationOnly import SplunkOpenTelemetry
-@_implementationOnly import CiscoSessionReplay
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkCrashReports
+internal import SplunkLogger
+internal import SplunkOpenTelemetry
+internal import CiscoSessionReplay
+internal import SplunkSharedProtocols
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
 ///

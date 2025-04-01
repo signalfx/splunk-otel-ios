@@ -18,7 +18,6 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-protocol CustomDataRepresentable: PropertyList {}
 
 public final class CustomData {
 
@@ -32,15 +31,4 @@ public final class CustomData {
 
     public required init() {} // see install() in Module extension for startup tasks
 
-
-    // MARK: - CustomData helper functions
-
-
-    // MARK: - CustomData Reporting
-
-    // This is a placeholder for temporary use only. Will be replaced by
-    // real data population and output.
-    private func reportCustom(data: CustomDataRepresentable) {
-        print(String(describing: data))
-    }
 }
