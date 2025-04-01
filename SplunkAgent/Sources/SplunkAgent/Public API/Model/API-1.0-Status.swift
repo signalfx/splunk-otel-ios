@@ -29,11 +29,15 @@ public enum Status: Equatable {
 
     /// The cause why the recording is currently not running.
     public enum Cause {
-        /// The SplunkAgent agent is not supported on the current platform.
+
+        /// The agent has not been installed.
+        case notInstalled
+
+        /// The agent is not supported on the current platform.
         case unsupportedPlatform
 
-        /// Disabled by remote configuration.
-        case notEnabled
+        /// The agent is not running because of being sampled out locally.
+        case sampledOut
     }
 }
 
@@ -44,11 +48,14 @@ extension Status.Cause: CustomStringConvertible, CustomDebugStringConvertible {
 
     public var description: String {
         switch self {
-        case .unsupportedPlatform:
-            return "unsupportedPlatform"
+        case .notInstalled:
+            return "The agent has not been installed."
 
-        case .notEnabled:
-            return "notEnabled"
+        case .unsupportedPlatform:
+            return "The agent is not supported on the current platform."
+
+        case .sampledOut:
+            return "The agent is not running because of being sampled out locally."
         }
     }
 

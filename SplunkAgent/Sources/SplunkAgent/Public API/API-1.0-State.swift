@@ -31,7 +31,7 @@ import Foundation
 /// The class conforms to `Combine.ObservableObject` protocol to make
 /// the published properties available for Combine and SwiftUI.
 ///
-public final class RuntimeState: AgentState, ObservableObject {
+public final class State: AgentState, ObservableObject {
 
     // MARK: - Internal
 
@@ -46,7 +46,7 @@ public final class RuntimeState: AgentState, ObservableObject {
 }
 
 
-public extension RuntimeState {
+public extension State {
 
     // MARK: - Agent status
 
@@ -58,18 +58,33 @@ public extension RuntimeState {
 
     // MARK: - User configuration
 
-    /// The base address of the server to which the agent is configured.
-    var url: URL? {
-        owner.agentConfiguration.url
-    }
-
-    /// A `String` that contains the name used for the application.
+    /// A `String` that contains the name used for the application identification.
     var appName: String {
-        owner.agentConfiguration.appName ?? ""
+        owner.agentConfiguration.appName
     }
 
-    /// A `String` that contains the version used for the application.
+    /// A `String` that contains the used application version.
     var appVersion: String {
-        owner.agentConfiguration.appVersion ?? ""
+        owner.agentConfiguration.appVersion
+    }
+
+    /// A `EndpointConfiguration` containing either the specified realm, or endpoint urls.
+    var endpointConfiguration: EndpointConfiguration {
+        owner.agentConfiguration.endpoint
+    }
+
+    /// A `String` containing the used application deployment environment.
+    var deploymentEnvironment: String {
+        owner.agentConfiguration.deploymentEnvironment
+    }
+
+    /// A `Bool` value determining whether the debug logging has been enabled.
+    var isDebugLoggingEnabled: Bool {
+        owner.agentConfiguration.enableDebugLogging
+    }
+
+    /// A `Double` containing the used sampling rate.
+    var sessionSamplingRate: Double {
+        owner.agentConfiguration.sessionSamplingRate
     }
 }

@@ -28,6 +28,8 @@ struct DefaultResources: AgentResources {
 
     var appBuild: String
 
+    var appDeploymentEnvironment: String
+
 
     // MARK: - Agent info
 
