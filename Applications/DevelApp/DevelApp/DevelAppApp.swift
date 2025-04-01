@@ -10,11 +10,7 @@ import SplunkAgent
 
 @main
 struct DevelAppApp: App {
-    @StateObject var agent = SplunkRum.install(with:
-        Configuration(url: vanityUrl())
-            .appName("smartlook-ios")
-            .appVersion("1.0.0")
-    )
+    @StateObject var agent = initAgent()
 
     var body: some Scene {
         WindowGroup {
@@ -25,17 +21,17 @@ struct DevelAppApp: App {
         }
     }
 
-    private static func vanityUrl() -> URL {
-        // Alameda
-//        return URL(string: "https://alameda-eum-qe.saas.appd-test.com")!
+    private static func initAgent() -> SplunkRum {
+        let agentConfig = try! AgentConfiguration(
+            rumAccessToken: "token",
+            endpoint: .init(realm: "realm"),
+            appName: "App Name",
+            deploymentEnvironment: "dev"
+        )
+            .enableDebugLogging(true)
 
-        // smartlook c0 secondary
-        return URL(string: "https://smartlookdev2.saas.appd-test.com")!
+        let agent = SplunkRum.install(with: agentConfig)
 
-        // smartlook c0
-//        return URL(string: "https://smartlookdev.saas.appd-test.com")!
-
-        // Signoz
-//        return URL(string: "https://otelcollector-http.us.smartlook.cloud")!
+        return agent
     }
 }
