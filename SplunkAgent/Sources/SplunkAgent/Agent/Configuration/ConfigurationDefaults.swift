@@ -20,13 +20,15 @@ import Foundation
 /// Defines default values for configuration
 struct ConfigurationDefaults {
 
-    static var appName: String? {
-        Bundle.main.bundleIdentifier
+    static var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
     }
 
-    static var appVersion: String? {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    }
+    static var enableDebugLogging = false
+
+    static var sessionSamplingRate = 1.0
+
+    static var globalAttributes: [String: String] = [:]
 
     static var sessionTimeout = 15.0 * 60.0 // 15 minutes
 
