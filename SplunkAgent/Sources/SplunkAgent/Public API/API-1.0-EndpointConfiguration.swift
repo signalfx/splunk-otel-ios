@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
+
 import Foundation
 
 /// Endpoint configuration defines a destination for all instrumentation.
@@ -38,8 +38,8 @@ public struct EndpointConfiguration: Codable, Equatable {
     public init(realm: String) {
         guard realm.count > 0 else {
             self.realm = nil
-            self.tracesEndpoint = nil
-            self.sessionReplayEndpoint = nil
+            tracesEndpoint = nil
+            sessionReplayEndpoint = nil
 
             return
         }
