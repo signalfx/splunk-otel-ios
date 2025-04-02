@@ -22,7 +22,6 @@ import OpenTelemetrySdk
 import SplunkSharedProtocols
 import SplunkOpenTelemetryBackgroundExporter
 import SplunkLogger
-import StdoutExporter
 
 /// OTLPLogEventProcessor sends OpenTelemetry Logs enriched with Resources via an instantiated background exporter.
 public class OTLPLogEventProcessor: LogEventProcessor {
@@ -80,10 +79,7 @@ public class OTLPLogEventProcessor: LogEventProcessor {
 
         // Initialize optional debug exporter
         if debugEnabled {
-            let stdoutExporter = StdoutLogExporter(isDebug: true)
-            let stdoutLogProcessor = SimpleLogRecordProcessor(logRecordExporter: stdoutExporter)
-            
-            loggerProviderBuilder = loggerProviderBuilder.add(spanProcessor: stdoutSpanProcessor)
+            // TODO: DEMRUM-1425 - implement Logging exporter
         }
 
         let loggerProvider = loggerProviderBuilder.build()

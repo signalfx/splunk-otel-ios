@@ -63,6 +63,7 @@ public class OTLPTraceProcessor: TraceProcessor {
 
         // Initialize optional debug exporter
         if debugEnabled {
+            // TODO: DEMRUM-1425 - implement Logging exporter, remove StdoutSpanExporter
             let stdoutExporter = StdoutSpanExporter(isDebug: true)
             let stdoutSpanProcessor = SimpleSpanProcessor(spanExporter: stdoutExporter)
             

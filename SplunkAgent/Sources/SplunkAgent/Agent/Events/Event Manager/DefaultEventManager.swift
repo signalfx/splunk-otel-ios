@@ -85,7 +85,7 @@ class DefaultEventManager: AgentEventManager {
         )
 
         // Initialize log event processor
-        logEventProcessor = OTLPLogEventProcessor(with: configuration.logsUrl, resources: resources)
+        logEventProcessor = OTLPLogEventProcessor(with: configuration.logsUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
 
         // Initialize trace processor
         traceProcesssor = OTLPTraceProcessor(with: configuration.tracesUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
