@@ -83,7 +83,7 @@ public class SplunkRum: ObservableObject {
     public private(set) lazy var session = Session(for: self)
 
     /// An object reflects the current state and setting used for the recording.
-    public private(set) lazy var state = State(for: self)
+    public private(set) lazy var state = RuntimeState(for: self)
 
     /// OpenTelemetry instance.
     public var openTelemetry: OpenTelemetry {
