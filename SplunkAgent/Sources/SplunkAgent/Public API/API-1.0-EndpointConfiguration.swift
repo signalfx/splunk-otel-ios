@@ -17,10 +17,10 @@ limitations under the License.
 
 import Foundation
 
-/// Endpoint configuration defines a destination for all instrumentation.
+/// Endpoint configuration builds OTel collector urls.
 ///
-/// Can be set either by providing the `realm`, which sends all instrumentation to the Splunk RUM collector to a specified realm;
-/// or by providing a custom traces and optionally a custom session replay url, to which all instrumentation will be sent to.
+/// URLs can be defined either by providing the `realm`, which sends all instrumentation to the Splunk RUM collector to a specified realm;
+/// or by providing a custom `traces` and optionally a custom `session replay` url.
 public struct EndpointConfiguration: Codable, Equatable {
 
     // MARK: - Public
@@ -35,6 +35,8 @@ public struct EndpointConfiguration: Codable, Equatable {
     public let sessionReplayEndpoint: URL?
 
     /// Initialize the endpoint configuration with the Splunk RUM realm.
+    ///
+    /// - Parameter realm: A Splunk RUM realm to which all instrumentation will be sent to.
     public init(realm: String) {
         guard realm.count > 0 else {
             self.realm = nil
@@ -57,7 +59,11 @@ public struct EndpointConfiguration: Codable, Equatable {
         sessionReplayEndpoint = nil
     }
 
-    /// Initialize the endpoint configuration with a custom traces url and an optional session replay url. All traces will be routed to the provided traces url.
+    /// Initialize the endpoint configuration with a custom traces url and an optional session replay url.
+    ///
+    /// - Parameters:
+    ///   - traces: A trace URL to which all traces wil be sent to.
+    ///   - sessionReplay: An optional session replay url, to which session replay data will be sent to. Required if session replay functionality is enabled.
     public init(traces: URL, sessionReplay: URL? = nil) {
         realm = nil
         tracesEndpoint = traces
@@ -68,10 +74,9 @@ public struct EndpointConfiguration: Codable, Equatable {
 extension EndpointConfiguration: CustomStringConvertible, CustomDebugStringConvertible {
     public var description: String {
         return """
-
-            realm: \(realm ?? "nil")
-            tracesEndpoint: \(sessionReplayEndpoint?.absoluteString ?? "nil")
-            sessionReplayEndpoint: \(sessionReplayEndpoint?.absoluteString ?? "nil")
+        Realm: \(realm ?? "nil"), \
+        Trace endpoint: \(sessionReplayEndpoint?.absoluteString ?? "nil"), \
+        Session replay endpoint: \(sessionReplayEndpoint?.absoluteString ?? "nil")
         """
     }
 

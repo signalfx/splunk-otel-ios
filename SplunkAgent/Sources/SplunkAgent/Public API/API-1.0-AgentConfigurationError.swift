@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
+
 import Foundation
 
 /// Describes an invalid agent configuration.
@@ -38,7 +38,7 @@ extension AgentConfigurationError: CustomStringConvertible, CustomDebugStringCon
         switch self {
         case let .invalidEndpoint(endpointConfiguration):
             return """
-            Invalid endpoint configuration supplied. Either one of the supplied endpoint urls (traces, session, replay) \
+            Either one of the supplied endpoint urls (trace url, session, replay) \
             is invalid, or the supplied realm is empty. \
             Please check the agent configuration.
             Supplied endpoint configuration: \(endpointConfiguration.description)

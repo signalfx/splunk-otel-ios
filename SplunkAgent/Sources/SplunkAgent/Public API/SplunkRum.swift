@@ -105,7 +105,7 @@ public class SplunkRum: ObservableObject {
         // Pass user configuration
         agentConfigurationHandler = configurationHandler
 
-        // Set current instance status (using .notIntalled as a placeholder, as .notEnabled has been removed from the api)
+        // Set current instance status
         currentStatus = .notRunning(.notInstalled)
 
         // Assign identification

@@ -17,22 +17,14 @@ limitations under the License.
 
 import Foundation
 
-/// Defines default values for configuration
-struct ConfigurationDefaults {
+extension AgentConfigurationProtocol {
 
-    static var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+    mutating func mergeRemote(_ remote: RemoteConfiguration?) {
+        guard let remote else {
+            return
+        }
+
+        sessionTimeout = remote.configuration.mrum.sessionTimeout
+        maxSessionLength = remote.configuration.mrum.maxSessionLength
     }
-
-    static var enableDebugLogging = false
-
-    static var sessionSamplingRate = 1.0
-
-    static var globalAttributes: [String: String] = [:]
-
-    static var sessionTimeout = 15.0 * 60.0
-
-    static var maxSessionLength = 4.0 * 60.0 * 60.0
-
-    static var recordingEnabled = true
 }

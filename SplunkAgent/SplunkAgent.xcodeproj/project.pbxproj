@@ -12,7 +12,6 @@
 		2A03CF5D2D9C315C00CF3BC9 /* API-1.0-AgentConfigurationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */; };
 		2A03CF5F2D9C31C100CF3BC9 /* API-1.0-AgentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */; };
 		2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1673CC2BA1F52600F85698 /* EventsModel.swift */; };
-		2A2E541F2D9E677E00B130F4 /* API-1.0-RuntimeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2E541E2D9E677E00B130F4 /* API-1.0-RuntimeState.swift */; };
 		2A30EE1C2BD7AEDD008557DD /* NOTICES in Resources */ = {isa = PBXBuildFile; fileRef = 2A30EE1B2BD7AECE008557DD /* NOTICES */; };
 		2AA52B492B8DF4CD00DF9373 /* EventsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA52B482B8DF4CD00DF9373 /* EventsTests.swift */; };
 		2AA52B4C2B8DF50300DF9373 /* v.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 2AA52B4B2B8DF50300DF9373 /* v.mp4 */; };
@@ -284,6 +283,7 @@
 		E4F2E50C2B17350D006EBA69 /* AgentUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F2E50B2B17350D006EBA69 /* AgentUser.swift */; };
 		E4F2E50E2B17351E006EBA69 /* DefaultUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F2E50D2B17351E006EBA69 /* DefaultUser.swift */; };
 		E4F2E5102B1737F2006EBA69 /* API-1.0-Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F2E50F2B1737F2006EBA69 /* API-1.0-Session.swift */; };
+		E4F2E5142B173D34006EBA69 /* API-1.0-State.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F2E5132B173D34006EBA69 /* API-1.0-State.swift */; };
 		E4F2E51F2B174BB8006EBA69 /* AgentState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F2E51E2B174BB8006EBA69 /* AgentState.swift */; };
 		E4F2E5282B179658006EBA69 /* String+NanoID.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F2E5272B179658006EBA69 /* String+NanoID.swift */; };
 		E4FAEEB12B6A51AA008D4E6E /* DefaultModulesManagerTestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4FAEEB02B6A51AA008D4E6E /* DefaultModulesManagerTestBuilder.swift */; };
@@ -516,7 +516,6 @@
 		2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-AgentConfigurationError.swift"; sourceTree = "<group>"; };
 		2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-AgentConfiguration.swift"; sourceTree = "<group>"; };
 		2A1673CC2BA1F52600F85698 /* EventsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsModel.swift; sourceTree = "<group>"; };
-		2A2E541E2D9E677E00B130F4 /* API-1.0-RuntimeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-RuntimeState.swift"; sourceTree = "<group>"; };
 		2A30EE1B2BD7AECE008557DD /* NOTICES */ = {isa = PBXFileReference; lastKnownFileType = text; path = NOTICES; sourceTree = "<group>"; };
 		2AA52B482B8DF4CD00DF9373 /* EventsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsTests.swift; sourceTree = "<group>"; };
 		2AA52B4B2B8DF50300DF9373 /* v.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = v.mp4; sourceTree = "<group>"; };
@@ -799,6 +798,7 @@
 		E4F2E50B2B17350D006EBA69 /* AgentUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentUser.swift; sourceTree = "<group>"; };
 		E4F2E50D2B17351E006EBA69 /* DefaultUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultUser.swift; sourceTree = "<group>"; };
 		E4F2E50F2B1737F2006EBA69 /* API-1.0-Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-Session.swift"; sourceTree = "<group>"; };
+		E4F2E5132B173D34006EBA69 /* API-1.0-State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-State.swift"; sourceTree = "<group>"; };
 		E4F2E51E2B174BB8006EBA69 /* AgentState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentState.swift; sourceTree = "<group>"; };
 		E4F2E5272B179658006EBA69 /* String+NanoID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+NanoID.swift"; sourceTree = "<group>"; };
 		E4FAEEB02B6A51AA008D4E6E /* DefaultModulesManagerTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultModulesManagerTestBuilder.swift; sourceTree = "<group>"; };
@@ -2694,8 +2694,8 @@
 				2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */,
 				2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */,
 				2A03CF5A2D9C311800CF3BC9 /* API-1.0-EndpointConfiguration.swift */,
-				2A2E541E2D9E677E00B130F4 /* API-1.0-RuntimeState.swift */,
 				E4F2E50F2B1737F2006EBA69 /* API-1.0-Session.swift */,
+				E4F2E5132B173D34006EBA69 /* API-1.0-State.swift */,
 				E4F2E4FF2B172A64006EBA69 /* API-1.0-User.swift */,
 			);
 			path = "Public API";
@@ -3667,7 +3667,6 @@
 				2A03CF5D2D9C315C00CF3BC9 /* API-1.0-AgentConfigurationError.swift in Sources */,
 				4BB680F22B7940C0000A54D4 /* API-1.0-SessionReplayModuleState.swift in Sources */,
 				C703FAB52BAB0D4A000CC11B /* AppStateEvent.swift in Sources */,
-				2A2E541F2D9E677E00B130F4 /* API-1.0-RuntimeState.swift in Sources */,
 				3384F2AD2AC879FD00512D79 /* SplunkRum.swift in Sources */,
 				E4A708B32B9754B7002C692E /* RepeatingJob.swift in Sources */,
 				E4EE9ED42BA34A400000D594 /* SessionReplayNonOperationalState.swift in Sources */,
@@ -3727,6 +3726,7 @@
 				4BB680E92B7940C0000A54D4 /* Status+Conversions.swift in Sources */,
 				E426CFAA2B28C18000094AC0 /* SessionsModel.swift in Sources */,
 				E42634832BB44B0F003706A9 /* SplunkAgent.docc in Sources */,
+				E4F2E5142B173D34006EBA69 /* API-1.0-State.swift in Sources */,
 				C73FF4882B6CE749009C53FF /* ConfigurationHandlerError.swift in Sources */,
 				C703FAB32BA9D424000CC11B /* AppState.swift in Sources */,
 				E4F2E5102B1737F2006EBA69 /* API-1.0-Session.swift in Sources */,
@@ -8968,7 +8968,7 @@
 		};
 		4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:smartlook/smartlook-ios-sdk-private.git";
+			repositoryURL = "https://github.com/smartlook/smartlook-ios-sdk-private";
 			requirement = {
 				branch = develop;
 				kind = branch;

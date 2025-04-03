@@ -29,10 +29,10 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Public mandatory properties
 
-    /// The required RUM access token, authenticates requests to the RUM instrumentation collector.
+    /// A required RUM access token, authenticates requests to the RUM instrumentation collector.
     public let rumAccessToken: String
 
-    /// The required endpoint configuration defining URLs to the instrumentation collector.
+    /// A required endpoint configuration defining URLs to the instrumentation collector.
     public let endpoint: EndpointConfiguration
 
     /// Required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
@@ -97,11 +97,12 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// Initializes a new Agent configuration with which the Agent is initialized.
     ///
     /// - Parameters:
-    ///   - rumAccessToken: The required RUM access token to authenticate requests with the RUM instrumentation collector.
-    ///   - endpoint: The required endpoint configuration defining URLs to the RUM instrumentation collector.
-    ///   - appName: The required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
-    ///   - deploymentEnvironment: The required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
+    ///   - rumAccessToken: A required RUM access token to authenticate requests with the RUM instrumentation collector.
+    ///   - endpoint: A required endpoint configuration defining URLs to the RUM instrumentation collector.
+    ///   - appName: A required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
+    ///   - deploymentEnvironment: A required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
     ///   Deployment environment is sent in all signals as a resource.
+    ///   
     /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
     public init(rumAccessToken: String, endpoint: EndpointConfiguration, appName: String, deploymentEnvironment: String) throws {
 
@@ -175,7 +176,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     /// Sets the sampling rate with which sessions will be sampled.
     ///
-    /// - Parameter sessionSamplingRate: The sampling rate in the `<0.0, 1.0>` interval.
+    /// - Parameter sessionSamplingRate: A sampling rate in the `<0.0, 1.0>` interval.
     /// `1.0` equals to zero sampling (all instrumentation is sent), `0.0` equals to all session being sampled, `0.5` equals to 50% sampling.
     ///
     /// - Returns: The updated configuration structure.
@@ -203,7 +204,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// Sets the span filter callback. If the callback is provided, all spans will be funneled to the callback,
     /// and can be either approved by returning the span in the callback, or discarded by returning `nil`.
     ///
-    /// - Parameter spanFilter: The span filter callback.
+    /// - Parameter spanFilter: A span filter callback.
     ///
     /// - Returns: The updated configuration structure.
     @discardableResult

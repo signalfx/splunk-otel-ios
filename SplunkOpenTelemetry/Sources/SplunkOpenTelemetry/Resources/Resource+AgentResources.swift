@@ -39,32 +39,32 @@ extension Resource {
 
             // Service info
             // TODO: DEMRUM-1401 - Do we need service name and version?
-            ResourceAttributes.serviceName.rawValue: AttributeValue.string(serviceName),
-            ResourceAttributes.serviceVersion.rawValue: AttributeValue.string(serviceVersion),
+            ResourceAttributes.serviceName.rawValue: .string(serviceName),
+            ResourceAttributes.serviceVersion.rawValue: .string(serviceVersion),
 
             // App info
-            ResourceAttributes.deploymentEnvironment.rawValue: AttributeValue.string(agentResources.appDeploymentEnvironment),
-            "app": AttributeValue.string(agentResources.appName),
-            "app.version": AttributeValue.string(agentResources.appVersion),
+            ResourceAttributes.deploymentEnvironment.rawValue: .string(agentResources.appDeploymentEnvironment),
+            "app": .string(agentResources.appName),
+            "app.version": .string(agentResources.appVersion),
 
             // SDK info
-            "rum.sdk.version": AttributeValue.string(agentResources.agentVersion),
+            "rum.sdk.version": .string(agentResources.agentVersion),
 
             // Device info
-            ResourceAttributes.deviceModelIdentifier.rawValue: AttributeValue.string(agentResources.deviceModelIdentifier),
-            ResourceAttributes.deviceManufacturer.rawValue: AttributeValue.string(agentResources.deviceManufacturer),
-            ResourceAttributes.deviceId.rawValue: AttributeValue.string(agentResources.deviceID),
+            ResourceAttributes.deviceModelIdentifier.rawValue: .string(agentResources.deviceModelIdentifier),
+            ResourceAttributes.deviceManufacturer.rawValue: .string(agentResources.deviceManufacturer),
+            ResourceAttributes.deviceId.rawValue: .string(agentResources.deviceID),
 
             // TODO: DEMRUM-1401 - add translation table from model identifier to model name
-            ResourceAttributes.deviceModelName.rawValue: AttributeValue.string(agentResources.deviceModelIdentifier),
+            ResourceAttributes.deviceModelName.rawValue: .string(agentResources.deviceModelIdentifier),
 
 
             // OS info
             // TODO: DEMRUM-1401 - use hardcoded "iOS"?
-            ResourceAttributes.osName.rawValue: AttributeValue.string("iOS"),
-            ResourceAttributes.osVersion.rawValue: AttributeValue.string(agentResources.osVersion),
-            ResourceAttributes.osDescription.rawValue: AttributeValue.string(agentResources.osDescription),
-            ResourceAttributes.osType.rawValue: AttributeValue.string(agentResources.osType)
+            ResourceAttributes.osName.rawValue: .string("iOS"),
+            ResourceAttributes.osVersion.rawValue: .string(agentResources.osVersion),
+            ResourceAttributes.osDescription.rawValue: .string(agentResources.osDescription),
+            ResourceAttributes.osType.rawValue: .string(agentResources.osType)
         ]
 
         // Add required attributes to the resource
