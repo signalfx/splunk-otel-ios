@@ -33,8 +33,8 @@ public class NetworkInstrumentation {
 
     // MARK: - Public
 
-    /// Endpoint of the backend, needs to be excluded from instrumentation
-    public var traceEndpointURL: URL?
+    /// Endpoints excluded from network instrumentation.
+    public var excludedEndpoints: [URL]?
 
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
@@ -59,19 +59,15 @@ public class NetworkInstrumentation {
         */
         let requestEndpoint = URLRequest.description
 
-        if let traceEndpointURL {
-            let traceEndpoint = traceEndpointURL.absoluteString
+        if let excludedEndpoints {
+            for excludedEndpoint in excludedEndpoints {
+                if requestEndpoint.contains(excludedEndpoint.absoluteString) {
+                    self.internalLogger.log(level: .debug) {
+                        "Should Not Instrument Backend URL \(URLRequest.description)"
+                    }
 
-            // TODO: remove this condition when DEMRUM-1403 is implemented
-            if requestEndpoint.contains("signalfx.com/v1/rum") {
-                return false
-            }
-
-            if requestEndpoint.contains(traceEndpoint) {
-                self.internalLogger.log(level: .debug) {
-                    "Should Not Instrument Backend URL \(URLRequest.description)"
+                    return false
                 }
-                return false
             }
         }
         else {

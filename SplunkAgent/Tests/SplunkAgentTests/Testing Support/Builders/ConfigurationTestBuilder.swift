@@ -22,16 +22,57 @@ final class ConfigurationTestBuilder {
 
     // MARK: - Static constants
 
-    public static let endpointUrl = URL(string: "http://sampledomain.com/tenant")
+    public static let customTracesUrl = URL(string: "http://sampledomain.com/tenant/traces")!
+    public static let customSessionReplayUrl = URL(string: "http://sampledomain.com/tenant/sessionreplay")!
+    public static let realm = "dev"
+    public static let deploymentEnvironment = "testenv"
+    public static let appName = "Tests"
+    public static let appVersion = "1.0.1"
+    public static let rumAccessToken = "token"
 
 
     // MARK: - Basic builds
 
-    public static func buildDefault() throws -> Configuration {
+    public static func buildDefault() throws -> AgentConfiguration {
         // Default configuration for unit testing
-        var configuration = Configuration(url: endpointUrl!)
-        configuration.appName = "DevelApp (Tests)"
-        configuration.appVersion = "1.0.0"
+        var configuration = try AgentConfiguration(
+            rumAccessToken: rumAccessToken,
+            endpoint: EndpointConfiguration(realm: realm),
+            appName: appName,
+            deploymentEnvironment: deploymentEnvironment
+        )
+
+        configuration.appVersion = appVersion
+        configuration.enableDebugLogging = true
+        configuration.sessionSamplingRate = 0.1
+        configuration.globalAttributes = ["attribute": "value"]
+        configuration.spanFilter = { spanData in
+            spanData
+        }
+
+        return configuration
+    }
+
+    public static func buildMinimal() throws -> AgentConfiguration {
+        // Minimal configuration for unit testing
+        let minimal = try AgentConfiguration(
+            rumAccessToken: rumAccessToken,
+            endpoint: EndpointConfiguration(realm: realm),
+            appName: appName,
+            deploymentEnvironment: deploymentEnvironment
+        )
+
+        return minimal
+    }
+
+    public static func buildWithCustomUrls() throws -> AgentConfiguration {
+        // Configuration with custom traces and session replay urls
+        let configuration = try AgentConfiguration(
+            rumAccessToken: rumAccessToken,
+            endpoint: EndpointConfiguration(traces: customTracesUrl, sessionReplay: customSessionReplayUrl),
+            appName: appName,
+            deploymentEnvironment: deploymentEnvironment
+        )
 
         return configuration
     }

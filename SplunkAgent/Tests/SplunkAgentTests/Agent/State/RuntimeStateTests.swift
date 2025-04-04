@@ -15,48 +15,41 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAgent
+@testable import SplunkAgent
 import XCTest
 
-final class RuntimeStateTests: XCTestCase {
+final class StateTests: XCTestCase {
 
     // MARK: - Tests
 
     func testProperties() throws {
-        let endpointUrl = URL(string: "http://sampledomain.com/tenant")
 
         // Prepare agent instance
-        let configuration = Configuration(url: endpointUrl!)
+        let configuration = try ConfigurationTestBuilder.buildMinimal()
         let agent = try AgentTestBuilder.build(with: configuration)
 
         // Properties with minimal agent configuration (READ)
         let state = agent.state
 
         let agentStatus = state.status
-        XCTAssertEqual(agentStatus, .notRunning(.notEnabled))
+        XCTAssertEqual(agentStatus, .notRunning(.notInstalled))
 
         let appName = state.appName
-        XCTAssertEqual(appName, "com.apple.dt.xctest.tool")
+        XCTAssertEqual(appName, ConfigurationTestBuilder.appName)
 
         let appVersion = state.appVersion
         XCTAssertNotNil(appVersion)
-    }
 
-    func testEmptyProperties() throws {
-        let endpointUrl = URL(string: "http://sampledomain.com/tenant")
+        let realm = state.endpointConfiguration.realm
+        XCTAssertEqual(realm, ConfigurationTestBuilder.realm)
 
-        // Prepare minimal "empty" configuration
-        var configuration = Configuration(url: endpointUrl!)
-        configuration.appName = nil
-        configuration.appVersion = nil
+        let deploymentEnvironment = state.deploymentEnvironment
+        XCTAssertEqual(deploymentEnvironment, ConfigurationTestBuilder.deploymentEnvironment)
 
-        // Prepare agent instance
-        let agent = try AgentTestBuilder.build(with: configuration)
+        let debugEnabled = state.isDebugLoggingEnabled
+        XCTAssertEqual(debugEnabled, ConfigurationDefaults.enableDebugLogging)
 
-        // Properties with minimal agent configuration (READ)
-        let state = agent.state
-
-        XCTAssertEqual(state.appName, "")
-        XCTAssertEqual(state.appVersion, "")
+        let sampling = state.sessionSamplingRate
+        XCTAssertEqual(sampling, ConfigurationDefaults.sessionSamplingRate)
     }
 }

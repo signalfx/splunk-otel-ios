@@ -22,7 +22,6 @@ import OpenTelemetrySdk
 import SplunkSharedProtocols
 import SplunkOpenTelemetryBackgroundExporter
 import StdoutExporter
-import ZipkinExporter
 
 /// OTLPTraceProcessor initializes and uses OpenTelemetry Trace Provider.
 ///
@@ -37,48 +36,45 @@ public class OTLPTraceProcessor: TraceProcessor {
     
     // MARK: - Initialization
     
-    required public init(with baseURL: URL, resources: AgentResources) {
-        /* Using Zipkin for now
+    required public init(with tracesEndpoint: URL, resources: AgentResources, debugEnabled: Bool) {
+
         let configuration = OtlpConfiguration()
         let envVarHeaders = [(String, String)]()
 
-        // Construct traces api endpoint from user supplied vanity url and traces api path
-        let tracesEndpoint = baseURL.appendingPathComponent(ApiPaths.traces.rawValue)
-
-        // Initialise background exporter
+        // Initialize background exporter
         let backgroundTraceExporter = OTLPBackgroundHTTPTraceExporter(
             endpoint: tracesEndpoint,
             config: configuration,
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: envVarHeaders
         )
-                
-        // Initialise processor
+
+        // Initialize processor
         let spanProcessor = SimpleSpanProcessor(spanExporter: backgroundTraceExporter)
-         */
 
-        // TODO: determine exporter
-        let zipkinExportOptions = ZipkinTraceExporterOptions(endpoint: baseURL.absoluteString, serviceName: "myservice")
-        let zipkinExporter = ZipkinTraceExporter(options: zipkinExportOptions)
-        let spanProcessor = SimpleSpanProcessor(spanExporter: zipkinExporter)
-
-        // TODO: enable/disable based on DEMRUM-1403
-        let stdoutExporter = StdoutSpanExporter(isDebug: true)
-        let stdoutSpanProcessor = SimpleSpanProcessor(spanExporter: stdoutExporter)
-
-        
         // Build Resources
         var resource = Resource()
         resource.merge(with: resources)
-        
+
         // Initialize tracer provider
-        tracerProvider = TracerProviderBuilder()
+        var tracerProviderBuilder = TracerProviderBuilder()
             .with(resource: resource)
             .add(spanProcessor: spanProcessor)
-            .add(spanProcessor: stdoutSpanProcessor)
-            .build()
-        
+
+        // Initialize optional debug exporter
+        if debugEnabled {
+            // TODO: DEMRUM-1425 - implement Logging exporter, remove StdoutSpanExporter
+            let stdoutExporter = StdoutSpanExporter(isDebug: true)
+            let stdoutSpanProcessor = SimpleSpanProcessor(spanExporter: stdoutExporter)
+            
+            tracerProviderBuilder = tracerProviderBuilder.add(spanProcessor: stdoutSpanProcessor)
+        }
+
+        let tracerProvider = tracerProviderBuilder.build()
+
         // Register default tracer provider
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
+
+        self.tracerProvider = tracerProvider
     }
 }

@@ -56,11 +56,9 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Initialization
 
-    required init(with configuration: AgentConfiguration, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
+    required init(with configuration: AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
         self.agent = agent
         self.eventsModel = eventsModel
-
-        let appName = configuration.appName ?? ""
 
         let deviceManufacturer = "Apple"
 
@@ -71,9 +69,10 @@ class DefaultEventManager: AgentEventManager {
 
         // Build resources
         let resources = DefaultResources(
-            appName: appName,
-            appVersion: AppInfo.version ?? "-",
+            appName: configuration.appName,
+            appVersion: configuration.appVersion,
             appBuild: AppInfo.buildId ?? "-",
+            appDeploymentEnvironment: configuration.deploymentEnvironment,
             agentHybridType: hybridType,
             agentVersion: agentVersion,
             deviceID: DeviceInfo.deviceID ?? "-",
@@ -86,10 +85,10 @@ class DefaultEventManager: AgentEventManager {
         )
 
         // Initialize log event processor
-        logEventProcessor = OTLPLogEventProcessor(with: configuration.url, resources: resources)
+        logEventProcessor = OTLPLogEventProcessor(with: configuration.logsUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
 
         // Initialize trace processor
-        traceProcesssor = OTLPTraceProcessor(with: configuration.url, resources: resources)
+        traceProcesssor = OTLPTraceProcessor(with: configuration.tracesUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
 
         // Schedule job for Pulse Events
         pulseEventJob = LifecycleRepeatingJob(interval: pulseEventInterval) { [weak self] in

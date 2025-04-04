@@ -36,35 +36,33 @@ public class OTLPLogEventProcessor: LogEventProcessor {
 
     // Logger background dispatch queues
     private let backgroundQueue = DispatchQueue(label: "com.splunk.rum.LogEventProcessor", qos: .utility)
-    
+
     // Stored properties for Unit tests
 #if DEBUG
     public var resource: Resource?
     public var storedLastProcessedEvent: (any Event)?
     public var storedLastSentEvent: (any Event)?
 #endif
-    
-    
+
+
     // MARK: - Initialization
     
-    required public init(with baseURL: URL, resources: AgentResources) {
+    required public init(with logsEndpoint: URL, resources: AgentResources, debugEnabled: Bool) {
+
         let configuration = OtlpConfiguration()
         let envVarHeaders = [(String, String)]()
 
-        // Construct Logs api endpoint from user supplied vanity url and logs api path
-        let logsEndpoint = baseURL.appendingPathComponent(ApiPaths.logs.rawValue)
-
-        // Initialise background exporter
+        // Initialize background exporter
         let backgroundLogExporter = OTLPBackgroundHTTPLogExporter(
             endpoint: logsEndpoint,
             config: configuration,
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: envVarHeaders
         )
-        
+
         // Initialise LogRecordProcessor
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(logRecordExporter: backgroundLogExporter)
-        
+
         // Build Resources
         var resource = Resource()
         resource.merge(with: resources)
@@ -73,15 +71,23 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         #if DEBUG
         self.resource = resource
         #endif
-        
-        // Logger provider
-        loggerProvider = LoggerProviderBuilder()
+
+        // Initialize logger provider
+        var loggerProviderBuilder = LoggerProviderBuilder()
             .with(processors: [simpleLogRecordProcessor])
             .with(resource: resource)
-            .build()
+
+        // Initialize optional debug exporter
+        if debugEnabled {
+            // TODO: DEMRUM-1425 - implement Logging exporter
+        }
+
+        let loggerProvider = loggerProviderBuilder.build()
         
         // Set default logger provider
         OpenTelemetry.registerLoggerProvider(loggerProvider: loggerProvider)
+
+        self.loggerProvider = loggerProvider
     }
 
 

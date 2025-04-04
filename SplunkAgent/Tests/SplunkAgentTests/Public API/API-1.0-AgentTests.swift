@@ -35,6 +35,9 @@ final class API10AgentTests: XCTestCase {
         let expectedStatus = expectedAgentStatus()
         XCTAssertEqual(agentStatus, expectedStatus)
 
+        // Check OpenTelemetry instance
+        XCTAssertNotNil(agent?.openTelemetry)
+
         // Another attempt to install should return an instance from the previous attempt
         let anotherAgentInstance = SplunkRum.install(with: configuration)
         XCTAssertTrue(agent === anotherAgentInstance)
