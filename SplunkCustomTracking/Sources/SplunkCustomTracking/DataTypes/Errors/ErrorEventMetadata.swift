@@ -18,29 +18,33 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-protocol TrackedDataRepresentable: PropertyList {}
 
-public final class TrackedData {
+// MARK: - ErrorEventMetadata
 
-
-    // MARK: - Private properties
-
-    private var config = TrackedDataConfiguration(enabled: true)
+struct ErrorEventMetadata: ModuleEventMetadata {
 
 
-    // MARK: - TrackedData lifecycle
+    // MARK: - Properties
+    
+    let timestamp: Date
+    let id: String
+    let errorType: String
 
-    public required init() {} // see install() in Module extension for startup tasks
+
+    // MARK: - Initialization
+    
+    init(timestamp: Date = Date(), errorType: String) {
+        self.timestamp = timestamp
+        self.id = UUID().uuidString
+        self.errorType = errorType
+    }
+}
 
 
-    // MARK: - TrackedData helper functions
+// MARK: - Equatable Conformance
 
-
-    // MARK: - TrackedData Reporting
-
-    // This is a placeholder for temporary use only. Will be replaced by
-    // real data population and output.
-    private func reportCustom(data: TrackedDataRepresentable) {
-        print(String(describing: data))
+extension ErrorEventMetadata: Equatable {
+    static func == (lhs: ErrorEventMetadata, rhs: ErrorEventMetadata) -> Bool {
+        lhs.id == rhs.id
     }
 }
