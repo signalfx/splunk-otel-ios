@@ -15,20 +15,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-import SplunkSharedProtocols
 
-public struct TrackedDataRemoteConfiguration: RemoteModuleConfiguration {
-
-
-    // MARK: - Public
-
-    public var enabled: Bool
-
-
-    // MARK: init()
-
-    public init?(from data: Data) {
-        enabled = true
-    }
-}

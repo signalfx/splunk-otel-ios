@@ -18,19 +18,33 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-public struct TrackedDataConfiguration: ModuleConfiguration {
 
+// MARK: - CustomTrackingConfiguration
 
-    // MARK: - Public
+public struct CustomTrackingConfiguration: ModuleConfiguration {
+    
 
+    // MARK: - Public Properties
+
+    /// Whether tracking is enabled
     public var enabled: Bool
-    public var threshold: CFTimeInterval
+
+    /// Maximum number of tracked items to store in memory
+    public var maxBufferSize: Int
+
+    /// Maximum time in seconds to hold tracked items before forcing emission
+    public var maxBufferAge: TimeInterval
 
 
-    // MARK: init()
+    // MARK: Initialization
 
-    public init(enabled: Bool, threshold: CFTimeInterval = 2.0) {
+    public init(
+        enabled: Bool,
+        maxBufferSize: Int = 100,
+        maxBufferAge: TimeInterval = 60.0
+    ) {
         self.enabled = enabled
-        self.threshold = threshold
+        self.maxBufferSize = maxBufferSize
+        self.maxBufferAge = maxBufferAge
     }
 }
