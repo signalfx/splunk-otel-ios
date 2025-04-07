@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-extension AgentConfiguration {
+extension AgentConfigurationProtocol {
 
     mutating func mergeRemote(_ remote: RemoteConfiguration?) {
         guard let remote else {

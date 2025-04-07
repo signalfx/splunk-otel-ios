@@ -230,12 +230,12 @@ let package = Package(
             dependencies: [
                 "SplunkOpenTelemetryBackgroundExporter",
                 "SplunkLogger",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
                 .product(name: "ResourceExtension", package: "opentelemetry-swift"),
                 .product(name: "SignPostIntegration", package: "opentelemetry-swift"),
-                .product(name: "StdoutExporter", package: "opentelemetry-swift"),
-                .product(name: "ZipkinExporter", package: "opentelemetry-swift")
+                .product(name: "StdoutExporter", package: "opentelemetry-swift")
             ],
             path: "SplunkOpenTelemetry/Sources"
         ),

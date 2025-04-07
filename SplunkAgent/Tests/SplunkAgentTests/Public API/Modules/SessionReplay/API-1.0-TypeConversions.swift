@@ -100,14 +100,13 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
         proxyStatus = .init(srStatus: moduleStatus)
         XCTAssertEqual(proxyStatus, .notRecording(.notStarted))
 
-        // TODO: Fix in DEMRUM-1403
-//        moduleStatus = .notRecording(.projectLimitReached)
-//        proxyStatus = .init(srStatus: moduleStatus)
-//        XCTAssertEqual(proxyStatus, .notRecording(.projectLimitReached))
-
         moduleStatus = .notRecording(.stopped)
         proxyStatus = .init(srStatus: moduleStatus)
         XCTAssertEqual(proxyStatus, .notRecording(.stopped))
+
+        moduleStatus = .notRecording(.internalError)
+        proxyStatus = .init(srStatus: moduleStatus)
+        XCTAssertEqual(proxyStatus, .notRecording(.internalError))
 
         moduleStatus = .notRecording(.swiftUIPreviewContext)
         proxyStatus = .init(srStatus: moduleStatus)
@@ -116,6 +115,10 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
         moduleStatus = .notRecording(.unsupportedPlatform)
         proxyStatus = .init(srStatus: moduleStatus)
         XCTAssertEqual(proxyStatus, .notRecording(.unsupportedPlatform))
+
+        moduleStatus = .notRecording(.diskCacheCapacityOverreached)
+        proxyStatus = .init(srStatus: moduleStatus)
+        XCTAssertEqual(proxyStatus, .notRecording(.diskCacheCapacityOverreached))
     }
 
     func testStatusToModuleConversion() throws {
@@ -140,12 +143,6 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
         proxyStatus = .notRecording(.notStarted)
         srStatus = proxyStatus.srStatus
         XCTAssertEqual(srStatus, .notRecording(.notStarted))
-
-
-        // TODO: Fix in DEMRUM-1403
-//        proxyStatus = .notRecording(.projectLimitReached)
-//        srStatus = proxyStatus.srStatus
-//        XCTAssertEqual(srStatus, .notRecording(.projectLimitReached))
 
         proxyStatus = .notRecording(.stopped)
         srStatus = proxyStatus.srStatus

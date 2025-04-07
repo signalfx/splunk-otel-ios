@@ -32,6 +32,9 @@ public protocol AgentResources {
     /// Application build number.
     var appBuild: String { get }
 
+    /// Application deployment environment supplied by a customer.
+    var appDeploymentEnvironment: String { get }
+
 
     // MARK: - Agent info
 

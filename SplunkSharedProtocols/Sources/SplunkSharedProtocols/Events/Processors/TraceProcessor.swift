@@ -17,17 +17,19 @@ limitations under the License.
 
 import Foundation
 
-/// TraceProcessor enriches traces by provided Resources, and exports traces to an exporter.
+/// TraceProcessor processes Spans - enriches them with provided Resources, and sends those events to
+/// an exporter.
 public protocol TraceProcessor {
 
     // MARK: - Initialization
 
-    /// Initialize Trace Processor by providing API base url and Resources.
+    /// Initialize Trace Processor by providing traces API endpoint, resources, and a setting to enable debug logging.
     ///
     /// - Parameters:
-    ///   - baseURL: API base url.
+    ///   - tracesEndpoint: Traces api endpoint.
     ///   - resources: Resources which enrich all Traces.
-    init(with baseURL: URL, resources: AgentResources)
+    ///   - debugEnabled: Enables logging span contents into a console.
+    init(with tracesEndpoint: URL, resources: AgentResources, debugEnabled: Bool)
 
     /// Sends Span Event to an exporter.
     ///

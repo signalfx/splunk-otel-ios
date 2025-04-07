@@ -27,53 +27,44 @@ extension Resource {
     mutating func merge(with agentResources: AgentResources) {
 
         // Service info
+        // TODO: DEMRUM-1401 - Do we need service name and version?
         let serviceName = agentResources.appName
         let serviceVersion = Resource.serviceVersion(
             fromAppVersion: agentResources.appVersion,
             appBuild: agentResources.appBuild
         )
-        
-        // Agent info
-        let agentVersion = agentResources.agentVersion
 
-        // Device info
-        let deviceModelIdentifier = agentResources.deviceModelIdentifier
-        let deviceManufacturer = agentResources.deviceManufacturer
-        let deviceID = agentResources.deviceID
-        
-        // OS info
-        // ⚠️⚠️⚠️ osName hardcoded right now because platform does not accept other variations, like iPadOS
-        let osName = "iOS"
-//        let osName = agentResources.osName
-        let osVersion = agentResources.osVersion
-        let osDescription = agentResources.osDescription
-        let osType = agentResources.osType
-        
         // Build required attributes
         let requiredAttributes: [String: AttributeValue] = [
 
             // Service info
-            ResourceAttributes.serviceName.rawValue: AttributeValue.string(serviceName),
-            ResourceAttributes.serviceVersion.rawValue: AttributeValue.string(serviceVersion),
+            // TODO: DEMRUM-1401 - Do we need service name and version?
+            ResourceAttributes.serviceName.rawValue: .string(serviceName),
+            ResourceAttributes.serviceVersion.rawValue: .string(serviceVersion),
 
-            // TODO: update in DEMRUM-1401
+            // App info
+            ResourceAttributes.deploymentEnvironment.rawValue: .string(agentResources.appDeploymentEnvironment),
+            "app": .string(agentResources.appName),
+            "app.version": .string(agentResources.appVersion),
+
             // SDK info
-            "splunk.rumVersion": AttributeValue.string(agentVersion),
-            "app.version": AttributeValue.string(serviceVersion),
-            "environment": AttributeValue.string("dev"),
-            "app": AttributeValue.string(agentResources.appName),
-            ResourceAttributes.deviceModelName.rawValue: AttributeValue.string(deviceModelIdentifier),
+            "rum.sdk.version": .string(agentResources.agentVersion),
 
             // Device info
-            ResourceAttributes.deviceModelIdentifier.rawValue: AttributeValue.string(deviceModelIdentifier),
-            ResourceAttributes.deviceManufacturer.rawValue: AttributeValue.string(deviceManufacturer),
-            ResourceAttributes.deviceId.rawValue: AttributeValue.string(deviceID),
+            ResourceAttributes.deviceModelIdentifier.rawValue: .string(agentResources.deviceModelIdentifier),
+            ResourceAttributes.deviceManufacturer.rawValue: .string(agentResources.deviceManufacturer),
+            ResourceAttributes.deviceId.rawValue: .string(agentResources.deviceID),
+
+            // TODO: DEMRUM-1401 - add translation table from model identifier to model name
+            ResourceAttributes.deviceModelName.rawValue: .string(agentResources.deviceModelIdentifier),
+
 
             // OS info
-            ResourceAttributes.osName.rawValue: AttributeValue.string(osName),
-            ResourceAttributes.osVersion.rawValue: AttributeValue.string(osVersion),
-            ResourceAttributes.osDescription.rawValue: AttributeValue.string(osDescription),
-            ResourceAttributes.osType.rawValue: AttributeValue.string(osType)
+            // TODO: DEMRUM-1401 - use hardcoded "iOS"?
+            ResourceAttributes.osName.rawValue: .string("iOS"),
+            ResourceAttributes.osVersion.rawValue: .string(agentResources.osVersion),
+            ResourceAttributes.osDescription.rawValue: .string(agentResources.osDescription),
+            ResourceAttributes.osType.rawValue: .string(agentResources.osType)
         ]
 
         // Add required attributes to the resource

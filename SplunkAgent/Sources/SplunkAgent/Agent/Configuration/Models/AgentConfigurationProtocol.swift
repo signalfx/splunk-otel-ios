@@ -16,23 +16,38 @@ limitations under the License.
 */
 
 import Foundation
+import OpenTelemetrySdk
 
-/// Defines the basic properties of the agent configuration.
-protocol AgentConfiguration {
+/// Defines the properties of the agent configuration.
+protocol AgentConfigurationProtocol {
 
     // MARK: - Mandatory parameters
 
-    var url: URL { get }
+    var rumAccessToken: String { get }
+    var endpoint: EndpointConfiguration { get }
+    var appName: String { get }
+    var deploymentEnvironment: String { get }
 
 
     // MARK: - Optional parameters
 
-    var appName: String? { get set }
-    var appVersion: String? { get set }
+    var appVersion: String { get set }
+    var enableDebugLogging: Bool { get set }
+    var sessionSamplingRate: Double { get set }
+    var globalAttributes: [String: String] { get set }
+    var spanFilter: ((SpanData) -> SpanData?)? { get set }
 
 
     // MARK: - Remote configuration parameters
 
     var sessionTimeout: Double { get set }
     var maxSessionLength: Double { get set }
+
+
+    // MARK: - Endpoints
+
+    var tracesUrl: URL { get }
+    var logsUrl: URL { get }
+    var configUrl: URL { get }
+    var sessionReplayUrl: URL? { get }
 }

@@ -21,15 +21,25 @@ import SwiftUI
 
 @main
 struct ANRDemoApp: App {
-    @StateObject var agent = SplunkRum.install(with:
-        Configuration(url: URL(string: "https://smartlookdev2.saas.appd-test.com")!)
-            .appName("smartlook-ios")
-            .appVersion("1.0.0")
-    )
+    @StateObject var agent = initAgent()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
+    }
+
+    private static func initAgent() -> SplunkRum {
+        let agentConfig = try! AgentConfiguration(
+            rumAccessToken: "token",
+            endpoint: .init(realm: "realm"),
+            appName: "App Name",
+            deploymentEnvironment: "dev"
+        )
+            .enableDebugLogging(true)
+
+        let agent = SplunkRum.install(with: agentConfig)
+
+        return agent
     }
 }
