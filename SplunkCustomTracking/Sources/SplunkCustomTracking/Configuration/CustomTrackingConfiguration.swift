@@ -21,30 +21,41 @@ import SplunkSharedProtocols
 
 // MARK: - CustomTrackingConfiguration
 
-public struct CustomTrackingConfiguration: ModuleConfiguration {
-    
+public struct CustomTrackingConfiguration: ModuleConfiguration { }
+
+public struct CustomTrackingRemoteConfiguration: RemoteModuleConfiguration {
+
 
     // MARK: - Public Properties
 
-    /// Whether tracking is enabled
     public var enabled: Bool
 
-    /// Maximum number of tracked items to store in memory
-    public var maxBufferSize: Int
+    private struct Tracking: Decodable {
+        let enabled: Bool
+    }
 
-    /// Maximum time in seconds to hold tracked items before forcing emission
-    public var maxBufferAge: TimeInterval
+    private struct Configuration: Decodable {
+        let tracking: Tracking
+    }
+
+    private struct Root: Decodable {
+        let configuration: Configuration
+    }
 
 
     // MARK: Initialization
 
     public init(
-        enabled: Bool,
-        maxBufferSize: Int = 100,
-        maxBufferAge: TimeInterval = 60.0
+        enabled: Bool
     ) {
         self.enabled = enabled
-        self.maxBufferSize = maxBufferSize
-        self.maxBufferAge = maxBufferAge
     }
+
+    public init?(from data: Data) {
+        guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
+            return nil
+        }
+        self.enabled = root.configuration.tracking.enabled
+    }
+
 }
