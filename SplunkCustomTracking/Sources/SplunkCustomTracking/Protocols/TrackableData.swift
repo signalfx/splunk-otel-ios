@@ -19,32 +19,26 @@ import Foundation
 import SplunkSharedProtocols
 
 
-// MARK: - ErrorEventMetadata
+// MARK: - TrackableData Protocol
 
-struct ErrorEventMetadata: ModuleEventMetadata {
+public protocol TrackableData: SplunkTrackable {
+    /// Category of the data, used for grouping
+    var category: String { get }
 
+    /// The values to be tracked
+    var values: [String: EventAttributeValue] { get }
 
-    // MARK: - Properties
-    
-    let timestamp: Date
-    let id: String
-    let errorType: String
-
-
-    // MARK: - Initialization
-    
-    init(timestamp: Date = Date(), errorType: String) {
-        self.timestamp = timestamp
-        self.id = UUID().uuidString
-        self.errorType = errorType
-    }
 }
 
 
-// MARK: - Equatable Conformance
 
-extension ErrorEventMetadata: Equatable {
-    static func == (lhs: ErrorEventMetadata, rhs: ErrorEventMetadata) -> Bool {
-        lhs.id == rhs.id
+// MARK: - Default Implementation
+
+public extension TrackableData {
+
+    func toEventAttributes() -> [String: EventAttributeValue] {
+        var attributes = values
+
+        return attributes
     }
 }

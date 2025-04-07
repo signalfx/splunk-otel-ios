@@ -49,7 +49,7 @@ public enum ErrorAttributeKeys {
     public enum Service: String, AttributeKey {
         case name = "service.name"
     }
-    
+
 }
 
 
