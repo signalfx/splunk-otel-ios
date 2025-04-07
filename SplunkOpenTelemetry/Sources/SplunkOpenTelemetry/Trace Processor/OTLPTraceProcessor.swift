@@ -92,7 +92,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         let name = event.name
         let timestamp = event.timestamp ?? Date()
 
-        var span = tracer.spanBuilder(spanName: name)
+        let span = tracer.spanBuilder(spanName: name)
             .setStartTime(time: timestamp)
             .startSpan()
 
