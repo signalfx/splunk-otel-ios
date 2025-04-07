@@ -15,22 +15,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+
 import Foundation
 import SplunkCommon
 
-public struct TrackedDataConfiguration: ModuleConfiguration {
+
+// MARK: - CustomDataEventMetadata
+
+struct CustomDataEventMetadata: ModuleEventMetadata {
 
 
-    // MARK: - Public
+    // MARK: - Properties
 
-    public var enabled: Bool
-    public var threshold: CFTimeInterval
+    let timestamp: Date
+    let id: String
+    let dataType: String
+    let category: String
 
 
-    // MARK: init()
+    // MARK: - Initialization
 
-    public init(enabled: Bool, threshold: CFTimeInterval = 2.0) {
-        self.enabled = enabled
-        self.threshold = threshold
+    init(timestamp: Date = Date(), dataType: String, category: String) {
+        self.timestamp = timestamp
+	self.id = UUID().uuidString
+	self.dataType = dataType
+	self.category = category
     }
 }

@@ -18,17 +18,3 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-public struct TrackedDataRemoteConfiguration: RemoteModuleConfiguration {
-
-
-    // MARK: - Public
-
-    public var enabled: Bool
-
-
-    // MARK: init()
-
-    public init?(from data: Data) {
-        enabled = true
-    }
-}
