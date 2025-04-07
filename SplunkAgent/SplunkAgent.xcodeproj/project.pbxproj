@@ -9020,7 +9020,7 @@
 		};
 		4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "git@github.com:smartlook/smartlook-ios-sdk-private.git";
+			repositoryURL = "https://github.com/smartlook/smartlook-ios-sdk-private";
 			requirement = {
 				branch = develop;
 				kind = branch;
