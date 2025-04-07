@@ -16,21 +16,19 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkSharedProtocols
 
 
-// MARK: - Trackable Protocol
+// MARK: - SplunkTrackable Protocol
 
 /// Protocol defining the base requirements for any item that can be tracked in the system.
 /// This serves as the foundation for both error tracking and custom data tracking.
-public protocol Trackable {
+public protocol SplunkTrackable {
     /// The type name of the trackable item, used for categorization
     var typeName: String { get }
 
     /// Timestamp when the trackable item was created
     var timestamp: Date { get }
-
-    /// Optional service name associated with this trackable item
-    var serviceName: String { get }
 
     /// Converts the trackable item to event attributes
     /// - Returns: Dictionary of attribute key-value pairs
@@ -40,8 +38,7 @@ public protocol Trackable {
 
 // MARK: - Default Implementations
 
-public extension Trackable {
-    var serviceName: String? { nil }
+public extension SplunkTrackable {
 
     var timestamp: Date {
         Date()

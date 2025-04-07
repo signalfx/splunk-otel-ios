@@ -22,53 +22,45 @@ import SplunkSharedProtocols
 // MARK: - Module Type Definitions
 
 
-extension CustomTracking: Module {
+class CustomTracking: Module {
+
     public typealias Configuration = CustomTrackingConfiguration
     public typealias RemoteConfiguration = CustomTrackingRemoteConfiguration
+
     public typealias EventMetadata = CustomTrackingEventMetadata
     public typealias EventData = CustomTrackingEventData
 
+    private var config: CustomTrackingConfiguration?
+    private var dataConsumer: ((CustomTrackingEventMetadata, CustomTrackingEventData) -> Void)?
+
+    public required init() {}
 
     // MARK: - Module Installation
 
-    public func install(
-        with configuration: (any ModuleConfiguration)?,
-        remoteConfiguration: (any RemoteModuleConfiguration)?
-    ) {
+    func install(with configuration: (any SplunkSharedProtocols.ModuleConfiguration)?, remoteConfiguration: (any SplunkSharedProtocols.RemoteModuleConfiguration)?) {
         if let config = configuration as? CustomTrackingConfiguration {
             self.config = config
         }
     }
 
+
     // MARK: - Module Data Handling
 
-    public func onPublish(data block: @escaping (CustomDataEventMetadata, CustomDataEventData) -> Void) {
+    public func onPublish(data block: @escaping (CustomTrackingEventMetadata, CustomTrackingEventData) -> Void) {
         dataConsumer = block
+    }
+
+    func publishData(data: SplunkTrackable, serviceName: String? = nil) {
+        guard let config = config, config.enabled else { return }
+
+        let metadata = CustomTrackingEventMetadata(eventType: data.typeName)
+        let eventData = CustomTrackingEventData(data: data)
+        dataConsumer?(metadata, eventData)
     }
 
     public func deleteData(for metadata: any ModuleEventMetadata) {
         // No persistent data to clean up for error reporting
     }
+
 }
 
-
-
-
-// MARK: - Module Installation
-
-extension TrackedError {
-    public func install(
-        with configuration: (any ModuleConfiguration)?,
-        remoteConfiguration: (any RemoteModuleConfiguration)?
-    ) {
-        if let config = configuration as? CustomTrackingConfiguration {
-            self.config = config
-        }
-    }
-}
-
-
-// MARK: - Module Data Handling
-
-extension TrackedError {
-}

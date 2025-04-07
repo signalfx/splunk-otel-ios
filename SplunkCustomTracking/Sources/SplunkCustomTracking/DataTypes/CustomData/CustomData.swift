@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,20 +15,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 import Foundation
 import SplunkSharedProtocols
 
 
-struct CustomDataEventData: ModuleEventData {
-    private let attributes: [String: EventAttributeValue]
+struct CustomData: SplunkTrackable {
+    var typeName: String
+    var attributes: [String: String]
 
-    init(customData: CustomData) {
-        self.attributes = customData.toEventAttributes()
+    init(name: String, attributes: [String: String]) {
+        self.typeName = name
+        self.attributes = attributes
     }
 
-    func getAttributes() -> [String: EventAttributeValue] {
-        attributes
+    // Convert attributes to EventAttributeValue
+    func toEventAttributes() -> [String: EventAttributeValue] {
+        return attributes.mapValues { .string($0) }
     }
 }
-

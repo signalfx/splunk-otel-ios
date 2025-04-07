@@ -15,37 +15,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 import Foundation
 import SplunkSharedProtocols
 
 
-// MARK: - CustomDataEventMetadata
+// MARK: - ErrorEventMetadata
 
-struct CustomDataEventMetadata: ModuleEventMetadata {
+struct ErrorEventMetadata: ModuleEventMetadata {
 
     // MARK: - Properties
 
     let timestamp: Date
     let id: String
-    let dataType: String
-    let category: String // Optional removal if not needed
+    let errorType: String
 
     // MARK: - Initialization
 
-    init(timestamp: Date = Date(), dataType: String, category: String = "") {
+    init(timestamp: Date = Date(), errorType: String) {
         self.timestamp = timestamp
         self.id = UUID().uuidString
-        self.dataType = dataType
-        self.category = category
+        self.errorType = errorType
     }
 }
 
 
 // MARK: - Equatable Conformance
 
-extension CustomDataEventMetadata: Equatable {
-    static func == (lhs: CustomDataEventMetadata, rhs: CustomDataEventMetadata) -> Bool {
-        lhs.id == rhs.id && lhs.timestamp == rhs.timestamp
+extension ErrorEventMetadata: Equatable {
+    static func == (lhs: ErrorEventMetadata, rhs: ErrorEventMetadata) -> Bool {
+        lhs.id == rhs.id
     }
 }
+
