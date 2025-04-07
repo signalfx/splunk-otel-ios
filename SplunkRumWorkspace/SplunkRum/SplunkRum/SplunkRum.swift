@@ -19,7 +19,7 @@ import Foundation
 import WebKit
 
 // Make sure the version numbers on the podspec and SplunkRum.swift match
-let SplunkRumVersionString = "0.12.0"
+let SplunkRumVersionString = "0.13.0"
 
 /**
  Default maximum size of the disk cache in bytes.

@@ -21,6 +21,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Security
 
+## [0.13.0](https://github.com/signalfx/splunk-otel-ios/releases/tag/0.13.0)
+
+### Added
+
+* Update MAX_ATTRIBUTE_LENGTH to 32kb to support crash symbolication [#255](https://github.com/signalfx/splunk-otel-ios/pull/255)
+
+* Update minimum supported deployment target version to 15.0 for iOS, 12.0 for macOS [#262](https://github.com/signalfx/splunk-otel-ios/pull/262)
+
+### Fixed
+
+* Fix Xcode 16.3 compilation failure from Span's == to Self [#264](https://github.com/signalfx/splunk-otel-ios/pull/264)
+
 ## [0.12.0](https://github.com/signalfx/splunk-otel-ios/releases/tag/0.12.0)
 
 ### Deprecated
