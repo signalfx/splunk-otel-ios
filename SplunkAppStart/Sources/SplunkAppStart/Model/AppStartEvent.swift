@@ -16,11 +16,18 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 
-/// Describes a destination into which the AppStart module sends it's results.
-protocol AppStartDestination {
+/// Represents a single timed event.
+struct AppStartEvent {
+    let name: String
+    let timestamp: Date
 
-    /// Sends results into a destination.
-    func send(appStart: AppStartSpanData, agentInitialize: AgentInitializeSpanData?, sharedState: AgentSharedState?)
+    static func sortedEvents(from events: [String: Date]) -> [AppStartEvent] {
+
+        let appStartEvents = events.map { name, timestamp in
+            AppStartEvent(name: name, timestamp: timestamp)
+        }.sorted { $0.timestamp < $1.timestamp }
+
+        return appStartEvents
+    }
 }

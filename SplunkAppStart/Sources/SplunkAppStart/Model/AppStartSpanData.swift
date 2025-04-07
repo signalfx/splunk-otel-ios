@@ -16,11 +16,11 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 
-/// Describes a destination into which the AppStart module sends it's results.
-protocol AppStartDestination {
-
-    /// Sends results into a destination.
-    func send(appStart: AppStartSpanData, agentInitialize: AgentInitializeSpanData?, sharedState: AgentSharedState?)
+/// Represents App start span's data.
+struct AppStartSpanData {
+    let type: AppStartType
+    let start: Date
+    let end: Date
+    let events: [AppStartEvent]?
 }

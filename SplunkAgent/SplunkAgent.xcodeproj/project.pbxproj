@@ -12,6 +12,14 @@
 		2A03CF5D2D9C315C00CF3BC9 /* API-1.0-AgentConfigurationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */; };
 		2A03CF5F2D9C31C100CF3BC9 /* API-1.0-AgentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */; };
 		2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1673CC2BA1F52600F85698 /* EventsModel.swift */; };
+		2A1789B72DA3CDA900EC548B /* AppStartSimulations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */; };
+		2A1789BB2DA3CDD300EC548B /* AppStartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789B92DA3CDD300EC548B /* AppStartTests.swift */; };
+		2A1789C02DA3CDEB00EC548B /* InitializeTests+Checks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789BE2DA3CDEB00EC548B /* InitializeTests+Checks.swift */; };
+		2A1789C12DA3CDEB00EC548B /* InitializeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789BD2DA3CDEB00EC548B /* InitializeTests.swift */; };
+		2A1789C32DA3D5F100EC548B /* AppStartTests+Checks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789C22DA3D5F100EC548B /* AppStartTests+Checks.swift */; };
+		2A1789C82DA3D62100EC548B /* AgentInitializeSpanData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789C42DA3D62100EC548B /* AgentInitializeSpanData.swift */; };
+		2A1789C92DA3D62100EC548B /* AppStartEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789C52DA3D62100EC548B /* AppStartEvent.swift */; };
+		2A1789CA2DA3D62100EC548B /* AppStartSpanData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789C62DA3D62100EC548B /* AppStartSpanData.swift */; };
 		2A30EE1C2BD7AEDD008557DD /* NOTICES in Resources */ = {isa = PBXBuildFile; fileRef = 2A30EE1B2BD7AECE008557DD /* NOTICES */; };
 		2AA52B492B8DF4CD00DF9373 /* EventsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA52B482B8DF4CD00DF9373 /* EventsTests.swift */; };
 		2AA52B4C2B8DF50300DF9373 /* v.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 2AA52B4B2B8DF50300DF9373 /* v.mp4 */; };
@@ -62,9 +70,6 @@
 		4B385B532D94C594005CF4C9 /* AppStartDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B162D94C4EB005CF4C9 /* AppStartDestination.swift */; };
 		4B385B542D94C594005CF4C9 /* AppStart+ProcessStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B202D94C4EB005CF4C9 /* AppStart+ProcessStart.swift */; };
 		4B385B552D94C594005CF4C9 /* AppStartRemoteConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B1C2D94C4EB005CF4C9 /* AppStartRemoteConfiguration.swift */; };
-		4B385B562D94C5A0005CF4C9 /* AppStartTests+Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B252D94C4EB005CF4C9 /* AppStartTests+Notifications.swift */; };
-		4B385B572D94C5A0005CF4C9 /* AppStartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B232D94C4EB005CF4C9 /* AppStartTests.swift */; };
-		4B385B582D94C5A0005CF4C9 /* AppStartTests+CheckType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B242D94C4EB005CF4C9 /* AppStartTests+CheckType.swift */; };
 		4B6878C12B9F3B420024479A /* ConfigurationHandler+RequestErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6878C02B9F3B420024479A /* ConfigurationHandler+RequestErrorHandling.swift */; };
 		4B963FEF2D60F7E3009A2E7F /* SplunkLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B963FE52D60F7E3009A2E7F /* SplunkLogger.framework */; };
 		4B9640052D60F81F009A2E7F /* LoggerPrefix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3B3AEF2D5E3B7E004DA9DA /* LoggerPrefix.swift */; };
@@ -516,6 +521,14 @@
 		2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-AgentConfigurationError.swift"; sourceTree = "<group>"; };
 		2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-AgentConfiguration.swift"; sourceTree = "<group>"; };
 		2A1673CC2BA1F52600F85698 /* EventsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsModel.swift; sourceTree = "<group>"; };
+		2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartSimulations.swift; sourceTree = "<group>"; };
+		2A1789B92DA3CDD300EC548B /* AppStartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartTests.swift; sourceTree = "<group>"; };
+		2A1789BD2DA3CDEB00EC548B /* InitializeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitializeTests.swift; sourceTree = "<group>"; };
+		2A1789BE2DA3CDEB00EC548B /* InitializeTests+Checks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InitializeTests+Checks.swift"; sourceTree = "<group>"; };
+		2A1789C22DA3D5F100EC548B /* AppStartTests+Checks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStartTests+Checks.swift"; sourceTree = "<group>"; };
+		2A1789C42DA3D62100EC548B /* AgentInitializeSpanData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentInitializeSpanData.swift; sourceTree = "<group>"; };
+		2A1789C52DA3D62100EC548B /* AppStartEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartEvent.swift; sourceTree = "<group>"; };
+		2A1789C62DA3D62100EC548B /* AppStartSpanData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartSpanData.swift; sourceTree = "<group>"; };
 		2A30EE1B2BD7AECE008557DD /* NOTICES */ = {isa = PBXFileReference; lastKnownFileType = text; path = NOTICES; sourceTree = "<group>"; };
 		2AA52B482B8DF4CD00DF9373 /* EventsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsTests.swift; sourceTree = "<group>"; };
 		2AA52B4B2B8DF50300DF9373 /* v.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = v.mp4; sourceTree = "<group>"; };
@@ -572,9 +585,6 @@
 		4B385B1E2D94C4EB005CF4C9 /* AppStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStart.swift; sourceTree = "<group>"; };
 		4B385B1F2D94C4EB005CF4C9 /* AppStart+Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStart+Notifications.swift"; sourceTree = "<group>"; };
 		4B385B202D94C4EB005CF4C9 /* AppStart+ProcessStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStart+ProcessStart.swift"; sourceTree = "<group>"; };
-		4B385B232D94C4EB005CF4C9 /* AppStartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartTests.swift; sourceTree = "<group>"; };
-		4B385B242D94C4EB005CF4C9 /* AppStartTests+CheckType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStartTests+CheckType.swift"; sourceTree = "<group>"; };
-		4B385B252D94C4EB005CF4C9 /* AppStartTests+Notifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStartTests+Notifications.swift"; sourceTree = "<group>"; };
 		4B385B2F2D94C55A005CF4C9 /* SplunkAppStart.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkAppStart.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B385B362D94C55B005CF4C9 /* SplunkAppStartTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkAppStartTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3B3AE12D5E3B7E004DA9DA /* InternalLoggerConfiguration+Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InternalLoggerConfiguration+Defaults.swift"; sourceTree = "<group>"; };
@@ -1013,6 +1023,42 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		2A1789B62DA3CDA900EC548B /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		2A1789B82DA3CDBB00EC548B /* AppStart tests */ = {
+			isa = PBXGroup;
+			children = (
+				2A1789B92DA3CDD300EC548B /* AppStartTests.swift */,
+				2A1789C22DA3D5F100EC548B /* AppStartTests+Checks.swift */,
+			);
+			path = "AppStart tests";
+			sourceTree = "<group>";
+		};
+		2A1789BF2DA3CDEB00EC548B /* Initialize tests */ = {
+			isa = PBXGroup;
+			children = (
+				2A1789BD2DA3CDEB00EC548B /* InitializeTests.swift */,
+				2A1789BE2DA3CDEB00EC548B /* InitializeTests+Checks.swift */,
+			);
+			path = "Initialize tests";
+			sourceTree = "<group>";
+		};
+		2A1789C72DA3D62100EC548B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2A1789C42DA3D62100EC548B /* AgentInitializeSpanData.swift */,
+				2A1789C52DA3D62100EC548B /* AppStartEvent.swift */,
+				2A1789C62DA3D62100EC548B /* AppStartSpanData.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		2AA52B472B8DF4CD00DF9373 /* Events */ = {
 			isa = PBXGroup;
 			children = (
@@ -1417,11 +1463,12 @@
 		4B385B212D94C4EB005CF4C9 /* SplunkAppStart */ = {
 			isa = PBXGroup;
 			children = (
-				4B385B192D94C4EB005CF4C9 /* Destination */,
-				4B385B1D2D94C4EB005CF4C9 /* Module */,
 				4B385B1E2D94C4EB005CF4C9 /* AppStart.swift */,
 				4B385B1F2D94C4EB005CF4C9 /* AppStart+Notifications.swift */,
 				4B385B202D94C4EB005CF4C9 /* AppStart+ProcessStart.swift */,
+				2A1789C72DA3D62100EC548B /* Model */,
+				4B385B192D94C4EB005CF4C9 /* Destination */,
+				4B385B1D2D94C4EB005CF4C9 /* Module */,
 			);
 			path = SplunkAppStart;
 			sourceTree = "<group>";
@@ -1437,9 +1484,9 @@
 		4B385B262D94C4EB005CF4C9 /* SplunkAppStartTests */ = {
 			isa = PBXGroup;
 			children = (
-				4B385B232D94C4EB005CF4C9 /* AppStartTests.swift */,
-				4B385B242D94C4EB005CF4C9 /* AppStartTests+CheckType.swift */,
-				4B385B252D94C4EB005CF4C9 /* AppStartTests+Notifications.swift */,
+				2A1789B82DA3CDBB00EC548B /* AppStart tests */,
+				2A1789BF2DA3CDEB00EC548B /* Initialize tests */,
+				2A1789B62DA3CDA900EC548B /* Support */,
 			);
 			path = SplunkAppStartTests;
 			sourceTree = "<group>";
@@ -3755,6 +3802,9 @@
 			files = (
 				4B385B4D2D94C594005CF4C9 /* DebugDestination.swift in Sources */,
 				4B385B4E2D94C594005CF4C9 /* OTelDestination.swift in Sources */,
+				2A1789C82DA3D62100EC548B /* AgentInitializeSpanData.swift in Sources */,
+				2A1789C92DA3D62100EC548B /* AppStartEvent.swift in Sources */,
+				2A1789CA2DA3D62100EC548B /* AppStartSpanData.swift in Sources */,
 				4B385B4F2D94C594005CF4C9 /* AppStartConfiguration.swift in Sources */,
 				4B385B502D94C594005CF4C9 /* AppStart.swift in Sources */,
 				4B385B512D94C594005CF4C9 /* AppStart+Notifications.swift in Sources */,
@@ -3769,9 +3819,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B385B562D94C5A0005CF4C9 /* AppStartTests+Notifications.swift in Sources */,
-				4B385B572D94C5A0005CF4C9 /* AppStartTests.swift in Sources */,
-				4B385B582D94C5A0005CF4C9 /* AppStartTests+CheckType.swift in Sources */,
+				2A1789B72DA3CDA900EC548B /* AppStartSimulations.swift in Sources */,
+				2A1789C02DA3CDEB00EC548B /* InitializeTests+Checks.swift in Sources */,
+				2A1789C12DA3CDEB00EC548B /* InitializeTests.swift in Sources */,
+				2A1789BB2DA3CDD300EC548B /* AppStartTests.swift in Sources */,
+				2A1789C32DA3D5F100EC548B /* AppStartTests+Checks.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
