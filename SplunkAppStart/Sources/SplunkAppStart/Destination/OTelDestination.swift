@@ -48,6 +48,8 @@ struct OTelDestination: AppStartDestination {
             appStartSpan.addEvent(name: event.name, timestamp: event.timestamp)
         }
 
+        appStartSpan.end(time: appStart.end)
+
         // Create and send the Initialize span as a app start span's child
         if let agentInitialize {
             let initializeSpan = tracer.spanBuilder(spanName: "SplunkRum.initialize")
@@ -70,13 +72,11 @@ struct OTelDestination: AppStartDestination {
 
             // Add session id
             if let sessionID = sharedState?.sessionId {
-                initializeSpan.setAttribute(key: "splunk.rumSessionId", value: sessionID)
+                initializeSpan.setAttribute(key: "session.id", value: sessionID)
             }
 
             initializeSpan.end(time: agentInitialize.end)
         }
-
-        appStartSpan.end(time: appStart.end)
     }
 
     private func typeIdentifier(for type: AppStartType) -> String {
