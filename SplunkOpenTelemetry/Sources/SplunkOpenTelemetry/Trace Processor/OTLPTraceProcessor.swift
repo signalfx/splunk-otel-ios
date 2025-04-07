@@ -33,10 +33,10 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // OTel tracer provider
     private let tracerProvider: TracerProvider
-    
-    
+
+
     // MARK: - Initialization
-    
+
     required public init(with baseURL: URL, resources: AgentResources) {
         /* Using Zipkin for now
         let configuration = OtlpConfiguration()
@@ -66,19 +66,80 @@ public class OTLPTraceProcessor: TraceProcessor {
         let stdoutExporter = StdoutSpanExporter(isDebug: true)
         let stdoutSpanProcessor = SimpleSpanProcessor(spanExporter: stdoutExporter)
 
-        
+
         // Build Resources
         var resource = Resource()
         resource.merge(with: resources)
-        
+
         // Initialize tracer provider
         tracerProvider = TracerProviderBuilder()
             .with(resource: resource)
             .add(spanProcessor: spanProcessor)
             .add(spanProcessor: stdoutSpanProcessor)
             .build()
-        
+
         // Register default tracer provider
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
+    }
+
+
+    // MARK: - Events
+
+    /// Sends Span Event to an exporter.
+    ///
+    /// - Parameters:
+    ///   - event: Event to be sent to exporter.
+    ///   - completion: Completion block, returns `true` if the event was sent correctly.
+    public func sendEvent(event: any Event, completion: @escaping (Bool) -> Void) {
+        let tracer = tracerProvider.get(instrumentationName: event.instrumentationScope, instrumentationVersion: nil)
+
+        let name = event.name
+        let timestamp = event.timestamp ?? Date()
+
+        var span = tracer.spanBuilder(spanName: name)
+            .setStartTime(time: timestamp)
+            .startSpan()
+
+        // sessionID
+        if let sessionID = event.sessionID {
+            span.setAttribute(key: "session.id", value: .string(sessionID))
+        }
+
+        // event attributes
+        if let eventAttributes = event.attributes {
+            for (key, value) in eventAttributes {
+                if let spanValue = convertToSpanAttributeValue(value) {
+                    span.setAttribute(key: key, value: spanValue)
+                } else {
+                    span.setAttribute(key: key, value: .string(value.description))
+                }
+            }
+        }
+
+        // event body → attribute „body“ (if exists)
+        if let body = event.body {
+            let bodyValue = convertToSpanAttributeValue(body) ?? .string(body.description)
+            span.setAttribute(key: "body", value: bodyValue)
+        }
+
+        span.end(time: timestamp)
+
+        completion(true)
+    }
+
+
+    // MARK: - Private methods
+
+    private func convertToSpanAttributeValue(_ value: EventAttributeValue) -> AttributeValue? {
+        switch value {
+        case .string(let s):
+            return .string(s)
+        case .int(let i):
+            return .int(i)
+        case .double(let d):
+            return .double(d)
+        case .data(let data):
+            return .string(data.base64EncodedString())
+        }
     }
 }

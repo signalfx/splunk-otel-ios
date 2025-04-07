@@ -28,4 +28,11 @@ public protocol TraceProcessor {
     ///   - baseURL: API base url.
     ///   - resources: Resources which enrich all Traces.
     init(with baseURL: URL, resources: AgentResources)
+
+    /// Sends Span Event to an exporter.
+    ///
+    /// - Parameters:
+    ///   - event: Event to be sent to exporter.
+    ///   - completion: Completion block, returns `true` if the event was sent correctly.
+    func sendEvent(event: any Event, completion: @escaping (Bool) -> Void)
 }

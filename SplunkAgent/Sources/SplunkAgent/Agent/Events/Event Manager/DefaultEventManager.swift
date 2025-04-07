@@ -125,11 +125,7 @@ class DefaultEventManager: AgentEventManager {
             let sessionID = agent.session.sessionId(for: metadata.timestamp)
             let event = CrashReportsDataEvent(metadata: metadata, data: data, sessionID: sessionID)
 
-            logEventProcessor.sendEvent(
-                event: event,
-                immediateProcessing: true,
-                completion: completion
-            )
+            traceProcesssor.sendEvent(event: event, completion: completion)
 
         // Unknown module data
         default:
