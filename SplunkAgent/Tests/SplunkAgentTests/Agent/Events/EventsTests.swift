@@ -147,7 +147,7 @@ final class EventsTests: XCTestCase {
         //    replaySessionId: replaySessionID
         // )
 
-        let datachunkMetadata = Metadata(startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000), endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0))
+        let datachunkMetadata = Metadata(startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000.0), endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0))
 
         let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, sessionID: sessionID)
 
