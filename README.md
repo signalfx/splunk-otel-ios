@@ -39,7 +39,7 @@ The Splunk RUM agent for iOS provides a Swift package that captures:
 
 ## Requirements
 
-Splunk RUM agent for iOS supports iOS 11 and higher, including iPadOS 13 and higher.
+Splunk RUM agent for iOS supports iOS 15 and higher, including iPadOS 15 and higher.
 
 ## Getting Started
 
