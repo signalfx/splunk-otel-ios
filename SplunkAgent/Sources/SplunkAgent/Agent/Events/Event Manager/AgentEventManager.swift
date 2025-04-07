@@ -60,10 +60,4 @@ protocol AgentEventManager {
 
     /// Sends session replay start event.
     func sendSessionStartEvent()
-
-
-    // MARK: - Session Pulse event
-
-    /// Sends session replay pulse event.
-    func sendSessionPulseEvent()
 }

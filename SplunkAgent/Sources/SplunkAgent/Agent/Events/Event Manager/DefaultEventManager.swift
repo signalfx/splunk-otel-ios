@@ -90,11 +90,6 @@ class DefaultEventManager: AgentEventManager {
         // Initialize trace processor
         traceProcesssor = OTLPTraceProcessor(with: configuration.tracesUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
 
-        // Schedule job for Pulse Events
-        pulseEventJob = LifecycleRepeatingJob(interval: pulseEventInterval) { [weak self] in
-            self?.sendSessionPulseEvent()
-        }.resume()
-
         // Starts listening to a Session Reset nofification to send the Session Start event.
         NotificationCenter.default.addObserver(forName: DefaultSession.sessionDidResetNotification, object: nil, queue: nil) { _ in
             self.sendSessionStartEvent()
@@ -185,25 +180,6 @@ class DefaultEventManager: AgentEventManager {
             // Mark the session start event as "sent"
             if success {
                 self.eventsModel.markSessionStartSent(sessionID)
-            }
-        }
-    }
-
-
-    // MARK: - Session Pulse event
-
-    func sendSessionPulseEvent() {
-        let sessionID = agent.currentSession.currentSessionId
-        let timestamp = Date()
-
-        let event = SessionPulseEvent(
-            sessionID: sessionID,
-            timestamp: timestamp
-        )
-
-        logEventProcessor.sendEvent(event) { success in
-            self.logger.log(level: .info) {
-                "Session Pulse event sent with success: \(success)"
             }
         }
     }

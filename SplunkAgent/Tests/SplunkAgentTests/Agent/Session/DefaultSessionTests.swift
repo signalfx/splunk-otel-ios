@@ -69,7 +69,6 @@ final class DefaultSessionTests: XCTestCase {
         XCTAssertEqual(sessionModel.sessions, matchedSessions)
     }
 
-    // TODO: Fix tests in DEMRUM-1489
     func testSessionForLogic() throws {
         var configuration = try ConfigurationTestBuilder.buildDefault()
         configuration.maxSessionLength = 5
@@ -145,6 +144,26 @@ final class DefaultSessionTests: XCTestCase {
         timestamp = lastSessionItem.start + configuration.maxSessionLength + tolerance + threshold
         retrievedSessionId = defaultSession.sessionId(for: timestamp)
         XCTAssertNil(retrievedSessionId)
+    }
+
+    // Test whether next application launch creates a new session
+    func testNextLaunchSession() throws {
+        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "nextLaunchSessionTest")
+        let sessionModel = SessionsModel(storage: storage)
+
+        let previousSession = DefaultSession(sessionsModel: sessionModel)
+        let previousSessionId = previousSession.currentSession.id
+
+        let nextSession = DefaultSession(sessionsModel: sessionModel)
+        let nextSessionId = nextSession.currentSession.id
+
+        XCTAssertNotEqual(previousSessionId, nextSessionId)
+
+        XCTAssertTrue(sessionModel.sessions.count == 2)
+
+        let previousSessionUpdated = try XCTUnwrap(sessionModel.sessions.first)
+        let closed = try XCTUnwrap(previousSessionUpdated.closed)
+        XCTAssertTrue(closed)
     }
 
 
