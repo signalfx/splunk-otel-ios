@@ -16,9 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
-import SplunkLogger
 internal import SplunkCrashReporter
+import SplunkLogger
+import SplunkSharedProtocols
 
 public class CrashReports {
 
@@ -29,12 +29,13 @@ public class CrashReports {
 
     private var crashReporter: SPLKPLCrashReporter?
     private let internalLogger = InternalLogger(configuration: .crashReporter(category: "CrashReporter"))
+    private var allUsedImageNames: Array <String> = []
 
     // A reference to the Module's data publishing callback.
-    var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)? = nil
+    var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)?
 
     // MARK: - Module methods
-    
+
     public required init() {
     }
 
@@ -55,7 +56,7 @@ public class CrashReports {
             return
         }
         crashReporter = crashReporterInstance
-        
+
         // Initialize CrashReports module
         _ = initializeCrashReporter()
     }
@@ -96,7 +97,6 @@ public class CrashReports {
                 self.internalLogger.log(level: .error) {
                     "CrashReporter failed to parse the Crash Report JSON payload."
                 }
-
                 return
             }
 
@@ -107,7 +107,6 @@ public class CrashReports {
                 self.internalLogger.log(level: .error) {
                     "CrashReporter did not receive a valid system info block."
                 }
-
                 return
             }
 
@@ -184,7 +183,7 @@ public class CrashReports {
 
         return debuggerIsAttached
     }
-    
+
 
     // Report formatting
     
@@ -202,7 +201,7 @@ public class CrashReports {
         stackFrames[CrashReportKeys.threads] = threads
 
         stackFrames[CrashReportKeys.exceptionStackFrames] = nil
-        if (report.hasExceptionInfo) {
+        if report.hasExceptionInfo {
             stackFrames[CrashReportKeys.exceptionStackFrames] = convertStackFrames(frames: report.exceptionInfo.stackFrames, report: report)
         }
         return stackFrames
@@ -213,57 +212,25 @@ public class CrashReports {
         var reportDict: [String:Any] = [:]
         
         if ((report.systemInfo) != nil) {
-
-            reportDict[CrashReportKeys.operatingSystem] = report.systemInfo.operatingSystem.rawValue
-            reportDict[CrashReportKeys.osVersion] = report.systemInfo.operatingSystemVersion
-            reportDict[CrashReportKeys.osBuild] = report.systemInfo.operatingSystemBuild
             reportDict[CrashReportKeys.timestamp] = "\(report.systemInfo.timestamp!)"
             reportDict[CrashReportKeys.actualTimestamp] = "\(report.systemInfo.timestamp!)"
-            reportDict[CrashReportKeys.systemVersionAtCrash] = report.systemInfo.operatingSystemVersion
-        }
-        
-        if (report.hasMachineInfo) {
-            
-            reportDict[CrashReportKeys.hardwareModel] = report.machineInfo.modelName
-            reportDict[CrashReportKeys.cpuType] = cpuTypeFromReport(report: report)
-            reportDict[CrashReportKeys.cpuCount] = report.machineInfo.processorCount
-            reportDict[CrashReportKeys.cpuLogicalCount] = report.machineInfo.logicalProcessorCount
         }
         
         if (report.applicationInfo != nil) {
-            
-            reportDict[CrashReportKeys.appBundleId] = report.applicationInfo.applicationIdentifier
-            let versionString = "\(report.applicationInfo.applicationMarketingVersion ?? "?")(\(report.applicationInfo.applicationVersion ?? "?"))"
-            reportDict[CrashReportKeys.appVersion] = versionString
-            if (report.applicationInfo.applicationMarketingVersion != nil) {
-                reportDict[CrashReportKeys.majorVersionAtCrash] = report.applicationInfo.applicationMarketingVersion
-            }
-            if (report.applicationInfo.applicationVersion != nil) {
-                reportDict[CrashReportKeys.minorVersionAtCrash] = report.applicationInfo.applicationVersion
-            }
+            reportDict[CrashReportKeys.appVersion] = report.applicationInfo.applicationMarketingVersion
         }
         
-        if (report.hasProcessInfo) {
-            
-            reportDict[CrashReportKeys.processName] = report.processInfo.processName
-            reportDict[CrashReportKeys.processId] = report.processInfo.processID
+        if report.hasProcessInfo {
             reportDict[CrashReportKeys.processPath] = report.processInfo.processPath
-            if (report.processInfo.parentProcessName != nil) {
-                reportDict[CrashReportKeys.parentProcessName] = report.processInfo.parentProcessName
-            }
-            reportDict[CrashReportKeys.parentProcessId] = report.processInfo.parentProcessID
             reportDict[CrashReportKeys.isNative] = report.processInfo.native ? "1" : "0"
         }
         
         if (report.signalInfo != nil) {
-            
             reportDict[CrashReportKeys.signalName] = report.signalInfo.name
-            reportDict[CrashReportKeys.signalCode] = report.signalInfo.code
             reportDict[CrashReportKeys.faultAddress] = String(report.signalInfo.address)
         }
         
         if (report.hasExceptionInfo) {
-            
             if(report.exceptionInfo.exceptionName != nil) {
                 reportDict[CrashReportKeys.exceptionName] = report.exceptionInfo.exceptionName
             }
@@ -276,7 +243,7 @@ public class CrashReports {
             else {
                 reportDict[CrashReportKeys.exceptionReason] = ""
             }
-            if((stackFrames[CrashReportKeys.exceptionStackFrames]) != nil)  {
+            if(stackFrames[CrashReportKeys.exceptionStackFrames] != nil)  {
                 reportDict[CrashReportKeys.exceptionStackFrames] = stackFrames[CrashReportKeys.exceptionStackFrames]
             }
         }
@@ -302,7 +269,7 @@ public class CrashReports {
             let appState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
 
             switch appState {
-            case "active": 
+            case "active":
                 crashPayload[CrashReportKeys.previousAppState] = "foreground"
 
             case "inactive":
@@ -316,28 +283,9 @@ public class CrashReports {
             }
             // End of mapping code
         }
-        
         return crashPayload
     }
-    
-    private func cpuTypeDictionary(cpuType: SPLKPLCrashReportProcessorInfo) -> Dictionary<String, String>  {
-        
-        var dictionary: [String:String] = [:]
-        dictionary.updateValue(String(cpuType.type), forKey: CrashReportKeys.cType)
-        dictionary.updateValue(String(cpuType.subtype), forKey: CrashReportKeys.cSubType)
-        return dictionary
-    }
-    
-    private func cpuTypeFromReport(report: SPLKPLCrashReport) -> Dictionary<String, String> {
-        
-        for image in report.images {
-            if let image = image as? SPLKPLCrashReportBinaryImageInfo, image.codeType != nil {
-                return cpuTypeDictionary(cpuType: image.codeType)
-            }
-        }
-        return cpuTypeDictionary(cpuType: report.machineInfo.processorInfo)
-    }
-    
+
     private func convertStackFrames(frames: Array<Any>, report: SPLKPLCrashReport) -> Array<Any> {
         
         var stackFrames: Array<Any> = []
@@ -371,6 +319,23 @@ public class CrashReports {
             }
             else {
                 frameDict[CrashReportKeys.imageName] = imageName
+                allUsedImageNames.append(imageName!)
+            }
+            
+            var baseAddress: UInt64 = 0
+            var offset: UInt64 = 0
+            if imageInfo != nil {
+                baseAddress = imageInfo!.imageBaseAddress
+                offset = instructionPointer - baseAddress
+            }
+            if stackFrame.symbolInfo != nil {
+                let symbolName = stackFrame.symbolInfo.symbolName
+                let symOffset = instructionPointer - stackFrame.symbolInfo.startAddress
+                frameDict[CrashReportKeys.symbolName] = symbolName
+                frameDict[CrashReportKeys.offset] = symOffset
+            } else {
+                frameDict[CrashReportKeys.baseAddress] = baseAddress
+                frameDict[CrashReportKeys.offset] = offset
             }
             stackFrames.append(frameDict)
         }
@@ -395,24 +360,7 @@ public class CrashReports {
 
             if let info = thread[CrashReportKeys.details] as? SPLKPLCrashReportThreadInfo {
                 threadDictionary[CrashReportKeys.threadNumber] = info.threadNumber
-                
                 threadDictionary[threadKey] = info.crashed
-                if(info.crashed) {
-                    
-                    var registers: Array<Any> = []
-                    for reg in info.registers {
-                        
-                        var regDict: [String:Any] = [:]
-                        guard let regInfo = reg as? SPLKPLCrashReportRegisterInfo else {
-                            continue
-                        }
-                        
-                        regDict[CrashReportKeys.registerName] = regInfo.registerName
-                        regDict[CrashReportKeys.registerValue] = regInfo.registerValue
-                        registers.append(regDict)
-                    }
-                    threadDictionary[CrashReportKeys.registers] = registers
-                }
             }
             outputThreads.append(threadDictionary)
         }
@@ -427,19 +375,19 @@ public class CrashReports {
     private func imageList(images: Array<Any>) -> Array<Any> {
         var outputImages: Array<Any> = []
         for image in images {
-            
             var imageDictionary: [String:Any] = [:]
             guard let image = image as? SPLKPLCrashReportBinaryImageInfo else {
                 continue
             }
-                        
-            imageDictionary[CrashReportKeys.codeType] = cpuTypeDictionary(cpuType: image.codeType)
-            imageDictionary[CrashReportKeys.baseAddress] = image.imageBaseAddress
-            imageDictionary[CrashReportKeys.imageSize] = image.imageSize
-            imageDictionary[CrashReportKeys.imagePath] = image.imageName
-            imageDictionary[CrashReportKeys.imageUUID] = image.imageUUID
-            
-            outputImages.append(imageDictionary)
+            // Only add the image to the list if it was noted in the stack traces
+            if(allUsedImageNames.contains(image.imageName)) {
+                imageDictionary[CrashReportKeys.baseAddress] = image.imageBaseAddress
+                imageDictionary[CrashReportKeys.imageSize] = image.imageSize
+                imageDictionary[CrashReportKeys.imagePath] = image.imageName
+                imageDictionary[CrashReportKeys.imageUUID] = image.imageUUID
+                
+                outputImages.append(imageDictionary)
+            }
         }
         return outputImages
     }    

@@ -20,24 +20,18 @@ import Foundation
 // JSON Support for Crash Reports.
 
 public class CrashReportJSON {
-    
+
     public static func convertDictionaryToJSONData(_ dictionary: [String: Any]) -> Data? {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted) else {
-            
             return nil
         }
         return jsonData
     }
-    
+
     public static func convertDictionaryToJSONString(_ dictionary: [String: Any]) -> String? {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted) else {
-            
             return nil
         }
-        guard let jsonString = String(data: jsonData, encoding: .utf8) else {
-            
-            return nil
-        }
-        return jsonString
+        return String(data: jsonData, encoding: .utf8)
     }
 }
