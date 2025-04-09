@@ -17,3 +17,13 @@ limitations under the License.
 
 import Foundation
 import SplunkCommon
+
+struct CustomTracking {
+
+    public unowned var sharedState: AgentSharedState?
+
+    // track(data:)
+    // track(error:)
+
+}
+
