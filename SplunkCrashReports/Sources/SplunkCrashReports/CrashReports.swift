@@ -81,6 +81,7 @@ public class CrashReports {
         }
 
         do {
+            allUsedImageNames.removeAll()
             let data = try crashReporter?.loadPendingCrashReportDataAndReturnError()
 
             // Retrieving crash reporter data.
