@@ -22,7 +22,7 @@ import SplunkSharedProtocols
 // MARK: - ErrorData
 
 
-struct ErrorData: TrackableIssue {
+struct ErrorData: SplunkTrackable {
     var typeName: String
     var message: String
     var stacktrace: Stacktrace?
