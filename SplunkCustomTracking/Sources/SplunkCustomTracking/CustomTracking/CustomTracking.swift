@@ -15,4 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 	
+struct CustomTracking {
+
+    public unowned var sharedState: AgentSharedState?
+
+
+    // track(data:)
+    // track(error:)
+    
+
+
+
+
+}
 

@@ -46,6 +46,7 @@ class CustomTracking: Module {
 
     // MARK: - Module Data Handling
 
+
     public func onPublish(data block: @escaping (CustomTrackingEventMetadata, CustomTrackingEventData) -> Void) {
         dataConsumer = block
     }
@@ -61,6 +62,8 @@ class CustomTracking: Module {
     public func deleteData(for metadata: any ModuleEventMetadata) {
         // No persistent data to clean up for error reporting
     }
+
+
 
 }
 
