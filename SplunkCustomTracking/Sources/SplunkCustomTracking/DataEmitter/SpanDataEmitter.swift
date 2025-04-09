@@ -24,7 +24,7 @@ import SplunkSharedProtocols
 struct SpanDataEmitter {
 
     public func setupSpanEmitter() {
-        onPublish { metadata, eventData in
+        onPublish { metadata: CustomTrackingEventMetadata, eventData: CustomTrackingEventData in
 
             let start = Time.now()
 
@@ -57,6 +57,4 @@ struct SpanDataEmitter {
         }
     }
 }
-
-
 
