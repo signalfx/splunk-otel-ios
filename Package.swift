@@ -39,6 +39,7 @@ let package = Package(
                 "SplunkOpenTelemetry",
                 "SplunkANRReporter",
                 "SplunkAppStart",
+                "SplunkCustomTracking",
                 .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAgent",
@@ -125,35 +126,22 @@ let package = Package(
         ),
         
         
-        // MARK: Splunk Custom Data
-        
+        // MARK: Splunk Custom Tracking
+
         .target(
-            name: "SplunkCustomData",
+            name: "SplunkCustomTracking",
             dependencies: [
                 "SplunkCommon"
+                "SplunkLogger",
+                "SplunkOpenTelemetry",
             ],
-            path: "SplunkCustomData/Sources"
+            path: "SplunkCustomTracking",
+            sources: ["Sources"],
         ),
         .testTarget(
-            name: "SplunkCustomDataTests",
-            dependencies: ["SplunkCustomData"],
-            path: "SplunkCustomData/Tests"
-        ),
-        
-        
-        // MARK: Splunk Error Reporting
-        
-        .target(
-            name: "SplunkErrorReporting",
-            dependencies: [
-                "SplunkCommon"
-            ],
-            path: "SplunkErrorReporting/Sources"
-        ),
-        .testTarget(
-            name: "SplunkErrorReportingTests",
-            dependencies: ["SplunkErrorReporting"],
-            path: "SplunkErrorReporting/Tests"
+            name: "SplunkCustomTrackingTests",
+            dependencies: ["SplunkCustomTracking"],
+            path: "SplunkCustomTracking/Tests"
         ),
         
         
