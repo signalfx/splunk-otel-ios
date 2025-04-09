@@ -248,6 +248,11 @@
 		E47953C52BA1CF7D0065677D /* SessionReplay+Recording.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47953C42BA1CF7D0065677D /* SessionReplay+Recording.swift */; };
 		E49F9ABB2B99D27500D652AA /* RepeatingJobTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49F9ABA2B99D27500D652AA /* RepeatingJobTests.swift */; };
 		E49F9ABD2B99D28E00D652AA /* LifecycleRepeatingJobTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49F9ABC2B99D28E00D652AA /* LifecycleRepeatingJobTests.swift */; };
+		E4A537422DA655E2002323E2 /* OLTPAttributesSpanProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A537412DA655E2002323E2 /* OLTPAttributesSpanProcessor.swift */; };
+		E4A5374D2DA6661D002323E2 /* RuntimeAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A5374B2DA6661D002323E2 /* RuntimeAttributes.swift */; };
+		E4A537502DA66B5A002323E2 /* AgentRuntimeAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A5374F2DA66B4F002323E2 /* AgentRuntimeAttributes.swift */; };
+		E4A537522DA66DB6002323E2 /* DefaultRuntimeAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A537512DA66DA7002323E2 /* DefaultRuntimeAttributes.swift */; };
+		E4A537552DA68F5F002323E2 /* OTLPAttributesLogRecordProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A537542DA68F5F002323E2 /* OTLPAttributesLogRecordProcessor.swift */; };
 		E4A708AF2B97501F002C692E /* AgentRepeatingJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A708AE2B97501F002C692E /* AgentRepeatingJob.swift */; };
 		E4A708B32B9754B7002C692E /* RepeatingJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A708B22B9754B7002C692E /* RepeatingJob.swift */; };
 		E4AD34F42B56E075004976CA /* AgentModulesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD34F32B56E075004976CA /* AgentModulesManager.swift */; };
@@ -761,6 +766,11 @@
 		E47953C62BA1D78C0065677D /* SessionReplayPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionReplayPreferences.swift; sourceTree = "<group>"; };
 		E49F9ABA2B99D27500D652AA /* RepeatingJobTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingJobTests.swift; sourceTree = "<group>"; };
 		E49F9ABC2B99D28E00D652AA /* LifecycleRepeatingJobTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifecycleRepeatingJobTests.swift; sourceTree = "<group>"; };
+		E4A537412DA655E2002323E2 /* OLTPAttributesSpanProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OLTPAttributesSpanProcessor.swift; sourceTree = "<group>"; };
+		E4A5374B2DA6661D002323E2 /* RuntimeAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeAttributes.swift; sourceTree = "<group>"; };
+		E4A5374F2DA66B4F002323E2 /* AgentRuntimeAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRuntimeAttributes.swift; sourceTree = "<group>"; };
+		E4A537512DA66DA7002323E2 /* DefaultRuntimeAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultRuntimeAttributes.swift; sourceTree = "<group>"; };
+		E4A537542DA68F5F002323E2 /* OTLPAttributesLogRecordProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPAttributesLogRecordProcessor.swift; sourceTree = "<group>"; };
 		E4A708AE2B97501F002C692E /* AgentRepeatingJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentRepeatingJob.swift; sourceTree = "<group>"; };
 		E4A708B22B9754B7002C692E /* RepeatingJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingJob.swift; sourceTree = "<group>"; };
 		E4AD34F32B56E075004976CA /* AgentModulesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentModulesManager.swift; sourceTree = "<group>"; };
@@ -1743,6 +1753,7 @@
 				4B5A5BB42D5E4E33009DA0D5 /* Events */,
 				4B5A5BB82D5E4E33009DA0D5 /* Modules */,
 				4B5A5BBA2D5E4E33009DA0D5 /* Resources */,
+				E4A5374C2DA6661D002323E2 /* Runtime Attributes */,
 			);
 			path = SplunkSharedProtocols;
 			sourceTree = "<group>";
@@ -1937,9 +1948,12 @@
 		4B5A5CAA2D60ED3D009DA0D5 /* SplunkOpenTelemetry */ = {
 			isa = PBXGroup;
 			children = (
+				E4A537472DA6595B002323E2 /* Model */,
 				4B5A5C9F2D60ED3D009DA0D5 /* API */,
 				4B5A5CA22D60ED3D009DA0D5 /* Log Event Processor */,
+				E4A537532DA68F17002323E2 /* Log Processors */,
 				4B5A5CA42D60ED3D009DA0D5 /* Resources */,
+				E4A537402DA655AF002323E2 /* Span Processors */,
 				4B5A5CA62D60ED3D009DA0D5 /* Trace Processor */,
 				4B5A5CA82D60ED3D009DA0D5 /* Utils */,
 				4B5A5CA92D60ED3D009DA0D5 /* OTel.swift */,
@@ -2577,6 +2591,46 @@
 			path = "Repeating jobs";
 			sourceTree = "<group>";
 		};
+		E4A537402DA655AF002323E2 /* Span Processors */ = {
+			isa = PBXGroup;
+			children = (
+				E4A537412DA655E2002323E2 /* OLTPAttributesSpanProcessor.swift */,
+			);
+			path = "Span Processors";
+			sourceTree = "<group>";
+		};
+		E4A537472DA6595B002323E2 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		E4A5374C2DA6661D002323E2 /* Runtime Attributes */ = {
+			isa = PBXGroup;
+			children = (
+				E4A5374B2DA6661D002323E2 /* RuntimeAttributes.swift */,
+			);
+			path = "Runtime Attributes";
+			sourceTree = "<group>";
+		};
+		E4A5374E2DA66B35002323E2 /* Runtime Attributes */ = {
+			isa = PBXGroup;
+			children = (
+				E4A5374F2DA66B4F002323E2 /* AgentRuntimeAttributes.swift */,
+				E4A537512DA66DA7002323E2 /* DefaultRuntimeAttributes.swift */,
+			);
+			path = "Runtime Attributes";
+			sourceTree = "<group>";
+		};
+		E4A537532DA68F17002323E2 /* Log Processors */ = {
+			isa = PBXGroup;
+			children = (
+				E4A537542DA68F5F002323E2 /* OTLPAttributesLogRecordProcessor.swift */,
+			);
+			path = "Log Processors";
+			sourceTree = "<group>";
+		};
 		E4A708B02B975033002C692E /* Repeating jobs */ = {
 			isa = PBXGroup;
 			children = (
@@ -2738,6 +2792,7 @@
 				2AE43B3F2B861325002C4A98 /* Events */,
 				E4AD34F22B56E031004976CA /* Modules */,
 				2AE43B0A2B7FAD88002C4A98 /* Resources */,
+				E4A5374E2DA66B35002323E2 /* Runtime Attributes */,
 				E4F2E4F52B172806006EBA69 /* Session */,
 				52286CB32CD53FFA001F8A31 /* ScreenContent */,
 				E4F2E51D2B174B7D006EBA69 /* State */,
@@ -3722,6 +3777,7 @@
 				2A03CF5F2D9C31C100CF3BC9 /* API-1.0-AgentConfiguration.swift in Sources */,
 				E4F2E5282B179658006EBA69 /* String+NanoID.swift in Sources */,
 				E4AD34F62B56E4BB004976CA /* DefaultModulesManager.swift in Sources */,
+				E4A537502DA66B5A002323E2 /* AgentRuntimeAttributes.swift in Sources */,
 				4BB680E92B7940C0000A54D4 /* Status+Conversions.swift in Sources */,
 				E426CFAA2B28C18000094AC0 /* SessionsModel.swift in Sources */,
 				E42634832BB44B0F003706A9 /* SplunkAgent.docc in Sources */,
@@ -3736,6 +3792,7 @@
 				E4B737DD2BBECBFB00086A93 /* PlatformSupportScope.swift in Sources */,
 				C73FF4872B6CE749009C53FF /* ConfigurationHandler+LoadRemote.swift in Sources */,
 				C73FF4942B6CE777009C53FF /* Endpoint.swift in Sources */,
+				E4A537522DA66DB6002323E2 /* DefaultRuntimeAttributes.swift in Sources */,
 				E4E4B1162BA1A0DA001CB6B3 /* SessionReplay+RecordingMask.swift in Sources */,
 				52286CB52CD5404A001F8A31 /* ScreenName.swift in Sources */,
 				C73FF4972B6CE777009C53FF /* AgentAPIClient.swift in Sources */,
@@ -3850,6 +3907,7 @@
 				4B9640A42D60FD1C009A2E7F /* AgentResources.swift in Sources */,
 				4B9640A52D60FD1C009A2E7F /* Event.swift in Sources */,
 				4B9640A62D60FD1C009A2E7F /* TraceProcessor.swift in Sources */,
+				E4A5374D2DA6661D002323E2 /* RuntimeAttributes.swift in Sources */,
 				4B9640A72D60FD1C009A2E7F /* EventAttributeValue.swift in Sources */,
 				4B9640A82D60FD1C009A2E7F /* LogEventProcessor.swift in Sources */,
 				4B9640A92D60FD1C009A2E7F /* ModuleConfiguration.swift in Sources */,
@@ -3919,7 +3977,9 @@
 				4B9642162D61375E009A2E7F /* ApiPaths.swift in Sources */,
 				4B9642172D61375E009A2E7F /* OTLPLogEventProcessor.swift in Sources */,
 				4B9642182D61375E009A2E7F /* OTLPLogEventProcessor+AgentEvent.swift in Sources */,
+				E4A537552DA68F5F002323E2 /* OTLPAttributesLogRecordProcessor.swift in Sources */,
 				4B9642192D61375E009A2E7F /* OTLPTraceProcessor.swift in Sources */,
+				E4A537422DA655E2002323E2 /* OLTPAttributesSpanProcessor.swift in Sources */,
 				4B96421A2D61375E009A2E7F /* OTel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8968,7 +9028,7 @@
 		};
 		4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/smartlook/smartlook-ios-sdk-private";
+			repositoryURL = "git@github.com:smartlook/smartlook-ios-sdk-private.git";
 			requirement = {
 				branch = develop;
 				kind = branch;

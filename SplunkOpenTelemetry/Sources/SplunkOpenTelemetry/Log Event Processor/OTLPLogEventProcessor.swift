@@ -47,7 +47,12 @@ public class OTLPLogEventProcessor: LogEventProcessor {
 
     // MARK: - Initialization
     
-    required public init(with logsEndpoint: URL, resources: AgentResources, debugEnabled: Bool) {
+    required public init(
+        with logsEndpoint: URL,
+        resources: AgentResources,
+        runtimeAttributes: RuntimeAttributes,
+        debugEnabled: Bool
+    ) {
 
         let configuration = OtlpConfiguration()
         let envVarHeaders = [(String, String)]()
@@ -60,8 +65,14 @@ public class OTLPLogEventProcessor: LogEventProcessor {
             envVarHeaders: envVarHeaders
         )
 
-        // Initialise LogRecordProcessor
-        let simpleLogRecordProcessor = SimpleLogRecordProcessor(logRecordExporter: backgroundLogExporter)
+        // Initialize LogRecordProcessor
+        let simpleLogRecordProcessor = SimpleLogRecordProcessor(
+            logRecordExporter: backgroundLogExporter
+        )
+        let attributesLogRecordProcessor = OTLPAttributesLogRecordProcessor(
+            proxy: simpleLogRecordProcessor,
+            with: runtimeAttributes
+        )
 
         // Build Resources
         var resource = Resource()
@@ -74,7 +85,7 @@ public class OTLPLogEventProcessor: LogEventProcessor {
 
         // Initialize logger provider
         var loggerProviderBuilder = LoggerProviderBuilder()
-            .with(processors: [simpleLogRecordProcessor])
+            .with(processors: [attributesLogRecordProcessor])
             .with(resource: resource)
 
         // Initialize optional debug exporter

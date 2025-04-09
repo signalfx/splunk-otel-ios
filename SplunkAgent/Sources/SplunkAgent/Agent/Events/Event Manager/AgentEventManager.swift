@@ -30,7 +30,7 @@ protocol AgentEventManager {
     var logEventProcessor: LogEventProcessor { get }
 
     /// Trace processor to process Traces.
-    var traceProcesssor: TraceProcessor { get }
+    var traceProcessor: TraceProcessor { get }
 
 
     // MARK: - Initialization
