@@ -39,7 +39,8 @@ let package = Package(
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkANRReporter",
-                "SplunkAppStart"
+                "SplunkAppStart",
+                "SplunkCustomTracking"
             ],
             path: "SplunkAgent",
             sources: ["Sources"],
@@ -138,35 +139,22 @@ let package = Package(
         ),
         
         
-        // MARK: Splunk Custom Data
-        
+        // MARK: Splunk Custom Tracking
+
         .target(
-            name: "SplunkCustomData",
+            name: "SplunkCustomTracking",
             dependencies: [
+                "SplunkLogger",
+                "SplunkOpenTelemetry",
                 "SplunkSharedProtocols"
             ],
-            path: "SplunkCustomData/Sources"
+            path: "SplunkCustomTracking",
+            sources: ["Sources"],
         ),
         .testTarget(
-            name: "SplunkCustomDataTests",
-            dependencies: ["SplunkCustomData"],
-            path: "SplunkCustomData/Tests"
-        ),
-        
-        
-        // MARK: Splunk Error Reporting
-        
-        .target(
-            name: "SplunkErrorReporting",
-            dependencies: [
-                "SplunkSharedProtocols"
-            ],
-            path: "SplunkErrorReporting/Sources"
-        ),
-        .testTarget(
-            name: "SplunkErrorReportingTests",
-            dependencies: ["SplunkErrorReporting"],
-            path: "SplunkErrorReporting/Tests"
+            name: "SplunkCustomTrackingTests",
+            dependencies: ["SplunkCustomTracking"],
+            path: "SplunkCustomTracking/Tests"
         ),
         
         
