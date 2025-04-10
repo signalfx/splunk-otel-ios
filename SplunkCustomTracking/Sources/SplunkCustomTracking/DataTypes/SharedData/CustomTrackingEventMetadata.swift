@@ -31,12 +31,12 @@ enum CustomTrackingEventType {
 
 struct CustomTrackingEventMetadata: ModuleEventMetadata {
 
-    // MARK: - Common Properties
+    // MARK: - Common properties
     let timestamp: Date
     let id: String
     let eventType: CustomTrackingEventType
 
-    // MARK: - Specific Attributes
+    // MARK: - Specific attributes
     private let specificAttributes: [String: String]
 
     // MARK: - Initialization
@@ -47,13 +47,12 @@ struct CustomTrackingEventMetadata: ModuleEventMetadata {
         self.specificAttributes = attributes
     }
 
-    // Retrieve specificAttributes dictionary
     func getAttributes() -> [String: String] {
         return specificAttributes
     }
 }
 
-// MARK: - Equatable Conformance
+// MARK: - Equatable conformance
 extension CustomTrackingEventMetadata: Equatable {
     static func == (lhs: CustomTrackingEventMetadata, rhs: CustomTrackingEventMetadata) -> Bool {
         return lhs.id == rhs.id && lhs.timestamp == rhs.timestamp && lhs.eventType == rhs.eventType
