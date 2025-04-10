@@ -17,21 +17,17 @@ limitations under the License.
 
 import Foundation
 
-/// A dummy configuration handler. It will be used when we do not fully support the target platform.
-final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
+/// Represents a single timed event.
+struct AppStartEvent {
+    let name: String
+    let timestamp: Date
 
-    // MARK: - Configuration
+    static func sortedEvents(from events: [String: Date]) -> [AppStartEvent] {
 
-    var configurationData: Data? {
-        return nil
-    }
+        let appStartEvents = events.map { name, timestamp in
+            AppStartEvent(name: name, timestamp: timestamp)
+        }.sorted { $0.timestamp < $1.timestamp }
 
-    let configuration: any AgentConfigurationProtocol
-
-
-    // MARK: - Intialization
-
-    init(for configuration: any AgentConfigurationProtocol) {
-        self.configuration = configuration
+        return appStartEvents
     }
 }

@@ -23,7 +23,7 @@ final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
 
     // MARK: - Internal properties
 
-    private(set) var configuration: AgentConfigurationProtocol
+    private(set) var configuration: any AgentConfigurationProtocol
 
     let apiClient: AgentAPIClient
     let storage: KeyValueStorage
@@ -45,7 +45,7 @@ final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
 
     // MARK: - Initialization
 
-    init(for configuration: AgentConfigurationProtocol, apiClient: AgentAPIClient, storage: KeyValueStorage = UserDefaultsStorage()) {
+    init(for configuration: any AgentConfigurationProtocol, apiClient: AgentAPIClient, storage: KeyValueStorage = UserDefaultsStorage()) {
         self.configuration = configuration
         self.apiClient = apiClient
         self.storage = storage

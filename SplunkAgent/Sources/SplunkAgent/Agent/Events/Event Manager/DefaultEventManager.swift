@@ -56,7 +56,7 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Initialization
 
-    required init(with configuration: AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
+    required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
         self.agent = agent
         self.eventsModel = eventsModel
 

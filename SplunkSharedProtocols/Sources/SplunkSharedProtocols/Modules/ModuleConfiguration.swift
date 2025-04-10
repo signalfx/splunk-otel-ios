@@ -18,4 +18,4 @@ limitations under the License.
 import Foundation
 
 /// The basic protocol for user configuration of the module.
-public protocol ModuleConfiguration {}
+public protocol ModuleConfiguration: Encodable {}

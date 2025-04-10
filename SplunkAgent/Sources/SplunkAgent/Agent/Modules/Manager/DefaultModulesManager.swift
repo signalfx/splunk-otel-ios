@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+internal import SplunkLogger
 internal import SplunkSharedProtocols
 
 class DefaultModulesManager: AgentModulesManager {
@@ -25,6 +26,9 @@ class DefaultModulesManager: AgentModulesManager {
     private var modulesPool: AgentModulesPool.Type
     private var modulesDataConsumer: ((any ModuleEventMetadata, any ModuleEventData) -> Void)?
 
+    private var initializationTimes: [String: Date] = [:]
+    private var configurationDescription: [String: String] = [:]
+    private let internalLogger = InternalLogger(configuration: .agent(category: "ModulesManager"))
 
     // MARK: - Public
 
@@ -64,6 +68,8 @@ class DefaultModulesManager: AgentModulesManager {
             with: configurations,
             remoteConfigurations: remoteConfigurations
         )
+
+        prepareModulesConfigurationDescription(with: configurations)
     }
 
     /// Helper method for generic module initialization.
@@ -107,6 +113,9 @@ class DefaultModulesManager: AgentModulesManager {
                 with: configuration,
                 remoteConfiguration: remoteConfiguration
             )
+
+            // Report initialization timestamp
+            initializationTimes[String(describing: type(of: module))] = Date()
         }
     }
 
@@ -166,6 +175,44 @@ class DefaultModulesManager: AgentModulesManager {
         // Forward request into corresponding module
         if let module {
             module.deleteData(for: metadata)
+        }
+    }
+
+
+    // MARK: - Metrics
+
+    var modulesInitializationTimes: [String: Date] {
+        return initializationTimes
+    }
+
+    var modulesConfigurationDescription: [String: String] {
+        return configurationDescription
+    }
+
+    /// Calculates modules configuration description, in a format of a `[String: String]` dictionary,
+    /// with `"ModuleName.propertyName"` as a key and the property's value as a value.
+    private func prepareModulesConfigurationDescription(with configurations: [any ModuleConfiguration]) {
+        do {
+            let jsonEncoder = JSONEncoder()
+            var description: [String: String] = [:]
+
+            for configuration in configurations {
+                if let dictionary = try JSONSerialization.jsonObject(with: jsonEncoder.encode(configuration), options: []) as? [String: Any] {
+                    for object in dictionary {
+                        let type = String(describing: type(of: configuration))
+                        let key = String(format: "%@.%@", type, object.key)
+                        let value = String(describing: object.value)
+
+                        description[key] = value
+                    }
+                }
+            }
+
+            configurationDescription = description
+        } catch {
+            internalLogger.log(level: .error) {
+                "Error when calculating modules configuration  with error message \(error.localizedDescription)."
+            }
         }
     }
 }

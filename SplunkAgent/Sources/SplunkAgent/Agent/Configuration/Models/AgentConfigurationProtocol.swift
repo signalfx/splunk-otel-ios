@@ -19,7 +19,7 @@ import Foundation
 import OpenTelemetrySdk
 
 /// Defines the properties of the agent configuration.
-protocol AgentConfigurationProtocol {
+protocol AgentConfigurationProtocol: Codable, Equatable {
 
     // MARK: - Mandatory parameters
 

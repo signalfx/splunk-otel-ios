@@ -19,24 +19,29 @@ limitations under the License.
 import XCTest
 
 extension AppStartTests {
-
-    /// Checks determined type in a destination matches checked type.
     func checkDeterminedType(_ checkedType: AppStartType, in destination: DebugDestination) throws {
-        let type = try XCTUnwrap(destination.type)
-        let startTime = try XCTUnwrap(destination.startTime)
-        let endTime = try XCTUnwrap(destination.endTime)
-
+        let storedAppStart = try XCTUnwrap(destination.storedAppStart)
+        
+        let type = try XCTUnwrap(storedAppStart.type)
+        let startTime = try XCTUnwrap(storedAppStart.start)
+        let endTime = try XCTUnwrap(storedAppStart.end)
+        
         XCTAssertTrue(type == checkedType)
-
+        
         let duration = endTime.timeIntervalSince(startTime)
         XCTAssertTrue(duration > 0.0)
         XCTAssertTrue(duration < 60.0)
     }
 
-    /// Checks whether the determied type in the destination is not determined.
+    func checkDates(in destination: DebugDestination) throws {
+        let storedAppStart = try XCTUnwrap(destination.storedAppStart)
+        
+        let timeInterval = storedAppStart.end.timeIntervalSince(storedAppStart.start)
+        XCTAssertTrue(timeInterval > 0.0)
+        XCTAssertTrue(timeInterval < 60.0)
+    }
+
     func checkNotDeterminedType(in destination: DebugDestination) throws {
-        XCTAssertTrue(destination.type == nil)
-        XCTAssertTrue(destination.startTime == nil)
-        XCTAssertTrue(destination.endTime == nil)
+        XCTAssertTrue(destination.storedAppStart == nil)
     }
 }

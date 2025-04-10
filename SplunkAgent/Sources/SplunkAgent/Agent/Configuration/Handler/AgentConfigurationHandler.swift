@@ -24,5 +24,5 @@ protocol AgentConfigurationHandler {
     var configurationData: Data? { get }
 
     /// Encoded configuration model from configurationData
-    var configuration: AgentConfigurationProtocol { get }
+    var configuration: any AgentConfigurationProtocol { get }
 }
