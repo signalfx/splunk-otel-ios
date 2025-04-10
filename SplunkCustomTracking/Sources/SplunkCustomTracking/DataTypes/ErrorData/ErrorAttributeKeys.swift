@@ -21,7 +21,7 @@ import SplunkSharedProtocols
 
 // MARK: - AttributeKey helper
 
-/// Protocol for type-safe attribute keys
+
 public protocol AttributeKey {
     var rawValue: String { get }
 }
@@ -29,7 +29,7 @@ public protocol AttributeKey {
 
 // MARK: - ErrorAttributeKeys
 
-/// Namespace containing OpenTelemetry semantic convention keys for error reporting
+/// Namespace with OpenTelemetry semantic convention keys for error reporting
 public enum ErrorAttributeKeys {
     /// Exception-specific attribute keys
     public enum Exception: String, AttributeKey {
@@ -40,7 +40,7 @@ public enum ErrorAttributeKeys {
         case escaped = "exception.escaped"
     }
     
-    /// ErrorCode-specific attribute keys... did not use `Code` here because Xcode flags it as reserved
+    /// ErrorCode-specific attribute keys
     public enum ErrorCode: String, AttributeKey {
         case namespace = "code.namespace"
     }
@@ -53,7 +53,7 @@ public enum ErrorAttributeKeys {
 }
 
 
-// MARK: - Dictionary Convenience Extensions
+// MARK: - Dictionary convenience extension
 
 extension Dictionary where Key == String, Value == EventAttributeValue {
     /// Initialize a dictionary from attribute keys

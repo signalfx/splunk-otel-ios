@@ -674,6 +674,9 @@
 		520067062DAED2F600444346 /* SlowFrameDetector+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SlowFrameDetector+Module.swift"; sourceTree = "<group>"; };
 		520067072DAED2F600444346 /* SlowFrameDetectorConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorConfiguration.swift; sourceTree = "<group>"; };
 		5200670A2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMetadataSlowFrameDetector.swift; sourceTree = "<group>"; };
+		52194E442DA7331C00A08C47 /* MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributes.swift; sourceTree = "<group>"; };
+		52194E452DA73D9000A08C47 /* CustomErrorTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomErrorTracking.swift; sourceTree = "<group>"; };
+		52194E462DA7503B00A08C47 /* SplunkTrackableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackableData.swift; sourceTree = "<group>"; };
 		52286CB42CD54045001F8A31 /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
 		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorDestination.swift; sourceTree = "<group>"; };
@@ -681,7 +684,7 @@
 		52B25E7E2DA6F30C006C34A5 /* SplunkCustomData.xcscheme */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SplunkCustomData.xcscheme; sourceTree = "<group>"; };
 		52B25E812DA6F30C006C34A5 /* xcschememanagement.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = xcschememanagement.plist; sourceTree = "<group>"; };
 		52B25E872DA6F30C006C34A5 /* CustomTrackingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingConfiguration.swift; sourceTree = "<group>"; };
-		52B25E892DA6F30C006C34A5 /* CustomTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTracking.swift; sourceTree = "<group>"; };
+		52B25E892DA6F30C006C34A5 /* CustomDataTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDataTracking.swift; sourceTree = "<group>"; };
 		52B25E8A2DA6F30C006C34A5 /* CustomTracking+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomTracking+Module.swift"; sourceTree = "<group>"; };
 		52B25E8C2DA6F30C006C34A5 /* LogDataEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDataEmitter.swift; sourceTree = "<group>"; };
 		52B25E8D2DA6F30C006C34A5 /* SpanDataEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDataEmitter.swift; sourceTree = "<group>"; };
@@ -696,9 +699,9 @@
 		52B25E992DA6F30C006C34A5 /* CustomTrackingEventData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingEventData.swift; sourceTree = "<group>"; };
 		52B25E9A2DA6F30C006C34A5 /* CustomTrackingEventMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingEventMetadata.swift; sourceTree = "<group>"; };
 		52B25E9D2DA6F30C006C34A5 /* SplunkTrackable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackable.swift; sourceTree = "<group>"; };
-		52B25E9E2DA6F30C006C34A5 /* TrackableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackableData.swift; sourceTree = "<group>"; };
-		52B25E9F2DA6F30C006C34A5 /* TrackableIssue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackableIssue.swift; sourceTree = "<group>"; };
+		52B25E9F2DA6F30C006C34A5 /* SplunkTrackableIssue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackableIssue.swift; sourceTree = "<group>"; };
 		52B25EA32DA6F30C006C34A5 /* SplunkCustomTrackingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkCustomTrackingTests.swift; sourceTree = "<group>"; };
+		52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkCustomTracking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB22BA9D424000CC11B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -812,6 +815,14 @@
 		E4FAEEB02B6A51AA008D4E6E /* DefaultModulesManagerTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultModulesManagerTestBuilder.swift; sourceTree = "<group>"; };
 		E4FAEEB62B6A9F81008D4E6E /* RemoteConfiguration.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = RemoteConfiguration.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		52B948F62DA7625E00C75635 /* SplunkCustomTracking */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SplunkCustomTracking;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		3384F29F2AC879E900512D79 /* Frameworks */ = {
@@ -1001,6 +1012,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		52B948F22DA7625E00C75635 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E46896262B21C85800727A6A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1142,6 +1160,7 @@
 				E4E9747A2B1643EE00ACB469 /* Sources */,
 				E46896332B21C8FF00727A6A /* Tests */,
 				E4F2E4EC2B1721CB006EBA69 /* Tools */,
+				52B948F62DA7625E00C75635 /* SplunkCustomTracking */,
 				3384F2A32AC879E900512D79 /* Products */,
 				E45F8C952BC5881E007AC144 /* Packages */,
 				526521F42CB8937800DB3BB9 /* Frameworks */,
@@ -1173,6 +1192,7 @@
 				4B9642682D613A88009A2E7F /* SplunkSessionReplayProxyTests.xctest */,
 				4B385B2F2D94C55A005CF4C9 /* SplunkAppStart.framework */,
 				4B385B362D94C55B005CF4C9 /* SplunkAppStartTests.xctest */,
+				52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2117,7 +2137,8 @@
 		52B25E8B2DA6F30C006C34A5 /* CustomTracking */ = {
 			isa = PBXGroup;
 			children = (
-				52B25E892DA6F30C006C34A5 /* CustomTracking.swift */,
+				52194E452DA73D9000A08C47 /* CustomErrorTracking.swift */,
+				52B25E892DA6F30C006C34A5 /* CustomDataTracking.swift */,
 				52B25E8A2DA6F30C006C34A5 /* CustomTracking+Module.swift */,
 			);
 			path = CustomTracking;
@@ -2135,6 +2156,7 @@
 		52B25E922DA6F30C006C34A5 /* CustomData */ = {
 			isa = PBXGroup;
 			children = (
+				52194E442DA7331C00A08C47 /* MutableAttributes.swift */,
 				52B25E8F2DA6F30C006C34A5 /* CustomData.swift */,
 				52B25E902DA6F30C006C34A5 /* CustomDataEventData.swift */,
 				52B25E912DA6F30C006C34A5 /* CustomDataEventMetadata.swift */,
@@ -2176,9 +2198,9 @@
 		52B25EA02DA6F30C006C34A5 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				52194E462DA7503B00A08C47 /* SplunkTrackableData.swift */,
 				52B25E9D2DA6F30C006C34A5 /* SplunkTrackable.swift */,
-				52B25E9E2DA6F30C006C34A5 /* TrackableData.swift */,
-				52B25E9F2DA6F30C006C34A5 /* TrackableIssue.swift */,
+				52B25E9F2DA6F30C006C34A5 /* SplunkTrackableIssue.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -2863,6 +2885,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		52B948F02DA7625E00C75635 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -3319,6 +3348,29 @@
 			productReference = 4B9642682D613A88009A2E7F /* SplunkSessionReplayProxyTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		52B948F42DA7625E00C75635 /* SplunkCustomTracking */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 52B948F92DA7625E00C75635 /* Build configuration list for PBXNativeTarget "SplunkCustomTracking" */;
+			buildPhases = (
+				52B948F02DA7625E00C75635 /* Headers */,
+				52B948F12DA7625E00C75635 /* Sources */,
+				52B948F22DA7625E00C75635 /* Frameworks */,
+				52B948F32DA7625E00C75635 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				52B948F62DA7625E00C75635 /* SplunkCustomTracking */,
+			);
+			name = SplunkCustomTracking;
+			packageProductDependencies = (
+			);
+			productName = SplunkCustomTracking;
+			productReference = 52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		E46896282B21C85800727A6A /* SplunkAgentTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E46896322B21C85800727A6A /* Build configuration list for PBXNativeTarget "SplunkAgentTests" */;
@@ -3345,7 +3397,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 1630;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					3384F2A12AC879E900512D79 = {
@@ -3411,6 +3463,9 @@
 					4B9642672D613A88009A2E7F = {
 						CreatedOnToolsVersion = 16.2;
 					};
+					52B948F42DA7625E00C75635 = {
+						CreatedOnToolsVersion = 16.3;
+					};
 					E46896282B21C85800727A6A = {
 						CreatedOnToolsVersion = 15.0.1;
 					};
@@ -3456,6 +3511,7 @@
 				4B9642672D613A88009A2E7F /* SplunkSessionReplayProxyTests */,
 				4B385B2E2D94C55A005CF4C9 /* SplunkAppStart */,
 				4B385B352D94C55B005CF4C9 /* SplunkAppStartTests */,
+				52B948F42DA7625E00C75635 /* SplunkCustomTracking */,
 			);
 		};
 /* End PBXProject section */
@@ -3604,6 +3660,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B9642662D613A88009A2E7F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52B948F32DA7625E00C75635 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3971,6 +4034,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B9642802D613ABA009A2E7F /* SplunkSessionReplayProxyTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52B948F12DA7625E00C75635 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8594,6 +8664,228 @@
 			};
 			name = "Release-staticlib";
 		};
+		52B948FA2DA7625E00C75635 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		52B948FB2DA7625E00C75635 /* Debug-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-mh_dylib";
+		};
+		52B948FC2DA7625E00C75635 /* Debug-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-staticlib";
+		};
+		52B948FD2DA7625E00C75635 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		52B948FE2DA7625E00C75635 /* Release-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-mh_dylib";
+		};
+		52B948FF2DA7625E00C75635 /* Release-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-staticlib";
+		};
 		E46896302B21C85800727A6A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B536BFF2B693BED004A6C7C /* Debug-mh_dylib.xcconfig */;
@@ -8930,6 +9222,19 @@
 				4B96427C2D613A88009A2E7F /* Release */,
 				4B96427D2D613A88009A2E7F /* Release-mh_dylib */,
 				4B96427E2D613A88009A2E7F /* Release-staticlib */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		52B948F92DA7625E00C75635 /* Build configuration list for PBXNativeTarget "SplunkCustomTracking" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				52B948FA2DA7625E00C75635 /* Debug */,
+				52B948FB2DA7625E00C75635 /* Debug-mh_dylib */,
+				52B948FC2DA7625E00C75635 /* Debug-staticlib */,
+				52B948FD2DA7625E00C75635 /* Release */,
+				52B948FE2DA7625E00C75635 /* Release-mh_dylib */,
+				52B948FF2DA7625E00C75635 /* Release-staticlib */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

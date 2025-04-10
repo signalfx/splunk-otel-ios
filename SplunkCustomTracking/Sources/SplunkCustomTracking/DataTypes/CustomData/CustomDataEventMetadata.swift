@@ -16,6 +16,10 @@ limitations under the License.
 */
 
 
+
+// TODO: - This is currently not used. Maybe not needed?
+
+
 import Foundation
 import SplunkSharedProtocols
 
@@ -29,7 +33,7 @@ struct CustomDataEventMetadata: ModuleEventMetadata {
     let timestamp: Date
     let id: String
     let dataType: String
-    let category: String // Optional removal if not needed
+    let category: String // This might be the only reason to have this type... TBD
 
     // MARK: - Initialization
 

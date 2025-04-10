@@ -19,8 +19,7 @@ import Foundation
 import SplunkSharedProtocols
 
 
-// MARK: - Module Type Definitions
-
+// MARK: - Module type definitions
 
 class CustomTracking: Module {
 
@@ -35,7 +34,7 @@ class CustomTracking: Module {
 
     public required init() {}
 
-    // MARK: - Module Installation
+    // MARK: - Module installation
 
     func install(with configuration: (any SplunkSharedProtocols.ModuleConfiguration)?, remoteConfiguration: (any SplunkSharedProtocols.RemoteModuleConfiguration)?) {
         if let config = configuration as? CustomTrackingConfiguration {
@@ -44,8 +43,7 @@ class CustomTracking: Module {
     }
 
 
-    // MARK: - Module Data Handling
-
+    // MARK: - Module data handling
 
     public func onPublish(data block: @escaping (CustomTrackingEventMetadata, CustomTrackingEventData) -> Void) {
         dataConsumer = block
@@ -60,10 +58,6 @@ class CustomTracking: Module {
     }
 
     public func deleteData(for metadata: any ModuleEventMetadata) {
-        // No persistent data to clean up for error reporting
+        // TODO: - Do we need to clean up any data here? Maybe only if we had persisted something, which we do not.
     }
-
-
-
 }
-
