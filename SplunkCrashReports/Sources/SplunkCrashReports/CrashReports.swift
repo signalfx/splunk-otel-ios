@@ -91,7 +91,7 @@ public class CrashReports {
             let stackFrames = stackFramesFromCrashReport(report: report)
 
             // At this point we should send the report to the collector
-            let reportPayload =  formatCrashReport(report: report, stackFrames: stackFrames)
+            let reportPayload = formatCrashReport(report: report, stackFrames: stackFrames)
             let jsonPayload = CrashReportJSON.convertDictionaryToJSONString(reportPayload)
 
             guard let jsonPayload else {
@@ -136,7 +136,7 @@ public class CrashReports {
 
     // Starts up crash reporter if enable is true and no debugger attached
     private func initializeCrashReporter() -> Bool {
-        
+
         guard crashReporter != nil else {
             self.internalLogger.log(level: .warn) {
                 "Could not enable crash reporter: Not Installed"
@@ -161,7 +161,7 @@ public class CrashReports {
         }
         return true
     }
-    
+
     // Returns true if debugger is attached
     private func isDebuggerAttached() -> Bool {
         var debuggerIsAttached = false
