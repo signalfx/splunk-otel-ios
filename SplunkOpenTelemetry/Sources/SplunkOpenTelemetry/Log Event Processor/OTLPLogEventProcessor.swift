@@ -72,15 +72,20 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         self.resource = resource
         #endif
 
-        // Initialize logger provider
-        var loggerProviderBuilder = LoggerProviderBuilder()
-            .with(processors: [simpleLogRecordProcessor])
-            .with(resource: resource)
+        var processors: [LogRecordProcessor] = [simpleLogRecordProcessor]
 
-        // Initialize optional debug exporter
+        // Initialize optional stdout exporter
         if debugEnabled {
-            // TODO: DEMRUM-1425 - implement Logging exporter
+            let stdoutExporter = SplunkStdoutLogExporter()
+            let stdoutSpanProcessor = SimpleLogRecordProcessor(logRecordExporter: stdoutExporter)
+
+            processors.append(stdoutSpanProcessor)
         }
+
+        // Initialize logger provider
+        let loggerProviderBuilder = LoggerProviderBuilder()
+            .with(processors: processors)
+            .with(resource: resource)
 
         let loggerProvider = loggerProviderBuilder.build()
         
