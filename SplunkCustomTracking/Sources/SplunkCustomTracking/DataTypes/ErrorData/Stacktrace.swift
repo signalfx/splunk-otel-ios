@@ -7,7 +7,6 @@ import Foundation
 
 public struct Stacktrace {
 
-    // The individual frames of the stacktrace
     public let frames: [String]
 
     public init(frames: [String]) {
@@ -16,10 +15,9 @@ public struct Stacktrace {
 }
 
 
-// MARK: - Stacktrace Formatting
+// MARK: - Stacktrace formatting
 
 extension Stacktrace {
-    // Returns a formatted string representation of the stacktrace
     public var formatted: String {
         frames.joined(separator: "\n")
     }

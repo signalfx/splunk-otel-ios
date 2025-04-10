@@ -19,6 +19,9 @@ import Foundation
 import SplunkSharedProtocols
 
 
+// TODO: - This is currently not used. Maybe not needed?
+
+
 // MARK: - ErrorEventMetadata
 
 struct ErrorEventMetadata: ModuleEventMetadata {

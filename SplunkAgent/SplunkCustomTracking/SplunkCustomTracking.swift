@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,29 +16,13 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
+struct CustomTracking {
 
-// MARK: - TrackableData Protocol
+    public unowned var sharedState: AgentSharedState?
 
-public protocol TrackableData: SplunkTrackable {
-    /// Category of the data, used for grouping
-    var category: String { get }
+    // track(data:)
+    // track(error:)
 
-    /// The values to be tracked
-    var values: [String: EventAttributeValue] { get }
-
-}
-
-
-
-// MARK: - Default Implementation
-
-public extension TrackableData {
-
-    func toEventAttributes() -> [String: EventAttributeValue] {
-        var attributes = values
-
-        return attributes
-    }
 }

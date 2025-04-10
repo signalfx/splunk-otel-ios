@@ -33,7 +33,7 @@ struct ErrorData: SplunkTrackable {
         self.stacktrace = stacktrace
     }
 
-    // Implement toEventAttributes as required by the protocol
+    // protocol conformance requirement
     func toEventAttributes() -> [String: EventAttributeValue] {
         var attributes: [String: EventAttributeValue] = [
             "typeName": .string(typeName),
@@ -45,36 +45,5 @@ struct ErrorData: SplunkTrackable {
         }
 
         return attributes
-    }
-}
-
-
-extension Error {
-    func asErrorData() -> ErrorData {
-        return ErrorData(
-            typeName: String(describing: type(of: self)),
-            message: localizedDescription,
-            stacktrace: Stacktrace(frames: Thread.callStackSymbols)
-        )
-    }
-}
-
-extension NSError {
-    func asErrorData() -> ErrorData {
-        return ErrorData(
-            typeName: domain,
-            message: localizedDescription,
-            stacktrace: Stacktrace(frames: Thread.callStackSymbols)
-        )
-    }
-}
-
-extension NSException {
-    func asErrorData() -> ErrorData {
-        return ErrorData(
-            typeName: name.rawValue,
-            message: reason ?? "No reason provided",
-            stacktrace: Stacktrace(frames: callStackSymbols)
-        )
     }
 }
