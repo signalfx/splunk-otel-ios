@@ -21,6 +21,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Security
 
+## [0.12.1](https://github.com/signalfx/splunk-otel-ios/releases/tag/0.12.1)
+
+### Fixed
+
+* Fix == for Span(s) type to Self [#264](https://github.com/signalfx/splunk-otel-ios/pull/264)
+
 ## [0.12.0](https://github.com/signalfx/splunk-otel-ios/releases/tag/0.12.0)
 
 ### Deprecated
