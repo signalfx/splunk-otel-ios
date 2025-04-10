@@ -11,7 +11,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'SplunkOtel'  
-  s.version          = '0.12.0'
+  s.version          = '0.12.1'
   s.summary          = 'Splunk OpenTelemetry pod for iOS' 
   s.description      = <<-DESC
 The Splunk RUM agent for iOS provides a Swift package that captures:
