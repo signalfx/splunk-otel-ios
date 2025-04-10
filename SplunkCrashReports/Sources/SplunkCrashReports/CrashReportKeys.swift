@@ -23,8 +23,8 @@ public class CrashReportKeys {
     static let previousAppState = "ios.state"
     static let eventName = "device.app.crash"
 
-    static let timestamp = "crash.timestamp"
-    static let actualTimestamp = "crash.observedTimestamp"
+    static let crashTimestamp = "crash.timestamp"
+    static let currentTimestamp = "crash.observedTimestamp"
     static let freeDiskSpace = "crash.freeDiskSpace"
     static let batteryLevel = "crash.batteryLevel"
     static let freeMemory = "crash.freeMemory"
@@ -36,15 +36,14 @@ public class CrashReportKeys {
     static let signalName = "signalName"
     static let faultAddress = "crash.address"
 
-    static let exceptionName = "exceptionName"
-    static let exceptionReason = "exceptionReason"
-    static let exceptionStackFrames = "exceptionStackFrames"
+    static let exceptionName = "exception.type"
+    static let exceptionReason = "exception.message"
 
     static let threads = "exception.threads"
     static let images = "exception.images"
     static let details = "details"
     static let component = "component"
-    static let errortag = "error"
+    static let status = "status"
 
     // Stack Frame
     static let instructionPointer = "instructionPointer"
@@ -57,7 +56,6 @@ public class CrashReportKeys {
     static let isCrashedThread = "crashed"
 
     // Binary Image
-    static let codeType = "codeType"
     static let baseAddress = "baseAddress"
     static let offset = "offset"
     static let imageSize = "imageSize"
