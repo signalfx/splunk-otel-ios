@@ -30,4 +30,11 @@ public protocol TraceProcessor {
     ///   - resources: Resources which enrich all Traces.
     ///   - debugEnabled: Enables logging span contents into a console.
     init(with tracesEndpoint: URL, resources: AgentResources, debugEnabled: Bool)
+
+    /// Sends Span Event to an exporter.
+    ///
+    /// - Parameters:
+    ///   - event: Event to be sent to exporter.
+    ///   - completion: Completion block, returns `true` if the event was sent correctly.
+    func sendEvent(event: any Event, completion: @escaping (Bool) -> Void)
 }
