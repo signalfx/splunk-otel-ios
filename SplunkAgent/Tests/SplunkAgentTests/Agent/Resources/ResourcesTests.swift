@@ -85,7 +85,7 @@ final class ResourcesTests: XCTestCase {
         XCTAssertFalse(osType.description.isEmpty)
 
         // Test agent version
-        let agentVersion = try XCTUnwrap(otelResource.attributes["com.splunk.rum.agent.version"])
+        let agentVersion = try XCTUnwrap(otelResource.attributes["rum.sdk.version"])
         XCTAssertFalse(agentVersion.description.isEmpty)
     }
 }

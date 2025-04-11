@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import SplunkLogger
+internal import SplunkLogger
 
 /// The class implements a single persistent key-value store
 /// using standard `UserDefaults` database services.

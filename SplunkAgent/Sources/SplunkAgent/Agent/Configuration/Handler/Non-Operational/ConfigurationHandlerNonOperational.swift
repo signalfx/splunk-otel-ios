@@ -26,12 +26,12 @@ final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
         return nil
     }
 
-    let configuration: any AgentConfiguration
+    let configuration: any AgentConfigurationProtocol
 
 
     // MARK: - Intialization
 
-    init(for configuration: AgentConfiguration) {
+    init(for configuration: AgentConfigurationProtocol) {
         self.configuration = configuration
     }
 }

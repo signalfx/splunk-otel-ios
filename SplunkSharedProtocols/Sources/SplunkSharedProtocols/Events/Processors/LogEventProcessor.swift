@@ -23,12 +23,13 @@ public protocol LogEventProcessor {
 
     // MARK: - Initialization
 
-    /// Initialise Log Event Processor by providing API base url and resources.
+    /// Initialize Log Event Processor by providing Logs API endpoint, resources, and a setting to enable debug logging.
     ///
     /// - Parameters:
-    ///   - baseURL: API base url.
+    ///   - logsEndpoint: Logs api endpoint.
     ///   - resources: Resources which enrich all Logs.
-    init(with baseURL: URL, resources: AgentResources)
+    ///   - debugEnabled: Enables logging span contents into a console.
+    init(with logsEndpoint: URL, resources: AgentResources, debugEnabled: Bool)
 
 
     // MARK: - Events

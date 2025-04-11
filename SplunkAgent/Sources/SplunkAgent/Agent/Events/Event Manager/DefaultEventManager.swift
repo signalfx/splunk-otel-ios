@@ -16,11 +16,11 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import SplunkCrashReports
-@_implementationOnly import SplunkLogger
-@_implementationOnly import SplunkOpenTelemetry
-@_implementationOnly import CiscoSessionReplay
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkCrashReports
+internal import SplunkLogger
+internal import SplunkOpenTelemetry
+internal import CiscoSessionReplay
+internal import SplunkSharedProtocols
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
 ///
@@ -56,11 +56,9 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Initialization
 
-    required init(with configuration: AgentConfiguration, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
+    required init(with configuration: AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
         self.agent = agent
         self.eventsModel = eventsModel
-
-        let appName = configuration.appName ?? ""
 
         let deviceManufacturer = "Apple"
 
@@ -71,9 +69,10 @@ class DefaultEventManager: AgentEventManager {
 
         // Build resources
         let resources = DefaultResources(
-            appName: appName,
-            appVersion: AppInfo.version ?? "-",
+            appName: configuration.appName,
+            appVersion: configuration.appVersion,
             appBuild: AppInfo.buildId ?? "-",
+            appDeploymentEnvironment: configuration.deploymentEnvironment,
             agentHybridType: hybridType,
             agentVersion: agentVersion,
             deviceID: DeviceInfo.deviceID ?? "-",
@@ -86,15 +85,10 @@ class DefaultEventManager: AgentEventManager {
         )
 
         // Initialize log event processor
-        logEventProcessor = OTLPLogEventProcessor(with: configuration.url, resources: resources)
+        logEventProcessor = OTLPLogEventProcessor(with: configuration.logsUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
 
         // Initialize trace processor
-        traceProcesssor = OTLPTraceProcessor(with: configuration.url, resources: resources)
-
-        // Schedule job for Pulse Events
-        pulseEventJob = LifecycleRepeatingJob(interval: pulseEventInterval) { [weak self] in
-            self?.sendSessionPulseEvent()
-        }.resume()
+        traceProcesssor = OTLPTraceProcessor(with: configuration.tracesUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
 
         // Starts listening to a Session Reset nofification to send the Session Start event.
         NotificationCenter.default.addObserver(forName: DefaultSession.sessionDidResetNotification, object: nil, queue: nil) { _ in
@@ -186,25 +180,6 @@ class DefaultEventManager: AgentEventManager {
             // Mark the session start event as "sent"
             if success {
                 self.eventsModel.markSessionStartSent(sessionID)
-            }
-        }
-    }
-
-
-    // MARK: - Session Pulse event
-
-    func sendSessionPulseEvent() {
-        let sessionID = agent.currentSession.currentSessionId
-        let timestamp = Date()
-
-        let event = SessionPulseEvent(
-            sessionID: sessionID,
-            timestamp: timestamp
-        )
-
-        logEventProcessor.sendEvent(event) { success in
-            self.logger.log(level: .info) {
-                "Session Pulse event sent with success: \(success)"
             }
         }
     }

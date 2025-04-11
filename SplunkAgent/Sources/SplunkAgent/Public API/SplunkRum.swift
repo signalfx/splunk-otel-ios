@@ -17,17 +17,18 @@ limitations under the License.
 
 import Combine
 import Foundation
+import OpenTelemetryApi
 
 
 #if canImport(SplunkCrashReports)
-    @_implementationOnly import SplunkCrashReports
+    internal import SplunkCrashReports
 #endif
-@_implementationOnly import SplunkAppStart
-@_implementationOnly import SplunkLogger
-@_implementationOnly import SplunkNetwork
-@_implementationOnly import SplunkOpenTelemetry
-@_implementationOnly import CiscoSessionReplay
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkAppStart
+internal import SplunkLogger
+internal import SplunkNetwork
+internal import SplunkOpenTelemetry
+internal import CiscoSessionReplay
+internal import SplunkSharedProtocols
 
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
@@ -36,7 +37,7 @@ public class SplunkRum: ObservableObject {
 
     let agentConfigurationHandler: AgentConfigurationHandler
 
-    var agentConfiguration: AgentConfiguration {
+    var agentConfiguration: AgentConfigurationProtocol {
         agentConfigurationHandler.configuration
     }
 
@@ -84,6 +85,12 @@ public class SplunkRum: ObservableObject {
     /// An object reflects the current state and setting used for the recording.
     public private(set) lazy var state = RuntimeState(for: self)
 
+    /// OpenTelemetry instance.
+    public var openTelemetry: OpenTelemetry {
+        return OpenTelemetry.instance
+    }
+
+
     // MARK: - Public API (Modules)
 
     /// An object that holds session replay module.
@@ -99,7 +106,7 @@ public class SplunkRum: ObservableObject {
         agentConfigurationHandler = configurationHandler
 
         // Set current instance status
-        currentStatus = .notRunning(.notEnabled)
+        currentStatus = .notRunning(.notInstalled)
 
         // Assign identification
         currentUser = user
@@ -119,7 +126,7 @@ public class SplunkRum: ObservableObject {
     ///   - moduleConfigurations: An array of individual module-specific configurations.
     ///
     /// - Returns: A newly initialized `SplunkRum` instance.
-    public static func install(with configuration: Configuration, moduleConfigurations: [Any]? = nil) -> SplunkRum {
+    public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) -> SplunkRum {
         // Only one instance is allowed
         if let sharedInstance = instance {
             return sharedInstance
@@ -185,18 +192,6 @@ public class SplunkRum: ObservableObject {
         return agent
     }
 
-    private static func createConfigurationHandler(for configuration: AgentConfiguration) -> AgentConfigurationHandler {
-        // If the platform is not fully supported, we use the dummy handler.
-        guard isSupportedPlatform else {
-            return ConfigurationHandlerNonOperational(for: configuration)
-        }
-
-        return ConfigurationHandler(
-            for: configuration,
-            apiClient: APIClient(baseUrl: configuration.url)
-        )
-    }
-
 
     // MARK: - Modules customization
 
@@ -230,7 +225,17 @@ public class SplunkRum: ObservableObject {
         networkModule?.sharedState = sharedState
 
         // We need the endpoint url to manage trace exclusion logic
-        networkModule?.traceEndpointURL = agentConfiguration.url
+        var exludedEndpoints: [URL] = [
+            agentConfiguration.tracesUrl,
+            agentConfiguration.logsUrl,
+            agentConfiguration.configUrl
+        ]
+
+        if let sessionReplayUrl = agentConfiguration.sessionReplayUrl {
+            exludedEndpoints.append(sessionReplayUrl)
+        }
+
+        networkModule?.excludedEndpoints = exludedEndpoints
     }
 
     /// Configure Crash Reports module with shared state.
@@ -254,6 +259,21 @@ public class SplunkRum: ObservableObject {
         let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
 
         appStartModule?.sharedState = sharedState
+    }
+
+
+    // MARK: - Configuration handler
+
+    private static func createConfigurationHandler(for configuration: AgentConfigurationProtocol) -> AgentConfigurationHandler {
+        // If the platform is not fully supported, we use the dummy handler.
+        guard isSupportedPlatform else {
+            return ConfigurationHandlerNonOperational(for: configuration)
+        }
+
+        return ConfigurationHandler(
+            for: configuration,
+            apiClient: APIClient(baseUrl: configuration.configUrl)
+        )
     }
 
 

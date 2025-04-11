@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkSharedProtocols
 
 /// Event manager publishes Module data, sends other events to exporters.
 ///
@@ -41,7 +41,7 @@ protocol AgentEventManager {
     ///   - configuration: Agent Configuration object.
     ///   - agent: Agent object, used to obtain Session information and User information.
     ///   - eventsModel: Events model object to store persisted events metadata.
-    init(with configuration: AgentConfiguration, agent: SplunkRum, eventsModel: EventsModel)
+    init(with configuration: AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel)
 
 
     // MARK: - Module Events
@@ -60,10 +60,4 @@ protocol AgentEventManager {
 
     /// Sends session replay start event.
     func sendSessionStartEvent()
-
-
-    // MARK: - Session Pulse event
-
-    /// Sends session replay pulse event.
-    func sendSessionPulseEvent()
 }

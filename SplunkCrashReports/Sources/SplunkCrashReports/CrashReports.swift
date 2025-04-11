@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 import SplunkLogger
-@_implementationOnly import ADCrashReporter
+internal import SplunkCrashReporter
 
 public class CrashReports {
 
@@ -27,7 +27,7 @@ public class CrashReports {
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
 
-    private var crashReporter: APPDPLCrashReporter?
+    private var crashReporter: SPLKPLCrashReporter?
     private let internalLogger = InternalLogger(configuration: .crashReporter(category: "CrashReporter"))
 
     // A reference to the Module's data publishing callback.
@@ -47,8 +47,8 @@ public class CrashReports {
         let signalHandlerType = PLCrashReporterSignalHandlerType.mach
 #endif
 
-        let signalConfig = APPDPLCrashReporterConfig(signalHandlerType: signalHandlerType, symbolicationStrategy: [])
-        guard let crashReporterInstance = APPDPLCrashReporter(configuration: signalConfig) else {
+        let signalConfig = SPLKPLCrashReporterConfig(signalHandlerType: signalHandlerType, symbolicationStrategy: [])
+        guard let crashReporterInstance = SPLKPLCrashReporter(configuration: signalConfig) else {
             self.internalLogger.log(level: .error) {
                 "PLCrashReporter failed to initialize."
             }
@@ -83,7 +83,7 @@ public class CrashReports {
             let data = try crashReporter?.loadPendingCrashReportDataAndReturnError()
 
             // Retrieving crash reporter data.
-            let report = try APPDPLCrashReport(data: data)
+            let report = try SPLKPLCrashReport(data: data)
 
             // And collect stack frames
             let stackFrames = stackFramesFromCrashReport(report: report)
@@ -188,12 +188,12 @@ public class CrashReports {
 
     // Report formatting
     
-    private func stackFramesFromCrashReport(report: APPDPLCrashReport) -> Dictionary<String, Any> {
+    private func stackFramesFromCrashReport(report: SPLKPLCrashReport) -> Dictionary<String, Any> {
         var stackFrames: [String:Any] = [:]
         var threads: Array<Any> = []
 
         for thread in report.threads {
-            if let thread = thread as? APPDPLCrashReportThreadInfo {
+            if let thread = thread as? SPLKPLCrashReportThreadInfo {
                 let thr = threadFromReport(thread: thread, report: report)
 
                 threads.append(thr)
@@ -208,7 +208,7 @@ public class CrashReports {
         return stackFrames
     }
     
-    private func formatCrashReport(report: APPDPLCrashReport, stackFrames: Dictionary<String, Any>) -> Dictionary<String, Any> {
+    private func formatCrashReport(report: SPLKPLCrashReport, stackFrames: Dictionary<String, Any>) -> Dictionary<String, Any> {
         
         var reportDict: [String:Any] = [:]
         
@@ -320,7 +320,7 @@ public class CrashReports {
         return crashPayload
     }
     
-    private func cpuTypeDictionary(cpuType: APPDPLCrashReportProcessorInfo) -> Dictionary<String, String>  {
+    private func cpuTypeDictionary(cpuType: SPLKPLCrashReportProcessorInfo) -> Dictionary<String, String>  {
         
         var dictionary: [String:String] = [:]
         dictionary.updateValue(String(cpuType.type), forKey: CrashReportKeys.cType)
@@ -328,22 +328,22 @@ public class CrashReports {
         return dictionary
     }
     
-    private func cpuTypeFromReport(report: APPDPLCrashReport) -> Dictionary<String, String> {
+    private func cpuTypeFromReport(report: SPLKPLCrashReport) -> Dictionary<String, String> {
         
         for image in report.images {
-            if let image = image as? APPDPLCrashReportBinaryImageInfo, image.codeType != nil {
+            if let image = image as? SPLKPLCrashReportBinaryImageInfo, image.codeType != nil {
                 return cpuTypeDictionary(cpuType: image.codeType)
             }
         }
         return cpuTypeDictionary(cpuType: report.machineInfo.processorInfo)
     }
     
-    private func convertStackFrames(frames: Array<Any>, report: APPDPLCrashReport) -> Array<Any> {
+    private func convertStackFrames(frames: Array<Any>, report: SPLKPLCrashReport) -> Array<Any> {
         
         var stackFrames: Array<Any> = []
         var isFirstTime: Bool = true
         
-        guard let frames = frames as? [APPDPLCrashReportStackFrameInfo] else {
+        guard let frames = frames as? [SPLKPLCrashReportStackFrameInfo] else {
             // TODO: - Check the correctness of the return value.
             self.internalLogger.log(level: .error) {
                 "CrashReporter received incorrect stackFrame type."
@@ -377,7 +377,7 @@ public class CrashReports {
         return stackFrames
     }
     
-    private func threadFromReport(thread: APPDPLCrashReportThreadInfo, report: APPDPLCrashReport) -> Dictionary<String, Any> {
+    private func threadFromReport(thread: SPLKPLCrashReportThreadInfo, report: SPLKPLCrashReport) -> Dictionary<String, Any> {
         
         var oneThread: [String:Any] = [:]
         oneThread[CrashReportKeys.details] = thread
@@ -393,7 +393,7 @@ public class CrashReports {
             var threadDictionary: [String:Any] = [:]
             threadDictionary[CrashReportKeys.stackFrames] = thread[CrashReportKeys.stackFrames]
 
-            if let info = thread[CrashReportKeys.details] as? APPDPLCrashReportThreadInfo {
+            if let info = thread[CrashReportKeys.details] as? SPLKPLCrashReportThreadInfo {
                 threadDictionary[CrashReportKeys.threadNumber] = info.threadNumber
                 
                 threadDictionary[threadKey] = info.crashed
@@ -403,7 +403,7 @@ public class CrashReports {
                     for reg in info.registers {
                         
                         var regDict: [String:Any] = [:]
-                        guard let regInfo = reg as? APPDPLCrashReportRegisterInfo else {
+                        guard let regInfo = reg as? SPLKPLCrashReportRegisterInfo else {
                             continue
                         }
                         
@@ -429,7 +429,7 @@ public class CrashReports {
         for image in images {
             
             var imageDictionary: [String:Any] = [:]
-            guard let image = image as? APPDPLCrashReportBinaryImageInfo else {
+            guard let image = image as? SPLKPLCrashReportBinaryImageInfo else {
                 continue
             }
                         

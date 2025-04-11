@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import SplunkSharedProtocols
+internal import SplunkSharedProtocols
 
 struct DefaultResources: AgentResources {
 
@@ -27,6 +27,8 @@ struct DefaultResources: AgentResources {
     var appVersion: String
 
     var appBuild: String
+
+    var appDeploymentEnvironment: String
 
 
     // MARK: - Agent info

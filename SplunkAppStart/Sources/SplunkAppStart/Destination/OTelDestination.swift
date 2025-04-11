@@ -40,7 +40,7 @@ struct OTelDestination: AppStartDestination {
         span.setAttribute(key: "start.type", value: typeIdentifier(for: type))
 
         if let sessionID = sharedState?.sessionId {
-            span.setAttribute(key: "splunk.rumSessionId", value: sessionID)
+            span.setAttribute(key: "session.id", value: sessionID)
         }
 
         span.setAttribute(key: "screen.name", value: "unknown")

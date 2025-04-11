@@ -71,10 +71,7 @@ extension ConfigurationHandler {
     // MARK: - Private functions
 
     private func fetchRemoteConfiguration() async throws -> Data {
-        guard let appName = configuration.appName else {
-            throw ConfigurationHandlerError.missingConfigurationAppName
-        }
-
+        let appName = configuration.appName
         let endpoint = RemoteConfigurationEndpoint(appName: appName)
 
         return try await apiClient.sendRequest(endpoint: endpoint)

@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_implementationOnly import CiscoSessionReplay
+internal import CiscoSessionReplay
 
 /// The state object implements public API for the current state of the Session Replay module.
 final class SessionReplayState: SessionReplayModuleState {

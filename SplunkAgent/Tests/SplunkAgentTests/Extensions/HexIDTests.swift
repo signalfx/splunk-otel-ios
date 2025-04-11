@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+@testable import SplunkAgent
 import XCTest
 
 final class HexIDTests: XCTestCase {
@@ -36,11 +37,11 @@ final class HexIDTests: XCTestCase {
         }
 
         // Shorter IDs must have a corresponding length
-        let shorterId = String.uniqueIdentifier(ofLength: 12)
+        let shorterId = String.uniqueHexIdentifier(ofLength: 12)
         XCTAssertTrue(shorterId.count == 12)
 
         // Longer IDs must have a corresponding length
-        let longerId = String.uniqueIdentifier(ofLength: 32)
+        let longerId = String.uniqueHexIdentifier(ofLength: 32)
         XCTAssertTrue(longerId.count == 32)
     }
 }
