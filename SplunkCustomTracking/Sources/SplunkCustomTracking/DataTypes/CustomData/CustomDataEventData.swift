@@ -16,16 +16,18 @@ limitations under the License.
 */
 
 import Foundation
-
-public struct EventMetadataCustomData {
-
-
-    // MARK: - Public
-
-    public var timestamp = Date()
+import SplunkSharedProtocols
 
 
-    // MARK: - Internal
+struct CustomDataEventData: ModuleEventData {
+    private let attributes: [String: EventAttributeValue]
 
-    let id: String
+    init(customData: CustomData) {
+        self.attributes = customData.toEventAttributes()
+    }
+
+    func getAttributes() -> [String: EventAttributeValue] {
+        attributes
+    }
 }
+

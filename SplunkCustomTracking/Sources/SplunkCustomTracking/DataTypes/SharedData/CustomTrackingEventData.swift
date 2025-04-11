@@ -14,21 +14,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
+	
 import Foundation
 import SplunkSharedProtocols
 
-public struct CustomDataRemoteConfiguration: RemoteModuleConfiguration {
 
+struct CustomTrackingEventData: ModuleEventData {
+    private let attributes: [String: EventAttributeValue]
 
-    // MARK: - Public
-
-    public var enabled: Bool
-
-
-    // MARK: init()
-
-    public init?(from data: Data) {
-        enabled = true
+    init(data: SplunkTrackable) {
+        self.attributes = data.toEventAttributes()
+    }
+    
+    func getAttributes() -> [String: EventAttributeValue] {
+        return attributes
     }
 }

@@ -18,19 +18,35 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-public struct CustomDataConfiguration: ModuleConfiguration {
+
+// TODO: - This is currently not used. Maybe not needed?
 
 
-    // MARK: - Public
+// MARK: - ErrorEventMetadata
 
-    public var enabled: Bool
-    public var threshold: CFTimeInterval
+struct ErrorEventMetadata: ModuleEventMetadata {
 
+    // MARK: - Properties
 
-    // MARK: init()
+    let timestamp: Date
+    let id: String
+    let errorType: String
 
-    public init(enabled: Bool, threshold: CFTimeInterval = 2.0) {
-        self.enabled = enabled
-        self.threshold = threshold
+    // MARK: - Initialization
+
+    init(timestamp: Date = Date(), errorType: String) {
+        self.timestamp = timestamp
+        self.id = UUID().uuidString
+        self.errorType = errorType
     }
 }
+
+
+// MARK: - Equatable Conformance
+
+extension ErrorEventMetadata: Equatable {
+    static func == (lhs: ErrorEventMetadata, rhs: ErrorEventMetadata) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+

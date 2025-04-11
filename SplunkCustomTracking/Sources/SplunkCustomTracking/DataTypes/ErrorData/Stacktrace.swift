@@ -16,25 +16,25 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 
 
-public final class ErrorReporting {
+// MARK: - Stacktrace
 
+public struct Stacktrace {
 
-    // MARK: - Private properties
+    public let frames: [String]
 
-    private var config = ErrorReportingConfiguration(enabled: true)
-
-
-    // MARK: - ErrorReporting lifecycle
-
-    public required init() {} // see install() in Module extension for startup tasks
-
-
-    // MARK: - ErrorReporting helper functions
-
-
-    // MARK: - ErrorReporting Reporting
-
+    public init(frames: [String]) {
+        self.frames = frames
+    }
 }
+
+
+// MARK: - Stacktrace formatting
+
+extension Stacktrace {
+    public var formatted: String {
+        frames.joined(separator: "\n")
+    }
+}
+

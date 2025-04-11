@@ -18,19 +18,21 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-public struct ErrorReportingConfiguration: ModuleConfiguration {
+
+// TODO: Determine whether we can collapse CustomData and CustomDataEventData into one.
 
 
-    // MARK: - Public
+struct CustomData: SplunkTrackable {
+    var typeName: String
+    var attributes: [String: String]
 
-    public var enabled: Bool
-    public var threshold: CFTimeInterval
+    init(name: String, attributes: [String: String]) {
+        self.typeName = name
+        self.attributes = attributes
+    }
 
-
-    // MARK: init()
-
-    public init(enabled: Bool, threshold: CFTimeInterval = 2.0) {
-        self.enabled = enabled
-        self.threshold = threshold
+    // Convert attributes to EventAttributeValue
+    func toEventAttributes() -> [String: EventAttributeValue] {
+        return attributes.mapValues { .string($0) }
     }
 }

@@ -16,19 +16,25 @@ limitations under the License.
 */
 
 import Foundation
+import OpenTelemetryApi
 import SplunkSharedProtocols
 
-public struct ErrorReportingRemoteConfiguration: RemoteModuleConfiguration {
 
+struct LogDataEmitter {
 
-    // MARK: - Public
+    public func setupLogEmitter() {
+        onPublish { metadata: CustomTrackingEventMetadata, eventData: CustomTrackingEventData in
 
-    public var enabled: Bool
+            let start = Time.now()
 
+            var attributes = eventData.getAttributes()
+            attributes["component"] = "customtracking"
+            attributes["screen.name"] = "unknown"
+            attributes["session.id"] = sharedState?.sessionId ?? "unknown"
 
-    // MARK: init()
-
-    public init?(from data: Data) {
-        enabled = true
+            internalLogger.log(level: .info) {
+                "Sending custom data: \(attributes?.debugDescription ?? "none")"
+            }
+        }
     }
 }

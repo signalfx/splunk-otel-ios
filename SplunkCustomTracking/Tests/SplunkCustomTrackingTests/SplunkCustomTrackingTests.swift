@@ -15,20 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-import SplunkSharedProtocols
+@testable import SplunkCustomTracking
+import XCTest
 
+final class SplunkCustomTrackingTests: XCTestCase {
+    func testExample() throws {
+        // XCTest Documentation
+        // https://developer.apple.com/documentation/xctest
 
-public final class CustomData {
-
-
-    // MARK: - Private properties
-
-    private var config = CustomDataConfiguration(enabled: true)
-
-
-    // MARK: - CustomData lifecycle
-
-    public required init() {} // see install() in Module extension for startup tasks
-
+        // Defining Test Cases and Test Methods
+        // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
+    }
 }
