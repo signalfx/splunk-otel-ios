@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,70 +15,80 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 import Foundation
 import SplunkSharedProtocols
 import SplunkLogger
 
 
-// MARK: - String length validation helper
+// MARK: - StringError: A Custom Error Type for Strings
 
-// TODO: - Move this to a home for utility functions and let CustomDataTracking use it as well
-
-extension String {
-    func validated(forLimit maxLength: Int, allowTruncated: Bool) -> String? {
-        if self.count <= maxLength {
-            return self
-        } else if allowTruncated {
-            let truncatedValue = String(self.prefix(maxLength - 3)) + "..."
-            internalLogger.log(level: .warning) {
-                "Value for key '\(self.prefix(10))...' exceeds max length. Truncating value."
-            }
-            return truncatedValue
-        }
-        return nil
-    }
+struct StringError: Error {
+    let message: String
 }
 
 
+// MARK: - CustomErrorTracking with ConstrainedAttributes
+
 public struct CustomErrorTracking: CustomTracking {
+
     public var typeName: String
     public unowned var sharedState: AgentSharedState?
 
     private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "ErrorTracking"))
 
+
+
+    // TODO: Can we come up with an interface that is more unified? One
+    // interface would be nice. That was where SplunkTrackableIssue was
+    // trying to go. Two would be... ok. Not sure we need three.
+
+
+    
+    // Track method for SplunkTrackableIssue
     public func track(issue: SplunkTrackableIssue) {
+        // Initialize ConstrainedAttributes
+        var constrainedAttributes = ConstrainedAttributes<String>()
+
         // Obtain attributes from the issue
         let attributes = issue.toEventAttributes()
-        let maxLength = maxUserDataKeyValueLengthInChars
 
         // TODO: - Determine the correct use of this property versus the serviceName in publishData()
         issue.typeName = "error"
 
         for (key, value) in attributes {
-
-            // Validate key length
-            guard let validKey = key.validated(forLimit: maxLength, allowTruncated: false) else {
-                internalLogger.log(level: .error) {
-                    "Key '\(key)' exceeds max length. Not publishing this issue."
-                }
-                return
-            }
-
-            // Validate value length
+            // Validate and set key-value pairs using ConstrainedAttributes
             if case .string(let stringValue) = value {
-                if let validValue = stringValue.validated(forLimit: maxLength, allowTruncated: true) {
-                    attributes[validKey] = .string(validValue)
-                } else {
+                if !constrainedAttributes.setAttribute(for: key, value: stringValue) {
                     internalLogger.log(level: .warning) {
-                        "Value for key '\(validKey)' exceeds max length. Not publishing this issue."
+                        "Invalid key or value length for key '\(key)'. Not publishing this issue."
                     }
                     return
                 }
             }
+        }
 
-            publishData(data: issue, serviceName: "errorTracking")
+        // TODO: we're not even using the attributes we got off the data;
+        // we're just using the data directly. Need to figure out what to do here.
+
+        publishData(data: issue, serviceName: "errorTracking")
+    }
+
+    // Track method for Error
+    public func track(issue: Error) {
+        // Convert the Error to SplunkTrackableIssue if necessary
+        if let trackableIssue = issue as? SplunkTrackableIssue {
+            track(issue: trackableIssue)
+        } else {
+            // Handle non-SplunkTrackableIssue conforming errors
+            let customIssue = CustomError(issue: issue)
+            track(issue: customIssue)
         }
     }
-}
 
+    // Track method for String
+    public func track(issue: String) {
+        // Convert String to StringError and then call track(issue: Error)
+        let stringError = StringError(message: issue)
+        track(issue: stringError)
+    }
+}

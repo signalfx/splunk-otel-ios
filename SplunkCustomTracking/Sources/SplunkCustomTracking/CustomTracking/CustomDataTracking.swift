@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,59 +18,35 @@ limitations under the License.
 import Foundation
 
 
-// Constants for validation
-let maxUserDataKeyValueLengthInChars = 2048
-
-
-// Utility function to validate length of strings
-// TODO: - Maybe replace with validated(forLimit:allowTruncation:)
-func validateLength(of string: String, maxLength: Int) -> Bool {
-    return string.count <= maxLength
-}
-
-
 // MARK: - CustomTracking implementation
 
 class CustomDataTracking: CustomTracking {
-    override init() {
-        super.init()
-    }
+
+    public unowned var sharedState: AgentSharedState?
+
+    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "CustomDataTracking"))
 
     func track(data: SplunkTrackableData) {
 
-        let attributes = data.toEventAttributes()
+        var constrainedAttributes = ConstrainedAttributes<EventAttributeValue>()
 
         // TODO: - Determine the correct use of this property versus the serviceName in publishData()
-        data.typeName = "custom"
+        data.typeName = "data"
 
-        for (key, value) in attributes {
-            guard validateLength(of: key, maxLength: maxUserDataKeyValueLengthInChars) else {
-                print("Invalid key length: \(key)")
+        // Convert SplunkTrackableData to attributes and set them with length validation
+        for (key, value) in data.toEventAttributes() {
+            if !constrainedAttributes.setAttribute(for: key, value: value) {
+                print("Failed to set attribute due to length constraints: \(key)")
                 return
             }
-
-            // MARK: - switch used only for cases that require length validation
-
-            switch value {
-            case .string(let stringValue):
-                guard validateLength(of: stringValue, maxLength: maxUserDataKeyValueLengthInChars) else {
-                    print("Invalid value length for key: \(key)")
-                    return
-                }
-            case .data(let dataValue):
-                guard validateLength(of: dataValue, maxLength: maxUserDataKeyValueLengthInChars) else {
-                    print("Invalid data length for key: \(key)")
-                    return
-                }
-            default:
-                break
-            }
-
-            publishData(data: data, serviceName: "customDataTracking")
         }
-    }
 
-    func isValidKey(_ key: String) -> Bool {
-        return validateLength(of: key, maxLength: maxUserDataKeyValueLengthInChars)
+
+        // TODO: we're not even using the attributes we got off the data;
+        // we're just using the data directly. Need to figure out what to do here.
+
+
+        // Publish the data if all attributes are valid
+        publishData(data: data, serviceName: "customDataTracking")
     }
 }

@@ -57,5 +57,4 @@ public struct CustomTrackingRemoteConfiguration: RemoteModuleConfiguration {
         }
         self.enabled = root.configuration.tracking.enabled
     }
-
 }

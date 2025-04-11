@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,9 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 // TODO: - Check for overlap between this and the MutableAttributes class
-
 
 public protocol SplunkTrackableData: SplunkTrackable {
     var attributes: MutableAttributes { get }
@@ -32,6 +30,7 @@ public protocol SplunkTrackableData: SplunkTrackable {
 }
 
 public extension SplunkTrackableData {
+    
     // Default implementation using MutableAttributes
     func toEventAttributes() -> [String: EventAttributeValue] {
         return attributes.getAll()
