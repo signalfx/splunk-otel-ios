@@ -702,6 +702,7 @@
 		52B25E9F2DA6F30C006C34A5 /* SplunkTrackableIssue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackableIssue.swift; sourceTree = "<group>"; };
 		52B25EA32DA6F30C006C34A5 /* SplunkCustomTrackingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkCustomTrackingTests.swift; sourceTree = "<group>"; };
 		52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkCustomTracking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		52F0BA482DA8A12400133EE5 /* MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributes.swift; sourceTree = "<group>"; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB22BA9D424000CC11B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -2156,7 +2157,6 @@
 		52B25E922DA6F30C006C34A5 /* CustomData */ = {
 			isa = PBXGroup;
 			children = (
-				52194E442DA7331C00A08C47 /* MutableAttributes.swift */,
 				52B25E8F2DA6F30C006C34A5 /* CustomData.swift */,
 				52B25E902DA6F30C006C34A5 /* CustomDataEventData.swift */,
 				52B25E912DA6F30C006C34A5 /* CustomDataEventMetadata.swift */,
@@ -2188,6 +2188,7 @@
 		52B25E9C2DA6F30C006C34A5 /* DataTypes */ = {
 			isa = PBXGroup;
 			children = (
+				52F0BA472DA8A11900133EE5 /* DataHelpers */,
 				52B25E922DA6F30C006C34A5 /* CustomData */,
 				52B25E982DA6F30C006C34A5 /* ErrorData */,
 				52B25E9B2DA6F30C006C34A5 /* SharedData */,
@@ -2251,6 +2252,14 @@
 			name = SplunkCustomTracking;
 			path = ../SplunkCustomTracking;
 			sourceTree = SOURCE_ROOT;
+		};
+		52F0BA472DA8A11900133EE5 /* DataHelpers */ = {
+			isa = PBXGroup;
+			children = (
+				52F0BA482DA8A12400133EE5 /* MutableAttributes.swift */,
+			);
+			path = DataHelpers;
+			sourceTree = "<group>";
 		};
 		C703FAAD2BA9D3A2000CC11B /* AppState */ = {
 			isa = PBXGroup;

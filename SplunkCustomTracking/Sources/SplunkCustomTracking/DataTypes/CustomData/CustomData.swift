@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@ limitations under the License.
 
 import Foundation
 import SplunkSharedProtocols
+
+
+// TODO: Determine whether we can collapse CustomData and CustomDataEventData into one.
 
 
 struct CustomData: SplunkTrackable {

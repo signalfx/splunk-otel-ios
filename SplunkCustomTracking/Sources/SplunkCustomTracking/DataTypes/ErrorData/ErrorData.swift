@@ -19,8 +19,10 @@ import Foundation
 import SplunkSharedProtocols
 
 
-// MARK: - ErrorData
+// TODO: Determine whether we can collapse ErrorData and ErrorEventData into one.
 
+
+// MARK: - ErrorData
 
 struct ErrorData: SplunkTrackable {
     var typeName: String
