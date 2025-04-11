@@ -16,9 +16,7 @@ limitations under the License.
 */
 
 
-
 // TODO: - This is currently not used. Maybe not needed?
-
 
 import Foundation
 import SplunkSharedProtocols
