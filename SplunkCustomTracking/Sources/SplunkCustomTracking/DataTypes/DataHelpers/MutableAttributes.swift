@@ -123,11 +123,9 @@ extension AttributeContainer {
     // MARK: - Mutator Pattern: Modify attributes in place
 
     mutating func apply(mutatingClosure: (String, inout T) -> Void) {
-        update { attributes in
-            for (key, var value) in attributes {
-                mutatingClosure(key, &value)
-                attributes[key] = value
-            }
+        for (key, var value) in attributes {
+            mutatingClosure(key, &value)
+            attributes[key] = value
         }
     }
 }
