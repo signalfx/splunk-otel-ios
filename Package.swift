@@ -261,7 +261,21 @@ let package = Package(
             dependencies: ["SplunkOpenTelemetryBackgroundExporter"],
             path: "SplunkOpenTelemetryBackgroundExporter/Tests"
         ),
-        
+
+
+        // MARK: Splunk Interactions
+
+        .target(
+                name: "SplunkInteractions",
+                dependencies: [],
+                path: "SplunkInteractions/Sources"
+            ),
+        .testTarget(
+            name: "SplunkInteractionsTests",
+            dependencies: ["SplunkInteractions"],
+            path: "SplunkInteractions/Tests"
+        ),
+
         
         // MARK: Splunk App Start
         
