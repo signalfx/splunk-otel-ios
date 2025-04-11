@@ -41,6 +41,9 @@ class DefaultEventManager: AgentEventManager {
     // Trace processor
     var traceProcesssor: TraceProcessor
 
+    // Event processor for session replay
+    private var replayLogEventProcessor: LogEventProcessor
+
     // Agent reference
     private unowned let agent: SplunkRum
 
@@ -84,8 +87,11 @@ class DefaultEventManager: AgentEventManager {
             osType: SystemInfo.type
         )
 
-        // Initialize log event processor
-        logEventProcessor = OTLPLogEventProcessor(with: configuration.logsUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
+        // Initialize log event processor (for session replay)
+        replayLogEventProcessor = OTLPLogEventProcessor(with: configuration.logsUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
+
+        // Initialize log event processor (Log to span)
+        logEventProcessor = OTLPLogToSpanEventProcessor(with: configuration.tracesUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
 
         // Initialize trace processor
         traceProcesssor = OTLPTraceProcessor(with: configuration.tracesUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
@@ -113,7 +119,7 @@ class DefaultEventManager: AgentEventManager {
             let sessionID = agent.session.sessionId(for: metadata.timestamp)
             let event = SessionReplayDataEvent(metadata: metadata, data: data, sessionID: sessionID)
 
-            logEventProcessor.sendEvent(
+            replayLogEventProcessor.sendEvent(
                 event: event,
                 immediateProcessing: false,
                 completion: completion
