@@ -19,12 +19,9 @@ import Foundation
 import SplunkSharedProtocols
 
 
-// TODO: Determine whether we can collapse ErrorData and ErrorEventData into one.
-
-
 // MARK: - ErrorData
 
-struct ErrorData: SplunkTrackable {
+struct ErrorData: SplunkTrackable, ModuleEventData {
     var typeName: String
     var message: String
     var stacktrace: Stacktrace?
@@ -35,15 +32,15 @@ struct ErrorData: SplunkTrackable {
         self.stacktrace = stacktrace
     }
 
-    // protocol conformance requirement
+    // Convert to event attributes
     func toEventAttributes() -> [String: EventAttributeValue] {
         var attributes: [String: EventAttributeValue] = [
-            "typeName": .string(typeName),
-            "message": .string(message)
+            "exception.type": .string(typeName),
+            "exception.message": .string(message)
         ]
 
         if let stacktrace = stacktrace {
-            attributes["stacktrace"] = .string(stacktrace.formatted)
+            attributes["exception.stacktrace"] = .string(stacktrace.formatted)
         }
 
         return attributes
