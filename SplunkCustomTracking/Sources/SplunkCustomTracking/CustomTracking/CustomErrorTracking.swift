@@ -26,24 +26,15 @@ struct StringError: Error {
     let message: String
 }
 
-
 // MARK: - CustomErrorTracking with ConstrainedAttributes
 
-public struct CustomErrorTracking: CustomTracking {
+public struct CustomErrorTracking {
 
     public var typeName: String
     public unowned var sharedState: AgentSharedState?
 
     private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "ErrorTracking"))
 
-
-
-    // TODO: Can we come up with an interface that is more unified? One
-    // interface would be nice. That was where SplunkTrackableIssue was
-    // trying to go. Two would be... ok. Not sure we need three.
-
-
-    
     // Track method for SplunkTrackableIssue
     public func track(issue: SplunkTrackableIssue) {
         // Initialize ConstrainedAttributes
@@ -52,11 +43,8 @@ public struct CustomErrorTracking: CustomTracking {
         // Obtain attributes from the issue
         let attributes = issue.toEventAttributes()
 
-        // TODO: - Determine the correct use of this property versus the serviceName in publishData()
-        issue.typeName = "error"
-
+        // Validate and set key-value pairs using ConstrainedAttributes
         for (key, value) in attributes {
-            // Validate and set key-value pairs using ConstrainedAttributes
             if case .string(let stringValue) = value {
                 if !constrainedAttributes.setAttribute(for: key, value: stringValue) {
                     internalLogger.log(level: .warning) {
@@ -67,19 +55,14 @@ public struct CustomErrorTracking: CustomTracking {
             }
         }
 
-        // TODO: we're not even using the attributes we got off the data;
-        // we're just using the data directly. Need to figure out what to do here.
-
-        publishData(data: issue, serviceName: "errorTracking")
+        TelemetryEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "ErrorTracking")
     }
 
     // Track method for Error
     public func track(issue: Error) {
-        // Convert the Error to SplunkTrackableIssue if necessary
         if let trackableIssue = issue as? SplunkTrackableIssue {
             track(issue: trackableIssue)
         } else {
-            // Handle non-SplunkTrackableIssue conforming errors
             let customIssue = CustomError(issue: issue)
             track(issue: customIssue)
         }
@@ -87,7 +70,6 @@ public struct CustomErrorTracking: CustomTracking {
 
     // Track method for String
     public func track(issue: String) {
-        // Convert String to StringError and then call track(issue: Error)
         let stringError = StringError(message: issue)
         track(issue: stringError)
     }

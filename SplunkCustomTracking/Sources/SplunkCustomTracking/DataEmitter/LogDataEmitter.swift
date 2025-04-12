@@ -16,25 +16,26 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryApi
 import SplunkSharedProtocols
-
+import SplunkLogger
 
 struct LogDataEmitter {
 
-    public func setupLogEmitter() {
-        onPublish { metadata: CustomTrackingEventMetadata, eventData: CustomTrackingEventData in
+    // Logger for logging messages
+    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "LogDataTracking"))
 
-            let start = Time.now()
+    public func emitLog(data: SplunkTrackable, sharedState: AgentSharedState?) {
+        // Prepare attributes for logging
+        var attributes = data.toEventAttributes()
+        attributes["component"] = .string("customtracking")
+        attributes["screen.name"] = .string("unknown")
+        if let sessionID = sharedState?.sessionId {
+            attributes["session.id"] = .string(sessionID)
+        }
 
-            var attributes = eventData.getAttributes()
-            attributes["component"] = "customtracking"
-            attributes["screen.name"] = "unknown"
-            attributes["session.id"] = sharedState?.sessionId ?? "unknown"
-
-            internalLogger.log(level: .info) {
-                "Sending custom data: \(attributes?.debugDescription ?? "none")"
-            }
+        // Log the attributes
+        internalLogger.log(level: .info) {
+            "Sending custom data: \(attributes.debugDescription)"
         }
     }
 }
