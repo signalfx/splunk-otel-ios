@@ -690,7 +690,6 @@
 		52B25E8D2DA6F30C006C34A5 /* SpanDataEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDataEmitter.swift; sourceTree = "<group>"; };
 		52B25E8F2DA6F30C006C34A5 /* CustomData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomData.swift; sourceTree = "<group>"; };
 		52B25E902DA6F30C006C34A5 /* CustomDataEventData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDataEventData.swift; sourceTree = "<group>"; };
-		52B25E912DA6F30C006C34A5 /* CustomDataEventMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDataEventMetadata.swift; sourceTree = "<group>"; };
 		52B25E932DA6F30C006C34A5 /* ErrorAttributeKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAttributeKeys.swift; sourceTree = "<group>"; };
 		52B25E942DA6F30C006C34A5 /* ErrorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorData.swift; sourceTree = "<group>"; };
 		52B25E952DA6F30C006C34A5 /* ErrorEventData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorEventData.swift; sourceTree = "<group>"; };
@@ -2159,7 +2158,6 @@
 			children = (
 				52B25E8F2DA6F30C006C34A5 /* CustomData.swift */,
 				52B25E902DA6F30C006C34A5 /* CustomDataEventData.swift */,
-				52B25E912DA6F30C006C34A5 /* CustomDataEventMetadata.swift */,
 			);
 			path = CustomData;
 			sourceTree = "<group>";
