@@ -689,14 +689,9 @@
 		52B25E8C2DA6F30C006C34A5 /* LogDataEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDataEmitter.swift; sourceTree = "<group>"; };
 		52B25E8D2DA6F30C006C34A5 /* SpanDataEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDataEmitter.swift; sourceTree = "<group>"; };
 		52B25E8F2DA6F30C006C34A5 /* CustomData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomData.swift; sourceTree = "<group>"; };
-		52B25E902DA6F30C006C34A5 /* CustomDataEventData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDataEventData.swift; sourceTree = "<group>"; };
 		52B25E932DA6F30C006C34A5 /* ErrorAttributeKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAttributeKeys.swift; sourceTree = "<group>"; };
 		52B25E942DA6F30C006C34A5 /* ErrorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorData.swift; sourceTree = "<group>"; };
-		52B25E952DA6F30C006C34A5 /* ErrorEventData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorEventData.swift; sourceTree = "<group>"; };
-		52B25E962DA6F30C006C34A5 /* ErrorEventMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorEventMetadata.swift; sourceTree = "<group>"; };
 		52B25E972DA6F30C006C34A5 /* Stacktrace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stacktrace.swift; sourceTree = "<group>"; };
-		52B25E992DA6F30C006C34A5 /* CustomTrackingEventData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingEventData.swift; sourceTree = "<group>"; };
-		52B25E9A2DA6F30C006C34A5 /* CustomTrackingEventMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingEventMetadata.swift; sourceTree = "<group>"; };
 		52B25E9D2DA6F30C006C34A5 /* SplunkTrackable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackable.swift; sourceTree = "<group>"; };
 		52B25E9F2DA6F30C006C34A5 /* SplunkTrackableIssue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackableIssue.swift; sourceTree = "<group>"; };
 		52B25EA32DA6F30C006C34A5 /* SplunkCustomTrackingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkCustomTrackingTests.swift; sourceTree = "<group>"; };
@@ -2157,7 +2152,6 @@
 			isa = PBXGroup;
 			children = (
 				52B25E8F2DA6F30C006C34A5 /* CustomData.swift */,
-				52B25E902DA6F30C006C34A5 /* CustomDataEventData.swift */,
 			);
 			path = CustomData;
 			sourceTree = "<group>";
@@ -2167,8 +2161,6 @@
 			children = (
 				52B25E932DA6F30C006C34A5 /* ErrorAttributeKeys.swift */,
 				52B25E942DA6F30C006C34A5 /* ErrorData.swift */,
-				52B25E952DA6F30C006C34A5 /* ErrorEventData.swift */,
-				52B25E962DA6F30C006C34A5 /* ErrorEventMetadata.swift */,
 				52B25E972DA6F30C006C34A5 /* Stacktrace.swift */,
 			);
 			path = ErrorData;
@@ -2177,8 +2169,6 @@
 		52B25E9B2DA6F30C006C34A5 /* SharedData */ = {
 			isa = PBXGroup;
 			children = (
-				52B25E992DA6F30C006C34A5 /* CustomTrackingEventData.swift */,
-				52B25E9A2DA6F30C006C34A5 /* CustomTrackingEventMetadata.swift */,
 			);
 			path = SharedData;
 			sourceTree = "<group>";
