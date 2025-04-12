@@ -16,9 +16,17 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkSharedProtocols
 
 
-extension Dictionary where Key == String, Value == EventAttributeValue {
+protocol AttributeOperations {
+    mutating func setAttribute(for key: String, value: EventAttributeValue, maxKeyLength: Int, maxValueLength: Int) -> Bool
+    func apply<U>(mappingClosure: (String, EventAttributeValue) -> U) -> [String: U]
+    mutating func apply(mutatingClosure: (String, inout EventAttributeValue) -> Void)
+}
+
+
+extension Dictionary: AttributeOperations where Key == String, Value == EventAttributeValue {
 
     mutating func setAttribute(for key: String, value: EventAttributeValue, maxKeyLength: Int = 1024, maxValueLength: Int = 2048) -> Bool {
         guard key.count <= maxKeyLength, value.description.count <= maxValueLength else {
