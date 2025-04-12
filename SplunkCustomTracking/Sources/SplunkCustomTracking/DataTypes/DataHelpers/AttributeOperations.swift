@@ -37,16 +37,7 @@ extension Dictionary: AttributeOperations where Key == String, Value == EventAtt
         return true
     }
 
-    func apply<U>(mappingClosure: (String, EventAttributeValue) -> U) -> [String: U] {
-        var mappedAttributes: [String: U] = [:]
-        for (key, value) in self {
-            let newValue = mappingClosure(key, value)
-            mappedAttributes[key] = newValue
-        }
-        return mappedAttributes
-    }
-
-    mutating func apply(mutatingClosure: (String, inout EventAttributeValue) -> Void) {
+    mutating func apply(mutating: (String, inout EventAttributeValue) -> Void) {
         for (key, var value) in self {
             mutatingClosure(key, &value)
             self[key] = value
