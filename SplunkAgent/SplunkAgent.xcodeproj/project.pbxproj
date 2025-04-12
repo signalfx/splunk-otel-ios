@@ -683,9 +683,9 @@
 		522A70BA2DAD9F23008A2479 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
 		52B25E7E2DA6F30C006C34A5 /* SplunkCustomData.xcscheme */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SplunkCustomData.xcscheme; sourceTree = "<group>"; };
 		52B25E812DA6F30C006C34A5 /* xcschememanagement.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = xcschememanagement.plist; sourceTree = "<group>"; };
-		52B25E872DA6F30C006C34A5 /* CustomTrackingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingConfiguration.swift; sourceTree = "<group>"; };
+		52B25E872DA6F30C006C34A5 /* CustomTrackingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CustomTrackingConfiguration.swift; path = ../Configuration/CustomTrackingConfiguration.swift; sourceTree = "<group>"; };
 		52B25E892DA6F30C006C34A5 /* CustomDataTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDataTracking.swift; sourceTree = "<group>"; };
-		52B25E8A2DA6F30C006C34A5 /* CustomTracking+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomTracking+Module.swift"; sourceTree = "<group>"; };
+		52B25E8A2DA6F30C006C34A5 /* CustomTracking+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "CustomTracking+Module.swift"; path = "../CustomTracking/CustomTracking+Module.swift"; sourceTree = "<group>"; };
 		52B25E8C2DA6F30C006C34A5 /* LogDataEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDataEmitter.swift; sourceTree = "<group>"; };
 		52B25E8D2DA6F30C006C34A5 /* SpanDataEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDataEmitter.swift; sourceTree = "<group>"; };
 		52B25E8F2DA6F30C006C34A5 /* CustomData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomData.swift; sourceTree = "<group>"; };
@@ -2121,20 +2121,11 @@
 			path = .swiftpm;
 			sourceTree = "<group>";
 		};
-		52B25E882DA6F30C006C34A5 /* Configuration */ = {
-			isa = PBXGroup;
-			children = (
-				52B25E872DA6F30C006C34A5 /* CustomTrackingConfiguration.swift */,
-			);
-			path = Configuration;
-			sourceTree = "<group>";
-		};
 		52B25E8B2DA6F30C006C34A5 /* CustomTracking */ = {
 			isa = PBXGroup;
 			children = (
 				52194E452DA73D9000A08C47 /* CustomErrorTracking.swift */,
 				52B25E892DA6F30C006C34A5 /* CustomDataTracking.swift */,
-				52B25E8A2DA6F30C006C34A5 /* CustomTracking+Module.swift */,
 			);
 			path = CustomTracking;
 			sourceTree = "<group>";
@@ -2197,7 +2188,7 @@
 		52B25EA12DA6F30C006C34A5 /* SplunkCustomTracking */ = {
 			isa = PBXGroup;
 			children = (
-				52B25E882DA6F30C006C34A5 /* Configuration */,
+				52BE136F2DA9F067009A7262 /* Module */,
 				52B25E8B2DA6F30C006C34A5 /* CustomTracking */,
 				52B25E8E2DA6F30C006C34A5 /* DataEmitter */,
 				52B25E9C2DA6F30C006C34A5 /* DataTypes */,
@@ -2240,6 +2231,15 @@
 			name = SplunkCustomTracking;
 			path = ../SplunkCustomTracking;
 			sourceTree = SOURCE_ROOT;
+		};
+		52BE136F2DA9F067009A7262 /* Module */ = {
+			isa = PBXGroup;
+			children = (
+				52B25E8A2DA6F30C006C34A5 /* CustomTracking+Module.swift */,
+				52B25E872DA6F30C006C34A5 /* CustomTrackingConfiguration.swift */,
+			);
+			path = Module;
+			sourceTree = "<group>";
 		};
 		52F0BA472DA8A11900133EE5 /* DataHelpers */ = {
 			isa = PBXGroup;
