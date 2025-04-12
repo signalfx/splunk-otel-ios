@@ -38,7 +38,7 @@ extension Dictionary: AttributeOperations where Key == String, Value == EventAtt
 
     mutating func apply(mutating: (String, inout EventAttributeValue) -> Void) {
         for (key, var value) in self {
-            mutatingClosure(key, &value)
+            mutating(key, &value)
             self[key] = value
         }
     }
