@@ -18,41 +18,22 @@ limitations under the License.
 import Foundation
 
 
-// MARK: - SplunkAttribute: Protocol for general attribute behavior
-protocol SplunkAttribute {
-    var description: String { get }
-}
-
-
-// MARK: - Extension of base types for SplunkAttribute conformance
-extension String: SplunkAttribute {}
-extension Int: SplunkAttribute {}
-extension Double: SplunkAttribute {}
-
-
 // MARK: AttributeContainer: Protocol for common attribute operations
 protocol AttributeContainer {
 
-
-    // MARK: - Associated types
-
-    // Allows T to stand in for any type having SplunkAttribute conformance
-    associatedtype T: SplunkAttribute
-
-
     // MARK: - Protocol required functions
 
-    // Stores SplunkAttribute attributes in a key-value format
-    var attributes: [String: T] { get set }
+    // Stores EventAttributeValue attributes in a key-value format
+    var attributes: [String: EventAttributeValue] { get set }
 
     // Adds an attribute or updates an existing one
-    mutating func setAttribute(for key: String, value: T)
+    mutating func setAttribute(for key: String, value: EventAttributeValue)
 
     // Retrieves a specific attribute
-    func getAttribute(for key: String) -> T?
+    func getAttribute(for key: String) -> EventAttributeValue?
 
     // Returns all attributes to support operations like data output
-    func listAttributes() -> [String: T]
+    func listAttributes() -> [String: EventAttributeValue]
 
     // Removes a specific attribute
     mutating func remove(key: String)
@@ -61,68 +42,55 @@ protocol AttributeContainer {
     mutating func removeAll()
 
     // Replaces existing attributes with new ones for batch updates
-    mutating func setAll(newAttributes: [String: T])
+    mutating func setAll(newAttributes: [String: EventAttributeValue])
 
     // Applies a transformation using the Mapping pattern
-    func apply<U: SplunkAttribute>(mappingClosure: (String, T) -> U) -> MutableAttributes<U> {
+    func apply<U: Hashable>(mappingClosure: (String, EventAttributeValue) -> U) -> MutableAttributes
 
     // Modifies attributes in place using the Mutator pattern
-    mutating func apply(mutatingClosure: (String, inout T) -> Void)
+    mutating func apply(mutatingClosure: (String, inout EventAttributeValue) -> Void)
 }
 
 
 // MARK: - AttributeContainer: Default implementations for AttributeContainer
 extension AttributeContainer {
 
-
     // MARK: - Protocol required function default implementations
 
-    func getAttribute(for key: String) -> T? {
+    func getAttribute(for key: String) -> EventAttributeValue? {
         return attributes[key]
     }
 
-    func listAttributes() -> [String: T] {
+    func listAttributes() -> [String: EventAttributeValue] {
         return attributes
     }
 
     mutating func remove(key: String) {
-        apply(mutatingClosure: { k, _ in
-            if k == key {
-                attributes[k] = nil
-            }
-        })
+        attributes[key] = nil
     }
 
     mutating func removeAll() {
-        apply(mutatingClosure: { k, _ in
-            attributes[k] = nil
-        })
+        attributes.removeAll()
     }
 
-    mutating func setAll(newAttributes: [String: T]) {
-        apply(mutatingClosure: { k, _ in
-            if let newValue = newAttributes[k] {
-                attributes[k] = newValue
-            }
-        })
+    mutating func setAll(newAttributes: [String: EventAttributeValue]) {
+        attributes = newAttributes
     }
-
 
     // MARK: - Mapping pattern to return transformed attributes
 
-    func apply<U: SplunkAttribute>(mappingClosure: (String, T) -> U) -> MutableAttributes<U> {
-        var mappedAttributes = MutableAttributes<U>()
+    func apply<U: Hashable>(mappingClosure: (String, EventAttributeValue) -> U) -> MutableAttributes {
+        var mappedAttributes = MutableAttributes()
         for (key, value) in listAttributes() {
-            let newValue = mappingClosure(key, value)
-            mappedAttributes.setAttribute(for: key, value: newValue)
+            let _ = mappingClosure(key, value)
+            mappedAttributes.setAttribute(for: key, value: value)
         }
         return mappedAttributes
     }
 
-
     // MARK: - Mutator Pattern: Modify attributes in place
 
-    mutating func apply(mutatingClosure: (String, inout T) -> Void) {
+    mutating func apply(mutatingClosure: (String, inout EventAttributeValue) -> Void) {
         for (key, var value) in attributes {
             mutatingClosure(key, &value)
             attributes[key] = value
@@ -132,10 +100,10 @@ extension AttributeContainer {
 
 
 // MARK: - MutableAttributes: Base struct for managing attributes
-struct MutableAttributes<T: SplunkAttribute>: AttributeContainer {
-    var attributes: [String: T] = [:]
+struct MutableAttributes: AttributeContainer {
+    var attributes: [String: EventAttributeValue] = [:]
 
-    mutating func setAttribute(for key: String, value: T) {
+    mutating func setAttribute(for key: String, value: EventAttributeValue) {
         attributes[key] = value
     }
 }
@@ -145,7 +113,7 @@ struct MutableAttributes<T: SplunkAttribute>: AttributeContainer {
 protocol LengthEnforcable: AttributeContainer {
     var maxKeyLength: Int { get }
     var maxValueLength: Int { get }
-    mutating func setAttribute(for key: String, value: T) -> Bool
+    mutating func setAttribute(for key: String, value: EventAttributeValue) -> Bool
 }
 
 
@@ -157,13 +125,12 @@ extension LengthEnforcable {
 
 
 // MARK: - ConstrainedAttributes: Struct for managing attributes with length constraints
-struct ConstrainedAttributes<T: SplunkAttribute>: LengthEnforcable {
-    var attributes = MutableAttributes<T>().attributes
-
+struct ConstrainedAttributes: LengthEnforcable {
+    var attributes: [String: EventAttributeValue] = [:]
 
     // MARK: - Constrained setAttribute that checks the length of its keys and values
 
-    mutating func setAttribute(for key: String, value: T) -> Bool {
+    mutating func setAttribute(for key: String, value: EventAttributeValue) -> Bool {
         guard key.count <= maxKeyLength, value.description.count <= maxValueLength else {
             print("Invalid key or value length.")
             return false
