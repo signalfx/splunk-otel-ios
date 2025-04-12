@@ -15,36 +15,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// TODO: - Check for overlap between this and the MutableAttributes class
 
 public protocol SplunkTrackableData: SplunkTrackable {
-    var attributes: MutableAttributes { get }
-
-    // Retrieve all event attributes
-    func toEventAttributes() -> [String: EventAttributeValue]
-
-    // Additional methods to directly interact with MutableAttributes
-    func setAttribute(key: String, value: EventAttributeValue)
-    func getAttribute(key: String) -> EventAttributeValue?
-    func removeAttribute(key: String)
+    var attributes: [String: EventAttributeValue] { get set }
 }
 
 public extension SplunkTrackableData {
-    
-    // Default implementation using MutableAttributes
+    // Directly use the dictionary's methods
     func toEventAttributes() -> [String: EventAttributeValue] {
-        return attributes.getAll()
+        return attributes
     }
 
-    func setAttribute(key: String, value: EventAttributeValue) {
-        attributes.set(key: key, value: value)
+    mutating func setAttribute(key: String, value: EventAttributeValue, maxKeyLength: Int = 1024, maxValueLength: Int = 2048) -> Bool {
+        return attributes.setAttribute(for: key, value: value, maxKeyLength: maxKeyLength, maxValueLength: maxValueLength)
     }
 
     func getAttribute(key: String) -> EventAttributeValue? {
-        return attributes.get(key: key)
+        return attributes[key]
     }
 
-    func removeAttribute(key: String) {
-        attributes.remove(key: key)
+    mutating func removeAttribute(key: String) {
+        attributes.removeValue(forKey: key)
+    }
+
+    mutating func applyAttributes(mutatingClosure: (String, inout EventAttributeValue) -> Void) {
+        attributes.apply(mutating: mutatingClosure)
     }
 }
