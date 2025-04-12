@@ -31,6 +31,9 @@ class CustomDataTracking {
 
     func track(data: SplunkTrackableData) {
 
+        // TODO: See TODO about attributes in this same location in CustomErrorTracking -
+        // the same questions apply here.
+
         var constrainedAttributes = ConstrainedAttributes<EventAttributeValue>()
 
         // Convert SplunkTrackableData to attributes and set them with length validation

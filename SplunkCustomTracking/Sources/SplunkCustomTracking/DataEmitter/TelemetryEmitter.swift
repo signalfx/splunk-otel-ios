@@ -24,6 +24,10 @@ struct TelemetryEmitter {
     static func emitSpan(data: SplunkTrackable, sharedState: AgentSharedState?, spanName: String = "Tracking") {
         let start = Time.now()
 
+
+        // TODO: needs cleanup (a sweep through items to see if everything belongs)
+
+        
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(

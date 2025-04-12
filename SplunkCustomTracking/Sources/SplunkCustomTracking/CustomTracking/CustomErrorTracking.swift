@@ -20,12 +20,6 @@ import SplunkSharedProtocols
 import SplunkLogger
 
 
-// MARK: - StringError: A Custom Error Type for Strings
-
-struct StringError: Error {
-    let message: String
-}
-
 // MARK: - CustomErrorTracking with ConstrainedAttributes
 
 public struct CustomErrorTracking {
@@ -37,6 +31,15 @@ public struct CustomErrorTracking {
 
     // Track method for SplunkTrackableIssue
     public func track(issue: SplunkTrackableIssue) {
+
+
+        // TODO: figuer out whether any of the attributes stuff here is useful
+        // for anything other than length validation when we are not in the
+        // regime of ModuleEventData and ModuleEventMetadata. Length validation
+        // here and in CustomDataTracking is itself worthwhile since the data
+        // we gather here is user-submitted.
+
+
         // Initialize ConstrainedAttributes
         var constrainedAttributes = ConstrainedAttributes<String>()
 
@@ -59,6 +62,8 @@ public struct CustomErrorTracking {
     }
 
     // Track method for Error
+    // Might be able to get rid of this one and use track(issue:) above instead
+    // but in any case the call site is the same, so this is good too.
     public func track(issue: Error) {
         if let trackableIssue = issue as? SplunkTrackableIssue {
             track(issue: trackableIssue)
@@ -70,7 +75,8 @@ public struct CustomErrorTracking {
 
     // Track method for String
     public func track(issue: String) {
-        let stringError = StringError(message: issue)
-        track(issue: stringError)
+        // Wrap the string in a SplunkIssue and track it
+        let wrappedIssue = SplunkIssue(issue)
+        track(issue: wrappedIssue)
     }
 }
