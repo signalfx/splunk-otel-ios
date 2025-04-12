@@ -21,9 +21,10 @@ import SplunkSharedProtocols
 
 // MARK: - SplunkTrackable Protocol
 
-/// Protocol defining the base requirements for any item that can be tracked in the system.
-/// This serves as the foundation for both error tracking and custom data tracking.
+/// Protocol defining the base requirements for any item that can be tracked.
+/// Foundation for both error tracking and custom data tracking.
 public protocol SplunkTrackable {
+
     /// The type name of the trackable item, used for categorization
     var typeName: String { get }
 
@@ -31,7 +32,6 @@ public protocol SplunkTrackable {
     var timestamp: Date { get }
 
     /// Converts the trackable item to event attributes
-    /// - Returns: Dictionary of attribute key-value pairs
     func toEventAttributes() -> [String: EventAttributeValue]
 }
 
@@ -44,4 +44,3 @@ public extension SplunkTrackable {
         Date()
     }
 }
-

@@ -29,6 +29,10 @@ public protocol AttributeKey {
 
 // MARK: - ErrorAttributeKeys
 
+// TODO: Could pull this closer toward AttributeOperations but not sure there
+// is much synergy. We could have `KeyedAttributeOperations` though for example.
+
+
 /// Namespace with OpenTelemetry semantic convention keys for error reporting
 public enum ErrorAttributeKeys {
     /// Exception-specific attribute keys

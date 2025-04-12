@@ -29,7 +29,7 @@ public protocol SplunkTrackableIssue: SplunkTrackable {
 }
 
 
-// MARK: - Default Implementation
+// MARK: - Default Implementation for toEventAttributes
 
 public extension SplunkTrackableIssue {
     func toEventAttributes() -> [String: EventAttributeValue] {
@@ -47,8 +47,18 @@ public extension SplunkTrackableIssue {
 }
 
 
-extension String: SplunkTrackableIssue {
-    var typeName: String { "String" }
-    var message: String { self }
-    var stacktrace: Stacktrace? { nil }
+public struct SplunkIssue: SplunkTrackableIssue {
+    public let message: String
+
+    public var typeName: String {
+        return "CustomIssue"
+    }
+
+    public var stacktrace: Stacktrace? {
+        return nil
+    }
+
+    public init(_ message: String) {
+        self.message = message
+    }
 }

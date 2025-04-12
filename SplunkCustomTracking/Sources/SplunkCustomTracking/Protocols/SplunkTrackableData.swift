@@ -38,7 +38,7 @@ public extension SplunkTrackableData {
         attributes.removeValue(forKey: key)
     }
 
-    mutating func applyAttributes(mutatingClosure: (String, inout EventAttributeValue) -> Void) {
-        attributes.apply(mutating: mutatingClosure)
+    mutating func applyAttributes(mutating closure: (String, inout EventAttributeValue) -> Void) {
+        attributes.apply(mutating: closure)
     }
 }

@@ -25,6 +25,9 @@ struct LogDataEmitter {
     private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "LogDataTracking"))
 
     public func emitLog(data: SplunkTrackable, sharedState: AgentSharedState?) {
+
+        // TODO: needs cleanup (a sweep through items to see if everything belongs)
+
         // Prepare attributes for logging
         var attributes = data.toEventAttributes()
         attributes["component"] = .string("customtracking")
