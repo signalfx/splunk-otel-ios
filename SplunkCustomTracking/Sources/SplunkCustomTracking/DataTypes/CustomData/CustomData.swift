@@ -19,10 +19,7 @@ import Foundation
 import SplunkSharedProtocols
 
 
-// TODO: Determine whether we can collapse CustomData and CustomDataEventData into one.
-
-
-struct CustomData: SplunkTrackable {
+struct CustomData: SplunkTrackable, ModuleEventData {
     var typeName: String
     var attributes: [String: String]
 
@@ -31,7 +28,7 @@ struct CustomData: SplunkTrackable {
         self.attributes = attributes
     }
 
-    // Convert attributes to EventAttributeValue
+    // Convert to event attributes
     func toEventAttributes() -> [String: EventAttributeValue] {
         return attributes.mapValues { .string($0) }
     }
