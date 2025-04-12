@@ -15,12 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+
+// MARK: - CustomDataTracking implementation
+
+
 import Foundation
+import OpenTelemetryApi
 
 
-// MARK: - CustomTracking implementation
-
-class CustomDataTracking: CustomTracking {
+class CustomDataTracking {
 
     public unowned var sharedState: AgentSharedState?
 
@@ -30,9 +33,6 @@ class CustomDataTracking: CustomTracking {
 
         var constrainedAttributes = ConstrainedAttributes<EventAttributeValue>()
 
-        // TODO: - Determine the correct use of this property versus the serviceName in publishData()
-        data.typeName = "data"
-
         // Convert SplunkTrackableData to attributes and set them with length validation
         for (key, value) in data.toEventAttributes() {
             if !constrainedAttributes.setAttribute(for: key, value: value) {
@@ -41,12 +41,7 @@ class CustomDataTracking: CustomTracking {
             }
         }
 
-
-        // TODO: we're not even using the attributes we got off the data;
-        // we're just using the data directly. Need to figure out what to do here.
-
-
-        // Publish the data if all attributes are valid
-        publishData(data: data, serviceName: "customDataTracking")
+        // Emit the span directly using the TelemetryEmitter
+        TelemetryEmitter.emitSpan(data: data, sharedState: sharedState, spanName: "CustomDataTracking")
     }
 }

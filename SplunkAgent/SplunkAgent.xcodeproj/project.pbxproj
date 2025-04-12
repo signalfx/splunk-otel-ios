@@ -675,6 +675,7 @@
 		520067072DAED2F600444346 /* SlowFrameDetectorConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorConfiguration.swift; sourceTree = "<group>"; };
 		5200670A2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMetadataSlowFrameDetector.swift; sourceTree = "<group>"; };
 		52194E442DA7331C00A08C47 /* MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributes.swift; sourceTree = "<group>"; };
+		5201451C2DAA04D70065F7EC /* TelemetryEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryEmitter.swift; sourceTree = "<group>"; };
 		52194E452DA73D9000A08C47 /* CustomErrorTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomErrorTracking.swift; sourceTree = "<group>"; };
 		52194E462DA7503B00A08C47 /* SplunkTrackableData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackableData.swift; sourceTree = "<group>"; };
 		52286CB42CD54045001F8A31 /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
@@ -685,7 +686,6 @@
 		52B25E812DA6F30C006C34A5 /* xcschememanagement.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = xcschememanagement.plist; sourceTree = "<group>"; };
 		52B25E892DA6F30C006C34A5 /* CustomDataTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDataTracking.swift; sourceTree = "<group>"; };
 		52B25E8C2DA6F30C006C34A5 /* LogDataEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDataEmitter.swift; sourceTree = "<group>"; };
-		52B25E8D2DA6F30C006C34A5 /* SpanDataEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpanDataEmitter.swift; sourceTree = "<group>"; };
 		52B25E8F2DA6F30C006C34A5 /* CustomData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomData.swift; sourceTree = "<group>"; };
 		52B25E932DA6F30C006C34A5 /* ErrorAttributeKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAttributeKeys.swift; sourceTree = "<group>"; };
 		52B25E942DA6F30C006C34A5 /* ErrorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorData.swift; sourceTree = "<group>"; };
@@ -2134,8 +2134,8 @@
 		52B25E8E2DA6F30C006C34A5 /* DataEmitter */ = {
 			isa = PBXGroup;
 			children = (
+				5201451C2DAA04D70065F7EC /* TelemetryEmitter.swift */,
 				52B25E8C2DA6F30C006C34A5 /* LogDataEmitter.swift */,
-				52B25E8D2DA6F30C006C34A5 /* SpanDataEmitter.swift */,
 			);
 			path = DataEmitter;
 			sourceTree = "<group>";
