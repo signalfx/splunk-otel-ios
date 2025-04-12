@@ -21,8 +21,7 @@ import SplunkSharedProtocols
 
 protocol AttributeOperations {
     mutating func setAttribute(for key: String, value: EventAttributeValue, maxKeyLength: Int, maxValueLength: Int) -> Bool
-    func apply<U>(mappingClosure: (String, EventAttributeValue) -> U) -> [String: U]
-    mutating func apply(mutatingClosure: (String, inout EventAttributeValue) -> Void)
+    mutating func apply(mutating: (String, inout EventAttributeValue) -> Void)
 }
 
 
