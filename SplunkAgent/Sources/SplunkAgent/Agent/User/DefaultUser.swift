@@ -22,7 +22,7 @@ class DefaultUser: AgentUser {
 
     // MARK: - Private
 
-    var userModel: UserModel
+    private(set) var userModel: UserModel
 
 
     // MARK: - Public

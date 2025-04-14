@@ -53,4 +53,3 @@ public struct CrashReportsRemoteConfiguration: RemoteModuleConfiguration {
         enabled = root.configuration.mrum.crashReporting.enabled
     }
 }
-

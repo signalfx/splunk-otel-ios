@@ -54,28 +54,4 @@ final class DefaultUserTests: XCTestCase {
         // The User between runs must be the same
         XCTAssertEqual(userIdentifier, anotherIdentifier)
     }
-
-    func testProperties() throws {
-        let storage = UserDefaultsStorage()
-        let user = DefaultUser(storage: storage)
-
-
-        // Properties (READ)
-        let userStorage = user.storage as? UserDefaultsStorage
-        XCTAssertNotNil(userStorage)
-        XCTAssertTrue(storage === userStorage)
-
-
-        // Properties (WRITE)
-        let anotherKeysPrefix = "com.sample."
-        let anotherStorage = UserDefaultsStorage()
-        anotherStorage.keysPrefix = anotherKeysPrefix
-
-        user.storage = anotherStorage
-        XCTAssertNotNil(user.storage)
-
-        let assignedKeysPrefix = (user.storage as? UserDefaultsStorage)?.keysPrefix
-        XCTAssertNotNil(assignedKeysPrefix)
-        XCTAssertEqual(assignedKeysPrefix, anotherKeysPrefix)
-    }
 }

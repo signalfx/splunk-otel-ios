@@ -29,8 +29,14 @@ protocol AgentRuntimeAttributes: RuntimeAttributes {
     // MARK: - Custom attributes management
 
     /// Update or add a new custom attribute. This method is thread-safe.
-    func updateCustom(_ key: String, _ value: Any)
+    ///
+    /// - Parameters:
+    ///   - named: A `String` with the name of the attribute.
+    ///   - value: The new value of the attribute.
+    func updateCustom(named: String, with value: Any)
 
     /// Remove custom attribute. This method is thread-safe.
-    func removeCustom(_ key: String)
+    ///
+    /// - Parameter named: A `String` with the name of the removed attribute.
+    func removeCustom(named: String)
 }

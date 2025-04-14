@@ -52,7 +52,9 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
 
         // Custom attributes will only be added if needed
         if !customAttributes.isEmpty {
-            allAttributes = systemAttributes.merging(custom) { $1 }
+            allAttributes = systemAttributes.merging(custom) { current, _ in
+                current
+            }
         }
 
         return allAttributes
@@ -67,15 +69,15 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
         }
     }
 
-    func updateCustom(_ key: String, _ value: Any) {
+    func updateCustom(named: String, with value: Any) {
         accessQueue.async(flags: .barrier) {
-            self.customValue[key] = value
+            self.customValue[named] = value
         }
     }
 
-    func removeCustom(_ key: String) {
+    func removeCustom(named: String) {
         accessQueue.async(flags: .barrier) {
-            self.customValue[key] = nil
+            self.customValue[named] = nil
         }
     }
 
