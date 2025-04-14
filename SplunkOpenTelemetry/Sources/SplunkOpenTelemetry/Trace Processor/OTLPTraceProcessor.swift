@@ -48,8 +48,11 @@ public class OTLPTraceProcessor: TraceProcessor {
             envVarHeaders: envVarHeaders
         )
 
+        // Initialize attribute checker proxy exporter
+        let attributeCheckerExporter = AttributeCheckerSpanExporter(proxy: backgroundTraceExporter)
+
         // Initialize processor
-        let spanProcessor = SimpleSpanProcessor(spanExporter: backgroundTraceExporter)
+        let spanProcessor = SimpleSpanProcessor(spanExporter: attributeCheckerExporter)
 
         // Build Resources
         var resource = Resource()

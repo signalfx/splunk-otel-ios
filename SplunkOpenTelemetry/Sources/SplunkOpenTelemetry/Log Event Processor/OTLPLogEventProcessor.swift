@@ -60,8 +60,11 @@ public class OTLPLogEventProcessor: LogEventProcessor {
             envVarHeaders: envVarHeaders
         )
 
-        // Initialise LogRecordProcessor
-        let simpleLogRecordProcessor = SimpleLogRecordProcessor(logRecordExporter: backgroundLogExporter)
+        // Initialize attribute checker proxy exporter
+        let attributeCheckerExporter = AttributeCheckerLogExporter(proxy: backgroundLogExporter)
+
+        // Initialize LogRecordProcessor
+        let simpleLogRecordProcessor = SimpleLogRecordProcessor(logRecordExporter: attributeCheckerExporter)
 
         // Build Resources
         var resource = Resource()
