@@ -16,8 +16,8 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 import SplunkLogger
+import SplunkSharedProtocols
 
 struct LogDataEmitter {
 

@@ -43,17 +43,16 @@ public enum ErrorAttributeKeys {
         case code = "exception.code"
         case escaped = "exception.escaped"
     }
-    
+
     /// ErrorCode-specific attribute keys
     public enum ErrorCode: String, AttributeKey {
         case namespace = "code.namespace"
     }
-    
+
     /// Service-specific attribute keys
     public enum Service: String, AttributeKey {
         case name = "service.name"
     }
-
 }
 
 
@@ -64,5 +63,4 @@ extension Dictionary where Key == String, Value == EventAttributeValue {
     init<T: AttributeKey>(_ keyed: [T: Value]) {
         self.init(uniqueKeysWithValues: keyed.map { ($0.rawValue, $1) })
     }
-
 }

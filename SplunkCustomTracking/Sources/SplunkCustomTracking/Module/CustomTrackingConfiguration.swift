@@ -21,7 +21,7 @@ import SplunkSharedProtocols
 
 // MARK: - CustomTrackingConfiguration
 
-public struct CustomTrackingConfiguration: ModuleConfiguration { }
+public struct CustomTrackingConfiguration: ModuleConfiguration {}
 
 public struct CustomTrackingRemoteConfiguration: RemoteModuleConfiguration {
 
@@ -55,6 +55,6 @@ public struct CustomTrackingRemoteConfiguration: RemoteModuleConfiguration {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
             return nil
         }
-        self.enabled = root.configuration.tracking.enabled
+        enabled = root.configuration.tracking.enabled
     }
 }

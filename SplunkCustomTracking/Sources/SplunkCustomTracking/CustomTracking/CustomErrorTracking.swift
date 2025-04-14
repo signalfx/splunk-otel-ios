@@ -16,8 +16,8 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 import SplunkLogger
+import SplunkSharedProtocols
 
 
 // MARK: - CustomErrorTracking with ConstrainedAttributes
@@ -39,7 +39,6 @@ public struct CustomErrorTracking {
         // here and in CustomDataTracking is itself worthwhile since the data
         // we gather here is user-submitted.
 
-
         // Initialize ConstrainedAttributes
         var constrainedAttributes = ConstrainedAttributes<String>()
 
@@ -48,7 +47,7 @@ public struct CustomErrorTracking {
 
         // Validate and set key-value pairs using ConstrainedAttributes
         for (key, value) in attributes {
-            if case .string(let stringValue) = value {
+            if case let .string(stringValue) = value {
                 if !constrainedAttributes.setAttribute(for: key, value: stringValue) {
                     internalLogger.log(level: .warning) {
                         "Invalid key or value length for key '\(key)'. Not publishing this issue."
