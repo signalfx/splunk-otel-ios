@@ -22,4 +22,7 @@ protocol AgentUser {
 
     /// User's anonymous ID.
     var userIdentifier: String { get }
+
+    /// The currently used tracking mode.
+    var trackingMode: UserTrackingMode { get set }
 }

@@ -17,41 +17,31 @@ limitations under the License.
 
 import Foundation
 
+/// The object implements the logic around the agent user.
 class DefaultUser: AgentUser {
 
     // MARK: - Private
 
-    var storage: KeyValueStorage
+    var userModel: UserModel
 
 
     // MARK: - Public
 
-    private(set) lazy var userIdentifier: String = prepareIdentifier()
+    private(set) lazy var userIdentifier: String = userModel.prepareIdentifier()
+
+    var trackingMode: UserTrackingMode {
+        get {
+            userModel.trackingMode
+        }
+        set {
+            userModel.trackingMode = newValue
+        }
+    }
 
 
     // MARK: - Initialization
 
-    init(storage: KeyValueStorage = UserDefaultsStorage()) {
-        self.storage = storage
-    }
-
-
-    // MARK: - Business logic
-
-    private func prepareIdentifier() -> String {
-        let key = "userIdentifier"
-
-        // At first, we try to read the identifier from the permanent cache
-        let identifier: String? = try? storage.read(forKey: key)
-
-        if let identifier {
-            return identifier
-        }
-
-        // No cached identifier. We need to create a new one and cache it.
-        let newIdentifier = String.uniqueIdentifier()
-        try? storage.insert(newIdentifier, forKey: key)
-
-        return newIdentifier
+    required init(userModel: UserModel = UserModel()) {
+        self.userModel = userModel
     }
 }

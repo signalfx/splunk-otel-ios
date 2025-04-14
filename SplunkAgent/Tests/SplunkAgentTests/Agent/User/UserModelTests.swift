@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,18 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+@testable import SplunkAgent
 import XCTest
 
-final class API10UserTests: XCTestCase {
-
-    // MARK: - API Tests
-
-    func testUser() throws {
-        // Touch `User` property
-        let agent = try AgentTestBuilder.buildDefault()
-        let user = agent.user
-        XCTAssertNotNil(user)
-
-        // Properties (READ)
-    }
+final class UserModelTests: XCTestCase {
+    
 }

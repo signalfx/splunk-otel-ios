@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,18 +15,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import XCTest
+/// A state object reflects the current user's state.
+public final class UserState {
 
-final class API10UserTests: XCTestCase {
+    // MARK: - Internal
 
-    // MARK: - API Tests
+    private unowned let owner: SplunkRum
 
-    func testUser() throws {
-        // Touch `User` property
-        let agent = try AgentTestBuilder.buildDefault()
-        let user = agent.user
-        XCTAssertNotNil(user)
 
-        // Properties (READ)
+    // MARK: - Initialization
+
+    init(for owner: SplunkRum) {
+        self.owner = owner
+    }
+}
+
+
+public extension UserState {
+
+    // MARK: - User identification
+
+    /// The currently used tracking mode.
+    var trackingMode: UserTrackingMode {
+        owner.currentUser.trackingMode
     }
 }

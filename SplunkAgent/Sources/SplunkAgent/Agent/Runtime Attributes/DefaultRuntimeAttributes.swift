@@ -15,23 +15,68 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Foundation
+
 /// The class implements default runtime attributes for the agent.
 final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
 
     // MARK: - Internal
 
     private unowned let owner: SplunkRum
+    private let accessQueue: DispatchQueue
+
+
+    // MARK: - Private
+
+    // Internal value store for custom attributes
+    private var customValue: [String: Any]
 
 
     // MARK: - RuntimeAttributes protocol
 
+    /// A list of attributes to use at signal start.
+    ///
+    ///  This list also contains custom attributes.
     public var all: [String: Any] {
-        var attributes: [String: Any] = [:]
+        var allAttributes: [String: Any] = [:]
 
-        attributes["user.anonymous_id"] = userIdentifier()
-        attributes["session.id"] = sessionIdentifier()
+        // Attributes added directly should come from sources
+        // that are thread-safe themselves
+        var systemAttributes: [String: Any] = [:]
+        systemAttributes["user.anonymous_id"] = userIdentifier()
+        systemAttributes["session.id"] = sessionIdentifier()
+        allAttributes = systemAttributes
 
-        return attributes
+
+        let customAttributes = custom
+
+        // Custom attributes will only be added if needed
+        if !customAttributes.isEmpty {
+            allAttributes = systemAttributes.merging(custom) { $1 }
+        }
+
+        return allAttributes
+    }
+
+
+    // MARK: - AgentRuntimeAttributes protocol
+
+    var custom: [String: Any] {
+        accessQueue.sync {
+            customValue
+        }
+    }
+
+    func updateCustom(_ key: String, _ value: Any) {
+        accessQueue.async(flags: .barrier) {
+            self.customValue[key] = value
+        }
+    }
+
+    func removeCustom(_ key: String) {
+        accessQueue.async(flags: .barrier) {
+            self.customValue[key] = nil
+        }
     }
 
 
@@ -39,16 +84,25 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
 
     init(for owner: SplunkRum) {
         self.owner = owner
+        customValue = [:]
+
+        let queueName = PackageIdentifier.default(named: "runtimeAttributesAccess")
+        accessQueue = DispatchQueue(label: queueName)
     }
 
 
     // MARK: - Private methods
 
     private func userIdentifier() -> String? {
-        owner.user.identifier
+        // We only identify users if tracking is not prohibited
+        guard owner.currentUser.trackingMode != .noTracking else {
+            return nil
+        }
+
+        return owner.currentUser.userIdentifier
     }
 
     private func sessionIdentifier() -> String? {
-        owner.session.currentSessionId
+        owner.currentSession.currentSessionId
     }
 }

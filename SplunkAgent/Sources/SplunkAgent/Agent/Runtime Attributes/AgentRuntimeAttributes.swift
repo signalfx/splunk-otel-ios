@@ -18,4 +18,19 @@ limitations under the License.
 internal import SplunkSharedProtocols
 
 /// Defines runtime attributes in the agent space.
-protocol AgentRuntimeAttributes: RuntimeAttributes {}
+protocol AgentRuntimeAttributes: RuntimeAttributes {
+
+    // MARK: - Custom attributes
+
+    /// A list of custom attributes to use at signal start.
+    var custom: [String: Any] { get }
+
+
+    // MARK: - Custom attributes management
+
+    /// Update or add a new custom attribute. This method is thread-safe.
+    func updateCustom(_ key: String, _ value: Any)
+
+    /// Remove custom attribute. This method is thread-safe.
+    func removeCustom(_ key: String)
+}
