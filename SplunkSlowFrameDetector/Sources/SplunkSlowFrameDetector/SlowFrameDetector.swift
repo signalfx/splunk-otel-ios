@@ -15,8 +15,8 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 import QuartzCore
+import SplunkSharedProtocols
 import UIKit
 
 
