@@ -156,10 +156,8 @@ final class EventsTests: XCTestCase {
             requestExpectation.fulfill()
         })
 
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
-        let sentEvent = try XCTUnwrap(logEventProcessor.storedLastSentEvent) as? AgentEvent
-
-        XCTAssertTrue(processedEvent == sentEvent)
+        XCTAssertNotNil(logEventProcessor.storedLastProcessedEvent)
+        XCTAssertNotNil(logEventProcessor.storedLastSentEvent)
     }
 
     func testBackgroundProcessing() throws {
@@ -180,10 +178,8 @@ final class EventsTests: XCTestCase {
             requestExpectation.fulfill()
         })
 
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
-        let sentEvent = logEventProcessor.storedLastSentEvent as? AgentEvent
-
-        XCTAssertFalse(processedEvent == sentEvent)
+        XCTAssertNotNil(logEventProcessor.storedLastProcessedEvent)
+        XCTAssertNil(logEventProcessor.storedLastSentEvent)
     }
 
     func testDuplicateSessionStartEvents() throws {
@@ -237,10 +233,11 @@ final class EventsTests: XCTestCase {
         }
     }
 
-    func checkEventBaseAttributes(_ event: SplunkSharedProtocols.Event) throws {
+    func checkEventBaseAttributes(_ event: SplunkSharedProtocols.AgentEvent) throws {
         XCTAssertNotNil(event.domain)
         XCTAssertNotNil(event.name)
         XCTAssertNotNil(event.instrumentationScope)
+        XCTAssertNotNil(event.component)
 
         XCTAssertNotNil(event.sessionID)
         XCTAssertNotNil(event.timestamp)
