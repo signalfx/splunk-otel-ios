@@ -22,6 +22,21 @@ internal import SplunkSharedProtocols
 /// Crash Reports data event. Represents stringified Crash Report with metadata.
 class CrashReportsDataEvent: AgentEvent {
 
+    // MARK: - Event Identification
+
+    let domain = "mrum"
+    var name: String
+    var instrumentationScope = "com.splunk.rum.crashreports"
+
+
+    // MARK: - Event properties
+
+    var sessionID: String?
+    var timestamp: Date?
+    var attributes: [String: EventAttributeValue]?
+    var body: EventAttributeValue?
+
+
     // MARK: - Initialization
 
     /// Initializes a Crash Report data event.
@@ -31,7 +46,6 @@ class CrashReportsDataEvent: AgentEvent {
     ///   - data: Crash Report data serialized as a `String`.
     ///   - sessionID: The `session ID` of a session in which the event occured.
     public init(metadata: CrashReportsMetadata, data: String, sessionID: String?) {
-        super.init()
 
         // Event identification
         name = metadata.eventName
