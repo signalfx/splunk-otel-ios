@@ -1,5 +1,5 @@
 /*
-Copyright 2021 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,12 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-
-/*
-Adapted from SlowFrameDetector implementation at https://github.com/signalfx/splunk-otel-ios
- */
-
 
 import Foundation
 import SplunkSharedProtocols
@@ -56,14 +50,9 @@ public final class SlowFrameDetector {
 
     private var config: SlowFrameDetectorRemoteConfiguration?
 
-    // Legacy settings which are ignored (see comments in displayLinkCallback)
-    private var slowThresholdSeconds: CFTimeInterval = 16.7
-    private var frozenThresholdSeconds: CFTimeInterval = 700.0
-
-    // Candidates to replace threshold values in the future
+    // Candidate future configuration options. If exposed, will need clamping.
     private var tolerancePercentage: Double = 15.0
     private var frozenDurationMultipler: Double = 40.0
-
 
 
     // MARK: - SlowFrameDetector lifecycle
@@ -77,12 +66,7 @@ public final class SlowFrameDetector {
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
 
         config = remoteConfiguration as? SlowFrameDetectorRemoteConfiguration
-        let sfd = SlowFrameDetector()
-        if let config {
-            slowThresholdSeconds = config.slowFrameThresholdMilliseconds / 1e3
-            frozenThresholdSeconds = config.frozenFrameThresholdMilliseconds / 1e3
-        }
-        sfd.start()
+        start()
     }
 
     public func start() {
@@ -186,8 +170,6 @@ public final class SlowFrameDetector {
             return
         }
 
-        // TODO: This approach will need PM approval, because it totally ignores the incoming settings from the configuration. We could map the settings or there are a number of approaches for us to talk about but I think this is the right one. Ignoring the settings is simplest and fits with the fact that the platform is giving us a different picture to deal with, with variable FPS being common.
-
         // Set the previousTimestamp before any potential short circuit
         let actualDuration = actualTimestamp - previousTimestamp
         previousTimestamp = actualTimestamp
@@ -226,33 +208,18 @@ public final class SlowFrameDetector {
 
     private func dumpFrames() async {
 
+        let destination = OTelDestination()
+
         if let slowReportable = await slowFrames?.framesToReport() {
             for (screenName, count) in slowReportable {
-                reportFrame("slowRenders", screenName, count)
+                destination.send(type: "slowRenders", screenName: screenName, count: count, sharedState: nil)
             }
         }
 
         if let frozenReportable = await frozenFrames?.framesToReport() {
             for (screenName, count) in frozenReportable {
-                reportFrame("frozenRenders", screenName, count)
+                destination.send(type: "frozenRenders", screenName: screenName, count: count, sharedState: nil)
             }
         }
-    }
-
-    private func reportFrame(_ type: String, _ screenName: String, _ count: Int) {
-
-        // TODO: DEMRUM-12 - iOS Spike: Integrate COP agent with Splunk O11y
-
-        // The commented-out code below is from the SignalFX repo implementation.
-        // We need to connect with the corresponding code in our COP implementation
-        // such that exports will work and data will show up on the server.
-
-        // let tracer = buildTracer()
-        // let now = Date()
-        // let span = tracer.spanBuilder(spanName: type).setStartTime(time: now).startSpan()
-        // span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "ui")
-        // span.setAttribute(key: Constants.AttributeNames.COUNT, value: count)
-        // span.setAttribute(key: Constants.AttributeNames.SCREEN_NAME, value: screenName)
-        // span.end(time: now)
     }
 }
