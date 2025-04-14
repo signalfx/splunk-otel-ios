@@ -42,6 +42,9 @@ extension OTLPLogEventProcessor {
         // Attributes - event.name
         otelAttributes["event.name"] = AttributeValue(event.name)
 
+        // Attributes - component
+        otelAttributes["component"] = AttributeValue(event.component)
+
         // Merge with provided attributes
         if let providedAttributes = event.attributes {
             for (attributeName, attributeValue) in providedAttributes {

@@ -28,8 +28,11 @@ public protocol AgentEvent {
     /// Event name, specific for each event type.
     var name: String { get }
 
-    /// Instrumentation scope, defines a module from which the event was generated.
+    /// Instrumentation scope attribute, defines a module from which the event was generated.
     var instrumentationScope: String { get }
+
+    /// Component attribute, unique per event.
+    var component: String { get }
 
 
     // MARK: - Event properties

@@ -27,6 +27,7 @@ class CrashReportsDataEvent: AgentEvent {
     let domain = "mrum"
     var name: String
     var instrumentationScope = "com.splunk.rum.crashreports"
+    let component = "crash"
 
 
     // MARK: - Event properties

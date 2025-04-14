@@ -27,6 +27,7 @@ class SessionReplayDataEvent: AgentEvent {
     let domain = "mrum"
     let name = "session_replay_data"
     let instrumentationScope = "com.splunk.rum.sessionreplay"
+    let component = "session.replay"
 
 
     // MARK: - Event properties

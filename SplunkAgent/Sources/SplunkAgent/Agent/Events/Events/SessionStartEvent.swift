@@ -26,6 +26,7 @@ class SessionStartEvent: AgentEvent {
     let domain = "mrum"
     let name = "session_start"
     let instrumentationScope = "com.splunk.rum.agent"
+    let component = "session.start"
 
 
     // MARK: - Event properties
