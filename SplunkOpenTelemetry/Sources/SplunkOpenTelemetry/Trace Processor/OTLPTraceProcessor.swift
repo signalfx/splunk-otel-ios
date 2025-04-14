@@ -21,7 +21,6 @@ import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import SplunkSharedProtocols
 import SplunkOpenTelemetryBackgroundExporter
-import StdoutExporter
 
 /// OTLPTraceProcessor initializes and uses OpenTelemetry Trace Provider.
 ///
@@ -32,8 +31,8 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // OTel tracer provider
     private let tracerProvider: TracerProvider
-    
-    
+
+
     // MARK: - Initialization
     
     required public init(
@@ -68,10 +67,9 @@ public class OTLPTraceProcessor: TraceProcessor {
             .add(spanProcessor: attributesProcessor)
             .add(spanProcessor: spanProcessor)
 
-        // Initialize optional debug exporter
+        // Initialize optional stdout exporter
         if debugEnabled {
-            // TODO: DEMRUM-1425 - implement Logging exporter, remove StdoutSpanExporter
-            let stdoutExporter = StdoutSpanExporter(isDebug: true)
+            let stdoutExporter = SplunkStdoutSpanExporter()
             let stdoutSpanProcessor = SimpleSpanProcessor(spanExporter: stdoutExporter)
             
             tracerProviderBuilder = tracerProviderBuilder.add(spanProcessor: stdoutSpanProcessor)

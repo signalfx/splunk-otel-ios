@@ -57,16 +57,6 @@ final class EventsTests: XCTestCase {
         XCTAssertEqual(processedEvent.name, "session_start")
     }
 
-    func testEventManagerSessionPulseEvent() throws {
-        let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
-
-        eventManager.sendSessionPulseEvent()
-
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
-        XCTAssertEqual(processedEvent.name, "session_pulse")
-    }
-
 
     // MARK: - Testing Event manual events
 
@@ -97,32 +87,6 @@ final class EventsTests: XCTestCase {
         try checkEventBaseAttributes(processedEvent)
 
         XCTAssertEqual(processedEvent.name, "session_start")
-
-        wait(for: [requestExpectation], timeout: 5)
-    }
-
-    func testSessionPulseEvent() throws {
-        let sessionID = try XCTUnwrap(agent?.session.currentSessionId)
-        let timestamp = Date()
-
-        let event = SessionPulseEvent(sessionID: sessionID, timestamp: timestamp)
-
-        let requestExpectation = XCTestExpectation(description: "Send request")
-
-        let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
-
-        logEventProcessor.sendEvent(event, completion: { _ in
-            // TODO: MRUM_AC-1111 - EventManager and Events tests
-//            XCTAssert(success)
-
-            requestExpectation.fulfill()
-        })
-
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
-        try checkEventBaseAttributes(processedEvent)
-
-        XCTAssertEqual(processedEvent.name, "session_pulse")
 
         wait(for: [requestExpectation], timeout: 5)
     }
@@ -176,9 +140,10 @@ final class EventsTests: XCTestCase {
 
     func testImmediateProcessing() throws {
         let sessionID = try XCTUnwrap(agent?.session.currentSessionId)
+        let userID = try XCTUnwrap(agent?.user.identifier)
         let timestamp = Date()
 
-        let event = SessionPulseEvent(sessionID: sessionID, timestamp: timestamp)
+        let event = SessionStartEvent(sessionID: sessionID, timestamp: timestamp, userID: userID)
 
         let requestExpectation = XCTestExpectation(description: "Send request")
 
@@ -199,9 +164,10 @@ final class EventsTests: XCTestCase {
 
     func testBackgroundProcessing() throws {
         let sessionID = try XCTUnwrap(agent?.session.currentSessionId)
+        let userID = try XCTUnwrap(agent?.user.identifier)
         let timestamp = Date()
 
-        let event = SessionPulseEvent(sessionID: sessionID, timestamp: timestamp)
+        let event = SessionStartEvent(sessionID: sessionID, timestamp: timestamp, userID: userID)
 
         let requestExpectation = XCTestExpectation(description: "Send request")
 
