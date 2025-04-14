@@ -20,7 +20,7 @@ struct ContentView: View {
 
     let userId = SplunkRum.instance?.user.identifier ?? "nil"
     @State private var sessionId = SplunkRum.instance?.session.currentSessionId ?? "nil"
-    @State private var agentStatus = SplunkRum.instance?.state.status ?? .notRunning(.notEnabled)
+    @State private var agentStatus = SplunkRum.instance?.state.status ?? Status.notRunning(.notInstalled)
 
     let sessionPublisher = NotificationCenter.default
         .publisher(
