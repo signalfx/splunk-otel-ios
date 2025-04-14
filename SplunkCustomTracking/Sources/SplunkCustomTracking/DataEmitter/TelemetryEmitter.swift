@@ -27,7 +27,7 @@ struct TelemetryEmitter {
 
         // TODO: needs cleanup (a sweep through items to see if everything belongs)
 
-        
+
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
@@ -38,7 +38,7 @@ struct TelemetryEmitter {
         let span = tracer.spanBuilder(spanName: spanName)
             .setStartTime(time: start)
             .startSpan()
-        
+
         span.setAttribute(key: "component", value: "customtracking")
 
         // Populate span with attributes
@@ -50,7 +50,7 @@ struct TelemetryEmitter {
 
         span.setAttribute(key: "screen.name", value: "unknown")
 
-        attributes.forEach { key, value in
+        for (key, value) in attributes {
             span.setAttribute(key: key, value: value.toString())
         }
 

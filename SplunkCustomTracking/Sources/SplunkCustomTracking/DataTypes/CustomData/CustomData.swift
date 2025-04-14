@@ -24,7 +24,7 @@ struct CustomData: SplunkTrackable, ModuleEventData {
     var attributes: [String: String]
 
     init(name: String, attributes: [String: String]) {
-        self.typeName = name
+        typeName = name
         self.attributes = attributes
     }
 

@@ -32,9 +32,8 @@ public struct Stacktrace {
 
 // MARK: - Stacktrace formatting
 
-extension Stacktrace {
-    public var formatted: String {
+public extension Stacktrace {
+    var formatted: String {
         frames.joined(separator: "\n")
     }
 }
-
