@@ -23,6 +23,11 @@ import Foundation
 import OpenTelemetryApi
 
 
+
+// TODO: Probably `Data` is going to become `Event` in a lot of places to better match the team understanding.
+// CustomDataTracking -> CustomEventTracking, SplunkTrackableData -> SplunkTrackableEvent, etc.
+
+
 class CustomDataTracking {
 
     public unowned var sharedState: AgentSharedState?
