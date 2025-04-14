@@ -19,49 +19,48 @@ import Foundation
 
 // Static strings for crash report keys
 
-public class CrashReportKeys {
-    static let previousAppState = "ios.state"
-    static let eventName = "device.app.crash"
+public enum CrashReportKeys: String {
+    case previousAppState = "ios.state"
 
-    static let crashTimestamp = "crash.timestamp"
-    static let currentTimestamp = "crash.observedTimestamp"
-    static let freeDiskSpace = "crash.freeDiskSpace"
-    static let batteryLevel = "crash.batteryLevel"
-    static let freeMemory = "crash.freeMemory"
-    static let appVersion = "appVersion"
+    case crashTimestamp = "crash.timestamp"
+    case currentTimestamp = "crash.observedTimestamp"
+    case freeDiskSpace = "crash.freeDiskSpace"
+    case batteryLevel = "crash.batteryLevel"
+    case freeMemory = "crash.freeMemory"
+    case appVersion = "appVersion"
 
-    static let processPath = "crash.processPath"
-    static let isNative = "crash.isNative"
+    case processPath = "crash.processPath"
+    case isNative = "crash.isNative"
 
-    static let signalName = "signalName"
-    static let faultAddress = "crash.address"
+    case signalName = "signalName"
+    case faultAddress = "crash.address"
 
-    static let exceptionName = "exception.type"
-    static let exceptionReason = "exception.message"
+    case exceptionName = "exception.type"
+    case exceptionReason = "exception.message"
 
-    static let threads = "exception.threads"
-    static let images = "exception.images"
-    static let details = "details"
-    static let component = "component"
-    static let status = "status"
+    case threads = "exception.threads"
+    case images = "exception.images"
+    case details = "details"
+    case component = "component"
+    case error = "error"
 
     // Stack Frame
-    static let instructionPointer = "instructionPointer"
-    static let imageName = "imageName"
-    static let symbolName = "symbolName"
+    case instructionPointer = "instructionPointer"
+    case imageName = "imageName"
+    case symbolName = "symbolName"
 
     // Thread
-    static let threadNumber = "threadNumber"
-    static let stackFrames = "stackFrames"
-    static let isCrashedThread = "crashed"
+    case threadNumber = "threadNumber"
+    case stackFrames = "stackFrames"
+    case isCrashedThread = "crashed"
 
     // Binary Image
-    static let baseAddress = "baseAddress"
-    static let offset = "offset"
-    static let imageSize = "imageSize"
-    static let imagePath = "imagePath"
-    static let imageUUID = "imageUUID"
+    case baseAddress = "baseAddress"
+    case offset = "offset"
+    case imageSize = "imageSize"
+    case imagePath = "imagePath"
+    case imageUUID = "imageUUID"
 
     // Primary group key
-    static let crashReportMessageName = "ios.crash_report"
+    case crashReportMessageName = "ios.crash_report"
 }

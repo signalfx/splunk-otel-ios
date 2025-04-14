@@ -29,7 +29,7 @@ public class CrashReports {
 
     private var crashReporter: SPLKPLCrashReporter?
     private let internalLogger = InternalLogger(configuration: .crashReporter(category: "CrashReporter"))
-    private var allUsedImageNames: Array<String> = []
+    private var allUsedImageNames: [String] = []
 
     // A reference to the Module's data publishing callback.
     var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)?
@@ -188,9 +188,9 @@ public class CrashReports {
 
     // Report formatting
 
-    private func stackFramesFromCrashReport(report: SPLKPLCrashReport) -> Dictionary<String, Any> {
-        var stackFrames: [String: Any] = [:]
-        var threads: Array<Any> = []
+    private func stackFramesFromCrashReport(report: SPLKPLCrashReport) -> [CrashReportKeys: Any] {
+        var stackFrames: [CrashReportKeys: Any] = [:]
+        var threads: [Any] = []
 
         for thread in report.threads {
             if let thread = thread as? SPLKPLCrashReportThreadInfo {
@@ -204,80 +204,80 @@ public class CrashReports {
         return stackFrames
     }
 
-    private func formatCrashReport(report: SPLKPLCrashReport, stackFrames: Dictionary<String, Any>) -> Dictionary<String, Any> {
+    private func formatCrashReport(report: SPLKPLCrashReport, stackFrames: [CrashReportKeys: Any]) -> [CrashReportKeys: Any] {
 
-        var reportDict: [String: Any] = [:]
+        var reportDict: [CrashReportKeys: Any] = [:]
 
-        reportDict[CrashReportKeys.component] = "crash"
-        reportDict[CrashReportKeys.status] = "Error"
+        reportDict[.component] = "crash"
+        reportDict[.error] = true
 
         if report.systemInfo != nil {
-            reportDict[CrashReportKeys.crashTimestamp] = report.systemInfo.timestamp!
+            reportDict[.crashTimestamp] = report.systemInfo.timestamp!
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-            reportDict[CrashReportKeys.currentTimestamp] = formatter.string(from: Date())
+            reportDict[.currentTimestamp] = formatter.string(from: Date())
         }
 
         if report.applicationInfo != nil {
-            reportDict[CrashReportKeys.appVersion] = report.applicationInfo.applicationMarketingVersion
+            reportDict[.appVersion] = report.applicationInfo.applicationMarketingVersion
         }
 
         if report.hasProcessInfo {
-            reportDict[CrashReportKeys.processPath] = report.processInfo.processPath
-            reportDict[CrashReportKeys.isNative] = report.processInfo.native ? "1" : "0"
+            reportDict[.processPath] = report.processInfo.processPath
+            reportDict[.isNative] = report.processInfo.native ? "1" : "0"
         }
 
         if report.signalInfo != nil {
-            reportDict[CrashReportKeys.signalName] = report.signalInfo.name
-            reportDict[CrashReportKeys.faultAddress] = String(report.signalInfo.address)
+            reportDict[.signalName] = report.signalInfo.name
+            reportDict[.faultAddress] = String(report.signalInfo.address)
         }
 
         if report.hasExceptionInfo {
-            reportDict[CrashReportKeys.exceptionName] = report.exceptionInfo.exceptionName ?? ""
-            reportDict[CrashReportKeys.exceptionReason] = report.exceptionInfo.exceptionReason ?? ""
+            reportDict[.exceptionName] = report.exceptionInfo.exceptionName ?? ""
+            reportDict[.exceptionReason] = report.exceptionInfo.exceptionReason ?? ""
         }
 
         let stackFramesSlice = stackFrames[CrashReportKeys.threads]
-        if let stackFramesSlice = stackFramesSlice as? Array<Dictionary<String, Any>> {
-            reportDict[CrashReportKeys.threads] = threadList(frames: stackFramesSlice)
+        if let stackFramesSlice = stackFramesSlice as? [[CrashReportKeys: Any]] {
+            reportDict[.threads] = threadList(frames: stackFramesSlice)
         }
 
-        reportDict[CrashReportKeys.images] = imageList(images: report.images)
+        reportDict[.images] = imageList(images: report.images)
 
-        var crashPayload: [String: Any] = [:]
-        crashPayload[CrashReportKeys.crashReportMessageName] = reportDict
+        var crashPayload: [CrashReportKeys: Any] = [:]
+        crashPayload[.crashReportMessageName] = reportDict
 
         // Place app state as a sibling to the crash report
-        crashPayload[CrashReportKeys.previousAppState] = "unknown"
+        crashPayload[.previousAppState] = "unknown"
         if let sharedState {
 
             // TODO: In a post GA release, once the backend is able to support we should enable this line of code and remove the 'mapping' code below
-            // crashPayload[CrashReportKeys.previousAppState] = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
+            // crashPayload[.previousAppState] = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
 
             // TODO: As related to above, this mapping code should be removed in favor of the line above once the backend is able to support it.
             let appState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
 
             switch appState {
             case "active":
-                crashPayload[CrashReportKeys.previousAppState] = "foreground"
+                crashPayload[.previousAppState] = "foreground"
 
             case "inactive":
-                crashPayload[CrashReportKeys.previousAppState] = "background"
+                crashPayload[.previousAppState] = "background"
 
             case "terminate":
-                crashPayload[CrashReportKeys.previousAppState] = "background"
+                crashPayload[.previousAppState] = "background"
 
             default:
-                crashPayload[CrashReportKeys.previousAppState] = appState
+                crashPayload[.previousAppState] = appState
             }
             // End of mapping code
         }
         return crashPayload
     }
 
-    private func convertStackFrames(frames: Array<Any>, report: SPLKPLCrashReport) -> Array<Any> {
+    private func convertStackFrames(frames: [Any], report: SPLKPLCrashReport) -> [Any] {
 
-        var stackFrames: Array<Any> = []
+        var stackFrames: [Any] = []
         var isFirstTime = true
 
         guard let frames = frames as? [SPLKPLCrashReportStackFrameInfo] else {
@@ -289,7 +289,7 @@ public class CrashReports {
         }
 
         for stackFrame in frames {
-            var frameDict: [String: Any] = [:]
+            var frameDict: [CrashReportKeys: Any] = [:]
 
             var instructionPointer = stackFrame.instructionPointer
             if !isFirstTime {
@@ -297,7 +297,7 @@ public class CrashReports {
             }
             isFirstTime = false
 
-            frameDict[CrashReportKeys.instructionPointer] = instructionPointer
+            frameDict[.instructionPointer] = instructionPointer
 
             let imageInfo = report.image(forAddress: instructionPointer)
             let imageName = imageInfo?.imageName
@@ -306,7 +306,7 @@ public class CrashReports {
                     "Agent could not locate image for instruction pointer."
                 }
             } else {
-                frameDict[CrashReportKeys.imageName] = imageName
+                frameDict[.imageName] = imageName
                 allUsedImageNames.append(imageName!)
             }
 
@@ -319,35 +319,35 @@ public class CrashReports {
             if stackFrame.symbolInfo != nil {
                 let symbolName = stackFrame.symbolInfo.symbolName
                 let symOffset = instructionPointer - stackFrame.symbolInfo.startAddress
-                frameDict[CrashReportKeys.symbolName] = symbolName
-                frameDict[CrashReportKeys.offset] = symOffset
+                frameDict[.symbolName] = symbolName
+                frameDict[.offset] = symOffset
             } else {
-                frameDict[CrashReportKeys.baseAddress] = baseAddress
-                frameDict[CrashReportKeys.offset] = offset
+                frameDict[.baseAddress] = baseAddress
+                frameDict[.offset] = offset
             }
             stackFrames.append(frameDict)
         }
         return stackFrames
     }
 
-    private func threadFromReport(thread: SPLKPLCrashReportThreadInfo, report: SPLKPLCrashReport) -> Dictionary<String, Any> {
+    private func threadFromReport(thread: SPLKPLCrashReportThreadInfo, report: SPLKPLCrashReport) -> [CrashReportKeys: Any] {
 
-        var oneThread: [String:Any] = [:]
-        oneThread[CrashReportKeys.details] = thread
-        oneThread[CrashReportKeys.stackFrames] = convertStackFrames(frames: thread.stackFrames, report: report)
+        var oneThread: [CrashReportKeys: Any] = [:]
+        oneThread[.details] = thread
+        oneThread[.stackFrames] = convertStackFrames(frames: thread.stackFrames, report: report)
         return oneThread
     }
 
-    private func threadList(threads: Array<Dictionary<String, Any>>, threadKey: String) -> Array<Any> {
-        var outputThreads: Array<Any> = []
+    private func threadList(threads: [[CrashReportKeys: Any]], threadKey: CrashReportKeys) -> [Any] {
+        var outputThreads: [Any] = []
 
         for thread in threads {
 
-            var threadDictionary: [String: Any] = [:]
-            threadDictionary[CrashReportKeys.stackFrames] = thread[CrashReportKeys.stackFrames]
+            var threadDictionary: [CrashReportKeys: Any] = [:]
+            threadDictionary[.stackFrames] = thread[CrashReportKeys.stackFrames]
 
             if let info = thread[CrashReportKeys.details] as? SPLKPLCrashReportThreadInfo {
-                threadDictionary[CrashReportKeys.threadNumber] = info.threadNumber
+                threadDictionary[.threadNumber] = info.threadNumber
                 threadDictionary[threadKey] = info.crashed
             }
             outputThreads.append(threadDictionary)
@@ -355,23 +355,23 @@ public class CrashReports {
         return outputThreads
     }
 
-    private func threadList(frames: Array<Dictionary<String, Any>>) -> Array<Any> {
-        return threadList(threads: frames, threadKey: CrashReportKeys.isCrashedThread)
+    private func threadList(frames: [[CrashReportKeys: Any]]) -> [Any] {
+        return threadList(threads: frames, threadKey: .isCrashedThread)
     }
 
-    private func imageList(images: Array<Any>) -> Array<Any> {
-        var outputImages: Array<Any> = []
+    private func imageList(images: [Any]) -> [Any] {
+        var outputImages: [Any] = []
         for image in images {
-            var imageDictionary: [String: Any] = [:]
+            var imageDictionary: [CrashReportKeys: Any] = [:]
             guard let image = image as? SPLKPLCrashReportBinaryImageInfo else {
                 continue
             }
             // Only add the image to the list if it was noted in the stack traces
             if allUsedImageNames.contains(image.imageName) {
-                imageDictionary[CrashReportKeys.baseAddress] = image.imageBaseAddress
-                imageDictionary[CrashReportKeys.imageSize] = image.imageSize
-                imageDictionary[CrashReportKeys.imagePath] = image.imageName
-                imageDictionary[CrashReportKeys.imageUUID] = image.imageUUID
+                imageDictionary[.baseAddress] = image.imageBaseAddress
+                imageDictionary[.imageSize] = image.imageSize
+                imageDictionary[.imagePath] = image.imageName
+                imageDictionary[.imageUUID] = image.imageUUID
 
                 outputImages.append(imageDictionary)
             }

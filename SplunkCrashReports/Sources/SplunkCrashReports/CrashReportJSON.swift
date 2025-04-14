@@ -21,14 +21,14 @@ import Foundation
 
 public class CrashReportJSON {
 
-    public static func convertDictionaryToJSONData(_ dictionary: [String: Any]) -> Data? {
+    public static func convertDictionaryToJSONData(_ dictionary: [CrashReportKeys: Any]) -> Data? {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted) else {
             return nil
         }
         return jsonData
     }
 
-    public static func convertDictionaryToJSONString(_ dictionary: [String: Any]) -> String? {
+    public static func convertDictionaryToJSONString(_ dictionary: [CrashReportKeys: Any]) -> String? {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted) else {
             return nil
         }
