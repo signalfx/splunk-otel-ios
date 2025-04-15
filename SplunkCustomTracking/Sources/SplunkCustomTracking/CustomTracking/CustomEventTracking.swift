@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 
-// MARK: - CustomDataTracking implementation
+// MARK: - CustomEventTracking implementation
 
 
 import Foundation
@@ -24,19 +24,19 @@ import OpenTelemetryApi
 import SplunkLogger
 
 
-class CustomDataTracking {
+class CustomEventTracking {
 
     public unowned var sharedState: AgentSharedState?
 
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "CustomDataTracking"))
+    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "CustomEventTracking"))
 
-    func track(data: SplunkTrackableData) {
+    func track(event: SplunkTrackableEvent) {
 
         // Initialize ConstrainedAttributes -- currently used for length validation
         var constrainedAttributes = ConstrainedAttributes<EventAttributeValue>()
 
         // Obtain attributes from the data
-        let attributes = data.toEventAttributes()
+        let attributes = event.toEventAttributes()
 
         // Validate by trying to set key-value pairs using ConstrainedAttributes
         for (key, value) in attributes {
@@ -49,6 +49,6 @@ class CustomDataTracking {
         }
 
         // Emit the span directly using the TelemetryEmitter
-        TelemetryEmitter.emitSpan(data: data, sharedState: sharedState, spanName: "CustomDataTracking")
+        TelemetryEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "CustomEventTracking")
     }
 }

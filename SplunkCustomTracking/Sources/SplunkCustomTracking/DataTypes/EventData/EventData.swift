@@ -19,7 +19,7 @@ import Foundation
 import SplunkSharedProtocols
 
 
-struct CustomData: SplunkTrackable, ModuleEventData {
+struct EventData: SplunkTrackable, ModuleEventData {
     var typeName: String
     var attributes: [String: String]
 
