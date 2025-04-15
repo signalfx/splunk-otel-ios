@@ -697,7 +697,6 @@
 		52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkCustomTracking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52BE13702DA9F158009A7262 /* CustomTracking+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomTracking+Module.swift"; sourceTree = "<group>"; };
 		52BE13712DA9F158009A7262 /* CustomTrackingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingConfiguration.swift; sourceTree = "<group>"; };
-		52F0BA482DA8A12400133EE5 /* AttributeOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributeOperations.swift; sourceTree = "<group>"; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB22BA9D424000CC11B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -2212,7 +2211,6 @@
 			isa = PBXGroup;
 			children = (
 				528E4ADC2DAE34510000627B /* ValidationUtils.swift */,
-				52F0BA482DA8A12400133EE5 /* AttributeOperations.swift */,
 			);
 			path = DataHelpers;
 			sourceTree = "<group>";
