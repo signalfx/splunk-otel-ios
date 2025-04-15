@@ -32,20 +32,13 @@ public struct CustomErrorTracking {
     // Track method for SplunkTrackableIssue
     public func track(issue: SplunkTrackableIssue) {
 
-
-        // TODO: figure out whether any of the attributes stuff here is useful
-        // for anything other than length validation when we are not in the
-        // regime of ModuleEventData and ModuleEventMetadata. Length validation
-        // here and in CustomDataTracking is itself worthwhile since the data
-        // we gather here is user-submitted.
-
-        // Initialize ConstrainedAttributes
+        // Initialize ConstrainedAttributes -- currently used for length validation
         var constrainedAttributes = ConstrainedAttributes<String>()
 
         // Obtain attributes from the issue
         let attributes = issue.toEventAttributes()
 
-        // Validate and set key-value pairs using ConstrainedAttributes
+        // Validate by trying to set key-value pairs using ConstrainedAttributes
         for (key, value) in attributes {
             if case let .string(stringValue) = value {
                 if !constrainedAttributes.setAttribute(for: key, value: stringValue) {
