@@ -38,6 +38,10 @@ internal import SplunkSharedProtocols
     internal import SplunkAppStart
 #endif
 
+#if canImport(SplunkCustomTracking)
+    internal import SplunkCustomTracking
+#endif
+
 
 /// The class implements the default pool of available modules.
 class DefaultModulesPool: AgentModulesPool {
@@ -69,6 +73,12 @@ class DefaultModulesPool: AgentModulesPool {
         #if canImport(SplunkSlowFrameDetector)
             knownModules.append(SlowFrameDetector.self)
         #endif
+
+        // Custom Tracking
+        #if canImport(SplunkCustomTracking)
+            knownModules.append(CustomTracking.self)
+        #endif
+
 
         return knownModules
     }
