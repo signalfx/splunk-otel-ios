@@ -40,8 +40,7 @@ public class CrashReportDeviceStats {
             return "Unknown"
         }
     }
-    
-    // https://stackoverflow.com/questions/5012886/determining-the-available-amount-of-ram-on-an-ios-device/8540665#8540665
+
     class var freeMemory: String {
         var usedBytes: Float = 0
         let totalBytes = Float(ProcessInfo.processInfo.physicalMemory)
@@ -50,10 +49,10 @@ public class CrashReportDeviceStats {
         let kerr: kern_return_t = withUnsafeMutablePointer(to: &info) {
             $0.withMemoryRebound(to: integer_t.self, capacity: 1) {
                 task_info(
-                        mach_task_self_,
-                        task_flavor_t(MACH_TASK_BASIC_INFO),
-                        $0,
-                        &count
+                    mach_task_self_,
+                    task_flavor_t(MACH_TASK_BASIC_INFO),
+                    $0,
+                    &count
                 )
             }
         }
@@ -65,5 +64,4 @@ public class CrashReportDeviceStats {
         let freeBytes = totalBytes - usedBytes
         return ByteCountFormatter.string(fromByteCount: Int64(freeBytes), countStyle: .memory)
     }
-
 }

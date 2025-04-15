@@ -221,7 +221,6 @@ public class CrashReports {
         }
     }
 
-
     // Report formatting
 
     private func stackFramesFromCrashReport(report: SPLKPLCrashReport) -> [CrashReportKeys: Any] {
@@ -253,26 +252,21 @@ public class CrashReports {
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
             reportDict[.currentTimestamp] = formatter.string(from: Date())
         }
-
         if report.applicationInfo != nil {
             reportDict[.appVersion] = report.applicationInfo.applicationMarketingVersion
         }
-
         if report.hasProcessInfo {
             reportDict[.processPath] = report.processInfo.processPath
             reportDict[.isNative] = report.processInfo.native ? "1" : "0"
         }
-
         if report.signalInfo != nil {
             reportDict[.signalName] = report.signalInfo.name
             reportDict[.faultAddress] = String(report.signalInfo.address)
         }
-
         if report.hasExceptionInfo {
             reportDict[.exceptionName] = report.exceptionInfo.exceptionName ?? ""
             reportDict[.exceptionReason] = report.exceptionInfo.exceptionReason ?? ""
         }
-
         if report.customData != nil {
             let customData = NSKeyedUnarchiver.unarchiveObject(with: report.customData) as? [CrashReportKeys: String]
             if customData != nil {
@@ -305,13 +299,10 @@ public class CrashReports {
             switch appState {
             case "active":
                 crashPayload[.previousAppState] = "foreground"
-
             case "inactive":
                 crashPayload[.previousAppState] = "background"
-
             case "terminate":
                 crashPayload[.previousAppState] = "background"
-
             default:
                 crashPayload[.previousAppState] = appState
             }
@@ -326,7 +317,6 @@ public class CrashReports {
         var isFirstTime = true
 
         guard let frames = frames as? [SPLKPLCrashReportStackFrameInfo] else {
-            // TODO: - Check the correctness of the return value.
             internalLogger.log(level: .error) {
                 "CrashReporter received incorrect stackFrame type."
             }

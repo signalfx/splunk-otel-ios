@@ -40,7 +40,6 @@ public struct CrashReportsRemoteConfiguration: RemoteModuleConfiguration {
         let configuration: Configuration
     }
 
-
     // MARK: - Protocol compliance
 
     public var enabled: Bool
@@ -53,4 +52,3 @@ public struct CrashReportsRemoteConfiguration: RemoteModuleConfiguration {
         enabled = root.configuration.mrum.crashReporting.enabled
     }
 }
-
