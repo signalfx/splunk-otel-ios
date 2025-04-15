@@ -20,7 +20,7 @@ import SplunkSharedProtocols
 
 public struct NetworkInstrumentationConfiguration: ModuleConfiguration {}
 
-public struct NetworkInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
+public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
 
     // MARK: - Internal decoding
 

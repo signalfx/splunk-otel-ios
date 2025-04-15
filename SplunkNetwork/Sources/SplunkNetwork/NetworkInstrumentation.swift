@@ -28,7 +28,8 @@ public class NetworkInstrumentation {
 
     // MARK: - Private
 
-    private let internalLogger = InternalLogger(configuration: .networkInstrumentation(category: "NetworkInstrumentation"))
+    private let internalLogger = InternalLogger(configuration:
+            .networkInstrumentation(category: "NetworkInstrumentation"))
 
     // MARK: - Public
 
@@ -41,10 +42,16 @@ public class NetworkInstrumentation {
     public required init() {    // For Module conformance
     }
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    public func install(with configuration: (any ModuleConfiguration)?,
+                        remoteConfiguration: (any RemoteModuleConfiguration)?) {
 
         // Start up NSURLSession instrumentation
-        _ = URLSessionInstrumentation(configuration: URLSessionInstrumentationConfiguration(shouldRecordPayload: shouldRecordPayload, shouldInstrument: shouldInstrument, createdRequest: createdRequest, receivedResponse: receivedResponse, receivedError: receivedError))
+        _ = URLSessionInstrumentation(configuration: URLSessionInstrumentationConfiguration(
+            shouldRecordPayload: shouldRecordPayload,
+            shouldInstrument: shouldInstrument,
+            createdRequest: createdRequest,
+            receivedResponse: receivedResponse,
+            receivedError: receivedError))
     }
 
     // Callback methods to modify URLSession monitoring
