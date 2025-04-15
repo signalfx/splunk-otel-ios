@@ -28,8 +28,8 @@ public final class SlowFrameDetector {
     actor ReportableFramesBuffer {
         private var buffer: FrameBuffer = [:]
 
-        func incrementFrames(_ screenName: String) async {
-            buffer[screenName, default: 0] += 1
+        func incrementFrames() async {
+            buffer["shared", default: 0] += 1
         }
 
         func framesToReport() async -> FrameBuffer {
@@ -47,9 +47,6 @@ public final class SlowFrameDetector {
     private var frozenFrames: ReportableFramesBuffer? = ReportableFramesBuffer()
 
     private var previousTimestamp: CFTimeInterval = 0.0
-
-    // TODO: DEMRUM-1896, find out where to get screen name info
-    private var currentScreenName = "unknown"
 
     private var config: SlowFrameDetectorRemoteConfiguration?
 
@@ -193,12 +190,12 @@ public final class SlowFrameDetector {
         // Apply isFrozen check first because it's a subset of isSlow
         if isFrozen {
             displayLinkTask = Task { [weak self] in
-                await self?.frozenFrames?.incrementFrames(self?.currentScreenName ?? "unknown")
+                await self?.frozenFrames?.incrementFrames()
                 self?.displayLinkTask = nil
             }
         } else if isSlow {
             displayLinkTask = Task { [weak self] in
-                await self?.slowFrames?.incrementFrames(self?.currentScreenName ?? "unknown")
+                await self?.slowFrames?.incrementFrames()
                 self?.displayLinkTask = nil
             }
         }
