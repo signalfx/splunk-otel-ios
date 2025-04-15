@@ -16,11 +16,11 @@ limitations under the License.
 */
 
 
-public protocol SplunkTrackableData: SplunkTrackable {
+public protocol SplunkTrackableEvent: SplunkTrackable {
     var attributes: [String: EventAttributeValue] { get set }
 }
 
-public extension SplunkTrackableData {
+public extension SplunkTrackableEvent {
     // Directly use the dictionary's methods
     func toEventAttributes() -> [String: EventAttributeValue] {
         return attributes

@@ -47,6 +47,8 @@ public extension SplunkTrackableIssue {
 }
 
 
+// MARK: - SplunkIssue: Wrapper for String with SplunkTrackableIssue conformance
+
 public struct SplunkIssue: SplunkTrackableIssue {
     public let message: String
 
