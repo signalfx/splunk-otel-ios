@@ -15,18 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-// MARK: - CustomEventTracking implementation
-
-
 import Foundation
 import OpenTelemetryApi
 import SplunkLogger
 
 
-class CustomEventTracking {
+// MARK: - EventTracking
 
-    public unowned var sharedState: AgentSharedState?
+class EventTracking {
+
+    var typeName: String
+    unowned var sharedState: AgentSharedState?
 
     private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "CustomEventTracking"))
 
