@@ -20,11 +20,11 @@ import Foundation
 
 // MARK: - Stacktrace
 
-public struct Stacktrace {
+struct Stacktrace {
 
-    public let frames: [String]
+    let frames: [String]
 
-    public init(frames: [String]) {
+    init(frames: [String]) {
         self.frames = frames
     }
 }
@@ -32,7 +32,7 @@ public struct Stacktrace {
 
 // MARK: - Stacktrace formatting
 
-public extension Stacktrace {
+extension Stacktrace {
     var formatted: String {
         frames.joined(separator: "\n")
     }
