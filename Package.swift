@@ -39,7 +39,8 @@ let package = Package(
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkANRReporter",
-                "SplunkAppStart"
+                "SplunkAppStart",
+                "SplunkInteractions"
             ],
             path: "SplunkAgent",
             sources: ["Sources"],
@@ -267,7 +268,9 @@ let package = Package(
 
         .target(
                 name: "SplunkInteractions",
-                dependencies: [],
+                dependencies: [
+                    "SplunkLogger"
+                ],
                 path: "SplunkInteractions/Sources"
             ),
         .testTarget(

@@ -22,6 +22,7 @@ import Foundation
 import CiscoSwizzling
 import CiscoInteractions
 import SplunkSharedProtocols
+import SplunkLogger
 
 extension Data: ModuleEventData {}
 
@@ -47,18 +48,12 @@ public struct InteractionsRemoteConfiguration: RemoteModuleConfiguration {
 
     public var enabled: Bool = true
 
-    public init?(from data: Data) {
-        return nil
-    }
+    public init?(from data: Data) {}
 }
 
 
 public final class SplunkInteractions: Module {
-    public func onPublish(data: @escaping (CiscoInteractions.InteractionEvent, Data) -> Void) {
-        <#code#>
-    }
-    
-    
+
     // MARK: - Module types
 
     public typealias Configuration = InteractionsConfiguration
@@ -68,9 +63,28 @@ public final class SplunkInteractions: Module {
     public typealias EventData = Data
 
 
+    // MARK: - Private properties
+
+    private var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
+    private let internalLogger = InternalLogger(configuration: .interactions(category: "Module"))
+
     // MARK: - Module methods
 
+    public init() {}
+
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+        Task {
+            do {
+                interactionsDetector = try await InteractionsDetector<DefaultSwizzling>()
+            } catch {
+                internalLogger.log(level: .error) {
+                    "Could not initialize InteractionsDetector: \(error)."
+                }
+            }
+        }
+    }
+
+    public func onPublish(data: @escaping (CiscoInteractions.InteractionEvent, Data) -> Void) {
 
     }
 
