@@ -687,9 +687,7 @@
 		52B25E812DA6F30C006C34A5 /* xcschememanagement.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = xcschememanagement.plist; sourceTree = "<group>"; };
 		52B25E892DA6F30C006C34A5 /* CustomEventTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomEventTracking.swift; sourceTree = "<group>"; };
 		52B25E8C2DA6F30C006C34A5 /* LogDataEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogDataEmitter.swift; sourceTree = "<group>"; };
-		52B25E8F2DA6F30C006C34A5 /* EventData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventData.swift; sourceTree = "<group>"; };
 		52B25E932DA6F30C006C34A5 /* ErrorAttributeKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAttributeKeys.swift; sourceTree = "<group>"; };
-		52B25E942DA6F30C006C34A5 /* ErrorData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorData.swift; sourceTree = "<group>"; };
 		52B25E972DA6F30C006C34A5 /* Stacktrace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stacktrace.swift; sourceTree = "<group>"; };
 		52B25E9D2DA6F30C006C34A5 /* SplunkTrackable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackable.swift; sourceTree = "<group>"; };
 		52B25E9F2DA6F30C006C34A5 /* SplunkTrackableIssue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackableIssue.swift; sourceTree = "<group>"; };
@@ -2134,19 +2132,10 @@
 			path = DataEmitter;
 			sourceTree = "<group>";
 		};
-		52B25E922DA6F30C006C34A5 /* EventData */ = {
-			isa = PBXGroup;
-			children = (
-				52B25E8F2DA6F30C006C34A5 /* EventData.swift */,
-			);
-			path = EventData;
-			sourceTree = "<group>";
-		};
 		52B25E982DA6F30C006C34A5 /* ErrorData */ = {
 			isa = PBXGroup;
 			children = (
 				52B25E932DA6F30C006C34A5 /* ErrorAttributeKeys.swift */,
-				52B25E942DA6F30C006C34A5 /* ErrorData.swift */,
 				52B25E972DA6F30C006C34A5 /* Stacktrace.swift */,
 			);
 			path = ErrorData;
@@ -2156,7 +2145,6 @@
 			isa = PBXGroup;
 			children = (
 				52F0BA472DA8A11900133EE5 /* DataHelpers */,
-				52B25E922DA6F30C006C34A5 /* EventData */,
 				52B25E982DA6F30C006C34A5 /* ErrorData */,
 			);
 			path = DataTypes;
