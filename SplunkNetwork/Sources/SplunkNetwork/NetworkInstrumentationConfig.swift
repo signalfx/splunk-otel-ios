@@ -40,7 +40,6 @@ public struct NetworkInstrumentationRemoteConfiguration: RemoteModuleConfigurati
         let configuration: Configuration
     }
 
-
     // MARK: - Protocol compliance
 
     public var enabled: Bool

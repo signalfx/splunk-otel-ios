@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 import Foundation
 import SplunkSharedProtocols
 import SplunkLogger
@@ -26,9 +25,9 @@ import ResourceExtension
 import SignPostIntegration
 
 public class NetworkInstrumentation {
-    
+
     // MARK: - Private
-    
+
     private let internalLogger = InternalLogger(configuration: .networkInstrumentation(category: "NetworkInstrumentation"))
 
     // MARK: - Public
@@ -41,13 +40,13 @@ public class NetworkInstrumentation {
 
     public required init() {    // For Module conformance
     }
-    
+
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
- 
+
         // Start up NSURLSession instrumentation
         _ = URLSessionInstrumentation(configuration: URLSessionInstrumentationConfiguration(shouldRecordPayload: shouldRecordPayload, shouldInstrument: shouldInstrument, createdRequest: createdRequest, receivedResponse: receivedResponse, receivedError: receivedError))
     }
-    
+
     // Callback methods to modify URLSession monitoring
     func shouldInstrument(URLRequest: URLRequest) -> Bool {
         // Code here could filter based on URLRequest
@@ -60,17 +59,13 @@ public class NetworkInstrumentation {
         let requestEndpoint = URLRequest.description
 
         if let excludedEndpoints {
-            for excludedEndpoint in excludedEndpoints {
-                if requestEndpoint.contains(excludedEndpoint.absoluteString) {
-                    self.internalLogger.log(level: .debug) {
-                        "Should Not Instrument Backend URL \(URLRequest.description)"
-                    }
-
-                    return false
+            for excludedEndpoint in excludedEndpoints where requestEndpoint.contains(excludedEndpoint.absoluteString) {
+                self.internalLogger.log(level: .debug) {
+                    "Should Not Instrument Backend URL \(URLRequest.description)"
                 }
+                return false
             }
-        }
-        else {
+        } else {
             self.internalLogger.log(level: .debug) {
                 "Should Not Instrument, Backend URL not yet configured."
             }
@@ -83,8 +78,7 @@ public class NetworkInstrumentation {
                 "Should Not Instrument Localhost \(URLRequest.description)"
             }
             return false
-        }
-        else {
+        } else {
             self.internalLogger.log(level: .debug) {
                 "Should Instrument \(URLRequest.description)"
             }
@@ -96,23 +90,23 @@ public class NetworkInstrumentation {
         return true
     }
 
-    func createdRequest(URLRequest: URLRequest, Span: Span) -> Void {
+    func createdRequest(URLRequest: URLRequest, span: Span) {
         let key = SemanticAttributes.httpRequestContentLength
         let body = URLRequest.httpBody
         let length = body?.count ?? 0
-        Span.setAttribute(key: key, value: length)
+        span.setAttribute(key: key, value: length)
 
         if let sharedState {
             let sessionID = sharedState.sessionId
-            Span.setAttribute(key: "session.id", value: sessionID)
+            span.setAttribute(key: "session.id", value: sessionID)
         }
     }
 
-    func receivedResponse(URLResponse: URLResponse, DataOrFile: DataOrFile?, Span: Span) -> Void {
+    func receivedResponse(URLResponse: URLResponse, dataOrFile: DataOrFile?, span: Span) {
         let key = SemanticAttributes.httpResponseContentLength
         let response = URLResponse as? HTTPURLResponse
         let length = response?.expectedContentLength ?? 0
-        Span.setAttribute(key: key, value: Int(length))
+        span.setAttribute(key: key, value: Int(length))
 
         /* Save this until we add the feature into the Agent side API
         guard ((agentConfiguration?.appDCloudNetworkResponseCallback?(URLResponse)) == nil) else {
@@ -123,13 +117,12 @@ public class NetworkInstrumentation {
         }
         */
     }
-    
-    func receivedError(Error: Error, DataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, Span: Span) -> Void {
-        
-        print(Error)
+
+    func receivedError(error: Error, dataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, span: Span) {
+
+        print(error)
         self.internalLogger.log(level: .error) {
-            "Error: \(Error.localizedDescription), Status: \(HTTPStatus)"
+            "Error: \(error.localizedDescription), Status: \(HTTPStatus)"
         }
     }
 }
-
