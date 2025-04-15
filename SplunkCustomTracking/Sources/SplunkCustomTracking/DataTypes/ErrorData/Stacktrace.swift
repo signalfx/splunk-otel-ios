@@ -21,12 +21,7 @@ import Foundation
 // MARK: - Stacktrace
 
 struct Stacktrace {
-
     let frames: [String]
-
-    init(frames: [String]) {
-        self.frames = frames
-    }
 }
 
 
