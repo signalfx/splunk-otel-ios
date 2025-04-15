@@ -24,11 +24,6 @@ import OpenTelemetryApi
 import SplunkLogger
 
 
-
-// TODO: Probably `Data` is going to become `Event` in a lot of places to better match the team understanding.
-// CustomDataTracking -> CustomEventTracking, SplunkTrackableData -> SplunkTrackableEvent, etc.
-
-
 class CustomDataTracking {
 
     public unowned var sharedState: AgentSharedState?
@@ -37,13 +32,14 @@ class CustomDataTracking {
 
     func track(data: SplunkTrackableData) {
 
-        // TODO: See TODO about attributes in this same location in CustomErrorTracking -
-        // the same questions apply here.
-
+        // Initialize ConstrainedAttributes -- currently used for length validation
         var constrainedAttributes = ConstrainedAttributes<EventAttributeValue>()
 
-        // Convert SplunkTrackableData to attributes and set them with length validation
-        for (key, value) in data.toEventAttributes() {
+        // Obtain attributes from the data
+        let attributes = data.toEventAttributes()
+
+        // Validate by trying to set key-value pairs using ConstrainedAttributes
+        for (key, value) in attributes {
             if !constrainedAttributes.setAttribute(for: key, value: value) {
                 internalLogger.log(level: .warning) {
                     "Invalid key or value length for key '\(key)'. Not publishing this event."
