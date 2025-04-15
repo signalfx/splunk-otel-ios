@@ -204,6 +204,7 @@
 		C76AB8DA2B7B785500CB4307 /* RawMockDataBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76AB8D92B7B785500CB4307 /* RawMockDataBuilder.swift */; };
 		C76AB8DC2B7B798400CB4307 /* RemoteError.json in Resources */ = {isa = PBXBuildFile; fileRef = C76AB8DB2B7B798400CB4307 /* RemoteError.json */; };
 		C76AB8DE2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = C76AB8DD2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json */; };
+		C791ADFE2DAE8AFA002AAA2B /* OTLPLogToSpanEventProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C791ADFC2DAE8AFA002AAA2B /* OTLPLogToSpanEventProcessor.swift */; };
 		C7A2BD1B2BB45363005D4CFB /* AppStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */; };
 		C7FFC4F52B7662E30035203B /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FFC4F42B7662E30035203B /* Service.swift */; };
 		E4032E622B552343003D4392 /* DefaultSessionTestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */; };
@@ -715,6 +716,7 @@
 		C76AB8D92B7B785500CB4307 /* RawMockDataBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawMockDataBuilder.swift; sourceTree = "<group>"; };
 		C76AB8DB2B7B798400CB4307 /* RemoteError.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = RemoteError.json; sourceTree = "<group>"; };
 		C76AB8DD2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AlternativeRemoteConfiguration.json; sourceTree = "<group>"; };
+		C791ADFC2DAE8AFA002AAA2B /* OTLPLogToSpanEventProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPLogToSpanEventProcessor.swift; sourceTree = "<group>"; };
 		C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateModel.swift; sourceTree = "<group>"; };
 		C7FFC4F42B7662E30035203B /* Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Service.swift; sourceTree = "<group>"; };
 		E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSessionTestBuilder.swift; sourceTree = "<group>"; };
@@ -1937,6 +1939,7 @@
 		4B5A5CAA2D60ED3D009DA0D5 /* SplunkOpenTelemetry */ = {
 			isa = PBXGroup;
 			children = (
+				C791ADFD2DAE8AFA002AAA2B /* LogToSpan Event processor */,
 				4B5A5C9F2D60ED3D009DA0D5 /* API */,
 				4B5A5CA22D60ED3D009DA0D5 /* Log Event Processor */,
 				4B5A5CA42D60ED3D009DA0D5 /* Resources */,
@@ -2310,6 +2313,14 @@
 				C73FF49D2B6CE809009C53FF /* ConfigurationHandlerTests.swift */,
 			);
 			path = Configuration;
+			sourceTree = "<group>";
+		};
+		C791ADFD2DAE8AFA002AAA2B /* LogToSpan Event processor */ = {
+			isa = PBXGroup;
+			children = (
+				C791ADFC2DAE8AFA002AAA2B /* OTLPLogToSpanEventProcessor.swift */,
+			);
+			path = "LogToSpan Event processor";
 			sourceTree = "<group>";
 		};
 		C7A2BD192BB44E1C005D4CFB /* Model */ = {
@@ -3918,6 +3929,7 @@
 				4B9642152D61375E009A2E7F /* Resource+AgentResources.swift in Sources */,
 				4B9642162D61375E009A2E7F /* ApiPaths.swift in Sources */,
 				4B9642172D61375E009A2E7F /* OTLPLogEventProcessor.swift in Sources */,
+				C791ADFE2DAE8AFA002AAA2B /* OTLPLogToSpanEventProcessor.swift in Sources */,
 				4B9642182D61375E009A2E7F /* OTLPLogEventProcessor+AgentEvent.swift in Sources */,
 				4B9642192D61375E009A2E7F /* OTLPTraceProcessor.swift in Sources */,
 				4B96421A2D61375E009A2E7F /* OTel.swift in Sources */,
