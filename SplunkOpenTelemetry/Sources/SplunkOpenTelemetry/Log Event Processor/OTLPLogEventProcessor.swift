@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
-import OpenTelemetrProtocolExporterCommon
+import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import SplunkSharedProtocols
 import SplunkOpenTelemetryBackgroundExporter

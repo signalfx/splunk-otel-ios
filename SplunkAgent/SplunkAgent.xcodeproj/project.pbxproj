@@ -202,6 +202,8 @@
 		C76AB8DC2B7B798400CB4307 /* RemoteError.json in Resources */ = {isa = PBXBuildFile; fileRef = C76AB8DB2B7B798400CB4307 /* RemoteError.json */; };
 		C76AB8DE2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = C76AB8DD2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json */; };
 		C791ADFB2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter in Frameworks */ = {isa = PBXBuildFile; productRef = C791ADFA2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter */; };
+		C791AE002DAE8B81002AAA2B /* KeyBuilder+DefaultKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C791ADFF2DAE8B81002AAA2B /* KeyBuilder+DefaultKeys.swift */; };
+		C791AE022DAE8B99002AAA2B /* CiscoDiskStorage in Frameworks */ = {isa = PBXBuildFile; productRef = C791AE012DAE8B99002AAA2B /* CiscoDiskStorage */; };
 		C7A2BD1B2BB45363005D4CFB /* AppStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */; };
 		C7FFC4F52B7662E30035203B /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FFC4F42B7662E30035203B /* Service.swift */; };
 		E4032E622B552343003D4392 /* DefaultSessionTestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */; };
@@ -711,6 +713,7 @@
 		C76AB8D92B7B785500CB4307 /* RawMockDataBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawMockDataBuilder.swift; sourceTree = "<group>"; };
 		C76AB8DB2B7B798400CB4307 /* RemoteError.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = RemoteError.json; sourceTree = "<group>"; };
 		C76AB8DD2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AlternativeRemoteConfiguration.json; sourceTree = "<group>"; };
+		C791ADFF2DAE8B81002AAA2B /* KeyBuilder+DefaultKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyBuilder+DefaultKeys.swift"; sourceTree = "<group>"; };
 		C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateModel.swift; sourceTree = "<group>"; };
 		C7FFC4F42B7662E30035203B /* Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Service.swift; sourceTree = "<group>"; };
 		E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSessionTestBuilder.swift; sourceTree = "<group>"; };
@@ -962,6 +965,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C791ADFB2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter in Frameworks */,
+				C791AE022DAE8B99002AAA2B /* CiscoDiskStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2023,6 +2027,7 @@
 		4B5A5CC52D60F352009DA0D5 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				C791ADFF2DAE8B81002AAA2B /* KeyBuilder+DefaultKeys.swift */,
 				4B5A5CC32D60F352009DA0D5 /* InternalLoggerConfiguration+Defaults.swift */,
 				4B5A5CC42D60F352009DA0D5 /* OperationQueue.swift */,
 			);
@@ -3243,6 +3248,7 @@
 			name = SplunkOpenTelemetryBackgroundExporter;
 			packageProductDependencies = (
 				C791ADFA2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter */,
+				C791AE012DAE8B99002AAA2B /* CiscoDiskStorage */,
 			);
 			productName = SplunkOpenTelemetryBackgroundExporter;
 			productReference = 4B9642272D6138DD009A2E7F /* SplunkOpenTelemetryBackgroundExporter.framework */;
@@ -3930,6 +3936,7 @@
 				4B96424D2D613910009A2E7F /* OTLPBackgroundHTTPBaseExporter.swift in Sources */,
 				4B96424F2D613910009A2E7F /* OTLPBackgroundHTTPLogExporter.swift in Sources */,
 				4B9642502D613910009A2E7F /* OTLPBackgroundHTTPTraceExporter.swift in Sources */,
+				C791AE002DAE8B81002AAA2B /* KeyBuilder+DefaultKeys.swift in Sources */,
 				4B9642512D613910009A2E7F /* RequestDescriptor.swift in Sources */,
 				4B9642522D613910009A2E7F /* SessionQOSConfiguration.swift in Sources */,
 			);
@@ -9030,6 +9037,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B0F23872D79F2C000EA575A /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = OpenTelemetryProtocolExporter;
+		};
+		C791AE012DAE8B99002AAA2B /* CiscoDiskStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
+			productName = CiscoDiskStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
