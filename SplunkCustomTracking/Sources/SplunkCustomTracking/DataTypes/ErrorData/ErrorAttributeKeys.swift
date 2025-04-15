@@ -22,7 +22,7 @@ import SplunkSharedProtocols
 // MARK: - AttributeKey helper
 
 
-public protocol AttributeKey {
+protocol AttributeKey {
     var rawValue: String { get }
 }
 
@@ -31,9 +31,9 @@ public protocol AttributeKey {
 
 
 /// Namespace with OpenTelemetry semantic convention keys for error reporting
-public enum ErrorAttributeKeys {
+enum ErrorAttributeKeys {
     /// Exception-specific attribute keys
-    public enum Exception: String, AttributeKey {
+    enum Exception: String, AttributeKey {
         case type = "exception.type"
         case message = "exception.message"
         case stacktrace = "exception.stacktrace"
@@ -42,12 +42,12 @@ public enum ErrorAttributeKeys {
     }
 
     /// ErrorCode-specific attribute keys
-    public enum ErrorCode: String, AttributeKey {
+    enum ErrorCode: String, AttributeKey {
         case namespace = "code.namespace"
     }
 
     /// Service-specific attribute keys
-    public enum Service: String, AttributeKey {
+    enum Service: String, AttributeKey {
         case name = "service.name"
     }
 }
