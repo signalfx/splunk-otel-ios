@@ -47,7 +47,9 @@ public final class SlowFrameDetector {
     private var frozenFrames: ReportableFramesBuffer? = ReportableFramesBuffer()
 
     private var previousTimestamp: CFTimeInterval = 0.0
-    private var currentScreenName = getScreenName()
+
+    // TODO: DEMRUM-1896, find out where to get screen name info
+    private var currentScreenName = "unknown"
 
     private var config: SlowFrameDetectorRemoteConfiguration?
 
@@ -77,17 +79,8 @@ public final class SlowFrameDetector {
             return
         }
 
-
-        // Stay informed when screen name is updated by code elsewhere
-        addScreenNameChangeCallback { [weak self] name in
-            self?.currentScreenName = name
-        }
-
-
         // Stay on top of app lifecycle so we can pause things if needed
-
         let center = NotificationCenter.default
-
         center.addObserver(self,
                            selector: #selector(appWillResignActive(notification:)),
                            name: UIApplication.willResignActiveNotification,
@@ -200,12 +193,12 @@ public final class SlowFrameDetector {
         // Apply isFrozen check first because it's a subset of isSlow
         if isFrozen {
             displayLinkTask = Task { [weak self] in
-                await self?.frozenFrames?.incrementFrames(self?.currentScreenName ?? "Unknown")
+                await self?.frozenFrames?.incrementFrames(self?.currentScreenName ?? "unknown")
                 self?.displayLinkTask = nil
             }
         } else if isSlow {
             displayLinkTask = Task { [weak self] in
-                await self?.slowFrames?.incrementFrames(self?.currentScreenName ?? "Unknown")
+                await self?.slowFrames?.incrementFrames(self?.currentScreenName ?? "unknown")
                 self?.displayLinkTask = nil
             }
         }
