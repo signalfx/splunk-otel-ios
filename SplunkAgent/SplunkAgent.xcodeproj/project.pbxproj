@@ -183,6 +183,7 @@
 		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		522A70B92DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */; };
 		522A70BB2DAD9F23008A2479 /* OTelDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70BA2DAD9F23008A2479 /* OTelDestination.swift */; };
+		52DA8A012DADC55B00B5260C /* SplunkCustomTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DA8A002DADC55B00B5260C /* SplunkCustomTracking.swift */; };
 		C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */; };
 		C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB02BA9D41E000CC11B /* AppStateManager.swift */; };
 		C703FAB32BA9D424000CC11B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB22BA9D424000CC11B /* AppState.swift */; };
@@ -697,6 +698,7 @@
 		52BE13702DA9F158009A7262 /* CustomTracking+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomTracking+Module.swift"; sourceTree = "<group>"; };
 		52BE13712DA9F158009A7262 /* CustomTrackingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingConfiguration.swift; sourceTree = "<group>"; };
 		52BE13742DA9F454009A7262 /* SplunkCustomTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkCustomTracking.swift; sourceTree = "<group>"; };
+		52DA8A002DADC55B00B5260C /* SplunkCustomTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkCustomTracking.swift; sourceTree = "<group>"; };
 		52F0BA482DA8A12400133EE5 /* AttributeOperations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributeOperations.swift; sourceTree = "<group>"; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
@@ -811,14 +813,6 @@
 		E4FAEEB02B6A51AA008D4E6E /* DefaultModulesManagerTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultModulesManagerTestBuilder.swift; sourceTree = "<group>"; };
 		E4FAEEB62B6A9F81008D4E6E /* RemoteConfiguration.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = RemoteConfiguration.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		52B948F62DA7625E00C75635 /* SplunkCustomTracking */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SplunkCustomTracking;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		3384F29F2AC879E900512D79 /* Frameworks */ = {
@@ -1156,7 +1150,6 @@
 				E4E9747A2B1643EE00ACB469 /* Sources */,
 				E46896332B21C8FF00727A6A /* Tests */,
 				E4F2E4EC2B1721CB006EBA69 /* Tools */,
-				52B948F62DA7625E00C75635 /* SplunkCustomTracking */,
 				3384F2A32AC879E900512D79 /* Products */,
 				E45F8C952BC5881E007AC144 /* Packages */,
 				526521F42CB8937800DB3BB9 /* Frameworks */,
@@ -2125,6 +2118,7 @@
 		52B25E8B2DA6F30C006C34A5 /* CustomTracking */ = {
 			isa = PBXGroup;
 			children = (
+				52DA8A002DADC55B00B5260C /* SplunkCustomTracking.swift */,
 				52194E452DA73D9000A08C47 /* CustomErrorTracking.swift */,
 				52B25E892DA6F30C006C34A5 /* CustomDataTracking.swift */,
 			);
@@ -3360,9 +3354,6 @@
 			);
 			dependencies = (
 			);
-			fileSystemSynchronizedGroups = (
-				52B948F62DA7625E00C75635 /* SplunkCustomTracking */,
-			);
 			name = SplunkCustomTracking;
 			packageProductDependencies = (
 			);
@@ -4040,6 +4031,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52DA8A012DADC55B00B5260C /* SplunkCustomTracking.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

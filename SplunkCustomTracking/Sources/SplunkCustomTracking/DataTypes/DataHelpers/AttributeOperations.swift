@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkLogger
 import SplunkSharedProtocols
 
 
@@ -29,7 +30,6 @@ extension Dictionary: AttributeOperations where Key == String, Value == EventAtt
 
     mutating func setAttribute(for key: String, value: EventAttributeValue, maxKeyLength: Int = 1024, maxValueLength: Int = 2048) -> Bool {
         guard key.count <= maxKeyLength, value.description.count <= maxValueLength else {
-            print("Invalid key or value length.")
             return false
         }
         self[key] = value
