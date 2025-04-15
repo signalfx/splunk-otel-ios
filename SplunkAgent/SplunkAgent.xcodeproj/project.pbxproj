@@ -201,6 +201,7 @@
 		C76AB8DA2B7B785500CB4307 /* RawMockDataBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76AB8D92B7B785500CB4307 /* RawMockDataBuilder.swift */; };
 		C76AB8DC2B7B798400CB4307 /* RemoteError.json in Resources */ = {isa = PBXBuildFile; fileRef = C76AB8DB2B7B798400CB4307 /* RemoteError.json */; };
 		C76AB8DE2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = C76AB8DD2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json */; };
+		C791ADFB2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter in Frameworks */ = {isa = PBXBuildFile; productRef = C791ADFA2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter */; };
 		C7A2BD1B2BB45363005D4CFB /* AppStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */; };
 		C7FFC4F52B7662E30035203B /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FFC4F42B7662E30035203B /* Service.swift */; };
 		E4032E622B552343003D4392 /* DefaultSessionTestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */; };
@@ -960,6 +961,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C791ADFB2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3240,6 +3242,7 @@
 			);
 			name = SplunkOpenTelemetryBackgroundExporter;
 			packageProductDependencies = (
+				C791ADFA2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter */,
 			);
 			productName = SplunkOpenTelemetryBackgroundExporter;
 			productReference = 4B9642272D6138DD009A2E7F /* SplunkOpenTelemetryBackgroundExporter.framework */;
@@ -9022,6 +9025,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4BAA09ED2D9360A000B7D6AE /* XCLocalSwiftPackageReference "../SplunkCrashReporter" */;
 			productName = SplunkCrashReporter;
+		};
+		C791ADFA2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B0F23872D79F2C000EA575A /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			productName = OpenTelemetryProtocolExporter;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
