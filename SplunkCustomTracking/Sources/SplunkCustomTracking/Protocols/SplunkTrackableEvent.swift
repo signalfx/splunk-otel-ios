@@ -25,20 +25,4 @@ public extension SplunkTrackableEvent {
     func toEventAttributes() -> [String: EventAttributeValue] {
         return attributes
     }
-
-    mutating func setAttribute(key: String, value: EventAttributeValue, maxKeyLength: Int = 1024, maxValueLength: Int = 2048) -> Bool {
-        return attributes.setAttribute(for: key, value: value, maxKeyLength: maxKeyLength, maxValueLength: maxValueLength)
-    }
-
-    func getAttribute(key: String) -> EventAttributeValue? {
-        return attributes[key]
-    }
-
-    mutating func removeAttribute(key: String) {
-        attributes.removeValue(forKey: key)
-    }
-
-    mutating func applyAttributes(mutating closure: (String, inout EventAttributeValue) -> Void) {
-        attributes.apply(mutating: closure)
-    }
 }
