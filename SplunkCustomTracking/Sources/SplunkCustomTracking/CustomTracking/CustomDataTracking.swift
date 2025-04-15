@@ -21,6 +21,7 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
+import SplunkLogger
 
 
 
@@ -44,7 +45,9 @@ class CustomDataTracking {
         // Convert SplunkTrackableData to attributes and set them with length validation
         for (key, value) in data.toEventAttributes() {
             if !constrainedAttributes.setAttribute(for: key, value: value) {
-                print("Failed to set attribute due to length constraints: \(key)")
+                internalLogger.log(level: .warning) {
+                    "Invalid key or value length for key '\(key)'. Not publishing this event."
+                }
                 return
             }
         }
