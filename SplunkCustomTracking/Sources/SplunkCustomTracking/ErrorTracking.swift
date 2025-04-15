@@ -20,17 +20,17 @@ import SplunkLogger
 import SplunkSharedProtocols
 
 
-// MARK: - CustomErrorTracking with ConstrainedAttributes
+// MARK: - ErrorTracking
 
-public struct CustomErrorTracking {
+struct ErrorTracking {
 
-    public var typeName: String
-    public unowned var sharedState: AgentSharedState?
+    var typeName: String
+    unowned var sharedState: AgentSharedState?
 
     private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "ErrorTracking"))
 
-    // Track method for SplunkTrackableIssue
-    public func track(issue: SplunkTrackableIssue) {
+    /// Unified track method for SplunkTrackableIssue, Error, NSError, NSException, and wrapped String.
+    func track(issue: SplunkTrackableIssue) {
 
         // Initialize ConstrainedAttributes -- currently used for length validation
         var constrainedAttributes = ConstrainedAttributes<String>()
@@ -51,24 +51,5 @@ public struct CustomErrorTracking {
         }
 
         TelemetryEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "ErrorTracking")
-    }
-
-    // Track method for Error
-    // Might be able to get rid of this one and use track(issue:) above instead
-    // but in any case the call site is the same, so this is good too.
-    public func track(issue: Error) {
-        if let trackableIssue = issue as? SplunkTrackableIssue {
-            track(issue: trackableIssue)
-        } else {
-            let customIssue = CustomError(issue: issue)
-            track(issue: customIssue)
-        }
-    }
-
-    // Track method for String
-    public func track(issue: String) {
-        // Wrap the string in a SplunkIssue and track it
-        let wrappedIssue = SplunkIssue(issue)
-        track(issue: wrappedIssue)
     }
 }
