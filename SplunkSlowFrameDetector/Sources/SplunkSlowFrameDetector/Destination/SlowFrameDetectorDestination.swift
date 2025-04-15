@@ -22,5 +22,5 @@ import SplunkSharedProtocols
 protocol SlowFrameDetectorDestination {
 
     /// Sends results into a destination.
-    func send(type: String, screenName: String, count: Int, sharedState: AgentSharedState?)
+    func send(type: String, count: Int, sharedState: AgentSharedState?)
 }

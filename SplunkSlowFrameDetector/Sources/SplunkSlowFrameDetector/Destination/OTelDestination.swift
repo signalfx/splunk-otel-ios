@@ -26,7 +26,7 @@ struct OTelDestination: SlowFrameDetectorDestination {
 
     // MARK: - Sending
 
-    func send(type: String, screenName: String, count: Int, sharedState: AgentSharedState?) {
+    func send(type: String, count: Int, sharedState: AgentSharedState?) {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
@@ -40,7 +40,6 @@ struct OTelDestination: SlowFrameDetectorDestination {
 
         span.setAttribute(key: "component", value: "ui")
         span.setAttribute(key: "count", value: count)
-        span.setAttribute(key: "screen.name", value: screenName)
 
         span.end(time: Date())
     }

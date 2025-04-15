@@ -212,14 +212,14 @@ public final class SlowFrameDetector {
         let destination = OTelDestination()
 
         if let slowReportable = await slowFrames?.framesToReport() {
-            for (screenName, count) in slowReportable {
-                destination.send(type: "slowRenders", screenName: screenName, count: count, sharedState: nil)
+            for (_, count) in slowReportable {
+                destination.send(type: "slowRenders", count: count, sharedState: nil)
             }
         }
 
         if let frozenReportable = await frozenFrames?.framesToReport() {
-            for (screenName, count) in frozenReportable {
-                destination.send(type: "frozenRenders", screenName: screenName, count: count, sharedState: nil)
+            for (_, count) in frozenReportable {
+                destination.send(type: "frozenRenders", count: count, sharedState: nil)
             }
         }
     }
