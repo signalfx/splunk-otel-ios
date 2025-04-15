@@ -28,7 +28,7 @@ struct TelemetryEmitter {
             .tracerProvider
             .get(
                 instrumentationName: "splunk-custom-tracking",
-                instrumentationVersion: sharedState?.agentVersion ?? : "unknown"
+                instrumentationVersion: sharedState?.agentVersion ?? "unknown"
             )
 
         let span = tracer.spanBuilder(spanName: spanName)

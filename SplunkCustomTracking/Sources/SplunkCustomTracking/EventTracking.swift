@@ -30,21 +30,10 @@ class EventTracking {
     private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "CustomEventTracking"))
 
     func track(event: SplunkTrackableEvent) {
-
-        // Initialize ConstrainedAttributes -- currently used for length validation
-        var constrainedAttributes = ConstrainedAttributes<EventAttributeValue>()
-
-        // Obtain attributes from the data
         let attributes = event.toEventAttributes()
 
-        // Validate by trying to set key-value pairs using ConstrainedAttributes
-        for (key, value) in attributes {
-            if !constrainedAttributes.setAttribute(for: key, value: value) {
-                internalLogger.log(level: .warning) {
-                    "Invalid key or value length for key '\(key)'. Not publishing this event."
-                }
-                return
-            }
+        guard validateAttributeLengths(attributes: attributes, logger: internalLogger) else {
+            return
         }
 
         // Emit the span directly using the TelemetryEmitter

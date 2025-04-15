@@ -16,9 +16,8 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkLogger
 import OpenTelemetryApi
-
+import SplunkLogger
 
 
 public final class SplunkCustomTracking {
@@ -41,8 +40,8 @@ public final class SplunkCustomTracking {
 
     public init(sharedState: AgentSharedState? = nil) {
         self.sharedState = sharedState
-        self.eventTracking = EventTracking(typeName: "CustomEventType", sharedState: sharedState)
-        self.errorTracking = ErrorTracking(typeName: "CustomErrorType", sharedState: sharedState)
+        eventTracking = EventTracking(typeName: "CustomEventType", sharedState: sharedState)
+        errorTracking = ErrorTracking(typeName: "CustomErrorType", sharedState: sharedState)
     }
 
 

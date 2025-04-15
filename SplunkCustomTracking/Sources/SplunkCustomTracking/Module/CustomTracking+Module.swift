@@ -37,7 +37,8 @@ extension SplunkCustomTracking: Module {
 
     // MARK: - Module installation
 
-    func install(with configuration: (any SplunkSharedProtocols.ModuleConfiguration)?, remoteConfiguration: (any SplunkSharedProtocols.RemoteModuleConfiguration)?) {}
+    func install(with configuration: (any SplunkSharedProtocols.ModuleConfiguration)?,
+                 remoteConfiguration: (any SplunkSharedProtocols.RemoteModuleConfiguration)?) {}
 
 
     // MARK: - Module data handling

@@ -31,23 +31,10 @@ struct ErrorTracking {
 
     /// Unified track method for SplunkTrackableIssue, Error, NSError, NSException, and wrapped String.
     func track(issue: SplunkTrackableIssue) {
-
-        // Initialize ConstrainedAttributes -- currently used for length validation
-        var constrainedAttributes = ConstrainedAttributes<String>()
-
-        // Obtain attributes from the issue
         let attributes = issue.toEventAttributes()
 
-        // Validate by trying to set key-value pairs using ConstrainedAttributes
-        for (key, value) in attributes {
-            if case let .string(stringValue) = value {
-                if !constrainedAttributes.setAttribute(for: key, value: stringValue) {
-                    internalLogger.log(level: .warning) {
-                        "Invalid key or value length for key '\(key)'. Not publishing this issue."
-                    }
-                    return
-                }
-            }
+        guard validateAttributeLengths(attributes: attributes, logger: internalLogger) else {
+            return
         }
 
         TelemetryEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "ErrorTracking")
