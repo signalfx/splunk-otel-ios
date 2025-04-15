@@ -47,6 +47,9 @@ public extension SplunkTrackableIssue {
 }
 
 
+// MARK: - Add SplunkTrackableIssue conformance to Error types and SplunkIssue
+
+
 // MARK: - SplunkIssue: Wrapper for String with SplunkTrackableIssue conformance
 
 public struct SplunkIssue: SplunkTrackableIssue {
@@ -62,5 +65,56 @@ public struct SplunkIssue: SplunkTrackableIssue {
 
     public init(_ message: String) {
         self.message = message
+    }
+}
+
+
+// MARK: - Error Extension for SplunkTrackableIssue
+
+extension Error: SplunkTrackableIssue {
+    public var typeName: String {
+        return String(describing: type(of: self))
+    }
+
+    public var message: String {
+        return localizedDescription
+    }
+
+    public var stacktrace: Stacktrace? {
+        return Stacktrace(frames: Thread.callStackSymbols)
+    }
+}
+
+
+// MARK: - NSError Extension for SplunkTrackableIssue
+
+extension NSError: SplunkTrackableIssue {
+    public var typeName: String {
+        return domain
+    }
+
+    public var message: String {
+        return localizedDescription
+    }
+
+    public var stacktrace: Stacktrace? {
+        return Stacktrace(frames: Thread.callStackSymbols)
+    }
+}
+
+
+// MARK: - NSException Extension for SplunkTrackableIssue
+
+extension NSException: SplunkTrackableIssue {
+    public var typeName: String {
+        return name.rawValue
+    }
+
+    public var message: String {
+        return reason ?? "No reason provided"
+    }
+
+    public var stacktrace: Stacktrace? {
+        return Stacktrace(frames: callStackSymbols)
     }
 }
