@@ -39,7 +39,8 @@ let package = Package(
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkANRReporter",
-                "SplunkAppStart"
+                "SplunkAppStart",
+                "SplunkInteractions"
             ],
             path: "SplunkAgent",
             sources: ["Sources"],
@@ -261,7 +262,23 @@ let package = Package(
             dependencies: ["SplunkOpenTelemetryBackgroundExporter"],
             path: "SplunkOpenTelemetryBackgroundExporter/Tests"
         ),
-        
+
+
+        // MARK: Splunk Interactions
+
+        .target(
+                name: "SplunkInteractions",
+                dependencies: [
+                    "SplunkLogger"
+                ],
+                path: "SplunkInteractions/Sources"
+            ),
+        .testTarget(
+            name: "SplunkInteractionsTests",
+            dependencies: ["SplunkInteractions"],
+            path: "SplunkInteractions/Tests"
+        ),
+
         
         // MARK: Splunk App Start
         
