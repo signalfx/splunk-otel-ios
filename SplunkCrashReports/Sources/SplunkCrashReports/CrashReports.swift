@@ -30,6 +30,7 @@ public class CrashReports {
     private var crashReporter: SPLKPLCrashReporter?
     private let internalLogger = InternalLogger(configuration: .crashReporter(category: "CrashReporter"))
     private var allUsedImageNames: [String] = []
+    private var deviceDataDictionary: [CrashReportKeys: String] = [:]
 
     // A reference to the Module's data publishing callback.
     var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)?
@@ -159,6 +160,11 @@ public class CrashReports {
             }
             return false
         }
+
+        // Init device stats collection
+        updateDeviceStats()
+        startPollingForDeviceStats()
+
         return true
     }
 
@@ -183,6 +189,36 @@ public class CrashReports {
         }
 
         return debuggerIsAttached
+    }
+
+    // Device stats handler
+
+    private func updateDeviceStats() {
+        do {
+            deviceDataDictionary[.batteryLevel] = CrashReportDeviceStats.batteryLevel
+            deviceDataDictionary[.freeDiskSpace] = CrashReportDeviceStats.freeDiskSpace
+            deviceDataDictionary[.freeMemory] = CrashReportDeviceStats.freeMemory
+            let customData = try NSKeyedArchiver.archivedData(withRootObject: deviceDataDictionary, requiringSecureCoding: false)
+            crashReporter?.customData = customData
+        } catch {
+            // We have failed to archive the custom data dictionary.
+            internalLogger.log(level: .warn) {
+                "Failed to add the device stats to the crash reports data."
+            }
+        }
+    }
+
+    /*
+     Will poll every 5 seconds to update the device stats.
+     */
+    private func startPollingForDeviceStats() {
+        let repeatSeconds: Double = 5
+        DispatchQueue.global(qos: .background).async {
+            let timer = Timer.scheduledTimer(withTimeInterval: repeatSeconds, repeats: true) { _ in
+                self.updateDeviceStats()
+            }
+            timer.fire()
+        }
     }
 
 
@@ -235,6 +271,15 @@ public class CrashReports {
         if report.hasExceptionInfo {
             reportDict[.exceptionName] = report.exceptionInfo.exceptionName ?? ""
             reportDict[.exceptionReason] = report.exceptionInfo.exceptionReason ?? ""
+        }
+
+        if report.customData != nil {
+            let customData = NSKeyedUnarchiver.unarchiveObject(with: report.customData) as? [CrashReportKeys: String]
+            if customData != nil {
+                reportDict[.batteryLevel] = customData![.batteryLevel]
+                reportDict[.freeMemory] = customData![.freeMemory]
+                reportDict[.freeDiskSpace] = customData![.freeDiskSpace]
+            }
         }
 
         let stackFramesSlice = stackFrames[CrashReportKeys.threads]
@@ -312,8 +357,8 @@ public class CrashReports {
 
             var baseAddress: UInt64 = 0
             var offset: UInt64 = 0
-            if imageInfo != nil {
-                baseAddress = imageInfo!.imageBaseAddress
+            if let imageInfo {
+                baseAddress = imageInfo.imageBaseAddress
                 offset = instructionPointer - baseAddress
             }
             if stackFrame.symbolInfo != nil {

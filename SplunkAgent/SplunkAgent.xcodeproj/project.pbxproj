@@ -180,6 +180,7 @@
 		4BB680F62B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680E22B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift */; };
 		4BB680FF2B7A7A53000A54D4 /* API-1.0-ModuleProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680FD2B7A7A04000A54D4 /* API-1.0-ModuleProxyTests.swift */; };
 		52286CB52CD5404A001F8A31 /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52286CB42CD54045001F8A31 /* ScreenName.swift */; };
+		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */; };
 		C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB02BA9D41E000CC11B /* AppStateManager.swift */; };
 		C703FAB32BA9D424000CC11B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB22BA9D424000CC11B /* AppState.swift */; };
@@ -691,6 +692,7 @@
 		4BB680E22B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "API-1.0-SessionReplayModule.swift"; sourceTree = "<group>"; };
 		4BB680FD2B7A7A04000A54D4 /* API-1.0-ModuleProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-ModuleProxyTests.swift"; sourceTree = "<group>"; };
 		52286CB42CD54045001F8A31 /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
+		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB22BA9D424000CC11B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -1848,6 +1850,7 @@
 		4B5A5C8C2D5E5686009DA0D5 /* SplunkCrashReports */ = {
 			isa = PBXGroup;
 			children = (
+				BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */,
 				4B5A5C862D5E5686009DA0D5 /* Extensions */,
 				4B5A5C872D5E5686009DA0D5 /* CrashReportConfig.swift */,
 				4B5A5C882D5E5686009DA0D5 /* CrashReportJSON.swift */,
@@ -3898,6 +3901,7 @@
 				4B96410A2D60FE8E009A2E7F /* CrashReports.swift in Sources */,
 				4B96410B2D60FE8E009A2E7F /* CrashReportKeys.swift in Sources */,
 				4B96410C2D60FE8E009A2E7F /* CrashReportJSON.swift in Sources */,
+				BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */,
 				4B96410D2D60FE8E009A2E7F /* CrashReportConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
