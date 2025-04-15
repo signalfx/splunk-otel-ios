@@ -23,7 +23,6 @@ public struct SlowFrameDetectorConfiguration: ModuleConfiguration {}
 public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
 
 
-
     // MARK: - Internal decoding
 
     struct SlowFrameDetector: Decodable {

@@ -116,9 +116,7 @@
 		4B9640C32D60FD73009A2E7F /* SplunkSlowFrameDetector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640B92D60FD73009A2E7F /* SplunkSlowFrameDetector.framework */; };
 		4B9640D92D60FDBF009A2E7F /* ScreenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BCA2D5E4FBC009DA0D5 /* ScreenManager.swift */; };
 		4B9640DA2D60FDBF009A2E7F /* EventMetadataSlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BCC2D5E4FBC009DA0D5 /* EventMetadataSlowFrameDetector.swift */; };
-		4B9640DB2D60FDBF009A2E7F /* SlowFrameDetector+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BCE2D5E4FBC009DA0D5 /* SlowFrameDetector+Module.swift */; };
 		4B9640DC2D60FDBF009A2E7F /* SlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BCD2D5E4FBC009DA0D5 /* SlowFrameDetector.swift */; };
-		4B9640DD2D60FDBF009A2E7F /* SlowFrameDetectorConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BCF2D5E4FBC009DA0D5 /* SlowFrameDetectorConfiguration.swift */; };
 		4B9640DE2D60FDC8009A2E7F /* SplunkSlowFrameDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BD22D5E4FBC009DA0D5 /* SplunkSlowFrameDetectorTests.swift */; };
 		4B9640DF2D60FDED009A2E7F /* SplunkSlowFrameDetector.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640B92D60FD73009A2E7F /* SplunkSlowFrameDetector.framework */; };
 		4B9640F22D60FE72009A2E7F /* SplunkCrashReports.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640E82D60FE72009A2E7F /* SplunkCrashReports.framework */; };
@@ -180,6 +178,8 @@
 		4BB680F52B7940C0000A54D4 /* API-1.0-SessionReplayStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680E12B7940C0000A54D4 /* API-1.0-SessionReplayStatus.swift */; };
 		4BB680F62B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680E22B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift */; };
 		4BB680FF2B7A7A53000A54D4 /* API-1.0-ModuleProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680FD2B7A7A04000A54D4 /* API-1.0-ModuleProxyTests.swift */; };
+		520067082DAED31F00444346 /* SlowFrameDetectorConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520067072DAED2F600444346 /* SlowFrameDetectorConfiguration.swift */; };
+		520067092DAED31F00444346 /* SlowFrameDetector+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520067062DAED2F600444346 /* SlowFrameDetector+Module.swift */; };
 		52286CB52CD5404A001F8A31 /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52286CB42CD54045001F8A31 /* ScreenName.swift */; };
 		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		522A70B92DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */; };
@@ -627,8 +627,6 @@
 		4B5A5BCA2D5E4FBC009DA0D5 /* ScreenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenManager.swift; sourceTree = "<group>"; };
 		4B5A5BCC2D5E4FBC009DA0D5 /* EventMetadataSlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMetadataSlowFrameDetector.swift; sourceTree = "<group>"; };
 		4B5A5BCD2D5E4FBC009DA0D5 /* SlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetector.swift; sourceTree = "<group>"; };
-		4B5A5BCE2D5E4FBC009DA0D5 /* SlowFrameDetector+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SlowFrameDetector+Module.swift"; path = "../SlowFrameDetector+Module.swift"; sourceTree = "<group>"; };
-		4B5A5BCF2D5E4FBC009DA0D5 /* SlowFrameDetectorConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SlowFrameDetectorConfiguration.swift; path = ../SlowFrameDetectorConfiguration.swift; sourceTree = "<group>"; };
 		4B5A5BD22D5E4FBC009DA0D5 /* SplunkSlowFrameDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkSlowFrameDetectorTests.swift; sourceTree = "<group>"; };
 		4B5A5C852D5E5686009DA0D5 /* InternalLoggerConfiguration+Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InternalLoggerConfiguration+Defaults.swift"; sourceTree = "<group>"; };
 		4B5A5C872D5E5686009DA0D5 /* CrashReportConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportConfig.swift; sourceTree = "<group>"; };
@@ -695,6 +693,8 @@
 		4BB680E12B7940C0000A54D4 /* API-1.0-SessionReplayStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "API-1.0-SessionReplayStatus.swift"; sourceTree = "<group>"; };
 		4BB680E22B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "API-1.0-SessionReplayModule.swift"; sourceTree = "<group>"; };
 		4BB680FD2B7A7A04000A54D4 /* API-1.0-ModuleProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-ModuleProxyTests.swift"; sourceTree = "<group>"; };
+		520067062DAED2F600444346 /* SlowFrameDetector+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SlowFrameDetector+Module.swift"; sourceTree = "<group>"; };
+		520067072DAED2F600444346 /* SlowFrameDetectorConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorConfiguration.swift; sourceTree = "<group>"; };
 		52286CB42CD54045001F8A31 /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
 		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorDestination.swift; sourceTree = "<group>"; };
@@ -2257,8 +2257,8 @@
 		522A70B72DAD9A02008A2479 /* Module */ = {
 			isa = PBXGroup;
 			children = (
-				4B5A5BCE2D5E4FBC009DA0D5 /* SlowFrameDetector+Module.swift */,
-				4B5A5BCF2D5E4FBC009DA0D5 /* SlowFrameDetectorConfiguration.swift */,
+				520067062DAED2F600444346 /* SlowFrameDetector+Module.swift */,
+				520067072DAED2F600444346 /* SlowFrameDetectorConfiguration.swift */,
 			);
 			path = Module;
 			sourceTree = "<group>";
@@ -3910,11 +3910,11 @@
 			files = (
 				4B9640D92D60FDBF009A2E7F /* ScreenManager.swift in Sources */,
 				4B9640DA2D60FDBF009A2E7F /* EventMetadataSlowFrameDetector.swift in Sources */,
-				4B9640DB2D60FDBF009A2E7F /* SlowFrameDetector+Module.swift in Sources */,
 				522A70B92DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift in Sources */,
+				520067082DAED31F00444346 /* SlowFrameDetectorConfiguration.swift in Sources */,
+				520067092DAED31F00444346 /* SlowFrameDetector+Module.swift in Sources */,
 				4B9640DC2D60FDBF009A2E7F /* SlowFrameDetector.swift in Sources */,
 				522A70BB2DAD9F23008A2479 /* OTelDestination.swift in Sources */,
-				4B9640DD2D60FDBF009A2E7F /* SlowFrameDetectorConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,3 +1,4 @@
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -5,7 +6,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -84,9 +85,18 @@ public final class SlowFrameDetector {
 
 
         // Stay on top of app lifecycle so we can pause things if needed
-        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: nil)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive(notification:)), name: UIApplication.didBecomeActiveNotification, object: nil)
+        let center = NotificationCenter.default
+
+        center.addObserver(self,
+                           selector: #selector(appWillResignActive(notification:)),
+                           name: UIApplication.willResignActiveNotification,
+                           object: nil)
+
+        center.addObserver(self,
+                           selector: #selector(appDidBecomeActive(notification:)),
+                           name: UIApplication.didBecomeActiveNotification,
+                           object: nil)
 
 
         // Runs every frame to detect if any frame took longer than expected
@@ -135,8 +145,6 @@ public final class SlowFrameDetector {
 
     @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
 
-        // TODO: Verify the following understanding
-        //
         // We are working off of some ambiguous documentation from Apple.
         // https://developer.apple.com/documentation/quartzcore/cadisplaylink
         //

@@ -22,16 +22,8 @@ import OpenTelemetrySdk
 
 // Global convenience functions to maintain compatibility with legacy code
 
-// TODO: Consider lifting this up out of this module and into SplunkAgent
-//
-// we need some team input on this.
-//
-// For example, it might go under a new group "ScreenContent":
-// SplunkAgent ->
-//            Agent ->
-//                    ScreenContent ->
-//                                    ScreenName.swift
-//
+
+// TODO: DEMRUM-1896, find a better place for "scren name" equivalent info.
 
 
 public func setScreenName(_ newName: String, manual: Bool = false) {
@@ -56,7 +48,6 @@ public func addScreenNameChangeCallback(_ callback: @escaping (String) -> Void) 
 }
 
 
-
 // MARK: - ScreenManager singleton
 
 public class ScreenManager: NSObject {
@@ -70,11 +61,9 @@ public class ScreenManager: NSObject {
     private let queue = DispatchQueue(label: "com.splunk.mrum.ios.screenManager.queue")
 
 
-
     // MARK: - Required initializer
 
     override private init() {}
-
 
 
     // MARK: - Public methods
@@ -130,10 +119,7 @@ public class ScreenManager: NSObject {
     }
 
 
-    // TODO: Hook this up with the real OTEL code
     private func emitScreenNameChangedSpan(oldName: String, newName: String) {
-        // OpenTelemetrySdk.emitScreenNameChangedSpan(oldName: oldName, newName: newName)
         print("calling emitScreenNameChangedSpan")
     }
 }
-

@@ -15,8 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-
 import Foundation
 import OpenTelemetryApi
 import SplunkSharedProtocols
@@ -37,7 +35,6 @@ struct OTelDestination: SlowFrameDetectorDestination {
             )
 
         let span = tracer.spanBuilder(spanName: type)
-            // TODO: - Replace with actual start time if available
             .setStartTime(time: Date())
             .startSpan()
 
@@ -45,7 +42,6 @@ struct OTelDestination: SlowFrameDetectorDestination {
         span.setAttribute(key: "count", value: count)
         span.setAttribute(key: "screen.name", value: screenName)
 
-        // TODO: - Replace with actual end time if available
         span.end(time: Date())
     }
 }
