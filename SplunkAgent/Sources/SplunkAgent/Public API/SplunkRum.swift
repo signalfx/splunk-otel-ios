@@ -31,6 +31,9 @@ internal import SplunkCommon
 
 internal import SplunkNetwork
 internal import SplunkOpenTelemetry
+internal import CiscoSessionReplay
+internal import SplunkCustomTracking
+
 
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
