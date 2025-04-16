@@ -19,10 +19,10 @@ import Foundation
 import SplunkLogger
 import SplunkSharedProtocols
 
-struct LogDataEmitter {
+struct DebugEmitter {
 
     // Logger for logging messages
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "LogDataTracking"))
+    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "LogCustomTracking"))
 
     public func emitLog(data: SplunkTrackable, sharedState: AgentSharedState?) {
 
