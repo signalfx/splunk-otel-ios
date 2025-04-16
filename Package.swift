@@ -135,8 +135,7 @@ let package = Package(
                 "SplunkLogger",
                 "SplunkOpenTelemetry",
             ],
-            path: "SplunkCustomTracking",
-            sources: ["Sources"],
+            path: "SplunkCustomTracking/Sources",
         ),
         .testTarget(
             name: "SplunkCustomTrackingTests",
