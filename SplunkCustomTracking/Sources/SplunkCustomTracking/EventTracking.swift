@@ -16,20 +16,20 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryApi
 import SplunkLogger
+import SplunkSharedProtocols
 
 
 // MARK: - EventTracking
 
 class EventTracking {
 
-    var typeName: String
+    var typeName: String = ""
     unowned var sharedState: AgentSharedState?
 
     private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "CustomEventTracking"))
 
-    func track(event: SplunkTrackableEvent) {
+    func track(_ name: String, _ event: SplunkTrackableEvent) {
         let attributes = event.toEventAttributes()
 
         guard validateAttributeLengths(attributes: attributes, logger: internalLogger) else {

@@ -18,11 +18,12 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
+import SplunkSharedProtocols
 
 struct TelemetryEmitter {
 
     static func emitSpan(data: SplunkTrackable, sharedState: AgentSharedState?, spanName: String = "Tracking") {
-        let start = Time.now()
+        let start = Date.now
 
         let tracer = OpenTelemetry.instance
             .tracerProvider
@@ -47,9 +48,9 @@ struct TelemetryEmitter {
         span.setAttribute(key: "screen.name", value: "unknown")
 
         for (key, value) in attributes {
-            span.setAttribute(key: key, value: value.toString())
+            span.setAttribute(key: key, value: value.description)
         }
 
-        span.end(time: Date.now())
+        span.end(time: Date.now)
     }
 }
