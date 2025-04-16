@@ -20,14 +20,14 @@ import Foundation
 
 // MARK: - Stacktrace
 
-struct Stacktrace {
+public struct Stacktrace {
     let frames: [String]
 }
 
 
 // MARK: - Stacktrace formatting
 
-extension Stacktrace {
+public extension Stacktrace {
     var formatted: String {
         frames.joined(separator: "\n")
     }

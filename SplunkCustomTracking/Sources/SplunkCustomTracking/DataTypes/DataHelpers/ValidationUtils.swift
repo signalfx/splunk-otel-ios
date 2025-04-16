@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 import SplunkLogger
+import SplunkSharedProtocols
 
 // Constants for maximum allowed lengths
 let maxKeyLength = 1024
@@ -28,7 +29,7 @@ let maxValueLength = 2048
 func validateAttributeLengths(attributes: [String: EventAttributeValue], logger: InternalLogger) -> Bool {
 
     func logAndReturnFalse(type: String, key: String) -> Bool {
-        logger.log(level: .warning) {
+        logger.log(level: .warn) {
             "Invalid \(type) length for key '\(key)'. Not publishing this event."
         }
         return false
@@ -38,7 +39,8 @@ func validateAttributeLengths(attributes: [String: EventAttributeValue], logger:
         if key.count > maxKeyLength {
             return logAndReturnFalse(type: "key", key: key)
         }
-        if let stringValue = value as? String, stringValue.count > maxValueLength {
+        let stringValue = value.description
+        if stringValue.count > maxValueLength {
             return logAndReturnFalse(type: "value", key: key)
         }
     }

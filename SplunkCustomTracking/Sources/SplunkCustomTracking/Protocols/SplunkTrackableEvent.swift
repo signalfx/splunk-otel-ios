@@ -15,14 +15,49 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Foundation
+import SplunkSharedProtocols
 
-public protocol SplunkTrackableEvent: SplunkTrackable {
-    var attributes: [String: EventAttributeValue] { get set }
-}
 
-public extension SplunkTrackableEvent {
-    // Directly use the dictionary's methods
-    func toEventAttributes() -> [String: EventAttributeValue] {
+public struct SplunkTrackableEvent: SplunkTrackable {
+    public var typeName: String
+    public var attributes: [String: EventAttributeValue]
+
+    public var timestamp: Date {
+        return Date()
+    }
+
+    public init(typeName: String, attributes: [String: EventAttributeValue] = [:]) {
+        self.typeName = typeName
+        self.attributes = attributes
+    }
+
+    // Set methods for various types
+    public mutating func set(_ key: String, value: Int) {
+        attributes[key] = .int(value)
+    }
+
+    public mutating func set(_ key: String, value: String) {
+        attributes[key] = .string(value)
+    }
+
+    public mutating func set(_ key: String, value: Double) {
+        attributes[key] = .double(value)
+    }
+
+    public mutating func set(_ key: String, value: Data) {
+        attributes[key] = .data(value)
+    }
+
+    public mutating func set(_ key: String, value: EventAttributeValue) {
+        attributes[key] = value
+    }
+
+    public func get(_ key: String) -> EventAttributeValue? {
+        return attributes[key]
+    }
+
+    public func toEventAttributes() -> [String: EventAttributeValue] {
         return attributes
     }
 }

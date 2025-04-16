@@ -31,8 +31,8 @@ public protocol SplunkTrackableIssue: SplunkTrackable {
 
 // MARK: - Default Implementation for toEventAttributes
 
-public extension SplunkTrackableIssue {
-    func toEventAttributes() -> [String: EventAttributeValue] {
+extension SplunkTrackableIssue {
+    public func toEventAttributes() -> [String: EventAttributeValue] {
         var attributes: [ErrorAttributeKeys.Exception: EventAttributeValue] = [
             .type: .string(typeName),
             .message: .string(message)
@@ -50,38 +50,25 @@ public extension SplunkTrackableIssue {
 // MARK: - Add SplunkTrackableIssue conformance to Error types and SplunkIssue
 
 
-// MARK: - SplunkIssue: Wrapper for String with SplunkTrackableIssue conformance
+// MARK: - SplunkIssue: Wrapper for String or Error with SplunkTrackableIssue conformance
 
 public struct SplunkIssue: SplunkTrackableIssue {
     public let message: String
+    public let typeName: String
+    public var stacktrace: Stacktrace?
 
-    public var typeName: String {
-        return "CustomIssue"
-    }
-
-    public var stacktrace: Stacktrace? {
-        return nil
-    }
-
+    // Initializer for String issues
     public init(_ message: String) {
         self.message = message
-    }
-}
-
-
-// MARK: - Error Extension for SplunkTrackableIssue
-
-extension Error: SplunkTrackableIssue {
-    public var typeName: String {
-        return String(describing: type(of: self))
+        self.typeName = "CustomIssue"
+        self.stacktrace = nil
     }
 
-    public var message: String {
-        return localizedDescription
-    }
-
-    public var stacktrace: Stacktrace? {
-        return Stacktrace(frames: Thread.callStackSymbols)
+    // Initializer for Error
+    public init(_ error: Error) {
+        self.message = (error as? LocalizedError)?.errorDescription ?? "Unknown error"
+        self.typeName = String(describing: type(of: error))
+        self.stacktrace = Stacktrace(frames: Thread.callStackSymbols)
     }
 }
 

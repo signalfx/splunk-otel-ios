@@ -16,8 +16,8 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryApi
 import SplunkLogger
+import SplunkSharedProtocols
 
 
 public final class SplunkCustomTracking {
@@ -25,8 +25,8 @@ public final class SplunkCustomTracking {
 
     // MARK: - Private Properties
 
-    private let eventTracking: EventTracking
-    private let errorTracking: ErrorTracking
+    private var eventTracking = EventTracking()
+    private var errorTracking = ErrorTracking()
 
     // Shared state
     public unowned var sharedState: AgentSharedState?
@@ -40,27 +40,31 @@ public final class SplunkCustomTracking {
 
     public init(sharedState: AgentSharedState? = nil) {
         self.sharedState = sharedState
-        eventTracking = EventTracking(typeName: "CustomEventType", sharedState: sharedState)
-        errorTracking = ErrorTracking(typeName: "CustomErrorType", sharedState: sharedState)
     }
 
 
     // MARK: - Public API
 
     /// Tracks a custom event.
-    public func trackEvent(event: SplunkTrackableEvent) {
+    public func trackEvent(eventName name: String, event: SplunkTrackableEvent) {
         eventTracking.sharedState = sharedState
-        eventTracking.track(event: event)
+        eventTracking.track(name, event)
     }
 
     /// Tracks a custom issue (Error, NSError, NSException, wrapped String).
     public func track(issue: SplunkTrackableIssue) {
         errorTracking.sharedState = sharedState
-        errorTracking.track(issue: issue)
+        errorTracking.track(issue)
     }
 
     /// Overloaded method for String issue.
     public func track(issue: String) {
+        let wrappedIssue = SplunkIssue(issue)
+        track(issue: wrappedIssue)
+    }
+
+    /// Overloaded method for Error issue.
+    public func track(issue: Error) {
         let wrappedIssue = SplunkIssue(issue)
         track(issue: wrappedIssue)
     }
