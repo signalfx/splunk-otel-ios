@@ -19,87 +19,48 @@ import Foundation
 
 // Static strings for crash report keys
 
-public class CrashReportKeys {
-    static let previousAppState = "ios.state"
+public enum CrashReportKeys: String {
+    case previousAppState = "ios.state"
 
-    static let operatingSystem = "operatingSystem"
-    static let architecture = "architecture"
-    static let osVersion = "osVersion"
-    static let osBuild = "osBuild"
-    static let timestamp = "timestamp"
-    static let actualTimestamp = "actualTimestamp"
-    
-    static let hardwareModel = "hardwareModel"
-    static let cpuType = "cpuType"
-    static let cpuCount = "cpuCount"
-    static let cpuLogicalCount = "cpuLogicalCount"
-    
-    static let appBundleId = "appBundleId"
-    static let appVersion = "appVersion"
-    
-    static let processName = "processName"
-    static let processId = "processId"
-    static let processPath = "processPath"
-    static let parentProcessName = "parentProcessName"
-    static let parentProcessId = "parentProcessId"
-    static let isNative = "isNative"
-    
-    static let signalName = "signalName"
-    static let signalCode = "signalCode"
-    static let faultAddress = "faultAddress"
-    
-    static let exceptionName = "exceptionName"
-    static let exceptionReason = "exceptionReason"
-    static let exceptionStackFrames = "exceptionStackFrames"
-    
-    static let threads = "threads"
-    static let images = "images"
-    static let details = "details"
-    
-    // Register
-    static let registerName = "registerName"
-    static let registerValue = "registerValue"
-    
+    case crashTimestamp = "crash.timestamp"
+    case currentTimestamp = "crash.observedTimestamp"
+    case freeDiskSpace = "crash.freeDiskSpace"
+    case batteryLevel = "crash.batteryLevel"
+    case freeMemory = "crash.freeMemory"
+    case appVersion = "appVersion"
+
+    case processPath = "crash.processPath"
+    case isNative = "crash.isNative"
+
+    case signalName = "signalName"
+    case faultAddress = "crash.address"
+
+    case exceptionName = "exception.type"
+    case exceptionReason = "exception.message"
+
+    case threads = "exception.threads"
+    case images = "exception.images"
+    case details = "details"
+    case component = "component"
+    case error = "error"
+
     // Stack Frame
-    static let instructionPointer = "instructionPointer"
-    static let imageName = "imageName"
-    static let symbolName = "symbolName"
-    static let symbolOffset = "symbolOffset"
-    static let nearestSymbolOffset = "nearestSymbolOffset"
+    case instructionPointer = "instructionPointer"
+    case imageName = "imageName"
+    case symbolName = "symbolName"
 
     // Thread
-    static let threadNumber = "threadNumber"
-    static let stackFrames = "stackFrames"
-    static let isCrashedThread = "isIssueThread"
-    static let isErrorThread = "isIssueThread"
-    static let isANRThread = "isIssueThread"
-    static let registers = "registers"
-    
-    // CPU Type
-    static let cType = "cpuType"
-    static let cSubType = "subType"
-    
-    // Binary Image
-    static let codeType = "codeType"
-    static let baseAddress = "baseAddress"
-    static let imageSize = "imageSize"
-    static let imagePath = "imagePath"
-    static let imageUUID = "imageUUID"
+    case threadNumber = "threadNumber"
+    case stackFrames = "stackFrames"
+    case isCrashedThread = "crashed"
 
-    // Prior run holdover keys
-    static let majorVersionAtCrash = "appMajorVersionAtCrash"
-    static let minorVersionAtCrash = "appMinorVersionAtCrash"
-    static let systemVersionAtCrash = "osVersionAtCrash"
+    // Binary Image
+    case baseAddress = "baseAddress"
+    case offset = "offset"
+    case imageSize = "imageSize"
+    case imagePath = "imagePath"
+    case imageUUID = "imageUUID"
 
     // Primary group key
-    static let crashReportMessageName = "ios.crash_report"
-    
-    // Logging keys
-    static let scopeName = "ios-mrum"
-    static let versionKey = "appdynamics.agent.version"
-    static let eventDomainKey = "event.domain"
-    static let eventNameKey = "event.name"
-    static let eventDomain = "mrum"
-    // TODO: MRUM_AC-985 - Change event.name value to device.app.crash
-    static let eventName = "device.app.crash"
+    case crashReportMessageName = "ios.crash_report"
 }
