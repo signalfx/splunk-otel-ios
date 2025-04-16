@@ -37,6 +37,6 @@ struct ErrorTracking {
             return
         }
 
-        TelemetryEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "ErrorTracking")
+        OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "ErrorTracking")
     }
 }

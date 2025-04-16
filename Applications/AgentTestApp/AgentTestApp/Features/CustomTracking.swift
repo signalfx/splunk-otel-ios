@@ -33,7 +33,7 @@ class CustomTracking: UIViewController {
 
         let staticAttributes: [String: EventAttributeValue] = [
             "name": .string("universe"),
-            "age": .int(42)
+            "meaning": .int(42)
         ]
         var event = SplunkTrackableEvent(typeName: "UserEvent", attributes: staticAttributes)
         event.set("location", value: "New York")

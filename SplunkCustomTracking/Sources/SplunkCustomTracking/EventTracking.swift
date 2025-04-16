@@ -36,7 +36,7 @@ class EventTracking {
             return
         }
 
-        // Emit the span directly using the TelemetryEmitter
-        TelemetryEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "CustomEventTracking")
+        // Emit the span directly using the OTelEmitter
+        OTelEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "CustomEventTracking")
     }
 }

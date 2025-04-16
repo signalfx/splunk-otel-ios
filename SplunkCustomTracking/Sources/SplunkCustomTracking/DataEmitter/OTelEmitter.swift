@@ -20,9 +20,9 @@ import Foundation
 import OpenTelemetryApi
 import SplunkSharedProtocols
 
-struct TelemetryEmitter {
+struct OTelEmitter {
 
-    static func emitSpan(data: SplunkTrackable, sharedState: AgentSharedState?, spanName: String = "Tracking") {
+    static func emitSpan(data: SplunkTrackable, sharedState: AgentSharedState?, spanName: String = "CustomTracking") {
         let start = Date.now
 
         let tracer = OpenTelemetry.instance
