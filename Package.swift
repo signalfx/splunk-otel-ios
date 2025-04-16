@@ -148,8 +148,7 @@ let package = Package(
                 "SplunkOpenTelemetry",
                 "SplunkSharedProtocols"
             ],
-            path: "SplunkCustomTracking",
-            sources: ["Sources"],
+            path: "SplunkCustomTracking/Sources",
         ),
         .testTarget(
             name: "SplunkCustomTrackingTests",
