@@ -50,7 +50,7 @@ extension AppStart {
 
         // didBecomeActive notification - store the timestamp, determine app start type and send results
         listen(to: UIApplication.didBecomeActiveNotification, in: &tokens) {
-            self.didBecomeActiveDate = Date()
+            self.didBecomeActiveTimestamp = Date()
 
             if self.backgroundLaunchDetected == nil {
                 self.backgroundLaunchDetected = false

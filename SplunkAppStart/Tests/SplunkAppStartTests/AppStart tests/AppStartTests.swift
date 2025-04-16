@@ -39,7 +39,9 @@ final class AppStartTests: XCTestCase {
 
         simulateColdStartNotifications()
 
+        // Check type and dates
         try checkDeterminedType(.cold, in: destination)
+        try checkDates(in: destination)
     }
 
     func testStop() throws {
@@ -53,6 +55,7 @@ final class AppStartTests: XCTestCase {
 
         simulateColdStartNotifications()
 
+        // Check type and dates
         try checkNotDeterminedType(in: destination)
     }
 
@@ -65,12 +68,20 @@ final class AppStartTests: XCTestCase {
 
         simulateColdStartNotifications()
 
-        // Check type
+        // Check type and dates
         try checkDeterminedType(.cold, in: destination)
-
+        try checkDates(in: destination)
+        
         // Check events
-        let events = try XCTUnwrap(destination.events)
+        let events = try XCTUnwrap(destination.storedAppStart?.events)
         XCTAssertTrue(events.count >= 4)
+
+        // Check event sorting
+        var testedDate = Date(timeIntervalSince1970: 0)
+        for event in events {
+            XCTAssertTrue(event.timestamp > testedDate)
+            testedDate = event.timestamp
+        }
     }
 
     func testPrewarmStart() throws {
@@ -83,7 +94,9 @@ final class AppStartTests: XCTestCase {
 
         simulateWarmStartNotifications()
 
+        // Check type and dates
         try checkDeterminedType(.warm, in: destination)
+        try checkDates(in: destination)
     }
 
     func testBackgroundStart() throws {
@@ -96,7 +109,9 @@ final class AppStartTests: XCTestCase {
 
         simulateWarmStartNotifications()
 
+        // Check type and dates
         try checkDeterminedType(.warm, in: destination)
+        try checkDates(in: destination)
     }
 
     func testHotStart() throws {
@@ -108,7 +123,9 @@ final class AppStartTests: XCTestCase {
 
         simulateHotStartNotifications()
 
+        // Check type and dates
         try checkDeterminedType(.hot, in: destination)
+        try checkDates(in: destination)
     }
 
     func testNoDidFinishLaunching() throws {
