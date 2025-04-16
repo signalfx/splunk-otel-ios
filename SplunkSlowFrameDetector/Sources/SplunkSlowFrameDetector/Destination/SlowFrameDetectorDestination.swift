@@ -16,15 +16,11 @@ limitations under the License.
 */
 
 import Foundation
-@testable import SplunkSlowFrameDetector
-import XCTest
+import SplunkSharedProtocols
 
-final class SplunkSlowFrameDetectorTests: XCTestCase {
-    func testExample() throws {
-        // XCTest Documentation
-        // https://developer.apple.com/documentation/xctest
+/// Describes a destination into which the SlowFrameDetector module sends its results.
+protocol SlowFrameDetectorDestination {
 
-        // Defining Test Cases and Test Methods
-        // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
-    }
+    /// Sends results into a destination.
+    func send(type: String, count: Int, sharedState: AgentSharedState?)
 }
