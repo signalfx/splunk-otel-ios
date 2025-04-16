@@ -69,6 +69,9 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(
             logRecordExporter: backgroundLogExporter
         )
+
+        // Initialize AttributesLogRecordProcessor as the first stage of processing,
+        // which adds runtime attributes to all processed log records
         let attributesLogRecordProcessor = OTLPAttributesLogRecordProcessor(
             proxy: simpleLogRecordProcessor,
             with: runtimeAttributes

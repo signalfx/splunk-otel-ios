@@ -2012,7 +2012,6 @@
 		4B5A5CAA2D60ED3D009DA0D5 /* SplunkOpenTelemetry */ = {
 			isa = PBXGroup;
 			children = (
-				E4A537472DA6595B002323E2 /* Model */,
 				4B5A5C9F2D60ED3D009DA0D5 /* API */,
 				4B5A5CA22D60ED3D009DA0D5 /* Log Event Processor */,
 				E4A537532DA68F17002323E2 /* Log Processors */,
@@ -2685,13 +2684,6 @@
 				E4A537412DA655E2002323E2 /* OLTPAttributesSpanProcessor.swift */,
 			);
 			path = "Span Processors";
-			sourceTree = "<group>";
-		};
-		E4A537472DA6595B002323E2 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		E4A5374C2DA6661D002323E2 /* Runtime Attributes */ = {
