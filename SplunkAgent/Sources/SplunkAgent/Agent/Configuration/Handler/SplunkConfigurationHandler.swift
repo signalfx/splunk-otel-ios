@@ -17,12 +17,13 @@ limitations under the License.
 
 import Foundation
 
-/// A default Splunk configuration handler. It is used as an in-place source for default module enablement until a proper remote configuration is implemented in the O11y backend.
+/// A default Splunk configuration handler.
+/// It is used as an in-place source for default module enablement until a proper remote configuration is implemented in the O11y backend.
 final class SplunkConfigurationHandler: AgentConfigurationHandler {
 
     // MARK: - Raw configuration data
 
-    /// Raw configuration data. This is a temporary source of thruth for default modules manager enablement and any configuration defaults.
+    /// Raw configuration data. This is a temporary source of truth for default modules manager enablement and any configuration defaults.
     private let rawConfiguration = """
     {
         "configuration": {
@@ -52,6 +53,7 @@ final class SplunkConfigurationHandler: AgentConfigurationHandler {
     }
     """
 
+
     // MARK: - Configuration
 
     var configurationData: Data? {
@@ -63,7 +65,7 @@ final class SplunkConfigurationHandler: AgentConfigurationHandler {
 
     // MARK: - Intialization
 
-    init(for configuration: AgentConfigurationProtocol) {
+    init(for configuration: any AgentConfigurationProtocol) {
         self.configuration = configuration
     }
 }
