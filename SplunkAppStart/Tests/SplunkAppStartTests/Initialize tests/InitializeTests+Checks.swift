@@ -14,24 +14,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+	
+@testable import SplunkAppStart
+import XCTest
 
-import Foundation
+extension InitializeTests {
 
-/// A dummy configuration handler. It will be used when we do not fully support the target platform.
-final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
-
-    // MARK: - Configuration
-
-    var configurationData: Data? {
-        return nil
-    }
-
-    let configuration: any AgentConfigurationProtocol
-
-
-    // MARK: - Intialization
-
-    init(for configuration: any AgentConfigurationProtocol) {
-        self.configuration = configuration
+    func checkDates(in destination: DebugDestination) throws {
+        let storedInitialize = try XCTUnwrap(destination.storedInitialize)
+        
+        let timeInterval = storedInitialize.end.timeIntervalSince(storedInitialize.start)
+        XCTAssertTrue(timeInterval > 0.0)
+        XCTAssertTrue(timeInterval < 60.0)
     }
 }

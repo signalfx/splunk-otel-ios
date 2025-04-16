@@ -1,11 +1,12 @@
+//
 /*
-Copyright 2021 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,15 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-/*
-Adapted from SlowFrameDetector implementation at https://github.com/signalfx/splunk-otel-ios
- */
-
-
 import Foundation
-import SplunkSharedProtocols
 import QuartzCore
+import SplunkSharedProtocols
 import UIKit
 
 
@@ -33,8 +28,8 @@ public final class SlowFrameDetector {
     actor ReportableFramesBuffer {
         private var buffer: FrameBuffer = [:]
 
-        func incrementFrames(_ screenName: String) async {
-            buffer[screenName, default: 0] += 1
+        func incrementFrames() async {
+            buffer["shared", default: 0] += 1
         }
 
         func framesToReport() async -> FrameBuffer {
@@ -52,18 +47,12 @@ public final class SlowFrameDetector {
     private var frozenFrames: ReportableFramesBuffer? = ReportableFramesBuffer()
 
     private var previousTimestamp: CFTimeInterval = 0.0
-    private var currentScreenName = getScreenName()
 
     private var config: SlowFrameDetectorRemoteConfiguration?
 
-    // Legacy settings which are ignored (see comments in displayLinkCallback)
-    private var slowThresholdSeconds: CFTimeInterval = 16.7
-    private var frozenThresholdSeconds: CFTimeInterval = 700.0
-
-    // Candidates to replace threshold values in the future
+    // Candidate future configuration options. If exposed, will need clamping.
     private var tolerancePercentage: Double = 15.0
     private var frozenDurationMultipler: Double = 40.0
-
 
 
     // MARK: - SlowFrameDetector lifecycle
@@ -77,12 +66,7 @@ public final class SlowFrameDetector {
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
 
         config = remoteConfiguration as? SlowFrameDetectorRemoteConfiguration
-        let sfd = SlowFrameDetector()
-        if let config {
-            slowThresholdSeconds = config.slowFrameThresholdMilliseconds / 1e3
-            frozenThresholdSeconds = config.frozenFrameThresholdMilliseconds / 1e3
-        }
-        sfd.start()
+        start()
     }
 
     public func start() {
@@ -92,17 +76,17 @@ public final class SlowFrameDetector {
             return
         }
 
-
-        // Stay informed when screen name is updated by code elsewhere
-        addScreenNameChangeCallback { [weak self] name in
-            self?.currentScreenName = name
-        }
-
-
         // Stay on top of app lifecycle so we can pause things if needed
-        NotificationCenter.default.addObserver(self, selector: #selector(appWillResignActive(notification:)), name: UIApplication.willResignActiveNotification, object: nil)
+        let center = NotificationCenter.default
+        center.addObserver(self,
+                           selector: #selector(appWillResignActive(notification:)),
+                           name: UIApplication.willResignActiveNotification,
+                           object: nil)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(appDidBecomeActive(notification:)), name: UIApplication.didBecomeActiveNotification, object: nil)
+        center.addObserver(self,
+                           selector: #selector(appDidBecomeActive(notification:)),
+                           name: UIApplication.didBecomeActiveNotification,
+                           object: nil)
 
 
         // Runs every frame to detect if any frame took longer than expected
@@ -151,8 +135,6 @@ public final class SlowFrameDetector {
 
     @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
 
-        // TODO: Verify the following understanding
-        //
         // We are working off of some ambiguous documentation from Apple.
         // https://developer.apple.com/documentation/quartzcore/cadisplaylink
         //
@@ -186,8 +168,6 @@ public final class SlowFrameDetector {
             return
         }
 
-        // TODO: This approach will need PM approval, because it totally ignores the incoming settings from the configuration. We could map the settings or there are a number of approaches for us to talk about but I think this is the right one. Ignoring the settings is simplest and fits with the fact that the platform is giving us a different picture to deal with, with variable FPS being common.
-
         // Set the previousTimestamp before any potential short circuit
         let actualDuration = actualTimestamp - previousTimestamp
         previousTimestamp = actualTimestamp
@@ -210,12 +190,12 @@ public final class SlowFrameDetector {
         // Apply isFrozen check first because it's a subset of isSlow
         if isFrozen {
             displayLinkTask = Task { [weak self] in
-                await self?.frozenFrames?.incrementFrames(self?.currentScreenName ?? "Unknown")
+                await self?.frozenFrames?.incrementFrames()
                 self?.displayLinkTask = nil
             }
         } else if isSlow {
             displayLinkTask = Task { [weak self] in
-                await self?.slowFrames?.incrementFrames(self?.currentScreenName ?? "Unknown")
+                await self?.slowFrames?.incrementFrames()
                 self?.displayLinkTask = nil
             }
         }
@@ -226,33 +206,18 @@ public final class SlowFrameDetector {
 
     private func dumpFrames() async {
 
+        let destination = OTelDestination()
+
         if let slowReportable = await slowFrames?.framesToReport() {
-            for (screenName, count) in slowReportable {
-                reportFrame("slowRenders", screenName, count)
+            for (_, count) in slowReportable {
+                destination.send(type: "slowRenders", count: count, sharedState: nil)
             }
         }
 
         if let frozenReportable = await frozenFrames?.framesToReport() {
-            for (screenName, count) in frozenReportable {
-                reportFrame("frozenRenders", screenName, count)
+            for (_, count) in frozenReportable {
+                destination.send(type: "frozenRenders", count: count, sharedState: nil)
             }
         }
-    }
-
-    private func reportFrame(_ type: String, _ screenName: String, _ count: Int) {
-
-        // TODO: DEMRUM-12 - iOS Spike: Integrate COP agent with Splunk O11y
-
-        // The commented-out code below is from the SignalFX repo implementation.
-        // We need to connect with the corresponding code in our COP implementation
-        // such that exports will work and data will show up on the server.
-
-        // let tracer = buildTracer()
-        // let now = Date()
-        // let span = tracer.spanBuilder(spanName: type).setStartTime(time: now).startSpan()
-        // span.setAttribute(key: Constants.AttributeNames.COMPONENT, value: "ui")
-        // span.setAttribute(key: Constants.AttributeNames.COUNT, value: count)
-        // span.setAttribute(key: Constants.AttributeNames.SCREEN_NAME, value: screenName)
-        // span.end(time: now)
     }
 }

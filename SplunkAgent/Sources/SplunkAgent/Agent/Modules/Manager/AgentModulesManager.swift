@@ -75,6 +75,21 @@ protocol AgentModulesManager {
     ///
     /// - Parameter metadata: A struct with essential data identification.
     func deleteModuleData(for metadata: any ModuleEventMetadata)
+
+    
+    // MARK: - Metrics
+
+    /// Modules manager needs to provide all modules' initialization timestamps.
+    ///
+    /// - Returns: A dictionary with the module's name as a key, and a timestamp as a value.
+    var modulesInitializationTimes: [String: Date] { get }
+
+    /// Modules manager needs to provide all user specified module configurations.
+    /// This information is used in the Initialize span.
+    ///
+    /// - Returns: A dictionary with the module's name and a property as a key in a format of
+    /// `"ModuleName.propertyName"`, and the value of the property as a string.
+    var modulesConfigurationDescription: [String: String] { get }
 }
 
 
