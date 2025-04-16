@@ -16,19 +16,19 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 
 
-public final class CustomData {
+// MARK: - Stacktrace
+
+public struct Stacktrace {
+    let frames: [String]
+}
 
 
-    // MARK: - Private properties
+// MARK: - Stacktrace formatting
 
-    private var config = CustomDataConfiguration(enabled: true)
-
-
-    // MARK: - CustomData lifecycle
-
-    public required init() {} // see install() in Module extension for startup tasks
-
+public extension Stacktrace {
+    var formatted: String {
+        frames.joined(separator: "\n")
+    }
 }

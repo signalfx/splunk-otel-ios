@@ -15,17 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
+@testable import SplunkCustomTracking
+import XCTest
 
-public struct EventMetadataCustomData {
+final class SplunkCustomTrackingTests: XCTestCase {
+    func testExample() throws {
+        // XCTest Documentation
+        // https://developer.apple.com/documentation/xctest
 
-
-    // MARK: - Public
-
-    public var timestamp = Date()
-
-
-    // MARK: - Internal
-
-    let id: String
+        // Defining Test Cases and Test Methods
+        // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
+    }
 }

@@ -179,10 +179,26 @@
 		520067082DAED31F00444346 /* SlowFrameDetectorConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520067072DAED2F600444346 /* SlowFrameDetectorConfiguration.swift */; };
 		520067092DAED31F00444346 /* SlowFrameDetector+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520067062DAED2F600444346 /* SlowFrameDetector+Module.swift */; };
 		5200670B2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5200670A2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift */; };
+		52087D822DAF585200EAC971 /* SplunkCustomTrackingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B25EA32DA6F30C006C34A5 /* SplunkCustomTrackingTests.swift */; };
 		52286CB52CD5404A001F8A31 /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52286CB42CD54045001F8A31 /* ScreenName.swift */; };
-		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		522A70B92DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */; };
 		522A70BB2DAD9F23008A2479 /* OTelDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70BA2DAD9F23008A2479 /* OTelDestination.swift */; };
+		528C950C2DAE3F55001CB26A /* SplunkCustomTracking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */; };
+		52DBB82F2DAF408100BB1044 /* SplunkCustomTracking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */; };
+		52DBB8392DAF472F00BB1044 /* CustomTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E4AD92DAE18070000627B /* CustomTracking.swift */; };
+		52DBB83A2DAF473B00BB1044 /* EventTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E4ADB2DAE18070000627B /* EventTracking.swift */; };
+		52DBB83B2DAF473B00BB1044 /* ErrorTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E4ADA2DAE18070000627B /* ErrorTracking.swift */; };
+		52DBB83C2DAF474C00BB1044 /* CustomTracking+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BE13702DA9F158009A7262 /* CustomTracking+Module.swift */; };
+		52DBB83D2DAF474C00BB1044 /* CustomTrackingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BE13712DA9F158009A7262 /* CustomTrackingConfiguration.swift */; };
+		52DBB83E2DAF475800BB1044 /* DebugEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B25E8C2DA6F30C006C34A5 /* DebugEmitter.swift */; };
+		52DBB83F2DAF475800BB1044 /* OTelEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5201451C2DAA04D70065F7EC /* OTelEmitter.swift */; };
+		52DBB8402DAF476200BB1044 /* ValidationUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E4ADC2DAE34510000627B /* ValidationUtils.swift */; };
+		52DBB8412DAF476D00BB1044 /* ErrorAttributeKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B25E932DA6F30C006C34A5 /* ErrorAttributeKeys.swift */; };
+		52DBB8422DAF476D00BB1044 /* Stacktrace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B25E972DA6F30C006C34A5 /* Stacktrace.swift */; };
+		52DBB8432DAF477900BB1044 /* SplunkTrackableEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52194E462DA7503B00A08C47 /* SplunkTrackableEvent.swift */; };
+		52DBB8442DAF477900BB1044 /* SplunkTrackable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B25E9D2DA6F30C006C34A5 /* SplunkTrackable.swift */; };
+		52DBB8452DAF477900BB1044 /* SplunkTrackableIssue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B25E9F2DA6F30C006C34A5 /* SplunkTrackableIssue.swift */; };
+		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */; };
 		C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB02BA9D41E000CC11B /* AppStateManager.swift */; };
 		C703FAB32BA9D424000CC11B /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB22BA9D424000CC11B /* AppState.swift */; };
@@ -491,6 +507,20 @@
 			remoteGlobalIDString = 4B963FE42D60F7E3009A2E7F;
 			remoteInfo = SplunkLogger;
 		};
+		528C950E2DAE3F55001CB26A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 52B948F42DA7625E00C75635;
+			remoteInfo = SplunkCustomTracking;
+		};
+		52DBB8302DAF408100BB1044 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 52B948F42DA7625E00C75635;
+			remoteInfo = SplunkCustomTracking;
+		};
 		E468962E2B21C85800727A6A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
@@ -548,25 +578,6 @@
 		3384F2A22AC879E900512D79 /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3384F2AC2AC879FD00512D79 /* SplunkRum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkRum.swift; sourceTree = "<group>"; };
 		4B2C8BBA2BCBE4A200C6E72F /* CrashReportsDataEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportsDataEvent.swift; sourceTree = "<group>"; };
-		4B385AE42D94BEB8005CF4C9 /* SplunkCustomData.xcscheme */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SplunkCustomData.xcscheme; sourceTree = "<group>"; };
-		4B385AE72D94BEB8005CF4C9 /* xcschememanagement.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = xcschememanagement.plist; sourceTree = "<group>"; };
-		4B385AEB2D94BEB8005CF4C9 /* package.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = wrapper.workspace; path = package.xcworkspace; sourceTree = "<group>"; };
-		4B385AEE2D94BEB8005CF4C9 /* CustomData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomData.swift; sourceTree = "<group>"; };
-		4B385AEF2D94BEB8005CF4C9 /* CustomData+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomData+Module.swift"; sourceTree = "<group>"; };
-		4B385AF02D94BEB8005CF4C9 /* CustomDataConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDataConfiguration.swift; sourceTree = "<group>"; };
-		4B385AF12D94BEB8005CF4C9 /* CustomDataRemoteConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDataRemoteConfiguration.swift; sourceTree = "<group>"; };
-		4B385AF22D94BEB8005CF4C9 /* EventMetadataCustomData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMetadataCustomData.swift; sourceTree = "<group>"; };
-		4B385AF52D94BEB8005CF4C9 /* SplunkCustomDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkCustomDataTests.swift; sourceTree = "<group>"; };
-		4B385AF82D94BEB8005CF4C9 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		4B385AFB2D94BEC7005CF4C9 /* xcschememanagement.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = xcschememanagement.plist; sourceTree = "<group>"; };
-		4B385AFF2D94BEC7005CF4C9 /* package.xcworkspace */ = {isa = PBXFileReference; lastKnownFileType = wrapper.workspace; path = package.xcworkspace; sourceTree = "<group>"; };
-		4B385B022D94BEC7005CF4C9 /* ErrorReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorReporting.swift; sourceTree = "<group>"; };
-		4B385B032D94BEC7005CF4C9 /* ErrorReporting+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ErrorReporting+Module.swift"; sourceTree = "<group>"; };
-		4B385B042D94BEC7005CF4C9 /* ErrorReportingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorReportingConfiguration.swift; sourceTree = "<group>"; };
-		4B385B052D94BEC7005CF4C9 /* ErrorReportingRemoteConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorReportingRemoteConfiguration.swift; sourceTree = "<group>"; };
-		4B385B062D94BEC7005CF4C9 /* EventMetadataErrorReporting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMetadataErrorReporting.swift; sourceTree = "<group>"; };
-		4B385B092D94BEC7005CF4C9 /* SplunkErrorReportingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkErrorReportingTests.swift; sourceTree = "<group>"; };
-		4B385B0C2D94BEC7005CF4C9 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		4B385B162D94C4EB005CF4C9 /* AppStartDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartDestination.swift; sourceTree = "<group>"; };
 		4B385B172D94C4EB005CF4C9 /* DebugDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugDestination.swift; sourceTree = "<group>"; };
 		4B385B182D94C4EB005CF4C9 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
@@ -693,10 +704,28 @@
 		520067062DAED2F600444346 /* SlowFrameDetector+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SlowFrameDetector+Module.swift"; sourceTree = "<group>"; };
 		520067072DAED2F600444346 /* SlowFrameDetectorConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorConfiguration.swift; sourceTree = "<group>"; };
 		5200670A2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMetadataSlowFrameDetector.swift; sourceTree = "<group>"; };
+		5201451C2DAA04D70065F7EC /* OTelEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelEmitter.swift; sourceTree = "<group>"; };
+		52194E462DA7503B00A08C47 /* SplunkTrackableEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackableEvent.swift; sourceTree = "<group>"; };
 		52286CB42CD54045001F8A31 /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
-		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorDestination.swift; sourceTree = "<group>"; };
 		522A70BA2DAD9F23008A2479 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
+		528E4AD92DAE18070000627B /* CustomTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTracking.swift; sourceTree = "<group>"; };
+		528E4ADA2DAE18070000627B /* ErrorTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorTracking.swift; sourceTree = "<group>"; };
+		528E4ADB2DAE18070000627B /* EventTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTracking.swift; sourceTree = "<group>"; };
+		528E4ADC2DAE34510000627B /* ValidationUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationUtils.swift; sourceTree = "<group>"; };
+		52B25E7E2DA6F30C006C34A5 /* SplunkCustomData.xcscheme */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SplunkCustomData.xcscheme; sourceTree = "<group>"; };
+		52B25E812DA6F30C006C34A5 /* xcschememanagement.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = xcschememanagement.plist; sourceTree = "<group>"; };
+		52B25E8C2DA6F30C006C34A5 /* DebugEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugEmitter.swift; sourceTree = "<group>"; };
+		52B25E932DA6F30C006C34A5 /* ErrorAttributeKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAttributeKeys.swift; sourceTree = "<group>"; };
+		52B25E972DA6F30C006C34A5 /* Stacktrace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stacktrace.swift; sourceTree = "<group>"; };
+		52B25E9D2DA6F30C006C34A5 /* SplunkTrackable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackable.swift; sourceTree = "<group>"; };
+		52B25E9F2DA6F30C006C34A5 /* SplunkTrackableIssue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackableIssue.swift; sourceTree = "<group>"; };
+		52B25EA32DA6F30C006C34A5 /* SplunkCustomTrackingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkCustomTrackingTests.swift; sourceTree = "<group>"; };
+		52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkCustomTracking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		52BE13702DA9F158009A7262 /* CustomTracking+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomTracking+Module.swift"; sourceTree = "<group>"; };
+		52BE13712DA9F158009A7262 /* CustomTrackingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingConfiguration.swift; sourceTree = "<group>"; };
+		52DBB82B2DAF408000BB1044 /* SplunkCustomTrackingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkCustomTrackingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB22BA9D424000CC11B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -821,6 +850,7 @@
 				4B985E4B2D94C7A000CB0321 /* SplunkAppStart.framework in Frameworks */,
 				4B9640772D60FC24009A2E7F /* SplunkNetwork.framework in Frameworks */,
 				4B96407B2D60FCCC009A2E7F /* SplunkANRReporter.framework in Frameworks */,
+				528C950C2DAE3F55001CB26A /* SplunkCustomTracking.framework in Frameworks */,
 				4B96410F2D60FEC5009A2E7F /* SplunkCrashReports.framework in Frameworks */,
 				4B9640182D60F8A5009A2E7F /* SplunkLogger.framework in Frameworks */,
 				4B1CEA022D95748E00A8CCCE /* SplunkSessionReplayProxy.framework in Frameworks */,
@@ -999,6 +1029,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		52B948F22DA7625E00C75635 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52DBB8282DAF408000BB1044 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				52DBB82F2DAF408100BB1044 /* SplunkCustomTracking.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E46896262B21C85800727A6A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1126,8 +1171,6 @@
 			children = (
 				4B385B292D94C4EB005CF4C9 /* SplunkAppStart */,
 				4B385AE22D94AD93005CF4C9 /* Resources */,
-				4B385B0D2D94BEC7005CF4C9 /* SplunkErrorReporting */,
-				4B385AF92D94BEB8005CF4C9 /* SplunkCustomData */,
 				4B5A5CDE2D60F472009DA0D5 /* SplunkSessionReplayProxy */,
 				4B5A5CD02D60F352009DA0D5 /* SplunkOpenTelemetryBackgroundExporter */,
 				4B5A5CB02D60ED3D009DA0D5 /* SplunkOpenTelemetry */,
@@ -1137,6 +1180,7 @@
 				4B5A5BA62D5E4CF8009DA0D5 /* SplunkANRReporter */,
 				4B5A5B932D5E4C79009DA0D5 /* SplunkNetwork */,
 				4B3B3AFC2D5E3B7E004DA9DA /* SplunkLogger */,
+				52B25EA62DA6F30C006C34A5 /* SplunkCustomTracking */,
 				4B536BF12B67FADC004A6C7C /* Configurations */,
 				E4E9747A2B1643EE00ACB469 /* Sources */,
 				E46896332B21C8FF00727A6A /* Tests */,
@@ -1172,6 +1216,8 @@
 				4B9642682D613A88009A2E7F /* SplunkSessionReplayProxyTests.xctest */,
 				4B385B2F2D94C55A005CF4C9 /* SplunkAppStart.framework */,
 				4B385B362D94C55B005CF4C9 /* SplunkAppStartTests.xctest */,
+				52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */,
+				52DBB82B2DAF408000BB1044 /* SplunkCustomTrackingTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1196,217 +1242,6 @@
 			);
 			path = Resources;
 			sourceTree = "<group>";
-		};
-		4B385AE32D94BEB8005CF4C9 /* configuration */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = configuration;
-			sourceTree = "<group>";
-		};
-		4B385AE52D94BEB8005CF4C9 /* xcschemes */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AE42D94BEB8005CF4C9 /* SplunkCustomData.xcscheme */,
-			);
-			path = xcschemes;
-			sourceTree = "<group>";
-		};
-		4B385AE62D94BEB8005CF4C9 /* xcshareddata */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AE52D94BEB8005CF4C9 /* xcschemes */,
-			);
-			path = xcshareddata;
-			sourceTree = "<group>";
-		};
-		4B385AE82D94BEB8005CF4C9 /* xcschemes */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AE72D94BEB8005CF4C9 /* xcschememanagement.plist */,
-			);
-			path = xcschemes;
-			sourceTree = "<group>";
-		};
-		4B385AE92D94BEB8005CF4C9 /* budim.xcuserdatad */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AE82D94BEB8005CF4C9 /* xcschemes */,
-			);
-			path = budim.xcuserdatad;
-			sourceTree = "<group>";
-		};
-		4B385AEA2D94BEB8005CF4C9 /* xcuserdata */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AE92D94BEB8005CF4C9 /* budim.xcuserdatad */,
-			);
-			path = xcuserdata;
-			sourceTree = "<group>";
-		};
-		4B385AEC2D94BEB8005CF4C9 /* xcode */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AE62D94BEB8005CF4C9 /* xcshareddata */,
-				4B385AEA2D94BEB8005CF4C9 /* xcuserdata */,
-				4B385AEB2D94BEB8005CF4C9 /* package.xcworkspace */,
-			);
-			path = xcode;
-			sourceTree = "<group>";
-		};
-		4B385AED2D94BEB8005CF4C9 /* .swiftpm */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AE32D94BEB8005CF4C9 /* configuration */,
-				4B385AEC2D94BEB8005CF4C9 /* xcode */,
-			);
-			path = .swiftpm;
-			sourceTree = "<group>";
-		};
-		4B385AF32D94BEB8005CF4C9 /* SplunkCustomData */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AEE2D94BEB8005CF4C9 /* CustomData.swift */,
-				4B385AEF2D94BEB8005CF4C9 /* CustomData+Module.swift */,
-				4B385AF02D94BEB8005CF4C9 /* CustomDataConfiguration.swift */,
-				4B385AF12D94BEB8005CF4C9 /* CustomDataRemoteConfiguration.swift */,
-				4B385AF22D94BEB8005CF4C9 /* EventMetadataCustomData.swift */,
-			);
-			path = SplunkCustomData;
-			sourceTree = "<group>";
-		};
-		4B385AF42D94BEB8005CF4C9 /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AF32D94BEB8005CF4C9 /* SplunkCustomData */,
-			);
-			path = Sources;
-			sourceTree = "<group>";
-		};
-		4B385AF62D94BEB8005CF4C9 /* SplunkCustomDataTests */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AF52D94BEB8005CF4C9 /* SplunkCustomDataTests.swift */,
-			);
-			path = SplunkCustomDataTests;
-			sourceTree = "<group>";
-		};
-		4B385AF72D94BEB8005CF4C9 /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AF62D94BEB8005CF4C9 /* SplunkCustomDataTests */,
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		4B385AF92D94BEB8005CF4C9 /* SplunkCustomData */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AED2D94BEB8005CF4C9 /* .swiftpm */,
-				4B385AF42D94BEB8005CF4C9 /* Sources */,
-				4B385AF72D94BEB8005CF4C9 /* Tests */,
-				4B385AF82D94BEB8005CF4C9 /* .gitignore */,
-			);
-			name = SplunkCustomData;
-			path = ../SplunkCustomData;
-			sourceTree = SOURCE_ROOT;
-		};
-		4B385AFA2D94BEC7005CF4C9 /* configuration */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = configuration;
-			sourceTree = "<group>";
-		};
-		4B385AFC2D94BEC7005CF4C9 /* xcschemes */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AFB2D94BEC7005CF4C9 /* xcschememanagement.plist */,
-			);
-			path = xcschemes;
-			sourceTree = "<group>";
-		};
-		4B385AFD2D94BEC7005CF4C9 /* budim.xcuserdatad */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AFC2D94BEC7005CF4C9 /* xcschemes */,
-			);
-			path = budim.xcuserdatad;
-			sourceTree = "<group>";
-		};
-		4B385AFE2D94BEC7005CF4C9 /* xcuserdata */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AFD2D94BEC7005CF4C9 /* budim.xcuserdatad */,
-			);
-			path = xcuserdata;
-			sourceTree = "<group>";
-		};
-		4B385B002D94BEC7005CF4C9 /* xcode */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AFE2D94BEC7005CF4C9 /* xcuserdata */,
-				4B385AFF2D94BEC7005CF4C9 /* package.xcworkspace */,
-			);
-			path = xcode;
-			sourceTree = "<group>";
-		};
-		4B385B012D94BEC7005CF4C9 /* .swiftpm */ = {
-			isa = PBXGroup;
-			children = (
-				4B385AFA2D94BEC7005CF4C9 /* configuration */,
-				4B385B002D94BEC7005CF4C9 /* xcode */,
-			);
-			path = .swiftpm;
-			sourceTree = "<group>";
-		};
-		4B385B072D94BEC7005CF4C9 /* SplunkErrorReporting */ = {
-			isa = PBXGroup;
-			children = (
-				4B385B022D94BEC7005CF4C9 /* ErrorReporting.swift */,
-				4B385B032D94BEC7005CF4C9 /* ErrorReporting+Module.swift */,
-				4B385B042D94BEC7005CF4C9 /* ErrorReportingConfiguration.swift */,
-				4B385B052D94BEC7005CF4C9 /* ErrorReportingRemoteConfiguration.swift */,
-				4B385B062D94BEC7005CF4C9 /* EventMetadataErrorReporting.swift */,
-			);
-			path = SplunkErrorReporting;
-			sourceTree = "<group>";
-		};
-		4B385B082D94BEC7005CF4C9 /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				4B385B072D94BEC7005CF4C9 /* SplunkErrorReporting */,
-			);
-			path = Sources;
-			sourceTree = "<group>";
-		};
-		4B385B0A2D94BEC7005CF4C9 /* SplunkErrorReportingTests */ = {
-			isa = PBXGroup;
-			children = (
-				4B385B092D94BEC7005CF4C9 /* SplunkErrorReportingTests.swift */,
-			);
-			path = SplunkErrorReportingTests;
-			sourceTree = "<group>";
-		};
-		4B385B0B2D94BEC7005CF4C9 /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-				4B385B0A2D94BEC7005CF4C9 /* SplunkErrorReportingTests */,
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		4B385B0D2D94BEC7005CF4C9 /* SplunkErrorReporting */ = {
-			isa = PBXGroup;
-			children = (
-				4B385B012D94BEC7005CF4C9 /* .swiftpm */,
-				4B385B082D94BEC7005CF4C9 /* Sources */,
-				4B385B0B2D94BEC7005CF4C9 /* Tests */,
-				4B385B0C2D94BEC7005CF4C9 /* .gitignore */,
-			);
-			name = SplunkErrorReporting;
-			path = ../SplunkErrorReporting;
-			sourceTree = SOURCE_ROOT;
 		};
 		4B385B192D94C4EB005CF4C9 /* Destination */ = {
 			isa = PBXGroup;
@@ -2259,6 +2094,166 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		52B25E7F2DA6F30C006C34A5 /* xcschemes */ = {
+			isa = PBXGroup;
+			children = (
+				52B25E7E2DA6F30C006C34A5 /* SplunkCustomData.xcscheme */,
+			);
+			path = xcschemes;
+			sourceTree = "<group>";
+		};
+		52B25E802DA6F30C006C34A5 /* xcshareddata */ = {
+			isa = PBXGroup;
+			children = (
+				52B25E7F2DA6F30C006C34A5 /* xcschemes */,
+			);
+			path = xcshareddata;
+			sourceTree = "<group>";
+		};
+		52B25E822DA6F30C006C34A5 /* xcschemes */ = {
+			isa = PBXGroup;
+			children = (
+				52B25E812DA6F30C006C34A5 /* xcschememanagement.plist */,
+			);
+			path = xcschemes;
+			sourceTree = "<group>";
+		};
+		52B25E832DA6F30C006C34A5 /* cmcevill.xcuserdatad */ = {
+			isa = PBXGroup;
+			children = (
+				52B25E822DA6F30C006C34A5 /* xcschemes */,
+			);
+			path = cmcevill.xcuserdatad;
+			sourceTree = "<group>";
+		};
+		52B25E842DA6F30C006C34A5 /* xcuserdata */ = {
+			isa = PBXGroup;
+			children = (
+				52B25E832DA6F30C006C34A5 /* cmcevill.xcuserdatad */,
+			);
+			path = xcuserdata;
+			sourceTree = "<group>";
+		};
+		52B25E852DA6F30C006C34A5 /* xcode */ = {
+			isa = PBXGroup;
+			children = (
+				52B25E802DA6F30C006C34A5 /* xcshareddata */,
+				52B25E842DA6F30C006C34A5 /* xcuserdata */,
+			);
+			path = xcode;
+			sourceTree = "<group>";
+		};
+		52B25E862DA6F30C006C34A5 /* .swiftpm */ = {
+			isa = PBXGroup;
+			children = (
+				52B25E852DA6F30C006C34A5 /* xcode */,
+			);
+			path = .swiftpm;
+			sourceTree = "<group>";
+		};
+		52B25E8E2DA6F30C006C34A5 /* DataEmitter */ = {
+			isa = PBXGroup;
+			children = (
+				5201451C2DAA04D70065F7EC /* OTelEmitter.swift */,
+				52B25E8C2DA6F30C006C34A5 /* DebugEmitter.swift */,
+			);
+			path = DataEmitter;
+			sourceTree = "<group>";
+		};
+		52B25E982DA6F30C006C34A5 /* ErrorData */ = {
+			isa = PBXGroup;
+			children = (
+				52B25E932DA6F30C006C34A5 /* ErrorAttributeKeys.swift */,
+				52B25E972DA6F30C006C34A5 /* Stacktrace.swift */,
+			);
+			path = ErrorData;
+			sourceTree = "<group>";
+		};
+		52B25E9C2DA6F30C006C34A5 /* DataTypes */ = {
+			isa = PBXGroup;
+			children = (
+				52F0BA472DA8A11900133EE5 /* DataHelpers */,
+				52B25E982DA6F30C006C34A5 /* ErrorData */,
+			);
+			path = DataTypes;
+			sourceTree = "<group>";
+		};
+		52B25EA02DA6F30C006C34A5 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				52194E462DA7503B00A08C47 /* SplunkTrackableEvent.swift */,
+				52B25E9D2DA6F30C006C34A5 /* SplunkTrackable.swift */,
+				52B25E9F2DA6F30C006C34A5 /* SplunkTrackableIssue.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		52B25EA12DA6F30C006C34A5 /* SplunkCustomTracking */ = {
+			isa = PBXGroup;
+			children = (
+				528E4AD92DAE18070000627B /* CustomTracking.swift */,
+				528E4ADA2DAE18070000627B /* ErrorTracking.swift */,
+				528E4ADB2DAE18070000627B /* EventTracking.swift */,
+				52BE136F2DA9F067009A7262 /* Module */,
+				52B25E8E2DA6F30C006C34A5 /* DataEmitter */,
+				52B25E9C2DA6F30C006C34A5 /* DataTypes */,
+				52B25EA02DA6F30C006C34A5 /* Protocols */,
+			);
+			path = SplunkCustomTracking;
+			sourceTree = "<group>";
+		};
+		52B25EA22DA6F30C006C34A5 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				52B25EA12DA6F30C006C34A5 /* SplunkCustomTracking */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		52B25EA42DA6F30C006C34A5 /* SplunkCustomTrackingTests */ = {
+			isa = PBXGroup;
+			children = (
+				52B25EA32DA6F30C006C34A5 /* SplunkCustomTrackingTests.swift */,
+			);
+			path = SplunkCustomTrackingTests;
+			sourceTree = "<group>";
+		};
+		52B25EA52DA6F30C006C34A5 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				52B25EA42DA6F30C006C34A5 /* SplunkCustomTrackingTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		52B25EA62DA6F30C006C34A5 /* SplunkCustomTracking */ = {
+			isa = PBXGroup;
+			children = (
+				52B25E862DA6F30C006C34A5 /* .swiftpm */,
+				52B25EA22DA6F30C006C34A5 /* Sources */,
+				52B25EA52DA6F30C006C34A5 /* Tests */,
+			);
+			name = SplunkCustomTracking;
+			path = ../SplunkCustomTracking;
+			sourceTree = SOURCE_ROOT;
+		};
+		52BE136F2DA9F067009A7262 /* Module */ = {
+			isa = PBXGroup;
+			children = (
+				52BE13702DA9F158009A7262 /* CustomTracking+Module.swift */,
+				52BE13712DA9F158009A7262 /* CustomTrackingConfiguration.swift */,
+			);
+			path = Module;
+			sourceTree = "<group>";
+		};
+		52F0BA472DA8A11900133EE5 /* DataHelpers */ = {
+			isa = PBXGroup;
+			children = (
+				528E4ADC2DAE34510000627B /* ValidationUtils.swift */,
+			);
+			path = DataHelpers;
+			sourceTree = "<group>";
+		};
 		C703FAAD2BA9D3A2000CC11B /* AppState */ = {
 			isa = PBXGroup;
 			children = (
@@ -2892,6 +2887,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		52B948F02DA7625E00C75635 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -2918,6 +2920,7 @@
 				4B9642A32D613EAD009A2E7F /* PBXTargetDependency */,
 				4B985E4E2D94C7A000CB0321 /* PBXTargetDependency */,
 				4B1CEA052D95748E00A8CCCE /* PBXTargetDependency */,
+				528C950F2DAE3F55001CB26A /* PBXTargetDependency */,
 			);
 			name = SplunkAgent;
 			packageProductDependencies = (
@@ -3348,6 +3351,46 @@
 			productReference = 4B9642682D613A88009A2E7F /* SplunkSessionReplayProxyTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		52B948F42DA7625E00C75635 /* SplunkCustomTracking */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 52B948F92DA7625E00C75635 /* Build configuration list for PBXNativeTarget "SplunkCustomTracking" */;
+			buildPhases = (
+				52B948F02DA7625E00C75635 /* Headers */,
+				52B948F12DA7625E00C75635 /* Sources */,
+				52B948F22DA7625E00C75635 /* Frameworks */,
+				52B948F32DA7625E00C75635 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SplunkCustomTracking;
+			packageProductDependencies = (
+			);
+			productName = SplunkCustomTracking;
+			productReference = 52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		52DBB82A2DAF408000BB1044 /* SplunkCustomTrackingTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 52DBB8382DAF408100BB1044 /* Build configuration list for PBXNativeTarget "SplunkCustomTrackingTests" */;
+			buildPhases = (
+				52DBB8272DAF408000BB1044 /* Sources */,
+				52DBB8282DAF408000BB1044 /* Frameworks */,
+				52DBB8292DAF408000BB1044 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				52DBB8312DAF408100BB1044 /* PBXTargetDependency */,
+			);
+			name = SplunkCustomTrackingTests;
+			packageProductDependencies = (
+			);
+			productName = SplunkCustomTrackingTests;
+			productReference = 52DBB82B2DAF408000BB1044 /* SplunkCustomTrackingTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		E46896282B21C85800727A6A /* SplunkAgentTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E46896322B21C85800727A6A /* Build configuration list for PBXNativeTarget "SplunkAgentTests" */;
@@ -3374,7 +3417,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 1630;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					3384F2A12AC879E900512D79 = {
@@ -3440,6 +3483,12 @@
 					4B9642672D613A88009A2E7F = {
 						CreatedOnToolsVersion = 16.2;
 					};
+					52B948F42DA7625E00C75635 = {
+						CreatedOnToolsVersion = 16.3;
+					};
+					52DBB82A2DAF408000BB1044 = {
+						CreatedOnToolsVersion = 16.3;
+					};
 					E46896282B21C85800727A6A = {
 						CreatedOnToolsVersion = 15.0.1;
 					};
@@ -3485,6 +3534,8 @@
 				4B9642672D613A88009A2E7F /* SplunkSessionReplayProxyTests */,
 				4B385B2E2D94C55A005CF4C9 /* SplunkAppStart */,
 				4B385B352D94C55B005CF4C9 /* SplunkAppStartTests */,
+				52B948F42DA7625E00C75635 /* SplunkCustomTracking */,
+				52DBB82A2DAF408000BB1044 /* SplunkCustomTrackingTests */,
 			);
 		};
 /* End PBXProject section */
@@ -3639,6 +3690,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		52B948F32DA7625E00C75635 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52DBB8292DAF408000BB1044 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E46896272B21C85800727A6A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3670,7 +3735,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check SplunkAgent directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger package\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols package\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy package\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector package\ncd ../SplunkSlowFrameDetector/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork package\ncd ../SplunkNetwork/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
+			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check SplunkAgent directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger package\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols package\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy package\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports package\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector package\ncd ../SplunkSlowFrameDetector/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork package\ncd ../SplunkNetwork/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter package\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCustomTracking package\ncd ../SplunkCustomTracking/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -4003,6 +4068,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		52B948F12DA7625E00C75635 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				52DBB83A2DAF473B00BB1044 /* EventTracking.swift in Sources */,
+				52DBB83B2DAF473B00BB1044 /* ErrorTracking.swift in Sources */,
+				52DBB8412DAF476D00BB1044 /* ErrorAttributeKeys.swift in Sources */,
+				52DBB8422DAF476D00BB1044 /* Stacktrace.swift in Sources */,
+				52DBB8392DAF472F00BB1044 /* CustomTracking.swift in Sources */,
+				52DBB8432DAF477900BB1044 /* SplunkTrackableEvent.swift in Sources */,
+				52DBB8442DAF477900BB1044 /* SplunkTrackable.swift in Sources */,
+				52DBB8452DAF477900BB1044 /* SplunkTrackableIssue.swift in Sources */,
+				52DBB83C2DAF474C00BB1044 /* CustomTracking+Module.swift in Sources */,
+				52DBB8402DAF476200BB1044 /* ValidationUtils.swift in Sources */,
+				52DBB83D2DAF474C00BB1044 /* CustomTrackingConfiguration.swift in Sources */,
+				52DBB83E2DAF475800BB1044 /* DebugEmitter.swift in Sources */,
+				52DBB83F2DAF475800BB1044 /* OTelEmitter.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		52DBB8272DAF408000BB1044 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				52087D822DAF585200EAC971 /* SplunkCustomTrackingTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E46896252B21C85800727A6A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -4224,6 +4317,16 @@
 			target = 4B963FE42D60F7E3009A2E7F /* SplunkLogger */;
 			targetProxy = 4B985E522D94C91300CB0321 /* PBXContainerItemProxy */;
 		};
+		528C950F2DAE3F55001CB26A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 52B948F42DA7625E00C75635 /* SplunkCustomTracking */;
+			targetProxy = 528C950E2DAE3F55001CB26A /* PBXContainerItemProxy */;
+		};
+		52DBB8312DAF408100BB1044 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 52B948F42DA7625E00C75635 /* SplunkCustomTracking */;
+			targetProxy = 52DBB8302DAF408100BB1044 /* PBXContainerItemProxy */;
+		};
 		E468962F2B21C85800727A6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3384F2A12AC879E900512D79 /* SplunkAgent */;
@@ -4369,7 +4472,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -4419,7 +4522,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEPLOYMENT_POSTPROCESSING = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -4464,7 +4567,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -4504,7 +4607,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -4544,7 +4647,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -4584,7 +4687,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -4624,7 +4727,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -4664,7 +4767,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -4888,7 +4991,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEPLOYMENT_POSTPROCESSING = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5023,7 +5126,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEPLOYMENT_POSTPROCESSING = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5164,7 +5267,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5306,7 +5409,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5378,7 +5481,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5419,7 +5522,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5460,7 +5563,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5501,7 +5604,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5542,7 +5645,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5583,7 +5686,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5744,7 +5847,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5785,7 +5888,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5826,7 +5929,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5867,7 +5970,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5908,7 +6011,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5949,7 +6052,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -5988,7 +6091,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6008,7 +6111,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6028,7 +6131,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6048,7 +6151,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6068,7 +6171,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6088,7 +6191,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6110,7 +6213,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6150,7 +6253,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6190,7 +6293,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6230,7 +6333,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6270,7 +6373,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6310,7 +6413,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6348,7 +6451,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6368,7 +6471,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6388,7 +6491,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6408,7 +6511,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6428,7 +6531,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6448,7 +6551,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -6470,7 +6573,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6510,7 +6613,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6550,7 +6653,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6590,7 +6693,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6630,7 +6733,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6670,7 +6773,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6830,7 +6933,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6870,7 +6973,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6910,7 +7013,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6950,7 +7053,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -6990,7 +7093,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7030,7 +7133,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7068,7 +7171,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7088,7 +7191,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7108,7 +7211,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7128,7 +7231,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7148,7 +7251,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7168,7 +7271,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7190,7 +7293,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7230,7 +7333,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7270,7 +7373,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7310,7 +7413,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7350,7 +7453,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7390,7 +7493,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7550,7 +7653,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7590,7 +7693,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7630,7 +7733,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7670,7 +7773,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7710,7 +7813,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7750,7 +7853,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -7788,7 +7891,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7808,7 +7911,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7828,7 +7931,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7848,7 +7951,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7868,7 +7971,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -7888,7 +7991,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
@@ -8270,7 +8373,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -8310,7 +8413,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -8350,7 +8453,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -8390,7 +8493,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -8430,7 +8533,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -8470,7 +8573,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -8614,6 +8717,348 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkSessionReplayProxyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-staticlib";
+		};
+		52B948FA2DA7625E00C75635 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		52B948FB2DA7625E00C75635 /* Debug-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-mh_dylib";
+		};
+		52B948FC2DA7625E00C75635 /* Debug-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-staticlib";
+		};
+		52B948FD2DA7625E00C75635 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		52B948FE2DA7625E00C75635 /* Release-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-mh_dylib";
+		};
+		52B948FF2DA7625E00C75635 /* Release-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTracking;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-staticlib";
+		};
+		52DBB8322DAF408100BB1044 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTrackingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		52DBB8332DAF408100BB1044 /* Debug-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTrackingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-mh_dylib";
+		};
+		52DBB8342DAF408100BB1044 /* Debug-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTrackingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-staticlib";
+		};
+		52DBB8352DAF408100BB1044 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTrackingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		52DBB8362DAF408100BB1044 /* Release-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTrackingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-mh_dylib";
+		};
+		52DBB8372DAF408100BB1044 /* Release-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2B838T8T8L;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkCustomTrackingTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -8959,6 +9404,32 @@
 				4B96427C2D613A88009A2E7F /* Release */,
 				4B96427D2D613A88009A2E7F /* Release-mh_dylib */,
 				4B96427E2D613A88009A2E7F /* Release-staticlib */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		52B948F92DA7625E00C75635 /* Build configuration list for PBXNativeTarget "SplunkCustomTracking" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				52B948FA2DA7625E00C75635 /* Debug */,
+				52B948FB2DA7625E00C75635 /* Debug-mh_dylib */,
+				52B948FC2DA7625E00C75635 /* Debug-staticlib */,
+				52B948FD2DA7625E00C75635 /* Release */,
+				52B948FE2DA7625E00C75635 /* Release-mh_dylib */,
+				52B948FF2DA7625E00C75635 /* Release-staticlib */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		52DBB8382DAF408100BB1044 /* Build configuration list for PBXNativeTarget "SplunkCustomTrackingTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				52DBB8322DAF408100BB1044 /* Debug */,
+				52DBB8332DAF408100BB1044 /* Debug-mh_dylib */,
+				52DBB8342DAF408100BB1044 /* Debug-staticlib */,
+				52DBB8352DAF408100BB1044 /* Release */,
+				52DBB8362DAF408100BB1044 /* Release-mh_dylib */,
+				52DBB8372DAF408100BB1044 /* Release-staticlib */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
