@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,22 +16,11 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkSharedProtocols
 
-/// A dummy configuration handler. It will be used when we do not fully support the target platform.
-final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
+/// Describes a destination into which the SlowFrameDetector module sends its results.
+protocol SlowFrameDetectorDestination {
 
-    // MARK: - Configuration
-
-    var configurationData: Data? {
-        return nil
-    }
-
-    let configuration: any AgentConfigurationProtocol
-
-
-    // MARK: - Intialization
-
-    init(for configuration: any AgentConfigurationProtocol) {
-        self.configuration = configuration
-    }
+    /// Sends results into a destination.
+    func send(type: String, count: Int, sharedState: AgentSharedState?)
 }

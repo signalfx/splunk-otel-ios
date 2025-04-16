@@ -18,14 +18,37 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-/// AppStart remote configuration, minimal configuration for module conformance.
+/// AppStart remote configuration.
 public struct AppStartRemoteConfiguration: RemoteModuleConfiguration {
+
+    // MARK: - Internal decoding
+
+    struct AppStart: Decodable {
+        let enabled: Bool
+    }
+
+    struct MRUMRoot: Decodable {
+        let appStart: AppStart
+    }
+
+    struct Configuration: Decodable {
+        let mrum: MRUMRoot
+    }
+
+    struct Root: Decodable {
+        let configuration: Configuration
+    }
+
 
     // MARK: - Public
 
     public var enabled: Bool
 
     public init?(from data: Data) {
-        enabled = true
+        guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
+            return nil
+        }
+
+        enabled = root.configuration.mrum.appStart.enabled
     }
 }

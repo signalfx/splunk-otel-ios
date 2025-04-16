@@ -40,7 +40,6 @@ public struct CrashReportsRemoteConfiguration: RemoteModuleConfiguration {
         let configuration: Configuration
     }
 
-
     // MARK: - Protocol compliance
 
     public var enabled: Bool

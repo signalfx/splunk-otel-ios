@@ -15,16 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-@testable import SplunkSlowFrameDetector
+@testable import SplunkAgent
 import XCTest
 
-final class SplunkSlowFrameDetectorTests: XCTestCase {
-    func testExample() throws {
-        // XCTest Documentation
-        // https://developer.apple.com/documentation/xctest
+class SplunkConfigurationHandlerTests: XCTestCase {
 
-        // Defining Test Cases and Test Methods
-        // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
+    func test_splunkConfiguration_givenRawConfigurationStructure() throws {
+        let defaultConfig = try ConfigurationTestBuilder.buildDefault()
+        let splunkConfiguration = SplunkConfigurationHandler(for: defaultConfig)
+
+        // Structurally test the actual Remote configuration for our module consistency.
+        XCTAssertNoThrow(try JSONDecoder().decode(RemoteConfigurationTestModel.self, from: splunkConfiguration.configurationData!))
     }
 }

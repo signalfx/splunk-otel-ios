@@ -17,21 +17,30 @@ limitations under the License.
 
 import Foundation
 
-// JSON Support for Crash Reports.
+/// Represents Initialize span's data.
+struct AgentInitializeSpanData {
+    let start: Date
+    let end: Date
+    let events: [AppStartEvent]?
+    let configurationSettings: [String: String]
 
-public class CrashReportJSON {
-
-    public static func convertDictionaryToJSONData(_ dictionary: [CrashReportKeys: Any]) -> Data? {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted) else {
+    var formattedConfigurationSettings: String? {
+        if configurationSettings.isEmpty {
             return nil
         }
-        return jsonData
-    }
 
-    public static func convertDictionaryToJSONString(_ dictionary: [CrashReportKeys: Any]) -> String? {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted) else {
-            return nil
+        var formatted = "["
+
+        for (key, value) in configurationSettings {
+            if formatted.count > 1 {
+                formatted += ", "
+            }
+
+            formatted += "\(key):\(value)"
         }
-        return String(data: jsonData, encoding: .utf8)
+
+        formatted += "]"
+
+        return formatted
     }
 }

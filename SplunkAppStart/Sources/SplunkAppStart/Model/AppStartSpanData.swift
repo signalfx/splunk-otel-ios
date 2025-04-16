@@ -17,21 +17,10 @@ limitations under the License.
 
 import Foundation
 
-/// A dummy configuration handler. It will be used when we do not fully support the target platform.
-final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
-
-    // MARK: - Configuration
-
-    var configurationData: Data? {
-        return nil
-    }
-
-    let configuration: any AgentConfigurationProtocol
-
-
-    // MARK: - Intialization
-
-    init(for configuration: any AgentConfigurationProtocol) {
-        self.configuration = configuration
-    }
+/// Represents App start span's data.
+struct AppStartSpanData {
+    let type: AppStartType
+    let start: Date
+    let end: Date
+    let events: [AppStartEvent]?
 }
