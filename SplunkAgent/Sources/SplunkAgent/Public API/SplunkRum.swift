@@ -307,8 +307,8 @@ public class SplunkRum: ObservableObject {
     private var configurationSettings: [String: String] {
         var settings = [String: String]()
 
-        settings["enableDebugLogging"] = agentConfigurationHandler.configuration.enableDebugLogging ? "true" : "false"
-        settings["sessionSamplingRate"] = "\(agentConfigurationHandler.configuration.sessionSamplingRate)"
+        settings["enableDebugLogging"] = String(agentConfigurationHandler.configuration.enableDebugLogging)
+        settings["sessionSamplingRate"] = String(agentConfigurationHandler.configuration.sessionSamplingRate)
 
         if let modulesConfigurations = modulesManager?.modulesConfigurationDescription {
             settings.merge(modulesConfigurations) { $1 }

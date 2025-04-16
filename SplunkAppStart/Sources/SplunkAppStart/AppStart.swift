@@ -123,9 +123,9 @@ public final class AppStart {
     }
 
 
-    // MARK: - Sending
+    // MARK: - Type determination
 
-    /// Determines an app start type from available notifications timestampts, sends results into a destination if results are valid.
+    /// Determines an app start type from available notifications timestamps, sends valid results.
     func determineAndSend() {
 
         var determinedType: AppStartType?
@@ -172,19 +172,7 @@ public final class AppStart {
 
         // Send app start if the type was determined
         if let determinedType, let startTime {
-
-            // Send app start events and initialize span in a cold start only
-            let events = determinedType == .cold ? coldStartEvents(startTime: startTime) : nil
-            let initializeData = determinedType == .cold ? agentInitializeSpanData : nil
-
-            let appStartData = AppStartSpanData(
-                type: determinedType,
-                start: startTime,
-                end: endTime,
-                events: events
-            )
-
-            destination.send(appStart: appStartData, agentInitialize: initializeData, sharedState: sharedState)
+            send(start: startTime, end: endTime, type: determinedType)
 
             internalLogger.log(level: .debug) {
                 "App start log: determined app start type: \(determinedType.rawValue), start time: \(startTime), end time: \(endTime)."
@@ -203,6 +191,31 @@ public final class AppStart {
     }
 
 
+    // MARK: - Sending
+
+    /// Sends results into a destination.
+    private func send(start: Date, end: Date, type: AppStartType) {
+
+        var events: [AppStartEvent]?
+        var initializeData: AgentInitializeSpanData?
+
+        // Send app start events and initialize span in a cold start only
+        if type == .cold {
+            events = coldStartEvents(startTime: start)
+            initializeData = agentInitializeSpanData
+        }
+
+        let appStartData = AppStartSpanData(
+            type: type,
+            start: start,
+            end: end,
+            events: events
+        )
+
+        destination.send(appStart: appStartData, agentInitialize: initializeData, sharedState: sharedState)
+    }
+
+
     // MARK: - Cold start events
 
     private func coldStartEvents(startTime: Date) -> [AppStartEvent] {
@@ -211,15 +224,30 @@ public final class AppStart {
         events.append(AppStartEvent(name: "process.start", timestamp: startTime))
 
         if let didFinishLaunchingTimestamp {
-            events.append(AppStartEvent(name: UIApplication.didFinishLaunchingNotification.rawValue, timestamp: didFinishLaunchingTimestamp))
+            events.append(
+                AppStartEvent(
+                    name: UIApplication.didFinishLaunchingNotification.rawValue,
+                    timestamp: didFinishLaunchingTimestamp
+                )
+            )
         }
 
         if let willEnterForegroundTimestamp {
-            events.append(AppStartEvent(name: UIApplication.willEnterForegroundNotification.rawValue, timestamp: willEnterForegroundTimestamp))
+            events.append(
+                AppStartEvent(
+                    name: UIApplication.willEnterForegroundNotification.rawValue,
+                    timestamp: willEnterForegroundTimestamp
+                )
+            )
         }
 
         if let didBecomeActiveTimestamp {
-            events.append(AppStartEvent(name: UIApplication.didBecomeActiveNotification.rawValue, timestamp: didBecomeActiveTimestamp))
+            events.append(
+                AppStartEvent(
+                    name: UIApplication.didBecomeActiveNotification.rawValue,
+                    timestamp: didBecomeActiveTimestamp
+                )
+            )
         }
 
         return events

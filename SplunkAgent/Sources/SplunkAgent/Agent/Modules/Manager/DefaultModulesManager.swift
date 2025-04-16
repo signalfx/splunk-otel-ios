@@ -30,6 +30,7 @@ class DefaultModulesManager: AgentModulesManager {
     private var configurationDescription: [String: String] = [:]
     private let internalLogger = InternalLogger(configuration: .agent(category: "ModulesManager"))
 
+
     // MARK: - Public
 
     private(set) var modules: [any Module] = []
@@ -189,7 +190,7 @@ class DefaultModulesManager: AgentModulesManager {
         return configurationDescription
     }
 
-    /// Calculates modules configuration description, in a format of a `[String: String]` dictionary,
+    /// Prepares modules configuration description, in a format of a `[String: String]` dictionary,
     /// with `"ModuleName.propertyName"` as a key and the property's value as a value.
     private func prepareModulesConfigurationDescription(with configurations: [any ModuleConfiguration]) {
         do {
@@ -211,7 +212,7 @@ class DefaultModulesManager: AgentModulesManager {
             configurationDescription = description
         } catch {
             internalLogger.log(level: .error) {
-                "Error when calculating modules configuration  with error message \(error.localizedDescription)."
+                "An error when preparing modules configuration description: \(error.localizedDescription)"
             }
         }
     }

@@ -97,10 +97,10 @@ final class DefaultModulesManagerTests: XCTestCase {
         XCTAssertNotNil(remoteModuleConfiguration)
 
         // Test modules initialization times
-        XCTAssertTrue(modulesManager.modulesInitializationTimes.count > 0)
+        XCTAssertTrue(modulesManager.modulesInitializationTimes.count == 2)
 
         // Test modules config settings
-        XCTAssertTrue(modulesManager.modulesConfigurationDescription.count > 0)
+        XCTAssertTrue(modulesManager.modulesConfigurationDescription.count == 1)
     }
 
     func testModuleConnection() throws {
