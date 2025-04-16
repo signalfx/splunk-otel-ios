@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		521151B82DAF2FF6007C33A6 /* CustomTracking.swift in Resources */ = {isa = PBXBuildFile; fileRef = 521151B72DAF2FF6007C33A6 /* CustomTracking.swift */; };
 		52705BE02D08FDF600445B8E /* SlowFrameBeatingHeartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52705BDF2D08FDF600445B8E /* SlowFrameBeatingHeartView.swift */; };
 		52705BE12D08FDF600445B8E /* SlowFrameDetectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52705BDE2D08FDF600445B8E /* SlowFrameDetectorViewController.swift */; };
 		BA188B202BA0C91B00DACB15 /* CrashesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA188B1E2BA0C91B00DACB15 /* CrashesViewController.swift */; };
@@ -40,6 +41,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		521151B72DAF2FF6007C33A6 /* CustomTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTracking.swift; sourceTree = "<group>"; };
 		52705BDE2D08FDF600445B8E /* SlowFrameDetectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorViewController.swift; sourceTree = "<group>"; };
 		52705BDF2D08FDF600445B8E /* SlowFrameBeatingHeartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameBeatingHeartView.swift; sourceTree = "<group>"; };
 		BA188B1E2BA0C91B00DACB15 /* CrashesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashesViewController.swift; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 		BA5E5A572B6864A60022CEB2 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				521151B72DAF2FF6007C33A6 /* CustomTracking.swift */,
 				BA188B1F2BA0C91B00DACB15 /* Crashes.swift */,
 				BA188B1E2BA0C91B00DACB15 /* CrashesViewController.swift */,
 				BA5E5A582B6864A60022CEB2 /* NetworkCalls.swift */,
@@ -189,6 +192,7 @@
 			files = (
 				BA5E5A502B6859BD0022CEB2 /* LaunchScreen.storyboard in Resources */,
 				BA5E5A4D2B6859BD0022CEB2 /* Assets.xcassets in Resources */,
+				521151B82DAF2FF6007C33A6 /* CustomTracking.swift in Resources */,
 				BA5E5A4B2B6859BC0022CEB2 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
