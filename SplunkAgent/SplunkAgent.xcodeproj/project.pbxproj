@@ -184,6 +184,9 @@
 		520067082DAED31F00444346 /* SlowFrameDetectorConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520067072DAED2F600444346 /* SlowFrameDetectorConfiguration.swift */; };
 		520067092DAED31F00444346 /* SlowFrameDetector+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520067062DAED2F600444346 /* SlowFrameDetector+Module.swift */; };
 		5200670B2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5200670A2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift */; };
+		4BF895742DAD7C2100E171A4 /* SplunkConfigurationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF895732DAD7C2100E171A4 /* SplunkConfigurationHandler.swift */; };
+		4BF8957F2DAD984D00E171A4 /* SplunkConfigurationHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8957D2DAD984D00E171A4 /* SplunkConfigurationHandlerTests.swift */; };
+		4BF895812DAD987D00E171A4 /* RemoteConfigurationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF895802DAD987D00E171A4 /* RemoteConfigurationModel.swift */; };
 		52286CB52CD5404A001F8A31 /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52286CB42CD54045001F8A31 /* ScreenName.swift */; };
 		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		522A70B92DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */; };
@@ -703,6 +706,9 @@
 		520067062DAED2F600444346 /* SlowFrameDetector+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SlowFrameDetector+Module.swift"; sourceTree = "<group>"; };
 		520067072DAED2F600444346 /* SlowFrameDetectorConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorConfiguration.swift; sourceTree = "<group>"; };
 		5200670A2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMetadataSlowFrameDetector.swift; sourceTree = "<group>"; };
+		4BF895732DAD7C2100E171A4 /* SplunkConfigurationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkConfigurationHandler.swift; sourceTree = "<group>"; };
+		4BF8957D2DAD984D00E171A4 /* SplunkConfigurationHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkConfigurationHandlerTests.swift; sourceTree = "<group>"; };
+		4BF895802DAD987D00E171A4 /* RemoteConfigurationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationModel.swift; sourceTree = "<group>"; };
 		52286CB42CD54045001F8A31 /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
 		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorDestination.swift; sourceTree = "<group>"; };
@@ -2272,6 +2278,15 @@
 			path = SessionReplay;
 			sourceTree = "<group>";
 		};
+		4BF8957E2DAD984D00E171A4 /* Splunk Configuration */ = {
+			isa = PBXGroup;
+			children = (
+				4BF8957D2DAD984D00E171A4 /* SplunkConfigurationHandlerTests.swift */,
+				4BF895802DAD987D00E171A4 /* RemoteConfigurationModel.swift */,
+			);
+			path = "Splunk Configuration";
+			sourceTree = "<group>";
+		};
 		52286CB32CD53FFA001F8A31 /* ScreenContent */ = {
 			isa = PBXGroup;
 			children = (
@@ -2335,6 +2350,7 @@
 				C73FF4812B6CE749009C53FF /* ConfigurationHandler+LoadRemote.swift */,
 				4B6878C02B9F3B420024479A /* ConfigurationHandler+RequestErrorHandling.swift */,
 				C73FF4802B6CE749009C53FF /* ConfigurationHandler+Storage.swift */,
+				4BF895732DAD7C2100E171A4 /* SplunkConfigurationHandler.swift */,
 			);
 			path = Handler;
 			sourceTree = "<group>";
@@ -2379,6 +2395,7 @@
 		C73FF49C2B6CE809009C53FF /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
+				4BF8957E2DAD984D00E171A4 /* Splunk Configuration */,
 				C73FF49D2B6CE809009C53FF /* ConfigurationHandlerTests.swift */,
 			);
 			path = Configuration;
@@ -3794,6 +3811,7 @@
 				E4F2E5282B179658006EBA69 /* String+NanoID.swift in Sources */,
 				E4AD34F62B56E4BB004976CA /* DefaultModulesManager.swift in Sources */,
 				4BB680E92B7940C0000A54D4 /* Status+Conversions.swift in Sources */,
+				4BF895742DAD7C2100E171A4 /* SplunkConfigurationHandler.swift in Sources */,
 				E426CFAA2B28C18000094AC0 /* SessionsModel.swift in Sources */,
 				E42634832BB44B0F003706A9 /* SplunkAgent.docc in Sources */,
 				C73FF4882B6CE749009C53FF /* ConfigurationHandlerError.swift in Sources */,
@@ -4097,6 +4115,7 @@
 				E4C14EBB2B2B397F008CC270 /* SessionsModelTests.swift in Sources */,
 				2AE43B012B7B838D002C4A98 /* DeviceInfoTests.swift in Sources */,
 				E46896402B21DA7C00727A6A /* API-1.0-AgentTests.swift in Sources */,
+				4BF895812DAD987D00E171A4 /* RemoteConfigurationModel.swift in Sources */,
 				E4570F802BAAEE83002ED1DC /* API-1.0-ExtensionsTests.swift in Sources */,
 				E43370D92B95C86F00102C2D /* DefaultSharedStateTests.swift in Sources */,
 				E4FAEEB12B6A51AA008D4E6E /* DefaultModulesManagerTestBuilder.swift in Sources */,
@@ -4106,6 +4125,7 @@
 				E468964A2B21ED7900727A6A /* API-1.0-ConfigurationTests.swift in Sources */,
 				E4122CBF2B67DD400095157B /* ModuleAcceptHelpersTests.swift in Sources */,
 				E4720E6D2B71458B008B393A /* AgentModulesManagerTests.swift in Sources */,
+				4BF8957F2DAD984D00E171A4 /* SplunkConfigurationHandlerTests.swift in Sources */,
 				C76AB8DA2B7B785500CB4307 /* RawMockDataBuilder.swift in Sources */,
 				2A03CF592D9C2A8F00CF3BC9 /* API-1.0-ConfigurationErrorTests.swift in Sources */,
 				E4577D7B2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift in Sources */,

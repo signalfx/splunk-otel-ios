@@ -298,10 +298,13 @@ public class SplunkRum: ObservableObject {
             return ConfigurationHandlerNonOperational(for: configuration)
         }
 
-        return ConfigurationHandler(
-            for: configuration,
-            apiClient: APIClient(baseUrl: configuration.configUrl)
-        )
+        return SplunkConfigurationHandler(for: configuration)
+
+        // Temporarily commented-out code until O11y implements a proper backend config endpoint.
+//        return ConfigurationHandler(
+//            for: configuration,
+//            apiClient: APIClient(baseUrl: configuration.configUrl)
+//        )
     }
 
     private var configurationSettings: [String: String] {
