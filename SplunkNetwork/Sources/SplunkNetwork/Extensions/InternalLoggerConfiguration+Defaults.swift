@@ -27,7 +27,8 @@ public extension InternalLoggerConfiguration {
     ///
     /// - Parameters:
     ///  - category: More finely-grained category of the logged subsystem.
-    static func networkInstrumentation(subsystem: String = "SplunkAgent Network Instrumentation", category: String) -> InternalLoggerConfiguration {
+    static func networkInstrumentation(subsystem: String = "SplunkAgent Network Instrumentation",
+                                       category: String) -> InternalLoggerConfiguration {
         return InternalLoggerConfiguration(subsystem: subsystem, category: category)
     }
 }
