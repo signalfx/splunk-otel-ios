@@ -59,7 +59,6 @@
                         <segue destination="Xqp-MF-bVJ" kind="show" identifier="TestApiCalls" id="LdI-pp-FX3"/>
                         <segue destination="GJu-EY-m7h" kind="show" identifier="Crashes" id="xHt-0h-0Ur"/>
                         <segue destination="VBl-p7-cVN" kind="show" identifier="SlowFrameRenders" id="SYQ-QU-pfj"/>
-                        <segue destination="VBl-p7-cVN" kind="show" id="SYQ-QU-pfj"/>
                         <segue destination="umb-CS-MKl" kind="show" identifier="CustomTracking" id="kc3-Ix-XQY"/>
                     </connections>
                 </viewController>
