@@ -263,6 +263,12 @@ public class SplunkRum: ObservableObject {
         appStartModule?.sharedState = sharedState
     }
 
+    /// Configure Custom Tracking module
+    private func customizeCustomTracking() {
+        let customTrackingModule = modulesManager?.module(ofType: SplunkCustomTracking.CustomTracking.self)
+
+        customTrackingModule?.sharedState = sharedState
+    }
 
     // MARK: - Configuration handler
 
