@@ -18,9 +18,9 @@ struct ContentView: View {
 
     // MARK: - Identifiers
 
-    let userId = SplunkRum.instance?.user.identifier ?? "nil"
     @State private var sessionId = SplunkRum.instance?.session.currentSessionId ?? "nil"
-    @State private var agentStatus = SplunkRum.instance?.state.status ?? Status.notRunning(.notInstalled)
+    @State private var userTrackingMode = SplunkRum.instance?.user.state.trackingMode ?? .default
+    @State private var agentStatus = SplunkRum.instance?.state.status ?? .notRunning(.notInstalled)
 
     let sessionPublisher = NotificationCenter.default
         .publisher(
@@ -58,7 +58,7 @@ struct ContentView: View {
                     .transition(.opacity)
                     .id("LabelSessionID" + sessionId)
                 
-                Text("User ID: \(userId)")
+                Text("User Tracking: \(userTrackingMode)")
             }
             .foregroundColor(Color(uiColor: .black))
             .padding()

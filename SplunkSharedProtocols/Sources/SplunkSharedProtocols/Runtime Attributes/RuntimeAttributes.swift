@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,14 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Defines the basic properties and behavior of the agent user.
-protocol AgentUser {
+/// Defines list of attributes that change continuously over time.
+public protocol RuntimeAttributes: AnyObject {
 
-    // MARK: - Identification
-
-    /// User's anonymous ID.
-    var userIdentifier: String { get }
-
-    /// The currently used tracking mode.
-    var trackingMode: UserTrackingMode { get set }
+    /// A list of attributes to use at signal start.
+    var all: [String: Any] { get }
 }

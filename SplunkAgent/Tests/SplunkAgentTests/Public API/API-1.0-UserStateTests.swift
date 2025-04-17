@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,23 +15,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import SplunkAgent
 import XCTest
 
-final class API10UserTests: XCTestCase {
+final class API10UserStateTests: XCTestCase {
 
     // MARK: - API Tests
 
-    func testUser() throws {
-        // Touch `User` property
+    func testState() throws {
+        // Touch `UserState` property
         let agent = try AgentTestBuilder.buildDefault()
-        let user = agent.user
-        XCTAssertNotNil(user)
+        let userState = agent.user.state
+        XCTAssertNotNil(userState)
 
         // Properties (READ)
-        let preferences = user.preferences
-        XCTAssertNotNil(preferences)
+        let initialTrackingMode = userState.trackingMode
+        XCTAssertEqual(initialTrackingMode, UserTrackingMode.noTracking)
 
-        let state = user.state
-        XCTAssertNotNil(state)
+        agent.user.preferences.trackingMode = .anonymousTracking
+        XCTAssertEqual(userState.trackingMode, .anonymousTracking)
     }
 }

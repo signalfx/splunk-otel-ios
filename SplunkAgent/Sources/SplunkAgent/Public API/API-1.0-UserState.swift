@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,14 +15,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Defines the basic properties and behavior of the agent user.
-protocol AgentUser {
+/// A state object reflects the current user's state.
+public final class UserState {
 
-    // MARK: - Identification
+    // MARK: - Internal
 
-    /// User's anonymous ID.
-    var userIdentifier: String { get }
+    private unowned let owner: SplunkRum
+
+
+    // MARK: - Initialization
+
+    init(for owner: SplunkRum) {
+        self.owner = owner
+    }
+}
+
+
+public extension UserState {
+
+    // MARK: - User identification
 
     /// The currently used tracking mode.
-    var trackingMode: UserTrackingMode { get set }
+    var trackingMode: UserTrackingMode {
+        owner.currentUser.trackingMode
+    }
 }

@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,14 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Defines the basic properties and behavior of the agent user.
-protocol AgentUser {
+@testable import SplunkAgent
 
-    // MARK: - Identification
+final class DefaultUserTestBuilder {
 
-    /// User's anonymous ID.
-    var userIdentifier: String { get }
+    // MARK: - Basic builds
 
-    /// The currently used tracking mode.
-    var trackingMode: UserTrackingMode { get set }
+    public static func build(named: String) throws -> DefaultUser {
+        // Build user with preconfigured storage
+        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: named)
+        let userModel = UserModel(storage: storage)
+        let user = DefaultUser(userModel: userModel)
+
+        return user
+    }
 }

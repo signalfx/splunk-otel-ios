@@ -51,6 +51,8 @@ public class SplunkRum: ObservableObject {
     let appStateManager: AgentAppStateManager
     lazy var sharedState: AgentSharedState = DefaultSharedState(for: self)
 
+    lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
+
     let logger = InternalLogger(configuration: .default(subsystem: "Splunk RUM Agent"))
 
 
@@ -253,17 +255,17 @@ public class SplunkRum: ObservableObject {
         networkModule?.sharedState = sharedState
 
         // We need the endpoint url to manage trace exclusion logic
-        var exludedEndpoints: [URL] = [
+        var excludedEndpoints: [URL] = [
             agentConfiguration.tracesUrl,
             agentConfiguration.logsUrl,
             agentConfiguration.configUrl
         ]
 
         if let sessionReplayUrl = agentConfiguration.sessionReplayUrl {
-            exludedEndpoints.append(sessionReplayUrl)
+            excludedEndpoints.append(sessionReplayUrl)
         }
 
-        networkModule?.excludedEndpoints = exludedEndpoints
+        networkModule?.excludedEndpoints = excludedEndpoints
     }
 
     /// Configure Crash Reports module with shared state.

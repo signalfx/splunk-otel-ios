@@ -39,7 +39,7 @@ class DefaultEventManager: AgentEventManager {
     var logEventProcessor: LogEventProcessor
 
     // Trace processor
-    var traceProcesssor: TraceProcessor
+    var traceProcessor: TraceProcessor
 
     // Agent reference
     private unowned let agent: SplunkRum
@@ -85,12 +85,22 @@ class DefaultEventManager: AgentEventManager {
         )
 
         // Initialize log event processor
-        logEventProcessor = OTLPLogEventProcessor(with: configuration.logsUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
+        logEventProcessor = OTLPLogEventProcessor(
+            with: configuration.logsUrl,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            debugEnabled: configuration.enableDebugLogging
+        )
 
         // Initialize trace processor
-        traceProcesssor = OTLPTraceProcessor(with: configuration.tracesUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
+        traceProcessor = OTLPTraceProcessor(
+            with: configuration.tracesUrl,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            debugEnabled: configuration.enableDebugLogging
+        )
 
-        // Starts listening to a Session Reset nofification to send the Session Start event.
+        // Starts listening to a Session Reset notification to send the Session Start event.
         NotificationCenter.default.addObserver(forName: DefaultSession.sessionDidResetNotification, object: nil, queue: nil) { _ in
             self.sendSessionStartEvent()
         }
