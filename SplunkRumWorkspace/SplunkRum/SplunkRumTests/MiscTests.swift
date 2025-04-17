@@ -43,25 +43,25 @@ class MiscTests: XCTestCase {
     func testLengthLimitingExporter() throws {
         // This test is shaped kinda funny since we can't construct SpanData() directly
         let span = buildTracer().spanBuilder(spanName: "limitTest").startSpan()
-        var longString = "0123456789abcdefghijklmnopqurstuvwxyzabcdefghijklmnopqrstuvwxyz0123456789abcde"
+        var longString = "0123456789abcdefghijklmnopqurstuvwxyzabcdefghijklmnopqrstuvwxyz01"
         var i = 0
-        while i < 9 {
+        while i < 11 {
             longString += longString
             i += 1
         }
-        XCTAssertTrue(longString.count > 32768)
+        XCTAssertTrue(longString.count > 131072)
         span.setAttribute(key: "longString", value: longString)
         span.setAttribute(key: "normalString", value: "normal")
         span.setAttribute(key: "normalInt", value: 7)
         span.end()
         XCTAssertEqual(1, localSpans.count)
         let rawSpans = localSpans
-        XCTAssertTrue(rawSpans[0].attributes["longString"]?.description.count ?? 0 > 32768)
+        XCTAssertTrue(rawSpans[0].attributes["longString"]?.description.count ?? 0 > 131072)
         localSpans.removeAll()
         let le = LimitingExporter(proxy: TestSpanExporter(), spanFilter: nil) // rewrites into localSpans; yes, this is weird
         _ = le.export(spans: rawSpans)
         XCTAssertEqual(1, localSpans.count)
-        XCTAssertTrue(localSpans[0].attributes["longString"]?.description.count ?? 32767 <= 32768)
+        XCTAssertTrue(localSpans[0].attributes["longString"]?.description.count ?? 131071 <= 131072)
         XCTAssertEqual("normal", localSpans[0].attributes["normalString"]?.description ?? nil)
         XCTAssertEqual("7", localSpans[0].attributes["normalInt"]?.description ?? nil)
     }
