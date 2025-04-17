@@ -26,7 +26,7 @@ public struct CustomTrackingMetadata: ModuleEventMetadata {
 
 // MARK: - Module type definitions
 
-extension SplunkCustomTracking: Module {
+extension CustomTracking: Module {
 
     public typealias Configuration = CustomTrackingConfiguration
     public typealias RemoteConfiguration = CustomTrackingRemoteConfiguration
@@ -37,8 +37,8 @@ extension SplunkCustomTracking: Module {
 
     // MARK: - Module installation
 
-    func install(with configuration: (any SplunkSharedProtocols.ModuleConfiguration)?,
-                 remoteConfiguration: (any SplunkSharedProtocols.RemoteModuleConfiguration)?) {}
+    public func install(with configuration: (any SplunkSharedProtocols.ModuleConfiguration)?,
+                        remoteConfiguration: (any SplunkSharedProtocols.RemoteModuleConfiguration)?) {}
 
 
     // MARK: - Module data handling

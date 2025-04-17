@@ -189,6 +189,9 @@
 		52DBB8432DAF477900BB1044 /* SplunkTrackableEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52194E462DA7503B00A08C47 /* SplunkTrackableEvent.swift */; };
 		52DBB8442DAF477900BB1044 /* SplunkTrackable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B25E9D2DA6F30C006C34A5 /* SplunkTrackable.swift */; };
 		52DBB8452DAF477900BB1044 /* SplunkTrackableIssue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B25E9F2DA6F30C006C34A5 /* SplunkTrackableIssue.swift */; };
+		52E7D0452DB0081700128742 /* OpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = 52E7D0442DB0081700128742 /* OpenTelemetryApi */; };
+		52E7D0462DB0082000128742 /* SplunkLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B963FE52D60F7E3009A2E7F /* SplunkLogger.framework */; };
+		52E7D0472DB0082E00128742 /* SplunkSharedProtocols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkSharedProtocols.framework */; };
 		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */; };
 		C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB02BA9D41E000CC11B /* AppStateManager.swift */; };
@@ -1081,6 +1084,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52E7D0472DB0082E00128742 /* SplunkSharedProtocols.framework in Frameworks */,
+				52E7D0462DB0082000128742 /* SplunkLogger.framework in Frameworks */,
+				52E7D0452DB0081700128742 /* OpenTelemetryApi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3407,6 +3413,7 @@
 			);
 			name = SplunkCustomTracking;
 			packageProductDependencies = (
+				52E7D0442DB0081700128742 /* OpenTelemetryApi */,
 			);
 			productName = SplunkCustomTracking;
 			productReference = 52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */;
@@ -9639,6 +9646,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
 			productName = CiscoLogger;
+		52E7D0442DB0081700128742 /* OpenTelemetryApi */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B0F23872D79F2C000EA575A /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			productName = OpenTelemetryApi;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -20,7 +20,7 @@ import SplunkLogger
 import SplunkSharedProtocols
 
 
-public final class SplunkCustomTracking {
+public final class CustomTracking {
 
 
     // MARK: - Private Properties
