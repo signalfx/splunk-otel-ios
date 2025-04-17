@@ -109,11 +109,37 @@ public class NetworkInstrumentation {
         }
     }
 
+    let serverTimingPattern = #"traceparent;desc=['\"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['\"]"#
+
+    func addLinkToSpan(span: Span, valStr: String) {
+        let regex = try! NSRegularExpression(pattern: serverTimingPattern)
+        let result = regex.matches(in: valStr, range: NSRange(location: 0, length: valStr.utf16.count))
+        // per standard regex logic, number of matched segments is 3 (whole match plus two () captures)
+        if result.count != 1 || result[0].numberOfRanges != 3 {
+            return
+        }
+        let traceId = String(valStr[Range(result[0].range(at: 1), in: valStr)!])
+        let spanId = String(valStr[Range(result[0].range(at: 2), in: valStr)!])
+        span.setAttribute(key: "link.traceId", value: traceId)
+        span.setAttribute(key: "link.spanId", value: spanId)
+    }
+
     func receivedResponse(URLResponse: URLResponse, dataOrFile: DataOrFile?, span: Span) {
         let key = SemanticAttributes.httpResponseContentLength
         let response = URLResponse as? HTTPURLResponse
         let length = response?.expectedContentLength ?? 0
         span.setAttribute(key: key, value: Int(length))
+
+        if response != nil {
+            for (key, val) in response!.allHeaderFields {
+                if let keyStr = key as? String,
+                   let valStr = val as? String,
+                   keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
+                   valStr.contains("traceparent") {
+                    addLinkToSpan(span: span, valStr: valStr)
+                }
+            }
+        }
 
         /* Save this until we add the feature into the Agent side API
         guard ((agentConfiguration?.appDCloudNetworkResponseCallback?(URLResponse)) == nil) else {
