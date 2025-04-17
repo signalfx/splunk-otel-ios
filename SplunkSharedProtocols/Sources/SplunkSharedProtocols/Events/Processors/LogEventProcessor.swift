@@ -42,7 +42,7 @@ public protocol LogEventProcessor {
     /// - Parameters:
     ///   - event: Event to be sent to exporter.
     ///   - completion: Completion block, returns `true` if the event was sent correctly.
-    func sendEvent(_: any Event, completion: @escaping (Bool) -> Void)
+    func sendEvent(_: any AgentEvent, completion: @escaping (Bool) -> Void)
 
     /// Sends Log Event to an exporter.
     ///
@@ -55,5 +55,5 @@ public protocol LogEventProcessor {
     ///   - immediateProcessing: `true` processes the event synchronously,
     ///   `false` processes the event on a background thread.
     ///   - completion: Completion block, returns `true` if the event was sent correctly.
-    func sendEvent(event: any Event, immediateProcessing: Bool, completion: @escaping (Bool) -> Void)
+    func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void)
 }
