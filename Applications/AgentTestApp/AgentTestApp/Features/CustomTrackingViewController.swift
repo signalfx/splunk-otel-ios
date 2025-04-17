@@ -18,12 +18,15 @@ limitations under the License.
 import Foundation
 import UIKit
 
-class CustomTracking: UIViewController {
+class CustomTrackingViewController: UIViewController {
 
-    @IBOutlet var trackEventButton: UIButton!
-    @IBOutlet var trackErrorButton: UIButton!
-    @IBOutlet var resultView: UITextView!
+    @IBOutlet weak var trackEventButton: UIButton!
+    @IBOutlet weak var trackErrorButton: UIButton!
+    @IBOutlet weak var resultView: UITextView!
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
 
     // MARK: - Track Event
 
@@ -73,10 +76,4 @@ class CustomTracking: UIViewController {
 
         return formatted.trimmingCharacters(in: .whitespacesAndNewlines)
     }
-
-
 }
-
-
-
-
