@@ -15,11 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import OpenTelemetryProtocolExporterCommon
-import SwiftProtobuf
-import Foundation
 import CiscoDiskStorage
 import CiscoEncryption
+import Foundation
+import OpenTelemetryProtocolExporterCommon
+import SwiftProtobuf
+
 
 /// Basic implementation of exporters
 public class OTLPBackgroundHTTPBaseExporter {
@@ -42,7 +43,10 @@ public class OTLPBackgroundHTTPBaseExporter {
         envVarHeaders: [(String, String)]? = EnvVarHeaders.attributes,
         diskStorage: DiskStorage = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: "OTLPBackgroundExporter"),
-            rules: Rules.default,
+            rules: Rules(
+                relativeUsedSize: 0.2,
+                absoluteUsedSize: .init(value: 200, unit: .megabytes)
+            ),
             encryption: NoneEncryption()
         )
     ) {
@@ -63,6 +67,7 @@ public class OTLPBackgroundHTTPBaseExporter {
             }
         }
     }
+
 
     // MARK: - Request method
 
@@ -89,7 +94,6 @@ public class OTLPBackgroundHTTPBaseExporter {
             .compactMap { $0.id }
 
         guard let uploadList = try? diskStorage.list(forKey: KeyBuilder.uploadsKey) else {
-
             return
         }
 

@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoDiskStorage
 import Foundation
 import SplunkLogger
-import CiscoDiskStorage
 
 /// Client for sending requests over HTTP.
 final class BackgroundHTTPClient: NSObject {
@@ -30,6 +30,7 @@ final class BackgroundHTTPClient: NSObject {
     private let internalLogger = InternalLogger(configuration: .backgroundExporter(category: "BackgroundHTTPClient"))
 
     private let diskStorage: DiskStorage
+
 
     // MARK: - Computed properties
 
@@ -54,6 +55,7 @@ final class BackgroundHTTPClient: NSObject {
     init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage) {
         self.sessionQosConfiguration = sessionQosConfiguration
         self.diskStorage = diskStorage
+
         super.init()
     }
 
@@ -72,6 +74,7 @@ final class BackgroundHTTPClient: NSObject {
             }
 
             try diskStorage.delete(forKey: fileKey)
+
             return
         }
 

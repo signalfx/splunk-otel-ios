@@ -15,10 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoDiskStorage
+import Foundation
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
-import Foundation
-import CiscoDiskStorage
 
 public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogRecordExporter {
 
