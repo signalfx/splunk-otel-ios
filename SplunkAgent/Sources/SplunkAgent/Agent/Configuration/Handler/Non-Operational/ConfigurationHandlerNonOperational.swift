@@ -31,7 +31,7 @@ final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
 
     // MARK: - Intialization
 
-    init(for configuration: AgentConfigurationProtocol) {
+    init(for configuration: any AgentConfigurationProtocol) {
         self.configuration = configuration
     }
 }

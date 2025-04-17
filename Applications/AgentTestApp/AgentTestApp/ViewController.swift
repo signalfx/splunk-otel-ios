@@ -11,7 +11,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
     // Data model: These strings will be the data for the table view cells and drive the segue
     //             Each array must have the same number of elements
-    let displayName: [String] = ["Network Calls", "Crashes", "Test API Sample Calls", "Sample Next Task"] // Can be any descriptive text
+    let displayName: [String] = ["Network Calls", "Crashes", "Test API Sample Calls", "Slow Frame Renders", "Sample Next Task"] // Can be any descriptive text
     let segueName: [String] = ["NetworkCalls", "Crashes", "TestApiCalls", "SlowFrameRenders", "PlaceHolder"] //  Segues declared in the storyboard
 
     // cell reuse id (cells that scroll out of view can be reused)

@@ -35,7 +35,12 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Initialization
     
-    required public init(with tracesEndpoint: URL, resources: AgentResources, debugEnabled: Bool) {
+    required public init(
+        with tracesEndpoint: URL,
+        resources: AgentResources,
+        runtimeAttributes: RuntimeAttributes,
+        debugEnabled: Bool
+    ) {
 
         let configuration = OtlpConfiguration()
         let envVarHeaders = [(String, String)]()
@@ -53,6 +58,7 @@ public class OTLPTraceProcessor: TraceProcessor {
 
         // Initialize processor
         let spanProcessor = SimpleSpanProcessor(spanExporter: attributeCheckerExporter)
+        let attributesProcessor = OLTPAttributesSpanProcessor(with: runtimeAttributes)
 
         // Build Resources
         var resource = Resource()
@@ -61,6 +67,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         // Initialize tracer provider
         var tracerProviderBuilder = TracerProviderBuilder()
             .with(resource: resource)
+            .add(spanProcessor: attributesProcessor)
             .add(spanProcessor: spanProcessor)
 
         // Initialize optional stdout exporter

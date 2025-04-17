@@ -30,7 +30,7 @@ protocol AgentEventManager {
     var logEventProcessor: LogEventProcessor { get }
 
     /// Trace processor to process Traces.
-    var traceProcesssor: TraceProcessor { get }
+    var traceProcessor: TraceProcessor { get }
 
 
     // MARK: - Initialization
@@ -41,7 +41,7 @@ protocol AgentEventManager {
     ///   - configuration: Agent Configuration object.
     ///   - agent: Agent object, used to obtain Session information and User information.
     ///   - eventsModel: Events model object to store persisted events metadata.
-    init(with configuration: AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel)
+    init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel)
 
 
     // MARK: - Module Events
