@@ -15,14 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 import UIKit
+import SplunkSharedProtocols
 
 class CustomTrackingViewController: UIViewController {
 
     @IBOutlet weak var trackEventButton: UIButton!
     @IBOutlet weak var trackErrorButton: UIButton!
-    @IBOutlet weak var resultView: UITextView!
+    @IBOutlet weak var resultsView: UITextView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +33,7 @@ class CustomTrackingViewController: UIViewController {
     @IBAction func trackEventClicked(_ sender: UIButton) {
 
         print("Track Event Clicked")
-
+/*
         let staticAttributes: [String: EventAttributeValue] = [
             "name": .string("universe"),
             "meaning": .int(42)
@@ -47,6 +47,7 @@ class CustomTrackingViewController: UIViewController {
         let formatted = prettyPrintAttributes(attributes)
         print(attributes)
         resultView.text = formatted
+ */
     }
 
 
