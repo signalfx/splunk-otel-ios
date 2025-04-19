@@ -61,7 +61,7 @@ final class EventsTests: XCTestCase {
     // MARK: - Testing Event manual events
 
     func testSessionStartEvent() throws {
-        let sessionID = try XCTUnwrap(agent?.session.currentSessionId)
+        let sessionID = try XCTUnwrap(agent?.session.state.id)
         let timestamp = Date()
         let userID = try XCTUnwrap(agent?.currentUser.userIdentifier)
 
@@ -139,7 +139,7 @@ final class EventsTests: XCTestCase {
     // MARK: - Testing immediate and background processing
 
     func testImmediateProcessing() throws {
-        let sessionID = try XCTUnwrap(agent?.session.currentSessionId)
+        let sessionID = try XCTUnwrap(agent?.session.state.id)
         let userID = try XCTUnwrap(agent?.user.identifier)
         let timestamp = Date()
 
@@ -163,7 +163,7 @@ final class EventsTests: XCTestCase {
     }
 
     func testBackgroundProcessing() throws {
-        let sessionID = try XCTUnwrap(agent?.session.currentSessionId)
+        let sessionID = try XCTUnwrap(agent?.session.state.id)
         let userID = try XCTUnwrap(agent?.user.identifier)
         let timestamp = Date()
 
@@ -188,7 +188,7 @@ final class EventsTests: XCTestCase {
 
     func testDuplicateSessionStartEvents() throws {
         let agent = try XCTUnwrap(agent)
-        let sessionID = try XCTUnwrap(agent.session.currentSessionId)
+        let sessionID = try XCTUnwrap(agent.session.state.id)
         let eventManager = try XCTUnwrap(agent.eventManager as? DefaultEventManager)
 
         let eventsModel = eventManager.eventsModel

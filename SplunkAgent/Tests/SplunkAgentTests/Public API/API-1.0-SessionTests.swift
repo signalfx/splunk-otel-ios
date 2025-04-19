@@ -28,9 +28,12 @@ final class API10SessionTests: XCTestCase {
         let session = agent.session
         XCTAssertNotNil(session)
 
-        // Properties (READ)
-        let currentSessionId = session.currentSessionId
+        // State properties (READ)
+        let currentSessionId = session.state.id
         XCTAssertNotNil(currentSessionId)
+
+        let currentSamplingRate = session.state.samplingRate
+        XCTAssertNotNil(currentSamplingRate)
 
         // Methods
         let sessionId = session.sessionId(for: Date())

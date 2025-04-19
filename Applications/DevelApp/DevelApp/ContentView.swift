@@ -18,7 +18,7 @@ struct ContentView: View {
 
     // MARK: - Identifiers
 
-    @State private var sessionId = SplunkRum.instance?.session.currentSessionId ?? "nil"
+    @State private var sessionId = SplunkRum.instance?.session.state.id ?? "nil"
     @State private var userTrackingMode = SplunkRum.instance?.user.state.trackingMode ?? .default
     @State private var agentStatus = SplunkRum.instance?.state.status ?? .notRunning(.notInstalled)
 
