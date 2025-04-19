@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,19 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-
-/// A session object is a representation of the current user session.
-public final class Session {
+/// A state object that reflects the current session's state.
+public final class SessionState {
 
     // MARK: - Internal
 
     private unowned let owner: SplunkRum
 
-
-    // MARK: - State
-
-    public private(set) lazy var state: SessionState = SessionState(for: owner)
 
     // MARK: - Initialization
 
@@ -36,18 +30,19 @@ public final class Session {
     }
 }
 
+public extension SessionState {
 
-public extension Session {
+    // MARK: - Public properties
 
-    // MARK: - Identifier
-
-    /// Identification of recorded session in given time.
+    /// Identification of recorded session.
     ///
-    /// Some events can be tracked with a delay caused by, e.g., its asynchronous pre-processing
-    /// or an application crash.
-    ///
-    /// This method returns the respective session ID for the timestamp the event originates.
-    func sessionId(for timestamp: Date) -> String? {
-        owner.currentSession.sessionId(for: timestamp)
+    /// When the agent is initialized, there is always some session ID.
+    var id: String {
+        owner.currentSession.currentSessionId
+    }
+
+    /// Value of the currently used session sampling rate.
+    var samplingRate: Double {
+        owner.agentConfiguration.sessionSamplingRate
     }
 }
