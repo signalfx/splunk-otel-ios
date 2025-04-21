@@ -22,6 +22,8 @@ import SplunkSharedProtocols
 
 public final class CustomTracking {
 
+    public static var instance = CustomTracking()
+
 
     // MARK: - Private Properties
 
@@ -45,27 +47,31 @@ public final class CustomTracking {
 
     // MARK: - Public API
 
-    /// Tracks a custom event.
-    public func trackEvent(eventName name: String, event: SplunkTrackableEvent) {
-        eventTracking.sharedState = sharedState
-        eventTracking.track(name, event)
+    /// Track a custom event.
+    public func trackEvent(_ name: String, attributes: [String: Any]) {
+        let event = SplunkTrackableEvent(typeName: name, attributes: attributes)
+        eventTracking.track(event)
     }
 
-    /// Tracks a custom issue (Error, NSError, NSException, wrapped String).
-    public func track(issue: SplunkTrackableIssue) {
-        errorTracking.sharedState = sharedState
-        errorTracking.track(issue)
-    }
+    /// Track any kind of issue (String message, Error, NSError, NSException).
 
-    /// Overloaded method for String issue.
     public func track(issue: String) {
-        let wrappedIssue = SplunkIssue(issue)
-        track(issue: wrappedIssue)
+        let internalIssue = SplunkIssue(from: issue)
+        errorTracking.track(internalIssue)
     }
 
-    /// Overloaded method for Error issue.
     public func track(issue: Error) {
-        let wrappedIssue = SplunkIssue(issue)
-        track(issue: wrappedIssue)
+        let internalIssue = SplunkIssue(from: issue)
+        errorTracking.track(internalIssue)
+    }
+
+    public func track(issue: NSError) {
+        let internalIssue = SplunkIssue(from: issue)
+        errorTracking.track(internalIssue)
+    }
+
+    public func track(issue: NSException) {
+        let internalIssue = SplunkIssue(from: issue)
+        errorTracking.track(internalIssue)
     }
 }

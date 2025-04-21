@@ -27,16 +27,9 @@ class EventTracking {
     var typeName: String = ""
     unowned var sharedState: AgentSharedState?
 
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "CustomEventTracking"))
-
-    func track(_ name: String, _ event: SplunkTrackableEvent) {
-        let attributes = event.toEventAttributes()
-
-        guard validateAttributeLengths(attributes: attributes, logger: internalLogger) else {
-            return
-        }
-
+    /// Unified track method for any Event
+    func track(_ event: SplunkTrackableEvent) {
         // Emit the span directly using the OTelEmitter
-        OTelEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "CustomEventTracking")
+        OTelEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "EventTracking")
     }
 }

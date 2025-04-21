@@ -27,16 +27,8 @@ struct ErrorTracking {
     var typeName: String = ""
     unowned var sharedState: AgentSharedState?
 
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "ErrorTracking"))
-
     /// Unified track method for SplunkTrackableIssue, Error, NSError, NSException, and wrapped String.
     func track(_ issue: SplunkTrackableIssue) {
-        let attributes = issue.toEventAttributes()
-
-        guard validateAttributeLengths(attributes: attributes, logger: internalLogger) else {
-            return
-        }
-
         OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "ErrorTracking")
     }
 }

@@ -32,28 +32,47 @@ public struct SplunkTrackableEvent: SplunkTrackable {
         self.attributes = attributes
     }
 
+    public init(typeName: String, attributes: [String: Any] = [:]) {
+        self.typeName = typeName
+        self.attributes = [:]
+        for (key, value) in attributes {
+            if let stringValue = value as? String {
+                set(key, value: .string(stringValue))
+            }
+            if let intValue = value as? Int {
+                set(key, value: .int(intValue))
+            }
+            if let doubleValue = value as? Double {
+                set(key, value: .double(doubleValue))
+            }
+            if let dataValue = value as? Data {
+                set(key, value: .data(dataValue))
+            }
+        }
+    }
+
     // Set methods for various types
-    public mutating func set(_ key: String, value: Int) {
+    mutating func set(_ key: String, value: Int) {
         attributes[key] = .int(value)
     }
 
-    public mutating func set(_ key: String, value: String) {
+    mutating func set(_ key: String, value: String) {
         attributes[key] = .string(value)
     }
 
-    public mutating func set(_ key: String, value: Double) {
+    mutating func set(_ key: String, value: Double) {
         attributes[key] = .double(value)
     }
 
-    public mutating func set(_ key: String, value: Data) {
+    mutating func set(_ key: String, value: Data) {
         attributes[key] = .data(value)
     }
 
-    public mutating func set(_ key: String, value: EventAttributeValue) {
+    mutating func set(_ key: String, value: EventAttributeValue) {
         attributes[key] = value
     }
 
-    public func get(_ key: String) -> EventAttributeValue? {
+    func get(_ key: String) -> EventAttributeValue? {
         return attributes[key]
     }
 

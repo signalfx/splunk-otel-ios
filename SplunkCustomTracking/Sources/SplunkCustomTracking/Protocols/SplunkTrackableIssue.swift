@@ -21,15 +21,14 @@ import SplunkSharedProtocols
 
 // MARK: - SplunkTrackableIssue Protocol
 
+
 public protocol SplunkTrackableIssue: SplunkTrackable {
-
     var message: String { get }
-
     var stacktrace: Stacktrace? { get }
 }
 
 
-// MARK: - Default Implementation for toEventAttributes
+// MARK: - Default Implementation for SplunkTrackableIssue
 
 extension SplunkTrackableIssue {
     public func toEventAttributes() -> [String: EventAttributeValue] {
@@ -47,28 +46,44 @@ extension SplunkTrackableIssue {
 }
 
 
-// MARK: - Add SplunkTrackableIssue conformance to Error types and SplunkIssue
-
-
 // MARK: - SplunkIssue: Wrapper for String or Error with SplunkTrackableIssue conformance
 
 public struct SplunkIssue: SplunkTrackableIssue {
     public let message: String
     public let typeName: String
+    public let timestamp: Date
     public var stacktrace: Stacktrace?
 
     // Initializer for String issues
-    public init(_ message: String) {
+    public init(from message: String) {
         self.message = message
         self.typeName = "CustomIssue"
+        self.timestamp = Date()
         self.stacktrace = nil
     }
 
     // Initializer for Error
-    public init(_ error: Error) {
+    public init(from error: Error) {
         self.message = (error as? LocalizedError)?.errorDescription ?? "Unknown error"
         self.typeName = String(describing: type(of: error))
+        self.timestamp = Date()
         self.stacktrace = Stacktrace(frames: Thread.callStackSymbols)
+    }
+
+    // Initializer for NSError
+    public init(from error: NSError) {
+        self.message = error.localizedDescription
+        self.typeName = error.domain
+        self.timestamp = Date()
+        self.stacktrace = Stacktrace(frames: Thread.callStackSymbols)
+    }
+
+    // Initializer for NSException
+    public init(from exception: NSException) {
+        self.message = exception.reason ?? "No reason provided"
+        self.typeName = exception.name.rawValue
+        self.timestamp = Date()
+        self.stacktrace = Stacktrace(frames: exception.callStackSymbols)
     }
 }
 
@@ -89,7 +104,6 @@ extension NSError: SplunkTrackableIssue {
     }
 }
 
-
 // MARK: - NSException Extension for SplunkTrackableIssue
 
 extension NSException: SplunkTrackableIssue {
@@ -105,3 +119,4 @@ extension NSException: SplunkTrackableIssue {
         return Stacktrace(frames: callStackSymbols)
     }
 }
+
