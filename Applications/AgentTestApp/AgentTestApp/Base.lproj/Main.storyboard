@@ -500,9 +500,11 @@
                             <constraint firstItem="M9G-zc-DZ7" firstAttribute="centerX" secondItem="waZ-Zl-ctA" secondAttribute="centerX" id="DdM-3d-Ns8"/>
                             <constraint firstItem="hXJ-VI-BDm" firstAttribute="leading" secondItem="waZ-Zl-ctA" secondAttribute="leading" constant="20" id="HLy-VC-EQq"/>
                             <constraint firstItem="waZ-Zl-ctA" firstAttribute="trailing" secondItem="gya-8W-NUT" secondAttribute="trailing" constant="20" id="Jtj-45-zNY"/>
+                            <constraint firstItem="waZ-Zl-ctA" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="M9G-zc-DZ7" secondAttribute="trailing" constant="20" id="ZfA-mY-32J"/>
                             <constraint firstItem="M9G-zc-DZ7" firstAttribute="centerY" secondItem="waZ-Zl-ctA" secondAttribute="centerY" id="csp-4l-gxc"/>
                             <constraint firstItem="waZ-Zl-ctA" firstAttribute="trailing" secondItem="hXJ-VI-BDm" secondAttribute="trailing" constant="20" id="gdK-qF-LMp"/>
                             <constraint firstItem="gya-8W-NUT" firstAttribute="top" secondItem="hXJ-VI-BDm" secondAttribute="bottom" constant="27" id="uJv-zg-4RI"/>
+                            <constraint firstItem="M9G-zc-DZ7" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="waZ-Zl-ctA" secondAttribute="leading" constant="20" id="zU8-Ph-JSM"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="CUe-pG-h5R"/>
@@ -529,7 +531,6 @@
                                 <color key="backgroundColor" systemColor="systemRedColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="35" id="Y1h-2z-YwT"/>
-                                    <constraint firstAttribute="width" constant="374" id="ufn-QE-5EA"/>
                                 </constraints>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <state key="normal" title="Button"/>
@@ -542,7 +543,6 @@
                                 <rect key="frame" x="20" y="228" width="374" height="35"/>
                                 <color key="backgroundColor" systemColor="systemRedColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="374" id="Ytx-O4-RDx"/>
                                     <constraint firstAttribute="height" constant="35" id="cp1-Ew-pcd"/>
                                 </constraints>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -578,6 +578,7 @@
                             <constraint firstItem="DJL-Xf-8QR" firstAttribute="bottom" secondItem="NaA-En-1hM" secondAttribute="bottom" constant="33" id="Jnw-a1-yZs"/>
                             <constraint firstItem="DJL-Xf-8QR" firstAttribute="leading" secondItem="NaA-En-1hM" secondAttribute="leading" constant="20" id="LKh-YX-ZM0"/>
                             <constraint firstItem="GRd-y8-EU8" firstAttribute="top" secondItem="x2J-zY-rqU" secondAttribute="bottom" constant="27" id="MCM-PY-9Cb"/>
+                            <constraint firstItem="NaA-En-1hM" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="hLK-2V-RE8" secondAttribute="trailing" symbolic="YES" id="Nqf-M7-1Yh"/>
                             <constraint firstItem="NaA-En-1hM" firstAttribute="trailing" secondItem="DJL-Xf-8QR" secondAttribute="trailing" constant="20" id="RSc-gj-u0m"/>
                             <constraint firstItem="NaA-En-1hM" firstAttribute="trailing" secondItem="GRd-y8-EU8" secondAttribute="trailing" constant="20" id="ZRV-AT-pnS"/>
                             <constraint firstItem="GRd-y8-EU8" firstAttribute="leading" secondItem="NaA-En-1hM" secondAttribute="leading" constant="20" id="hhd-P6-O4H"/>

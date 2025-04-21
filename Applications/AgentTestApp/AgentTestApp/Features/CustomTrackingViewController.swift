@@ -17,6 +17,7 @@ limitations under the License.
 
 import UIKit
 import SplunkSharedProtocols
+import SplunkAgent
 
 class CustomTrackingViewController: UIViewController {
 
@@ -33,23 +34,20 @@ class CustomTrackingViewController: UIViewController {
     @IBAction func trackEventClicked(_ sender: UIButton) {
 
         print("Track Event Clicked")
-/*
-        let staticAttributes: [String: EventAttributeValue] = [
-            "name": .string("universe"),
-            "meaning": .int(42)
+        let eventDict: [String: Any] = [
+            "name": "universe",
+            "meaning": 42
         ]
-        var event = SplunkTrackableEvent(typeName: "UserEvent", attributes: staticAttributes)
-        event.set("location", value: "New York")
-        event.set("temperature", value: 72)
-        track(eventName: "SomeEvent", trackableEvent: event)
+        let formatted = prettyFormat(eventDict)
+        print(eventDict)
+        resultsView.text = formatted
 
-        let attributes = event.toEventAttributes()
-        let formatted = prettyPrintAttributes(attributes)
-        print(attributes)
-        resultView.text = formatted
- */
+
+        // TODO: remove this example for WIP reference: SplunkRum.instance?.sessionReplay.recordingMask = RecordingMask(elements: [MaskElement]())
+
+        SplunkRum.instance?.customTracking.trackEvent(name: "someEvent", attributes: eventDict)
+
     }
-
 
     // MARK: - Track Error
 
@@ -57,24 +55,11 @@ class CustomTrackingViewController: UIViewController {
         print("Track Error Clicked")
     }
 
-    func formatAttributes(_ attributes: [String: EventAttributeValue]) -> String {
+    func prettyFormat(_ attributes: [String: Any]) -> String {
         var formatted = ""
-
         for (key, value) in attributes {
-            let valueDescription: String
-            switch value {
-            case .string(let str):
-                valueDescription = "\"\(str)\""
-            case .int(let int):
-                valueDescription = "\(int)"
-            case .double(let double):
-                valueDescription = "\(double)"
-            case .data(let data):
-                valueDescription = data.description
-            }
-            formatted += "\(key): \(valueDescription)\n"
+            formatted += "\(key): \(String(describing: value))\n"
         }
-
         return formatted.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
