@@ -35,6 +35,16 @@ internal import CiscoSessionReplay
 internal import SplunkCustomTracking
 
 
+
+public struct CustomTrackingWrapper {
+    // Public method to track events
+    public func trackEvent(name: String, attributes: [String: Any]) {
+        // Access the internal CustomTracking.instance indirectly
+        CustomTracking.instance.trackEvent(name, attributes: attributes)
+    }
+}
+
+
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
 
@@ -106,6 +116,10 @@ public class SplunkRum: ObservableObject {
         sessionReplayProxy
     }
 
+    // Expose customTracking via CustomTrackingWrapper
+    public var customTracking: CustomTrackingWrapper {
+        return CustomTrackingWrapper()
+    }
 
     // MARK: - Initialization
 
@@ -300,6 +314,13 @@ public class SplunkRum: ObservableObject {
         crashReportsModule?.reportCrashIfPresent()
     #endif
     // swiftformat:enable indent
+    }
+
+    // Expose CustomTracking
+    private func setupCustomTracking() {
+        let customTrackingModule = modulesManager?.module(ofType: SplunkCustomTracking.CustomTracking.self)
+        customTrackingModule?.sharedState = sharedState
+
     }
 
     /// Configure App start module
