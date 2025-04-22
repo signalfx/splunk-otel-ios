@@ -57,21 +57,11 @@ final class EventsTests: XCTestCase {
         XCTAssertEqual(processedEvent.name, "session_start")
     }
 
-    func testEventManagerSessionPulseEvent() throws {
-        let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
-
-        eventManager.sendSessionPulseEvent()
-
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
-        XCTAssertEqual(processedEvent.name, "session_pulse")
-    }
-
 
     // MARK: - Testing Event manual events
 
     func testSessionStartEvent() throws {
-        let sessionID = try XCTUnwrap(agent?.session.currentSessionId)
+        let sessionID = try XCTUnwrap(agent?.session.state.id)
         let timestamp = Date()
         let userID = try XCTUnwrap(agent?.currentUser.userIdentifier)
 
@@ -101,32 +91,6 @@ final class EventsTests: XCTestCase {
         wait(for: [requestExpectation], timeout: 5)
     }
 
-    func testSessionPulseEvent() throws {
-        let sessionID = try XCTUnwrap(agent?.session.currentSessionId)
-        let timestamp = Date()
-
-        let event = SessionPulseEvent(sessionID: sessionID, timestamp: timestamp)
-
-        let requestExpectation = XCTestExpectation(description: "Send request")
-
-        let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
-
-        logEventProcessor.sendEvent(event, completion: { _ in
-            // TODO: MRUM_AC-1111 - EventManager and Events tests
-//            XCTAssert(success)
-
-            requestExpectation.fulfill()
-        })
-
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
-        try checkEventBaseAttributes(processedEvent)
-
-        XCTAssertEqual(processedEvent.name, "session_pulse")
-
-        wait(for: [requestExpectation], timeout: 5)
-    }
-
     func testSessionReplayDataEvent() throws {
         guard let sampleVideoData = sampleVideoData else {
             XCTFail("Missing sample video data")
@@ -147,7 +111,7 @@ final class EventsTests: XCTestCase {
         //    replaySessionId: replaySessionID
         // )
 
-        let datachunkMetadata = Metadata(startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000), endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0))
+        let datachunkMetadata = Metadata(startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000.0), endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0))
 
         let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, sessionID: sessionID)
 
@@ -175,10 +139,11 @@ final class EventsTests: XCTestCase {
     // MARK: - Testing immediate and background processing
 
     func testImmediateProcessing() throws {
-        let sessionID = try XCTUnwrap(agent?.session.currentSessionId)
+        let sessionID = try XCTUnwrap(agent?.session.state.id)
+        let userID = try XCTUnwrap(agent?.user.identifier)
         let timestamp = Date()
 
-        let event = SessionPulseEvent(sessionID: sessionID, timestamp: timestamp)
+        let event = SessionStartEvent(sessionID: sessionID, timestamp: timestamp, userID: userID)
 
         let requestExpectation = XCTestExpectation(description: "Send request")
 
@@ -198,10 +163,11 @@ final class EventsTests: XCTestCase {
     }
 
     func testBackgroundProcessing() throws {
-        let sessionID = try XCTUnwrap(agent?.session.currentSessionId)
+        let sessionID = try XCTUnwrap(agent?.session.state.id)
+        let userID = try XCTUnwrap(agent?.user.identifier)
         let timestamp = Date()
 
-        let event = SessionPulseEvent(sessionID: sessionID, timestamp: timestamp)
+        let event = SessionStartEvent(sessionID: sessionID, timestamp: timestamp, userID: userID)
 
         let requestExpectation = XCTestExpectation(description: "Send request")
 
@@ -222,7 +188,7 @@ final class EventsTests: XCTestCase {
 
     func testDuplicateSessionStartEvents() throws {
         let agent = try XCTUnwrap(agent)
-        let sessionID = try XCTUnwrap(agent.session.currentSessionId)
+        let sessionID = try XCTUnwrap(agent.session.state.id)
         let eventManager = try XCTUnwrap(agent.eventManager as? DefaultEventManager)
 
         let eventsModel = eventManager.eventsModel

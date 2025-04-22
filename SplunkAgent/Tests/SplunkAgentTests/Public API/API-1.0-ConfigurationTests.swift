@@ -72,7 +72,6 @@ final class API10ConfigurationTests: XCTestCase {
 
 
         // Properties (WRITE)
-
         full.appVersion = "0.1"
         XCTAssertEqual(full.appVersion, "0.1")
 

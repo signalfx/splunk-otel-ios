@@ -23,6 +23,15 @@ public final class User {
     private unowned let owner: SplunkRum
 
 
+    // MARK: - Public API
+
+    /// An object that holds preferred settings for the user.
+    public private(set) lazy var preferences = UserPreferences(for: owner)
+
+    /// An object reflects the current user's state.
+    public private(set) lazy var state = UserState(for: owner)
+
+
     // MARK: - Initialization
 
     init(for owner: SplunkRum) {
@@ -31,7 +40,7 @@ public final class User {
 }
 
 
-public extension User {
+extension User {
 
     // MARK: - Identifier
 

@@ -18,11 +18,9 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-// `Data` can be used as an event type that the module produces.
-extension Data: ModuleEventData {}
 
-// Struct `EventMetadataSlowFrameDetector` describes event metadata.
-// This type must be unique in the module/agent space.
+public struct SlowFrameData: ModuleEventData {}
+
 extension EventMetadataSlowFrameDetector: ModuleEventMetadata {
     public static func == (lhs: EventMetadataSlowFrameDetector, rhs: EventMetadataSlowFrameDetector) -> Bool {
         return lhs.timestamp == rhs.timestamp
@@ -40,7 +38,7 @@ extension SlowFrameDetector: Module {
     public typealias RemoteConfiguration = SlowFrameDetectorRemoteConfiguration
 
     public typealias EventMetadata = EventMetadataSlowFrameDetector
-    public typealias EventData = Data
+    public typealias EventData = SlowFrameData
 
 
     // MARK: - Module methods
@@ -52,7 +50,7 @@ extension SlowFrameDetector: Module {
         // In SlowFrameDetector we don't have any data to delete.
     }
 
-    public func onPublish(data: @escaping (EventMetadataSlowFrameDetector, EventData) -> Void) {
-        // TODO: Code TBD
+    public func onPublish(data: @escaping (EventMetadataSlowFrameDetector, SlowFrameData) -> Void) {
+        // We are emitting spans directly instead of using this.
     }
 }

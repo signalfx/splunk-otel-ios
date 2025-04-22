@@ -23,6 +23,7 @@ final class DefaultUserTests: XCTestCase {
     // MARK: - Tests
 
     func testBusinessLogic() throws {
+        let testName = "defaultUserTest"
         let key = "userIdentifier"
         let keysPrefix = "\(PackageIdentifier.default).defaultUserTest."
 
@@ -31,10 +32,7 @@ final class DefaultUserTests: XCTestCase {
 
 
         // We need to test the class with separate storage
-        let storage = UserDefaultsStorage()
-        storage.keysPrefix = keysPrefix
-
-        let user = DefaultUser(storage: storage)
+        let user = try DefaultUserTestBuilder.build(named: testName)
 
 
         // New identifier preparation
@@ -42,42 +40,18 @@ final class DefaultUserTests: XCTestCase {
         XCTAssertNotNil(userIdentifier)
 
         // Check the returned value for its format
-        try NanoIDValidator.checkFormat(userIdentifier)
+        try HexIDValidator.checkFormat(userIdentifier)
 
 
         // Use previously prepared identifiers
         //
         // NOTE:
         // This approach, in principle, simulates two application runs
-        let anotherInstance = DefaultUser(storage: storage)
+        let anotherInstance = try DefaultUserTestBuilder.build(named: testName)
         let anotherIdentifier = anotherInstance.userIdentifier
         XCTAssertNotNil(anotherIdentifier)
 
         // The User between runs must be the same
         XCTAssertEqual(userIdentifier, anotherIdentifier)
-    }
-
-    func testProperties() throws {
-        let storage = UserDefaultsStorage()
-        let user = DefaultUser(storage: storage)
-
-
-        // Properties (READ)
-        let userStorage = user.storage as? UserDefaultsStorage
-        XCTAssertNotNil(userStorage)
-        XCTAssertTrue(storage === userStorage)
-
-
-        // Properties (WRITE)
-        let anotherKeysPrefix = "com.sample."
-        let anotherStorage = UserDefaultsStorage()
-        anotherStorage.keysPrefix = anotherKeysPrefix
-
-        user.storage = anotherStorage
-        XCTAssertNotNil(user.storage)
-
-        let assignedKeysPrefix = (user.storage as? UserDefaultsStorage)?.keysPrefix
-        XCTAssertNotNil(assignedKeysPrefix)
-        XCTAssertEqual(assignedKeysPrefix, anotherKeysPrefix)
     }
 }

@@ -39,7 +39,7 @@ class DefaultEventManager: AgentEventManager {
     var logEventProcessor: LogEventProcessor
 
     // Trace processor
-    var traceProcesssor: TraceProcessor
+    var traceProcessor: TraceProcessor
 
     // Agent reference
     private unowned let agent: SplunkRum
@@ -56,7 +56,7 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Initialization
 
-    required init(with configuration: AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
+    required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
         self.agent = agent
         self.eventsModel = eventsModel
 
@@ -84,17 +84,23 @@ class DefaultEventManager: AgentEventManager {
             osType: SystemInfo.type
         )
 
-        logEventProcessor = OTLPLogEventProcessor(with: configuration.logsUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
+        // Initialize log event processor
+        logEventProcessor = OTLPLogEventProcessor(
+            with: configuration.logsUrl,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            debugEnabled: configuration.enableDebugLogging
+        )
 
         // Initialize trace processor
-        traceProcesssor = OTLPTraceProcessor(with: configuration.tracesUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
+        traceProcessor = OTLPTraceProcessor(
+            with: configuration.tracesUrl,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            debugEnabled: configuration.enableDebugLogging
+        )
 
-        // Schedule job for Pulse Events
-        pulseEventJob = LifecycleRepeatingJob(interval: pulseEventInterval) { [weak self] in
-            self?.sendSessionPulseEvent()
-        }.resume()
-
-        // Starts listening to a Session Reset nofification to send the Session Start event.
+        // Starts listening to a Session Reset notification to send the Session Start event.
         NotificationCenter.default.addObserver(forName: DefaultSession.sessionDidResetNotification, object: nil, queue: nil) { _ in
             self.sendSessionStartEvent()
         }
@@ -123,7 +129,11 @@ class DefaultEventManager: AgentEventManager {
             let sessionID = agent.session.sessionId(for: metadata.timestamp)
             let event = CrashReportsDataEvent(metadata: metadata, data: data, sessionID: sessionID)
 
-            traceProcesssor.sendEvent(event: event, completion: completion)
+            logEventProcessor.sendEvent(
+                event: event,
+                immediateProcessing: false,
+                completion: completion
+            )
 
         // Unknown module data
         default:
@@ -180,25 +190,6 @@ class DefaultEventManager: AgentEventManager {
             // Mark the session start event as "sent"
             if success {
                 self.eventsModel.markSessionStartSent(sessionID)
-            }
-        }
-    }
-
-
-    // MARK: - Session Pulse event
-
-    func sendSessionPulseEvent() {
-        let sessionID = agent.currentSession.currentSessionId
-        let timestamp = Date()
-
-        let event = SessionPulseEvent(
-            sessionID: sessionID,
-            timestamp: timestamp
-        )
-
-        logEventProcessor.sendEvent(event) { success in
-            self.logger.log(level: .info) {
-                "Session Pulse event sent with success: \(success)"
             }
         }
     }

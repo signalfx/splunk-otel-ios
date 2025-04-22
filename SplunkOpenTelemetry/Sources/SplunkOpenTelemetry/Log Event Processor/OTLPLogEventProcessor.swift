@@ -47,15 +47,29 @@ public class OTLPLogEventProcessor: LogEventProcessor {
 
     // MARK: - Initialization
     
-    required public init(with logsEndpoint: URL, resources: AgentResources, debugEnabled: Bool) {
+    required public init(
+        with logsEndpoint: URL,
+        resources: AgentResources,
+        runtimeAttributes: RuntimeAttributes,
+        debugEnabled: Bool
+    ) {
 
         let configuration = OtlpConfiguration()
         let envVarHeaders = [(String, String)]()
 
         let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
 
-        // Initialise LogRecordProcessor
-        let simpleLogRecordProcessor = SimpleLogRecordProcessor(logRecordExporter: logToSpanExporter)
+        // Initialize LogRecordProcessor
+        let simpleLogRecordProcessor = SimpleLogRecordProcessor(
+            logRecordExporter: logToSpanExporter
+        )
+
+        // Initialize AttributesLogRecordProcessor as the first stage of processing,
+        // which adds runtime attributes to all processed log records
+        let attributesLogRecordProcessor = OTLPAttributesLogRecordProcessor(
+            proxy: simpleLogRecordProcessor,
+            with: runtimeAttributes
+        )
 
         // Build Resources
         var resource = Resource()
@@ -66,15 +80,21 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         self.resource = resource
         #endif
 
-        // Initialize logger provider
-        var loggerProviderBuilder = LoggerProviderBuilder()
-            .with(processors: [simpleLogRecordProcessor])
-            .with(resource: resource)
 
-        // Initialize optional debug exporter
+        var processors: [LogRecordProcessor] = [attributesLogRecordProcessor]
+
+        // Initialize optional stdout exporter
         if debugEnabled {
-            // TODO: DEMRUM-1425 - implement Logging exporter
+            let stdoutExporter = SplunkStdoutLogExporter()
+            let stdoutSpanProcessor = SimpleLogRecordProcessor(logRecordExporter: stdoutExporter)
+
+            processors.append(stdoutSpanProcessor)
         }
+
+        // Initialize logger provider
+        let loggerProviderBuilder = LoggerProviderBuilder()
+            .with(processors: processors)
+            .with(resource: resource)
 
         let loggerProvider = loggerProviderBuilder.build()
         

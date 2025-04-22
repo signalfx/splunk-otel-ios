@@ -65,7 +65,7 @@ class DefaultModulesPool: AgentModulesPool {
             knownModules.append(NetworkInstrumentation.self)
         #endif
 
-        // Network Instrumentation
+        // Slow Frame Detector
         #if canImport(SplunkSlowFrameDetector)
             knownModules.append(SlowFrameDetector.self)
         #endif

@@ -16,22 +16,21 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkSharedProtocols
 
-/// Session Pulse Event. Sent in constant intervals to keep a session alive.
-class SessionPulseEvent: AgentEvent {
+/// Represents a single timed event.
+struct AppStartEvent {
+    let name: String
+    let timestamp: Date
+}
 
-    // MARK: - Initialization
+extension AppStartEvent {
 
-    public init(sessionID: String, timestamp: Date) {
-        super.init()
+    /// Sorts events by timestamp.
+    static func sortedEvents(from events: [String: Date]) -> [AppStartEvent] {
+        let appStartEvents = events.map { name, timestamp in
+            AppStartEvent(name: name, timestamp: timestamp)
+        }.sorted { $0.timestamp < $1.timestamp }
 
-        // Event identification
-        name = "session_pulse"
-        instrumentationScope = "com.splunk.rum.agent"
-
-        // Event properties
-        self.sessionID = sessionID
-        self.timestamp = timestamp
+        return appStartEvents
     }
 }
