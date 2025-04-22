@@ -191,6 +191,8 @@
 		52286CB52CD5404A001F8A31 /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52286CB42CD54045001F8A31 /* ScreenName.swift */; };
 		522A70B92DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */; };
 		522A70BB2DAD9F23008A2479 /* OTelDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70BA2DAD9F23008A2479 /* OTelDestination.swift */; };
+		BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */; };
+		BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */; };
 		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */; };
 		C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB02BA9D41E000CC11B /* AppStateManager.swift */; };
@@ -760,6 +762,8 @@
 		52286CB42CD54045001F8A31 /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
 		522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorDestination.swift; sourceTree = "<group>"; };
 		522A70BA2DAD9F23008A2479 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
+		BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributesTests.swift; sourceTree = "<group>"; };
+		BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributes.swift; sourceTree = "<group>"; };
 		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
@@ -2390,6 +2394,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		BA7A63BA2DB818AD00A44570 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		C703FAAD2BA9D3A2000CC11B /* AppState */ = {
 			isa = PBXGroup;
 			children = (
@@ -2529,6 +2541,7 @@
 		E4134BA92BC6ABD700F0D2FC /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */,
 				2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */,
 				E4134BAA2BC6AC5400F0D2FC /* API-1.0-Status.swift */,
 				E4F3ACB32DA7B432007EFC0A /* API-1.0-UserTrackingMode.swift */,
@@ -2655,6 +2668,7 @@
 		E46896372B21CA1F00727A6A /* Public API */ = {
 			isa = PBXGroup;
 			children = (
+				BA7A63BA2DB818AD00A44570 /* Model */,
 				4BB680FB2B7A79E1000A54D4 /* Modules */,
 				E468963F2B21DA7C00727A6A /* API-1.0-AgentTests.swift */,
 				E46896492B21ED7900727A6A /* API-1.0-ConfigurationTests.swift */,
@@ -3923,6 +3937,7 @@
 				E4F3ACB42DA7B444007EFC0A /* API-1.0-UserTrackingMode.swift in Sources */,
 				2AB51E972B7A670600307B77 /* SystemInfo.swift in Sources */,
 				E4F2E5072B1733C9006EBA69 /* AgentSession.swift in Sources */,
+				BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */,
 				4BB680E82B7940C0000A54D4 /* RecordingMask+Conversions.swift in Sources */,
 				E4AD34F42B56E075004976CA /* AgentModulesManager.swift in Sources */,
 				2AB51E982B7A670600307B77 /* AppInfo.swift in Sources */,
@@ -4287,6 +4302,7 @@
 				E4577D7B2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift in Sources */,
 				E468964E2B21EDE000727A6A /* API-1.0-StateTests.swift in Sources */,
 				2AC8C0952BAAE0710052ECF4 /* EventsModelTests.swift in Sources */,
+				BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */,
 				E4C14EB82B2B353A008CC270 /* PackageIdentifierTests.swift in Sources */,
 				E46896362B21CA0300727A6A /* UserDefaultsStoragePrefixTests.swift in Sources */,
 				E4FAEEB22B6A6A73008D4E6E /* SessionReplayTestModule.swift in Sources */,
