@@ -16,63 +16,38 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-
-import Foundation
-import CiscoSwizzling
 import CiscoInteractions
-import SplunkSharedProtocols
+import CiscoSwizzling
+import Foundation
 import SplunkLogger
+import SplunkSharedProtocols
 
-extension Data: ModuleEventData {}
-
-extension InteractionEvent: @retroactive Equatable {}
-extension CiscoInteractions.InteractionEvent: ModuleEventMetadata {
-    public static func == (lhs: CiscoInteractions.InteractionEvent, rhs: CiscoInteractions.InteractionEvent) -> Bool {
-        lhs.id == rhs.id
-    }
-
-    public var timestamp: Date {
-        time
-    }
-}
-
-
-// Minimal implementation that ensures protocol conformance.
-public struct InteractionsConfiguration: ModuleConfiguration {}
-
-// Minimal implementation that ensures protocol conformance.
-public struct InteractionsRemoteConfiguration: RemoteModuleConfiguration {
-
-    // MARK: - Protocol compliance
-
-    public var enabled: Bool = true
-
-    public init?(from data: Data) {}
-}
-
-
-public final class SplunkInteractions: Module {
-
-    // MARK: - Module types
-
-    public typealias Configuration = InteractionsConfiguration
-    public typealias RemoteConfiguration = InteractionsRemoteConfiguration
-
-    public typealias EventMetadata = InteractionEvent
-    public typealias EventData = Data
-
-
+/// Handles interaction events and send them into destination.
+public final class SplunkInteractions {
+    
     // MARK: - Private properties
 
     private var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
     private let internalLogger = InternalLogger(configuration: .interactions(category: "Module"))
 
-    // MARK: - Module methods
 
-    public init() {}
+    // MARK: - Initialization
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    // Module conformance
+    public required init() {}
+
+
+    // MARK: - Instrumentation
+    
+    /// Start detecting interaction events.
+    func startInteractionsDetection() {
+        guard interactionsDetector == nil else {
+            internalLogger.log(level: .error) {
+                "Interactions detection is already running."
+            }
+            return
+        }
+
         Task {
             do {
                 interactionsDetector = try await InteractionsDetector<DefaultSwizzling>()
@@ -81,19 +56,6 @@ public final class SplunkInteractions: Module {
                     "Could not initialize InteractionsDetector: \(error)."
                 }
             }
-        }
-    }
-
-    public func onPublish(data: @escaping (CiscoInteractions.InteractionEvent, Data) -> Void) {
-
-    }
-
-
-    // MARK: - Type transparency helpers
-
-    public func deleteData(for metadata: any ModuleEventMetadata) {
-        if let recordMetadata = metadata as? EventMetadata {
-            deleteData(for: recordMetadata)
         }
     }
 }
