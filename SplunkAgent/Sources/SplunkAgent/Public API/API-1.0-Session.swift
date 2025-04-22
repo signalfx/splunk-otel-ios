@@ -27,7 +27,9 @@ public final class Session {
 
     // MARK: - State
 
-    public private(set) lazy var state: SessionState = SessionState(for: owner)
+    /// An object that reflects the current session's state.
+    public private(set) lazy var state = SessionState(for: owner)
+
 
     // MARK: - Initialization
 
