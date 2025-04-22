@@ -1,5 +1,5 @@
 {
-  "originHash" : "3eb9999c68975bd1cc59f9b5d725dd6b3d40dee008aa9ee04c4b4fbde03c3c1f",
+  "originHash" : "086cbf8ba05fee02327b46721643451f4c667c178e559c7a6787221339f1d7b4",
   "pins" : [
     {
       "identity" : "grpc-swift",
@@ -31,7 +31,7 @@
     {
       "identity" : "smartlook-ios-sdk-private",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/smartlook/smartlook-ios-sdk-private",
+      "location" : "git@github.com:smartlook/smartlook-ios-sdk-private.git",
       "state" : {
         "branch" : "develop",
         "revision" : "814c1a3e2650ee705ef0cfb0419000397bbf792a"
