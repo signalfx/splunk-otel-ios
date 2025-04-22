@@ -131,7 +131,7 @@ class DefaultEventManager: AgentEventManager {
 
             logEventProcessor.sendEvent(
                 event: event,
-                immediateProcessing: false,
+                immediateProcessing: true,
                 completion: completion
             )
 
