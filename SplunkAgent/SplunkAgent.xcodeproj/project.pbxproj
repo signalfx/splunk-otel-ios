@@ -12,6 +12,8 @@
 		2A03CF5D2D9C315C00CF3BC9 /* API-1.0-AgentConfigurationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */; };
 		2A03CF5F2D9C31C100CF3BC9 /* API-1.0-AgentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */; };
 		2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1673CC2BA1F52600F85698 /* EventsModel.swift */; };
+		2A2926352DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2926332DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift */; };
+		2A2926372DAD11C800AB6F03 /* AttributeCheckerLogExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2926362DAD11C100AB6F03 /* AttributeCheckerLogExporter.swift */; };
 		2A1789B72DA3CDA900EC548B /* AppStartSimulations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */; };
 		2A1789BB2DA3CDD300EC548B /* AppStartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789B92DA3CDD300EC548B /* AppStartTests.swift */; };
 		2A1789C02DA3CDEB00EC548B /* InitializeTests+Checks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789BE2DA3CDEB00EC548B /* InitializeTests+Checks.swift */; };
@@ -44,7 +46,6 @@
 		2AE43B0C2B7FAD9B002C4A98 /* DefaultResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B0B2B7FAD9B002C4A98 /* DefaultResources.swift */; };
 		2AE43B472B861325002C4A98 /* AgentEventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B412B861325002C4A98 /* AgentEventManager.swift */; };
 		2AE43B482B861325002C4A98 /* SessionReplayDataEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B432B861325002C4A98 /* SessionReplayDataEvent.swift */; };
-		2AE43B492B861325002C4A98 /* AgentEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B442B861325002C4A98 /* AgentEvent.swift */; };
 		2AE43B4B2B861325002C4A98 /* SessionStartEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B462B861325002C4A98 /* SessionStartEvent.swift */; };
 		3384F2AD2AC879FD00512D79 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F2AC2AC879FD00512D79 /* SplunkRum.swift */; };
 		4B0F23892D79F35300EA575A /* OpenTelemetryProtocolExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 4B0F23882D79F35300EA575A /* OpenTelemetryProtocolExporter */; };
@@ -106,7 +107,7 @@
 		4B96407B2D60FCCC009A2E7F /* SplunkANRReporter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B96404A2D60FB7D009A2E7F /* SplunkANRReporter.framework */; };
 		4B96408E2D60FD05009A2E7F /* SplunkSharedProtocols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkSharedProtocols.framework */; };
 		4B9640A42D60FD1C009A2E7F /* AgentResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BB92D5E4E33009DA0D5 /* AgentResources.swift */; };
-		4B9640A52D60FD1C009A2E7F /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BB22D5E4E33009DA0D5 /* Event.swift */; };
+		4B9640A52D60FD1C009A2E7F /* AgentEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BB22D5E4E33009DA0D5 /* AgentEvent.swift */; };
 		4B9640A62D60FD1C009A2E7F /* TraceProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BB02D5E4E33009DA0D5 /* TraceProcessor.swift */; };
 		4B9640A72D60FD1C009A2E7F /* EventAttributeValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BB32D5E4E33009DA0D5 /* EventAttributeValue.swift */; };
 		4B9640A82D60FD1C009A2E7F /* LogEventProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BAF2D5E4E33009DA0D5 /* LogEventProcessor.swift */; };
@@ -574,6 +575,8 @@
 		2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-AgentConfigurationError.swift"; sourceTree = "<group>"; };
 		2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-AgentConfiguration.swift"; sourceTree = "<group>"; };
 		2A1673CC2BA1F52600F85698 /* EventsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsModel.swift; sourceTree = "<group>"; };
+		2A2926332DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributeCheckerSpanExporter.swift; sourceTree = "<group>"; };
+		2A2926362DAD11C100AB6F03 /* AttributeCheckerLogExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributeCheckerLogExporter.swift; sourceTree = "<group>"; };
 		2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartSimulations.swift; sourceTree = "<group>"; };
 		2A1789B92DA3CDD300EC548B /* AppStartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartTests.swift; sourceTree = "<group>"; };
 		2A1789BD2DA3CDEB00EC548B /* InitializeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitializeTests.swift; sourceTree = "<group>"; };
@@ -606,7 +609,6 @@
 		2AE43B0B2B7FAD9B002C4A98 /* DefaultResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultResources.swift; sourceTree = "<group>"; };
 		2AE43B412B861325002C4A98 /* AgentEventManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentEventManager.swift; sourceTree = "<group>"; };
 		2AE43B432B861325002C4A98 /* SessionReplayDataEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionReplayDataEvent.swift; sourceTree = "<group>"; };
-		2AE43B442B861325002C4A98 /* AgentEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentEvent.swift; sourceTree = "<group>"; };
 		2AE43B462B861325002C4A98 /* SessionStartEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionStartEvent.swift; sourceTree = "<group>"; };
 		3384F2A22AC879E900512D79 /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3384F2AC2AC879FD00512D79 /* SplunkRum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkRum.swift; sourceTree = "<group>"; };
@@ -674,7 +676,7 @@
 		4B5A5BAD2D5E4E33009DA0D5 /* AgentSharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSharedState.swift; sourceTree = "<group>"; };
 		4B5A5BAF2D5E4E33009DA0D5 /* LogEventProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEventProcessor.swift; sourceTree = "<group>"; };
 		4B5A5BB02D5E4E33009DA0D5 /* TraceProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraceProcessor.swift; sourceTree = "<group>"; };
-		4B5A5BB22D5E4E33009DA0D5 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		4B5A5BB22D5E4E33009DA0D5 /* AgentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentEvent.swift; sourceTree = "<group>"; };
 		4B5A5BB32D5E4E33009DA0D5 /* EventAttributeValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventAttributeValue.swift; sourceTree = "<group>"; };
 		4B5A5BB52D5E4E33009DA0D5 /* Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Module.swift; sourceTree = "<group>"; };
 		4B5A5BB62D5E4E33009DA0D5 /* ModuleConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleConfiguration.swift; sourceTree = "<group>"; };
@@ -1101,6 +1103,15 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		2A2926342DAD114900AB6F03 /* Attribute Checker Exporters */ = {
+			isa = PBXGroup;
+			children = (
+				2A2926362DAD11C100AB6F03 /* AttributeCheckerLogExporter.swift */,
+				2A2926332DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift */,
+			);
+			path = "Attribute Checker Exporters";
+			sourceTree = "<group>";
+		};
 		2A1789B62DA3CDA900EC548B /* Support */ = {
 			isa = PBXGroup;
 			children = (
@@ -1231,7 +1242,6 @@
 		2AE43B422B861325002C4A98 /* Events */ = {
 			isa = PBXGroup;
 			children = (
-				2AE43B442B861325002C4A98 /* AgentEvent.swift */,
 				2AE43B432B861325002C4A98 /* SessionReplayDataEvent.swift */,
 				2AE43B462B861325002C4A98 /* SessionStartEvent.swift */,
 				4B2C8BBA2BCBE4A200C6E72F /* CrashReportsDataEvent.swift */,
@@ -1845,7 +1855,7 @@
 			isa = PBXGroup;
 			children = (
 				4B5A5BB12D5E4E33009DA0D5 /* Processors */,
-				4B5A5BB22D5E4E33009DA0D5 /* Event.swift */,
+				4B5A5BB22D5E4E33009DA0D5 /* AgentEvent.swift */,
 				4B5A5BB32D5E4E33009DA0D5 /* EventAttributeValue.swift */,
 			);
 			path = Events;
@@ -2063,12 +2073,13 @@
 			isa = PBXGroup;
 			children = (
 				4B5A5C9F2D60ED3D009DA0D5 /* API */,
+				4B5A5CA62D60ED3D009DA0D5 /* Trace Processor */,
 				4B5A5CA22D60ED3D009DA0D5 /* Log Event Processor */,
 				E4A537532DA68F17002323E2 /* Log Processors */,
 				4B5A5CA42D60ED3D009DA0D5 /* Resources */,
 				E4A537402DA655AF002323E2 /* Span Processors */,
 				2A5949DA2DA3FC2100F2E857 /* Stdout Exporters */,
-				4B5A5CA62D60ED3D009DA0D5 /* Trace Processor */,
+				2A2926342DAD114900AB6F03 /* Attribute Checker Exporters */,
 				4B5A5CA82D60ED3D009DA0D5 /* Utils */,
 				4B5A5CA92D60ED3D009DA0D5 /* OTel.swift */,
 			);
@@ -3902,7 +3913,6 @@
 				3384F2AD2AC879FD00512D79 /* SplunkRum.swift in Sources */,
 				E4A708B32B9754B7002C692E /* RepeatingJob.swift in Sources */,
 				E4EE9ED42BA34A400000D594 /* SessionReplayNonOperationalState.swift in Sources */,
-				2AE43B492B861325002C4A98 /* AgentEvent.swift in Sources */,
 				E4B737E12BBECEDD00086A93 /* PlatformSupport.swift in Sources */,
 				2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */,
 				2AE43B0C2B7FAD9B002C4A98 /* DefaultResources.swift in Sources */,
@@ -4090,7 +4100,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B9640A42D60FD1C009A2E7F /* AgentResources.swift in Sources */,
-				4B9640A52D60FD1C009A2E7F /* Event.swift in Sources */,
+				4B9640A52D60FD1C009A2E7F /* AgentEvent.swift in Sources */,
 				4B9640A62D60FD1C009A2E7F /* TraceProcessor.swift in Sources */,
 				E4A5374D2DA6661D002323E2 /* RuntimeAttributes.swift in Sources */,
 				4B9640A72D60FD1C009A2E7F /* EventAttributeValue.swift in Sources */,
@@ -4166,10 +4176,12 @@
 				4B9642182D61375E009A2E7F /* OTLPLogEventProcessor+AgentEvent.swift in Sources */,
 				E4A537552DA68F5F002323E2 /* OTLPAttributesLogRecordProcessor.swift in Sources */,
 				4B9642192D61375E009A2E7F /* OTLPTraceProcessor.swift in Sources */,
+				2A2926372DAD11C800AB6F03 /* AttributeCheckerLogExporter.swift in Sources */,
 				E4A537422DA655E2002323E2 /* OLTPAttributesSpanProcessor.swift in Sources */,
 				4B96421A2D61375E009A2E7F /* OTel.swift in Sources */,
 				2A5949DB2DA3FC2100F2E857 /* SplunkStdoutSpanExporter.swift in Sources */,
 				2A5949DC2DA3FC2100F2E857 /* SplunkStdoutLogExporter.swift in Sources */,
+				2A2926352DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
