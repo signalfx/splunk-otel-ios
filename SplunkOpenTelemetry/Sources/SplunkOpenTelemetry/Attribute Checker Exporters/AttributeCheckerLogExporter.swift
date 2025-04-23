@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 	
+internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
-import SplunkLogger
 
 class AttributeCheckerLogExporter: LogRecordExporter {
 
@@ -28,7 +28,8 @@ class AttributeCheckerLogExporter: LogRecordExporter {
 
     private let proxyExporter: LogRecordExporter
 
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk RUM OTel", category: "LogAttributeChecker"))
+    // Internal Logger
+    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "OpenTelemetry")
 
 
     // MARK: - Initialization
@@ -60,7 +61,7 @@ class AttributeCheckerLogExporter: LogRecordExporter {
         for log in logs {
             for requiredAttribute in requiredAttributes {
                 guard let _ = log.attributes[requiredAttribute] else {
-                    internalLogger.log(level: .error) {
+                    logger.log(level: .error) {
                         """
                         ‼️‼️‼️ LogRecord is missing a required attribute: \"\(requiredAttribute)\" 
                         Attributes: \(log.attributes)

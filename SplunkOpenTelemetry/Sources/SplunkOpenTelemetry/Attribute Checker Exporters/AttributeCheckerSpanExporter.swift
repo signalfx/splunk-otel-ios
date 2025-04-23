@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
-import SplunkLogger
 
 class AttributeCheckerSpanExporter: SpanExporter {
 
@@ -31,7 +31,8 @@ class AttributeCheckerSpanExporter: SpanExporter {
 
     private let proxyExporter: SpanExporter
 
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk RUM OTel", category: "SpanAttributeChecker"))
+    // Internal Logger
+    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "OpenTelemetry")
 
 
     // MARK: - Initialization
@@ -66,7 +67,7 @@ class AttributeCheckerSpanExporter: SpanExporter {
                 guard let _ = span.attributes[requiredAttribute] else {
                     let spanName = span.name
 
-                    internalLogger.log(level: .error) {
+                    logger.log(level: .error) {
                         """
                         ‼️‼️‼️ Span \(spanName) is missing a required attribute: \"\(requiredAttribute)\"
                         Attributes: \(span.attributes)
