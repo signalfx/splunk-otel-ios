@@ -71,7 +71,7 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
                 span.setAttribute(key: key, value: value)
             }
 
-            span.setAttribute(key: "log.body", value: log.body)
+            span.setAttribute(key: "body", value: log.body)
 
             span.end(time: log.timestamp)
         }
