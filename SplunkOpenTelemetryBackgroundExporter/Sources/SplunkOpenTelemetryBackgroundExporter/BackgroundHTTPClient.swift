@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoDiskStorage
 internal import CiscoLogger
 import Foundation
 
@@ -27,6 +28,8 @@ final class BackgroundHTTPClient: NSObject {
     private let sessionQosConfiguration: SessionQOSConfiguration
 
     private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "BackgroundExporter")
+
+    private let diskStorage: DiskStorage
 
 
     // MARK: - Computed properties
@@ -49,35 +52,33 @@ final class BackgroundHTTPClient: NSObject {
 
     // MARK: - Initialization
 
-    init(sessionQosConfiguration: SessionQOSConfiguration) {
+    init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage) {
         self.sessionQosConfiguration = sessionQosConfiguration
+        self.diskStorage = diskStorage
+
         super.init()
     }
 
 
     // MARK: - Client logic
 
-    func send(_ requestDescriptor: RequestDescriptor) {
-
-        guard
-            let fileUrl = DiskCache.cache(subfolder: .uploadFiles, item: requestDescriptor.id.uuidString),
-            DiskCache.fileExists(at: fileUrl)
-        else {
-            self.logger.log(level: .info) {
-                "File to upload doesn't exist for the given taskDescription: \(requestDescriptor)."
-            }
-
-            return
-        }
+    func send(_ requestDescriptor: RequestDescriptor) throws {
+        let fileKey = KeyBuilder(
+            requestDescriptor.id.uuidString,
+            parrentKeyBuilder: KeyBuilder.uploadsKey
+        )
 
         guard requestDescriptor.shouldSend else {
             self.logger.log(level: .info) {
                 "Maximal retry sent count exceeded for the given taskDescription: \(requestDescriptor)."
             }
 
-            DiskCache.clean(item: requestDescriptor.id.uuidString, in: .uploadFiles)
+            try diskStorage.delete(forKey: fileKey)
+
             return
         }
+
+        let fileUrl = try diskStorage.finalDestination(forKey: fileKey)
 
         let task = session.uploadTask(
             with: requestDescriptor.createRequest(),
@@ -154,7 +155,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
                 """
             }
 
-            send(requestDescriptor)
+            try? send(requestDescriptor)
         }
         else if let error {
             self.logger.log(level: .info) {
@@ -165,7 +166,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
                 """
             }
 
-            send(requestDescriptor)
+            try? send(requestDescriptor)
         } else {
 
             if let httpResponse = task.response as? HTTPURLResponse {
@@ -177,7 +178,12 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
                 }
             }
 
-            DiskCache.clean(item: requestDescriptor.id.uuidString, in: .uploadFiles)
+            try? diskStorage.delete(
+                forKey: KeyBuilder(
+                    requestDescriptor.id.uuidString,
+                    parrentKeyBuilder: KeyBuilder.uploadsKey
+                )
+            )
         }
     }
 }
