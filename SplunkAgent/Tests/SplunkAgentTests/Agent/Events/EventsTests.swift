@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+@testable import CiscoSessionReplay
 @testable import SplunkAgent
 @testable import SplunkOpenTelemetry
-@testable import CiscoSessionReplay
 @testable import SplunkSharedProtocols
 
 import XCTest
@@ -111,7 +111,10 @@ final class EventsTests: XCTestCase {
         //    replaySessionId: replaySessionID
         // )
 
-        let datachunkMetadata = Metadata(startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000.0), endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0))
+        let datachunkMetadata = Metadata(
+            startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000.0),
+            endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0)
+        )
 
         let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, sessionID: sessionID)
 

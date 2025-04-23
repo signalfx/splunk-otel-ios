@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
-internal import SplunkLogger
 
 /// The class implements a single persistent key-value store
 /// using standard `UserDefaults` database services.
@@ -26,7 +26,7 @@ class UserDefaultsStorage: KeyValueStorage {
 
     private let userDefaults = UserDefaults.standard
 
-    private let internalLogger = InternalLogger(configuration: .agent(category: "UserDefaults Storage"))
+    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "Agent")
 
 
     // MARK: - Public
@@ -44,7 +44,7 @@ class UserDefaultsStorage: KeyValueStorage {
 
         // Verifies that there is no data for this key yet
         guard userDefaults.data(forKey: storageKey) == nil else {
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Insert operation for key: \(storageKey) failed due to duplicate data present."
             }
 
@@ -53,7 +53,7 @@ class UserDefaultsStorage: KeyValueStorage {
 
         // Save new record into storage
         guard let data = try? JSONEncoder().encode(value) else {
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Insert operation for key: \(storageKey) failed while encoding data."
             }
 
@@ -73,7 +73,7 @@ class UserDefaultsStorage: KeyValueStorage {
 
         // We try to decode data into target type.
         guard let value = try? JSONDecoder().decode(T.self, from: data) else {
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Read operation for key: \(storageKey) failed while decoding data for type \(T.self)."
             }
 
@@ -88,7 +88,7 @@ class UserDefaultsStorage: KeyValueStorage {
 
         // Save value data into storage
         guard let data = try? JSONEncoder().encode(value) else {
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Update operation for key: \(storageKey) failed while encoding data."
             }
 
@@ -103,7 +103,7 @@ class UserDefaultsStorage: KeyValueStorage {
 
         // Verifies that there is data for this key
         guard userDefaults.data(forKey: storageKey) != nil else {
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Delete operation for key: \(storageKey) failed due to missing data."
             }
 

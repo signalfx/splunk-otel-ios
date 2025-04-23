@@ -15,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
+internal import CiscoSessionReplay
 import Foundation
 internal import SplunkCrashReports
-internal import SplunkLogger
 internal import SplunkOpenTelemetry
-internal import CiscoSessionReplay
 internal import SplunkSharedProtocols
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
@@ -45,7 +45,9 @@ class DefaultEventManager: AgentEventManager {
     private unowned let agent: SplunkRum
 
     // Logger
-    private let logger = InternalLogger(configuration: .agent(category: "EventManager"))
+    private var logger: LogAgent {
+        agent.logger
+    }
 
     // Events state storage
     let eventsModel: EventsModel
@@ -137,7 +139,7 @@ class DefaultEventManager: AgentEventManager {
 
         // Unknown module data
         default:
-            logger.log(level: .error) {
+            logger.log(level: .error, isPrivate: false) {
                 "Missing Event for module published metadata: \(metadata), data: \(data)"
             }
 
@@ -163,7 +165,7 @@ class DefaultEventManager: AgentEventManager {
 
         // Check if the session start event for this session is being sent or was already sent
         guard shouldSendSessionStart(sessionID) else {
-            logger.log(level: .info) {
+            logger.log(level: .info, isPrivate: false) {
                 "Skipping session start event for: \(sessionID)"
             }
 
@@ -183,7 +185,7 @@ class DefaultEventManager: AgentEventManager {
 
         // Send event
         logEventProcessor.sendEvent(event) { success in
-            self.logger.log(level: .info) {
+            self.logger.log(level: .info, isPrivate: false) {
                 "Session Start event sent with success: \(success)"
             }
 

@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkLogger
+import CiscoLogger
 import SplunkSharedProtocols
 import UIKit
 
@@ -43,7 +43,7 @@ public final class AppStart {
     // MARK: - Private
 
     // Internal Logger
-    let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "AppStart"))
+    let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "AppStart")
 
     // Notifications and process start
     var notificationTokens: [NSObjectProtocol]?
@@ -92,7 +92,7 @@ public final class AppStart {
         do {
             processStartTimestamp = try processStartTime()
         } catch {
-            internalLogger.log(level: .warn) {
+            logger.log(level: .warn) {
                 "Was not able to obtain process start date, cold start won't be recorded. Error: \(error)"
             }
         }
@@ -174,17 +174,17 @@ public final class AppStart {
         if let determinedType, let startTime {
             send(start: startTime, end: endTime, type: determinedType)
 
-            internalLogger.log(level: .debug) {
+            logger.log(level: .debug) {
                 "App start log: determined app start type: \(determinedType.rawValue), start time: \(startTime), end time: \(endTime)."
             }
 
         } else if didFinishLaunchingTimestamp != nil {
-            internalLogger.log(level: .debug) {
+            logger.log(level: .debug) {
                 "App start log: could not determine, skipping."
             }
 
         } else {
-            internalLogger.log(level: .warn) {
+            logger.log(level: .warn) {
                 "Could not determine app start type, the agent was likely initialized later than receiving the didFinishLaunching notification."
             }
         }

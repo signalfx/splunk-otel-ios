@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
-import SplunkLogger
 
 /// Client for sending requests over HTTP.
 final class BackgroundHTTPClient: NSObject {
@@ -26,7 +26,7 @@ final class BackgroundHTTPClient: NSObject {
     private let urlSessionDelegateQueue = OperationQueue("URLSessionDelegate", maxConcurrents: 1, qualityOfService: .utility)
     private let sessionQosConfiguration: SessionQOSConfiguration
 
-    private let internalLogger = InternalLogger(configuration: .backgroundExporter(category: "BackgroundHTTPClient"))
+    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "BackgroundExporter")
 
 
     // MARK: - Computed properties
@@ -63,7 +63,7 @@ final class BackgroundHTTPClient: NSObject {
             let fileUrl = DiskCache.cache(subfolder: .uploadFiles, item: requestDescriptor.id.uuidString),
             DiskCache.fileExists(at: fileUrl)
         else {
-            self.internalLogger.log(level: .info) {
+            self.logger.log(level: .info) {
                 "File to upload doesn't exist for the given taskDescription: \(requestDescriptor)."
             }
 
@@ -71,7 +71,7 @@ final class BackgroundHTTPClient: NSObject {
         }
 
         guard requestDescriptor.shouldSend else {
-            self.internalLogger.log(level: .info) {
+            self.logger.log(level: .info) {
                 "Maximal retry sent count exceeded for the given taskDescription: \(requestDescriptor)."
             }
 
@@ -117,7 +117,7 @@ extension BackgroundHTTPClient: URLSessionDataDelegate {
             return
         }
 
-        self.internalLogger.log(level: .info) {
+        self.logger.log(level: .info) {
             """
             Request to: \(requestDescriptor.endpoint.absoluteString) \n
             with a data task id: \(requestDescriptor.id) \n
@@ -135,7 +135,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             let taskDescription = task.taskDescription,
             let requestDescriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
         else {
-            self.internalLogger.log(level: .info) {
+            self.logger.log(level: .info) {
                 "Failed to reconstruct request descriptor for a request with an empty taskDescription: \(String(describing: task.taskDescription))."
             }
 
@@ -146,7 +146,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             let httpResponse = task.response as? HTTPURLResponse,
             !(200...299).contains(httpResponse.statusCode)
         {
-            self.internalLogger.log(level: .info) {
+            self.logger.log(level: .info) {
                 """
                 Request to: \(requestDescriptor.endpoint.absoluteString) \n
                 with a data task id: \(requestDescriptor.id) \n
@@ -157,7 +157,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             send(requestDescriptor)
         }
         else if let error {
-            self.internalLogger.log(level: .info) {
+            self.logger.log(level: .info) {
                 """
                 Request to: \(requestDescriptor.endpoint.absoluteString) \n
                 with a data task id: \(requestDescriptor.id) \n
@@ -169,7 +169,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
         } else {
 
             if let httpResponse = task.response as? HTTPURLResponse {
-                self.internalLogger.log(level: .info) {
+                self.logger.log(level: .info) {
                     """
                     Request to: \(requestDescriptor.endpoint.absoluteString) \n
                     has been successfully received with status code \(httpResponse.statusCode).

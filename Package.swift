@@ -31,7 +31,6 @@ let package = Package(
         .target(
             name: "SplunkAgent",
             dependencies: [
-                "SplunkLogger",
                 "SplunkSharedProtocols",
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",
@@ -39,7 +38,8 @@ let package = Package(
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkANRReporter",
-                "SplunkAppStart"
+                "SplunkAppStart",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAgent",
             sources: ["Sources"],
@@ -59,19 +59,6 @@ let package = Package(
                 .copy("SplunkAgentTests/Testing Support/Mock Data/RemoteError.json")
             ],
             swiftSettings: [.define("SPM_TESTS")]
-        ),
-        
-        
-        // MARK: Splunk Logger
-        
-        .target(
-            name: "SplunkLogger",
-            path: "SplunkLogger/Sources"
-        ),
-        .testTarget(
-            name: "SplunkLoggerTests",
-            dependencies: ["SplunkLogger"],
-            path: "SplunkLogger/Tests"
         ),
         
         
@@ -229,12 +216,12 @@ let package = Package(
             name: "SplunkOpenTelemetry",
             dependencies: [
                 "SplunkOpenTelemetryBackgroundExporter",
-                "SplunkLogger",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
                 .product(name: "ResourceExtension", package: "opentelemetry-swift"),
-                .product(name: "SignPostIntegration", package: "opentelemetry-swift")
+                .product(name: "SignPostIntegration", package: "opentelemetry-swift"),
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkOpenTelemetry/Sources"
         ),
@@ -250,9 +237,9 @@ let package = Package(
         .target(
             name: "SplunkOpenTelemetryBackgroundExporter",
             dependencies: [
-                "SplunkLogger",
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
-                .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift")
+                .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkOpenTelemetryBackgroundExporter/Sources"
         ),
@@ -269,8 +256,8 @@ let package = Package(
             name: "SplunkAppStart",
             dependencies: [
                 "SplunkSharedProtocols",
-                "SplunkLogger",
-                "SplunkOpenTelemetry"
+                "SplunkOpenTelemetry",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAppStart/Sources"
         ),
@@ -279,8 +266,8 @@ let package = Package(
             dependencies: [
                 "SplunkAppStart",
                 "SplunkSharedProtocols",
-                "SplunkLogger",
-                "SplunkOpenTelemetry"
+                "SplunkOpenTelemetry",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAppStart/Tests"
         ),
@@ -331,9 +318,11 @@ func sessionReplayDependency() -> Package.Dependency {
     
     // Check if a branch was set as an environment variable.
     // Atm it's set in a build script in Tools/build_frameworks/050-Xarchives.sh
+    /*
     if let environmentBranch = ProcessInfo.processInfo.environment["SESSION_REPLAY_BRANCH"] {
         return .package(url: packageGitUrl, branch: environmentBranch)
     }
+     */
     
     // Local dependency, enables SessionReplay local development, needs smartlook-ios-sdk checked out locally
     if shouldUseLocalSessionReplayDependency() {

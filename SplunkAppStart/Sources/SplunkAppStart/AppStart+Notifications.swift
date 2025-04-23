@@ -33,7 +33,7 @@ extension AppStart {
         listen(to: UIApplication.didFinishLaunchingNotification, in: &tokens) {
             self.didFinishLaunchingTimestamp = Date()
 
-            self.internalLogger.log(level: .debug) { "UIApplication.didFinishLaunchingNotification triggered" }
+            self.logger.log(level: .debug) { "UIApplication.didFinishLaunchingNotification triggered" }
         }
 
         // willEnterForeground notification - store the notification timestamp and detect a background launch
@@ -45,7 +45,7 @@ extension AppStart {
                 self.backgroundLaunchDetected = true
             }
 
-            self.internalLogger.log(level: .debug) { "UIApplication.willEnterForegroundNotification triggered" }
+            self.logger.log(level: .debug) { "UIApplication.willEnterForegroundNotification triggered" }
         }
 
         // didBecomeActive notification - store the timestamp, determine app start type and send results
@@ -56,7 +56,7 @@ extension AppStart {
                 self.backgroundLaunchDetected = false
             }
 
-            self.internalLogger.log(level: .debug) { "UIApplication.didBecomeActiveNotification triggered" }
+            self.logger.log(level: .debug) { "UIApplication.didBecomeActiveNotification triggered" }
 
             self.determineAndSend()
         }
@@ -65,12 +65,12 @@ extension AppStart {
         listen(to: UIApplication.willResignActiveNotification, in: &tokens) {
             self.willResignActiveTimestamp = Date()
 
-            self.internalLogger.log(level: .debug) { "UIApplication.willResignActiveNotification triggered" }
+            self.logger.log(level: .debug) { "UIApplication.willResignActiveNotification triggered" }
         }
 
         // didEnterBackground notification - no op atm
         listen(to: UIApplication.didEnterBackgroundNotification, in: &tokens) {
-            self.internalLogger.log(level: .debug) { "UIApplication.didEnterBackgroundNotification triggered" }
+            self.logger.log(level: .debug) { "UIApplication.didEnterBackgroundNotification triggered" }
         }
 
         notificationTokens = tokens
@@ -79,8 +79,8 @@ extension AppStart {
     /// Stop listening to UIApplication app lifecycle notifications.
     func stopNotificationListeners() {
         if let notificationTokens {
-            notificationTokens.forEach {
-                NotificationCenter.default.removeObserver($0)
+            for notificationToken in notificationTokens {
+                NotificationCenter.default.removeObserver(notificationToken)
             }
 
             self.notificationTokens = nil

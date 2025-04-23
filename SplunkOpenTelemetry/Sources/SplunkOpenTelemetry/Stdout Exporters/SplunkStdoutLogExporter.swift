@@ -14,10 +14,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-    
+
+internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
-import SplunkLogger
 
 /// Prints Log Record contents into the console using an internal logger.
 class SplunkStdoutLogExporter: LogRecordExporter {
@@ -25,7 +25,7 @@ class SplunkStdoutLogExporter: LogRecordExporter {
     // MARK: - Private
 
     // Internal Logger
-    private let internalLogger = InternalLogger(configuration: .agent(category: "OpenTelemetry"))
+    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "OpenTelemetry")
 
     // Date format
     private let dateFormatStyle: Date.FormatStyle = {
@@ -43,47 +43,47 @@ class SplunkStdoutLogExporter: LogRecordExporter {
     }()
 
     init() {}
-    
+
     func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         for logRecord in logRecords {
-            var message = ""
+            // Log LogRecord data
+            logger.log {
+                var message = ""
 
-            message += "------ 🪵 Log: ------\n"
-            message += "Severity: \(String(describing: logRecord.severity))\n"
-            message += "Body: \(String(describing: logRecord.body))\n"
-            message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
-            message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(dateFormatStyle)))\n"
+                message += "------ 🪵 Log: ------\n"
+                message += "Severity: \(String(describing: logRecord.severity))\n"
+                message += "Body: \(String(describing: logRecord.body))\n"
+                message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
+                message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(self.dateFormatStyle)))\n"
 
-            if let observedTimestamp = logRecord.observedTimestamp {
-                message += "ObservedTimestamp: \(observedTimestamp.timeIntervalSince1970.toNanoseconds) (\(observedTimestamp.formatted(dateFormatStyle)))\n"
-            } else {
-                message += "ObservedTimestamp: -\n"
-            }
+                if let observedTimestamp = logRecord.observedTimestamp {
+                    message += "ObservedTimestamp: \(observedTimestamp.timeIntervalSince1970.toNanoseconds) (\(observedTimestamp.formatted(self.dateFormatStyle)))\n"
+                } else {
+                    message += "ObservedTimestamp: -\n"
+                }
 
-            message += "SpanContext: \(String(describing: logRecord.spanContext))\n"
+                message += "SpanContext: \(String(describing: logRecord.spanContext))\n"
 
-            // Log attributes
-            message += "Attributes:\n"
-            message += "  \(logRecord.attributes)\n"
+                // Log attributes
+                message += "Attributes:\n"
+                message += "  \(logRecord.attributes)\n"
 
-            // Log resources
-            message += "Resource:\n"
-            message += "  \(logRecord.resource.attributes)\n"
+                // Log resources
+                message += "Resource:\n"
+                message += "  \(logRecord.resource.attributes)\n"
 
-            message += "--------------------\n"
+                message += "--------------------\n"
 
-            // Print message
-            internalLogger.log {
-                message
+                return message
             }
         }
 
         return .success
     }
-    
+
     func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         return .success
     }
-    
+
     func shutdown(explicitTimeout: TimeInterval?) {}
 }

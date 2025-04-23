@@ -76,7 +76,7 @@ protocol AgentModulesManager {
     /// - Parameter metadata: A struct with essential data identification.
     func deleteModuleData(for metadata: any ModuleEventMetadata)
 
-    
+
     // MARK: - Metrics
 
     /// Modules manager needs to provide all modules' initialization timestamps.
