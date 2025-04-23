@@ -216,9 +216,8 @@
 		C76AB8DA2B7B785500CB4307 /* RawMockDataBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C76AB8D92B7B785500CB4307 /* RawMockDataBuilder.swift */; };
 		C76AB8DC2B7B798400CB4307 /* RemoteError.json in Resources */ = {isa = PBXBuildFile; fileRef = C76AB8DB2B7B798400CB4307 /* RemoteError.json */; };
 		C76AB8DE2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = C76AB8DD2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json */; };
-		C791ADFE2DAE8AFA002AAA2B /* OTLPLogToSpanEventProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C791ADFC2DAE8AFA002AAA2B /* OTLPLogToSpanEventProcessor.swift */; };
-		C791AE042DAEA805002AAA2B /* OTLPLogToSpanExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C791AE032DAEA805002AAA2B /* OTLPLogToSpanExporter.swift */; };
 		C7A2BD1B2BB45363005D4CFB /* AppStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */; };
+		C7C112672DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112652DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift */; };
 		C7FFC4F52B7662E30035203B /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FFC4F42B7662E30035203B /* Service.swift */; };
 		E4032E622B552343003D4392 /* DefaultSessionTestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */; };
 		E4032E642B55278C003D4392 /* PersistentSessionsValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4032E632B55278C003D4392 /* PersistentSessionsValidator.swift */; };
@@ -787,9 +786,8 @@
 		C76AB8D92B7B785500CB4307 /* RawMockDataBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RawMockDataBuilder.swift; sourceTree = "<group>"; };
 		C76AB8DB2B7B798400CB4307 /* RemoteError.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = RemoteError.json; sourceTree = "<group>"; };
 		C76AB8DD2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AlternativeRemoteConfiguration.json; sourceTree = "<group>"; };
-		C791ADFC2DAE8AFA002AAA2B /* OTLPLogToSpanEventProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPLogToSpanEventProcessor.swift; sourceTree = "<group>"; };
-		C791AE032DAEA805002AAA2B /* OTLPLogToSpanExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPLogToSpanExporter.swift; sourceTree = "<group>"; };
 		C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateModel.swift; sourceTree = "<group>"; };
+		C7C112652DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPLogToSpanExporter.swift; sourceTree = "<group>"; };
 		C7FFC4F42B7662E30035203B /* Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Service.swift; sourceTree = "<group>"; };
 		E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSessionTestBuilder.swift; sourceTree = "<group>"; };
 		E4032E632B55278C003D4392 /* PersistentSessionsValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentSessionsValidator.swift; sourceTree = "<group>"; };
@@ -2066,7 +2064,6 @@
 		4B5A5CAA2D60ED3D009DA0D5 /* SplunkOpenTelemetry */ = {
 			isa = PBXGroup;
 			children = (
-				C791ADFD2DAE8AFA002AAA2B /* LogToSpan Event processor */,
 				4B5A5C9F2D60ED3D009DA0D5 /* API */,
 				4B5A5CA22D60ED3D009DA0D5 /* Log Event Processor */,
 				E4A537532DA68F17002323E2 /* Log Processors */,
@@ -2076,6 +2073,7 @@
 				4B5A5CA62D60ED3D009DA0D5 /* Trace Processor */,
 				4B5A5CA82D60ED3D009DA0D5 /* Utils */,
 				4B5A5CA92D60ED3D009DA0D5 /* OTel.swift */,
+				C7C112662DB8D64C00B8E893 /* LogToSpanExporter */,
 			);
 			path = SplunkOpenTelemetry;
 			sourceTree = "<group>";
@@ -2475,15 +2473,6 @@
 			path = Configuration;
 			sourceTree = "<group>";
 		};
-		C791ADFD2DAE8AFA002AAA2B /* LogToSpan Event processor */ = {
-			isa = PBXGroup;
-			children = (
-				C791ADFC2DAE8AFA002AAA2B /* OTLPLogToSpanEventProcessor.swift */,
-				C791AE032DAEA805002AAA2B /* OTLPLogToSpanExporter.swift */,
-			);
-			path = "LogToSpan Event processor";
-			sourceTree = "<group>";
-		};
 		C7A2BD192BB44E1C005D4CFB /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -2492,6 +2481,14 @@
 				C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		C7C112662DB8D64C00B8E893 /* LogToSpanExporter */ = {
+			isa = PBXGroup;
+			children = (
+				C7C112652DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift */,
+			);
+			path = LogToSpanExporter;
 			sourceTree = "<group>";
 		};
 		E405497D2DACF57500B7A2E4 /* User */ = {
@@ -4173,17 +4170,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C791AE042DAEA805002AAA2B /* OTLPLogToSpanExporter.swift in Sources */,
 				4B9642142D61375E009A2E7F /* AttributeValue+MrumEventAttributeValue.swift in Sources */,
 				4B9642152D61375E009A2E7F /* Resource+AgentResources.swift in Sources */,
 				4B9642162D61375E009A2E7F /* ApiPaths.swift in Sources */,
 				4B9642172D61375E009A2E7F /* OTLPLogEventProcessor.swift in Sources */,
-				C791ADFE2DAE8AFA002AAA2B /* OTLPLogToSpanEventProcessor.swift in Sources */,
 				4B9642182D61375E009A2E7F /* OTLPLogEventProcessor+AgentEvent.swift in Sources */,
 				E4A537552DA68F5F002323E2 /* OTLPAttributesLogRecordProcessor.swift in Sources */,
 				4B9642192D61375E009A2E7F /* OTLPTraceProcessor.swift in Sources */,
 				E4A537422DA655E2002323E2 /* OLTPAttributesSpanProcessor.swift in Sources */,
 				4B96421A2D61375E009A2E7F /* OTel.swift in Sources */,
+				C7C112672DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift in Sources */,
 				2A5949DB2DA3FC2100F2E857 /* SplunkStdoutSpanExporter.swift in Sources */,
 				2A5949DC2DA3FC2100F2E857 /* SplunkStdoutLogExporter.swift in Sources */,
 			);
