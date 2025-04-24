@@ -37,10 +37,11 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
                 storeData,
                 forKey: KeyBuilder(
                     requestId.uuidString,
-                    parrentKeyBuilder: KeyBuilder.uploadsKey
+                    parrentKeyBuilder: getStorageKey()
                 )
             )
         } catch {
+
             return .failure
         }
 
@@ -49,7 +50,8 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
         let requestDescriptor = RequestDescriptor(
             id: requestId,
             endpoint: endpoint,
-            explicitTimeout: timeout
+            explicitTimeout: timeout,
+            fileKeyType: getFileKeyType()
         )
 
         do {
@@ -74,4 +76,11 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
     }
 
     public func shutdown(explicitTimeout: TimeInterval? = nil) {}
+
+
+    // MARK: - Local override
+
+    override func getFileKeyType() -> String {
+        "logs"
+    }
 }

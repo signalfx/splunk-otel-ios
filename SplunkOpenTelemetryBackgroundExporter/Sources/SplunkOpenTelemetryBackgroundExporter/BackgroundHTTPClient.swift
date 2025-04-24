@@ -65,7 +65,7 @@ final class BackgroundHTTPClient: NSObject {
     func send(_ requestDescriptor: RequestDescriptor) throws {
         let fileKey = KeyBuilder(
             requestDescriptor.id.uuidString,
-            parrentKeyBuilder: KeyBuilder.uploadsKey
+            parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
         )
 
         guard requestDescriptor.shouldSend else {
@@ -189,7 +189,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             try? diskStorage.delete(
                 forKey: KeyBuilder(
                     requestDescriptor.id.uuidString,
-                    parrentKeyBuilder: KeyBuilder.uploadsKey
+                    parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
                 )
             )
         }
