@@ -43,7 +43,7 @@ public final class AppStart {
     // MARK: - Private
 
     // Internal Logger
-    let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "AppStart")
+    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "AppStart")
 
     // Notifications and process start
     var notificationTokens: [NSObjectProtocol]?

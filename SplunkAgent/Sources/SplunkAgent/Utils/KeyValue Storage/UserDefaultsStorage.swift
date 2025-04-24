@@ -17,6 +17,7 @@ limitations under the License.
 
 internal import CiscoLogger
 import Foundation
+internal import SplunkCommon
 
 /// The class implements a single persistent key-value store
 /// using standard `UserDefaults` database services.
@@ -26,7 +27,7 @@ class UserDefaultsStorage: KeyValueStorage {
 
     private let userDefaults = UserDefaults.standard
 
-    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "Agent")
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Public

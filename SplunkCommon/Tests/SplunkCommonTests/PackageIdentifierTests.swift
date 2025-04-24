@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
+@testable import SplunkCommon
 import XCTest
 
 final class PackageIdentifierTests: XCTestCase {
@@ -44,5 +44,28 @@ final class PackageIdentifierTests: XCTestCase {
 
         identifier = PackageIdentifier.default(named: emptyExtension)
         XCTAssertEqual(identifier, expectedIdentifier)
+    }
+    
+    func testInstanceIdentification() throws {
+        let defaultExtension = "default"
+        let namedExtension = "named"
+        let defaultIdentifier = PackageIdentifier.default
+
+        let defaultInstanceIdentifier = PackageIdentifier.instance()
+        let emptyInstanceIdentifier = PackageIdentifier.instance(named: "")
+        let namedInstanceIdentifier = PackageIdentifier.instance(named: namedExtension)
+
+
+        // Check format for the default instance
+        let expectedDefault = "\(defaultIdentifier)-\(defaultExtension)"
+        XCTAssertEqual(defaultInstanceIdentifier, expectedDefault)
+
+        // Checks format for the identifier generated with an empty extension
+        let expectedEmpty = "\(defaultIdentifier)-\(defaultExtension)"
+        XCTAssertEqual(emptyInstanceIdentifier, expectedEmpty)
+
+        // Check if the identifier has the expected format
+        let expectedNamed = "\(defaultIdentifier)-\(namedExtension)"
+        XCTAssertEqual(namedInstanceIdentifier, expectedNamed)
     }
 }

@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 internal import CiscoLogger
+internal import SplunkCommon
 
 /// The class implementing Session Replay public API in non-operational mode.
 ///
@@ -41,7 +42,7 @@ final class SessionReplayNonOperational: SessionReplayModule {
     // MARK: - Initialization
 
     init() {
-        logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "SessionReplay")
+        logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SessionReplay")
 
         // Build "dummy" Session Replay module
         sensitivity = SessionReplayNonOperationalSensitivity(logger: logger)

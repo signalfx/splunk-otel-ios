@@ -18,6 +18,7 @@ limitations under the License.
 internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
+import SplunkCommon
 
 class AttributeCheckerLogExporter: LogRecordExporter {
 
@@ -29,7 +30,7 @@ class AttributeCheckerLogExporter: LogRecordExporter {
     private let proxyExporter: LogRecordExporter
 
     // Internal Logger
-    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "OpenTelemetry")
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
 
     // MARK: - Initialization

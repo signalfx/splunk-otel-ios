@@ -19,6 +19,7 @@ import Foundation
 
 internal import CiscoLogger
 internal import CiscoSessionReplay
+internal import SplunkCommon
 
 /// The class implementing Session Replay public API.
 final class SessionReplay: SessionReplayModule {
@@ -45,7 +46,7 @@ final class SessionReplay: SessionReplayModule {
 
     init(for module: CiscoSessionReplay.SessionReplay) {
         self.module = module
-        logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "SessionReplay")
+        logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SessionReplay")
 
         // Monitor session changes in the agent.
         hookToAgentLifecycle()

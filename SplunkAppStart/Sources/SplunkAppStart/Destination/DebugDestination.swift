@@ -31,7 +31,7 @@ class DebugDestination: AppStartDestination {
     var storedInitialize: AgentInitializeSpanData?
 
     // Internal Logger
-    let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "AppStart")
+    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "AppStart")
 
 
     // MARK: - Sending

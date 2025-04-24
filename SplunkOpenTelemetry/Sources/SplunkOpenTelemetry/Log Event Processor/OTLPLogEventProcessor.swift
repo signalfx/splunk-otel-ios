@@ -31,7 +31,10 @@ public class OTLPLogEventProcessor: LogEventProcessor {
     private let loggerProvider: LoggerProvider
 
     // Logger background dispatch queues
-    private let backgroundQueue = DispatchQueue(label: "com.splunk.rum.LogEventProcessor", qos: .utility)
+    private let backgroundQueue = DispatchQueue(
+        label: PackageIdentifier.default(named: "LogEventProcessor"),
+        qos: .utility
+    )
 
     // Stored properties for Unit tests
 #if DEBUG

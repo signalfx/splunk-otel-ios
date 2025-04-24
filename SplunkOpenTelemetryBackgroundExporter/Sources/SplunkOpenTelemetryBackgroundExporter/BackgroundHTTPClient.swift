@@ -18,6 +18,7 @@ limitations under the License.
 import CiscoDiskStorage
 internal import CiscoLogger
 import Foundation
+import SplunkCommon
 
 /// Client for sending requests over HTTP.
 final class BackgroundHTTPClient: NSObject {
@@ -27,7 +28,7 @@ final class BackgroundHTTPClient: NSObject {
     private let urlSessionDelegateQueue = OperationQueue("URLSessionDelegate", maxConcurrents: 1, qualityOfService: .utility)
     private let sessionQosConfiguration: SessionQOSConfiguration
 
-    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "BackgroundExporter")
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "BackgroundExporter")
 
     private let diskStorage: DiskStorage
 

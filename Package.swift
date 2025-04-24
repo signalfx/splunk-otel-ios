@@ -50,7 +50,7 @@ let package = Package(
         ),
         .testTarget(
             name: "SplunkAgentTests",
-            dependencies: ["SplunkAgent"],
+            dependencies: ["SplunkAgent", "SplunkCommon"],
             path: "SplunkAgent/Tests",
             resources: [
                 .copy("SplunkAgentTests/Testing Support/Assets/v.mp4"),
@@ -246,7 +246,7 @@ let package = Package(
         ),
         .testTarget(
             name: "SplunkOpenTelemetryBackgroundExporterTests",
-            dependencies: ["SplunkOpenTelemetryBackgroundExporter"],
+            dependencies: ["SplunkOpenTelemetryBackgroundExporter", "SplunkCommon"],
             path: "SplunkOpenTelemetryBackgroundExporter/Tests"
         ),
         

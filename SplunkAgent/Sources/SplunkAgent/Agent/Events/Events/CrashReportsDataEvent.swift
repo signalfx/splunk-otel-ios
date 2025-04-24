@@ -26,7 +26,7 @@ class CrashReportsDataEvent: AgentEvent {
 
     let domain = "mrum"
     var name: String
-    var instrumentationScope = "com.splunk.rum.crashreports"
+    var instrumentationScope = PackageIdentifier.default(named: "crashreports")
     let component = "crash"
 
 
@@ -51,7 +51,7 @@ class CrashReportsDataEvent: AgentEvent {
         // Event identification
         name = metadata.eventName
 
-        instrumentationScope = "com.splunk.rum.crashreports"
+        instrumentationScope = PackageIdentifier.default(named: "crashreports")
 
         if let sessionID {
             self.sessionID = sessionID

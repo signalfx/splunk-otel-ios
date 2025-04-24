@@ -28,7 +28,7 @@ public class CrashReports {
     public unowned var sharedState: AgentSharedState?
 
     private var crashReporter: SPLKPLCrashReporter?
-    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "CrashReports")
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "CrashReports")
     private var allUsedImageNames: [String] = []
     private var deviceDataDictionary: [CrashReportKeys: String] = [:]
 

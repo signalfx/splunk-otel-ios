@@ -17,6 +17,7 @@ limitations under the License.
 
 internal import CiscoLogger
 import Foundation
+internal import SplunkCommon
 
 class AppStateModel {
 
@@ -34,7 +35,7 @@ class AppStateModel {
     // MARK: - Internal properties
 
     private let storage: KeyValueStorage
-    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "Agent")
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Initialization

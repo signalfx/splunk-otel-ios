@@ -18,6 +18,7 @@ limitations under the License.
 internal import CiscoLogger
 import Combine
 import Foundation
+internal import SplunkCommon
 
 final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
 
@@ -31,7 +32,7 @@ final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
     var reloadSessionTimer: Timer?
     var cancellables = [AnyCancellable]()
 
-    let logger = DefaultLogAgent(poolName: "com.splunk.com", category: "Agent")
+    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Public properties

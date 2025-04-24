@@ -18,6 +18,7 @@ limitations under the License.
 internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
+import SplunkCommon
 
 /// Prints Span contents into the console using an internal logger.
 class SplunkStdoutSpanExporter: SpanExporter {
@@ -25,7 +26,7 @@ class SplunkStdoutSpanExporter: SpanExporter {
     // MARK: - Private
 
     // Internal Logger
-    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "OpenTelemetry")
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
     // Date format
     private let dateFormatStyle: Date.FormatStyle = {

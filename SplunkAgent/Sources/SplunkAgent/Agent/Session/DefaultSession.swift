@@ -17,6 +17,7 @@ limitations under the License.
 
 internal import CiscoLogger
 import Foundation
+internal import SplunkCommon
 
 #if os(iOS) || os(tvOS) || os(visionOS)
     import UIKit
@@ -38,7 +39,7 @@ class DefaultSession: AgentSession {
     private var enterBackground: Date?
     private var leaveBackground: Date?
 
-    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "Agent")
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Test support

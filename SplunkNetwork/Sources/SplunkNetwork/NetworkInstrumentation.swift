@@ -28,7 +28,7 @@ public class NetworkInstrumentation {
 
     // MARK: - Private
 
-    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "NetworkInstrumentation")
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
 
 
     // MARK: - Public

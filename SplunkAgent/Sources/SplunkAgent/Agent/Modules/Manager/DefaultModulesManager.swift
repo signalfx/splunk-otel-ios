@@ -28,7 +28,7 @@ class DefaultModulesManager: AgentModulesManager {
 
     private var initializationTimes: [String: Date] = [:]
     private var configurationDescription: [String: String] = [:]
-    private let logger = DefaultLogAgent(poolName: "com.splunk.rum", category: "Agent")
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Public

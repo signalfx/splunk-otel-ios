@@ -117,13 +117,13 @@ public class SplunkRum: ObservableObject {
         currentUser = user
         currentSession = session
 
-        let logPoolName = "com.splunk.rum"
+        let logPoolName = PackageIdentifier.instance()
         let verboseLogging = agentConfigurationHandler.configuration.enableDebugLogging
 
         // Configure internall logging
         logProcessor = DefaultLogProcessor(
             poolName: logPoolName,
-            subsystem: "com.splunk.rum"
+            subsystem: PackageIdentifier.default
         )
         .verbosity(verboseLogging ? .verbose : .default)
 

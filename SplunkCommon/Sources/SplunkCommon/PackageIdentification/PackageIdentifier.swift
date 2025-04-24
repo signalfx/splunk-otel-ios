@@ -17,17 +17,17 @@ limitations under the License.
 
 import Foundation
 
-/// Implements internal package identification for the Agent.
-struct PackageIdentifier: PackageIdentification {
+/// Implements internal package identification for the Splunk Agent.
+public struct PackageIdentifier: PackageIdentification {
 
     // MARK: - Package identification
 
-    static var `default` = "com.splunk.rum"
+    public static var `default` = "com.splunk.rum"
 
 
     // MARK: - Package identification methods
 
-    static func `default`(named: String) -> String {
+    public static func `default`(named: String) -> String {
         guard !named.isEmpty else {
             return `default`
         }
