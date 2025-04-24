@@ -1,5 +1,3 @@
-//
-//
 /*
 Copyright 2025 Splunk Inc.
 
