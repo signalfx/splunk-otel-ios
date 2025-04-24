@@ -17,8 +17,8 @@ limitations under the License.
 
 internal import CiscoLogger
 import Foundation
+import SplunkCommon
 internal import SplunkCrashReporter
-import SplunkSharedProtocols
 
 public class CrashReports {
 

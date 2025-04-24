@@ -17,7 +17,7 @@ limitations under the License.
 
 import CiscoSessionReplay
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 // IMPORTANT NOTES:
 //

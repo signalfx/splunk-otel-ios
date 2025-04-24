@@ -19,8 +19,8 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
+import SplunkCommon
 import SplunkOpenTelemetryBackgroundExporter
-import SplunkSharedProtocols
 
 /// OTLPLogEventProcessor sends OpenTelemetry Logs enriched with Resources via an instantiated background exporter.
 public class OTLPLogEventProcessor: LogEventProcessor {

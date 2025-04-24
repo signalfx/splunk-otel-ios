@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
 struct DefaultResources: AgentResources {
 

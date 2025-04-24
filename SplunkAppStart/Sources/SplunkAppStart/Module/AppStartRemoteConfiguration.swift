@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// AppStart remote configuration.
 public struct AppStartRemoteConfiguration: RemoteModuleConfiguration {

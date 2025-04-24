@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkSharedProtocols
+@testable import SplunkCommon
 import XCTest
 
 final class SplunkSharedProtocolsTests: XCTestCase {

@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoLogger
-import SplunkSharedProtocols
+internal import CiscoLogger
+import SplunkCommon
 import UIKit
 
 /// Defines an app start type.

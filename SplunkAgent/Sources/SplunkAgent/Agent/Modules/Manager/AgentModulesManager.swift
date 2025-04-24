@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
 /// Defines the basic properties and behavior of the modules manager.
 ///

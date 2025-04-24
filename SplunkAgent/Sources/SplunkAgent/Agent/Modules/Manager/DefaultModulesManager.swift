@@ -17,7 +17,7 @@ limitations under the License.
 
 internal import CiscoLogger
 import Foundation
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
 class DefaultModulesManager: AgentModulesManager {
 

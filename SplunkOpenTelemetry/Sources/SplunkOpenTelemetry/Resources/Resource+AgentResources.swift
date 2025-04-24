@@ -16,9 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 import OpenTelemetryApi
 import OpenTelemetrySdk
+import SplunkCommon
 
 /// Builds OTel Resource object from AgentResources.
 extension Resource {

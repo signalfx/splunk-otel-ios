@@ -16,8 +16,8 @@ limitations under the License.
 */
 
 import Foundation
+internal import SplunkCommon
 internal import SplunkCrashReports
-internal import SplunkSharedProtocols
 
 /// Crash Reports data event. Represents stringified Crash Report with metadata.
 class CrashReportsDataEvent: AgentEvent {

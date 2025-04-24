@@ -16,19 +16,21 @@ limitations under the License.
 */
 
 internal import CiscoLogger
+internal import CiscoSessionReplay
+
 import Combine
 import Foundation
 import OpenTelemetryApi
 
+internal import SplunkAppStart
+internal import SplunkCommon
 
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
 #endif
-internal import SplunkAppStart
+
 internal import SplunkNetwork
 internal import SplunkOpenTelemetry
-internal import CiscoSessionReplay
-internal import SplunkSharedProtocols
 
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
