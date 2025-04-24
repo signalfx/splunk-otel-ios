@@ -236,7 +236,7 @@ final class EventsTests: XCTestCase {
         }
     }
 
-    func checkEventBaseAttributes(_ event: SplunkSharedProtocols.AgentEvent) throws {
+    func checkEventBaseAttributes(_ event: SplunkCommon.AgentEvent) throws {
         XCTAssertNotNil(event.domain)
         XCTAssertNotNil(event.name)
         XCTAssertNotNil(event.instrumentationScope)

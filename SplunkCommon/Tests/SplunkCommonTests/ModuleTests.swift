@@ -18,7 +18,7 @@ limitations under the License.
 @testable import SplunkCommon
 import XCTest
 
-final class SplunkSharedProtocolsTests: XCTestCase {
+final class SplunkCommonTests: XCTestCase {
 
     func testModuleProtocols() throws {
         // Constant Metadata, Data is generated at the start of the test.
