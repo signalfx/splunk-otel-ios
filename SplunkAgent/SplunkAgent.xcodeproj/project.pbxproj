@@ -12,8 +12,6 @@
 		2A03CF5D2D9C315C00CF3BC9 /* API-1.0-AgentConfigurationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */; };
 		2A03CF5F2D9C31C100CF3BC9 /* API-1.0-AgentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */; };
 		2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1673CC2BA1F52600F85698 /* EventsModel.swift */; };
-		2A2926352DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2926332DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift */; };
-		2A2926372DAD11C800AB6F03 /* AttributeCheckerLogExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2926362DAD11C100AB6F03 /* AttributeCheckerLogExporter.swift */; };
 		2A1789B72DA3CDA900EC548B /* AppStartSimulations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */; };
 		2A1789BB2DA3CDD300EC548B /* AppStartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789B92DA3CDD300EC548B /* AppStartTests.swift */; };
 		2A1789C02DA3CDEB00EC548B /* InitializeTests+Checks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789BE2DA3CDEB00EC548B /* InitializeTests+Checks.swift */; };
@@ -22,6 +20,8 @@
 		2A1789C82DA3D62100EC548B /* AgentInitializeSpanData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789C42DA3D62100EC548B /* AgentInitializeSpanData.swift */; };
 		2A1789C92DA3D62100EC548B /* AppStartEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789C52DA3D62100EC548B /* AppStartEvent.swift */; };
 		2A1789CA2DA3D62100EC548B /* AppStartSpanData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789C62DA3D62100EC548B /* AppStartSpanData.swift */; };
+		2A2926352DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2926332DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift */; };
+		2A2926372DAD11C800AB6F03 /* AttributeCheckerLogExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A2926362DAD11C100AB6F03 /* AttributeCheckerLogExporter.swift */; };
 		2A30EE1C2BD7AEDD008557DD /* NOTICES in Resources */ = {isa = PBXBuildFile; fileRef = 2A30EE1B2BD7AECE008557DD /* NOTICES */; };
 		2A5949DB2DA3FC2100F2E857 /* SplunkStdoutSpanExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5949D92DA3FC2100F2E857 /* SplunkStdoutSpanExporter.swift */; };
 		2A5949DC2DA3FC2100F2E857 /* SplunkStdoutLogExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5949D82DA3FC2100F2E857 /* SplunkStdoutLogExporter.swift */; };
@@ -188,6 +188,8 @@
 		52286CB52CD5404A001F8A31 /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52286CB42CD54045001F8A31 /* ScreenName.swift */; };
 		522A70B92DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */; };
 		522A70BB2DAD9F23008A2479 /* OTelDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70BA2DAD9F23008A2479 /* OTelDestination.swift */; };
+		BAAC20C22DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */; };
+		BAAC20C42DB9BB5E00BC8B60 /* IgnoreURLsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */; };
 		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */; };
 		C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB02BA9D41E000CC11B /* AppStateManager.swift */; };
@@ -574,8 +576,6 @@
 		2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-AgentConfigurationError.swift"; sourceTree = "<group>"; };
 		2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-AgentConfiguration.swift"; sourceTree = "<group>"; };
 		2A1673CC2BA1F52600F85698 /* EventsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsModel.swift; sourceTree = "<group>"; };
-		2A2926332DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributeCheckerSpanExporter.swift; sourceTree = "<group>"; };
-		2A2926362DAD11C100AB6F03 /* AttributeCheckerLogExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributeCheckerLogExporter.swift; sourceTree = "<group>"; };
 		2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartSimulations.swift; sourceTree = "<group>"; };
 		2A1789B92DA3CDD300EC548B /* AppStartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartTests.swift; sourceTree = "<group>"; };
 		2A1789BD2DA3CDEB00EC548B /* InitializeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitializeTests.swift; sourceTree = "<group>"; };
@@ -584,6 +584,8 @@
 		2A1789C42DA3D62100EC548B /* AgentInitializeSpanData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentInitializeSpanData.swift; sourceTree = "<group>"; };
 		2A1789C52DA3D62100EC548B /* AppStartEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartEvent.swift; sourceTree = "<group>"; };
 		2A1789C62DA3D62100EC548B /* AppStartSpanData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartSpanData.swift; sourceTree = "<group>"; };
+		2A2926332DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributeCheckerSpanExporter.swift; sourceTree = "<group>"; };
+		2A2926362DAD11C100AB6F03 /* AttributeCheckerLogExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributeCheckerLogExporter.swift; sourceTree = "<group>"; };
 		2A30EE1B2BD7AECE008557DD /* NOTICES */ = {isa = PBXFileReference; lastKnownFileType = text; path = NOTICES; sourceTree = "<group>"; };
 		2A5949D82DA3FC2100F2E857 /* SplunkStdoutLogExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkStdoutLogExporter.swift; sourceTree = "<group>"; };
 		2A5949D92DA3FC2100F2E857 /* SplunkStdoutSpanExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkStdoutSpanExporter.swift; sourceTree = "<group>"; };
@@ -758,6 +760,8 @@
 		52286CB42CD54045001F8A31 /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
 		522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorDestination.swift; sourceTree = "<group>"; };
 		522A70BA2DAD9F23008A2479 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
+		BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentationIgnoreURLs.swift; sourceTree = "<group>"; };
+		BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreURLsTests.swift; sourceTree = "<group>"; };
 		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
@@ -1101,15 +1105,6 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		2A2926342DAD114900AB6F03 /* Attribute Checker Exporters */ = {
-			isa = PBXGroup;
-			children = (
-				2A2926362DAD11C100AB6F03 /* AttributeCheckerLogExporter.swift */,
-				2A2926332DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift */,
-			);
-			path = "Attribute Checker Exporters";
-			sourceTree = "<group>";
-		};
 		2A1789B62DA3CDA900EC548B /* Support */ = {
 			isa = PBXGroup;
 			children = (
@@ -1144,6 +1139,15 @@
 				2A1789C62DA3D62100EC548B /* AppStartSpanData.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		2A2926342DAD114900AB6F03 /* Attribute Checker Exporters */ = {
+			isa = PBXGroup;
+			children = (
+				2A2926362DAD11C100AB6F03 /* AttributeCheckerLogExporter.swift */,
+				2A2926332DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift */,
+			);
+			path = "Attribute Checker Exporters";
 			sourceTree = "<group>";
 		};
 		2A5949DA2DA3FC2100F2E857 /* Stdout Exporters */ = {
@@ -1743,6 +1747,7 @@
 		4B5A5B8E2D5E4C79009DA0D5 /* SplunkNetwork */ = {
 			isa = PBXGroup;
 			children = (
+				BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */,
 				4B5A5B8A2D5E4C79009DA0D5 /* Extensions */,
 				4B5A5B8B2D5E4C79009DA0D5 /* NetworkInstrumentation.swift */,
 				4B5A5B8C2D5E4C79009DA0D5 /* NetworkInstrumentation+Module.swift */,
@@ -1762,6 +1767,7 @@
 		4B5A5B912D5E4C79009DA0D5 /* SplunkNetworkTests */ = {
 			isa = PBXGroup;
 			children = (
+				BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */,
 				4B5A5B902D5E4C79009DA0D5 /* SplunkNetworkTests.swift */,
 			);
 			path = SplunkNetworkTests;
@@ -4041,6 +4047,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B9640402D60FB4B009A2E7F /* NetworkInstrumentationConfig.swift in Sources */,
+				BAAC20C22DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift in Sources */,
 				4B9640412D60FB4B009A2E7F /* NetworkInstrumentation.swift in Sources */,
 				4B9640422D60FB4B009A2E7F /* NetworkInstrumentation+Module.swift in Sources */,
 				4B9640432D60FB4B009A2E7F /* InternalLoggerConfiguration+Defaults.swift in Sources */,
@@ -4052,6 +4059,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B9640442D60FB66009A2E7F /* SplunkNetworkTests.swift in Sources */,
+				BAAC20C42DB9BB5E00BC8B60 /* IgnoreURLsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
