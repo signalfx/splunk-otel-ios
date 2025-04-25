@@ -193,6 +193,8 @@
 		522A70BB2DAD9F23008A2479 /* OTelDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70BA2DAD9F23008A2479 /* OTelDestination.swift */; };
 		BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */; };
 		BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */; };
+		BAAC20C62DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */; };
+		BAAC20C82DBB0F4800BC8B60 /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */; };
 		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */; };
 		C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB02BA9D41E000CC11B /* AppStateManager.swift */; };
@@ -764,6 +766,8 @@
 		522A70BA2DAD9F23008A2479 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
 		BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributesTests.swift; sourceTree = "<group>"; };
 		BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributes.swift; sourceTree = "<group>"; };
+		BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionaryTests.swift; sourceTree = "<group>"; };
+		BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionary.swift; sourceTree = "<group>"; };
 		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
@@ -2397,6 +2401,7 @@
 		BA7A63BA2DB818AD00A44570 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */,
 				BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */,
 			);
 			path = Model;
@@ -2541,6 +2546,7 @@
 		E4134BA92BC6ABD700F0D2FC /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */,
 				BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */,
 				2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */,
 				E4134BAA2BC6AC5400F0D2FC /* API-1.0-Status.swift */,
@@ -3919,6 +3925,7 @@
 				2AE43B492B861325002C4A98 /* AgentEvent.swift in Sources */,
 				E4B737E12BBECEDD00086A93 /* PlatformSupport.swift in Sources */,
 				2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */,
+				BAAC20C82DBB0F4800BC8B60 /* ThreadSafeDictionary.swift in Sources */,
 				2AE43B0C2B7FAD9B002C4A98 /* DefaultResources.swift in Sources */,
 				2AE43B4B2B861325002C4A98 /* SessionStartEvent.swift in Sources */,
 				2AB51E992B7A670600307B77 /* DeviceInfo.swift in Sources */,
@@ -4244,6 +4251,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E46BBA6B2B503CDF00317C8E /* UserDefaultsStorageTestBuilder.swift in Sources */,
+				BAAC20C62DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift in Sources */,
 				C703FAB92BAD856F000CC11B /* AppStateManagerTests.swift in Sources */,
 				2AE43AFD2B7B8269002C4A98 /* AppInfoTests.swift in Sources */,
 				E40E0AF32B6BC27900D31EEF /* CrashReportsTestModuleTypes.swift in Sources */,

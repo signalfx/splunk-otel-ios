@@ -19,20 +19,20 @@ import Foundation
 import OpenTelemetryApi
 
 class MutableAttributes {
-    private var attributes: [String: AttributeValue]
+    private var attributes: ThreadSafeDictionary<String, AttributeValue>
 
     // MARK: - Initialize
 
-    init() {
-        attributes = [:]
+    public init() {
+        attributes = ThreadSafeDictionary<String, AttributeValue>()
     }
 
-    init(dictionary: [String: AttributeValue]) {
-        attributes = dictionary
+    public init(dictionary: [String: AttributeValue]) {
+        attributes = ThreadSafeDictionary<String, AttributeValue>(dictionary: dictionary)
     }
 
-    init(attributeSet: AttributeSet) {
-        attributes = [:]
+    public init(attributeSet: AttributeSet) {
+        attributes = ThreadSafeDictionary<String, AttributeValue>()
         addAttributeSet(attributeSet)
     }
 
@@ -279,23 +279,23 @@ class MutableAttributes {
     }
 
     func contains(key: String) -> Bool {
-        return attributes.keys.contains(key)
+        return attributes.contains(key: key)
     }
 
     func getAll() -> [String: AttributeValue] {
-        return attributes
+        return attributes.getAll()
     }
 
     func getAllKeys() -> [String] {
-        return Array(attributes.keys)
+        return attributes.allKeys()
     }
 
     func getAllValues() -> [AttributeValue] {
-        return Array(attributes.values)
+        return attributes.allValues()
     }
 
     func count() -> Int {
-        return attributes.count
+        return attributes.count()
     }
 
     // MARK: - Description
@@ -303,7 +303,8 @@ class MutableAttributes {
     func description() -> String {
         var result = "[\n"
 
-        for (key, value) in attributes.sorted(by: { $0.key < $1.key }) {
+        let dictionaryCopy = attributes.getAll()
+        for (key, value) in dictionaryCopy.sorted(by: { $0.key < $1.key }) {
             let valueDescription = attributeDescription(value)
             result += "  \(key): \(valueDescription)\n"
         }
