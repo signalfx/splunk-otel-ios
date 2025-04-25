@@ -23,14 +23,16 @@ import Foundation
 /// Defines a public API for the CustomTracking  module.
 public protocol CustomTrackingModule {
 
+
     // MARK: - Track Events
 
-    func track(event name: String, attributes: [String: Any])
+    func trackCustomEvent(_ name: String, _ attributes: [String: Any])
 
-    // MARK: - Track Issues / Errors
 
-    func track(issue: String)
-    func track(issue: Error)
-    func track(issue: NSError)
-    func track(issue: NSException)
+    // MARK: - Track Errors
+
+    func trackError(_ message: String, _ attributes: [String: Any])
+    func trackError(_ error: Error, _ attributes: [String: Any])
+    func trackError(_ ns_error: NSError, _ attributes: [String: Any])
+    func trackException(_ exception: NSException, _ attributes: [String: Any])
 }

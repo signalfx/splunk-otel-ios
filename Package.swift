@@ -40,6 +40,7 @@ let package = Package(
                 "SplunkANRReporter",
                 "SplunkAppStart",
                 "SplunkCustomTracking",
+                "SplunkCustomTrackingProxy",
                 .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAgent",
@@ -275,6 +276,23 @@ let package = Package(
             name: "SplunkSessionReplayProxyTests",
             dependencies: ["SplunkSessionReplayProxy"],
             path: "SplunkSessionReplayProxy/Tests"
+        ),
+
+
+        // MARK: CustomTracking Proxy
+        
+        .target(
+            name: "SplunkCustomTrackingProxy",
+            dependencies: [
+                "SplunkSharedProtocols",
+                "SplunkCustomTracking"
+	    ],
+            path: "SplunkCustomTrackingProxy/Sources"
+        ),
+        .testTarget(
+            name: "SplunkCustomTrackingProxyTests",
+            dependencies: ["SplunkCustomTrackingProxy"],
+            path: "SplunkCustomTrackingProxy/Tests"
         )
     ]
 )

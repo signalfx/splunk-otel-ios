@@ -18,7 +18,10 @@ limitations under the License.
 import Foundation
 import SplunkSharedProtocols
 
-public struct CustomTrackingData: ModuleEventData {}
+public struct CustomTrackingData: ModuleEventData {
+    public let name: String
+    public let attributes: [String: EventAttributeValue]
+}
 
 public struct CustomTrackingMetadata: ModuleEventMetadata {
     public var timestamp = Date()
@@ -34,15 +37,49 @@ extension CustomTracking: Module {
     public typealias EventMetadata = CustomTrackingMetadata
     public typealias EventData = CustomTrackingData
 
-
     // MARK: - Module installation
 
     public func install(with configuration: (any SplunkSharedProtocols.ModuleConfiguration)?,
-                        remoteConfiguration: (any SplunkSharedProtocols.RemoteModuleConfiguration)?) {}
+                        remoteConfiguration: (any SplunkSharedProtocols.RemoteModuleConfiguration)?) {
+    }
 
+    public func customize(sharedState: AgentSharedState?) {
+        self.sharedState = sharedState
+    }
 
     // MARK: - Module data handling
 
     public func deleteData(for metadata: any ModuleEventMetadata) {}
-    public func onPublish(data: @escaping (CustomTrackingMetadata, CustomTrackingData) -> Void) {}
+
+    public func onPublish(data: @escaping (CustomTrackingMetadata, CustomTrackingData) -> Void) {
+        self.onPublishBlock = data
+    }
+
+    // MARK: - Internal tracking methods (to be called from CustomTracking class)
+
+    internal func track(event: SplunkTrackableEvent) {
+        guard let onPublishBlock = self.onPublishBlock else {
+            print("onPublish block not set!")
+            return
+        }
+
+        let metadata = CustomTrackingMetadata()
+        let data = CustomTrackingData(name: event.typeName, attributes: event.toEventAttributes())
+        onPublishBlock(metadata, data)
+    }
+
+    internal func track(issue: SplunkTrackableIssue, attributes: [String: Any]) {
+        guard let onPublishBlock = self.onPublishBlock else {
+            print("onPublish block not set!")
+            return
+        }
+
+        let metadata = CustomTrackingMetadata()
+        var allAttributes = attributes.mapValues { EventAttributeValue.convert(from: $0) }
+        issue.toEventAttributes().forEach { (key, value) in
+            allAttributes[key] = value
+        }
+        let data = CustomTrackingData(name: issue.typeName, attributes: allAttributes)
+        onPublishBlock(metadata, data)
+    }
 }

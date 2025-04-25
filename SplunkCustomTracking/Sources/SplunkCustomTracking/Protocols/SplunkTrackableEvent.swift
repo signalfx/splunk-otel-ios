@@ -19,39 +19,35 @@ import Foundation
 import SplunkSharedProtocols
 
 
+// MARK: - SplunkTrackableEvent Struct
+
 public struct SplunkTrackableEvent: SplunkTrackable {
     public var typeName: String
     public var attributes: [String: EventAttributeValue]
 
-    public var timestamp: Date {
-        return Date()
-    }
-
+    // Initializer for event attributes
     public init(typeName: String, attributes: [String: EventAttributeValue] = [:]) {
         self.typeName = typeName
         self.attributes = attributes
     }
 
+    // Initializer for generic attributes
     public init(typeName: String, attributes: [String: Any] = [:]) {
         self.typeName = typeName
         self.attributes = [:]
-        for (key, value) in attributes {
-            if let stringValue = value as? String {
-                set(key, value: .string(stringValue))
-            }
-            if let intValue = value as? Int {
-                set(key, value: .int(intValue))
-            }
-            if let doubleValue = value as? Double {
-                set(key, value: .double(doubleValue))
-            }
-            if let dataValue = value as? Data {
-                set(key, value: .data(dataValue))
-            }
-        }
+        setAttributes(attributes: attributes)
     }
 
-    // Set methods for various types
+    // Converts trackable item to event attributes
+    public func toEventAttributes() -> [String: EventAttributeValue] {
+        return attributes
+    }
+}
+
+
+// MARK: - Attribute Handling Extension
+
+public extension SplunkTrackableEvent {
     mutating func set(_ key: String, value: Int) {
         attributes[key] = .int(value)
     }
@@ -75,8 +71,34 @@ public struct SplunkTrackableEvent: SplunkTrackable {
     func get(_ key: String) -> EventAttributeValue? {
         return attributes[key]
     }
+}
 
-    public func toEventAttributes() -> [String: EventAttributeValue] {
-        return attributes
+
+// MARK: - Attribute Initialization Extension
+
+private extension SplunkTrackableEvent {
+    mutating func setAttributes(attributes: [String: Any]) {
+        for (key, value) in attributes {
+            if let stringValue = value as? String {
+                set(key, value: .string(stringValue))
+            } else if let intValue = value as? Int {
+                set(key, value: .int(intValue))
+            } else if let doubleValue = value as? Double {
+                set(key, value: .double(doubleValue))
+            } else if let dataValue = value as? Data {
+                set(key, value: .data(dataValue))
+            }
+        }
     }
 }
+
+
+// MARK: - Protocol Conformance Extension
+
+public extension SplunkTrackableEvent {
+    var typeFamily: String {
+        "Event"
+    }
+}
+
+

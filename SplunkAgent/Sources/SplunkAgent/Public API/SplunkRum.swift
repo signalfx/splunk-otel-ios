@@ -35,16 +35,6 @@ internal import CiscoSessionReplay
 internal import SplunkCustomTracking
 
 
-
-public struct CustomTrackingWrapper {
-    // Public method to track events
-    public func trackEvent(name: String, attributes: [String: Any]) {
-        // Access the internal CustomTracking.instance indirectly
-        CustomTracking.instance.trackEvent(name, attributes: attributes)
-    }
-}
-
-
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
 
@@ -75,6 +65,8 @@ public class SplunkRum: ObservableObject {
     // MARK: - Internal (Modules Proxy)
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
+
+    lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
 
 
     // MARK: - Platform Support
@@ -116,10 +108,11 @@ public class SplunkRum: ObservableObject {
         sessionReplayProxy
     }
 
-    // Expose customTracking via CustomTrackingWrapper
-    public var customTracking: CustomTrackingWrapper {
-        return CustomTrackingWrapper()
+    // Expose customTracking via proxy
+    public var customTracking: any CustomTrackingModule {
+        customTrackingProxy
     }
+
 
     // MARK: - Initialization
 
@@ -263,6 +256,7 @@ public class SplunkRum: ObservableObject {
         customizeSessionReplay()
         customizeNetwork()
         customizeAppStart()
+        customizeCustomTracking()
     }
 
     /// Perform operations specific to the SessionReplay module.
@@ -316,13 +310,6 @@ public class SplunkRum: ObservableObject {
     // swiftformat:enable indent
     }
 
-    // Expose CustomTracking
-    private func setupCustomTracking() {
-        let customTrackingModule = modulesManager?.module(ofType: SplunkCustomTracking.CustomTracking.self)
-        customTrackingModule?.sharedState = sharedState
-
-    }
-
     /// Configure App start module
     private func customizeAppStart() {
         let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
@@ -336,6 +323,7 @@ public class SplunkRum: ObservableObject {
 
         customTrackingModule?.sharedState = sharedState
     }
+
 
     // MARK: - Configuration handler
 

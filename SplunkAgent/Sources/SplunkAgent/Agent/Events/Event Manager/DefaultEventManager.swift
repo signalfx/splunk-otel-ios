@@ -21,6 +21,7 @@ import Foundation
 internal import SplunkCommon
 internal import SplunkCrashReports
 internal import SplunkOpenTelemetry
+internal import SplunkCustomTracking
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
 ///
@@ -136,6 +137,19 @@ class DefaultEventManager: AgentEventManager {
                 immediateProcessing: true,
                 completion: completion
             )
+
+        // Custom Tracking module data
+        case let (metadata as CustomTrackingMetadata, data as CustomTrackingData):
+            let sessionID = agent.session.sessionId(for: metadata.timestamp)
+
+            let event = CustomTrackingDataEvent(metadata: metadata, data: data, sessionID: sessionID)
+
+            logEventProcessor.sendEvent(
+                event: event,
+                immediateProcessing: true,
+                completion: completion
+            )
+
 
         // Unknown module data
         default:

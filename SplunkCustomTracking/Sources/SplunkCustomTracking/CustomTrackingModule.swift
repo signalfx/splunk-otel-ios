@@ -23,23 +23,20 @@ public final class CustomTracking {
 
     public static var instance = CustomTracking()
 
-
-    // MARK: - Module conformance
-
-    public required init() {}
-
-
     // MARK: - Private Properties
 
+    private var eventTracking = EventTracking()
+    private var errorTracking = ErrorTracking()
     private let internalLogger = InternalLogger(configuration: .default(subsystem: "SplunkCustomTracking", category: "Data"))
 
-
-    // MARK: - Shared state
-
+    // Shared state
     public unowned var sharedState: AgentSharedState?
     private var module: CustomTracking?
     private var onPublishBlock: ((CustomTrackingMetadata, CustomTrackingData) -> Void)?
 
+
+    // Module conformance
+    public required init() {}
 
     // MARK: - Initialization
 
@@ -54,37 +51,40 @@ public final class CustomTracking {
     // MARK: - Public API
 
     /// Track a custom event.
-    public func trackCustomEvent(_ name: String, _ attributes: [String: Any]) {
+    public func trackCustomEvent(_ name: String, _ attributes: [String: EventAttributeValue]) {
         internalLogger.log(level: .info) { "Tracking custom event: \(name) with attributes: \(attributes)" }
-        let event = SplunkTrackableEvent(typeName: name, attributes: attributes)
-        module?.track(event: event)
+        module?.track(name: name, attributes: attributes)
     }
 
     /// Track an error with optional attributes.
-    public func trackError(_ message: String, _ attributes: [String: Any] = [:]) {
+    public func trackError(_ message: String, _ attributes: [String: EventAttributeValue] = [:]) {
         internalLogger.log(level: .error) { "Tracking error: \(message) with attributes: \(attributes)" }
-        let issue = SplunkIssue(from: message)
-        module?.track(issue: issue, attributes: attributes)
+        //let internalIssue = SplunkIssue(from: message)
+        //errorTracking.track(internalIssue)
+        module?.track(name: "Error", attributes: ["message": message, "attributes": attributes])
     }
 
     /// Track an Error object with optional attributes.
-    public func trackError(_ error: Error, _ attributes: [String: Any] = [:]) {
+    public func trackError(_ error: Error, _ attributes: [String: EventAttributeValue] = [:]) {
         internalLogger.log(level: .error) { "Tracking error: \(error) with attributes: \(attributes)" }
-        let issue = SplunkIssue(from: error)
-        module?.track(issue: issue, attributes: attributes)
+        //let internalIssue = SplunkIssue(from: error)
+        //errorTracking.track(internalIssue)
+        module?.track(name: "Error", attributes: ["error": error, "attributes": attributes])
     }
 
     /// Track an NSError object with optional attributes.
-    public func trackError(_ ns_error: NSError, _ attributes: [String: Any] = [:]) {
-        internalLogger.log(level: .error) { "Tracking NSError: \(ns_error) with attributes: \(attributes)" }
-        let issue = SplunkIssue(from: ns_error)
-        module?.track(issue: issue, attributes: attributes)
+    public func trackError(_ error: NSError, _ attributes: [String: EventAttributeValue] = [:]) {
+        internalLogger.log(level: .error) { "Tracking NSError: \(error) with attributes: \(attributes)" }
+        //let internalIssue = SplunkIssue(from: error)
+        //errorTracking.track(internalIssue)
+        module?.track(name: "NSError", attributes: ["error": error, "attributes": attributes])
     }
 
     /// Track an NSException object with optional attributes.
-    public func trackException(_ exception: NSException, _ attributes: [String: Any] = [:]) {
+    public func trackException(_ exception: NSException, _ attributes: [String: EventAttributeValue] = [:]) {
         internalLogger.log(level: .error) { "Tracking NSException: \(exception) with attributes: \(attributes)" }
-        let issue = SplunkIssue(from: exception)
-        module?.track(issue: issue, attributes: attributes)
+        //let internalIssue = SplunkIssue(from: exception)
+        //errorTracking.track(internalIssue)
+        module?.track(name: "NSException", attributes: ["exception": exception, "attributes": attributes])
     }
 }
