@@ -17,8 +17,8 @@ limitations under the License.
 
 import Foundation
 
-/// Event describes a unit of information sent by the Agent to backend.
-public protocol Event {
+/// AgentEvent describes a LogRecord Event, with mandatory and optional parameters.
+public protocol AgentEvent {
 
     // MARK: - Event Identification
 
@@ -26,10 +26,13 @@ public protocol Event {
     var domain: String { get }
 
     /// Event name, specific for each event type.
-    var name: String { get set }
+    var name: String { get }
 
-    /// Instrumentation scope, defines a module from which the event was generated.
-    var instrumentationScope: String { get set }
+    /// Instrumentation scope attribute, defines a module from which the event was generated.
+    var instrumentationScope: String { get }
+
+    /// Component attribute, unique per event.
+    var component: String { get }
 
 
     // MARK: - Event properties

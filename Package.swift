@@ -252,7 +252,8 @@ let package = Package(
             dependencies: [
                 "SplunkLogger",
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
-                .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift")
+                .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
+                .product(name: "CiscoDiskStorage", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkOpenTelemetryBackgroundExporter/Sources"
         ),
