@@ -70,7 +70,7 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Agent singleton
 
-    /// An singleton shared instance of the Agent library.
+    /// A singleton shared instance of the Agent library.
     ///
     /// This shared instance is used to access all SDK functions.
     public private(set) static var shared: SplunkRum?
@@ -128,11 +128,16 @@ public class SplunkRum: ObservableObject {
     ///   - moduleConfigurations: An array of individual module-specific configurations.
     ///
     /// - Returns: A newly initialized `SplunkRum` instance.
-    public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) -> SplunkRum {
+    ///
+    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
+    public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws -> SplunkRum {
 
         // Initialization metrics to be sent in the Initialize span
         let initializeStart = Date()
         var initializeEvents: [String: Date] = [:]
+
+        // Validate the configuration
+        try configuration.validate()
 
         // Only one instance is allowed
         if let sharedInstance = shared {
@@ -255,13 +260,12 @@ public class SplunkRum: ObservableObject {
         networkModule?.sharedState = sharedState
 
         // We need the endpoint url to manage trace exclusion logic
-        var excludedEndpoints: [URL] = [
-            agentConfiguration.tracesUrl,
-            agentConfiguration.logsUrl,
-            agentConfiguration.configUrl
-        ]
+        var excludedEndpoints: [URL] = []
+        if let traceUrl = agentConfiguration.endpoint.traceEndpoint {
+            excludedEndpoints.append(traceUrl)
+        }
 
-        if let sessionReplayUrl = agentConfiguration.sessionReplayUrl {
+        if let sessionReplayUrl = agentConfiguration.endpoint.sessionReplayEndpoint {
             excludedEndpoints.append(sessionReplayUrl)
         }
 

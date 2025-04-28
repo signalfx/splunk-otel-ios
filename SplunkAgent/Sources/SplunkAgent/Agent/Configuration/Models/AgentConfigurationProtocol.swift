@@ -23,7 +23,6 @@ protocol AgentConfigurationProtocol: Codable, Equatable {
 
     // MARK: - Mandatory parameters
 
-    var rumAccessToken: String { get }
     var endpoint: EndpointConfiguration { get }
     var appName: String { get }
     var deploymentEnvironment: String { get }
@@ -42,12 +41,4 @@ protocol AgentConfigurationProtocol: Codable, Equatable {
 
     var sessionTimeout: Double { get set }
     var maxSessionLength: Double { get set }
-
-
-    // MARK: - Endpoints
-
-    var tracesUrl: URL { get }
-    var logsUrl: URL { get }
-    var configUrl: URL { get }
-    var sessionReplayUrl: URL? { get }
 }
