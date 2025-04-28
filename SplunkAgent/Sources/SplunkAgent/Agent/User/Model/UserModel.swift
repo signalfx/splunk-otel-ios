@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+internal import SplunkCommon
 
 /// Stores and manages user data.
 class UserModel {

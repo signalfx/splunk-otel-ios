@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
 /// Defines the basic properties and behavior of the modules manager.
 ///
@@ -76,7 +76,7 @@ protocol AgentModulesManager {
     /// - Parameter metadata: A struct with essential data identification.
     func deleteModuleData(for metadata: any ModuleEventMetadata)
 
-    
+
     // MARK: - Metrics
 
     /// Modules manager needs to provide all modules' initialization timestamps.

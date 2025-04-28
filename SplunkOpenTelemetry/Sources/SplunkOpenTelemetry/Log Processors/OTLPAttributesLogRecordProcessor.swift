@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// The class implements a generic log record processor that adds runtime attributes to all records.
 public class OTLPAttributesLogRecordProcessor: LogRecordProcessor {

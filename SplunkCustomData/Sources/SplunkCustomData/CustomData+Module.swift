@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 // `Data` can be used as an event type that the module produces.
 extension Data: ModuleEventData {}

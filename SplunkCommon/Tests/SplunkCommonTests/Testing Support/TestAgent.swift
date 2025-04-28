@@ -15,23 +15,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
+@testable import SplunkCommon
+import XCTest
 
-/// Implements internal package identification for the Agent.
-struct PackageIdentifier: PackageIdentification {
+public class TestAgent {
+    let module: any Module
 
-    // MARK: - Package identification
+    public init(module: any Module) {
+        self.module = module
+        self.module.onPublish(data: receive)
+    }
 
-    static var `default` = "com.splunk.rum"
+    public func receive(metadata: any ModuleEventMetadata, data: any ModuleEventData) {
+        let metadata = metadata as? TestEventMetadata
+        let data = data as? TestEventData
 
-
-    // MARK: - Package identification methods
-
-    static func `default`(named: String) -> String {
-        guard !named.isEmpty else {
-            return `default`
+        if let metadata {
+            // process the data
+            module.deleteData(for: metadata)
         }
 
-        return "\(`default`).\(named)"
+        XCTAssertNotNil(metadata)
+        XCTAssertNotNil(data)
     }
 }

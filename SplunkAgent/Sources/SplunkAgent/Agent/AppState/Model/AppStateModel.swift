@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
-internal import SplunkLogger
+internal import SplunkCommon
 
 class AppStateModel {
 
@@ -34,7 +35,7 @@ class AppStateModel {
     // MARK: - Internal properties
 
     private let storage: KeyValueStorage
-    private let internalLogger = InternalLogger(configuration: .agent(category: "AppStateModel"))
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Initialization
@@ -42,6 +43,7 @@ class AppStateModel {
     init(storage: KeyValueStorage = UserDefaultsStorage()) {
         self.storage = storage
     }
+
 
     // MARK: - Public functions
 
@@ -67,7 +69,7 @@ class AppStateModel {
         do {
             try storage.update(events, forKey: Self.storageKey)
         } catch {
-            internalLogger.log(level: .error) {
+            logger.log(level: .error) {
                 "Error when updating AppStateEvents in storage with error message \(error.localizedDescription)."
             }
         }
@@ -82,7 +84,7 @@ class AppStateModel {
 
             return foundEvent?.state
         } catch {
-            internalLogger.log(level: .error) {
+            logger.log(level: .error) {
                 "Error when fetching AppStateEvents from storage with error message \(error.localizedDescription)."
             }
 

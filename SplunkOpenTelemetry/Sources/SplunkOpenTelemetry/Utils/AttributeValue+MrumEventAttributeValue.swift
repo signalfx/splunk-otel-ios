@@ -16,8 +16,8 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
 import OpenTelemetryApi
+import SplunkCommon
 
 extension AttributeValue {
     public init(_ eventAttributeValue: EventAttributeValue) {

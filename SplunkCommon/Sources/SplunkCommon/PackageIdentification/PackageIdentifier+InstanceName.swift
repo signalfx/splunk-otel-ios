@@ -14,10 +14,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+	
+public extension PackageIdentifier {
 
-@testable import SplunkAgent
-import XCTest
+    // MARK: - Package identification for instances
 
-final class UserModelTests: XCTestCase {
-    
+    /// Creates an identifier based on `default` extended by
+    /// a suffix with the instance name.
+    ///
+    /// - Parameter named: A `String` with instance extension.
+    ///
+    /// - Returns: A newly assembled `String` with an extended identifier.
+    static func instance(named: String = "default") -> String {
+        guard !named.isEmpty else {
+            return "\(`default`)-default"
+        }
+
+        return "\(`default`)-\(named)"
+    }
 }

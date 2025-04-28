@@ -15,24 +15,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
-import SplunkSharedProtocols
-import SplunkLogger
 import OpenTelemetryApi
-import URLSessionInstrumentation
 import OpenTelemetrySdk
 import ResourceExtension
 import SignPostIntegration
+import SplunkCommon
+import URLSessionInstrumentation
 
 public class NetworkInstrumentation {
 
     // MARK: - Private
 
-    private let internalLogger = InternalLogger(configuration:
-            .networkInstrumentation(category: "NetworkInstrumentation"))
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
 
     /// Holds regex patterns from IgnoreURLs API
     private let ignoreURLs = IgnoreURLs()
+
 
     // MARK: - Public
 
@@ -70,7 +70,7 @@ public class NetworkInstrumentation {
         // Filter using ignoreURLs API
         if let urlToTest = URLRequest.url {
             if ignoreURLs.matches(url: urlToTest) {
-                self.internalLogger.log(level: .debug) {
+                self.logger.log(level: .debug) {
                     "URL excluded via IgnoreURLs API \(URLRequest.description)"
                 }
                 return false
@@ -80,13 +80,13 @@ public class NetworkInstrumentation {
         let requestEndpoint = URLRequest.description
         if let excludedEndpoints {
             for excludedEndpoint in excludedEndpoints where requestEndpoint.contains(excludedEndpoint.absoluteString) {
-                self.internalLogger.log(level: .debug) {
+                self.logger.log(level: .debug) {
                     "Should Not Instrument Backend URL \(URLRequest.description)"
                 }
                 return false
             }
         } else {
-            self.internalLogger.log(level: .debug) {
+            self.logger.log(level: .debug) {
                 "Should Not Instrument, Backend URL not yet configured."
             }
             return false
@@ -94,12 +94,12 @@ public class NetworkInstrumentation {
         // Leave the localhost test in place for the test case where we have two endpoints,
         // both collector and zipkin on local.
         if requestEndpoint.hasPrefix("http://localhost") {
-            self.internalLogger.log(level: .debug) {
+            self.logger.log(level: .debug) {
                 "Should Not Instrument Localhost \(URLRequest.description)"
             }
             return false
         } else {
-            self.internalLogger.log(level: .debug) {
+            self.logger.log(level: .debug) {
                 "Should Instrument \(URLRequest.description)"
             }
             return true
@@ -165,9 +165,7 @@ public class NetworkInstrumentation {
     }
 
     func receivedError(error: Error, dataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, span: Span) {
-
-        print(error)
-        self.internalLogger.log(level: .error) {
+        self.logger.log(level: .error) {
             "Error: \(error.localizedDescription), Status: \(HTTPStatus)"
         }
     }

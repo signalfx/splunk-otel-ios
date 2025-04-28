@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// AppStart module configuration, minimal configuration for module conformance.
 public struct AppStartConfiguration: ModuleConfiguration {}

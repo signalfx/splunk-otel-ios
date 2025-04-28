@@ -71,7 +71,7 @@ final class AppStartTests: XCTestCase {
         // Check type and dates
         try checkDeterminedType(.cold, in: destination)
         try checkDates(in: destination)
-        
+
         // Check events
         let events = try XCTUnwrap(destination.storedAppStart?.events)
         XCTAssertTrue(events.count >= 4)
