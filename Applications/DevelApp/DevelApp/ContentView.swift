@@ -13,14 +13,14 @@ struct ContentView: View {
     // MARK: - Versions
 
     let agentVersion = SplunkRum.version
-    let agentAppVersion = SplunkRum.instance?.state.appVersion ?? "nil"
+    let agentAppVersion = SplunkRum.shared?.state.appVersion ?? "nil"
 
 
     // MARK: - Identifiers
 
-    @State private var sessionId = SplunkRum.instance?.session.state.id ?? "nil"
-    @State private var userTrackingMode = SplunkRum.instance?.user.state.trackingMode ?? .default
-    @State private var agentStatus = SplunkRum.instance?.state.status ?? .notRunning(.notInstalled)
+    @State private var sessionId = SplunkRum.shared?.session.state.id ?? "nil"
+    @State private var userTrackingMode = SplunkRum.shared?.user.state.trackingMode ?? .default
+    @State private var agentStatus = SplunkRum.shared?.state.status ?? .notRunning(.notInstalled)
 
     let sessionPublisher = NotificationCenter.default
         .publisher(

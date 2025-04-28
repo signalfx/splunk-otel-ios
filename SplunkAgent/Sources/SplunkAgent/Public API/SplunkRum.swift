@@ -70,10 +70,10 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Agent singleton
 
-    /// An singleton instance of the Agent library.
+    /// An singleton shared instance of the Agent library.
     ///
-    /// This instance is used to access all the SDK functions.
-    public private(set) static var instance: SplunkRum?
+    /// This shared instance is used to access all SDK functions.
+    public private(set) static var shared: SplunkRum?
 
 
     // MARK: - Public API
@@ -135,7 +135,7 @@ public class SplunkRum: ObservableObject {
         var initializeEvents: [String: Date] = [:]
 
         // Only one instance is allowed
-        if let sharedInstance = instance {
+        if let sharedInstance = shared {
             return sharedInstance
         }
 
@@ -149,7 +149,7 @@ public class SplunkRum: ObservableObject {
             session: DefaultSession(),
             appStateManager: AppStateManager()
         )
-        instance = agent
+        shared = agent
 
         initializeEvents["agent_instance_initialized"] = Date()
 
