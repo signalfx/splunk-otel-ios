@@ -120,7 +120,7 @@ public class SplunkRum: ObservableObject {
         let logPoolName = PackageIdentifier.instance()
         let verboseLogging = agentConfigurationHandler.configuration.enableDebugLogging
 
-        // Configure internall logging
+        // Configure internal logging
         logProcessor = DefaultLogProcessor(
             poolName: logPoolName,
             subsystem: PackageIdentifier.default
