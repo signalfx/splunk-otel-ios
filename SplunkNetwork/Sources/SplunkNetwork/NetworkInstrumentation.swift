@@ -30,6 +30,9 @@ public class NetworkInstrumentation {
 
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
 
+    /// Holds regex patterns from IgnoreURLs API
+    private let ignoreURLs = IgnoreURLs()
+
 
     // MARK: - Public
 
@@ -63,8 +66,18 @@ public class NetworkInstrumentation {
             return ((agentConfiguration?.appDCloudShouldInstrument!(URLRequest)) != nil)
         }
         */
-        let requestEndpoint = URLRequest.description
 
+        // Filter using ignoreURLs API
+        if let urlToTest = URLRequest.url {
+            if ignoreURLs.matches(url: urlToTest) {
+                self.logger.log(level: .debug) {
+                    "URL excluded via IgnoreURLs API \(URLRequest.description)"
+                }
+                return false
+            }
+        }
+
+        let requestEndpoint = URLRequest.description
         if let excludedEndpoints {
             for excludedEndpoint in excludedEndpoints where requestEndpoint.contains(excludedEndpoint.absoluteString) {
                 self.logger.log(level: .debug) {
