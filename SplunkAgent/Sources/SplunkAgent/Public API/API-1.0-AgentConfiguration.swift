@@ -65,11 +65,11 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// Defaults to an empty dictionary.
     public var globalAttributes: [String: String] = ConfigurationDefaults.globalAttributes
 
-    /// Span filter to be used to filter all outgoing spans.
+    /// Span interceptor to be used to filter or modify all outgoing spans.
     ///
-    /// If the callback is provided, all spans are funneled to the callback, and can be either approved by returning the span in the callback,
-    /// or discarded by returning `nil` in the callback.
-    public var spanFilter: ((SpanData) -> SpanData?)?
+    /// If the callback is provided, all spans are funneled through the callback, and can be either approved by returning the span in the callback,
+    /// or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
+    public var spanInterceptor: ((inout SpanData) -> SpanData?)?
 
 
     // MARK: - Private
@@ -201,16 +201,17 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         return updated
     }
 
-    /// Sets the span filter callback. If the callback is provided, all spans will be funneled to the callback,
+    /// Sets the span interceptor callback. If the callback is provided, all spans will be funneled through the callback,
     /// and can be either approved by returning the span in the callback, or discarded by returning `nil`.
+    /// Spans can also be modified by the callback.
     ///
-    /// - Parameter spanFilter: A span filter callback.
+    /// - Parameter spanInterceptor: A span interceptor callback.
     ///
     /// - Returns: The updated configuration structure.
     @discardableResult
-    public func spanFilter(_ spanFilter: ((SpanData) -> SpanData?)?) -> Self {
+    public func spanInterceptor(_ spanInterceptor: ((inout SpanData) -> SpanData?)?) -> Self {
         var updated = self
-        updated.spanFilter = spanFilter
+        updated.spanInterceptor = spanInterceptor
 
         return updated
     }

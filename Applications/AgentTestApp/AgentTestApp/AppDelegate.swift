@@ -17,6 +17,7 @@ limitations under the License.
 
 import UIKit
 import SplunkAgent
+import OpenTelemetryApi
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -33,6 +34,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 deploymentEnvironment: "dev"
             )
                 .enableDebugLogging(true)
+                .spanInterceptor { spanData in
+                    var attributes = spanData.attributes
+                    attributes["test_attribute"] = AttributeValue("test_value")
+                    spanData.settingAttributes(attributes)
+
+                    return spanData
+                }
 
             _ = SplunkRum.install(with: agentConfig)
 

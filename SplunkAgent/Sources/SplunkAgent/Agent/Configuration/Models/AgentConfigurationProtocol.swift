@@ -35,7 +35,7 @@ protocol AgentConfigurationProtocol: Codable, Equatable {
     var enableDebugLogging: Bool { get set }
     var sessionSamplingRate: Double { get set }
     var globalAttributes: [String: String] { get set }
-    var spanFilter: ((SpanData) -> SpanData?)? { get set }
+    var spanInterceptor: ((inout SpanData) -> SpanData?)? { get set }
 
 
     // MARK: - Remote configuration parameters
