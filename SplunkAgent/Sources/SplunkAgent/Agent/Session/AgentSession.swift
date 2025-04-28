@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+internal import SplunkCommon
 
 /// Defines the basic properties and behavior of the session manager.
 protocol AgentSession {

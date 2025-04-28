@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
-internal import SplunkLogger
+internal import SplunkCommon
 
 #if os(iOS) || os(tvOS) || os(visionOS)
     import UIKit
@@ -38,7 +39,7 @@ class DefaultSession: AgentSession {
     private var enterBackground: Date?
     private var leaveBackground: Date?
 
-    private let internalLogger = InternalLogger(configuration: .agent(category: "Session Management"))
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Test support
@@ -176,8 +177,10 @@ class DefaultSession: AgentSession {
                 sessionsModel.sessions[previousSessionIndex] = previousSession
             }
 
-            internalLogger.log(level: .info) {
-                "Previous session (id \(previousSession.id)) has been closed."
+            let previousSessionId = previousSession.id
+
+            logger.log(level: .info) {
+                "Previous session (id \(previousSessionId)) has been closed."
             }
         }
 
@@ -191,7 +194,7 @@ class DefaultSession: AgentSession {
     func refreshSession() {
         // Exceeding the limit for running in the background
         if isInBackgroundTooLong() {
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Current session length exceeded the length limit for running in background."
             }
 
@@ -204,7 +207,7 @@ class DefaultSession: AgentSession {
 
         // Exceeding the limit for the length of one session
         if isSessionTooLong() {
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Current session length exceeded the length limit."
             }
 
@@ -244,7 +247,7 @@ class DefaultSession: AgentSession {
         // Adds new session item into `SessionsModel`
         sessionsModel.sessions.append(newSession)
 
-        internalLogger.log(level: .info) {
+        logger.log(level: .info) {
             "New session with id \(newSession.id) has been created."
         }
 
@@ -263,7 +266,7 @@ class DefaultSession: AgentSession {
             sessionsModel.sessions[currentSessionIndex] = currentSession
         }
 
-        internalLogger.log(level: .info) { [weak self] in
+        logger.log(level: .info) { [weak self] in
             guard let sessionId = self?.currentSession.id else {
                 return "Current session has been closed."
             }

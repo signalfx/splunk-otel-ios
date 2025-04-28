@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
 /// Session Start event. Sent when a session starts.
 class SessionStartEvent: AgentEvent {
@@ -25,7 +25,7 @@ class SessionStartEvent: AgentEvent {
 
     let domain = "mrum"
     let name = "session_start"
-    let instrumentationScope = "com.splunk.rum.agent"
+    let instrumentationScope = PackageIdentifier.default(named: "agent")
     let component = "session.start"
 
 

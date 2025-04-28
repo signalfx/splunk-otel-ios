@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 
 /// Defines a basic set of properties for identifying a package.
-protocol PackageIdentification {
+public protocol PackageIdentification {
 
     // MARK: - Static constants
 
