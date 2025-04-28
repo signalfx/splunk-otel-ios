@@ -15,8 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
+internal import SplunkCommon
 
 /// Structure that holds a configuration for an initial SDK setup.
 ///
@@ -73,6 +75,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     var sessionTimeout: Double = ConfigurationDefaults.sessionTimeout
     var maxSessionLength: Double = ConfigurationDefaults.maxSessionLength
     var recordingEnabled: Bool = ConfigurationDefaults.recordingEnabled
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Initialization
@@ -209,7 +212,7 @@ extension AgentConfiguration {
 
         // Validate app name
         if appName.isEmpty {
-            internalLogger.log(level: .error) {
+            logger.log(level: .error, isPrivate: false) {
                 AgentConfigurationError
                     .invalidAppName(supplied: appName)
                     .description
@@ -218,7 +221,7 @@ extension AgentConfiguration {
 
         // Validate deployment environment
         if deploymentEnvironment.isEmpty {
-            internalLogger.log(level: .error) {
+            logger.log(level: .error) {
                 AgentConfigurationError
                     .invalidDeploymentEnvironment(supplied: deploymentEnvironment)
                     .description

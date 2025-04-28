@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// NoopTraceProcessor is a non-operational implementation of the `TraceProcessor`.
 public class NoopTraceProcessor: TraceProcessor {

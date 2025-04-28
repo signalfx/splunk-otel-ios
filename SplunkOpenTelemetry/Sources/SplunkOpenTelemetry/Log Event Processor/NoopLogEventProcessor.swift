@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// NoopLogEventProcessor is a non-operation implementation of the `LogEventProcessor`.
 public class NoopLogEventProcessor: LogEventProcessor {
