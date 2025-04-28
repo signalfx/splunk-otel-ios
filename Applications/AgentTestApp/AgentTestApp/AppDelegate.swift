@@ -25,25 +25,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
+
+        let endpointConfig = EndpointConfiguration(
+            realm: "realm",
+            rumAccessToken: "token"
+        )
+
+        let agentConfig = AgentConfiguration(
+            endpoint: endpointConfig,
+            appName: "App Name",
+            deploymentEnvironment: "dev"
+        )
+            .enableDebugLogging(true)
+            .spanInterceptor { spanData in
+                var attributes = spanData.attributes
+                attributes["test_attribute"] = AttributeValue("test_value")
+                spanData.settingAttributes(attributes)
+                
+                return spanData
+            }
+
         do {
-            let agentConfig = try AgentConfiguration(
-                rumAccessToken: "token",
-                endpoint: .init(realm: "realm"),
-                appName: "App Name",
-                deploymentEnvironment: "dev"
-            )
-                .enableDebugLogging(true)
-                .spanInterceptor { spanData in
-                    var attributes = spanData.attributes
-                    attributes["test_attribute"] = AttributeValue("test_value")
-                    spanData.settingAttributes(attributes)
-
-                    return spanData
-                }
-
-            _ = SplunkRum.install(with: agentConfig)
-
+            _ = try SplunkRum.install(with: agentConfig)
         } catch {
             print("Unable to start the Splunk agent, error: \(error)")
         }

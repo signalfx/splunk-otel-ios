@@ -23,7 +23,7 @@ public class NoopLogEventProcessor: LogEventProcessor {
 
     public init() {}
 
-    public func sendEvent(_ event: any Event, completion: @escaping (Bool) -> Void) {}
+    public func sendEvent(_ event: any AgentEvent, completion: @escaping (Bool) -> Void) {}
 
-    public func sendEvent(event: any Event, immediateProcessing: Bool , completion: @escaping (Bool) -> Void) {}
+    public func sendEvent(event: any AgentEvent, immediateProcessing: Bool , completion: @escaping (Bool) -> Void) {}
 }

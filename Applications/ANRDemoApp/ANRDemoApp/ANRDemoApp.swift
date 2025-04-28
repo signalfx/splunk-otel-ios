@@ -30,15 +30,14 @@ struct ANRDemoApp: App {
     }
 
     private static func initAgent() -> SplunkRum {
-        let agentConfig = try! AgentConfiguration(
-            rumAccessToken: "token",
-            endpoint: .init(realm: "realm"),
+        let agentConfig = AgentConfiguration(
+            endpoint: .init(realm: "realm", rumAccessToken: "token"),
             appName: "App Name",
             deploymentEnvironment: "dev"
         )
             .enableDebugLogging(true)
 
-        let agent = SplunkRum.install(with: agentConfig)
+        let agent = try! SplunkRum.install(with: agentConfig)
 
         return agent
     }
