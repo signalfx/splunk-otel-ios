@@ -60,30 +60,30 @@ public struct SplunkIssue: SplunkTrackableIssue {
     // Initializers for SplunkIssue
     public init(from message: String) {
         self.message = message
-        self.typeName = "CustomIssue"
-        self.timestamp = Date()
-        self.stacktrace = nil
+        typeName = "CustomIssue"
+        timestamp = Date()
+        stacktrace = nil
     }
 
     public init(from error: Error) {
-        self.message = (error as? LocalizedError)?.errorDescription ?? "Unknown error"
-        self.typeName = String(describing: type(of: error))
-        self.timestamp = Date()
-        self.stacktrace = Stacktrace(frames: Thread.callStackSymbols)
+        message = (error as? LocalizedError)?.errorDescription ?? "Unknown error"
+        typeName = String(describing: type(of: error))
+        timestamp = Date()
+        stacktrace = Stacktrace(frames: Thread.callStackSymbols)
     }
 
-    public init(from error: NSError) {
-        self.message = error.localizedDescription
-        self.typeName = error.domain
-        self.timestamp = Date()
-        self.stacktrace = Stacktrace(frames: Thread.callStackSymbols)
+    public init(from nsError: NSError) {
+        message = nsError.localizedDescription
+        typeName = nsError.domain
+        timestamp = Date()
+        stacktrace = Stacktrace(frames: Thread.callStackSymbols)
     }
 
     public init(from exception: NSException) {
-        self.message = exception.reason ?? "No reason provided"
-        self.typeName = exception.name.rawValue
-        self.timestamp = Date()
-        self.stacktrace = Stacktrace(frames: exception.callStackSymbols)
+        message = exception.reason ?? "No reason provided"
+        typeName = exception.name.rawValue
+        timestamp = Date()
+        stacktrace = Stacktrace(frames: exception.callStackSymbols)
     }
 }
 

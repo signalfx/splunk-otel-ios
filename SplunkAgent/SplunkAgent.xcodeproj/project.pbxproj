@@ -166,14 +166,9 @@
 		52286CB52CD5404A001F8A31 /* ScreenName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52286CB42CD54045001F8A31 /* ScreenName.swift */; };
 		522A70B92DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */; };
 		522A70BB2DAD9F23008A2479 /* OTelDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70BA2DAD9F23008A2479 /* OTelDestination.swift */; };
-		BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */; };
-		BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */; };
-		BAAC20C62DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */; };
-		BAAC20C82DBB0F4800BC8B60 /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */; };
-		BAAC20C22DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */; };
-		BAAC20C42DB9BB5E00BC8B60 /* IgnoreURLsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */; };
-		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
-		52DA8A012DADC55B00B5260C /* SplunkCustomTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DA8A002DADC55B00B5260C /* SplunkCustomTracking.swift */; };
+		525F0D352DBF176E00A91A94 /* SplunkCustomTrackingProxy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5293AA052DBC220500D8E408 /* SplunkCustomTrackingProxy.framework */; };
+		525F0D362DBF6B9000A91A94 /* SplunkCustomTracking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */; };
+		525F0D372DBF6B9000A91A94 /* SplunkCustomTracking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		528C950C2DAE3F55001CB26A /* SplunkCustomTracking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */; };
 		5293AA0E2DBC220500D8E408 /* SplunkCustomTrackingProxy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5293AA052DBC220500D8E408 /* SplunkCustomTrackingProxy.framework */; };
 		5293AA232DBC222200D8E408 /* OpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = 5293AA222DBC222200D8E408 /* OpenTelemetryApi */; };
@@ -187,10 +182,6 @@
 		52D4BAEA2DBC2DA000CD1028 /* SplunkCustomTrackingProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D4BAE52DBC2D4F00CD1028 /* SplunkCustomTrackingProxyTests.swift */; };
 		52DBB82F2DAF408100BB1044 /* SplunkCustomTracking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */; };
 		52DBB8392DAF472F00BB1044 /* CustomTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E4AD92DAE18070000627B /* CustomTracking.swift */; };
-		52DBB83A2DAF473B00BB1044 /* EventTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E4ADB2DAE18070000627B /* EventTracking.swift */; };
-		52DBB83B2DAF473B00BB1044 /* ErrorTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528E4ADA2DAE18070000627B /* ErrorTracking.swift */; };
-		52DBB83C2DAF474C00BB1044 /* CustomTracking+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BE13702DA9F158009A7262 /* CustomTracking+Module.swift */; };
-		52DBB83D2DAF474C00BB1044 /* CustomTrackingConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BE13712DA9F158009A7262 /* CustomTrackingConfiguration.swift */; };
 		52DBB83E2DAF475800BB1044 /* DebugEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B25E8C2DA6F30C006C34A5 /* DebugEmitter.swift */; };
 		52DBB83F2DAF475800BB1044 /* OTelEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5201451C2DAA04D70065F7EC /* OTelEmitter.swift */; };
 		52DBB8412DAF476D00BB1044 /* ErrorAttributeKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B25E932DA6F30C006C34A5 /* ErrorAttributeKeys.swift */; };
@@ -201,6 +192,12 @@
 		52E7D0452DB0081700128742 /* OpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = 52E7D0442DB0081700128742 /* OpenTelemetryApi */; };
 		52E7D0462DB0082000128742 /* SplunkLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B963FE52D60F7E3009A2E7F /* SplunkLogger.framework */; };
 		52E7D0472DB0082E00128742 /* SplunkSharedProtocols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkSharedProtocols.framework */; };
+		BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */; };
+		BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */; };
+		BAAC20C22DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */; };
+		BAAC20C42DB9BB5E00BC8B60 /* IgnoreURLsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */; };
+		BAAC20C62DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */; };
+		BAAC20C82DBB0F4800BC8B60 /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */; };
 		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */; };
 		C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB02BA9D41E000CC11B /* AppStateManager.swift */; };
@@ -525,6 +522,13 @@
 			remoteGlobalIDString = 5293AA042DBC220500D8E408;
 			remoteInfo = SplunkCustomTrackingProxy;
 		};
+		525F0D382DBF6B9000A91A94 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 52B948F42DA7625E00C75635;
+			remoteInfo = SplunkCustomTracking;
+		};
 		528C950E2DAE3F55001CB26A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
@@ -618,6 +622,17 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		525F0D3A2DBF6B9000A91A94 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				525F0D372DBF6B9000A91A94 /* SplunkCustomTracking.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -773,23 +788,12 @@
 		520067062DAED2F600444346 /* SlowFrameDetector+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SlowFrameDetector+Module.swift"; sourceTree = "<group>"; };
 		520067072DAED2F600444346 /* SlowFrameDetectorConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorConfiguration.swift; sourceTree = "<group>"; };
 		5200670A2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMetadataSlowFrameDetector.swift; sourceTree = "<group>"; };
-		52194E442DA7331C00A08C47 /* MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributes.swift; sourceTree = "<group>"; };
-		5201451C2DAA04D70065F7EC /* TelemetryEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryEmitter.swift; sourceTree = "<group>"; };
 		5201451C2DAA04D70065F7EC /* OTelEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelEmitter.swift; sourceTree = "<group>"; };
 		52194E462DA7503B00A08C47 /* SplunkTrackableEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackableEvent.swift; sourceTree = "<group>"; };
 		52286CB42CD54045001F8A31 /* ScreenName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenName.swift; sourceTree = "<group>"; };
 		522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorDestination.swift; sourceTree = "<group>"; };
 		522A70BA2DAD9F23008A2479 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
-		BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributesTests.swift; sourceTree = "<group>"; };
-		BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributes.swift; sourceTree = "<group>"; };
-		BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionaryTests.swift; sourceTree = "<group>"; };
-		BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionary.swift; sourceTree = "<group>"; };
-		BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentationIgnoreURLs.swift; sourceTree = "<group>"; };
-		BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreURLsTests.swift; sourceTree = "<group>"; };
-		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		528E4AD92DAE18070000627B /* CustomTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTracking.swift; sourceTree = "<group>"; };
-		528E4ADA2DAE18070000627B /* ErrorTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorTracking.swift; sourceTree = "<group>"; };
-		528E4ADB2DAE18070000627B /* EventTracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTracking.swift; sourceTree = "<group>"; };
 		5293AA052DBC220500D8E408 /* SplunkCustomTrackingProxy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkCustomTrackingProxy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5293AA0D2DBC220500D8E408 /* SplunkCustomTrackingProxyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkCustomTrackingProxyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		52B25E7E2DA6F30C006C34A5 /* SplunkCustomData.xcscheme */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SplunkCustomData.xcscheme; sourceTree = "<group>"; };
@@ -801,8 +805,6 @@
 		52B25E9F2DA6F30C006C34A5 /* SplunkTrackableIssue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkTrackableIssue.swift; sourceTree = "<group>"; };
 		52B25EA32DA6F30C006C34A5 /* SplunkCustomTrackingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkCustomTrackingTests.swift; sourceTree = "<group>"; };
 		52B948F52DA7625E00C75635 /* SplunkCustomTracking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkCustomTracking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		52BE13702DA9F158009A7262 /* CustomTracking+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomTracking+Module.swift"; sourceTree = "<group>"; };
-		52BE13712DA9F158009A7262 /* CustomTrackingConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingConfiguration.swift; sourceTree = "<group>"; };
 		52CFCD3C2DB6F4C400D30E2B /* API-1.0-CustomTrackingModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-CustomTrackingModule.swift"; sourceTree = "<group>"; };
 		52CFCD442DB9731300D30E2B /* CustomTrackingDataEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingDataEvent.swift; sourceTree = "<group>"; };
 		52CFCD4A2DBC051C00D30E2B /* CustomTrackingNonOperational.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingNonOperational.swift; sourceTree = "<group>"; };
@@ -810,6 +812,12 @@
 		52D4BAE22DBC2D4F00CD1028 /* CustomTracking+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CustomTracking+Module.swift"; sourceTree = "<group>"; };
 		52D4BAE52DBC2D4F00CD1028 /* SplunkCustomTrackingProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkCustomTrackingProxyTests.swift; sourceTree = "<group>"; };
 		52DBB82B2DAF408000BB1044 /* SplunkCustomTrackingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkCustomTrackingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributesTests.swift; sourceTree = "<group>"; };
+		BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributes.swift; sourceTree = "<group>"; };
+		BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentationIgnoreURLs.swift; sourceTree = "<group>"; };
+		BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreURLsTests.swift; sourceTree = "<group>"; };
+		BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionaryTests.swift; sourceTree = "<group>"; };
+		BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionary.swift; sourceTree = "<group>"; };
 		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
@@ -1144,6 +1152,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5293AA292DBC223800D8E408 /* SplunkLogger.framework in Frameworks */,
+				525F0D362DBF6B9000A91A94 /* SplunkCustomTracking.framework in Frameworks */,
 				5293AA242DBC222B00D8E408 /* SplunkSharedProtocols.framework in Frameworks */,
 				5293AA232DBC222200D8E408 /* OpenTelemetryApi in Frameworks */,
 			);
@@ -1153,7 +1162,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5293AA0E2DBC220500D8E408 /* SplunkCustomTrackingProxy.framework in Frameworks */,
+				525F0D352DBF176E00A91A94 /* SplunkCustomTrackingProxy.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2128,15 +2137,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		BA7A63BA2DB818AD00A44570 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */,
-				BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
 		52B25E7F2DA6F30C006C34A5 /* xcschemes */ = {
 			isa = PBXGroup;
 			children = (
@@ -2234,9 +2234,6 @@
 			isa = PBXGroup;
 			children = (
 				528E4AD92DAE18070000627B /* CustomTracking.swift */,
-				528E4ADB2DAE18070000627B /* EventTracking.swift */,
-				528E4ADA2DAE18070000627B /* ErrorTracking.swift */,
-				52BE136F2DA9F067009A7262 /* Module */,
 				52B25E8E2DA6F30C006C34A5 /* DataEmitter */,
 				52B25E9C2DA6F30C006C34A5 /* DataTypes */,
 				52B25EA02DA6F30C006C34A5 /* Protocols */,
@@ -2278,15 +2275,6 @@
 			name = SplunkCustomTracking;
 			path = ../SplunkCustomTracking;
 			sourceTree = SOURCE_ROOT;
-		};
-		52BE136F2DA9F067009A7262 /* Module */ = {
-			isa = PBXGroup;
-			children = (
-				52BE13702DA9F158009A7262 /* CustomTracking+Module.swift */,
-				52BE13712DA9F158009A7262 /* CustomTrackingConfiguration.swift */,
-			);
-			path = Module;
-			sourceTree = "<group>";
 		};
 		52CFCD3D2DB6F4C400D30E2B /* Public API */ = {
 			isa = PBXGroup;
@@ -2370,6 +2358,15 @@
 			);
 			name = SplunkCustomTrackingProxy;
 			path = ../SplunkCustomTrackingProxy;
+			sourceTree = "<group>";
+		};
+		BA7A63BA2DB818AD00A44570 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */,
+				BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		C703FAAD2BA9D3A2000CC11B /* AppState */ = {
@@ -3571,12 +3568,14 @@
 				5293AA012DBC220500D8E408 /* Sources */,
 				5293AA022DBC220500D8E408 /* Frameworks */,
 				5293AA032DBC220500D8E408 /* Resources */,
+				525F0D3A2DBF6B9000A91A94 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				5293AA272DBC222B00D8E408 /* PBXTargetDependency */,
 				5293AA2C2DBC223800D8E408 /* PBXTargetDependency */,
+				525F0D392DBF6B9000A91A94 /* PBXTargetDependency */,
 			);
 			name = SplunkCustomTrackingProxy;
 			packageProductDependencies = (
@@ -4376,16 +4375,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				52DBB83A2DAF473B00BB1044 /* EventTracking.swift in Sources */,
-				52DBB83B2DAF473B00BB1044 /* ErrorTracking.swift in Sources */,
 				52DBB8412DAF476D00BB1044 /* ErrorAttributeKeys.swift in Sources */,
 				52DBB8422DAF476D00BB1044 /* Stacktrace.swift in Sources */,
 				52DBB8392DAF472F00BB1044 /* CustomTracking.swift in Sources */,
 				52DBB8432DAF477900BB1044 /* SplunkTrackableEvent.swift in Sources */,
 				52DBB8442DAF477900BB1044 /* SplunkTrackable.swift in Sources */,
 				52DBB8452DAF477900BB1044 /* SplunkTrackableIssue.swift in Sources */,
-				52DBB83C2DAF474C00BB1044 /* CustomTracking+Module.swift in Sources */,
-				52DBB83D2DAF474C00BB1044 /* CustomTrackingConfiguration.swift in Sources */,
 				52DBB83E2DAF475800BB1044 /* DebugEmitter.swift in Sources */,
 				52DBB83F2DAF475800BB1044 /* OTelEmitter.swift in Sources */,
 			);
@@ -4612,6 +4607,11 @@
 			isa = PBXTargetDependency;
 			target = 5293AA042DBC220500D8E408 /* SplunkCustomTrackingProxy */;
 			targetProxy = 522CBF3E2DBC23F100A0D3FC /* PBXContainerItemProxy */;
+		};
+		525F0D392DBF6B9000A91A94 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 52B948F42DA7625E00C75635 /* SplunkCustomTracking */;
+			targetProxy = 525F0D382DBF6B9000A91A94 /* PBXContainerItemProxy */;
 		};
 		528C950F2DAE3F55001CB26A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -10304,6 +10304,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B0F23872D79F2C000EA575A /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = OpenTelemetryApi;
+		};
+		C791ADFA2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B0F23872D79F2C000EA575A /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			productName = OpenTelemetryProtocolExporter;
+		};
+		C791AE012DAE8B99002AAA2B /* CiscoDiskStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
+			productName = CiscoDiskStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

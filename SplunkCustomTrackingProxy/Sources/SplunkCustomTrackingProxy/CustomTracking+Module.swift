@@ -20,23 +20,24 @@ import SplunkCustomTracking
 import SplunkSharedProtocols
 
 
-// `Data` can be used as an event type that the module produces.
-extension CustomTrackingData: ModuleEventData {}
+// `CustomTrackingData` can be used as an event type that the module produces.
+public struct CustomTrackingData: ModuleEventData {
+    public let name: String
+    public let attributes: [String: EventAttributeValue]
+}
 
-// Struct `RecordMetadata` describes event metadata.
-// This type must be unique in the module/agent space.
-extension CustomTrackingMetadata: ModuleEventMetadata {
-    public var timestamp: Date {
-        Date(timeIntervalSince1970: Double(startUnixMs) / 1000.0)
-    }
+// Struct `CustomTrackingMetadata` describes event metadata.
+public struct CustomTrackingMetadata: ModuleEventMetadata {
+    public var timestamp = Date()
 }
 
 
-// Minimal implementation that ensures protocol conformance.
+// Minimal protocol conformance.
 public struct CustomTrackingConfiguration: ModuleConfiguration {}
 
-// Minimal implementation that ensures protocol conformance.
+// Minimal protocol conformance.
 public struct CustomTrackingRemoteConfiguration: RemoteModuleConfiguration {
+
 
     // MARK: - Internal decoding
 
@@ -59,7 +60,7 @@ public struct CustomTrackingRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Protocol compliance
 
-    public var enabled: Bool
+    public var enabled: Bool = true
 
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
@@ -75,28 +76,25 @@ public struct CustomTrackingRemoteConfiguration: RemoteModuleConfiguration {
 // and implements methods that are missing in the original `CustomTracking`.
 extension CustomTracking: Module {
 
-    // MARK: - Module types
-
     public typealias Configuration = CustomTrackingConfiguration
     public typealias RemoteConfiguration = CustomTrackingRemoteConfiguration
 
     public typealias EventMetadata = CustomTrackingMetadata
     public typealias EventData = CustomTrackingData
 
-
-    // MARK: - Module methods
-
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
-        // Initialize CustomTracking module
+    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any SplunkSharedProtocols.RemoteModuleConfiguration)?) {
         _ = CustomTracking.instance
     }
 
-
-    // MARK: - Type transparency helpers
-
-    public func deleteData(for metadata: any ModuleEventMetadata) {
-        if let recordMetadata = metadata as? EventMetadata {
-            deleteData(for: recordMetadata)
+    public func onPublish(data: @escaping (CustomTrackingMetadata, CustomTrackingData) -> Void) {
+        CustomTracking.instance.onPublishBlock = { (metadata: any ModuleEventMetadata, customData: any ModuleEventData) in
+            guard let metadata = metadata as? CustomTrackingMetadata,
+                  let customData = customData as? CustomTrackingData else {
+                return
+            }
+            data(metadata, customData)
         }
     }
+
+    public func deleteData(for metadata: any SplunkSharedProtocols.ModuleEventMetadata) {}
 }

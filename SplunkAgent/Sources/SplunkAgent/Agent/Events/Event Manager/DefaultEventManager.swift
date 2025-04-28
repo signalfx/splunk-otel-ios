@@ -22,6 +22,8 @@ internal import SplunkCommon
 internal import SplunkCrashReports
 internal import SplunkOpenTelemetry
 internal import SplunkCustomTracking
+internal import SplunkCustomTrackingProxy
+
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
 ///

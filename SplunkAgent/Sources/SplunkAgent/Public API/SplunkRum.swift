@@ -322,6 +322,10 @@ public class SplunkRum: ObservableObject {
         let customTrackingModule = modulesManager?.module(ofType: SplunkCustomTracking.CustomTracking.self)
 
         customTrackingModule?.sharedState = sharedState
+
+        if let customTrackingModule {
+            customTrackingProxy = CustomTracking(for: customTrackingModule)
+        }
     }
 
 

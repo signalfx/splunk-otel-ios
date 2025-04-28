@@ -14,45 +14,51 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
-import Foundation
 
-internal import SplunkLogger
+import Foundation
 internal import SplunkCustomTracking
+internal import SplunkLogger
+internal import SplunkSharedProtocols
 
 
 final class CustomTracking: CustomTrackingModule {
 
     unowned let module: SplunkCustomTracking.CustomTracking
 
-    private let internalLogger: InternalLogger
-
-
     init(for module: SplunkCustomTracking.CustomTracking) {
         self.module = module
-        internalLogger = InternalLogger(configuration: .agent(category: "CustomTracking Module"))
     }
 
 
     // MARK: - Public API
 
-    func trackCustomEvent(_ name: String, _ attributes: [String : Any]) {
-        <#code#>
+    /// Track a custom event.
+    public func trackCustomEvent(_ name: String, _ attributes: [String: Any]) {
+        let event = SplunkTrackableEvent(typeName: name, attributes: attributes)
+        module.track(event: event)
     }
-    
-    func trackError(_ message: String, _ attributes: [String : Any]) {
-        <#code#>
+
+    /// Track an error (String message) with optional attributes.
+    public func trackError(_ message: String, _ attributes: [String: Any]? = nil) {
+        let issue = SplunkIssue(from: message)
+        module.track(issue: issue, attributes: attributes ?? [:])
     }
-    
-    func trackError(_ error: any Error, _ attributes: [String : Any]) {
-        <#code#>
+
+    /// Track an Error (Swift conforming type) with optional attributes.
+    public func trackError(_ error: Error, _ attributes: [String: Any]? = nil) {
+        let issue = SplunkIssue(from: error)
+        module.track(issue: issue, attributes: attributes ?? [:])
     }
-    
-    func trackError(_ ns_error: NSError, _ attributes: [String : Any]) {
-        <#code#>
+
+    /// Track an NSError object with optional attributes.
+    public func trackError(_ nsError: NSError, _ attributes: [String: Any]? = nil) {
+        let issue = SplunkIssue(from: nsError)
+        module.track(issue: issue, attributes: attributes ?? [:])
     }
-    
-    func trackException(_ exception: NSException, _ attributes: [String : Any]) {
-        <#code#>
+
+    /// Track an NSException object with optional attributes.
+    public func trackException(_ exception: NSException, _ attributes: [String: Any]? = nil) {
+        let issue = SplunkIssue(from: exception)
+        module.track(issue: issue, attributes: attributes ?? [:])
     }
 }

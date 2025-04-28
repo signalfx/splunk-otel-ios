@@ -19,72 +19,83 @@ import Foundation
 import SplunkLogger
 import SplunkSharedProtocols
 
+
+// MARK: - CustomTracking internal module
+
 public final class CustomTracking {
 
     public static var instance = CustomTracking()
-
-
-    // MARK: - Module conformance
-
-    public required init() {}
-
 
     // MARK: - Private Properties
 
     private let internalLogger = InternalLogger(configuration: .default(subsystem: "SplunkCustomTracking", category: "Data"))
 
-
-    // MARK: - Shared state
-
+    // Shared state
     public unowned var sharedState: AgentSharedState?
-    private var module: CustomTracking?
-    private var onPublishBlock: ((CustomTrackingMetadata, CustomTrackingData) -> Void)?
+    public var onPublishBlock: ((any ModuleEventMetadata, any ModuleEventData) -> Void)?
 
 
-    // MARK: - Initialization
+    // Module conformance
+    public required init() {}
 
-    public init(sharedState: AgentSharedState? = nil) {
-        self.sharedState = sharedState
+    // MARK: - Internal Tracking Methods
+
+    public func track(event: SplunkTrackableEvent) {
+        OTelEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "customEvent")
+        /*
+        guard let onPublishBlock = onPublishBlock else {
+            print("onPublish block not set!")
+            return
+        }
+        let metadata = InternalCustomTrackingMetadata()
+        let data = InternalCustomTrackingData(name: event.typeName, attributes: event.toEventAttributes())
+        onPublishBlock(metadata, data)
+         */
     }
 
-    internal func setModule(_ module: CustomTracking) {
-        self.module = module
+    public func track(issue: SplunkTrackableIssue, attributes: [String: Any]) {
+        OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "customError")
+        /*
+        guard let onPublishBlock = onPublishBlock else {
+            print("onPublish block not set!")
+            return
+        }
+        let metadata = InternalCustomTrackingMetadata()
+        // Convert public-facing attributes to internal EventAttributeValue
+        let convertedAttributes = attributes.mapValues { EventAttributeValue.convert(from: $0) }
+        var allAttributes = convertedAttributes
+        for (key, value) in issue.toEventAttributes() {
+            allAttributes[key] = value
+        }
+        let data = InternalCustomTrackingData(name: issue.typeName, attributes: allAttributes)
+        onPublishBlock(metadata, data)
+        */
     }
 
-    // MARK: - Public API
-
-    /// Track a custom event.
-    public func trackCustomEvent(_ name: String, _ attributes: [String: Any]) {
-        internalLogger.log(level: .info) { "Tracking custom event: \(name) with attributes: \(attributes)" }
-        let event = SplunkTrackableEvent(typeName: name, attributes: attributes)
-        module?.track(event: event)
+    private struct InternalCustomTrackingMetadata: ModuleEventMetadata {
+        public var timestamp = Date()
     }
 
-    /// Track an error with optional attributes.
-    public func trackError(_ message: String, _ attributes: [String: Any] = [:]) {
-        internalLogger.log(level: .error) { "Tracking error: \(message) with attributes: \(attributes)" }
-        let issue = SplunkIssue(from: message)
-        module?.track(issue: issue, attributes: attributes)
+    private struct InternalCustomTrackingData: ModuleEventData {
+        public let name: String
+        public let attributes: [String: EventAttributeValue]
     }
+}
 
-    /// Track an Error object with optional attributes.
-    public func trackError(_ error: Error, _ attributes: [String: Any] = [:]) {
-        internalLogger.log(level: .error) { "Tracking error: \(error) with attributes: \(attributes)" }
-        let issue = SplunkIssue(from: error)
-        module?.track(issue: issue, attributes: attributes)
-    }
 
-    /// Track an NSError object with optional attributes.
-    public func trackError(_ ns_error: NSError, _ attributes: [String: Any] = [:]) {
-        internalLogger.log(level: .error) { "Tracking NSError: \(ns_error) with attributes: \(attributes)" }
-        let issue = SplunkIssue(from: ns_error)
-        module?.track(issue: issue, attributes: attributes)
-    }
-
-    /// Track an NSException object with optional attributes.
-    public func trackException(_ exception: NSException, _ attributes: [String: Any] = [:]) {
-        internalLogger.log(level: .error) { "Tracking NSException: \(exception) with attributes: \(attributes)" }
-        let issue = SplunkIssue(from: exception)
-        module?.track(issue: issue, attributes: attributes)
+private extension EventAttributeValue {
+    static func convert(from value: Any) -> EventAttributeValue {
+        switch value {
+        case let stringValue as String:
+            return .string(stringValue)
+        case let intValue as Int:
+            return .int(intValue)
+        case let doubleValue as Double:
+            return .double(doubleValue)
+        case let dataValue as Data:
+            return .data(dataValue)
+        default:
+            return .string(String(describing: value))
+        }
     }
 }

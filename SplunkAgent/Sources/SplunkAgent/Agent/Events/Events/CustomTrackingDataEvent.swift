@@ -14,33 +14,46 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
-import Foundation
-internal import SplunkCustomTracking
-internal import SplunkSharedProtocols
 
-/// Custom Tracking data event.
-class CustomTrackingDataEvent: AgentEvent {
+import Foundation
+internal import SplunkSharedProtocols
+internal import SplunkLogger
+internal import SplunkCustomTrackingProxy
+
+// MARK: - Custom Tracking data event
+
+struct CustomTrackingDataEvent: AgentEvent {
+
+
+    // MARK: - Properties
+
+    let domain: String
+    let name: String
+    let instrumentationScope: String
+    let component: String
+    var sessionID: String?
+    var timestamp: Date?
+    var attributes: [String: SplunkSharedProtocols.EventAttributeValue]?
+    var body: SplunkSharedProtocols.EventAttributeValue?
+
+    private let internalLogger = InternalLogger(configuration: .agent(category: "CustomTrackingDataEvent"))
+
 
     // MARK: - Initialization
 
-    /// Initializes a Custom Tracking data event.
-    ///
-    /// - Parameters:
-    ///   - metadata: `WIP... currently only holds timestamp`
-    public init(metadata: CustomTrackingMetadata, data: CustomTrackingData, sessionID: String?) {
-        super.init()
-
-        // Event identification
-        name = data.eventFamily
-
+    init(metadata: CustomTrackingMetadata, data: CustomTrackingData, sessionID: String?) {
+        domain = "data"
+        name = data.name
         instrumentationScope = "com.splunk.rum.customtracking"
-
-        if let sessionID {
-            self.sessionID = sessionID
-        }
-
+        component = "custom_tracking"
+        self.sessionID = sessionID
         timestamp = metadata.timestamp
-        attributes = [:] // probably will set this one from `data`
+        attributes = data.attributes
+        body = nil
+        if sessionID == nil {
+            internalLogger.log(level: .warn) {
+                "sessionID is nil for CustomTrackingDataEvent"
+            }
+        }
     }
 }

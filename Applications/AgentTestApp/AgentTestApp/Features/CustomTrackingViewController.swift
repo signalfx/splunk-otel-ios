@@ -41,18 +41,15 @@ class CustomTrackingViewController: UIViewController {
         let formatted = prettyFormat(eventDict)
         print(eventDict)
         resultsView.text = formatted
-
-
-        // TODO: remove this example for WIP reference: SplunkRum.instance?.sessionReplay.recordingMask = RecordingMask(elements: [MaskElement]())
-
-        SplunkRum.instance?.customTracking.trackEvent(name: "someEvent", attributes: eventDict)
-
+        SplunkRum.instance?.customTracking.trackCustomEvent("test", eventDict)
     }
 
     // MARK: - Track Error
 
     @IBAction func trackErrorClicked(_ sender: UIButton) {
         print("Track Error Clicked")
+        let errorString = "My error string"
+        SplunkRum.instance?.customTracking.trackError(errorString)
     }
 
     func prettyFormat(_ attributes: [String: Any]) -> String {

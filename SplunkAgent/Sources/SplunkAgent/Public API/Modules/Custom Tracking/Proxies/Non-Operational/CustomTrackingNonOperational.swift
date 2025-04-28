@@ -35,19 +35,19 @@ final class CustomTrackingNonOperational: CustomTrackingModule {
 
     // MARK: - Track Errors
 
-    func trackError(_ message: String, _ attributes: [String: Any]) {
+    func trackError(_ message: String, _ attributes: [String: Any]? = nil) {
         logAccess(toApi: "trackError:message:attributes")
     }
 
-    func trackError(_ error: Error, _ attributes: [String: Any]) {
+    func trackError(_ error: Error, _ attributes: [String: Any]? = nil) {
         logAccess(toApi: "trackError:error:attributes")
     }
 
-    func trackError(_ ns_error: NSError, _ attributes: [String: Any]) {
-        logAccess(toApi: "trackError:ns_error:attributes")
+    func trackError(_ nsError: NSError, _ attributes: [String: Any]? = nil) {
+        logAccess(toApi: "trackError:nsError:attributes")
     }
 
-    func trackException(_ exception: NSException, _ attributes: [String: Any]) {
+    func trackException(_ exception: NSException, _ attributes: [String: Any]? = nil) {
         logAccess(toApi: "trackError:exception:attributes")
     }
 

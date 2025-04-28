@@ -75,10 +75,10 @@ class DefaultModulesPool: AgentModulesPool {
         #endif
 
         // Custom Tracking
-        #if canImport(SplunkCustomTracking)
-            knownModules.append(CustomTracking.self)
-        #endif
-
+        // Cannot convert value of type 'CustomTracking.Type' to expected argument type 'any Module.Type'
+        //#if canImport(SplunkCustomTracking)
+        //    knownModules.append(SplunkCustomTracking.CustomTracking.self)
+        //#endif
 
         return knownModules
     }
