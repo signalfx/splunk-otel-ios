@@ -21,18 +21,6 @@ import Foundation
 /// an exporter.
 public protocol LogEventProcessor {
 
-    // MARK: - Initialization
-
-    /// Initialize Log Event Processor by providing Logs API endpoint, resources, and a setting to enable debug logging.
-    ///
-    /// - Parameters:
-    ///   - logsEndpoint: Logs api endpoint.
-    ///   - resources: Resources which enrich all Logs.
-    ///   - runtimeAttributes: An object that holds and manages runtime attributes.
-    ///   - debugEnabled: Enables logging span contents into a console.
-    init(with logsEndpoint: URL, resources: AgentResources, runtimeAttributes: RuntimeAttributes, debugEnabled: Bool)
-
-
     // MARK: - Events
 
     /// Sends Log Event to an exporter.

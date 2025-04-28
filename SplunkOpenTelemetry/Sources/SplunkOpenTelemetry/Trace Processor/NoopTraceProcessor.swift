@@ -16,7 +16,10 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkSharedProtocols
 
-/// TraceProcessor processes Spans - enriches them with provided Resources, and sends those events to
-/// an exporter.
-public protocol TraceProcessor {}
+/// NoopTraceProcessor is a non-operational implementation of the `TraceProcessor`.
+public class NoopTraceProcessor: TraceProcessor {
+
+    public init() {}
+}

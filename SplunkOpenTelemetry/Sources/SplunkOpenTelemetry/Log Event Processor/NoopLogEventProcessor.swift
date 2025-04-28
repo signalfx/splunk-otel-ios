@@ -16,7 +16,14 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkSharedProtocols
 
-/// TraceProcessor processes Spans - enriches them with provided Resources, and sends those events to
-/// an exporter.
-public protocol TraceProcessor {}
+/// NoopLogEventProcessor is a non-operation implementation of the `LogEventProcessor`.
+public class NoopLogEventProcessor: LogEventProcessor {
+
+    public init() {}
+
+    public func sendEvent(_ event: any Event, completion: @escaping (Bool) -> Void) {}
+
+    public func sendEvent(event: any Event, immediateProcessing: Bool , completion: @escaping (Bool) -> Void) {}
+}

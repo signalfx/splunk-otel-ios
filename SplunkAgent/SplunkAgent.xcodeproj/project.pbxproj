@@ -31,6 +31,8 @@
 		2AAC95E62D6C7880004FAE2C /* HexIDValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAC95E52D6C787C004FAE2C /* HexIDValidator.swift */; };
 		2AAC95E82D6C78DF004FAE2C /* HexIDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAC95E72D6C78DB004FAE2C /* HexIDTests.swift */; };
 		2AAD518E2BA97FD500710505 /* DefaultEventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAD518D2BA97FD500710505 /* DefaultEventManager.swift */; };
+		2AAEE8A42DBF71BA00791D5E /* NoopTraceProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAEE8A32DBF71AD00791D5E /* NoopTraceProcessor.swift */; };
+		2AAEE8A62DBF71DE00791D5E /* NoopLogEventProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAEE8A52DBF71D700791D5E /* NoopLogEventProcessor.swift */; };
 		2AB51E972B7A670600307B77 /* SystemInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB51E942B7A670600307B77 /* SystemInfo.swift */; };
 		2AB51E982B7A670600307B77 /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB51E952B7A670600307B77 /* AppInfo.swift */; };
 		2AB51E992B7A670600307B77 /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AB51E962B7A670600307B77 /* DeviceInfo.swift */; };
@@ -190,10 +192,10 @@
 		522A70BB2DAD9F23008A2479 /* OTelDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70BA2DAD9F23008A2479 /* OTelDestination.swift */; };
 		BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */; };
 		BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */; };
-		BAAC20C62DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */; };
-		BAAC20C82DBB0F4800BC8B60 /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */; };
 		BAAC20C22DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */; };
 		BAAC20C42DB9BB5E00BC8B60 /* IgnoreURLsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */; };
+		BAAC20C62DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */; };
+		BAAC20C82DBB0F4800BC8B60 /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */; };
 		BABAA26A2DADE0FF00F925E5 /* CrashReportDeviceStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */; };
 		C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */; };
 		C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C703FAB02BA9D41E000CC11B /* AppStateManager.swift */; };
@@ -599,6 +601,8 @@
 		2AAC95E52D6C787C004FAE2C /* HexIDValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexIDValidator.swift; sourceTree = "<group>"; };
 		2AAC95E72D6C78DB004FAE2C /* HexIDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexIDTests.swift; sourceTree = "<group>"; };
 		2AAD518D2BA97FD500710505 /* DefaultEventManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultEventManager.swift; sourceTree = "<group>"; };
+		2AAEE8A32DBF71AD00791D5E /* NoopTraceProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoopTraceProcessor.swift; sourceTree = "<group>"; };
+		2AAEE8A52DBF71D700791D5E /* NoopLogEventProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoopLogEventProcessor.swift; sourceTree = "<group>"; };
 		2AB51E942B7A670600307B77 /* SystemInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemInfo.swift; sourceTree = "<group>"; };
 		2AB51E952B7A670600307B77 /* AppInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
 		2AB51E962B7A670600307B77 /* DeviceInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
@@ -766,10 +770,10 @@
 		522A70BA2DAD9F23008A2479 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
 		BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributesTests.swift; sourceTree = "<group>"; };
 		BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributes.swift; sourceTree = "<group>"; };
-		BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionaryTests.swift; sourceTree = "<group>"; };
-		BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionary.swift; sourceTree = "<group>"; };
 		BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentationIgnoreURLs.swift; sourceTree = "<group>"; };
 		BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreURLsTests.swift; sourceTree = "<group>"; };
+		BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionaryTests.swift; sourceTree = "<group>"; };
+		BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionary.swift; sourceTree = "<group>"; };
 		BABAA2692DADE0FF00F925E5 /* CrashReportDeviceStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportDeviceStats.swift; sourceTree = "<group>"; };
 		C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentAppStateManager.swift; sourceTree = "<group>"; };
 		C703FAB02BA9D41E000CC11B /* AppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateManager.swift; sourceTree = "<group>"; };
@@ -2051,6 +2055,7 @@
 		4B5A5CA22D60ED3D009DA0D5 /* Log Event Processor */ = {
 			isa = PBXGroup;
 			children = (
+				2AAEE8A52DBF71D700791D5E /* NoopLogEventProcessor.swift */,
 				4B5A5CA02D60ED3D009DA0D5 /* OTLPLogEventProcessor.swift */,
 				4B5A5CA12D60ED3D009DA0D5 /* OTLPLogEventProcessor+AgentEvent.swift */,
 			);
@@ -2068,6 +2073,7 @@
 		4B5A5CA62D60ED3D009DA0D5 /* Trace Processor */ = {
 			isa = PBXGroup;
 			children = (
+				2AAEE8A32DBF71AD00791D5E /* NoopTraceProcessor.swift */,
 				4B5A5CA52D60ED3D009DA0D5 /* OTLPTraceProcessor.swift */,
 			);
 			path = "Trace Processor";
@@ -4181,6 +4187,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B9642142D61375E009A2E7F /* AttributeValue+MrumEventAttributeValue.swift in Sources */,
+				2AAEE8A62DBF71DE00791D5E /* NoopLogEventProcessor.swift in Sources */,
 				4B9642152D61375E009A2E7F /* Resource+AgentResources.swift in Sources */,
 				4B9642162D61375E009A2E7F /* ApiPaths.swift in Sources */,
 				4B9642172D61375E009A2E7F /* OTLPLogEventProcessor.swift in Sources */,
@@ -4192,6 +4199,7 @@
 				4B96421A2D61375E009A2E7F /* OTel.swift in Sources */,
 				2A5949DB2DA3FC2100F2E857 /* SplunkStdoutSpanExporter.swift in Sources */,
 				2A5949DC2DA3FC2100F2E857 /* SplunkStdoutLogExporter.swift in Sources */,
+				2AAEE8A42DBF71BA00791D5E /* NoopTraceProcessor.swift in Sources */,
 				2A2926352DAD114900AB6F03 /* AttributeCheckerSpanExporter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
