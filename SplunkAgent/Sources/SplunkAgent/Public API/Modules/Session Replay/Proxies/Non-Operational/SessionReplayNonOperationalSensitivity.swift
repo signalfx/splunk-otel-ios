@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 
-internal import SplunkLogger
+internal import CiscoLogger
 import UIKit
 
 /// The class implementing public API for the view element's sensitivity in non-operational mode.
@@ -27,13 +27,13 @@ final class SessionReplayNonOperationalSensitivity: SessionReplayModuleSensitivi
 
     // MARK: - Internal
 
-    private(set) unowned var internalLogger: InternalLogger
+    private(set) unowned var logger: LogAgent
 
 
     // MARK: - Initialization
 
-    init(logger: InternalLogger) {
-        internalLogger = logger
+    init(logger: LogAgent) {
+        self.logger = logger
     }
 
 
@@ -86,7 +86,7 @@ final class SessionReplayNonOperationalSensitivity: SessionReplayModuleSensitivi
     // MARK: - Logging
 
     func logAccess(toApi named: String) {
-        internalLogger.log(level: .notice) {
+        logger.log(level: .notice, isPrivate: false) {
             """
             Attempt to access the Sensitivity API of a remotely disabled Session Replay module. \n
             API: `\(named)`

@@ -15,10 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
-@testable import SplunkOpenTelemetry
 @testable import CiscoSessionReplay
-@testable import SplunkSharedProtocols
+@testable import SplunkAgent
+@testable import SplunkCommon
+@testable import SplunkOpenTelemetry
 
 import XCTest
 
@@ -111,7 +111,10 @@ final class EventsTests: XCTestCase {
         //    replaySessionId: replaySessionID
         // )
 
-        let datachunkMetadata = Metadata(startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000.0), endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0))
+        let datachunkMetadata = Metadata(
+            startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000.0),
+            endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0)
+        )
 
         let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, sessionID: sessionID)
 
@@ -233,7 +236,7 @@ final class EventsTests: XCTestCase {
         }
     }
 
-    func checkEventBaseAttributes(_ event: SplunkSharedProtocols.AgentEvent) throws {
+    func checkEventBaseAttributes(_ event: SplunkCommon.AgentEvent) throws {
         XCTAssertNotNil(event.domain)
         XCTAssertNotNil(event.name)
         XCTAssertNotNil(event.instrumentationScope)

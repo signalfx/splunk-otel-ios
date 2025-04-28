@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetrySdk
-internal import SplunkLogger
 
 /// Structure that holds a configuration for an initial SDK setup.
 ///
@@ -74,7 +73,6 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     var sessionTimeout: Double = ConfigurationDefaults.sessionTimeout
     var maxSessionLength: Double = ConfigurationDefaults.maxSessionLength
     var recordingEnabled: Bool = ConfigurationDefaults.recordingEnabled
-    let internalLogger = InternalLogger(configuration: .agent(category: "Configuration"))
 
 
     // MARK: - Initialization

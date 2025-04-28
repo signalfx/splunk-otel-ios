@@ -16,18 +16,22 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkLogger
 
-// MARK: Default configuration
+/// Implements internal package identification for the Splunk Agent.
+public struct PackageIdentifier: PackageIdentification {
 
-public extension InternalLoggerConfiguration {
+    // MARK: - Package identification
 
-    /// Provides a default `InternalLoggerConfiguration` with the pre-specified subsystem to
-    /// "SplunkAgent Crash Reporter" and a variable category.
-    ///
-    /// - Parameters:
-    ///  - category: More finely-grained category of the logged subsystem.
-    static func crashReporter(subsystem: String = "SplunkAgent Crash Reporter", category: String) -> InternalLoggerConfiguration {
-        return InternalLoggerConfiguration(subsystem: subsystem, category: category)
+    public static var `default` = "com.splunk.rum"
+
+
+    // MARK: - Package identification methods
+
+    public static func `default`(named: String) -> String {
+        guard !named.isEmpty else {
+            return `default`
+        }
+
+        return "\(`default`).\(named)"
     }
 }

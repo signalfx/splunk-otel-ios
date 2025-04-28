@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
+
 @testable import SplunkAppStart
 import XCTest
 
@@ -22,7 +22,7 @@ extension InitializeTests {
 
     func checkDates(in destination: DebugDestination) throws {
         let storedInitialize = try XCTUnwrap(destination.storedInitialize)
-        
+
         let timeInterval = storedInitialize.end.timeIntervalSince(storedInitialize.start)
         XCTAssertTrue(timeInterval > 0.0)
         XCTAssertTrue(timeInterval < 60.0)

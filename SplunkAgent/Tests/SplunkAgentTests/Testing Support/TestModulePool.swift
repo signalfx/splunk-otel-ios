@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import Foundation
-import SplunkSharedProtocols
+@testable import SplunkAgent
+import SplunkCommon
 
 /// The class implements the default pool of modules available for tests.
 class TestModulesPool: AgentModulesPool {

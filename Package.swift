@@ -31,15 +31,15 @@ let package = Package(
         .target(
             name: "SplunkAgent",
             dependencies: [
-                "SplunkLogger",
-                "SplunkSharedProtocols",
+                "SplunkCommon",
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",
                 "SplunkNetwork",
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkANRReporter",
-                "SplunkAppStart"
+                "SplunkAppStart",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAgent",
             sources: ["Sources"],
@@ -50,7 +50,7 @@ let package = Package(
         ),
         .testTarget(
             name: "SplunkAgentTests",
-            dependencies: ["SplunkAgent"],
+            dependencies: ["SplunkAgent", "SplunkCommon"],
             path: "SplunkAgent/Tests",
             resources: [
                 .copy("SplunkAgentTests/Testing Support/Assets/v.mp4"),
@@ -62,25 +62,12 @@ let package = Package(
         ),
         
         
-        // MARK: Splunk Logger
-        
-        .target(
-            name: "SplunkLogger",
-            path: "SplunkLogger/Sources"
-        ),
-        .testTarget(
-            name: "SplunkLoggerTests",
-            dependencies: ["SplunkLogger"],
-            path: "SplunkLogger/Tests"
-        ),
-        
-        
         // MARK: Splunk Network
         
         .target(
             name: "SplunkNetwork",
             dependencies: [
-                "SplunkSharedProtocols",
+                "SplunkCommon",
                 "SplunkOpenTelemetry"
             ],
             path: "SplunkNetwork/Sources"
@@ -97,7 +84,7 @@ let package = Package(
         .target(
             name: "SplunkANRReporter",
             dependencies: [
-                "SplunkSharedProtocols"
+                "SplunkCommon"
             ],
             path: "SplunkANRReporter/Sources"
         ),
@@ -108,16 +95,16 @@ let package = Package(
         ),
         
         
-        // MARK: Splunk Shared Protocols
+        // MARK: Splunk Common
         
         .target(
-            name: "SplunkSharedProtocols",
-            path: "SplunkSharedProtocols/Sources"
+            name: "SplunkCommon",
+            path: "SplunkCommon/Sources"
         ),
         .testTarget(
-            name: "SplunkSharedProtocolsTests",
-            dependencies: ["SplunkSharedProtocols"],
-            path: "SplunkSharedProtocols/Tests"
+            name: "SplunkCommonTests",
+            dependencies: ["SplunkCommon"],
+            path: "SplunkCommon/Tests"
         ),
         
         
@@ -126,14 +113,14 @@ let package = Package(
         .target(
             name: "SplunkSlowFrameDetector",
             dependencies: [
-                .byName(name: "SplunkSharedProtocols"),
+                .byName(name: "SplunkCommon"),
                 "SplunkOpenTelemetry"
             ],
             path: "SplunkSlowFrameDetector/Sources"
         ),
         .testTarget(
             name: "SplunkSlowFrameDetectorTests",
-            dependencies: ["SplunkSlowFrameDetector", "SplunkSharedProtocols"],
+            dependencies: ["SplunkSlowFrameDetector", "SplunkCommon"],
             path: "SplunkSlowFrameDetector/Tests"
         ),
         
@@ -143,7 +130,7 @@ let package = Package(
         .target(
             name: "SplunkCustomData",
             dependencies: [
-                "SplunkSharedProtocols"
+                "SplunkCommon"
             ],
             path: "SplunkCustomData/Sources"
         ),
@@ -159,7 +146,7 @@ let package = Package(
         .target(
             name: "SplunkErrorReporting",
             dependencies: [
-                "SplunkSharedProtocols"
+                "SplunkCommon"
             ],
             path: "SplunkErrorReporting/Sources"
         ),
@@ -212,13 +199,13 @@ let package = Package(
             dependencies: [
                 "SplunkCrashReporter",
                 "SplunkOpenTelemetry",
-                "SplunkSharedProtocols"
+                "SplunkCommon"
             ],
             path: "SplunkCrashReports/Sources"
         ),
         .testTarget(
             name: "SplunkCrashReportsTests",
-            dependencies: ["SplunkCrashReports", "SplunkSharedProtocols"],
+            dependencies: ["SplunkCrashReports", "SplunkCommon"],
             path: "SplunkCrashReports/Tests"
         ),
         
@@ -229,18 +216,18 @@ let package = Package(
             name: "SplunkOpenTelemetry",
             dependencies: [
                 "SplunkOpenTelemetryBackgroundExporter",
-                "SplunkLogger",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
                 .product(name: "ResourceExtension", package: "opentelemetry-swift"),
-                .product(name: "SignPostIntegration", package: "opentelemetry-swift")
+                .product(name: "SignPostIntegration", package: "opentelemetry-swift"),
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkOpenTelemetry/Sources"
         ),
         .testTarget(
             name: "SplunkOpenTelemetryTests",
-            dependencies: ["SplunkOpenTelemetry", "SplunkSharedProtocols"],
+            dependencies: ["SplunkOpenTelemetry", "SplunkCommon"],
             path: "SplunkOpenTelemetry/Tests"
         ),
         
@@ -250,16 +237,16 @@ let package = Package(
         .target(
             name: "SplunkOpenTelemetryBackgroundExporter",
             dependencies: [
-                "SplunkLogger",
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private"),
                 .product(name: "CiscoDiskStorage", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkOpenTelemetryBackgroundExporter/Sources"
         ),
         .testTarget(
             name: "SplunkOpenTelemetryBackgroundExporterTests",
-            dependencies: ["SplunkOpenTelemetryBackgroundExporter"],
+            dependencies: ["SplunkOpenTelemetryBackgroundExporter", "SplunkCommon"],
             path: "SplunkOpenTelemetryBackgroundExporter/Tests"
         ),
         
@@ -269,9 +256,9 @@ let package = Package(
         .target(
             name: "SplunkAppStart",
             dependencies: [
-                "SplunkSharedProtocols",
-                "SplunkLogger",
-                "SplunkOpenTelemetry"
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAppStart/Sources"
         ),
@@ -279,9 +266,9 @@ let package = Package(
             name: "SplunkAppStartTests",
             dependencies: [
                 "SplunkAppStart",
-                "SplunkSharedProtocols",
-                "SplunkLogger",
-                "SplunkOpenTelemetry"
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAppStart/Tests"
         ),
@@ -292,7 +279,7 @@ let package = Package(
         .target(
             name: "SplunkSessionReplayProxy",
             dependencies: [
-                "SplunkSharedProtocols",
+                "SplunkCommon",
                 .product(name: "CiscoSessionReplay", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkSessionReplayProxy/Sources"
@@ -332,6 +319,7 @@ func sessionReplayDependency() -> Package.Dependency {
     
     // Check if a branch was set as an environment variable.
     // Atm it's set in a build script in Tools/build_frameworks/050-Xarchives.sh
+
     if let environmentBranch = ProcessInfo.processInfo.environment["SESSION_REPLAY_BRANCH"] {
         return .package(url: packageGitUrl, branch: environmentBranch)
     }

@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 
 final public class ANRReporter {
@@ -25,7 +25,10 @@ final public class ANRReporter {
     // MARK: - Private properties
 
     private let tuning = ANRTunableValues()
-    private let detectionQueue = DispatchQueue(label: "com.splunk.rum.anr.background", qos: .background)
+    private let detectionQueue = DispatchQueue(
+        label: PackageIdentifier.default(named: "anr.background"),
+        qos: .background
+    )
     private var config: ANRReporterConfiguration = ANRReporterConfiguration(enabled: true)
     private var isMainThreadResponsive: Bool = false
     private var heartbeatTimer: Timer?
