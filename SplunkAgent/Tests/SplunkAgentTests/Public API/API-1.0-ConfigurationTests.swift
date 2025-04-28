@@ -22,7 +22,7 @@ final class API10ConfigurationTests: XCTestCase {
 
     // MARK: - Private
 
-    private let customTracesUrl = ConfigurationTestBuilder.customTracesUrl
+    private let customTraceUrl = ConfigurationTestBuilder.customTraceUrl
     private let customSessionReplayUrl = ConfigurationTestBuilder.customSessionReplayUrl
     private let deploymentEnvironment = ConfigurationTestBuilder.deploymentEnvironment
     private let appName = ConfigurationTestBuilder.appName
@@ -39,18 +39,16 @@ final class API10ConfigurationTests: XCTestCase {
 
         // Properties (READ)
         XCTAssertEqual(full.endpoint.realm, realm)
+        XCTAssertEqual(full.endpoint.rumAccessToken, rumAccessToken)
         XCTAssertEqual(full.deploymentEnvironment, deploymentEnvironment)
         XCTAssertEqual(full.appName, appName)
-        XCTAssertEqual(full.rumAccessToken, rumAccessToken)
         XCTAssertEqual(full.appVersion, appVersion)
         XCTAssertNotNil(full.enableDebugLogging)
         XCTAssertNotNil(full.sessionSamplingRate)
         XCTAssertNotNil(full.globalAttributes)
-        XCTAssertNotNil(full.spanFilter)
-        XCTAssertNotNil(full.tracesUrl)
-        XCTAssertNil(full.sessionReplayUrl)
-        XCTAssertNotNil(full.logsUrl)
-        XCTAssertNotNil(full.configUrl)
+        XCTAssertNotNil(full.spanInterceptor)
+        XCTAssertNotNil(full.endpoint.traceEndpoint)
+        XCTAssertNil(full.endpoint.sessionReplayEndpoint)
 
 
         // Minimal initialization
@@ -59,17 +57,14 @@ final class API10ConfigurationTests: XCTestCase {
 
         // Properties (READ)
         XCTAssertEqual(minimal.endpoint.realm, realm)
+        XCTAssertEqual(minimal.endpoint.rumAccessToken, rumAccessToken)
+        XCTAssertNotNil(minimal.endpoint.traceEndpoint)
+        XCTAssertNil(minimal.endpoint.sessionReplayEndpoint)
         XCTAssertEqual(minimal.deploymentEnvironment, deploymentEnvironment)
         XCTAssertEqual(minimal.appName, appName)
-        XCTAssertEqual(minimal.rumAccessToken, rumAccessToken)
         XCTAssertNotNil(minimal.appVersion)
         XCTAssertEqual(minimal.enableDebugLogging, ConfigurationDefaults.enableDebugLogging)
         XCTAssertEqual(minimal.sessionSamplingRate, ConfigurationDefaults.sessionSamplingRate)
-        XCTAssertNil(minimal.sessionReplayUrl)
-        XCTAssertNotNil(minimal.tracesUrl)
-        XCTAssertNotNil(minimal.logsUrl)
-        XCTAssertNotNil(minimal.configUrl)
-
 
         // Properties (WRITE)
         full.appVersion = "0.1"
@@ -110,9 +105,9 @@ final class API10ConfigurationTests: XCTestCase {
         // Default initialization
         let configuration = try ConfigurationTestBuilder.buildDefault()
 
-        let tracesUrl = configuration.tracesUrl
+        let traceUrl = try XCTUnwrap(configuration.endpoint.traceEndpoint)
 
-        let urlComponents = try XCTUnwrap(URLComponents(url: tracesUrl, resolvingAgainstBaseURL: false))
+        let urlComponents = try XCTUnwrap(URLComponents(url: traceUrl, resolvingAgainstBaseURL: false))
 
         XCTAssertEqual(urlComponents.scheme, "https")
         XCTAssertEqual(urlComponents.host, "rum-ingest.\(realm).signalfx.com")
@@ -128,15 +123,19 @@ final class API10ConfigurationTests: XCTestCase {
         // Custom urls initialization
         let configuration = try ConfigurationTestBuilder.buildWithCustomUrls()
 
-        let tracesUrl = configuration.tracesUrl
-        let sessionReplayUrl = try XCTUnwrap(configuration.sessionReplayUrl)
+        let traceUrl = try XCTUnwrap(configuration.endpoint.traceEndpoint)
+        let sessionReplayUrl = try XCTUnwrap(configuration.endpoint.sessionReplayEndpoint)
 
-        XCTAssertTrue(tracesUrl.absoluteString.hasPrefix(customTracesUrl.absoluteString))
-        XCTAssertTrue(sessionReplayUrl.absoluteString.hasPrefix(customSessionReplayUrl.absoluteString))
+        XCTAssertEqual(traceUrl, customTraceUrl)
+        XCTAssertEqual(sessionReplayUrl, customSessionReplayUrl)
+    }
 
-        // Make sure we do supply access token to customer's custom url
-        let urlComponents = try XCTUnwrap(URLComponents(url: tracesUrl, resolvingAgainstBaseURL: false))
-        XCTAssertTrue(urlComponents.queryItems?.count ?? 0 > 0)
+    func testInvalidConfiguration() throws {
+        let configuration = try ConfigurationTestBuilder.buildInvalidEndpoint()
+
+        XCTAssertThrowsError(
+            _ = try SplunkRum.install(with: configuration)
+        )
     }
 
     func testConfigurationBuilder() throws {
@@ -151,7 +150,7 @@ final class API10ConfigurationTests: XCTestCase {
             .enableDebugLogging(debugLogging)
             .sessionSamplingRate(sampling)
             .globalAttributes(globalAttributes)
-            .spanFilter { spanData in
+            .spanInterceptor { spanData in
                 spanData
             }
 
@@ -160,6 +159,6 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration.enableDebugLogging, debugLogging)
         XCTAssertEqual(configuration.sessionSamplingRate, sampling)
         XCTAssertEqual(configuration.globalAttributes, globalAttributes)
-        XCTAssertNotNil(configuration.spanFilter)
+        XCTAssertNotNil(configuration.spanInterceptor)
     }
 }
