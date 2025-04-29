@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SwiftUI
 import Combine
 import SplunkAgent
+import SwiftUI
 
 class AgentDataSource: ObservableObject {
 
@@ -62,6 +62,7 @@ class AgentDataSource: ObservableObject {
     }
 
     // MARK: - Derived Properties
+
     var agentStatusDescription: String {
         return rumEnabled ? "Running" : "Not Running"
     }

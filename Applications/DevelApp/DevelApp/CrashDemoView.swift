@@ -18,7 +18,7 @@ limitations under the License.
 import SwiftUI
 
 struct CrashDemoView: View {
-    
+
     var body: some View {
         VStack {
             DemoHeaderView()

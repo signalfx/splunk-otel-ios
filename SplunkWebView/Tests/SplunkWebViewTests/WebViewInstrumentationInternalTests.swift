@@ -41,7 +41,7 @@ final class WebViewInstrumentationInternalTests: XCTestCase {
     func testInjectSessionId() {
         let expectation = XCTestExpectation(description: "JavaScript injected")
 
-        mockWebView.evaluateJavaScriptHandler = { (script, completionHandler) in
+        mockWebView.evaluateJavaScriptHandler = { script, completionHandler in
             // Assert that the script is the expected script
             XCTAssertTrue(script.contains("window.SplunkRumNative"))
             XCTAssertTrue(script.contains("getNativeSessionId"))
@@ -69,7 +69,6 @@ class MockWebView: WKWebView {
             DispatchQueue.main.async {
                 self.evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })
             }
-
         }
     }
 }

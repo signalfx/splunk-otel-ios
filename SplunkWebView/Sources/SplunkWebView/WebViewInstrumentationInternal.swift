@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
 import CiscoLogger
 import SplunkCommon
+import WebKit
 
 public final class WebViewInstrumentationInternal {
 
@@ -25,12 +25,13 @@ public final class WebViewInstrumentationInternal {
 
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
 
-    public var sharedState: AgentSharedState? = nil
+    public var sharedState: AgentSharedState?
 
     // Module conformance
     public required init() {}
 
     // MARK: - Internal Methods
+
     public func injectSessionId(into webView: WKWebView) {
         guard let sessionId = sharedState?.sessionId else {
             logger.log(level: .warn) {
@@ -58,7 +59,7 @@ public final class WebViewInstrumentationInternal {
         }
         """
 
-        webView.evaluateJavaScript(script) { (result, error) in
+        webView.evaluateJavaScript(script) { _, error in
             if let error = error {
                 self.logger.log(level: .error) {
                     "Error injecting JavaScript: \(error)"

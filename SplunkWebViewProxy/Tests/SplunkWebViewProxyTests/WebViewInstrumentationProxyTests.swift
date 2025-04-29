@@ -41,11 +41,8 @@ final class WebViewInstrumentationProxyTests: XCTestCase {
     }
 
     func testInjectSessionId() {
-        //ARRANGE
         mockWebViewInstrumentation.injectSessionIdCalled = false
-        //ACT
         webViewInstrumentationProxy.injectSessionId(into: mockWebView)
-        //ASSERT
         XCTAssertTrue(mockWebViewInstrumentation.injectSessionIdCalled, "injectSessionId should have been called on the mock module")
     }
 

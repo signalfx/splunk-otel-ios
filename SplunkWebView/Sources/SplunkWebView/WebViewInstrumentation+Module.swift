@@ -25,7 +25,7 @@ public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
 // RemoteModuleConfiguration conformance
 public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
     public var enabled: Bool
-    
+
     public init?(from data: Data) {
         return nil
     }
@@ -40,11 +40,12 @@ extension WebViewInstrumentationInternal: Module {
     public typealias EventMetadata = WebViewInstrumentationMetadata
     public typealias EventData = WebViewInstrumentationData
 
-    public func install(with configuration: (any ModuleConfiguration)?,
-                       remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?) {}
+    public func install(
+        with configuration: (any ModuleConfiguration)?,
+        remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?
+    ) {}
 
     public func onPublish(data: @escaping (WebViewInstrumentationMetadata, WebViewInstrumentationData) -> Void) {}
 
     public func deleteData(for metadata: any SplunkCommon.ModuleEventMetadata) {}
-
 }

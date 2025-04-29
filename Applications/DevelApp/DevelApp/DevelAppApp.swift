@@ -5,8 +5,8 @@
 //  Created by Pavel Kroh on 30.09.2023.
 //
 
-import SwiftUI
 import SplunkAgent
+import SwiftUI
 
 @main
 struct DevelAppApp: App {

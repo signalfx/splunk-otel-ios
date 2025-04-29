@@ -15,15 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SwiftUI
-import WebKit
-import SplunkAgent
 import Combine
 import Foundation
+import SplunkAgent
+import SwiftUI
+import WebKit
 
 struct WebViewDemoView: View {
-    @State private var webView: WKWebView = WKWebView()
-    @State private var injected: Bool = false
+    @State private var webView = WKWebView()
+    @State private var injected = false
     @State private var subscription: AnyCancellable?
 
     var body: some View {

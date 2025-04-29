@@ -14,8 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
-
 
 //
 //  SessionReplayDemoView.swift
@@ -24,8 +22,8 @@ limitations under the License.
 //  Created by Pavel Kroh on 30.09.2023.
 //
 
-import SwiftUI
 import SplunkAgent
+import SwiftUI
 
 struct SessionReplayDemoView: View {
 
@@ -49,6 +47,7 @@ struct SessionReplayDemoView: View {
 
 
     // MARK: - View
+
     @State var now = Date()
 
     let timer = Timer.publish(every: 0.2, on: .current, in: .common).autoconnect()
@@ -64,7 +63,7 @@ struct SessionReplayDemoView: View {
                     .cornerRadius(4)
             }
             .padding(.vertical, 32)
-            
+
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
@@ -76,7 +75,7 @@ struct SessionReplayDemoView: View {
                 Text("Session ID: \(sessionId)")
                     .transition(.opacity)
                     .id("LabelSessionID" + sessionId)
-                
+
                 Text("User Tracking: \(userTrackingMode)")
             }
             .foregroundColor(Color(uiColor: .black))
@@ -101,7 +100,7 @@ struct SessionReplayDemoView: View {
             Spacer()
         }
         .padding()
-        .onReceive(sessionPublisher) { (output) in
+        .onReceive(sessionPublisher) { output in
             if let currentSessionId = output.object as? String {
                 withAnimation {
                     sessionId = currentSessionId

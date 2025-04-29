@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
 import SplunkWebView
+import WebKit
 
 public protocol WebViewInstrumentationModule {
     func injectSessionId(into webView: WKWebView)
@@ -25,9 +25,9 @@ public protocol WebViewInstrumentationModule {
 public final class WebViewInstrumentationProxy: WebViewInstrumentationModule {
     public static let instance = WebViewInstrumentationProxy()
 
-    private let module: WebViewInstrumentationInternal = WebViewInstrumentationInternal.instance
+    private let module = WebViewInstrumentationInternal.instance
 
-    internal init() {}
+    init() {}
 
     public func injectSessionId(into webView: WKWebView) {
         module.injectSessionId(into: webView)
