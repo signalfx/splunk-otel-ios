@@ -164,6 +164,8 @@
 		5200670B2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5200670A2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift */; };
 		522A70B92DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */; };
 		522A70BB2DAD9F23008A2479 /* OTelDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70BA2DAD9F23008A2479 /* OTelDestination.swift */; };
+		522DB6C52DC123DF0047FBCD /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 522DB6C32DC123D00047FBCD /* XCTest.framework */; platformFilter = ios; };
+		522DB6C62DC123EC0047FBCD /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 522DB6C32DC123D00047FBCD /* XCTest.framework */; platformFilter = ios; };
 		5280E2832DC0AA5500770A90 /* WebViewInstrumentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E27F2DC0AA5500770A90 /* WebViewInstrumentationTests.swift */; };
 		5280E2842DC0AA5500770A90 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E27B2DC0AA5500770A90 /* WebViewInstrumentation.swift */; };
 		5280E2852DC0AA5500770A90 /* WebViewInstrumentation+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E27C2DC0AA5500770A90 /* WebViewInstrumentation+Module.swift */; };
@@ -749,6 +751,7 @@
 		5200670A2DAEE2A900444346 /* EventMetadataSlowFrameDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMetadataSlowFrameDetector.swift; sourceTree = "<group>"; };
 		522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorDestination.swift; sourceTree = "<group>"; };
 		522A70BA2DAD9F23008A2479 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
+		522DB6C32DC123D00047FBCD /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		5280E27B2DC0AA5500770A90 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
 		5280E27C2DC0AA5500770A90 /* WebViewInstrumentation+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebViewInstrumentation+Module.swift"; sourceTree = "<group>"; };
 		5280E27F2DC0AA5500770A90 /* WebViewInstrumentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentationTests.swift; sourceTree = "<group>"; };
@@ -1107,6 +1110,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				522DB6C62DC123EC0047FBCD /* XCTest.framework in Frameworks */,
 				52D9456A2DC0A62D00DE8220 /* SplunkWebView.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1124,6 +1128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				522DB6C52DC123DF0047FBCD /* XCTest.framework in Frameworks */,
 				52D945B02DC0A70700DE8220 /* SplunkWebViewProxy.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2288,6 +2293,7 @@
 		526521F42CB8937800DB3BB9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				522DB6C32DC123D00047FBCD /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
