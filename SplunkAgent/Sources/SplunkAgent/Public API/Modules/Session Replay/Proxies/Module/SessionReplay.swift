@@ -85,6 +85,10 @@ final class SessionReplay: SessionReplayModule {
     private(set) lazy var sensitivity: any SessionReplayModuleSensitivity = SessionReplaySensitivity(for: module)
 
 
+    // MARK: - Custom id
+
+    private(set) lazy var customId: any SessionReplayModuleCustomId = SessionReplaySensitivity(for: module)
+
     // MARK: - State
 
     private(set) lazy var state: any SessionReplayModuleState = SessionReplayState(for: module)

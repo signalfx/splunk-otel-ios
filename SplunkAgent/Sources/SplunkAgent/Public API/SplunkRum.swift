@@ -98,6 +98,8 @@ public class SplunkRum: ObservableObject {
         sessionReplayProxy
     }
 
+    public var splunkInteracton
+
 
     // MARK: - Initialization
 

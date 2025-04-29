@@ -21,6 +21,7 @@ internal import SplunkLogger
 internal import SplunkOpenTelemetry
 internal import CiscoSessionReplay
 internal import SplunkSharedProtocols
+internal import SplunkInteractions
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
 ///
@@ -124,6 +125,9 @@ class DefaultEventManager: AgentEventManager {
                 immediateProcessing: true,
                 completion: completion
             )
+
+        case let (metadata as Metadata, data as InteractionEventData):
+            
 
         // Unknown module data
         default:

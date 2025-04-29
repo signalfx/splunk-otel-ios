@@ -18,7 +18,10 @@ import Foundation
 import SplunkSharedProtocols
 import CiscoInteractions
 
-extension Data: ModuleEventData {}
+public struct InteractionEventData: ModuleEventData {
+    var elementId: ObjectIdentifier?
+    var type: String
+}
 
 extension InteractionEvent: @retroactive Equatable {}
 
@@ -40,7 +43,7 @@ extension SplunkInteractions: Module {
     public typealias RemoteConfiguration = SplunkInteractionsRemoteConfiguration
 
     public typealias EventMetadata = InteractionEvent
-    public typealias EventData = Data
+    public typealias EventData = InteractionEventData
 
 
     // MARK: - Module methods
@@ -52,6 +55,6 @@ extension SplunkInteractions: Module {
 
     // MARK: - Type transparency helpers
 
-    public func onPublish(data: @escaping (CiscoInteractions.InteractionEvent, Data) -> Void) {}
+    public func onPublish(data: @escaping (CiscoInteractions.InteractionEvent, InteractionEventData) -> Void) {}
     public func deleteData(for metadata: any ModuleEventMetadata) {}
 }

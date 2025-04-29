@@ -25,14 +25,26 @@ public final class SplunkInteractions {
     
     // MARK: - Private properties
 
-    private var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
     private let internalLogger = InternalLogger(configuration: .interactions(category: "Module"))
+    private let destination: SplunkInteractionsDestination
+    private var interactionsTask: Task<Void, Never>?
+
+
+    // MARK: - Internal properties
+
+    var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
 
 
     // MARK: - Initialization
 
     // Module conformance
-    public required init() {}
+    public required init() {
+        self.destination = OTelDestination()
+    }
+
+    init(destination: SplunkInteractionsDestination) {
+        self.destination = destination
+    }
 
 
     // MARK: - Instrumentation
@@ -43,13 +55,24 @@ public final class SplunkInteractions {
             internalLogger.log(level: .error) {
                 "Interactions detection is already running."
             }
+
             return
         }
 
-        Task {
+        interactionsTask = Task {
             do {
                 interactionsDetector = try await InteractionsDetector<DefaultSwizzling>()
+
+                guard let eventsStream = interactionsDetector?.eventsStream else {
+
+                    return
+                }
+
+                for await event in eventsStream {
+                    destination.send(event: event)
+                }
             } catch {
+
                 internalLogger.log(level: .error) {
                     "Could not initialize InteractionsDetector: \(error)."
                 }

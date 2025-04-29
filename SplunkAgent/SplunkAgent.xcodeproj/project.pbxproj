@@ -173,7 +173,6 @@
 		4BB680E82B7940C0000A54D4 /* RecordingMask+Conversions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680D32B7940C0000A54D4 /* RecordingMask+Conversions.swift */; };
 		4BB680E92B7940C0000A54D4 /* Status+Conversions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680D42B7940C0000A54D4 /* Status+Conversions.swift */; };
 		4BB680EC2B7940C0000A54D4 /* API-1.0-RecordingMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680D82B7940C0000A54D4 /* API-1.0-RecordingMask.swift */; };
-		4BB680EE2B7940C0000A54D4 /* API-1.0-SessionReplayModuleSensitivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680DA2B7940C0000A54D4 /* API-1.0-SessionReplayModuleSensitivity.swift */; };
 		4BB680F22B7940C0000A54D4 /* API-1.0-SessionReplayModuleState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680DE2B7940C0000A54D4 /* API-1.0-SessionReplayModuleState.swift */; };
 		4BB680F32B7940C0000A54D4 /* API-1.0-Sensitivity+UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680DF2B7940C0000A54D4 /* API-1.0-Sensitivity+UIView.swift */; };
 		4BB680F42B7940C0000A54D4 /* API-1.0-Sensitivity+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680E02B7940C0000A54D4 /* API-1.0-Sensitivity+SwiftUI.swift */; };
@@ -206,6 +205,26 @@
 		C76AB8DC2B7B798400CB4307 /* RemoteError.json in Resources */ = {isa = PBXBuildFile; fileRef = C76AB8DB2B7B798400CB4307 /* RemoteError.json */; };
 		C76AB8DE2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json in Resources */ = {isa = PBXBuildFile; fileRef = C76AB8DD2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json */; };
 		C7A2BD1B2BB45363005D4CFB /* AppStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */; };
+		C7C1127C2DBB767200B8E893 /* SplunkLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B963FE52D60F7E3009A2E7F /* SplunkLogger.framework */; };
+		C7C1127D2DBB767200B8E893 /* OpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = C7C1126E2DBB767200B8E893 /* OpenTelemetryApi */; };
+		C7C1128B2DBB767D00B8E893 /* AppStartTests+Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B252D94C4EB005CF4C9 /* AppStartTests+Notifications.swift */; };
+		C7C1128C2DBB767D00B8E893 /* AppStartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B232D94C4EB005CF4C9 /* AppStartTests.swift */; };
+		C7C1128D2DBB767D00B8E893 /* AppStartTests+CheckType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B242D94C4EB005CF4C9 /* AppStartTests+CheckType.swift */; };
+		C7C112992DBB769200B8E893 /* SplunkInteractions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7C112862DBB767200B8E893 /* SplunkInteractions.framework */; };
+		C7C1129A2DBB769200B8E893 /* SplunkInteractions.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C7C112862DBB767200B8E893 /* SplunkInteractions.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C7C1129F2DBB78D300B8E893 /* CiscoInteractions in Frameworks */ = {isa = PBXBuildFile; productRef = C7C1129E2DBB78D300B8E893 /* CiscoInteractions */; };
+		C7C112BB2DBB7E2700B8E893 /* SplunkInteractionsConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112B12DBB7E2700B8E893 /* SplunkInteractionsConfiguration.swift */; };
+		C7C112BC2DBB7E2700B8E893 /* SplunkInteractions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112B42DBB7E2700B8E893 /* SplunkInteractions.swift */; };
+		C7C112BD2DBB7E2700B8E893 /* SplunkInteractionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112B72DBB7E2700B8E893 /* SplunkInteractionsTests.swift */; };
+		C7C112BE2DBB7E2700B8E893 /* SplunkInteractions+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112B02DBB7E2700B8E893 /* SplunkInteractions+Module.swift */; };
+		C7C112BF2DBB7E2700B8E893 /* SplunkInteractionsRemoteConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112B22DBB7E2700B8E893 /* SplunkInteractionsRemoteConfiguration.swift */; };
+		C7C112C22DBB7E6C00B8E893 /* SplunkInteractionsDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112C12DBB7E6C00B8E893 /* SplunkInteractionsDestination.swift */; };
+		C7C112C42DBB7E8C00B8E893 /* DebugDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112C32DBB7E8C00B8E893 /* DebugDestination.swift */; };
+		C7C112C62DBB7E9800B8E893 /* OTelDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112C52DBB7E9800B8E893 /* OTelDestination.swift */; };
+		C7C112CB2DBF7CE000B8E893 /* API-1.0-SessionReplayModuleSensitivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112CA2DBF7CE000B8E893 /* API-1.0-SessionReplayModuleSensitivity.swift */; };
+		C7C112CE2DBF7D0000B8E893 /* API-1.0-SessionReplayModuleCustomId.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112CD2DBF7D0000B8E893 /* API-1.0-SessionReplayModuleCustomId.swift */; };
+		C7C112D12DBF7D6700B8E893 /* API-1.0-CustomId+UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112D02DBF7D6700B8E893 /* API-1.0-CustomId+UIView.swift */; };
+		C7C112D32DBF851D00B8E893 /* SessionReplayCustomId.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112D22DBF851D00B8E893 /* SessionReplayCustomId.swift */; };
 		C7FFC4F52B7662E30035203B /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FFC4F42B7662E30035203B /* Service.swift */; };
 		E4032E622B552343003D4392 /* DefaultSessionTestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */; };
 		E4032E642B55278C003D4392 /* PersistentSessionsValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4032E632B55278C003D4392 /* PersistentSessionsValidator.swift */; };
@@ -489,6 +508,20 @@
 			remoteGlobalIDString = 4B963FE42D60F7E3009A2E7F;
 			remoteInfo = SplunkLogger;
 		};
+		C7C1126D2DBB767200B8E893 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B963FE42D60F7E3009A2E7F;
+			remoteInfo = SplunkLogger;
+		};
+		C7C1129B2DBB769200B8E893 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C7C1126B2DBB767200B8E893;
+			remoteInfo = SplunkInteractions;
+		};
 		E468962E2B21C85800727A6A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
@@ -505,6 +538,17 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7C1129D2DBB769200B8E893 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C7C1129A2DBB769200B8E893 /* SplunkInteractions.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -683,7 +727,6 @@
 		4BB680D42B7940C0000A54D4 /* Status+Conversions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Status+Conversions.swift"; sourceTree = "<group>"; };
 		4BB680D52B7940C0000A54D4 /* Preferences+Conversions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Preferences+Conversions.swift"; sourceTree = "<group>"; };
 		4BB680D82B7940C0000A54D4 /* API-1.0-RecordingMask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "API-1.0-RecordingMask.swift"; sourceTree = "<group>"; };
-		4BB680DA2B7940C0000A54D4 /* API-1.0-SessionReplayModuleSensitivity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "API-1.0-SessionReplayModuleSensitivity.swift"; sourceTree = "<group>"; };
 		4BB680DB2B7940C0000A54D4 /* API-1.0-RenderingMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "API-1.0-RenderingMode.swift"; sourceTree = "<group>"; };
 		4BB680DC2B7940C0000A54D4 /* API-1.0-SessionReplayModulePreferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "API-1.0-SessionReplayModulePreferences.swift"; sourceTree = "<group>"; };
 		4BB680DE2B7940C0000A54D4 /* API-1.0-SessionReplayModuleState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "API-1.0-SessionReplayModuleState.swift"; sourceTree = "<group>"; };
@@ -718,6 +761,20 @@
 		C76AB8DB2B7B798400CB4307 /* RemoteError.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = RemoteError.json; sourceTree = "<group>"; };
 		C76AB8DD2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AlternativeRemoteConfiguration.json; sourceTree = "<group>"; };
 		C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateModel.swift; sourceTree = "<group>"; };
+		C7C112862DBB767200B8E893 /* SplunkInteractions.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkInteractions.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7C112982DBB767D00B8E893 /* SplunkInteractionsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkInteractionsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7C112B02DBB7E2700B8E893 /* SplunkInteractions+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SplunkInteractions+Module.swift"; sourceTree = "<group>"; };
+		C7C112B12DBB7E2700B8E893 /* SplunkInteractionsConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkInteractionsConfiguration.swift; sourceTree = "<group>"; };
+		C7C112B22DBB7E2700B8E893 /* SplunkInteractionsRemoteConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkInteractionsRemoteConfiguration.swift; sourceTree = "<group>"; };
+		C7C112B42DBB7E2700B8E893 /* SplunkInteractions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkInteractions.swift; sourceTree = "<group>"; };
+		C7C112B72DBB7E2700B8E893 /* SplunkInteractionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkInteractionsTests.swift; sourceTree = "<group>"; };
+		C7C112C12DBB7E6C00B8E893 /* SplunkInteractionsDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkInteractionsDestination.swift; sourceTree = "<group>"; };
+		C7C112C32DBB7E8C00B8E893 /* DebugDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugDestination.swift; sourceTree = "<group>"; };
+		C7C112C52DBB7E9800B8E893 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
+		C7C112CA2DBF7CE000B8E893 /* API-1.0-SessionReplayModuleSensitivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-SessionReplayModuleSensitivity.swift"; sourceTree = "<group>"; };
+		C7C112CD2DBF7D0000B8E893 /* API-1.0-SessionReplayModuleCustomId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-SessionReplayModuleCustomId.swift"; sourceTree = "<group>"; };
+		C7C112D02DBF7D6700B8E893 /* API-1.0-CustomId+UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-CustomId+UIView.swift"; sourceTree = "<group>"; };
+		C7C112D22DBF851D00B8E893 /* SessionReplayCustomId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionReplayCustomId.swift; sourceTree = "<group>"; };
 		C7FFC4F42B7662E30035203B /* Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Service.swift; sourceTree = "<group>"; };
 		E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSessionTestBuilder.swift; sourceTree = "<group>"; };
 		E4032E632B55278C003D4392 /* PersistentSessionsValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentSessionsValidator.swift; sourceTree = "<group>"; };
@@ -995,6 +1052,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C7C1127B2DBB767200B8E893 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7C1127C2DBB767200B8E893 /* SplunkLogger.framework in Frameworks */,
+				C7C1127D2DBB767200B8E893 /* OpenTelemetryApi in Frameworks */,
+				C7C1129F2DBB78D300B8E893 /* CiscoInteractions in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7C1128E2DBB767D00B8E893 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7C112992DBB769200B8E893 /* SplunkInteractions.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E46896262B21C85800727A6A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1120,6 +1195,7 @@
 		3384F2982AC879E900512D79 = {
 			isa = PBXGroup;
 			children = (
+				C7C112BA2DBB7E2700B8E893 /* SplunkInteractions */,
 				4B385B292D94C4EB005CF4C9 /* SplunkAppStart */,
 				4B385AE22D94AD93005CF4C9 /* Resources */,
 				4B385B0D2D94BEC7005CF4C9 /* SplunkErrorReporting */,
@@ -1168,6 +1244,8 @@
 				4B9642682D613A88009A2E7F /* SplunkSessionReplayProxyTests.xctest */,
 				4B385B2F2D94C55A005CF4C9 /* SplunkAppStart.framework */,
 				4B385B362D94C55B005CF4C9 /* SplunkAppStartTests.xctest */,
+				C7C112862DBB767200B8E893 /* SplunkInteractions.framework */,
+				C7C112982DBB767D00B8E893 /* SplunkInteractionsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2203,10 +2281,12 @@
 				E4EE9EC52BA30A7B0000D594 /* Model */,
 				4BB680E22B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift */,
 				4BB680DC2B7940C0000A54D4 /* API-1.0-SessionReplayModulePreferences.swift */,
-				4BB680DA2B7940C0000A54D4 /* API-1.0-SessionReplayModuleSensitivity.swift */,
+				C7C112CA2DBF7CE000B8E893 /* API-1.0-SessionReplayModuleSensitivity.swift */,
+				C7C112CD2DBF7D0000B8E893 /* API-1.0-SessionReplayModuleCustomId.swift */,
 				4BB680DE2B7940C0000A54D4 /* API-1.0-SessionReplayModuleState.swift */,
 				4BB680E02B7940C0000A54D4 /* API-1.0-Sensitivity+SwiftUI.swift */,
 				4BB680DF2B7940C0000A54D4 /* API-1.0-Sensitivity+UIView.swift */,
+				C7C112D02DBF7D6700B8E893 /* API-1.0-CustomId+UIView.swift */,
 			);
 			path = "Public API";
 			sourceTree = "<group>";
@@ -2331,6 +2411,70 @@
 				C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		C7C112B32DBB7E2700B8E893 /* Module */ = {
+			isa = PBXGroup;
+			children = (
+				C7C112B02DBB7E2700B8E893 /* SplunkInteractions+Module.swift */,
+				C7C112B12DBB7E2700B8E893 /* SplunkInteractionsConfiguration.swift */,
+				C7C112B22DBB7E2700B8E893 /* SplunkInteractionsRemoteConfiguration.swift */,
+			);
+			path = Module;
+			sourceTree = "<group>";
+		};
+		C7C112B52DBB7E2700B8E893 /* SplunkInteractions */ = {
+			isa = PBXGroup;
+			children = (
+				C7C112C02DBB7E3300B8E893 /* Destination */,
+				C7C112B32DBB7E2700B8E893 /* Module */,
+				C7C112B42DBB7E2700B8E893 /* SplunkInteractions.swift */,
+			);
+			path = SplunkInteractions;
+			sourceTree = "<group>";
+		};
+		C7C112B62DBB7E2700B8E893 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				C7C112B52DBB7E2700B8E893 /* SplunkInteractions */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		C7C112B82DBB7E2700B8E893 /* SplunkInteractionsTests */ = {
+			isa = PBXGroup;
+			children = (
+				C7C112B72DBB7E2700B8E893 /* SplunkInteractionsTests.swift */,
+			);
+			path = SplunkInteractionsTests;
+			sourceTree = "<group>";
+		};
+		C7C112B92DBB7E2700B8E893 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				C7C112B82DBB7E2700B8E893 /* SplunkInteractionsTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		C7C112BA2DBB7E2700B8E893 /* SplunkInteractions */ = {
+			isa = PBXGroup;
+			children = (
+				C7C112B62DBB7E2700B8E893 /* Sources */,
+				C7C112B92DBB7E2700B8E893 /* Tests */,
+			);
+			name = SplunkInteractions;
+			path = ../SplunkInteractions;
+			sourceTree = SOURCE_ROOT;
+		};
+		C7C112C02DBB7E3300B8E893 /* Destination */ = {
+			isa = PBXGroup;
+			children = (
+				C7C112C12DBB7E6C00B8E893 /* SplunkInteractionsDestination.swift */,
+				C7C112C32DBB7E8C00B8E893 /* DebugDestination.swift */,
+				C7C112C52DBB7E9800B8E893 /* OTelDestination.swift */,
+			);
+			path = Destination;
 			sourceTree = "<group>";
 		};
 		E40E0AF02B6BC1F900D31EEF /* SessionReplay */ = {
@@ -2574,6 +2718,7 @@
 				E4E4B1152BA1A0DA001CB6B3 /* SessionReplay+RecordingMask.swift */,
 				E47953C62BA1D78C0065677D /* SessionReplayPreferences.swift */,
 				E4EE9EC32BA308850000D594 /* SessionReplaySensitivity.swift */,
+				C7C112D22DBF851D00B8E893 /* SessionReplayCustomId.swift */,
 				E4EE9EC62BA30E180000D594 /* SessionReplayState.swift */,
 			);
 			path = Module;
@@ -2872,6 +3017,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B96425A2D613A87009A2E7F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7C112702DBB767200B8E893 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3334,6 +3486,50 @@
 			productReference = 4B9642682D613A88009A2E7F /* SplunkSessionReplayProxyTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		C7C1126B2DBB767200B8E893 /* SplunkInteractions */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C7C1127F2DBB767200B8E893 /* Build configuration list for PBXNativeTarget "SplunkInteractions" */;
+			buildPhases = (
+				C7C112702DBB767200B8E893 /* Headers */,
+				C7C112712DBB767200B8E893 /* Sources */,
+				C7C1127B2DBB767200B8E893 /* Frameworks */,
+				C7C1127E2DBB767200B8E893 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C7C1126C2DBB767200B8E893 /* PBXTargetDependency */,
+			);
+			name = SplunkInteractions;
+			packageProductDependencies = (
+				C7C1126E2DBB767200B8E893 /* OpenTelemetryApi */,
+				C7C1129E2DBB78D300B8E893 /* CiscoInteractions */,
+			);
+			productName = SplunkAppStart;
+			productReference = C7C112862DBB767200B8E893 /* SplunkInteractions.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		C7C112872DBB767D00B8E893 /* SplunkInteractionsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C7C112912DBB767D00B8E893 /* Build configuration list for PBXNativeTarget "SplunkInteractionsTests" */;
+			buildPhases = (
+				C7C1128A2DBB767D00B8E893 /* Sources */,
+				C7C1128E2DBB767D00B8E893 /* Frameworks */,
+				C7C112902DBB767D00B8E893 /* Resources */,
+				C7C1129D2DBB769200B8E893 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C7C1129C2DBB769200B8E893 /* PBXTargetDependency */,
+			);
+			name = SplunkInteractionsTests;
+			packageProductDependencies = (
+			);
+			productName = SplunkAppStartTests;
+			productReference = C7C112982DBB767D00B8E893 /* SplunkInteractionsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		E46896282B21C85800727A6A /* SplunkAgentTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E46896322B21C85800727A6A /* Build configuration list for PBXNativeTarget "SplunkAgentTests" */;
@@ -3471,6 +3667,8 @@
 				4B9642672D613A88009A2E7F /* SplunkSessionReplayProxyTests */,
 				4B385B2E2D94C55A005CF4C9 /* SplunkAppStart */,
 				4B385B352D94C55B005CF4C9 /* SplunkAppStartTests */,
+				C7C1126B2DBB767200B8E893 /* SplunkInteractions */,
+				C7C112872DBB767D00B8E893 /* SplunkInteractionsTests */,
 			);
 		};
 /* End PBXProject section */
@@ -3625,6 +3823,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C7C1127E2DBB767200B8E893 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7C112902DBB767D00B8E893 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E46896272B21C85800727A6A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3671,7 +3883,6 @@
 				C73FF4832B6CE749009C53FF /* ConfigurationHandler.swift in Sources */,
 				E4F2E50E2B17351E006EBA69 /* DefaultUser.swift in Sources */,
 				E4C14EB42B2AF5CC008CC270 /* PackageIdentification.swift in Sources */,
-				4BB680EE2B7940C0000A54D4 /* API-1.0-SessionReplayModuleSensitivity.swift in Sources */,
 				4BB680F62B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift in Sources */,
 				2ADAEFC92B95C85A00DF2214 /* TimeInterval+Nanoseconds.swift in Sources */,
 				2AAD518E2BA97FD500710505 /* DefaultEventManager.swift in Sources */,
@@ -3708,6 +3919,7 @@
 				2AE43B472B861325002C4A98 /* AgentEventManager.swift in Sources */,
 				E4C9D2012B98B41100A274ED /* LifecycleRepeatingJob.swift in Sources */,
 				E4BB4A242B5E97ED004A86A1 /* DefaultModulesPool.swift in Sources */,
+				C7C112CE2DBF7D0000B8E893 /* API-1.0-SessionReplayModuleCustomId.swift in Sources */,
 				E4A708AF2B97501F002C692E /* AgentRepeatingJob.swift in Sources */,
 				4BB680F32B7940C0000A54D4 /* API-1.0-Sensitivity+UIView.swift in Sources */,
 				E4EE9EC72BA30E180000D594 /* SessionReplayState.swift in Sources */,
@@ -3722,11 +3934,14 @@
 				4BB680E52B7940C0000A54D4 /* SensitivityModifier.swift in Sources */,
 				E4C14EB12B2AF56F008CC270 /* PackageIdentifier.swift in Sources */,
 				4B2C8BBB2BCBE4A200C6E72F /* CrashReportsDataEvent.swift in Sources */,
+				C7C112D32DBF851D00B8E893 /* SessionReplayCustomId.swift in Sources */,
 				C7A2BD1B2BB45363005D4CFB /* AppStateModel.swift in Sources */,
 				E4EE9ECE2BA330730000D594 /* SessionReplayNonOperational+Recording.swift in Sources */,
+				C7C112CB2DBF7CE000B8E893 /* API-1.0-SessionReplayModuleSensitivity.swift in Sources */,
 				C73FF4862B6CE749009C53FF /* ConfigurationHandler+Storage.swift in Sources */,
 				C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */,
 				4B6878C12B9F3B420024479A /* ConfigurationHandler+RequestErrorHandling.swift in Sources */,
+				C7C112D12DBF7D6700B8E893 /* API-1.0-CustomId+UIView.swift in Sources */,
 				E4F2E51F2B174BB8006EBA69 /* AgentState.swift in Sources */,
 				E4EF6E412B18878700206883 /* KeyValueStorage.swift in Sources */,
 				2A03CF5F2D9C31C100CF3BC9 /* API-1.0-AgentConfiguration.swift in Sources */,
@@ -3987,6 +4202,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C7C112712DBB767200B8E893 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7C112BB2DBB7E2700B8E893 /* SplunkInteractionsConfiguration.swift in Sources */,
+				C7C112BC2DBB7E2700B8E893 /* SplunkInteractions.swift in Sources */,
+				C7C112C22DBB7E6C00B8E893 /* SplunkInteractionsDestination.swift in Sources */,
+				C7C112BD2DBB7E2700B8E893 /* SplunkInteractionsTests.swift in Sources */,
+				C7C112BE2DBB7E2700B8E893 /* SplunkInteractions+Module.swift in Sources */,
+				C7C112C42DBB7E8C00B8E893 /* DebugDestination.swift in Sources */,
+				C7C112C62DBB7E9800B8E893 /* OTelDestination.swift in Sources */,
+				C7C112BF2DBB7E2700B8E893 /* SplunkInteractionsRemoteConfiguration.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C7C1128A2DBB767D00B8E893 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C7C1128B2DBB767D00B8E893 /* AppStartTests+Notifications.swift in Sources */,
+				C7C1128C2DBB767D00B8E893 /* AppStartTests.swift in Sources */,
+				C7C1128D2DBB767D00B8E893 /* AppStartTests+CheckType.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E46896252B21C85800727A6A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -4207,6 +4447,16 @@
 			isa = PBXTargetDependency;
 			target = 4B963FE42D60F7E3009A2E7F /* SplunkLogger */;
 			targetProxy = 4B985E522D94C91300CB0321 /* PBXContainerItemProxy */;
+		};
+		C7C1126C2DBB767200B8E893 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B963FE42D60F7E3009A2E7F /* SplunkLogger */;
+			targetProxy = C7C1126D2DBB767200B8E893 /* PBXContainerItemProxy */;
+		};
+		C7C1129C2DBB769200B8E893 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C7C1126B2DBB767200B8E893 /* SplunkInteractions */;
+			targetProxy = C7C1129B2DBB769200B8E893 /* PBXContainerItemProxy */;
 		};
 		E468962F2B21C85800727A6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -8607,6 +8857,366 @@
 			};
 			name = "Release-staticlib";
 		};
+		C7C112802DBB767200B8E893 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStart;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
+			};
+			name = Debug;
+		};
+		C7C112812DBB767200B8E893 /* Debug-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStart;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
+			};
+			name = "Debug-mh_dylib";
+		};
+		C7C112822DBB767200B8E893 /* Debug-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStart;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
+			};
+			name = "Debug-staticlib";
+		};
+		C7C112832DBB767200B8E893 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStart;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C7C112842DBB767200B8E893 /* Release-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStart;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-mh_dylib";
+		};
+		C7C112852DBB767200B8E893 /* Release-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStart;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-staticlib";
+		};
+		C7C112922DBB767D00B8E893 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStartTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C7C112932DBB767D00B8E893 /* Debug-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStartTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-mh_dylib";
+		};
+		C7C112942DBB767D00B8E893 /* Debug-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStartTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-staticlib";
+		};
+		C7C112952DBB767D00B8E893 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStartTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C7C112962DBB767D00B8E893 /* Release-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStartTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-mh_dylib";
+		};
+		C7C112972DBB767D00B8E893 /* Release-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkAppStartTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-staticlib";
+		};
 		E46896302B21C85800727A6A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B536BFF2B693BED004A6C7C /* Debug-mh_dylib.xcconfig */;
@@ -8947,6 +9557,32 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		C7C1127F2DBB767200B8E893 /* Build configuration list for PBXNativeTarget "SplunkInteractions" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C7C112802DBB767200B8E893 /* Debug */,
+				C7C112812DBB767200B8E893 /* Debug-mh_dylib */,
+				C7C112822DBB767200B8E893 /* Debug-staticlib */,
+				C7C112832DBB767200B8E893 /* Release */,
+				C7C112842DBB767200B8E893 /* Release-mh_dylib */,
+				C7C112852DBB767200B8E893 /* Release-staticlib */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C7C112912DBB767D00B8E893 /* Build configuration list for PBXNativeTarget "SplunkInteractionsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C7C112922DBB767D00B8E893 /* Debug */,
+				C7C112932DBB767D00B8E893 /* Debug-mh_dylib */,
+				C7C112942DBB767D00B8E893 /* Debug-staticlib */,
+				C7C112952DBB767D00B8E893 /* Release */,
+				C7C112962DBB767D00B8E893 /* Release-mh_dylib */,
+				C7C112972DBB767D00B8E893 /* Release-staticlib */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E46896322B21C85800727A6A /* Build configuration list for PBXNativeTarget "SplunkAgentTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -8984,6 +9620,14 @@
 			requirement = {
 				branch = develop;
 				kind = branch;
+			};
+		};
+		C7C1126F2DBB767200B8E893 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/open-telemetry/opentelemetry-swift";
+			requirement = {
+				kind = exactVersion;
+				version = 1.14.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -9058,6 +9702,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4BAA09ED2D9360A000B7D6AE /* XCLocalSwiftPackageReference "../SplunkCrashReporter" */;
 			productName = SplunkCrashReporter;
+		};
+		C7C1126E2DBB767200B8E893 /* OpenTelemetryApi */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C7C1126F2DBB767200B8E893 /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			productName = OpenTelemetryApi;
+		};
+		C7C1129E2DBB78D300B8E893 /* CiscoInteractions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
+			productName = CiscoInteractions;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
