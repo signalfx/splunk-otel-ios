@@ -16,19 +16,30 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
-/// Session Start Event. Sent when a session starts.
+/// Session Start event. Sent when a session starts.
 class SessionStartEvent: AgentEvent {
+
+    // MARK: - Event Identification
+
+    let domain = "mrum"
+    let name = "session_start"
+    let instrumentationScope = PackageIdentifier.default(named: "agent")
+    let component = "session.start"
+
+
+    // MARK: - Event properties
+
+    var sessionID: String?
+    var timestamp: Date?
+    var attributes: [String: EventAttributeValue]?
+    var body: EventAttributeValue?
+
 
     // MARK: - Initialization
 
     public init(sessionID: String, timestamp: Date, userID: String) {
-        super.init()
-
-        // Event identification
-        name = "session_start"
-        instrumentationScope = "com.splunk.rum.agent"
 
         // Event properties
         self.sessionID = sessionID

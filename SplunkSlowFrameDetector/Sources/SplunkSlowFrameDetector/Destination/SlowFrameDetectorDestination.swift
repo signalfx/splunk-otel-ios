@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// Describes a destination into which the SlowFrameDetector module sends its results.
 protocol SlowFrameDetectorDestination {

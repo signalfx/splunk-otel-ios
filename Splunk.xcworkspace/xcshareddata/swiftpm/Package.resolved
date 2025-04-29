@@ -1,5 +1,5 @@
 {
-  "originHash" : "086cbf8ba05fee02327b46721643451f4c667c178e559c7a6787221339f1d7b4",
+  "originHash" : "ea349202d89427ca9c4e6b4fc0cc4218b403d37c867c7782cb9a97532f44b2b3",
   "pins" : [
     {
       "identity" : "grpc-swift",
@@ -34,7 +34,7 @@
       "location" : "git@github.com:smartlook/smartlook-ios-sdk-private.git",
       "state" : {
         "branch" : "develop",
-        "revision" : "814c1a3e2650ee705ef0cfb0419000397bbf792a"
+        "revision" : "91eef6ec6602fb90d409a77bbb4c26cbd3445ffc"
       }
     },
     {

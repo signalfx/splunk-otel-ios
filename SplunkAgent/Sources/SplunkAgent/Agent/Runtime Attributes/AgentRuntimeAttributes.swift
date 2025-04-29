@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
 /// Defines runtime attributes in the agent space.
 protocol AgentRuntimeAttributes: RuntimeAttributes {

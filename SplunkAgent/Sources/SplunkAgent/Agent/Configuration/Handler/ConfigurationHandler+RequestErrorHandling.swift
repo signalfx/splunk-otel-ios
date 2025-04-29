@@ -27,7 +27,7 @@ extension ConfigurationHandler {
         case let .server(serverDetail):
             setupReloadTimer(in: serverDetail.retryAfterMs)
 
-            internalLogger.log(level: .warn) {
+            logger.log(level: .warn) {
                 """
                 Fetching remote configuration failed with an internal server error. \n
                 Status code: \(serverDetail.statusCode)
@@ -37,17 +37,17 @@ extension ConfigurationHandler {
             }
 
         case .noData:
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Fetching remote configuration failed with an empty server response."
             }
 
         case .sessionDataFailed:
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Fetching remote configuration failed due to an internal `URLSession` error: \(error.localizedDescription)."
             }
 
         case let .statusCode(statusCode):
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Fetching remote configuration failed with a non-success response code: \(statusCode)."
             }
         }
@@ -57,14 +57,14 @@ extension ConfigurationHandler {
 
         switch error {
         case .missingConfigurationAppName:
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Fetching remote configuration failed due to a missing application name."
             }
         }
     }
 
     func handleError(_ error: Error) {
-        internalLogger.log(level: .info) {
+        logger.log(level: .info) {
             "Fetching remote configuration failed with an error: \(error.localizedDescription)"
         }
     }

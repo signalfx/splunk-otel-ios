@@ -15,9 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoDiskStorage
+import CiscoEncryption
+import Foundation
 import OpenTelemetryProtocolExporterCommon
 import SwiftProtobuf
-import Foundation
+
 
 /// Basic implementation of exporters
 public class OTLPBackgroundHTTPBaseExporter {
@@ -28,6 +31,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     let httpClient: BackgroundHTTPClient
     let envVarHeaders: [(String, String)]?
     let config: OtlpConfiguration
+    let diskStorage: DiskStorage
 
 
     // MARK: - Initialization
@@ -36,17 +40,31 @@ public class OTLPBackgroundHTTPBaseExporter {
         endpoint: URL,
         config: OtlpConfiguration = OtlpConfiguration(),
         qosConfig: SessionQOSConfiguration,
-        envVarHeaders: [(String, String)]? = EnvVarHeaders.attributes
+        envVarHeaders: [(String, String)]? = EnvVarHeaders.attributes,
+        diskStorage: DiskStorage = FilesystemDiskStorage(
+            prefix: FilesystemPrefix(module: "OTLPBackgroundExporter"),
+            rules: Rules(
+                relativeUsedSize: 0.2,
+                absoluteUsedSize: .init(value: 200, unit: .megabytes)
+            ),
+            encryption: NoneEncryption()
+        )
     ) {
         self.envVarHeaders = envVarHeaders
         self.endpoint = endpoint
         self.config = config
+        self.diskStorage = diskStorage
 
-        httpClient = BackgroundHTTPClient(sessionQosConfiguration: qosConfig)
+        httpClient = BackgroundHTTPClient(sessionQosConfiguration: qosConfig, diskStorage: diskStorage)
 
         // Get incomplete requests and check for stalled files
-        httpClient.getAllSessionsTasks { [weak self] tasks in
-            self?.checkStalledUploadsOperation(tasks: tasks)
+        // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
+        let cleanTime = DispatchTime.now() + .seconds(Int.random(in: 5 ... 8))
+
+        DispatchQueue.global(qos: .utility).asyncAfter(deadline: cleanTime) { [weak self] in
+            self?.httpClient.getAllSessionsTasks { [weak self] tasks in
+                self?.checkStalledUploadsOperation(tasks: tasks)
+            }
         }
     }
 
@@ -75,54 +93,27 @@ public class OTLPBackgroundHTTPBaseExporter {
             }
             .compactMap { $0.id }
 
-        // Get enumerator for all files in cache folder
-        guard let uploadsCacheFilesEnumerator = getCacheEnumerator() else {
+        guard let uploadList = try? diskStorage.list(forKey: KeyBuilder.uploadsKey) else {
             return
         }
 
-        // Enumerate files in cache folder
-        for case let fileUrl as URL in uploadsCacheFilesEnumerator {
-            guard 
-                let fileName = fetchFileName(for: fileUrl),
-                let requestId = UUID(uuidString: fileName)
-            else {                
-                continue
-            }
+        for file in uploadList {
 
             // If there is no upload task for file in cache folder, create RequestDescriptor and plan its upload to server
             // Note:
             //      File names are UUIDs of tasks
-            if !taskIdentifiers.contains(where: { $0.uuidString == fileName }) {
+            if
+                let requestId = UUID(uuidString: file.key),
+                !taskIdentifiers.contains(where: { $0 == requestId })
+            {
                 let requestDescriptor = RequestDescriptor(
                     id: requestId,
                     endpoint: endpoint,
                     explicitTimeout: config.timeout
                 )
 
-                httpClient.send(requestDescriptor)
+                try? httpClient.send(requestDescriptor)
             }
         }
-    }
-
-    func fetchFileName(for file: URL) -> String? {
-        let fileProperties = try? file.resourceValues(forKeys: [.nameKey])
-        return fileProperties?.name
-    }
-
-    func getCacheEnumerator() -> FileManager.DirectoryEnumerator? {
-        // Get folder where to upload files are stored
-        guard let uploadsCacheFolder = DiskCache.cache(subfolder: .uploadFiles) else {
-            return nil
-        }
-
-        // Get enumerator for all stalled files
-        let propertyKeys: [URLResourceKey] = [.nameKey]
-
-        return FileManager.default.enumerator(
-            at: uploadsCacheFolder,
-            includingPropertiesForKeys: propertyKeys,
-            options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants],
-            errorHandler: nil
-        )
     }
 }

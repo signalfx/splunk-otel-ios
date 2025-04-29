@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetrySdk
-internal import SplunkLogger
 
 /// Structure that holds a configuration for an initial SDK setup.
 ///
@@ -89,7 +88,6 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     var sessionTimeout: Double = ConfigurationDefaults.sessionTimeout
     var maxSessionLength: Double = ConfigurationDefaults.maxSessionLength
     var recordingEnabled: Bool = ConfigurationDefaults.recordingEnabled
-    let internalLogger = InternalLogger(configuration: .agent(category: "Configuration"))
 
 
     // MARK: - Initialization
@@ -102,7 +100,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     ///   - appName: A required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
     ///   - deploymentEnvironment: A required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
     ///   Deployment environment is sent in all signals as a resource.
-    ///   
+    ///
     /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
     public init(rumAccessToken: String, endpoint: EndpointConfiguration, appName: String, deploymentEnvironment: String) throws {
 

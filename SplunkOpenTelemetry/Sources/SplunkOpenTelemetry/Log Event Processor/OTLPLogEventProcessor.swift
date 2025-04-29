@@ -19,9 +19,8 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
-import SplunkSharedProtocols
+import SplunkCommon
 import SplunkOpenTelemetryBackgroundExporter
-import SplunkLogger
 
 /// OTLPLogEventProcessor sends OpenTelemetry Logs enriched with Resources via an instantiated background exporter.
 public class OTLPLogEventProcessor: LogEventProcessor {
@@ -31,17 +30,17 @@ public class OTLPLogEventProcessor: LogEventProcessor {
     // OTel logger provider
     private let loggerProvider: LoggerProvider
 
-    // Internal Logger
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk RUM OTel", category: "Logs"))
-
     // Logger background dispatch queues
-    private let backgroundQueue = DispatchQueue(label: "com.splunk.rum.LogEventProcessor", qos: .utility)
+    private let backgroundQueue = DispatchQueue(
+        label: PackageIdentifier.default(named: "LogEventProcessor"),
+        qos: .utility
+    )
 
     // Stored properties for Unit tests
 #if DEBUG
     public var resource: Resource?
-    public var storedLastProcessedEvent: (any Event)?
-    public var storedLastSentEvent: (any Event)?
+    public var storedLastProcessedEvent: (any AgentEvent)?
+    public var storedLastSentEvent: (any AgentEvent)?
 #endif
 
 
@@ -58,6 +57,9 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         let envVarHeaders = [(String, String)]()
 
         let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
+
+        // Initialize attribute checker proxy exporter
+        let attributeCheckerExporter = AttributeCheckerLogExporter(proxy: backgroundLogExporter)
 
         // Initialize LogRecordProcessor
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(
@@ -107,11 +109,11 @@ public class OTLPLogEventProcessor: LogEventProcessor {
 
     // MARK: - Events
 
-    public func sendEvent(_ event: any Event, completion: @escaping (Bool) -> Void) {
+    public func sendEvent(_ event: any AgentEvent, completion: @escaping (Bool) -> Void) {
         sendEvent(event: event, immediateProcessing: false, completion: completion)
     }
 
-    public func sendEvent(event: any Event, immediateProcessing: Bool , completion: @escaping (Bool) -> Void) {
+    public func sendEvent(event: any AgentEvent, immediateProcessing: Bool , completion: @escaping (Bool) -> Void) {
 #if DEBUG
         storedLastProcessedEvent = event
 #endif
@@ -128,7 +130,7 @@ public class OTLPLogEventProcessor: LogEventProcessor {
 
     // MARK: - Private methods
 
-    private func processEvent(event: any Event, completion: @escaping (Bool) -> Void) {
+    private func processEvent(event: any AgentEvent, completion: @escaping (Bool) -> Void) {
         let logger = self.loggerProvider.get(instrumentationScopeName: event.instrumentationScope)
 
         // Build LogRecordBuilder from LogEvent

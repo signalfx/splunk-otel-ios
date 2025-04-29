@@ -30,7 +30,7 @@ extension ConfigurationHandler {
                 self.configurationData = receivedData
                 storeConfiguration(receivedData)
 
-                self.internalLogger.log(level: .info) {
+                self.logger.log(level: .info) {
                     "Remote configuration was successfully fetched and stored."
                 }
             } catch let error as APIClientError {

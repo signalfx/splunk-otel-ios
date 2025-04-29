@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
+
 @testable import SplunkAppStart
 import XCTest
 
@@ -23,7 +23,7 @@ final class InitializeTests: XCTestCase {
         let destination = DebugDestination()
 
         let initializeStart = Date()
-        
+
         let eventName = "test"
         let eventTimestamp = Date()
 
@@ -32,7 +32,12 @@ final class InitializeTests: XCTestCase {
 
         appStart.startDetection()
 
-        appStart.reportAgentInitialize(start: initializeStart, end: Date(), events: [eventName : eventTimestamp])
+        appStart.reportAgentInitialize(
+            start: initializeStart,
+            end: Date(),
+            events: [eventName: eventTimestamp],
+            configurationSettings: [:]
+        )
 
         simulateColdStartNotifications()
 

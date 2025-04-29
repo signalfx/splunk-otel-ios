@@ -15,8 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoDiskStorage
+internal import CiscoLogger
 import Foundation
-import SplunkLogger
+import SplunkCommon
 
 /// Client for sending requests over HTTP.
 final class BackgroundHTTPClient: NSObject {
@@ -26,7 +28,9 @@ final class BackgroundHTTPClient: NSObject {
     private let urlSessionDelegateQueue = OperationQueue("URLSessionDelegate", maxConcurrents: 1, qualityOfService: .utility)
     private let sessionQosConfiguration: SessionQOSConfiguration
 
-    private let internalLogger = InternalLogger(configuration: .backgroundExporter(category: "BackgroundHTTPClient"))
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "BackgroundExporter")
+
+    private let diskStorage: DiskStorage
 
 
     // MARK: - Computed properties
@@ -49,35 +53,33 @@ final class BackgroundHTTPClient: NSObject {
 
     // MARK: - Initialization
 
-    init(sessionQosConfiguration: SessionQOSConfiguration) {
+    init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage) {
         self.sessionQosConfiguration = sessionQosConfiguration
+        self.diskStorage = diskStorage
+
         super.init()
     }
 
 
     // MARK: - Client logic
 
-    func send(_ requestDescriptor: RequestDescriptor) {
-
-        guard
-            let fileUrl = DiskCache.cache(subfolder: .uploadFiles, item: requestDescriptor.id.uuidString),
-            DiskCache.fileExists(at: fileUrl)
-        else {
-            self.internalLogger.log(level: .info) {
-                "File to upload doesn't exist for the given taskDescription: \(requestDescriptor)."
-            }
-
-            return
-        }
+    func send(_ requestDescriptor: RequestDescriptor) throws {
+        let fileKey = KeyBuilder(
+            requestDescriptor.id.uuidString,
+            parrentKeyBuilder: KeyBuilder.uploadsKey
+        )
 
         guard requestDescriptor.shouldSend else {
-            self.internalLogger.log(level: .info) {
+            self.logger.log(level: .info) {
                 "Maximal retry sent count exceeded for the given taskDescription: \(requestDescriptor)."
             }
 
-            DiskCache.clean(item: requestDescriptor.id.uuidString, in: .uploadFiles)
+            try diskStorage.delete(forKey: fileKey)
+
             return
         }
+
+        let fileUrl = try diskStorage.finalDestination(forKey: fileKey)
 
         let task = session.uploadTask(
             with: requestDescriptor.createRequest(),
@@ -117,7 +119,7 @@ extension BackgroundHTTPClient: URLSessionDataDelegate {
             return
         }
 
-        self.internalLogger.log(level: .info) {
+        self.logger.log(level: .info) {
             """
             Request to: \(requestDescriptor.endpoint.absoluteString) \n
             with a data task id: \(requestDescriptor.id) \n
@@ -135,7 +137,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             let taskDescription = task.taskDescription,
             let requestDescriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
         else {
-            self.internalLogger.log(level: .info) {
+            self.logger.log(level: .info) {
                 "Failed to reconstruct request descriptor for a request with an empty taskDescription: \(String(describing: task.taskDescription))."
             }
 
@@ -146,7 +148,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             let httpResponse = task.response as? HTTPURLResponse,
             !(200...299).contains(httpResponse.statusCode)
         {
-            self.internalLogger.log(level: .info) {
+            self.logger.log(level: .info) {
                 """
                 Request to: \(requestDescriptor.endpoint.absoluteString) \n
                 with a data task id: \(requestDescriptor.id) \n
@@ -154,10 +156,10 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
                 """
             }
 
-            send(requestDescriptor)
+            try? send(requestDescriptor)
         }
         else if let error {
-            self.internalLogger.log(level: .info) {
+            self.logger.log(level: .info) {
                 """
                 Request to: \(requestDescriptor.endpoint.absoluteString) \n
                 with a data task id: \(requestDescriptor.id) \n
@@ -165,11 +167,11 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
                 """
             }
 
-            send(requestDescriptor)
+            try? send(requestDescriptor)
         } else {
 
             if let httpResponse = task.response as? HTTPURLResponse {
-                self.internalLogger.log(level: .info) {
+                self.logger.log(level: .info) {
                     """
                     Request to: \(requestDescriptor.endpoint.absoluteString) \n
                     has been successfully received with status code \(httpResponse.statusCode).
@@ -177,7 +179,12 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
                 }
             }
 
-            DiskCache.clean(item: requestDescriptor.id.uuidString, in: .uploadFiles)
+            try? diskStorage.delete(
+                forKey: KeyBuilder(
+                    requestDescriptor.id.uuidString,
+                    parrentKeyBuilder: KeyBuilder.uploadsKey
+                )
+            )
         }
     }
 }

@@ -15,9 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoDiskStorage
+import Foundation
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
-import Foundation
 
 public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogRecordExporter {
 
@@ -30,21 +31,18 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
 
         let requestId = UUID()
 
-        guard
-            DiskCache.checkDiskSpaceAndIntegrity(),
-            let url = DiskCache.cache(subfolder: .uploadFiles, item: requestId.uuidString)
-        else {
-            return .failure
-        }
-
         do {
             let storeData = try body.serializedData()
-            try storeData.write(to: url)
+            try diskStorage.insert(
+                storeData,
+                forKey: KeyBuilder(
+                    requestId.uuidString,
+                    parrentKeyBuilder: KeyBuilder.uploadsKey
+                )
+            )
         } catch {
             return .failure
         }
-
-        DiskCache.refreshStatistics()
 
         let timeout = min(explicitTimeout ?? TimeInterval.greatestFiniteMagnitude, config.timeout)
 
@@ -54,9 +52,14 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
             explicitTimeout: timeout
         )
 
-        httpClient.send(requestDescriptor)
+        do {
+            try httpClient.send(requestDescriptor)
 
-        return .success
+            return .success
+        } catch {
+
+            return .failure
+        }
     }
 
     public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
