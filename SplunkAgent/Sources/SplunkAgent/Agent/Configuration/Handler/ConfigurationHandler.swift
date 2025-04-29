@@ -15,9 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Combine
 import Foundation
-internal import SplunkLogger
+internal import SplunkCommon
 
 final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
 
@@ -31,7 +32,7 @@ final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
     var reloadSessionTimer: Timer?
     var cancellables = [AnyCancellable]()
 
-    let internalLogger = InternalLogger(configuration: .agent(category: "ConfigurationHandler"))
+    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Public properties
@@ -72,7 +73,7 @@ final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
             .default
             .publisher(for: DefaultSession.sessionWillResetNotification)
             .sink { [weak self] _ in
-                self?.internalLogger.log(level: .info) {
+                self?.logger.log(level: .info) {
                     "Session will reset, fetching new configuration."
                 }
 
@@ -83,7 +84,7 @@ final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
 
     private func setupConfiguration(data: Data?) {
         guard let data, !data.isEmpty else {
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Missing configuration data, aborting setting up configuration."
             }
 
@@ -94,7 +95,7 @@ final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
             let remoteConfiguration = try RemoteConfiguration.decode(data)
             configuration.mergeRemote(remoteConfiguration)
         } catch {
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "Failed to decode remote configuration data with an error: \(error)."
             }
         }

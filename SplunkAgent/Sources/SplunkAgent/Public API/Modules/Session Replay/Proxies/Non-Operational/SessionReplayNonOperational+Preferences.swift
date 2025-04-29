@@ -17,32 +17,30 @@ limitations under the License.
 
 // MARK: - Module preferences
 
-// Temporarily removed with Rendering Modes.
+/* Temporarily removed with Rendering Modes.
 
-// swiftformat:disable indent
-//
-// extension SessionReplayNonOperational {
-//
-//    // MARK: - Module preferences
-//
-//    var preferences: any SessionReplayModulePreferences {
-//        get {
-//            logAccess(toApi: #function)
-//
-//            return SessionReplayPreferences()
-//        }
-//
-//        // swiftlint:disable unused_setter_value
-//        set {
-//            logAccess(toApi: #function)
-//        }
-//        // swiftlint:enable unused_setter_value
-//    }
-//
-//    @discardableResult func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule {
-//        logAccess(toApi: #function)
-//
-//        return self
-//    }
-// }
-// swiftformat:enable indent
+extension SessionReplayNonOperational {
+
+    // MARK: - Module preferences
+
+    var preferences: any SessionReplayModulePreferences {
+        get {
+            logAccess(toApi: #function)
+
+            return SessionReplayPreferences()
+        }
+
+        // swiftlint:disable unused_setter_value
+        set {
+            logAccess(toApi: #function)
+        }
+        // swiftlint:enable unused_setter_value
+    }
+
+    @discardableResult func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule {
+        logAccess(toApi: #function)
+
+        return self
+    }
+}
+ */

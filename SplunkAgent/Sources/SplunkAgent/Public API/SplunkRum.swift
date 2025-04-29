@@ -15,20 +15,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
+internal import CiscoSessionReplay
+
 import Combine
 import Foundation
 import OpenTelemetryApi
 
+internal import SplunkAppStart
+internal import SplunkCommon
 
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
 #endif
-internal import SplunkAppStart
-internal import SplunkLogger
+
 internal import SplunkNetwork
 internal import SplunkOpenTelemetry
-internal import CiscoSessionReplay
-internal import SplunkSharedProtocols
 
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
@@ -53,7 +55,8 @@ public class SplunkRum: ObservableObject {
 
     lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
 
-    let logger = InternalLogger(configuration: .default(subsystem: "Splunk RUM Agent"))
+    let logProcessor: LogProcessor
+    let logger: LogAgent
 
 
     // MARK: - Internal (Modules Proxy)
@@ -113,6 +116,18 @@ public class SplunkRum: ObservableObject {
         // Assign identification
         currentUser = user
         currentSession = session
+
+        let logPoolName = PackageIdentifier.instance()
+        let verboseLogging = agentConfigurationHandler.configuration.enableDebugLogging
+
+        // Configure internal logging
+        logProcessor = DefaultLogProcessor(
+            poolName: logPoolName,
+            subsystem: PackageIdentifier.default
+        )
+        .verbosity(verboseLogging ? .verbose : .default)
+
+        logger = DefaultLogAgent(poolName: logPoolName, category: "Agent")
 
         // Assign AppState manager
         self.appStateManager = appStateManager
@@ -205,7 +220,7 @@ public class SplunkRum: ObservableObject {
 
         initializeEvents["modules_customized"] = Date()
 
-        agent.logger.log {
+        agent.logger.log(level: .notice, isPrivate: false) {
             "Splunk RUM Agent v\(Self.version)."
         }
 

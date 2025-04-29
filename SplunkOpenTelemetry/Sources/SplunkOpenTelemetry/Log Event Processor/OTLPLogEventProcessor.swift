@@ -19,9 +19,8 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
-import SplunkSharedProtocols
+import SplunkCommon
 import SplunkOpenTelemetryBackgroundExporter
-import SplunkLogger
 
 /// OTLPLogEventProcessor sends OpenTelemetry Logs enriched with Resources via an instantiated background exporter.
 public class OTLPLogEventProcessor: LogEventProcessor {
@@ -31,11 +30,11 @@ public class OTLPLogEventProcessor: LogEventProcessor {
     // OTel logger provider
     private let loggerProvider: LoggerProvider
 
-    // Internal Logger
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk RUM OTel", category: "Logs"))
-
     // Logger background dispatch queues
-    private let backgroundQueue = DispatchQueue(label: "com.splunk.rum.LogEventProcessor", qos: .utility)
+    private let backgroundQueue = DispatchQueue(
+        label: PackageIdentifier.default(named: "LogEventProcessor"),
+        qos: .utility
+    )
 
     // Stored properties for Unit tests
 #if DEBUG

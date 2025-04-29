@@ -15,10 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
+import SplunkCommon
 internal import SplunkCrashReporter
-import SplunkLogger
-import SplunkSharedProtocols
 
 public class CrashReports {
 
@@ -28,17 +28,18 @@ public class CrashReports {
     public unowned var sharedState: AgentSharedState?
 
     private var crashReporter: SPLKPLCrashReporter?
-    private let internalLogger = InternalLogger(configuration: .crashReporter(category: "CrashReporter"))
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "CrashReports")
     private var allUsedImageNames: [String] = []
     private var deviceDataDictionary: [CrashReportKeys: String] = [:]
 
     // A reference to the Module's data publishing callback.
     var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)?
 
+
     // MARK: - Module methods
 
-    public required init() {
-    }
+    public required init() {}
+
 
     // MARK: - Public methods
 
@@ -51,7 +52,7 @@ public class CrashReports {
 
         let signalConfig = SPLKPLCrashReporterConfig(signalHandlerType: signalHandlerType, symbolicationStrategy: [])
         guard let crashReporterInstance = SPLKPLCrashReporter(configuration: signalConfig) else {
-            internalLogger.log(level: .error) {
+            logger.log(level: .error) {
                 "PLCrashReporter failed to initialize."
             }
             return
@@ -66,7 +67,7 @@ public class CrashReports {
     public func reportCrashIfPresent() {
 
         guard crashReporter != nil else {
-            internalLogger.log(level: .warn) {
+            logger.log(level: .warn) {
                 "Could not report crash reporter: Not Installed."
             }
             return
@@ -75,7 +76,7 @@ public class CrashReports {
         let didCrash = crashReporter?.hasPendingCrashReport()
 
         guard didCrash ?? false else {
-            internalLogger.log(level: .info) {
+            logger.log(level: .info) {
                 "No Crash Report found."
             }
             return
@@ -96,7 +97,7 @@ public class CrashReports {
             let jsonPayload = CrashReportJSON.convertDictionaryToJSONString(reportPayload)
 
             guard let jsonPayload else {
-                internalLogger.log(level: .error) {
+                logger.log(level: .error) {
                     "CrashReporter failed to parse the Crash Report JSON payload."
                 }
                 return
@@ -106,7 +107,7 @@ public class CrashReports {
                 let systemInfo = report.systemInfo,
                 let timestamp = systemInfo.timestamp
             else {
-                internalLogger.log(level: .error) {
+                logger.log(level: .error) {
                     "CrashReporter did not receive a valid system info block."
                 }
                 return
@@ -118,7 +119,7 @@ public class CrashReports {
                 jsonPayload
             )
         } catch let error {
-            internalLogger.log(level: .error) {
+            logger.log(level: .error) {
                 "CrashReporter failed to load/parse with error: \(error)"
             }
             return
@@ -128,7 +129,7 @@ public class CrashReports {
         crashReporter?.purgePendingCrashReport()
 
         // And indicate that crash occured
-        internalLogger.log(level: .warn) {
+        logger.log(level: .warn) {
             "Crash ended previous execution of app."
         }
     }
@@ -139,14 +140,14 @@ public class CrashReports {
     private func initializeCrashReporter() -> Bool {
 
         guard crashReporter != nil else {
-            internalLogger.log(level: .warn) {
+            logger.log(level: .warn) {
                 "Could not enable crash reporter: Not Installed"
             }
             return false
         }
 
         guard !isDebuggerAttached() else {
-            internalLogger.log(level: .warn) {
+            logger.log(level: .warn) {
                 "Could not enable crash reporter: Debugger Attached."
             }
             return false
@@ -155,7 +156,7 @@ public class CrashReports {
         do {
             try crashReporter?.enableAndReturnError()
         } catch let error {
-            internalLogger.log(level: .error) {
+            logger.log(level: .error) {
                 "Could not enable crash reporter: \(error)"
             }
             return false
@@ -202,7 +203,7 @@ public class CrashReports {
             crashReporter?.customData = customData
         } catch {
             // We have failed to archive the custom data dictionary.
-            internalLogger.log(level: .warn) {
+            logger.log(level: .warn) {
                 "Failed to add the device stats to the crash reports data."
             }
         }
@@ -317,7 +318,7 @@ public class CrashReports {
         var isFirstTime = true
 
         guard let frames = frames as? [SPLKPLCrashReportStackFrameInfo] else {
-            internalLogger.log(level: .error) {
+            logger.log(level: .error) {
                 "CrashReporter received incorrect stackFrame type."
             }
             return []
@@ -337,7 +338,7 @@ public class CrashReports {
             let imageInfo = report.image(forAddress: instructionPointer)
             let imageName = imageInfo?.imageName
             if imageName == nil {
-                internalLogger.log(level: .warn) {
+                logger.log(level: .warn) {
                     "Agent could not locate image for instruction pointer."
                 }
             } else {

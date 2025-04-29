@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 @testable import SplunkAgent
-import SplunkSharedProtocols
+import SplunkCommon
 import XCTest
 
 final class DefaultModulesManagerTests: XCTestCase {

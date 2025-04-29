@@ -27,10 +27,11 @@ public enum RenderingMode: Equatable, Codable {
     /// Render the video only as a wireframe representation of screen data.
     case wireframe
 
-    // Temporarily removed
+    /* Temporarily removed
     /// Render the whole screen as a gray image.
     /// Actual content is not part of the final video.
-    // case noRendering
+    case noRendering
+     */
 }
 
 

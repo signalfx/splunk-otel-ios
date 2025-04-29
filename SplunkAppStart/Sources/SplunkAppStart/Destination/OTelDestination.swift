@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// Creates and sends an OpenTelemetry span from supplied app start data.
 struct OTelDestination: AppStartDestination {
