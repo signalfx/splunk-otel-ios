@@ -77,7 +77,7 @@ class DefaultModulesPool: AgentModulesPool {
 
         // Web View Instrumentation
         #if canImport(SplunkWebView)
-            knownModules.append(WebViewInstrumentation.self)
+            knownModules.append(WebViewInstrumentationInternal.self)
         #endif
 
         return knownModules

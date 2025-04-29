@@ -14,7 +14,7 @@ struct DevelAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RoutingView()
                 .onAppear(perform: {
                     agent.sessionReplay.start()
                 })

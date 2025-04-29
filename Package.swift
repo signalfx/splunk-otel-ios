@@ -275,9 +275,8 @@ let package = Package(
             path: "SplunkAppStart/Tests"
         ),
         
-        
         // MARK: Splunk Web Instrumentation
-        
+    
         .target(
             name: "SplunkWebView",
             dependencies: [
@@ -290,15 +289,11 @@ let package = Package(
         .testTarget(
             name: "SplunkWebViewTests",
             dependencies: [
-                "SplunkCommon",
-                "SplunkOpenTelemetry",
                 "SplunkWebView",
-                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkWebView/Tests"
         ),
-        
-        
+
         // MARK: Splunk Web Instrumentation Proxy
         
         .target(
@@ -316,6 +311,7 @@ let package = Package(
             dependencies: [
                 "SplunkCommon",
                 "SplunkOpenTelemetry",
+                "SplunkWebView",
                 "SplunkWebViewProxy",
                 .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],

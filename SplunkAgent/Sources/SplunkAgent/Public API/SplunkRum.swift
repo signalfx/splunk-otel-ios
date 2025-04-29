@@ -201,8 +201,8 @@ public class SplunkRum: ObservableObject {
         )
 
         // Get WebViewInstrumentation module, set its sharedState
-        if let webViewInstrumentationModule = agent.modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentation.self) {
-            WebViewInstrumentation.instance.sharedState = agent.sharedState
+        if let webViewInstrumentationModule = agent.modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
+            WebViewInstrumentationInternal.instance.sharedState = agent.sharedState
             agent.logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module installed."
             }

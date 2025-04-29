@@ -15,21 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
-import SplunkWebView
+import SwiftUI
+import SplunkAgent
+import SwiftUI
 
-public protocol WebViewInstrumentationModule {
-    func injectSessionId(into webView: WKWebView)
-}
-
-public final class WebViewInstrumentationProxy: WebViewInstrumentationModule {
-    public static let instance = WebViewInstrumentationProxy()
-
-    private let module: WebViewInstrumentationInternal = WebViewInstrumentationInternal.instance
-
-    internal init() {}
-
-    public func injectSessionId(into webView: WKWebView) {
-        module.injectSessionId(into: webView)
+struct TemplateView: View {
+    var body: some View {
+        VStack {
+            DemoHeaderView()
+            Spacer()
+            Text("New Demo/Test Content Here")
+            Spacer()
+        }
+        .padding()
+        Spacer()
     }
 }

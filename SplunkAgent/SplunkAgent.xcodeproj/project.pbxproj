@@ -166,19 +166,19 @@
 		522A70BB2DAD9F23008A2479 /* OTelDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522A70BA2DAD9F23008A2479 /* OTelDestination.swift */; };
 		522DB6C52DC123DF0047FBCD /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 522DB6C32DC123D00047FBCD /* XCTest.framework */; platformFilter = ios; };
 		522DB6C62DC123EC0047FBCD /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 522DB6C32DC123D00047FBCD /* XCTest.framework */; platformFilter = ios; };
-		5280E2832DC0AA5500770A90 /* WebViewInstrumentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E27F2DC0AA5500770A90 /* WebViewInstrumentationTests.swift */; };
-		5280E2842DC0AA5500770A90 /* WebViewInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E27B2DC0AA5500770A90 /* WebViewInstrumentation.swift */; };
+		527070D92DC13B9000EDD390 /* WebViewInstrumentationInternalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E27F2DC0AA5500770A90 /* WebViewInstrumentationInternalTests.swift */; };
+		527070DA2DC13BC600EDD390 /* WebViewInstrumentationProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E2892DC0AA6E00770A90 /* WebViewInstrumentationProxyTests.swift */; };
+		5280E2842DC0AA5500770A90 /* WebViewInstrumentationInternal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E27B2DC0AA5500770A90 /* WebViewInstrumentationInternal.swift */; };
 		5280E2852DC0AA5500770A90 /* WebViewInstrumentation+Module.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E27C2DC0AA5500770A90 /* WebViewInstrumentation+Module.swift */; };
 		5280E28D2DC0AA6E00770A90 /* WebViewInstrumentationProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E2862DC0AA6E00770A90 /* WebViewInstrumentationProxy.swift */; };
-		5280E28E2DC0AA6E00770A90 /* WebViewInstrumentationProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E2892DC0AA6E00770A90 /* WebViewInstrumentationProxyTests.swift */; };
 		5280E2912DC0AD6300770A90 /* API-1.0-WebViewInstrumentationModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5280E28F2DC0AD6300770A90 /* API-1.0-WebViewInstrumentationModule.swift */; };
 		5280E2922DC0AF1700770A90 /* SplunkWebViewProxy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D945A72DC0A70700DE8220 /* SplunkWebViewProxy.framework */; platformFilters = (ios, maccatalyst, ); };
 		52D9456A2DC0A62D00DE8220 /* SplunkWebView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D945612DC0A62C00DE8220 /* SplunkWebView.framework */; };
-		52D9457E2DC0A66200DE8220 /* SplunkCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; };
+		52D9457E2DC0A66200DE8220 /* SplunkCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; platformFilters = (ios, maccatalyst, tvos, ); };
 		52D945812DC0A6C100DE8220 /* SplunkWebView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D945612DC0A62C00DE8220 /* SplunkWebView.framework */; platformFilters = (ios, maccatalyst, ); };
 		52D945B02DC0A70700DE8220 /* SplunkWebViewProxy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D945A72DC0A70700DE8220 /* SplunkWebViewProxy.framework */; };
 		52D945C42DC0A71200DE8220 /* SplunkWebView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D945612DC0A62C00DE8220 /* SplunkWebView.framework */; };
-		52D945C52DC0A73700DE8220 /* SplunkCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; };
+		52D945C52DC0A73700DE8220 /* SplunkCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; platformFilters = (ios, maccatalyst, tvos, ); };
 		52D945C92DC0A7F500DE8220 /* CiscoLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 52D945C82DC0A7F500DE8220 /* CiscoLogger */; };
 		BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */; };
 		BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */; };
@@ -752,9 +752,9 @@
 		522A70B82DAD9EE3008A2479 /* SlowFrameDetectorDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorDestination.swift; sourceTree = "<group>"; };
 		522A70BA2DAD9F23008A2479 /* OTelDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTelDestination.swift; sourceTree = "<group>"; };
 		522DB6C32DC123D00047FBCD /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		5280E27B2DC0AA5500770A90 /* WebViewInstrumentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentation.swift; sourceTree = "<group>"; };
+		5280E27B2DC0AA5500770A90 /* WebViewInstrumentationInternal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentationInternal.swift; sourceTree = "<group>"; };
 		5280E27C2DC0AA5500770A90 /* WebViewInstrumentation+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WebViewInstrumentation+Module.swift"; sourceTree = "<group>"; };
-		5280E27F2DC0AA5500770A90 /* WebViewInstrumentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentationTests.swift; sourceTree = "<group>"; };
+		5280E27F2DC0AA5500770A90 /* WebViewInstrumentationInternalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentationInternalTests.swift; sourceTree = "<group>"; };
 		5280E2862DC0AA6E00770A90 /* WebViewInstrumentationProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentationProxy.swift; sourceTree = "<group>"; };
 		5280E2892DC0AA6E00770A90 /* WebViewInstrumentationProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewInstrumentationProxyTests.swift; sourceTree = "<group>"; };
 		5280E28F2DC0AD6300770A90 /* API-1.0-WebViewInstrumentationModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-WebViewInstrumentationModule.swift"; sourceTree = "<group>"; };
@@ -2301,7 +2301,7 @@
 		5280E27D2DC0AA5500770A90 /* SplunkWebView */ = {
 			isa = PBXGroup;
 			children = (
-				5280E27B2DC0AA5500770A90 /* WebViewInstrumentation.swift */,
+				5280E27B2DC0AA5500770A90 /* WebViewInstrumentationInternal.swift */,
 				5280E27C2DC0AA5500770A90 /* WebViewInstrumentation+Module.swift */,
 			);
 			path = SplunkWebView;
@@ -2318,7 +2318,7 @@
 		5280E2802DC0AA5500770A90 /* SplunkWebViewTests */ = {
 			isa = PBXGroup;
 			children = (
-				5280E27F2DC0AA5500770A90 /* WebViewInstrumentationTests.swift */,
+				5280E27F2DC0AA5500770A90 /* WebViewInstrumentationInternalTests.swift */,
 			);
 			path = SplunkWebViewTests;
 			sourceTree = "<group>";
@@ -4380,8 +4380,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5280E2832DC0AA5500770A90 /* WebViewInstrumentationTests.swift in Sources */,
-				5280E2842DC0AA5500770A90 /* WebViewInstrumentation.swift in Sources */,
+				5280E2842DC0AA5500770A90 /* WebViewInstrumentationInternal.swift in Sources */,
 				5280E2852DC0AA5500770A90 /* WebViewInstrumentation+Module.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4390,6 +4389,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				527070D92DC13B9000EDD390 /* WebViewInstrumentationInternalTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4398,7 +4398,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5280E28D2DC0AA6E00770A90 /* WebViewInstrumentationProxy.swift in Sources */,
-				5280E28E2DC0AA6E00770A90 /* WebViewInstrumentationProxyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4406,6 +4405,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				527070DA2DC13BC600EDD390 /* WebViewInstrumentationProxyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4629,11 +4629,21 @@
 		};
 		52D945CB2DC0A82800DE8220 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilters = (
+				ios,
+				maccatalyst,
+				tvos,
+			);
 			target = 4B9640832D60FD04009A2E7F /* SplunkCommon */;
 			targetProxy = 52D945CA2DC0A82800DE8220 /* PBXContainerItemProxy */;
 		};
 		52D945CD2DC0A84D00DE8220 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilters = (
+				ios,
+				maccatalyst,
+				tvos,
+			);
 			target = 4B9640832D60FD04009A2E7F /* SplunkCommon */;
 			targetProxy = 52D945CC2DC0A84D00DE8220 /* PBXContainerItemProxy */;
 		};
@@ -9077,7 +9087,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9090,12 +9100,15 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 			};
 			name = Debug;
 		};
@@ -9114,7 +9127,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9127,12 +9140,15 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 			};
 			name = "Debug-mh_dylib";
 		};
@@ -9151,7 +9167,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9164,12 +9180,15 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 			};
 			name = "Debug-staticlib";
 		};
@@ -9188,7 +9207,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9201,11 +9220,14 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -9225,7 +9247,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9238,11 +9260,14 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = "Release-mh_dylib";
@@ -9262,7 +9287,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9275,11 +9300,14 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = "Release-staticlib";
@@ -9292,7 +9320,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9312,7 +9340,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9332,7 +9360,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9352,7 +9380,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9372,7 +9400,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9392,7 +9420,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9419,7 +9447,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9432,12 +9460,15 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 			};
 			name = Debug;
 		};
@@ -9456,7 +9487,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9469,12 +9500,15 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 			};
 			name = "Debug-mh_dylib";
 		};
@@ -9493,7 +9527,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9506,12 +9540,15 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 			};
 			name = "Debug-staticlib";
 		};
@@ -9530,7 +9567,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9543,11 +9580,14 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -9567,7 +9607,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9580,11 +9620,14 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = "Release-mh_dylib";
@@ -9604,7 +9647,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -9617,11 +9660,14 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_INSTALL_MODULE = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TVOS_DEPLOYMENT_TARGET = 15;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = "Release-staticlib";
@@ -9634,7 +9680,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewProxyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9654,7 +9700,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewProxyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9674,7 +9720,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewProxyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9694,7 +9740,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewProxyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9714,7 +9760,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewProxyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -9734,7 +9780,7 @@
 				DEVELOPMENT_TEAM = 2B838T8T8L;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkWebViewProxyTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

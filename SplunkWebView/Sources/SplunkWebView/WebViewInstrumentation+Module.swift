@@ -1,22 +1,50 @@
+//
+/*
+Copyright 2025 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import Foundation
-import SplunkWebView
 import SplunkCommon
 import WebKit
 
-extension WebViewInstrumentation: Module {
-    convenience public init() {}
+// ModuleConfiguration conformance
+public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
 
-    public typealias Configuration = Void // No configuration
-    public typealias RemoteConfiguration = Void // No remote configuration
+// RemoteModuleConfiguration conformance
+public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
+    public var enabled: Bool
+    
+    public init?(from data: Data) {
+        return nil
+    }
+}
+
+extension WebViewInstrumentationInternal: Module {
+
+    public typealias Configuration = WebViewInstrumentationConfiguration
+    public typealias RemoteConfiguration = WebViewInstrumentationRemoteConfiguration
 
     // Module conformance
-    public typealias EventMetadata = Void
-    public typealias EventData = Void
+    public typealias EventMetadata = WebViewInstrumentationMetadata
+    public typealias EventData = WebViewInstrumentationData
 
     public func install(with configuration: (any ModuleConfiguration)?,
                        remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?) {}
 
-    public func onPublish(data: @escaping (Void, Void) -> Void) {}
+    public func onPublish(data: @escaping (WebViewInstrumentationMetadata, WebViewInstrumentationData) -> Void) {}
 
-    public func deleteData(for metadata: Any) {}
+    public func deleteData(for metadata: any SplunkCommon.ModuleEventMetadata) {}
+
 }

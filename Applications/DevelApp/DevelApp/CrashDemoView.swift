@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,21 +15,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
-import SplunkWebView
+import SwiftUI
 
-public protocol WebViewInstrumentationModule {
-    func injectSessionId(into webView: WKWebView)
-}
-
-public final class WebViewInstrumentationProxy: WebViewInstrumentationModule {
-    public static let instance = WebViewInstrumentationProxy()
-
-    private let module: WebViewInstrumentationInternal = WebViewInstrumentationInternal.instance
-
-    internal init() {}
-
-    public func injectSessionId(into webView: WKWebView) {
-        module.injectSessionId(into: webView)
+struct CrashDemoView: View {
+    
+    var body: some View {
+        VStack {
+            DemoHeaderView()
+            Spacer()
+            Button("Crash") {
+                // Simulate a crash
+                #if DEBUG
+                fatalError("Test fatal error from DevelApp")
+                #endif
+            }
+            Spacer()
+        }
+        .padding()
     }
 }
