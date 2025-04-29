@@ -59,11 +59,11 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
 
         // Initialize attribute checker proxy exporter
-        let attributeCheckerExporter = AttributeCheckerLogExporter(proxy: backgroundLogExporter)
+        let attributeCheckerExporter = AttributeCheckerLogExporter(proxy: logToSpanExporter)
 
         // Initialize LogRecordProcessor
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(
-            logRecordExporter: logToSpanExporter
+            logRecordExporter: attributeCheckerExporter
         )
 
         // Initialize AttributesLogRecordProcessor as the first stage of processing,
