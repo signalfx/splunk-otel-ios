@@ -82,7 +82,7 @@ final class BackgroundHTTPClient: NSObject {
         let fileUrl = try diskStorage.finalDestination(forKey: fileKey)
 
         guard FileManager.default.fileExists(atPath: fileUrl.path) else {
-            self.internalLogger.log(level: .error) {
+            self.logger.log(level: .error) {
                 "File does not exist at path: \(fileUrl)."
             }
 
