@@ -66,7 +66,7 @@ final class BackgroundHTTPClient: NSObject {
     func send(_ requestDescriptor: RequestDescriptor) throws {
         let fileKey = KeyBuilder(
             requestDescriptor.id.uuidString,
-            parrentKeyBuilder: KeyBuilder.uploadsKey
+            parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
         )
 
         guard requestDescriptor.shouldSend else {
@@ -80,6 +80,14 @@ final class BackgroundHTTPClient: NSObject {
         }
 
         let fileUrl = try diskStorage.finalDestination(forKey: fileKey)
+
+        guard FileManager.default.fileExists(atPath: fileUrl.path) else {
+            self.logger.log(level: .error) {
+                "File does not exist at path: \(fileUrl)."
+            }
+
+            return
+        }
 
         let task = session.uploadTask(
             with: requestDescriptor.createRequest(),
@@ -182,7 +190,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             try? diskStorage.delete(
                 forKey: KeyBuilder(
                     requestDescriptor.id.uuidString,
-                    parrentKeyBuilder: KeyBuilder.uploadsKey
+                    parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
                 )
             )
         }
