@@ -39,6 +39,8 @@ let package = Package(
                 "SplunkOpenTelemetry",
                 "SplunkANRReporter",
                 "SplunkAppStart",
+		"SplunkWebView",
+		"SplunkWebViewProxy",
                 .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAgent",
@@ -271,6 +273,53 @@ let package = Package(
                 .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAppStart/Tests"
+        ),
+        
+        
+        // MARK: Splunk Web Instrumentation
+        
+        .target(
+            name: "SplunkWebView",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+            ],
+            path: "SplunkWebView/Sources"
+        ),
+        .testTarget(
+            name: "SplunkWebViewTests",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                "SplunkWebView",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+            ],
+            path: "SplunkWebView/Tests"
+        ),
+        
+        
+        // MARK: Splunk Web Instrumentation Proxy
+        
+        .target(
+            name: "SplunkWebViewProxy",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                "SplunkWebView",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+            ],
+            path: "SplunkWebViewProxy/Sources"
+        ),
+        .testTarget(
+            name: "SplunkWebViewProxyTests",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                "SplunkWebViewProxy",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+            ],
+            path: "SplunkWebViewProxy/Tests"
         ),
         
         

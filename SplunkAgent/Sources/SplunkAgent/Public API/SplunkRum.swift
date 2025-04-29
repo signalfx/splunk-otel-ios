@@ -32,6 +32,10 @@ internal import SplunkCommon
 internal import SplunkNetwork
 internal import SplunkOpenTelemetry
 
+internal import SplunkWebView
+internal import SplunkWebViewProxy
+
+
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
 
@@ -195,6 +199,19 @@ public class SplunkRum: ObservableObject {
             rawConfiguration: configurationHandler.configurationData,
             moduleConfigurations: moduleConfigurations
         )
+
+        // Get WebViewInstrumentation module, set its sharedState
+        if let webViewInstrumentationModule = agent.modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentation.self) {
+            WebViewInstrumentation.instance.sharedState = agent.sharedState
+            agent.logger.log(level: .notice, isPrivate: false) {
+                "WebViewInstrumentation module installed."
+            }
+        } else {
+            agent.logger.log(level: .notice, isPrivate: false) {
+                "WebViewInstrumentation module not installed."
+            }
+        }
+
 
         initializeEvents["modules_connected"] = Date()
 
