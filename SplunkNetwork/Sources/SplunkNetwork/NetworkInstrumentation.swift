@@ -71,6 +71,7 @@ public class NetworkInstrumentation {
         // empty array defaults to standard exhaustive search
         if !delegateClasses.isEmpty {
             delegateClassesToInstrument = delegateClasses
+        } else {
             self.logger.log(level: .debug) {
                 "Standard Delegate classes not found, using exhaustive delegate class search.  This may incur performance overhead during startup."
             }
