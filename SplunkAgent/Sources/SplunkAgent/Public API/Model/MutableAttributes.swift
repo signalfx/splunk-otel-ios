@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 
-class MutableAttributes {
+public class MutableAttributes: Codable, Equatable {
     private var attributes: ThreadSafeDictionary<String, AttributeValue>
 
     // MARK: - Initialize
@@ -34,6 +34,68 @@ class MutableAttributes {
     public init(attributeSet: AttributeSet) {
         attributes = ThreadSafeDictionary<String, AttributeValue>()
         addAttributeSet(attributeSet)
+    }
+
+    // MARK: - Codable
+
+    public required init(from decoder: Decoder) throws {
+        attributes = ThreadSafeDictionary<String, AttributeValue>()
+        let container = try decoder.container(keyedBy: StringCodingKey.self)
+
+        for key in container.allKeys {
+            let value = try container.decode(AttributeValue.self, forKey: key)
+            attributes[key.stringValue] = value
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: StringCodingKey.self)
+        let dictionary = attributes.getAll()
+
+        for (key, value) in dictionary {
+            try container.encode(value, forKey: StringCodingKey(stringValue: key)!)
+        }
+    }
+
+    // Helper for coding with string keys
+    private struct StringCodingKey: CodingKey {
+        var stringValue: String
+        var intValue: Int?
+
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+            self.intValue = nil
+        }
+
+        init?(intValue: Int) {
+            self.stringValue = String(intValue)
+            self.intValue = intValue
+        }
+    }
+
+    // MARK: - Equatable
+
+    public static func == (lhs: MutableAttributes, rhs: MutableAttributes) -> Bool {
+        let lhsDict = lhs.attributes.getAll()
+        let rhsDict = rhs.attributes.getAll()
+
+        // Compare dictionary sizes first for quick check
+        guard lhsDict.count == rhsDict.count else {
+            return false
+        }
+
+        // Compare each key-value pair
+        for (key, lhsValue) in lhsDict {
+            guard let rhsValue = rhsDict[key] else {
+                return false
+            }
+
+            if lhsValue != rhsValue {
+                return false
+            }
+        }
+
+        return true
     }
 
     // MARK: - Subscripts

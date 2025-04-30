@@ -61,8 +61,8 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     /// Sets global attributes, which are sent with all signals.
     ///
-    /// Defaults to an empty dictionary.
-    public var globalAttributes: [String: String] = ConfigurationDefaults.globalAttributes
+    /// Defaults to an empty MutableAttributes object.
+    public var globalAttributes: MutableAttributes = ConfigurationDefaults.globalAttributes
 
     /// Span filter to be used to filter all outgoing spans.
     ///
@@ -192,7 +192,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     ///
     /// - Returns: The updated configuration structure.
     @discardableResult
-    public func globalAttributes(_ globalAttributes: [String: String]) -> Self {
+    public func globalAttributes(_ globalAttributes: MutableAttributes) -> Self {
         var updated = self
         updated.globalAttributes = globalAttributes
 

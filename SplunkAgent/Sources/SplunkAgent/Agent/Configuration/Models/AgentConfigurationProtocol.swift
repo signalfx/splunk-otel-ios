@@ -34,7 +34,7 @@ protocol AgentConfigurationProtocol: Codable, Equatable {
     var appVersion: String { get set }
     var enableDebugLogging: Bool { get set }
     var sessionSamplingRate: Double { get set }
-    var globalAttributes: [String: String] { get set }
+    var globalAttributes: MutableAttributes { get set }
     var spanFilter: ((SpanData) -> SpanData?)? { get set }
 
 
