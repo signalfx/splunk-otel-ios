@@ -217,6 +217,7 @@
 		C791AE002DAE8B81002AAA2B /* KeyBuilder+DefaultKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C791ADFF2DAE8B81002AAA2B /* KeyBuilder+DefaultKeys.swift */; };
 		C791AE022DAE8B99002AAA2B /* CiscoDiskStorage in Frameworks */ = {isa = PBXBuildFile; productRef = C791AE012DAE8B99002AAA2B /* CiscoDiskStorage */; };
 		C7A2BD1B2BB45363005D4CFB /* AppStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */; };
+		C7C112672DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7C112652DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift */; };
 		C7FFC4F52B7662E30035203B /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7FFC4F42B7662E30035203B /* Service.swift */; };
 		E4032E622B552343003D4392 /* DefaultSessionTestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */; };
 		E4032E642B55278C003D4392 /* PersistentSessionsValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4032E632B55278C003D4392 /* PersistentSessionsValidator.swift */; };
@@ -799,6 +800,7 @@
 		C76AB8DD2B7B7A2400CB4307 /* AlternativeRemoteConfiguration.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AlternativeRemoteConfiguration.json; sourceTree = "<group>"; };
 		C791ADFF2DAE8B81002AAA2B /* KeyBuilder+DefaultKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "KeyBuilder+DefaultKeys.swift"; sourceTree = "<group>"; };
 		C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateModel.swift; sourceTree = "<group>"; };
+		C7C112652DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPLogToSpanExporter.swift; sourceTree = "<group>"; };
 		C7FFC4F42B7662E30035203B /* Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Service.swift; sourceTree = "<group>"; };
 		E4032E612B552343003D4392 /* DefaultSessionTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSessionTestBuilder.swift; sourceTree = "<group>"; };
 		E4032E632B55278C003D4392 /* PersistentSessionsValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentSessionsValidator.swift; sourceTree = "<group>"; };
@@ -2010,6 +2012,7 @@
 				2A2926342DAD114900AB6F03 /* Attribute Checker Exporters */,
 				4B5A5CA82D60ED3D009DA0D5 /* Utils */,
 				4B5A5CA92D60ED3D009DA0D5 /* OTel.swift */,
+				C7C112662DB8D64C00B8E893 /* LogToSpanExporter */,
 			);
 			path = SplunkOpenTelemetry;
 			sourceTree = "<group>";
@@ -2494,6 +2497,14 @@
 				C7A2BD1A2BB45363005D4CFB /* AppStateModel.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		C7C112662DB8D64C00B8E893 /* LogToSpanExporter */ = {
+			isa = PBXGroup;
+			children = (
+				C7C112652DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift */,
+			);
+			path = LogToSpanExporter;
 			sourceTree = "<group>";
 		};
 		E405497D2DACF57500B7A2E4 /* User */ = {
@@ -4329,6 +4340,7 @@
 				2A2926372DAD11C800AB6F03 /* AttributeCheckerLogExporter.swift in Sources */,
 				E4A537422DA655E2002323E2 /* OLTPAttributesSpanProcessor.swift in Sources */,
 				4B96421A2D61375E009A2E7F /* OTel.swift in Sources */,
+				C7C112672DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift in Sources */,
 				2A5949DB2DA3FC2100F2E857 /* SplunkStdoutSpanExporter.swift in Sources */,
 				2A5949DC2DA3FC2100F2E857 /* SplunkStdoutLogExporter.swift in Sources */,
 				2AAEE8A42DBF71BA00791D5E /* NoopTraceProcessor.swift in Sources */,
