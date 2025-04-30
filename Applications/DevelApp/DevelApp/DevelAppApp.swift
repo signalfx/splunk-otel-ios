@@ -5,8 +5,8 @@
 //  Created by Pavel Kroh on 30.09.2023.
 //
 
-import SwiftUI
 import SplunkAgent
+import SwiftUI
 
 @main
 struct DevelAppApp: App {
@@ -14,7 +14,7 @@ struct DevelAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RoutingView()
                 .onAppear(perform: {
                     agent.sessionReplay.start()
                 })

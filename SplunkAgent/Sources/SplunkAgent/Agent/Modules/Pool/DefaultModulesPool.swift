@@ -38,6 +38,11 @@ internal import SplunkCommon
     internal import SplunkAppStart
 #endif
 
+#if canImport(SplunkWebView)
+    internal import SplunkWebView
+    internal import SplunkWebViewProxy
+#endif
+
 
 /// The class implements the default pool of available modules.
 class DefaultModulesPool: AgentModulesPool {
@@ -68,6 +73,11 @@ class DefaultModulesPool: AgentModulesPool {
         // Slow Frame Detector
         #if canImport(SplunkSlowFrameDetector)
             knownModules.append(SlowFrameDetector.self)
+        #endif
+
+        // Web View Instrumentation
+        #if canImport(SplunkWebView)
+            knownModules.append(WebViewInstrumentationInternal.self)
         #endif
 
         return knownModules

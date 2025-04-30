@@ -27,6 +27,7 @@ struct RequestDescriptor: Codable {
     let endpoint: URL
     let explicitTimeout: TimeInterval
     var sentCount: Int = 0
+    var fileKeyType: String
 
     var scheduled: Date {
         Calendar.current.date(byAdding: nextRequestDelay, to: Date()) ?? Date()
@@ -35,6 +36,7 @@ struct RequestDescriptor: Codable {
     var shouldSend: Bool {
         return sentCount <= 5
     }
+
 
     // MARK: - Request creation methods
 

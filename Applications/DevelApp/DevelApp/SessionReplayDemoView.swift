@@ -1,14 +1,31 @@
 //
-//  ContentView.swift
+/*
+Copyright 2025 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+//
+//  SessionReplayDemoView.swift
 //  DevelApp
 //
 //  Created by Pavel Kroh on 30.09.2023.
 //
 
-import SwiftUI
 import SplunkAgent
+import SwiftUI
 
-struct ContentView: View {
+struct SessionReplayDemoView: View {
 
     // MARK: - Versions
 
@@ -30,6 +47,7 @@ struct ContentView: View {
 
 
     // MARK: - View
+
     @State var now = Date()
 
     let timer = Timer.publish(every: 0.2, on: .current, in: .common).autoconnect()
@@ -45,7 +63,7 @@ struct ContentView: View {
                     .cornerRadius(4)
             }
             .padding(.vertical, 32)
-            
+
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
@@ -57,7 +75,7 @@ struct ContentView: View {
                 Text("Session ID: \(sessionId)")
                     .transition(.opacity)
                     .id("LabelSessionID" + sessionId)
-                
+
                 Text("User Tracking: \(userTrackingMode)")
             }
             .foregroundColor(Color(uiColor: .black))
@@ -82,7 +100,7 @@ struct ContentView: View {
             Spacer()
         }
         .padding()
-        .onReceive(sessionPublisher) { (output) in
+        .onReceive(sessionPublisher) { output in
             if let currentSessionId = output.object as? String {
                 withAnimation {
                     sessionId = currentSessionId
@@ -93,5 +111,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    SessionReplayDemoView()
 }

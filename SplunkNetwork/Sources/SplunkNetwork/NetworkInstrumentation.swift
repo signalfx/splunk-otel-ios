@@ -33,6 +33,17 @@ public class NetworkInstrumentation {
     /// Holds regex patterns from IgnoreURLs API
     private let ignoreURLs = IgnoreURLs()
 
+    private let delegateClassNames = [
+        "__NSURLSessionLocal",
+        "__NSCFURLSessionConnection",
+        "__NSCFRULLocalSessionConnection",
+        "__NSCFURLSession",
+        "__NSCFURLSessionTask",
+        "__NSCFURLSessionDataTask",
+        "__NSCFURLSessionDownloadTask",
+        "__NSCFURLSessionUploadTask",
+        "NSURLSessionDefault"
+    ]
 
     // MARK: - Public
 
@@ -48,13 +59,32 @@ public class NetworkInstrumentation {
     public func install(with configuration: (any ModuleConfiguration)?,
                         remoteConfiguration: (any RemoteModuleConfiguration)?) {
 
-        // Start up NSURLSession instrumentation
+        var delegateClassesToInstrument = nil as [AnyClass]?
+        var delegateClasses: [AnyClass] = []
+
+        // find concrete delegate classes
+        for className in delegateClassNames {
+            if let concreteClass = NSClassFromString(className) {
+                delegateClasses.append(concreteClass)
+            }
+        }
+        // empty array defaults to standard exhaustive search
+        if !delegateClasses.isEmpty {
+            delegateClassesToInstrument = delegateClasses
+        } else {
+            self.logger.log(level: .debug) {
+                "Standard Delegate classes not found, using exhaustive delegate class search.  This may incur performance overhead during startup."
+            }
+        }
+
+        // Start up URLSession instrumentation
         _ = URLSessionInstrumentation(configuration: URLSessionInstrumentationConfiguration(
             shouldRecordPayload: shouldRecordPayload,
             shouldInstrument: shouldInstrument,
             createdRequest: createdRequest,
             receivedResponse: receivedResponse,
-            receivedError: receivedError))
+            receivedError: receivedError,
+            delegateClassesToInstrument: delegateClassesToInstrument))
     }
 
     // Callback methods to modify URLSession monitoring

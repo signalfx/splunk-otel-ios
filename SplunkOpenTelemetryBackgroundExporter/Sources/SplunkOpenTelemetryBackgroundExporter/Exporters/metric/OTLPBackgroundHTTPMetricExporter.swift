@@ -38,17 +38,19 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
                 storeData,
                 forKey: KeyBuilder(
                     requestId.uuidString,
-                    parrentKeyBuilder: KeyBuilder.uploadsKey
+                    parrentKeyBuilder: getStorageKey()
                 )
             )
         } catch {
+
             return .failureNotRetryable
         }
 
         let requestDescriptor = RequestDescriptor(
             id: requestId,
             endpoint: endpoint,
-            explicitTimeout: config.timeout
+            explicitTimeout: config.timeout,
+            fileKeyType: getFileKeyType()
         )
 
         do {
@@ -56,6 +58,7 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
 
             return .success
         } catch {
+
             return .failureNotRetryable
         }
     }
@@ -69,5 +72,12 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
         semaphore.wait()
 
         return .success
+    }
+
+
+    // MARK: - Local override
+
+    override func getFileKeyType() -> String {
+        "metric"
     }
 }

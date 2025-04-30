@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-public class IgnoreURLs {
+public class IgnoreURLs: Codable {
     private var urlPatterns: [NSRegularExpression]
     
     public init() {
@@ -29,7 +29,24 @@ public class IgnoreURLs {
             try NSRegularExpression(pattern: pattern, options: [])
         }
     }
-    
+
+    public required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let patterns = try container.decode(Set<String>.self, forKey: .patterns)
+        self.urlPatterns = try patterns.map { pattern in
+            try NSRegularExpression(pattern: pattern, options: [])
+        }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case patterns
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(Set(getAllPatterns()), forKey: .patterns)
+    }
+
     @discardableResult
     public func clearPatterns() -> Int {
         let count = urlPatterns.count

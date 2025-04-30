@@ -84,16 +84,16 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     // MARK: - Stalled request operations
 
-    func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
+    private func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
         // Get ids from all incomplete requests
-        let taskIdentifiers = tasks
+        let taskDescriptions = tasks
             .compactMap { $0.taskDescription }
             .compactMap {
                 try? JSONDecoder().decode(RequestDescriptor.self, from: Data($0.utf8))
             }
-            .compactMap { $0.id }
 
-        guard let uploadList = try? diskStorage.list(forKey: KeyBuilder.uploadsKey) else {
+        guard let uploadList = try? diskStorage.list(forKey: getStorageKey()) else {
+
             return
         }
 
@@ -104,16 +104,28 @@ public class OTLPBackgroundHTTPBaseExporter {
             //      File names are UUIDs of tasks
             if
                 let requestId = UUID(uuidString: file.key),
-                !taskIdentifiers.contains(where: { $0 == requestId })
+                let taskDescription = taskDescriptions.first(where: { $0.id == requestId })
             {
                 let requestDescriptor = RequestDescriptor(
                     id: requestId,
                     endpoint: endpoint,
-                    explicitTimeout: config.timeout
+                    explicitTimeout: config.timeout,
+                    fileKeyType: taskDescription.fileKeyType
                 )
 
                 try? httpClient.send(requestDescriptor)
             }
         }
+    }
+
+
+    // MARK: - Helper functions
+
+    func getStorageKey() -> KeyBuilder {
+        KeyBuilder.uploadsKey.append(getFileKeyType())
+    }
+
+    func getFileKeyType() -> String {
+        "base"
     }
 }

@@ -37,10 +37,11 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
                 storeData,
                 forKey: KeyBuilder(
                     requestId.uuidString,
-                    parrentKeyBuilder: KeyBuilder.uploadsKey
+                    parrentKeyBuilder: getStorageKey()
                 )
             )
         } catch {
+
             return .failure
         }
 
@@ -49,7 +50,8 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
         let requestDescriptor = RequestDescriptor(
             id: requestId,
             endpoint: endpoint,
-            explicitTimeout: timeout
+            explicitTimeout: timeout,
+            fileKeyType: getFileKeyType()
         )
 
         do {
@@ -57,6 +59,7 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
 
             return .success
         } catch {
+
             return .failure
         }
     }
@@ -73,4 +76,11 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
     }
 
     public func shutdown(explicitTimeout: TimeInterval? = nil) {}
+
+
+    // MARK: - Local override
+
+    override func getFileKeyType() -> String {
+        "trace"
+    }
 }
