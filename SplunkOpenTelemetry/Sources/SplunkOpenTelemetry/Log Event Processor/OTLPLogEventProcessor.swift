@@ -56,16 +56,10 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         let configuration = OtlpConfiguration()
         let envVarHeaders = [(String, String)]()
 
-        // Initialize background exporter
-        let backgroundLogExporter = OTLPBackgroundHTTPLogExporter(
-            endpoint: logsEndpoint,
-            config: configuration,
-            qosConfig: SessionQOSConfiguration(),
-            envVarHeaders: envVarHeaders
-        )
+        let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
 
         // Initialize attribute checker proxy exporter
-        let attributeCheckerExporter = AttributeCheckerLogExporter(proxy: backgroundLogExporter)
+        let attributeCheckerExporter = AttributeCheckerLogExporter(proxy: logToSpanExporter)
 
         // Initialize LogRecordProcessor
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(
