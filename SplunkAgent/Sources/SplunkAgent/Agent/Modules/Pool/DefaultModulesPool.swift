@@ -17,8 +17,16 @@ limitations under the License.
 
 internal import SplunkCommon
 
+#if canImport(SplunkAppStart)
+    internal import SplunkAppStart
+#endif
+
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
+#endif
+
+#if canImport(SplunkNavigation)
+    internal import SplunkNavigation
 #endif
 
 #if canImport(SplunkNetwork)
@@ -32,10 +40,6 @@ internal import SplunkCommon
 
 #if canImport(SplunkSlowFrameDetector)
     internal import SplunkSlowFrameDetector
-#endif
-
-#if canImport(SplunkAppStart)
-    internal import SplunkAppStart
 #endif
 
 #if canImport(SplunkWebView)
@@ -63,6 +67,11 @@ class DefaultModulesPool: AgentModulesPool {
         // Session Replay
         #if canImport(CiscoSessionReplay)
             knownModules.append(CiscoSessionReplay.SessionReplay.self)
+        #endif
+
+        // Navigation Instrumentation
+        #if canImport(SplunkNavigation)
+            knownModules.append(Navigation.self)
         #endif
 
         // Network Instrumentation
