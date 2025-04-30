@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
+import Foundation
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import OpenTelemetryApi
-import Foundation
-import SplunkSharedProtocols
-import SplunkLogger
+import SplunkCommon
 
 public class OTLPLogToSpanExporter: LogRecordExporter {
 
@@ -29,7 +29,7 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
     private let agentVersion: String
 
     // Internal Logger
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "Log to span exporter", category: "Logs"))
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Log to Span Exporter")
 
 
     // MARK: - Initialization
@@ -56,7 +56,7 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
                 let spanName = spanName(from: log),
                 !spanName.isEmpty
             else {
-                internalLogger.log(level: .error) {
+                logger.log(level: .error) {
                     "Missing span name for log record"
                 }
                 continue
