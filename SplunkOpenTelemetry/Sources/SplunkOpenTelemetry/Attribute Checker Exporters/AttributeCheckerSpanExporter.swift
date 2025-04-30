@@ -65,7 +65,7 @@ class AttributeCheckerSpanExporter: SpanExporter {
     private func check(spans: [SpanData]) {
         for span in spans {
             for requiredAttribute in requiredAttributes {
-                guard let _ = span.attributes[requiredAttribute] else {
+                guard span.attributes[requiredAttribute] != nil else {
                     let spanName = span.name
 
                     logger.log(level: .error) {

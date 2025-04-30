@@ -35,4 +35,3 @@ public class WebViewToNativeBridge {
 extension SplunkRum {
     public static let webView = WebViewToNativeBridge(module: WebViewInstrumentationProxy.instance)
 }
-

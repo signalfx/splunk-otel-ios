@@ -34,8 +34,8 @@ public class OTLPTraceProcessor: TraceProcessor {
 
 
     // MARK: - Initialization
-    
-    required public init(
+
+    public required init(
         with tracesEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
@@ -74,7 +74,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         if debugEnabled {
             let stdoutExporter = SplunkStdoutSpanExporter()
             let stdoutSpanProcessor = SimpleSpanProcessor(spanExporter: stdoutExporter)
-            
+
             tracerProviderBuilder = tracerProviderBuilder.add(spanProcessor: stdoutSpanProcessor)
         }
 
