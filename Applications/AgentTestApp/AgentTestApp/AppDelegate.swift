@@ -33,6 +33,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 deploymentEnvironment: "dev"
             )
                 .enableDebugLogging(true)
+                .globalAttributes(MutableAttributes(dictionary: [
+                    "teststring": .string("value"),
+                    "testint": .int(100)]))
 
             _ = SplunkRum.install(with: agentConfig)
 
