@@ -344,7 +344,7 @@ public class MutableAttributes: Codable, Equatable {
         return attributes.contains(key: key)
     }
 
-    func getAll() -> [String: AttributeValue] {
+    public func getAll() -> [String: AttributeValue] {
         return attributes.getAll()
     }
 
@@ -358,6 +358,54 @@ public class MutableAttributes: Codable, Equatable {
 
     func count() -> Int {
         return attributes.count()
+    }
+
+    private func getAllAsAny() -> [String: Any] {
+        var result: [String: Any] = [:]
+        let dictionary = attributes.getAll()
+
+        for (key, value) in dictionary {
+            result[key] = convertToAny(value)
+        }
+
+        return result
+    }
+
+    public var all: [String: Any] {
+        return getAllAsAny()
+    }
+
+    private func convertToAny(_ value: AttributeValue) -> Any {
+        switch value {
+        case let .string(string):
+            return string
+        case let .bool(bool):
+            return bool
+        case let .int(int):
+            return int
+        case let .double(double):
+            return double
+        case let .array(array):
+            var result: [Any] = []
+            for element in array.values {
+                result.append(convertToAny(element))
+            }
+            return result
+        case let .stringArray(stringArray):
+            return stringArray
+        case let .boolArray(boolArray):
+            return boolArray
+        case let .intArray(intArray):
+            return intArray
+        case let .doubleArray(doubleArray):
+            return doubleArray
+        case let .set(attributeSet):
+            var result: [String: Any] = [:]
+            for (key, value) in attributeSet.labels {
+                result[key] = convertToAny(value)
+            }
+            return result
+        }
     }
 
     // MARK: - Description
