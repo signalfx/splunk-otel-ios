@@ -58,7 +58,14 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Initialization
 
-    required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
+    required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) throws {
+        guard let traceUrl = configuration.endpoint.traceEndpoint else {
+            throw AgentConfigurationError.invalidEndpoint(supplied: configuration.endpoint)
+        }
+
+        // ‼️ Using trace endpoint as a placeholder
+        let logUrl = traceUrl
+
         self.agent = agent
         self.eventsModel = eventsModel
 
@@ -86,45 +93,24 @@ class DefaultEventManager: AgentEventManager {
             osType: SystemInfo.type
         )
 
-        // Initialize log event processor. ‼️ Using trace endpoint as a placeholder
-        if let logUrl = configuration.endpoint.traceEndpoint {
-            logEventProcessor = OTLPLogEventProcessor(
-                with: logUrl,
-                resources: resources,
-                runtimeAttributes: agent.runtimeAttributes,
-                debugEnabled: configuration.enableDebugLogging
-            )
-
-            agent.logger.log(level: .info, isPrivate: false) {
-                "Using log url: \(logUrl)"
-            }
-        } else {
-            logEventProcessor = NoopLogEventProcessor()
-
-            agent.logger.log(level: .error, isPrivate: false) {
-                "Missing log endpoint URL. Logs will not be sent."
-            }
-        }
+        // Initialize log event processor.
+        logEventProcessor = OTLPLogEventProcessor(
+            with: logUrl,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            debugEnabled: configuration.enableDebugLogging
+        )
 
         // Initialize trace processor
-        if let traceUrl = configuration.endpoint.traceEndpoint {
-            traceProcessor = OTLPTraceProcessor(
-                with: traceUrl,
-                resources: resources,
-                runtimeAttributes: agent.runtimeAttributes,
-                debugEnabled: configuration.enableDebugLogging
-            )
+        traceProcessor = OTLPTraceProcessor(
+            with: traceUrl,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            debugEnabled: configuration.enableDebugLogging
+        )
 
-            logger.log(level: .info, isPrivate: false) {
-                "Using trace url: \(traceUrl)"
-            }
-
-        } else {
-            traceProcessor = NoopTraceProcessor()
-
-            logger.log(level: .error, isPrivate: false) {
-                "Missing trace endpoint URL. Traces will not be sent."
-            }
+        logger.log(level: .info, isPrivate: false) {
+            "Using trace url: \(traceUrl)"
         }
 
         // Starts listening to a Session Reset notification to send the Session Start event.

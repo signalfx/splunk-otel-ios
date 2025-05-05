@@ -192,7 +192,7 @@ public class SplunkRum: ObservableObject {
         agent.currentStatus = .running
 
         // Initialize Event manager
-        agent.eventManager = DefaultEventManager(with: configuration, agent: agent)
+        agent.eventManager = try DefaultEventManager(with: configuration, agent: agent)
 
         initializeEvents["event_manager_initialized"] = Date()
 
