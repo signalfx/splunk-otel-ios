@@ -155,13 +155,13 @@ public class SplunkRum: ObservableObject {
         let initializeStart = Date()
         var initializeEvents: [String: Date] = [:]
 
-        // Validate the configuration
-        try configuration.validate()
-
         // Only one instance is allowed
         if let sharedInstance = shared {
             return sharedInstance
         }
+
+        // Validate the configuration
+        try configuration.validate()
 
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = createConfigurationHandler(for: configuration)
