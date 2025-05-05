@@ -45,7 +45,9 @@ class DefaultEventManager: AgentEventManager {
     private unowned let agent: SplunkRum
 
     // Logger
-    private let logger: LogAgent
+    private var logger: LogAgent {
+        agent.logger
+    }
 
     // Events state storage
     let eventsModel: EventsModel
@@ -59,7 +61,6 @@ class DefaultEventManager: AgentEventManager {
     required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
         self.agent = agent
         self.eventsModel = eventsModel
-        logger = agent.logger
 
         let deviceManufacturer = "Apple"
 
@@ -94,13 +95,13 @@ class DefaultEventManager: AgentEventManager {
                 debugEnabled: configuration.enableDebugLogging
             )
 
-            logger.log(level: .info, isPrivate: false) {
+            agent.logger.log(level: .info, isPrivate: false) {
                 "Using log url: \(logUrl)"
             }
         } else {
             logEventProcessor = NoopLogEventProcessor()
 
-            logger.log(level: .error, isPrivate: false) {
+            agent.logger.log(level: .error, isPrivate: false) {
                 "Missing log endpoint URL. Logs will not be sent."
             }
         }
