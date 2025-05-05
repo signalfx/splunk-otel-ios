@@ -17,21 +17,13 @@ limitations under the License.
 
 import Foundation
 
-/// A dummy configuration handler. It is used for the non-operational instance, or on a target platform the agent is not fully supporting.
-final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
-
-    // MARK: - Configuration
-
-    var configurationData: Data? {
-        return nil
-    }
-
-    let configuration: any AgentConfigurationProtocol
-
-
-    // MARK: - Intialization
-
-    init(for configuration: any AgentConfigurationProtocol) {
-        self.configuration = configuration
+extension AgentConfiguration {
+    static var emptyConfiguration: AgentConfiguration {
+        return try! AgentConfiguration(
+            rumAccessToken: "token",
+            endpoint: EndpointConfiguration(realm: "realm"),
+            appName: "app name",
+            deploymentEnvironment: "env"
+        )
     }
 }

@@ -62,6 +62,15 @@ public class SplunkRum: ObservableObject {
     let logProcessor: LogProcessor
     let logger: LogAgent
 
+    static var privateInstance: SplunkRum?
+
+    static let noOpInstance = SplunkRum(
+        configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
+        user: NoOpUser(),
+        session: NoOpSession(),
+        appStateManager: NoOpAppStateManager()
+    )
+
 
     // MARK: - Internal (Modules Proxy)
 
@@ -80,7 +89,13 @@ public class SplunkRum: ObservableObject {
     /// An singleton instance of the Agent library.
     ///
     /// This instance is used to access all the SDK functions.
-    public private(set) static var instance: SplunkRum?
+    public static var instance: SplunkRum {
+        if let installedInstance = privateInstance {
+            return installedInstance
+        }
+
+        return noOpInstance
+    }
 
 
     // MARK: - Public API
@@ -154,21 +169,35 @@ public class SplunkRum: ObservableObject {
         var initializeEvents: [String: Date] = [:]
 
         // Only one instance is allowed
-        if let sharedInstance = instance {
+        if let sharedInstance = privateInstance {
             return sharedInstance
         }
 
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = createConfigurationHandler(for: configuration)
 
+        let session = DefaultSession()
+
+        // Preparation for sampling
+        let sampledOut = false
+        if sampledOut {
+            noOpInstance.currentStatus = .notRunning(.sampledOut)
+
+            noOpInstance.logger.log(level: .notice, isPrivate: false) {
+                "Agent sampled out."
+            }
+
+            return noOpInstance
+        }
+
         // Builds agent with default logic
         let agent = SplunkRum(
             configurationHandler: configurationHandler,
             user: DefaultUser(),
-            session: DefaultSession(),
+            session: session,
             appStateManager: AppStateManager()
         )
-        instance = agent
+        privateInstance = agent
 
         initializeEvents["agent_instance_initialized"] = Date()
 

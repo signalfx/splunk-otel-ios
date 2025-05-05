@@ -26,10 +26,10 @@ public extension UIView {
     /// Assigning `nil` removes previously assigned explicit sensitivity.
     var srSensitive: Bool? {
         get {
-            SplunkRum.instance?.sessionReplay.sensitivity[self]
+            SplunkRum.instance.sessionReplay.sensitivity[self]
         }
         set {
-            SplunkRum.instance?.sessionReplay.sensitivity[self] = newValue
+            SplunkRum.instance.sessionReplay.sensitivity[self] = newValue
         }
     }
 }
