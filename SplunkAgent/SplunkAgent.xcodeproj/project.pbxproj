@@ -314,6 +314,18 @@
 		E4EE9ED02BA330AE0000D594 /* SessionReplayNonOperational+RecordingMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EE9ECF2BA330AE0000D594 /* SessionReplayNonOperational+RecordingMask.swift */; };
 		E4EE9ED22BA332CD0000D594 /* SessionReplayNonOperationalSensitivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EE9ED12BA332CD0000D594 /* SessionReplayNonOperationalSensitivity.swift */; };
 		E4EE9ED42BA34A400000D594 /* SessionReplayNonOperationalState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EE9ED32BA34A400000D594 /* SessionReplayNonOperationalState.swift */; };
+		E4EF11502DC89C2E0026EDA0 /* API-1.0-ModuleProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF114F2DC89C1D0026EDA0 /* API-1.0-ModuleProxyTests.swift */; };
+		E4EF11552DC89CDA0026EDA0 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF11542DC89CD40026EDA0 /* Navigation.swift */; };
+		E4EF11572DC89D040026EDA0 /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF11562DC89CFD0026EDA0 /* NavigationState.swift */; };
+		E4EF11592DC89D230026EDA0 /* NavigationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF11582DC89D1A0026EDA0 /* NavigationPreferences.swift */; };
+		E4EF115B2DC89D490026EDA0 /* API-1.0-NavigationModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF115A2DC89D390026EDA0 /* API-1.0-NavigationModule.swift */; };
+		E4EF115D2DC89D860026EDA0 /* API-1.0-NavigationModulePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF115C2DC89D6D0026EDA0 /* API-1.0-NavigationModulePreferences.swift */; };
+		E4EF115F2DC89D9D0026EDA0 /* API-1.0-NavigationModuleState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF115E2DC89D8E0026EDA0 /* API-1.0-NavigationModuleState.swift */; };
+		E4EF11612DC8BFF00026EDA0 /* RuntimeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF11602DC8BFEB0026EDA0 /* RuntimeState.swift */; };
+		E4EF11632DC8C00D0026EDA0 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF11622DC8C0080026EDA0 /* Preferences.swift */; };
+		E4EF11652DC8E3820026EDA0 /* CiscoLogger in Frameworks */ = {isa = PBXBuildFile; productRef = E4EF11642DC8E3820026EDA0 /* CiscoLogger */; };
+		E4EF11672DC8F7D10026EDA0 /* Navigation+Tracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF11662DC8F7C30026EDA0 /* Navigation+Tracking.swift */; };
+		E4EF116A2DC90A280026EDA0 /* Navigation+Tracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF11692DC90A1F0026EDA0 /* Navigation+Tracking.swift */; };
 		E4EF6E412B18878700206883 /* KeyValueStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF6E402B18878700206883 /* KeyValueStorage.swift */; };
 		E4EF6E432B18986900206883 /* UserDefaultsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF6E422B18986900206883 /* UserDefaultsStorage.swift */; };
 		E4F2E5072B1733C9006EBA69 /* AgentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F2E5062B1733C9006EBA69 /* AgentSession.swift */; };
@@ -908,6 +920,17 @@
 		E4EE9ECF2BA330AE0000D594 /* SessionReplayNonOperational+RecordingMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionReplayNonOperational+RecordingMask.swift"; sourceTree = "<group>"; };
 		E4EE9ED12BA332CD0000D594 /* SessionReplayNonOperationalSensitivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionReplayNonOperationalSensitivity.swift; sourceTree = "<group>"; };
 		E4EE9ED32BA34A400000D594 /* SessionReplayNonOperationalState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionReplayNonOperationalState.swift; sourceTree = "<group>"; };
+		E4EF114F2DC89C1D0026EDA0 /* API-1.0-ModuleProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-ModuleProxyTests.swift"; sourceTree = "<group>"; };
+		E4EF11542DC89CD40026EDA0 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
+		E4EF11562DC89CFD0026EDA0 /* NavigationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationState.swift; sourceTree = "<group>"; };
+		E4EF11582DC89D1A0026EDA0 /* NavigationPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPreferences.swift; sourceTree = "<group>"; };
+		E4EF115A2DC89D390026EDA0 /* API-1.0-NavigationModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-NavigationModule.swift"; sourceTree = "<group>"; };
+		E4EF115C2DC89D6D0026EDA0 /* API-1.0-NavigationModulePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-NavigationModulePreferences.swift"; sourceTree = "<group>"; };
+		E4EF115E2DC89D8E0026EDA0 /* API-1.0-NavigationModuleState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-NavigationModuleState.swift"; sourceTree = "<group>"; };
+		E4EF11602DC8BFEB0026EDA0 /* RuntimeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeState.swift; sourceTree = "<group>"; };
+		E4EF11622DC8C0080026EDA0 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		E4EF11662DC8F7C30026EDA0 /* Navigation+Tracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Navigation+Tracking.swift"; sourceTree = "<group>"; };
+		E4EF11692DC90A1F0026EDA0 /* Navigation+Tracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Navigation+Tracking.swift"; sourceTree = "<group>"; };
 		E4EF6E402B18878700206883 /* KeyValueStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueStorage.swift; sourceTree = "<group>"; };
 		E4EF6E422B18986900206883 /* UserDefaultsStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsStorage.swift; sourceTree = "<group>"; };
 		E4F2E4ED2B1721CB006EBA69 /* Linting.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = Linting.sh; sourceTree = "<group>"; };
@@ -1160,6 +1183,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4EF11652DC8E3820026EDA0 /* CiscoLogger in Frameworks */,
 				E4BA931A2DC238CE00CDB203 /* SplunkCommon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2217,8 +2241,9 @@
 		4BB680CA2B7940C0000A54D4 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				5280E2902DC0AD6300770A90 /* WebViewInstrumentation */,
+				E4EF114D2DC89BC20026EDA0 /* Navigation */,
 				4BB680CB2B7940C0000A54D4 /* Session Replay */,
+				5280E2902DC0AD6300770A90 /* WebViewInstrumentation */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -2278,6 +2303,7 @@
 		4BB680FB2B7A79E1000A54D4 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				E4EF114E2DC89BEF0026EDA0 /* Navigation */,
 				4BB680FC2B7A79E9000A54D4 /* SessionReplay */,
 			);
 			path = Modules;
@@ -2779,6 +2805,9 @@
 			children = (
 				E48D23E42DC2429400D55FE2 /* Module */,
 				E48D23E52DC2429400D55FE2 /* Navigation.swift */,
+				E4EF11662DC8F7C30026EDA0 /* Navigation+Tracking.swift */,
+				E4EF11622DC8C0080026EDA0 /* Preferences.swift */,
+				E4EF11602DC8BFEB0026EDA0 /* RuntimeState.swift */,
 			);
 			path = SplunkNavigation;
 			sourceTree = "<group>";
@@ -2993,6 +3022,60 @@
 				4BB680E12B7940C0000A54D4 /* API-1.0-SessionReplayStatus.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		E4EF114D2DC89BC20026EDA0 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				E4EF11512DC89C930026EDA0 /* Public API */,
+				E4EF11522DC89CAC0026EDA0 /* Proxies */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		E4EF114E2DC89BEF0026EDA0 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				E4EF114F2DC89C1D0026EDA0 /* API-1.0-ModuleProxyTests.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		E4EF11512DC89C930026EDA0 /* Public API */ = {
+			isa = PBXGroup;
+			children = (
+				E4EF115A2DC89D390026EDA0 /* API-1.0-NavigationModule.swift */,
+				E4EF115C2DC89D6D0026EDA0 /* API-1.0-NavigationModulePreferences.swift */,
+				E4EF115E2DC89D8E0026EDA0 /* API-1.0-NavigationModuleState.swift */,
+			);
+			path = "Public API";
+			sourceTree = "<group>";
+		};
+		E4EF11522DC89CAC0026EDA0 /* Proxies */ = {
+			isa = PBXGroup;
+			children = (
+				E4EF11532DC89CC10026EDA0 /* Module */,
+				E4EF11682DC900AF0026EDA0 /* Non-Operational */,
+			);
+			path = Proxies;
+			sourceTree = "<group>";
+		};
+		E4EF11532DC89CC10026EDA0 /* Module */ = {
+			isa = PBXGroup;
+			children = (
+				E4EF11542DC89CD40026EDA0 /* Navigation.swift */,
+				E4EF11692DC90A1F0026EDA0 /* Navigation+Tracking.swift */,
+				E4EF11582DC89D1A0026EDA0 /* NavigationPreferences.swift */,
+				E4EF11562DC89CFD0026EDA0 /* NavigationState.swift */,
+			);
+			path = Module;
+			sourceTree = "<group>";
+		};
+		E4EF11682DC900AF0026EDA0 /* Non-Operational */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Non-Operational";
 			sourceTree = "<group>";
 		};
 		E4EF6E3F2B18871700206883 /* KeyValue Storage */ = {
@@ -3762,6 +3845,7 @@
 			);
 			name = SplunkNavigation;
 			packageProductDependencies = (
+				E4EF11642DC8E3820026EDA0 /* CiscoLogger */,
 			);
 			productName = SplunkLogger;
 			productReference = E474EEBC2DC20C5000BC7D1E /* SplunkNavigation.framework */;
@@ -4158,6 +4242,7 @@
 				E4A708B32B9754B7002C692E /* RepeatingJob.swift in Sources */,
 				E4EE9ED42BA34A400000D594 /* SessionReplayNonOperationalState.swift in Sources */,
 				E4B737E12BBECEDD00086A93 /* PlatformSupport.swift in Sources */,
+				E4EF11592DC89D230026EDA0 /* NavigationPreferences.swift in Sources */,
 				2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */,
 				BAAC20C82DBB0F4800BC8B60 /* ThreadSafeDictionary.swift in Sources */,
 				2AE43B0C2B7FAD9B002C4A98 /* DefaultResources.swift in Sources */,
@@ -4173,6 +4258,7 @@
 				4BB680EC2B7940C0000A54D4 /* API-1.0-RecordingMask.swift in Sources */,
 				C73FF4932B6CE777009C53FF /* RemoteConfigurationEndpoint.swift in Sources */,
 				C73FF4952B6CE777009C53FF /* APIClientHeaders.swift in Sources */,
+				E4EF115B2DC89D490026EDA0 /* API-1.0-NavigationModule.swift in Sources */,
 				2AE43B482B861325002C4A98 /* SessionReplayDataEvent.swift in Sources */,
 				E4BA26CC2BC3F8CE0067FC84 /* ConfigurationHandlerNonOperational.swift in Sources */,
 				E4BA26CA2BC3D75E0067FC84 /* CompileInfo.swift in Sources */,
@@ -4186,6 +4272,7 @@
 				E4EE9EC42BA308850000D594 /* SessionReplaySensitivity.swift in Sources */,
 				E4F2E50C2B17350D006EBA69 /* AgentUser.swift in Sources */,
 				2AE43B472B861325002C4A98 /* AgentEventManager.swift in Sources */,
+				E4EF115F2DC89D9D0026EDA0 /* API-1.0-NavigationModuleState.swift in Sources */,
 				E4C9D2012B98B41100A274ED /* LifecycleRepeatingJob.swift in Sources */,
 				E4F3ACB62DA7B7D1007EFC0A /* API-1.0-UserPreferences.swift in Sources */,
 				E4BB4A242B5E97ED004A86A1 /* DefaultModulesPool.swift in Sources */,
@@ -4195,6 +4282,7 @@
 				E41FB0932B90D873009F5CA6 /* DefaultSharedState.swift in Sources */,
 				E4F2E5092B173429006EBA69 /* DefaultSession.swift in Sources */,
 				E4EE9EC22BA2E5240000D594 /* SessionReplayNonOperational.swift in Sources */,
+				E4EF116A2DC90A280026EDA0 /* Navigation+Tracking.swift in Sources */,
 				4BB680F42B7940C0000A54D4 /* API-1.0-Sensitivity+SwiftUI.swift in Sources */,
 				E4BB4A262B5E9AFA004A86A1 /* AgentModulesPool.swift in Sources */,
 				E4EE9ED22BA332CD0000D594 /* SessionReplayNonOperationalSensitivity.swift in Sources */,
@@ -4204,11 +4292,13 @@
 				4B2C8BBB2BCBE4A200C6E72F /* CrashReportsDataEvent.swift in Sources */,
 				C7A2BD1B2BB45363005D4CFB /* AppStateModel.swift in Sources */,
 				E4EE9ECE2BA330730000D594 /* SessionReplayNonOperational+Recording.swift in Sources */,
+				E4EF115D2DC89D860026EDA0 /* API-1.0-NavigationModulePreferences.swift in Sources */,
 				C73FF4862B6CE749009C53FF /* ConfigurationHandler+Storage.swift in Sources */,
 				C703FAAF2BA9D417000CC11B /* AgentAppStateManager.swift in Sources */,
 				4B6878C12B9F3B420024479A /* ConfigurationHandler+RequestErrorHandling.swift in Sources */,
 				E4F2E51F2B174BB8006EBA69 /* AgentState.swift in Sources */,
 				E4EF6E412B18878700206883 /* KeyValueStorage.swift in Sources */,
+				E4EF11552DC89CDA0026EDA0 /* Navigation.swift in Sources */,
 				2A03CF5F2D9C31C100CF3BC9 /* API-1.0-AgentConfiguration.swift in Sources */,
 				E4F2E5282B179658006EBA69 /* String+NanoID.swift in Sources */,
 				E4AD34F62B56E4BB004976CA /* DefaultModulesManager.swift in Sources */,
@@ -4228,6 +4318,7 @@
 				E4B737DD2BBECBFB00086A93 /* PlatformSupportScope.swift in Sources */,
 				C73FF4872B6CE749009C53FF /* ConfigurationHandler+LoadRemote.swift in Sources */,
 				C73FF4942B6CE777009C53FF /* Endpoint.swift in Sources */,
+				E4EF11572DC89D040026EDA0 /* NavigationState.swift in Sources */,
 				E4A537522DA66DB6002323E2 /* DefaultRuntimeAttributes.swift in Sources */,
 				E4E4B1162BA1A0DA001CB6B3 /* SessionReplay+RecordingMask.swift in Sources */,
 				C73FF4972B6CE777009C53FF /* AgentAPIClient.swift in Sources */,
@@ -4515,6 +4606,7 @@
 				E40E0AF52B6BC35100D31EEF /* SessionReplayTestModuleTypes.swift in Sources */,
 				E49F9ABB2B99D27500D652AA /* RepeatingJobTests.swift in Sources */,
 				E40F96642BAC6C560042742C /* API-1.0-TypeConversions.swift in Sources */,
+				E4EF11502DC89C2E0026EDA0 /* API-1.0-ModuleProxyTests.swift in Sources */,
 				E46896532B220EDD00727A6A /* DefaultSessionTests.swift in Sources */,
 				4BB680FF2B7A7A53000A54D4 /* API-1.0-ModuleProxyTests.swift in Sources */,
 				E4374AFF2B4D89A800E3C88E /* AgentTestBuilder.swift in Sources */,
@@ -4564,8 +4656,11 @@
 			files = (
 				E48D23E62DC2429400D55FE2 /* NavigationConfiguration.swift in Sources */,
 				E48D23E72DC2429400D55FE2 /* Navigation+Module.swift in Sources */,
+				E4EF11672DC8F7D10026EDA0 /* Navigation+Tracking.swift in Sources */,
+				E4EF11632DC8C00D0026EDA0 /* Preferences.swift in Sources */,
 				E48D23E82DC2429400D55FE2 /* Navigation.swift in Sources */,
 				E48D23E92DC2429400D55FE2 /* NavigationRemoteConfiguration.swift in Sources */,
+				E4EF11612DC8BFF00026EDA0 /* RuntimeState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10446,6 +10541,11 @@
 			productName = CiscoLogger;
 		};
 		E4B374B72DB7E33100DB6DDE /* CiscoLogger */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
+			productName = CiscoLogger;
+		};
+		E4EF11642DC8E3820026EDA0 /* CiscoLogger */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
 			productName = CiscoLogger;

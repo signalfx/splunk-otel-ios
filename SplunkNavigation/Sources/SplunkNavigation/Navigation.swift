@@ -15,21 +15,59 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import SplunkCommon
 
-///
+/// The navigation module detects and tracks navigation in the application.
 public final class Navigation {
+
+    // MARK: - Private
+
+    // Internal Logger
+    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Navigation")
+
+    // Currently set custom name
+    var screenName: String?
+
+
+    // MARK: - Preferences
+
+    /// An object that holds preferred settings for the module.
+    public var preferences = Preferences() {
+        didSet {
+            preferences.module = self
+            update()
+        }
+    }
+
+
+    // MARK: - State
+
+    /// An object reflects the current state and settings used for the module.
+    public let state = RuntimeState()
+
 
     // MARK: - Initialization
 
-    // Module conformance
+    // Module protocol conformance
     public required init() {}
 
 
     // MARK: - Instrumentation
 
-    ///
+    /// Starts detection and processing of navigation.
     func startDetection() {
-        print("Navigation module started.")
+        logger.log {
+            "Navigation module started."
+        }
+    }
+
+    /// Updates the module to the desired state according to the current preferences.
+    func update() {
+        // Update module
+        // ...
+
+        // Update state
+        state.isAutomatedTrackingEnabled = preferences.enableAutomatedTracking ?? false
     }
 }

@@ -71,7 +71,7 @@ class DefaultModulesPool: AgentModulesPool {
 
         // Navigation Instrumentation
         #if canImport(SplunkNavigation)
-            knownModules.append(Navigation.self)
+            knownModules.append(SplunkNavigation.Navigation.self)
         #endif
 
         // Network Instrumentation
