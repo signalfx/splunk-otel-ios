@@ -29,8 +29,9 @@ public protocol LogEventProcessor {
     ///   - logsEndpoint: Logs api endpoint.
     ///   - resources: Resources which enrich all Logs.
     ///   - runtimeAttributes: An object that holds and manages runtime attributes.
+    ///   - globalAttributes: An object that holds and manages global attributes.
     ///   - debugEnabled: Enables logging span contents into a console.
-    init(with logsEndpoint: URL, resources: AgentResources, runtimeAttributes: RuntimeAttributes, debugEnabled: Bool)
+    init(with logsEndpoint: URL, resources: AgentResources, runtimeAttributes: RuntimeAttributes, globalAttributes: [String: Any], debugEnabled: Bool)
 
 
     // MARK: - Events

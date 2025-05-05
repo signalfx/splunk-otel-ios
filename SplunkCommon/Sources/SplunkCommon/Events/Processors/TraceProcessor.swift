@@ -30,6 +30,7 @@ public protocol TraceProcessor {
     ///   - tracesEndpoint: Traces api endpoint.
     ///   - resources: Resources which enrich all Traces.
     ///   - runtimeAttributes: An object that holds and manages runtime attributes.
+    ///   - globalAttributes: An object that holds and manages global attributes.
     ///   - debugEnabled: Enables logging span contents into a console.
-    init(with tracesEndpoint: URL, resources: AgentResources, runtimeAttributes: RuntimeAttributes, debugEnabled: Bool)
+    init(with tracesEndpoint: URL, resources: AgentResources, runtimeAttributes: RuntimeAttributes, globalAttributes: [String: Any], debugEnabled: Bool)
 }
