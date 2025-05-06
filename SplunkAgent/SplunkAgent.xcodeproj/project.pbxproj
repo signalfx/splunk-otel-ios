@@ -87,7 +87,6 @@
 		4B96406F2D60FBE8009A2E7F /* ANRReporterConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5B9C2D5E4CF8009DA0D5 /* ANRReporterConfiguration.swift */; };
 		4B9640702D60FBEF009A2E7F /* SplunkANRReporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BA22D5E4CF8009DA0D5 /* SplunkANRReporterTests.swift */; };
 		4B9640772D60FC24009A2E7F /* SplunkNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640202D60FB3A009A2E7F /* SplunkNetwork.framework */; };
-		4B96407B2D60FCCC009A2E7F /* SplunkANRReporter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B96404A2D60FB7D009A2E7F /* SplunkANRReporter.framework */; };
 		4B96408E2D60FD05009A2E7F /* SplunkCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; };
 		4B9640A42D60FD1C009A2E7F /* AgentResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BB92D5E4E33009DA0D5 /* AgentResources.swift */; };
 		4B9640A52D60FD1C009A2E7F /* AgentEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5BB22D5E4E33009DA0D5 /* AgentEvent.swift */; };
@@ -385,13 +384,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4B96401F2D60FB3A009A2E7F;
 			remoteInfo = SplunkNetwork;
-		};
-		4B96407D2D60FCCC009A2E7F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4B9640492D60FB7D009A2E7F;
-			remoteInfo = SplunkANRReporter;
 		};
 		4B96408F2D60FD05009A2E7F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -915,7 +907,6 @@
 				4B9642A02D613EAD009A2E7F /* SplunkOpenTelemetry.framework in Frameworks */,
 				4B985E4B2D94C7A000CB0321 /* SplunkAppStart.framework in Frameworks */,
 				4B9640772D60FC24009A2E7F /* SplunkNetwork.framework in Frameworks */,
-				4B96407B2D60FCCC009A2E7F /* SplunkANRReporter.framework in Frameworks */,
 				4B96410F2D60FEC5009A2E7F /* SplunkCrashReports.framework in Frameworks */,
 				E4B374B82DB7E33100DB6DDE /* CiscoLogger in Frameworks */,
 				4B1CEA022D95748E00A8CCCE /* SplunkSessionReplayProxy.framework in Frameworks */,
@@ -3167,7 +3158,6 @@
 				52D945C72DC0A7B900DE8220 /* PBXTargetDependency */,
 				4B96428B2D613C74009A2E7F /* PBXTargetDependency */,
 				4B96407A2D60FC24009A2E7F /* PBXTargetDependency */,
-				4B96407E2D60FCCC009A2E7F /* PBXTargetDependency */,
 				4B9640B32D60FD3C009A2E7F /* PBXTargetDependency */,
 				4B9640E22D60FDED009A2E7F /* PBXTargetDependency */,
 				4B9641122D60FEC5009A2E7F /* PBXTargetDependency */,
@@ -4061,7 +4051,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check SplunkAgent directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger module\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols module\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy module\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports module\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check AppStart module\ncd ../SplunkAppStart/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector module\ncd ../SplunkSlowFrameDetector/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork module\ncd ../SplunkNetwork/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkANRReporter module\n# cd ../SplunkANRReporter/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
+			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/Tools\"\n\n# Check SplunkAgent directory\ncd $PROJECT_DIR\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkLogger module\ncd ../SplunkLogger/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSharedProtocols module\ncd ../SplunkSharedProtocols/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy module\ncd ../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports module\ncd ../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check AppStart module\ncd ../SplunkAppStart/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector module\ncd ../SplunkSlowFrameDetector/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork module\ncd ../SplunkNetwork/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -4555,11 +4545,6 @@
 			isa = PBXTargetDependency;
 			target = 4B96401F2D60FB3A009A2E7F /* SplunkNetwork */;
 			targetProxy = 4B9640792D60FC24009A2E7F /* PBXContainerItemProxy */;
-		};
-		4B96407E2D60FCCC009A2E7F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4B9640492D60FB7D009A2E7F /* SplunkANRReporter */;
-			targetProxy = 4B96407D2D60FCCC009A2E7F /* PBXContainerItemProxy */;
 		};
 		4B9640902D60FD05009A2E7F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
