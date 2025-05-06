@@ -37,7 +37,6 @@ let package = Package(
                 "SplunkNetwork",
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
-                "SplunkANRReporter",
                 "SplunkAppStart",
 		"SplunkWebView",
 		"SplunkWebViewProxy",
@@ -79,23 +78,6 @@ let package = Package(
             dependencies: ["SplunkNetwork"],
             path: "SplunkNetwork/Tests"
         ),
-        
-        
-        // MARK: Splunk ANR Reporter
-        
-        .target(
-            name: "SplunkANRReporter",
-            dependencies: [
-                "SplunkCommon"
-            ],
-            path: "SplunkANRReporter/Sources"
-        ),
-        .testTarget(
-            name: "SplunkANRReporterTests",
-            dependencies: ["SplunkANRReporter"],
-            path: "SplunkANRReporter/Tests"
-        ),
-        
         
         // MARK: Splunk Common
         
