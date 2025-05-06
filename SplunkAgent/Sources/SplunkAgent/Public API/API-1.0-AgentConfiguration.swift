@@ -67,7 +67,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     ///
     /// If the callback is provided, all spans are funneled through the callback, and can be either approved by returning the span in the callback,
     /// or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
-    public var spanInterceptor: ((inout SpanData) -> SpanData?)?
+    public var spanInterceptor: ((SpanData) -> SpanData?)?
 
 
     // MARK: - Private
@@ -160,7 +160,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     ///
     /// - Returns: The updated configuration structure.
     @discardableResult
-    public func spanInterceptor(_ spanInterceptor: ((inout SpanData) -> SpanData?)?) -> Self {
+    public func spanInterceptor(_ spanInterceptor: ((SpanData) -> SpanData?)?) -> Self {
         var updated = self
         updated.spanInterceptor = spanInterceptor
 
