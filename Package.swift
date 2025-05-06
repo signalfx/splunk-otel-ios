@@ -79,23 +79,6 @@ let package = Package(
             path: "SplunkNetwork/Tests"
         ),
         
-        
-        // MARK: Splunk ANR Reporter
-        
-        .target(
-            name: "SplunkANRReporter",
-            dependencies: [
-                "SplunkCommon"
-            ],
-            path: "SplunkANRReporter/Sources"
-        ),
-        .testTarget(
-            name: "SplunkANRReporterTests",
-            dependencies: ["SplunkANRReporter"],
-            path: "SplunkANRReporter/Tests"
-        ),
-        
-        
         // MARK: Splunk Common
         
         .target(
