@@ -37,7 +37,6 @@ let package = Package(
                 "SplunkNetwork",
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
-                "SplunkANRReporter",
                 "SplunkAppStart",
 		"SplunkWebView",
 		"SplunkWebViewProxy",
