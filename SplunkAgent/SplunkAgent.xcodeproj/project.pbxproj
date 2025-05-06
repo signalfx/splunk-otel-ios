@@ -238,6 +238,9 @@
 		E4374B042B4D929300E3C88E /* NanoIDValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4374B022B4D923200E3C88E /* NanoIDValidator.swift */; };
 		E4374B072B4DA8B700E3C88E /* UserDefaultsUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4374B052B4D950D00E3C88E /* UserDefaultsUtils.swift */; };
 		E44D73BE2B99B10600121EA4 /* XCTestCase+SimulateWait.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D73BD2B99B10600121EA4 /* XCTestCase+SimulateWait.swift */; };
+		E451D86D2DC9FD9300BE48CB /* NavigationNonOperational.swift in Sources */ = {isa = PBXBuildFile; fileRef = E451D86C2DC9FD8700BE48CB /* NavigationNonOperational.swift */; };
+		E451D86F2DC9FDB800BE48CB /* NavigationNonOperational+Tracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = E451D86E2DC9FDB200BE48CB /* NavigationNonOperational+Tracking.swift */; };
+		E451D8712DC9FFDC00BE48CB /* NavigationNonOperationalState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E451D8702DC9FFC600BE48CB /* NavigationNonOperationalState.swift */; };
 		E4570F802BAAEE83002ED1DC /* API-1.0-ExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4570F7F2BAAEE83002ED1DC /* API-1.0-ExtensionsTests.swift */; };
 		E4570F822BAB243B002ED1DC /* API-1.0-NonOperationalProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4570F812BAB243B002ED1DC /* API-1.0-NonOperationalProxyTests.swift */; };
 		E4577D7B2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4577D7A2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift */; };
@@ -852,6 +855,9 @@
 		E4374B022B4D923200E3C88E /* NanoIDValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NanoIDValidator.swift; sourceTree = "<group>"; };
 		E4374B052B4D950D00E3C88E /* UserDefaultsUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsUtils.swift; sourceTree = "<group>"; };
 		E44D73BD2B99B10600121EA4 /* XCTestCase+SimulateWait.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+SimulateWait.swift"; sourceTree = "<group>"; };
+		E451D86C2DC9FD8700BE48CB /* NavigationNonOperational.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationNonOperational.swift; sourceTree = "<group>"; };
+		E451D86E2DC9FDB200BE48CB /* NavigationNonOperational+Tracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NavigationNonOperational+Tracking.swift"; sourceTree = "<group>"; };
+		E451D8702DC9FFC600BE48CB /* NavigationNonOperationalState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationNonOperationalState.swift; sourceTree = "<group>"; };
 		E4570F7F2BAAEE83002ED1DC /* API-1.0-ExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-ExtensionsTests.swift"; sourceTree = "<group>"; };
 		E4570F812BAB243B002ED1DC /* API-1.0-NonOperationalProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-NonOperationalProxyTests.swift"; sourceTree = "<group>"; };
 		E4577D7A2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+SimulateBackground.swift"; sourceTree = "<group>"; };
@@ -3074,6 +3080,9 @@
 		E4EF11682DC900AF0026EDA0 /* Non-Operational */ = {
 			isa = PBXGroup;
 			children = (
+				E451D86C2DC9FD8700BE48CB /* NavigationNonOperational.swift */,
+				E451D86E2DC9FDB200BE48CB /* NavigationNonOperational+Tracking.swift */,
+				E451D8702DC9FFC600BE48CB /* NavigationNonOperationalState.swift */,
 			);
 			path = "Non-Operational";
 			sourceTree = "<group>";
@@ -4240,6 +4249,7 @@
 				2AC68DA72D9E77970086EEF7 /* API-1.0-RuntimeState.swift in Sources */,
 				3384F2AD2AC879FD00512D79 /* SplunkRum.swift in Sources */,
 				E4A708B32B9754B7002C692E /* RepeatingJob.swift in Sources */,
+				E451D8712DC9FFDC00BE48CB /* NavigationNonOperationalState.swift in Sources */,
 				E4EE9ED42BA34A400000D594 /* SessionReplayNonOperationalState.swift in Sources */,
 				E4B737E12BBECEDD00086A93 /* PlatformSupport.swift in Sources */,
 				E4EF11592DC89D230026EDA0 /* NavigationPreferences.swift in Sources */,
@@ -4274,6 +4284,7 @@
 				2AE43B472B861325002C4A98 /* AgentEventManager.swift in Sources */,
 				E4EF115F2DC89D9D0026EDA0 /* API-1.0-NavigationModuleState.swift in Sources */,
 				E4C9D2012B98B41100A274ED /* LifecycleRepeatingJob.swift in Sources */,
+				E451D86D2DC9FD9300BE48CB /* NavigationNonOperational.swift in Sources */,
 				E4F3ACB62DA7B7D1007EFC0A /* API-1.0-UserPreferences.swift in Sources */,
 				E4BB4A242B5E97ED004A86A1 /* DefaultModulesPool.swift in Sources */,
 				E4A708AF2B97501F002C692E /* AgentRepeatingJob.swift in Sources */,
@@ -4304,6 +4315,7 @@
 				E4AD34F62B56E4BB004976CA /* DefaultModulesManager.swift in Sources */,
 				E4A537502DA66B5A002323E2 /* AgentRuntimeAttributes.swift in Sources */,
 				4BB680E92B7940C0000A54D4 /* Status+Conversions.swift in Sources */,
+				E451D86F2DC9FDB800BE48CB /* NavigationNonOperational+Tracking.swift in Sources */,
 				4BF895742DAD7C2100E171A4 /* SplunkConfigurationHandler.swift in Sources */,
 				E426CFAA2B28C18000094AC0 /* SessionsModel.swift in Sources */,
 				E42634832BB44B0F003706A9 /* SplunkAgent.docc in Sources */,
