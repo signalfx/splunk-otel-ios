@@ -50,7 +50,9 @@ public final class Navigation {
     // MARK: - Initialization
 
     // Module protocol conformance
-    public required init() {}
+    public required init() {
+        preferences.module = self
+    }
 
 
     // MARK: - Instrumentation

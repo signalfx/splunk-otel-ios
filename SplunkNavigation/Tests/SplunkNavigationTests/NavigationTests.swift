@@ -15,9 +15,70 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+@testable import SplunkNavigation
 import XCTest
 
 final class NavigationTests: XCTestCase {
 
-    //
+    // MARK: - Private
+
+    private let navigationModule = Navigation()
+
+
+    // MARK: - Basic logic
+
+    func testInitialization() throws {
+        XCTAssertNotNil(navigationModule)
+    }
+
+
+    // MARK: - Business logic
+
+    func testProperties() throws {
+        // Properties with default module configuration (READ)
+        let preferences = navigationModule.preferences
+        let state = navigationModule.state
+
+        // Properties (WRITE)
+        let customPreferences = Preferences(
+            enableAutomatedTracking: true
+        )
+        navigationModule.preferences = customPreferences
+
+
+        // Check existency of basic properties
+        XCTAssertNotNil(preferences)
+        XCTAssertNotNil(state)
+
+        // Module preferences should be updated
+        let modulePreferences = navigationModule.preferences
+        XCTAssertEqual(modulePreferences.enableAutomatedTracking, true)
+    }
+
+    func testStateUpdates() throws {
+        let state = navigationModule.state
+        let defaultTrackingState = state.isAutomatedTrackingEnabled
+
+
+        // Perform preference property updates
+        let preferences = navigationModule.preferences
+        preferences.enableAutomatedTracking = true
+
+        let updatedTrackingState = state.isAutomatedTrackingEnabled
+        preferences.enableAutomatedTracking = false
+
+
+        let finalTrackingState = state.isAutomatedTrackingEnabled
+        XCTAssertFalse(defaultTrackingState)
+        XCTAssertTrue(updatedTrackingState)
+        XCTAssertFalse(finalTrackingState)
+    }
+
+    func testTracking() {
+        let customName = "Test Screen"
+        navigationModule.track(screen: customName)
+
+        let screenName = navigationModule.screenName
+        XCTAssertEqual(screenName, customName)
+    }
 }
