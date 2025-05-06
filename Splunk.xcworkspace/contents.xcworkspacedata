@@ -5,9 +5,6 @@
       location = "group:Applications/AgentTestApp/AgentTestApp.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Applications/ANRDemoApp/ANRDemoApp.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:Applications/DevelApp/DevelApp.xcodeproj">
    </FileRef>
    <FileRef
