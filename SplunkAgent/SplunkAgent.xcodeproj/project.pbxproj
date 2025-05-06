@@ -635,13 +635,6 @@
 		4B5A5B8C2D5E4C79009DA0D5 /* NetworkInstrumentation+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkInstrumentation+Module.swift"; sourceTree = "<group>"; };
 		4B5A5B8D2D5E4C79009DA0D5 /* NetworkInstrumentationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentationConfig.swift; sourceTree = "<group>"; };
 		4B5A5B902D5E4C79009DA0D5 /* SplunkNetworkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkNetworkTests.swift; sourceTree = "<group>"; };
-		4B5A5B9A2D5E4CF8009DA0D5 /* ANRReporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANRReporter.swift; sourceTree = "<group>"; };
-		4B5A5B9B2D5E4CF8009DA0D5 /* ANRReporter+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ANRReporter+Module.swift"; sourceTree = "<group>"; };
-		4B5A5B9C2D5E4CF8009DA0D5 /* ANRReporterConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANRReporterConfiguration.swift; sourceTree = "<group>"; };
-		4B5A5B9D2D5E4CF8009DA0D5 /* ANRReporterRemoteConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANRReporterRemoteConfiguration.swift; sourceTree = "<group>"; };
-		4B5A5B9E2D5E4CF8009DA0D5 /* ANRTunableValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ANRTunableValues.swift; sourceTree = "<group>"; };
-		4B5A5B9F2D5E4CF8009DA0D5 /* EventMetadataANR.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMetadataANR.swift; sourceTree = "<group>"; };
-		4B5A5BA22D5E4CF8009DA0D5 /* SplunkANRReporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkANRReporterTests.swift; sourceTree = "<group>"; };
 		4B5A5BAD2D5E4E33009DA0D5 /* AgentSharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSharedState.swift; sourceTree = "<group>"; };
 		4B5A5BAF2D5E4E33009DA0D5 /* LogEventProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEventProcessor.swift; sourceTree = "<group>"; };
 		4B5A5BB02D5E4E33009DA0D5 /* TraceProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TraceProcessor.swift; sourceTree = "<group>"; };
@@ -1268,7 +1261,6 @@
 				4B5A5C932D5E5686009DA0D5 /* SplunkCrashReports */,
 				4B5A5BD62D5E4FBC009DA0D5 /* SplunkSlowFrameDetector */,
 				4B5A5BC32D5E4E33009DA0D5 /* SplunkCommon */,
-				4B5A5BA62D5E4CF8009DA0D5 /* SplunkANRReporter */,
 				4B5A5B932D5E4C79009DA0D5 /* SplunkNetwork */,
 				4B536BF12B67FADC004A6C7C /* Configurations */,
 				E4E9747A2B1643EE00ACB469 /* Sources */,
@@ -1675,53 +1667,6 @@
 			);
 			name = SplunkNetwork;
 			path = ../SplunkNetwork;
-			sourceTree = SOURCE_ROOT;
-		};
-		4B5A5BA02D5E4CF8009DA0D5 /* SplunkANRReporter */ = {
-			isa = PBXGroup;
-			children = (
-				4B5A5B9A2D5E4CF8009DA0D5 /* ANRReporter.swift */,
-				4B5A5B9B2D5E4CF8009DA0D5 /* ANRReporter+Module.swift */,
-				4B5A5B9C2D5E4CF8009DA0D5 /* ANRReporterConfiguration.swift */,
-				4B5A5B9D2D5E4CF8009DA0D5 /* ANRReporterRemoteConfiguration.swift */,
-				4B5A5B9E2D5E4CF8009DA0D5 /* ANRTunableValues.swift */,
-				4B5A5B9F2D5E4CF8009DA0D5 /* EventMetadataANR.swift */,
-			);
-			path = SplunkANRReporter;
-			sourceTree = "<group>";
-		};
-		4B5A5BA12D5E4CF8009DA0D5 /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				4B5A5BA02D5E4CF8009DA0D5 /* SplunkANRReporter */,
-			);
-			path = Sources;
-			sourceTree = "<group>";
-		};
-		4B5A5BA32D5E4CF8009DA0D5 /* SplunkANRReporterTests */ = {
-			isa = PBXGroup;
-			children = (
-				4B5A5BA22D5E4CF8009DA0D5 /* SplunkANRReporterTests.swift */,
-			);
-			path = SplunkANRReporterTests;
-			sourceTree = "<group>";
-		};
-		4B5A5BA42D5E4CF8009DA0D5 /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-				4B5A5BA32D5E4CF8009DA0D5 /* SplunkANRReporterTests */,
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		4B5A5BA62D5E4CF8009DA0D5 /* SplunkANRReporter */ = {
-			isa = PBXGroup;
-			children = (
-				4B5A5BA12D5E4CF8009DA0D5 /* Sources */,
-				4B5A5BA42D5E4CF8009DA0D5 /* Tests */,
-			);
-			name = SplunkANRReporter;
-			path = ../SplunkANRReporter;
 			sourceTree = SOURCE_ROOT;
 		};
 		4B5A5BAE2D5E4E33009DA0D5 /* Agent */ = {
