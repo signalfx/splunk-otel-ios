@@ -37,7 +37,7 @@ final class API10ConfigurationErrorTests: XCTestCase {
         )
 
         XCTAssertThrowsError(
-            _ = try SplunkRum.install(with: configuration)
+            try configuration.validate()
         ) { error in
             XCTAssertEqual(error as? AgentConfigurationError, AgentConfigurationError.invalidEndpoint(supplied: endpoint))
         }
@@ -58,7 +58,7 @@ final class API10ConfigurationErrorTests: XCTestCase {
         )
 
         XCTAssertThrowsError(
-            _ = try SplunkRum.install(with: configuration)
+            try configuration.validate()
         ) { error in
             XCTAssertEqual(error as? AgentConfigurationError, AgentConfigurationError.invalidRumAccessToken(supplied: authToken))
         }

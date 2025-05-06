@@ -134,7 +134,7 @@ final class API10ConfigurationTests: XCTestCase {
         let configuration = try ConfigurationTestBuilder.buildInvalidEndpoint()
 
         XCTAssertThrowsError(
-            _ = try SplunkRum.install(with: configuration)
+            try configuration.validate()
         )
     }
 
