@@ -176,8 +176,6 @@ public class SplunkRum: ObservableObject {
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = createConfigurationHandler(for: configuration)
 
-        let session = DefaultSession()
-
         // Preparation for sampling
         let sampledOut = false
         if sampledOut {
@@ -194,7 +192,7 @@ public class SplunkRum: ObservableObject {
         let agent = SplunkRum(
             configurationHandler: configurationHandler,
             user: DefaultUser(),
-            session: session,
+            session: DefaultSession(),
             appStateManager: AppStateManager()
         )
         privateInstance = agent

@@ -19,6 +19,8 @@ import Foundation
 
 extension AgentConfiguration {
     static var emptyConfiguration: AgentConfiguration {
+
+        // TODO: DEMRUM-1663 remove try! once the DEMRUM-1700 is merged
         return try! AgentConfiguration(
             rumAccessToken: "token",
             endpoint: EndpointConfiguration(realm: "realm"),
