@@ -36,11 +36,11 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
 
 
     // MARK: - Initialization
-    
+
     /// Initializes new span processor with given runtime attributes.
-    /// 
+    ///
     /// - Parameter runtimeAttributes: An object that holds and manages runtime attributes.
-    /// 
+    ///
     /// - Note: The processor itself does not own the object with runtime attributes.
     ///         So, ensuring its existence outside this span processor is always necessary.
     public init(with runtimeAttributes: RuntimeAttributes) {
@@ -72,4 +72,3 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
         }
     }
 }
-

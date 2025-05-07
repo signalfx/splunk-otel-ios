@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
+
 internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
@@ -61,10 +61,10 @@ class AttributeCheckerLogExporter: LogRecordExporter {
     private func check(logs: [ReadableLogRecord]) {
         for log in logs {
             for requiredAttribute in requiredAttributes {
-                guard let _ = log.attributes[requiredAttribute] else {
+                guard log.attributes[requiredAttribute] != nil else {
                     logger.log(level: .error) {
                         """
-                        ‼️‼️‼️ LogRecord is missing a required attribute: \"\(requiredAttribute)\" 
+                        ‼️‼️‼️ LogRecord is missing a required attribute: \"\(requiredAttribute)\"
                         Attributes: \(log.attributes)
                         """
                     }

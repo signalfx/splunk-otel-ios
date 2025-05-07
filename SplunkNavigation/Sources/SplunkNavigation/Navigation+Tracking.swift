@@ -15,23 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkWebViewProxy
-import WebKit
+public extension Navigation {
 
-public class WebViewToNativeBridge {
+    // MARK: - Manual detection
 
-    // Using the protocol here
-    private let module: WebViewInstrumentationModule
-
-    init(module: WebViewInstrumentationModule) {
-        self.module = module
+    func track(screen name: String) {
+        screenName = name
     }
-
-    public func integrateWithBrowserRum(_ view: WKWebView) {
-        module.injectSessionId(into: view)
-    }
-}
-
-extension SplunkRum {
-    public static let webView = WebViewToNativeBridge(module: WebViewInstrumentationProxy.instance)
 }

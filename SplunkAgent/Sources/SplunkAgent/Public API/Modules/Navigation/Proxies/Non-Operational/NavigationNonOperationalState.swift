@@ -15,23 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkWebViewProxy
-import WebKit
+internal import SplunkNavigation
 
-public class WebViewToNativeBridge {
+/// The class implementing public API for the current state in non-operational mode.
+///
+/// This is especially the case when the module is stopped by remote configuration,
+/// but we still need to keep the API available to the user.
+public final class NavigationNonOperationalState: NavigationModuleState {
 
-    // Using the protocol here
-    private let module: WebViewInstrumentationModule
+    // MARK: - Automated tracking
 
-    init(module: WebViewInstrumentationModule) {
-        self.module = module
+    public var isAutomatedTrackingEnabled: Bool {
+        false
     }
-
-    public func integrateWithBrowserRum(_ view: WKWebView) {
-        module.injectSessionId(into: view)
-    }
-}
-
-extension SplunkRum {
-    public static let webView = WebViewToNativeBridge(module: WebViewInstrumentationProxy.instance)
 }

@@ -15,23 +15,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkWebViewProxy
-import WebKit
+internal import SplunkNavigation
 
-public class WebViewToNativeBridge {
+/// The class implementing Navigation public API.
+final class Navigation: NavigationModule {
 
-    // Using the protocol here
-    private let module: WebViewInstrumentationModule
+    // MARK: - Internal
 
-    init(module: WebViewInstrumentationModule) {
+    unowned let module: SplunkNavigation.Navigation
+
+
+    // MARK: - Preferences
+
+    var preferences: any NavigationModulePreferences
+
+
+    // MARK: - State
+
+    private(set) lazy var state: any NavigationModuleState = NavigationState(for: module)
+
+
+    // MARK: - Initialization
+
+    init(for module: SplunkNavigation.Navigation) {
         self.module = module
-    }
 
-    public func integrateWithBrowserRum(_ view: WKWebView) {
-        module.injectSessionId(into: view)
+        preferences = NavigationPreferences(for: module)
     }
-}
-
-extension SplunkRum {
-    public static let webView = WebViewToNativeBridge(module: WebViewInstrumentationProxy.instance)
 }
