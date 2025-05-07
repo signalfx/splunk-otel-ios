@@ -38,20 +38,19 @@ extension AgentConfigurationError: CustomStringConvertible, CustomDebugStringCon
         switch self {
         case let .invalidEndpoint(endpointConfiguration):
             return """
-            Either one of the supplied endpoint urls (trace url, session, replay) \
-            is invalid, or the supplied realm is empty. \
+            The supplied endpoint configuration is invalid. \
             Please check the agent configuration.
             Supplied endpoint configuration: \(endpointConfiguration.description)
             """
 
         case let .invalidAppName(appName):
-            return "Invalid app name supplied, please check your configuration settings. Supplied: \(appName ?? "nil")"
+            return "Invalid app name supplied, please check your configuration settings. Supplied app name: \"\(appName ?? "nil")\""
 
         case let .invalidRumAccessToken(token):
-            return "Invalid RUM access token supplied, please check the agent configuration. Supplied: \(token ?? "nil")"
+            return "Invalid RUM access token supplied, please check the agent configuration. Supplied access token: \"\(token ?? "nil")\""
 
         case let .invalidDeploymentEnvironment(environment):
-            return "Invalid deployment environment supplied, please check the agent configuration. Supplied: \(environment ?? "nil")"
+            return "Invalid deployment environment supplied, please check the agent configuration. Supplied deployment environment: \"\(environment ?? "nil")\""
         }
     }
 

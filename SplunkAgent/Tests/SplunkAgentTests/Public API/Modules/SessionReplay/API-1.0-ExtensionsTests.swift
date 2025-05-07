@@ -30,7 +30,7 @@ final class SessionReplayAPI10ExtensionsTests: XCTestCase {
 
         // Agent install with initialized Session Replay module (by default)
         let configuration = try ConfigurationTestBuilder.buildDefault()
-        let agent = SplunkRum.install(with: configuration)
+        let agent = try SplunkRum.install(with: configuration)
 
         // Stop recording immediately (we don't need it)
         agent.sessionReplay.stop()
