@@ -201,33 +201,33 @@ public class SplunkRum: ObservableObject {
         initializeEvents["agent_instance_initialized"] = Date()
 
         // Links the current session with the agent
-        (instance.currentSession as? DefaultSession)?.owner = instance
+        (shared.currentSession as? DefaultSession)?.owner = shared
 
         // The agent is running, so we set the corresponding status
-        instance.currentStatus = .running
+        shared.currentStatus = .running
 
         // Initialize Event manager
-        shared.eventManager = DefaultEventManager(with: configuration, agent: instance)
+        shared.eventManager = try DefaultEventManager(with: configuration, agent: shared)
 
         initializeEvents["event_manager_initialized"] = Date()
 
         // Send session start event immediately as the session already started in the SplunkRum init method.
-        instance.eventManager?.sendSessionStartEvent()
+        shared.eventManager?.sendSessionStartEvent()
 
         // Starts connecting available modules to agent
-        instance.modulesManager = DefaultModulesManager(
+        shared.modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
             moduleConfigurations: moduleConfigurations
         )
 
         // Get WebViewInstrumentation module, set its sharedState
-        if let webViewInstrumentationModule = instance.modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
-            WebViewInstrumentationInternal.instance.sharedState = instance.sharedState
-            instance.logger.log(level: .notice, isPrivate: false) {
+        if let webViewInstrumentationModule = shared.modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
+            WebViewInstrumentationInternal.instance.sharedState = shared.sharedState
+            shared.logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module installed."
             }
         } else {
-            instance.logger.log(level: .notice, isPrivate: false) {
+            shared.logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module not installed."
             }
         }
@@ -236,10 +236,10 @@ public class SplunkRum: ObservableObject {
         initializeEvents["modules_connected"] = Date()
 
         // Send events on data publish
-        instance.modulesManager?.onModulePublish(data: { metadata, data in
-            instance.eventManager?.publish(data: data, metadata: metadata) { success in
+        shared.modulesManager?.onModulePublish(data: { metadata, data in
+            shared.eventManager?.publish(data: data, metadata: metadata) { success in
                 if success {
-                    instance.modulesManager?.deleteModuleData(for: metadata)
+                    shared.modulesManager?.deleteModuleData(for: metadata)
                 } else {
                     // TODO: MRUM_AC-1061 (post GA): Handle a case where data is not sent.
                 }
@@ -247,31 +247,31 @@ public class SplunkRum: ObservableObject {
         })
 
         // Runs module-specific customizations
-        instance.customizeModules()
+        shared.customizeModules()
 
         // Fetch modules initialization times from the Modules manager
-        instance.modulesManager?.modulesInitializationTimes.forEach { moduleName, time in
+        shared.modulesManager?.modulesInitializationTimes.forEach { moduleName, time in
             let moduleName = "\(moduleName)_initialized"
             initializeEvents[moduleName] = time
         }
 
         initializeEvents["modules_customized"] = Date()
 
-        instance.logger.log(level: .notice, isPrivate: false) {
+        shared.logger.log(level: .notice, isPrivate: false) {
             "Splunk RUM Agent v\(Self.version)."
         }
 
         // Report initialize events to App Start module
-        if let appStartModule = instance.modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
+        if let appStartModule = shared.modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
             appStartModule.reportAgentInitialize(
                 start: initializeStart,
                 end: Date(),
                 events: initializeEvents,
-                configurationSettings: instance.configurationSettings
+                configurationSettings: shared.configurationSettings
             )
         }
 
-        return instance
+        return shared
     }
 
 
