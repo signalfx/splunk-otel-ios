@@ -19,13 +19,10 @@ import Foundation
 
 extension AgentConfiguration {
     static var emptyConfiguration: AgentConfiguration {
-
-        // TODO: DEMRUM-1663 remove try! once the DEMRUM-1700 is merged
-        return try! AgentConfiguration(
-            rumAccessToken: "token",
-            endpoint: EndpointConfiguration(realm: "realm"),
-            appName: "app name",
-            deploymentEnvironment: "env"
+        return AgentConfiguration(
+            endpoint: EndpointConfiguration(realm: "", rumAccessToken: ""),
+            appName: "",
+            deploymentEnvironment: ""
         )
     }
 }
