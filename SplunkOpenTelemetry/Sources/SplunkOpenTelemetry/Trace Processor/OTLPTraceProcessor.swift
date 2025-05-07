@@ -39,7 +39,8 @@ public class OTLPTraceProcessor: TraceProcessor {
         with tracesEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
-        debugEnabled: Bool
+        debugEnabled: Bool,
+        spanInterceptor: SplunkSpanInterceptor?
     ) {
 
         let configuration = OtlpConfiguration()
@@ -56,8 +57,11 @@ public class OTLPTraceProcessor: TraceProcessor {
         // Initialize attribute checker proxy exporter
         let attributeCheckerExporter = AttributeCheckerSpanExporter(proxy: backgroundTraceExporter)
 
+        // Initialize span interceptor proxy exporter
+        let spanInterceptorExporter = SpanInterceptorExporter(with: spanInterceptor, proxy: attributeCheckerExporter)
+
         // Initialize processor
-        let spanProcessor = SimpleSpanProcessor(spanExporter: attributeCheckerExporter)
+        let spanProcessor = SimpleSpanProcessor(spanExporter: spanInterceptorExporter)
         let attributesProcessor = OLTPAttributesSpanProcessor(with: runtimeAttributes)
 
         // Build Resources
