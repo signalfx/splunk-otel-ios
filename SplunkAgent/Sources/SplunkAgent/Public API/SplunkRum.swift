@@ -41,7 +41,7 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Internal properties
 
-    let agentConfigurationHandler: AgentConfigurationHandler
+    var agentConfigurationHandler: AgentConfigurationHandler
 
     var agentConfiguration: any AgentConfigurationProtocol {
         agentConfigurationHandler.configuration
@@ -54,22 +54,13 @@ public class SplunkRum: ObservableObject {
     var modulesManager: AgentModulesManager?
     var eventManager: AgentEventManager?
 
-    let appStateManager: AgentAppStateManager
+    var appStateManager: AgentAppStateManager
     lazy var sharedState: AgentSharedState = DefaultSharedState(for: self)
 
     lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
 
     let logProcessor: LogProcessor
     let logger: LogAgent
-
-    static var privateInstance: SplunkRum?
-
-    static let noOpInstance = SplunkRum(
-        configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
-        user: NoOpUser(),
-        session: NoOpSession(),
-        appStateManager: NoOpAppStateManager()
-    )
 
 
     // MARK: - Internal (Modules Proxy)
@@ -86,16 +77,15 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Agent singleton
 
-    /// An singleton instance of the Agent library.
+    /// A singleton instance of the Agent library.
     ///
-    /// This instance is used to access all the SDK functions.
-    public static var instance: SplunkRum {
-        if let installedInstance = privateInstance {
-            return installedInstance
-        }
-
-        return noOpInstance
-    }
+    /// This instance is used to access all SDK functions.
+    public static var instance = SplunkRum(
+        configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
+        user: NoOpUser(),
+        session: NoOpSession(),
+        appStateManager: NoOpAppStateManager()
+    )
 
 
     // MARK: - Public API
@@ -168,73 +158,71 @@ public class SplunkRum: ObservableObject {
         let initializeStart = Date()
         var initializeEvents: [String: Date] = [:]
 
-        // Only one instance is allowed
-        if let sharedInstance = privateInstance {
-            return sharedInstance
+        // Install is allowed only once.
+        // ‼️ This condition check ensures that sampling check or platform check are performed only once
+        if instance.currentStatus != .notRunning(.notInstalled) {
+            return instance
+        }
+
+        // We will not continue to initialize additional
+        // agent capabilities on unsupported platforms
+        guard isSupportedPlatform else {
+            instance.currentStatus = .notRunning(.unsupportedPlatform)
+
+            return instance
+        }
+
+        // Preparation for sampling
+        let sampledOut = false
+        if sampledOut {
+            instance.currentStatus = .notRunning(.sampledOut)
+
+            instance.logger.log(level: .notice, isPrivate: false) {
+                "Agent sampled out."
+            }
+
+            return instance
         }
 
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = createConfigurationHandler(for: configuration)
 
-        // Preparation for sampling
-        let sampledOut = false
-        if sampledOut {
-            noOpInstance.currentStatus = .notRunning(.sampledOut)
-
-            noOpInstance.logger.log(level: .notice, isPrivate: false) {
-                "Agent sampled out."
-            }
-
-            return noOpInstance
-        }
-
         // Builds agent with default logic
-        let agent = SplunkRum(
-            configurationHandler: configurationHandler,
-            user: DefaultUser(),
-            session: DefaultSession(),
-            appStateManager: AppStateManager()
-        )
-        privateInstance = agent
+        instance.agentConfigurationHandler = configurationHandler
+        instance.currentUser = DefaultUser()
+        instance.currentSession = DefaultSession()
+        instance.appStateManager = AppStateManager()
 
         initializeEvents["agent_instance_initialized"] = Date()
 
-        // We will not continue to initialize additional
-        // agent capabilities on unsupported platforms
-        guard isSupportedPlatform else {
-            agent.currentStatus = .notRunning(.unsupportedPlatform)
-
-            return agent
-        }
-
         // Links the current session with the agent
-        (agent.currentSession as? DefaultSession)?.owner = agent
+        (instance.currentSession as? DefaultSession)?.owner = instance
 
         // The agent is running, so we set the corresponding status
-        agent.currentStatus = .running
+        instance.currentStatus = .running
 
         // Initialize Event manager
-        agent.eventManager = DefaultEventManager(with: configuration, agent: agent)
+        instance.eventManager = DefaultEventManager(with: configuration, agent: instance)
 
         initializeEvents["event_manager_initialized"] = Date()
 
         // Send session start event immediately as the session already started in the SplunkRum init method.
-        agent.eventManager?.sendSessionStartEvent()
+        instance.eventManager?.sendSessionStartEvent()
 
         // Starts connecting available modules to agent
-        agent.modulesManager = DefaultModulesManager(
+        instance.modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
             moduleConfigurations: moduleConfigurations
         )
 
         // Get WebViewInstrumentation module, set its sharedState
-        if let webViewInstrumentationModule = agent.modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
-            WebViewInstrumentationInternal.instance.sharedState = agent.sharedState
-            agent.logger.log(level: .notice, isPrivate: false) {
+        if let webViewInstrumentationModule = instance.modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
+            WebViewInstrumentationInternal.instance.sharedState = instance.sharedState
+            instance.logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module installed."
             }
         } else {
-            agent.logger.log(level: .notice, isPrivate: false) {
+            instance.logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module not installed."
             }
         }
@@ -243,10 +231,10 @@ public class SplunkRum: ObservableObject {
         initializeEvents["modules_connected"] = Date()
 
         // Send events on data publish
-        agent.modulesManager?.onModulePublish(data: { metadata, data in
-            agent.eventManager?.publish(data: data, metadata: metadata) { success in
+        instance.modulesManager?.onModulePublish(data: { metadata, data in
+            instance.eventManager?.publish(data: data, metadata: metadata) { success in
                 if success {
-                    agent.modulesManager?.deleteModuleData(for: metadata)
+                    instance.modulesManager?.deleteModuleData(for: metadata)
                 } else {
                     // TODO: MRUM_AC-1061 (post GA): Handle a case where data is not sent.
                 }
@@ -254,31 +242,31 @@ public class SplunkRum: ObservableObject {
         })
 
         // Runs module-specific customizations
-        agent.customizeModules()
+        instance.customizeModules()
 
         // Fetch modules initialization times from the Modules manager
-        agent.modulesManager?.modulesInitializationTimes.forEach { moduleName, time in
+        instance.modulesManager?.modulesInitializationTimes.forEach { moduleName, time in
             let moduleName = "\(moduleName)_initialized"
             initializeEvents[moduleName] = time
         }
 
         initializeEvents["modules_customized"] = Date()
 
-        agent.logger.log(level: .notice, isPrivate: false) {
+        instance.logger.log(level: .notice, isPrivate: false) {
             "Splunk RUM Agent v\(Self.version)."
         }
 
         // Report initialize events to App Start module
-        if let appStartModule = agent.modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
+        if let appStartModule = instance.modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
             appStartModule.reportAgentInitialize(
                 start: initializeStart,
                 end: Date(),
                 events: initializeEvents,
-                configurationSettings: agent.configurationSettings
+                configurationSettings: instance.configurationSettings
             )
         }
 
-        return agent
+        return instance
     }
 
 

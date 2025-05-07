@@ -23,9 +23,6 @@ final class API10AgentTests: XCTestCase {
     // MARK: - API Tests
 
     func testInstall() throws {
-        // Test noop instance
-        XCTAssertTrue(SplunkRum.instance === SplunkRum.noOpInstance)
-
         // Test initial state
         XCTAssertTrue(SplunkRum.instance.state.status == .notRunning(.notInstalled))
 
@@ -35,9 +32,6 @@ final class API10AgentTests: XCTestCase {
         // Agent install
         let configuration = try ConfigurationTestBuilder.buildDefault()
         var agent: SplunkRum? = SplunkRum.install(with: configuration)
-
-        // Test for internal instance
-        XCTAssertFalse(SplunkRum.instance === SplunkRum.noOpInstance)
 
         // The agent should run after install
         let agentStatus = try XCTUnwrap(agent?.state.status)
