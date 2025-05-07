@@ -32,31 +32,25 @@ public class OTLPGlobalAttributesLogRecordProcessor: LogRecordProcessor {
     // MARK: - LogRecordProcessor
 
     public func onEmit(logRecord: ReadableLogRecord) {
+
         // Convert global attributes to AttributeValue dictionary
         var convertedAttributes: [String: AttributeValue] = [:]
         for (key, value) in globalAttributes {
-            if let stringValue = value as? String {
-                convertedAttributes[key] = .string(stringValue)
-            } else if let boolValue = value as? Bool {
-                convertedAttributes[key] = .bool(boolValue)
-            } else if let intValue = value as? Int {
-                convertedAttributes[key] = .int(intValue)
-            } else if let doubleValue = value as? Double {
-                convertedAttributes[key] = .double(doubleValue)
-            } else if let arrayValue = value as? [Any] {
+            if let arrayValue = value as? [Any] {
                 var attributeValues: [AttributeValue] = []
+
                 for element in arrayValue {
-                    if let stringElement = element as? String {
-                        attributeValues.append(.string(stringElement))
-                    } else if let boolElement = element as? Bool {
-                        attributeValues.append(.bool(boolElement))
-                    } else if let intElement = element as? Int {
-                        attributeValues.append(.int(intElement))
-                    } else if let doubleElement = element as? Double {
-                        attributeValues.append(.double(doubleElement))
+                    if let attributeValue = AttributeValue(element) {
+                        attributeValues.append(attributeValue)
                     }
                 }
+
                 convertedAttributes[key] = .array(AttributeArray(values: attributeValues))
+
+            } else {
+                if let attributeValue = AttributeValue(value) {
+                    convertedAttributes[key] = attributeValue
+                }
             }
         }
 
