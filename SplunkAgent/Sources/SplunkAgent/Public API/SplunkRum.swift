@@ -79,10 +79,10 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Agent singleton
 
-    /// An singleton instance of the Agent library.
+    /// A singleton shared instance of the Agent library.
     ///
-    /// This instance is used to access all the SDK functions.
-    public private(set) static var instance: SplunkRum?
+    /// This shared instance is used to access all SDK functions.
+    public private(set) static var shared: SplunkRum?
 
 
     // MARK: - Public API
@@ -154,16 +154,21 @@ public class SplunkRum: ObservableObject {
     ///   - moduleConfigurations: An array of individual module-specific configurations.
     ///
     /// - Returns: A newly initialized `SplunkRum` instance.
-    public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) -> SplunkRum {
+    ///
+    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
+    public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws -> SplunkRum {
 
         // Initialization metrics to be sent in the Initialize span
         let initializeStart = Date()
         var initializeEvents: [String: Date] = [:]
 
         // Only one instance is allowed
-        if let sharedInstance = instance {
+        if let sharedInstance = shared {
             return sharedInstance
         }
+
+        // Validate the configuration
+        try configuration.validate()
 
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = createConfigurationHandler(for: configuration)
@@ -175,7 +180,7 @@ public class SplunkRum: ObservableObject {
             session: DefaultSession(),
             appStateManager: AppStateManager()
         )
-        instance = agent
+        shared = agent
 
         initializeEvents["agent_instance_initialized"] = Date()
 
@@ -194,7 +199,7 @@ public class SplunkRum: ObservableObject {
         agent.currentStatus = .running
 
         // Initialize Event manager
-        agent.eventManager = DefaultEventManager(with: configuration, agent: agent)
+        agent.eventManager = try DefaultEventManager(with: configuration, agent: agent)
 
         initializeEvents["event_manager_initialized"] = Date()
 
@@ -296,13 +301,12 @@ public class SplunkRum: ObservableObject {
         networkModule?.sharedState = sharedState
 
         // We need the endpoint url to manage trace exclusion logic
-        var excludedEndpoints: [URL] = [
-            agentConfiguration.tracesUrl,
-            agentConfiguration.logsUrl,
-            agentConfiguration.configUrl
-        ]
+        var excludedEndpoints: [URL] = []
+        if let traceUrl = agentConfiguration.endpoint.traceEndpoint {
+            excludedEndpoints.append(traceUrl)
+        }
 
-        if let sessionReplayUrl = agentConfiguration.sessionReplayUrl {
+        if let sessionReplayUrl = agentConfiguration.endpoint.sessionReplayEndpoint {
             excludedEndpoints.append(sessionReplayUrl)
         }
 

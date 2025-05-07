@@ -28,7 +28,7 @@ final class API10AgentTests: XCTestCase {
 
         // Agent install
         let configuration = try ConfigurationTestBuilder.buildDefault()
-        var agent: SplunkRum? = SplunkRum.install(with: configuration)
+        var agent: SplunkRum? = try SplunkRum.install(with: configuration)
 
         // The agent should run after install
         let agentStatus = try XCTUnwrap(agent?.state.status)
@@ -39,7 +39,7 @@ final class API10AgentTests: XCTestCase {
         XCTAssertNotNil(agent?.openTelemetry)
 
         // Another attempt to install should return an instance from the previous attempt
-        let anotherAgentInstance = SplunkRum.install(with: configuration)
+        let anotherAgentInstance = try SplunkRum.install(with: configuration)
         XCTAssertTrue(agent === anotherAgentInstance)
 
         agent = nil

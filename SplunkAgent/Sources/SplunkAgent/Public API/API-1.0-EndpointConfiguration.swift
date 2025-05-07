@@ -28,46 +28,54 @@ public struct EndpointConfiguration: Codable, Equatable {
     /// Defines a Splunk RUM realm to which all instrumentation will be sent to.
     public let realm: String?
 
-    /// Defines a custom traces endpoint to which all traces will be sent to.
-    public let tracesEndpoint: URL?
+    /// A RUM access token, authenticates requests to the RUM instrumentation collector.
+    public let rumAccessToken: String?
+
+    /// Defines a custom trace endpoint to which all traces will be sent to.
+    public let traceEndpoint: URL?
 
     /// Defines an optional custom session replay endpoint to which all session replay data will be sent to.
     public let sessionReplayEndpoint: URL?
 
-    /// Initialize the endpoint configuration with the Splunk RUM realm.
+    /// Initialize the endpoint configuration with the Splunk RUM realm and RUM access token.
     ///
-    /// - Parameter realm: A Splunk RUM realm to which all instrumentation will be sent to.
-    public init(realm: String) {
-        guard realm.count > 0 else {
-            self.realm = nil
-            tracesEndpoint = nil
-            sessionReplayEndpoint = nil
-
-            return
-        }
-
+    /// - Parameters:
+    ///   - realm: A Splunk RUM realm to which all instrumentation will be sent to.
+    ///   - rumAccessToken: A required RUM access token to authenticate requests with the RUM instrumentation collector.
+    public init(realm: String, rumAccessToken: String) {
         self.realm = realm
+        self.rumAccessToken = rumAccessToken
 
+        // Build trace url
         var urlCompoments = URLComponents()
         urlCompoments.scheme = "https"
         urlCompoments.host = "rum-ingest.\(realm).signalfx.com"
         urlCompoments.path = "/v1/rumotlp"
 
-        tracesEndpoint = urlCompoments.url
+        let traceUrl = urlCompoments.url
+
+        // Authenticate trace url
+        if let traceUrl {
+            traceEndpoint = Self.authenticate(url: traceUrl, with: rumAccessToken)
+        } else {
+            traceEndpoint = nil
+        }
 
         // ⚠️ Session replay endpoint not in use atm
         sessionReplayEndpoint = nil
     }
 
-    /// Initialize the endpoint configuration with a custom traces url and an optional session replay url.
+    /// Initialize the endpoint configuration with a custom trace url and an optional session replay url.
     ///
     /// - Parameters:
-    ///   - traces: A trace URL to which all traces wil be sent to.
+    ///   - trace: A trace URL to which all traces wil be sent to.
     ///   - sessionReplay: An optional session replay url, to which session replay data will be sent to. Required if session replay functionality is enabled.
-    public init(traces: URL, sessionReplay: URL? = nil) {
-        realm = nil
-        tracesEndpoint = traces
+    public init(trace: URL, sessionReplay: URL? = nil) {
+        traceEndpoint = trace
         sessionReplayEndpoint = sessionReplay
+
+        realm = nil
+        rumAccessToken = nil
     }
 }
 
@@ -75,12 +83,59 @@ extension EndpointConfiguration: CustomStringConvertible, CustomDebugStringConve
     public var description: String {
         return """
         Realm: \(realm ?? "nil"), \
-        Trace endpoint: \(sessionReplayEndpoint?.absoluteString ?? "nil"), \
+        RUM access token: \(rumAccessToken ?? "nil"), \
+        Trace endpoint: \(traceEndpoint?.absoluteString ?? "nil"), \
         Session replay endpoint: \(sessionReplayEndpoint?.absoluteString ?? "nil")
         """
     }
 
     public var debugDescription: String {
         return description
+    }
+}
+
+extension EndpointConfiguration {
+
+    /// Authenticates an endpoint URL by appending the auth token to the URL's query.
+    ///
+    /// - Returns: Authenticated url, or `nil` if building the url fails.
+    private static func authenticate(url: URL, with authToken: String) -> URL? {
+
+        guard var urlCompoments = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return nil
+        }
+
+        urlCompoments.queryItems = [URLQueryItem(name: "auth", value: authToken)]
+
+        guard urlCompoments.queryItems?.count ?? 0 > 0 else {
+            return nil
+        }
+
+        guard let authenticatedUrl = urlCompoments.url else {
+            return nil
+        }
+
+        return authenticatedUrl
+    }
+}
+
+extension EndpointConfiguration {
+
+    // MARK: - Validation
+
+    /// Validate endpoint configuration.
+    ///
+    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
+    func validate() throws {
+
+        // Validate rum access token if supplied
+        if realm != nil, rumAccessToken?.isEmpty ?? true {
+            throw AgentConfigurationError.invalidRumAccessToken(supplied: rumAccessToken)
+        }
+
+        // Validate trace endpoint
+        if traceEndpoint == nil {
+            throw AgentConfigurationError.invalidEndpoint(supplied: self)
+        }
     }
 }

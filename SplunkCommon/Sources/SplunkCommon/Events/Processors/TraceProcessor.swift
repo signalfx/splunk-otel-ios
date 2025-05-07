@@ -19,17 +19,4 @@ import Foundation
 
 /// TraceProcessor processes Spans - enriches them with provided Resources, and sends those events to
 /// an exporter.
-public protocol TraceProcessor {
-
-    // MARK: - Initialization
-
-    /// Initialize Trace Processor by providing traces API endpoint,
-    /// resources, runtime attributes, and a setting to enable debug logging.
-    ///
-    /// - Parameters:
-    ///   - tracesEndpoint: Traces api endpoint.
-    ///   - resources: Resources which enrich all Traces.
-    ///   - runtimeAttributes: An object that holds and manages runtime attributes.
-    ///   - debugEnabled: Enables logging span contents into a console.
-    init(with tracesEndpoint: URL, resources: AgentResources, runtimeAttributes: RuntimeAttributes, debugEnabled: Bool)
-}
+public protocol TraceProcessor {}

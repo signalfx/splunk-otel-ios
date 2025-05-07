@@ -24,10 +24,10 @@ class AgentDataSource: ObservableObject {
     // MARK: - Published Properties
 
     @Published var agentVersion: String = SplunkRum.version
-    @Published var agentAppVersion: String = SplunkRum.instance?.state.appVersion ?? "nil"
-    @Published var sessionId: String = SplunkRum.instance?.session.state.id ?? "nil"
-    @Published private var userTrackingMode = SplunkRum.instance?.user.state.trackingMode ?? .default
-    @Published var rumEnabled: Bool = SplunkRum.instance?.state.status == .running
+    @Published var agentAppVersion: String = SplunkRum.shared?.state.appVersion ?? "nil"
+    @Published var sessionId: String = SplunkRum.shared?.session.state.id ?? "nil"
+    @Published private var userTrackingMode = SplunkRum.shared?.user.state.trackingMode ?? .default
+    @Published var rumEnabled: Bool = SplunkRum.shared?.state.status == .running
 
     // MARK: - Session publisher for handling session resets
 
@@ -54,9 +54,9 @@ class AgentDataSource: ObservableObject {
         // Observe changes to agent status (rumEnabled) based on `state.status`
         Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             DispatchQueue.main.async {
-                self?.rumEnabled = (SplunkRum.instance?.state.status == .running)
-                self?.sessionId = SplunkRum.instance?.session.state.id ?? "nil"
-                self?.userTrackingMode = SplunkRum.instance?.user.state.trackingMode ?? .default
+                self?.rumEnabled = (SplunkRum.shared?.state.status == .running)
+                self?.sessionId = SplunkRum.shared?.session.state.id ?? "nil"
+                self?.userTrackingMode = SplunkRum.shared?.user.state.trackingMode ?? .default
             }
         }
     }

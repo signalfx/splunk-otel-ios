@@ -36,7 +36,7 @@ final class EventsTests: XCTestCase {
         // Setup Agent against a mock server
         let configuration = try ConfigurationTestBuilder.buildDefault()
         let mockAgent = try AgentTestBuilder.build(with: configuration)
-        mockAgent.eventManager = DefaultEventManager(with: configuration, agent: mockAgent)
+        mockAgent.eventManager = try DefaultEventManager(with: configuration, agent: mockAgent)
 
         // Use mock agent
         agent = mockAgent
