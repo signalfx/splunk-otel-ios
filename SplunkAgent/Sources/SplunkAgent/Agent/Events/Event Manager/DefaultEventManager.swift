@@ -58,7 +58,14 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Initialization
 
-    required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
+    required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) throws {
+        guard let traceUrl = configuration.endpoint.traceEndpoint else {
+            throw AgentConfigurationError.invalidEndpoint(supplied: configuration.endpoint)
+        }
+
+        // ‼️ Using trace endpoint as a placeholder
+        let logUrl = traceUrl
+
         self.agent = agent
         self.eventsModel = eventsModel
 
@@ -86,9 +93,9 @@ class DefaultEventManager: AgentEventManager {
             osType: SystemInfo.type
         )
 
-        // Initialize log event processor
+        // Initialize log event processor.
         logEventProcessor = OTLPLogEventProcessor(
-            with: configuration.logsUrl,
+            with: logUrl,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
             debugEnabled: configuration.enableDebugLogging
@@ -96,11 +103,15 @@ class DefaultEventManager: AgentEventManager {
 
         // Initialize trace processor
         traceProcessor = OTLPTraceProcessor(
-            with: configuration.tracesUrl,
+            with: traceUrl,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
             debugEnabled: configuration.enableDebugLogging
         )
+
+        logger.log(level: .info, isPrivate: false) {
+            "Using trace url: \(traceUrl)"
+        }
 
         // Starts listening to a Session Reset notification to send the Session Start event.
         NotificationCenter.default.addObserver(forName: DefaultSession.sessionDidResetNotification, object: nil, queue: nil) { _ in

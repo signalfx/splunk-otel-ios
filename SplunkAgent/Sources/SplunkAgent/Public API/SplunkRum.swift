@@ -77,10 +77,10 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Agent singleton
 
-    /// A singleton instance of the Agent library.
+    /// A singleton shared instance of the Agent library.
     ///
-    /// This instance is used to access all SDK functions.
-    public static var instance = SplunkRum(
+    /// This shared instance is used to access all SDK functions.
+    public private(set) static var shared = SplunkRum(
         configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
         user: NoOpUser(),
         session: NoOpSession(),
@@ -152,7 +152,9 @@ public class SplunkRum: ObservableObject {
     ///   - moduleConfigurations: An array of individual module-specific configurations.
     ///
     /// - Returns: A newly initialized `SplunkRum` instance.
-    public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) -> SplunkRum {
+    ///
+    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
+    public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws -> SplunkRum {
 
         // Initialization metrics to be sent in the Initialize span
         let initializeStart = Date()
@@ -160,38 +162,41 @@ public class SplunkRum: ObservableObject {
 
         // Install is allowed only once.
         // ‼️ This condition check ensures that sampling check or platform check are performed only once
-        if instance.currentStatus != .notRunning(.notInstalled) {
-            return instance
+        if shared.currentStatus != .notRunning(.notInstalled) {
+            return shared
         }
 
         // We will not continue to initialize additional
         // agent capabilities on unsupported platforms
         guard isSupportedPlatform else {
-            instance.currentStatus = .notRunning(.unsupportedPlatform)
+            shared.currentStatus = .notRunning(.unsupportedPlatform)
 
-            return instance
+            return shared
         }
 
         // Preparation for sampling
         let sampledOut = false
         if sampledOut {
-            instance.currentStatus = .notRunning(.sampledOut)
+            shared.currentStatus = .notRunning(.sampledOut)
 
-            instance.logger.log(level: .notice, isPrivate: false) {
+            shared.logger.log(level: .notice, isPrivate: false) {
                 "Agent sampled out."
             }
 
-            return instance
+            return shared
         }
+
+        // Validate the configuration
+        try configuration.validate()
 
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = createConfigurationHandler(for: configuration)
 
         // Builds agent with default logic
-        instance.agentConfigurationHandler = configurationHandler
-        instance.currentUser = DefaultUser()
-        instance.currentSession = DefaultSession()
-        instance.appStateManager = AppStateManager()
+        shared.agentConfigurationHandler = configurationHandler
+        shared.currentUser = DefaultUser()
+        shared.currentSession = DefaultSession()
+        shared.appStateManager = AppStateManager()
 
         initializeEvents["agent_instance_initialized"] = Date()
 
@@ -202,7 +207,7 @@ public class SplunkRum: ObservableObject {
         instance.currentStatus = .running
 
         // Initialize Event manager
-        instance.eventManager = DefaultEventManager(with: configuration, agent: instance)
+        shared.eventManager = DefaultEventManager(with: configuration, agent: instance)
 
         initializeEvents["event_manager_initialized"] = Date()
 
@@ -302,13 +307,12 @@ public class SplunkRum: ObservableObject {
         networkModule?.sharedState = sharedState
 
         // We need the endpoint url to manage trace exclusion logic
-        var excludedEndpoints: [URL] = [
-            agentConfiguration.tracesUrl,
-            agentConfiguration.logsUrl,
-            agentConfiguration.configUrl
-        ]
+        var excludedEndpoints: [URL] = []
+        if let traceUrl = agentConfiguration.endpoint.traceEndpoint {
+            excludedEndpoints.append(traceUrl)
+        }
 
-        if let sessionReplayUrl = agentConfiguration.sessionReplayUrl {
+        if let sessionReplayUrl = agentConfiguration.endpoint.sessionReplayEndpoint {
             excludedEndpoints.append(sessionReplayUrl)
         }
 

@@ -17,6 +17,7 @@ limitations under the License.
 
 import UIKit
 import SplunkAgent
+import OpenTelemetryApi
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -24,18 +25,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
+
+        let endpointConfig = EndpointConfiguration(
+            realm: "realm",
+            rumAccessToken: "token"
+        )
+
+        let agentConfig = AgentConfiguration(
+            endpoint: endpointConfig,
+            appName: "App Name",
+            deploymentEnvironment: "dev"
+        )
+            .enableDebugLogging(true)
+            .spanInterceptor { spanData in
+                var attributes = spanData.attributes
+                attributes["test_attribute"] = AttributeValue("test_value")
+
+                var modifiedSpan = spanData
+                modifiedSpan.settingAttributes(attributes)
+                
+                return modifiedSpan
+            }
+
         do {
-            let agentConfig = try AgentConfiguration(
-                rumAccessToken: "token",
-                endpoint: .init(realm: "realm"),
-                appName: "App Name",
-                deploymentEnvironment: "dev"
-            )
-                .enableDebugLogging(true)
-
-            _ = SplunkRum.install(with: agentConfig)
-
+            _ = try SplunkRum.install(with: agentConfig)
         } catch {
             print("Unable to start the Splunk agent, error: \(error)")
         }

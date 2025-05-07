@@ -30,14 +30,14 @@ struct SessionReplayDemoView: View {
     // MARK: - Versions
 
     let agentVersion = SplunkRum.version
-    let agentAppVersion = SplunkRum.instance.state.appVersion
+    let agentAppVersion = SplunkRum.shared.state.appVersion
 
 
     // MARK: - Identifiers
 
-    @State private var sessionId = SplunkRum.instance.session.state.id
-    @State private var userTrackingMode = SplunkRum.instance.user.state.trackingMode
-    @State private var agentStatus = SplunkRum.instance.state.status
+    @State private var sessionId = SplunkRum.shared.session.state.id
+    @State private var userTrackingMode = SplunkRum.shared.user.state.trackingMode
+    @State private var agentStatus = SplunkRum.shared.state.status
 
     let sessionPublisher = NotificationCenter.default
         .publisher(

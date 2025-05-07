@@ -41,7 +41,9 @@ protocol AgentEventManager {
     ///   - configuration: Agent Configuration object.
     ///   - agent: Agent object, used to obtain Session information and User information.
     ///   - eventsModel: Events model object to store persisted events metadata.
-    init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel)
+    ///
+    /// - Throws: Init should throw an error if provided configuration is invalid.
+    init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel) throws
 
 
     // MARK: - Module Events
