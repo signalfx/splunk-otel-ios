@@ -19,7 +19,7 @@ import Foundation
 import OpenTelemetryApi
 
 public class MutableAttributes: Codable, Equatable {
-    private var attributes: ThreadSafeDictionary<String, AttributeValue>
+    fileprivate var attributes: ThreadSafeDictionary<String, AttributeValue>
 
     // MARK: - Initialize
 
@@ -284,6 +284,9 @@ public class MutableAttributes: Codable, Equatable {
     func setSet(_ attributeSet: AttributeSet, for key: String) {
         attributes[key] = AttributeValue.set(attributeSet)
     }
+}
+
+public extension MutableAttributes {
 
     // MARK: - Iterative setters
 
@@ -344,7 +347,7 @@ public class MutableAttributes: Codable, Equatable {
         return attributes.contains(key: key)
     }
 
-    public func getAll() -> [String: AttributeValue] {
+    func getAll() -> [String: AttributeValue] {
         return attributes.getAll()
     }
 
@@ -371,41 +374,8 @@ public class MutableAttributes: Codable, Equatable {
         return result
     }
 
-    public var all: [String: Any] {
+    var all: [String: Any] {
         return getAllAsAny()
-    }
-
-    private func convertToAny(_ value: AttributeValue) -> Any {
-        switch value {
-        case let .string(string):
-            return string
-        case let .bool(bool):
-            return bool
-        case let .int(int):
-            return int
-        case let .double(double):
-            return double
-        case let .array(array):
-            var result: [Any] = []
-            for element in array.values {
-                result.append(convertToAny(element))
-            }
-            return result
-        case let .stringArray(stringArray):
-            return stringArray
-        case let .boolArray(boolArray):
-            return boolArray
-        case let .intArray(intArray):
-            return intArray
-        case let .doubleArray(doubleArray):
-            return doubleArray
-        case let .set(attributeSet):
-            var result: [String: Any] = [:]
-            for (key, value) in attributeSet.labels {
-                result[key] = convertToAny(value)
-            }
-            return result
-        }
     }
 
     // MARK: - Description
@@ -421,38 +391,5 @@ public class MutableAttributes: Codable, Equatable {
 
         result += "]"
         return result
-    }
-
-    private func attributeDescription(_ value: AttributeValue) -> String {
-        switch value {
-        case let .string(string):
-            return "\"\(string)\""
-        case let .bool(bool):
-            return bool ? "true" : "false"
-        case let .int(int):
-            return "\(int)"
-        case let .double(double):
-            return "\(double)"
-        case let .array(array):
-            return array.description
-        case let .stringArray(stringArray):
-            let arrayElements = stringArray.map { "\"\($0)\"" }.joined(separator: ", ")
-            return "[\(arrayElements)]"
-        case let .boolArray(boolArray):
-            let arrayElements = boolArray.map { $0 ? "true" : "false" }.joined(separator: ", ")
-            return "[\(arrayElements)]"
-        case let .intArray(intArray):
-            let arrayElements = intArray.map { "\($0)" }.joined(separator: ", ")
-            return "[\(arrayElements)]"
-        case let .doubleArray(doubleArray):
-            let arrayElements = doubleArray.map { "\($0)" }.joined(separator: ", ")
-            return "[\(arrayElements)]"
-        case let .set(attributeSet):
-            var elements: [String] = []
-            for (key, value) in attributeSet.labels {
-                elements.append("\(key): \(attributeDescription(value))")
-            }
-            return "{\(elements.joined(separator: ", "))}"
-        }
     }
 }
