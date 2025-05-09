@@ -25,6 +25,8 @@ class SplunkStdoutSpanExporter: SpanExporter {
 
     // MARK: - Private
 
+    private let proxyExporter: SpanExporter
+
     // Internal Logger
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
@@ -43,7 +45,9 @@ class SplunkStdoutSpanExporter: SpanExporter {
         return dateFormat
     }()
 
-    init() {}
+    init(with proxy: SpanExporter) {
+        proxyExporter = proxy
+    }
 
     func export(spans: [SpanData], explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
         for span in spans {
@@ -89,12 +93,14 @@ class SplunkStdoutSpanExporter: SpanExporter {
             }
         }
 
-        return .success
+        return proxyExporter.export(spans: spans)
     }
     
     public func flush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
-        return .success
+        return proxyExporter.flush(explicitTimeout: explicitTimeout)
     }
     
-    public func shutdown(explicitTimeout: TimeInterval?) {}
+    public func shutdown(explicitTimeout: TimeInterval?) {
+        proxyExporter.shutdown(explicitTimeout: explicitTimeout)
+    }
 }
