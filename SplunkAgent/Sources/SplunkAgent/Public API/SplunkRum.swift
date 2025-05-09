@@ -16,24 +16,11 @@ limitations under the License.
 */
 
 internal import CiscoLogger
-internal import CiscoSessionReplay
+internal import SplunkCommon
 
 import Combine
 import Foundation
 import OpenTelemetryApi
-
-internal import SplunkAppStart
-internal import SplunkCommon
-
-#if canImport(SplunkCrashReports)
-    internal import SplunkCrashReports
-#endif
-
-internal import SplunkNetwork
-internal import SplunkOpenTelemetry
-
-internal import SplunkWebView
-internal import SplunkWebViewProxy
 
 
 /// The class implementing Splunk Agent public API.
@@ -46,8 +33,6 @@ public class SplunkRum: ObservableObject {
     var agentConfiguration: any AgentConfigurationProtocol {
         agentConfigurationHandler.configuration
     }
-
-    var isNonOperational = true
 
     var currentUser: AgentUser
     var currentSession: AgentSession
@@ -129,9 +114,9 @@ public class SplunkRum: ObservableObject {
     public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws -> SplunkRum {
 
         // Install is allowed only once.
-        // ‼️ This condition check ensures that sampling check or platform check are performed only once
-        // TODO: maybe check .notRunning(.notInstalled)?
-        guard shared.isNonOperational else {
+        // ‼️ This condition check implies that other checks (supported platform check, sampling check) are performed only once,
+        // and agent's shared instance can't be reinstalled
+        guard shared.currentStatus == .notRunning(.notInstalled) else {
             return shared
         }
 
@@ -143,7 +128,7 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
-        // Preparation for sampling
+        // Preparation for sampling check
         let sampledOut = false
         if sampledOut {
             shared.currentStatus = .notRunning(.sampledOut)
@@ -155,13 +140,12 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
-        // Initialize the agent
+        // Initialize the full agent if all checks passed
         let agent = try SplunkRum(
             with: configuration,
             moduleConfigurations: moduleConfigurations
         )
 
-        agent.isNonOperational = false
         shared = agent
 
         return agent
@@ -254,123 +238,6 @@ public class SplunkRum: ObservableObject {
         }
     }
 
-    private func registerModulePublish() {
-        // Send events on data publish
-        modulesManager?.onModulePublish(data: { metadata, data in
-            self.eventManager?.publish(data: data, metadata: metadata) { success in
-                if success {
-                    self.modulesManager?.deleteModuleData(for: metadata)
-                } else {
-                    // TODO: MRUM_AC-1061 (post GA): Handle a case where data is not sent.
-                }
-            }
-        })
-    }
-
-    private func reportAgentInitialization(start: Date, initializeEvents: [String: Date]) {
-        var initializeEvents = initializeEvents
-
-        // Fetch modules initialization times from the Modules manager
-        modulesManager?.modulesInitializationTimes.forEach { moduleName, time in
-            let moduleName = "\(moduleName)_initialized"
-            initializeEvents[moduleName] = time
-        }
-
-        // Report initialize events to App Start module
-        if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
-            appStartModule.reportAgentInitialize(
-                start: start,
-                end: Date(),
-                events: initializeEvents,
-                configurationSettings: configurationSettings
-            )
-        }
-    }
-
-
-    // MARK: - Modules customization
-
-    /// Perform specific pre-defined customizations for some modules.
-    private func customizeModules() {
-        customizeCrashReports()
-        customizeSessionReplay()
-        customizeNetwork()
-        customizeAppStart()
-        customizeWebViewInstrumentation()
-    }
-
-    /// Perform operations specific to the SessionReplay module.
-    private func customizeSessionReplay() {
-        let moduleType = CiscoSessionReplay.SessionReplay.self
-        let sessionReplayModule = modulesManager?.module(ofType: moduleType)
-
-        guard let sessionReplayModule else {
-            return
-        }
-
-        // Initialize proxy API for this module
-        sessionReplayProxy = SessionReplay(for: sessionReplayModule)
-    }
-
-    /// Configure Network module with shared state.
-    private func customizeNetwork() {
-        let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
-
-        // Assign an object providing the current state of the agent instance.
-        // We need to do this because we need to read `sessionID` from the agent continuously.
-        networkModule?.sharedState = sharedState
-
-        // We need the endpoint url to manage trace exclusion logic
-        var excludedEndpoints: [URL] = []
-        if let traceUrl = agentConfiguration.endpoint.traceEndpoint {
-            excludedEndpoints.append(traceUrl)
-        }
-
-        if let sessionReplayUrl = agentConfiguration.endpoint.sessionReplayEndpoint {
-            excludedEndpoints.append(sessionReplayUrl)
-        }
-
-        networkModule?.excludedEndpoints = excludedEndpoints
-    }
-
-    /// Configure Crash Reports module with shared state.
-    private func customizeCrashReports() {
-    // swiftformat:disable indent
-    #if canImport(SplunkCrashReports)
-        let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
-
-        // Assign an object providing the current state of the agent instance.
-        // We need to do this because we need to read `appState` from the agent in the instance of a crash.
-        crashReportsModule?.sharedState = sharedState
-
-        // Check if a crash ended the previous run of the app
-        crashReportsModule?.reportCrashIfPresent()
-    #endif
-    // swiftformat:enable indent
-    }
-
-    /// Configure App start module
-    private func customizeAppStart() {
-        let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
-
-        appStartModule?.sharedState = sharedState
-    }
-
-    /// Configure WebView intrumentation module
-    private func customizeWebViewInstrumentation() {
-        // Get WebViewInstrumentation module, set its sharedState
-        if let webViewInstrumentationModule = modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
-            WebViewInstrumentationInternal.instance.sharedState = sharedState
-            logger.log(level: .notice, isPrivate: false) {
-                "WebViewInstrumentation module installed."
-            }
-        } else {
-            logger.log(level: .notice, isPrivate: false) {
-                "WebViewInstrumentation module not installed."
-            }
-        }
-    }
-
 
     // MARK: - Configuration handler
 
@@ -387,19 +254,6 @@ public class SplunkRum: ObservableObject {
 //            for: configuration,
 //            apiClient: APIClient(baseUrl: configuration.configUrl)
 //        )
-    }
-
-    private var configurationSettings: [String: String] {
-        var settings = [String: String]()
-
-        settings["enableDebugLogging"] = String(agentConfigurationHandler.configuration.enableDebugLogging)
-        settings["sessionSamplingRate"] = String(agentConfigurationHandler.configuration.sessionSamplingRate)
-
-        if let modulesConfigurations = modulesManager?.modulesConfigurationDescription {
-            settings.merge(modulesConfigurations) { $1 }
-        }
-
-        return settings
     }
 
 
