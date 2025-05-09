@@ -114,6 +114,7 @@ public class SplunkRum: ObservableObject {
     public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws -> SplunkRum {
 
         // Install is allowed only once.
+        //
         // ‼️ This condition check implies that other checks (supported platform check, sampling check) are performed only once,
         // and agent's shared instance can't be reinstalled
         guard shared.currentStatus == .notRunning(.notInstalled) else {
@@ -140,7 +141,7 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
-        // Initialize the full agent if all checks passed
+        // Initialize the full agent if all checks pass
         let agent = try SplunkRum(
             with: configuration,
             moduleConfigurations: moduleConfigurations
@@ -193,6 +194,7 @@ public class SplunkRum: ObservableObject {
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = Self.createConfigurationHandler(for: configuration)
 
+        // Initialize the agent
         self.init(
             configurationHandler: configurationHandler,
             user: DefaultUser(),
@@ -224,6 +226,7 @@ public class SplunkRum: ObservableObject {
 
         initializeEvents["modules_connected"] = Date()
 
+        // Register modules' publish callback
         registerModulePublish()
 
         // Runs module-specific customizations
@@ -231,6 +234,7 @@ public class SplunkRum: ObservableObject {
 
         initializeEvents["modules_customized"] = Date()
 
+        // Report agent's initialization metrics for the app start event
         reportAgentInitialization(start: initializeStart, initializeEvents: initializeEvents)
 
         logger.log(level: .notice, isPrivate: false) {
