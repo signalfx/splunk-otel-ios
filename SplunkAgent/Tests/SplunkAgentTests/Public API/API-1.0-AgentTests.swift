@@ -23,6 +23,9 @@ final class API10AgentTests: XCTestCase {
     // MARK: - API Tests
 
     func testInstall() throws {
+        // Test initial state
+        XCTAssertTrue(SplunkRum.shared.state.status == .notRunning(.notInstalled))
+
         // Agent initialization
         _ = try AgentTestBuilder.buildDefault()
 

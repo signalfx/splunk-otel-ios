@@ -14,24 +14,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
+	
 import Foundation
 
-/// A dummy configuration handler. It is used for the non-operational instance, or on a target platform the agent is not fully supporting.
-final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
+struct NoOpSession: AgentSession {
+    let currentSessionItem = SessionItem(id: "no-op", start: Date())
 
-    // MARK: - Configuration
-
-    var configurationData: Data? {
-        return nil
+    var currentSessionId: String {
+        currentSessionItem.id
     }
 
-    let configuration: any AgentConfigurationProtocol
-
-
-    // MARK: - Intialization
-
-    init(for configuration: any AgentConfigurationProtocol) {
-        self.configuration = configuration
+    func sessionId(for timestamp: Date) -> String? {
+        return currentSessionItem.id
     }
 }

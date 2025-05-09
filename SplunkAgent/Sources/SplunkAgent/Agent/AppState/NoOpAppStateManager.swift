@@ -14,24 +14,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
+	
 import Foundation
 
-/// A dummy configuration handler. It is used for the non-operational instance, or on a target platform the agent is not fully supporting.
-final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
+struct NoOpAppStateManager: AgentAppStateManager {
 
-    // MARK: - Configuration
-
-    var configurationData: Data? {
+    func appState(for timestamp: Date) -> AppState? {
         return nil
-    }
-
-    let configuration: any AgentConfigurationProtocol
-
-
-    // MARK: - Intialization
-
-    init(for configuration: any AgentConfigurationProtocol) {
-        self.configuration = configuration
     }
 }
