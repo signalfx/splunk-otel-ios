@@ -25,6 +25,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        do {
+            let agentConfig = try AgentConfiguration(
+                rumAccessToken: "token",
+                endpoint: .init(realm: "realm"),
+                appName: "App Name",
+                deploymentEnvironment: "dev"
+            )
+                .enableDebugLogging(true)
+                .globalAttributes(MutableAttributes(dictionary: [
+                    "teststring": .string("value"),
+                    "testint": .int(100)]))
 
         let endpointConfig = EndpointConfiguration(
             realm: "realm",

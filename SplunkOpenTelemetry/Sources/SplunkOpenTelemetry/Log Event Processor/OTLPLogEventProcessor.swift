@@ -50,6 +50,7 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         with logsEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
+        globalAttributes: [String: Any],
         debugEnabled: Bool
     ) {
 
@@ -73,6 +74,12 @@ public class OTLPLogEventProcessor: LogEventProcessor {
             with: runtimeAttributes
         )
 
+        // Add in Global Attributes processor
+        let globalAttributesLogRecordProcessor = OTLPGlobalAttributesLogRecordProcessor(
+            proxy: attributesLogRecordProcessor,
+            with: globalAttributes
+        )
+
         // Build Resources
         var resource = Resource()
         resource.merge(with: resources)
@@ -82,8 +89,7 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         self.resource = resource
         #endif
 
-
-        var processors: [LogRecordProcessor] = [attributesLogRecordProcessor]
+        var processors: [LogRecordProcessor] = [globalAttributesLogRecordProcessor]
 
         // Initialize optional stdout exporter
         if debugEnabled {

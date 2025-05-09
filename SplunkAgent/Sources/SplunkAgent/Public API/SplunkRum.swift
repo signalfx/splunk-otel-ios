@@ -59,6 +59,8 @@ public class SplunkRum: ObservableObject {
 
     lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
 
+    lazy var globalAttributes = agentConfiguration.globalAttributes
+
     let logProcessor: LogProcessor
     let logger: LogAgent
 

@@ -52,7 +52,7 @@ final class ConfigurationTestBuilder {
         configuration.appVersion = appVersion
         configuration.enableDebugLogging = true
         configuration.sessionSamplingRate = 0.1
-        configuration.globalAttributes = ["attribute": "value"]
+        configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
         configuration.spanInterceptor = { spanData in
             spanData
         }

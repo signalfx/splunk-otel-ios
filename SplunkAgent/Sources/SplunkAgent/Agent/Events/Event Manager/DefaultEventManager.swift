@@ -98,6 +98,7 @@ class DefaultEventManager: AgentEventManager {
             with: logUrl,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
+            globalAttributes: agent.globalAttributes.all,
             debugEnabled: configuration.enableDebugLogging
         )
 
@@ -106,6 +107,7 @@ class DefaultEventManager: AgentEventManager {
             with: traceUrl,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
+            globalAttributes: agent.globalAttributes.all,
             debugEnabled: configuration.enableDebugLogging,
             spanInterceptor: configuration.spanInterceptor
         )
