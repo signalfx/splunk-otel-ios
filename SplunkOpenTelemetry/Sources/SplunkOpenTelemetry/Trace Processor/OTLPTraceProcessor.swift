@@ -34,12 +34,13 @@ public class OTLPTraceProcessor: TraceProcessor {
 
 
     // MARK: - Initialization
-    
+
     required public init(
         with tracesEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
-        debugEnabled: Bool
+        debugEnabled: Bool,
+        spanInterceptor: SplunkSpanInterceptor?
     ) {
 
         let configuration = OtlpConfiguration()
@@ -54,10 +55,18 @@ public class OTLPTraceProcessor: TraceProcessor {
         )
 
         // Initialize attribute checker proxy exporter
-        let attributeCheckerExporter = AttributeCheckerSpanExporter(proxy: backgroundTraceExporter)
+        // Optionally chain it through stdout exporter
+        let attributeCheckerExporter = AttributeCheckerSpanExporter(
+            proxy: debugEnabled
+                ? SplunkStdoutSpanExporter(with: backgroundTraceExporter)
+                : backgroundTraceExporter)
+
+        // Initialize span interceptor proxy exporter
+        let spanInterceptorExporter = SpanInterceptorExporter(
+            with: spanInterceptor, proxy: attributeCheckerExporter)
 
         // Initialize processor
-        let spanProcessor = SimpleSpanProcessor(spanExporter: attributeCheckerExporter)
+        let spanProcessor = SimpleSpanProcessor(spanExporter: spanInterceptorExporter)
         let attributesProcessor = OLTPAttributesSpanProcessor(with: runtimeAttributes)
 
         // Build Resources
@@ -69,14 +78,6 @@ public class OTLPTraceProcessor: TraceProcessor {
             .with(resource: resource)
             .add(spanProcessor: attributesProcessor)
             .add(spanProcessor: spanProcessor)
-
-        // Initialize optional stdout exporter
-        if debugEnabled {
-            let stdoutExporter = SplunkStdoutSpanExporter()
-            let stdoutSpanProcessor = SimpleSpanProcessor(spanExporter: stdoutExporter)
-            
-            tracerProviderBuilder = tracerProviderBuilder.add(spanProcessor: stdoutSpanProcessor)
-        }
 
         let tracerProvider = tracerProviderBuilder.build()
 
