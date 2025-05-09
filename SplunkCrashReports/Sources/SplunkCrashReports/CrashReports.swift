@@ -18,7 +18,8 @@ limitations under the License.
 internal import CiscoLogger
 import Foundation
 import SplunkCommon
-internal import SplunkCrashReporter
+import CrashReporter
+//internal import SplunkCrashReporter
 
 public class CrashReports {
 
@@ -27,7 +28,7 @@ public class CrashReports {
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
 
-    private var crashReporter: SPLKPLCrashReporter?
+    private var crashReporter: PLCrashReporter?
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "CrashReports")
     private var allUsedImageNames: [String] = []
     private var deviceDataDictionary: [CrashReportKeys: String] = [:]
@@ -50,8 +51,8 @@ public class CrashReports {
         let signalHandlerType = PLCrashReporterSignalHandlerType.mach
 #endif
 
-        let signalConfig = SPLKPLCrashReporterConfig(signalHandlerType: signalHandlerType, symbolicationStrategy: [])
-        guard let crashReporterInstance = SPLKPLCrashReporter(configuration: signalConfig) else {
+        let signalConfig = PLCrashReporterConfig(signalHandlerType: signalHandlerType, symbolicationStrategy: [])
+        guard let crashReporterInstance = PLCrashReporter(configuration: signalConfig) else {
             logger.log(level: .error) {
                 "PLCrashReporter failed to initialize."
             }
@@ -87,7 +88,7 @@ public class CrashReports {
             let data = try crashReporter?.loadPendingCrashReportDataAndReturnError()
 
             // Retrieving crash reporter data.
-            let report = try SPLKPLCrashReport(data: data)
+            let report = try PLCrashReport(data: data)
 
             // And collect stack frames
             let stackFrames = stackFramesFromCrashReport(report: report)
@@ -224,12 +225,12 @@ public class CrashReports {
 
     // Report formatting
 
-    private func stackFramesFromCrashReport(report: SPLKPLCrashReport) -> [CrashReportKeys: Any] {
+    private func stackFramesFromCrashReport(report: PLCrashReport) -> [CrashReportKeys: Any] {
         var stackFrames: [CrashReportKeys: Any] = [:]
         var threads: [Any] = []
 
         for thread in report.threads {
-            if let thread = thread as? SPLKPLCrashReportThreadInfo {
+            if let thread = thread as? PLCrashReportThreadInfo {
                 let thr = threadFromReport(thread: thread, report: report)
 
                 threads.append(thr)
@@ -240,7 +241,7 @@ public class CrashReports {
         return stackFrames
     }
 
-    private func formatCrashReport(report: SPLKPLCrashReport, stackFrames: [CrashReportKeys: Any]) -> [CrashReportKeys: Any] {
+    private func formatCrashReport(report: PLCrashReport, stackFrames: [CrashReportKeys: Any]) -> [CrashReportKeys: Any] {
 
         var reportDict: [CrashReportKeys: Any] = [:]
 
@@ -312,12 +313,12 @@ public class CrashReports {
         return crashPayload
     }
 
-    private func convertStackFrames(frames: [Any], report: SPLKPLCrashReport) -> [Any] {
+    private func convertStackFrames(frames: [Any], report: PLCrashReport) -> [Any] {
 
         var stackFrames: [Any] = []
         var isFirstTime = true
 
-        guard let frames = frames as? [SPLKPLCrashReportStackFrameInfo] else {
+        guard let frames = frames as? [PLCrashReportStackFrameInfo] else {
             logger.log(level: .error) {
                 "CrashReporter received incorrect stackFrame type."
             }
@@ -366,7 +367,7 @@ public class CrashReports {
         return stackFrames
     }
 
-    private func threadFromReport(thread: SPLKPLCrashReportThreadInfo, report: SPLKPLCrashReport) -> [CrashReportKeys: Any] {
+    private func threadFromReport(thread: PLCrashReportThreadInfo, report: PLCrashReport) -> [CrashReportKeys: Any] {
 
         var oneThread: [CrashReportKeys: Any] = [:]
         oneThread[.details] = thread
@@ -382,7 +383,7 @@ public class CrashReports {
             var threadDictionary: [CrashReportKeys: Any] = [:]
             threadDictionary[.stackFrames] = thread[CrashReportKeys.stackFrames]
 
-            if let info = thread[CrashReportKeys.details] as? SPLKPLCrashReportThreadInfo {
+            if let info = thread[CrashReportKeys.details] as? PLCrashReportThreadInfo {
                 threadDictionary[.threadNumber] = info.threadNumber
                 threadDictionary[threadKey] = info.crashed
             }
@@ -399,7 +400,7 @@ public class CrashReports {
         var outputImages: [Any] = []
         for image in images {
             var imageDictionary: [CrashReportKeys: Any] = [:]
-            guard let image = image as? SPLKPLCrashReportBinaryImageInfo else {
+            guard let image = image as? PLCrashReportBinaryImageInfo else {
                 continue
             }
             // Only add the image to the list if it was noted in the stack traces

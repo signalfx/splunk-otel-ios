@@ -144,7 +144,6 @@
 		4B985E582D94C95700CB0321 /* StdoutExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 4B985E572D94C95700CB0321 /* StdoutExporter */; };
 		4B985E5A2D94C96200CB0321 /* ZipkinExporter in Frameworks */ = {isa = PBXBuildFile; productRef = 4B985E592D94C96200CB0321 /* ZipkinExporter */; };
 		4B985E5B2D94C9F900CB0321 /* String+HexID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAC95E22D6C741C004FAE2C /* String+HexID.swift */; };
-		4BAA09F12D9361AB00B7D6AE /* SplunkCrashReporter in Frameworks */ = {isa = PBXBuildFile; productRef = 4BAA09F02D9361AB00B7D6AE /* SplunkCrashReporter */; };
 		4BB680E52B7940C0000A54D4 /* SensitivityModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680CE2B7940C0000A54D4 /* SensitivityModifier.swift */; };
 		4BB680E82B7940C0000A54D4 /* RecordingMask+Conversions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680D32B7940C0000A54D4 /* RecordingMask+Conversions.swift */; };
 		4BB680E92B7940C0000A54D4 /* Status+Conversions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680D42B7940C0000A54D4 /* Status+Conversions.swift */; };
@@ -183,6 +182,7 @@
 		52D945C92DC0A7F500DE8220 /* CiscoLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 52D945C82DC0A7F500DE8220 /* CiscoLogger */; };
 		BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */; };
 		BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */; };
+		BA80F9E42DCEB343007F64FA /* CrashReporter in Frameworks */ = {isa = PBXBuildFile; productRef = BA80F9E32DCEB343007F64FA /* CrashReporter */; };
 		BAAC20C22DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */; };
 		BAAC20C42DB9BB5E00BC8B60 /* IgnoreURLsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */; };
 		BAAC20C62DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C52DBB0F2900BC8B60 /* ThreadSafeDictionaryTests.swift */; };
@@ -1031,8 +1031,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4754BC12DB8ED8F00E74532 /* CiscoLogger in Frameworks */,
+				BA80F9E42DCEB343007F64FA /* CrashReporter in Frameworks */,
 				4B9641132D60FEF4009A2E7F /* SplunkCommon.framework in Frameworks */,
-				4BAA09F12D9361AB00B7D6AE /* SplunkCrashReporter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3453,8 +3453,8 @@
 			);
 			name = SplunkCrashReports;
 			packageProductDependencies = (
-				4BAA09F02D9361AB00B7D6AE /* SplunkCrashReporter */,
 				E4754BC02DB8ED8F00E74532 /* CiscoLogger */,
+				BA80F9E32DCEB343007F64FA /* CrashReporter */,
 			);
 			productName = SplunkCrashReports;
 			productReference = 4B9640E82D60FE72009A2E7F /* SplunkCrashReports.framework */;
@@ -3815,7 +3815,7 @@
 			packageReferences = (
 				4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */,
 				4B0F23872D79F2C000EA575A /* XCRemoteSwiftPackageReference "opentelemetry-swift" */,
-				4BAA09ED2D9360A000B7D6AE /* XCLocalSwiftPackageReference "../SplunkCrashReporter" */,
+				BA80F9E22DCEB343007F64FA /* XCRemoteSwiftPackageReference "plcrashreporter" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3384F2A32AC879E900512D79 /* Products */;
@@ -7681,6 +7681,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				OTHER_SWIFT_FLAGS = "-no-verify-emitted-module-interface";
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkCrashReports;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
@@ -7721,6 +7722,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				OTHER_SWIFT_FLAGS = "-no-verify-emitted-module-interface";
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkCrashReports;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
@@ -7761,6 +7763,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				OTHER_SWIFT_FLAGS = "-no-verify-emitted-module-interface";
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkCrashReports;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
@@ -7801,6 +7804,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				OTHER_SWIFT_FLAGS = "-no-verify-emitted-module-interface";
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkCrashReports;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
@@ -7841,6 +7845,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				OTHER_SWIFT_FLAGS = "-no-verify-emitted-module-interface";
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkCrashReports;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
@@ -7881,6 +7886,7 @@
 				MARKETING_VERSION = 1.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				OTHER_SWIFT_FLAGS = "-no-verify-emitted-module-interface";
 				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkCrashReports;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
@@ -10223,13 +10229,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		4BAA09ED2D9360A000B7D6AE /* XCLocalSwiftPackageReference "../SplunkCrashReporter" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../SplunkCrashReporter;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		4B0F23872D79F2C000EA575A /* XCRemoteSwiftPackageReference "opentelemetry-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -10245,6 +10244,14 @@
 			requirement = {
 				branch = develop;
 				kind = branch;
+			};
+		};
+		BA80F9E22DCEB343007F64FA /* XCRemoteSwiftPackageReference "plcrashreporter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/microsoft/plcrashreporter.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.12.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -10310,15 +10317,15 @@
 			package = 4B0F23872D79F2C000EA575A /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
 			productName = ZipkinExporter;
 		};
-		4BAA09F02D9361AB00B7D6AE /* SplunkCrashReporter */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4BAA09ED2D9360A000B7D6AE /* XCLocalSwiftPackageReference "../SplunkCrashReporter" */;
-			productName = SplunkCrashReporter;
-		};
 		52D945C82DC0A7F500DE8220 /* CiscoLogger */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
 			productName = CiscoLogger;
+		};
+		BA80F9E32DCEB343007F64FA /* CrashReporter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BA80F9E22DCEB343007F64FA /* XCRemoteSwiftPackageReference "plcrashreporter" */;
+			productName = CrashReporter;
 		};
 		C791ADFA2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter */ = {
 			isa = XCSwiftPackageProductDependency;
