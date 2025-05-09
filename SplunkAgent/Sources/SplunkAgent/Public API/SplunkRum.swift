@@ -115,36 +115,6 @@ public class SplunkRum: ObservableObject {
     }
 
 
-    // MARK: - Initialization
-
-    required init(configurationHandler: AgentConfigurationHandler, user: AgentUser, session: AgentSession, appStateManager: AgentAppStateManager) {
-        // Pass user configuration
-        agentConfigurationHandler = configurationHandler
-
-        // Set current instance status
-        currentStatus = .notRunning(.notInstalled)
-
-        // Assign identification
-        currentUser = user
-        currentSession = session
-
-        let logPoolName = PackageIdentifier.instance()
-        let verboseLogging = agentConfigurationHandler.configuration.enableDebugLogging
-
-        // Configure internal logging
-        logProcessor = DefaultLogProcessor(
-            poolName: logPoolName,
-            subsystem: PackageIdentifier.default
-        )
-        .verbosity(verboseLogging ? .verbose : .default)
-
-        logger = DefaultLogAgent(poolName: logPoolName, category: "Agent")
-
-        // Assign AppState manager
-        self.appStateManager = appStateManager
-    }
-
-
     // MARK: - Agent builder
 
     /// Creates and initializes the singleton instance.
@@ -185,6 +155,7 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
+        // Initialize the agent
         let agent = try SplunkRum(
             with: configuration,
             moduleConfigurations: moduleConfigurations
@@ -194,6 +165,36 @@ public class SplunkRum: ObservableObject {
         shared = agent
 
         return agent
+    }
+
+
+    // MARK: - Initialization
+
+    required init(configurationHandler: AgentConfigurationHandler, user: AgentUser, session: AgentSession, appStateManager: AgentAppStateManager) {
+        // Pass user configuration
+        agentConfigurationHandler = configurationHandler
+
+        // Set current instance status
+        currentStatus = .notRunning(.notInstalled)
+
+        // Assign identification
+        currentUser = user
+        currentSession = session
+
+        let logPoolName = PackageIdentifier.instance()
+        let verboseLogging = agentConfigurationHandler.configuration.enableDebugLogging
+
+        // Configure internal logging
+        logProcessor = DefaultLogProcessor(
+            poolName: logPoolName,
+            subsystem: PackageIdentifier.default
+        )
+        .verbosity(verboseLogging ? .verbose : .default)
+
+        logger = DefaultLogAgent(poolName: logPoolName, category: "Agent")
+
+        // Assign AppState manager
+        self.appStateManager = appStateManager
     }
 
     convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {
@@ -237,21 +238,23 @@ public class SplunkRum: ObservableObject {
             moduleConfigurations: moduleConfigurations
         )
 
-        // Get WebViewInstrumentation module, set its sharedState
-        if let webViewInstrumentationModule = modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
-            WebViewInstrumentationInternal.instance.sharedState = sharedState
-            logger.log(level: .notice, isPrivate: false) {
-                "WebViewInstrumentation module installed."
-            }
-        } else {
-            logger.log(level: .notice, isPrivate: false) {
-                "WebViewInstrumentation module not installed."
-            }
-        }
-
-
         initializeEvents["modules_connected"] = Date()
 
+        registerModulePublish()
+
+        // Runs module-specific customizations
+        customizeModules()
+
+        initializeEvents["modules_customized"] = Date()
+
+        reportAgentInitialization(start: initializeStart, initializeEvents: initializeEvents)
+
+        logger.log(level: .notice, isPrivate: false) {
+            "Splunk RUM Agent v\(Self.version)."
+        }
+    }
+
+    private func registerModulePublish() {
         // Send events on data publish
         modulesManager?.onModulePublish(data: { metadata, data in
             self.eventManager?.publish(data: data, metadata: metadata) { success in
@@ -262,9 +265,10 @@ public class SplunkRum: ObservableObject {
                 }
             }
         })
+    }
 
-        // Runs module-specific customizations
-        customizeModules()
+    private func reportAgentInitialization(start: Date, initializeEvents: [String: Date]) {
+        var initializeEvents = initializeEvents
 
         // Fetch modules initialization times from the Modules manager
         modulesManager?.modulesInitializationTimes.forEach { moduleName, time in
@@ -272,17 +276,10 @@ public class SplunkRum: ObservableObject {
             initializeEvents[moduleName] = time
         }
 
-        initializeEvents["modules_customized"] = Date()
-
-        print("👀 Splunk RUM Agent v\(Self.version).")
-        logger.log(level: .notice, isPrivate: false) {
-            "Splunk RUM Agent v\(Self.version)."
-        }
-
         // Report initialize events to App Start module
         if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
             appStartModule.reportAgentInitialize(
-                start: initializeStart,
+                start: start,
                 end: Date(),
                 events: initializeEvents,
                 configurationSettings: configurationSettings
@@ -299,6 +296,7 @@ public class SplunkRum: ObservableObject {
         customizeSessionReplay()
         customizeNetwork()
         customizeAppStart()
+        customizeWebViewInstrumentation()
     }
 
     /// Perform operations specific to the SessionReplay module.
@@ -356,6 +354,21 @@ public class SplunkRum: ObservableObject {
         let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
 
         appStartModule?.sharedState = sharedState
+    }
+
+    /// Configure WebView intrumentation module
+    private func customizeWebViewInstrumentation() {
+        // Get WebViewInstrumentation module, set its sharedState
+        if let webViewInstrumentationModule = modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
+            WebViewInstrumentationInternal.instance.sharedState = sharedState
+            logger.log(level: .notice, isPrivate: false) {
+                "WebViewInstrumentation module installed."
+            }
+        } else {
+            logger.log(level: .notice, isPrivate: false) {
+                "WebViewInstrumentation module not installed."
+            }
+        }
     }
 
 
