@@ -47,6 +47,8 @@ public class SplunkRum: ObservableObject {
         agentConfigurationHandler.configuration
     }
 
+    var isNonOperational = true
+
     var currentUser: AgentUser
     var currentSession: AgentSession
     var currentStatus: Status
@@ -115,7 +117,7 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Initialization
 
-    init(configurationHandler: AgentConfigurationHandler, user: AgentUser, session: AgentSession, appStateManager: AgentAppStateManager) {
+    required init(configurationHandler: AgentConfigurationHandler, user: AgentUser, session: AgentSession, appStateManager: AgentAppStateManager) {
         // Pass user configuration
         agentConfigurationHandler = configurationHandler
 
@@ -156,13 +158,10 @@ public class SplunkRum: ObservableObject {
     /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
     public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws -> SplunkRum {
 
-        // Initialization metrics to be sent in the Initialize span
-        let initializeStart = Date()
-        var initializeEvents: [String: Date] = [:]
-
         // Install is allowed only once.
         // ‼️ This condition check ensures that sampling check or platform check are performed only once
-        if shared.currentStatus != .notRunning(.notInstalled) {
+        // TODO: maybe check .notRunning(.notInstalled)?
+        guard shared.isNonOperational else {
             return shared
         }
 
@@ -186,48 +185,66 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
+        let agent = try SplunkRum(
+            with: configuration,
+            moduleConfigurations: moduleConfigurations
+        )
+
+        agent.isNonOperational = false
+        shared = agent
+
+        return agent
+    }
+
+    convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {
+
+        // Initialization metrics to be sent in the Initialize span
+        let initializeStart = Date()
+        var initializeEvents: [String: Date] = [:]
+
         // Validate the configuration
         try configuration.validate()
 
         // Prepare handler for stored configuration and download remote configuration
-        let configurationHandler = createConfigurationHandler(for: configuration)
+        let configurationHandler = Self.createConfigurationHandler(for: configuration)
 
-        // Builds agent with default logic
-        shared.agentConfigurationHandler = configurationHandler
-        shared.currentUser = DefaultUser()
-        shared.currentSession = DefaultSession()
-        shared.appStateManager = AppStateManager()
+        self.init(
+            configurationHandler: configurationHandler,
+            user: DefaultUser(),
+            session: DefaultSession(),
+            appStateManager: AppStateManager()
+        )
 
         initializeEvents["agent_instance_initialized"] = Date()
 
         // Links the current session with the agent
-        (shared.currentSession as? DefaultSession)?.owner = shared
+        (currentSession as? DefaultSession)?.owner = self
 
         // The agent is running, so we set the corresponding status
-        shared.currentStatus = .running
+        currentStatus = .running
 
         // Initialize Event manager
-        shared.eventManager = try DefaultEventManager(with: configuration, agent: shared)
+        eventManager = try DefaultEventManager(with: configuration, agent: self)
 
         initializeEvents["event_manager_initialized"] = Date()
 
         // Send session start event immediately as the session already started in the SplunkRum init method.
-        shared.eventManager?.sendSessionStartEvent()
+        eventManager?.sendSessionStartEvent()
 
         // Starts connecting available modules to agent
-        shared.modulesManager = DefaultModulesManager(
+        modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
             moduleConfigurations: moduleConfigurations
         )
 
         // Get WebViewInstrumentation module, set its sharedState
-        if let webViewInstrumentationModule = shared.modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
-            WebViewInstrumentationInternal.instance.sharedState = shared.sharedState
-            shared.logger.log(level: .notice, isPrivate: false) {
+        if let webViewInstrumentationModule = modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
+            WebViewInstrumentationInternal.instance.sharedState = sharedState
+            logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module installed."
             }
         } else {
-            shared.logger.log(level: .notice, isPrivate: false) {
+            logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module not installed."
             }
         }
@@ -236,10 +253,10 @@ public class SplunkRum: ObservableObject {
         initializeEvents["modules_connected"] = Date()
 
         // Send events on data publish
-        shared.modulesManager?.onModulePublish(data: { metadata, data in
-            shared.eventManager?.publish(data: data, metadata: metadata) { success in
+        modulesManager?.onModulePublish(data: { metadata, data in
+            self.eventManager?.publish(data: data, metadata: metadata) { success in
                 if success {
-                    shared.modulesManager?.deleteModuleData(for: metadata)
+                    self.modulesManager?.deleteModuleData(for: metadata)
                 } else {
                     // TODO: MRUM_AC-1061 (post GA): Handle a case where data is not sent.
                 }
@@ -247,31 +264,30 @@ public class SplunkRum: ObservableObject {
         })
 
         // Runs module-specific customizations
-        shared.customizeModules()
+        customizeModules()
 
         // Fetch modules initialization times from the Modules manager
-        shared.modulesManager?.modulesInitializationTimes.forEach { moduleName, time in
+        modulesManager?.modulesInitializationTimes.forEach { moduleName, time in
             let moduleName = "\(moduleName)_initialized"
             initializeEvents[moduleName] = time
         }
 
         initializeEvents["modules_customized"] = Date()
 
-        shared.logger.log(level: .notice, isPrivate: false) {
+        print("👀 Splunk RUM Agent v\(Self.version).")
+        logger.log(level: .notice, isPrivate: false) {
             "Splunk RUM Agent v\(Self.version)."
         }
 
         // Report initialize events to App Start module
-        if let appStartModule = shared.modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
+        if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
             appStartModule.reportAgentInitialize(
                 start: initializeStart,
                 end: Date(),
                 events: initializeEvents,
-                configurationSettings: shared.configurationSettings
+                configurationSettings: configurationSettings
             )
         }
-
-        return shared
     }
 
 
