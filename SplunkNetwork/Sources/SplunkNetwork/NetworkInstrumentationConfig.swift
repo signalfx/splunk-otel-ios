@@ -18,7 +18,20 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-public struct NetworkInstrumentationConfiguration: ModuleConfiguration {}
+public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
+
+    // MARK: - Public
+
+    public var enabled: Bool
+    public var ignoreURLs: IgnoreURLs
+
+    // MARK: init()
+
+    public init(enabled: Bool, ignoreURLs: IgnoreURLs) {
+        self.enabled = enabled
+        self.ignoreURLs = ignoreURLs
+    }
+}
 
 public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
 
@@ -26,6 +39,7 @@ public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
 
     struct NetworkTracing: Decodable {
         let enabled: Bool
+        let ignoreURLs: IgnoreURLs
     }
 
     struct MRUMRoot: Decodable {
@@ -43,6 +57,7 @@ public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
     // MARK: - Protocol compliance
 
     public var enabled: Bool
+    public var IgnoreURLs: IgnoreURLs
 
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
@@ -50,5 +65,6 @@ public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
         }
 
         enabled = root.configuration.mrum.networkTracing.enabled
+        IgnoreURLs = root.configuration.mrum.networkTracing.ignoreURLs
     }
 }
