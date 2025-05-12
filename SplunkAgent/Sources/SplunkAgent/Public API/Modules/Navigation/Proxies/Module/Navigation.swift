@@ -29,10 +29,16 @@ final class Navigation: NavigationModule {
 
     var preferences: any NavigationModulePreferences
 
+    @discardableResult func preferences(_ preferences: any NavigationModulePreferences) -> any NavigationModule {
+        self.preferences = preferences
+
+        return self
+    }
+
 
     // MARK: - State
 
-    private(set) lazy var state: any NavigationModuleState = NavigationState(for: module)
+    let state: any NavigationModuleState
 
 
     // MARK: - Initialization
@@ -40,6 +46,7 @@ final class Navigation: NavigationModule {
     init(for module: SplunkNavigation.Navigation) {
         self.module = module
 
+        state = NavigationState(for: module)
         preferences = NavigationPreferences(for: module)
     }
 }

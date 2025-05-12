@@ -25,6 +25,13 @@ public protocol NavigationModule: ObservableObject {
     // An object that holds preferred settings for the module.
     var preferences: NavigationModulePreferences { get set }
 
+    /// Sets preferred settings for the module.
+    ///
+    /// - Parameter preferences: The preferred settings for the module.
+    ///
+    /// - Returns: The actual `Navigation` instance.
+    @discardableResult func preferences(_ preferences: NavigationModulePreferences) -> any NavigationModule
+
 
     // MARK: - State
 

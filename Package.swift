@@ -69,7 +69,10 @@ let package = Package(
 
         .target(
             name: "SplunkNavigation",
-            dependencies: ["SplunkCommon"],
+            dependencies: [
+                "SplunkCommon",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+            ],
             path: "SplunkNavigation/Sources"
         ),
         .testTarget(

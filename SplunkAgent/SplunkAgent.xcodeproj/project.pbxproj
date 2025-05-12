@@ -310,6 +310,8 @@
 		E4C576F82DBA59AE00C5F37E /* PackageIdentifier+InstanceName.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C576F72DBA598200C5F37E /* PackageIdentifier+InstanceName.swift */; };
 		E4C576F92DBA5FB100C5F37E /* PackageIdentifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C14EB72B2B353A008CC270 /* PackageIdentifierTests.swift */; };
 		E4C9D2012B98B41100A274ED /* LifecycleRepeatingJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C9D2002B98B41100A274ED /* LifecycleRepeatingJob.swift */; };
+		E4D396AD2DD1E481003D56C8 /* API-1.0-NavigationNonOperationalProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D396AC2DD1E461003D56C8 /* API-1.0-NavigationNonOperationalProxyTests.swift */; };
+		E4D396AF2DD1E550003D56C8 /* NavigationTestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D396AE2DD1E548003D56C8 /* NavigationTestBuilder.swift */; };
 		E4E4B1122BA19A5B001CB6B3 /* SessionReplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E4B1112BA19A5B001CB6B3 /* SessionReplay.swift */; };
 		E4E4B1162BA1A0DA001CB6B3 /* SessionReplay+RecordingMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4E4B1152BA1A0DA001CB6B3 /* SessionReplay+RecordingMask.swift */; };
 		E4EE9EC22BA2E5240000D594 /* SessionReplayNonOperational.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EE9EC12BA2E5240000D594 /* SessionReplayNonOperational.swift */; };
@@ -320,7 +322,7 @@
 		E4EE9ED02BA330AE0000D594 /* SessionReplayNonOperational+RecordingMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EE9ECF2BA330AE0000D594 /* SessionReplayNonOperational+RecordingMask.swift */; };
 		E4EE9ED22BA332CD0000D594 /* SessionReplayNonOperationalSensitivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EE9ED12BA332CD0000D594 /* SessionReplayNonOperationalSensitivity.swift */; };
 		E4EE9ED42BA34A400000D594 /* SessionReplayNonOperationalState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EE9ED32BA34A400000D594 /* SessionReplayNonOperationalState.swift */; };
-		E4EF11502DC89C2E0026EDA0 /* API-1.0-ModuleProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF114F2DC89C1D0026EDA0 /* API-1.0-ModuleProxyTests.swift */; };
+		E4EF11502DC89C2E0026EDA0 /* API-1.0-NavigationModuleProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF114F2DC89C1D0026EDA0 /* API-1.0-NavigationModuleProxyTests.swift */; };
 		E4EF11552DC89CDA0026EDA0 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF11542DC89CD40026EDA0 /* Navigation.swift */; };
 		E4EF11572DC89D040026EDA0 /* NavigationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF11562DC89CFD0026EDA0 /* NavigationState.swift */; };
 		E4EF11592DC89D230026EDA0 /* NavigationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EF11582DC89D1A0026EDA0 /* NavigationPreferences.swift */; };
@@ -921,6 +923,8 @@
 		E4C576F02DBA560700C5F37E /* TestModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestModule.swift; sourceTree = "<group>"; };
 		E4C576F72DBA598200C5F37E /* PackageIdentifier+InstanceName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PackageIdentifier+InstanceName.swift"; sourceTree = "<group>"; };
 		E4C9D2002B98B41100A274ED /* LifecycleRepeatingJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifecycleRepeatingJob.swift; sourceTree = "<group>"; };
+		E4D396AC2DD1E461003D56C8 /* API-1.0-NavigationNonOperationalProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-NavigationNonOperationalProxyTests.swift"; sourceTree = "<group>"; };
+		E4D396AE2DD1E548003D56C8 /* NavigationTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTestBuilder.swift; sourceTree = "<group>"; };
 		E4E4B1112BA19A5B001CB6B3 /* SessionReplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionReplay.swift; sourceTree = "<group>"; };
 		E4E4B1152BA1A0DA001CB6B3 /* SessionReplay+RecordingMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionReplay+RecordingMask.swift"; sourceTree = "<group>"; };
 		E4EE9EC12BA2E5240000D594 /* SessionReplayNonOperational.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionReplayNonOperational.swift; sourceTree = "<group>"; };
@@ -932,7 +936,7 @@
 		E4EE9ECF2BA330AE0000D594 /* SessionReplayNonOperational+RecordingMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionReplayNonOperational+RecordingMask.swift"; sourceTree = "<group>"; };
 		E4EE9ED12BA332CD0000D594 /* SessionReplayNonOperationalSensitivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionReplayNonOperationalSensitivity.swift; sourceTree = "<group>"; };
 		E4EE9ED32BA34A400000D594 /* SessionReplayNonOperationalState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionReplayNonOperationalState.swift; sourceTree = "<group>"; };
-		E4EF114F2DC89C1D0026EDA0 /* API-1.0-ModuleProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-ModuleProxyTests.swift"; sourceTree = "<group>"; };
+		E4EF114F2DC89C1D0026EDA0 /* API-1.0-NavigationModuleProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-NavigationModuleProxyTests.swift"; sourceTree = "<group>"; };
 		E4EF11542DC89CD40026EDA0 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
 		E4EF11562DC89CFD0026EDA0 /* NavigationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationState.swift; sourceTree = "<group>"; };
 		E4EF11582DC89D1A0026EDA0 /* NavigationPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPreferences.swift; sourceTree = "<group>"; };
@@ -2695,6 +2699,7 @@
 				E40549802DACF65D00B7A2E4 /* DefaultUserTestBuilder.swift */,
 				C76AB8D92B7B785500CB4307 /* RawMockDataBuilder.swift */,
 				E4EE9EC82BA321290000D594 /* SessionReplayTestBuilder.swift */,
+				E4D396AE2DD1E548003D56C8 /* NavigationTestBuilder.swift */,
 				E46BBA6A2B503CDF00317C8E /* UserDefaultsStorageTestBuilder.swift */,
 			);
 			path = Builders;
@@ -3059,7 +3064,8 @@
 		E4EF114E2DC89BEF0026EDA0 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
-				E4EF114F2DC89C1D0026EDA0 /* API-1.0-ModuleProxyTests.swift */,
+				E4EF114F2DC89C1D0026EDA0 /* API-1.0-NavigationModuleProxyTests.swift */,
+				E4D396AC2DD1E461003D56C8 /* API-1.0-NavigationNonOperationalProxyTests.swift */,
 			);
 			path = Navigation;
 			sourceTree = "<group>";
@@ -4620,6 +4626,7 @@
 				E40E0AF32B6BC27900D31EEF /* CrashReportsTestModuleTypes.swift in Sources */,
 				E4374B072B4DA8B700E3C88E /* UserDefaultsUtils.swift in Sources */,
 				E4570F822BAB243B002ED1DC /* API-1.0-NonOperationalProxyTests.swift in Sources */,
+				E4D396AD2DD1E481003D56C8 /* API-1.0-NavigationNonOperationalProxyTests.swift in Sources */,
 				C73FF4A02B6CE816009C53FF /* APIClientTestBuilder.swift in Sources */,
 				E4374B042B4D929300E3C88E /* NanoIDValidator.swift in Sources */,
 				C73FF49B2B6CE7FF009C53FF /* APIClientTests.swift in Sources */,
@@ -4629,6 +4636,7 @@
 				E42026A32B501304002C5F80 /* UserDefaultsStorageCRUDTests.swift in Sources */,
 				E4C3E5B72B6912E400661FA6 /* CrashReportsTestModule.swift in Sources */,
 				E46896512B220DBA00727A6A /* DefaultUserTests.swift in Sources */,
+				E4D396AF2DD1E550003D56C8 /* NavigationTestBuilder.swift in Sources */,
 				2AA52B492B8DF4CD00DF9373 /* EventsTests.swift in Sources */,
 				2AAC95E62D6C7880004FAE2C /* HexIDValidator.swift in Sources */,
 				E4577D7D2B9F5BE400DFA2C2 /* XCTestCase+SimulateNotifications.swift in Sources */,
@@ -4636,7 +4644,7 @@
 				E40E0AF52B6BC35100D31EEF /* SessionReplayTestModuleTypes.swift in Sources */,
 				E49F9ABB2B99D27500D652AA /* RepeatingJobTests.swift in Sources */,
 				E40F96642BAC6C560042742C /* API-1.0-TypeConversions.swift in Sources */,
-				E4EF11502DC89C2E0026EDA0 /* API-1.0-ModuleProxyTests.swift in Sources */,
+				E4EF11502DC89C2E0026EDA0 /* API-1.0-NavigationModuleProxyTests.swift in Sources */,
 				E46896532B220EDD00727A6A /* DefaultSessionTests.swift in Sources */,
 				4BB680FF2B7A7A53000A54D4 /* API-1.0-ModuleProxyTests.swift in Sources */,
 				E4374AFF2B4D89A800E3C88E /* AgentTestBuilder.swift in Sources */,

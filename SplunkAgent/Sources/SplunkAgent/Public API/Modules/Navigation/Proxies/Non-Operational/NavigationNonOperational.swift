@@ -25,6 +25,10 @@ final class NavigationNonOperational: NavigationModule {
 
     var preferences: any NavigationModulePreferences
 
+    @discardableResult func preferences(_ preferences: any NavigationModulePreferences) -> any NavigationModule {
+        return self
+    }
+
 
     // MARK: - State
 
