@@ -106,7 +106,8 @@ class DefaultEventManager: AgentEventManager {
             with: traceUrl,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
-            debugEnabled: configuration.enableDebugLogging
+            debugEnabled: configuration.enableDebugLogging,
+            spanInterceptor: configuration.spanInterceptor
         )
 
         logger.log(level: .info, isPrivate: false) {
