@@ -45,7 +45,7 @@ final class PackageIdentifierTests: XCTestCase {
         identifier = PackageIdentifier.default(named: emptyExtension)
         XCTAssertEqual(identifier, expectedIdentifier)
     }
-    
+
     func testInstanceIdentification() throws {
         let defaultExtension = "default"
         let namedExtension = "named"

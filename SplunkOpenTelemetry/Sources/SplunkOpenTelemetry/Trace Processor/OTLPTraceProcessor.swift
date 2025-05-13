@@ -35,7 +35,7 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Initialization
 
-    required public init(
+    public required init(
         with tracesEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
@@ -63,7 +63,9 @@ public class OTLPTraceProcessor: TraceProcessor {
 
         // Initialize span interceptor proxy exporter
         let spanInterceptorExporter = SpanInterceptorExporter(
-            with: spanInterceptor, proxy: attributeCheckerExporter)
+            with: spanInterceptor,
+            proxy: attributeCheckerExporter
+        )
 
         // Initialize processor
         let spanProcessor = SimpleSpanProcessor(spanExporter: spanInterceptorExporter)
@@ -74,7 +76,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         resource.merge(with: resources)
 
         // Initialize tracer provider
-        var tracerProviderBuilder = TracerProviderBuilder()
+        let tracerProviderBuilder = TracerProviderBuilder()
             .with(resource: resource)
             .add(spanProcessor: attributesProcessor)
             .add(spanProcessor: spanProcessor)

@@ -25,7 +25,7 @@ let package = Package(
         sessionReplayDependency()
     ],
     targets: [
-        
+
         // MARK: Splunk Agent
 
         .target(
@@ -34,13 +34,14 @@ let package = Package(
                 "SplunkCommon",
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",
+                "SplunkNavigation",
                 "SplunkNetwork",
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkANRReporter",
                 "SplunkAppStart",
-		"SplunkWebView",
-		"SplunkWebViewProxy",
+                "SplunkWebView",
+                "SplunkWebViewProxy",
                 .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAgent",
@@ -62,10 +63,27 @@ let package = Package(
             ],
             swiftSettings: [.define("SPM_TESTS")]
         ),
-        
-        
-        // MARK: Splunk Network
-        
+
+
+        // MARK: - Splunk Navigation (Instrumentation)
+
+        .target(
+            name: "SplunkNavigation",
+            dependencies: [
+                "SplunkCommon",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+            ],
+            path: "SplunkNavigation/Sources"
+        ),
+        .testTarget(
+            name: "SplunkNavigationTests",
+            dependencies: ["SplunkNavigation"],
+            path: "SplunkNavigation/Tests"
+        ),
+
+
+        // MARK: - Splunk Network (Instrumentation)
+
         .target(
             name: "SplunkNetwork",
             dependencies: [
@@ -79,10 +97,10 @@ let package = Package(
             dependencies: ["SplunkNetwork"],
             path: "SplunkNetwork/Tests"
         ),
-        
-        
-        // MARK: Splunk ANR Reporter
-        
+
+
+        // MARK: - Splunk ANR Reporter (Instrumentation)
+
         .target(
             name: "SplunkANRReporter",
             dependencies: [
@@ -95,10 +113,10 @@ let package = Package(
             dependencies: ["SplunkANRReporter"],
             path: "SplunkANRReporter/Tests"
         ),
-        
-        
-        // MARK: Splunk Common
-        
+
+
+        // MARK: - Splunk Common
+
         .target(
             name: "SplunkCommon",
             path: "SplunkCommon/Sources"
@@ -108,10 +126,10 @@ let package = Package(
             dependencies: ["SplunkCommon"],
             path: "SplunkCommon/Tests"
         ),
-        
-        
-        // MARK: Splunk Slow Frame Detector
-        
+
+
+        // MARK: - Splunk Slow Frame Detector (Instrumentation)
+
         .target(
             name: "SplunkSlowFrameDetector",
             dependencies: [
@@ -125,10 +143,10 @@ let package = Package(
             dependencies: ["SplunkSlowFrameDetector", "SplunkCommon"],
             path: "SplunkSlowFrameDetector/Tests"
         ),
-        
-        
-        // MARK: Splunk Custom Data
-        
+
+
+        // MARK: - Splunk Custom Data
+
         .target(
             name: "SplunkCustomData",
             dependencies: [
@@ -141,10 +159,10 @@ let package = Package(
             dependencies: ["SplunkCustomData"],
             path: "SplunkCustomData/Tests"
         ),
-        
-        
-        // MARK: Splunk Error Reporting
-        
+
+
+        // MARK: - Splunk Error Reporting
+
         .target(
             name: "SplunkErrorReporting",
             dependencies: [
@@ -157,10 +175,10 @@ let package = Package(
             dependencies: ["SplunkErrorReporting"],
             path: "SplunkErrorReporting/Tests"
         ),
-        
-        
-        // MARK: SplunkCrashReporter
-        
+
+
+        // MARK: - SplunkCrashReporter
+
         .target(
             name: "SplunkCrashReporter",
             path: "SplunkCrashReporter",
@@ -192,10 +210,10 @@ let package = Package(
                 .linkedFramework("Foundation")
             ]
         ),
-        
-        
-        // MARK: SplunkCrashReports
-        
+
+
+        // MARK: - SplunkCrashReports (Instrumentation)
+
         .target(
             name: "SplunkCrashReports",
             dependencies: [
@@ -210,10 +228,10 @@ let package = Package(
             dependencies: ["SplunkCrashReports", "SplunkCommon"],
             path: "SplunkCrashReports/Tests"
         ),
-        
-        
-        // MARK: Splunk Otel
-        
+
+
+        // MARK: - Splunk OTel
+
         .target(
             name: "SplunkOpenTelemetry",
             dependencies: [
@@ -232,10 +250,10 @@ let package = Package(
             dependencies: ["SplunkOpenTelemetry", "SplunkCommon"],
             path: "SplunkOpenTelemetry/Tests"
         ),
-        
-        
-        // MARK: Splunk OTel Background Exporter
-        
+
+
+        // MARK: - Splunk OTel Background Exporter
+
         .target(
             name: "SplunkOpenTelemetryBackgroundExporter",
             dependencies: [
@@ -251,10 +269,10 @@ let package = Package(
             dependencies: ["SplunkOpenTelemetryBackgroundExporter", "SplunkCommon"],
             path: "SplunkOpenTelemetryBackgroundExporter/Tests"
         ),
-        
-        
-        // MARK: Splunk App Start
-        
+
+
+        // MARK: - Splunk App Start (Instrumentation)
+
         .target(
             name: "SplunkAppStart",
             dependencies: [
@@ -274,9 +292,10 @@ let package = Package(
             ],
             path: "SplunkAppStart/Tests"
         ),
-        
-        // MARK: Splunk Web Instrumentation
-    
+
+
+        // MARK: - Splunk Web (Instrumentation)
+
         .target(
             name: "SplunkWebView",
             dependencies: [
@@ -294,8 +313,9 @@ let package = Package(
             path: "SplunkWebView/Tests"
         ),
 
-        // MARK: Splunk Web Instrumentation Proxy
-        
+
+        // MARK: - Splunk Web Instrumentation Proxy
+
         .target(
             name: "SplunkWebViewProxy",
             dependencies: [
@@ -317,10 +337,10 @@ let package = Package(
             ],
             path: "SplunkWebViewProxy/Tests"
         ),
-        
-        
-        // MARK: Session Replay Proxy
-        
+
+
+        // MARK: - Session Replay Proxy
+
         .target(
             name: "SplunkSessionReplayProxy",
             dependencies: [
@@ -338,7 +358,7 @@ let package = Package(
 )
 
 
-// MARK: Session Replay related helpers
+// MARK: - Session Replay related helpers
 
 /// Enables or disables having Session Replay as a local dependency (needs smartlook-ios-sdk checked out locally)
 /// or a remote dependency. If the value is `true`, overrides `remoteSessionReplayBranch()`.
@@ -361,18 +381,18 @@ func remoteSessionReplayBranch() -> String {
 func sessionReplayDependency() -> Package.Dependency {
     // Session replay git repo
     let packageGitUrl = "git@github.com:smartlook/smartlook-ios-sdk-private.git"
-    
+
     // Check if a branch was set as an environment variable.
     // Atm it's set in a build script in Tools/build_frameworks/050-Xarchives.sh
 
     if let environmentBranch = ProcessInfo.processInfo.environment["SESSION_REPLAY_BRANCH"] {
         return .package(url: packageGitUrl, branch: environmentBranch)
     }
-    
+
     // Local dependency, enables SessionReplay local development, needs smartlook-ios-sdk checked out locally
     if shouldUseLocalSessionReplayDependency() {
         return .package(name: "smartlook-ios-sdk-private", path: "../../smartlook-ios-sdk-private")
     }
-    
+
     return .package(url: packageGitUrl, branch: remoteSessionReplayBranch())
 }

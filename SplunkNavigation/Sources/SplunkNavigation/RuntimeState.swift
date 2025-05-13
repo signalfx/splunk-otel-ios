@@ -15,23 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkWebViewProxy
-import WebKit
+import Combine
 
-public class WebViewToNativeBridge {
+/// A state object that is representation for the current state of the module.
+public class RuntimeState: ObservableObject {
 
-    // Using the protocol here
-    private let module: WebViewInstrumentationModule
+    // MARK: - Automated tracking
 
-    init(module: WebViewInstrumentationModule) {
-        self.module = module
-    }
-
-    public func integrateWithBrowserRum(_ view: WKWebView) {
-        module.injectSessionId(into: view)
-    }
-}
-
-extension SplunkRum {
-    public static let webView = WebViewToNativeBridge(module: WebViewInstrumentationProxy.instance)
+    /// Indicates whether automatic navigation detection is enabled.
+    ///
+    /// The default value is `false`.
+    @Published public internal(set) var isAutomatedTrackingEnabled: Bool = false
 }

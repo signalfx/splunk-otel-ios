@@ -18,7 +18,7 @@ limitations under the License.
 @testable import SplunkAgent
 import XCTest
 
-final class StateTests: XCTestCase {
+final class RuntimeStateTests: XCTestCase {
 
     // MARK: - Tests
 

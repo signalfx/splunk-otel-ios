@@ -16,7 +16,6 @@
  */
 
 import CiscoDiskStorage
-import Foundation
 
 extension KeyBuilder {
     static let uploadsKey = KeyBuilder("uploadFiles")

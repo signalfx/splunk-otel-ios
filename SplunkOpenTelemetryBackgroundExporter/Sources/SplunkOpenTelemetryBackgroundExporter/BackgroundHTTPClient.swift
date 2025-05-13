@@ -70,7 +70,7 @@ final class BackgroundHTTPClient: NSObject {
         )
 
         guard requestDescriptor.shouldSend else {
-            self.logger.log(level: .info) {
+            logger.log(level: .info) {
                 "Maximal retry sent count exceeded for the given taskDescription: \(requestDescriptor)."
             }
 
@@ -82,7 +82,7 @@ final class BackgroundHTTPClient: NSObject {
         let fileUrl = try diskStorage.finalDestination(forKey: fileKey)
 
         guard FileManager.default.fileExists(atPath: fileUrl.path) else {
-            self.logger.log(level: .error) {
+            logger.log(level: .error) {
                 "File does not exist at path: \(fileUrl)."
             }
 
@@ -120,14 +120,14 @@ extension BackgroundHTTPClient: URLSessionDataDelegate {
         guard
             let httpResponse = dataTask.response as? HTTPURLResponse,
             let receivedData = String(data: data, encoding: .utf8),
-            !(200...299).contains(httpResponse.statusCode),
+            !(200 ... 299).contains(httpResponse.statusCode),
             let taskDescription = dataTask.taskDescription,
             let requestDescriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
         else {
             return
         }
 
-        self.logger.log(level: .info) {
+        logger.log(level: .info) {
             """
             Request to: \(requestDescriptor.endpoint.absoluteString) \n
             with a data task id: \(requestDescriptor.id) \n
@@ -145,7 +145,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             let taskDescription = task.taskDescription,
             let requestDescriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
         else {
-            self.logger.log(level: .info) {
+            logger.log(level: .info) {
                 "Failed to reconstruct request descriptor for a request with an empty taskDescription: \(String(describing: task.taskDescription))."
             }
 
@@ -154,9 +154,9 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
 
         if
             let httpResponse = task.response as? HTTPURLResponse,
-            !(200...299).contains(httpResponse.statusCode)
+            !(200 ... 299).contains(httpResponse.statusCode)
         {
-            self.logger.log(level: .info) {
+            logger.log(level: .info) {
                 """
                 Request to: \(requestDescriptor.endpoint.absoluteString) \n
                 with a data task id: \(requestDescriptor.id) \n
@@ -165,9 +165,9 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             }
 
             try? send(requestDescriptor)
-        }
-        else if let error {
-            self.logger.log(level: .info) {
+
+        } else if let error {
+            logger.log(level: .info) {
                 """
                 Request to: \(requestDescriptor.endpoint.absoluteString) \n
                 with a data task id: \(requestDescriptor.id) \n
@@ -176,10 +176,10 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             }
 
             try? send(requestDescriptor)
-        } else {
 
+        } else {
             if let httpResponse = task.response as? HTTPURLResponse {
-                self.logger.log(level: .info) {
+                logger.log(level: .info) {
                     """
                     Request to: \(requestDescriptor.endpoint.absoluteString) \n
                     has been successfully received with status code \(httpResponse.statusCode).
