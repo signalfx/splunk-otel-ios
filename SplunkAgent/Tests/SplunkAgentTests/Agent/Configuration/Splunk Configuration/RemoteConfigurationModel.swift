@@ -35,7 +35,7 @@ struct MRUMConfigurationTestModel: Codable {
     let sessionReplay: SessionReplayTestConfigurationModel
     let crashReporting: CrashReportsTestConfigurationModel
     let networkTracing: NetworkTracingTestConfigurationModel
-    let slowFrameDetector: ANRReportsTestConfigurationModel
+    let slowFrameDetector: SlowFrameDetectorTestConfigurationModel
     let appStart: AppStartTestConfigurationModel
 }
 
@@ -51,10 +51,8 @@ struct AppStartTestConfigurationModel: Codable {
     let enabled: Bool
 }
 
-struct ANRReportsTestConfigurationModel: Codable {
+struct SlowFrameDetectorTestConfigurationModel: Codable {
     let enabled: Bool
-    let slowFrameDetectorThresholdMilliseconds: Double
-    let frozenFrameDetectorThresholdMilliseconds: Double
 }
 
 struct NetworkTracingTestConfigurationModel: Codable {
