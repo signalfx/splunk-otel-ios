@@ -14,9 +14,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
+
 import Foundation
 
+/// This struct implements a non operational variant of the AgentAppStateManager.
 struct NoOpAppStateManager: AgentAppStateManager {
 
     func appState(for timestamp: Date) -> AppState? {

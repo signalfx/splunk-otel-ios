@@ -2851,8 +2851,10 @@
 		E4AD34F22B56E031004976CA /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				E468E7712B6123ED0035BB31 /* Pool */,
 				E468E7722B6124440035BB31 /* Manager */,
+				E468E7712B6123ED0035BB31 /* Pool */,
+				2AF6AABE2DCE099C00BB9DC3 /* SplunkRum+AppStart.swift */,
+				2AF6AABC2DCE081A00BB9DC3 /* SplunkRum+Modules.swift */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -3009,8 +3011,6 @@
 		E4F2E4F82B172911006EBA69 /* Agent */ = {
 			isa = PBXGroup;
 			children = (
-				2AF6AABC2DCE081A00BB9DC3 /* SplunkRum+Modules.swift */,
-				2AF6AABE2DCE099C00BB9DC3 /* SplunkRum+AppStart.swift */,
 				C703FAAD2BA9D3A2000CC11B /* AppState */,
 				E4F2E4F72B172853006EBA69 /* Configuration */,
 				2AE43B3F2B861325002C4A98 /* Events */,
