@@ -36,8 +36,6 @@ public class MutableAttributes: Codable, Equatable {
         addAttributeSet(attributeSet)
     }
 
-    // MARK: - Codable
-
     public required init(from decoder: Decoder) throws {
         attributes = ThreadSafeDictionary<String, AttributeValue>()
         let container = try decoder.container(keyedBy: StringCodingKey.self)
@@ -47,8 +45,12 @@ public class MutableAttributes: Codable, Equatable {
             attributes[key.stringValue] = value
         }
     }
+}
 
-    public func encode(to encoder: Encoder) throws {
+// Codable
+public extension MutableAttributes {
+
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: StringCodingKey.self)
         let dictionary = attributes.getAll()
 
@@ -72,10 +74,12 @@ public class MutableAttributes: Codable, Equatable {
             self.intValue = intValue
         }
     }
+}
 
-    // MARK: - Equatable
+// Equatable
+public extension MutableAttributes {
 
-    public static func == (lhs: MutableAttributes, rhs: MutableAttributes) -> Bool {
+    static func == (lhs: MutableAttributes, rhs: MutableAttributes) -> Bool {
         let lhsDict = lhs.attributes.getAll()
         let rhsDict = rhs.attributes.getAll()
 
@@ -97,8 +101,10 @@ public class MutableAttributes: Codable, Equatable {
 
         return true
     }
+}
 
-    // MARK: - Subscripts
+// Subscripts
+public extension MutableAttributes {
 
     subscript(key: String) -> AttributeValue? {
         get {
@@ -208,8 +214,10 @@ public class MutableAttributes: Codable, Equatable {
             }
         }
     }
+}
 
-    // MARK: - Get and Set
+// Get and Set
+public extension MutableAttributes {
 
     func getValue(for key: String) -> AttributeValue? {
         return attributes[key]
@@ -286,9 +294,8 @@ public class MutableAttributes: Codable, Equatable {
     }
 }
 
+// Iterative setters
 public extension MutableAttributes {
-
-    // MARK: - Iterative setters
 
     @discardableResult
     func addDictionary(_ dictionary: [String: AttributeValue]) -> Int {
@@ -331,8 +338,10 @@ public extension MutableAttributes {
         }
         return count
     }
+}
 
-    // MARK: - Utilities
+// Utilities
+public extension MutableAttributes {
 
     @discardableResult
     func remove(for key: String) -> AttributeValue? {
@@ -377,8 +386,10 @@ public extension MutableAttributes {
     var all: [String: Any] {
         return getAllAsAny()
     }
+}
 
-    // MARK: - Description
+// Description
+public extension MutableAttributes {
 
     func description() -> String {
         var result = "[\n"
