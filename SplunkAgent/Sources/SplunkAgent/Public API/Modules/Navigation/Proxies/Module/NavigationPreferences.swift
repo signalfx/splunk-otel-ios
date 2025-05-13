@@ -17,11 +17,10 @@ limitations under the License.
 
 internal import SplunkNavigation
 
-/// The preferences object is a representation of the module user's preferred settings.
+/// The preferences object allows the user to set navigation instrumentation's preferred settings.
 ///
-/// These are the settings that the user would like the module to use. The entered values
-/// always represent only the preferred settings, and the resulting state
-/// in which the module works may be different for each property.
+/// These preferred settings may not represent the actual state,
+/// which can be checked with the `NavigationState` object.
 ///
 /// To find out the current state, use the information from the ``NavigationState`` object.
 ///
