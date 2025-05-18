@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 
-public class MutableAttributes: Codable, Equatable {
+public class MutableAttributes {
     fileprivate var attributes: ThreadSafeDictionary<String, AttributeValue>
 
     // MARK: - Initialize
@@ -48,9 +48,9 @@ public class MutableAttributes: Codable, Equatable {
 }
 
 // Codable
-public extension MutableAttributes {
+extension MutableAttributes: Codable {
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: StringCodingKey.self)
         let dictionary = attributes.getAll()
 
@@ -77,9 +77,9 @@ public extension MutableAttributes {
 }
 
 // Equatable
-public extension MutableAttributes {
+extension MutableAttributes: Equatable {
 
-    static func == (lhs: MutableAttributes, rhs: MutableAttributes) -> Bool {
+    public static func == (lhs: MutableAttributes, rhs: MutableAttributes) -> Bool {
         let lhsDict = lhs.attributes.getAll()
         let rhsDict = rhs.attributes.getAll()
 
