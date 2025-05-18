@@ -19,7 +19,9 @@ internal import CiscoLogger
 import Foundation
 import SplunkCommon
 import CrashReporter
-//internal import SplunkCrashReporter
+
+// Temporarily remove local CrashReporter in favor of SPM version
+// internal import SplunkCrashReporter
 
 public class CrashReports {
 
@@ -50,8 +52,16 @@ public class CrashReports {
 #else
         let signalHandlerType = PLCrashReporterSignalHandlerType.mach
 #endif
+        // Setup private path for crash reports to avoid conflict with other
+        // instances of PLCrashReporter present in the client app
+        let fileManager = FileManager.default
+        let crashDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("SplunkCrashReports", isDirectory: true)
+        try? fileManager.createDirectory(at: crashDirectory, withIntermediateDirectories: true)
 
-        let signalConfig = PLCrashReporterConfig(signalHandlerType: signalHandlerType, symbolicationStrategy: [])
+        let signalConfig = PLCrashReporterConfig(
+            signalHandlerType: signalHandlerType,
+            symbolicationStrategy: [],
+            basePath: crashDirectory.path)
         guard let crashReporterInstance = PLCrashReporter(configuration: signalConfig) else {
             logger.log(level: .error) {
                 "PLCrashReporter failed to initialize."
