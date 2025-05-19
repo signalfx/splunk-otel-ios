@@ -11,6 +11,10 @@
 		2A03CF5B2D9C312200CF3BC9 /* API-1.0-EndpointConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5A2D9C311800CF3BC9 /* API-1.0-EndpointConfiguration.swift */; };
 		2A03CF5D2D9C315C00CF3BC9 /* API-1.0-AgentConfigurationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */; };
 		2A03CF5F2D9C31C100CF3BC9 /* API-1.0-AgentConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */; };
+		2A0B3FC32DC89B610042FB38 /* NoOpAppStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0B3FC22DC89B5A0042FB38 /* NoOpAppStateManager.swift */; };
+		2A0B3FC52DC89BB90042FB38 /* AgentConfiguration+Empty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0B3FC42DC89BAD0042FB38 /* AgentConfiguration+Empty.swift */; };
+		2A0B3FC72DC8A4180042FB38 /* NoOpSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0B3FC62DC8A4150042FB38 /* NoOpSession.swift */; };
+		2A0B3FC92DC8A43D0042FB38 /* NoOpUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0B3FC82DC8A43A0042FB38 /* NoOpUser.swift */; };
 		2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1673CC2BA1F52600F85698 /* EventsModel.swift */; };
 		2A1789B72DA3CDA900EC548B /* AppStartSimulations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */; };
 		2A1789BB2DA3CDD300EC548B /* AppStartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789B92DA3CDD300EC548B /* AppStartTests.swift */; };
@@ -47,6 +51,8 @@
 		2AE43B472B861325002C4A98 /* AgentEventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B412B861325002C4A98 /* AgentEventManager.swift */; };
 		2AE43B482B861325002C4A98 /* SessionReplayDataEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B432B861325002C4A98 /* SessionReplayDataEvent.swift */; };
 		2AE43B4B2B861325002C4A98 /* SessionStartEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B462B861325002C4A98 /* SessionStartEvent.swift */; };
+		2AF6AABD2DCE081F00BB9DC3 /* SplunkRum+Modules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF6AABC2DCE081A00BB9DC3 /* SplunkRum+Modules.swift */; };
+		2AF6AABF2DCE09B900BB9DC3 /* SplunkRum+AppStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF6AABE2DCE099C00BB9DC3 /* SplunkRum+AppStart.swift */; };
 		3384F2AD2AC879FD00512D79 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F2AC2AC879FD00512D79 /* SplunkRum.swift */; };
 		4B0F238A2D79F51F00EA575A /* SplunkCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; };
 		4B0F23952D79F54000EA575A /* OpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = 4B0F23942D79F54000EA575A /* OpenTelemetryApi */; };
@@ -557,6 +563,10 @@
 		2A03CF5A2D9C311800CF3BC9 /* API-1.0-EndpointConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-EndpointConfiguration.swift"; sourceTree = "<group>"; };
 		2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-AgentConfigurationError.swift"; sourceTree = "<group>"; };
 		2A03CF5E2D9C317D00CF3BC9 /* API-1.0-AgentConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-AgentConfiguration.swift"; sourceTree = "<group>"; };
+		2A0B3FC22DC89B5A0042FB38 /* NoOpAppStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoOpAppStateManager.swift; sourceTree = "<group>"; };
+		2A0B3FC42DC89BAD0042FB38 /* AgentConfiguration+Empty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentConfiguration+Empty.swift"; sourceTree = "<group>"; };
+		2A0B3FC62DC8A4150042FB38 /* NoOpSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoOpSession.swift; sourceTree = "<group>"; };
+		2A0B3FC82DC8A43A0042FB38 /* NoOpUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoOpUser.swift; sourceTree = "<group>"; };
 		2A1673CC2BA1F52600F85698 /* EventsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsModel.swift; sourceTree = "<group>"; };
 		2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartSimulations.swift; sourceTree = "<group>"; };
 		2A1789B92DA3CDD300EC548B /* AppStartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartTests.swift; sourceTree = "<group>"; };
@@ -593,6 +603,8 @@
 		2AE43B412B861325002C4A98 /* AgentEventManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentEventManager.swift; sourceTree = "<group>"; };
 		2AE43B432B861325002C4A98 /* SessionReplayDataEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionReplayDataEvent.swift; sourceTree = "<group>"; };
 		2AE43B462B861325002C4A98 /* SessionStartEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionStartEvent.swift; sourceTree = "<group>"; };
+		2AF6AABC2DCE081A00BB9DC3 /* SplunkRum+Modules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SplunkRum+Modules.swift"; sourceTree = "<group>"; };
+		2AF6AABE2DCE099C00BB9DC3 /* SplunkRum+AppStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SplunkRum+AppStart.swift"; sourceTree = "<group>"; };
 		3384F2A22AC879E900512D79 /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3384F2AC2AC879FD00512D79 /* SplunkRum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkRum.swift; sourceTree = "<group>"; };
 		4B2C8BBA2BCBE4A200C6E72F /* CrashReportsDataEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportsDataEvent.swift; sourceTree = "<group>"; };
@@ -2313,6 +2325,7 @@
 				C7A2BD192BB44E1C005D4CFB /* Model */,
 				C703FAAE2BA9D417000CC11B /* AgentAppStateManager.swift */,
 				C703FAB02BA9D41E000CC11B /* AppStateManager.swift */,
+				2A0B3FC22DC89B5A0042FB38 /* NoOpAppStateManager.swift */,
 			);
 			path = AppState;
 			sourceTree = "<group>";
@@ -2492,6 +2505,7 @@
 		E436194D2B87426E009AD3B8 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				2A0B3FC42DC89BAD0042FB38 /* AgentConfiguration+Empty.swift */,
 				2AC68DA82D9E77B60086EEF7 /* AgentConfigurationProtocol.swift */,
 				2AC68DA92D9E77B60086EEF7 /* AgentConfigurationProtocol+MergeRemote.swift */,
 				C73FF47F2B6CE749009C53FF /* RemoteConfiguration.swift */,
@@ -2730,8 +2744,10 @@
 		E4AD34F22B56E031004976CA /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				E468E7712B6123ED0035BB31 /* Pool */,
 				E468E7722B6124440035BB31 /* Manager */,
+				E468E7712B6123ED0035BB31 /* Pool */,
+				2AF6AABE2DCE099C00BB9DC3 /* SplunkRum+AppStart.swift */,
+				2AF6AABC2DCE081A00BB9DC3 /* SplunkRum+Modules.swift */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -2859,6 +2875,7 @@
 				E426CFA72B28C18000094AC0 /* Model */,
 				E4F2E5062B1733C9006EBA69 /* AgentSession.swift */,
 				E4F2E5082B173429006EBA69 /* DefaultSession.swift */,
+				2A0B3FC62DC8A4150042FB38 /* NoOpSession.swift */,
 			);
 			path = Session;
 			sourceTree = "<group>";
@@ -2866,6 +2883,7 @@
 		E4F2E4F62B17281F006EBA69 /* User */ = {
 			isa = PBXGroup;
 			children = (
+				2A0B3FC82DC8A43A0042FB38 /* NoOpUser.swift */,
 				E4F3ACBE2DA7B8E5007EFC0A /* Model */,
 				E4F2E50B2B17350D006EBA69 /* AgentUser.swift */,
 				E4F2E50D2B17351E006EBA69 /* DefaultUser.swift */,
@@ -3913,6 +3931,7 @@
 				2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */,
 				BAAC20C82DBB0F4800BC8B60 /* ThreadSafeDictionary.swift in Sources */,
 				2AE43B0C2B7FAD9B002C4A98 /* DefaultResources.swift in Sources */,
+				2AF6AABD2DCE081F00BB9DC3 /* SplunkRum+Modules.swift in Sources */,
 				2AE43B4B2B861325002C4A98 /* SessionStartEvent.swift in Sources */,
 				2AB51E992B7A670600307B77 /* DeviceInfo.swift in Sources */,
 				E4EE9ED02BA330AE0000D594 /* SessionReplayNonOperational+RecordingMask.swift in Sources */,
@@ -3945,6 +3964,7 @@
 				4BB680F32B7940C0000A54D4 /* API-1.0-Sensitivity+UIView.swift in Sources */,
 				E4EE9EC72BA30E180000D594 /* SessionReplayState.swift in Sources */,
 				E41FB0932B90D873009F5CA6 /* DefaultSharedState.swift in Sources */,
+				2A0B3FC32DC89B610042FB38 /* NoOpAppStateManager.swift in Sources */,
 				E4F2E5092B173429006EBA69 /* DefaultSession.swift in Sources */,
 				E4EE9EC22BA2E5240000D594 /* SessionReplayNonOperational.swift in Sources */,
 				4BB680F42B7940C0000A54D4 /* API-1.0-Sensitivity+SwiftUI.swift in Sources */,
@@ -3952,6 +3972,7 @@
 				E4EE9ED22BA332CD0000D594 /* SessionReplayNonOperationalSensitivity.swift in Sources */,
 				E4EF6E432B18986900206883 /* UserDefaultsStorage.swift in Sources */,
 				E47953C52BA1CF7D0065677D /* SessionReplay+Recording.swift in Sources */,
+				2AF6AABF2DCE09B900BB9DC3 /* SplunkRum+AppStart.swift in Sources */,
 				4BB680E52B7940C0000A54D4 /* SensitivityModifier.swift in Sources */,
 				4B2C8BBB2BCBE4A200C6E72F /* CrashReportsDataEvent.swift in Sources */,
 				C7A2BD1B2BB45363005D4CFB /* AppStateModel.swift in Sources */,
@@ -3969,6 +3990,7 @@
 				4BF895742DAD7C2100E171A4 /* SplunkConfigurationHandler.swift in Sources */,
 				E426CFAA2B28C18000094AC0 /* SessionsModel.swift in Sources */,
 				E42634832BB44B0F003706A9 /* SplunkAgent.docc in Sources */,
+				2A0B3FC52DC89BB90042FB38 /* AgentConfiguration+Empty.swift in Sources */,
 				C73FF4882B6CE749009C53FF /* ConfigurationHandlerError.swift in Sources */,
 				C703FAB32BA9D424000CC11B /* AppState.swift in Sources */,
 				E4F2E5102B1737F2006EBA69 /* API-1.0-Session.swift in Sources */,
@@ -3986,9 +4008,11 @@
 				C73FF4842B6CE749009C53FF /* AgentConfigurationHandler.swift in Sources */,
 				2A03CF5B2D9C312200CF3BC9 /* API-1.0-EndpointConfiguration.swift in Sources */,
 				C73FF4982B6CE777009C53FF /* APIClientError.swift in Sources */,
+				2A0B3FC92DC8A43D0042FB38 /* NoOpUser.swift in Sources */,
 				2AC68DAA2D9E77B60086EEF7 /* AgentConfigurationProtocol.swift in Sources */,
 				2AC68DAB2D9E77B60086EEF7 /* AgentConfigurationProtocol+MergeRemote.swift in Sources */,
 				C73FF4962B6CE777009C53FF /* APIClient.swift in Sources */,
+				2A0B3FC72DC8A4180042FB38 /* NoOpSession.swift in Sources */,
 				4B985E5B2D94C9F900CB0321 /* String+HexID.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

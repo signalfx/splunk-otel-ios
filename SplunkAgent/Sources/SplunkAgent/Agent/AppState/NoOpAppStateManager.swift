@@ -17,21 +17,10 @@ limitations under the License.
 
 import Foundation
 
-/// A dummy configuration handler. It is used for the non-operational instance, or on a target platform the agent is not fully supporting.
-final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
+/// This struct implements a non operational variant of the AgentAppStateManager.
+struct NoOpAppStateManager: AgentAppStateManager {
 
-    // MARK: - Configuration
-
-    var configurationData: Data? {
+    func appState(for timestamp: Date) -> AppState? {
         return nil
-    }
-
-    let configuration: any AgentConfigurationProtocol
-
-
-    // MARK: - Intialization
-
-    init(for configuration: any AgentConfigurationProtocol) {
-        self.configuration = configuration
     }
 }
