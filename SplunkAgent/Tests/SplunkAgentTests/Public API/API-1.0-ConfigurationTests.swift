@@ -85,11 +85,11 @@ final class API10ConfigurationTests: XCTestCase {
         full = full.sessionSamplingRate(0.5)
         XCTAssertEqual(full.sessionSamplingRate, 0.5)
 
-        var testAttributes = ["key_one": "value_one"]
+        let testAttributes = MutableAttributes(dictionary: ["key_one": .string("value_one")])
         full.globalAttributes = testAttributes
         XCTAssertEqual(full.globalAttributes, testAttributes)
 
-        testAttributes["key_two"] = "value_two"
+        testAttributes["key_two"] = .string("value_two")
         full = full.globalAttributes(testAttributes)
         XCTAssertEqual(full.globalAttributes, testAttributes)
 
@@ -142,7 +142,7 @@ final class API10ConfigurationTests: XCTestCase {
         let appVersion = "0.0.1 Test"
         let debugLogging = true
         let sampling = 0.4
-        let globalAttributes = ["test": "value"]
+        let globalAttributes = MutableAttributes(dictionary: ["test": .string("value")])
 
         // Builder methods
         let configuration = try ConfigurationTestBuilder.buildMinimal()

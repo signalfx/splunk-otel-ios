@@ -18,8 +18,8 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 
-class MutableAttributes {
-    private var attributes: ThreadSafeDictionary<String, AttributeValue>
+public class MutableAttributes {
+    fileprivate var attributes: ThreadSafeDictionary<String, AttributeValue>
 
     // MARK: - Initialize
 
@@ -36,7 +36,75 @@ class MutableAttributes {
         addAttributeSet(attributeSet)
     }
 
-    // MARK: - Subscripts
+    public required init(from decoder: Decoder) throws {
+        attributes = ThreadSafeDictionary<String, AttributeValue>()
+        let container = try decoder.container(keyedBy: StringCodingKey.self)
+
+        for key in container.allKeys {
+            let value = try container.decode(AttributeValue.self, forKey: key)
+            attributes[key.stringValue] = value
+        }
+    }
+}
+
+// Codable
+extension MutableAttributes: Codable {
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: StringCodingKey.self)
+        let dictionary = attributes.getAll()
+
+        for (key, value) in dictionary {
+            try container.encode(value, forKey: StringCodingKey(stringValue: key)!)
+        }
+    }
+
+    // Helper for coding with string keys
+    private struct StringCodingKey: CodingKey {
+        var stringValue: String
+        var intValue: Int?
+
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+            self.intValue = nil
+        }
+
+        init?(intValue: Int) {
+            self.stringValue = String(intValue)
+            self.intValue = intValue
+        }
+    }
+}
+
+// Equatable
+extension MutableAttributes: Equatable {
+
+    public static func == (lhs: MutableAttributes, rhs: MutableAttributes) -> Bool {
+        let lhsDict = lhs.attributes.getAll()
+        let rhsDict = rhs.attributes.getAll()
+
+        // Compare dictionary sizes first for quick check
+        guard lhsDict.count == rhsDict.count else {
+            return false
+        }
+
+        // Compare each key-value pair
+        for (key, lhsValue) in lhsDict {
+            guard let rhsValue = rhsDict[key] else {
+                return false
+            }
+
+            if lhsValue != rhsValue {
+                return false
+            }
+        }
+
+        return true
+    }
+}
+
+// Subscripts
+public extension MutableAttributes {
 
     subscript(key: String) -> AttributeValue? {
         get {
@@ -146,8 +214,10 @@ class MutableAttributes {
             }
         }
     }
+}
 
-    // MARK: - Get and Set
+// Get and Set
+public extension MutableAttributes {
 
     func getValue(for key: String) -> AttributeValue? {
         return attributes[key]
@@ -222,8 +292,10 @@ class MutableAttributes {
     func setSet(_ attributeSet: AttributeSet, for key: String) {
         attributes[key] = AttributeValue.set(attributeSet)
     }
+}
 
-    // MARK: - Iterative setters
+// Iterative setters
+public extension MutableAttributes {
 
     @discardableResult
     func addDictionary(_ dictionary: [String: AttributeValue]) -> Int {
@@ -266,8 +338,10 @@ class MutableAttributes {
         }
         return count
     }
+}
 
-    // MARK: - Utilities
+// Utilities
+public extension MutableAttributes {
 
     @discardableResult
     func remove(for key: String) -> AttributeValue? {
@@ -298,7 +372,24 @@ class MutableAttributes {
         return attributes.count()
     }
 
-    // MARK: - Description
+    private func getAllAsAny() -> [String: Any] {
+        var result: [String: Any] = [:]
+        let dictionary = attributes.getAll()
+
+        for (key, value) in dictionary {
+            result[key] = convertToAny(value)
+        }
+
+        return result
+    }
+
+    var all: [String: Any] {
+        return getAllAsAny()
+    }
+}
+
+// Description
+public extension MutableAttributes {
 
     func description() -> String {
         var result = "[\n"
@@ -311,38 +402,5 @@ class MutableAttributes {
 
         result += "]"
         return result
-    }
-
-    private func attributeDescription(_ value: AttributeValue) -> String {
-        switch value {
-        case let .string(string):
-            return "\"\(string)\""
-        case let .bool(bool):
-            return bool ? "true" : "false"
-        case let .int(int):
-            return "\(int)"
-        case let .double(double):
-            return "\(double)"
-        case let .array(array):
-            return array.description
-        case let .stringArray(stringArray):
-            let arrayElements = stringArray.map { "\"\($0)\"" }.joined(separator: ", ")
-            return "[\(arrayElements)]"
-        case let .boolArray(boolArray):
-            let arrayElements = boolArray.map { $0 ? "true" : "false" }.joined(separator: ", ")
-            return "[\(arrayElements)]"
-        case let .intArray(intArray):
-            let arrayElements = intArray.map { "\($0)" }.joined(separator: ", ")
-            return "[\(arrayElements)]"
-        case let .doubleArray(doubleArray):
-            let arrayElements = doubleArray.map { "\($0)" }.joined(separator: ", ")
-            return "[\(arrayElements)]"
-        case let .set(attributeSet):
-            var elements: [String] = []
-            for (key, value) in attributeSet.labels {
-                elements.append("\(key): \(attributeDescription(value))")
-            }
-            return "{\(elements.joined(separator: ", "))}"
-        }
     }
 }
