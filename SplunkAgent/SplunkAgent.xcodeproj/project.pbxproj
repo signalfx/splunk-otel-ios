@@ -741,6 +741,7 @@
 		52D945692DC0A62D00DE8220 /* SplunkWebViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkWebViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D945A72DC0A70700DE8220 /* SplunkWebViewProxy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkWebViewProxy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D945AF2DC0A70700DE8220 /* SplunkWebViewProxyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkWebViewProxyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA3376982DDD042300F45723 /* NetworkInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInfo.swift; sourceTree = "<group>"; };
 		BA4C084E2DC83988008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPGlobalAttributesSpanProcessor.swift; sourceTree = "<group>"; };
 		BA4C08512DC83AF0008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPGlobalAttributesLogRecordProcessor.swift; sourceTree = "<group>"; };
 		BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributesTests.swift; sourceTree = "<group>"; };
@@ -1281,6 +1282,7 @@
 				4B5A5BD62D5E4FBC009DA0D5 /* SplunkSlowFrameDetector */,
 				4B5A5BC32D5E4E33009DA0D5 /* SplunkCommon */,
 				4B5A5B932D5E4C79009DA0D5 /* SplunkNetwork */,
+				BA3376932DDD020700F45723 /* SplunkNetworkInfo */,
 				4B536BF12B67FADC004A6C7C /* Configurations */,
 				E4E9747A2B1643EE00ACB469 /* Sources */,
 				E46896332B21C8FF00727A6A /* Tests */,
@@ -2315,6 +2317,46 @@
 				5280E28F2DC0AD6300770A90 /* API-1.0-WebViewInstrumentationModule.swift */,
 			);
 			path = WebViewInstrumentation;
+			sourceTree = "<group>";
+		};
+		BA3376932DDD020700F45723 /* SplunkNetworkInfo */ = {
+			isa = PBXGroup;
+			children = (
+				BA3376942DDD023D00F45723 /* Sources */,
+				BA3376952DDD024800F45723 /* Tests */,
+			);
+			path = SplunkNetworkInfo;
+			sourceTree = "<group>";
+		};
+		BA3376942DDD023D00F45723 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				BA3376962DDD025E00F45723 /* SplunkNetworkInfo */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		BA3376952DDD024800F45723 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				BA3376972DDD027100F45723 /* SplunkNetworkInfoTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		BA3376962DDD025E00F45723 /* SplunkNetworkInfo */ = {
+			isa = PBXGroup;
+			children = (
+				BA3376982DDD042300F45723 /* NetworkInfo.swift */,
+			);
+			path = SplunkNetworkInfo;
+			sourceTree = "<group>";
+		};
+		BA3376972DDD027100F45723 /* SplunkNetworkInfoTests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = SplunkNetworkInfoTests;
 			sourceTree = "<group>";
 		};
 		BA7A63BA2DB818AD00A44570 /* Model */ = {
