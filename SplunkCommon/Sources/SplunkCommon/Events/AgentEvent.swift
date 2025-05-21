@@ -38,6 +38,9 @@ public protocol AgentEvent {
     // MARK: - Event properties
 
     /// Session id, identifies a session during which the event occured.
+    ///
+    /// Current session's session id is added automatically to all signals if this property is `nil`.
+    /// Also the automatically added session id does not overwrite this custom session id, if not `nil`.
     var sessionID: String? { get set }
 
     /// Event timestamp. The time at which the event occured.

@@ -40,10 +40,6 @@ struct OTelDestination: AppStartDestination {
         appStartSpan.setAttribute(key: "screen.name", value: "unknown")
         appStartSpan.setAttribute(key: "start.type", value: typeIdentifier(for: appStart.type))
 
-        if let sessionID = sharedState?.sessionId {
-            appStartSpan.setAttribute(key: "session.id", value: sessionID)
-        }
-
         appStart.events?.forEach { event in
             appStartSpan.addEvent(name: event.name, timestamp: event.timestamp)
         }
@@ -68,11 +64,6 @@ struct OTelDestination: AppStartDestination {
             // Add events
             agentInitialize.events?.forEach { event in
                 initializeSpan.addEvent(name: event.name, timestamp: event.timestamp)
-            }
-
-            // Add session id
-            if let sessionID = sharedState?.sessionId {
-                initializeSpan.setAttribute(key: "session.id", value: sessionID)
             }
 
             initializeSpan.end(time: agentInitialize.end)
