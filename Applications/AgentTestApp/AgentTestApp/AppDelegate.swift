@@ -42,8 +42,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             .spanInterceptor { spanData in
                 var attributes = spanData.attributes
                 attributes["test_attribute"] = AttributeValue("test_value")
+
                 var modifiedSpan = spanData
                 modifiedSpan.settingAttributes(attributes)
+                modifiedSpan.settingTotalAttributeCount(attributes.count)
 
                 return modifiedSpan
             }
