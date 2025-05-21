@@ -37,6 +37,8 @@ let package = Package(
                 "SplunkNetwork",
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 "SplunkAppStart",
 		"SplunkWebView",
 		"SplunkWebViewProxy",
@@ -69,7 +71,9 @@ let package = Package(
             name: "SplunkNetwork",
             dependencies: [
                 "SplunkCommon",
-                "SplunkOpenTelemetry"
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
+                .product(name: "ResourceExtension", package: "opentelemetry-swift")
             ],
             path: "SplunkNetwork/Sources"
         ),
@@ -98,7 +102,7 @@ let package = Package(
             name: "SplunkSlowFrameDetector",
             dependencies: [
                 .byName(name: "SplunkCommon"),
-                "SplunkOpenTelemetry"
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
             ],
             path: "SplunkSlowFrameDetector/Sources"
         ),
@@ -182,8 +186,8 @@ let package = Package(
             name: "SplunkCrashReports",
             dependencies: [
                 "SplunkCrashReporter",
-                "SplunkOpenTelemetry",
-                "SplunkCommon"
+                "SplunkCommon",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkCrashReports/Sources"
         ),
@@ -241,7 +245,7 @@ let package = Package(
             name: "SplunkAppStart",
             dependencies: [
                 "SplunkCommon",
-                "SplunkOpenTelemetry",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAppStart/Sources"
@@ -249,10 +253,7 @@ let package = Package(
         .testTarget(
             name: "SplunkAppStartTests",
             dependencies: [
-                "SplunkAppStart",
-                "SplunkCommon",
-                "SplunkOpenTelemetry",
-                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+                "SplunkAppStart"
             ],
             path: "SplunkAppStart/Tests"
         ),
@@ -263,7 +264,6 @@ let package = Package(
             name: "SplunkWebView",
             dependencies: [
                 "SplunkCommon",
-                "SplunkOpenTelemetry",
                 .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkWebView/Sources"
@@ -281,21 +281,14 @@ let package = Package(
         .target(
             name: "SplunkWebViewProxy",
             dependencies: [
-                "SplunkCommon",
-                "SplunkOpenTelemetry",
-                "SplunkWebView",
-                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+                "SplunkWebView"
             ],
             path: "SplunkWebViewProxy/Sources"
         ),
         .testTarget(
             name: "SplunkWebViewProxyTests",
             dependencies: [
-                "SplunkCommon",
-                "SplunkOpenTelemetry",
-                "SplunkWebView",
-                "SplunkWebViewProxy",
-                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+                "SplunkWebView"
             ],
             path: "SplunkWebViewProxy/Tests"
         ),
