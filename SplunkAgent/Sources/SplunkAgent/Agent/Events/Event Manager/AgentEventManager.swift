@@ -40,10 +40,9 @@ protocol AgentEventManager {
     /// - Parameters:
     ///   - configuration: Agent Configuration object.
     ///   - agent: Agent object, used to obtain Session information and User information.
-    ///   - eventsModel: Events model object to store persisted events metadata.
     ///
     /// - Throws: Init should throw an error if provided configuration is invalid.
-    init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel) throws
+    init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum) throws
 
 
     // MARK: - Module Events
@@ -56,10 +55,4 @@ protocol AgentEventManager {
     ///    - metadata: Module event metadata.
     ///    - completion: Completion block, returns `true` if the data was processed and sent correctly.
     func publish(data: any ModuleEventData, metadata: any ModuleEventMetadata, completion: @escaping (Bool) -> Void)
-
-
-    // MARK: - Session Start event
-
-    /// Sends session replay start event.
-    func sendSessionStartEvent()
 }

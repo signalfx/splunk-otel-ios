@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import CiscoSessionReplay
+import Foundation
 @testable import SplunkAgent
 
 final class SessionReplayTestBuilder {
@@ -37,5 +38,49 @@ final class SessionReplayTestBuilder {
         let moduleProxy = SessionReplayNonOperational()
 
         return moduleProxy
+    }
+
+
+    // MARK: - Session replay data event
+
+    public static func buildDataEvent() throws -> SessionReplayDataEvent {
+        let sampleVideoData = try Self.sampleVideoData()
+
+        let sessionID = UUID().uuidString
+        let recordID = UUID().uuidString
+        let replaySessionID = UUID().uuidString
+        let timestamp = Date()
+        let endTimestamp = Date()
+
+        // let recordMetadata = RecordMetadata(
+        //    recordId: recordID,
+        //    recordIndex: 0,
+        //    timestamp: timestamp,
+        //    timestampEnd: endTimestamp,
+        //    replaySessionId: replaySessionID
+        // )
+
+        let datachunkMetadata = Metadata(
+            startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000.0),
+            endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0)
+        )
+
+        let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, sessionID: sessionID)
+
+        return event
+    }
+
+    public static func sampleVideoData() throws -> Data {
+        #if SPM_TESTS
+        let fileUrl = Bundle.module.url(forResource: "v", withExtension: "mp4")
+
+        #else
+        let bundle = Bundle(for: EventsTests.self)
+        let fileUrl = bundle.url(forResource: "v", withExtension: "mp4")!
+        #endif
+
+        let data = try Data(contentsOf: fileUrl)
+
+        return data
     }
 }

@@ -15,7 +15,6 @@
 		2A0B3FC52DC89BB90042FB38 /* AgentConfiguration+Empty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0B3FC42DC89BAD0042FB38 /* AgentConfiguration+Empty.swift */; };
 		2A0B3FC72DC8A4180042FB38 /* NoOpSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0B3FC62DC8A4150042FB38 /* NoOpSession.swift */; };
 		2A0B3FC92DC8A43D0042FB38 /* NoOpUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0B3FC82DC8A43A0042FB38 /* NoOpUser.swift */; };
-		2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1673CC2BA1F52600F85698 /* EventsModel.swift */; };
 		2A1789B72DA3CDA900EC548B /* AppStartSimulations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */; };
 		2A1789BB2DA3CDD300EC548B /* AppStartTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789B92DA3CDD300EC548B /* AppStartTests.swift */; };
 		2A1789C02DA3CDEB00EC548B /* InitializeTests+Checks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1789BE2DA3CDEB00EC548B /* InitializeTests+Checks.swift */; };
@@ -41,7 +40,6 @@
 		2AC68DA72D9E77970086EEF7 /* API-1.0-RuntimeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AC68DA62D9E77970086EEF7 /* API-1.0-RuntimeState.swift */; };
 		2AC68DAA2D9E77B60086EEF7 /* AgentConfigurationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AC68DA82D9E77B60086EEF7 /* AgentConfigurationProtocol.swift */; };
 		2AC68DAB2D9E77B60086EEF7 /* AgentConfigurationProtocol+MergeRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AC68DA92D9E77B60086EEF7 /* AgentConfigurationProtocol+MergeRemote.swift */; };
-		2AC8C0952BAAE0710052ECF4 /* EventsModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AC8C0942BAAE0710052ECF4 /* EventsModelTests.swift */; };
 		2ADAEFC92B95C85A00DF2214 /* TimeInterval+Nanoseconds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ADAEFC82B95C85A00DF2214 /* TimeInterval+Nanoseconds.swift */; };
 		2AE43AFD2B7B8269002C4A98 /* AppInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43AFC2B7B8269002C4A98 /* AppInfoTests.swift */; };
 		2AE43AFF2B7B8376002C4A98 /* SystemInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43AFE2B7B8376002C4A98 /* SystemInfoTests.swift */; };
@@ -50,7 +48,6 @@
 		2AE43B0C2B7FAD9B002C4A98 /* DefaultResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B0B2B7FAD9B002C4A98 /* DefaultResources.swift */; };
 		2AE43B472B861325002C4A98 /* AgentEventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B412B861325002C4A98 /* AgentEventManager.swift */; };
 		2AE43B482B861325002C4A98 /* SessionReplayDataEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B432B861325002C4A98 /* SessionReplayDataEvent.swift */; };
-		2AE43B4B2B861325002C4A98 /* SessionStartEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B462B861325002C4A98 /* SessionStartEvent.swift */; };
 		2AF6AABD2DCE081F00BB9DC3 /* SplunkRum+Modules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF6AABC2DCE081A00BB9DC3 /* SplunkRum+Modules.swift */; };
 		2AF6AABF2DCE09B900BB9DC3 /* SplunkRum+AppStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF6AABE2DCE099C00BB9DC3 /* SplunkRum+AppStart.swift */; };
 		3384F2AD2AC879FD00512D79 /* SplunkRum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F2AC2AC879FD00512D79 /* SplunkRum.swift */; };
@@ -571,7 +568,6 @@
 		2A0B3FC42DC89BAD0042FB38 /* AgentConfiguration+Empty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentConfiguration+Empty.swift"; sourceTree = "<group>"; };
 		2A0B3FC62DC8A4150042FB38 /* NoOpSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoOpSession.swift; sourceTree = "<group>"; };
 		2A0B3FC82DC8A43A0042FB38 /* NoOpUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoOpUser.swift; sourceTree = "<group>"; };
-		2A1673CC2BA1F52600F85698 /* EventsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsModel.swift; sourceTree = "<group>"; };
 		2A1789B52DA3CDA900EC548B /* AppStartSimulations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartSimulations.swift; sourceTree = "<group>"; };
 		2A1789B92DA3CDD300EC548B /* AppStartTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStartTests.swift; sourceTree = "<group>"; };
 		2A1789BD2DA3CDEB00EC548B /* InitializeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitializeTests.swift; sourceTree = "<group>"; };
@@ -597,7 +593,6 @@
 		2AC68DA62D9E77970086EEF7 /* API-1.0-RuntimeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-RuntimeState.swift"; sourceTree = "<group>"; };
 		2AC68DA82D9E77B60086EEF7 /* AgentConfigurationProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfigurationProtocol.swift; sourceTree = "<group>"; };
 		2AC68DA92D9E77B60086EEF7 /* AgentConfigurationProtocol+MergeRemote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentConfigurationProtocol+MergeRemote.swift"; sourceTree = "<group>"; };
-		2AC8C0942BAAE0710052ECF4 /* EventsModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsModelTests.swift; sourceTree = "<group>"; };
 		2ADAEFC82B95C85A00DF2214 /* TimeInterval+Nanoseconds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Nanoseconds.swift"; sourceTree = "<group>"; };
 		2AE43AFC2B7B8269002C4A98 /* AppInfoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfoTests.swift; sourceTree = "<group>"; };
 		2AE43AFE2B7B8376002C4A98 /* SystemInfoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemInfoTests.swift; sourceTree = "<group>"; };
@@ -606,7 +601,6 @@
 		2AE43B0B2B7FAD9B002C4A98 /* DefaultResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultResources.swift; sourceTree = "<group>"; };
 		2AE43B412B861325002C4A98 /* AgentEventManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AgentEventManager.swift; sourceTree = "<group>"; };
 		2AE43B432B861325002C4A98 /* SessionReplayDataEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionReplayDataEvent.swift; sourceTree = "<group>"; };
-		2AE43B462B861325002C4A98 /* SessionStartEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionStartEvent.swift; sourceTree = "<group>"; };
 		2AF6AABC2DCE081A00BB9DC3 /* SplunkRum+Modules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SplunkRum+Modules.swift"; sourceTree = "<group>"; };
 		2AF6AABE2DCE099C00BB9DC3 /* SplunkRum+AppStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SplunkRum+AppStart.swift"; sourceTree = "<group>"; };
 		3384F2A22AC879E900512D79 /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1104,14 +1098,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2A1673CB2BA1F49800F85698 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				2A1673CC2BA1F52600F85698 /* EventsModel.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
 		2A1789B62DA3CDA900EC548B /* Support */ = {
 			isa = PBXGroup;
 			children = (
@@ -1170,7 +1156,6 @@
 			isa = PBXGroup;
 			children = (
 				2AA52B482B8DF4CD00DF9373 /* EventsTests.swift */,
-				2AC8C0942BAAE0710052ECF4 /* EventsModelTests.swift */,
 			);
 			path = Events;
 			sourceTree = "<group>";
@@ -1233,7 +1218,6 @@
 			children = (
 				2AE43B402B861325002C4A98 /* Event Manager */,
 				2AE43B422B861325002C4A98 /* Events */,
-				2A1673CB2BA1F49800F85698 /* Model */,
 				2ADAEFC72B95C83D00DF2214 /* Utils */,
 			);
 			path = Events;
@@ -1252,7 +1236,6 @@
 			isa = PBXGroup;
 			children = (
 				2AE43B432B861325002C4A98 /* SessionReplayDataEvent.swift */,
-				2AE43B462B861325002C4A98 /* SessionStartEvent.swift */,
 				4B2C8BBA2BCBE4A200C6E72F /* CrashReportsDataEvent.swift */,
 			);
 			path = Events;
@@ -3812,11 +3795,9 @@
 				E4A708B32B9754B7002C692E /* RepeatingJob.swift in Sources */,
 				E4EE9ED42BA34A400000D594 /* SessionReplayNonOperationalState.swift in Sources */,
 				E4B737E12BBECEDD00086A93 /* PlatformSupport.swift in Sources */,
-				2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */,
 				BAAC20C82DBB0F4800BC8B60 /* ThreadSafeDictionary.swift in Sources */,
 				2AE43B0C2B7FAD9B002C4A98 /* DefaultResources.swift in Sources */,
 				2AF6AABD2DCE081F00BB9DC3 /* SplunkRum+Modules.swift in Sources */,
-				2AE43B4B2B861325002C4A98 /* SessionStartEvent.swift in Sources */,
 				2AB51E992B7A670600307B77 /* DeviceInfo.swift in Sources */,
 				BA4C08502DC8398E008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift in Sources */,
 				E4EE9ED02BA330AE0000D594 /* SessionReplayNonOperational+RecordingMask.swift in Sources */,
@@ -4208,7 +4189,6 @@
 				E40549812DACF65D00B7A2E4 /* DefaultUserTestBuilder.swift in Sources */,
 				E4577D7B2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift in Sources */,
 				E468964E2B21EDE000727A6A /* API-1.0-StateTests.swift in Sources */,
-				2AC8C0952BAAE0710052ECF4 /* EventsModelTests.swift in Sources */,
 				BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */,
 				E46896362B21CA0300727A6A /* UserDefaultsStoragePrefixTests.swift in Sources */,
 				E4FAEEB22B6A6A73008D4E6E /* SessionReplayTestModule.swift in Sources */,

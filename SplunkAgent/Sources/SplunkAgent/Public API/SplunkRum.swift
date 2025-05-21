@@ -217,9 +217,6 @@ public class SplunkRum: ObservableObject {
 
         initializeEvents["event_manager_initialized"] = Date()
 
-        // Send session start event immediately as the session already started in the SplunkRum init method.
-        eventManager?.sendSessionStartEvent()
-
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
