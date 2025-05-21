@@ -45,7 +45,7 @@ extension Resource {
             ResourceAttributes.deviceModelName.rawValue: .string(agentResources.deviceModelIdentifier),
 
             // OS info
-            ResourceAttributes.osName.rawValue: .string("iOS"),
+            ResourceAttributes.osName.rawValue: .string(agentResources.osName),
             ResourceAttributes.osVersion.rawValue: .string(agentResources.osVersion),
             ResourceAttributes.osDescription.rawValue: .string(agentResources.osDescription),
             ResourceAttributes.osType.rawValue: .string(agentResources.osType)
