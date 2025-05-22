@@ -19,11 +19,11 @@ public extension CustomTracking {
 
 
     // MARK: - Internal Tracking Methods
-    
+
 
     // MARK: - Custom Event Tracking
 
-    public func track(event: SplunkTrackableEvent) {
+    func track(event: SplunkTrackableEvent) {
         OTelEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "customEvent")
         /*
         guard let onPublishBlock = onPublishBlock else {
@@ -38,8 +38,8 @@ public extension CustomTracking {
 
 
     // MARK: - Custom Error Tracking
-    
-    public func track(issue: SplunkTrackableIssue, attributes: MutableAttributes) {
+
+    func track(issue: SplunkTrackableIssue, attributes: MutableAttributes) {
         OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "customError")
         /*
         guard let onPublishBlock = onPublishBlock else {

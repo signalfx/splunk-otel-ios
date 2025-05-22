@@ -28,26 +28,31 @@ extension CustomTrackingNonOperational {
 
     // MARK: - Implement logging-only functions
 
-    func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) {
+    func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) -> any CustomTrackingModule {
         logAccess(toApi: "trackCustomEvent:name:attributes")
+        return self
     }
 
 
     // MARK: - Track Errors
 
-    func trackError(_ message: String, _ attributes: MutableAttributes? = nil) {
+    func trackError(_ message: String, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
         logAccess(toApi: "trackError:message:attributes")
+        return self
     }
 
-    func trackError(_ error: Error, _ attributes: MutableAttributes? = nil) {
+    func trackError(_ error: Error, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
         logAccess(toApi: "trackError:error:attributes")
+        return self
     }
 
-    func trackError(_ nsError: NSError, _ attributes: MutableAttributes? = nil) {
+    func trackError(_ nsError: NSError, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
         logAccess(toApi: "trackError:nsError:attributes")
+        return self
     }
 
-    func trackException(_ exception: NSException, _ attributes: MutableAttributes? = nil) {
+    func trackException(_ exception: NSException, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
         logAccess(toApi: "trackError:exception:attributes")
+        return self
     }
 }

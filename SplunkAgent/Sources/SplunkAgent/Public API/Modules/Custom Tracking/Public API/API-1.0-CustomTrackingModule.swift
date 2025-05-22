@@ -38,8 +38,8 @@ public protocol CustomTrackingModule {
     ///
     /// - Parameter attributes: MutableAttributes instance.
     ///
-    /// - Returns: no return value.
-    func trackCustomEvent(_ name: String, _ attributes: MutableAttributes)
+    /// - Returns: The updated `CustomTrackingModule` instance.
+    func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
 
     ///////
@@ -55,8 +55,8 @@ public protocol CustomTrackingModule {
     ///
     /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
     ///
-    /// - Returns: no return value.
-    func trackError(_ message: String, _ attributes: MutableAttributes?)
+    /// - Returns: The updated `CustomTrackingModule` instance.
+    func trackError(_ message: String, _ attributes: MutableAttributes?) -> any CustomTrackingModule
 
 
     // MARK: - Error
@@ -67,8 +67,8 @@ public protocol CustomTrackingModule {
     ///
     /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
     ///
-    /// - Returns: no return value.
-    func trackError(_ error: Error, _ attributes: MutableAttributes?)
+    /// - Returns: The updated `CustomTrackingModule` instance.
+    func trackError(_ error: Error, _ attributes: MutableAttributes?) -> any CustomTrackingModule
 
 
     // MARK: - NSError
@@ -79,50 +79,50 @@ public protocol CustomTrackingModule {
     ///
     /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
     ///
-    /// - Returns: no return value.
-    func trackError(_ nsError: NSError, _ attributes: MutableAttributes?)
+    /// - Returns: The updated `CustomTrackingModule` instance.
+    func trackError(_ nsError: NSError, _ attributes: MutableAttributes?) -> any CustomTrackingModule
 
 
     // MARK: - NSException
-    
+
     /// Track an NSException object with optional attributes.
     ///
     /// - Parameter exception: An NSException instance such as one caught after a throw.
     ///
     /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
     ///
-    /// - Returns: no return value.
-    func trackException(_ exception: NSException, _ attributes: MutableAttributes?)
+    /// - Returns: The updated `CustomTrackingModule` instance.
+    func trackException(_ exception: NSException, _ attributes: MutableAttributes?) -> any CustomTrackingModule
 
 
     // MARK: - Helpers
-    
-    func trackError(_ message: String)
-    func trackError(_ error: Error)
-    func trackError(_ nsError: NSError)
-    func trackException(_ exception: NSException)
+
+    func trackError(_ message: String) -> any CustomTrackingModule
+    func trackError(_ error: Error) -> any CustomTrackingModule
+    func trackError(_ nsError: NSError) -> any CustomTrackingModule
+    func trackException(_ exception: NSException) -> any CustomTrackingModule
 }
 
 
 // MARK: - Helpers for Single Argument Invocation
-    
+
 extension CustomTrackingModule {
 
     // Get around the obstinance of protocols not letting calling code omit an argument
-    
-    func trackError(_ message: String) {
-        trackError(message, nil)
+
+    func trackError(_ message: String) -> any CustomTrackingModule {
+        return trackError(message, nil)
     }
 
-    func trackError(_ error: Error) {
-        trackError(error, nil)
+    func trackError(_ error: Error) -> any CustomTrackingModule {
+        return trackError(error, nil)
     }
 
-    func trackError(_ nsError: NSError) {
-        trackError(nsError, nil)
+    func trackError(_ nsError: NSError) -> any CustomTrackingModule {
+        return trackError(nsError, nil)
     }
 
-    func trackException(_ exception: NSException) {
-        trackException(exception, nil)
+    func trackException(_ exception: NSException) -> any CustomTrackingModule {
+        return trackException(exception, nil)
     }
 }
