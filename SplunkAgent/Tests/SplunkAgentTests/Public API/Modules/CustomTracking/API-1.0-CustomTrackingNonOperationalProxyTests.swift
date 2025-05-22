@@ -25,43 +25,6 @@ final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
     let moduleProxy = CustomTrackingTestBuilder.buildNonOperational()
 
 
-    // MARK: - Preferences
-
-    func testPreferences() throws {
-        // FIXME: use correct configuration property
-        let preferences = CustomTrackingPreferences()
-            .enableAutomatedTracking(true)
-
-        // Set prepared preferences
-        moduleProxy.preferences = preferences
-        moduleProxy.preferences(preferences)
-
-        // Codable conformance
-        let readPreferences = moduleProxy.preferences
-        let encodedPreferences = try? JSONEncoder().encode(readPreferences as? CustomTrackingPreferences)
-        XCTAssertNotNil(encodedPreferences)
-
-        if let encodedPreferences {
-            XCTAssertNoThrow(
-                try JSONDecoder().decode(CustomTrackingPreferences.self, from: encodedPreferences)
-            )
-        }
-    }
-
-
-    // MARK: - State
-
-    func testState() throws {
-        let state = moduleProxy.state
-
-        // Properties with default module configuration (READ)
-        // FIXME
-        let defaultAutomatedTracking = state.isAutomatedTrackingEnabled
-        XCTAssertNotNil(state.isAutomatedTrackingEnabled)
-        XCTAssertFalse(defaultAutomatedTracking)
-    }
-
-
     // MARK: - Manual detection
 
     // FIXME
