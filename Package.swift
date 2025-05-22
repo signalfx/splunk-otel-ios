@@ -109,38 +109,6 @@ let package = Package(
         ),
         
         
-        // MARK: Splunk Custom Data
-        
-        .target(
-            name: "SplunkCustomData",
-            dependencies: [
-                "SplunkCommon"
-            ],
-            path: "SplunkCustomData/Sources"
-        ),
-        .testTarget(
-            name: "SplunkCustomDataTests",
-            dependencies: ["SplunkCustomData"],
-            path: "SplunkCustomData/Tests"
-        ),
-        
-        
-        // MARK: Splunk Error Reporting
-        
-        .target(
-            name: "SplunkErrorReporting",
-            dependencies: [
-                "SplunkCommon"
-            ],
-            path: "SplunkErrorReporting/Sources"
-        ),
-        .testTarget(
-            name: "SplunkErrorReportingTests",
-            dependencies: ["SplunkErrorReporting"],
-            path: "SplunkErrorReporting/Tests"
-        ),
-        
-        
         // MARK: SplunkCrashReporter
         
         .target(
