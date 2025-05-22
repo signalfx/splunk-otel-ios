@@ -24,32 +24,37 @@ extension CustomTracking {
     // MARK: - Public API
 
     /// Track a custom event.
-    public func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) {
+    public func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) -> any CustomTrackingModule {
         let event = SplunkTrackableEvent(typeName: name, attributes: attributes)
         module.track(event: event)
+        return self
     }
 
     /// Track an error (String message) with optional attributes.
-    public func trackError(_ message: String, _ attributes: MutableAttributes? = nil) {
+    public func trackError(_ message: String, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
         let issue = SplunkIssue(from: message)
         module.track(issue: issue, attributes: attributes ?? [:])
+        return self
     }
 
     /// Track an Error (Swift conforming type) with optional attributes.
-    public func trackError(_ error: Error, _ attributes: MutableAttributes? = nil) {
+    public func trackError(_ error: Error, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
         let issue = SplunkIssue(from: error)
         module.track(issue: issue, attributes: attributes ?? [:])
+        return self
     }
 
     /// Track an NSError object with optional attributes.
-    public func trackError(_ nsError: NSError, _ attributes: MutableAttributes? = nil) {
+    public func trackError(_ nsError: NSError, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
         let issue = SplunkIssue(from: nsError)
         module.track(issue: issue, attributes: attributes ?? [:])
+        return self
     }
 
     /// Track an NSException object with optional attributes.
-    public func trackException(_ exception: NSException, _ attributes: MutableAttributes? = nil) {
+    public func trackException(_ exception: NSException, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
         let issue = SplunkIssue(from: exception)
         module.track(issue: issue, attributes: attributes ?? [:])
+        return self
     }
 }
