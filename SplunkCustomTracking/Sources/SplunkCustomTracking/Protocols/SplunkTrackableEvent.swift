@@ -100,5 +100,3 @@ public extension SplunkTrackableEvent {
         "Event"
     }
 }
-
-

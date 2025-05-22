@@ -22,11 +22,10 @@ struct CustomDataEventData: ModuleEventData {
     private let attributes: [String: EventAttributeValue]
 
     init(customData: CustomData) {
-        self.attributes = customData.toEventAttributes()
+        attributes = customData.toEventAttributes()
     }
 
     func getAttributes() -> [String: EventAttributeValue] {
         attributes
     }
 }
-
