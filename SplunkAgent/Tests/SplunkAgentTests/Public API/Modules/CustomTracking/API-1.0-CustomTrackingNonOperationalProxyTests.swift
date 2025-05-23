@@ -25,10 +25,33 @@ final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
     let moduleProxy = CustomTrackingTestBuilder.buildNonOperational()
 
 
-    // MARK: - Manual detection
+    // MARK: - Custom Event Tracking
 
-    // FIXME
-    func testTracking() throws {
-        XCTAssertNotNil(moduleProxy.track(screen: "Test"))
+    func testTrackCustomEvent() throws {
+        XCTAssertNotNil(moduleProxy.trackCustomEvent("testEvent"))
+    }
+
+
+    // MARK: - Custom Error Tracking
+
+    func testTrackErrorString() throws {
+        let testErrorString = "TestErrorString"
+        XCTAssertNotNil(moduleProxy.trackError(testErrorString))
+    }
+    
+    func testTrackError() throws {
+        struct TestError: Error {}
+        let testError = TestError()
+        XCTAssertNotNil(moduleProxy.trackError(testError))
+    }
+    
+    func testTrackNSError() throws {
+	let testNSError = NSError(domain: "TestDomain", code: 0, userInfo: nil)
+        XCTAssertNotNil(moduleProxy.trackError(testNSError))
+    }
+    
+    func testTrackException() throws {
+        let testException = NSException(name: "TestException", reason: nil, userInfo: nil)
+        XCTAssertNotNil(moduleProxy.trackException(testException))
     }
 }
