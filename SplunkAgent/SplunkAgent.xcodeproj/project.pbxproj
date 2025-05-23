@@ -114,7 +114,6 @@
 		4B9642172D61375E009A2E7F /* OTLPLogEventProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CA02D60ED3D009DA0D5 /* OTLPLogEventProcessor.swift */; };
 		4B9642182D61375E009A2E7F /* OTLPLogEventProcessor+AgentEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CA12D60ED3D009DA0D5 /* OTLPLogEventProcessor+AgentEvent.swift */; };
 		4B9642192D61375E009A2E7F /* OTLPTraceProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CA52D60ED3D009DA0D5 /* OTLPTraceProcessor.swift */; };
-		4B96421A2D61375E009A2E7F /* OTel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CA92D60ED3D009DA0D5 /* OTel.swift */; };
 		4B96421B2D613766009A2E7F /* SplunkOpenTelemetryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CAC2D60ED3D009DA0D5 /* SplunkOpenTelemetryTests.swift */; };
 		4B9642312D6138DD009A2E7F /* SplunkOpenTelemetryBackgroundExporter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9642272D6138DD009A2E7F /* SplunkOpenTelemetryBackgroundExporter.framework */; };
 		4B9642492D613910009A2E7F /* OperationQueue+ConvenienceInit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CC42D60F352009DA0D5 /* OperationQueue+ConvenienceInit.swift */; };
@@ -663,7 +662,6 @@
 		4B5A5CA32D60ED3D009DA0D5 /* Resource+AgentResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Resource+AgentResources.swift"; sourceTree = "<group>"; };
 		4B5A5CA52D60ED3D009DA0D5 /* OTLPTraceProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPTraceProcessor.swift; sourceTree = "<group>"; };
 		4B5A5CA72D60ED3D009DA0D5 /* AttributeValue+MrumEventAttributeValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AttributeValue+MrumEventAttributeValue.swift"; sourceTree = "<group>"; };
-		4B5A5CA92D60ED3D009DA0D5 /* OTel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTel.swift; sourceTree = "<group>"; };
 		4B5A5CAC2D60ED3D009DA0D5 /* SplunkOpenTelemetryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkOpenTelemetryTests.swift; sourceTree = "<group>"; };
 		4B5A5CBC2D60F352009DA0D5 /* OTLPBackgroundHTTPLogExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPBackgroundHTTPLogExporter.swift; sourceTree = "<group>"; };
 		4B5A5CBE2D60F352009DA0D5 /* OTLPBackgroundHTTPMetricExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPBackgroundHTTPMetricExporter.swift; sourceTree = "<group>"; };
@@ -1785,7 +1783,6 @@
 				2A5949DA2DA3FC2100F2E857 /* Stdout Exporters */,
 				2A2926342DAD114900AB6F03 /* Attribute Checker Exporters */,
 				4B5A5CA82D60ED3D009DA0D5 /* Utils */,
-				4B5A5CA92D60ED3D009DA0D5 /* OTel.swift */,
 				C7C112662DB8D64C00B8E893 /* LogToSpanExporter */,
 			);
 			path = SplunkOpenTelemetry;
@@ -4036,7 +4033,6 @@
 				4B9642192D61375E009A2E7F /* OTLPTraceProcessor.swift in Sources */,
 				2A2926372DAD11C800AB6F03 /* AttributeCheckerLogExporter.swift in Sources */,
 				E4A537422DA655E2002323E2 /* OLTPAttributesSpanProcessor.swift in Sources */,
-				4B96421A2D61375E009A2E7F /* OTel.swift in Sources */,
 				C7C112672DB8D64C00B8E893 /* OTLPLogToSpanExporter.swift in Sources */,
 				BA4C08522DC83AFD008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift in Sources */,
 				2A5949DB2DA3FC2100F2E857 /* SplunkStdoutSpanExporter.swift in Sources */,
