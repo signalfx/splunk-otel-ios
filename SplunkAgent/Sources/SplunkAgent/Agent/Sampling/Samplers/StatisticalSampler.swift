@@ -18,7 +18,7 @@ limitations under the License.
 /// A protocol for samplers that calculate decisions based on statistical probability.
 protocol StatisticalSampler: BaseSampler {
 
-    /// The target probability of sampling an item (e.g., 0.5 for 50% sampling rate).
+    /// The target probability of sampling an item.
     var probability: Double { get }
 
     /// The upper bound of the interval used for generating random numbers in the sampling decision.
@@ -46,6 +46,11 @@ extension StatisticalSampler {
     /// - Returns: A `SamplingDecision`.
     func sample(randomNumberProvider: RandomNumberProvider = SystemRandomNumberProvider()) -> SamplingDecision {
 
+        // Filter out miss-configured bounds.
+        guard lowerBound <= upperBound, lowerBound >= 0.0, upperBound <= 1.0 else {
+            return .sampledOut
+        }
+
         // The user-configured sampling rate is 1, meaning we want to record all Agent sessions.
         if probability == 1.0 {
             return .notSampledOut
@@ -53,11 +58,6 @@ extension StatisticalSampler {
 
         // The user-configured sampling rate is 0, meaning we want to record no Agent sessions.
         if probability == 0.0 {
-            return .sampledOut
-        }
-
-        // Filter out miss-configured bounds.
-        guard lowerBound <= upperBound else {
             return .sampledOut
         }
 
@@ -71,7 +71,7 @@ extension StatisticalSampler {
 
         return .sampledOut
     }
-    
+
     /// Calculates a sampling decision using the default system random number provider by
     /// calling the default `sample(randomNumberProvider: RandomNumberProvider)` function.
     ///

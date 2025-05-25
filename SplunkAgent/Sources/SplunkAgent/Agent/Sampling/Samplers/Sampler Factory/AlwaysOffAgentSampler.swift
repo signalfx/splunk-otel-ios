@@ -31,8 +31,8 @@ final class AlwaysOffAgentSampler: AgentSessionSampler {
 
     /// A non-operational configuration method.
     ///
-    /// - Parameter _: The agent configuration (ignored).
-    func configure(with _: any AgentConfigurationProtocol) {}
+    /// - Parameter configuration: The agent configuration (ignored).
+    func configure(with configuration: any AgentConfigurationProtocol) {}
 
 
     // MARK: - Sampling

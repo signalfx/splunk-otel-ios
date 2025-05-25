@@ -17,7 +17,6 @@ limitations under the License.
 
 /// A default concrete implementation of `AgentSessionSampler`.
 ///
-/// This sampler uses a configurable sampling rate to make decisions.
 /// It defaults to a sampling rate of 1.0 (sample all sessions) until configured otherwise.
 /// The random number generation for sampling decisions uses the `[0.0, 1.0]` bounding interval.
 final class DefaultAgentSessionSampler: AgentSessionSampler {

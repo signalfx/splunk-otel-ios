@@ -20,9 +20,9 @@ limitations under the License.
 /// It adds a mechanism to configure the sampler agent-specific session sampling rate.
 protocol AgentSessionSampler: StatisticalSampler {
 
-    /// Configures the session sampler with agent-specific session sampling rate.
+    /// Configures the session sampler with agent-specific configuration.
     ///
-    /// - Parameter configuration: A `AgentConfigurationProtocol` object
-    ///                          which provides the necessary `sessionSamplingRate` configuration.
+    /// - Parameter configuration: A `AgentConfigurationProtocol` object which provides
+    ///                           the necessary `sessionSamplingRate` configuration.
     func configure(with configuration: any AgentConfigurationProtocol)
 }

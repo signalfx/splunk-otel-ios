@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A protocol defining the fundamental contract for all samplers.
+/// A protocol defining the fundamental behaviour for all samplers.
 protocol BaseSampler: AnyObject {
 
     /// Calculates a sampling decision.

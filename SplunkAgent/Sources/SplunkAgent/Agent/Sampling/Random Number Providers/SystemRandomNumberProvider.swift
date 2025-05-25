@@ -21,6 +21,7 @@ import Foundation
 protocol RandomNumberProvider {
 
     /// Generates a random `Double` within the specified inclusive range.
+    ///
     /// - Parameters:
     ///   - range: A `ClosedRange<Double>` specifying the lower and upper bounds for the random number.
     /// - Returns: A random `Double` within the specified range.
