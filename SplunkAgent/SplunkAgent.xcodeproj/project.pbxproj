@@ -152,6 +152,18 @@
 		4BB680F52B7940C0000A54D4 /* API-1.0-SessionReplayStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680E12B7940C0000A54D4 /* API-1.0-SessionReplayStatus.swift */; };
 		4BB680F62B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680E22B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift */; };
 		4BB680FF2B7A7A53000A54D4 /* API-1.0-ModuleProxyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB680FD2B7A7A04000A54D4 /* API-1.0-ModuleProxyTests.swift */; };
+		4BEEA75C2DE33BEC006AC6C7 /* AgentSessionSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA75B2DE33BDF006AC6C7 /* AgentSessionSampler.swift */; };
+		4BEEA75F2DE3471E006AC6C7 /* DefaultAgentSessionSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA75E2DE34718006AC6C7 /* DefaultAgentSessionSampler.swift */; };
+		4BEEA7612DE347AF006AC6C7 /* SamplingDecision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA7602DE347A9006AC6C7 /* SamplingDecision.swift */; };
+		4BEEA7632DE34A06006AC6C7 /* StatisticalSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA7622DE349F6006AC6C7 /* StatisticalSampler.swift */; };
+		4BEEA7682DE364E7006AC6C7 /* BaseSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA7672DE364D0006AC6C7 /* BaseSampler.swift */; };
+		4BEEA76B2DE37DA1006AC6C7 /* SystemRandomNumberProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA76A2DE37D9B006AC6C7 /* SystemRandomNumberProvider.swift */; };
+		4BEEA76E2DE38ACB006AC6C7 /* SamplerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA76D2DE38AC8006AC6C7 /* SamplerFactory.swift */; };
+		4BEEA7712DE3911C006AC6C7 /* AlwaysOnAgentSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA7702DE39116006AC6C7 /* AlwaysOnAgentSampler.swift */; };
+		4BEEA7732DE3914E006AC6C7 /* AlwaysOffAgentSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA7722DE39148006AC6C7 /* AlwaysOffAgentSampler.swift */; };
+		4BEEA7752DE3A6CA006AC6C7 /* DefaultAgentSessionSamplerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA7742DE3A6B8006AC6C7 /* DefaultAgentSessionSamplerTests.swift */; };
+		4BEEA7772DE3A777006AC6C7 /* SystemRandomNumberProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA7762DE3A768006AC6C7 /* SystemRandomNumberProviderTests.swift */; };
+		4BEEA77A2DE3A81D006AC6C7 /* RandomNumberProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEEA7792DE3A817006AC6C7 /* RandomNumberProviderMock.swift */; };
 		4BF895742DAD7C2100E171A4 /* SplunkConfigurationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF895732DAD7C2100E171A4 /* SplunkConfigurationHandler.swift */; };
 		4BF8957F2DAD984D00E171A4 /* SplunkConfigurationHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8957D2DAD984D00E171A4 /* SplunkConfigurationHandlerTests.swift */; };
 		4BF895812DAD987D00E171A4 /* RemoteConfigurationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF895802DAD987D00E171A4 /* RemoteConfigurationModel.swift */; };
@@ -721,6 +733,18 @@
 		4BB680E12B7940C0000A54D4 /* API-1.0-SessionReplayStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "API-1.0-SessionReplayStatus.swift"; sourceTree = "<group>"; };
 		4BB680E22B7940C0000A54D4 /* API-1.0-SessionReplayModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "API-1.0-SessionReplayModule.swift"; sourceTree = "<group>"; };
 		4BB680FD2B7A7A04000A54D4 /* API-1.0-ModuleProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "API-1.0-ModuleProxyTests.swift"; sourceTree = "<group>"; };
+		4BEEA75B2DE33BDF006AC6C7 /* AgentSessionSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentSessionSampler.swift; sourceTree = "<group>"; };
+		4BEEA75E2DE34718006AC6C7 /* DefaultAgentSessionSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAgentSessionSampler.swift; sourceTree = "<group>"; };
+		4BEEA7602DE347A9006AC6C7 /* SamplingDecision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplingDecision.swift; sourceTree = "<group>"; };
+		4BEEA7622DE349F6006AC6C7 /* StatisticalSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticalSampler.swift; sourceTree = "<group>"; };
+		4BEEA7672DE364D0006AC6C7 /* BaseSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseSampler.swift; sourceTree = "<group>"; };
+		4BEEA76A2DE37D9B006AC6C7 /* SystemRandomNumberProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemRandomNumberProvider.swift; sourceTree = "<group>"; };
+		4BEEA76D2DE38AC8006AC6C7 /* SamplerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplerFactory.swift; sourceTree = "<group>"; };
+		4BEEA7702DE39116006AC6C7 /* AlwaysOnAgentSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlwaysOnAgentSampler.swift; sourceTree = "<group>"; };
+		4BEEA7722DE39148006AC6C7 /* AlwaysOffAgentSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlwaysOffAgentSampler.swift; sourceTree = "<group>"; };
+		4BEEA7742DE3A6B8006AC6C7 /* DefaultAgentSessionSamplerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultAgentSessionSamplerTests.swift; sourceTree = "<group>"; };
+		4BEEA7762DE3A768006AC6C7 /* SystemRandomNumberProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemRandomNumberProviderTests.swift; sourceTree = "<group>"; };
+		4BEEA7792DE3A817006AC6C7 /* RandomNumberProviderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomNumberProviderMock.swift; sourceTree = "<group>"; };
 		4BF895732DAD7C2100E171A4 /* SplunkConfigurationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkConfigurationHandler.swift; sourceTree = "<group>"; };
 		4BF8957D2DAD984D00E171A4 /* SplunkConfigurationHandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkConfigurationHandlerTests.swift; sourceTree = "<group>"; };
 		4BF895802DAD987D00E171A4 /* RemoteConfigurationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfigurationModel.swift; sourceTree = "<group>"; };
@@ -2188,6 +2212,72 @@
 			path = SessionReplay;
 			sourceTree = "<group>";
 		};
+		4BEEA75A2DE33BD7006AC6C7 /* Sampling */ = {
+			isa = PBXGroup;
+			children = (
+				4BEEA7692DE37D7B006AC6C7 /* Random Number Providers */,
+				4BEEA7662DE364C7006AC6C7 /* Samplers */,
+				4BEEA7602DE347A9006AC6C7 /* SamplingDecision.swift */,
+				4BEEA75D2DE3470E006AC6C7 /* Session Sampling */,
+			);
+			path = Sampling;
+			sourceTree = "<group>";
+		};
+		4BEEA75D2DE3470E006AC6C7 /* Session Sampling */ = {
+			isa = PBXGroup;
+			children = (
+				4BEEA75E2DE34718006AC6C7 /* DefaultAgentSessionSampler.swift */,
+				4BEEA75B2DE33BDF006AC6C7 /* AgentSessionSampler.swift */,
+			);
+			path = "Session Sampling";
+			sourceTree = "<group>";
+		};
+		4BEEA7662DE364C7006AC6C7 /* Samplers */ = {
+			isa = PBXGroup;
+			children = (
+				4BEEA76F2DE390FB006AC6C7 /* Sampler Factory */,
+				4BEEA7672DE364D0006AC6C7 /* BaseSampler.swift */,
+				4BEEA7622DE349F6006AC6C7 /* StatisticalSampler.swift */,
+			);
+			path = Samplers;
+			sourceTree = "<group>";
+		};
+		4BEEA7692DE37D7B006AC6C7 /* Random Number Providers */ = {
+			isa = PBXGroup;
+			children = (
+				4BEEA76A2DE37D9B006AC6C7 /* SystemRandomNumberProvider.swift */,
+			);
+			path = "Random Number Providers";
+			sourceTree = "<group>";
+		};
+		4BEEA76C2DE3892D006AC6C7 /* Sampling */ = {
+			isa = PBXGroup;
+			children = (
+				4BEEA7782DE3A80C006AC6C7 /* Mocks */,
+				4BEEA7762DE3A768006AC6C7 /* SystemRandomNumberProviderTests.swift */,
+				4BEEA7742DE3A6B8006AC6C7 /* DefaultAgentSessionSamplerTests.swift */,
+			);
+			path = Sampling;
+			sourceTree = "<group>";
+		};
+		4BEEA76F2DE390FB006AC6C7 /* Sampler Factory */ = {
+			isa = PBXGroup;
+			children = (
+				4BEEA7722DE39148006AC6C7 /* AlwaysOffAgentSampler.swift */,
+				4BEEA7702DE39116006AC6C7 /* AlwaysOnAgentSampler.swift */,
+				4BEEA76D2DE38AC8006AC6C7 /* SamplerFactory.swift */,
+			);
+			path = "Sampler Factory";
+			sourceTree = "<group>";
+		};
+		4BEEA7782DE3A80C006AC6C7 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				4BEEA7792DE3A817006AC6C7 /* RandomNumberProviderMock.swift */,
+			);
+			path = Mocks;
+			sourceTree = "<group>";
+		};
 		4BF8957E2DAD984D00E171A4 /* Splunk Configuration */ = {
 			isa = PBXGroup;
 			children = (
@@ -2631,6 +2721,7 @@
 		E468964F2B220D8800727A6A /* Agent */ = {
 			isa = PBXGroup;
 			children = (
+				4BEEA76C2DE3892D006AC6C7 /* Sampling */,
 				C703FAB62BAD8526000CC11B /* AppState */,
 				C73FF49C2B6CE809009C53FF /* Configuration */,
 				2AA52B472B8DF4CD00DF9373 /* Events */,
@@ -2914,6 +3005,7 @@
 		E4F2E4F82B172911006EBA69 /* Agent */ = {
 			isa = PBXGroup;
 			children = (
+				4BEEA75A2DE33BD7006AC6C7 /* Sampling */,
 				C703FAAD2BA9D3A2000CC11B /* AppState */,
 				E4F2E4F72B172853006EBA69 /* Configuration */,
 				2AE43B3F2B861325002C4A98 /* Events */,
@@ -3938,6 +4030,7 @@
 				E4A708B32B9754B7002C692E /* RepeatingJob.swift in Sources */,
 				E4EE9ED42BA34A400000D594 /* SessionReplayNonOperationalState.swift in Sources */,
 				E4B737E12BBECEDD00086A93 /* PlatformSupport.swift in Sources */,
+				4BEEA7632DE34A06006AC6C7 /* StatisticalSampler.swift in Sources */,
 				2A1673CD2BA1F52600F85698 /* EventsModel.swift in Sources */,
 				BAAC20C82DBB0F4800BC8B60 /* ThreadSafeDictionary.swift in Sources */,
 				2AE43B0C2B7FAD9B002C4A98 /* DefaultResources.swift in Sources */,
@@ -3949,6 +4042,7 @@
 				E4134BAB2BC6AC5400F0D2FC /* API-1.0-Status.swift in Sources */,
 				4BF895AD2DB3CC7D00E171A4 /* API-1.0-SessionState.swift in Sources */,
 				4BB680F52B7940C0000A54D4 /* API-1.0-SessionReplayStatus.swift in Sources */,
+				4BEEA7612DE347AF006AC6C7 /* SamplingDecision.swift in Sources */,
 				5280E2912DC0AD6300770A90 /* API-1.0-WebViewInstrumentationModule.swift in Sources */,
 				E4F3ACB82DA7B800007EFC0A /* API-1.0-UserState.swift in Sources */,
 				E4E4B1122BA19A5B001CB6B3 /* SessionReplay.swift in Sources */,
@@ -3958,10 +4052,13 @@
 				2AE43B482B861325002C4A98 /* SessionReplayDataEvent.swift in Sources */,
 				E4BA26CC2BC3F8CE0067FC84 /* ConfigurationHandlerNonOperational.swift in Sources */,
 				E4BA26CA2BC3D75E0067FC84 /* CompileInfo.swift in Sources */,
+				4BEEA7732DE3914E006AC6C7 /* AlwaysOffAgentSampler.swift in Sources */,
 				E4F3ACB42DA7B444007EFC0A /* API-1.0-UserTrackingMode.swift in Sources */,
 				2AB51E972B7A670600307B77 /* SystemInfo.swift in Sources */,
 				E4F2E5072B1733C9006EBA69 /* AgentSession.swift in Sources */,
 				BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */,
+				4BEEA76E2DE38ACB006AC6C7 /* SamplerFactory.swift in Sources */,
+				4BEEA75F2DE3471E006AC6C7 /* DefaultAgentSessionSampler.swift in Sources */,
 				4BB680E82B7940C0000A54D4 /* RecordingMask+Conversions.swift in Sources */,
 				E4AD34F42B56E075004976CA /* AgentModulesManager.swift in Sources */,
 				2AB51E982B7A670600307B77 /* AppInfo.swift in Sources */,
@@ -3998,6 +4095,7 @@
 				E4AD34F62B56E4BB004976CA /* DefaultModulesManager.swift in Sources */,
 				E4A537502DA66B5A002323E2 /* AgentRuntimeAttributes.swift in Sources */,
 				4BB680E92B7940C0000A54D4 /* Status+Conversions.swift in Sources */,
+				4BEEA75C2DE33BEC006AC6C7 /* AgentSessionSampler.swift in Sources */,
 				4BF895742DAD7C2100E171A4 /* SplunkConfigurationHandler.swift in Sources */,
 				E426CFAA2B28C18000094AC0 /* SessionsModel.swift in Sources */,
 				E42634832BB44B0F003706A9 /* SplunkAgent.docc in Sources */,
@@ -4006,12 +4104,15 @@
 				C703FAB32BA9D424000CC11B /* AppState.swift in Sources */,
 				E4F2E5102B1737F2006EBA69 /* API-1.0-Session.swift in Sources */,
 				C703FAB12BA9D41E000CC11B /* AppStateManager.swift in Sources */,
+				4BEEA7682DE364E7006AC6C7 /* BaseSampler.swift in Sources */,
 				C73FF4852B6CE749009C53FF /* RemoteConfiguration.swift in Sources */,
 				C7FFC4F52B7662E30035203B /* Service.swift in Sources */,
 				C73FF4792B6CE72A009C53FF /* ConfigurationDefaults.swift in Sources */,
 				E426CFAB2B28C18000094AC0 /* SessionItem.swift in Sources */,
 				E4B737DD2BBECBFB00086A93 /* PlatformSupportScope.swift in Sources */,
+				4BEEA7712DE3911C006AC6C7 /* AlwaysOnAgentSampler.swift in Sources */,
 				C73FF4872B6CE749009C53FF /* ConfigurationHandler+LoadRemote.swift in Sources */,
+				4BEEA76B2DE37DA1006AC6C7 /* SystemRandomNumberProvider.swift in Sources */,
 				C73FF4942B6CE777009C53FF /* Endpoint.swift in Sources */,
 				E4A537522DA66DB6002323E2 /* DefaultRuntimeAttributes.swift in Sources */,
 				E4E4B1162BA1A0DA001CB6B3 /* SessionReplay+RecordingMask.swift in Sources */,
@@ -4308,6 +4409,7 @@
 				E44D73BE2B99B10600121EA4 /* XCTestCase+SimulateWait.swift in Sources */,
 				2AAC95E42D6C7427004FAE2C /* String+HexID.swift in Sources */,
 				2AAC95E82D6C78DF004FAE2C /* HexIDTests.swift in Sources */,
+				4BEEA77A2DE3A81D006AC6C7 /* RandomNumberProviderMock.swift in Sources */,
 				E4EE9ECA2BA322F50000D594 /* SessionReplayTestBuilder.swift in Sources */,
 				E46896552B22102E00727A6A /* RuntimeStateTests.swift in Sources */,
 				2AE43B042B7BA352002C4A98 /* ResourcesTests.swift in Sources */,
@@ -4334,7 +4436,9 @@
 				E40549812DACF65D00B7A2E4 /* DefaultUserTestBuilder.swift in Sources */,
 				E4577D7B2B9F2BA700DFA2C2 /* XCTestCase+SimulateBackground.swift in Sources */,
 				E468964E2B21EDE000727A6A /* API-1.0-StateTests.swift in Sources */,
+				4BEEA7772DE3A777006AC6C7 /* SystemRandomNumberProviderTests.swift in Sources */,
 				2AC8C0952BAAE0710052ECF4 /* EventsModelTests.swift in Sources */,
+				4BEEA7752DE3A6CA006AC6C7 /* DefaultAgentSessionSamplerTests.swift in Sources */,
 				BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */,
 				E46896362B21CA0300727A6A /* UserDefaultsStoragePrefixTests.swift in Sources */,
 				E4FAEEB22B6A6A73008D4E6E /* SessionReplayTestModule.swift in Sources */,

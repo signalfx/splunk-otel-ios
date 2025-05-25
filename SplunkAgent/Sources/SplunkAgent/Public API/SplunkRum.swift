@@ -51,6 +51,8 @@ public class SplunkRum: ObservableObject {
     let logProcessor: LogProcessor
     let logger: LogAgent
 
+    let sessionSampler: any AgentSessionSampler
+
 
     // MARK: - Internal (Modules Proxy)
 
@@ -73,7 +75,8 @@ public class SplunkRum: ObservableObject {
         configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
         user: NoOpUser(),
         session: NoOpSession(),
-        appStateManager: NoOpAppStateManager()
+        appStateManager: NoOpAppStateManager(),
+        sessionSampler: DefaultAgentSessionSampler()
     )
 
 
@@ -131,9 +134,11 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
-        // Preparation for sampling check
-        let sampledOut = false
-        if sampledOut {
+        // Call the configured Session Sampler.
+        let samplingDecision = shared.sessionSampler.sample()
+
+        // Continue with a noop instance in case of sampling out.
+        if samplingDecision == .sampledOut {
             shared.currentStatus = .notRunning(.sampledOut)
 
             shared.logger.log(level: .notice, isPrivate: false) {
@@ -157,7 +162,12 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Initialization
 
-    required init(configurationHandler: AgentConfigurationHandler, user: AgentUser, session: AgentSession, appStateManager: AgentAppStateManager) {
+    required init(
+        configurationHandler: AgentConfigurationHandler,
+        user: AgentUser, session: AgentSession,
+        appStateManager: AgentAppStateManager,
+        sessionSampler: AgentSessionSampler
+    ) {
         // Pass user configuration
         agentConfigurationHandler = configurationHandler
 
@@ -182,6 +192,10 @@ public class SplunkRum: ObservableObject {
 
         // Assign AppState manager
         self.appStateManager = appStateManager
+
+        // Assign and configure the session sampler
+        self.sessionSampler = sessionSampler
+        self.sessionSampler.configure(with: agentConfiguration)
     }
 
     convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {
@@ -201,7 +215,8 @@ public class SplunkRum: ObservableObject {
             configurationHandler: configurationHandler,
             user: DefaultUser(),
             session: DefaultSession(),
-            appStateManager: AppStateManager()
+            appStateManager: AppStateManager(),
+            sessionSampler: DefaultAgentSessionSampler()
         )
 
         initializeEvents["agent_instance_initialized"] = Date()
