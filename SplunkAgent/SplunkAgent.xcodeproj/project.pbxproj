@@ -175,7 +175,7 @@
 		BA4C08502DC8398E008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4C084E2DC83988008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift */; };
 		BA4C08522DC83AFD008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4C08512DC83AF0008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift */; };
 		BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */; };
-		BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */; };
+		BA7A63BE2DB8198200A44570 /* API-1.0-MutableAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7A63BD2DB8198200A44570 /* API-1.0-MutableAttributes.swift */; };
 		BA80F9E12DCD9033007F64FA /* MutableAttributes+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA80F9E02DCD9025007F64FA /* MutableAttributes+Extension.swift */; };
 		BAAC20C22DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */; };
 		BAAC20C42DB9BB5E00BC8B60 /* IgnoreURLsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */; };
@@ -717,7 +717,7 @@
 		BA4C084E2DC83988008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPGlobalAttributesSpanProcessor.swift; sourceTree = "<group>"; };
 		BA4C08512DC83AF0008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPGlobalAttributesLogRecordProcessor.swift; sourceTree = "<group>"; };
 		BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributesTests.swift; sourceTree = "<group>"; };
-		BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributes.swift; sourceTree = "<group>"; };
+		BA7A63BD2DB8198200A44570 /* API-1.0-MutableAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API-1.0-MutableAttributes.swift; sourceTree = "<group>"; };
 		BA80F9E02DCD9025007F64FA /* MutableAttributes+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MutableAttributes+Extension.swift"; sourceTree = "<group>"; };
 		BAAC20C12DB9BA8B00BC8B60 /* NetworkInstrumentationIgnoreURLs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInstrumentationIgnoreURLs.swift; sourceTree = "<group>"; };
 		BAAC20C32DB9BB5E00BC8B60 /* IgnoreURLsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IgnoreURLsTests.swift; sourceTree = "<group>"; };
@@ -2290,7 +2290,7 @@
 			isa = PBXGroup;
 			children = (
 				BAAC20C72DBB0F4800BC8B60 /* ThreadSafeDictionary.swift */,
-				BA7A63BD2DB8198200A44570 /* MutableAttributes.swift */,
+				BA7A63BD2DB8198200A44570 /* API-1.0-MutableAttributes.swift */,
 				BA80F9E02DCD9025007F64FA /* MutableAttributes+Extension.swift */,
 				2A03CF5C2D9C315000CF3BC9 /* API-1.0-AgentConfigurationError.swift */,
 				E4134BAA2BC6AC5400F0D2FC /* API-1.0-Status.swift */,
@@ -3706,7 +3706,7 @@
 				E4F3ACB42DA7B444007EFC0A /* API-1.0-UserTrackingMode.swift in Sources */,
 				2AB51E972B7A670600307B77 /* SystemInfo.swift in Sources */,
 				E4F2E5072B1733C9006EBA69 /* AgentSession.swift in Sources */,
-				BA7A63BE2DB8198200A44570 /* MutableAttributes.swift in Sources */,
+				BA7A63BE2DB8198200A44570 /* API-1.0-MutableAttributes.swift in Sources */,
 				4BB680E82B7940C0000A54D4 /* RecordingMask+Conversions.swift in Sources */,
 				E4AD34F42B56E075004976CA /* AgentModulesManager.swift in Sources */,
 				2AB51E982B7A670600307B77 /* AppInfo.swift in Sources */,
