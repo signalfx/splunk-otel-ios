@@ -114,11 +114,11 @@ public class CrashReports {
             }
 
             // Send the serialized Crash Report to the Module data consumer for processing.
-            self.crashReportDataConsumer?(
+            crashReportDataConsumer?(
                 CrashReportsMetadata(timestamp: timestamp),
                 jsonPayload
             )
-        } catch let error {
+        } catch {
             logger.log(level: .error) {
                 "CrashReporter failed to load/parse with error: \(error)"
             }

@@ -56,7 +56,7 @@ class SpanInterceptorExporter: SpanExporter {
         }
 
         // Invoke the interceptor and only pass through non-nil spans.
-        let interceptedSpans = spans.compactMap({ span in return spanInterceptor(span)})
+        let interceptedSpans = spans.compactMap { span in spanInterceptor(span) }
 
         return proxyExporter.export(spans: interceptedSpans)
     }

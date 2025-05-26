@@ -27,18 +27,18 @@ extension OTLPLogEventProcessor {
     ///   - event: An event with which the LogRecordBuilder is built from.
     ///   - logRecordBuilder: Initial LogRecordBuilder, which is extented with data from the Event.
     func buildEvent(with event: any AgentEvent, logRecordBuilder: LogRecordBuilder) -> LogRecordBuilder {
-        
+
         // Initialise attribute dictionary
         var otelAttributes: [String: AttributeValue] = [:]
-        
+
         // Attributes - session ID
         if let sessionID = event.sessionID {
             otelAttributes["session.id"] = AttributeValue(sessionID)
         }
-        
+
         // Attributes - event.domain
         otelAttributes["event.domain"] = AttributeValue(event.domain)
-        
+
         // Attributes - event.name
         otelAttributes["event.name"] = AttributeValue(event.name)
 
@@ -51,10 +51,10 @@ extension OTLPLogEventProcessor {
                 otelAttributes[attributeName] = AttributeValue(attributeValue)
             }
         }
-    
+
         // Start building the builder
         let resultingBuilder = logRecordBuilder
-        
+
         // Add attributes
         if !otelAttributes.isEmpty {
             _ = resultingBuilder.setAttributes(otelAttributes)

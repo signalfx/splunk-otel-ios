@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryApi
+internal import OpenTelemetryApi
 import SplunkCommon
 
 /// Creates and sends an OpenTelemetry span from supplied app start data.

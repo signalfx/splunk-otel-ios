@@ -21,11 +21,9 @@ import XCTest
 
 final class MutableAttributesTests: XCTestCase {
 
-    override func setUpWithError() throws {
-    }
+    override func setUpWithError() throws {}
 
-    override func tearDownWithError() throws {
-    }
+    override func tearDownWithError() throws {}
 
     // MARK: - Initialization Tests
 

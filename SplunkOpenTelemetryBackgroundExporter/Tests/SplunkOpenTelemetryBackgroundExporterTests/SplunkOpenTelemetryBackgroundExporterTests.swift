@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import XCTest
 @testable import SplunkOpenTelemetryBackgroundExporter
+import XCTest
 
 final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
 
@@ -26,10 +26,11 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0)
+            explicitTimeout: 0
+        )
 
         requestDescriotor.sentCount = 3
-        
+
         XCTAssertTrue(requestDescriotor.shouldSend)
     }
 
@@ -37,10 +38,11 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0)
+            explicitTimeout: 0
+        )
 
         requestDescriotor.sentCount = 6
-        
+
         XCTAssertFalse(requestDescriotor.shouldSend)
     }
 
@@ -51,7 +53,8 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0)
+            explicitTimeout: 0
+        )
 
         requestDescriotor.sentCount = 3
 
