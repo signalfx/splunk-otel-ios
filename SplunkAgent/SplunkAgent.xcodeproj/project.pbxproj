@@ -110,7 +110,6 @@
 		4B9641FE2D613746009A2E7F /* SplunkOpenTelemetry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9641F42D613746009A2E7F /* SplunkOpenTelemetry.framework */; };
 		4B9642142D61375E009A2E7F /* AttributeValue+MrumEventAttributeValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CA72D60ED3D009DA0D5 /* AttributeValue+MrumEventAttributeValue.swift */; };
 		4B9642152D61375E009A2E7F /* Resource+AgentResources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CA32D60ED3D009DA0D5 /* Resource+AgentResources.swift */; };
-		4B9642162D61375E009A2E7F /* ApiPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5C9E2D60ED3D009DA0D5 /* ApiPaths.swift */; };
 		4B9642172D61375E009A2E7F /* OTLPLogEventProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CA02D60ED3D009DA0D5 /* OTLPLogEventProcessor.swift */; };
 		4B9642182D61375E009A2E7F /* OTLPLogEventProcessor+AgentEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CA12D60ED3D009DA0D5 /* OTLPLogEventProcessor+AgentEvent.swift */; };
 		4B9642192D61375E009A2E7F /* OTLPTraceProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5CA52D60ED3D009DA0D5 /* OTLPTraceProcessor.swift */; };
@@ -656,7 +655,6 @@
 		4B5A5C8B2D5E5686009DA0D5 /* CrashReports+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CrashReports+Module.swift"; sourceTree = "<group>"; };
 		4B5A5C8E2D5E5686009DA0D5 /* SplunkCrashReportsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkCrashReportsTests.swift; sourceTree = "<group>"; };
 		4B5A5C922D5E5686009DA0D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4B5A5C9E2D60ED3D009DA0D5 /* ApiPaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiPaths.swift; sourceTree = "<group>"; };
 		4B5A5CA02D60ED3D009DA0D5 /* OTLPLogEventProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPLogEventProcessor.swift; sourceTree = "<group>"; };
 		4B5A5CA12D60ED3D009DA0D5 /* OTLPLogEventProcessor+AgentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OTLPLogEventProcessor+AgentEvent.swift"; sourceTree = "<group>"; };
 		4B5A5CA32D60ED3D009DA0D5 /* Resource+AgentResources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Resource+AgentResources.swift"; sourceTree = "<group>"; };
@@ -1729,14 +1727,6 @@
 			path = ../SplunkCrashReports;
 			sourceTree = SOURCE_ROOT;
 		};
-		4B5A5C9F2D60ED3D009DA0D5 /* API */ = {
-			isa = PBXGroup;
-			children = (
-				4B5A5C9E2D60ED3D009DA0D5 /* ApiPaths.swift */,
-			);
-			path = API;
-			sourceTree = "<group>";
-		};
 		4B5A5CA22D60ED3D009DA0D5 /* Log Event Processor */ = {
 			isa = PBXGroup;
 			children = (
@@ -1774,7 +1764,6 @@
 			isa = PBXGroup;
 			children = (
 				4B3B3FF12DCB613C00F1BC5C /* Span Interceptor Exporter */,
-				4B5A5C9F2D60ED3D009DA0D5 /* API */,
 				4B5A5CA62D60ED3D009DA0D5 /* Trace Processor */,
 				4B5A5CA22D60ED3D009DA0D5 /* Log Event Processor */,
 				E4A537532DA68F17002323E2 /* Log Processors */,
@@ -4025,7 +4014,6 @@
 			files = (
 				4B9642142D61375E009A2E7F /* AttributeValue+MrumEventAttributeValue.swift in Sources */,
 				4B9642152D61375E009A2E7F /* Resource+AgentResources.swift in Sources */,
-				4B9642162D61375E009A2E7F /* ApiPaths.swift in Sources */,
 				4B9642172D61375E009A2E7F /* OTLPLogEventProcessor.swift in Sources */,
 				4B9642182D61375E009A2E7F /* OTLPLogEventProcessor+AgentEvent.swift in Sources */,
 				BA4C084F2DC8398E008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift in Sources */,
