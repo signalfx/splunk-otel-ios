@@ -42,7 +42,7 @@ struct RemoteConfigurationEndpoint: Endpoint {
 
     // MARK: - Static constants aliases
 
-    static var service = Service(path: "eum/v1/config", httpMethod: .get)
+    static var service = Service(path: "config", httpMethod: .get)
 
 
     // MARK: - Variables
