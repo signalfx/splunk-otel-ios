@@ -288,6 +288,15 @@ public class SplunkRum: ObservableObject {
             return
         }
 
+        navigationModule.agentVersion(sharedState.agentVersion)
+
+        // Set up forwarding of screen name changes to runtime attributes.
+        Task(priority: .userInitiated) {
+            for await newValue in navigationModule.screenNameStream {
+                runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
+            }
+        }
+
         // Initialize proxy API for this module
         navigationProxy = Navigation(for: navigationModule)
     }

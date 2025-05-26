@@ -227,9 +227,11 @@
 		E4122CBD2B67D94A0095157B /* DefaultModulesManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4122CBC2B67D94A0095157B /* DefaultModulesManagerTests.swift */; };
 		E4122CBF2B67DD400095157B /* ModuleAcceptHelpersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4122CBE2B67DD400095157B /* ModuleAcceptHelpersTests.swift */; };
 		E4134BAB2BC6AC5400F0D2FC /* API-1.0-Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4134BAA2BC6AC5400F0D2FC /* API-1.0-Status.swift */; };
+		E41475EF2DD23A7500F47A47 /* CiscoSwizzling in Frameworks */ = {isa = PBXBuildFile; productRef = E41475EE2DD23A7500F47A47 /* CiscoSwizzling */; };
 		E41FB0932B90D873009F5CA6 /* DefaultSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41FB0922B90D873009F5CA6 /* DefaultSharedState.swift */; };
 		E42026A32B501304002C5F80 /* UserDefaultsStorageCRUDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42026A22B501304002C5F80 /* UserDefaultsStorageCRUDTests.swift */; };
 		E42634832BB44B0F003706A9 /* SplunkAgent.docc in Sources */ = {isa = PBXBuildFile; fileRef = E42634822BB44B0F003706A9 /* SplunkAgent.docc */; };
+		E426652A2DE4683C00C452A1 /* AutomatedNavigationEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42665292DE4683C00C452A1 /* AutomatedNavigationEvent.swift */; };
 		E426CFAA2B28C18000094AC0 /* SessionsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E426CFA82B28C18000094AC0 /* SessionsModel.swift */; };
 		E426CFAB2B28C18000094AC0 /* SessionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E426CFA92B28C18000094AC0 /* SessionItem.swift */; };
 		E43370D92B95C86F00102C2D /* DefaultSharedStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43370D82B95C86F00102C2D /* DefaultSharedStateTests.swift */; };
@@ -266,6 +268,9 @@
 		E4699CDD2DAD4DCE00C1F948 /* SplunkCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; };
 		E46BBA6B2B503CDF00317C8E /* UserDefaultsStorageTestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46BBA6A2B503CDF00317C8E /* UserDefaultsStorageTestBuilder.swift */; };
 		E4720E6D2B71458B008B393A /* AgentModulesManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4720E6C2B71458B008B393A /* AgentModulesManagerTests.swift */; };
+		E4723B152DDC907C003256D3 /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4723B142DDC9072003256D3 /* NavigationModel.swift */; };
+		E4723B172DDC90BC003256D3 /* NavigationPair.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4723B162DDC90B5003256D3 /* NavigationPair.swift */; };
+		E4723B192DDC9981003256D3 /* Navigation+Span.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4723B182DDC9981003256D3 /* Navigation+Span.swift */; };
 		E474EECC2DC20CA400BC7D1E /* SplunkNavigation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E474EEBC2DC20C5000BC7D1E /* SplunkNavigation.framework */; };
 		E4754BBF2DB8ED7A00E74532 /* CiscoLogger in Frameworks */ = {isa = PBXBuildFile; productRef = E4754BBE2DB8ED7A00E74532 /* CiscoLogger */; };
 		E4754BC12DB8ED8F00E74532 /* CiscoLogger in Frameworks */ = {isa = PBXBuildFile; productRef = E4754BC02DB8ED8F00E74532 /* CiscoLogger */; };
@@ -290,6 +295,7 @@
 		E4AD34F62B56E4BB004976CA /* DefaultModulesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD34F52B56E4BB004976CA /* DefaultModulesManager.swift */; };
 		E4B374B62DB7E0FC00DB6DDE /* CiscoLogger in Frameworks */ = {isa = PBXBuildFile; productRef = E4B374B52DB7E0FC00DB6DDE /* CiscoLogger */; };
 		E4B374B82DB7E33100DB6DDE /* CiscoLogger in Frameworks */ = {isa = PBXBuildFile; productRef = E4B374B72DB7E33100DB6DDE /* CiscoLogger */; };
+		E4B5E57B2DDB830700A83857 /* OpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = E4B5E57A2DDB830700A83857 /* OpenTelemetryApi */; };
 		E4B737DD2BBECBFB00086A93 /* PlatformSupportScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B737DC2BBECBFB00086A93 /* PlatformSupportScope.swift */; };
 		E4B737DF2BBECE7900086A93 /* PlatformSupporting.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B737DE2BBECE7900086A93 /* PlatformSupporting.swift */; };
 		E4B737E12BBECEDD00086A93 /* PlatformSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B737E02BBECEDD00086A93 /* PlatformSupport.swift */; };
@@ -853,6 +859,7 @@
 		E41FB0922B90D873009F5CA6 /* DefaultSharedState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSharedState.swift; sourceTree = "<group>"; };
 		E42026A22B501304002C5F80 /* UserDefaultsStorageCRUDTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsStorageCRUDTests.swift; sourceTree = "<group>"; };
 		E42634822BB44B0F003706A9 /* SplunkAgent.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = SplunkAgent.docc; sourceTree = "<group>"; };
+		E42665292DE4683C00C452A1 /* AutomatedNavigationEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomatedNavigationEvent.swift; sourceTree = "<group>"; };
 		E426CFA82B28C18000094AC0 /* SessionsModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionsModel.swift; sourceTree = "<group>"; };
 		E426CFA92B28C18000094AC0 /* SessionItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionItem.swift; sourceTree = "<group>"; };
 		E43370D82B95C86F00102C2D /* DefaultSharedStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSharedStateTests.swift; sourceTree = "<group>"; };
@@ -887,6 +894,9 @@
 		E4699CDA2DAD26E400C1F948 /* DefaultRuntimeAttributesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultRuntimeAttributesTests.swift; sourceTree = "<group>"; };
 		E46BBA6A2B503CDF00317C8E /* UserDefaultsStorageTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsStorageTestBuilder.swift; sourceTree = "<group>"; };
 		E4720E6C2B71458B008B393A /* AgentModulesManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentModulesManagerTests.swift; sourceTree = "<group>"; };
+		E4723B142DDC9072003256D3 /* NavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationModel.swift; sourceTree = "<group>"; };
+		E4723B162DDC90B5003256D3 /* NavigationPair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPair.swift; sourceTree = "<group>"; };
+		E4723B182DDC9981003256D3 /* Navigation+Span.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Navigation+Span.swift"; sourceTree = "<group>"; };
 		E474EEBC2DC20C5000BC7D1E /* SplunkNavigation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkNavigation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E474EECB2DC20C7B00BC7D1E /* SplunkNavigationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkNavigationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E47953C42BA1CF7D0065677D /* SessionReplay+Recording.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionReplay+Recording.swift"; sourceTree = "<group>"; };
@@ -1200,7 +1210,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4EF11652DC8E3820026EDA0 /* CiscoLogger in Frameworks */,
+				E41475EF2DD23A7500F47A47 /* CiscoSwizzling in Frameworks */,
 				E4BA931A2DC238CE00CDB203 /* SplunkCommon.framework in Frameworks */,
+				E4B5E57B2DDB830700A83857 /* OpenTelemetryApi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2647,6 +2659,14 @@
 			path = UserDefaultsStorage;
 			sourceTree = "<group>";
 		};
+		E42665282DE4681E00C452A1 /* Legacy */ = {
+			isa = PBXGroup;
+			children = (
+				E42665292DE4683C00C452A1 /* AutomatedNavigationEvent.swift */,
+			);
+			path = Legacy;
+			sourceTree = "<group>";
+		};
 		E426CFA72B28C18000094AC0 /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -2826,11 +2846,23 @@
 			path = "Runtime Attributes";
 			sourceTree = "<group>";
 		};
+		E4723B132DDC905F003256D3 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				E42665282DE4681E00C452A1 /* Legacy */,
+				E4723B162DDC90B5003256D3 /* NavigationPair.swift */,
+				E4723B142DDC9072003256D3 /* NavigationModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		E474EED62DC20E3E00BC7D1E /* SplunkNavigation */ = {
 			isa = PBXGroup;
 			children = (
+				E4723B132DDC905F003256D3 /* Model */,
 				E48D23E42DC2429400D55FE2 /* Module */,
 				E48D23E52DC2429400D55FE2 /* Navigation.swift */,
+				E4723B182DDC9981003256D3 /* Navigation+Span.swift */,
 				E4EF11662DC8F7C30026EDA0 /* Navigation+Tracking.swift */,
 				E4EF11622DC8C0080026EDA0 /* Preferences.swift */,
 				E4EF11602DC8BFEB0026EDA0 /* RuntimeState.swift */,
@@ -3878,6 +3910,8 @@
 			name = SplunkNavigation;
 			packageProductDependencies = (
 				E4EF11642DC8E3820026EDA0 /* CiscoLogger */,
+				E41475EE2DD23A7500F47A47 /* CiscoSwizzling */,
+				E4B5E57A2DDB830700A83857 /* OpenTelemetryApi */,
 			);
 			productName = SplunkLogger;
 			productReference = E474EEBC2DC20C5000BC7D1E /* SplunkNavigation.framework */;
@@ -4696,9 +4730,13 @@
 				E48D23E72DC2429400D55FE2 /* Navigation+Module.swift in Sources */,
 				E4EF11672DC8F7D10026EDA0 /* Navigation+Tracking.swift in Sources */,
 				E4EF11632DC8C00D0026EDA0 /* Preferences.swift in Sources */,
+				E4723B152DDC907C003256D3 /* NavigationModel.swift in Sources */,
 				E48D23E82DC2429400D55FE2 /* Navigation.swift in Sources */,
+				E4723B192DDC9981003256D3 /* Navigation+Span.swift in Sources */,
+				E426652A2DE4683C00C452A1 /* AutomatedNavigationEvent.swift in Sources */,
 				E48D23E92DC2429400D55FE2 /* NavigationRemoteConfiguration.swift in Sources */,
 				E4EF11612DC8BFF00026EDA0 /* RuntimeState.swift in Sources */,
+				E4723B172DDC90BC003256D3 /* NavigationPair.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10555,6 +10593,11 @@
 			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
 			productName = CiscoDiskStorage;
 		};
+		E41475EE2DD23A7500F47A47 /* CiscoSwizzling */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
+			productName = CiscoSwizzling;
+		};
 		E4754BBE2DB8ED7A00E74532 /* CiscoLogger */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
@@ -10584,6 +10627,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
 			productName = CiscoLogger;
+		};
+		E4B5E57A2DDB830700A83857 /* OpenTelemetryApi */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B0F23872D79F2C000EA575A /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			productName = OpenTelemetryApi;
 		};
 		E4EF11642DC8E3820026EDA0 /* CiscoLogger */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -15,15 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Combine
+import Foundation
+internal import CiscoSwizzling
 
-/// A state object that is representation for the current state of the module.
-public final class RuntimeState: Sendable {
+/// Represents automatic navigation event. Used for legacy solution compatibility.
+struct AutomatedNavigationEvent: NavigationActionEvent {
 
-    // MARK: - Automated tracking
+    // MARK: - Public
 
-    /// Indicates whether automatic navigation detection is enabled.
-    ///
-    /// The default value is `false`.
-    public internal(set) nonisolated(unsafe) var isAutomatedTrackingEnabled: Bool = false
+    var type: NavigationActionEventType
+    var controllerTypeName: String
+    var controllerIdentifier: ObjectIdentifier
+    var viewFrame: CGRect?
 }
