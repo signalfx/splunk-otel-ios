@@ -26,21 +26,8 @@ extension Resource {
     /// Merges Resource object with AgentResources.
     mutating func merge(with agentResources: AgentResources) {
 
-        // Service info
-        // TODO: DEMRUM-1401 - Do we need service name and version?
-        let serviceName = agentResources.appName
-        let serviceVersion = Resource.serviceVersion(
-            fromAppVersion: agentResources.appVersion,
-            appBuild: agentResources.appBuild
-        )
-
         // Build required attributes
         let requiredAttributes: [String: AttributeValue] = [
-
-            // Service info
-            // TODO: DEMRUM-1401 - Do we need service name and version?
-            ResourceAttributes.serviceName.rawValue: .string(serviceName),
-            ResourceAttributes.serviceVersion.rawValue: .string(serviceVersion),
 
             // App info
             ResourceAttributes.deploymentEnvironment.rawValue: .string(agentResources.appDeploymentEnvironment),
@@ -55,13 +42,10 @@ extension Resource {
             ResourceAttributes.deviceManufacturer.rawValue: .string(agentResources.deviceManufacturer),
             ResourceAttributes.deviceId.rawValue: .string(agentResources.deviceID),
 
-            // TODO: DEMRUM-1401 - add translation table from model identifier to model name
             ResourceAttributes.deviceModelName.rawValue: .string(agentResources.deviceModelIdentifier),
 
-
             // OS info
-            // TODO: DEMRUM-1401 - use hardcoded "iOS"?
-            ResourceAttributes.osName.rawValue: .string("iOS"),
+            ResourceAttributes.osName.rawValue: .string(agentResources.osName),
             ResourceAttributes.osVersion.rawValue: .string(agentResources.osVersion),
             ResourceAttributes.osDescription.rawValue: .string(agentResources.osDescription),
             ResourceAttributes.osType.rawValue: .string(agentResources.osType)
