@@ -75,7 +75,6 @@
 		4B385B552D94C594005CF4C9 /* AppStartRemoteConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B385B1C2D94C4EB005CF4C9 /* AppStartRemoteConfiguration.swift */; };
 		4B3B3FF32DCB616200F1BC5C /* SpanInterceptorExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3B3FF22DCB616200F1BC5C /* SpanInterceptorExporter.swift */; };
 		4B6878C12B9F3B420024479A /* ConfigurationHandler+RequestErrorHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B6878C02B9F3B420024479A /* ConfigurationHandler+RequestErrorHandling.swift */; };
-		4B963FEF2D60F7E3009A2E7F /* SplunkLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B963FE52D60F7E3009A2E7F /* SplunkLogger.framework */; };
 		4B96402A2D60FB3B009A2E7F /* SplunkNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640202D60FB3A009A2E7F /* SplunkNetwork.framework */; };
 		4B9640402D60FB4B009A2E7F /* NetworkInstrumentationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5B8D2D5E4C79009DA0D5 /* NetworkInstrumentationConfig.swift */; };
 		4B9640412D60FB4B009A2E7F /* NetworkInstrumentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A5B8B2D5E4C79009DA0D5 /* NetworkInstrumentation.swift */; };
@@ -352,13 +351,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4B385B2E2D94C55A005CF4C9;
 			remoteInfo = SplunkAppStart;
-		};
-		4B963FF02D60F7E3009A2E7F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4B963FE42D60F7E3009A2E7F;
-			remoteInfo = SplunkLogger;
 		};
 		4B96402B2D60FB3B009A2E7F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -673,8 +665,6 @@
 		4B5A5CD72D60F472009DA0D5 /* SessionReplay+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SessionReplay+Module.swift"; sourceTree = "<group>"; };
 		4B5A5CDA2D60F472009DA0D5 /* SplunkSessionReplayProxyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplunkSessionReplayProxyTests.swift; sourceTree = "<group>"; };
 		4B6878C02B9F3B420024479A /* ConfigurationHandler+RequestErrorHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationHandler+RequestErrorHandling.swift"; sourceTree = "<group>"; };
-		4B963FE52D60F7E3009A2E7F /* SplunkLogger.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkLogger.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B963FEE2D60F7E3009A2E7F /* SplunkLoggerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkLoggerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B9640202D60FB3A009A2E7F /* SplunkNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B9640292D60FB3B009A2E7F /* SplunkNetworkTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkNetworkTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B9640842D60FD04009A2E7F /* SplunkCommon.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkCommon.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -899,21 +889,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B385B372D94C55B005CF4C9 /* SplunkAppStart.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B963FE22D60F7E3009A2E7F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B963FEB2D60F7E3009A2E7F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4B963FEF2D60F7E3009A2E7F /* SplunkLogger.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1268,8 +1243,6 @@
 			children = (
 				3384F2A22AC879E900512D79 /* SplunkAgent.framework */,
 				E46896292B21C85800727A6A /* SplunkAgentTests.xctest */,
-				4B963FE52D60F7E3009A2E7F /* SplunkLogger.framework */,
-				4B963FEE2D60F7E3009A2E7F /* SplunkLoggerTests.xctest */,
 				4B9640202D60FB3A009A2E7F /* SplunkNetwork.framework */,
 				4B9640292D60FB3B009A2E7F /* SplunkNetworkTests.xctest */,
 				4B9640842D60FD04009A2E7F /* SplunkCommon.framework */,
@@ -2835,13 +2808,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4B963FE02D60F7E3009A2E7F /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4B96401B2D60FB3A009A2E7F /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -2980,46 +2946,6 @@
 			);
 			productName = SplunkAppStartTests;
 			productReference = 4B385B362D94C55B005CF4C9 /* SplunkAppStartTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		4B963FE42D60F7E3009A2E7F /* SplunkLogger */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4B963FF72D60F7E3009A2E7F /* Build configuration list for PBXNativeTarget "SplunkLogger" */;
-			buildPhases = (
-				4B963FE02D60F7E3009A2E7F /* Headers */,
-				4B963FE12D60F7E3009A2E7F /* Sources */,
-				4B963FE22D60F7E3009A2E7F /* Frameworks */,
-				4B963FE32D60F7E3009A2E7F /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = SplunkLogger;
-			packageProductDependencies = (
-			);
-			productName = SplunkLogger;
-			productReference = 4B963FE52D60F7E3009A2E7F /* SplunkLogger.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		4B963FED2D60F7E3009A2E7F /* SplunkLoggerTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4B963FFE2D60F7E3009A2E7F /* Build configuration list for PBXNativeTarget "SplunkLoggerTests" */;
-			buildPhases = (
-				4B963FEA2D60F7E3009A2E7F /* Sources */,
-				4B963FEB2D60F7E3009A2E7F /* Frameworks */,
-				4B963FEC2D60F7E3009A2E7F /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4B963FF12D60F7E3009A2E7F /* PBXTargetDependency */,
-			);
-			name = SplunkLoggerTests;
-			packageProductDependencies = (
-			);
-			productName = SplunkLoggerTests;
-			productReference = 4B963FEE2D60F7E3009A2E7F /* SplunkLoggerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		4B96401F2D60FB3A009A2E7F /* SplunkNetwork */ = {
@@ -3448,12 +3374,6 @@
 					4B385B352D94C55B005CF4C9 = {
 						CreatedOnToolsVersion = 16.2;
 					};
-					4B963FE42D60F7E3009A2E7F = {
-						CreatedOnToolsVersion = 16.2;
-					};
-					4B963FED2D60F7E3009A2E7F = {
-						CreatedOnToolsVersion = 16.2;
-					};
 					4B96401F2D60FB3A009A2E7F = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -3533,8 +3453,6 @@
 			targets = (
 				3384F2A12AC879E900512D79 /* SplunkAgent */,
 				E46896282B21C85800727A6A /* SplunkAgentTests */,
-				4B963FE42D60F7E3009A2E7F /* SplunkLogger */,
-				4B963FED2D60F7E3009A2E7F /* SplunkLoggerTests */,
 				4B96401F2D60FB3A009A2E7F /* SplunkNetwork */,
 				4B9640282D60FB3B009A2E7F /* SplunkNetworkTests */,
 				4B9640832D60FD04009A2E7F /* SplunkCommon */,
@@ -3577,20 +3495,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B385B342D94C55B005CF4C9 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B963FE32D60F7E3009A2E7F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B963FEC2D60F7E3009A2E7F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3901,20 +3805,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4B963FE12D60F7E3009A2E7F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4B963FEA2D60F7E3009A2E7F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		4B96401C2D60FB3A009A2E7F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -4212,11 +4102,6 @@
 			isa = PBXTargetDependency;
 			target = 4B385B2E2D94C55A005CF4C9 /* SplunkAppStart */;
 			targetProxy = 4B385B382D94C55B005CF4C9 /* PBXContainerItemProxy */;
-		};
-		4B963FF12D60F7E3009A2E7F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4B963FE42D60F7E3009A2E7F /* SplunkLogger */;
-			targetProxy = 4B963FF02D60F7E3009A2E7F /* PBXContainerItemProxy */;
 		};
 		4B96402C2D60FB3B009A2E7F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -5499,372 +5384,6 @@
 				TVOS_DEPLOYMENT_TARGET = 15;
 			};
 			name = "Debug-mh_dylib";
-		};
-		4B963FF82D60F7E3009A2E7F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLogger;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
-				SUPPORTS_MACCATALYST = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3,7";
-				TVOS_DEPLOYMENT_TARGET = 15;
-				XROS_DEPLOYMENT_TARGET = 1;
-			};
-			name = Debug;
-		};
-		4B963FF92D60F7E3009A2E7F /* Debug-mh_dylib */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLogger;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
-				SUPPORTS_MACCATALYST = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3,7";
-				TVOS_DEPLOYMENT_TARGET = 15;
-				XROS_DEPLOYMENT_TARGET = 1;
-			};
-			name = "Debug-mh_dylib";
-		};
-		4B963FFA2D60F7E3009A2E7F /* Debug-staticlib */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLogger;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
-				SUPPORTS_MACCATALYST = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3,7";
-				TVOS_DEPLOYMENT_TARGET = 15;
-				XROS_DEPLOYMENT_TARGET = 1;
-			};
-			name = "Debug-staticlib";
-		};
-		4B963FFB2D60F7E3009A2E7F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLogger;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
-				SUPPORTS_MACCATALYST = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3,7";
-				TVOS_DEPLOYMENT_TARGET = 15;
-				VALIDATE_PRODUCT = YES;
-				XROS_DEPLOYMENT_TARGET = 1;
-			};
-			name = Release;
-		};
-		4B963FFC2D60F7E3009A2E7F /* Release-mh_dylib */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLogger;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
-				SUPPORTS_MACCATALYST = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3,7";
-				TVOS_DEPLOYMENT_TARGET = 15;
-				VALIDATE_PRODUCT = YES;
-				XROS_DEPLOYMENT_TARGET = 1;
-			};
-			name = "Release-mh_dylib";
-		};
-		4B963FFD2D60F7E3009A2E7F /* Release-staticlib */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLogger;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator xros xrsimulator";
-				SUPPORTS_MACCATALYST = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3,7";
-				TVOS_DEPLOYMENT_TARGET = 15;
-				VALIDATE_PRODUCT = YES;
-				XROS_DEPLOYMENT_TARGET = 1;
-			};
-			name = "Release-staticlib";
-		};
-		4B963FFF2D60F7E3009A2E7F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLoggerTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		4B9640002D60F7E3009A2E7F /* Debug-mh_dylib */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLoggerTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = "Debug-mh_dylib";
-		};
-		4B9640012D60F7E3009A2E7F /* Debug-staticlib */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLoggerTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = "Debug-staticlib";
-		};
-		4B9640022D60F7E3009A2E7F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLoggerTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		4B9640032D60F7E3009A2E7F /* Release-mh_dylib */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLoggerTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = "Release-mh_dylib";
-		};
-		4B9640042D60F7E3009A2E7F /* Release-staticlib */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 9J84E5CFM9;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.rum.SplunkLoggerTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-			};
-			name = "Release-staticlib";
 		};
 		4B9640332D60FB3B009A2E7F /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -9220,32 +8739,6 @@
 				4B385B4A2D94C55B005CF4C9 /* Release */,
 				4B385B4B2D94C55B005CF4C9 /* Release-mh_dylib */,
 				4B385B4C2D94C55B005CF4C9 /* Release-staticlib */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4B963FF72D60F7E3009A2E7F /* Build configuration list for PBXNativeTarget "SplunkLogger" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4B963FF82D60F7E3009A2E7F /* Debug */,
-				4B963FF92D60F7E3009A2E7F /* Debug-mh_dylib */,
-				4B963FFA2D60F7E3009A2E7F /* Debug-staticlib */,
-				4B963FFB2D60F7E3009A2E7F /* Release */,
-				4B963FFC2D60F7E3009A2E7F /* Release-mh_dylib */,
-				4B963FFD2D60F7E3009A2E7F /* Release-staticlib */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4B963FFE2D60F7E3009A2E7F /* Build configuration list for PBXNativeTarget "SplunkLoggerTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4B963FFF2D60F7E3009A2E7F /* Debug */,
-				4B9640002D60F7E3009A2E7F /* Debug-mh_dylib */,
-				4B9640012D60F7E3009A2E7F /* Debug-staticlib */,
-				4B9640022D60F7E3009A2E7F /* Release */,
-				4B9640032D60F7E3009A2E7F /* Release-mh_dylib */,
-				4B9640042D60F7E3009A2E7F /* Release-staticlib */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
