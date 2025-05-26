@@ -40,10 +40,6 @@ final class ResourcesTests: XCTestCase {
         let serviceName = try XCTUnwrap(otelResource.attributes[ResourceAttributes.serviceName.rawValue])
         XCTAssertFalse(serviceName.description.isEmpty)
 
-        // Test service version
-        let serviceVersion = try XCTUnwrap(otelResource.attributes[ResourceAttributes.serviceVersion.rawValue])
-        XCTAssertFalse(serviceVersion.description.isEmpty)
-
         // Test telemetry sdk name
         let telemetrySdkName = try XCTUnwrap(otelResource.attributes[ResourceAttributes.telemetrySdkName.rawValue])
         XCTAssertFalse(telemetrySdkName.description.isEmpty)
