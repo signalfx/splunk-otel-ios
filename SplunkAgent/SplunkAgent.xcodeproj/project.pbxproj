@@ -41,10 +41,14 @@
 		2AC68DAA2D9E77B60086EEF7 /* AgentConfigurationProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AC68DA82D9E77B60086EEF7 /* AgentConfigurationProtocol.swift */; };
 		2AC68DAB2D9E77B60086EEF7 /* AgentConfigurationProtocol+MergeRemote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AC68DA92D9E77B60086EEF7 /* AgentConfigurationProtocol+MergeRemote.swift */; };
 		2ADAEFC92B95C85A00DF2214 /* TimeInterval+Nanoseconds.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ADAEFC82B95C85A00DF2214 /* TimeInterval+Nanoseconds.swift */; };
-		2AE423772DE4B1DE00C3AFBF /* MutableAttributes+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE423752DE4B1DE00C3AFBF /* MutableAttributes+Extension.swift */; };
+		2AE423772DE4B1DE00C3AFBF /* MutableAttributes+Conversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE423752DE4B1DE00C3AFBF /* MutableAttributes+Conversion.swift */; };
 		2AE423782DE4B1DE00C3AFBF /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE423762DE4B1DE00C3AFBF /* ThreadSafeDictionary.swift */; };
-		2AE423792DE4B1DE00C3AFBF /* MutableAttributes+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE423752DE4B1DE00C3AFBF /* MutableAttributes+Extension.swift */; };
+		2AE423792DE4B1DE00C3AFBF /* MutableAttributes+Conversion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE423752DE4B1DE00C3AFBF /* MutableAttributes+Conversion.swift */; };
 		2AE4237A2DE4B1DE00C3AFBF /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE423762DE4B1DE00C3AFBF /* ThreadSafeDictionary.swift */; };
+		2AE4237C2DE4B88E00C3AFBF /* MutableAttributes+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE4237B2DE4B88500C3AFBF /* MutableAttributes+Codable.swift */; };
+		2AE4237D2DE4B88E00C3AFBF /* MutableAttributes+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE4237B2DE4B88500C3AFBF /* MutableAttributes+Codable.swift */; };
+		2AE4237F2DE4B8B000C3AFBF /* MutableAttributes+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE4237E2DE4B8AA00C3AFBF /* MutableAttributes+Equatable.swift */; };
+		2AE423802DE4B8B000C3AFBF /* MutableAttributes+Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE4237E2DE4B8AA00C3AFBF /* MutableAttributes+Equatable.swift */; };
 		2AE43AFD2B7B8269002C4A98 /* AppInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43AFC2B7B8269002C4A98 /* AppInfoTests.swift */; };
 		2AE43AFF2B7B8376002C4A98 /* SystemInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43AFE2B7B8376002C4A98 /* SystemInfoTests.swift */; };
 		2AE43B012B7B838D002C4A98 /* DeviceInfoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE43B002B7B838D002C4A98 /* DeviceInfoTests.swift */; };
@@ -586,8 +590,10 @@
 		2AC68DA82D9E77B60086EEF7 /* AgentConfigurationProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentConfigurationProtocol.swift; sourceTree = "<group>"; };
 		2AC68DA92D9E77B60086EEF7 /* AgentConfigurationProtocol+MergeRemote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AgentConfigurationProtocol+MergeRemote.swift"; sourceTree = "<group>"; };
 		2ADAEFC82B95C85A00DF2214 /* TimeInterval+Nanoseconds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Nanoseconds.swift"; sourceTree = "<group>"; };
-		2AE423752DE4B1DE00C3AFBF /* MutableAttributes+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MutableAttributes+Extension.swift"; sourceTree = "<group>"; };
+		2AE423752DE4B1DE00C3AFBF /* MutableAttributes+Conversion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MutableAttributes+Conversion.swift"; sourceTree = "<group>"; };
 		2AE423762DE4B1DE00C3AFBF /* ThreadSafeDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionary.swift; sourceTree = "<group>"; };
+		2AE4237B2DE4B88500C3AFBF /* MutableAttributes+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MutableAttributes+Codable.swift"; sourceTree = "<group>"; };
+		2AE4237E2DE4B8AA00C3AFBF /* MutableAttributes+Equatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MutableAttributes+Equatable.swift"; sourceTree = "<group>"; };
 		2AE43AFC2B7B8269002C4A98 /* AppInfoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfoTests.swift; sourceTree = "<group>"; };
 		2AE43AFE2B7B8376002C4A98 /* SystemInfoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemInfoTests.swift; sourceTree = "<group>"; };
 		2AE43B002B7B838D002C4A98 /* DeviceInfoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfoTests.swift; sourceTree = "<group>"; };
@@ -1163,7 +1169,9 @@
 		2AE423742DE4B16D00C3AFBF /* Attributes */ = {
 			isa = PBXGroup;
 			children = (
-				2AE423752DE4B1DE00C3AFBF /* MutableAttributes+Extension.swift */,
+				2AE4237E2DE4B8AA00C3AFBF /* MutableAttributes+Equatable.swift */,
+				2AE4237B2DE4B88500C3AFBF /* MutableAttributes+Codable.swift */,
+				2AE423752DE4B1DE00C3AFBF /* MutableAttributes+Conversion.swift */,
 				2AE423762DE4B1DE00C3AFBF /* ThreadSafeDictionary.swift */,
 			);
 			path = Attributes;
@@ -3695,11 +3703,13 @@
 				E4A708B32B9754B7002C692E /* RepeatingJob.swift in Sources */,
 				E4EE9ED42BA34A400000D594 /* SessionReplayNonOperationalState.swift in Sources */,
 				E4B737E12BBECEDD00086A93 /* PlatformSupport.swift in Sources */,
+				2AE4237C2DE4B88E00C3AFBF /* MutableAttributes+Codable.swift in Sources */,
 				2AE43B0C2B7FAD9B002C4A98 /* DefaultResources.swift in Sources */,
 				2AF6AABD2DCE081F00BB9DC3 /* SplunkRum+Modules.swift in Sources */,
 				2AB51E992B7A670600307B77 /* DeviceInfo.swift in Sources */,
 				BA4C08502DC8398E008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift in Sources */,
 				E4EE9ED02BA330AE0000D594 /* SessionReplayNonOperational+RecordingMask.swift in Sources */,
+				2AE4237F2DE4B8B000C3AFBF /* MutableAttributes+Equatable.swift in Sources */,
 				E4134BAB2BC6AC5400F0D2FC /* API-1.0-Status.swift in Sources */,
 				4BF895AD2DB3CC7D00E171A4 /* API-1.0-SessionState.swift in Sources */,
 				4BB680F52B7940C0000A54D4 /* API-1.0-SessionReplayStatus.swift in Sources */,
@@ -3735,7 +3745,7 @@
 				4BB680F42B7940C0000A54D4 /* API-1.0-Sensitivity+SwiftUI.swift in Sources */,
 				E4BB4A262B5E9AFA004A86A1 /* AgentModulesPool.swift in Sources */,
 				E4EE9ED22BA332CD0000D594 /* SessionReplayNonOperationalSensitivity.swift in Sources */,
-				2AE423772DE4B1DE00C3AFBF /* MutableAttributes+Extension.swift in Sources */,
+				2AE423772DE4B1DE00C3AFBF /* MutableAttributes+Conversion.swift in Sources */,
 				2AE423782DE4B1DE00C3AFBF /* ThreadSafeDictionary.swift in Sources */,
 				E4EF6E432B18986900206883 /* UserDefaultsStorage.swift in Sources */,
 				E47953C52BA1CF7D0065677D /* SessionReplay+Recording.swift in Sources */,
@@ -4048,6 +4058,7 @@
 				2AAC95E42D6C7427004FAE2C /* String+HexID.swift in Sources */,
 				2AAC95E82D6C78DF004FAE2C /* HexIDTests.swift in Sources */,
 				E4EE9ECA2BA322F50000D594 /* SessionReplayTestBuilder.swift in Sources */,
+				2AE4237D2DE4B88E00C3AFBF /* MutableAttributes+Codable.swift in Sources */,
 				E46896552B22102E00727A6A /* RuntimeStateTests.swift in Sources */,
 				2AE43B042B7BA352002C4A98 /* ResourcesTests.swift in Sources */,
 				E4122CBD2B67D94A0095157B /* DefaultModulesManagerTests.swift in Sources */,
@@ -4076,8 +4087,9 @@
 				BA7A63BC2DB8196800A44570 /* MutableAttributesTests.swift in Sources */,
 				E46896362B21CA0300727A6A /* UserDefaultsStoragePrefixTests.swift in Sources */,
 				E4FAEEB22B6A6A73008D4E6E /* SessionReplayTestModule.swift in Sources */,
+				2AE423802DE4B8B000C3AFBF /* MutableAttributes+Equatable.swift in Sources */,
 				E4032E622B552343003D4392 /* DefaultSessionTestBuilder.swift in Sources */,
-				2AE423792DE4B1DE00C3AFBF /* MutableAttributes+Extension.swift in Sources */,
+				2AE423792DE4B1DE00C3AFBF /* MutableAttributes+Conversion.swift in Sources */,
 				2AE4237A2DE4B1DE00C3AFBF /* ThreadSafeDictionary.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

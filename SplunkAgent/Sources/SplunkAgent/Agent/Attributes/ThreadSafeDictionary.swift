@@ -17,11 +17,14 @@ limitations under the License.
 
 import Foundation
 
-/// A thread-safe dictionary implementation using DispatchQueue
+/// A thread-safe dictionary implementation using DispatchQueue.
 class ThreadSafeDictionary<Key: Hashable, Value> {
-    private var dictionary: [Key: Value]
 
+    // MARK: - Private
+
+    private var dictionary: [Key: Value]
     private let queue: DispatchQueue
+
 
     // MARK: - Initialize
 
@@ -34,6 +37,7 @@ class ThreadSafeDictionary<Key: Hashable, Value> {
         self.dictionary = dictionary
         queue = DispatchQueue(label: "com.splunk.rum.SplunkAgent.MutableAttributes")
     }
+
 
     // MARK: - Subscript
 
@@ -56,6 +60,7 @@ class ThreadSafeDictionary<Key: Hashable, Value> {
         }
     }
 
+
     // MARK: - Get and Set
 
     func value(forKey key: Key) -> Value? {
@@ -65,6 +70,7 @@ class ThreadSafeDictionary<Key: Hashable, Value> {
     func setValue(_ value: Value?, forKey key: Key) {
         self[key] = value
     }
+
 
     // MARK: - Utilities
 
