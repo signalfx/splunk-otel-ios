@@ -21,11 +21,11 @@ public class IgnoreURLs: Codable {
     private var urlPatterns: [NSRegularExpression]
 
     public init() {
-        self.urlPatterns = []
+        urlPatterns = []
     }
 
     public init(patterns: Set<String>) throws {
-        self.urlPatterns = try patterns.map { pattern in
+        urlPatterns = try patterns.map { pattern in
             try NSRegularExpression(pattern: pattern, options: [])
         }
     }
@@ -33,7 +33,7 @@ public class IgnoreURLs: Codable {
     public required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let patterns = try container.decode(Set<String>.self, forKey: .patterns)
-        self.urlPatterns = try patterns.map { pattern in
+        urlPatterns = try patterns.map { pattern in
             try NSRegularExpression(pattern: pattern, options: [])
         }
     }

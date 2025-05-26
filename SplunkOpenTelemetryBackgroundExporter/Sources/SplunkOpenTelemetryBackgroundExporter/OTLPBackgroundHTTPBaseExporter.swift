@@ -104,8 +104,7 @@ public class OTLPBackgroundHTTPBaseExporter {
             //      File names are UUIDs of tasks
             if
                 let requestId = UUID(uuidString: file.key),
-                let taskDescription = taskDescriptions.first(where: { $0.id == requestId })
-            {
+                let taskDescription = taskDescriptions.first(where: { $0.id == requestId }) {
                 let requestDescriptor = RequestDescriptor(
                     id: requestId,
                     endpoint: endpoint,

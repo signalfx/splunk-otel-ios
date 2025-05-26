@@ -64,19 +64,18 @@ class AttributeCheckerSpanExporter: SpanExporter {
 
     private func check(spans: [SpanData]) {
         for span in spans {
-            for requiredAttribute in requiredAttributes {
-                guard let _ = span.attributes[requiredAttribute] else {
-                    let spanName = span.name
+            for requiredAttribute in requiredAttributes where span.attributes[requiredAttribute] == nil {
+                let spanName = span.name
+                let attributes = span.attributes
 
-                    logger.log(level: .error) {
-                        """
-                        ‼️‼️‼️ Span \(spanName) is missing a required attribute: \"\(requiredAttribute)\"
-                        Attributes: \(span.attributes)
-                        """
-                    }
-
-                    continue
+                logger.log(level: .error) {
+                    """
+                    ‼️‼️‼️ Span \(spanName) is missing a required attribute: \"\(requiredAttribute)\"
+                    Attributes: \(attributes)
+                    """
                 }
+
+                continue
             }
         }
     }

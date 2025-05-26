@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-  
+
 internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
@@ -95,11 +95,11 @@ class SplunkStdoutSpanExporter: SpanExporter {
 
         return proxyExporter.export(spans: spans)
     }
-    
+
     public func flush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
         return proxyExporter.flush(explicitTimeout: explicitTimeout)
     }
-    
+
     public func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
     }

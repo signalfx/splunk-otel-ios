@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import XCTest
 @testable import SplunkNetwork
+import XCTest
 
 final class SplunkNetworkTests: XCTestCase {
     func testExample() throws {

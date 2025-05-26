@@ -155,7 +155,7 @@ public class CrashReports {
 
         do {
             try crashReporter?.enableAndReturnError()
-        } catch let error {
+        } catch {
             logger.log(level: .error) {
                 "Could not enable crash reporter: \(error)"
             }

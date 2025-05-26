@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import XCTest
 @testable import SplunkNetwork
+import XCTest
 
 final class IgnoreURLsTests: XCTestCase {
 
@@ -33,7 +33,7 @@ final class IgnoreURLsTests: XCTestCase {
             ".*\\.(jpg|jpeg|png|gif)$",
             ".*/api/.*"
         ])
-        
+
         let ignoreURLs = try IgnoreURLs(patterns: patterns)
         XCTAssertEqual(ignoreURLs.count(), 2)
         XCTAssertEqual(Set(ignoreURLs.getAllPatterns()), patterns)
@@ -42,10 +42,10 @@ final class IgnoreURLsTests: XCTestCase {
     func testInitializerWithInvalidPatterns() {
         let patterns = Set([
             ".*\\.(jpg|jpeg|png|gif)$",
-            "[A-Z",  // Invalid pattern - missing closing bracket
+            "[A-Z", // Invalid pattern - missing closing bracket
             ".*/api/.*"
         ])
-        
+
         XCTAssertThrowsError(try IgnoreURLs(patterns: patterns))
     }
 
@@ -57,7 +57,7 @@ final class IgnoreURLsTests: XCTestCase {
             ".*\\.(jpg|jpeg|png|gif)$",
             ".*/api/.*"
         ])
-        
+
         let addedCount = try ignoreURLs.addPatterns(patterns)
         XCTAssertEqual(addedCount, 2)
         XCTAssertEqual(ignoreURLs.count(), 2)
@@ -74,8 +74,8 @@ final class IgnoreURLsTests: XCTestCase {
 
         // Try to add the same patterns again
         let addedCount = try ignoreURLs.addPatterns(initialPatterns)
-        XCTAssertEqual(addedCount, 0)  // No new patterns added
-        XCTAssertEqual(ignoreURLs.count(), 2)  // Count remains the same
+        XCTAssertEqual(addedCount, 0) // No new patterns added
+        XCTAssertEqual(ignoreURLs.count(), 2) // Count remains the same
         XCTAssertEqual(Set(ignoreURLs.getAllPatterns()), initialPatterns)
     }
 
@@ -93,7 +93,7 @@ final class IgnoreURLsTests: XCTestCase {
         // Then try to add invalid patterns
         let invalidPatterns = Set([
             ".*\\.(pdf|doc)$",
-            "[A-Z",  // Invalid pattern
+            "[A-Z", // Invalid pattern
             ".*/downloads/.*"
         ])
 
@@ -121,7 +121,7 @@ final class IgnoreURLsTests: XCTestCase {
 
 
     // MARK: - URL Matching Tests
-    
+
     func testMatchesWithStringURLs() throws {
         let patterns = Set([
             ".*\\.(jpg|jpeg|png|gif)$",
@@ -158,7 +158,7 @@ final class IgnoreURLsTests: XCTestCase {
 
     func testMatchesWithEmptyPatterns() {
         let ignoreURLs = IgnoreURLs()
-        
+
         // No patterns should mean no matches
         XCTAssertFalse(ignoreURLs.matches("https://example.com/image.jpg"))
     }

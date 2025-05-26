@@ -60,17 +60,17 @@ class AttributeCheckerLogExporter: LogRecordExporter {
 
     private func check(logs: [ReadableLogRecord]) {
         for log in logs {
-            for requiredAttribute in requiredAttributes {
-                guard let _ = log.attributes[requiredAttribute] else {
-                    logger.log(level: .error) {
-                        """
-                        ‼️‼️‼️ LogRecord is missing a required attribute: \"\(requiredAttribute)\" 
-                        Attributes: \(log.attributes)
-                        """
-                    }
+            for requiredAttribute in requiredAttributes where log.attributes[requiredAttribute] == nil {
+                let attributes = log.attributes
 
-                    continue
+                logger.log(level: .error) {
+                    """
+                    ‼️‼️‼️ LogRecord is missing a required attribute: \"\(requiredAttribute)\"
+                    Attributes: \(attributes)
+                    """
                 }
+
+                continue
             }
         }
     }
