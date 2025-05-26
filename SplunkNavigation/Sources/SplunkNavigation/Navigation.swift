@@ -189,7 +189,7 @@ public final class Navigation: Sendable {
                 .values
 
             for await notification in didShowStream {
-                if let event = await navigationEvent(for: notification.object, type: .viewDidLoad) {
+                if let event = await navigationEvent(for: notification.object, type: .viewDidAppear) {
                     await processNavigationEnd(event: event)
                 }
             }

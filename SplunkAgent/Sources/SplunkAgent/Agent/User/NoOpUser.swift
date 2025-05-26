@@ -16,21 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkCommon
 
-public struct ANRReporterConfiguration: ModuleConfiguration {
-
-
-    // MARK: - Public
-
-    public var enabled: Bool
-    public var threshold: CFTimeInterval
-
-
-    // MARK: init()
-
-    public init(enabled: Bool, threshold: CFTimeInterval = 2.0) {
-        self.enabled = enabled
-        self.threshold = threshold
-    }
+/// This struct implements a non operational variant of the AgentUser.
+struct NoOpUser: AgentUser {
+    let userIdentifier = "noop"
+    var trackingMode = UserTrackingMode.noTracking
 }

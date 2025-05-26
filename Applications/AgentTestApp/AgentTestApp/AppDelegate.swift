@@ -37,16 +37,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             deploymentEnvironment: "dev"
         )
             .enableDebugLogging(true)
+            .globalAttributes(MutableAttributes(dictionary: [
+                "teststring": .string("value"),
+                "testint": .int(100)]))
             .spanInterceptor { spanData in
                 var attributes = spanData.attributes
                 // attributes["test_attribute"] = AttributeValue("test_value")
 
                 var modifiedSpan = spanData
                 modifiedSpan.settingAttributes(attributes)
-                
+
                 return modifiedSpan
             }
-
         do {
             _ = try SplunkRum.install(with: agentConfig)
         } catch {
@@ -54,7 +56,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         // Navigation Instrumentation
-        SplunkRum.shared?.navigation.preferences.enableAutomatedTracking = true
+        SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
+
 
         return true
     }

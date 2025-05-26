@@ -16,19 +16,11 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkCommon
 
-public struct ANRReporterRemoteConfiguration: RemoteModuleConfiguration {
+/// This struct implements a non operational variant of the AgentAppStateManager.
+struct NoOpAppStateManager: AgentAppStateManager {
 
-
-    // MARK: - Public
-
-    public var enabled: Bool
-
-
-    // MARK: init()
-
-    public init?(from data: Data) {
-        self.enabled = true
+    func appState(for timestamp: Date) -> AppState? {
+        return nil
     }
 }

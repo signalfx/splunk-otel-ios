@@ -28,7 +28,7 @@ struct ConfigurationDefaults {
 
     static var sessionSamplingRate = 1.0
 
-    static var globalAttributes: [String: String] = [:]
+    static var globalAttributes = MutableAttributes()
 
     static var sessionTimeout = 15.0 * 60.0
 
