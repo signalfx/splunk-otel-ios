@@ -19,7 +19,7 @@ import Foundation
 import OpenTelemetryApi
 
 public class MutableAttributes {
-    fileprivate var attributes: ThreadSafeDictionary<String, AttributeValue>
+    var attributes: ThreadSafeDictionary<String, AttributeValue>
 
     // MARK: - Initialize
 
