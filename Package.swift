@@ -38,8 +38,9 @@ let package = Package(
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkAppStart",
-		"SplunkWebView",
-		"SplunkWebViewProxy",
+                "SplunkWebView",
+                "SplunkWebViewProxy",
+                "SplunkCustomTracking",
                 .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
             ],
             path: "SplunkAgent",
@@ -201,8 +202,8 @@ let package = Package(
             dependencies: ["SplunkOpenTelemetryBackgroundExporter", "SplunkCommon"],
             path: "SplunkOpenTelemetryBackgroundExporter/Tests"
         ),
-        
-        
+
+
         // MARK: Splunk App Start
         
         .target(
@@ -224,9 +225,10 @@ let package = Package(
             ],
             path: "SplunkAppStart/Tests"
         ),
-        
+
+
         // MARK: Splunk Web Instrumentation
-    
+        
         .target(
             name: "SplunkWebView",
             dependencies: [
@@ -243,6 +245,7 @@ let package = Package(
             ],
             path: "SplunkWebView/Tests"
         ),
+
 
         // MARK: Splunk Web Instrumentation Proxy
         
@@ -267,8 +270,31 @@ let package = Package(
             ],
             path: "SplunkWebViewProxy/Tests"
         ),
+
+
+        // MARK: Splunk Custom Tracking
         
-        
+        .target(
+            name: "SplunkCustomTracking",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+            ],
+            path: "SplunkCustomTracking/Sources"
+        ),
+        .testTarget(
+            name: "SplunkCustomTrackingTests",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                "SplunkCustomTracking",
+                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+            ],
+            path: "SplunkCustomTracking/Tests"
+        ),
+
+
         // MARK: Session Replay Proxy
         
         .target(
