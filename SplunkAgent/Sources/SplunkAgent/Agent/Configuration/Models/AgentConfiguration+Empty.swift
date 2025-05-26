@@ -17,15 +17,12 @@ limitations under the License.
 
 import Foundation
 
-public struct EventMetadataANR {
-
-
-    // MARK: - Public
-
-    public var timestamp: Date = Date()
-
-
-    // MARK: - Internal
-
-    let id: String
+extension AgentConfiguration {
+    static var emptyConfiguration: AgentConfiguration {
+        return AgentConfiguration(
+            endpoint: EndpointConfiguration(realm: "", rumAccessToken: ""),
+            appName: "",
+            deploymentEnvironment: ""
+        )
+    }
 }

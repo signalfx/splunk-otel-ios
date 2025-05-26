@@ -36,7 +36,7 @@ public class NetworkInstrumentation {
     private let delegateClassNames = [
         "__NSURLSessionLocal",
         "__NSCFURLSessionConnection",
-        "__NSCFRULLocalSessionConnection",
+        "__NSCFURLLocalSessionConnection",
         "__NSCFURLSession",
         "__NSCFURLSessionTask",
         "__NSCFURLSessionDataTask",

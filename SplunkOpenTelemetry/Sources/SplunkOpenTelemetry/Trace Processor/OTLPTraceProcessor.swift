@@ -39,6 +39,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         with tracesEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
+        globalAttributes: [String: Any],
         debugEnabled: Bool,
         spanInterceptor: SplunkSpanInterceptor?
     ) {
@@ -71,6 +72,9 @@ public class OTLPTraceProcessor: TraceProcessor {
         let spanProcessor = SimpleSpanProcessor(spanExporter: spanInterceptorExporter)
         let attributesProcessor = OLTPAttributesSpanProcessor(with: runtimeAttributes)
 
+        // Global Attributes processor
+        let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(with: globalAttributes)
+
         // Build Resources
         var resource = Resource()
         resource.merge(with: resources)
@@ -78,6 +82,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         // Initialize tracer provider
         let tracerProviderBuilder = TracerProviderBuilder()
             .with(resource: resource)
+            .add(spanProcessor: globalAttributesProcessor)
             .add(spanProcessor: attributesProcessor)
             .add(spanProcessor: spanProcessor)
 

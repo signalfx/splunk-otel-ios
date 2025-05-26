@@ -15,19 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SwiftUI
+import Foundation
 
-struct DemoTitle: View {
+/// This struct implements a non operational variant of the AgentSession.
+struct NoOpSession: AgentSession {
+    let currentSessionItem = SessionItem(id: "no-op", start: Date())
 
-    let title: String
-
-    init(_ title: String) {
-        self.title = title
+    var currentSessionId: String {
+        currentSessionItem.id
     }
 
-    var body: some View {
-        Text(title)
-            .font(.headline)
-            .padding(15)
+    func sessionId(for timestamp: Date) -> String? {
+        return currentSessionItem.id
     }
 }
