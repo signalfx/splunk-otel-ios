@@ -23,16 +23,16 @@ import SplunkCommon
 
 public struct SplunkTrackableEvent: SplunkTrackable {
     public var typeName: String
-    public var attributes: [String: EventAttributeValue]
+    public var attributes: MutableAttributes
 
     // Initializer for event attributes
-    public init(typeName: String, attributes: [String: EventAttributeValue] = [:]) {
+    public init(typeName: String, attributes: MutableAttributes = [:]) {
         self.typeName = typeName
         self.attributes = attributes
     }
 
     // Initializer for generic attributes
-    public init(typeName: String, attributes: [String: Any] = [:]) {
+    public init(typeName: String, attributes: MutableAttributes = [:]) {
         self.typeName = typeName
         self.attributes = [:]
         setAttributes(attributes: attributes)
@@ -41,54 +41,6 @@ public struct SplunkTrackableEvent: SplunkTrackable {
     // Converts trackable item to event attributes
     public func toEventAttributes() -> [String: EventAttributeValue] {
         return attributes
-    }
-}
-
-
-// MARK: - Attribute Handling Extension
-
-public extension SplunkTrackableEvent {
-    mutating func set(_ key: String, value: Int) {
-        attributes[key] = .int(value)
-    }
-
-    mutating func set(_ key: String, value: String) {
-        attributes[key] = .string(value)
-    }
-
-    mutating func set(_ key: String, value: Double) {
-        attributes[key] = .double(value)
-    }
-
-    mutating func set(_ key: String, value: Data) {
-        attributes[key] = .data(value)
-    }
-
-    mutating func set(_ key: String, value: EventAttributeValue) {
-        attributes[key] = value
-    }
-
-    func get(_ key: String) -> EventAttributeValue? {
-        return attributes[key]
-    }
-}
-
-
-// MARK: - Attribute Initialization Extension
-
-private extension SplunkTrackableEvent {
-    mutating func setAttributes(attributes: [String: Any]) {
-        for (key, value) in attributes {
-            if let stringValue = value as? String {
-                set(key, value: .string(stringValue))
-            } else if let intValue = value as? Int {
-                set(key, value: .int(intValue))
-            } else if let doubleValue = value as? Double {
-                set(key, value: .double(doubleValue))
-            } else if let dataValue = value as? Data {
-                set(key, value: .data(dataValue))
-            }
-        }
     }
 }
 

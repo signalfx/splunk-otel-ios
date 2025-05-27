@@ -15,6 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import SplunkCommon
+
+
 public extension CustomTracking {
 
 
@@ -39,7 +42,7 @@ public extension CustomTracking {
 
     // MARK: - Custom Error Tracking
 
-    func track(issue: SplunkTrackableIssue, attributes: MutableAttributes) {
+    func track<T: SplunkTrackableIssue>(issue: T, attributes: MutableAttributes) {
         OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "customError")
         /*
         guard let onPublishBlock = onPublishBlock else {

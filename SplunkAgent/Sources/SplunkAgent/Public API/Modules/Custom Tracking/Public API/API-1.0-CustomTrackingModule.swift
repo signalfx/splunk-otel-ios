@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Combine
+import Foundation
 import SplunkCommon
 
 
@@ -56,7 +57,7 @@ public protocol CustomTrackingModule {
     /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
     ///
     /// - Returns: The updated `CustomTrackingModule` instance.
-    func trackError(_ message: String, _ attributes: MutableAttributes?) -> any CustomTrackingModule
+    func trackError(_ message: String, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
 
     // MARK: - Error
@@ -68,7 +69,7 @@ public protocol CustomTrackingModule {
     /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
     ///
     /// - Returns: The updated `CustomTrackingModule` instance.
-    func trackError(_ error: Error, _ attributes: MutableAttributes?) -> any CustomTrackingModule
+    func trackError(_ error: Error, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
 
     // MARK: - NSError
@@ -80,7 +81,7 @@ public protocol CustomTrackingModule {
     /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
     ///
     /// - Returns: The updated `CustomTrackingModule` instance.
-    func trackError(_ nsError: NSError, _ attributes: MutableAttributes?) -> any CustomTrackingModule
+    func trackError(_ nsError: NSError, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
 
     // MARK: - NSException
@@ -92,7 +93,7 @@ public protocol CustomTrackingModule {
     /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
     ///
     /// - Returns: The updated `CustomTrackingModule` instance.
-    func trackException(_ exception: NSException, _ attributes: MutableAttributes?) -> any CustomTrackingModule
+    func trackException(_ exception: NSException, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
 
     // MARK: - Helpers
@@ -111,18 +112,18 @@ extension CustomTrackingModule {
     // Get around the obstinance of protocols not letting calling code omit an argument
 
     func trackError(_ message: String) -> any CustomTrackingModule {
-        return trackError(message, nil)
+        return trackError(message, MutableAttributes())
     }
 
     func trackError(_ error: Error) -> any CustomTrackingModule {
-        return trackError(error, nil)
+        return trackError(error, MutableAttributes())
     }
 
     func trackError(_ nsError: NSError) -> any CustomTrackingModule {
-        return trackError(nsError, nil)
+        return trackError(nsError, MutableAttributes())
     }
 
     func trackException(_ exception: NSException) -> any CustomTrackingModule {
-        return trackException(exception, nil)
+        return trackException(exception, MutableAttributes())
     }
 }
