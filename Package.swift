@@ -3,119 +3,6 @@
 import class Foundation.ProcessInfo
 import PackageDescription
 
-// MARK: - Binary target registry
-
-/// Registry containing all Session Replay binary target definitions.
-struct SessionReplayBinaryRegistry {
-
-    /// Internal descriptor of the Target structure, including its Wrapper name for generation.
-    struct BinaryTargetInfo {
-        let name: String
-        let url: String
-        let checksum: String
-        let productName: String
-        let wrapperName: String
-    }
-
-    static let targets: [String: BinaryTargetInfo] = [
-        "logger": BinaryTargetInfo(
-            name: "CiscoLogger",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/logger-ios-sdk-1.0.1.zip",
-            checksum: "403cf7060207186c0d5a26a01fff0a1a4647cc81b608feb4eeb9230afa1e7b16",
-            productName: "CiscoLogger",
-            wrapperName: "CiscoLoggerWrapper"
-        ),
-        "encryptor": BinaryTargetInfo(
-            name: "CiscoEncryption",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/encryption-ios-sdk-1.0.254.zip",
-            checksum: "236d2ae950c7decb528d8290359c58c22c662cdc1e42899d7544edd9760d893c",
-            productName: "CiscoEncryption",
-            wrapperName: "CiscoEncryptionWrapper"
-        ),
-        "swizzling": BinaryTargetInfo(
-            name: "CiscoSwizzling",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/swizzling-ios-sdk-1.0.254.zip",
-            checksum: "a6cd8fb5c463bb9e660f560acfa5b33e4c5271fda222047b417bd531a8c0c956",
-            productName: "CiscoSwizzling",
-            wrapperName: "CiscoSwizzlingWrapper"
-        ),
-        "interactions": BinaryTargetInfo(
-            name: "CiscoInteractions",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/interactions-ios-sdk-1.0.254.zip",
-            checksum: "65c53ade295f34ad7876919f935f428b2ebb016236b21add72b5946a9f57789c",
-            productName: "CiscoInteractions",
-            wrapperName: "CiscoInteractionsWrapper"
-        ),
-        "diskStorage": BinaryTargetInfo(
-            name: "CiscoDiskStorage",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/disk-storage-ios-sdk-1.0.254.zip",
-            checksum: "1b47895f1793a690ce68fca431e72f689a38470423af392e9785135e514d93de",
-            productName: "CiscoDiskStorage",
-            wrapperName: "CiscoDiskStorageWrapper"
-        ),
-        "sessionReplay": BinaryTargetInfo(
-            name: "CiscoSessionReplay",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/session-replay-ios-sdk-1.0.6.254.zip",
-            checksum: "d1cf5141c4710fcd5af8c957aa57e319c7f28ee338cc64e6f7283f19aaa66a71",
-            productName: "CiscoSessionReplay",
-            wrapperName: "CiscoSessionReplayWrapper"
-        ),
-        "instanceManager": BinaryTargetInfo(
-            name: "CiscoInstanceManager",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/instance-manager-ios-sdk-1.0.254.zip",
-            checksum: "fe0bc116914ef408ac2e015aa0fa482774a35868cf803f19a7e593bbaeae6ef3",
-            productName: "CiscoInstanceManager",
-            wrapperName: "CiscoInstanceManagerWrapper"
-        ),
-        "runtimeCache": BinaryTargetInfo(
-            name: "CiscoRuntimeCache",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/runtime-cache-ios-sdk-1.0.254.zip",
-            checksum: "4bed11f441350f9b52726b2d8e88f1647bd702325e5128d956eb814b05ea028b",
-            productName: "CiscoRuntimeCache",
-            wrapperName: "CiscoRuntimeCacheWrapper"
-        )
-    ]
-}
-
-/// Determines which dependency resolution strategy to use.
-/// Defaults to `.binaryTargets`, present in the `current` property.
-enum DependencyResolutionStrategy {
-
-    /// SessionReplay dependencies are linked as binary targets
-    /// fetched from S3 storage.
-    case binaryTargets
-
-    /// SessionReplay dependencies are linked as products
-    /// from a SPM-linked SR repository.
-    case repositoryDependency
-
-    static var current: DependencyResolutionStrategy {
-        if shouldUseSessionReplayAsRepositoryDependency() {
-            return .repositoryDependency
-        } else {
-            return .binaryTargets
-        }
-    }
-}
-
-/// Resolves a dependency based on the current strategy
-/// - Parameter key: The key from SessionReplayBinaryRegistry.targets
-/// - Returns: A dependency reference (either wrapper target name or product reference)
-func resolveDependency(_ key: String) -> Target.Dependency {
-    guard let targetInfo = SessionReplayBinaryRegistry.targets[key] else {
-        fatalError("Unknown Session Replay dependency key: \(key)")
-    }
-
-    switch DependencyResolutionStrategy.current {
-    case .binaryTargets:
-        return .byName(name: targetInfo.wrapperName)
-
-    case .repositoryDependency:
-        return .product(name: targetInfo.productName, package: "smartlook-ios-sdk-private")
-    }
-}
-
-
 // MARK: - Package and target definitions
 
 // Create the package instance base.
@@ -210,7 +97,7 @@ func generateMainTargets() -> [Target] {
             path: "SplunkNetwork/Tests"
         ),
 
-        
+
         // MARK: - Splunk Common
 
         .target(
@@ -533,6 +420,119 @@ func generateBinaryWrapperTargets() -> [Target] {
             path: "TargetWrappers/CiscoSessionReplayWrapper/Sources"
         )
     ]
+}
+
+
+// MARK: - Binary target registry
+
+/// Registry containing all Session Replay binary target definitions.
+struct SessionReplayBinaryRegistry {
+
+    /// Internal descriptor of the Target structure, including its Wrapper name for generation.
+    struct BinaryTargetInfo {
+        let name: String
+        let url: String
+        let checksum: String
+        let productName: String
+        let wrapperName: String
+    }
+
+    static let targets: [String: BinaryTargetInfo] = [
+        "logger": BinaryTargetInfo(
+            name: "CiscoLogger",
+            url: "https://sdk.smartlook.com/splunk-agent-test/ios/logger-ios-sdk-1.0.1.zip",
+            checksum: "403cf7060207186c0d5a26a01fff0a1a4647cc81b608feb4eeb9230afa1e7b16",
+            productName: "CiscoLogger",
+            wrapperName: "CiscoLoggerWrapper"
+        ),
+        "encryptor": BinaryTargetInfo(
+            name: "CiscoEncryption",
+            url: "https://sdk.smartlook.com/splunk-agent-test/ios/encryption-ios-sdk-1.0.254.zip",
+            checksum: "236d2ae950c7decb528d8290359c58c22c662cdc1e42899d7544edd9760d893c",
+            productName: "CiscoEncryption",
+            wrapperName: "CiscoEncryptionWrapper"
+        ),
+        "swizzling": BinaryTargetInfo(
+            name: "CiscoSwizzling",
+            url: "https://sdk.smartlook.com/splunk-agent-test/ios/swizzling-ios-sdk-1.0.254.zip",
+            checksum: "a6cd8fb5c463bb9e660f560acfa5b33e4c5271fda222047b417bd531a8c0c956",
+            productName: "CiscoSwizzling",
+            wrapperName: "CiscoSwizzlingWrapper"
+        ),
+        "interactions": BinaryTargetInfo(
+            name: "CiscoInteractions",
+            url: "https://sdk.smartlook.com/splunk-agent-test/ios/interactions-ios-sdk-1.0.254.zip",
+            checksum: "65c53ade295f34ad7876919f935f428b2ebb016236b21add72b5946a9f57789c",
+            productName: "CiscoInteractions",
+            wrapperName: "CiscoInteractionsWrapper"
+        ),
+        "diskStorage": BinaryTargetInfo(
+            name: "CiscoDiskStorage",
+            url: "https://sdk.smartlook.com/splunk-agent-test/ios/disk-storage-ios-sdk-1.0.254.zip",
+            checksum: "1b47895f1793a690ce68fca431e72f689a38470423af392e9785135e514d93de",
+            productName: "CiscoDiskStorage",
+            wrapperName: "CiscoDiskStorageWrapper"
+        ),
+        "sessionReplay": BinaryTargetInfo(
+            name: "CiscoSessionReplay",
+            url: "https://sdk.smartlook.com/splunk-agent-test/ios/session-replay-ios-sdk-1.0.6.254.zip",
+            checksum: "d1cf5141c4710fcd5af8c957aa57e319c7f28ee338cc64e6f7283f19aaa66a71",
+            productName: "CiscoSessionReplay",
+            wrapperName: "CiscoSessionReplayWrapper"
+        ),
+        "instanceManager": BinaryTargetInfo(
+            name: "CiscoInstanceManager",
+            url: "https://sdk.smartlook.com/splunk-agent-test/ios/instance-manager-ios-sdk-1.0.254.zip",
+            checksum: "fe0bc116914ef408ac2e015aa0fa482774a35868cf803f19a7e593bbaeae6ef3",
+            productName: "CiscoInstanceManager",
+            wrapperName: "CiscoInstanceManagerWrapper"
+        ),
+        "runtimeCache": BinaryTargetInfo(
+            name: "CiscoRuntimeCache",
+            url: "https://sdk.smartlook.com/splunk-agent-test/ios/runtime-cache-ios-sdk-1.0.254.zip",
+            checksum: "4bed11f441350f9b52726b2d8e88f1647bd702325e5128d956eb814b05ea028b",
+            productName: "CiscoRuntimeCache",
+            wrapperName: "CiscoRuntimeCacheWrapper"
+        )
+    ]
+}
+
+/// Determines which dependency resolution strategy to use.
+/// Defaults to `.binaryTargets`, present in the `current` property.
+enum DependencyResolutionStrategy {
+
+    /// SessionReplay dependencies are linked as binary targets
+    /// fetched from S3 storage.
+    case binaryTargets
+
+    /// SessionReplay dependencies are linked as products
+    /// from a SPM-linked SR repository.
+    case repositoryDependency
+
+    static var current: DependencyResolutionStrategy {
+        if shouldUseSessionReplayAsRepositoryDependency() {
+            return .repositoryDependency
+        } else {
+            return .binaryTargets
+        }
+    }
+}
+
+/// Resolves a dependency based on the current strategy
+/// - Parameter key: The key from SessionReplayBinaryRegistry.targets
+/// - Returns: A dependency reference (either wrapper target name or product reference)
+func resolveDependency(_ key: String) -> Target.Dependency {
+    guard let targetInfo = SessionReplayBinaryRegistry.targets[key] else {
+        fatalError("Unknown Session Replay dependency key: \(key)")
+    }
+
+    switch DependencyResolutionStrategy.current {
+    case .binaryTargets:
+        return .byName(name: targetInfo.wrapperName)
+
+    case .repositoryDependency:
+        return .product(name: targetInfo.productName, package: "smartlook-ios-sdk-private")
+    }
 }
 
 
