@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkCommon
 
 /// NetworkInfo remote configuration.
 public struct NetworkInfoRemoteConfiguration: RemoteModuleConfiguration {
@@ -28,7 +27,7 @@ public struct NetworkInfoRemoteConfiguration: RemoteModuleConfiguration {
     }
 
     struct MRUMRoot: Decodable {
-        let appStart: NetworkInfo
+        let networkInfo: NetworkInfo
     }
 
     struct Configuration: Decodable {

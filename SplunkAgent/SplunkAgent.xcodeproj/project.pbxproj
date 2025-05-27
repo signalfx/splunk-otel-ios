@@ -916,11 +916,6 @@
 			path = SplunkNetworkInfo;
 			sourceTree = "<group>";
 		};
-		BA3376F52DE55DA500F45723 /* SplunkNetworkInfoTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = SplunkNetworkInfoTests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1336,13 +1331,12 @@
 				4B5A5BD62D5E4FBC009DA0D5 /* SplunkSlowFrameDetector */,
 				4B5A5BC32D5E4E33009DA0D5 /* SplunkCommon */,
 				4B5A5B932D5E4C79009DA0D5 /* SplunkNetwork */,
+				BA33771E2DE5606F00F45723 /* SplunkNetworkInfo */,
 				BA3376932DDD020700F45723 /* SplunkNetworkInfo */,
 				4B536BF12B67FADC004A6C7C /* Configurations */,
 				E4E9747A2B1643EE00ACB469 /* Sources */,
 				E46896332B21C8FF00727A6A /* Tests */,
 				E4F2E4EC2B1721CB006EBA69 /* Tools */,
-				BA3376D62DE55D2600F45723 /* SplunkNetworkInfo */,
-				BA3376F52DE55DA500F45723 /* SplunkNetworkInfoTests */,
 				3384F2A32AC879E900512D79 /* Products */,
 				E45F8C952BC5881E007AC144 /* Packages */,
 				526521F42CB8937800DB3BB9 /* Frameworks */,
@@ -2426,6 +2420,14 @@
 				BA33769A2DDD2AD800F45723 /* NetworkInfoRemoteConfiguration.swift */,
 			);
 			path = Module;
+			sourceTree = "<group>";
+		};
+		BA33771E2DE5606F00F45723 /* SplunkNetworkInfo */ = {
+			isa = PBXGroup;
+			children = (
+				BA3376D62DE55D2600F45723 /* SplunkNetworkInfo */,
+			);
+			path = SplunkNetworkInfo;
 			sourceTree = "<group>";
 		};
 		BA7A63BA2DB818AD00A44570 /* Model */ = {
@@ -3720,9 +3722,6 @@
 			);
 			dependencies = (
 				BA3376FA2DE55DA500F45723 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				BA3376F52DE55DA500F45723 /* SplunkNetworkInfoTests */,
 			);
 			name = SplunkNetworkInfoTests;
 			packageProductDependencies = (
