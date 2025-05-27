@@ -25,7 +25,7 @@ public class NetworkInfo {
         case cellular
         case wiredEthernet
         case other
-        case unavailable
+        case lost
     }
 
     public static let shared = NetworkMonitor()
@@ -35,7 +35,7 @@ public class NetworkInfo {
     private let tracer: Tracer
 
     public private(set) var isConnected: Bool = false
-    public private(set) var connectionType: ConnectionType = .unavailable
+    public private(set) var connectionType: ConnectionType = .lost
     public private(set) var isVPNActive: Bool = false
 
     public var statusChangeHandler: ((Bool, ConnectionType, Bool) -> Void)?
@@ -71,7 +71,7 @@ public class NetworkInfo {
         } else if path.usesInterfaceType(.wiredEthernet) {
             return .wiredEthernet
         } else if path.status == .unsatisfied {
-            return .unavailable
+            return .lost
         } else {
             return .other
         }
@@ -80,7 +80,7 @@ public class NetworkInfo {
     private func sendNetworkChangeSpan() {
         let span = tracer.spanBuilder(spanName: "network.change").startSpan()
         span.setAttribute(key: "network.connected", value: isConnected)
-        span.setAttribute(key: "network.type", value: connectionType.rawValue)
+        span.setAttribute(key: "network.connection.type", value: connectionType.rawValue)
         span.setAttribute(key: "network.vpn", value: isVPNActive)
         span.end()
     }

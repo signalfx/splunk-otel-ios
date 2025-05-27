@@ -742,6 +742,9 @@
 		52D945A72DC0A70700DE8220 /* SplunkWebViewProxy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkWebViewProxy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		52D945AF2DC0A70700DE8220 /* SplunkWebViewProxyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkWebViewProxyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA3376982DDD042300F45723 /* NetworkInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInfo.swift; sourceTree = "<group>"; };
+		BA33769A2DDD2AD800F45723 /* NetworkInfoRemoteConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInfoRemoteConfiguration.swift; sourceTree = "<group>"; };
+		BA33769B2DDD2ADC00F45723 /* NetworkInfoConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInfoConfiguration.swift; sourceTree = "<group>"; };
+		BA33769C2DDD2AE100F45723 /* NetworkInfo+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkInfo+Module.swift"; sourceTree = "<group>"; };
 		BA4C084E2DC83988008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPGlobalAttributesSpanProcessor.swift; sourceTree = "<group>"; };
 		BA4C08512DC83AF0008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPGlobalAttributesLogRecordProcessor.swift; sourceTree = "<group>"; };
 		BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributesTests.swift; sourceTree = "<group>"; };
@@ -2348,6 +2351,7 @@
 			isa = PBXGroup;
 			children = (
 				BA3376982DDD042300F45723 /* NetworkInfo.swift */,
+				BA3376992DDD2A9900F45723 /* Module */,
 			);
 			path = SplunkNetworkInfo;
 			sourceTree = "<group>";
@@ -2357,6 +2361,16 @@
 			children = (
 			);
 			path = SplunkNetworkInfoTests;
+			sourceTree = "<group>";
+		};
+		BA3376992DDD2A9900F45723 /* Module */ = {
+			isa = PBXGroup;
+			children = (
+				BA33769C2DDD2AE100F45723 /* NetworkInfo+Module.swift */,
+				BA33769B2DDD2ADC00F45723 /* NetworkInfoConfiguration.swift */,
+				BA33769A2DDD2AD800F45723 /* NetworkInfoRemoteConfiguration.swift */,
+			);
+			path = Module;
 			sourceTree = "<group>";
 		};
 		BA7A63BA2DB818AD00A44570 /* Model */ = {
