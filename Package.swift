@@ -79,6 +79,22 @@ let package = Package(
             path: "SplunkNetwork/Tests"
         ),
         
+        // MARK: Splunk Network Info
+        
+        .target(
+            name: "SplunkNetworkInfo",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry"
+            ],
+            path: "SplunkNetworkInfo/Sources"
+        ),
+        .testTarget(
+            name: "SplunkNetworkInfoTests",
+            dependencies: ["SplunkNetworkInfo"],
+            path: "SplunkNetworkInfo/Tests"
+        ),
+        
         // MARK: Splunk Common
         
         .target(

@@ -177,6 +177,7 @@
 		52D945C42DC0A71200DE8220 /* SplunkWebView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D945612DC0A62C00DE8220 /* SplunkWebView.framework */; };
 		52D945C52DC0A73700DE8220 /* SplunkCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; platformFilters = (ios, maccatalyst, tvos, ); };
 		52D945C92DC0A7F500DE8220 /* CiscoLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 52D945C82DC0A7F500DE8220 /* CiscoLogger */; };
+		BA3376F82DE55DA500F45723 /* SplunkAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3384F2A22AC879E900512D79 /* SplunkAgent.framework */; };
 		BA4C084F2DC8398E008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4C084E2DC83988008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift */; };
 		BA4C08502DC8398E008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4C084E2DC83988008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift */; };
 		BA4C08522DC83AFD008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4C08512DC83AF0008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift */; };
@@ -512,6 +513,13 @@
 			remoteGlobalIDString = 4B9640832D60FD04009A2E7F;
 			remoteInfo = SplunkCommon;
 		};
+		BA3376F92DE55DA500F45723 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3384F2A12AC879E900512D79;
+			remoteInfo = SplunkAgent;
+		};
 		E468962E2B21C85800727A6A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
@@ -745,6 +753,8 @@
 		BA33769A2DDD2AD800F45723 /* NetworkInfoRemoteConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInfoRemoteConfiguration.swift; sourceTree = "<group>"; };
 		BA33769B2DDD2ADC00F45723 /* NetworkInfoConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInfoConfiguration.swift; sourceTree = "<group>"; };
 		BA33769C2DDD2AE100F45723 /* NetworkInfo+Module.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkInfo+Module.swift"; sourceTree = "<group>"; };
+		BA3376D52DE55D2600F45723 /* SplunkNetworkInfo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SplunkNetworkInfo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BA3376F42DE55DA500F45723 /* SplunkNetworkInfoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SplunkNetworkInfoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA4C084E2DC83988008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPGlobalAttributesSpanProcessor.swift; sourceTree = "<group>"; };
 		BA4C08512DC83AF0008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTLPGlobalAttributesLogRecordProcessor.swift; sourceTree = "<group>"; };
 		BA7A63BB2DB8196800A44570 /* MutableAttributesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableAttributesTests.swift; sourceTree = "<group>"; };
@@ -886,6 +896,32 @@
 		E4FAEEB02B6A51AA008D4E6E /* DefaultModulesManagerTestBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultModulesManagerTestBuilder.swift; sourceTree = "<group>"; };
 		E4FAEEB62B6A9F81008D4E6E /* RemoteConfiguration.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = RemoteConfiguration.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BA3376DB2DE55D2600F45723 /* Exceptions for "SplunkNetworkInfo" folder in "SplunkNetworkInfo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			publicHeaders = (
+				SplunkNetworkInfo.h,
+			);
+			target = BA3376D42DE55D2600F45723 /* SplunkNetworkInfo */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		BA3376D62DE55D2600F45723 /* SplunkNetworkInfo */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BA3376DB2DE55D2600F45723 /* Exceptions for "SplunkNetworkInfo" folder in "SplunkNetworkInfo" target */,
+			);
+			path = SplunkNetworkInfo;
+			sourceTree = "<group>";
+		};
+		BA3376F52DE55DA500F45723 /* SplunkNetworkInfoTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SplunkNetworkInfoTests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		3384F29F2AC879E900512D79 /* Frameworks */ = {
@@ -1103,6 +1139,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BA3376D22DE55D2600F45723 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BA3376F12DE55DA500F45723 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BA3376F82DE55DA500F45723 /* SplunkAgent.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E46896262B21C85800727A6A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1290,6 +1341,8 @@
 				E4E9747A2B1643EE00ACB469 /* Sources */,
 				E46896332B21C8FF00727A6A /* Tests */,
 				E4F2E4EC2B1721CB006EBA69 /* Tools */,
+				BA3376D62DE55D2600F45723 /* SplunkNetworkInfo */,
+				BA3376F52DE55DA500F45723 /* SplunkNetworkInfoTests */,
 				3384F2A32AC879E900512D79 /* Products */,
 				E45F8C952BC5881E007AC144 /* Packages */,
 				526521F42CB8937800DB3BB9 /* Frameworks */,
@@ -1323,6 +1376,8 @@
 				52D945692DC0A62D00DE8220 /* SplunkWebViewTests.xctest */,
 				52D945A72DC0A70700DE8220 /* SplunkWebViewProxy.framework */,
 				52D945AF2DC0A70700DE8220 /* SplunkWebViewProxyTests.xctest */,
+				BA3376D52DE55D2600F45723 /* SplunkNetworkInfo.framework */,
+				BA3376F42DE55DA500F45723 /* SplunkNetworkInfoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3118,6 +3173,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BA3376D02DE55D2600F45723 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -3623,6 +3685,52 @@
 			productReference = 52D945AF2DC0A70700DE8220 /* SplunkWebViewProxyTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		BA3376D42DE55D2600F45723 /* SplunkNetworkInfo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BA3376DC2DE55D2600F45723 /* Build configuration list for PBXNativeTarget "SplunkNetworkInfo" */;
+			buildPhases = (
+				BA3376D02DE55D2600F45723 /* Headers */,
+				BA3376D12DE55D2600F45723 /* Sources */,
+				BA3376D22DE55D2600F45723 /* Frameworks */,
+				BA3376D32DE55D2600F45723 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				BA3376D62DE55D2600F45723 /* SplunkNetworkInfo */,
+			);
+			name = SplunkNetworkInfo;
+			packageProductDependencies = (
+			);
+			productName = SplunkNetworkInfo;
+			productReference = BA3376D52DE55D2600F45723 /* SplunkNetworkInfo.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		BA3376F32DE55DA500F45723 /* SplunkNetworkInfoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BA3376FB2DE55DA500F45723 /* Build configuration list for PBXNativeTarget "SplunkNetworkInfoTests" */;
+			buildPhases = (
+				BA3376F02DE55DA500F45723 /* Sources */,
+				BA3376F12DE55DA500F45723 /* Frameworks */,
+				BA3376F22DE55DA500F45723 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BA3376FA2DE55DA500F45723 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				BA3376F52DE55DA500F45723 /* SplunkNetworkInfoTests */,
+			);
+			name = SplunkNetworkInfoTests;
+			packageProductDependencies = (
+			);
+			productName = SplunkNetworkInfoTests;
+			productReference = BA3376F42DE55DA500F45723 /* SplunkNetworkInfoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		E46896282B21C85800727A6A /* SplunkAgentTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E46896322B21C85800727A6A /* Build configuration list for PBXNativeTarget "SplunkAgentTests" */;
@@ -3649,7 +3757,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1630;
+				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1630;
 				TargetAttributes = {
 					3384F2A12AC879E900512D79 = {
@@ -3721,6 +3829,12 @@
 					52D945AE2DC0A70700DE8220 = {
 						CreatedOnToolsVersion = 16.3;
 					};
+					BA3376D42DE55D2600F45723 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					BA3376F32DE55DA500F45723 = {
+						CreatedOnToolsVersion = 16.2;
+					};
 					E46896282B21C85800727A6A = {
 						CreatedOnToolsVersion = 15.0.1;
 					};
@@ -3768,6 +3882,8 @@
 				52D945682DC0A62D00DE8220 /* SplunkWebViewTests */,
 				52D945A62DC0A70700DE8220 /* SplunkWebViewProxy */,
 				52D945AE2DC0A70700DE8220 /* SplunkWebViewProxyTests */,
+				BA3376D42DE55D2600F45723 /* SplunkNetworkInfo */,
+				BA3376F32DE55DA500F45723 /* SplunkNetworkInfoTests */,
 			);
 		};
 /* End PBXProject section */
@@ -3930,6 +4046,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		52D945AD2DC0A70700DE8220 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BA3376D32DE55D2600F45723 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BA3376F22DE55DA500F45723 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -4328,6 +4458,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BA3376D12DE55D2600F45723 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BA3376F02DE55DA500F45723 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E46896252B21C85800727A6A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -4550,6 +4694,11 @@
 			);
 			target = 4B9640832D60FD04009A2E7F /* SplunkCommon */;
 			targetProxy = 52D945CC2DC0A84D00DE8220 /* PBXContainerItemProxy */;
+		};
+		BA3376FA2DE55DA500F45723 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3384F2A12AC879E900512D79 /* SplunkAgent */;
+			targetProxy = BA3376F92DE55DA500F45723 /* PBXContainerItemProxy */;
 		};
 		E468962F2B21C85800727A6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -9336,6 +9485,348 @@
 			};
 			name = "Release-staticlib";
 		};
+		BA3376DD2DE55D2600F45723 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BA3376DE2DE55D2600F45723 /* Debug-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-mh_dylib";
+		};
+		BA3376DF2DE55D2600F45723 /* Debug-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-staticlib";
+		};
+		BA3376E02DE55D2600F45723 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BA3376E12DE55D2600F45723 /* Release-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-mh_dylib";
+		};
+		BA3376E22DE55D2600F45723 /* Release-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfo;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-staticlib";
+		};
+		BA3376FC2DE55DA500F45723 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3GU8KX3K7W;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BA3376FD2DE55DA500F45723 /* Debug-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3GU8KX3K7W;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-mh_dylib";
+		};
+		BA3376FE2DE55DA500F45723 /* Debug-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3GU8KX3K7W;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = "Debug-staticlib";
+		};
+		BA3376FF2DE55DA500F45723 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3GU8KX3K7W;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BA3377002DE55DA500F45723 /* Release-mh_dylib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3GU8KX3K7W;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-mh_dylib";
+		};
+		BA3377012DE55DA500F45723 /* Release-staticlib */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3GU8KX3K7W;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.splunk.SplunkNetworkInfoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = "Release-staticlib";
+		};
 		E46896302B21C85800727A6A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4B536BFF2B693BED004A6C7C /* Debug-mh_dylib.xcconfig */;
@@ -9698,6 +10189,32 @@
 				52D945C12DC0A70700DE8220 /* Release */,
 				52D945C22DC0A70700DE8220 /* Release-mh_dylib */,
 				52D945C32DC0A70700DE8220 /* Release-staticlib */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BA3376DC2DE55D2600F45723 /* Build configuration list for PBXNativeTarget "SplunkNetworkInfo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BA3376DD2DE55D2600F45723 /* Debug */,
+				BA3376DE2DE55D2600F45723 /* Debug-mh_dylib */,
+				BA3376DF2DE55D2600F45723 /* Debug-staticlib */,
+				BA3376E02DE55D2600F45723 /* Release */,
+				BA3376E12DE55D2600F45723 /* Release-mh_dylib */,
+				BA3376E22DE55D2600F45723 /* Release-staticlib */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BA3376FB2DE55DA500F45723 /* Build configuration list for PBXNativeTarget "SplunkNetworkInfoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BA3376FC2DE55DA500F45723 /* Debug */,
+				BA3376FD2DE55DA500F45723 /* Debug-mh_dylib */,
+				BA3376FE2DE55DA500F45723 /* Debug-staticlib */,
+				BA3376FF2DE55DA500F45723 /* Release */,
+				BA3377002DE55DA500F45723 /* Release-mh_dylib */,
+				BA3377012DE55DA500F45723 /* Release-staticlib */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
