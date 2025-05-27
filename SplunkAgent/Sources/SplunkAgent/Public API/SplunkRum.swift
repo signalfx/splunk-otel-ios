@@ -56,6 +56,8 @@ public class SplunkRum: ObservableObject {
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
 
+    lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
+
 
     // MARK: - Platform Support
 
@@ -99,6 +101,11 @@ public class SplunkRum: ObservableObject {
     /// An object that holds session replay module.
     public var sessionReplay: any SessionReplayModule {
         sessionReplayProxy
+    }
+
+    /// An object that holds the Custom Tracking  module.
+    public var customTracking: any CustomTrackingModule {
+        customTrackingProxy
     }
 
 
