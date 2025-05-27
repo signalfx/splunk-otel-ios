@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 import Network
+import OpenTelemetryApi
 
 public class NetworkInfo {
     public enum ConnectionType: String {
@@ -27,7 +28,7 @@ public class NetworkInfo {
         case lost
     }
 
-    public static let shared = NetworkMonitor()
+    public static let shared = NetworkInfo()
 
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitorQueue")
@@ -42,11 +43,11 @@ public class NetworkInfo {
     // MARK: - Initialization
 
     // Module conformance
-    public required init() {}
+    public required init() {
+        self.tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "NetworkInfo", instrumentationVersion: "1.0")
+    }
 
     public func startDetection() {
-        self.tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "NetworkMonitor", instrumentationVersion: "1.0")
-
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self = self else { return }
             self.isConnected = path.status == .satisfied

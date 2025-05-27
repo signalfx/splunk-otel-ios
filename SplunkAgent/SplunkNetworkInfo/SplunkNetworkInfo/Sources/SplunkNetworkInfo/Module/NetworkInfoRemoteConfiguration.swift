@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkCommon
 
 /// NetworkInfo remote configuration.
 public struct NetworkInfoRemoteConfiguration: RemoteModuleConfiguration {

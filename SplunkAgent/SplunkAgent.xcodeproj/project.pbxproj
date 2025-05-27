@@ -178,6 +178,9 @@
 		52D945C52DC0A73700DE8220 /* SplunkCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; platformFilters = (ios, maccatalyst, tvos, ); };
 		52D945C92DC0A7F500DE8220 /* CiscoLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 52D945C82DC0A7F500DE8220 /* CiscoLogger */; };
 		BA3376F82DE55DA500F45723 /* SplunkAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3384F2A22AC879E900512D79 /* SplunkAgent.framework */; };
+		BA33771F2DE5FFA400F45723 /* SplunkCommon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; };
+		BA3377202DE5FFA400F45723 /* SplunkCommon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4B9640842D60FD04009A2E7F /* SplunkCommon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BA3377252DE6014900F45723 /* OpenTelemetryApi in Frameworks */ = {isa = PBXBuildFile; productRef = BA3377242DE6014900F45723 /* OpenTelemetryApi */; };
 		BA4C084F2DC8398E008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4C084E2DC83988008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift */; };
 		BA4C08502DC8398E008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4C084E2DC83988008BFD5E /* OTLPGlobalAttributesSpanProcessor.swift */; };
 		BA4C08522DC83AFD008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA4C08512DC83AF0008BFD5E /* OTLPGlobalAttributesLogRecordProcessor.swift */; };
@@ -520,6 +523,13 @@
 			remoteGlobalIDString = 3384F2A12AC879E900512D79;
 			remoteInfo = SplunkAgent;
 		};
+		BA3377212DE5FFA400F45723 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B9640832D60FD04009A2E7F;
+			remoteInfo = SplunkCommon;
+		};
 		E468962E2B21C85800727A6A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3384F2992AC879E900512D79 /* Project object */;
@@ -564,6 +574,17 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BA3377232DE5FFA400F45723 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BA3377202DE5FFA400F45723 /* SplunkCommon.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1138,6 +1159,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BA33771F2DE5FFA400F45723 /* SplunkCommon.framework in Frameworks */,
+				BA3377252DE6014900F45723 /* OpenTelemetryApi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3695,16 +3718,19 @@
 				BA3376D12DE55D2600F45723 /* Sources */,
 				BA3376D22DE55D2600F45723 /* Frameworks */,
 				BA3376D32DE55D2600F45723 /* Resources */,
+				BA3377232DE5FFA400F45723 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				BA3377222DE5FFA400F45723 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				BA3376D62DE55D2600F45723 /* SplunkNetworkInfo */,
 			);
 			name = SplunkNetworkInfo;
 			packageProductDependencies = (
+				BA3377242DE6014900F45723 /* OpenTelemetryApi */,
 			);
 			productName = SplunkNetworkInfo;
 			productReference = BA3376D52DE55D2600F45723 /* SplunkNetworkInfo.framework */;
@@ -4698,6 +4724,11 @@
 			isa = PBXTargetDependency;
 			target = 3384F2A12AC879E900512D79 /* SplunkAgent */;
 			targetProxy = BA3376F92DE55DA500F45723 /* PBXContainerItemProxy */;
+		};
+		BA3377222DE5FFA400F45723 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B9640832D60FD04009A2E7F /* SplunkCommon */;
+			targetProxy = BA3377212DE5FFA400F45723 /* PBXContainerItemProxy */;
 		};
 		E468962F2B21C85800727A6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -10329,6 +10360,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B9642812D613B32009A2E7F /* XCRemoteSwiftPackageReference "smartlook-ios-sdk-private" */;
 			productName = CiscoLogger;
+		};
+		BA3377242DE6014900F45723 /* OpenTelemetryApi */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4B0F23872D79F2C000EA575A /* XCRemoteSwiftPackageReference "opentelemetry-swift" */;
+			productName = OpenTelemetryApi;
 		};
 		C791ADFA2DAE72D5002AAA2B /* OpenTelemetryProtocolExporter */ = {
 			isa = XCSwiftPackageProductDependency;
