@@ -26,14 +26,15 @@ final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
     let moduleProxy = CustomTrackingTestBuilder.buildNonOperational()
 
 
-    // MARK: - Custom Event Tracking
+    // MARK: - Custom Tracking: Event
 
     func testTrackCustomEvent() throws {
-        XCTAssertNotNil(moduleProxy.trackCustomEvent("testEvent"))
+        let attributes = MutableAttributes()
+        XCTAssertNotNil(moduleProxy.trackCustomEvent("testEvent", attributes))
     }
 
 
-    // MARK: - Custom Error Tracking
+    // MARK: - Custom Tracking: Errors
 
     func testTrackErrorString() throws {
         let testErrorString = "TestErrorString"
@@ -52,7 +53,8 @@ final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
     }
     
     func testTrackException() throws {
-        let testException = NSException(name: "TestException", reason: nil, userInfo: nil)
+        let exceptionName = NSExceptionName("TestException")
+        let testException = NSException(name: exceptionName, reason: nil, userInfo: nil)
         XCTAssertNotNil(moduleProxy.trackException(testException))
     }
 }
