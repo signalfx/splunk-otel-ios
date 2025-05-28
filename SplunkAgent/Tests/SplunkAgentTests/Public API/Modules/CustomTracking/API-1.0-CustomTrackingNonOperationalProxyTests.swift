@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 @testable import SplunkAgent
+@testable import SplunkCommon
 import XCTest
 
 final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
