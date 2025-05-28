@@ -36,23 +36,23 @@ extension CustomTrackingNonOperational {
 
     // MARK: - Track Errors
 
-    func trackError(_ message: String, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
+    func trackError(_ message: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         logAccess(toApi: "trackError:message:attributes")
         return self
     }
 
-    func trackError(_ error: Error, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
+    func trackError(_ error: Error, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         logAccess(toApi: "trackError:error:attributes")
         return self
     }
 
-    func trackError(_ nsError: NSError, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
+    func trackError(_ nsError: NSError, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         logAccess(toApi: "trackError:nsError:attributes")
         return self
     }
 
-    func trackException(_ exception: NSException, _ attributes: MutableAttributes? = nil) -> any CustomTrackingModule {
-        logAccess(toApi: "trackError:exception:attributes")
+    func trackException(_ exception: NSException, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
+        logAccess(toApi: "trackException:exception:attributes")
         return self
     }
 }

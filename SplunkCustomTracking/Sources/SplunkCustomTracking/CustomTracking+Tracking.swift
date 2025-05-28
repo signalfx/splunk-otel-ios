@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import OpenTelemetryApi
 import SplunkCommon
 
 public extension CustomTracking {
@@ -37,8 +38,7 @@ public extension CustomTracking {
         // Metadata and data for the event
         let metadata = InternalCustomTrackingMetadata()
 
-        // Pass `MutableAttributes` directly into `InternalCustomTrackingData`
-        let data = InternalCustomTrackingData(name: event.typeName, attributes: event.toMutableAttributes())
+        let data = InternalCustomTrackingData(name: event.typeName, attributes: event.toAttributesDictionary())
 
         // Publish the event using the block
         onPublishBlock(metadata, data)
@@ -47,7 +47,7 @@ public extension CustomTracking {
 
     // MARK: - Custom Error Tracking
 
-    func track(issue: SplunkTrackableIssue, attributes: MutableAttributes) {
+    func track(_ issue: SplunkTrackableIssue, _ attributes: [String: AttributeValue]) {
         // OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "customError")
 
         // Ensure the `onPublishBlock` is set
@@ -60,9 +60,7 @@ public extension CustomTracking {
         let metadata = InternalCustomTrackingMetadata()
 
         // Combine the provided attributes with attributes from the issue
-        let combinedAttributes = MutableAttributes()
-        combinedAttributes.addDictionary(attributes.getAll())
-        combinedAttributes.addDictionary(issue.toMutableAttributes().getAll())
+        let combinedAttributes = attributes.merging(issue.toAttributesDictionary()) { $1 }
 
         // Create the tracking data
         let data = InternalCustomTrackingData(name: issue.typeName, attributes: combinedAttributes)

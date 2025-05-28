@@ -17,7 +17,7 @@ limitations under the License.
 
 import CiscoLogger
 import Foundation
-import SplunkAgent
+import OpenTelemetryApi
 import SplunkCommon
 
 
@@ -47,9 +47,9 @@ public final class CustomTracking {
 
     internal struct InternalCustomTrackingData: ModuleEventData {
         public let name: String
-        public let attributes: MutableAttributes
+        public let attributes: [String: AttributeValue]
 
-        public init(name: String, attributes: MutableAttributes) {
+        public init(name: String, attributes: [String: AttributeValue]) {
             self.name = name
             self.attributes = attributes
         }

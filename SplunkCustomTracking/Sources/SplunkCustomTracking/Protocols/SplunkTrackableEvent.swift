@@ -16,32 +16,28 @@ limitations under the License.
 */
 
 import Foundation
+import OpenTelemetryApi
 import SplunkCommon
 
-
-// MARK: - SplunkTrackableEvent Struct
-
-import Foundation
-import SplunkAgent
-import SplunkCommon
 
 // MARK: - SplunkTrackableEvent Struct
 
 public struct SplunkTrackableEvent: SplunkTrackable {
+    public var timestampEnd: Date?
     public var typeName: String
-    public var attributes: MutableAttributes
+    public var attributes: [String: AttributeValue]
 
     // Simplified initializer for events
-    public init(typeName: String, attributes: MutableAttributes = MutableAttributes()) {
+    public init(typeName: String, attributes: [String: AttributeValue] = [:]) {
         self.typeName = typeName
         self.attributes = attributes
     }
 
-    // Converts trackable item to mutable attributes
-    public func toMutableAttributes() -> MutableAttributes {
+    public func toAttributesDictionary() -> [String: AttributeValue] {
         return attributes
     }
 }
+
 
 // MARK: - Protocol Conformance Extension
 
