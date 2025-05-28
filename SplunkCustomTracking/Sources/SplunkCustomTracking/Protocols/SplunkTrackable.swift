@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkAgent
+import OpenTelemetryApi
 import SplunkCommon
 
 
@@ -33,12 +33,13 @@ public protocol SplunkTrackable {
     /// Example: in the Issue family, `typeName`s are CustomType, Error, NSError, NSException
     var typeName: String { get }
 
-    /// Timestamp when the trackable item was created
+    /// Timestamp when the trackable item was created or when a duration started
     var timestamp: Date { get }
 
-    /// Converts the trackable item to mutable attributes
-    func toMutableAttributes() -> MutableAttributes
+    /// Converts the trackable item to a dictionary representation using `[String: AttributeValue]`.
+    func toAttributesDictionary() -> [String: AttributeValue]
 }
+
 
 // MARK: - Default Implementations
 

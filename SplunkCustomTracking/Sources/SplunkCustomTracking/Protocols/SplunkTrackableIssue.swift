@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import OpenTelemetryApi
 import SplunkCommon
 
 
@@ -29,24 +30,27 @@ public protocol SplunkTrackableIssue: SplunkTrackable {
 
 // MARK: - Default Implementation for SplunkTrackableIssue
 
-public extension SplunkTrackableIssue {
-    var typeFamily: String {
-        "Issue"
-    }
 
-    func toMutableAttributes() -> MutableAttributes {
-        let attributes = MutableAttributes()
+public extension SplunkTrackableIssue {
+    func toAttributesDictionary() -> [String: AttributeValue] {
+        var attributes: [String: AttributeValue] = [:]
 
         // Set required attributes
-        attributes.setString(typeName, for: ErrorAttributeKeys.Exception.type.rawValue)
-        attributes.setString(message, for: ErrorAttributeKeys.Exception.message.rawValue)
+        attributes[ErrorAttributeKeys.Exception.type.rawValue] = .string(typeName)
+        attributes[ErrorAttributeKeys.Exception.message.rawValue] = .string(message)
 
         // Optionally set stacktrace if it exists
         if let stacktrace = stacktrace {
-            attributes.setString(stacktrace.formatted, for: ErrorAttributeKeys.Exception.stacktrace.rawValue)
+            attributes[ErrorAttributeKeys.Exception.stacktrace.rawValue] = .string(stacktrace.formatted)
         }
 
         return attributes
+    }
+}
+
+public extension SplunkTrackableIssue {
+    var typeFamily: String {
+        "Issue"
     }
 }
 

@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 internal import SplunkCommon
 internal import CiscoLogger
-internal import SplunkCustomTrackingProxy
+internal import SplunkCustomTracking
 
 // MARK: - Custom Tracking data event
 
@@ -36,7 +36,7 @@ struct CustomTrackingDataEvent: AgentEvent {
     var attributes: [String: SplunkCommon.EventAttributeValue]?
     var body: SplunkCommon.EventAttributeValue?
 
-    private let internalLogger = InternalLogger(configuration: .agent(category: "CustomTrackingDataEvent"))
+    private let internalLogger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "CustomTrackingDataEvent")
 
 
     // MARK: - Initialization

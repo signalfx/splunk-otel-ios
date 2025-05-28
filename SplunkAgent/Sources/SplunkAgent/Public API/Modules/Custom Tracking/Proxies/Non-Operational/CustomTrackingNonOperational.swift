@@ -35,18 +35,18 @@ final class CustomTrackingNonOperational: CustomTrackingModule {
     // MARK: - Initialization
 
     init() {
-//        internalLogger = DefaultLogAgent(configuration: .agent(category: "CustomTracking Module (Non-Operational)"))
+        internalLogger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "LogCustomTracking")
     }
 
 
     // MARK: - Logger
 
     func logAccess(toApi named: String) {
-//        internalLogger.log(level: .notice, isPrivate: true) {
-//            """
-//            Attempt to access the API of a remotely disabled CustomTracking module. \n
-//            API: `\(named)`
-//            """
-//        }
+        internalLogger.log(level: .notice, isPrivate: true) {
+            """
+            Attempt to access the API of a remotely disabled CustomTracking module. \n
+            API: `\(named)`
+            """
+        }
     }
 }
