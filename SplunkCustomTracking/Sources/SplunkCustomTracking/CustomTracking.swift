@@ -27,9 +27,11 @@ public final class CustomTracking {
 
     public static var instance = CustomTracking()
 
+
     // MARK: - Private Properties
 
-    private let internalLogger = InternalLogger(configuration: .default(subsystem: "SplunkCustomTracking", category: "Data"))
+    private let internalLogger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "LogCustomTracking")
+
 
     // Shared state
     public unowned var sharedState: AgentSharedState?
@@ -39,30 +41,17 @@ public final class CustomTracking {
     // Module conformance
     public required init() {}
 
-    private struct InternalCustomTrackingMetadata: ModuleEventMetadata {
+    internal struct InternalCustomTrackingMetadata: ModuleEventMetadata {
         public var timestamp = Date()
     }
 
-    private struct InternalCustomTrackingData: ModuleEventData {
+    internal struct InternalCustomTrackingData: ModuleEventData {
         public let name: String
-        public let attributes: [String: EventAttributeValue]
-    }
-}
+        public let attributes: MutableAttributes
 
-
-private extension EventAttributeValue {
-    static func convert(from value: Any) -> EventAttributeValue {
-        switch value {
-        case let stringValue as String:
-            return .string(stringValue)
-        case let intValue as Int:
-            return .int(intValue)
-        case let doubleValue as Double:
-            return .double(doubleValue)
-        case let dataValue as Data:
-            return .data(dataValue)
-        default:
-            return .string(String(describing: value))
+        public init(name: String, attributes: MutableAttributes) {
+            self.name = name
+            self.attributes = attributes
         }
     }
 }
