@@ -17,6 +17,7 @@ limitations under the License.
 
 import CiscoLogger
 import Foundation
+import SplunkAgent
 import SplunkCommon
 
 

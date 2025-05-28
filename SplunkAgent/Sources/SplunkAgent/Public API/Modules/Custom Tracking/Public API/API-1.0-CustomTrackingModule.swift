@@ -17,7 +17,7 @@ limitations under the License.
 
 import Combine
 import Foundation
-import SplunkCommon
+internal import SplunkCommon
 
 
 // MARK: - CustomTracking

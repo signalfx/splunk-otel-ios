@@ -21,6 +21,12 @@ import SplunkCommon
 
 // MARK: - SplunkTrackableEvent Struct
 
+import Foundation
+import SplunkAgent
+import SplunkCommon
+
+// MARK: - SplunkTrackableEvent Struct
+
 public struct SplunkTrackableEvent: SplunkTrackable {
     public var typeName: String
     public var attributes: MutableAttributes

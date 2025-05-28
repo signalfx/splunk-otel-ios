@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkCustomTracking
 import XCTest
 
 final class SplunkCustomTrackingTests: XCTestCase {
