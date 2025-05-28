@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import SplunkCommon
-import SplunkCustomTracking
 
 
 // `CustomTrackingData` can be used as an event type that the module produces.
