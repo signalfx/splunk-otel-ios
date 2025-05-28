@@ -24,41 +24,31 @@ extension CustomTracking {
 
     // MARK: - Public API
 
-    /// Track a custom event.
-    @discardableResult public func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) -> any CustomTrackingModule {
+
+    /// Track a custom event by name with attributes.
+    @discardableResult public func trackCustomEvent(_ name: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         let event = SplunkTrackableEvent(typeName: name, attributes: attributes)
-        module.track(event: event)
+        module.track(event: event) // internal track(event:)
         return self
     }
 
-    /// Track an error (String message) with optional attributes.
-    @discardableResult public func trackError(_ message: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        let issue = SplunkIssue(from: message)
+    @discardableResult public func trackError(_ error: Any, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
+        let issue: SplunkTrackableIssue
 
-        // TODO: DEMRUM-861 something going on with the module here; it's resolving
-        // this to the wrong track()ee
-        module.track(issue: issue as SplunkTrackableIssue, attributes: attributes)
-        return self
-    }
+        if let stringError = error as? String {
+            issue = SplunkIssue(from: stringError)
+        } else if let swiftError = error as? Error {
+            issue = SplunkIssue(from: swiftError)
+        } else if let nsError = error as? NSError {
+            issue = SplunkIssue(from: nsError)
+        } else if let exception = error as? NSException {
+            issue = SplunkIssue(from: exception)
+        } else {
+            print("Warning: Unsupported error type provided.")
+            return self
+        }
 
-    /// Track an Error (Swift conforming type) with optional attributes.
-    @discardableResult public func trackError(_ error: Error, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        let issue = SplunkIssue(from: error)
-        module.track(issue: issue, attributes: attributes)
-        return self
-    }
-
-    /// Track an NSError object with optional attributes.
-    @discardableResult public func trackError(_ nsError: NSError, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        let issue = SplunkIssue(from: nsError)
-        module.track(issue: issue, attributes: attributes)
-        return self
-    }
-
-    /// Track an NSException object with optional attributes.
-    @discardableResult public func trackException(_ exception: NSException, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        let issue = SplunkIssue(from: exception)
-        module.track(issue: issue, attributes: attributes)
+        module.track(issue, attributes)
         return self
     }
 }
