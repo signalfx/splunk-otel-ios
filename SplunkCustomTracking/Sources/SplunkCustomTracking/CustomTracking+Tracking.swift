@@ -26,7 +26,7 @@ public extension CustomTracking {
 
     // MARK: - Custom Event Tracking
 
-    func track(event: SplunkTrackableEvent) {
+    func track(_ event: SplunkTrackableEvent) {
         // OTelEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "customEvent")
 
         // Ensure the `onPublishBlock` is set
