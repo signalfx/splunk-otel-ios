@@ -26,37 +26,48 @@ public extension CustomTracking {
     // MARK: - Custom Event Tracking
 
     func track(event: SplunkTrackableEvent) {
-        OTelEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "customEvent")
-        /*
+        // OTelEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "customEvent")
+
+        // Ensure the `onPublishBlock` is set
         guard let onPublishBlock = onPublishBlock else {
             print("onPublish block not set!")
             return
         }
+
+        // Metadata and data for the event
         let metadata = InternalCustomTrackingMetadata()
-        let data = InternalCustomTrackingData(name: event.typeName, attributes: event.toEventAttributes())
+
+        // Pass `MutableAttributes` directly into `InternalCustomTrackingData`
+        let data = InternalCustomTrackingData(name: event.typeName, attributes: event.toMutableAttributes())
+
+        // Publish the event using the block
         onPublishBlock(metadata, data)
-         */
     }
 
 
     // MARK: - Custom Error Tracking
 
-    func track<T: SplunkTrackableIssue>(issue: T, attributes: MutableAttributes) {
-        OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "customError")
-        /*
+    func track(issue: SplunkTrackableIssue, attributes: MutableAttributes) {
+        // OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "customError")
+
+        // Ensure the `onPublishBlock` is set
         guard let onPublishBlock = onPublishBlock else {
             print("onPublish block not set!")
             return
         }
+
+        // Metadata for the issue
         let metadata = InternalCustomTrackingMetadata()
-        // Convert public-facing attributes to internal EventAttributeValue
-        let convertedAttributes = attributes.mapValues { EventAttributeValue.convert(from: $0) }
-        var allAttributes = convertedAttributes
-        for (key, value) in issue.toEventAttributes() {
-            allAttributes[key] = value
-        }
-        let data = InternalCustomTrackingData(name: issue.typeName, attributes: allAttributes)
+
+        // Combine the provided attributes with attributes from the issue
+        let combinedAttributes = MutableAttributes()
+        combinedAttributes.addDictionary(attributes.getAll())
+        combinedAttributes.addDictionary(issue.toMutableAttributes().getAll())
+
+        // Create the tracking data
+        let data = InternalCustomTrackingData(name: issue.typeName, attributes: combinedAttributes)
+
+        // Publish the issue using the block
         onPublishBlock(metadata, data)
-        */
     }
 }
