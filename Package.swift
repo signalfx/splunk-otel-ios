@@ -128,6 +128,7 @@ func generateMainTargets() -> [Target] {
             path: "SplunkSlowFrameDetector/Tests"
         ),
 
+
         // MARK: - SplunkCrashReporter
 
         .target(
@@ -221,6 +222,7 @@ func generateMainTargets() -> [Target] {
             path: "SplunkOpenTelemetryBackgroundExporter/Tests"
         ),
 
+
         // MARK: - Splunk App Start
         
         .target(
@@ -296,7 +298,7 @@ func generateMainTargets() -> [Target] {
             dependencies: [
                 "SplunkCommon",
                 "SplunkOpenTelemetry",
-                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+                resolveDependency("logger")
             ],
             path: "SplunkCustomTracking/Sources"
         ),
@@ -306,7 +308,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 "SplunkOpenTelemetry",
                 "SplunkCustomTracking",
-                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+                resolveDependency("logger")
             ],
             path: "SplunkCustomTracking/Tests"
         ),
