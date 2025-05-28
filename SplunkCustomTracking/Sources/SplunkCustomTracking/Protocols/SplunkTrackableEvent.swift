@@ -31,25 +31,17 @@ public struct SplunkTrackableEvent: SplunkTrackable {
     public var typeName: String
     public var attributes: MutableAttributes
 
-    // Initializer for event attributes
-    public init(typeName: String, attributes: MutableAttributes = [:]) {
+    // Simplified initializer for events
+    public init(typeName: String, attributes: MutableAttributes = MutableAttributes()) {
         self.typeName = typeName
         self.attributes = attributes
     }
 
-    // Initializer for generic attributes
-    public init(typeName: String, attributes: MutableAttributes = [:]) {
-        self.typeName = typeName
-        self.attributes = [:]
-        setAttributes(attributes: attributes)
-    }
-
-    // Converts trackable item to event attributes
-    public func toEventAttributes() -> [String: EventAttributeValue] {
+    // Converts trackable item to mutable attributes
+    public func toMutableAttributes() -> MutableAttributes {
         return attributes
     }
 }
-
 
 // MARK: - Protocol Conformance Extension
 
@@ -58,3 +50,4 @@ public extension SplunkTrackableEvent {
         "Event"
     }
 }
+

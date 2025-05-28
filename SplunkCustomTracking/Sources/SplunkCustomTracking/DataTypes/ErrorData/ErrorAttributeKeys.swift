@@ -19,9 +19,9 @@ import Foundation
 import SplunkCommon
 
 
-// MARK: - AttributeKey helper
+// MARK: - AttributeKey Protocol
 
-
+/// Protocol defining the base requirements for attribute keys.
 protocol AttributeKey {
     var rawValue: String { get }
 }
@@ -29,10 +29,9 @@ protocol AttributeKey {
 
 // MARK: - ErrorAttributeKeys
 
-
-/// Namespace with OpenTelemetry semantic convention keys for error reporting
+/// Namespace with OpenTelemetry semantic convention keys for error reporting.
 enum ErrorAttributeKeys {
-    /// Exception-specific attribute keys
+    /// Exception-specific attribute keys.
     enum Exception: String, AttributeKey {
         case type = "exception.type"
         case message = "exception.message"
@@ -41,23 +40,13 @@ enum ErrorAttributeKeys {
         case escaped = "exception.escaped"
     }
 
-    /// ErrorCode-specific attribute keys
+    /// ErrorCode-specific attribute keys.
     enum ErrorCode: String, AttributeKey {
         case namespace = "code.namespace"
     }
 
-    /// Service-specific attribute keys
+    /// Service-specific attribute keys.
     enum Service: String, AttributeKey {
         case name = "service.name"
-    }
-}
-
-
-// MARK: - Dictionary convenience extension
-
-extension Dictionary where Key == String, Value == EventAttributeValue {
-    /// Initialize a dictionary from attribute keys
-    init<T: AttributeKey>(_ keyed: [T: Value]) {
-        self.init(uniqueKeysWithValues: keyed.map { ($0.rawValue, $1) })
     }
 }

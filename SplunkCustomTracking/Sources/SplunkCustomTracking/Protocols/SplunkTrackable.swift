@@ -36,10 +36,9 @@ public protocol SplunkTrackable {
     /// Timestamp when the trackable item was created
     var timestamp: Date { get }
 
-    /// Converts the trackable item to event attributes
-    func toEventAttributes() -> [String: EventAttributeValue]
+    /// Converts the trackable item to mutable attributes
+    func toMutableAttributes() -> MutableAttributes
 }
-
 
 // MARK: - Default Implementations
 
@@ -49,3 +48,4 @@ public extension SplunkTrackable {
         Date()
     }
 }
+

@@ -34,17 +34,19 @@ public extension SplunkTrackableIssue {
         "Issue"
     }
 
-    func toEventAttributes() -> [String: EventAttributeValue] {
-        var attributes: [ErrorAttributeKeys.Exception: EventAttributeValue] = [
-            .type: .string(typeName),
-            .message: .string(message)
-        ]
+    func toMutableAttributes() -> MutableAttributes {
+        let attributes = MutableAttributes()
 
+        // Set required attributes
+        attributes.setString(typeName, for: ErrorAttributeKeys.Exception.type.rawValue)
+        attributes.setString(message, for: ErrorAttributeKeys.Exception.message.rawValue)
+
+        // Optionally set stacktrace if it exists
         if let stacktrace = stacktrace {
-            attributes[.stacktrace] = .string(stacktrace.formatted)
+            attributes.setString(stacktrace.formatted, for: ErrorAttributeKeys.Exception.stacktrace.rawValue)
         }
 
-        return Dictionary(attributes)
+        return attributes
     }
 }
 
