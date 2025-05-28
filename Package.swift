@@ -108,10 +108,10 @@ let package = Package(
             dependencies: ["SplunkSlowFrameDetector", "SplunkCommon"],
             path: "SplunkSlowFrameDetector/Tests"
         ),
-        
-        
-        // MARK: SplunkCrashReporter
-        
+
+
+        // MARK: - SplunkCrashReporter
+
         .target(
             name: "SplunkCrashReporter",
             path: "SplunkCrashReporter",
@@ -204,7 +204,7 @@ let package = Package(
         ),
 
 
-        // MARK: Splunk App Start
+        // MARK: - Splunk App Start
         
         .target(
             name: "SplunkAppStart",
@@ -279,7 +279,7 @@ let package = Package(
             dependencies: [
                 "SplunkCommon",
                 "SplunkOpenTelemetry",
-                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+                resolveDependency("logger")
             ],
             path: "SplunkCustomTracking/Sources"
         ),
@@ -289,7 +289,7 @@ let package = Package(
                 "SplunkCommon",
                 "SplunkOpenTelemetry",
                 "SplunkCustomTracking",
-                .product(name: "CiscoLogger", package: "smartlook-ios-sdk-private")
+                resolveDependency("logger")
             ],
             path: "SplunkCustomTracking/Tests"
         ),
