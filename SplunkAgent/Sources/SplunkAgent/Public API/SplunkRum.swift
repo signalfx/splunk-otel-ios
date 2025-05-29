@@ -71,7 +71,7 @@ public class SplunkRum: ObservableObject {
     /// A singleton shared instance of the Agent library.
     ///
     /// This shared instance is used to access all SDK functions.
-    public private(set) static var shared = SplunkRum(
+    public internal(set) static var shared = SplunkRum(
         configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
         user: NoOpUser(),
         session: NoOpSession(),
@@ -134,7 +134,8 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
-        // Call the configured Session Sampler.
+        // Re-configure and call the Session Sampler.
+        shared.sessionSampler.configure(with: configuration)
         let samplingDecision = shared.sessionSampler.sample()
 
         // Continue with a noop instance in case of sampling out.

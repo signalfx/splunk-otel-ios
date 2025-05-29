@@ -18,7 +18,7 @@ limitations under the License.
 @testable import SplunkAgent
 import XCTest
 
-final class API10AgentTests: XCTest {
+final class API10AgentTests: XCTestCase {
 
     var agent: SplunkRum?
 
@@ -30,6 +30,7 @@ final class API10AgentTests: XCTest {
 
     override func tearDown() {
         agent = nil
+        SplunkRum.resetSharedInstance()
 
         super.tearDown()
     }
