@@ -22,11 +22,17 @@ struct TemplateView: View {
     var body: some View {
         VStack {
             DemoHeaderView()
-            Spacer()
-            Text("New Demo/Test Content Here")
+            Text("Clone this and add your content")
+            Button("Do something") {
+                doSomething()
+            }
             Spacer()
         }
-        .padding()
+        .navigationTitle("Your title")
         Spacer()
+    }
+
+    func doSomething() {
+        print("did something")
     }
 }
