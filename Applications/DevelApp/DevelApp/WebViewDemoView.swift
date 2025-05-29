@@ -28,7 +28,6 @@ struct WebViewDemoView: View {
 
     var body: some View {
         VStack {
-            Text("WebView Demo").font(.title).padding()
             DemoHeaderView()
             WebViewRepresentable(webView: webView, injected: injected)
                 .frame(height: 200)
