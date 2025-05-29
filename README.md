@@ -61,7 +61,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for instructions on building, running t
 
 ## Troubleshooting
 
-For troubleshooting issues with the Splunk OpenTelemetry iOS instrumentation, see [Troubleshoot iOS instrumentation for Splunk Observability Cloud](https://docs.splunk.com/Observability/gdi/get-data-in/rum/ios/troubleshooting.html) in the official documentation.
+For troubleshooting issues with the Splunk OpenTelemetry iOS instrumentation, see [Troubleshoot iOS instrumentation for Splunk Observability Cloud](https://help.splunk.com/Observability/gdi/get-data-in/rum/ios/troubleshooting.html) in the official documentation.
 
 ## License
 
