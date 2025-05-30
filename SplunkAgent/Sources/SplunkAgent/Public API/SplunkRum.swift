@@ -76,6 +76,7 @@ public class SplunkRum: ObservableObject {
         user: NoOpUser(),
         session: NoOpSession(),
         appStateManager: NoOpAppStateManager(),
+        logPoolName: PackageIdentifier.nonOperationalInstance(),
         sessionSampler: DefaultAgentSessionSampler()
     )
 
@@ -165,8 +166,10 @@ public class SplunkRum: ObservableObject {
 
     required init(
         configurationHandler: AgentConfigurationHandler,
-        user: AgentUser, session: AgentSession,
+        user: AgentUser,
+        session: AgentSession,
         appStateManager: AgentAppStateManager,
+        logPoolName: String? = nil,
         sessionSampler: AgentSessionSampler
     ) {
         // Pass user configuration
@@ -179,17 +182,17 @@ public class SplunkRum: ObservableObject {
         currentUser = user
         currentSession = session
 
-        let logPoolName = PackageIdentifier.instance()
+        let poolName = logPoolName ?? PackageIdentifier.instance()
         let verboseLogging = agentConfigurationHandler.configuration.enableDebugLogging
 
         // Configure internal logging
         logProcessor = DefaultLogProcessor(
-            poolName: logPoolName,
+            poolName: poolName,
             subsystem: PackageIdentifier.default
         )
         .verbosity(verboseLogging ? .verbose : .default)
 
-        logger = DefaultLogAgent(poolName: logPoolName, category: "Agent")
+        logger = DefaultLogAgent(poolName: poolName, category: "Agent")
 
         // Assign AppState manager
         self.appStateManager = appStateManager
