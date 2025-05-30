@@ -28,6 +28,6 @@ public final class CustomData {
 
     // MARK: - CustomData lifecycle
 
-    public required init() {} // see install() in Module extension for startup tasks
-
+    // see install() in Module extension for startup tasks
+    public required init() {}
 }

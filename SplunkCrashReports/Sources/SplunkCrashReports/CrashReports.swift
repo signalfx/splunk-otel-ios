@@ -16,9 +16,9 @@ limitations under the License.
 */
 
 internal import CiscoLogger
+import CrashReporter
 import Foundation
 import SplunkCommon
-import CrashReporter
 
 // Temporarily remove local CrashReporter in favor of SPM version
 // internal import SplunkCrashReporter

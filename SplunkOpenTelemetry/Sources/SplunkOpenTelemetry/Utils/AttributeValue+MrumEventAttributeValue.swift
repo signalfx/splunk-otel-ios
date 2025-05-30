@@ -19,8 +19,8 @@ import Foundation
 import OpenTelemetryApi
 import SplunkCommon
 
-extension AttributeValue {
-    public init(_ eventAttributeValue: EventAttributeValue) {
+public extension AttributeValue {
+    init(_ eventAttributeValue: EventAttributeValue) {
         switch eventAttributeValue {
         case let .string(eventAttributeValue):
             self = .string(eventAttributeValue)
