@@ -177,7 +177,11 @@ func generateMainTargets() -> [Target] {
         ),
         .testTarget(
             name: "SplunkCrashReportsTests",
-            dependencies: ["SplunkCrashReports", "SplunkCommon", "PLCrashReporter"],
+            dependencies: [
+                "SplunkCrashReports",
+                "SplunkCommon",
+                .product(name: "CrashReporter", package: "PLCrashReporter")
+            ],
             path: "SplunkCrashReports/Tests"
         ),
 
