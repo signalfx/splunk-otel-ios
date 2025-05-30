@@ -24,6 +24,10 @@ let package = Package(
         .package(
             url: "https://github.com/open-telemetry/opentelemetry-swift",
             exact: "1.14.0"
+        ),
+        .package(
+            url:"https://github.com/microsoft/plcrashreporter",
+            from: "1.12.0"
         )
     ],
     targets: []
@@ -169,15 +173,19 @@ func generateMainTargets() -> [Target] {
         .target(
             name: "SplunkCrashReports",
             dependencies: [
-                "SplunkCrashReporter",
                 "SplunkOpenTelemetry",
-                "SplunkCommon"
+                "SplunkCommon",
+                .product(name: "CrashReporter", package: "PLCrashReporter")
             ],
             path: "SplunkCrashReports/Sources"
         ),
         .testTarget(
             name: "SplunkCrashReportsTests",
-            dependencies: ["SplunkCrashReports", "SplunkCommon"],
+            dependencies: [
+                "SplunkCrashReports",
+                "SplunkCommon",
+                .product(name: "CrashReporter", package: "PLCrashReporter")
+            ],
             path: "SplunkCrashReports/Tests"
         ),
 
