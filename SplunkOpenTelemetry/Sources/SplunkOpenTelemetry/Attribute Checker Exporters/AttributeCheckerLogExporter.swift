@@ -69,8 +69,6 @@ class AttributeCheckerLogExporter: LogRecordExporter {
                     Attributes: \(attributes)
                     """
                 }
-
-                continue
             }
         }
     }

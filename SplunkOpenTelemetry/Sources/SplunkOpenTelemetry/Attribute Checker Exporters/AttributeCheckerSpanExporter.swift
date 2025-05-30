@@ -74,8 +74,6 @@ class AttributeCheckerSpanExporter: SpanExporter {
                     Attributes: \(attributes)
                     """
                 }
-
-                continue
             }
         }
     }
