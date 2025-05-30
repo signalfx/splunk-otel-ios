@@ -42,7 +42,10 @@ final class SessionReplayNonOperational: SessionReplayModule {
     // MARK: - Initialization
 
     init() {
-        logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SessionReplay")
+        logger = DefaultLogAgent(
+            poolName: PackageIdentifier.nonOperationalInstance(),
+            category: "SessionReplay"
+        )
 
         // Build "dummy" Session Replay module
         sensitivity = SessionReplayNonOperationalSensitivity(logger: logger)

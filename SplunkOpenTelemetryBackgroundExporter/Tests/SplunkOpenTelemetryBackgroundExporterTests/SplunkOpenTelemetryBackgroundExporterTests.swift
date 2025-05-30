@@ -26,7 +26,7 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0
+            explicitTimeout: 0, fileKeyType: "logfile"
         )
 
         requestDescriotor.sentCount = 3
@@ -38,7 +38,7 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0
+            explicitTimeout: 0, fileKeyType: "logfile"
         )
 
         requestDescriotor.sentCount = 6
@@ -53,7 +53,7 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0
+            explicitTimeout: 0, fileKeyType: "logfile"
         )
 
         requestDescriotor.sentCount = 3
