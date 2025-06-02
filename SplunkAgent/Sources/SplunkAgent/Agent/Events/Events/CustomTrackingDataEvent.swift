@@ -48,7 +48,9 @@ struct CustomTrackingDataEvent: AgentEvent {
         component = "custom_tracking"
         self.sessionID = sessionID
         timestamp = metadata.timestamp
-        attributes = data.attributes
+
+        // TODO: DEMRUM-861 attributes need to be transformed?
+//        attributes = data.attributes
         body = nil
         if sessionID == nil {
             internalLogger.log(level: .warn) {

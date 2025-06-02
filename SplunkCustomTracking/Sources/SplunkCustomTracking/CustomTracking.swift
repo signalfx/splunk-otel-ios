@@ -22,10 +22,23 @@ import SplunkCommon
 
 
 // MARK: - CustomTracking internal module
+public struct CustomTrackingMetadata: ModuleEventMetadata {
+    public var timestamp = Date()
+}
 
-public final class CustomTracking {
+public struct CustomTrackingData: ModuleEventData {
+    public let name: String
+    public let attributes: [String: AttributeValue]
 
-    public static var instance = CustomTracking()
+    public init(name: String, attributes: [String: AttributeValue]) {
+        self.name = name
+        self.attributes = attributes
+    }
+}
+
+public final class CustomTrackingInternal {
+
+    public static var instance = CustomTrackingInternal()
 
 
     // MARK: - Private Properties
@@ -35,23 +48,11 @@ public final class CustomTracking {
 
     // Shared state
     public unowned var sharedState: AgentSharedState?
-    public var onPublishBlock: ((any ModuleEventMetadata, any ModuleEventData) -> Void)?
+    public var onPublishBlock: ((CustomTrackingMetadata, CustomTrackingData) -> Void)?
 
 
     // Module conformance
     public required init() {}
 
-    internal struct InternalCustomTrackingMetadata: ModuleEventMetadata {
-        public var timestamp = Date()
-    }
-
-    internal struct InternalCustomTrackingData: ModuleEventData {
-        public let name: String
-        public let attributes: [String: AttributeValue]
-
-        public init(name: String, attributes: [String: AttributeValue]) {
-            self.name = name
-            self.attributes = attributes
-        }
-    }
+    
 }
