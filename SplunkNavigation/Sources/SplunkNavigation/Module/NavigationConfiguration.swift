@@ -18,4 +18,29 @@ limitations under the License.
 import SplunkCommon
 
 /// Navigation module configuration, minimal configuration for module conformance.
-public struct NavigationConfiguration: ModuleConfiguration {}
+public struct NavigationConfiguration: ModuleConfiguration {
+
+    // MARK: - Module management
+
+    /// Indicates whether the Module is enabled. Default value is `true`.
+    public var isEnabled: Bool = true
+
+    /// A `Boolean` value determines whether the module should automatically detect navigation in the application.
+    public var enableAutomatedTracking: Bool?
+
+
+    // MARK: - Initialization
+
+    /// Initialize a new configuration.
+    public init() {}
+
+    /// Initializes new module configuration with preconfigured values.
+    ///
+    /// - Parameters:
+    ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
+    ///   - enableAutomatedTracking: If `true`, the module will automatically detect navigation.
+    public init(isEnabled: Bool, enableAutomatedTracking: Bool? = nil) {
+        self.isEnabled = isEnabled
+        self.enableAutomatedTracking = enableAutomatedTracking
+    }
+}

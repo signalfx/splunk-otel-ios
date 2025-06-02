@@ -188,6 +188,9 @@ public class SplunkRum: ObservableObject {
 
         // Assign AppState manager
         self.appStateManager = appStateManager
+
+        // Set default screen names
+        runtimeAttributes.updateCustom(named: "screen.name", with: "unknown")
     }
 
     convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {

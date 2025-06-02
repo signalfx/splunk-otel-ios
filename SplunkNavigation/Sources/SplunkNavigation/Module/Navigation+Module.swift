@@ -40,11 +40,35 @@ extension Navigation: Module {
     // MARK: - Module methods
 
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
-        // Start the detection in the module
-        startDetection()
+        let configuration = configuration as? Configuration
+
+        // Setup initial configuration
+        setup(with: configuration)
+
+        // Start the detection in the module (unless it is explicitly disabled)
+        if configuration?.isEnabled ?? true {
+            startDetection()
+        }
     }
 
     public func deleteData(for metadata: any ModuleEventMetadata) {}
 
     public func onPublish(data: @escaping (NavigationMetadata, NavigationData) -> Void) {}
+
+
+    // MARK: - Private methods
+
+    private func setup(with configuration: Configuration?) {
+        guard let configuration else {
+            return
+        }
+
+        // Update preferences
+        preferences.enableAutomatedTracking = configuration.enableAutomatedTracking
+
+        // Update module mode
+        Task {
+            await model.update(moduleEnabled: configuration.isEnabled)
+        }
+    }
 }

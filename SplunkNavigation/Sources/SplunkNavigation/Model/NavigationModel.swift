@@ -20,17 +20,34 @@ actor NavigationModel {
 
     // MARK: - Public
 
+    public private(set) var moduleEnabled: Bool = true
+
+
     public private(set) var screenName: String = "unknown"
+
+    public private(set) var isManualScreenName = false
+
 
     public private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
 
     public private(set) var agentVersion: String?
 
 
+    // MARK: - Module management
+
+    func update(moduleEnabled: Bool) {
+        self.moduleEnabled = moduleEnabled
+    }
+
+
     // MARK: - Screen name management
 
     func update(screenName: String) {
         self.screenName = screenName
+    }
+
+    func update(isManualScreenName: Bool) {
+        self.isManualScreenName = isManualScreenName
     }
 
 

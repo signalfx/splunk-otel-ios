@@ -15,13 +15,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Foundation
+
 public extension Navigation {
 
     // MARK: - Manual detection
 
     func track(screen name: String) {
+        let start = Date()
+
         Task {
+            let moduleEnabled = await model.moduleEnabled
+            let lastScreenName = await model.screenName
+
+            guard moduleEnabled else {
+                return
+            }
+
+            guard lastScreenName != name else {
+                return
+            }
+
+            // The manual screen name takes priority over the detected name
             await model.update(screenName: name)
+            await model.update(isManualScreenName: true)
+
+            // Send corresponding span
+            send(screenName: name, lastScreenName: lastScreenName, start: start)
         }
     }
 }
