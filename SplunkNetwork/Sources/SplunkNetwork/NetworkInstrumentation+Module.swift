@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 public struct NetworkInstrumentationData: ModuleEventData {}
 
@@ -29,7 +29,7 @@ extension NetworkInstrumentation: Module {
     // MARK: - Module types
 
     public typealias Configuration = NetworkInstrumentationConfiguration
-    public typealias RemoteConfiguration = NetworkInstrumentationRemoteConfiguration
+    public typealias RemoteConfiguration = NetworkInstrumentationRemoteConfig
 
     public typealias EventMetadata = NetworkInstrumentationMetadata
     public typealias EventData = NetworkInstrumentationData

@@ -23,74 +23,44 @@ final class API10ConfigurationErrorTests: XCTestCase {
     // MARK: - Configuration error tests
 
     func testInvalidEndpoint() throws {
-        var configuration: AgentConfiguration?
-        let endpointConfiguration = EndpointConfiguration(realm: "")
+        let realm = "\\//"
+
+        let endpoint = EndpointConfiguration(
+            realm: realm,
+            rumAccessToken: "token"
+        )
+
+        let configuration = AgentConfiguration(
+            endpoint: endpoint,
+            appName: "App",
+            deploymentEnvironment: "test"
+        )
 
         XCTAssertThrowsError(
-            configuration = try AgentConfiguration(
-                rumAccessToken: "token",
-                endpoint: endpointConfiguration,
-                appName: "App",
-                deploymentEnvironment: "test"
-            )
+            try configuration.validate()
         ) { error in
-            XCTAssertEqual(error as? AgentConfigurationError, AgentConfigurationError.invalidEndpoint(supplied: endpointConfiguration))
+            XCTAssertEqual(error as? AgentConfigurationError, AgentConfigurationError.invalidEndpoint(supplied: endpoint))
         }
-        XCTAssertNil(configuration)
-    }
-
-    func testInvalidAppName() throws {
-        var configuration: AgentConfiguration?
-        let endpointConfiguration = EndpointConfiguration(realm: "dev")
-        let appName = ""
-
-        XCTAssertThrowsError(
-            configuration = try AgentConfiguration(
-                rumAccessToken: "token",
-                endpoint: endpointConfiguration,
-                appName: appName,
-                deploymentEnvironment: "test"
-            )
-        ) { error in
-            XCTAssertEqual(error as? AgentConfigurationError, AgentConfigurationError.invalidAppName(supplied: appName))
-        }
-        XCTAssertNil(configuration)
     }
 
     func testInvalidAccessToken() throws {
-        var configuration: AgentConfiguration?
-        let endpointConfiguration = EndpointConfiguration(realm: "dev")
         let authToken = ""
 
+        let endpoint = EndpointConfiguration(
+            realm: "dev",
+            rumAccessToken: authToken
+        )
+
+        let configuration = AgentConfiguration(
+            endpoint: endpoint,
+            appName: "App",
+            deploymentEnvironment: "test"
+        )
+
         XCTAssertThrowsError(
-            configuration = try AgentConfiguration(
-                rumAccessToken: authToken,
-                endpoint: endpointConfiguration,
-                appName: "App",
-                deploymentEnvironment: "test"
-            )
+            try configuration.validate()
         ) { error in
             XCTAssertEqual(error as? AgentConfigurationError, AgentConfigurationError.invalidRumAccessToken(supplied: authToken))
         }
-        XCTAssertNil(configuration)
-    }
-
-
-    func testInvalidDeploymentEnvironment() throws {
-        var configuration: AgentConfiguration?
-        let endpointConfiguration = EndpointConfiguration(realm: "dev")
-        let deploymentEnvironment = ""
-
-        XCTAssertThrowsError(
-            configuration = try AgentConfiguration(
-                rumAccessToken: "token",
-                endpoint: endpointConfiguration,
-                appName: "App",
-                deploymentEnvironment: deploymentEnvironment
-            )
-        ) { error in
-            XCTAssertEqual(error as? AgentConfigurationError, AgentConfigurationError.invalidDeploymentEnvironment(supplied: deploymentEnvironment))
-        }
-        XCTAssertNil(configuration)
     }
 }

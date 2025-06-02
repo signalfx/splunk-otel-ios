@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
@@ -36,6 +36,11 @@ internal import SplunkSharedProtocols
 
 #if canImport(SplunkAppStart)
     internal import SplunkAppStart
+#endif
+
+#if canImport(SplunkWebView)
+    internal import SplunkWebView
+    internal import SplunkWebViewProxy
 #endif
 
 
@@ -65,9 +70,14 @@ class DefaultModulesPool: AgentModulesPool {
             knownModules.append(NetworkInstrumentation.self)
         #endif
 
-        // Network Instrumentation
+        // Slow Frame Detector
         #if canImport(SplunkSlowFrameDetector)
             knownModules.append(SlowFrameDetector.self)
+        #endif
+
+        // Web View Instrumentation
+        #if canImport(SplunkWebView)
+            knownModules.append(WebViewInstrumentationInternal.self)
         #endif
 
         return knownModules

@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 import CiscoInteractions
 
 public struct InteractionEventData: ModuleEventData {

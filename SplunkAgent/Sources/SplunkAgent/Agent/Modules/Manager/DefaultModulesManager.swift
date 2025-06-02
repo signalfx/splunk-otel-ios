@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
 class DefaultModulesManager: AgentModulesManager {
 
@@ -24,6 +25,10 @@ class DefaultModulesManager: AgentModulesManager {
 
     private var modulesPool: AgentModulesPool.Type
     private var modulesDataConsumer: ((any ModuleEventMetadata, any ModuleEventData) -> Void)?
+
+    private var initializationTimes: [String: Date] = [:]
+    private var configurationDescription: [String: String] = [:]
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Public
@@ -64,6 +69,8 @@ class DefaultModulesManager: AgentModulesManager {
             with: configurations,
             remoteConfigurations: remoteConfigurations
         )
+
+        prepareModulesConfigurationDescription(with: configurations)
     }
 
     /// Helper method for generic module initialization.
@@ -88,18 +95,18 @@ class DefaultModulesManager: AgentModulesManager {
         // Connect all modules with corresponding configurations (if exists)
         for module in modules {
             // Get corresponding configuration
-            let configuration = configurations.filter { configuration in
+            let configuration = configurations.first { configuration in
                 let configurationType = type(of: configuration)
 
                 return type(of: module).acceptsConfiguration(type: configurationType)
-            }.first
+            }
 
             // Get corresponding remote configuration
-            let remoteConfiguration = remoteConfigurations.filter { remoteConfiguration in
+            let remoteConfiguration = remoteConfigurations.first { remoteConfiguration in
                 let configurationType = type(of: remoteConfiguration)
 
                 return type(of: module).acceptsRemoteConfiguration(type: configurationType)
-            }.first
+            }
 
             // Try to connect module
             connect(
@@ -107,6 +114,9 @@ class DefaultModulesManager: AgentModulesManager {
                 with: configuration,
                 remoteConfiguration: remoteConfiguration
             )
+
+            // Report initialization timestamp
+            initializationTimes[String(describing: type(of: module))] = Date()
         }
     }
 
@@ -156,16 +166,54 @@ class DefaultModulesManager: AgentModulesManager {
     // that was previously published by some of the modules
     func deleteModuleData(for metadata: any ModuleEventMetadata) {
         // Finds a module that understands the format of this metadata
-        let module: (any Module)? = modules.filter { module in
+        let module: (any Module)? = modules.first { module in
             let moduleType = type(of: module)
             let metadataType = type(of: metadata)
 
             return moduleType.acceptsMetadata(type: metadataType)
-        }.first
+        }
 
         // Forward request into corresponding module
         if let module {
             module.deleteData(for: metadata)
+        }
+    }
+
+
+    // MARK: - Metrics
+
+    var modulesInitializationTimes: [String: Date] {
+        return initializationTimes
+    }
+
+    var modulesConfigurationDescription: [String: String] {
+        return configurationDescription
+    }
+
+    /// Prepares modules configuration description, in a format of a `[String: String]` dictionary,
+    /// with `"ModuleName.propertyName"` as a key and the property's value as a value.
+    private func prepareModulesConfigurationDescription(with configurations: [any ModuleConfiguration]) {
+        do {
+            let jsonEncoder = JSONEncoder()
+            var description: [String: String] = [:]
+
+            for configuration in configurations {
+                if let dictionary = try JSONSerialization.jsonObject(with: jsonEncoder.encode(configuration), options: []) as? [String: Any] {
+                    for object in dictionary {
+                        let type = String(describing: type(of: configuration))
+                        let key = String(format: "%@.%@", type, object.key)
+                        let value = String(describing: object.value)
+
+                        description[key] = value
+                    }
+                }
+            }
+
+            configurationDescription = description
+        } catch {
+            logger.log(level: .error) {
+                "An error when preparing modules configuration description: \(error.localizedDescription)"
+            }
         }
     }
 }

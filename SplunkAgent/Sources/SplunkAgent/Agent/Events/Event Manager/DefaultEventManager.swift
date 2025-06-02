@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-internal import SplunkCrashReports
-internal import SplunkLogger
-internal import SplunkOpenTelemetry
+internal import CiscoLogger
 internal import CiscoSessionReplay
-internal import SplunkSharedProtocols
+import Foundation
+internal import SplunkCommon
+internal import SplunkCrashReports
+internal import SplunkOpenTelemetry
 internal import SplunkInteractions
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
@@ -40,13 +40,15 @@ class DefaultEventManager: AgentEventManager {
     var logEventProcessor: LogEventProcessor
 
     // Trace processor
-    var traceProcesssor: TraceProcessor
+    var traceProcessor: TraceProcessor
 
     // Agent reference
     private unowned let agent: SplunkRum
 
     // Logger
-    private let logger = InternalLogger(configuration: .agent(category: "EventManager"))
+    private var logger: LogAgent {
+        agent.logger
+    }
 
     // Events state storage
     let eventsModel: EventsModel
@@ -57,7 +59,14 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Initialization
 
-    required init(with configuration: AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) {
+    required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) throws {
+        guard let traceUrl = configuration.endpoint.traceEndpoint else {
+            throw AgentConfigurationError.invalidEndpoint(supplied: configuration.endpoint)
+        }
+
+        // ‼️ Using trace endpoint as a placeholder
+        let logUrl = traceUrl
+
         self.agent = agent
         self.eventsModel = eventsModel
 
@@ -85,13 +94,30 @@ class DefaultEventManager: AgentEventManager {
             osType: SystemInfo.type
         )
 
-        // Initialize log event processor
-        logEventProcessor = OTLPLogEventProcessor(with: configuration.logsUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
+        // Initialize log event processor.
+        logEventProcessor = OTLPLogEventProcessor(
+            with: logUrl,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            globalAttributes: agent.globalAttributes.all,
+            debugEnabled: configuration.enableDebugLogging
+        )
 
         // Initialize trace processor
-        traceProcesssor = OTLPTraceProcessor(with: configuration.tracesUrl, resources: resources, debugEnabled: configuration.enableDebugLogging)
+        traceProcessor = OTLPTraceProcessor(
+            with: traceUrl,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            globalAttributes: agent.globalAttributes.all,
+            debugEnabled: configuration.enableDebugLogging,
+            spanInterceptor: configuration.spanInterceptor
+        )
 
-        // Starts listening to a Session Reset nofification to send the Session Start event.
+        logger.log(level: .info, isPrivate: false) {
+            "Using trace url: \(traceUrl)"
+        }
+
+        // Starts listening to a Session Reset notification to send the Session Start event.
         NotificationCenter.default.addObserver(forName: DefaultSession.sessionDidResetNotification, object: nil, queue: nil) { _ in
             self.sendSessionStartEvent()
         }
@@ -126,12 +152,9 @@ class DefaultEventManager: AgentEventManager {
                 completion: completion
             )
 
-        case let (metadata as Metadata, data as InteractionEventData):
-            
-
         // Unknown module data
         default:
-            logger.log(level: .error) {
+            logger.log(level: .error, isPrivate: false) {
                 "Missing Event for module published metadata: \(metadata), data: \(data)"
             }
 
@@ -157,7 +180,7 @@ class DefaultEventManager: AgentEventManager {
 
         // Check if the session start event for this session is being sent or was already sent
         guard shouldSendSessionStart(sessionID) else {
-            logger.log(level: .info) {
+            logger.log(level: .info, isPrivate: false) {
                 "Skipping session start event for: \(sessionID)"
             }
 
@@ -177,7 +200,7 @@ class DefaultEventManager: AgentEventManager {
 
         // Send event
         logEventProcessor.sendEvent(event) { success in
-            self.logger.log(level: .info) {
+            self.logger.log(level: .info, isPrivate: false) {
                 "Session Start event sent with success: \(success)"
             }
 

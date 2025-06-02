@@ -28,7 +28,10 @@ final class API10UserTests: XCTestCase {
         XCTAssertNotNil(user)
 
         // Properties (READ)
-        let identifier = user.identifier
-        XCTAssertNotNil(identifier)
+        let preferences = user.preferences
+        XCTAssertNotNil(preferences)
+
+        let state = user.state
+        XCTAssertNotNil(state)
     }
 }

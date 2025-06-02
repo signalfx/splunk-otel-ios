@@ -15,9 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoDiskStorage
+import Foundation
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
-import Foundation
+
 
 public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, MetricExporter {
 
@@ -30,31 +32,35 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
 
         let requestId = UUID()
 
-        guard
-            DiskCache.checkDiskSpaceAndIntegrity(),
-            let url = DiskCache.cache(subfolder: .uploadFiles, item: requestId.uuidString)
-        else {
-            return .failureNotRetryable
-        }
-
         do {
             let storeData = try body.serializedData()
-            try storeData.write(to: url)
+            try diskStorage.insert(
+                storeData,
+                forKey: KeyBuilder(
+                    requestId.uuidString,
+                    parrentKeyBuilder: getStorageKey()
+                )
+            )
         } catch {
+
             return .failureNotRetryable
         }
-
-        DiskCache.refreshStatistics()
 
         let requestDescriptor = RequestDescriptor(
             id: requestId,
             endpoint: endpoint,
-            explicitTimeout: config.timeout
+            explicitTimeout: config.timeout,
+            fileKeyType: getFileKeyType()
         )
 
-        httpClient.send(requestDescriptor)
+        do {
+            try httpClient.send(requestDescriptor)
 
-        return .success
+            return .success
+        } catch {
+
+            return .failureNotRetryable
+        }
     }
 
     public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
@@ -66,5 +72,12 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
         semaphore.wait()
 
         return .success
+    }
+
+
+    // MARK: - Local override
+
+    override func getFileKeyType() -> String {
+        "metric"
     }
 }

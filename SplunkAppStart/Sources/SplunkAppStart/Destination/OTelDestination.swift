@@ -17,14 +17,14 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// Creates and sends an OpenTelemetry span from supplied app start data.
 struct OTelDestination: AppStartDestination {
 
     // MARK: - Sending
 
-    func send(type: AppStartType, start: Date, end: Date, sharedState: (any AgentSharedState)?, events: [String: Date]?) {
+    func send(appStart: AppStartSpanData, agentInitialize: AgentInitializeSpanData?, sharedState: (any AgentSharedState)?) {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
@@ -32,24 +32,51 @@ struct OTelDestination: AppStartDestination {
                 instrumentationVersion: sharedState?.agentVersion
             )
 
-        let span = tracer.spanBuilder(spanName: "AppStart")
-            .setStartTime(time: start)
+        let appStartSpan = tracer.spanBuilder(spanName: "AppStart")
+            .setStartTime(time: appStart.start)
             .startSpan()
 
-        span.setAttribute(key: "component", value: "appstart")
-        span.setAttribute(key: "start.type", value: typeIdentifier(for: type))
+        appStartSpan.setAttribute(key: "component", value: "appstart")
+        appStartSpan.setAttribute(key: "screen.name", value: "unknown")
+        appStartSpan.setAttribute(key: "start.type", value: typeIdentifier(for: appStart.type))
 
         if let sessionID = sharedState?.sessionId {
-            span.setAttribute(key: "session.id", value: sessionID)
+            appStartSpan.setAttribute(key: "session.id", value: sessionID)
         }
 
-        span.setAttribute(key: "screen.name", value: "unknown")
-
-        events?.forEach { name, timestamp in
-            span.addEvent(name: name, timestamp: timestamp)
+        appStart.events?.forEach { event in
+            appStartSpan.addEvent(name: event.name, timestamp: event.timestamp)
         }
 
-        span.end(time: end)
+        appStartSpan.end(time: appStart.end)
+
+        // Create and send the Initialize span as a app start span's child
+        if let agentInitialize {
+            let initializeSpan = tracer.spanBuilder(spanName: "SplunkRum.initialize")
+                .setStartTime(time: agentInitialize.start)
+                .setParent(appStartSpan)
+                .startSpan()
+
+            initializeSpan.setAttribute(key: "component", value: "appstart")
+            initializeSpan.setAttribute(key: "screen.name", value: "unknown")
+
+            // Add config settings
+            if let configSettings = agentInitialize.formattedConfigurationSettings {
+                initializeSpan.setAttribute(key: "config_settings", value: configSettings)
+            }
+
+            // Add events
+            agentInitialize.events?.forEach { event in
+                initializeSpan.addEvent(name: event.name, timestamp: event.timestamp)
+            }
+
+            // Add session id
+            if let sessionID = sharedState?.sessionId {
+                initializeSpan.setAttribute(key: "session.id", value: sessionID)
+            }
+
+            initializeSpan.end(time: agentInitialize.end)
+        }
     }
 
     private func typeIdentifier(for type: AppStartType) -> String {

@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// SplunkInteractions module configuration, minimal configuration for module conformance.
 public struct SplunkInteractionsConfiguration: ModuleConfiguration {}

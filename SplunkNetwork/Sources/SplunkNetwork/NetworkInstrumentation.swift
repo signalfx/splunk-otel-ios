@@ -15,21 +15,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
+internal import CiscoLogger
 import Foundation
-import SplunkSharedProtocols
-import SplunkLogger
 import OpenTelemetryApi
-import URLSessionInstrumentation
 import OpenTelemetrySdk
 import ResourceExtension
 import SignPostIntegration
+import SplunkCommon
+import URLSessionInstrumentation
 
 public class NetworkInstrumentation {
-    
+
     // MARK: - Private
-    
-    private let internalLogger = InternalLogger(configuration: .networkInstrumentation(category: "NetworkInstrumentation"))
+
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
+
+    /// Holds regex patterns from IgnoreURLs API
+    private let ignoreURLs = IgnoreURLs()
+
+    private let delegateClassNames = [
+        "__NSURLSessionLocal",
+        "__NSCFURLSessionConnection",
+        "__NSCFURLLocalSessionConnection",
+        "__NSCFURLSession",
+        "__NSCFURLSessionTask",
+        "__NSCFURLSessionDataTask",
+        "__NSCFURLSessionDownloadTask",
+        "__NSCFURLSessionUploadTask",
+        "NSURLSessionDefault"
+    ]
 
     // MARK: - Public
 
@@ -41,13 +55,38 @@ public class NetworkInstrumentation {
 
     public required init() {    // For Module conformance
     }
-    
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
- 
-        // Start up NSURLSession instrumentation
-        _ = URLSessionInstrumentation(configuration: URLSessionInstrumentationConfiguration(shouldRecordPayload: shouldRecordPayload, shouldInstrument: shouldInstrument, createdRequest: createdRequest, receivedResponse: receivedResponse, receivedError: receivedError))
+
+    public func install(with configuration: (any ModuleConfiguration)?,
+                        remoteConfiguration: (any RemoteModuleConfiguration)?) {
+
+        var delegateClassesToInstrument = nil as [AnyClass]?
+        var delegateClasses: [AnyClass] = []
+
+        // find concrete delegate classes
+        for className in delegateClassNames {
+            if let concreteClass = NSClassFromString(className) {
+                delegateClasses.append(concreteClass)
+            }
+        }
+        // empty array defaults to standard exhaustive search
+        if !delegateClasses.isEmpty {
+            delegateClassesToInstrument = delegateClasses
+        } else {
+            self.logger.log(level: .debug) {
+                "Standard Delegate classes not found, using exhaustive delegate class search.  This may incur performance overhead during startup."
+            }
+        }
+
+        // Start up URLSession instrumentation
+        _ = URLSessionInstrumentation(configuration: URLSessionInstrumentationConfiguration(
+            shouldRecordPayload: shouldRecordPayload,
+            shouldInstrument: shouldInstrument,
+            createdRequest: createdRequest,
+            receivedResponse: receivedResponse,
+            receivedError: receivedError,
+            delegateClassesToInstrument: delegateClassesToInstrument))
     }
-    
+
     // Callback methods to modify URLSession monitoring
     func shouldInstrument(URLRequest: URLRequest) -> Bool {
         // Code here could filter based on URLRequest
@@ -57,21 +96,27 @@ public class NetworkInstrumentation {
             return ((agentConfiguration?.appDCloudShouldInstrument!(URLRequest)) != nil)
         }
         */
-        let requestEndpoint = URLRequest.description
 
-        if let excludedEndpoints {
-            for excludedEndpoint in excludedEndpoints {
-                if requestEndpoint.contains(excludedEndpoint.absoluteString) {
-                    self.internalLogger.log(level: .debug) {
-                        "Should Not Instrument Backend URL \(URLRequest.description)"
-                    }
-
-                    return false
+        // Filter using ignoreURLs API
+        if let urlToTest = URLRequest.url {
+            if ignoreURLs.matches(url: urlToTest) {
+                self.logger.log(level: .debug) {
+                    "URL excluded via IgnoreURLs API \(URLRequest.description)"
                 }
+                return false
             }
         }
-        else {
-            self.internalLogger.log(level: .debug) {
+
+        let requestEndpoint = URLRequest.description
+        if let excludedEndpoints {
+            for excludedEndpoint in excludedEndpoints where requestEndpoint.contains(excludedEndpoint.absoluteString) {
+                self.logger.log(level: .debug) {
+                    "Should Not Instrument Backend URL \(URLRequest.description)"
+                }
+                return false
+            }
+        } else {
+            self.logger.log(level: .debug) {
                 "Should Not Instrument, Backend URL not yet configured."
             }
             return false
@@ -79,13 +124,12 @@ public class NetworkInstrumentation {
         // Leave the localhost test in place for the test case where we have two endpoints,
         // both collector and zipkin on local.
         if requestEndpoint.hasPrefix("http://localhost") {
-            self.internalLogger.log(level: .debug) {
+            self.logger.log(level: .debug) {
                 "Should Not Instrument Localhost \(URLRequest.description)"
             }
             return false
-        }
-        else {
-            self.internalLogger.log(level: .debug) {
+        } else {
+            self.logger.log(level: .debug) {
                 "Should Instrument \(URLRequest.description)"
             }
             return true
@@ -96,23 +140,49 @@ public class NetworkInstrumentation {
         return true
     }
 
-    func createdRequest(URLRequest: URLRequest, Span: Span) -> Void {
+    func createdRequest(URLRequest: URLRequest, span: Span) {
         let key = SemanticAttributes.httpRequestContentLength
         let body = URLRequest.httpBody
         let length = body?.count ?? 0
-        Span.setAttribute(key: key, value: length)
+        span.setAttribute(key: key, value: length)
 
         if let sharedState {
             let sessionID = sharedState.sessionId
-            Span.setAttribute(key: "session.id", value: sessionID)
+            span.setAttribute(key: "session.id", value: sessionID)
         }
     }
 
-    func receivedResponse(URLResponse: URLResponse, DataOrFile: DataOrFile?, Span: Span) -> Void {
+    let serverTimingPattern = #"traceparent;desc=['\"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['\"]"#
+
+    func addLinkToSpan(span: Span, valStr: String) {
+        let regex = try! NSRegularExpression(pattern: serverTimingPattern)
+        let result = regex.matches(in: valStr, range: NSRange(location: 0, length: valStr.utf16.count))
+        // per standard regex logic, number of matched segments is 3 (whole match plus two () captures)
+        if result.count != 1 || result[0].numberOfRanges != 3 {
+            return
+        }
+        let traceId = String(valStr[Range(result[0].range(at: 1), in: valStr)!])
+        let spanId = String(valStr[Range(result[0].range(at: 2), in: valStr)!])
+        span.setAttribute(key: "link.traceId", value: traceId)
+        span.setAttribute(key: "link.spanId", value: spanId)
+    }
+
+    func receivedResponse(URLResponse: URLResponse, dataOrFile: DataOrFile?, span: Span) {
         let key = SemanticAttributes.httpResponseContentLength
         let response = URLResponse as? HTTPURLResponse
         let length = response?.expectedContentLength ?? 0
-        Span.setAttribute(key: key, value: Int(length))
+        span.setAttribute(key: key, value: Int(length))
+
+        if response != nil {
+            for (key, val) in response!.allHeaderFields {
+                if let keyStr = key as? String,
+                   let valStr = val as? String,
+                   keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
+                   valStr.contains("traceparent") {
+                    addLinkToSpan(span: span, valStr: valStr)
+                }
+            }
+        }
 
         /* Save this until we add the feature into the Agent side API
         guard ((agentConfiguration?.appDCloudNetworkResponseCallback?(URLResponse)) == nil) else {
@@ -123,13 +193,10 @@ public class NetworkInstrumentation {
         }
         */
     }
-    
-    func receivedError(Error: Error, DataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, Span: Span) -> Void {
-        
-        print(Error)
-        self.internalLogger.log(level: .error) {
-            "Error: \(Error.localizedDescription), Status: \(HTTPStatus)"
+
+    func receivedError(error: Error, dataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, span: Span) {
+        self.logger.log(level: .error) {
+            "Error: \(error.localizedDescription), Status: \(HTTPStatus)"
         }
     }
 }
-

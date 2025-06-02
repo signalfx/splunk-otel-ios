@@ -20,15 +20,33 @@ import XCTest
 
 final class API10AgentTests: XCTestCase {
 
+    var agent: SplunkRum?
+
+    override func setUp() {
+        super.setUp()
+
+        agent = nil
+    }
+
+    override func tearDown() {
+        agent = nil
+        SplunkRum.resetSharedInstance()
+
+        super.tearDown()
+    }
+
     // MARK: - API Tests
 
-    func testInstall() throws {
+    func testInstall_givenAgentNotSampledOut() throws {
+        // Test initial state
+        XCTAssertTrue(SplunkRum.shared.state.status == .notRunning(.notInstalled))
+
         // Agent initialization
-        _ = try AgentTestBuilder.buildDefault()
+        agent = try AgentTestBuilder.buildDefault()
 
         // Agent install
         let configuration = try ConfigurationTestBuilder.buildDefault()
-        var agent: SplunkRum? = SplunkRum.install(with: configuration)
+        agent = try SplunkRum.install(with: configuration)
 
         // The agent should run after install
         let agentStatus = try XCTUnwrap(agent?.state.status)
@@ -39,10 +57,32 @@ final class API10AgentTests: XCTestCase {
         XCTAssertNotNil(agent?.openTelemetry)
 
         // Another attempt to install should return an instance from the previous attempt
-        let anotherAgentInstance = SplunkRum.install(with: configuration)
+        let anotherAgentInstance = try SplunkRum.install(with: configuration)
         XCTAssertTrue(agent === anotherAgentInstance)
+    }
 
-        agent = nil
+    func testInstall_givenAgentSampledOut() throws {
+        // Test initial state
+        XCTAssertTrue(SplunkRum.shared.state.status == .notRunning(.notInstalled))
+
+        // Agent initialization
+        agent = try AgentTestBuilder.buildDefault()
+
+        // Agent install
+        let configuration = try ConfigurationTestBuilder.buildDefaultSampledOut()
+        agent = try SplunkRum.install(with: configuration)
+
+        // The agent be sampled out after install
+        let agentStatus = try XCTUnwrap(agent?.state.status)
+
+        XCTAssertEqual(agentStatus, .notRunning(.sampledOut))
+
+        // Check OpenTelemetry instance
+        XCTAssertNotNil(agent?.openTelemetry)
+
+        // Another attempt to install should return an instance from the previous attempt
+        let anotherAgentInstance = try SplunkRum.install(with: configuration)
+        XCTAssertTrue(agent === anotherAgentInstance)
     }
 
 

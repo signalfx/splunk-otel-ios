@@ -15,7 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkLogger
+internal import CiscoLogger
+internal import SplunkCommon
 
 /// The class implementing Session Replay public API in non-operational mode.
 ///
@@ -25,12 +26,17 @@ final class SessionReplayNonOperational: SessionReplayModule {
 
     // MARK: - Private
 
-    private let internalLogger: InternalLogger
+    private let logger: DefaultLogAgent
 
 
     // MARK: - Sensitivity
 
     let sensitivity: any SessionReplayModuleSensitivity
+
+
+    // MARK: - Custom Id
+
+    var customIdentifiers: any SessionReplayModuleCustomId
 
 
     // MARK: - State
@@ -41,10 +47,14 @@ final class SessionReplayNonOperational: SessionReplayModule {
     // MARK: - Initialization
 
     init() {
-        internalLogger = InternalLogger(configuration: .agent(category: "SessionReplay Module (Non-Operational)"))
+        logger = DefaultLogAgent(
+            poolName: PackageIdentifier.nonOperationalInstance(),
+            category: "SessionReplay"
+        )
 
         // Build "dummy" Session Replay module
-        sensitivity = SessionReplayNonOperationalSensitivity(logger: internalLogger)
+        sensitivity = SessionReplayNonOperationalSensitivity(logger: logger)
+        customIdentifiers = SessionReplayNonOperationalCustomId(logger: logger)
         state = SessionReplayNonOperationalState()
     }
 
@@ -52,7 +62,7 @@ final class SessionReplayNonOperational: SessionReplayModule {
     // MARK: - Logger
 
     func logAccess(toApi named: String) {
-        internalLogger.log(level: .notice) {
+        logger.log(level: .notice) {
             """
             Attempt to access the API of a remotely disabled Session Replay module. \n
             API: `\(named)`

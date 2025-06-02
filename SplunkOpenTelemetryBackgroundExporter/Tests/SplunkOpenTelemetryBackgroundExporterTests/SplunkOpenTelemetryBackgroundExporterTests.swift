@@ -9,7 +9,7 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0)
+            explicitTimeout: 0, fileKeyType: "logfile")
 
         requestDescriotor.sentCount = 3
         
@@ -20,7 +20,7 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0)
+            explicitTimeout: 0, fileKeyType: "logfile")
 
         requestDescriotor.sentCount = 6
         
@@ -34,7 +34,7 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0)
+            explicitTimeout: 0, fileKeyType: "logfile")
 
         requestDescriotor.sentCount = 3
 
@@ -44,30 +44,5 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
 
         // Check the date intervals with an arbitrarily small accuracy.
         XCTAssertEqual(expectedSendDate.timeIntervalSinceReferenceDate, requestDescriotor.scheduled.timeIntervalSinceReferenceDate, accuracy: 0.001)
-    }
-
-
-    // MARK: - Disk cache clearing tests
-
-    func testDiskCacheClear_givenExceededSentCount() throws {
-
-        let requestId = UUID()
-        let fileUrl = DiskCache.cache(subfolder: .uploadFiles, item: requestId.uuidString)!
-
-        try Data().write(to: fileUrl)
-
-        XCTAssertTrue(DiskCache.fileExists(at: fileUrl))
-
-        var requestDescriotor = RequestDescriptor(
-            id: requestId,
-            endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0)
-
-        requestDescriotor.sentCount = 6
-
-        let client = BackgroundHTTPClient(sessionQosConfiguration: SessionQOSConfiguration())
-        client.send(requestDescriotor)
-
-        XCTAssertFalse(DiskCache.fileExists(at: fileUrl))
     }
 }

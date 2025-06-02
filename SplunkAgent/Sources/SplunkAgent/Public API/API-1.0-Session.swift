@@ -25,6 +25,12 @@ public final class Session {
     private unowned let owner: SplunkRum
 
 
+    // MARK: - State
+
+    /// An object that reflects the current session's state.
+    public private(set) lazy var state = SessionState(for: owner)
+
+
     // MARK: - Initialization
 
     init(for owner: SplunkRum) {
@@ -36,13 +42,6 @@ public final class Session {
 public extension Session {
 
     // MARK: - Identifier
-
-    /// Identification of recorded session.
-    ///
-    /// When the agent is initialized, there is always some session ID.
-    var currentSessionId: String {
-        owner.currentSession.currentSessionId
-    }
 
     /// Identification of recorded session in given time.
     ///

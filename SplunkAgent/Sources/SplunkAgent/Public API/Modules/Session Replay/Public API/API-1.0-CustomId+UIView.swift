@@ -25,12 +25,11 @@ public extension UIView {
     /// Assigning `nil` removes previously assigned custom id.
     var srCustomId: String? {
         get {
-            SplunkRum.instance?.sessionReplay.customIdentifiers[self]
-            // TODO: nova cache s custom id
-
+            SplunkRum.shared.sessionReplay.customIdentifiers[self]
         }
         set {
-            SplunkRum.instance?.sessionReplay.customIdentifiers[self] = newValue
+            SplunkRum.shared.sessionReplay.customIdentifiers[self] = newValue
+            SplunkRum.shared.interactions.register(customId: newValue, for: ObjectIdentifier(self))
         }
     }
 }

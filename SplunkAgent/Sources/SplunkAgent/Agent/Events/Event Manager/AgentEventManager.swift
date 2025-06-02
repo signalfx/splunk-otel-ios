@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
 /// Event manager publishes Module data, sends other events to exporters.
 ///
@@ -30,7 +30,7 @@ protocol AgentEventManager {
     var logEventProcessor: LogEventProcessor { get }
 
     /// Trace processor to process Traces.
-    var traceProcesssor: TraceProcessor { get }
+    var traceProcessor: TraceProcessor { get }
 
 
     // MARK: - Initialization
@@ -41,7 +41,9 @@ protocol AgentEventManager {
     ///   - configuration: Agent Configuration object.
     ///   - agent: Agent object, used to obtain Session information and User information.
     ///   - eventsModel: Events model object to store persisted events metadata.
-    init(with configuration: AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel)
+    ///
+    /// - Throws: Init should throw an error if provided configuration is invalid.
+    init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel) throws
 
 
     // MARK: - Module Events

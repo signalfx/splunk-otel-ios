@@ -17,8 +17,8 @@ limitations under the License.
 
 @testable import OpenTelemetrySdk
 @testable import SplunkAgent
+@testable import SplunkCommon
 @testable import SplunkOpenTelemetry
-@testable import SplunkSharedProtocols
 import XCTest
 
 
@@ -29,7 +29,7 @@ final class ResourcesTests: XCTestCase {
         // Agent initialization
         let configuration = try ConfigurationTestBuilder.buildDefault()
         let agent = try AgentTestBuilder.build(with: configuration)
-        agent.eventManager = DefaultEventManager(with: configuration, agent: agent)
+        agent.eventManager = try DefaultEventManager(with: configuration, agent: agent)
 
         // Get stored resources
         let eventManager = try XCTUnwrap(agent.eventManager as? DefaultEventManager)

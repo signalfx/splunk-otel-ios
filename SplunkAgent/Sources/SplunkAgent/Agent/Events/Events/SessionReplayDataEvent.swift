@@ -17,10 +17,26 @@ limitations under the License.
 
 import Foundation
 internal import CiscoSessionReplay
-internal import SplunkSharedProtocols
+internal import SplunkCommon
 
-/// Session Replay data events. Sends session replay blob with metadata.
+/// Session Replay data event. Sends session replay blob with metadata.
 class SessionReplayDataEvent: AgentEvent {
+
+    // MARK: - Event Identification
+
+    let domain = "mrum"
+    let name = "session_replay_data"
+    let instrumentationScope = PackageIdentifier.default(named: "sessionreplay")
+    let component = "session.replay"
+
+
+    // MARK: - Event properties
+
+    var sessionID: String?
+    var timestamp: Date?
+    var attributes: [String: EventAttributeValue]?
+    var body: EventAttributeValue?
+
 
     // MARK: - Initialization
 
@@ -31,11 +47,6 @@ class SessionReplayDataEvent: AgentEvent {
     ///   - data: Session replay blob of type `Data`.
     ///   - sessionID: The `session ID` of a session in which the event occured. Optional so that we can see sessions with no session id in the backend.
     public init(metadata: Metadata, data: Data, sessionID: String?) {
-        super.init()
-
-        // Event identification
-        name = "session_replay_data"
-        instrumentationScope = "com.splunk.rum.sessionreplay"
 
         // Event properties
         let timestamp = metadata.timestamp

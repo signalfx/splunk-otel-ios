@@ -31,7 +31,7 @@ struct SystemInfo {
             return UIDevice.current.systemName
 
         #elseif os(macOS)
-            return"macOS"
+            return "macOS"
         #endif
     }
 

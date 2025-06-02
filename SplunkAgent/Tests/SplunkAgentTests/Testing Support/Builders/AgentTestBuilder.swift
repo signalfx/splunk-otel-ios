@@ -31,10 +31,14 @@ final class AgentTestBuilder {
         return agent
     }
 
-    public static func build(with configuration: AgentConfiguration, session: AgentSession = DefaultSession()) throws -> SplunkRum {
+    public static func build(
+        with configuration: AgentConfiguration,
+        session: AgentSession = DefaultSession(),
+        user: AgentUser = DefaultUser(),
+        sessionSampler: AgentSessionSampler = SamplerFactory.alwaysOnSampler()
+    ) throws -> SplunkRum {
         // Custom key-value storage instance with different keys for testing
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "com.splunk.rum.test.")
-        let user = DefaultUser(storage: storage)
 
         let handler = ConfigurationHandler(
             for: configuration,
@@ -50,7 +54,8 @@ final class AgentTestBuilder {
             configurationHandler: handler,
             user: user,
             session: session,
-            appStateManager: appStateManager
+            appStateManager: appStateManager,
+            sessionSampler: sessionSampler
         )
 
         // Links the current session with the agent

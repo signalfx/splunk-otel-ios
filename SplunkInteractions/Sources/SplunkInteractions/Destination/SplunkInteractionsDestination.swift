@@ -15,12 +15,12 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 import CiscoInteractions
 
 /// Describes a destination into which the AppStart module sends it's results.
 public protocol SplunkInteractionsDestination {
 
     /// Sends results into a destination.
-    func send(event: InteractionEvent)
+    func send(actionName: String, elementId: String?, time: Date)
 }

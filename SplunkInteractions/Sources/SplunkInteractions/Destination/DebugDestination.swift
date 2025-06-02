@@ -16,8 +16,8 @@ limitations under the License.
 
 import CiscoInteractions
 import Foundation
-import SplunkLogger
-import SplunkSharedProtocols
+import CiscoLogger
+import SplunkCommon
 
 /// Stores results for testing purposes and prints results.
 class DebugDestination: SplunkInteractionsDestination {
@@ -25,15 +25,15 @@ class DebugDestination: SplunkInteractionsDestination {
     // MARK: - Private
 
     // Internal Logger
-    let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "SplunkInteractions"))
+    let internalLogger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkInteractions")
 
 
     // MARK: - Sending
 
-    func send(event: InteractionEvent) {
+    func send(actionName: String, elementId: String?, time: Date) {
 
         internalLogger.log(level: .info) {
-            "Sending interaction: \(event.id), type: \(event.type)"
+            "Sending interaction: \(actionName), type: \(elementId ?? "none"), time: \(time)"
         }
     }
 }

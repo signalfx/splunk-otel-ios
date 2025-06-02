@@ -17,19 +17,14 @@ limitations under the License.
 import CiscoInteractions
 import Foundation
 import OpenTelemetryApi
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// Creates and sends an OpenTelemetry span from supplied app start data.
 struct OTelDestination: SplunkInteractionsDestination {
 
     // MARK: - Sending
 
-    func send(event: InteractionEvent) {
-
-        guard let interactionType = interactionType(from: event) else {
-
-            return
-        }
+    func send(actionName: String, elementId: String?, time: Date) {
 
         let logProvider = OpenTelemetry.instance
             .loggerProvider
@@ -39,87 +34,18 @@ struct OTelDestination: SplunkInteractionsDestination {
 
         var attributes: [String: AttributeValue] = [:]
 
-        attributes["action.name"] = .string(interactionType)
+        attributes["action.name"] = .string(actionName)
 
-        if let elementId = targetElement(from: event) {
+        if let elementId {
             attributes["target.type"] = .string(elementId)
         }
 
         let logRecordBuilder = logProvider
             .logRecordBuilder()
-            .setTimestamp(event.time)
+            .setTimestamp(time)
             .setAttributes(attributes)
 
         // Send event
         logRecordBuilder.emit()
-    }
-
-
-    // MARK: - Private helper functions
-
-    private func targetElement(from event: InteractionEvent) -> String? {
-        var identifier: ObjectIdentifier?
-
-        if let targetElementId = event.gestureTap?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.gestureLongPress?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.gestureDoubleTap?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.gestureRageTap?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.gesturePinch?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.gestureRotation?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.focus?.targetElementId {
-            identifier = targetElementId
-        }
-
-        guard let identifier else {
-
-            return nil
-        }
-
-        return String(UInt(bitPattern: identifier))
-    }
-
-    private func interactionType(from event: InteractionEvent) -> String? {
-
-        switch event.type {
-
-        case .gestureTap:
-            "tap"
-
-        case .gestureLongPress:
-            "long_press"
-
-        case .gestureDoubleTap:
-            "double_tap"
-
-        case .gestureRageTap:
-            "rage_tap"
-
-        case .gesturePinch:
-            "pinch"
-
-        case .gestureRotation:
-            "rotation"
-
-        case .focus:
-            "focus"
-
-        case .softKeyboard:
-            "soft_keyboard"
-
-        default:
-            nil
-        }
     }
 }

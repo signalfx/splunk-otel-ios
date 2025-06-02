@@ -17,8 +17,9 @@ limitations under the License.
 
 import Foundation
 
-internal import SplunkLogger
+internal import CiscoLogger
 internal import CiscoSessionReplay
+internal import SplunkCommon
 
 /// The class implementing Session Replay public API.
 final class SessionReplay: SessionReplayModule {
@@ -33,7 +34,7 @@ final class SessionReplay: SessionReplayModule {
     // Temporarily removed with Rendering Modes.
     // var internalPreferences: (any SessionReplayModulePreferences)?
 
-    private let internalLogger: InternalLogger
+    private let logger: DefaultLogAgent
 
 
     // MARK: - Test support
@@ -45,7 +46,7 @@ final class SessionReplay: SessionReplayModule {
 
     init(for module: CiscoSessionReplay.SessionReplay) {
         self.module = module
-        internalLogger = InternalLogger(configuration: .agent(category: "SessionReplay Module"))
+        logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SessionReplay")
 
         // Monitor session changes in the agent.
         hookToAgentLifecycle()
@@ -87,7 +88,7 @@ final class SessionReplay: SessionReplayModule {
 
     // MARK: - Custom id
 
-    private(set) lazy var customId: any SessionReplayModuleCustomId = SessionReplaySensitivity(for: module)
+    private(set) lazy var customIdentifiers: any SessionReplayModuleCustomId = SessionReplayCustomId(for: module)
 
     // MARK: - State
 
@@ -114,7 +115,7 @@ extension SessionReplay {
             // self?.module.openNewSession()
 
             // Log the change for easier debugging
-            self?.internalLogger.log(level: .info) {
+            self?.logger.log(level: .info) {
                 "The current record from the Session Replay module will be split due to a session change."
             }
 

@@ -16,11 +16,11 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkSharedProtocols
+import SplunkCommon
 
 public struct NetworkInstrumentationConfiguration: ModuleConfiguration {}
 
-public struct NetworkInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
+public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
 
     // MARK: - Internal decoding
 
@@ -39,7 +39,6 @@ public struct NetworkInstrumentationRemoteConfiguration: RemoteModuleConfigurati
     struct Root: Decodable {
         let configuration: Configuration
     }
-
 
     // MARK: - Protocol compliance
 

@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import OpenTelemetryProtocolExporterCommon
 import Foundation
+import OpenTelemetryProtocolExporterCommon
 
 /// Defines description of request used to upload exported file
 struct RequestDescriptor: Codable {
@@ -27,6 +27,7 @@ struct RequestDescriptor: Codable {
     let endpoint: URL
     let explicitTimeout: TimeInterval
     var sentCount: Int = 0
+    var fileKeyType: String
 
     var scheduled: Date {
         Calendar.current.date(byAdding: nextRequestDelay, to: Date()) ?? Date()
@@ -35,6 +36,7 @@ struct RequestDescriptor: Codable {
     var shouldSend: Bool {
         return sentCount <= 5
     }
+
 
     // MARK: - Request creation methods
 

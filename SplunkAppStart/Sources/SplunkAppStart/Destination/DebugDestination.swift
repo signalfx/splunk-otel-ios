@@ -15,38 +15,81 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
-import SplunkLogger
-import SplunkSharedProtocols
+import SplunkCommon
 
 /// Stores results for testing purposes and prints results.
 class DebugDestination: AppStartDestination {
 
     // MARK: - Private
 
-    // Stored results
-    var type: AppStartType?
-    var startTime: Date?
-    var endTime: Date?
-    var events: [String: Date]?
+    // Stored app start
+    var storedAppStart: AppStartSpanData?
+
+    // Stored initialize
+    var storedInitialize: AgentInitializeSpanData?
 
     // Internal Logger
-    let internalLogger = InternalLogger(configuration: .default(subsystem: "Splunk Agent", category: "AppStart"))
+    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "AppStart")
 
 
     // MARK: - Sending
 
-    func send(type: AppStartType, start: Date, end: Date, sharedState: (any AgentSharedState)?, events: [String: Date]?) {
-        self.type = type
-        self.events = events
+    func send(appStart: AppStartSpanData, agentInitialize: AgentInitializeSpanData?, sharedState: (any AgentSharedState)?) {
+        storedAppStart = appStart
+        storedInitialize = agentInitialize
 
-        startTime = start
-        endTime = end
+        let appStartDuration = appStart.end.timeIntervalSince(appStart.start)
 
-        let duration = end.timeIntervalSince(start)
+        logger.log(level: .info) {
+            var string = """
+            App start span:
+                type: \(appStart.type),
+                start: \(appStart.start),
+                end: \(appStart.end),
+                duration: \(String(format: "%.3lfms", appStartDuration * 1000.0)),
+            """
 
-        internalLogger.log(level: .info) {
-            "Sending app start: \(type), duration: \(duration)s, events: \(events?.debugDescription ?? "none")"
+            string += "\n\tEvents:\n"
+            appStart.events?.forEach { event in
+                let timeIntervalMs = event.timestamp.timeIntervalSince(appStart.start) * 1000.0
+                string += String(format: "\t\t%@ +%.3lfms\n", event.name, timeIntervalMs)
+            }
+
+            return string
+        }
+
+        if let agentInitialize {
+            let initializeDuration = agentInitialize.end.timeIntervalSince(agentInitialize.start)
+            var configSettings = ""
+
+            for configurationSetting in agentInitialize.configurationSettings {
+                if configSettings.count > 0 {
+                    configSettings.append(", ")
+                }
+                configSettings.append("\(configurationSetting.key): \(configurationSetting.value)")
+            }
+
+            let configSettingsText = configSettings
+
+            logger.log(level: .info) {
+                var string = """
+                Initialize span:
+                    start: \(agentInitialize.start),
+                    end: \(agentInitialize.end),
+                    duration: \(String(format: "%.3lfms", initializeDuration * 1000.0)),
+                    config settings: \(configSettingsText)
+                """
+
+                string += "\n\tEvents:\n"
+                agentInitialize.events?.forEach { event in
+                    let timeIntervalMs = event.timestamp.timeIntervalSince(agentInitialize.start) * 1000.0
+                    string += String(format: "\t\t%@ +%.3lfms\n", event.name, timeIntervalMs)
+                }
+
+                return string
+            }
         }
     }
 }

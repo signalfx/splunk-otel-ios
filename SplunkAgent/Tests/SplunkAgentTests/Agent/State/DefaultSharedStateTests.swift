@@ -39,6 +39,9 @@ final class DefaultSharedStateTests: XCTestCase {
         let currentSessionItem = agent.currentSession.currentSessionItem
         XCTAssertEqual(sessionId, currentSessionItem.id)
         XCTAssertNotNil(currentSessionItem.start)
+
+        let agentVersion = sharedState.agentVersion
+        XCTAssertEqual(agentVersion, SplunkRum.version)
     }
 
     func testAppStateRetrieval() throws {

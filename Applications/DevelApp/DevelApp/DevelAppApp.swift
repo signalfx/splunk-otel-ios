@@ -5,8 +5,8 @@
 //  Created by Pavel Kroh on 30.09.2023.
 //
 
-import SwiftUI
 import SplunkAgent
+import SwiftUI
 
 @main
 struct DevelAppApp: App {
@@ -14,7 +14,7 @@ struct DevelAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RoutingView()
                 .onAppear(perform: {
                     agent.sessionReplay.start()
                 })
@@ -22,15 +22,17 @@ struct DevelAppApp: App {
     }
 
     private static func initAgent() -> SplunkRum {
-        let agentConfig = try! AgentConfiguration(
-            rumAccessToken: "token",
-            endpoint: .init(realm: "realm"),
+        let agentConfig = AgentConfiguration(
+            endpoint: .init(realm: "realm", rumAccessToken: "token"),
             appName: "App Name",
             deploymentEnvironment: "dev"
         )
             .enableDebugLogging(true)
+            // Sampled-out agent
+            //.sessionSamplingRate(0)
+            .sessionSamplingRate(1)
 
-        let agent = SplunkRum.install(with: agentConfig)
+        let agent = try! SplunkRum.install(with: agentConfig)
 
         return agent
     }

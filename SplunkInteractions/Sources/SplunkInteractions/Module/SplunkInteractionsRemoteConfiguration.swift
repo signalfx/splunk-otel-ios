@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkSharedProtocols
+import SplunkCommon
 import Foundation
 
 /// SplunkInteractions remote configuration, minimal configuration for module conformance.
