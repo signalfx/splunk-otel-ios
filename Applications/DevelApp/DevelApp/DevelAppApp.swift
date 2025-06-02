@@ -29,8 +29,8 @@ struct DevelAppApp: App {
         )
             .enableDebugLogging(true)
             // Sampled-out agent
-            //.sessionSamplingRate(0)
-            .sessionSamplingRate(1)
+            //.sessionConfiguration(SessionConfiguration(samplingRate: 0))
+            .sessionConfiguration(SessionConfiguration(samplingRate: 1))
 
         let agent = try! SplunkRum.install(with: agentConfig)
 

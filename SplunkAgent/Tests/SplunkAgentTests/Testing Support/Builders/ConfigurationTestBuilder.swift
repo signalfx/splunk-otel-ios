@@ -49,9 +49,12 @@ final class ConfigurationTestBuilder {
             deploymentEnvironment: deploymentEnvironment
         )
 
+        var sessionConfiguration = SessionConfiguration()
+        sessionConfiguration.samplingRate = 1.0
+
         configuration.appVersion = appVersion
         configuration.enableDebugLogging = true
-        configuration.sessionSamplingRate = 1
+        configuration.session = sessionConfiguration
         configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
         configuration.spanInterceptor = { spanData in
             spanData
@@ -75,9 +78,12 @@ final class ConfigurationTestBuilder {
             deploymentEnvironment: deploymentEnvironment
         )
 
+        var sessionConfiguration = SessionConfiguration()
+        sessionConfiguration.samplingRate = 0.0
+
         configuration.appVersion = appVersion
         configuration.enableDebugLogging = true
-        configuration.sessionSamplingRate = 0
+        configuration.session = sessionConfiguration
         configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
         configuration.spanInterceptor = { spanData in
             spanData

@@ -223,6 +223,10 @@ public class SplunkRum: ObservableObject {
             sessionSampler: DefaultAgentSessionSampler()
         )
 
+        // TODO: uncomment when implemented
+        // Set the configured user tracking mode
+//        user.preferences.trackingMode = configuration.user.trackingMode
+
         initializeEvents["agent_instance_initialized"] = Date()
 
         // Links the current session with the agent
