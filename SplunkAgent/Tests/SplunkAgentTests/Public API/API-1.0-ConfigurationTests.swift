@@ -164,13 +164,13 @@ final class API10ConfigurationTests: XCTestCase {
         
         var userConfiguration = UserConfiguration()
         userConfiguration.trackingMode = .anonymousTracking
-        
 
         // Builder methods
         let configuration = try ConfigurationTestBuilder.buildMinimal()
             .appVersion(appVersion)
             .enableDebugLogging(debugLogging)
             .sessionConfiguration(sessionConfiguration)
+            .userConfiguration(userConfiguration)
             .globalAttributes(globalAttributes)
             .spanInterceptor { spanData in
                 spanData
@@ -180,6 +180,7 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration.appVersion, appVersion)
         XCTAssertEqual(configuration.enableDebugLogging, debugLogging)
         XCTAssertEqual(configuration.session.samplingRate, sampling)
+        XCTAssertEqual(configuration.user.trackingMode, userTrackingMode)
         XCTAssertEqual(configuration.globalAttributes, globalAttributes)
         XCTAssertNotNil(configuration.spanInterceptor)
     }
