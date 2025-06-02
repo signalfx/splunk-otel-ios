@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-	
+
 public extension PackageIdentifier {
 
     // MARK: - Package identification for instances
@@ -31,5 +31,19 @@ public extension PackageIdentifier {
         }
 
         return "\(`default`)-\(named)"
+    }
+
+    /// Creates an identifier for non-operational instances
+    /// based on `default` extended by a suffix with the instance name.
+    ///
+    /// - Parameter named: A `String` with instance extension.
+    ///
+    /// - Returns: A newly assembled `String` with an extended identifier.
+    static func nonOperationalInstance(named: String = "default") -> String {
+        guard !named.isEmpty else {
+            return "\(`default`)-noop-default"
+        }
+
+        return "\(`default`)-noop-\(named)"
     }
 }
