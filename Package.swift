@@ -57,6 +57,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",
                 "SplunkNetwork",
+                "SplunkNetworkInfo",
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkAppStart",

@@ -25,6 +25,10 @@ internal import SplunkCommon
     internal import SplunkNetwork
 #endif
 
+#if canImport(SplunkNetworkInfo)
+    internal import SplunkNetworkInfo
+#endif
+
 #if canImport(CiscoSessionReplay)
     internal import CiscoSessionReplay
     internal import SplunkSessionReplayProxy
