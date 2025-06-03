@@ -62,6 +62,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkAppStart",
                 "SplunkWebView",
                 "SplunkWebViewProxy",
+                "SplunkCustomTracking",
                 resolveDependency("logger")
             ],
             path: "SplunkAgent",
@@ -130,8 +131,8 @@ func generateMainTargets() -> [Target] {
             dependencies: ["SplunkSlowFrameDetector", "SplunkCommon"],
             path: "SplunkSlowFrameDetector/Tests"
         ),
-        
-        
+
+
         // MARK: - SplunkCrashReporter
 
         .target(
@@ -295,6 +296,29 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("logger")
             ],
             path: "SplunkWebViewProxy/Tests"
+        ),
+
+
+        // MARK: - Splunk Custom Tracking
+        
+        .target(
+            name: "SplunkCustomTracking",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                resolveDependency("logger")
+            ],
+            path: "SplunkCustomTracking/Sources"
+        ),
+        .testTarget(
+            name: "SplunkCustomTrackingTests",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                "SplunkCustomTracking",
+                resolveDependency("logger")
+            ],
+            path: "SplunkCustomTracking/Tests"
         ),
 
 

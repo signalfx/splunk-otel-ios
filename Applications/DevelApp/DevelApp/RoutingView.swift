@@ -24,6 +24,9 @@ struct RoutingView: View {
                 NavigationLink(destination: CrashDemoView()) {
                     Text("Crash Demo")
                 }
+                NavigationLink(destination: CustomTrackingDemoView()) {
+                    Text("Custom Tracking Demo")
+                }
                 NavigationLink(destination: SessionReplayDemoView()) {
                     Text("Session Replay Demo")
                 }
