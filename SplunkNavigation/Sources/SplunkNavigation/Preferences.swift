@@ -32,6 +32,8 @@ public final class Preferences: Codable, Sendable {
     // MARK: - Automated tracking
 
     /// A `Boolean` value determines whether the module should automatically detect navigation in the application.
+    ///
+    /// The default value is `nil` (no preferred mode). However, this detection is disabled by default, see ``RuntimeState``.
     public nonisolated(unsafe) var enableAutomatedTracking: Bool? {
         didSet {
             module?.update()
