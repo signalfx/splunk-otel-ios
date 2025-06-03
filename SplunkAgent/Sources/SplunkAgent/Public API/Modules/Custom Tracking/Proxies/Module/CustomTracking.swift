@@ -20,9 +20,9 @@ internal import SplunkCustomTracking
 
 final class CustomTracking: CustomTrackingModule {
 
-    unowned let module: SplunkCustomTracking.CustomTracking
+    unowned let module: CustomTrackingInternal
 
-    init(for module: SplunkCustomTracking.CustomTracking) {
+    init(for module: CustomTrackingInternal) {
         self.module = module
     }
 }

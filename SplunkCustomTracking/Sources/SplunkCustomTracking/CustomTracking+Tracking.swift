@@ -18,7 +18,7 @@ limitations under the License.
 import OpenTelemetryApi
 import SplunkCommon
 
-public extension CustomTracking {
+public extension CustomTrackingInternal {
 
 
     // MARK: - Internal Tracking Methods
@@ -36,9 +36,9 @@ public extension CustomTracking {
         }
 
         // Metadata and data for the event
-        let metadata = InternalCustomTrackingMetadata()
+        let metadata = CustomTrackingMetadata()
 
-        let data = InternalCustomTrackingData(name: event.typeName, attributes: event.toAttributesDictionary())
+        let data = CustomTrackingData(name: event.typeName, attributes: event.toAttributesDictionary())
 
         // Publish the event using the block
         onPublishBlock(metadata, data)
@@ -57,13 +57,13 @@ public extension CustomTracking {
         }
 
         // Metadata for the issue
-        let metadata = InternalCustomTrackingMetadata()
+        let metadata = CustomTrackingMetadata()
 
         // Combine the provided attributes with attributes from the issue
         let combinedAttributes = attributes.merging(issue.toAttributesDictionary()) { $1 }
 
         // Create the tracking data
-        let data = InternalCustomTrackingData(name: issue.typeName, attributes: combinedAttributes)
+        let data = CustomTrackingData(name: issue.typeName, attributes: combinedAttributes)
 
         // Publish the issue using the block
         onPublishBlock(metadata, data)

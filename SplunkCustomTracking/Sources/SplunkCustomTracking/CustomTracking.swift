@@ -21,11 +21,26 @@ import OpenTelemetryApi
 import SplunkCommon
 
 
+public struct CustomTrackingMetadata: ModuleEventMetadata {
+    public var timestamp = Date()
+}
+
+public struct CustomTrackingData: ModuleEventData {
+    public let name: String
+    public let attributes: [String: AttributeValue]
+
+    public init(name: String, attributes: [String: AttributeValue]) {
+        self.name = name
+        self.attributes = attributes
+    }
+}
+
+
 // MARK: - CustomTracking internal module
 
-public final class CustomTracking {
+public final class CustomTrackingInternal {
 
-    public static var instance = CustomTracking()
+    public static var instance = CustomTrackingInternal()
 
 
     // MARK: - Private Properties
@@ -35,23 +50,9 @@ public final class CustomTracking {
 
     // Shared state
     public unowned var sharedState: AgentSharedState?
-    public var onPublishBlock: ((any ModuleEventMetadata, any ModuleEventData) -> Void)?
+    public var onPublishBlock: ((CustomTrackingMetadata, CustomTrackingData) -> Void)?
 
 
     // Module conformance
     public required init() {}
-
-    internal struct InternalCustomTrackingMetadata: ModuleEventMetadata {
-        public var timestamp = Date()
-    }
-
-    internal struct InternalCustomTrackingData: ModuleEventData {
-        public let name: String
-        public let attributes: [String: AttributeValue]
-
-        public init(name: String, attributes: [String: AttributeValue]) {
-            self.name = name
-            self.attributes = attributes
-        }
-    }
 }

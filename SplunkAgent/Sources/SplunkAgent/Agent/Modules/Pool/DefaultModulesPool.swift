@@ -86,7 +86,7 @@ class DefaultModulesPool: AgentModulesPool {
 
         // Custom Tracking
         #if canImport(SplunkCustomTracking)
-            knownModules.append(SplunkCustomTracking.CustomTracking.self)
+            knownModules.append(CustomTrackingInternal.self)
         #endif
 
         return knownModules
