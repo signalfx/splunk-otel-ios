@@ -43,6 +43,10 @@ internal import SplunkCommon
     internal import SplunkWebViewProxy
 #endif
 
+#if canImport(SplunkInteractions)
+    internal import SplunkInteractions
+#endif
+
 
 /// The class implements the default pool of available modules.
 class DefaultModulesPool: AgentModulesPool {
@@ -78,6 +82,11 @@ class DefaultModulesPool: AgentModulesPool {
         // Web View Instrumentation
         #if canImport(SplunkWebView)
             knownModules.append(WebViewInstrumentationInternal.self)
+        #endif
+
+        // App Start
+        #if canImport(SplunkInteractions)
+            knownModules.append(SplunkInteractions.self)
         #endif
 
         return knownModules
