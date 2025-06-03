@@ -3,15 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		3384F28A2AC8795800512D79 /* DevelAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3384F2892AC8795800512D79 /* DevelAppApp.swift */; };
 		3384F28E2AC8795800512D79 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3384F28D2AC8795800512D79 /* Assets.xcassets */; };
 		3384F2922AC8795800512D79 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3384F2912AC8795800512D79 /* Preview Assets.xcassets */; };
-		4B1CE9FD2D9554D100A8CCCE /* SplunkAgent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B1CE9FC2D9554D100A8CCCE /* SplunkAgent.framework */; };
-		4B1CE9FE2D9554D100A8CCCE /* SplunkAgent.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4B1CE9FC2D9554D100A8CCCE /* SplunkAgent.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4BD024D32DE79F9000ADB31D /* SplunkAgent in Frameworks */ = {isa = PBXBuildFile; productRef = 4BD024D22DE79F9000ADB31D /* SplunkAgent */; };
 		522DB6C82DC134C70047FBCD /* RoutingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522DB6C72DC134C70047FBCD /* RoutingView.swift */; };
 		522DB6CA2DC135920047FBCD /* SessionReplayDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522DB6C92DC135920047FBCD /* SessionReplayDemoView.swift */; };
 		522DB6CC2DC135BC0047FBCD /* TemplateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522DB6CB2DC135BC0047FBCD /* TemplateView.swift */; };
@@ -22,20 +21,6 @@
 		527070E02DC147AB00EDD390 /* AgentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527070DF2DC147AB00EDD390 /* AgentDataSource.swift */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		4B1CE9FF2D9554D100A8CCCE /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				4B1CE9FE2D9554D100A8CCCE /* SplunkAgent.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		3384F2862AC8795800512D79 /* DevelApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DevelApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3384F2892AC8795800512D79 /* DevelAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevelAppApp.swift; sourceTree = "<group>"; };
@@ -43,7 +28,6 @@
 		3384F28F2AC8795800512D79 /* DevelApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DevelApp.entitlements; sourceTree = "<group>"; };
 		3384F2912AC8795800512D79 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3384F2AE2AC87A3B00512D79 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4B1CE9FC2D9554D100A8CCCE /* SplunkAgent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SplunkAgent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		522DB6C72DC134C70047FBCD /* RoutingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutingView.swift; sourceTree = "<group>"; };
 		522DB6C92DC135920047FBCD /* SessionReplayDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionReplayDemoView.swift; sourceTree = "<group>"; };
 		522DB6CB2DC135BC0047FBCD /* TemplateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateView.swift; sourceTree = "<group>"; };
@@ -59,7 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B1CE9FD2D9554D100A8CCCE /* SplunkAgent.framework in Frameworks */,
+				4BD024D32DE79F9000ADB31D /* SplunkAgent in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,7 +98,6 @@
 		3384F2AF2AC87A4300512D79 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4B1CE9FC2D9554D100A8CCCE /* SplunkAgent.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -126,10 +109,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3384F2952AC8795800512D79 /* Build configuration list for PBXNativeTarget "DevelApp" */;
 			buildPhases = (
+				4BD024D72DE79FDC00ADB31D /* Swift Lint & Swift Format */,
 				3384F2822AC8795800512D79 /* Sources */,
 				3384F2832AC8795800512D79 /* Frameworks */,
 				3384F2842AC8795800512D79 /* Resources */,
-				4B1CE9FF2D9554D100A8CCCE /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -148,7 +131,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					3384F2852AC8795800512D79 = {
 						CreatedOnToolsVersion = 15.0;
@@ -156,7 +139,6 @@
 				};
 			};
 			buildConfigurationList = 3384F2812AC8795700512D79 /* Build configuration list for PBXProject "DevelApp" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -165,7 +147,9 @@
 			);
 			mainGroup = 3384F27D2AC8795700512D79;
 			packageReferences = (
+				4BD024D12DE79F9000ADB31D /* XCLocalSwiftPackageReference "../../../splunk-otel-ios" */,
 			);
+			preferredProjectObjectVersion = 77;
 			productRefGroup = 3384F2872AC8795800512D79 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -262,6 +246,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -323,6 +308,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -351,6 +337,7 @@
 				CODE_SIGN_ENTITLEMENTS = DevelApp/DevelApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"DevelApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 9J84E5CFM9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -395,6 +382,7 @@
 				CODE_SIGN_ENTITLEMENTS = DevelApp/DevelApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"DevelApp/Preview Content\"";
 				DEVELOPMENT_TEAM = 9J84E5CFM9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -453,6 +441,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		4BD024D12DE79F9000ADB31D /* XCLocalSwiftPackageReference "../../../splunk-otel-ios" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../splunk-otel-ios";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4BD024D22DE79F9000ADB31D /* SplunkAgent */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SplunkAgent;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3384F27E2AC8795700512D79 /* Project object */;
 }

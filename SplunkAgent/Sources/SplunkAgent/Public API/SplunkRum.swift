@@ -46,8 +46,12 @@ public class SplunkRum: ObservableObject {
 
     lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
 
+    lazy var globalAttributes = agentConfiguration.globalAttributes
+
     let logProcessor: LogProcessor
     let logger: LogAgent
+
+    let sessionSampler: any AgentSessionSampler
 
 
     // MARK: - Internal (Modules Proxy)
@@ -69,11 +73,13 @@ public class SplunkRum: ObservableObject {
     /// A singleton shared instance of the Agent library.
     ///
     /// This shared instance is used to access all SDK functions.
-    public private(set) static var shared = SplunkRum(
+    public internal(set) static var shared = SplunkRum(
         configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
         user: NoOpUser(),
         session: NoOpSession(),
-        appStateManager: NoOpAppStateManager()
+        appStateManager: NoOpAppStateManager(),
+        logPoolName: PackageIdentifier.nonOperationalInstance(),
+        sessionSampler: DefaultAgentSessionSampler()
     )
 
 
@@ -136,9 +142,12 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
-        // Preparation for sampling check
-        let sampledOut = false
-        if sampledOut {
+        // Re-configure and call the Session Sampler.
+        shared.sessionSampler.configure(with: configuration)
+        let samplingDecision = shared.sessionSampler.sample()
+
+        // Continue with a noop instance in case of sampling out.
+        if samplingDecision == .sampledOut {
             shared.currentStatus = .notRunning(.sampledOut)
 
             shared.logger.log(level: .notice, isPrivate: false) {
@@ -162,7 +171,14 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Initialization
 
-    required init(configurationHandler: AgentConfigurationHandler, user: AgentUser, session: AgentSession, appStateManager: AgentAppStateManager) {
+    required init(
+        configurationHandler: AgentConfigurationHandler,
+        user: AgentUser,
+        session: AgentSession,
+        appStateManager: AgentAppStateManager,
+        logPoolName: String? = nil,
+        sessionSampler: AgentSessionSampler
+    ) {
         // Pass user configuration
         agentConfigurationHandler = configurationHandler
 
@@ -173,20 +189,24 @@ public class SplunkRum: ObservableObject {
         currentUser = user
         currentSession = session
 
-        let logPoolName = PackageIdentifier.instance()
+        let poolName = logPoolName ?? PackageIdentifier.instance()
         let verboseLogging = agentConfigurationHandler.configuration.enableDebugLogging
 
         // Configure internal logging
         logProcessor = DefaultLogProcessor(
-            poolName: logPoolName,
+            poolName: poolName,
             subsystem: PackageIdentifier.default
         )
         .verbosity(verboseLogging ? .verbose : .default)
 
-        logger = DefaultLogAgent(poolName: logPoolName, category: "Agent")
+        logger = DefaultLogAgent(poolName: poolName, category: "Agent")
 
         // Assign AppState manager
         self.appStateManager = appStateManager
+
+        // Assign and configure the session sampler
+        self.sessionSampler = sessionSampler
+        self.sessionSampler.configure(with: agentConfiguration)
     }
 
     convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {
@@ -206,7 +226,8 @@ public class SplunkRum: ObservableObject {
             configurationHandler: configurationHandler,
             user: DefaultUser(),
             session: DefaultSession(),
-            appStateManager: AppStateManager()
+            appStateManager: AppStateManager(),
+            sessionSampler: DefaultAgentSessionSampler()
         )
 
         initializeEvents["agent_instance_initialized"] = Date()
