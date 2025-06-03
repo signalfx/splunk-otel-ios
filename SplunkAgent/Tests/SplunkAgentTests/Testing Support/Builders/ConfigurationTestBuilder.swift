@@ -51,7 +51,33 @@ final class ConfigurationTestBuilder {
 
         configuration.appVersion = appVersion
         configuration.enableDebugLogging = true
-        configuration.sessionSamplingRate = 0.1
+        configuration.sessionSamplingRate = 1
+        configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
+        configuration.spanInterceptor = { spanData in
+            spanData
+        }
+
+        return configuration
+    }
+
+    public static func buildDefaultSampledOut() throws -> AgentConfiguration {
+
+        // Default endpoint configuration for unit testing
+        let endpoint = EndpointConfiguration(
+            realm: realm,
+            rumAccessToken: rumAccessToken
+        )
+
+        // Default configuration for unit testing
+        var configuration = AgentConfiguration(
+            endpoint: endpoint,
+            appName: appName,
+            deploymentEnvironment: deploymentEnvironment
+        )
+
+        configuration.appVersion = appVersion
+        configuration.enableDebugLogging = true
+        configuration.sessionSamplingRate = 0
         configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
         configuration.spanInterceptor = { spanData in
             spanData

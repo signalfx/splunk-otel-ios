@@ -32,4 +32,18 @@ public extension PackageIdentifier {
 
         return "\(`default`)-\(named)"
     }
+
+    /// Creates an identifier for non-operational instances
+    /// based on `default` extended by a suffix with the instance name.
+    ///
+    /// - Parameter named: A `String` with instance extension.
+    ///
+    /// - Returns: A newly assembled `String` with an extended identifier.
+    static func nonOperationalInstance(named: String = "default") -> String {
+        guard !named.isEmpty else {
+            return "\(`default`)-noop-default"
+        }
+
+        return "\(`default`)-noop-\(named)"
+    }
 }
