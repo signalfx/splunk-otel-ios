@@ -20,6 +20,9 @@ import SplunkCommon
 
 
 // `CustomTrackingData` can be used as an event type that the module produces.
+
+// TODO: DEMRUM-861: commented, as there are duplicates in CustomTracking.swift. Delete this?
+/*
 public struct CustomTrackingData: ModuleEventData {
     public let name: String
     public let attributes: [String: EventAttributeValue]
@@ -28,11 +31,11 @@ public struct CustomTrackingData: ModuleEventData {
 public struct CustomTrackingMetadata: ModuleEventMetadata {
     public var timestamp = Date()
 }
-
+ */
 
 // Defines CustomTracking conformance to `Module` protocol
 // and implements methods that are missing in the original `CustomTracking`.
-extension CustomTracking: Module {
+extension CustomTrackingInternal: Module {
 
     public typealias Configuration = CustomTrackingConfiguration
     public typealias RemoteConfiguration = CustomTrackingRemoteConfiguration
@@ -41,17 +44,11 @@ extension CustomTracking: Module {
     public typealias EventData = CustomTrackingData
 
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?) {
-        _ = CustomTracking.instance
+        _ = CustomTrackingInternal.instance
     }
 
     public func onPublish(data: @escaping (CustomTrackingMetadata, CustomTrackingData) -> Void) {
-        CustomTracking.instance.onPublishBlock = { (metadata: any ModuleEventMetadata, customData: any ModuleEventData) in
-            guard let metadata = metadata as? CustomTrackingMetadata,
-                  let customData = customData as? CustomTrackingData else {
-                return
-            }
-            data(metadata, customData)
-        }
+        onPublishBlock = data
     }
 
     public func deleteData(for metadata: any SplunkCommon.ModuleEventMetadata) {}

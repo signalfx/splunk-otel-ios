@@ -19,6 +19,7 @@ import Combine
 import Foundation
 internal import SplunkCommon
 
+// TODO: DEMRUM-861: there are unnecessary MARKs, which are also causing lint issues. I'd suggest removing them.
 
 // MARK: - CustomTracking
 
