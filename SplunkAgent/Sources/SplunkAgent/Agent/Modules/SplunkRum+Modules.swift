@@ -19,6 +19,7 @@ import Foundation
 internal import CiscoSessionReplay
 internal import SplunkAppStart
 internal import SplunkNetwork
+internal import SplunkNetworkInfo
 
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
@@ -53,6 +54,7 @@ extension SplunkRum {
         customizeSessionReplay()
         customizeNetwork()
         customizeAppStart()
+        customizeNetworkInfo()
         customizeWebViewInstrumentation()
     }
 
@@ -111,6 +113,13 @@ extension SplunkRum {
         let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
 
         appStartModule?.sharedState = sharedState
+    }
+
+    /// Configure NetworkInfo module
+    private func customizeNetworkInfo() {
+        let networkInfoModule = modulesManager?.module(ofType: SplunkNetworkInfo.NetworkInfo.self)
+
+        networkInfoModule?.sharedState = sharedState
     }
 
     /// Configure WebView intrumentation module

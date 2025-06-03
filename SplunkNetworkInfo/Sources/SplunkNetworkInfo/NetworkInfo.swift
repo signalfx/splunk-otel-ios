@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 import Network
+import SplunkCommon
 import OpenTelemetryApi
 
 public class NetworkInfo {
@@ -28,11 +29,13 @@ public class NetworkInfo {
         case lost
     }
 
+    /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
+    public unowned var sharedState: AgentSharedState?
+
     public static let shared = NetworkInfo()
 
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitorQueue")
-    private var tracer: Tracer
 
     public private(set) var isConnected: Bool = false
     public private(set) var connectionType: ConnectionType = .lost
@@ -43,9 +46,7 @@ public class NetworkInfo {
     // MARK: - Initialization
 
     // Module conformance
-    public required init() {
-        self.tracer = OpenTelemetry.instance.tracerProvider.get(instrumentationName: "NetworkInfo", instrumentationVersion: "1.0")
-    }
+    public required init() { }
 
     public func startDetection() {
         monitor.pathUpdateHandler = { [weak self] path in
@@ -83,10 +84,20 @@ public class NetworkInfo {
     }
 
     private func sendNetworkChangeSpan() {
-        let span = tracer.spanBuilder(spanName: "network.change").startSpan()
+
+        let tracer = OpenTelemetry.instance
+            .tracerProvider
+            .get(
+                instrumentationName: "NetworkInfo",
+                instrumentationVersion: sharedState?.agentVersion
+            )
+
+        let span = tracer.spanBuilder(spanName: "network.change")
+                .setStartTime(time: Date())
+                .startSpan()
         span.setAttribute(key: "network.connected", value: isConnected)
         span.setAttribute(key: "network.connection.type", value: connectionType.rawValue)
         span.setAttribute(key: "network.vpn", value: isVPNActive)
-        span.end()
+        span.end(time: Date())
     }
 }
