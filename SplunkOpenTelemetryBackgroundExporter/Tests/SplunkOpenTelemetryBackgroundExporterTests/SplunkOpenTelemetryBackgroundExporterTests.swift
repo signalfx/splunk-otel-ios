@@ -22,7 +22,7 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
 
     // MARK: - Private
 
-    let fileKeyType: String = "test"
+    let fileKeyType: String = "logfile"
 
 
     // MARK: - Should send tests
