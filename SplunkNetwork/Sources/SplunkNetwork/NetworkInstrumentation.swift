@@ -152,17 +152,37 @@ public class NetworkInstrumentation {
         }
     }
 
-    let serverTimingPattern = #"traceparent;desc=['\"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['\"]"#
-
     func addLinkToSpan(span: Span, valStr: String) {
-        let regex = try! NSRegularExpression(pattern: serverTimingPattern)
+
+        let serverTimingPattern = #"traceparent;desc=['"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['"]"#
+
+        guard let regex = try? NSRegularExpression(pattern: serverTimingPattern) else {
+            self.logger.log(level: .fault) {
+                "Regex failed to compile"
+            }
+            // Intentional hard failure in both Debug and Release builds
+            preconditionFailure("Regex failed to compile. Likely programmer error in edit of serverTimingPattern regex: #\(serverTimingPattern)#")
+        }
+
+        // Match the regex against the input string
         let result = regex.matches(in: valStr, range: NSRange(location: 0, length: valStr.utf16.count))
-        // per standard regex logic, number of matched segments is 3 (whole match plus two () captures)
-        if result.count != 1 || result[0].numberOfRanges != 3 {
+
+        // Ensure there's exactly one match and the correct number of capture groups
+        guard result.count == 1, result[0].numberOfRanges == 3,
+              let traceIdRange = Range(result[0].range(at: 1), in: valStr),
+              let spanIdRange = Range(result[0].range(at: 2), in: valStr) else {
+            // If the match or capture groups are invalid, log and return early
+            // Also, prevent over-long log output
+            let truncatedValStr = valStr.count > 255 ? String(valStr.prefix(252)) + "..." : valStr
+            self.logger.log(level: .debug) {
+                "Failed to match traceparent string: \(truncatedValStr)"
+            }
             return
         }
-        let traceId = String(valStr[Range(result[0].range(at: 1), in: valStr)!])
-        let spanId = String(valStr[Range(result[0].range(at: 2), in: valStr)!])
+
+        let traceId = String(valStr[traceIdRange])
+        let spanId = String(valStr[spanIdRange])
+
         span.setAttribute(key: "link.traceId", value: traceId)
         span.setAttribute(key: "link.spanId", value: spanId)
     }
