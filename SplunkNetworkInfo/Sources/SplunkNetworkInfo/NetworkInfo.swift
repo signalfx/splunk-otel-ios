@@ -25,6 +25,7 @@ public class NetworkInfo {
         case wifi
         case cellular
         case wiredEthernet
+        case vpn
         case other
         case lost
     }
@@ -39,9 +40,8 @@ public class NetworkInfo {
 
     public private(set) var isConnected: Bool = false
     public private(set) var connectionType: ConnectionType = .lost
-    public private(set) var isVPNActive: Bool = false
 
-    public var statusChangeHandler: ((Bool, ConnectionType, Bool) -> Void)?
+    public var statusChangeHandler: ((Bool, ConnectionType) -> Void)?
 
     // MARK: - Initialization
 
@@ -53,14 +53,8 @@ public class NetworkInfo {
             guard let self = self else { return }
             self.isConnected = path.status == .satisfied
             self.connectionType = self.getConnectionType(path)
-            self.isVPNActive = path.availableInterfaces.contains(where: { iface in
-                iface.type == .other &&
-                (iface.name.lowercased().contains("utun") ||
-                 iface.name.lowercased().contains("ppp") ||
-                 iface.name.lowercased().contains("ipsec"))
-            })
             self.sendNetworkChangeSpan()
-            self.statusChangeHandler?(self.isConnected, self.connectionType, self.isVPNActive)
+            self.statusChangeHandler?(self.isConnected, self.connectionType)
         }
         monitor.start(queue: queue)
         // Send initial state span
@@ -79,12 +73,18 @@ public class NetworkInfo {
         } else if path.status == .unsatisfied {
             return .lost
         } else {
-            return .other
+            // Check for VPN
+            let isVPN = path.availableInterfaces.contains(where: { iface in
+                iface.type == .other &&
+                (iface.name.lowercased().contains("utun") ||
+                 iface.name.lowercased().contains("ppp") ||
+                 iface.name.lowercased().contains("ipsec"))
+            })
+            return isVPN ? .vpn : .other
         }
     }
 
     private func sendNetworkChangeSpan() {
-
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
@@ -95,9 +95,8 @@ public class NetworkInfo {
         let span = tracer.spanBuilder(spanName: "network.change")
                 .setStartTime(time: Date())
                 .startSpan()
-        span.setAttribute(key: "network.connected", value: isConnected)
+        span.setAttribute(key: "network.status", value: isConnected)
         span.setAttribute(key: "network.connection.type", value: connectionType.rawValue)
-        span.setAttribute(key: "network.vpn", value: isVPNActive)
         span.end(time: Date())
     }
 }
