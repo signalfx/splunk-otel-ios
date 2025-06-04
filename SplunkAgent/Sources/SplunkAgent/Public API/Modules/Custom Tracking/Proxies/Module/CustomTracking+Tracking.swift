@@ -29,7 +29,7 @@ extension CustomTracking {
 
     /// Track a custom event by name with attributes.
     @discardableResult func trackCustomEvent(_ name: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        module.track(SplunkTrackableEvent(typeName: name, attributes: attributes.getAll()))
+        module.track(SplunkTrackableEvent(typeName: name, attributes: attributes.toEventAttributes()))
         return self
     }
 
@@ -37,22 +37,22 @@ extension CustomTracking {
     // MARK: - Custom Tracking - Errors
 
     @discardableResult func trackError(_ message: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        module.track(SplunkIssue(from: message), attributes.getAll())
+        module.track(SplunkIssue(from: message), attributes.toEventAttributes())
         return self
     }
 
     @discardableResult func trackError(_ error: Error, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        module.track(SplunkIssue(from: error), attributes.getAll())
+        module.track(SplunkIssue(from: error), attributes.toEventAttributes())
         return self
     }
 
     @discardableResult func trackError(_ nsError: NSError, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        module.track(SplunkIssue(from: nsError), attributes.getAll())
+        module.track(SplunkIssue(from: nsError), attributes.toEventAttributes())
         return self
     }
 
     @discardableResult func trackException(_ exception: NSException, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        module.track(SplunkIssue(from: exception), attributes.getAll())
+        module.track(SplunkIssue(from: exception), attributes.toEventAttributes())
         return self
     }
 }

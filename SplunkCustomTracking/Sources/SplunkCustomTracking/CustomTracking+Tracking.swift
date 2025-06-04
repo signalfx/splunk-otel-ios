@@ -47,7 +47,7 @@ public extension CustomTrackingInternal {
 
     // MARK: - Custom Error Tracking
 
-    func track(_ issue: SplunkTrackableIssue, _ attributes: [String: AttributeValue]) {
+    func track(_ issue: SplunkTrackableIssue, _ attributes: [String: EventAttributeValue]) {
         // OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "customError")
 
         // Ensure the `onPublishBlock` is set

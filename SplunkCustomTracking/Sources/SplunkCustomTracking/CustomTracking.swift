@@ -27,9 +27,9 @@ public struct CustomTrackingMetadata: ModuleEventMetadata {
 
 public struct CustomTrackingData: ModuleEventData {
     public let name: String
-    public let attributes: [String: AttributeValue]
+    public let attributes: [String: EventAttributeValue]
 
-    public init(name: String, attributes: [String: AttributeValue]) {
+    public init(name: String, attributes: [String: EventAttributeValue]) {
         self.name = name
         self.attributes = attributes
     }

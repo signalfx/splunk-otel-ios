@@ -32,8 +32,8 @@ public protocol SplunkTrackableIssue: SplunkTrackable {
 
 
 public extension SplunkTrackableIssue {
-    func toAttributesDictionary() -> [String: AttributeValue] {
-        var attributes: [String: AttributeValue] = [:]
+    func toAttributesDictionary() -> [String: EventAttributeValue] {
+        var attributes: [String: EventAttributeValue] = [:]
 
         // Set required attributes
         attributes[ErrorAttributeKeys.Exception.type.rawValue] = .string(typeName)

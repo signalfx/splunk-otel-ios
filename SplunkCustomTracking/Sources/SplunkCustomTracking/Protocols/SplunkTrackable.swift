@@ -37,7 +37,7 @@ public protocol SplunkTrackable {
     var timestamp: Date { get }
 
     /// Converts the trackable item to a dictionary representation using `[String: AttributeValue]`.
-    func toAttributesDictionary() -> [String: AttributeValue]
+    func toAttributesDictionary() -> [String: EventAttributeValue]
 }
 
 
@@ -49,4 +49,3 @@ public extension SplunkTrackable {
         Date()
     }
 }
-
