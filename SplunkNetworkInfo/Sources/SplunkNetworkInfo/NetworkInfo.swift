@@ -57,10 +57,6 @@ public class NetworkInfo {
             self.statusChangeHandler?(self.isConnected, self.connectionType)
         }
         monitor.start(queue: queue)
-        // Send initial state span
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            self?.sendNetworkChangeSpan()
-        }
     }
 
     private func getConnectionType(_ path: NWPath) -> ConnectionType {
