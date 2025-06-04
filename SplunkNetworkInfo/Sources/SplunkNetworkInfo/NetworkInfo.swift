@@ -41,6 +41,10 @@ public class NetworkInfo {
     public private(set) var isConnected: Bool = false
     public private(set) var connectionType: ConnectionType = .lost
 
+    // Track previous state
+    private var previousStatus: String?
+    private var previousType: ConnectionType?
+
     public var statusChangeHandler: ((Bool, ConnectionType) -> Void)?
 
     // MARK: - Initialization
@@ -53,7 +57,18 @@ public class NetworkInfo {
             guard let self = self else { return }
             self.isConnected = path.status == .satisfied
             self.connectionType = self.getConnectionType(path)
-            self.sendNetworkChangeSpan()
+
+            let currentStatus = self.isConnected ? "available" : "lost"
+
+            if let prevStatus = self.previousStatus,
+               let prevType = self.previousType,
+               (currentStatus != prevStatus || self.connectionType != prevType) {
+                self.sendNetworkChangeSpan()
+            }
+
+            self.previousStatus = currentStatus
+            self.previousType = self.connectionType
+
             self.statusChangeHandler?(self.isConnected, self.connectionType)
         }
         monitor.start(queue: queue)
