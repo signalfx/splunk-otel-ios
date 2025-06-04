@@ -36,7 +36,7 @@ public protocol SplunkTrackable {
     /// Timestamp when the trackable item was created or when a duration started
     var timestamp: Date { get }
 
-    /// Converts the trackable item to a dictionary representation using `[String: AttributeValue]`.
+    /// Converts the trackable item to a dictionary representation using `[String: EventAttributeValue]`.
     func toAttributesDictionary() -> [String: EventAttributeValue]
 }
 
