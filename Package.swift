@@ -102,7 +102,8 @@ func generateMainTargets() -> [Target] {
             path: "SplunkNetwork/Tests"
         ),
         
-        // MARK: Splunk Network Info
+        
+        // MARK: - Splunk Network Info
         
         .target(
             name: "SplunkNetworkInfo",
@@ -118,7 +119,8 @@ func generateMainTargets() -> [Target] {
             path: "SplunkNetworkInfo/Tests"
         ),
         
-        // MARK: Splunk Common
+        
+        // MARK: - Splunk Common
         
         .target(
             name: "SplunkCommon",
