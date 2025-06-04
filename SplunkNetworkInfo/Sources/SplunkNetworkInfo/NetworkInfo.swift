@@ -95,7 +95,7 @@ public class NetworkInfo {
         let span = tracer.spanBuilder(spanName: "network.change")
                 .setStartTime(time: Date())
                 .startSpan()
-        span.setAttribute(key: "network.status", value: isConnected)
+        span.setAttribute(key: "network.status", value: isConnected ? "available" : "lost")
         span.setAttribute(key: "network.connection.type", value: connectionType.rawValue)
         span.end(time: Date())
     }
