@@ -17,27 +17,31 @@ limitations under the License.
 
 import Foundation
 
-/// A thread-safe dictionary implementation using DispatchQueue
-public class ThreadSafeDictionary<Key: Hashable, Value> {
-    private var dictionary: [Key: Value]
+/// A thread-safe dictionary implementation using DispatchQueue.
+class ThreadSafeDictionary<Key: Hashable, Value> {
 
+    // MARK: - Private
+
+    private var dictionary: [Key: Value]
     private let queue: DispatchQueue
+
 
     // MARK: - Initialize
 
-    public init() {
+    init() {
         dictionary = [:]
         queue = DispatchQueue(label: "com.splunk.rum.SplunkAgent.MutableAttributes")
     }
 
-    public init(dictionary: [Key: Value]) {
+    init(dictionary: [Key: Value]) {
         self.dictionary = dictionary
         queue = DispatchQueue(label: "com.splunk.rum.SplunkAgent.MutableAttributes")
     }
 
+
     // MARK: - Subscript
 
-    public subscript(key: Key) -> Value? {
+    subscript(key: Key) -> Value? {
         get {
             var result: Value?
             queue.sync {
@@ -56,20 +60,22 @@ public class ThreadSafeDictionary<Key: Hashable, Value> {
         }
     }
 
+
     // MARK: - Get and Set
 
-    public func value(forKey key: Key) -> Value? {
+    func value(forKey key: Key) -> Value? {
         return self[key]
     }
 
-    public func setValue(_ value: Value?, forKey key: Key) {
+    func setValue(_ value: Value?, forKey key: Key) {
         self[key] = value
     }
+
 
     // MARK: - Utilities
 
     @discardableResult
-    public func removeValue(forKey key: Key) -> Value? {
+    func removeValue(forKey key: Key) -> Value? {
         var result: Value?
         queue.async(flags: .barrier) {
             result = self.dictionary.removeValue(forKey: key)
@@ -77,7 +83,7 @@ public class ThreadSafeDictionary<Key: Hashable, Value> {
         return result
     }
 
-    public func contains(key: Key) -> Bool {
+    func contains(key: Key) -> Bool {
         var result = false
         queue.sync {
             result = dictionary.keys.contains(key)
@@ -85,7 +91,7 @@ public class ThreadSafeDictionary<Key: Hashable, Value> {
         return result
     }
 
-    public func allKeys() -> [Key] {
+    func allKeys() -> [Key] {
         var result: [Key] = []
         queue.sync {
             result = Array(dictionary.keys)
@@ -93,7 +99,7 @@ public class ThreadSafeDictionary<Key: Hashable, Value> {
         return result
     }
 
-    public func allValues() -> [Value] {
+    func allValues() -> [Value] {
         var result: [Value] = []
         queue.sync {
             result = Array(dictionary.values)
@@ -101,7 +107,7 @@ public class ThreadSafeDictionary<Key: Hashable, Value> {
         return result
     }
 
-    public func count() -> Int {
+    func count() -> Int {
         var result = 0
         queue.sync {
             result = dictionary.count
@@ -109,13 +115,13 @@ public class ThreadSafeDictionary<Key: Hashable, Value> {
         return result
     }
 
-    public func removeAll() {
+    func removeAll() {
         queue.async(flags: .barrier) {
             self.dictionary.removeAll()
         }
     }
 
-    public func getAll() -> [Key: Value] {
+    func getAll() -> [Key: Value] {
         var result: [Key: Value] = [:]
         queue.sync {
             result = self.dictionary
@@ -124,7 +130,7 @@ public class ThreadSafeDictionary<Key: Hashable, Value> {
     }
 
     @discardableResult
-    public func update(with other: [Key: Value]) -> Int {
+    func update(with other: [Key: Value]) -> Int {
         var count = 0
         queue.async(flags: .barrier) {
             for (key, value) in other {

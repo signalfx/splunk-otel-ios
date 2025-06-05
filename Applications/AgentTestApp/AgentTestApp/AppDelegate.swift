@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,8 +42,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             .spanInterceptor { spanData in
                 var attributes = spanData.attributes
                 attributes["test_attribute"] = AttributeValue("test_value")
+
                 var modifiedSpan = spanData
                 modifiedSpan.settingAttributes(attributes)
+                modifiedSpan.settingTotalAttributeCount(attributes.count)
 
                 return modifiedSpan
             }
