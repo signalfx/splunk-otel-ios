@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -144,8 +144,7 @@ class DefaultSession: AgentSession {
         // defined by the configurations
         if
             let session,
-            session.start + maxSessionLength + sessionRefreshInterval + (refreshJob?.tolerance ?? 0.0) > timestamp
-        {
+            session.start + maxSessionLength + sessionRefreshInterval + (refreshJob?.tolerance ?? 0.0) > timestamp {
             return session
         }
 
@@ -164,8 +163,7 @@ class DefaultSession: AgentSession {
         // Close previous session
         if
             var previousSession = sessionsModel.sessions.last,
-            !(previousSession.closed ?? false)
-        {
+            !(previousSession.closed ?? false) {
             previousSession.closed = true
 
             // Updates corresponding item in `SessionsModel`

@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryApi
+internal import OpenTelemetryApi
 import SplunkCommon
 
 /// Creates and sends an OpenTelemetry span from supplied app start data.
@@ -39,10 +39,6 @@ struct OTelDestination: AppStartDestination {
         appStartSpan.setAttribute(key: "component", value: "appstart")
         appStartSpan.setAttribute(key: "screen.name", value: "unknown")
         appStartSpan.setAttribute(key: "start.type", value: typeIdentifier(for: appStart.type))
-
-        if let sessionID = sharedState?.sessionId {
-            appStartSpan.setAttribute(key: "session.id", value: sessionID)
-        }
 
         appStart.events?.forEach { event in
             appStartSpan.addEvent(name: event.name, timestamp: event.timestamp)
@@ -68,11 +64,6 @@ struct OTelDestination: AppStartDestination {
             // Add events
             agentInitialize.events?.forEach { event in
                 initializeSpan.addEvent(name: event.name, timestamp: event.timestamp)
-            }
-
-            // Add session id
-            if let sessionID = sharedState?.sessionId {
-                initializeSpan.setAttribute(key: "session.id", value: sessionID)
             }
 
             initializeSpan.end(time: agentInitialize.end)

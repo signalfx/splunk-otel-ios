@@ -17,9 +17,9 @@ limitations under the License.
 
 internal import CiscoLogger
 import Foundation
+import OpenTelemetryApi
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
-import OpenTelemetryApi
 import SplunkCommon
 
 public class OTLPLogToSpanExporter: LogRecordExporter {
