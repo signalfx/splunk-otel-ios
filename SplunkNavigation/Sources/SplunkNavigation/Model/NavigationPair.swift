@@ -15,15 +15,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Combine
+import Foundation
 
-/// A state object that is representation for the current state of the module.
-public final class RuntimeState: Sendable {
+/// Defines known types of navigation.
+enum NavigationType: Sendable {
+    case show
+    case transition
+}
 
-    // MARK: - Automated tracking
+/// The structure encapsulates one navigation in the client application.
+struct NavigationPair: Sendable {
 
-    /// Indicates whether automatic navigation detection is enabled.
-    ///
-    /// The default value is `false`.
-    public internal(set) nonisolated(unsafe) var isAutomatedTrackingEnabled: Bool = false
+    // MARK: - Navigation identity
+
+    let type: NavigationType
+
+
+    // MARK: - Navigation life
+
+    let start: Date
+    var end: Date?
+
+
+    // MARK: - Controller identity
+
+    let typeName: String
+    let screenName: String
 }

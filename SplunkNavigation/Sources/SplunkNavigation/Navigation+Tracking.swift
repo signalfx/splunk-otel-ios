@@ -20,6 +20,8 @@ public extension Navigation {
     // MARK: - Manual detection
 
     func track(screen name: String) {
-        screenName = name
+        Task {
+            await model.update(screenName: name)
+        }
     }
 }

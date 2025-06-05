@@ -25,11 +25,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
+
         let endpointConfig = EndpointConfiguration(
             realm: "realm",
             rumAccessToken: "token"
         )
+
         let agentConfig = AgentConfiguration(
             endpoint: endpointConfig,
             appName: "App Name",
@@ -41,7 +42,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 "testint": .int(100)]))
             .spanInterceptor { spanData in
                 var attributes = spanData.attributes
-                attributes["test_attribute"] = AttributeValue("test_value")
+                // attributes["test_attribute"] = AttributeValue("test_value")
+
                 var modifiedSpan = spanData
                 modifiedSpan.settingAttributes(attributes)
 
@@ -52,6 +54,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("Unable to start the Splunk agent, error: \(error)")
         }
+
+        // Navigation Instrumentation
+        SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
+
+
         return true
     }
 

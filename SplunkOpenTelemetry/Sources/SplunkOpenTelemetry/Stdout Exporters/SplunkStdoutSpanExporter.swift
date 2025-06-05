@@ -99,7 +99,7 @@ class SplunkStdoutSpanExporter: SpanExporter {
     public func flush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
         return proxyExporter.flush(explicitTimeout: explicitTimeout)
     }
-    
+
     public func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
     }
