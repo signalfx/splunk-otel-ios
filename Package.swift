@@ -300,7 +300,7 @@ func generateMainTargets() -> [Target] {
         .testTarget(
             name: "SplunkWebViewProxyTests",
             dependencies: [
-                "SplunkWebView"
+                "SplunkWebViewProxy"
             ],
             path: "SplunkWebViewProxy/Tests"
         ),

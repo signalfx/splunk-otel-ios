@@ -51,7 +51,7 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
         XCTAssertEqual(systemAttributes.count, 2)
         XCTAssertEqual(systemAttributes["session.id"] as? String, defaultSession.currentSessionId)
         XCTAssertEqual(systemAttributes["user.anonymous_id"] as? String, nil)
-  
+
         XCTAssertEqual(customAttributes.count, 1)
 
         XCTAssertEqual(anonymousSystemAttributes.count, 3)

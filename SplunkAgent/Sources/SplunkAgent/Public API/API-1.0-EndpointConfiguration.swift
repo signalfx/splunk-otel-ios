@@ -160,8 +160,8 @@ extension EndpointConfiguration {
         // Validate session replay endpoint
         if
             realm != nil, rumAccessToken != nil,
-            sessionReplayEndpoint == nil
-        {
+            sessionReplayEndpoint == nil {
+
             throw AgentConfigurationError.invalidEndpoint(supplied: self)
         }
     }

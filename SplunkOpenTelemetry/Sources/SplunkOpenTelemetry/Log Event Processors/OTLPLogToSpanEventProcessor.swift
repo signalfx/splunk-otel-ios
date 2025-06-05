@@ -56,11 +56,11 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         // Build Resources
             var resource = Resource()
             resource.merge(with: resources)
-        
+
             self.resource = resource
         #endif
 
-        
+
         let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
 
         // Initialize LogRecordProcessor
