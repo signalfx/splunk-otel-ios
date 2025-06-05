@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 
-public extension MutableAttributes {
+extension MutableAttributes {
 
     // MARK: - Type Conversion
 
@@ -52,8 +52,8 @@ public extension MutableAttributes {
         }
     }
 
-    // MARK: - Description
 
+    // MARK: - Description
 
     func attributeDescription(_ value: AttributeValue) -> String {
         switch value {

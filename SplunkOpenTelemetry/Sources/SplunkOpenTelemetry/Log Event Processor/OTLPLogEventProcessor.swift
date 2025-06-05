@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -53,10 +53,6 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         globalAttributes: [String: Any],
         debugEnabled: Bool
     ) {
-
-        let configuration = OtlpConfiguration()
-        let envVarHeaders = [(String, String)]()
-
         let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
 
         // Initialize attribute checker proxy exporter
@@ -120,9 +116,9 @@ public class OTLPLogEventProcessor: LogEventProcessor {
     }
 
     public func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void) {
-#if DEBUG
-        storedLastProcessedEvent = event
-#endif
+        #if DEBUG
+            storedLastProcessedEvent = event
+        #endif
 
         if immediateProcessing {
             processEvent(event: event, completion: completion)
