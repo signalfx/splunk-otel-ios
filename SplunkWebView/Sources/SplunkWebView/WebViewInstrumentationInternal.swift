@@ -80,4 +80,3 @@ public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
 
 // Type for conforming to ModuleEventData
 public struct WebViewInstrumentationData: ModuleEventData {}
-

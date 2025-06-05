@@ -19,7 +19,11 @@ import Foundation
 import OpenTelemetryApi
 
 public class MutableAttributes {
-    fileprivate var attributes: ThreadSafeDictionary<String, AttributeValue>
+
+    // MARK: - Private
+
+    var attributes: ThreadSafeDictionary<String, AttributeValue>
+
 
     // MARK: - Initialize
 
@@ -47,64 +51,9 @@ public class MutableAttributes {
     }
 }
 
-// Codable
-extension MutableAttributes: Codable {
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: StringCodingKey.self)
-        let dictionary = attributes.getAll()
-
-        for (key, value) in dictionary {
-            try container.encode(value, forKey: StringCodingKey(stringValue: key)!)
-        }
-    }
-
-    // Helper for coding with string keys
-    private struct StringCodingKey: CodingKey {
-        var stringValue: String
-        var intValue: Int?
-
-        init?(stringValue: String) {
-            self.stringValue = stringValue
-            self.intValue = nil
-        }
-
-        init?(intValue: Int) {
-            self.stringValue = String(intValue)
-            self.intValue = intValue
-        }
-    }
-}
-
-// Equatable
-extension MutableAttributes: Equatable {
-
-    public static func == (lhs: MutableAttributes, rhs: MutableAttributes) -> Bool {
-        let lhsDict = lhs.attributes.getAll()
-        let rhsDict = rhs.attributes.getAll()
-
-        // Compare dictionary sizes first for quick check
-        guard lhsDict.count == rhsDict.count else {
-            return false
-        }
-
-        // Compare each key-value pair
-        for (key, lhsValue) in lhsDict {
-            guard let rhsValue = rhsDict[key] else {
-                return false
-            }
-
-            if lhsValue != rhsValue {
-                return false
-            }
-        }
-
-        return true
-    }
-}
-
-// Subscripts
 public extension MutableAttributes {
+
+    // MARK: - Subscripts
 
     subscript(key: String) -> AttributeValue? {
         get {
@@ -216,8 +165,9 @@ public extension MutableAttributes {
     }
 }
 
-// Get and Set
 public extension MutableAttributes {
+
+    // MARK: - Getters and setters
 
     func getValue(for key: String) -> AttributeValue? {
         return attributes[key]
@@ -294,8 +244,9 @@ public extension MutableAttributes {
     }
 }
 
-// Iterative setters
 public extension MutableAttributes {
+
+    // MARK: - Iterative setters
 
     @discardableResult
     func addDictionary(_ dictionary: [String: AttributeValue]) -> Int {
@@ -340,8 +291,9 @@ public extension MutableAttributes {
     }
 }
 
-// Utilities
 public extension MutableAttributes {
+
+    // MARK: - Utilities
 
     @discardableResult
     func remove(for key: String) -> AttributeValue? {
@@ -388,10 +340,11 @@ public extension MutableAttributes {
     }
 }
 
-// Description
-public extension MutableAttributes {
+extension MutableAttributes: CustomStringConvertible {
 
-    func description() -> String {
+    // MARK: - Description
+
+    public var description: String {
         var result = "[\n"
 
         let dictionaryCopy = attributes.getAll()
