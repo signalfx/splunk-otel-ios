@@ -46,7 +46,6 @@ final class DefaultSharedStateTests: XCTestCase {
 
     func testAppStateRetrieval() throws {
         let agent = try AgentTestBuilder.buildDefault()
-        let sharedState = DefaultSharedState(for: agent)
 
         sendSimulatedNotification(UIApplication.didBecomeActiveNotification)
 

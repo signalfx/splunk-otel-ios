@@ -49,11 +49,11 @@ final class EventsTests: XCTestCase {
 
     func testEventManagerSessionStartEvent() throws {
         let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
         eventManager.eventsModel.clear()
         eventManager.sendSessionStartEvent()
 
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
+        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent)
         XCTAssertEqual(processedEvent.name, "session_start")
     }
 
@@ -74,7 +74,7 @@ final class EventsTests: XCTestCase {
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
 
         eventManager.logEventProcessor.sendEvent(event, completion: { _ in
             // TODO: MRUM_AC-1111 - EventManager and Events tests
@@ -83,7 +83,7 @@ final class EventsTests: XCTestCase {
             requestExpectation.fulfill()
         })
 
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
+        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent)
         try checkEventBaseAttributes(processedEvent)
 
         XCTAssertEqual(processedEvent.name, "session_start")
@@ -98,8 +98,6 @@ final class EventsTests: XCTestCase {
         }
 
         let sessionID = try XCTUnwrap(agent?.currentSession.currentSessionId)
-        let recordID = UUID().uuidString
-        let replaySessionID = UUID().uuidString
         let timestamp = Date()
         let endTimestamp = Date()
 
@@ -116,12 +114,12 @@ final class EventsTests: XCTestCase {
             endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0)
         )
 
-        let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, sessionID: sessionID)
+        let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, index: 1, sessionID: sessionID)
 
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
 
         logEventProcessor.sendEvent(event, completion: { _ in
             // TODO: MRUM_AC-1111 - EventManager and Events tests
@@ -130,7 +128,7 @@ final class EventsTests: XCTestCase {
             requestExpectation.fulfill()
         })
 
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
+        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent)
         try checkEventBaseAttributes(processedEvent)
 
         XCTAssertEqual(processedEvent.name, "session_replay_data")
@@ -151,7 +149,7 @@ final class EventsTests: XCTestCase {
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
 
         logEventProcessor.sendEvent(event: event, immediateProcessing: true, completion: { success in
             XCTAssert(success)
@@ -173,7 +171,7 @@ final class EventsTests: XCTestCase {
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
 
         logEventProcessor.sendEvent(event, completion: { success in
             XCTAssert(success)
@@ -182,7 +180,7 @@ final class EventsTests: XCTestCase {
         })
 
         XCTAssertNotNil(logEventProcessor.storedLastProcessedEvent)
-        XCTAssertNil(logEventProcessor.storedLastSentEvent)
+        XCTAssertNotNil(logEventProcessor.storedLastSentEvent)
     }
 
     func testDuplicateSessionStartEvents() throws {

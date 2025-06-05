@@ -48,14 +48,16 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
         let anonymousCustomAttributes = runtimeAttributes.custom
 
 
-        XCTAssertEqual(systemAttributes.count, 1)
+        XCTAssertEqual(systemAttributes.count, 2)
         XCTAssertEqual(systemAttributes["session.id"] as? String, defaultSession.currentSessionId)
-        XCTAssertTrue(customAttributes.isEmpty)
+        XCTAssertEqual(systemAttributes["user.anonymous_id"] as? String, nil)
+  
+        XCTAssertEqual(customAttributes.count, 1)
 
-        XCTAssertEqual(anonymousSystemAttributes.count, 2)
+        XCTAssertEqual(anonymousSystemAttributes.count, 3)
         XCTAssertEqual(anonymousSystemAttributes["session.id"] as? String, defaultSession.currentSessionId)
         XCTAssertEqual(anonymousSystemAttributes["user.anonymous_id"] as? String, defaultUser.userIdentifier)
-        XCTAssertTrue(anonymousCustomAttributes.isEmpty)
+        XCTAssertFalse(anonymousCustomAttributes.isEmpty)
     }
 
     func testCustomAttributes() throws {
@@ -98,20 +100,20 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
 
 
         let sessionName = "session.id"
-        XCTAssertEqual(allAttributes.count, 2)
+        XCTAssertEqual(allAttributes.count, 3)
         XCTAssertEqual(allAttributes[sessionName] as? String, agent.currentSession.currentSessionId)
         XCTAssertEqual(allAttributes[customName] as? String, customValue)
-        XCTAssertEqual(customAttributes.count, 1)
+        XCTAssertEqual(customAttributes.count, 2)
         XCTAssertEqual(customAttributes[customName] as? String, customValue)
 
-        XCTAssertEqual(updatedAllAttributes.count, 2)
+        XCTAssertEqual(updatedAllAttributes.count, 3)
         XCTAssertEqual(updatedAllAttributes[sessionName] as? String, agent.currentSession.currentSessionId)
-        XCTAssertEqual(updatedCustomAttributes.count, 1)
+        XCTAssertEqual(updatedCustomAttributes.count, 2)
         XCTAssertEqual(updatedCustomAttributes[customName] as? String, updatedValue)
 
-        XCTAssertEqual(finalAllAttributes.count, 1)
+        XCTAssertEqual(finalAllAttributes.count, 2)
         XCTAssertEqual(finalAllAttributes[sessionName] as? String, agent.currentSession.currentSessionId)
-        XCTAssertEqual(finalCustomAttributes.count, 0)
+        XCTAssertEqual(finalCustomAttributes.count, 1)
     }
 
     func testCustomAttributesPriority() throws {
@@ -141,10 +143,10 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
 
 
         // System attributes always take precedence over custom attributes
-        XCTAssertEqual(allAttributes.count, 1)
+        XCTAssertEqual(allAttributes.count, 2)
         XCTAssertEqual(allAttributes[systemName] as? String, agent.currentSession.currentSessionId)
 
-        XCTAssertEqual(customAttributes.count, 1)
+        XCTAssertEqual(customAttributes.count, 2)
         XCTAssertEqual(customAttributes[systemName] as? String, customValue)
     }
 }

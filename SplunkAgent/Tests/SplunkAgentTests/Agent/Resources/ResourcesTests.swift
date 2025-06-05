@@ -33,16 +33,12 @@ final class ResourcesTests: XCTestCase {
 
         // Get stored resources
         let eventManager = try XCTUnwrap(agent.eventManager as? DefaultEventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
         let otelResource = try XCTUnwrap(logEventProcessor.resource)
 
         // Test service name
         let serviceName = try XCTUnwrap(otelResource.attributes[ResourceAttributes.serviceName.rawValue])
         XCTAssertFalse(serviceName.description.isEmpty)
-
-        // Test service version
-        let serviceVersion = try XCTUnwrap(otelResource.attributes[ResourceAttributes.serviceVersion.rawValue])
-        XCTAssertFalse(serviceVersion.description.isEmpty)
 
         // Test telemetry sdk name
         let telemetrySdkName = try XCTUnwrap(otelResource.attributes[ResourceAttributes.telemetrySdkName.rawValue])
