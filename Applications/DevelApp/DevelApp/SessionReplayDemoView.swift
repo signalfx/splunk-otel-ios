@@ -15,13 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-//
-//  SessionReplayDemoView.swift
-//  DevelApp
-//
-//  Created by Pavel Kroh on 30.09.2023.
-//
-
 import SplunkAgent
 import SwiftUI
 

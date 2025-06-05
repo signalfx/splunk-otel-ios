@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import SplunkCommon
 public struct NetworkInstrumentationData: ModuleEventData {}
 
 public struct NetworkInstrumentationMetadata: ModuleEventMetadata {
-    public var timestamp: Date = Date()
+    public var timestamp = Date()
 }
 
 extension NetworkInstrumentation: Module {
