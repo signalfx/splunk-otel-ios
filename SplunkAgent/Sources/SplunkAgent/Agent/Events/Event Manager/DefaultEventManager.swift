@@ -98,8 +98,6 @@ class DefaultEventManager: AgentEventManager {
         logEventProcessor = OTLPLogToSpanEventProcessor(
             with: logUrl,
             resources: resources,
-            runtimeAttributes: agent.runtimeAttributes,
-            globalAttributes: agent.globalAttributes.all,
             debugEnabled: configuration.enableDebugLogging
         )
 

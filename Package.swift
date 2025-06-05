@@ -92,6 +92,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkNavigation",
             dependencies: [
                 "SplunkCommon",
+                "SplunkOpenTelemetry",
                 resolveDependency("logger")
             ],
             path: "SplunkNavigation/Sources"

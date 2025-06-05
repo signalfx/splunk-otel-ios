@@ -37,11 +37,11 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
     )
 
     // Stored properties for Unit tests
-#if DEBUG
-    public var resource: Resource?
-    public var storedLastProcessedEvent: (any AgentEvent)?
-    public var storedLastSentEvent: (any AgentEvent)?
-#endif
+    #if DEBUG
+        public var resource: Resource?
+        public var storedLastProcessedEvent: (any AgentEvent)?
+        public var storedLastSentEvent: (any AgentEvent)?
+    #endif
 
 
     // MARK: - Initialization
@@ -49,43 +49,26 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
     public required init(
         with logsEndpoint: URL,
         resources: AgentResources,
-        runtimeAttributes: RuntimeAttributes,
-        globalAttributes: [String: Any],
         debugEnabled: Bool
     ) {
-        let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
-
-        // Initialize attribute checker proxy exporter
-        let attributeCheckerExporter = AttributeCheckerLogExporter(proxy: logToSpanExporter)
-
-        // Initialize LogRecordProcessor
-        let simpleLogRecordProcessor = SimpleLogRecordProcessor(
-            logRecordExporter: attributeCheckerExporter
-        )
-
-        // Initialize AttributesLogRecordProcessor as the first stage of processing,
-        // which adds runtime attributes to all processed log records
-        let attributesLogRecordProcessor = OTLPAttributesLogRecordProcessor(
-            proxy: simpleLogRecordProcessor,
-            with: runtimeAttributes
-        )
-
-        // Add in Global Attributes processor
-        let globalAttributesLogRecordProcessor = OTLPGlobalAttributesLogRecordProcessor(
-            proxy: attributesLogRecordProcessor,
-            with: globalAttributes
-        )
-
-        // Build Resources
-        var resource = Resource()
-        resource.merge(with: resources)
-
         // Store resources object for Unit tests
         #if DEBUG
+        // Build Resources
+            var resource = Resource()
+            resource.merge(with: resources)
+        
             self.resource = resource
         #endif
 
-        var processors: [LogRecordProcessor] = [globalAttributesLogRecordProcessor]
+        
+        let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
+
+        // Initialize LogRecordProcessor
+        let simpleLogRecordProcessor = SimpleLogRecordProcessor(
+            logRecordExporter: logToSpanExporter
+        )
+
+        var processors: [LogRecordProcessor] = [simpleLogRecordProcessor]
 
         // Initialize optional stdout exporter
         if debugEnabled {
@@ -98,7 +81,6 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         // Initialize logger provider
         let loggerProviderBuilder = LoggerProviderBuilder()
             .with(processors: processors)
-            .with(resource: resource)
 
         let loggerProvider = loggerProviderBuilder.build()
 
