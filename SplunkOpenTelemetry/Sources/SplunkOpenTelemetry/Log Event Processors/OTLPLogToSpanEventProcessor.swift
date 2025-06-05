@@ -22,17 +22,17 @@ import OpenTelemetrySdk
 import SplunkCommon
 import SplunkOpenTelemetryBackgroundExporter
 
-/// OTLPLogEventProcessor sends OpenTelemetry Logs enriched with Resources via an instantiated background exporter.
-public class OTLPLogEventProcessor: LogEventProcessor {
+/// OTLPLogEventProcessor converts OpenTelemetry Logs to Spans and emits them through a standard infrastructure for Span.
+public class OTLPLogToSpanEventProcessor: LogEventProcessor {
 
     // MARK: - Private properties
 
     // OTel logger provider
     private let loggerProvider: LoggerProvider
 
-    // Logger background dispatch queues
+    // Logger background dispatch queue
     private let backgroundQueue = DispatchQueue(
-        label: PackageIdentifier.default(named: "LogEventProcessor"),
+        label: PackageIdentifier.default(named: "LogToSpanEventProcessor"),
         qos: .utility
     )
 
@@ -53,10 +53,6 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         globalAttributes: [String: Any],
         debugEnabled: Bool
     ) {
-
-        let configuration = OtlpConfiguration()
-        let envVarHeaders = [(String, String)]()
-
         let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
 
         // Initialize attribute checker proxy exporter
@@ -86,7 +82,7 @@ public class OTLPLogEventProcessor: LogEventProcessor {
 
         // Store resources object for Unit tests
         #if DEBUG
-        self.resource = resource
+            self.resource = resource
         #endif
 
         var processors: [LogRecordProcessor] = [globalAttributesLogRecordProcessor]
@@ -120,9 +116,9 @@ public class OTLPLogEventProcessor: LogEventProcessor {
     }
 
     public func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void) {
-#if DEBUG
-        storedLastProcessedEvent = event
-#endif
+        #if DEBUG
+            storedLastProcessedEvent = event
+        #endif
 
         if immediateProcessing {
             processEvent(event: event, completion: completion)
@@ -140,8 +136,9 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         let logger = loggerProvider.get(instrumentationScopeName: event.instrumentationScope)
 
         // Build LogRecordBuilder from LogEvent
-        var logRecordBuilder = logger.logRecordBuilder()
-        logRecordBuilder = buildEvent(with: event, logRecordBuilder: logRecordBuilder)
+        let logRecordBuilder = logger
+            .logRecordBuilder()
+            .build(with: event)
 
         // Set observation timestamp
         _ = logRecordBuilder.setObservedTimestamp(Date())

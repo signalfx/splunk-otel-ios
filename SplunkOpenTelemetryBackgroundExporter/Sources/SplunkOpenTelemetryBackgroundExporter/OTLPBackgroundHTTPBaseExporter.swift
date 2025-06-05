@@ -25,6 +25,11 @@ import SwiftProtobuf
 /// Basic implementation of exporters
 public class OTLPBackgroundHTTPBaseExporter {
 
+    // MARK: - Private
+
+    let fileType: String?
+
+
     // MARK: - Public
 
     let endpoint: URL
@@ -48,12 +53,14 @@ public class OTLPBackgroundHTTPBaseExporter {
                 absoluteUsedSize: .init(value: 200, unit: .megabytes)
             ),
             encryption: NoneEncryption()
-        )
+        ),
+        fileType: String? = nil
     ) {
         self.envVarHeaders = envVarHeaders
         self.endpoint = endpoint
         self.config = config
         self.diskStorage = diskStorage
+        self.fileType = fileType
 
         httpClient = BackgroundHTTPClient(sessionQosConfiguration: qosConfig, diskStorage: diskStorage)
 
@@ -126,6 +133,6 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     func getFileKeyType() -> String {
-        "base"
+        fileType ?? "base"
     }
 }

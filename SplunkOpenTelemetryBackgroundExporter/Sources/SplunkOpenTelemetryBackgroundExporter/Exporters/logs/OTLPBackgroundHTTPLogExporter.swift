@@ -81,6 +81,6 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
     // MARK: - Local override
 
     override func getFileKeyType() -> String {
-        "logs"
+        fileType ?? "logs"
     }
 }
