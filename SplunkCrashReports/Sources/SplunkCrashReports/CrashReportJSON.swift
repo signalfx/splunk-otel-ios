@@ -21,15 +21,31 @@ import Foundation
 
 public class CrashReportJSON {
 
+    private static func convertValue(_ value: Any) -> Any {
+        if let dict = value as? [CrashReportKeys: Any] {
+            return Dictionary(uniqueKeysWithValues: dict.map { ($0.key.rawValue, convertValue($0.value)) })
+        } else if let array = value as? [[CrashReportKeys: Any]] {
+            return array.map { convertValue($0) }
+        } else {
+            return value
+        }
+    }
+
+    private static func toDictionary(_ dict: [CrashReportKeys: Any]) -> [String: Any] {
+        Dictionary(uniqueKeysWithValues: dict.map { ($0.key.rawValue, convertValue($0.value)) })
+    }
+
     public static func convertDictionaryToJSONData(_ dictionary: [CrashReportKeys: Any]) -> Data? {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted) else {
+        let rawdictionary = toDictionary(dictionary)
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: rawdictionary, options: .prettyPrinted) else {
             return nil
         }
         return jsonData
     }
 
     public static func convertDictionaryToJSONString(_ dictionary: [CrashReportKeys: Any]) -> String? {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted) else {
+        let rawdictionary = toDictionary(dictionary)
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: rawdictionary, options: .prettyPrinted) else {
             return nil
         }
         return String(data: jsonData, encoding: .utf8)

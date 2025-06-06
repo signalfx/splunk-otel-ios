@@ -259,9 +259,9 @@ public class CrashReports {
         reportDict[.error] = true
 
         if report.systemInfo != nil {
-            reportDict[.crashTimestamp] = report.systemInfo.timestamp!
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+            reportDict[.crashTimestamp] = formatter.string(from: report.systemInfo.timestamp)
             reportDict[.currentTimestamp] = formatter.string(from: Date())
         }
         if report.applicationInfo != nil {
