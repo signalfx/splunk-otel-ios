@@ -113,7 +113,10 @@ struct CustomTrackingDemoView: View {
     func trackWorkflow() {
         let customSpan = SplunkRum.shared.customTracking.trackWorkflow("Custom Workflow")
         customSpan.setAttribute(key: "test", value: "qwerty")
-        Thread.sleep(forTimeInterval: 15)
-        customSpan.end()
+        
+        // End span after 15 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+                customSpan.end()
+        }
     }
 }
