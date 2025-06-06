@@ -56,7 +56,7 @@ class SpanInterceptorExporter: SpanExporter {
         }
 
         // Invoke the interceptor and only pass through non-nil spans.
-        var interceptedSpans = spans.compactMap { span in spanInterceptor(span) }
+        let interceptedSpans = spans.compactMap { span in spanInterceptor(span) }
 
         /*
          Recalculate `totalAttributeCount`.
@@ -71,7 +71,7 @@ class SpanInterceptorExporter: SpanExporter {
          which means that the `droppedAttributesCount` will have a wrong value. If the `droppedAttributesCount` parameter
          is required in the future, we should consider another approach.
         */
-        interceptedSpans = interceptedSpans.map {
+        let recalculatedSpans = interceptedSpans.map {
             var span = $0
             let attributeCount = span.attributes.count
 
@@ -82,6 +82,6 @@ class SpanInterceptorExporter: SpanExporter {
             return span
         }
 
-        return proxyExporter.export(spans: interceptedSpans)
+        return proxyExporter.export(spans: recalculatedSpans)
     }
 }
