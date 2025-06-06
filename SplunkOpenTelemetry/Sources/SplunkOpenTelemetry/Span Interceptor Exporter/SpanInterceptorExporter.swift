@@ -56,7 +56,31 @@ class SpanInterceptorExporter: SpanExporter {
         }
 
         // Invoke the interceptor and only pass through non-nil spans.
-        let interceptedSpans = spans.compactMap { span in spanInterceptor(span) }
+        var interceptedSpans = spans.compactMap { span in spanInterceptor(span) }
+
+        /*
+         Recalculate `totalAttributeCount`.
+
+         We allow attribute mutation in the `spanInterceptor`. SpanData stores information
+         about total number of attributes (`totalAttributeCount`), which is used to calculate and track
+         a number of dropped attributes in case of exceeding maximum number of attributes.
+         Having `span.attributes.count` larger than `span.totalAttributeCount` causes a crash when calculating
+         `droppedAttributesCount`.
+
+         ‼️ By recalculating the `totalAttributeCount`, we effectively disable the `droppedAttributesCount` calculation,
+         which means that the `droppedAttributesCount` will have a wrong value. If the `droppedAttributesCount` parameter
+         is required in the future, we should consider another approach.
+        */
+        interceptedSpans = interceptedSpans.map {
+            var span = $0
+            let attributeCount = span.attributes.count
+
+            if span.totalAttributeCount != attributeCount {
+                return span.settingTotalAttributeCount(attributeCount)
+            }
+
+            return span
+        }
 
         return proxyExporter.export(spans: interceptedSpans)
     }
