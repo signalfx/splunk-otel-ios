@@ -18,8 +18,10 @@ limitations under the License.
 import Combine
 import Foundation
 internal import SplunkCommon
+import OpenTelemetryApi
 
 // TODO: DEMRUM-861: there are unnecessary MARKs, which are also causing lint issues. I'd suggest removing them.
+
 
 // MARK: - CustomTracking
 
@@ -27,9 +29,7 @@ internal import SplunkCommon
 public protocol CustomTrackingModule {
 
 
-    ///////
     // MARK: - Track Events
-    ///////
 
 
     // MARK: - Track Custom Event
@@ -44,13 +44,12 @@ public protocol CustomTrackingModule {
     @discardableResult func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
 
-    ///////
+
     // MARK: - Track Errors
-    ///////
 
 
     // MARK: - String Error
-    
+
     /// Track an error (String message) with optional attributes.
     ///
     /// - Parameter message: A concise summary of the error condition.
@@ -62,7 +61,7 @@ public protocol CustomTrackingModule {
 
 
     // MARK: - Error
-    
+
     /// Track an Error (Swift conforming type) with optional attributes.
     ///
     /// - Parameter error: An instance of a Swift type conforming to Error.
@@ -74,7 +73,7 @@ public protocol CustomTrackingModule {
 
 
     // MARK: - NSError
-    
+
     /// Track an NSError object with optional attributes.
     ///
     /// - Parameter nsError: An NSError object instance.
@@ -96,6 +95,14 @@ public protocol CustomTrackingModule {
     /// - Returns: The updated `CustomTrackingModule` instance.
     @discardableResult func trackException(_ exception: NSException, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
+    // MARK: - Track Custom Workflow
+
+    /// Track a workflow with a name and return a Span object.
+    ///
+    /// - Parameter workflowName: The name of the workflow to track.
+    ///
+    /// - Returns: A Span object representing the workflow.
+    func trackWorkflow(_ workflowName: String) -> Span
 
     // MARK: - Helpers
 
@@ -129,5 +136,12 @@ extension CustomTrackingModule {
 
     @discardableResult func trackException(_ exception: NSException) -> any CustomTrackingModule {
         return trackException(exception, MutableAttributes())
+    }
+}
+
+extension CustomTrackingModule {
+
+    func trackWorkflow(_ workflowName: String) -> Span {
+        return trackWorkflow(workflowName)
     }
 }

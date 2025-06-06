@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 internal import SplunkCommon
 internal import SplunkCustomTracking
+import OpenTelemetryApi
 
 extension CustomTracking {
 
@@ -54,5 +55,11 @@ extension CustomTracking {
     @discardableResult func trackException(_ exception: NSException, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         module.track(SplunkIssue(from: exception), attributes.getAll())
         return self
+    }
+
+    // MARK: - Custom Tracking - Workflows(Spans
+
+    func trackWorkflow(_ workflowName: String) -> Span {
+        return module.track(workflowName)
     }
 }

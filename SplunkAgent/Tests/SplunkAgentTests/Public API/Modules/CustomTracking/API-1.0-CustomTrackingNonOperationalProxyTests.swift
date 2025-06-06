@@ -40,18 +40,18 @@ final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
         let testErrorString = "TestErrorString"
         XCTAssertNotNil(moduleProxy.trackError(testErrorString))
     }
-    
+
     func testTrackError() throws {
         struct TestError: Error {}
         let testError = TestError()
         XCTAssertNotNil(moduleProxy.trackError(testError))
     }
-    
+
     func testTrackNSError() throws {
 	let testNSError = NSError(domain: "TestDomain", code: 0, userInfo: nil)
         XCTAssertNotNil(moduleProxy.trackError(testNSError))
     }
-    
+
     func testTrackException() throws {
         let exceptionName = NSExceptionName("TestException")
         let testException = NSException(name: exceptionName, reason: nil, userInfo: nil)

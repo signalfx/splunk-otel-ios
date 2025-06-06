@@ -52,16 +52,19 @@ final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
         let attributes = MutableAttributes()
         XCTAssertNoThrow(moduleProxy.trackError("Test error message", attributes))
     }
+
     func testTrackError_withError() throws {
         let attributes = MutableAttributes()
         let error = NSError(domain: "com.splunk.test", code: 1, userInfo: nil) as Error
         XCTAssertNoThrow(moduleProxy.trackError(error, attributes))
     }
+
     func testTrackError_withNSError() throws {
         let attributes = MutableAttributes()
         let nsError = NSError(domain: "com.splunk.test", code: 1, userInfo: nil)
         XCTAssertNoThrow(moduleProxy.trackError(nsError, attributes))
     }
+
     func testTrackError_withNSException() throws {
         let attributes = MutableAttributes()
         let exception = NSException(name: .genericException, reason: "Test exception", userInfo: nil)
