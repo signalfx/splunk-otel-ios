@@ -68,4 +68,22 @@ public extension CustomTrackingInternal {
         // Publish the issue using the block
         onPublishBlock(metadata, data)
     }
+    
+    func track(_ workflowName: String) -> Span {
+        // Ensure the tracer provider is properly configured
+            let tracer = OpenTelemetry.instance
+                .tracerProvider
+                .get(
+                    instrumentationName: "splunk-custom-tracking",
+                    instrumentationVersion: sharedState?.agentVersion
+                )
+
+            // Start a span for the workflow
+        let span = tracer.spanBuilder(spanName: workflowName)
+                .setAttribute(key: "workflow.name", value: workflowName)
+                .startSpan()
+
+            // Return the span object
+            return span
+    }
 }
