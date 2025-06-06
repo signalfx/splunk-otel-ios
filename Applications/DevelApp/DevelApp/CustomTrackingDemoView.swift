@@ -52,7 +52,7 @@ struct CustomTrackingDemoView: View {
                 trackNSException()
             }
             .padding()
-            
+
             // Button for tracking a Workflow
             Button("Track Workflow (Span)") {
                 trackWorkflow()
@@ -109,11 +109,11 @@ struct CustomTrackingDemoView: View {
         let exception = NSException(name: .genericException, reason: "Sample NSException reason", userInfo: ["Key": "Value"])
         SplunkRum.shared.customTracking.trackException(exception, attributes)
     }
-    
+
     func trackWorkflow() {
         let customSpan = SplunkRum.shared.customTracking.trackWorkflow("Custom Workflow")
         customSpan.setAttribute(key: "test", value: "qwerty")
-        
+
         // End span after 15 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
                 customSpan.end()
