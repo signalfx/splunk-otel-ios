@@ -15,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoLogger
+internal import CiscoLogger
 import SplunkCommon
 import WebKit
 
-public final class WebViewInstrumentationInternal {
+public final class WebViewInstrumentationInternal: NSObject {
 
     public static var instance = WebViewInstrumentationInternal()
 
@@ -28,47 +28,69 @@ public final class WebViewInstrumentationInternal {
     public var sharedState: AgentSharedState?
 
     // Module conformance
-    public required init() {}
+    public override required init() {}
 
     // MARK: - Internal Methods
 
     public func injectSessionId(into webView: WKWebView) {
+
         guard let sessionId = sharedState?.sessionId else {
             logger.log(level: .warn) {
-                "Session ID not available."
+                "Native Session ID not available for webview injection."
             }
             return
         }
 
-        // Extracted JavaScript template for better readability and maintainability
-        let script = """
+        let javaScript = """
         if (!window.SplunkRumNative) {
-            window.SplunkRumNative = {
-                cachedSessionId: '\(sessionId)',
-                getNativeSessionId: function() {
-                    try {
-                        window.webkit.messageHandlers.SplunkRumNativeUpdate.postMessage('').catch(function() {});
-                    } catch (e) {
-                        console.error('Error in getNativeSessionId:', e); // Improved error handling
-                    }
-                    return window.SplunkRumNative.cachedSessionId;
-                },
-            };
-        } else {
-            window.SplunkRumNative.cachedSessionId = '\(sessionId)';
+            window.SplunkRumNative = {};
         }
+
+        window.SplunkRumNative.getNativeSessionId = () => {
+            return window.webkit.messageHandlers.sessionBridge
+                .postMessage({})
+                .then(r => r.sessionId);
+        };
         """
 
-        webView.evaluateJavaScript(script) { _, error in
-            if let error = error {
-                self.logger.log(level: .error) {
-                    "Error injecting JavaScript: \(error)"
-                }
-            } else {
-                self.logger.log(level: .debug) {
-                    "JavaScript injected successfully."
-                }
-            }
+        let userScript = WKUserScript(
+            source: javaScript,
+            injectionTime: .atDocumentEnd,
+            forMainFrameOnly: true
+        )
+
+        contentController(
+            forName: "sessionBridge",
+            forWebView: webView
+        ).addUserScript(userScript)
+
+        // Needed at first load only; user script will persist across reloads and navigation
+        webView.evaluateJavaScript(javaScript)
+    }
+
+    private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
+        let contentController = webView.configuration.userContentController
+        contentController.removeScriptMessageHandler(forName: name)
+        contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
+        return contentController
+    }
+}
+
+// MARK: - WKScriptMessageHandlerWithReply
+
+extension WebViewInstrumentationInternal: WKScriptMessageHandlerWithReply {
+
+    /// Handles JavaScript messages with a reply handler for asynchronous communication
+    public func userContentController(
+        _ userContentController: WKUserContentController,
+        didReceive message: WKScriptMessage,
+        replyHandler: @escaping @MainActor @Sendable (Any?, String?) -> Void
+    ) {
+        // hint: parse message.body["action"] here if you need to add features
+        if let sessionId = sharedState?.sessionId {
+            replyHandler(["sessionId": sessionId], nil)
+        } else {
+            replyHandler(nil, "Native Session ID not available")
         }
     }
 }

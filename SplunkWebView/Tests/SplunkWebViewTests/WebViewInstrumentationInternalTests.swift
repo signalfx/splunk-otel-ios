@@ -45,7 +45,6 @@ final class WebViewInstrumentationInternalTests: XCTestCase {
             // Assert that the script is the expected script
             XCTAssertTrue(script.contains("window.SplunkRumNative"))
             XCTAssertTrue(script.contains("getNativeSessionId"))
-            XCTAssertTrue(script.contains("cachedSessionId"))
             expectation.fulfill()
             completionHandler(nil, nil) // Simulate success
         }
@@ -64,7 +63,7 @@ class MockWebView: WKWebView {
 
     func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
         if Thread.isMainThread {
-            self.evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })
+            evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })
         } else {
             DispatchQueue.main.async {
                 self.evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })

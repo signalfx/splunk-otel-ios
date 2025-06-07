@@ -24,14 +24,12 @@ import WebKit
 struct WebViewDemoView: View {
     @State private var webView = WKWebView()
     @State private var injected = false
-    @State private var subscription: AnyCancellable?
 
     var body: some View {
         VStack {
-            Text("WebView Demo").font(.title).padding()
             DemoHeaderView()
             WebViewRepresentable(webView: webView, injected: injected)
-                .frame(height: 200)
+                .frame(height: 300)
                 .border(Color.gray)
                 .padding()
 
@@ -39,60 +37,55 @@ struct WebViewDemoView: View {
                 injectJavaScript()
             }
             .padding()
-
             Spacer()
         }
         .onAppear {
             loadWebViewContent()
-            observeSessionIdChanges()
-        }
-        .onDisappear {
-            subscription?.cancel()
         }
         .navigationTitle("WebView Demo")
     }
 
+    /// Load initial HTML content into the WebView
     private func loadWebViewContent() {
-        // Load a simple HTML page with a placeholder for the session ID
         let initialContent = """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>WebView Demo</title>
-                <script>
-                    function updateSessionId() {
-                        // Fetch the session ID from the native layer
-                        const sessionId = window.SplunkRumNative.getNativeSessionId();
-                        document.getElementById('sessionId').innerText = sessionId;
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script>
+                // This pre-existing script is not needed in a user's
+                // webView. It is just a demo stand-in for the BRUM agent.
+                //
+                // As the agent would, it gracefully handles the absence
+                // of the API prior to injection, and after injection
+                // it makes use of the API.
+                async function updateSessionId() {
+                    try {
+                        const response = await window.SplunkRumNative.getNativeSessionId();
+                        document.getElementById('sessionId').innerText = response;
+                    } catch (error) {
+                        document.getElementById('sessionId').innerText = 'Error getting native Session ID';
                     }
+                }
 
-                    // Update the session ID every 1 second
-                    setInterval(updateSessionId, 1000);
-                </script>
-            </head>
-            <body>
-                <h1>WebView Demo</h1>
-                <p>Current Session ID:</p>
-                <p id="sessionId">unknown</p>
-            </body>
-            </html>
+                // Likewise, the timer represents the initiative of the
+                // BRUM agent. In real usage, the agent would of course
+                // be free to access the API on demand.
+                setInterval(updateSessionId, 1000); // pull every 1 second
+            </script>
+        </head>
+        <body style="font-size: 48px; font-family: sans-serif">
+            <h3>Current Native Session ID:</h3>
+            <p id="sessionId">unknown</p>
+        </body>
+        </html>
         """
         webView.loadHTMLString(initialContent, baseURL: nil)
     }
 
+    /// Inject the JavaScript bridge into the WebView
     private func injectJavaScript() {
-        // This integrates the web view with SplunkRum
         SplunkRum.webView.integrateWithBrowserRum(webView)
         injected = true
-    }
-
-    private func observeSessionIdChanges() {
-        // Observe changes to the session ID and reload the web view content if needed
-        subscription = NotificationCenter.default
-            .publisher(for: NSNotification.Name("com.splunk.rum.session-id-did-change"))
-            .sink { _ in
-                print("Session ID changed. WebView should now reflect the updated value.")
-            }
     }
 }
 
