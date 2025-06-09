@@ -72,7 +72,7 @@ final class SessionReplayTestBuilder {
 
     public static func sampleVideoData() throws -> Data {
         #if SPM_TESTS
-        let fileUrl = Bundle.module.url(forResource: "v", withExtension: "mp4")
+        let fileUrl = Bundle.module.url(forResource: "v", withExtension: "mp4")!
 
         #else
         let bundle = Bundle(for: EventsTests.self)

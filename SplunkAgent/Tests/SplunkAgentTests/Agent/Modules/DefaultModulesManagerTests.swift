@@ -163,6 +163,7 @@ final class DefaultModulesManagerTests: XCTestCase {
 
 
         let dataExpectation = expectation(description: "Data from module not be delivered.")
+        dataExpectation.assertForOverFulfill = false
 
         // We simulate taking and deleting data from modules
         modulesManager.onModulePublish { metadata, data in

@@ -45,7 +45,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                 var modifiedSpan = spanData
                 modifiedSpan.settingAttributes(attributes)
-                modifiedSpan.settingTotalAttributeCount(attributes.count)
 
                 return modifiedSpan
             }
