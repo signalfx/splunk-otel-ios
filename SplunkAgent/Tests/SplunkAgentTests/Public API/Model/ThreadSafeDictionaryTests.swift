@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import XCTest
 @testable import SplunkAgent
+import XCTest
 
 class ThreadSafeDictionaryTests: XCTestCase {
 
@@ -209,14 +209,14 @@ class ThreadSafeDictionaryTests: XCTestCase {
         expectation.expectedFulfillmentCount = 100
 
         // Initialize with some values
-        for i in 0..<10 {
-            dict["key\(i)"] = i
+        for index in 0 ..< 10 {
+            dict["key\(index)"] = index
         }
 
         // Perform concurrent reads
-        for _ in 0..<100 {
+        for _ in 0 ..< 100 {
             DispatchQueue.global().async {
-                _ = dict["key\(Int.random(in: 0..<10))"]
+                _ = dict["key\(Int.random(in: 0 ..< 10))"]
                 expectation.fulfill()
             }
         }
@@ -230,9 +230,9 @@ class ThreadSafeDictionaryTests: XCTestCase {
         expectation.expectedFulfillmentCount = 100
 
         // Perform concurrent writes
-        for i in 0..<100 {
+        for index in 0 ..< 100 {
             DispatchQueue.global().async {
-                dict["key\(i)"] = i
+                dict["key\(index)"] = index
                 expectation.fulfill()
             }
         }
@@ -241,8 +241,8 @@ class ThreadSafeDictionaryTests: XCTestCase {
 
         // Verify all values were written
         XCTAssertEqual(dict.count(), 100)
-        for i in 0..<100 {
-            XCTAssertEqual(dict["key\(i)"], i)
+        for index in 0 ..< 100 {
+            XCTAssertEqual(dict["key\(index)"], index)
         }
     }
 
@@ -253,22 +253,22 @@ class ThreadSafeDictionaryTests: XCTestCase {
         readExpectation.expectedFulfillmentCount = 100
         writeExpectation.expectedFulfillmentCount = 100
 
-        for i in 0..<10 {
-            dict["key\(i)"] = i
+        for index in 0 ..< 10 {
+            dict["key\(index)"] = index
         }
 
         // Perform concurrent reads
-        for _ in 0..<100 {
+        for _ in 0 ..< 100 {
             DispatchQueue.global().async {
-                _ = dict["key\(Int.random(in: 0..<10))"]
+                _ = dict["key\(Int.random(in: 0 ..< 10))"]
                 readExpectation.fulfill()
             }
         }
 
         // Perform concurrent writes
-        for i in 0..<100 {
+        for index in 0 ..< 100 {
             DispatchQueue.global().async {
-                dict["key\(i + 10)"] = i + 10
+                dict["key\(index + 10)"] = index + 10
                 writeExpectation.fulfill()
             }
         }
@@ -277,8 +277,8 @@ class ThreadSafeDictionaryTests: XCTestCase {
 
         // Verify all values were written
         XCTAssertEqual(dict.count(), 110)
-        for i in 0..<110 {
-            XCTAssertEqual(dict["key\(i)"], i)
+        for index in 0 ..< 110 {
+            XCTAssertEqual(dict["key\(index)"], index)
         }
     }
 }

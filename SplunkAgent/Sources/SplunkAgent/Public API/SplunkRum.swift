@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -238,9 +238,6 @@ public class SplunkRum: ObservableObject {
         eventManager = try DefaultEventManager(with: configuration, agent: self)
 
         initializeEvents["event_manager_initialized"] = Date()
-
-        // Send session start event immediately as the session already started in the SplunkRum init method.
-        eventManager?.sendSessionStartEvent()
 
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(

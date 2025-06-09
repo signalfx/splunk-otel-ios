@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ struct RemoteConfigurationEndpoint: Endpoint {
 
     // MARK: - Static constants aliases
 
-    static var service = Service(path: "eum/v1/config", httpMethod: .get)
+    static var service = Service(path: "config", httpMethod: .get)
 
 
     // MARK: - Variables

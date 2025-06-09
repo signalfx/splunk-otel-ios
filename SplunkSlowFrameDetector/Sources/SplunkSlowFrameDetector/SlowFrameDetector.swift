@@ -20,7 +20,6 @@ import QuartzCore
 import SplunkCommon
 import UIKit
 
-
 public final class SlowFrameDetector {
 
     typealias FrameBuffer = [String: Int]

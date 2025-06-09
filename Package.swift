@@ -60,6 +60,8 @@ func generateMainTargets() -> [Target] {
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkInteractions",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 "SplunkAppStart",
                 "SplunkWebView",
                 "SplunkWebViewProxy",
@@ -92,7 +94,11 @@ func generateMainTargets() -> [Target] {
             name: "SplunkNetwork",
             dependencies: [
                 "SplunkCommon",
-                "SplunkOpenTelemetry"
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
+                .product(name: "ResourceExtension", package: "opentelemetry-swift"),
+                .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
+                .product(name: "SignPostIntegration", package: "opentelemetry-swift")
             ],
             path: "SplunkNetwork/Sources"
         ),
@@ -122,7 +128,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkSlowFrameDetector",
             dependencies: [
                 .byName(name: "SplunkCommon"),
-                "SplunkOpenTelemetry"
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
             ],
             path: "SplunkSlowFrameDetector/Sources"
         ),
@@ -170,7 +176,6 @@ func generateMainTargets() -> [Target] {
         .target(
             name: "SplunkCrashReports",
             dependencies: [
-                "SplunkOpenTelemetry",
                 "SplunkCommon",
                 .product(name: "CrashReporter", package: "PLCrashReporter")
             ],
@@ -195,9 +200,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkOpenTelemetryBackgroundExporter",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
-                .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
-                .product(name: "ResourceExtension", package: "opentelemetry-swift"),
-                .product(name: "SignPostIntegration", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
                 resolveDependency("logger")
             ],
             path: "SplunkOpenTelemetry/Sources"
@@ -252,7 +255,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkAppStart",
             dependencies: [
                 "SplunkCommon",
-                "SplunkOpenTelemetry",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 resolveDependency("logger")
             ],
             path: "SplunkAppStart/Sources"
@@ -260,10 +263,7 @@ func generateMainTargets() -> [Target] {
         .testTarget(
             name: "SplunkAppStartTests",
             dependencies: [
-                "SplunkAppStart",
-                "SplunkCommon",
-                "SplunkOpenTelemetry",
-                resolveDependency("logger")
+                "SplunkAppStart"
             ],
             path: "SplunkAppStart/Tests"
         ),
@@ -275,7 +275,6 @@ func generateMainTargets() -> [Target] {
             name: "SplunkWebView",
             dependencies: [
                 "SplunkCommon",
-                "SplunkOpenTelemetry",
                 resolveDependency("logger")
             ],
             path: "SplunkWebView/Sources"
@@ -294,21 +293,14 @@ func generateMainTargets() -> [Target] {
         .target(
             name: "SplunkWebViewProxy",
             dependencies: [
-                "SplunkCommon",
-                "SplunkOpenTelemetry",
-                "SplunkWebView",
-                resolveDependency("logger")
+                "SplunkWebView"
             ],
             path: "SplunkWebViewProxy/Sources"
         ),
         .testTarget(
             name: "SplunkWebViewProxyTests",
             dependencies: [
-                "SplunkCommon",
-                "SplunkOpenTelemetry",
-                "SplunkWebView",
-                "SplunkWebViewProxy",
-                resolveDependency("logger")
+                "SplunkWebViewProxy"
             ],
             path: "SplunkWebViewProxy/Tests"
         ),

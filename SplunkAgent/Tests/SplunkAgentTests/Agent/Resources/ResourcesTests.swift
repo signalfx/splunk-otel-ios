@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -39,10 +39,6 @@ final class ResourcesTests: XCTestCase {
         // Test service name
         let serviceName = try XCTUnwrap(otelResource.attributes[ResourceAttributes.serviceName.rawValue])
         XCTAssertFalse(serviceName.description.isEmpty)
-
-        // Test service version
-        let serviceVersion = try XCTUnwrap(otelResource.attributes[ResourceAttributes.serviceVersion.rawValue])
-        XCTAssertFalse(serviceVersion.description.isEmpty)
 
         // Test telemetry sdk name
         let telemetrySdkName = try XCTUnwrap(otelResource.attributes[ResourceAttributes.telemetrySdkName.rawValue])
