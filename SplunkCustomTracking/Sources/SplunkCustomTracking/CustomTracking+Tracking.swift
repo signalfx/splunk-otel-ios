@@ -75,15 +75,15 @@ public extension CustomTrackingInternal {
                 .tracerProvider
                 .get(
                     instrumentationName: "splunk-custom-tracking",
-                    instrumentationVersion: sharedState?.agentVersion
+                    instrumentationVersion: sharedState?.agentVersion ?? "unknown"
                 )
 
-            // Start a span for the workflow
+        // Start a span for the workflow
         let span = tracer.spanBuilder(spanName: workflowName)
                 .setAttribute(key: "workflow.name", value: workflowName)
                 .startSpan()
 
-            // Return the span object
-            return span
+        // Return the span object
+        return span
     }
 }

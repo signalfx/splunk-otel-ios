@@ -138,10 +138,3 @@ extension CustomTrackingModule {
         return trackException(exception, MutableAttributes())
     }
 }
-
-extension CustomTrackingModule {
-
-    func trackWorkflow(_ workflowName: String) -> Span {
-        return trackWorkflow(workflowName)
-    }
-}

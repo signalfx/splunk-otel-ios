@@ -24,7 +24,7 @@ final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
 
     // MARK: - Private
 
-    private var module: SplunkCustomTracking.CustomTracking!
+    private var module: SplunkCustomTracking.CustomTrackingInternal!
     private var moduleProxy: SplunkAgent.CustomTracking!
 
 
@@ -33,7 +33,7 @@ final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        module = SplunkCustomTracking.CustomTracking()
+        module = SplunkCustomTracking.CustomTrackingInternal()
         moduleProxy = SplunkAgent.CustomTracking(for: module)
     }
 
@@ -69,5 +69,11 @@ final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
         let attributes = MutableAttributes()
         let exception = NSException(name: .genericException, reason: "Test exception", userInfo: nil)
         XCTAssertNoThrow(moduleProxy.trackException(exception, attributes))
+    }
+
+    func testTrackWorkflow() throws {
+        let span = moduleProxy.trackWorkflow("Test Custom Workflow")
+        XCTAssertNoThrow(span)
+        span.end()
     }
 }

@@ -24,7 +24,7 @@ final class CustomTrackingTestBuilder {
 
     public static func buildDefault() -> SplunkAgent.CustomTracking {
         // Build CustomTracking proxy with actual CustomTracking module
-        let module = SplunkCustomTracking.CustomTracking()
+        let module = SplunkCustomTracking.CustomTrackingInternal()
         let moduleProxy = SplunkAgent.CustomTracking(for: module)
 
         return moduleProxy

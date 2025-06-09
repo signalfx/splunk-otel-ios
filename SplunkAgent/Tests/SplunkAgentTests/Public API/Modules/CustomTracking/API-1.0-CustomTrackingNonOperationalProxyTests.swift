@@ -57,4 +57,9 @@ final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
         let testException = NSException(name: exceptionName, reason: nil, userInfo: nil)
         XCTAssertNotNil(moduleProxy.trackException(testException))
     }
+
+    func testTrackWorkflow() throws {
+        let testWorkflowString = "TestWorkflow"
+        XCTAssertNotNil(moduleProxy.trackWorkflow(testWorkflowString))
+    }
 }
