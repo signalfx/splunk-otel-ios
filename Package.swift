@@ -95,7 +95,9 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
-                .product(name: "ResourceExtension", package: "opentelemetry-swift")
+                .product(name: "ResourceExtension", package: "opentelemetry-swift"),
+                .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
+                .product(name: "SignPostIntegration", package: "opentelemetry-swift")
             ],
             path: "SplunkNetwork/Sources"
         ),
@@ -197,9 +199,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkOpenTelemetryBackgroundExporter",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
-                .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
-                .product(name: "ResourceExtension", package: "opentelemetry-swift"),
-                .product(name: "SignPostIntegration", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
                 resolveDependency("logger")
             ],
             path: "SplunkOpenTelemetry/Sources"
@@ -281,7 +281,7 @@ func generateMainTargets() -> [Target] {
         .testTarget(
             name: "SplunkWebViewProxyTests",
             dependencies: [
-                "SplunkWebView"
+                "SplunkWebViewProxy"
             ],
             path: "SplunkWebViewProxy/Tests"
         ),
