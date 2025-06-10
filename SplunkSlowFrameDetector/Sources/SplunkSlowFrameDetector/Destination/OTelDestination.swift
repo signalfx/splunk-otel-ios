@@ -19,7 +19,6 @@ import Foundation
 import OpenTelemetryApi
 import SplunkCommon
 
-
 // MARK: - OTelDestination for SlowFrameDetector data
 
 struct OTelDestination: SlowFrameDetectorDestination {

@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@ limitations under the License.
 */
 
 internal import CiscoLogger
+import CrashReporter
 import Foundation
 import SplunkCommon
-import CrashReporter
 
 // Temporarily remove local CrashReporter in favor of SPM version
 // internal import SplunkCrashReporter
@@ -125,11 +125,11 @@ public class CrashReports {
             }
 
             // Send the serialized Crash Report to the Module data consumer for processing.
-            self.crashReportDataConsumer?(
+            crashReportDataConsumer?(
                 CrashReportsMetadata(timestamp: timestamp),
                 jsonPayload
             )
-        } catch let error {
+        } catch {
             logger.log(level: .error) {
                 "CrashReporter failed to load/parse with error: \(error)"
             }
@@ -166,7 +166,7 @@ public class CrashReports {
 
         do {
             try crashReporter?.enableAndReturnError()
-        } catch let error {
+        } catch {
             logger.log(level: .error) {
                 "Could not enable crash reporter: \(error)"
             }

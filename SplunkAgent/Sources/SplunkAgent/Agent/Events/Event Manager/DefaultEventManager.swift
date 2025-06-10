@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,16 +49,13 @@ class DefaultEventManager: AgentEventManager {
         agent.logger
     }
 
-    // Events state storage
-    let eventsModel: EventsModel
-
     // Automatically repeated events
     private var pulseEventJob: AgentRepeatingJob?
 
 
     // MARK: - Initialization
 
-    required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum, eventsModel: EventsModel = EventsModel()) throws {
+    required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum) throws {
         guard let traceUrl = configuration.endpoint.traceEndpoint else {
             throw AgentConfigurationError.invalidEndpoint(supplied: configuration.endpoint)
         }
@@ -67,7 +64,6 @@ class DefaultEventManager: AgentEventManager {
         let logUrl = traceUrl
 
         self.agent = agent
-        self.eventsModel = eventsModel
 
         let deviceManufacturer = "Apple"
 
@@ -115,11 +111,6 @@ class DefaultEventManager: AgentEventManager {
         logger.log(level: .info, isPrivate: false) {
             "Using trace url: \(traceUrl)"
         }
-
-        // Starts listening to a Session Reset notification to send the Session Start event.
-        NotificationCenter.default.addObserver(forName: DefaultSession.sessionDidResetNotification, object: nil, queue: nil) { _ in
-            self.sendSessionStartEvent()
-        }
     }
 
 
@@ -158,55 +149,6 @@ class DefaultEventManager: AgentEventManager {
             }
 
             completion(false)
-        }
-    }
-
-
-    // MARK: - Session Start event
-
-    func shouldSendSessionStart(_ sessionID: String) -> Bool {
-        let sending = eventsModel.isSessionStartSending(sessionID)
-        let sent = eventsModel.isSessionStartSent(sessionID)
-
-        return !sending && !sent
-    }
-
-    // Sends session replay start event, once per session.
-    func sendSessionStartEvent() {
-        let sessionItem = agent.currentSession.currentSessionItem
-        let sessionID = sessionItem.id
-        let timestamp = sessionItem.start
-
-        // Check if the session start event for this session is being sent or was already sent
-        guard shouldSendSessionStart(sessionID) else {
-            logger.log(level: .info, isPrivate: false) {
-                "Skipping session start event for: \(sessionID)"
-            }
-
-            return
-        }
-
-        let userID = agent.currentUser.userIdentifier
-
-        let event = SessionStartEvent(
-            sessionID: sessionID,
-            timestamp: timestamp,
-            userID: userID
-        )
-
-        // Mark the session start event as "sending"
-        eventsModel.markSessionStartSending(sessionID)
-
-        // Send event
-        logEventProcessor.sendEvent(event) { success in
-            self.logger.log(level: .info, isPrivate: false) {
-                "Session Start event sent with success: \(success)"
-            }
-
-            // Mark the session start event as "sent"
-            if success {
-                self.eventsModel.markSessionStartSent(sessionID)
-            }
         }
     }
 }
