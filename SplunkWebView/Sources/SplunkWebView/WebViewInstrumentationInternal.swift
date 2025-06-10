@@ -28,7 +28,7 @@ public final class WebViewInstrumentationInternal: NSObject {
     public var sharedState: AgentSharedState?
 
     // Module conformance
-    required public override init() {}
+    public required override init() {}
 
     // MARK: - Internal Methods
 
@@ -136,6 +136,7 @@ public final class WebViewInstrumentationInternal: NSObject {
         // Needed at first load only; user script will persist across reloads and navigation
         webView.evaluateJavaScript(javaScript)
     }
+
     // swiftlint:enable function_body_length
 
     private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
