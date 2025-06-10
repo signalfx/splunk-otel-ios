@@ -51,22 +51,22 @@ public final class WebViewInstrumentationInternal: NSObject {
                 const staleAfterDurationMs = 5000;
                 const self = {
                     cachedSessionId: '\(sessionId)',
+                    _isInitialized: false,
                     _lastCheckTime: Date.now(),
                     _updateInProgress: false,
-                    _isInitialized: false,
                     onNativeSessionIdChanged: null,
 
                     _fetchSessionId: function() {
                         return window.webkit.messageHandlers.SplunkRumNativeUpdate
                             .postMessage({})
                             .then((r) => r.sessionId)
-                            .catch((error) => {
+                            .catch( function(error) {
                                 console.error("[SplunkRumNative] Failed to fetch native session ID:", error);
                                 throw error;
                             });
                     },
                     _notifyChange: function(oldId, newId) {
-                        if (typeof self.onNativeSessionIdChanged === 'function') {
+                        if (typeof self.onNativeSessionIdChanged === "function") {
                             try {
                                 self.onNativeSessionIdChanged({
                                     currentId: newId,
@@ -86,17 +86,17 @@ public final class WebViewInstrumentationInternal: NSObject {
                             self._updateInProgress = true;
                             self._lastCheckTime = now;
                             self._fetchSessionId()
-                                .then((newId) => {
+                                .then( function(newId) {
                                     if (newId !== self.cachedSessionId) {
                                         const oldId = self.cachedSessionId;
                                         self.cachedSessionId = newId;
                                         self._notifyChange(oldId, newId);
                                     }
                                 })
-                                .catch((error) => {
+                                .catch( function(error) {
                                     console.error("[SplunkRumNative] Failed to fetch session ID from native:", error);
                                 })
-                                .finally(() => {
+                                .finally( function() {
                                     self._updateInProgress = false;
                                 });
                         }
@@ -116,10 +116,10 @@ public final class WebViewInstrumentationInternal: NSObject {
                     }
                 };
                 console.log("[SplunkRumNative] Initialized with native session:", self.cachedSessionId)
-                console.log("[SplunkRumNative] Bridge available:", !!window.webkit?.messageHandlers?.SplunkRumNativeUpdate);
+                console.log("[SplunkRumNative] Bridge available:", Boolean(window.webkit?.messageHandlers?.SplunkRumNativeUpdate));
                 return self;
-            })();
-        };
+            }());
+        }        
         """
 
         let userScript = WKUserScript(
