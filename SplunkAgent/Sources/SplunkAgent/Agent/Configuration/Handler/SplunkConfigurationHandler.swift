@@ -41,9 +41,7 @@ final class SplunkConfigurationHandler: AgentConfigurationHandler {
                     "enabled": true
                 },
                 "slowFrameDetector": {
-                    "enabled": true,
-                    "slowFrameDetectorThresholdMilliseconds": 1000.0,
-                    "frozenFrameDetectorThresholdMilliseconds": 5000.0
+                    "enabled": true
                 },
                 "appStart": {
                     "enabled": true
