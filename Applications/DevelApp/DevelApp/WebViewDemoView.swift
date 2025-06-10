@@ -62,6 +62,32 @@ struct WebViewDemoView: View {
         .navigationTitle("WebView Demo")
     }
 
+    private static func brumScript() -> String {
+        return """
+        <script src="https://cdn.signalfx.com/o11y-gdi-rum/latest/splunk-otel-web.js" crossorigin="anonymous">
+        </script>
+        <script>
+            SplunkRum.init(
+            {
+                realm: '<realm>',
+                rumAccessToken: '<token>',
+                applicationName: 'com.splunk.rum.DevelApp',
+                version: '1.0'
+            });
+        </script>
+        <script type="module">
+            import { trace } from 'https://cdn.jsdelivr.net/npm/@opentelemetry/api@1.5.0/build/esm/index.js';
+            async function reportPeriodically() {
+                const tracer = trace.getTracer('testingDevelApp');
+                const span = tracer.startSpan('report');
+                span.setAttribute('testNativeSessionId', window.SplunkRumNative.getNativeSessionId());
+                span.end();
+            }
+            setInterval(reportPeriodically, 60000);
+        </script>
+        """
+    }
+
     private static func modernScriptExample() -> String {
         return """
         async function updateSessionId() {
@@ -97,6 +123,7 @@ struct WebViewDemoView: View {
         <!DOCTYPE html>
         <html>
         <head>
+            \(WebViewDemoView.brumScript())
             <script>
                 \(scriptContent)
             </script>
