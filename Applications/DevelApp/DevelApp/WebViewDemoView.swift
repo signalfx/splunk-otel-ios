@@ -22,55 +22,83 @@ import SwiftUI
 import WebKit
 
 struct WebViewDemoView: View {
-    @State private var webView = WKWebView()
-    @State private var injected = false
+    @State private var modernWebView = WKWebView()
+    @State private var legacyWebView = WKWebView()
+
+    // Store the script content in variables
+    private let modernScriptContent = modernScriptExample()
+    private let legacyScriptContent = legacyScriptExample()
 
     var body: some View {
         VStack {
             DemoHeaderView()
-            WebViewRepresentable(webView: webView, injected: injected)
-                .frame(height: 300)
-                .border(Color.gray)
-                .padding()
 
-            Button("Inject JavaScript") {
-                injectJavaScript()
-            }
-            .padding()
+            // Legacy WebView Section
+            WebViewSectionView(
+                caption: "WebView using current BRUM legacy API",
+                webView: legacyWebView,
+                buttonText: "Inject JavaScript (legacy, sync)",
+                backgroundColor: Color(red: 0.9, green: 0.93, blue: 1.0),
+                scriptContent: legacyScriptContent,
+                injectAction: injectIntoLegacyWebView
+            )
+
+            // Modern WebView Section
+            WebViewSectionView(
+                caption: "WebView using future BRUM async API",
+                webView: modernWebView,
+                buttonText: "Inject JavaScript (modern, async)",
+                backgroundColor: Color(red: 0.88, green: 1.0, blue: 0.88),
+                scriptContent: modernScriptContent,
+                injectAction: injectIntoModernWebView
+            )
+
             Spacer()
         }
         .onAppear {
-            loadWebViewContent()
+            loadWebViewContent(for: modernWebView, scriptContent: modernScriptContent)
+            loadWebViewContent(for: legacyWebView, scriptContent: legacyScriptContent)
         }
         .navigationTitle("WebView Demo")
     }
 
-    /// Load initial HTML content into the WebView
-    private func loadWebViewContent() {
+    private static func modernScriptExample() -> String {
+        return """
+        async function updateSessionId() {
+            try {
+                const response = await window.SplunkRumNative.getNativeSessionIdAsync();
+                document.getElementById('sessionId').innerText = response;
+            } catch (error) {
+                document.getElementById('sessionId').innerText = "unknown";
+                console.log(`Error getting native Session ID: ${error.message}`);
+            }
+        }
+        setInterval(updateSessionId, 1000);
+        """
+    }
+
+    private static func legacyScriptExample() -> String {
+        return """
+        function updateSessionId() {
+            try {
+                const sessionId = window.SplunkRumNative.getNativeSessionId();
+                document.getElementById('sessionId').innerText = sessionId;
+            } catch (error) {
+                document.getElementById('sessionId').innerText = "unknown";
+                console.log(`Error getting native Session ID: ${error.message}`);
+            }
+        }
+        setInterval(updateSessionId, 1000);
+        """
+    }
+
+    private func loadWebViewContent(for webView: WKWebView, scriptContent: String) {
         let initialContent = """
         <!DOCTYPE html>
         <html>
         <head>
             <script>
-                // This pre-existing script is not needed in a user's
-                // webView. It is just a demo stand-in for the BRUM agent.
-                //
-                // As the agent would, it gracefully handles the absence
-                // of the API prior to injection, and after injection
-                // it makes use of the API.
-                async function updateSessionId() {
-                    try {
-                        const response = await window.SplunkRumNative.getNativeSessionId();
-                        document.getElementById('sessionId').innerText = response;
-                    } catch (error) {
-                        document.getElementById('sessionId').innerText = 'Error getting native Session ID';
-                    }
-                }
-
-                // Likewise, the timer represents the initiative of the
-                // BRUM agent. In real usage, the agent would of course
-                // be free to access the API on demand.
-                setInterval(updateSessionId, 1000); // pull every 1 second
+                \(scriptContent)
             </script>
         </head>
         <body style="font-size: 48px; font-family: sans-serif">
@@ -82,16 +110,45 @@ struct WebViewDemoView: View {
         webView.loadHTMLString(initialContent, baseURL: nil)
     }
 
-    /// Inject the JavaScript bridge into the WebView
-    private func injectJavaScript() {
-        SplunkRum.webView.integrateWithBrowserRum(webView)
-        injected = true
+    private func injectIntoModernWebView() {
+        SplunkRum.webView.integrateWithBrowserRum(modernWebView)
+    }
+
+    private func injectIntoLegacyWebView() {
+        SplunkRum.webView.integrateWithBrowserRum(legacyWebView)
+    }
+}
+
+struct WebViewSectionView: View {
+    let caption: String
+    let webView: WKWebView
+    let buttonText: String
+    let backgroundColor: Color
+    let scriptContent: String
+    let injectAction: () -> Void
+
+    var body: some View {
+        VStack {
+            Text(caption)
+                .font(.footnote)
+                .padding(.top)
+            WebViewRepresentable(webView: webView)
+                .frame(height: 150)
+                .border(Color.gray)
+                .padding(.horizontal)
+            Button(buttonText) {
+                injectAction()
+            }
+            .padding()
+        }
+        .background(backgroundColor)
+        .cornerRadius(8)
+        .padding()
     }
 }
 
 struct WebViewRepresentable: UIViewRepresentable {
     let webView: WKWebView
-    let injected: Bool
 
     func makeUIView(context: Context) -> WKWebView {
         return webView
@@ -101,3 +158,4 @@ struct WebViewRepresentable: UIViewRepresentable {
         // Nothing to do here
     }
 }
+

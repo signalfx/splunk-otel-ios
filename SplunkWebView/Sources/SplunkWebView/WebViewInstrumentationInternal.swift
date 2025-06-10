@@ -28,10 +28,11 @@ public final class WebViewInstrumentationInternal: NSObject {
     public var sharedState: AgentSharedState?
 
     // Module conformance
-    public override required init() {}
+    required public override init() {}
 
     // MARK: - Internal Methods
 
+    // swiftlint:disable function_body_length
     public func injectSessionId(into webView: WKWebView) {
 
         guard let sessionId = sharedState?.sessionId else {
@@ -42,31 +43,100 @@ public final class WebViewInstrumentationInternal: NSObject {
         }
 
         let javaScript = """
-        if (!window.SplunkRumNative) {
-            window.SplunkRumNative = {};
-        }
+        if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
+            console.log("[SplunkRumNative] Already initialized; skipping.");
+        } else {
+            window.SplunkRumNative = (function() {
+                const debounceDurationMs = 1000;
+                const staleAfterDurationMs = 5000;
+                const self = {
+                    cachedSessionId: '\(sessionId)',
+                    _lastCheckTime: Date.now(),
+                    _updateInProgress: false,
+                    _isInitialized: false,
+                    onNativeSessionIdChanged: null,
 
-        window.SplunkRumNative.getNativeSessionId = () => {
-            return window.webkit.messageHandlers.sessionBridge
-                .postMessage({})
-                .then(r => r.sessionId);
+                    _fetchSessionId: function() {
+                        return window.webkit.messageHandlers.SplunkRumNativeUpdate
+                            .postMessage({})
+                            .then((r) => r.sessionId)
+                            .catch((error) => {
+                                console.error("[SplunkRumNative] Failed to fetch native session ID:", error);
+                                throw error;
+                            });
+                    },
+                    _notifyChange: function(oldId, newId) {
+                        if (typeof self.onNativeSessionIdChanged === 'function') {
+                            try {
+                                self.onNativeSessionIdChanged({
+                                    currentId: newId,
+                                    previousId: oldId,
+                                    timestamp: Date.now()
+                                });
+                            } catch (error) {
+                                console.error("[SplunkRumNative] Error in application-provided callback for onNativeSessionIdChanged:", error);
+                            }
+                        }
+                    },
+                    // This must be synchronous for legacy BRUM compatibility.
+                    getNativeSessionId: function() {
+                        const now = Date.now();
+                        const stale = (now - self._lastCheckTime) > staleAfterDurationMs;
+                        if (stale && !self._updateInProgress) {
+                            self._updateInProgress = true;
+                            self._lastCheckTime = now;
+                            self._fetchSessionId()
+                                .then((newId) => {
+                                    if (newId !== self.cachedSessionId) {
+                                        const oldId = self.cachedSessionId;
+                                        self.cachedSessionId = newId;
+                                        self._notifyChange(oldId, newId);
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error("[SplunkRumNative] Failed to fetch session ID from native:", error);
+                                })
+                                .finally(() => {
+                                    self._updateInProgress = false;
+                                });
+                        }
+                        // Here we finish before above promise is fulfilled, and
+                        // return cached ID immediately for legacy compatibility.
+                        return self.cachedSessionId;
+                    },
+                    // Recommended for BRUM use in new agents going forward.
+                    getNativeSessionIdAsync: async function() {
+                        const newId = await self._fetchSessionId();
+                        if (newId !== self.cachedSessionId) {
+                            const oldId = self.cachedSessionId;
+                                    self.cachedSessionId = newId;
+                                    self._notifyChange(oldId, newId);
+                        }
+                        return newId;
+                    }
+                };
+                console.log("[SplunkRumNative] Initialized with native session:", self.cachedSessionId)
+                console.log("[SplunkRumNative] Bridge available:", !!window.webkit?.messageHandlers?.SplunkRumNativeUpdate);
+                return self;
+            })();
         };
         """
 
         let userScript = WKUserScript(
             source: javaScript,
-            injectionTime: .atDocumentEnd,
-            forMainFrameOnly: true
+            injectionTime: .atDocumentStart, // expected by legacy BRUM
+            forMainFrameOnly: false // expected by legacy BRUM
         )
 
         contentController(
-            forName: "sessionBridge",
+            forName: "SplunkRumNativeUpdate",
             forWebView: webView
         ).addUserScript(userScript)
 
         // Needed at first load only; user script will persist across reloads and navigation
         webView.evaluateJavaScript(javaScript)
     }
+    // swiftlint:enable function_body_length
 
     private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
         let contentController = webView.configuration.userContentController
@@ -102,4 +172,3 @@ public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
 
 // Type for conforming to ModuleEventData
 public struct WebViewInstrumentationData: ModuleEventData {}
-
