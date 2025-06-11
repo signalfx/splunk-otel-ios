@@ -48,8 +48,5 @@ final class RuntimeStateTests: XCTestCase {
 
         let debugEnabled = state.isDebugLoggingEnabled
         XCTAssertEqual(debugEnabled, ConfigurationDefaults.enableDebugLogging)
-
-        let sampling = state.sessionSamplingRate
-        XCTAssertEqual(sampling, ConfigurationDefaults.sessionSamplingRate)
     }
 }

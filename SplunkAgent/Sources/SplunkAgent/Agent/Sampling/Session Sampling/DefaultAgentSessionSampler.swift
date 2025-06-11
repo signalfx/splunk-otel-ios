@@ -40,6 +40,6 @@ final class DefaultAgentSessionSampler: AgentSessionSampler {
     /// - Parameter configuration: An object conforming to `AgentConfigurationProtocol` that
     /// supplies the `sessionSamplingRate`.
     func configure(with configuration: any AgentConfigurationProtocol) {
-        probability = configuration.sessionSamplingRate
+        probability = configuration.session.samplingRate
     }
 }
