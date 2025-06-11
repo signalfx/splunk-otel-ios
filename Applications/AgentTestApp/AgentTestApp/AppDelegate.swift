@@ -46,7 +46,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                 var modifiedSpan = spanData
                 modifiedSpan.settingAttributes(attributes)
-                modifiedSpan.settingTotalAttributeCount(attributes.count)
 
                 return modifiedSpan
             }
@@ -58,7 +57,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Navigation Instrumentation
         SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
-
 
         return true
     }

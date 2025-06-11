@@ -21,15 +21,10 @@ actor NavigationModel {
     // MARK: - Public
 
     public private(set) var moduleEnabled: Bool = true
-
-
     public private(set) var screenName: String = "unknown"
-
     public private(set) var isManualScreenName = false
 
-
     public private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
-
     public private(set) var agentVersion: String?
 
 
