@@ -36,6 +36,5 @@ final class API10StateTests: XCTestCase {
         XCTAssertNotNil(state.endpointConfiguration.realm)
         XCTAssertNotNil(state.deploymentEnvironment)
         XCTAssertNotNil(state.isDebugLoggingEnabled)
-        XCTAssertNotNil(state.sessionSamplingRate)
     }
 }

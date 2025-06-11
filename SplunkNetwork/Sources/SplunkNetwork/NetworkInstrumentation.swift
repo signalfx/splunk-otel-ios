@@ -150,6 +150,8 @@ public class NetworkInstrumentation {
         let length = body?.count ?? 0
         span.setAttribute(key: key, value: length)
 
+        span.setAttribute(key: "component", value: "http")
+
         if let sharedState {
             let sessionID = sharedState.sessionId
             span.setAttribute(key: "session.id", value: sessionID)

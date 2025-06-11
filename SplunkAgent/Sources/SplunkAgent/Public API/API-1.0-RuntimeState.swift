@@ -82,9 +82,4 @@ public extension RuntimeState {
     var isDebugLoggingEnabled: Bool {
         owner.agentConfiguration.enableDebugLogging
     }
-
-    /// A `Double` containing the used sampling rate.
-    var sessionSamplingRate: Double {
-        owner.agentConfiguration.sessionSamplingRate
-    }
 }
