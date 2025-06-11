@@ -206,6 +206,9 @@ public class SplunkRum: ObservableObject {
         // Assign and configure the session sampler
         self.sessionSampler = sessionSampler
         self.sessionSampler.configure(with: agentConfiguration)
+
+        // Set default screen names
+        runtimeAttributes.updateCustom(named: "screen.name", with: "unknown")
     }
 
     convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {

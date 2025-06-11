@@ -145,22 +145,35 @@ public final class Navigation: Sendable {
 
             // Process navigation events
             for await event in navigationStream {
-                guard state.isAutomatedTrackingEnabled else {
+                guard await shouldProcessEvent() else {
                     continue
                 }
 
-                switch event.type {
+                var processedEvent = event
+                let screenName = await preferredScreenName(for: event.controllerTypeName)
+
+                // If we have set manual naming, then we prefer it
+                if await model.isManualScreenName {
+                    processedEvent = AutomatedNavigationEvent(
+                        type: event.type,
+                        controllerTypeName: screenName,
+                        controllerIdentifier: event.controllerIdentifier
+                    )
+                }
+
+                // Supported events handling
+                switch processedEvent.type {
                 case .viewDidLoad:
-                    await processShowStart(event: event)
+                    await processShowStart(event: processedEvent)
 
                 case .viewDidAppear:
-                    await processNavigationEnd(event: event)
+                    await processNavigationEnd(event: processedEvent)
 
                 case .willTransitionToTraitCollection:
-                    await processTransitionStart(event: event)
+                    await processTransitionStart(event: processedEvent)
 
                 case .didTransitionToTraitCollection:
-                    await processNavigationEnd(event: event)
+                    await processNavigationEnd(event: processedEvent)
 
                 default:
                     break
@@ -224,33 +237,38 @@ public final class Navigation: Sendable {
 
     private func navigationEvent(for notificationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
         guard
-            state.isAutomatedTrackingEnabled,
+            await shouldProcessEvent(),
             let navigationController = notificationObject as? UINavigationController,
             let visibleController = await navigationController.visibleViewController
         else {
             return nil
         }
 
+        let controllerTypeName = NSStringFromClass(type(of: visibleController))
+        let screenName = await preferredScreenName(for: controllerTypeName)
+
         return AutomatedNavigationEvent(
             type: eventType,
-            controllerTypeName: NSStringFromClass(type(of: visibleController)),
+            controllerTypeName: screenName,
             controllerIdentifier: ObjectIdentifier(visibleController)
         )
     }
 
     private func transitionEvent(for presentationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
         guard
-            state.isAutomatedTrackingEnabled,
+            await shouldProcessEvent(),
             let presentationController = presentationObject as? UIPresentationController
         else {
             return nil
         }
 
         let visibleController = await presentationController.presentedViewController
+        let controllerTypeName = NSStringFromClass(type(of: visibleController))
+        let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
             type: eventType,
-            controllerTypeName: NSStringFromClass(type(of: visibleController)),
+            controllerTypeName: screenName,
             controllerIdentifier: ObjectIdentifier(visibleController)
         )
     }
@@ -281,7 +299,9 @@ public final class Navigation: Sendable {
         continuation.yield(screenName)
 
         // Send corresponding span
-        send(screenName: screenName, lastScreenName: lastScreenName, start: start)
+        if screenName != lastScreenName {
+            send(screenName: screenName, lastScreenName: lastScreenName, start: start)
+        }
     }
 
     /// Process the beginning of the view controller transition.
@@ -303,7 +323,9 @@ public final class Navigation: Sendable {
         await model.update(navigation: navigation, for: event.controllerIdentifier)
 
         // Send corresponding span
-        send(screenName: screenName, lastScreenName: lastScreenName, start: start)
+        if screenName != lastScreenName {
+            send(screenName: screenName, lastScreenName: lastScreenName, start: start)
+        }
     }
 
     /// Process the finalizing of the navigation.
@@ -333,6 +355,26 @@ public final class Navigation: Sendable {
     func update() {
         // Update state
         state.isAutomatedTrackingEnabled = preferences.enableAutomatedTracking ?? false
+    }
+
+
+    // MARK: - Private methods
+
+    /// Determine whether processing should occur at call time.
+    private func shouldProcessEvent() async -> Bool {
+        let moduleEnabled = await model.moduleEnabled
+        let isManualScreenName = await model.isManualScreenName
+        let trackingEnabled = state.isAutomatedTrackingEnabled || isManualScreenName
+
+        return moduleEnabled && trackingEnabled
+    }
+
+    private func preferredScreenName(for controllerTypeName: String) async -> String {
+        if await model.isManualScreenName {
+            return await model.screenName
+        }
+
+        return controllerTypeName
     }
 
 

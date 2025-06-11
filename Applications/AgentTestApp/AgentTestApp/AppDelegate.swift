@@ -58,7 +58,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Navigation Instrumentation
         SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
 
-
         return true
     }
 
