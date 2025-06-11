@@ -53,11 +53,6 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// Defaults to `false`.
     public var enableDebugLogging: Bool = ConfigurationDefaults.enableDebugLogging
 
-    /// Sets the sampling rate with at which sessions will be sampled. The sampling rate is from the `<0.0, 1.0>` interval.
-    ///
-    /// `1.0` equals to zero sampling (all instrumentation is sent), `0.0` equals to all session being sampled, `0.5` equals to 50% sampling. Defaults to `1.0`.
-    public var sessionSamplingRate: Double = ConfigurationDefaults.sessionSamplingRate
-
     /// Sets global attributes, which are sent with all signals.
     ///
     /// Defaults to an empty MutableAttributes object.
@@ -68,6 +63,12 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// If the callback is provided, all spans are funneled through the callback, and can be either approved by returning the span in the callback,
     /// or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
     public var spanInterceptor: ((SpanData) -> SpanData?)?
+
+    /// Sets the `UserConfiguration` object.
+    public var user = UserConfiguration()
+
+    /// Sets the `SessionConfiguration` object.
+    public var session = SessionConfiguration()
 
 
     // MARK: - Private
@@ -125,16 +126,28 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         return updated
     }
 
-    /// Sets the sampling rate with which sessions will be sampled.
+    /// Sets the `UserConfiguration` object.
     ///
-    /// - Parameter sessionSamplingRate: A sampling rate in the `<0.0, 1.0>` interval.
-    /// `1.0` equals to zero sampling (all instrumentation is sent), `0.0` equals to all session being sampled, `0.5` equals to 50% sampling.
+    /// - Parameter userConfiguration: A configuration object representing properties of the Agent's `User`.
     ///
     /// - Returns: The updated configuration structure.
     @discardableResult
-    public func sessionSamplingRate(_ sessionSamplingRate: Double) -> Self {
+    public func userConfiguration(_ userConfiguration: UserConfiguration) -> Self {
         var updated = self
-        updated.sessionSamplingRate = sessionSamplingRate
+        updated.user = userConfiguration
+
+        return updated
+    }
+
+    /// Sets the `SessionConfiguration` object.
+    ///
+    /// - Parameter sessionConfiguration: A configuration object representing properties of the Agent's `Session`.
+    ///
+    /// - Returns: The updated configuration structure.
+    @discardableResult
+    public func sessionConfiguration(_ sessionConfiguration: SessionConfiguration) -> Self {
+        var updated = self
+        updated.session = sessionConfiguration
 
         return updated
     }
@@ -180,8 +193,11 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         // Optional public properties except span filter
         case appVersion
         case enableDebugLogging
-        case sessionSamplingRate
         case globalAttributes
+
+        // Optional public configuration objects
+        case user
+        case session
     }
 
 
@@ -195,8 +211,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
             lhs.appVersion == rhs.appVersion &&
             lhs.enableDebugLogging == rhs.enableDebugLogging &&
-            lhs.sessionSamplingRate == rhs.sessionSamplingRate &&
-            lhs.globalAttributes == rhs.globalAttributes
+            lhs.globalAttributes == rhs.globalAttributes &&
+            lhs.user == rhs.user &&
+            lhs.session == rhs.session
     }
 }
 
