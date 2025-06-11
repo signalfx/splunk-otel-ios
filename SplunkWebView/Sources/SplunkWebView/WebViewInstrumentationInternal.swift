@@ -47,7 +47,6 @@ public final class WebViewInstrumentationInternal: NSObject {
             console.log("[SplunkRumNative] Already initialized; skipping.");
         } else {
             window.SplunkRumNative = (function() {
-                const debounceDurationMs = 1000;
                 const staleAfterDurationMs = 5000;
                 const self = {
                     cachedSessionId: '\(sessionId)',
@@ -117,9 +116,10 @@ public final class WebViewInstrumentationInternal: NSObject {
                 };
                 console.log("[SplunkRumNative] Initialized with native session:", self.cachedSessionId)
                 console.log("[SplunkRumNative] Bridge available:", Boolean(window.webkit?.messageHandlers?.SplunkRumNativeUpdate));
+                self._isInitialized = true;
                 return self;
             }());
-        }        
+        }
         """
 
         let userScript = WKUserScript(
