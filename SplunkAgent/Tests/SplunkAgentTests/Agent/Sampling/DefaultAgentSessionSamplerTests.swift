@@ -47,7 +47,7 @@ final class DefaultAgentSessionSamplerTests: XCTestCase {
         let newSamplingRate = 0.5
 
         var configuration = try ConfigurationTestBuilder.buildDefault()
-        configuration.sessionSamplingRate = newSamplingRate
+        configuration.session.samplingRate = newSamplingRate
 
         sampler.configure(with: configuration)
 
