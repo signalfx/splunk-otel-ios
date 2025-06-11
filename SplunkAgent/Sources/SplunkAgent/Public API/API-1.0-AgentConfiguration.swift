@@ -65,10 +65,10 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     public var spanInterceptor: ((SpanData) -> SpanData?)?
 
     /// Sets the `UserConfiguration` object.
-    public var user: UserConfiguration = UserConfiguration()
+    public var user = UserConfiguration()
 
     /// Sets the `SessionConfiguration` object.
-    public var session: SessionConfiguration = SessionConfiguration()
+    public var session = SessionConfiguration()
 
 
     // MARK: - Private
