@@ -45,7 +45,7 @@ extension SplunkRum {
         var settings = [String: String]()
 
         settings["enableDebugLogging"] = String(agentConfigurationHandler.configuration.enableDebugLogging)
-        settings["sessionSamplingRate"] = String(agentConfigurationHandler.configuration.sessionSamplingRate)
+        settings["sessionSamplingRate"] = String(agentConfigurationHandler.configuration.session.samplingRate)
 
         if let modulesConfigurations = modulesManager?.modulesConfigurationDescription {
             settings.merge(modulesConfigurations) { $1 }

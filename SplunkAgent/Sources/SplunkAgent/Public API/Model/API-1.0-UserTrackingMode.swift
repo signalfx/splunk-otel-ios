@@ -18,7 +18,7 @@ limitations under the License.
 /// A mode of user tracking.
 ///
 /// Determines whether and, if necessary, how the user will be tracked.
-public enum UserTrackingMode: Equatable {
+public enum UserTrackingMode: Codable, Equatable {
 
     /// No tracking. Individual user sessions are not linked in any way.
     ///
