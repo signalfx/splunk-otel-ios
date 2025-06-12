@@ -24,7 +24,7 @@ final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
 
     // MARK: - Private
 
-    private var module: SplunkCustomTracking.CustomTracking!
+    private var module: SplunkCustomTracking.CustomTrackingInternal!
     private var moduleProxy: SplunkAgent.CustomTracking!
 
 
@@ -33,7 +33,7 @@ final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        module = SplunkCustomTracking.CustomTracking()
+        module = SplunkCustomTracking.CustomTrackingInternal()
         moduleProxy = SplunkAgent.CustomTracking(for: module)
     }
 
@@ -52,19 +52,28 @@ final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
         let attributes = MutableAttributes()
         XCTAssertNoThrow(moduleProxy.trackError("Test error message", attributes))
     }
+
     func testTrackError_withError() throws {
         let attributes = MutableAttributes()
         let error = NSError(domain: "com.splunk.test", code: 1, userInfo: nil) as Error
         XCTAssertNoThrow(moduleProxy.trackError(error, attributes))
     }
+
     func testTrackError_withNSError() throws {
         let attributes = MutableAttributes()
         let nsError = NSError(domain: "com.splunk.test", code: 1, userInfo: nil)
         XCTAssertNoThrow(moduleProxy.trackError(nsError, attributes))
     }
+
     func testTrackError_withNSException() throws {
         let attributes = MutableAttributes()
         let exception = NSException(name: .genericException, reason: "Test exception", userInfo: nil)
         XCTAssertNoThrow(moduleProxy.trackException(exception, attributes))
+    }
+
+    func testTrackWorkflow() throws {
+        let span = moduleProxy.trackWorkflow("Test Custom Workflow")
+        XCTAssertNoThrow(span)
+        span.end()
     }
 }

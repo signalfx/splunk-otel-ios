@@ -18,6 +18,7 @@ limitations under the License.
 import Combine
 import Foundation
 internal import SplunkCommon
+import OpenTelemetryApi
 
 
 // MARK: - CustomTracking
@@ -47,7 +48,6 @@ public protocol CustomTrackingModule {
     /// - Returns: The updated `CustomTrackingModule` instance.
     @discardableResult func trackError(_ message: String, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
-
     /// Track an Error (Swift conforming type) with optional attributes.
     ///
     /// - Parameter error: An instance of a Swift type conforming to Error.
@@ -56,7 +56,6 @@ public protocol CustomTrackingModule {
     ///
     /// - Returns: The updated `CustomTrackingModule` instance.
     @discardableResult func trackError(_ error: Error, _ attributes: MutableAttributes) -> any CustomTrackingModule
-
 
     /// Track an NSError object with optional attributes.
     ///
@@ -67,7 +66,6 @@ public protocol CustomTrackingModule {
     /// - Returns: The updated `CustomTrackingModule` instance.
     @discardableResult func trackError(_ nsError: NSError, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
-
     /// Track an NSException object with optional attributes.
     ///
     /// - Parameter exception: An NSException instance such as one caught after a throw.
@@ -77,6 +75,14 @@ public protocol CustomTrackingModule {
     /// - Returns: The updated `CustomTrackingModule` instance.
     @discardableResult func trackException(_ exception: NSException, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
+    // MARK: - Track Custom Workflow
+
+    /// Track a workflow with a name and return a Span object.
+    ///
+    /// - Parameter workflowName: The name of the workflow to track.
+    ///
+    /// - Returns: A Span object representing the workflow.
+    func trackWorkflow(_ workflowName: String) -> Span
 
     // MARK: - Single argument helpers (signatures)
 

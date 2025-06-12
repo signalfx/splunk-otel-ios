@@ -16,16 +16,16 @@ limitations under the License.
 */
 
 @testable import SplunkAgent
-import SplunkCustomTracking
+import SplunkNavigation
 
-final class CustomTrackingTestBuilder {
+final class NavigationTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func buildDefault() -> SplunkAgent.CustomTracking {
-        // Build CustomTracking proxy with actual CustomTracking module
-        let module = SplunkCustomTracking.CustomTracking()
-        let moduleProxy = SplunkAgent.CustomTracking(for: module)
+    public static func buildDefault() -> SplunkAgent.Navigation {
+        // Build Navigation proxy with actual Navigation module
+        let module = SplunkNavigation.Navigation()
+        let moduleProxy = SplunkAgent.Navigation(for: module)
 
         return moduleProxy
     }
@@ -33,8 +33,8 @@ final class CustomTrackingTestBuilder {
 
     // MARK: - Non-operational builds
 
-    public static func buildNonOperational() -> CustomTrackingNonOperational {
-        let moduleProxy = CustomTrackingNonOperational()
+    public static func buildNonOperational() -> NavigationNonOperational {
+        let moduleProxy = NavigationNonOperational()
 
         return moduleProxy
     }

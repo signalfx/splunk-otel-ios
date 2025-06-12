@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ public class SplunkRum: ObservableObject {
     // MARK: - Internal (Modules Proxy)
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
+    lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
 
     lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
 
@@ -102,14 +103,18 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Public API (Modules)
 
-    /// An object that holds session replay module.
+    /// An object that holds Session Replay module.
     public var sessionReplay: any SessionReplayModule {
         sessionReplayProxy
     }
 
-    /// An object that holds the Custom Tracking  module.
+    /// An object that holds Custom Tracking  module.
     public var customTracking: any CustomTrackingModule {
         customTrackingProxy
+
+    /// An object that holds Navigation module.
+    public var navigation: any NavigationModule {
+        navigationProxy
     }
 
 
@@ -207,6 +212,9 @@ public class SplunkRum: ObservableObject {
         // Assign and configure the session sampler
         self.sessionSampler = sessionSampler
         self.sessionSampler.configure(with: agentConfiguration)
+
+        // Set default screen names
+        runtimeAttributes.updateCustom(named: "screen.name", with: "unknown")
     }
 
     convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {
@@ -230,6 +238,9 @@ public class SplunkRum: ObservableObject {
             sessionSampler: DefaultAgentSessionSampler()
         )
 
+        // Set the configured user tracking mode
+        user.preferences.trackingMode = configuration.user.trackingMode
+
         initializeEvents["agent_instance_initialized"] = Date()
 
         // Links the current session with the agent
@@ -242,9 +253,6 @@ public class SplunkRum: ObservableObject {
         eventManager = try DefaultEventManager(with: configuration, agent: self)
 
         initializeEvents["event_manager_initialized"] = Date()
-
-        // Send session start event immediately as the session already started in the SplunkRum init method.
-        eventManager?.sendSessionStartEvent()
 
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(

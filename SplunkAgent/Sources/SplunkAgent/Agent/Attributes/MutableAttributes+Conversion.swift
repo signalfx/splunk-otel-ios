@@ -19,7 +19,7 @@ import Foundation
 import OpenTelemetryApi
 internal import SplunkCommon
 
-public extension MutableAttributes {
+extension MutableAttributes {
 
     // MARK: - Type Conversion
 
@@ -53,8 +53,8 @@ public extension MutableAttributes {
         }
     }
 
-    // MARK: - Description
 
+    // MARK: - Description
 
     func attributeDescription(_ value: AttributeValue) -> String {
         switch value {

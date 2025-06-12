@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ limitations under the License.
 
 internal import CiscoLogger
 import Foundation
-import OpenTelemetryApi
-import OpenTelemetrySdk
-import ResourceExtension
-import SignPostIntegration
+internal import OpenTelemetryApi
+internal import OpenTelemetrySdk
+internal import ResourceExtension
+internal import SignPostIntegration
 import SplunkCommon
-import URLSessionInstrumentation
+internal import URLSessionInstrumentation
 
 public class NetworkInstrumentation {
 
@@ -45,6 +45,7 @@ public class NetworkInstrumentation {
         "NSURLSessionDefault"
     ]
 
+
     // MARK: - Public
 
     /// Endpoints excluded from network instrumentation.
@@ -53,8 +54,8 @@ public class NetworkInstrumentation {
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
 
-    public required init() {    // For Module conformance
-    }
+    // For Module conformance
+    public required init() {}
 
     public func install(with configuration: (any ModuleConfiguration)?,
                         remoteConfiguration: (any RemoteModuleConfiguration)?) {
@@ -72,19 +73,22 @@ public class NetworkInstrumentation {
         if !delegateClasses.isEmpty {
             delegateClassesToInstrument = delegateClasses
         } else {
-            self.logger.log(level: .debug) {
+            logger.log(level: .debug) {
                 "Standard Delegate classes not found, using exhaustive delegate class search.  This may incur performance overhead during startup."
             }
         }
 
         // Start up URLSession instrumentation
-        _ = URLSessionInstrumentation(configuration: URLSessionInstrumentationConfiguration(
-            shouldRecordPayload: shouldRecordPayload,
-            shouldInstrument: shouldInstrument,
-            createdRequest: createdRequest,
-            receivedResponse: receivedResponse,
-            receivedError: receivedError,
-            delegateClassesToInstrument: delegateClassesToInstrument))
+        _ = URLSessionInstrumentation(
+            configuration: URLSessionInstrumentationConfiguration(
+                shouldRecordPayload: shouldRecordPayload,
+                shouldInstrument: shouldInstrument,
+                createdRequest: createdRequest,
+                receivedResponse: receivedResponse,
+                receivedError: receivedError,
+                delegateClassesToInstrument: delegateClassesToInstrument
+            )
+        )
     }
 
     // Callback methods to modify URLSession monitoring
@@ -100,7 +104,7 @@ public class NetworkInstrumentation {
         // Filter using ignoreURLs API
         if let urlToTest = URLRequest.url {
             if ignoreURLs.matches(url: urlToTest) {
-                self.logger.log(level: .debug) {
+                logger.log(level: .debug) {
                     "URL excluded via IgnoreURLs API \(URLRequest.description)"
                 }
                 return false
@@ -110,13 +114,13 @@ public class NetworkInstrumentation {
         let requestEndpoint = URLRequest.description
         if let excludedEndpoints {
             for excludedEndpoint in excludedEndpoints where requestEndpoint.contains(excludedEndpoint.absoluteString) {
-                self.logger.log(level: .debug) {
+                logger.log(level: .debug) {
                     "Should Not Instrument Backend URL \(URLRequest.description)"
                 }
                 return false
             }
         } else {
-            self.logger.log(level: .debug) {
+            logger.log(level: .debug) {
                 "Should Not Instrument, Backend URL not yet configured."
             }
             return false
@@ -124,12 +128,12 @@ public class NetworkInstrumentation {
         // Leave the localhost test in place for the test case where we have two endpoints,
         // both collector and zipkin on local.
         if requestEndpoint.hasPrefix("http://localhost") {
-            self.logger.log(level: .debug) {
+            logger.log(level: .debug) {
                 "Should Not Instrument Localhost \(URLRequest.description)"
             }
             return false
         } else {
-            self.logger.log(level: .debug) {
+            logger.log(level: .debug) {
                 "Should Instrument \(URLRequest.description)"
             }
             return true
@@ -146,6 +150,8 @@ public class NetworkInstrumentation {
         let length = body?.count ?? 0
         span.setAttribute(key: key, value: length)
 
+        span.setAttribute(key: "component", value: "http")
+
         if let sharedState {
             let sessionID = sharedState.sessionId
             span.setAttribute(key: "session.id", value: sessionID)
@@ -157,9 +163,10 @@ public class NetworkInstrumentation {
         let serverTimingPattern = #"traceparent;desc=['"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['"]"#
 
         guard let regex = try? NSRegularExpression(pattern: serverTimingPattern) else {
-            self.logger.log(level: .fault) {
+            logger.log(level: .fault) {
                 "Regex failed to compile"
             }
+
             // Intentional hard failure in both Debug and Release builds
             preconditionFailure("Regex failed to compile. Likely programmer error in edit of serverTimingPattern regex: #\(serverTimingPattern)#")
         }
@@ -174,9 +181,11 @@ public class NetworkInstrumentation {
             // If the match or capture groups are invalid, log and return early
             // Also, prevent over-long log output
             let truncatedValStr = valStr.count > 255 ? String(valStr.prefix(252)) + "..." : valStr
-            self.logger.log(level: .debug) {
+
+            logger.log(level: .debug) {
                 "Failed to match traceparent string: \(truncatedValStr)"
             }
+
             return
         }
 
@@ -215,7 +224,7 @@ public class NetworkInstrumentation {
     }
 
     func receivedError(error: Error, dataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, span: Span) {
-        self.logger.log(level: .error) {
+        logger.log(level: .error) {
             "Error: \(error.localizedDescription), Status: \(HTTPStatus)"
         }
     }

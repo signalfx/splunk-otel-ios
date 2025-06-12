@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,18 +45,14 @@ public class OTLPLogEventProcessor: LogEventProcessor {
 
 
     // MARK: - Initialization
-    
-    required public init(
+
+    public required init(
         with logsEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
         globalAttributes: [String: Any],
         debugEnabled: Bool
     ) {
-
-        let configuration = OtlpConfiguration()
-        let envVarHeaders = [(String, String)]()
-
         let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
 
         // Initialize attribute checker proxy exporter
@@ -105,7 +101,7 @@ public class OTLPLogEventProcessor: LogEventProcessor {
             .with(resource: resource)
 
         let loggerProvider = loggerProviderBuilder.build()
-        
+
         // Set default logger provider
         OpenTelemetry.registerLoggerProvider(loggerProvider: loggerProvider)
 
@@ -119,13 +115,13 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         sendEvent(event: event, immediateProcessing: false, completion: completion)
     }
 
-    public func sendEvent(event: any AgentEvent, immediateProcessing: Bool , completion: @escaping (Bool) -> Void) {
-#if DEBUG
-        storedLastProcessedEvent = event
-#endif
+    public func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void) {
+        #if DEBUG
+            storedLastProcessedEvent = event
+        #endif
 
         if immediateProcessing {
-            self.processEvent(event: event, completion: completion)
+            processEvent(event: event, completion: completion)
         } else {
             backgroundQueue.async {
                 self.processEvent(event: event, completion: completion)
@@ -137,11 +133,11 @@ public class OTLPLogEventProcessor: LogEventProcessor {
     // MARK: - Private methods
 
     private func processEvent(event: any AgentEvent, completion: @escaping (Bool) -> Void) {
-        let logger = self.loggerProvider.get(instrumentationScopeName: event.instrumentationScope)
+        let logger = loggerProvider.get(instrumentationScopeName: event.instrumentationScope)
 
         // Build LogRecordBuilder from LogEvent
         var logRecordBuilder = logger.logRecordBuilder()
-        logRecordBuilder = self.buildEvent(with: event, logRecordBuilder: logRecordBuilder)
+        logRecordBuilder = buildEvent(with: event, logRecordBuilder: logRecordBuilder)
 
         // Set observation timestamp
         _ = logRecordBuilder.setObservedTimestamp(Date())
@@ -149,9 +145,9 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         // Send event
         logRecordBuilder.emit()
 
-#if DEBUG
-        self.storedLastSentEvent = event
-#endif
+        #if DEBUG
+            storedLastSentEvent = event
+        #endif
 
         // TODO: MRUM_AC-1062 (Post GA) - Propagate OTel exporter API errors into the Agent
         DispatchQueue.main.async {

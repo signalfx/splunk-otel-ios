@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import Foundation
 /// Internal protocol for sharing agent state with modules.
 ///
 /// The Agent uses the protocol internally to manage Modules and their Events.
-public protocol AgentSharedState: AnyObject {
+public protocol AgentSharedState: AnyObject, Sendable {
 
     // MARK: - General state
 

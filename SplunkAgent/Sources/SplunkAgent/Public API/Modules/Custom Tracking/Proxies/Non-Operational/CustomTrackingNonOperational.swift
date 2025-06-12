@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 internal import SplunkCommon
 internal import CiscoLogger
+import OpenTelemetryApi
 
 
 /// The class implementing CustomTracking public API in non-operational mode.
@@ -48,5 +49,12 @@ final class CustomTrackingNonOperational: CustomTrackingModule {
             API: `\(named)`
             """
         }
+    }
+
+    func trackWorkflow(_ workflowName: String) -> any OpenTelemetryApi.Span {
+        logAccess(toApi: "trackWorkflow(workflowName)")
+        let span = DefaultTracer.instance.spanBuilder(spanName: workflowName).startSpan()
+        span.end()
+        return span
     }
 }
