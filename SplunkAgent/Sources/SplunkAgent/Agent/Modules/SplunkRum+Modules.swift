@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 internal import CiscoSessionReplay
 internal import SplunkAppStart
+internal import SplunkNavigation
 internal import SplunkNetwork
 
 #if canImport(SplunkCrashReports)
@@ -51,9 +52,10 @@ extension SplunkRum {
     func customizeModules() {
         customizeCrashReports()
         customizeSessionReplay()
+        customizeNavigation()
         customizeNetwork()
         customizeAppStart()
-        customizeWebViewInstrumentation()
+        customizeWebView()
     }
 
     /// Perform operations specific to the SessionReplay module.
@@ -67,6 +69,28 @@ extension SplunkRum {
 
         // Initialize proxy API for this module
         sessionReplayProxy = SessionReplay(for: sessionReplayModule)
+    }
+
+    // Configure Navigation module.
+    private func customizeNavigation() {
+        let moduleType = SplunkNavigation.Navigation.self
+        let navigationModule = modulesManager?.module(ofType: moduleType)
+
+        guard let navigationModule else {
+            return
+        }
+
+        navigationModule.agentVersion(sharedState.agentVersion)
+
+        // Set up forwarding of screen name changes to runtime attributes.
+        Task(priority: .userInitiated) {
+            for await newValue in navigationModule.screenNameStream {
+                runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
+            }
+        }
+
+        // Initialize proxy API for this module
+        navigationProxy = Navigation(for: navigationModule)
     }
 
     /// Configure Network module with shared state.
@@ -106,21 +130,25 @@ extension SplunkRum {
     // swiftformat:enable indent
     }
 
-    /// Configure App start module
+    /// Configure App start module with shared state.
     private func customizeAppStart() {
         let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
 
         appStartModule?.sharedState = sharedState
     }
 
-    /// Configure WebView intrumentation module
-    private func customizeWebViewInstrumentation() {
+    /// Configure WebView Instrumentation module with shared state.
+    private func customizeWebView() {
         // Get WebViewInstrumentation module, set its sharedState
-        if let webViewInstrumentationModule = modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentationInternal.self) {
-            WebViewInstrumentationInternal.instance.sharedState = sharedState
+        let moduleType = SplunkWebView.WebViewInstrumentationInternal.self
+
+        if let webViewInstrumentationModule = modulesManager?.module(ofType: moduleType) {
+            webViewInstrumentationModule.sharedState = sharedState
+
             logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module installed."
             }
+
         } else {
             logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module not installed."

@@ -17,19 +17,28 @@ limitations under the License.
 
 import Foundation
 
-/// Internal protocol for sharing agent state with modules.
-///
-/// The Agent uses the protocol internally to manage Modules and their Events.
-public protocol AgentSharedState: AnyObject, Sendable {
+/// Defines known types of navigation.
+enum NavigationType: Sendable {
+    case show
+    case transition
+}
 
-    // MARK: - General state
+/// The structure encapsulates one navigation in the client application.
+struct NavigationPair: Sendable {
 
-    /// Identification of the current session at the time of the creation of this state.
-    var sessionId: String { get }
+    // MARK: - Navigation identity
 
-    /// Agent version.
-    var agentVersion: String { get }
+    let type: NavigationType
 
-    /// Returns application state for the given timestamp.
-    func applicationState(for timestamp: Date) -> String?
+
+    // MARK: - Navigation life
+
+    let start: Date
+    var end: Date?
+
+
+    // MARK: - Controller identity
+
+    let typeName: String
+    let screenName: String
 }

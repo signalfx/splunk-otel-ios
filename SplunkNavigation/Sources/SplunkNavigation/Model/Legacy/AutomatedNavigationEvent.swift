@@ -16,20 +16,15 @@ limitations under the License.
 */
 
 import Foundation
+internal import CiscoSwizzling
 
-/// Internal protocol for sharing agent state with modules.
-///
-/// The Agent uses the protocol internally to manage Modules and their Events.
-public protocol AgentSharedState: AnyObject, Sendable {
+/// Represents automatic navigation event. Used for legacy solution compatibility.
+struct AutomatedNavigationEvent: NavigationActionEvent {
 
-    // MARK: - General state
+    // MARK: - Public
 
-    /// Identification of the current session at the time of the creation of this state.
-    var sessionId: String { get }
-
-    /// Agent version.
-    var agentVersion: String { get }
-
-    /// Returns application state for the given timestamp.
-    func applicationState(for timestamp: Date) -> String?
+    var type: NavigationActionEventType
+    var controllerTypeName: String
+    var controllerIdentifier: ObjectIdentifier
+    var viewFrame: CGRect?
 }

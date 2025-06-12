@@ -56,6 +56,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",
+                "SplunkNavigation",
                 "SplunkNetwork",
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
@@ -87,7 +88,24 @@ func generateMainTargets() -> [Target] {
         ),
 
 
-        // MARK: - Splunk Network
+        // MARK: - Splunk Navigation (Instrumentation)
+
+        .target(
+            name: "SplunkNavigation",
+            dependencies: [
+                "SplunkCommon",
+                resolveDependency("logger")
+            ],
+            path: "SplunkNavigation/Sources"
+        ),
+        .testTarget(
+            name: "SplunkNavigationTests",
+            dependencies: ["SplunkNavigation"],
+            path: "SplunkNavigation/Tests"
+        ),
+
+
+        // MARK: - Splunk Network (Instrumentation)
 
         .target(
             name: "SplunkNetwork",
@@ -121,7 +139,7 @@ func generateMainTargets() -> [Target] {
         ),
 
 
-        // MARK: - Splunk Slow Frame Detector
+        // MARK: - Splunk Slow Frame Detector (Instrumentation)
 
         .target(
             name: "SplunkSlowFrameDetector",
@@ -170,7 +188,7 @@ func generateMainTargets() -> [Target] {
         ),
 
 
-        // MARK: - SplunkCrashReports
+        // MARK: - SplunkCrashReports (Instrumentation)
 
         .target(
             name: "SplunkCrashReports",
@@ -191,7 +209,7 @@ func generateMainTargets() -> [Target] {
         ),
 
 
-        // MARK: - Splunk Otel
+        // MARK: - Splunk OTel
 
         .target(
             name: "SplunkOpenTelemetry",
@@ -212,7 +230,7 @@ func generateMainTargets() -> [Target] {
 
 
         // MARK: - Splunk OTel Background Exporter
-        
+
         .target(
             name: "SplunkOpenTelemetryBackgroundExporter",
             dependencies: [
@@ -230,8 +248,8 @@ func generateMainTargets() -> [Target] {
         ),
 
 
-        // MARK: - Splunk App Start
-        
+        // MARK: - Splunk App Start (Instrumentation)
+
         .target(
             name: "SplunkAppStart",
             dependencies: [
@@ -250,7 +268,7 @@ func generateMainTargets() -> [Target] {
         ),
 
 
-        // MARK: - Splunk Web Instrumentation
+        // MARK: - Splunk Web (Instrumentation)
 
         .target(
             name: "SplunkWebView",

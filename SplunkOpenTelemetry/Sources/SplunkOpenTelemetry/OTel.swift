@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoDiskStorage
+public class OTel {
 
-extension KeyBuilder {
-    static let uploadsKey = KeyBuilder("uploadFiles")
+    public static let version = "OTel 0.0.1"
 }

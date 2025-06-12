@@ -25,11 +25,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
+
         let endpointConfig = EndpointConfiguration(
             realm: "realm",
             rumAccessToken: "token"
         )
+
         let agentConfig = AgentConfiguration(
             endpoint: endpointConfig,
             appName: "App Name",
@@ -53,6 +54,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("Unable to start the Splunk agent, error: \(error)")
         }
+
+        // Navigation Instrumentation
+        SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
+
         return true
     }
 

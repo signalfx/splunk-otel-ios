@@ -15,21 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
+import Combine
 
-/// Internal protocol for sharing agent state with modules.
-///
-/// The Agent uses the protocol internally to manage Modules and their Events.
-public protocol AgentSharedState: AnyObject, Sendable {
+/// A state object that is representation for the current state of the module.
+public final class RuntimeState: Sendable {
 
-    // MARK: - General state
+    // MARK: - Automated tracking
 
-    /// Identification of the current session at the time of the creation of this state.
-    var sessionId: String { get }
-
-    /// Agent version.
-    var agentVersion: String { get }
-
-    /// Returns application state for the given timestamp.
-    func applicationState(for timestamp: Date) -> String?
+    /// Indicates whether automatic navigation detection is enabled.
+    ///
+    /// The default value is `false`.
+    public internal(set) nonisolated(unsafe) var isAutomatedTrackingEnabled: Bool = false
 }

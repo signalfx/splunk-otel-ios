@@ -15,21 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
+internal import SplunkNavigation
 
-/// Internal protocol for sharing agent state with modules.
+/// The class implementing public API for the current state in non-operational mode.
 ///
-/// The Agent uses the protocol internally to manage Modules and their Events.
-public protocol AgentSharedState: AnyObject, Sendable {
+/// This is especially the case when the module is stopped by remote configuration,
+/// but we still need to keep the API available to the user.
+public final class NavigationNonOperationalState: NavigationModuleState {
 
-    // MARK: - General state
+    // MARK: - Automated tracking
 
-    /// Identification of the current session at the time of the creation of this state.
-    var sessionId: String { get }
-
-    /// Agent version.
-    var agentVersion: String { get }
-
-    /// Returns application state for the given timestamp.
-    func applicationState(for timestamp: Date) -> String?
+    public var isAutomatedTrackingEnabled: Bool {
+        false
+    }
 }

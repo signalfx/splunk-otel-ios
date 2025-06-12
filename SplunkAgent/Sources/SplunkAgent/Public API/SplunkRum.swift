@@ -57,6 +57,7 @@ public class SplunkRum: ObservableObject {
     // MARK: - Internal (Modules Proxy)
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
+    lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
 
 
     // MARK: - Platform Support
@@ -100,9 +101,14 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Public API (Modules)
 
-    /// An object that holds session replay module.
+    /// An object that holds Session Replay module.
     public var sessionReplay: any SessionReplayModule {
         sessionReplayProxy
+    }
+
+    /// An object that holds Navigation module.
+    public var navigation: any NavigationModule {
+        navigationProxy
     }
 
 
@@ -200,6 +206,9 @@ public class SplunkRum: ObservableObject {
         // Assign and configure the session sampler
         self.sessionSampler = sessionSampler
         self.sessionSampler.configure(with: agentConfiguration)
+
+        // Set default screen names
+        runtimeAttributes.updateCustom(named: "screen.name", with: "unknown")
     }
 
     convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {

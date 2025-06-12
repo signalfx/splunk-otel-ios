@@ -155,6 +155,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
         if
             let httpResponse = task.response as? HTTPURLResponse,
             !(200 ... 299).contains(httpResponse.statusCode) {
+
             logger.log(level: .info) {
                 """
                 Request to: \(requestDescriptor.endpoint.absoluteString) \n
@@ -164,6 +165,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             }
 
             try? send(requestDescriptor)
+
         } else if let error {
             logger.log(level: .info) {
                 """
@@ -174,8 +176,8 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             }
 
             try? send(requestDescriptor)
-        } else {
 
+        } else {
             if let httpResponse = task.response as? HTTPURLResponse {
                 logger.log(level: .info) {
                     """
