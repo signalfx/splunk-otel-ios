@@ -109,7 +109,7 @@ extension MutableAttributes {
         var convertedAttributes: [String: T] = Dictionary(minimumCapacity: sourceAttributes.count)
 
         for (key, otelValue) in sourceAttributes {
-            // Caller provides the transformValue closure
+            // Caller provides the `transform` closure
             // only add items we can successfully transform
             if let convertedValue = transform(otelValue) {
                 convertedAttributes[key] = convertedValue
