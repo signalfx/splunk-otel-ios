@@ -58,7 +58,6 @@ public class SplunkRum: ObservableObject {
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
     lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
-
     lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
 
 
