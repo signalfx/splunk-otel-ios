@@ -15,21 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
+extension NavigationNonOperational {
 
-/// Internal protocol for sharing agent state with modules.
-///
-/// The Agent uses the protocol internally to manage Modules and their Events.
-public protocol AgentSharedState: AnyObject, Sendable {
+    // MARK: - Manual detection
 
-    // MARK: - General state
-
-    /// Identification of the current session at the time of the creation of this state.
-    var sessionId: String { get }
-
-    /// Agent version.
-    var agentVersion: String { get }
-
-    /// Returns application state for the given timestamp.
-    func applicationState(for timestamp: Date) -> String?
+    @discardableResult func track(screen name: String) -> any NavigationModule {
+        return self
+    }
 }

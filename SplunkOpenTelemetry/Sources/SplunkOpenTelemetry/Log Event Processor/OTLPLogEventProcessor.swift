@@ -46,7 +46,7 @@ public class OTLPLogEventProcessor: LogEventProcessor {
 
     // MARK: - Initialization
 
-    public init(
+    public required init(
         with logsEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
@@ -116,9 +116,9 @@ public class OTLPLogEventProcessor: LogEventProcessor {
     }
 
     public func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void) {
-#if DEBUG
-        storedLastProcessedEvent = event
-#endif
+        #if DEBUG
+            storedLastProcessedEvent = event
+        #endif
 
         if immediateProcessing {
             processEvent(event: event, completion: completion)
@@ -145,9 +145,9 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         // Send event
         logRecordBuilder.emit()
 
-#if DEBUG
-        storedLastSentEvent = event
-#endif
+        #if DEBUG
+            storedLastSentEvent = event
+        #endif
 
         // TODO: MRUM_AC-1062 (Post GA) - Propagate OTel exporter API errors into the Agent
         DispatchQueue.main.async {

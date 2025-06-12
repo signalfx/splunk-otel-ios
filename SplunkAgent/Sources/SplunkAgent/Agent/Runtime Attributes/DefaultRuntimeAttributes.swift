@@ -90,7 +90,7 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
         customValue = [:]
 
         let queueName = PackageIdentifier.default(named: "runtimeAttributesAccess")
-        accessQueue = DispatchQueue(label: queueName)
+        accessQueue = DispatchQueue(label: queueName, qos: .userInitiated)
     }
 
 

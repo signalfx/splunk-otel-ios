@@ -35,7 +35,7 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Initialization
 
-    public init(
+    public required init(
         with tracesEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
