@@ -38,7 +38,7 @@ public final class Navigation: Sendable {
     let model = NavigationModel()
 
     let appBundleName: String?
-    private let continuation: AsyncStream<String>.Continuation
+    let continuation: AsyncStream<String>.Continuation
 
     private let logger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),

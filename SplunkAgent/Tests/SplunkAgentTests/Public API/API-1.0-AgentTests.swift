@@ -20,7 +20,12 @@ import XCTest
 
 final class API10AgentTests: XCTestCase {
 
+    // MARK: - Private
+
     var agent: SplunkRum?
+
+
+    // MARK: - Tests lifecycle
 
     override func setUp() {
         super.setUp()
@@ -34,6 +39,7 @@ final class API10AgentTests: XCTestCase {
 
         super.tearDown()
     }
+
 
     // MARK: - API Tests
 

@@ -214,7 +214,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         var updated = self
         updated.screenNameSpans = enabled
 
-        return self
+        return updated
     }
 
     /// Sets whether or not the Navigation module should automatically detect navigation in the application.
@@ -232,7 +232,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         var updated = self
         updated.showVCInstrumentation = show
 
-        return self
+        return updated
     }
 
 

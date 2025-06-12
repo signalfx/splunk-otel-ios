@@ -101,7 +101,7 @@ final class EventsTests: XCTestCase {
         })
 
         XCTAssertNotNil(logEventProcessor.storedLastProcessedEvent)
-        XCTAssertNotNil(logEventProcessor.storedLastSentEvent)
+        XCTAssertNil(logEventProcessor.storedLastSentEvent)
     }
 
 
