@@ -45,7 +45,7 @@ struct CustomTrackingDataEvent: AgentEvent {
         domain = "data"
         name = data.name
         instrumentationScope = "com.splunk.rum.customtracking"
-        component = "custom_tracking"
+        component = data.component
         self.sessionID = sessionID
         timestamp = metadata.timestamp
 

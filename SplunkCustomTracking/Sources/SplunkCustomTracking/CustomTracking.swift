@@ -27,10 +27,12 @@ public struct CustomTrackingMetadata: ModuleEventMetadata {
 
 public struct CustomTrackingData: ModuleEventData {
     public let name: String
+    public let component: String
     public let attributes: [String: AttributeValue]
 
-    public init(name: String, attributes: [String: AttributeValue]) {
+    public init(name: String, component: String, attributes: [String: AttributeValue]) {
         self.name = name
+        self.component = component
         self.attributes = attributes
     }
 }
