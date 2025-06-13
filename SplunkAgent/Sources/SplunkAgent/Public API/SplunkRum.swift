@@ -110,6 +110,7 @@ public class SplunkRum: ObservableObject {
     /// An object that holds Custom Tracking  module.
     public var customTracking: any CustomTrackingModule {
         customTrackingProxy
+    }
 
     /// An object that holds Navigation module.
     public var navigation: any NavigationModule {
