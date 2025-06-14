@@ -19,9 +19,9 @@ import Foundation
 
 // JSON Support for Crash Reports.
 
-public class CrashReportJSON {
+extension CrashReports {
 
-    static func normalizeToJSONReady(_ value: Any, depth: Int = 0) -> Any {
+    func normalizeToJSONReady(_ value: Any, depth: Int = 0) -> Any {
         // Runaway recursion check
         guard depth < 10 else {
             return value
@@ -36,15 +36,8 @@ public class CrashReportJSON {
         }
     }
 
-    static func convertDictionaryToJSONData(_ dictionary: [CrashReportKeys: Any]) -> Data? {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: normalizeToJSONReady(dictionary), options: .prettyPrinted) else {
-            return nil
-        }
-        return jsonData
-    }
-
-    static func convertDictionaryToJSONString(_ dictionary: [CrashReportKeys: Any]) -> String? {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: normalizeToJSONReady(dictionary), options: .prettyPrinted) else {
+    func convertToJSONString(_ item: Any) -> String? {
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: normalizeToJSONReady(item), options: .prettyPrinted) else {
             return nil
         }
         return String(data: jsonData, encoding: .utf8)
