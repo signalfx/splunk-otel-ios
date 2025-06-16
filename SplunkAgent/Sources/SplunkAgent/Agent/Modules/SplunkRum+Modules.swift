@@ -69,6 +69,17 @@ extension SplunkRum {
             return
         }
 
+        guard let sessionReplayUrl = agentConfiguration.endpoint.sessionReplayEndpoint else {
+            logger.log(level: .warn, isPrivate: false) {
+                """
+                Session Replay module was not installed (the valid URL for Session Replay \
+                endpoint is missing in the Agent configuration).
+                """
+            }
+
+            return
+        }
+
         // Initialize proxy API for this module
         sessionReplayProxy = SessionReplay(for: sessionReplayModule)
     }

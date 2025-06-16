@@ -66,9 +66,10 @@ To send us a pull request:
 3. Ensure local tests pass and add new tests related to the contribution.
 4. Commit to your fork using clear commit messages.
 5. [Sign your commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits).
-6. Send us a pull request, answering any default questions in the pull request
+6. Use `NO-TICKET:` as the prefix in your PR title if your contribution is not associated with an internal ticket.
+7. Send us a pull request, answering any default questions in the pull request
    interface.
-7. Pay attention to any automated CI failures reported in the pull request, and
+8. Pay attention to any automated CI failures reported in the pull request, and
    stay involved in the conversation.
 
 GitHub provides additional documentation on [forking a

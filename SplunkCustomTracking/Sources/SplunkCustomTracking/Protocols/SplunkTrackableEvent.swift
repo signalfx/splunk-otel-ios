@@ -25,15 +25,15 @@ import SplunkCommon
 public struct SplunkTrackableEvent: SplunkTrackable {
     public var timestampEnd: Date?
     public var typeName: String
-    public var attributes: [String: AttributeValue]
+    public var attributes: [String: EventAttributeValue]
 
     // Simplified initializer for events
-    public init(typeName: String, attributes: [String: AttributeValue] = [:]) {
+    public init(typeName: String, attributes: [String: EventAttributeValue] = [:]) {
         self.typeName = typeName
         self.attributes = attributes
     }
 
-    public func toAttributesDictionary() -> [String: AttributeValue] {
+    public func toAttributesDictionary() -> [String: EventAttributeValue] {
         return attributes
     }
 }
@@ -46,4 +46,3 @@ public extension SplunkTrackableEvent {
         "Event"
     }
 }
-

@@ -33,7 +33,7 @@ final class ResourcesTests: XCTestCase {
 
         // Get stored resources
         let eventManager = try XCTUnwrap(agent.eventManager as? DefaultEventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
         let otelResource = try XCTUnwrap(logEventProcessor.resource)
 
         // Test service name

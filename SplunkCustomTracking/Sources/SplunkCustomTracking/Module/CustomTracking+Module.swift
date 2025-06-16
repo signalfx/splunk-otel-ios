@@ -19,20 +19,6 @@ import Foundation
 import SplunkCommon
 
 
-// `CustomTrackingData` can be used as an event type that the module produces.
-
-// TODO: DEMRUM-861: commented, as there are duplicates in CustomTracking.swift. Delete this?
-/*
-public struct CustomTrackingData: ModuleEventData {
-    public let name: String
-    public let attributes: [String: EventAttributeValue]
-}
-
-public struct CustomTrackingMetadata: ModuleEventMetadata {
-    public var timestamp = Date()
-}
- */
-
 // Defines CustomTracking conformance to `Module` protocol
 // and implements methods that are missing in the original `CustomTracking`.
 extension CustomTrackingInternal: Module {

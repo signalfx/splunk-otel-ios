@@ -20,19 +20,13 @@ import Foundation
 internal import SplunkCommon
 import OpenTelemetryApi
 
-// TODO: DEMRUM-861: there are unnecessary MARKs, which are also causing lint issues. I'd suggest removing them.
-
 
 // MARK: - CustomTracking
 
 /// Defines a public API for the CustomTracking  module.
 public protocol CustomTrackingModule {
 
-
-    // MARK: - Track Events
-
-
-    // MARK: - Track Custom Event
+    // MARK: - Track Custom Events
 
     /// Track a custom event with a name and attributes.
     ///
@@ -43,12 +37,7 @@ public protocol CustomTrackingModule {
     /// - Returns: The updated `CustomTrackingModule` instance.
     @discardableResult func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
-
-
     // MARK: - Track Errors
-
-
-    // MARK: - String Error
 
     /// Track an error (String message) with optional attributes.
     ///
@@ -59,9 +48,6 @@ public protocol CustomTrackingModule {
     /// - Returns: The updated `CustomTrackingModule` instance.
     @discardableResult func trackError(_ message: String, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
-
-    // MARK: - Error
-
     /// Track an Error (Swift conforming type) with optional attributes.
     ///
     /// - Parameter error: An instance of a Swift type conforming to Error.
@@ -71,9 +57,6 @@ public protocol CustomTrackingModule {
     /// - Returns: The updated `CustomTrackingModule` instance.
     @discardableResult func trackError(_ error: Error, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
-
-    // MARK: - NSError
-
     /// Track an NSError object with optional attributes.
     ///
     /// - Parameter nsError: An NSError object instance.
@@ -82,9 +65,6 @@ public protocol CustomTrackingModule {
     ///
     /// - Returns: The updated `CustomTrackingModule` instance.
     @discardableResult func trackError(_ nsError: NSError, _ attributes: MutableAttributes) -> any CustomTrackingModule
-
-
-    // MARK: - NSException
 
     /// Track an NSException object with optional attributes.
     ///
@@ -104,7 +84,7 @@ public protocol CustomTrackingModule {
     /// - Returns: A Span object representing the workflow.
     func trackWorkflow(_ workflowName: String) -> Span
 
-    // MARK: - Helpers
+    // MARK: - Single argument helpers (signatures)
 
     @discardableResult func trackError(_ message: String) -> any CustomTrackingModule
 
@@ -116,11 +96,9 @@ public protocol CustomTrackingModule {
 }
 
 
-// MARK: - Helpers for Single Argument Invocation
-
 extension CustomTrackingModule {
 
-    // Get around the obstinance of protocols not letting calling code omit an argument
+    // MARK: - Single argument helpers (implementations)
 
     @discardableResult func trackError(_ message: String) -> any CustomTrackingModule {
         return trackError(message, MutableAttributes())
