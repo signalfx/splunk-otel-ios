@@ -35,7 +35,7 @@ public class CrashReports {
     private var crashReporter: PLCrashReporter?
 
     /// Storage of periodically sampled device data
-    private var deviceDataDictionary: [CrashReportKeys: String] = [:]
+    private var deviceDataDictionary: [String: String] = [:]
 
     /// A reference to the Module's data publishing callback.
     var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)?
@@ -182,9 +182,9 @@ public class CrashReports {
     // so that it will be included in a future crash report
     private func updateDeviceStats() {
         do {
-            deviceDataDictionary[.batteryLevel] = CrashReportDeviceStats.batteryLevel
-            deviceDataDictionary[.freeDiskSpace] = CrashReportDeviceStats.freeDiskSpace
-            deviceDataDictionary[.freeMemory] = CrashReportDeviceStats.freeMemory
+            deviceDataDictionary["battery"] = CrashReportDeviceStats.batteryLevel
+            deviceDataDictionary["disk"] = CrashReportDeviceStats.freeDiskSpace
+            deviceDataDictionary["memory"] = CrashReportDeviceStats.freeMemory
             let customData = try NSKeyedArchiver.archivedData(withRootObject: deviceDataDictionary, requiringSecureCoding: false)
             crashReporter?.customData = customData
         } catch {
@@ -254,11 +254,11 @@ public class CrashReports {
         }
 
         if report.customData != nil {
-            let customData = NSKeyedUnarchiver.unarchiveObject(with: report.customData) as? [CrashReportKeys: String]
+            let customData = NSKeyedUnarchiver.unarchiveObject(with: report.customData) as? [String: String]
             if customData != nil {
-                reportDict[.batteryLevel] = customData![.batteryLevel]
-                reportDict[.freeMemory] = customData![.freeMemory]
-                reportDict[.freeDiskSpace] = customData![.freeDiskSpace]
+                reportDict[.batteryLevel] = customData!["battery"]
+                reportDict[.freeMemory] = customData!["disk"]
+                reportDict[.freeDiskSpace] = customData!["memory"]
             }
         }
 
