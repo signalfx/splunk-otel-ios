@@ -39,6 +39,10 @@ class DefaultEventManager: AgentEventManager {
     // Event processor
     var logEventProcessor: LogEventProcessor
 
+    // Session Replay processor
+    var sessionReplayProcessor: LogEventProcessor?
+    var sessionReplayEventIndex = 1
+
     // Trace processor
     var traceProcessor: TraceProcessor
 
@@ -66,12 +70,8 @@ class DefaultEventManager: AgentEventManager {
 
         self.agent = agent
 
-        let deviceManufacturer = "Apple"
-
         // Will be used later by hybrid agents
         let hybridType: String? = nil
-
-        let agentVersion = SplunkRum.version
 
         // Build resources
         let resources = DefaultResources(
@@ -80,19 +80,26 @@ class DefaultEventManager: AgentEventManager {
             appBuild: AppInfo.buildId ?? "-",
             appDeploymentEnvironment: configuration.deploymentEnvironment,
             agentHybridType: hybridType,
-            agentVersion: agentVersion,
+            agentVersion: SplunkRum.version,
             deviceID: DeviceInfo.deviceID ?? "-",
             deviceModelIdentifier: DeviceInfo.type ?? "-",
-            deviceManufacturer: deviceManufacturer,
+            deviceManufacturer: "Apple",
             osName: SystemInfo.name,
             osVersion: SystemInfo.version ?? "-",
             osDescription: SystemInfo.description,
             osType: SystemInfo.type
         )
 
-        // Initialize log event processor.
-        logEventProcessor = OTLPLogEventProcessor(
+        // Initialize log event processor
+        logEventProcessor = OTLPLogToSpanEventProcessor(
             with: logUrl,
+            resources: resources,
+            debugEnabled: configuration.enableDebugLogging
+        )
+
+        // Initialize session replay processor (optional)
+        sessionReplayProcessor = OTLPSessionReplayEventProcessor(
+            with: configuration.endpoint.sessionReplayEndpoint,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
             globalAttributes: agent.globalAttributes.all,
@@ -123,14 +130,32 @@ class DefaultEventManager: AgentEventManager {
 
         // Session Replay module data
         case let (metadata as Metadata, data as Data):
-            let sessionID = agent.session.sessionId(for: metadata.timestamp)
-            let event = SessionReplayDataEvent(metadata: metadata, data: data, sessionID: sessionID)
+            guard let sessionReplayProcessor else {
+                completion(false)
 
-            logEventProcessor.sendEvent(
+                return
+            }
+
+            let sessionID = agent.session.sessionId(for: metadata.timestamp)
+            let event = SessionReplayDataEvent(
+                metadata: metadata,
+                data: data,
+                index: sessionReplayEventIndex,
+                sessionID: sessionID
+            )
+
+            sessionReplayProcessor.sendEvent(
                 event: event,
                 immediateProcessing: false,
                 completion: completion
             )
+
+            // TODO: This is only temporary solution for PoC
+
+            // NOTE:
+            // A better solution would be to store a sequence number for each session
+            // for processed events and update this continuously depending on how the data is processed.
+            sessionReplayEventIndex += 1
 
         // Crash Reports module data
         case let (metadata as CrashReportsMetadata, data as String):

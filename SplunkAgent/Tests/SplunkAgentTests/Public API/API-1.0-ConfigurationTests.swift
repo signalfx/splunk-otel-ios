@@ -49,7 +49,7 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertNotNil(full.globalAttributes)
         XCTAssertNotNil(full.spanInterceptor)
         XCTAssertNotNil(full.endpoint.traceEndpoint)
-        XCTAssertNil(full.endpoint.sessionReplayEndpoint)
+        XCTAssertNotNil(full.endpoint.sessionReplayEndpoint)
 
 
         // Minimal initialization
@@ -60,7 +60,7 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertEqual(minimal.endpoint.realm, realm)
         XCTAssertEqual(minimal.endpoint.rumAccessToken, rumAccessToken)
         XCTAssertNotNil(minimal.endpoint.traceEndpoint)
-        XCTAssertNil(minimal.endpoint.sessionReplayEndpoint)
+        XCTAssertNotNil(minimal.endpoint.sessionReplayEndpoint)
         XCTAssertEqual(minimal.deploymentEnvironment, deploymentEnvironment)
         XCTAssertEqual(minimal.appName, appName)
         XCTAssertNotNil(minimal.appVersion)
