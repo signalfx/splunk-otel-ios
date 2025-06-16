@@ -81,6 +81,6 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
     // MARK: - Local override
 
     override func getFileKeyType() -> String {
-        "trace"
+        fileType ?? "trace"
     }
 }

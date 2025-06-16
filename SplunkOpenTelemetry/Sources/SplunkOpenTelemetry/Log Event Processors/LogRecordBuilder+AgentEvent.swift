@@ -19,16 +19,15 @@ import Foundation
 import OpenTelemetryApi
 import SplunkCommon
 
-extension OTLPLogEventProcessor {
+extension LogRecordBuilder {
 
     /// Builds LogRecordBuilder from supplied AgentEvent and initial LogRecordBuilder.
     ///
     /// - Parameters:
     ///   - event: An event with which the LogRecordBuilder is built from.
-    ///   - logRecordBuilder: Initial LogRecordBuilder, which is extented with data from the Event.
-    func buildEvent(with event: any AgentEvent, logRecordBuilder: LogRecordBuilder) -> LogRecordBuilder {
+    func build(with event: any AgentEvent) -> LogRecordBuilder {
 
-        // Initialise attribute dictionary
+        // Initialize attribute dictionary
         var otelAttributes: [String: AttributeValue] = [:]
 
         // Attributes - session ID
@@ -53,7 +52,7 @@ extension OTLPLogEventProcessor {
         }
 
         // Start building the builder
-        let resultingBuilder = logRecordBuilder
+        let resultingBuilder = self
 
         // Add attributes
         if !otelAttributes.isEmpty {
