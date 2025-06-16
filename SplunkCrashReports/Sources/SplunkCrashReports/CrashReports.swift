@@ -238,10 +238,6 @@ public class CrashReports {
             reportDict[.currentTimestamp] = formatter.string(from: Date())
         }
 
-        if let applicationInfo = report.applicationInfo {
-            reportDict[.appVersion] = applicationInfo.applicationMarketingVersion
-        }
-
         if report.hasProcessInfo {
             reportDict[.processPath] = report.processInfo.processPath
             reportDict[.isNative] = report.processInfo.native
