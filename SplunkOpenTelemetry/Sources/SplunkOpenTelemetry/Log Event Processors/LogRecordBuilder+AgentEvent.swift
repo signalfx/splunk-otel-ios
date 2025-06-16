@@ -30,6 +30,11 @@ extension LogRecordBuilder {
         // Initialize attribute dictionary
         var otelAttributes: [String: AttributeValue] = [:]
 
+        // Attributes - session ID
+        if let sessionID = event.sessionID {
+            otelAttributes["session.id"] = AttributeValue(sessionID)
+        }
+
         // Attributes - event.domain
         otelAttributes["event.domain"] = AttributeValue(event.domain)
 
