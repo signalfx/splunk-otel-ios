@@ -19,33 +19,38 @@ import Foundation
 import SplunkCommon
 
 
-public struct NetworkInfoData: ModuleEventData {}
+public struct NetworkMonitorData: ModuleEventData {}
 
-public struct NetworkInfoMetadata: ModuleEventMetadata {
+public struct NetworkMonitorMetadata: ModuleEventMetadata {
     public var timestamp = Date()
     public var eventName: String = "network.change"
 }
 
-extension NetworkInfo: Module {
+extension NetworkMonitor: Module {
 
     // MARK: - Module types
 
-    public typealias Configuration = NetworkInfoConfiguration
-    public typealias RemoteConfiguration = NetworkInfoRemoteConfiguration
+    public typealias Configuration = NetworkMonitorConfiguration
+    public typealias RemoteConfiguration = NetworkMonitorRemoteConfiguration
 
-    public typealias EventMetadata = NetworkInfoMetadata
-    public typealias EventData = NetworkInfoData
+    public typealias EventMetadata = NetworkMonitorMetadata
+    public typealias EventData = NetworkMonitorData
 
 
     // MARK: - Module methods
 
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
-        startDetection()
+        let config = configuration as? Configuration
+
+        // Start the network monitor if it's enabled or if no configuration is provided.
+        if config?.isEnabled ?? true {
+            startDetection()
+        }
     }
 
 
     // MARK: - Type transparency helpers
 
     public func deleteData(for metadata: any ModuleEventMetadata) {}
-    public func onPublish(data: @escaping (NetworkInfoMetadata, NetworkInfoData) -> Void) {}
+    public func onPublish(data: @escaping (NetworkMonitorMetadata, NetworkMonitorData) -> Void) {}
 }

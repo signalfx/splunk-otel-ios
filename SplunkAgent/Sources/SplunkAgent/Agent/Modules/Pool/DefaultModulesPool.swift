@@ -25,8 +25,8 @@ internal import SplunkCommon
     internal import SplunkNetwork
 #endif
 
-#if canImport(SplunkNetworkInfo)
-    internal import SplunkNetworkInfo
+#if canImport(SplunkNetworkMonitor)
+    internal import SplunkNetworkMonitor
 #endif
 
 #if canImport(CiscoSessionReplay)
@@ -75,8 +75,8 @@ class DefaultModulesPool: AgentModulesPool {
         #endif
 
         // Network Info
-        #if canImport(SplunkNetworkInfo)
-            knownModules.append(NetworkInfo.self)
+        #if canImport(SplunkNetworkMonitor)
+            knownModules.append(NetworkMonitor.self)
         #endif
 
         // Slow Frame Detector

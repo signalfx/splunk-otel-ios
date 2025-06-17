@@ -15,29 +15,29 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import XCTest
 import Network
-@testable import SplunkNetworkInfo
+@testable import SplunkNetworkMonitor
+import XCTest
 
-final class NetworkInfoTests: XCTestCase {
+final class NetworkMonitorTests: XCTestCase {
     func testInitialState() {
-        let networkInfo = NetworkInfo()
-        XCTAssertFalse(networkInfo.isConnected)
-        XCTAssertEqual(networkInfo.connectionType, .lost)
+        let NetworkMonitor = NetworkMonitor()
+        XCTAssertFalse(NetworkMonitor.isConnected)
+        XCTAssertEqual(NetworkMonitor.connectionType, .lost)
     }
 
     func testNetworkMonitoring() {
-        let networkInfo = NetworkInfo()
+        let NetworkMonitor = NetworkMonitor()
         let exp = expectation(description: "Network status change")
 
         // Set up handler to verify network changes
-        networkInfo.statusChangeHandler = { isConnected, type in
+        NetworkMonitor.statusChangeHandler = { isConnected, type in
             // Just verify we got a callback
             exp.fulfill()
         }
 
         // Start monitoring
-        networkInfo.startDetection()
+        NetworkMonitor.startDetection()
 
         wait(for: [exp], timeout: 5.0)
     }

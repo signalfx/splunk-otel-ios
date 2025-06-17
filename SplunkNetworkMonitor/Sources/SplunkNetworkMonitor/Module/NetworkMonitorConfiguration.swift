@@ -18,5 +18,19 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// NetworkInfo module configuration, minimal configuration for module conformance.
-public struct NetworkInfoConfiguration: ModuleConfiguration {}
+/// NetworkMonitor module configuration, minimal configuration for module conformance.
+public struct NetworkMonitorConfiguration: ModuleConfiguration {
+
+    // MARK: - Module management
+
+    /// Indicates whether the Module is enabled. Default value is `true`.
+    public var isEnabled: Bool = true
+
+    /// Initializes new module configuration with preconfigured values.
+    ///
+    /// - Parameters:
+    ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
+    public init(isEnabled: Bool) {
+        self.isEnabled = isEnabled
+    }
+}

@@ -18,17 +18,17 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// NetworkInfo remote configuration.
-public struct NetworkInfoRemoteConfiguration: RemoteModuleConfiguration {
+/// NetworkMonitor remote configuration.
+public struct NetworkMonitorRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Internal decoding
 
-    struct NetworkInfo: Decodable {
+    struct NetworkMonitor: Decodable {
         let enabled: Bool
     }
 
     struct MRUMRoot: Decodable {
-        let networkInfo: NetworkInfo
+        let NetworkMonitor: NetworkMonitor
     }
 
     struct Configuration: Decodable {
@@ -49,6 +49,6 @@ public struct NetworkInfoRemoteConfiguration: RemoteModuleConfiguration {
             return nil
         }
 
-        enabled = root.configuration.mrum.networkInfo.enabled
+        enabled = root.configuration.mrum.NetworkMonitor.enabled
     }
 }
