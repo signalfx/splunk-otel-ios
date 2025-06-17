@@ -21,11 +21,11 @@ internal import SplunkCommon
 /// A shared state is a representation of view on current internal information.
 ///
 /// All contained information is related to the current agent instance.
-class DefaultSharedState: AgentSharedState {
+final class DefaultSharedState: AgentSharedState {
 
     // MARK: - Internal
 
-    private unowned let owner: SplunkRum
+    private nonisolated unowned let owner: SplunkRum
 
 
     // MARK: - General state
