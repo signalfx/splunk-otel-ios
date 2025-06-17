@@ -256,7 +256,7 @@ func generateMainTargets() -> [Target] {
                 name: "SplunkInteractions",
                 dependencies: [
                     "SplunkCommon",
-                    "SplunkOpenTelemetry",
+                    .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                     resolveDependency("logger")
                 ],
                 path: "SplunkInteractions/Sources"

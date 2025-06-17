@@ -35,7 +35,7 @@ extension CiscoInteractions.InteractionEvent: ModuleEventMetadata {
     }
 }
 
-extension SplunkInteractions: Module {
+extension Interactions: Module {
 
     // MARK: - Module types
 

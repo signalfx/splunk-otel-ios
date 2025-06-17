@@ -1,4 +1,5 @@
 //
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -16,12 +17,26 @@ limitations under the License.
 */
 
 
-
 import Foundation
+internal import SplunkInteractions
 
-public final class SplunkInteractionsNonOperational: SplunkInteractionsModule {
+final class Interactions: InteractionsModule {
 
-    public init () {}
+    // MARK: - Internal
 
-    public func register(customId: String?, for viewId: ObjectIdentifier) {}
+    unowned let module: SplunkInteractions.Interactions
+
+
+    // MARK: - Initialization
+
+    init(for module: SplunkInteractions.Interactions) {
+        self.module = module
+    }
+
+
+    // MARK: - Custom ids
+
+    func register(customId: String?, for viewId: ObjectIdentifier) {
+        module.register(customId: customId, for: viewId)
+    }
 }

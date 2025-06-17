@@ -23,7 +23,7 @@ public extension UIView {
     /// Element custom id for the specified `UIView` instance.
     ///
     /// Assigning `nil` removes previously assigned custom id.
-    var srCustomId: String? {
+    var splunkRumId: String? {
         get {
             SplunkRum.shared.sessionReplay.customIdentifiers[self]
         }

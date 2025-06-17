@@ -88,7 +88,8 @@ final class SessionReplay: SessionReplayModule {
 
     // MARK: - Custom id
 
-    private(set) lazy var customIdentifiers: any SessionReplayModuleCustomId = SessionReplayCustomId(for: module)
+    private(set) lazy var customIdentifiers: any SessionReplayModuleCustomId = SessionReplayCustomId()
+
 
     // MARK: - State
 

@@ -22,7 +22,7 @@ import SplunkCommon
 import CiscoRuntimeCache
 
 /// Handles interaction events and send them into destination.
-public final class SplunkInteractions: SplunkInteractionsModule {
+public final class Interactions: SplunkInteractionsModule {
     
     // MARK: - Private properties
 

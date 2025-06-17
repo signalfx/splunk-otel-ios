@@ -1,3 +1,5 @@
+//
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -14,8 +16,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-import SplunkCommon
 
-/// SplunkInteractions module configuration, minimal configuration for module conformance.
-public struct SplunkInteractionsConfiguration: ModuleConfiguration {}
+import Foundation
+
+/// The InteractionsModule handles user interactions within the app.
+protocol InteractionsModule {
+
+    /// Registers a custom identifier for a view.
+    /// - Parameters:
+    ///   - customId: A custom identifier to associate with the view.
+    ///   - viewId: The identifier of the view to register the customId for.
+    func register(customId: String?, for viewId: ObjectIdentifier)
+}

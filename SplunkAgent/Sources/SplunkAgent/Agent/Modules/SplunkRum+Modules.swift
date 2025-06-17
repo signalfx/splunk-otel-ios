@@ -150,15 +150,16 @@ extension SplunkRum {
         appStartModule?.sharedState = sharedState
     }
 
-    /// Configure App start module
+    /// Configure Interactions module
     private func customizeInteractions() {
-        let interactionsModule = modulesManager?.module(ofType: SplunkInteractions.self)
+        let interactionsModule = modulesManager?.module(ofType: SplunkInteractions.Interactions.self)
 
         guard let interactionsModule else {
             return
         }
 
-        interactions = interactionsModule
+        // Initialize proxy API for this module
+        interactions = Interactions(for: interactionsModule)
     }
 
     /// Configure WebView Instrumentation module with shared state.

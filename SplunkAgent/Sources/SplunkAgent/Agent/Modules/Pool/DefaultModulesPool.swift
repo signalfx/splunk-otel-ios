@@ -95,7 +95,7 @@ class DefaultModulesPool: AgentModulesPool {
 
         // App Start
         #if canImport(SplunkInteractions)
-            knownModules.append(SplunkInteractions.self)
+        knownModules.append(SplunkInteractions.Interactions.self)
         #endif
 
         return knownModules

@@ -21,18 +21,6 @@ import UIKit
 /// The sensitivity object implements public API for the view element's sensitivity.
 final class SessionReplayCustomId: SessionReplayModuleCustomId {
 
-    // MARK: - Internal
-
-    private(set) unowned var module: CiscoSessionReplay.SessionReplay
-
-
-    // MARK: - Initialization
-
-    init(for module: CiscoSessionReplay.SessionReplay) {
-        self.module = module
-    }
-
-
     // MARK: - View sensitivity
 
     public subscript(view: UIView) -> String? {

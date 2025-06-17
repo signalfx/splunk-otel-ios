@@ -59,8 +59,7 @@ public class SplunkRum: ObservableObject {
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
     lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
-
-    var interactions: SplunkInteractionsModule = SplunkInteractionsNonOperational()
+    lazy var interactions: any InteractionsModule = InteractionsNonOperational()
 
 
     // MARK: - Platform Support

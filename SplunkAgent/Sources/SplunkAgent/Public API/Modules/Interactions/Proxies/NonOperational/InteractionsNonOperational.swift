@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -17,14 +16,9 @@ limitations under the License.
 */
 
 
-import Foundation
+final class InteractionsNonOperational: InteractionsModule {
 
-/// The SplunkInteractionsModule handles user interactions within the app.
-public protocol SplunkInteractionsModule {
+    // MARK: - Custom ids
 
-    /// Registers a custom identifier for a view.
-    /// - Parameters:
-    ///   - customId: A custom identifier to associate with the view.
-    ///   - viewId: The identifier of the view to register the customId for.
-    func register(customId: String?, for viewId: ObjectIdentifier)
+    func register(customId: String?, for viewId: ObjectIdentifier) {}
 }
