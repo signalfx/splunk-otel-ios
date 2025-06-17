@@ -19,7 +19,7 @@ import Foundation
 internal import CiscoLogger
 
 
-/// Extensions implemeenting CustomTracking public API in non-operational mode.
+/// Extensions implementing CustomTracking public API in non-operational mode.
 ///
 /// This is especially the case when the module is stopped by remote configuration,
 /// but we still need to keep the API available to the user.

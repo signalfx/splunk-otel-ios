@@ -59,6 +59,24 @@ struct CustomTrackingDemoView: View {
             }
             .padding()
 
+            // Button for tracking a custom event
+            Button("Track Legacy Event") {
+                trackLegacyEvent()
+            }
+            .padding()
+
+            // Button for tracking an Error (Swift conforming type)
+            Button("Track Legacy Error (Error)") {
+                trackLegacyError()
+            }
+            .padding()
+
+            // Button for tracking an NSError
+            Button("Track Legacy Error (NSError)") {
+                trackLegacyNSError()
+            }
+            .padding()
+
             Spacer()
         }
         .navigationTitle("Custom Tracking")
@@ -118,5 +136,20 @@ struct CustomTrackingDemoView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
                 customSpan.end()
         }
+    }
+
+    func trackLegacyError() {
+        let sampleError: Error = NSError(domain: "com.example.error", code: 100, userInfo: [NSLocalizedDescriptionKey: "Legacy Swift error"])
+        SplunkRum.shared.customTracking.reportError(error: sampleError)
+    }
+
+    func trackLegacyNSError() {
+        let nsError = NSError(domain: "com.example.nserror", code: 200, userInfo: [NSLocalizedDescriptionKey: "Legacy NSError"])
+        SplunkRum.shared.customTracking.reportError(error: nsError)
+    }
+
+    func trackLegacyEvent() {
+        let testDict = NSDictionary(dictionary: ["key1": "1", "key2": "2"])
+        SplunkRum.shared.customTracking.reportEvent(name: "Legacy event", attributes: testDict)
     }
 }
