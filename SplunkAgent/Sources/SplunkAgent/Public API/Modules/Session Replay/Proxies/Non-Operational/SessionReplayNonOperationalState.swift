@@ -24,19 +24,10 @@ final class SessionReplayNonOperationalState: SessionReplayModuleState {
     // MARK: - Recording
 
     public var status: SessionReplayStatus {
-        .notRecording(.remotelyDisabled)
+        .notRecording(.notStarted)
     }
 
     public var isRecording: Bool {
         false
     }
-
-
-    // MARK: - Rendering
-
-    // Temporarily removed with Rendering Modes.
-
-    // public var renderingMode: RenderingMode {
-    //     .noRendering
-    // }
 }

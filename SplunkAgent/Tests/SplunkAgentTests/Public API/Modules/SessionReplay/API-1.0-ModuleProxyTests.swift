@@ -38,14 +38,11 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
 
     // MARK: - Preferences
 
-    // Temporarily removed with Rendering Modes.
-
-    // swiftformat:disable indent
-
-    /*
     func testPreferences() throws {
+        _ = moduleProxy.preferences
+
         let preferences = SessionReplayPreferences()
-            .renderingMode(.wireframe)
+            .renderingMode(.wireframeOnly)
 
         moduleProxy.preferences = preferences
         moduleProxy.preferences(preferences)
@@ -61,17 +58,12 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
 
     func testPreferences_givenAllRenderingModes() throws {
         _ = SessionReplayPreferences()
-            .renderingMode(.wireframe)
+            .renderingMode(.wireframeOnly)
             .renderingMode(.native)
-            .renderingMode(.noRendering)
 
-        _ = SessionReplayPreferences(renderingMode: .wireframe)
+        _ = SessionReplayPreferences(renderingMode: .wireframeOnly)
         _ = SessionReplayPreferences(renderingMode: .native)
-        _ = SessionReplayPreferences(renderingMode: .noRendering)
     }
-     */
-
-    // swiftformat:enable indent
 
 
     // MARK: - State
@@ -80,10 +72,6 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
         let state = moduleProxy.state
 
         XCTAssertNotNil(state.status)
-
-        // Temporarily removed with Rendering Modes.
-        // XCTAssertNotNil(state.renderingMode)
-
         XCTAssertNotNil(state.isRecording)
     }
 
@@ -101,9 +89,6 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
         case .notRecording(.stopped):
             break
 
-        case .notRecording(.projectLimitReached):
-            break
-
         case .notRecording(.internalError):
             break
 
@@ -113,10 +98,7 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
         case .notRecording(.unsupportedPlatform):
             break
 
-        case .notRecording(.diskCacheCapacityOverreached):
-            break
-
-        case .notRecording(.remotelyDisabled):
+        case .notRecording(.storageLimitReached):
             break
         }
     }
@@ -158,21 +140,13 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
 
     // MARK: - Rendering Mode
 
-    // Temporarily removed with Rendering Modes.
-
-    // swiftformat:disable indent
-
-    /*
     func testRenderingModes() throws {
         let renderingMode = RenderingMode.default
         switch renderingMode {
         case .native:
             break
 
-        case .wireframe:
-            break
-
-        case .noRendering:
+        case .wireframeOnly:
             break
         }
     }
@@ -182,9 +156,6 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
 
         XCTAssertEqual(defaultRenderingMode, .native)
     }
-     */
-
-    // swiftformat:enable indent
 
 
     // MARK: - Recording Masks
