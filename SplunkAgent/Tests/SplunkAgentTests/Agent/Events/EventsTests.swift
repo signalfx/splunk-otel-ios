@@ -50,7 +50,7 @@ final class EventsTests: XCTestCase {
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
 
         logEventProcessor.sendEvent(event, completion: { _ in
             // TODO: MRUM_AC-1111 - EventManager and Events tests
@@ -59,7 +59,7 @@ final class EventsTests: XCTestCase {
             requestExpectation.fulfill()
         })
 
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
+        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent)
         try checkEventBaseAttributes(processedEvent)
 
         XCTAssertEqual(processedEvent.name, "session_replay_data")
@@ -75,7 +75,7 @@ final class EventsTests: XCTestCase {
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
 
         logEventProcessor.sendEvent(event: event, immediateProcessing: true, completion: { success in
             XCTAssert(success)
@@ -92,7 +92,7 @@ final class EventsTests: XCTestCase {
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
 
         logEventProcessor.sendEvent(event, completion: { success in
             XCTAssert(success)
@@ -101,7 +101,7 @@ final class EventsTests: XCTestCase {
         })
 
         XCTAssertNotNil(logEventProcessor.storedLastProcessedEvent)
-        XCTAssertNil(logEventProcessor.storedLastSentEvent)
+        XCTAssertNotNil(logEventProcessor.storedLastSentEvent)
     }
 
 

@@ -21,7 +21,7 @@ import SplunkCommon
 public struct NetworkInstrumentationData: ModuleEventData {}
 
 public struct NetworkInstrumentationMetadata: ModuleEventMetadata {
-    public var timestamp: Date = Date()
+    public var timestamp = Date()
 }
 
 extension NetworkInstrumentation: Module {

@@ -78,6 +78,6 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
     // MARK: - Local override
 
     override func getFileKeyType() -> String {
-        "metric"
+        fileType ?? "metric"
     }
 }

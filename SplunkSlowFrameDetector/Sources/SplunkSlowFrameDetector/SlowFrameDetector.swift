@@ -51,7 +51,7 @@ public final class SlowFrameDetector {
 
     // Candidate future configuration options. If exposed, will need clamping.
     private var tolerancePercentage: Double = 15.0
-    private var frozenDurationMultipler: Double = 40.0
+    private var frozenDurationMultiplier: Double = 40.0
 
 
     // MARK: - SlowFrameDetector lifecycle
@@ -184,7 +184,7 @@ public final class SlowFrameDetector {
         let isSlow = actualDuration > expectedDuration + tolerance
 
         // Frozen is much longer duration than simply "slow"
-        let isFrozen = actualDuration > expectedDuration * frozenDurationMultipler
+        let isFrozen = actualDuration > expectedDuration * frozenDurationMultiplier
 
         // Apply isFrozen check first because it's a subset of isSlow
         if isFrozen {

@@ -20,7 +20,7 @@ import Foundation
 /// Internal protocol for sharing agent state with modules.
 ///
 /// The Agent uses the protocol internally to manage Modules and their Events.
-public protocol AgentSharedState: AnyObject {
+public protocol AgentSharedState: AnyObject, Sendable {
 
     // MARK: - General state
 
