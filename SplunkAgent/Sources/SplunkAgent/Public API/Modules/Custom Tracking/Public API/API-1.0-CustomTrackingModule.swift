@@ -117,29 +117,3 @@ extension CustomTrackingModule {
         return trackException(exception, MutableAttributes())
     }
 }
-
-// MARK: - Legacy API Mappings
-
-public extension CustomTrackingModule {
-
-    // Legacy method for reporting an error using a string.
-    func reportError(string: String) {
-        _ = trackError(string)
-    }
-
-    // Legacy method for reporting an error using an Error object.
-    func reportError(error: Error) {
-        _ = trackError(error)
-    }
-
-    // Legacy method for reporting an error using an NSException.
-    func reportError(exception: NSException) {
-        _ = trackException(exception)
-    }
-
-    // Legacy method for reporting a custom event.
-    func reportEvent(name: String, attributes: NSDictionary) {
-        let mutableAttributes = MutableAttributes(from: attributes)
-        _ = trackCustomEvent(name, mutableAttributes)
-    }
-}
