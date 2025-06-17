@@ -20,71 +20,63 @@ import SwiftUI
 
 struct CustomTrackingDemoView: View {
     var body: some View {
-        VStack {
-            DemoHeaderView()
+        ScrollView {
+            VStack(spacing: 16) {
+                DemoHeaderView()
 
-            // Button for tracking a custom event
-            Button("Track Event") {
-                trackCustomEvent()
+                FeatureSection(title: "Custom Event Tracking") {
+                    FeatureButton(label: "Track Event") {
+                        trackCustomEvent()
+                    }
+                }
+
+                FeatureSection(title: "Custom Workflow Tracking") {
+                    FeatureButton(label: "Track Workflow (Span)") {
+                        trackWorkflow()
+                    }
+                }
+
+                FeatureSection(title: "Custom Error Tracking") {
+                    FeatureButton(label: "Track Error String") {
+                        let attributes = SampleAttributes.forStringError()
+                        SplunkRum.shared.customTracking.trackError(DemoErrors.stringError(), attributes)
+                    }
+
+                    FeatureButton(label: "Track Swift Error type") {
+                        let attributes = SampleAttributes.forSwiftError()
+                        SplunkRum.shared.customTracking.trackError(DemoErrors.swiftError(), attributes)
+                    }
+
+                    FeatureButton(label: "Track NSError") {
+                        let attributes = SampleAttributes.forNSError()
+                        SplunkRum.shared.customTracking.trackError(DemoErrors.nsError(), attributes)
+                    }
+
+                    FeatureButton(label: "Track NSException") {
+                        let attributes = SampleAttributes.forNSException()
+                        SplunkRum.shared.customTracking.trackException(DemoErrors.nsException(), attributes)
+                    }
+                }
+
+                FeatureSection(title: "Legacy Tracking") {
+                    FeatureButton(label: "Track Legacy Error") {
+		        trackLegacyError()
+                    }
+
+                    FeatureButton(label: "Track Legacy NSError") {
+		        trackLegacyNSError()
+                    }
+
+                    FeatureButton(label: "Track Legacy Event") {
+		        trackLegacyEvent()
+                    }
+		}
+		
+                Spacer()
             }
-            .padding()
-
-            // Button for tracking an error (String message)
-            Button("Track Error (String)") {
-                trackErrorString()
-            }
-            .padding()
-
-            // Button for tracking an Error (Swift conforming type)
-            Button("Track Error (Error)") {
-                trackErrorType()
-            }
-            .padding()
-
-            // Button for tracking an NSError
-            Button("Track Error (NSError)") {
-                trackNSError()
-            }
-            .padding()
-
-            // Button for tracking an NSException
-            Button("Track Exception (NSException)") {
-                trackNSException()
-            }
-            .padding()
-
-            // Button for tracking a Workflow
-            Button("Track Workflow (Span)") {
-                trackWorkflow()
-            }
-            .padding()
-
-            // Button for tracking a custom event
-            Button("Track Legacy Event") {
-                trackLegacyEvent()
-            }
-            .padding()
-
-            // Button for tracking an Error (Swift conforming type)
-            Button("Track Legacy Error (Error)") {
-                trackLegacyError()
-            }
-            .padding()
-
-            // Button for tracking an NSError
-            Button("Track Legacy Error (NSError)") {
-                trackLegacyNSError()
-            }
-            .padding()
-
-            Spacer()
         }
         .navigationTitle("Custom Tracking")
-        .padding()
     }
-
-
-    // MARK: - Custom Tracking Functions
 
     func trackCustomEvent() {
         let attributes = MutableAttributes()
@@ -95,46 +87,12 @@ struct CustomTrackingDemoView: View {
         SplunkRum.shared.customTracking.trackCustomEvent("Demo Button Clicked", attributes)
     }
 
-    func trackErrorString() {
-        let attributes = MutableAttributes()
-        attributes["ErrorType"] = .string("StringError")
-        attributes["ErrorSeverity"] = .string("Critical")
-        SplunkRum.shared.customTracking.trackError("This is a sample string error", attributes)
-    }
-
-    func trackErrorType() {
-        let attributes = MutableAttributes()
-        attributes["ErrorType"] = .string("SwiftError")
-        attributes["ErrorCode"] = .int(404)
-        let sampleError: Error = NSError(domain: "com.example.error", code: 100, userInfo: [NSLocalizedDescriptionKey: "Sample Swift error"])
-        SplunkRum.shared.customTracking.trackError(sampleError, attributes)
-    }
-
-    func trackNSError() {
-        let attributes = MutableAttributes()
-        attributes["ErrorDomain"] = .string("com.example.nserror")
-        attributes["ErrorCode"] = .int(200)
-        attributes["Description"] = .string("Sample NSError description")
-        let nsError = NSError(domain: "com.example.nserror", code: 200, userInfo: [NSLocalizedDescriptionKey: "Sample NSError"])
-        SplunkRum.shared.customTracking.trackError(nsError, attributes)
-    }
-
-    func trackNSException() {
-        let attributes = MutableAttributes()
-        attributes["ExceptionName"] = .string("GenericException")
-        attributes["Reason"] = .string("Sample NSException reason")
-        attributes["Handled"] = .bool(true)
-        let exception = NSException(name: .genericException, reason: "Sample NSException reason", userInfo: ["Key": "Value"])
-        SplunkRum.shared.customTracking.trackException(exception, attributes)
-    }
-
     func trackWorkflow() {
         let customSpan = SplunkRum.shared.customTracking.trackWorkflow("Custom Workflow")
         customSpan.setAttribute(key: "test", value: "qwerty")
 
-        // End span after 15 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
-                customSpan.end()
+            customSpan.end()
         }
     }
 
@@ -151,5 +109,70 @@ struct CustomTrackingDemoView: View {
     func trackLegacyEvent() {
         let testDict = NSDictionary(dictionary: ["key1": "1", "key2": "2"])
         SplunkRum.shared.customTracking.reportEvent(name: "Legacy event", attributes: testDict)
+    }
+}
+
+struct DemoErrors {
+    // String error (no stack trace needed)
+    static func stringError() -> String {
+        "This is a string representing an error message"
+    }
+
+    // Swift Error with stack trace
+    static func swiftError() -> Error {
+        struct SampleError: Error, LocalizedError {
+            var errorDescription: String? { "This is a Swift Error" }
+        }
+        return SampleError()
+    }
+
+    // NSError with stack trace
+    static func nsError() -> NSError {
+        NSError(domain: "com.example.error", code: 42, userInfo: [NSLocalizedDescriptionKey: "This is an NSError"])
+    }
+
+    // NSException with stack trace (from callStackSymbols)
+    static func nsException() -> NSException {
+        // Use the Objective-C helper to trigger and catch an NSException
+        let exception = ObjCExceptionHelper.performBlockAndCatchException {
+            // Trigger an NSException by calling an unrecognized selector
+            NSObject().perform(Selector(("nonExistentMethod")))
+        }
+
+        // Ensure the exception was captured
+        guard let exception = exception else {
+            fatalError("Failed to trigger NSException")
+        }
+
+        return exception
+    }
+}
+
+struct SampleAttributes {
+    static func forStringError() -> MutableAttributes {
+        let attributes = MutableAttributes()
+        attributes.setString("sampleValue", for: "stringKey")
+        return attributes
+    }
+
+    static func forSwiftError() -> MutableAttributes {
+        let attributes = MutableAttributes()
+        attributes.setBool(true, for: "isSwiftError")
+        attributes.setInt(404, for: "errorCode")
+        return attributes
+    }
+
+    static func forNSError() -> MutableAttributes {
+        let attributes = MutableAttributes()
+        attributes.setString("NSErrorDomain", for: "domain")
+        attributes.setInt(42, for: "code")
+        return attributes
+    }
+
+    static func forNSException() -> MutableAttributes {
+        let attributes = MutableAttributes()
+        attributes.setString("NSExceptionName", for: "exceptionName")
+        attributes.setString("Sample reason", for: "reason")
+        return attributes
     }
 }

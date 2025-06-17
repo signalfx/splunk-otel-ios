@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
+internal import SplunkCommon
 
 extension MutableAttributes {
 
@@ -86,8 +87,62 @@ extension MutableAttributes {
             }
             return "{\(elements.joined(separator: ", "))}"
         }
+    } // swiftlint:enable cyclomatic_complexity
+
+    // Convert Attribute values to target type using provided closure.
+    // - Parameters:
+    //   - targetType: Desired type for the values.
+    //   - transform: Closure to convert `AttributeValue` to an optional target type.
+    //     note: specific to OpenTelemetryApi.AttributeValue source type.
+    // - Returns: [String: T] with converted values, omitting non-convertible ones.
+    func converted<T>(
+        to targetType: T.Type,
+        using transform: (AttributeValue) -> T?
+    ) -> [String: T] {
+
+        let sourceAttributes = getAll()
+
+        if sourceAttributes.isEmpty {
+            return [:]
+        }
+
+        var convertedAttributes: [String: T] = Dictionary(minimumCapacity: sourceAttributes.count)
+
+        for (key, otelValue) in sourceAttributes {
+            // Caller provides the `transform` closure
+            // only add items we can successfully transform
+            if let convertedValue = transform(otelValue) {
+                convertedAttributes[key] = convertedValue
+            }
+        }
+        return convertedAttributes
     }
-    // swiftlint:enable cyclomatic_complexity
+
+    private static let convertToEventAttributeValue: (AttributeValue) -> EventAttributeValue? = { attributeValue in
+        switch attributeValue {
+        case let .string(value):
+            return EventAttributeValue.string(value)
+        case let .int(value):
+            return EventAttributeValue.int(value)
+        case let .double(value):
+            return EventAttributeValue.double(value)
+        case .array:
+            return nil
+        case .set:
+            return nil
+        case let .bool(boolValue):
+            return boolValue ? EventAttributeValue.string("true") : EventAttributeValue.string("false")
+        case .stringArray, .boolArray, .intArray, .doubleArray:
+            return nil
+        }
+    }
+
+    // Convert Attributes to `[String: EventAttributeValue]`.
+    // - Parameters: none
+    // - Returns: [String: EventAttributeValue] omitting non-convertible elements
+    internal func toEventAttributes() -> [String: EventAttributeValue] {
+        return converted(to: EventAttributeValue.self, using: MutableAttributes.convertToEventAttributeValue)
+    }
 }
 
 
