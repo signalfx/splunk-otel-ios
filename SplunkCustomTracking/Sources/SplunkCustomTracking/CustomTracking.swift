@@ -30,7 +30,7 @@ public struct CustomTrackingData: ModuleEventData {
     public let component: String
     public let attributes: [String: EventAttributeValue]
 
-    public init(name: String, attributes: [String: EventAttributeValue]) {
+    public init(name: String, component: String, attributes: [String: EventAttributeValue]) {
         self.name = name
         self.component = component
         self.attributes = attributes
