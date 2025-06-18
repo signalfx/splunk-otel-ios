@@ -22,13 +22,13 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
 
     // MARK: - Public
 
-    public var enabled: Bool
+    public var isEnabled: Bool = true
     public var ignoreURLs: IgnoreURLs
 
     // MARK: init()
 
-    public init(enabled: Bool, ignoreURLs: IgnoreURLs) {
-        self.enabled = enabled
+    public init(isEnabled: Bool, ignoreURLs: IgnoreURLs) {
+        self.isEnabled = isEnabled
         self.ignoreURLs = ignoreURLs
     }
 }

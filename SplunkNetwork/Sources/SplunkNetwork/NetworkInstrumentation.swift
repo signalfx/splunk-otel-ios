@@ -62,33 +62,38 @@ public class NetworkInstrumentation {
 
         var delegateClassesToInstrument = nil as [AnyClass]?
         var delegateClasses: [AnyClass] = []
+        let config = configuration as? Configuration
 
-        // find concrete delegate classes
-        for className in delegateClassNames {
-            if let concreteClass = NSClassFromString(className) {
-                delegateClasses.append(concreteClass)
-            }
-        }
-        // empty array defaults to standard exhaustive search
-        if !delegateClasses.isEmpty {
-            delegateClassesToInstrument = delegateClasses
-        } else {
-            logger.log(level: .debug) {
-                "Standard Delegate classes not found, using exhaustive delegate class search.  This may incur performance overhead during startup."
-            }
-        }
+        // Start the network instrumentation if it's enabled or if no configuration is provided.
+        if config?.isEnabled ?? true {
 
-        // Start up URLSession instrumentation
-        _ = URLSessionInstrumentation(
-            configuration: URLSessionInstrumentationConfiguration(
-                shouldRecordPayload: shouldRecordPayload,
-                shouldInstrument: shouldInstrument,
-                createdRequest: createdRequest,
-                receivedResponse: receivedResponse,
-                receivedError: receivedError,
-                delegateClassesToInstrument: delegateClassesToInstrument
+            // find concrete delegate classes
+            for className in delegateClassNames {
+                if let concreteClass = NSClassFromString(className) {
+                    delegateClasses.append(concreteClass)
+                }
+            }
+            // empty array defaults to standard exhaustive search
+            if !delegateClasses.isEmpty {
+                delegateClassesToInstrument = delegateClasses
+            } else {
+                logger.log(level: .debug) {
+                    "Standard Delegate classes not found, using exhaustive delegate class search.  This may incur performance overhead during startup."
+                }
+            }
+
+            // Start up URLSession instrumentation
+            _ = URLSessionInstrumentation(
+                configuration: URLSessionInstrumentationConfiguration(
+                    shouldRecordPayload: shouldRecordPayload,
+                    shouldInstrument: shouldInstrument,
+                    createdRequest: createdRequest,
+                    receivedResponse: receivedResponse,
+                    receivedError: receivedError,
+                    delegateClassesToInstrument: delegateClassesToInstrument
+                )
             )
-        )
+        }
     }
 
     // Callback methods to modify URLSession monitoring
