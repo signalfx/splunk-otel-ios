@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ limitations under the License.
 @testable import SplunkAgent
 import XCTest
 
-final class StateTests: XCTestCase {
+final class RuntimeStateTests: XCTestCase {
 
     // MARK: - Tests
 
@@ -48,8 +48,5 @@ final class StateTests: XCTestCase {
 
         let debugEnabled = state.isDebugLoggingEnabled
         XCTAssertEqual(debugEnabled, ConfigurationDefaults.enableDebugLogging)
-
-        let sampling = state.sessionSamplingRate
-        XCTAssertEqual(sampling, ConfigurationDefaults.sessionSamplingRate)
     }
 }

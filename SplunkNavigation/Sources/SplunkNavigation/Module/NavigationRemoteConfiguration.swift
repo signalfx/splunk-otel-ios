@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,8 +16,17 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkCommon
 
-enum ApiPaths: String {
-    case logs = "eum/v1/logs"
-    case traces = "eum/v1/traces"
+/// Navigation module remote configuration.
+public struct NavigationRemoteConfiguration: RemoteModuleConfiguration {
+
+    // MARK: - Module management
+
+    public var enabled: Bool = true
+
+
+    // MARK: - Initialization
+
+    public init?(from data: Data) {}
 }

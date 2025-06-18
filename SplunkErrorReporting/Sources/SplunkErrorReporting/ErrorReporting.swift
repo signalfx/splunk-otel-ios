@@ -18,7 +18,6 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-
 public final class ErrorReporting {
 
 
@@ -36,5 +35,4 @@ public final class ErrorReporting {
 
 
     // MARK: - ErrorReporting Reporting
-
 }

@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -81,10 +81,5 @@ public extension RuntimeState {
     /// A `Bool` value determining whether the debug logging has been enabled.
     var isDebugLoggingEnabled: Bool {
         owner.agentConfiguration.enableDebugLogging
-    }
-
-    /// A `Double` containing the used sampling rate.
-    var sessionSamplingRate: Double {
-        owner.agentConfiguration.sessionSamplingRate
     }
 }

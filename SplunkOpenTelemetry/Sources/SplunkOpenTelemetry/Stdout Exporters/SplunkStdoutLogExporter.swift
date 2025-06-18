@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -58,7 +58,9 @@ class SplunkStdoutLogExporter: LogRecordExporter {
                 message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(self.dateFormatStyle)))\n"
 
                 if let observedTimestamp = logRecord.observedTimestamp {
-                    message += "ObservedTimestamp: \(observedTimestamp.timeIntervalSince1970.toNanoseconds) (\(observedTimestamp.formatted(self.dateFormatStyle)))\n"
+                    let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
+                    let observedTimestampFormatted = observedTimestamp.formatted(self.dateFormatStyle)
+                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
                 } else {
                     message += "ObservedTimestamp: -\n"
                 }

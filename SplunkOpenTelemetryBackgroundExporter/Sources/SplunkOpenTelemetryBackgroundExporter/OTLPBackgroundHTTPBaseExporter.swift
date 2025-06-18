@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,6 +25,11 @@ import SwiftProtobuf
 /// Basic implementation of exporters
 public class OTLPBackgroundHTTPBaseExporter {
 
+    // MARK: - Private
+
+    let fileType: String?
+
+
     // MARK: - Public
 
     let endpoint: URL
@@ -48,12 +53,14 @@ public class OTLPBackgroundHTTPBaseExporter {
                 absoluteUsedSize: .init(value: 200, unit: .megabytes)
             ),
             encryption: NoneEncryption()
-        )
+        ),
+        fileType: String? = nil
     ) {
         self.envVarHeaders = envVarHeaders
         self.endpoint = endpoint
         self.config = config
         self.diskStorage = diskStorage
+        self.fileType = fileType
 
         httpClient = BackgroundHTTPClient(sessionQosConfiguration: qosConfig, diskStorage: diskStorage)
 
@@ -104,8 +111,7 @@ public class OTLPBackgroundHTTPBaseExporter {
             //      File names are UUIDs of tasks
             if
                 let requestId = UUID(uuidString: file.key),
-                let taskDescription = taskDescriptions.first(where: { $0.id == requestId })
-            {
+                let taskDescription = taskDescriptions.first(where: { $0.id == requestId }) {
                 let requestDescriptor = RequestDescriptor(
                     id: requestId,
                     endpoint: endpoint,
@@ -126,6 +132,6 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     func getFileKeyType() -> String {
-        "base"
+        fileType ?? "base"
     }
 }
