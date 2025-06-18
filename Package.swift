@@ -57,7 +57,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",
                 "SplunkNetwork",
-                "SplunkNetworkInfo",
+                "SplunkNetworkMonitor",
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkAppStart",
@@ -103,20 +103,20 @@ func generateMainTargets() -> [Target] {
         ),
         
         
-        // MARK: - Splunk Network Info
-        
+        // MARK: - Splunk Network Monitor
+
         .target(
-            name: "SplunkNetworkInfo",
+            name: "SplunkNetworkMonitor",
             dependencies: [
                 "SplunkCommon",
                 "SplunkOpenTelemetry"
             ],
-            path: "SplunkNetworkInfo/Sources"
+            path: "SplunkNetworkMonitor/Sources"
         ),
         .testTarget(
-            name: "SplunkNetworkInfoTests",
-            dependencies: ["SplunkNetworkInfo"],
-            path: "SplunkNetworkInfo/Tests"
+            name: "SplunkNetworkMonitorTests",
+            dependencies: ["SplunkNetworkMonitor"],
+            path: "SplunkNetworkMonitor/Tests"
         ),
         
         
