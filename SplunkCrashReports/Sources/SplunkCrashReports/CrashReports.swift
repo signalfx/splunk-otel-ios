@@ -48,7 +48,7 @@ public class CrashReports {
 
     // MARK: - Public methods
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    public func configureCrashReporter() {
 #if os(tvOS)
         let signalHandlerType = PLCrashReporterSignalHandlerType.BSD
 #else
@@ -68,9 +68,6 @@ public class CrashReports {
             return
         }
         crashReporter = crashReporterInstance
-
-        // Initialize CrashReports module
-        _ = initializeCrashReporter()
     }
 
     /// Check whether a crash ended the previous run of the app
@@ -123,7 +120,7 @@ public class CrashReports {
     // MARK: - Private methods
 
     // Starts up crash reporter if enable is true and no debugger attached
-    private func initializeCrashReporter() -> Bool {
+    public func initializeCrashReporter() -> Bool {
 
         guard crashReporter != nil else {
             logger.log(level: .warn) {
