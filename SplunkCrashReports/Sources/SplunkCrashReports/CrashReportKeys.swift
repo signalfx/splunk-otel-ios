@@ -21,6 +21,7 @@ import Foundation
 
 public enum CrashReportKeys: String {
     case previousAppState = "ios.state"
+    case screenName = "screen.name"
 
     case crashTimestamp = "crash.timestamp"
     case currentTimestamp = "crash.observedTimestamp"

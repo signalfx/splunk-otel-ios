@@ -227,6 +227,7 @@ public class CrashReports {
 
         reportDict[.component] = "crash"
         reportDict[.error] = true
+        reportDict[.screenName] = "unknown"
 
         if let systemInfo = report.systemInfo {
             let formatter = DateFormatter()
