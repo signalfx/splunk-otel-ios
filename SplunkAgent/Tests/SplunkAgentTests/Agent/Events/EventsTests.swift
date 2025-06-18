@@ -57,8 +57,8 @@ final class EventsTests: XCTestCase {
         })
 
         let processedEvent = try XCTUnwrap(sessionReplayProcessor.storedLastProcessedEvent)
-        try checkEventBaseAttributes(processedEvent)
         try checkEventAttributes(processedEvent)
+        try checkEventProperties(processedEvent)
 
         XCTAssertEqual(processedEvent.name, "session_replay_data")
 
@@ -105,16 +105,6 @@ final class EventsTests: XCTestCase {
 
     // MARK: - Helpers
 
-    func checkEventBaseAttributes(_ event: SplunkCommon.AgentEvent) throws {
-        XCTAssertNotNil(event.domain)
-        XCTAssertNotNil(event.name)
-        XCTAssertNotNil(event.instrumentationScope)
-        XCTAssertNotNil(event.component)
-
-        XCTAssertNotNil(event.sessionID)
-        XCTAssertNotNil(event.timestamp)
-    }
-
     func checkEventAttributes(_ event: SplunkCommon.AgentEvent) throws {
         let eventAttributes = try XCTUnwrap(event.attributes)
 
@@ -124,6 +114,10 @@ final class EventsTests: XCTestCase {
         let metadata = try JSONDecoder().decode(CiscoSessionReplay.Metadata.self, from: metadataData)
         XCTAssertNotNil(metadataValue)
         XCTAssertNotNil(metadata)
+
+        // Script ID
+        let scriptID = eventAttributes["splunk.scriptInstance"]
+        XCTAssertNotNil(scriptID)
 
         // Experimental attributes for integration PoC
         let totalChunks = eventAttributes["rr-web.total-chunks"]
@@ -137,5 +131,15 @@ final class EventsTests: XCTestCase {
 
         let offset = eventAttributes["rr-web.offset"]
         XCTAssertEqual(offset, .int(1))
+    }
+
+    func checkEventProperties(_ event: SplunkCommon.AgentEvent) throws {
+        XCTAssertNotNil(event.domain)
+        XCTAssertNotNil(event.name)
+        XCTAssertNotNil(event.instrumentationScope)
+        XCTAssertNotNil(event.component)
+
+        XCTAssertNotNil(event.sessionId)
+        XCTAssertNotNil(event.timestamp)
     }
 }

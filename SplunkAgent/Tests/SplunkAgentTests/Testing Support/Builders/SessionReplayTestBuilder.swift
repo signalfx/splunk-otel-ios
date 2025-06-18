@@ -46,7 +46,7 @@ final class SessionReplayTestBuilder {
     public static func buildDataEvent() throws -> SessionReplayDataEvent {
         let sampleVideoData = try Self.sampleVideoData()
 
-        let sessionID = UUID().uuidString
+        let sessionId = UUID().uuidString
         let timestamp = Date()
         let endTimestamp = Date()
 
@@ -59,7 +59,8 @@ final class SessionReplayTestBuilder {
             metadata: chunkMetadata,
             data: sampleVideoData,
             index: 1,
-            sessionID: sessionID
+            sessionId: sessionId,
+            scriptInstanceId: UUID().uuidString
         )
 
         return event
