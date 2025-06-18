@@ -57,7 +57,7 @@ extension CustomTracking {
         return self
     }
 
-    // MARK: - Custom Tracking - Workflows(Spans
+    // MARK: - Custom Tracking - Workflows
 
     func trackWorkflow(_ workflowName: String) -> Span {
         return module.track(workflowName)
