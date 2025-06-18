@@ -59,19 +59,27 @@ struct CustomTrackingDemoView: View {
                 }
 
                 FeatureSection(title: "Legacy Tracking") {
+                    FeatureButton(label: "Track Legacy Error (String)") {
+                        trackLegacyErrorString()
+                    }
+
                     FeatureButton(label: "Track Legacy Error") {
-		        trackLegacyError()
+                        trackLegacyError()
                     }
 
                     FeatureButton(label: "Track Legacy NSError") {
-		        trackLegacyNSError()
+                        trackLegacyNSError()
+                    }
+
+                    FeatureButton(label: "Track Legacy Exception") {
+                        trackLegacyException()
                     }
 
                     FeatureButton(label: "Track Legacy Event") {
-		        trackLegacyEvent()
+                        trackLegacyEvent()
                     }
-		}
-		
+                }
+
                 Spacer()
             }
         }
@@ -96,19 +104,31 @@ struct CustomTrackingDemoView: View {
         }
     }
 
+    // MARK: - Legacy API calls demonstrating available but deprecated methods
+
+    func trackLegacyErrorString() {
+        let message = "Legacy error string"
+        SplunkRum.reportError(string: message)
+    }
+
     func trackLegacyError() {
         let sampleError: Error = NSError(domain: "com.example.error", code: 100, userInfo: [NSLocalizedDescriptionKey: "Legacy Swift error"])
-        SplunkRum.shared.customTracking.reportError(error: sampleError)
+        SplunkRum.reportError(error: sampleError)
     }
 
     func trackLegacyNSError() {
         let nsError = NSError(domain: "com.example.nserror", code: 200, userInfo: [NSLocalizedDescriptionKey: "Legacy NSError"])
-        SplunkRum.shared.customTracking.reportError(error: nsError)
+        SplunkRum.reportError(error: nsError)
+    }
+
+    func trackLegacyException() {
+        let nsException = DemoErrors.nsException()
+        SplunkRum.reportError(exception: nsException)
     }
 
     func trackLegacyEvent() {
         let testDict = NSDictionary(dictionary: ["key1": "1", "key2": "2"])
-        SplunkRum.shared.customTracking.reportEvent(name: "Legacy event", attributes: testDict)
+        SplunkRum.reportEvent(name: "Legacy event", attributes: testDict)
     }
 }
 
