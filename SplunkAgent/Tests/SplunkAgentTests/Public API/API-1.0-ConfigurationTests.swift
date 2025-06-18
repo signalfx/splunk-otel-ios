@@ -93,7 +93,7 @@ final class API10ConfigurationTests: XCTestCase {
         // User configuration
         full.user.trackingMode = .noTracking
         XCTAssertEqual(full.user.trackingMode, .noTracking)
-        
+
         var userConfiguration = UserConfiguration()
         userConfiguration.trackingMode = .anonymousTracking
         full = full.userConfiguration(userConfiguration)
@@ -161,7 +161,7 @@ final class API10ConfigurationTests: XCTestCase {
 
         var sessionConfiguration = SessionConfiguration()
         sessionConfiguration.samplingRate = 0.4
-        
+
         var userConfiguration = UserConfiguration()
         userConfiguration.trackingMode = .anonymousTracking
 

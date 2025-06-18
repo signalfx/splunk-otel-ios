@@ -47,25 +47,20 @@ final class SessionReplayTestBuilder {
         let sampleVideoData = try Self.sampleVideoData()
 
         let sessionID = UUID().uuidString
-        let recordID = UUID().uuidString
-        let replaySessionID = UUID().uuidString
         let timestamp = Date()
         let endTimestamp = Date()
 
-        // let recordMetadata = RecordMetadata(
-        //    recordId: recordID,
-        //    recordIndex: 0,
-        //    timestamp: timestamp,
-        //    timestampEnd: endTimestamp,
-        //    replaySessionId: replaySessionID
-        // )
-
-        let datachunkMetadata = Metadata(
+        let chunkMetadata = Metadata(
             startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000.0),
             endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0)
         )
 
-        let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, sessionID: sessionID)
+        let event = SessionReplayDataEvent(
+            metadata: chunkMetadata,
+            data: sampleVideoData,
+            index: 1,
+            sessionID: sessionID
+        )
 
         return event
     }
