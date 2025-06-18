@@ -83,7 +83,7 @@ class DefaultModulesPool: AgentModulesPool {
             knownModules.append(NetworkInstrumentation.self)
         #endif
 
-        // Network Info
+        // Network Monitor
         #if canImport(SplunkNetworkMonitor)
             knownModules.append(NetworkMonitor.self)
         #endif

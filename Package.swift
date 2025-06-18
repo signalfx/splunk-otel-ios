@@ -128,7 +128,7 @@ func generateMainTargets() -> [Target] {
         ),
         
         
-        // MARK: - Splunk Network Info
+        // MARK: - Splunk Network Monitor
         
         .target(
             name: "SplunkNetworkMonitor",
