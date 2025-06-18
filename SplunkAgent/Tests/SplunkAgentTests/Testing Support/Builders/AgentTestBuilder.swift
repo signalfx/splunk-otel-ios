@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ final class AgentTestBuilder {
     public static func build(
         with configuration: AgentConfiguration,
         session: AgentSession = DefaultSession(),
-        user: AgentUser = DefaultUser()
+        user: AgentUser = DefaultUser(),
+        sessionSampler: AgentSessionSampler = SamplerFactory.alwaysOnSampler()
     ) throws -> SplunkRum {
         // Custom key-value storage instance with different keys for testing
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "com.splunk.rum.test.")
@@ -53,7 +54,8 @@ final class AgentTestBuilder {
             configurationHandler: handler,
             user: user,
             session: session,
-            appStateManager: appStateManager
+            appStateManager: appStateManager,
+            sessionSampler: sessionSampler
         )
 
         // Links the current session with the agent

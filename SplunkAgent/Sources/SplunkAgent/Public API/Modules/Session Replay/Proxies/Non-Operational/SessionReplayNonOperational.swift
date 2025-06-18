@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,7 +42,10 @@ final class SessionReplayNonOperational: SessionReplayModule {
     // MARK: - Initialization
 
     init() {
-        logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SessionReplay")
+        logger = DefaultLogAgent(
+            poolName: PackageIdentifier.nonOperationalInstance(),
+            category: "SessionReplay"
+        )
 
         // Build "dummy" Session Replay module
         sensitivity = SessionReplayNonOperationalSensitivity(logger: logger)

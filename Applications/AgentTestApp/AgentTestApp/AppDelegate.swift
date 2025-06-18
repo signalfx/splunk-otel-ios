@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,21 +37,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             deploymentEnvironment: "dev"
         )
             .enableDebugLogging(true)
+            .globalAttributes(MutableAttributes(dictionary: [
+                "teststring": .string("value"),
+                "testint": .int(100)]))
             .spanInterceptor { spanData in
                 var attributes = spanData.attributes
                 attributes["test_attribute"] = AttributeValue("test_value")
 
                 var modifiedSpan = spanData
                 modifiedSpan.settingAttributes(attributes)
-                
+
                 return modifiedSpan
             }
-
         do {
             _ = try SplunkRum.install(with: agentConfig)
         } catch {
             print("Unable to start the Splunk agent, error: \(error)")
         }
+
+        // Navigation Instrumentation
+        SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
 
         return true
     }

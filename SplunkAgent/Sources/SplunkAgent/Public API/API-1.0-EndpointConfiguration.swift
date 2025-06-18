@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,6 +37,9 @@ public struct EndpointConfiguration: Codable, Equatable {
     /// Defines an optional custom session replay endpoint to which all session replay data will be sent to.
     public let sessionReplayEndpoint: URL?
 
+
+    // MARK: - Initialization
+
     /// Initialize the endpoint configuration with the Splunk RUM realm and RUM access token.
     ///
     /// - Parameters:
@@ -46,13 +49,8 @@ public struct EndpointConfiguration: Codable, Equatable {
         self.realm = realm
         self.rumAccessToken = rumAccessToken
 
-        // Build trace url
-        var urlCompoments = URLComponents()
-        urlCompoments.scheme = "https"
-        urlCompoments.host = "rum-ingest.\(realm).signalfx.com"
-        urlCompoments.path = "/v1/rumotlp"
-
-        let traceUrl = urlCompoments.url
+        let traceUrl = Self.realmUrl(for: realm, path: "/v1/rumotlp")
+        let sessionReplayUrl = Self.realmUrl(for: realm, path: "/v1/rumreplay")
 
         // Authenticate trace url
         if let traceUrl {
@@ -61,8 +59,12 @@ public struct EndpointConfiguration: Codable, Equatable {
             traceEndpoint = nil
         }
 
-        // ⚠️ Session replay endpoint not in use atm
-        sessionReplayEndpoint = nil
+        // Authenticate session replay url
+        if let sessionReplayUrl {
+            sessionReplayEndpoint = Self.authenticate(url: sessionReplayUrl, with: rumAccessToken)
+        } else {
+            sessionReplayEndpoint = nil
+        }
     }
 
     /// Initialize the endpoint configuration with a custom trace url and an optional session replay url.
@@ -77,7 +79,20 @@ public struct EndpointConfiguration: Codable, Equatable {
         realm = nil
         rumAccessToken = nil
     }
+
+
+    // MARK: - Private methods
+
+    private static func realmUrl(for realm: String, path: String) -> URL? {
+        var urlComponents = URLComponents()
+        urlComponents.scheme = "https"
+        urlComponents.host = "rum-ingest.\(realm).signalfx.com"
+        urlComponents.path = path
+
+        return urlComponents.url
+    }
 }
+
 
 extension EndpointConfiguration: CustomStringConvertible, CustomDebugStringConvertible {
     public var description: String {
@@ -94,30 +109,34 @@ extension EndpointConfiguration: CustomStringConvertible, CustomDebugStringConve
     }
 }
 
+
 extension EndpointConfiguration {
+
+    // MARK: - Authentication
 
     /// Authenticates an endpoint URL by appending the auth token to the URL's query.
     ///
     /// - Returns: Authenticated url, or `nil` if building the url fails.
     private static func authenticate(url: URL, with authToken: String) -> URL? {
 
-        guard var urlCompoments = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+        guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return nil
         }
 
-        urlCompoments.queryItems = [URLQueryItem(name: "auth", value: authToken)]
+        urlComponents.queryItems = [URLQueryItem(name: "auth", value: authToken)]
 
-        guard urlCompoments.queryItems?.count ?? 0 > 0 else {
+        guard urlComponents.queryItems?.count ?? 0 > 0 else {
             return nil
         }
 
-        guard let authenticatedUrl = urlCompoments.url else {
+        guard let authenticatedUrl = urlComponents.url else {
             return nil
         }
 
         return authenticatedUrl
     }
 }
+
 
 extension EndpointConfiguration {
 
@@ -135,6 +154,14 @@ extension EndpointConfiguration {
 
         // Validate trace endpoint
         if traceEndpoint == nil {
+            throw AgentConfigurationError.invalidEndpoint(supplied: self)
+        }
+
+        // Validate session replay endpoint
+        if
+            realm != nil, rumAccessToken != nil,
+            sessionReplayEndpoint == nil {
+
             throw AgentConfigurationError.invalidEndpoint(supplied: self)
         }
     }

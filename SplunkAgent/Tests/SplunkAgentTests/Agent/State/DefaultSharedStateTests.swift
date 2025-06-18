@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ final class DefaultSharedStateTests: XCTestCase {
 
     func testAppStateRetrieval() throws {
         let agent = try AgentTestBuilder.buildDefault()
-        let sharedState = DefaultSharedState(for: agent)
 
         sendSimulatedNotification(UIApplication.didBecomeActiveNotification)
 

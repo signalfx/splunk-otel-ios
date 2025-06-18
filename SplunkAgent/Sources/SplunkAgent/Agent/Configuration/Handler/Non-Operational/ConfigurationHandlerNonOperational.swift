@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// A dummy configuration handler. It will be used when we do not fully support the target platform.
+/// A dummy configuration handler. It is used for the non-operational instance, or on a target platform the agent is not fully supporting.
 final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
 
     // MARK: - Configuration

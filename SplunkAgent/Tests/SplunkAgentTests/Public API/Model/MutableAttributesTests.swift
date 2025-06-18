@@ -21,12 +21,6 @@ import XCTest
 
 final class MutableAttributesTests: XCTestCase {
 
-    override func setUpWithError() throws {
-    }
-
-    override func tearDownWithError() throws {
-    }
-
     // MARK: - Initialization Tests
 
     func testEmptyInitialization() {
@@ -408,7 +402,7 @@ final class MutableAttributesTests: XCTestCase {
         attributes[int: "age"] = 30
         attributes[bool: "active"] = true
 
-        let description = attributes.description()
+        let description = attributes.description
         XCTAssertTrue(description.contains("name: \"John Doe\""))
         XCTAssertTrue(description.contains("age: 30"))
         XCTAssertTrue(description.contains("active: true"))

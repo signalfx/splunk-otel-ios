@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -35,10 +35,11 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Initialization
 
-    required public init(
+    public required init(
         with tracesEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
+        globalAttributes: [String: Any],
         debugEnabled: Bool,
         spanInterceptor: SplunkSpanInterceptor?
     ) {
@@ -63,19 +64,25 @@ public class OTLPTraceProcessor: TraceProcessor {
 
         // Initialize span interceptor proxy exporter
         let spanInterceptorExporter = SpanInterceptorExporter(
-            with: spanInterceptor, proxy: attributeCheckerExporter)
+            with: spanInterceptor,
+            proxy: attributeCheckerExporter
+        )
 
         // Initialize processor
         let spanProcessor = SimpleSpanProcessor(spanExporter: spanInterceptorExporter)
         let attributesProcessor = OLTPAttributesSpanProcessor(with: runtimeAttributes)
+
+        // Global Attributes processor
+        let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(with: globalAttributes)
 
         // Build Resources
         var resource = Resource()
         resource.merge(with: resources)
 
         // Initialize tracer provider
-        var tracerProviderBuilder = TracerProviderBuilder()
+        let tracerProviderBuilder = TracerProviderBuilder()
             .with(resource: resource)
+            .add(spanProcessor: globalAttributesProcessor)
             .add(spanProcessor: attributesProcessor)
             .add(spanProcessor: spanProcessor)
 

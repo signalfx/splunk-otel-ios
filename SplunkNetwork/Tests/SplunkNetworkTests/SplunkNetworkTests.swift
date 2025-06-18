@@ -20,6 +20,7 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 import URLSessionInstrumentation
 @testable import SplunkNetwork
+import XCTest
 
 final class SplunkNetworkTests: XCTestCase {
     var sut: NetworkInstrumentation!

@@ -43,6 +43,6 @@ public extension SessionState {
 
     /// Value of the currently used session sampling rate.
     var samplingRate: Double {
-        owner.agentConfiguration.sessionSamplingRate
+        owner.agentConfiguration.session.samplingRate
     }
 }

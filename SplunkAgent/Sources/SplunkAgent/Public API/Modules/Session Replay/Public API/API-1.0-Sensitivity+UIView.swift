@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@ public extension UIView {
     /// Assigning `nil` removes previously assigned explicit sensitivity.
     var srSensitive: Bool? {
         get {
-            SplunkRum.shared?.sessionReplay.sensitivity[self]
+            SplunkRum.shared.sessionReplay.sensitivity[self]
         }
         set {
-            SplunkRum.shared?.sessionReplay.sensitivity[self] = newValue
+            SplunkRum.shared.sessionReplay.sensitivity[self] = newValue
         }
     }
 }

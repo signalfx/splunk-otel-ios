@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,6 +38,9 @@ public protocol AgentEvent {
     // MARK: - Event properties
 
     /// Session id, identifies a session during which the event occured.
+    ///
+    /// Current session's session id is added automatically to all signals if this property is `nil`.
+    /// Also the automatically added session id does not overwrite this custom session id, if not `nil`.
     var sessionID: String? { get set }
 
     /// Event timestamp. The time at which the event occured.

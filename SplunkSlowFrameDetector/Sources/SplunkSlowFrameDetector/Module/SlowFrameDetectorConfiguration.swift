@@ -22,13 +22,10 @@ public struct SlowFrameDetectorConfiguration: ModuleConfiguration {}
 
 public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
 
-
     // MARK: - Internal decoding
 
     struct SlowFrameDetector: Decodable {
         let enabled: Bool
-        let slowFrameDetectorThresholdMilliseconds: CFTimeInterval
-        let frozenFrameDetectorThresholdMilliseconds: CFTimeInterval
     }
 
     struct MRUMRoot: Decodable {
@@ -50,18 +47,11 @@ public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
     // MARK: - Internal variables
 
     public var enabled: Bool
-    var slowFrameThresholdMilliseconds: CFTimeInterval
-    var frozenFrameThresholdMilliseconds: CFTimeInterval
 
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
             return nil
         }
-
         enabled = root.configuration.mrum.slowFrameDetector.enabled
-
-        slowFrameThresholdMilliseconds = root.configuration.mrum.slowFrameDetector.slowFrameDetectorThresholdMilliseconds
-
-        frozenFrameThresholdMilliseconds = root.configuration.mrum.slowFrameDetector.frozenFrameDetectorThresholdMilliseconds
     }
 }

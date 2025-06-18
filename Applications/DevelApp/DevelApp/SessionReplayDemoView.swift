@@ -15,13 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-//
-//  SessionReplayDemoView.swift
-//  DevelApp
-//
-//  Created by Pavel Kroh on 30.09.2023.
-//
-
 import SplunkAgent
 import SwiftUI
 
@@ -30,14 +23,14 @@ struct SessionReplayDemoView: View {
     // MARK: - Versions
 
     let agentVersion = SplunkRum.version
-    let agentAppVersion = SplunkRum.shared?.state.appVersion ?? "nil"
+    let agentAppVersion = SplunkRum.shared.state.appVersion
 
 
     // MARK: - Identifiers
 
-    @State private var sessionId = SplunkRum.shared?.session.state.id ?? "nil"
-    @State private var userTrackingMode = SplunkRum.shared?.user.state.trackingMode ?? .default
-    @State private var agentStatus = SplunkRum.shared?.state.status ?? .notRunning(.notInstalled)
+    @State private var sessionId = SplunkRum.shared.session.state.id
+    @State private var userTrackingMode = SplunkRum.shared.user.state.trackingMode
+    @State private var agentStatus = SplunkRum.shared.state.status
 
     let sessionPublisher = NotificationCenter.default
         .publisher(

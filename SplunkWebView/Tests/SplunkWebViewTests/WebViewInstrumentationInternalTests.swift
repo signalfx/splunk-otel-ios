@@ -62,9 +62,9 @@ final class WebViewInstrumentationInternalTests: XCTestCase {
 class MockWebView: WKWebView {
     var evaluateJavaScriptHandler: ((String, @escaping (Any?, Error?) -> Void) -> Void)?
 
-    override func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
+    func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
         if Thread.isMainThread {
-            self.evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })
+            evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })
         } else {
             DispatchQueue.main.async {
                 self.evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })

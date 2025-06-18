@@ -67,7 +67,7 @@ public class OTLPAttributesLogRecordProcessor: LogRecordProcessor {
 
         proxy.onEmit(logRecord: updatedLogRecord)
     }
-    
+
     func forceFlush() -> ExportResult {
         proxy.forceFlush()
     }

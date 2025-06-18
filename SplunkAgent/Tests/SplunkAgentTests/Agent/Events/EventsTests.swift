@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import CiscoSessionReplay
+import CiscoSessionReplay
 @testable import SplunkAgent
 @testable import SplunkCommon
 @testable import SplunkOpenTelemetry
@@ -27,7 +27,6 @@ final class EventsTests: XCTestCase {
     // MARK: - Private
 
     private var agent: SplunkRum?
-    private var sampleVideoData: Data?
 
 
     // MARK: - Setup
@@ -40,88 +39,18 @@ final class EventsTests: XCTestCase {
 
         // Use mock agent
         agent = mockAgent
-
-        try loadSampleVideo()
-    }
-
-
-    // MARK: - Testing Event manager events
-
-    func testEventManagerSessionStartEvent() throws {
-        let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
-        eventManager.eventsModel.clear()
-        eventManager.sendSessionStartEvent()
-
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
-        XCTAssertEqual(processedEvent.name, "session_start")
     }
 
 
     // MARK: - Testing Event manual events
 
-    func testSessionStartEvent() throws {
-        let sessionID = try XCTUnwrap(agent?.session.state.id)
-        let timestamp = Date()
-        let userID = try XCTUnwrap(agent?.currentUser.userIdentifier)
-
-        let event = SessionStartEvent(
-            sessionID: sessionID,
-            timestamp: timestamp,
-            userID: userID
-        )
-
-        let requestExpectation = XCTestExpectation(description: "Send request")
-
-        let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
-
-        eventManager.logEventProcessor.sendEvent(event, completion: { _ in
-            // TODO: MRUM_AC-1111 - EventManager and Events tests
-//            XCTAssert(success)
-
-            requestExpectation.fulfill()
-        })
-
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
-        try checkEventBaseAttributes(processedEvent)
-
-        XCTAssertEqual(processedEvent.name, "session_start")
-
-        wait(for: [requestExpectation], timeout: 5)
-    }
-
     func testSessionReplayDataEvent() throws {
-        guard let sampleVideoData = sampleVideoData else {
-            XCTFail("Missing sample video data")
-            return
-        }
-
-        let sessionID = try XCTUnwrap(agent?.currentSession.currentSessionId)
-        let recordID = UUID().uuidString
-        let replaySessionID = UUID().uuidString
-        let timestamp = Date()
-        let endTimestamp = Date()
-
-        // let recordMetadata = RecordMetadata(
-        //    recordId: recordID,
-        //    recordIndex: 0,
-        //    timestamp: timestamp,
-        //    timestampEnd: endTimestamp,
-        //    replaySessionId: replaySessionID
-        // )
-
-        let datachunkMetadata = Metadata(
-            startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000.0),
-            endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0)
-        )
-
-        let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, sessionID: sessionID)
+        let event = try SessionReplayTestBuilder.buildDataEvent()
 
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
 
         logEventProcessor.sendEvent(event, completion: { _ in
             // TODO: MRUM_AC-1111 - EventManager and Events tests
@@ -130,7 +59,7 @@ final class EventsTests: XCTestCase {
             requestExpectation.fulfill()
         })
 
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent as? AgentEvent)
+        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent)
         try checkEventBaseAttributes(processedEvent)
 
         XCTAssertEqual(processedEvent.name, "session_replay_data")
@@ -142,16 +71,11 @@ final class EventsTests: XCTestCase {
     // MARK: - Testing immediate and background processing
 
     func testImmediateProcessing() throws {
-        let sessionID = try XCTUnwrap(agent?.session.state.id)
-        let userID = try XCTUnwrap(agent?.user.identifier)
-        let timestamp = Date()
-
-        let event = SessionStartEvent(sessionID: sessionID, timestamp: timestamp, userID: userID)
-
+        let event = try SessionReplayTestBuilder.buildDataEvent()
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
 
         logEventProcessor.sendEvent(event: event, immediateProcessing: true, completion: { success in
             XCTAssert(success)
@@ -164,16 +88,11 @@ final class EventsTests: XCTestCase {
     }
 
     func testBackgroundProcessing() throws {
-        let sessionID = try XCTUnwrap(agent?.session.state.id)
-        let userID = try XCTUnwrap(agent?.user.identifier)
-        let timestamp = Date()
-
-        let event = SessionStartEvent(sessionID: sessionID, timestamp: timestamp, userID: userID)
-
+        let event = try SessionReplayTestBuilder.buildDataEvent()
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogEventProcessor)
+        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
 
         logEventProcessor.sendEvent(event, completion: { success in
             XCTAssert(success)
@@ -182,59 +101,11 @@ final class EventsTests: XCTestCase {
         })
 
         XCTAssertNotNil(logEventProcessor.storedLastProcessedEvent)
-        XCTAssertNil(logEventProcessor.storedLastSentEvent)
-    }
-
-    func testDuplicateSessionStartEvents() throws {
-        let agent = try XCTUnwrap(agent)
-        let sessionID = try XCTUnwrap(agent.session.state.id)
-        let eventManager = try XCTUnwrap(agent.eventManager as? DefaultEventManager)
-
-        let eventsModel = eventManager.eventsModel
-        eventsModel.clear()
-
-        XCTAssertTrue(eventManager.shouldSendSessionStart(sessionID))
-
-        eventManager.sendSessionStartEvent()
-
-        XCTAssertTrue(eventsModel.sendingSessionStartIDs.contains(sessionID))
-        XCTAssertFalse(eventManager.shouldSendSessionStart(sessionID))
-
-        let requestExpectation = XCTestExpectation(description: "Sent session start")
-
-        simulateMainThreadWait(duration: 2.0)
-
-        // Check if the session was marked as "sent"
-        XCTAssertFalse(eventManager.shouldSendSessionStart(sessionID))
-
-        eventManager.eventsModel.load()
-
-        XCTAssertFalse(eventManager.shouldSendSessionStart(sessionID))
-        XCTAssertTrue(eventsModel.sentSessionStartIDs.contains(sessionID))
-
-        requestExpectation.fulfill()
-
-        wait(for: [requestExpectation], timeout: 3.0)
+        XCTAssertNotNil(logEventProcessor.storedLastSentEvent)
     }
 
 
     // MARK: - Helpers
-
-    func loadSampleVideo() throws {
-        #if SPM_TESTS
-        let fileUrl = Bundle.module.url(forResource: "v", withExtension: "mp4")
-
-        #else
-        let bundle = Bundle(for: EventsTests.self)
-        let fileUrl = bundle.url(forResource: "v", withExtension: "mp4")
-        #endif
-
-        if let fileUrl = fileUrl {
-            let data = try Data(contentsOf: fileUrl)
-
-            sampleVideoData = data
-        }
-    }
 
     func checkEventBaseAttributes(_ event: SplunkCommon.AgentEvent) throws {
         XCTAssertNotNil(event.domain)

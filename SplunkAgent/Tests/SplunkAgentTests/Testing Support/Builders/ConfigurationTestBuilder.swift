@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,10 +49,42 @@ final class ConfigurationTestBuilder {
             deploymentEnvironment: deploymentEnvironment
         )
 
+        var sessionConfiguration = SessionConfiguration()
+        sessionConfiguration.samplingRate = 1.0
+
         configuration.appVersion = appVersion
         configuration.enableDebugLogging = true
-        configuration.sessionSamplingRate = 0.1
-        configuration.globalAttributes = ["attribute": "value"]
+        configuration.session = sessionConfiguration
+        configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
+        configuration.spanInterceptor = { spanData in
+            spanData
+        }
+
+        return configuration
+    }
+
+    public static func buildDefaultSampledOut() throws -> AgentConfiguration {
+
+        // Default endpoint configuration for unit testing
+        let endpoint = EndpointConfiguration(
+            realm: realm,
+            rumAccessToken: rumAccessToken
+        )
+
+        // Default configuration for unit testing
+        var configuration = AgentConfiguration(
+            endpoint: endpoint,
+            appName: appName,
+            deploymentEnvironment: deploymentEnvironment
+        )
+
+        var sessionConfiguration = SessionConfiguration()
+        sessionConfiguration.samplingRate = 0.0
+
+        configuration.appVersion = appVersion
+        configuration.enableDebugLogging = true
+        configuration.session = sessionConfiguration
+        configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
         configuration.spanInterceptor = { spanData in
             spanData
         }
