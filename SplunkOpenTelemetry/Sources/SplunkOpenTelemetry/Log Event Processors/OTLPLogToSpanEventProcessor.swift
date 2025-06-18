@@ -22,74 +22,53 @@ import OpenTelemetrySdk
 import SplunkCommon
 import SplunkOpenTelemetryBackgroundExporter
 
-/// OTLPLogEventProcessor sends OpenTelemetry Logs enriched with Resources via an instantiated background exporter.
-public class OTLPLogEventProcessor: LogEventProcessor {
+/// OTLPLogEventProcessor converts OpenTelemetry Logs to Spans and emits them through a standard infrastructure for Span.
+public class OTLPLogToSpanEventProcessor: LogEventProcessor {
 
     // MARK: - Private properties
 
     // OTel logger provider
     private let loggerProvider: LoggerProvider
 
-    // Logger background dispatch queues
+    // Logger background dispatch queue
     private let backgroundQueue = DispatchQueue(
-        label: PackageIdentifier.default(named: "LogEventProcessor"),
+        label: PackageIdentifier.default(named: "LogToSpanEventProcessor"),
         qos: .utility
     )
 
     // Stored properties for Unit tests
-#if DEBUG
-    public var resource: Resource?
-    public var storedLastProcessedEvent: (any AgentEvent)?
-    public var storedLastSentEvent: (any AgentEvent)?
-#endif
+    #if DEBUG
+        public var resource: Resource?
+        public var storedLastProcessedEvent: (any AgentEvent)?
+        public var storedLastSentEvent: (any AgentEvent)?
+    #endif
 
 
     // MARK: - Initialization
-    
-    required public init(
+
+    public required init(
         with logsEndpoint: URL,
         resources: AgentResources,
-        runtimeAttributes: RuntimeAttributes,
-        globalAttributes: [String: Any],
         debugEnabled: Bool
     ) {
+        // Store resources object for Unit tests
+        #if DEBUG
+        // Build Resources
+            var resource = Resource()
+            resource.merge(with: resources)
 
-        let configuration = OtlpConfiguration()
-        let envVarHeaders = [(String, String)]()
+            self.resource = resource
+        #endif
+
 
         let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
 
-        // Initialize attribute checker proxy exporter
-        let attributeCheckerExporter = AttributeCheckerLogExporter(proxy: logToSpanExporter)
-
         // Initialize LogRecordProcessor
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(
-            logRecordExporter: attributeCheckerExporter
+            logRecordExporter: logToSpanExporter
         )
 
-        // Initialize AttributesLogRecordProcessor as the first stage of processing,
-        // which adds runtime attributes to all processed log records
-        let attributesLogRecordProcessor = OTLPAttributesLogRecordProcessor(
-            proxy: simpleLogRecordProcessor,
-            with: runtimeAttributes
-        )
-
-        // Add in Global Attributes processor
-        let globalAttributesLogRecordProcessor = OTLPGlobalAttributesLogRecordProcessor(
-            proxy: attributesLogRecordProcessor,
-            with: globalAttributes
-        )
-
-        // Build Resources
-        var resource = Resource()
-        resource.merge(with: resources)
-
-        // Store resources object for Unit tests
-        #if DEBUG
-        self.resource = resource
-        #endif
-
-        var processors: [LogRecordProcessor] = [globalAttributesLogRecordProcessor]
+        var processors: [LogRecordProcessor] = [simpleLogRecordProcessor]
 
         // Initialize optional stdout exporter
         if debugEnabled {
@@ -102,10 +81,9 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         // Initialize logger provider
         let loggerProviderBuilder = LoggerProviderBuilder()
             .with(processors: processors)
-            .with(resource: resource)
 
         let loggerProvider = loggerProviderBuilder.build()
-        
+
         // Set default logger provider
         OpenTelemetry.registerLoggerProvider(loggerProvider: loggerProvider)
 
@@ -119,13 +97,13 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         sendEvent(event: event, immediateProcessing: false, completion: completion)
     }
 
-    public func sendEvent(event: any AgentEvent, immediateProcessing: Bool , completion: @escaping (Bool) -> Void) {
-#if DEBUG
-        storedLastProcessedEvent = event
-#endif
+    public func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void) {
+        #if DEBUG
+            storedLastProcessedEvent = event
+        #endif
 
         if immediateProcessing {
-            self.processEvent(event: event, completion: completion)
+            processEvent(event: event, completion: completion)
         } else {
             backgroundQueue.async {
                 self.processEvent(event: event, completion: completion)
@@ -137,11 +115,12 @@ public class OTLPLogEventProcessor: LogEventProcessor {
     // MARK: - Private methods
 
     private func processEvent(event: any AgentEvent, completion: @escaping (Bool) -> Void) {
-        let logger = self.loggerProvider.get(instrumentationScopeName: event.instrumentationScope)
+        let logger = loggerProvider.get(instrumentationScopeName: event.instrumentationScope)
 
         // Build LogRecordBuilder from LogEvent
-        var logRecordBuilder = logger.logRecordBuilder()
-        logRecordBuilder = self.buildEvent(with: event, logRecordBuilder: logRecordBuilder)
+        let logRecordBuilder = logger
+            .logRecordBuilder()
+            .build(with: event)
 
         // Set observation timestamp
         _ = logRecordBuilder.setObservedTimestamp(Date())
@@ -149,9 +128,9 @@ public class OTLPLogEventProcessor: LogEventProcessor {
         // Send event
         logRecordBuilder.emit()
 
-#if DEBUG
-        self.storedLastSentEvent = event
-#endif
+        #if DEBUG
+            storedLastSentEvent = event
+        #endif
 
         // TODO: MRUM_AC-1062 (Post GA) - Propagate OTel exporter API errors into the Agent
         DispatchQueue.main.async {

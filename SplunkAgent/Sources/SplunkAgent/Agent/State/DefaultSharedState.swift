@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ internal import SplunkCommon
 /// A shared state is a representation of view on current internal information.
 ///
 /// All contained information is related to the current agent instance.
-class DefaultSharedState: AgentSharedState {
+final class DefaultSharedState: AgentSharedState {
 
     // MARK: - Internal
 
-    private unowned let owner: SplunkRum
+    private nonisolated unowned let owner: SplunkRum
 
 
     // MARK: - General state

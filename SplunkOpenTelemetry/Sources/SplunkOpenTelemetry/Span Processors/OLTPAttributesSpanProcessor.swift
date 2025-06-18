@@ -36,11 +36,11 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
 
 
     // MARK: - Initialization
-    
+
     /// Initializes new span processor with given runtime attributes.
-    /// 
+    ///
     /// - Parameter runtimeAttributes: An object that holds and manages runtime attributes.
-    /// 
+    ///
     /// - Note: The processor itself does not own the object with runtime attributes.
     ///         So, ensuring its existence outside this span processor is always necessary.
     public init(with runtimeAttributes: RuntimeAttributes) {
@@ -67,9 +67,18 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
         // Attributes with a type not supported in OpenTelemetry are omitted
         for (key, value) in attributes {
             if let attributeValue = AttributeValue(value) {
+                // Regarding screen spans, we do not directly assign the screen name.
+                // Instead, we utilize the entry that is already part of the span
+                if key == "screen.name", isScreenSpan(span) {
+                    continue
+                }
+
                 span.setAttribute(key: key, value: attributeValue)
             }
         }
     }
-}
 
+    private func isScreenSpan(_ span: any OpenTelemetrySdk.ReadableSpan) -> Bool {
+        span.name == "screen name change" || span.name == "ShowVC"
+    }
+}

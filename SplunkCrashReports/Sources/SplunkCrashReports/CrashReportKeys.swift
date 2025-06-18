@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@ public enum CrashReportKeys: String {
     case freeDiskSpace = "crash.freeDiskSpace"
     case batteryLevel = "crash.batteryLevel"
     case freeMemory = "crash.freeMemory"
-    case appVersion = "appVersion"
+    case appVersion
 
     case processPath = "crash.processPath"
     case isNative = "crash.isNative"
 
-    case signalName = "signalName"
+    case signalName
     case faultAddress = "crash.address"
 
     case exceptionName = "exception.type"
@@ -40,26 +40,26 @@ public enum CrashReportKeys: String {
 
     case threads = "exception.threads"
     case images = "exception.images"
-    case details = "details"
-    case component = "component"
-    case error = "error"
+    case details
+    case component
+    case error
 
     // Stack Frame
-    case instructionPointer = "instructionPointer"
-    case imageName = "imageName"
-    case symbolName = "symbolName"
+    case instructionPointer
+    case imageName
+    case symbolName
 
     // Thread
-    case threadNumber = "threadNumber"
-    case stackFrames = "stackFrames"
+    case threadNumber
+    case stackFrames
     case isCrashedThread = "crashed"
 
     // Binary Image
-    case baseAddress = "baseAddress"
-    case offset = "offset"
-    case imageSize = "imageSize"
-    case imagePath = "imagePath"
-    case imageUUID = "imageUUID"
+    case baseAddress
+    case offset
+    case imageSize
+    case imagePath
+    case imageUUID
 
     // Primary group key
     case crashReportMessageName = "ios.crash_report"

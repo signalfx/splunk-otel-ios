@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,8 +17,16 @@ limitations under the License.
 
 internal import SplunkCommon
 
+#if canImport(SplunkAppStart)
+    internal import SplunkAppStart
+#endif
+
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
+#endif
+
+#if canImport(SplunkNavigation)
+    internal import SplunkNavigation
 #endif
 
 #if canImport(SplunkNetwork)
@@ -36,10 +44,6 @@ internal import SplunkCommon
 
 #if canImport(SplunkSlowFrameDetector)
     internal import SplunkSlowFrameDetector
-#endif
-
-#if canImport(SplunkAppStart)
-    internal import SplunkAppStart
 #endif
 
 #if canImport(SplunkWebView)
@@ -69,12 +73,17 @@ class DefaultModulesPool: AgentModulesPool {
             knownModules.append(CiscoSessionReplay.SessionReplay.self)
         #endif
 
+        // Navigation Instrumentation
+        #if canImport(SplunkNavigation)
+            knownModules.append(SplunkNavigation.Navigation.self)
+        #endif
+
         // Network Instrumentation
         #if canImport(SplunkNetwork)
             knownModules.append(NetworkInstrumentation.self)
         #endif
 
-        // Network Info
+        // Network Monitor
         #if canImport(SplunkNetworkMonitor)
             knownModules.append(NetworkMonitor.self)
         #endif

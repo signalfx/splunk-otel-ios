@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoLogger
+internal import CiscoLogger
 import SplunkCommon
 import WebKit
 
@@ -80,4 +80,3 @@ public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
 
 // Type for conforming to ModuleEventData
 public struct WebViewInstrumentationData: ModuleEventData {}
-
