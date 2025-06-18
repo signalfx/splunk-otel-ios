@@ -56,12 +56,9 @@ extension SplunkRum {
         customizeNavigation()
         customizeNetwork()
         customizeAppStart()
-<<<<<<< HEAD
         customizeNetworkMonitor()
-        customizeWebViewInstrumentation()
-=======
         customizeWebView()
->>>>>>> feature/next-gen
+
     }
 
     /// Perform operations specific to the SessionReplay module.
@@ -154,7 +151,6 @@ extension SplunkRum {
         appStartModule?.sharedState = sharedState
     }
 
-<<<<<<< HEAD
     /// Configure NetworkMonitor module
     private func customizeNetworkMonitor() {
         let networkMonitorModule = modulesManager?.module(ofType: SplunkNetworkMonitor.NetworkMonitor.self)
@@ -162,12 +158,8 @@ extension SplunkRum {
         networkMonitorModule?.sharedState = sharedState
     }
 
-    /// Configure WebView intrumentation module
-    private func customizeWebViewInstrumentation() {
-=======
     /// Configure WebView Instrumentation module with shared state.
     private func customizeWebView() {
->>>>>>> feature/next-gen
         // Get WebViewInstrumentation module, set its sharedState
         let moduleType = SplunkWebView.WebViewInstrumentationInternal.self
 
