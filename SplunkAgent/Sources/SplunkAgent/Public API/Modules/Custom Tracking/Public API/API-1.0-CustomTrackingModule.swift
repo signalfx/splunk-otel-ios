@@ -75,6 +75,7 @@ public protocol CustomTrackingModule {
     /// - Returns: The updated `CustomTrackingModule` instance.
     @discardableResult func trackException(_ exception: NSException, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
+
     // MARK: - Track Custom Workflow
 
     /// Track a workflow with a name and return a Span object.
