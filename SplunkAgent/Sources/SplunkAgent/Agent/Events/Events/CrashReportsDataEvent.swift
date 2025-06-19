@@ -32,7 +32,7 @@ class CrashReportsDataEvent: AgentEvent {
 
     // MARK: - Event properties
 
-    var sessionID: String?
+    var sessionId: String?
     var timestamp: Date?
     var attributes: [String: EventAttributeValue]?
     var body: EventAttributeValue?
@@ -54,7 +54,7 @@ class CrashReportsDataEvent: AgentEvent {
         instrumentationScope = PackageIdentifier.default(named: "crashreports")
 
         if let sessionID {
-            self.sessionID = sessionID
+            self.sessionId = sessionID
         }
 
         timestamp = metadata.timestamp
