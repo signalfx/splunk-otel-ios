@@ -98,7 +98,7 @@ class DefaultEventManager: AgentEventManager {
         )
 
         // Initialize session replay processor (optional)
-        scriptInstanceId = .uniqueHexIdentifier()
+        scriptInstanceId = .uniqueHexIdentifier(ofLength: 16)
         sessionReplayProcessor = OTLPSessionReplayEventProcessor(
             with: configuration.endpoint.sessionReplayEndpoint,
             resources: resources,
