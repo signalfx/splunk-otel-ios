@@ -121,16 +121,16 @@ final class EventsTests: XCTestCase {
 
         // Experimental attributes for integration PoC
         let totalChunks = eventAttributes["rr-web.total-chunks"]
-        XCTAssertEqual(totalChunks, .int(1))
+        XCTAssertEqual(totalChunks, .double(1))
 
         let chunk = eventAttributes["rr-web.chunk"]
-        XCTAssertEqual(chunk, .int(1))
+        XCTAssertEqual(chunk, .double(1))
 
         let eventNumber = eventAttributes["rr-web.event"]
         XCTAssertEqual(eventNumber, .int(1))
 
         let offset = eventAttributes["rr-web.offset"]
-        XCTAssertEqual(offset, .int(1))
+        XCTAssertEqual(offset, .double(1))
     }
 
     func checkEventProperties(_ event: SplunkCommon.AgentEvent) throws {
