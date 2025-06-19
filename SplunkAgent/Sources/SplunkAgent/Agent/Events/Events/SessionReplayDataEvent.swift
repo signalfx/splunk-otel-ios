@@ -67,10 +67,10 @@ class SessionReplayDataEvent: AgentEvent {
             "splunk.scriptInstance": .string(scriptInstanceId),
 
             // Experimental attributes for integration PoC
-            "rr-web.total-chunks": .int(1),
-            "rr-web.chunk": .int(1),
+            "rr-web.total-chunks": .double(1.0),
+            "rr-web.chunk": .double(1.0),
             "rr-web.event": .int(index),
-            "rr-web.offset": .int(index)
+            "rr-web.offset": .double(Double(index))
         ]
     }
 
