@@ -22,8 +22,7 @@ import SplunkCommon
 
 // MARK: - SplunkTrackable Protocol
 
-/// Protocol defining the base requirements for any item that can be tracked.
-/// Foundation for both error tracking and custom data tracking.
+/// Protocol defining the base requirements for any CustomTracking item.
 public protocol SplunkTrackable {
 
     /// Timestamp when the trackable item was created or when a duration started
