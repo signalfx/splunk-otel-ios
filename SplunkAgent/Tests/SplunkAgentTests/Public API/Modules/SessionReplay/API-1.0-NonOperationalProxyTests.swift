@@ -38,14 +38,9 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Preferences
 
-    // Temporarily removed with Rendering Modes.
-
-    // swiftformat:disable indent
-
-    /*
     func testPreferences() throws {
         let preferences = SessionReplayPreferences()
-            .renderingMode(.wireframe)
+            .renderingMode(.wireframeOnly)
 
         moduleProxy.preferences = preferences
         moduleProxy.preferences(preferences)
@@ -57,9 +52,6 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
             XCTAssertNoThrow(try JSONDecoder().decode(SessionReplayPreferences.self, from: encodedPreferences))
         }
     }
-     */
-
-    // swiftformat:enable indent
 
 
     // MARK: - State
@@ -68,10 +60,6 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
         let state = moduleProxy.state
 
         XCTAssertNotNil(state.status)
-
-        // Temporarily removed with Rendering Modes.
-        // XCTAssertNotNil(state.renderingMode)
-
         XCTAssertNotNil(state.isRecording)
     }
 
@@ -89,9 +77,6 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
         case .notRecording(.stopped):
             break
 
-        case .notRecording(.projectLimitReached):
-            break
-
         case .notRecording(.internalError):
             break
 
@@ -101,10 +86,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
         case .notRecording(.unsupportedPlatform):
             break
 
-        case .notRecording(.diskCacheCapacityOverreached):
-            break
-
-        case .notRecording(.remotelyDisabled):
+        case .notRecording(.storageLimitReached):
             break
         }
     }
@@ -113,7 +95,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
         let status = moduleProxy.state.status
 
         XCTAssertNotNil(status)
-        XCTAssertEqual(status, .notRecording(.remotelyDisabled))
+        XCTAssertEqual(status, .notRecording(.notStarted))
     }
 
 
@@ -144,21 +126,13 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Rendering Mode
 
-    // Temporarily removed with Rendering Modes.
-
-    // swiftformat:disable indent
-
-    /*
      func testRenderingModes() throws {
         let renderingMode = RenderingMode.default
         switch renderingMode {
         case .native:
             break
 
-        case .wireframe:
-            break
-
-        case .noRendering:
+        case .wireframeOnly:
             break
         }
     }
@@ -168,9 +142,6 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
         XCTAssertEqual(defaultRenderingMode, .native)
     }
-     */
-
-    // swiftformat:enable indent
 
 
     // MARK: - Recording Masks

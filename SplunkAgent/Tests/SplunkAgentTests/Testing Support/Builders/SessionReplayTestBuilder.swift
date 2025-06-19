@@ -65,7 +65,12 @@ final class SessionReplayTestBuilder {
             endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0)
         )
 
-        let event = SessionReplayDataEvent(metadata: datachunkMetadata, data: sampleVideoData, sessionID: sessionID)
+        let event = SessionReplayDataEvent(
+            metadata: datachunkMetadata,
+            data: sampleVideoData,
+            index: 1,
+            sessionID: sessionID
+        )
 
         return event
     }
