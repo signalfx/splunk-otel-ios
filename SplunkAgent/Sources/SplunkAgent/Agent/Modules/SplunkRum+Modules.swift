@@ -67,7 +67,7 @@ extension SplunkRum {
             return
         }
 
-        guard let sessionReplayUrl = agentConfiguration.endpoint.sessionReplayEndpoint else {
+        guard agentConfiguration.endpoint.sessionReplayEndpoint != nil else {
             logger.log(level: .warn, isPrivate: false) {
                 """
                 Session Replay module was not installed (the valid URL for Session Replay \
@@ -97,6 +97,7 @@ extension SplunkRum {
         Task(priority: .userInitiated) {
             for await newValue in navigationModule.screenNameStream {
                 runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
+                screenNameChangeCallback?(newValue)
             }
         }
 
