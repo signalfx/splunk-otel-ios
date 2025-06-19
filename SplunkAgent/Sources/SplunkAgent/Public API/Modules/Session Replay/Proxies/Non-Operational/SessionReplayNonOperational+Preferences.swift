@@ -17,8 +17,6 @@ limitations under the License.
 
 // MARK: - Module preferences
 
-/* Temporarily removed with Rendering Modes.
-
 extension SessionReplayNonOperational {
 
     // MARK: - Module preferences
@@ -43,4 +41,3 @@ extension SessionReplayNonOperational {
         return self
     }
 }
- */
