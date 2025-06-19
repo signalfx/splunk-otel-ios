@@ -46,11 +46,6 @@ extension CustomTrackingNonOperational {
         return self
     }
 
-    @discardableResult func trackError(_ nsError: NSError, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        logAccess(toApi: "trackError(nsError:attributes:)")
-        return self
-    }
-
     @discardableResult func trackException(_ exception: NSException, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         logAccess(toApi: "trackException(exception:attributes:)")
         return self

@@ -47,11 +47,6 @@ extension CustomTracking {
         return self
     }
 
-    @discardableResult func trackError(_ nsError: NSError, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        module.track(SplunkIssue(from: nsError), attributes.toEventAttributes())
-        return self
-    }
-
     @discardableResult func trackException(_ exception: NSException, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         module.track(SplunkIssue(from: exception), attributes.toEventAttributes())
         return self
