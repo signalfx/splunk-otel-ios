@@ -49,18 +49,16 @@ final class EventsTests: XCTestCase {
 
         let requestExpectation = XCTestExpectation(description: "Send request")
 
-        let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
+        let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
+        let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
 
-        logEventProcessor.sendEvent(event, completion: { _ in
-            // TODO: MRUM_AC-1111 - EventManager and Events tests
-//            XCTAssert(success)
-
+        sessionReplayProcessor.sendEvent(event, completion: { _ in
             requestExpectation.fulfill()
         })
 
-        let processedEvent = try XCTUnwrap(logEventProcessor.storedLastProcessedEvent)
+        let processedEvent = try XCTUnwrap(sessionReplayProcessor.storedLastProcessedEvent)
         try checkEventBaseAttributes(processedEvent)
+        try checkEventAttributes(processedEvent)
 
         XCTAssertEqual(processedEvent.name, "session_replay_data")
 
@@ -74,34 +72,34 @@ final class EventsTests: XCTestCase {
         let event = try SessionReplayTestBuilder.buildDataEvent()
         let requestExpectation = XCTestExpectation(description: "Send request")
 
-        let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
+        let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
+        let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
 
-        logEventProcessor.sendEvent(event: event, immediateProcessing: true, completion: { success in
+        sessionReplayProcessor.sendEvent(event: event, immediateProcessing: true, completion: { success in
             XCTAssert(success)
 
             requestExpectation.fulfill()
         })
 
-        XCTAssertNotNil(logEventProcessor.storedLastProcessedEvent)
-        XCTAssertNotNil(logEventProcessor.storedLastSentEvent)
+        XCTAssertNotNil(sessionReplayProcessor.storedLastProcessedEvent)
+        XCTAssertNotNil(sessionReplayProcessor.storedLastSentEvent)
     }
 
     func testBackgroundProcessing() throws {
         let event = try SessionReplayTestBuilder.buildDataEvent()
         let requestExpectation = XCTestExpectation(description: "Send request")
 
-        let eventManager = try XCTUnwrap(agent?.eventManager)
-        let logEventProcessor = try XCTUnwrap(eventManager.logEventProcessor as? OTLPLogToSpanEventProcessor)
+        let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
+        let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
 
-        logEventProcessor.sendEvent(event, completion: { success in
+        sessionReplayProcessor.sendEvent(event, completion: { success in
             XCTAssert(success)
 
             requestExpectation.fulfill()
         })
 
-        XCTAssertNotNil(logEventProcessor.storedLastProcessedEvent)
-        XCTAssertNotNil(logEventProcessor.storedLastSentEvent)
+        XCTAssertNotNil(sessionReplayProcessor.storedLastProcessedEvent)
+        XCTAssertNil(sessionReplayProcessor.storedLastSentEvent)
     }
 
 
@@ -115,5 +113,29 @@ final class EventsTests: XCTestCase {
 
         XCTAssertNotNil(event.sessionID)
         XCTAssertNotNil(event.timestamp)
+    }
+
+    func checkEventAttributes(_ event: SplunkCommon.AgentEvent) throws {
+        let eventAttributes = try XCTUnwrap(event.attributes)
+
+        // Metadata
+        let metadataValue = eventAttributes["segmentMetadata"]
+        let metadataData = try XCTUnwrap(metadataValue?.description.data(using: .utf8))
+        let metadata = try JSONDecoder().decode(CiscoSessionReplay.Metadata.self, from: metadataData)
+        XCTAssertNotNil(metadataValue)
+        XCTAssertNotNil(metadata)
+
+        // Experimental attributes for integration PoC
+        let totalChunks = eventAttributes["rr-web.total-chunks"]
+        XCTAssertEqual(totalChunks, .int(1))
+
+        let chunk = eventAttributes["rr-web.chunk"]
+        XCTAssertEqual(chunk, .int(1))
+
+        let eventNumber = eventAttributes["rr-web.event"]
+        XCTAssertEqual(eventNumber, .int(1))
+
+        let offset = eventAttributes["rr-web.offset"]
+        XCTAssertEqual(offset, .int(1))
     }
 }
