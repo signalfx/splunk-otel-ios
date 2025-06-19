@@ -52,6 +52,11 @@ struct CustomTrackingDemoView: View {
                         SplunkRum.shared.customTracking.trackError(DemoErrors.nsError(), attributes)
                     }
 
+                    FeatureButton(label: "Track NSError Subclass") {
+                        let attributes = SampleAttributes.forNSErrorSubclass()
+                        SplunkRum.shared.customTracking.trackError(DemoErrors.nsErrorSubclass(), attributes)
+                    }
+
                     FeatureButton(label: "Track NSException") {
                         let attributes = SampleAttributes.forNSException()
                         SplunkRum.shared.customTracking.trackException(DemoErrors.nsException(), attributes)
@@ -106,6 +111,9 @@ struct CustomTrackingDemoView: View {
 
     // MARK: - Legacy API calls demonstrating available but deprecated methods
 
+
+    /// Note: Deprecation warnings in the next section are an intentional feature of the demo.
+
     func trackLegacyErrorString() {
         let message = "Legacy error string"
         SplunkRum.reportError(string: message)
@@ -151,6 +159,13 @@ struct DemoErrors {
         NSError(domain: "com.example.error", code: 42, userInfo: [NSLocalizedDescriptionKey: "This is an NSError"])
     }
 
+    class MyCustomError: NSError, @unchecked Sendable {}
+    static func nsErrorSubclass() -> NSError {
+        return MyCustomError(domain: "com.example.mycustomerrordomain",
+                             code: 43,
+                             userInfo: [NSLocalizedDescriptionKey: "This is an instance of MyCustomError."])
+    }
+
     // NSException with stack trace (from callStackSymbols)
     static func nsException() -> NSException {
         // Use the Objective-C helper to trigger and catch an NSException
@@ -184,14 +199,23 @@ struct SampleAttributes {
 
     static func forNSError() -> MutableAttributes {
         let attributes = MutableAttributes()
-        attributes.setString("NSErrorDomain", for: "domain")
-        attributes.setInt(42, for: "code")
+        attributes.setString("NSErrorDomain", for: "domain_set_in_attributes")
+        attributes.setInt(44, for: "code_set_in_attributes")
+        return attributes
+    }
+
+    static func forNSErrorSubclass() -> MutableAttributes {
+        let attributes = MutableAttributes()
+        attributes.setString("NSErrorDomain", for: "domain_set_in_attributes")
+        attributes.setInt(45, for: "code_set_in_attributes")
+        attributes.setString("NSError subclass", for: "what")
         return attributes
     }
 
     static func forNSException() -> MutableAttributes {
         let attributes = MutableAttributes()
         attributes.setString("NSExceptionName", for: "exceptionName")
+        attributes.setInt(46, for: "code_set_in_attributes")
         attributes.setString("Sample reason", for: "reason")
         return attributes
     }
