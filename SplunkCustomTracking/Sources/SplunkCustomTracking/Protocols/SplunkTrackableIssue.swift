@@ -87,8 +87,7 @@ public struct SplunkIssue: SplunkTrackableIssue {
         if let nsError = error as? NSError {
             exceptionCode = .int(nsError.code)
             codeNamespace = nsError.domain
-        }
-        else {
+        } else {
             exceptionCode = nil
             codeNamespace = nil
         }
@@ -99,7 +98,7 @@ public struct SplunkIssue: SplunkTrackableIssue {
         exceptionType = String(describing: type(of: exception))
         timestamp = Date()
         stacktrace = Stacktrace(frames: exception.callStackSymbols)
-        self.exceptionCode = nil
-        self.codeNamespace = nil
+        exceptionCode = nil
+        codeNamespace = nil
     }
 }

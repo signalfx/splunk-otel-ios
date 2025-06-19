@@ -30,7 +30,7 @@ public struct SplunkTrackableEvent: SplunkTrackable {
 
     // Simplified initializer for events
     public init(eventName: String, attributes: [String: EventAttributeValue] = [:]) {
-        self.timestamp = Date()
+        timestamp = Date()
         self.eventName = eventName
         self.attributes = attributes
     }
