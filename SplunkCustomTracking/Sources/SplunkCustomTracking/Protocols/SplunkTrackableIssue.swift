@@ -22,21 +22,28 @@ import SplunkCommon
 
 // MARK: - SplunkTrackableIssue Protocol
 
+/// Protocol for marshalling CustomTracking issues of any type: `String`, `Error`, `NSError`, `NSExeption`
 public protocol SplunkTrackableIssue: SplunkTrackable {
+
+    /// The string message e. g. localizedDescription for the type
     var message: String { get }
+
+    /// The type of the error, e.g. `NSError`, to be reported as OTel `exception.type`
+    var exceptionType: String { get }
+
+    /// An actual or derived stack trace from the error. Empty for String message errors.
     var stacktrace: Stacktrace? { get }
 }
 
 
 // MARK: - Default Implementation for SplunkTrackableIssue
 
-
 public extension SplunkTrackableIssue {
     func toAttributesDictionary() -> [String: EventAttributeValue] {
         var attributes: [String: EventAttributeValue] = [:]
 
         // Set required attributes
-        attributes[ErrorAttributeKeys.Exception.type.rawValue] = .string(typeName)
+        attributes[ErrorAttributeKeys.Exception.type.rawValue] = .string(exceptionType)
         attributes[ErrorAttributeKeys.Exception.message.rawValue] = .string(message)
 
         // Optionally set stacktrace if it exists
@@ -48,32 +55,26 @@ public extension SplunkTrackableIssue {
     }
 }
 
-public extension SplunkTrackableIssue {
-    var typeFamily: String {
-        "Issue"
-    }
-}
-
 
 // MARK: - SplunkIssue Struct
 
 public struct SplunkIssue: SplunkTrackableIssue {
     public let message: String
-    public let typeName: String
+    public let exceptionType: String
     public let timestamp: Date
     public var stacktrace: Stacktrace?
 
     // Initializers for SplunkIssue
     public init(from message: String) {
         self.message = message
-        typeName = "CustomIssue"
+        exceptionType = String(describing: type(of: message))
         timestamp = Date()
         stacktrace = nil
     }
 
     public init(from error: Error) {
-        message = (error as? LocalizedError)?.errorDescription ?? "Unknown error"
-        typeName = String(describing: type(of: error))
+        message = (error as? LocalizedError)?.errorDescription ?? String(describing: error)
+        exceptionType = String(describing: type(of: error))
         timestamp = Date()
         stacktrace = Stacktrace(frames: Thread.callStackSymbols)
     }
@@ -87,7 +88,7 @@ public struct SplunkIssue: SplunkTrackableIssue {
 
     public init(from exception: NSException) {
         message = exception.reason ?? "No reason provided"
-        typeName = exception.name.rawValue
+        exceptionType = String(describing: type(of: exception))
         timestamp = Date()
         stacktrace = Stacktrace(frames: exception.callStackSymbols)
     }

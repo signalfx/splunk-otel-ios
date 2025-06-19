@@ -26,13 +26,6 @@ import SplunkCommon
 /// Foundation for both error tracking and custom data tracking.
 public protocol SplunkTrackable {
 
-    /// `Issue` or `Event`
-    var typeFamily: String { get }
-
-    /// The type name of the trackable item, used for categorization inside a family.
-    /// Example: in the Issue family, `typeName`s are CustomType, Error, NSError, NSException
-    var typeName: String { get }
-
     /// Timestamp when the trackable item was created or when a duration started
     var timestamp: Date { get }
 

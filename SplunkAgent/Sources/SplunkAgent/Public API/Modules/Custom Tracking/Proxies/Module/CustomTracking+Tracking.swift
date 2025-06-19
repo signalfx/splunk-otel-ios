@@ -30,7 +30,7 @@ extension CustomTracking {
 
     /// Track a custom event by name with attributes.
     @discardableResult func trackCustomEvent(_ name: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
-        module.track(SplunkTrackableEvent(typeName: name, attributes: attributes.toEventAttributes()))
+        module.track(SplunkTrackableEvent(eventName: name, attributes: attributes.toEventAttributes()))
         return self
     }
 
