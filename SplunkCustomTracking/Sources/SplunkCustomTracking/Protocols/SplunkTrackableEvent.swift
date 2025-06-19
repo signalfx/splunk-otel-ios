@@ -23,6 +23,7 @@ import SplunkCommon
 // MARK: - SplunkTrackableEvent Struct
 
 public struct SplunkTrackableEvent: SplunkTrackable {
+    public var timestamp: Date
     public var timestampEnd: Date?
     public var eventName: String
     public var attributes: [String: EventAttributeValue]
