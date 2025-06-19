@@ -1,3 +1,4 @@
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -14,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-import XCTest
-import CiscoRuntimeCache
 import CiscoInteractions
+import CiscoRuntimeCache
 import CiscoSwizzling
+import Foundation
 @testable import SplunkInteractions
+import XCTest
 
 final class SplunkInteractionsTests: XCTestCase {
 

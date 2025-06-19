@@ -1,3 +1,4 @@
+//
 /*
 Copyright 2024 Splunk Inc.
 
@@ -14,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoInteractions
 import Foundation
 import SplunkCommon
-import CiscoInteractions
 
 /// Describes a destination into which the AppStart module sends it's results.
 public protocol SplunkInteractionsDestination {

@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -19,6 +18,7 @@ limitations under the License.
 import Foundation
 internal import SplunkInteractions
 
+/// The class implementing Interactions public API.
 final class Interactions: InteractionsModule {
 
     // MARK: - Internal

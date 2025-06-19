@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -22,6 +21,7 @@ import Foundation
 protocol InteractionsModule {
 
     /// Registers a custom identifier for a view.
+    ///
     /// - Parameters:
     ///   - customId: A custom identifier to associate with the view.
     ///   - viewId: The identifier of the view to register the customId for.

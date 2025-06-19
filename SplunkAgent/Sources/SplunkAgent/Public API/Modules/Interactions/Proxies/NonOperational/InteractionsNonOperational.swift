@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/// The class implementing Interactions public API in non-operational mode.
 final class InteractionsNonOperational: InteractionsModule {
 
     // MARK: - Custom ids

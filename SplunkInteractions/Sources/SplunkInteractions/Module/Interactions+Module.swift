@@ -1,3 +1,4 @@
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -14,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoInteractions
 import Foundation
 import SplunkCommon
-import CiscoInteractions
 
 public struct InteractionEventData: ModuleEventData {
     var elementId: ObjectIdentifier?
@@ -39,8 +40,8 @@ extension Interactions: Module {
 
     // MARK: - Module types
 
-    public typealias Configuration = SplunkInteractionsConfiguration
-    public typealias RemoteConfiguration = SplunkInteractionsRemoteConfiguration
+    public typealias Configuration = InteractionsConfiguration
+    public typealias RemoteConfiguration = InteractionsRemoteConfiguration
 
     public typealias EventMetadata = InteractionEvent
     public typealias EventData = InteractionEventData
@@ -49,7 +50,12 @@ extension Interactions: Module {
     // MARK: - Module methods
 
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
-        startInteractionsDetection()
+        let configuration = configuration as? Configuration
+
+        // Start the interactions detection in the module (unless it is explicitly disabled)
+        if configuration?.isEnabled ?? true {
+            startInteractionsDetection()
+        }
     }
 
 

@@ -1,3 +1,4 @@
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -15,15 +16,15 @@ limitations under the License.
 */
 
 import CiscoInteractions
+import CiscoLogger
+import CiscoRuntimeCache
 import CiscoSwizzling
 import Foundation
-import CiscoLogger
 import SplunkCommon
-import CiscoRuntimeCache
 
 /// Handles interaction events and send them into destination.
 public final class Interactions: SplunkInteractionsModule {
-    
+
     // MARK: - Private properties
 
     private let destination: SplunkInteractionsDestination
@@ -34,7 +35,7 @@ public final class Interactions: SplunkInteractionsModule {
         category: "SplunkInteractions"
     )
 
-    private var customIdentifiers: RuntimeCache<String> = RuntimeCache<String>(
+    private var customIdentifiers = RuntimeCache<String>(
         name: "SplunkInteractionsCustomIds",
         poolName: PackageIdentifier.instance(),
         garbageCollectionCount: 1000
@@ -50,7 +51,7 @@ public final class Interactions: SplunkInteractionsModule {
 
     // Module conformance
     public required init() {
-        self.destination = OTelDestination()
+        destination = OTelDestination()
     }
 
     init(destination: SplunkInteractionsDestination) {
@@ -59,7 +60,7 @@ public final class Interactions: SplunkInteractionsModule {
 
 
     // MARK: - Instrumentation
-    
+
     /// Start detecting interaction events.
     func startInteractionsDetection() {
         guard interactionsDetector == nil else {
@@ -122,32 +123,7 @@ public final class Interactions: SplunkInteractionsModule {
     // MARK: - Private helper functions
 
     func targetElement(from event: InteractionEvent) async -> String? {
-        var identifier: ObjectIdentifier?
-
-        if let targetElementId = event.gestureTap?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.gestureLongPress?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.gestureDoubleTap?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.gestureRageTap?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.gesturePinch?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.gestureRotation?.targetElementId {
-            identifier = targetElementId
-        }
-        else if let targetElementId = event.focus?.targetElementId {
-            identifier = targetElementId
-        }
-
-        guard let identifier else {
-
+        guard let identifier = targetElementIdentifier(from: event) else {
             return nil
         }
 
@@ -156,10 +132,41 @@ public final class Interactions: SplunkInteractionsModule {
         return customId ?? String(UInt(bitPattern: identifier))
     }
 
+    func targetElementIdentifier(from event: InteractionEvent) -> ObjectIdentifier? {
+        if let targetElementId = event.gestureTap?.targetElementId {
+            return targetElementId
+        }
+
+        if let targetElementId = event.gestureLongPress?.targetElementId {
+            return targetElementId
+        }
+
+        if let targetElementId = event.gestureDoubleTap?.targetElementId {
+            return targetElementId
+        }
+
+        if let targetElementId = event.gestureRageTap?.targetElementId {
+            return targetElementId
+        }
+
+        if let targetElementId = event.gesturePinch?.targetElementId {
+            return targetElementId
+        }
+
+        if let targetElementId = event.gestureRotation?.targetElementId {
+            return targetElementId
+        }
+
+        if let targetElementId = event.focus?.targetElementId {
+            return targetElementId
+        }
+
+        return nil
+    }
+
     func interactionType(from eventType: CiscoInteractions.InteractionType) -> String? {
 
         switch eventType {
-
         case .gestureTap:
             "tap"
 

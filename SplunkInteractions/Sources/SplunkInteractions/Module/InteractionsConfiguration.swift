@@ -1,3 +1,4 @@
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -18,6 +19,6 @@ import Foundation
 import SplunkCommon
 
 /// SplunkInteractions module configuration, minimal configuration for module conformance.
-public struct SplunkInteractionsConfiguration: ModuleConfiguration {
+public struct InteractionsConfiguration: ModuleConfiguration {
     public var isEnabled: Bool = true
 }

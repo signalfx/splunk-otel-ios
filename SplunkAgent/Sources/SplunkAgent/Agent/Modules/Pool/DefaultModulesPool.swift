@@ -93,9 +93,9 @@ class DefaultModulesPool: AgentModulesPool {
             knownModules.append(WebViewInstrumentationInternal.self)
         #endif
 
-        // App Start
+        // Interactions
         #if canImport(SplunkInteractions)
-        knownModules.append(SplunkInteractions.Interactions.self)
+            knownModules.append(SplunkInteractions.Interactions.self)
         #endif
 
         return knownModules

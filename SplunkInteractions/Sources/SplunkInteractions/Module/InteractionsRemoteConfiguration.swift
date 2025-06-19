@@ -1,3 +1,4 @@
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -14,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkCommon
 import Foundation
+import SplunkCommon
 
-/// SplunkInteractions remote configuration, minimal configuration for module conformance.
-public struct SplunkInteractionsRemoteConfiguration: RemoteModuleConfiguration {
+/// Interactions remote configuration, minimal configuration for module conformance.
+public struct InteractionsRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Protocol compliance
 
