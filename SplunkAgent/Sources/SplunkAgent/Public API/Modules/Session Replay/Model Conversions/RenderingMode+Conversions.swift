@@ -31,7 +31,7 @@ extension RenderingMode {
         case .native:
             return .native
 
-        case .wireframe:
+        case .wireframeOnly:
             return .wireframe
         }
     }
@@ -46,7 +46,7 @@ extension RenderingMode {
             self = .native
 
         case .wireframe:
-            self = .wireframe
+            self = .wireframeOnly
 
         default:
             self = .default

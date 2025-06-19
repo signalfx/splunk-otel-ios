@@ -31,17 +31,13 @@ extension SessionReplayStatus {
         case .recording:
             return .recording
 
-        case .notRecording(.diskCacheCapacityOverreached):
+        case .notRecording(.storageLimitReached):
             return .notRecording(.diskCacheCapacityOverreached)
 
         case .notRecording(.internalError):
             return .notRecording(.internalError)
 
         case .notRecording(.notStarted):
-            return .notRecording(.notStarted)
-
-        case .notRecording(.projectLimitReached):
-            // TODO: validate - this changed from .projectLimitReached
             return .notRecording(.notStarted)
 
         case .notRecording(.stopped):
@@ -52,9 +48,6 @@ extension SessionReplayStatus {
 
         case .notRecording(.unsupportedPlatform):
             return .notRecording(.unsupportedPlatform)
-
-        case .notRecording(.remotelyDisabled):
-            return .notRecording(.notStarted)
         }
     }
 }
@@ -69,17 +62,13 @@ extension SessionReplayStatus {
             self = .recording
 
         case .notRecording(.diskCacheCapacityOverreached):
-            self = .notRecording(.diskCacheCapacityOverreached)
+            self = .notRecording(.storageLimitReached)
 
         case .notRecording(.internalError):
             self = .notRecording(.internalError)
 
         case .notRecording(.notStarted):
             self = .notRecording(.notStarted)
-
-        // TODO: validate - this changed from .projectLimitReached
-        // case .notRecording(.projectLimitReached):
-        //    self = .notRecording(.projectLimitReached)
 
         case .notRecording(.stopped):
             self = .notRecording(.stopped)
@@ -88,6 +77,9 @@ extension SessionReplayStatus {
             self = .notRecording(.swiftUIPreviewContext)
 
         case .notRecording(.unsupportedPlatform):
+            self = .notRecording(.unsupportedPlatform)
+
+        @unknown default:
             self = .notRecording(.unsupportedPlatform)
         }
     }
