@@ -32,7 +32,7 @@ class SessionReplayDataEvent: AgentEvent {
 
     // MARK: - Event properties
 
-    var sessionID: String?
+    var sessionId: String?
     var timestamp: Date?
     var attributes: [String: EventAttributeValue]?
     var body: EventAttributeValue?
@@ -46,32 +46,47 @@ class SessionReplayDataEvent: AgentEvent {
     ///   - metadata: `RecordMetadata` describing the session replay record.
     ///   - data: Session replay blob of type `Data`.
     ///   - index: Event sequence number within the session.
-    ///   - sessionID: The `session ID` of a session in which the event occurred.
+    ///   - sessionId: The `session Id` of a session in which the event occurred.
     ///               Optional so that we can see sessions with no session id in the backend.
-    public init(metadata: Metadata, data: Data, index: Int, sessionID: String?) {
-
+    public init(metadata: Metadata, data: Data, index: Int, sessionId: String?, scriptInstanceId: String) {
         // Event properties
-        let timestamp = metadata.timestamp
-        let startTimestamp = metadata.startUnixMs
-        let endTimestamp = metadata.endUnixMs
-        // let recordId = metadata.recordId
-
-        if let sessionID {
-            self.sessionID = sessionID
-        }
-
-        self.timestamp = timestamp
+        timestamp = metadata.timestamp
         body = EventAttributeValue(data)
 
+        if let sessionId {
+            self.sessionId = sessionId
+        }
+
+
+        // Event attributes
         attributes = [
-            "replay.start_timestamp": EventAttributeValue.int(startTimestamp),
-            "replay.end_timestamp": EventAttributeValue.int(endTimestamp),
+            // Chunk metadata
+            "segmentMetadata": .string(metadataToJSONString(metadata)),
+
+            // Script ID
+            "splunk.scriptInstance": .string(scriptInstanceId),
 
             // Experimental attributes for integration PoC
-            "rr-web.total-chunks": .int(1),
-            "rr-web.chunk": .int(1),
+            "rr-web.total-chunks": .double(1.0),
+            "rr-web.chunk": .double(1.0),
             "rr-web.event": .int(index),
-            "rr-web.offset": .int(index)
+            "rr-web.offset": .double(Double(index))
         ]
+    }
+
+
+    // MARK: - Private methods
+
+    private func metadataToJSONString(_ metadata: Metadata) -> String {
+        // We always prefer conversion with a standard encoder ...
+        guard
+            let metadataContent = try? JSONEncoder().encode(metadata),
+            let jsonString = String(data: metadataContent, encoding: .utf8)
+        else {
+            // ... but if something fails, we can build it manually
+            return "{\"startUnixMs\":\(metadata.startUnixMs), \"endUnixMs\":\(metadata.endUnixMs), \"source\":\"\(metadata.source)\"}"
+        }
+
+        return jsonString
     }
 }

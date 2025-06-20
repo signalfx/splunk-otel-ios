@@ -41,7 +41,7 @@ public protocol AgentEvent {
     ///
     /// Current session's session id is added automatically to all signals if this property is `nil`.
     /// Also the automatically added session id does not overwrite this custom session id, if not `nil`.
-    var sessionID: String? { get set }
+    var sessionId: String? { get set }
 
     /// Event timestamp. The time at which the event occured.
     var timestamp: Date? { get set }

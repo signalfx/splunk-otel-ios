@@ -42,6 +42,7 @@ class DefaultEventManager: AgentEventManager {
     // Session Replay processor
     var sessionReplayProcessor: LogEventProcessor?
     var sessionReplayEventIndex = 1
+    let scriptInstanceId: String
 
     // Trace processor
     var traceProcessor: TraceProcessor
@@ -98,11 +99,14 @@ class DefaultEventManager: AgentEventManager {
         )
 
         // Initialize session replay processor (optional)
+        scriptInstanceId = .uniqueHexIdentifier(ofLength: 16)
         sessionReplayProcessor = OTLPSessionReplayEventProcessor(
             with: configuration.endpoint.sessionReplayEndpoint,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
             globalAttributes: agent.globalAttributes.all,
+            initialSessionId: agent.currentSession.currentSessionId,
+            scriptInstanceId: scriptInstanceId,
             debugEnabled: configuration.enableDebugLogging
         )
 
@@ -136,12 +140,13 @@ class DefaultEventManager: AgentEventManager {
                 return
             }
 
-            let sessionID = agent.session.sessionId(for: metadata.timestamp)
+            let sessionId = agent.session.sessionId(for: metadata.timestamp)
             let event = SessionReplayDataEvent(
                 metadata: metadata,
                 data: data,
                 index: sessionReplayEventIndex,
-                sessionID: sessionID
+                sessionId: sessionId,
+                scriptInstanceId: scriptInstanceId
             )
 
             sessionReplayProcessor.sendEvent(
@@ -159,8 +164,8 @@ class DefaultEventManager: AgentEventManager {
 
         // Crash Reports module data
         case let (metadata as CrashReportsMetadata, data as String):
-            let sessionID = agent.session.sessionId(for: metadata.timestamp)
-            let event = CrashReportsDataEvent(metadata: metadata, data: data, sessionID: sessionID)
+            let sessionId = agent.session.sessionId(for: metadata.timestamp)
+            let event = CrashReportsDataEvent(metadata: metadata, data: data, sessionID: sessionId)
 
             logEventProcessor.sendEvent(
                 event: event,
