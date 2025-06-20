@@ -24,7 +24,7 @@ import SplunkCommon
 class SplunkStdoutLogExporter: LogRecordExporter {
 
     // MARK: - Private
-    
+
     private let proxyExporter: LogRecordExporter
 
     // Internal Logger

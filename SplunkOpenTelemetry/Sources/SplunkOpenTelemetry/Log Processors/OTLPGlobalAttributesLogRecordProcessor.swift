@@ -34,7 +34,7 @@ public class OTLPGlobalAttributesLogRecordProcessor: LogRecordProcessor {
     public func onEmit(logRecord: ReadableLogRecord) {
 
         var updatedAttributes = logRecord.attributes
-        
+
         // Add global attributes into the log record's attributes
         for (key, value) in globalAttributes() {
             updatedAttributes[key] = value
