@@ -63,7 +63,9 @@ public extension CustomTrackingInternal {
 
         // Combine the provided attributes with attributes from the issue
         // Our toAttributesDictionary() also injects the issue.exceptionType
-        let combinedAttributes = attributes.merging(issue.toAttributesDictionary()) { $1 }
+        let attributesToInject = ["error": EventAttributeValue.string("true")]
+        let augmented = attributes.merging(attributesToInject) { $1 }
+        let combinedAttributes = augmented.merging(issue.toAttributesDictionary()) { $1 }
 
         // Create the tracking data
         let data = CustomTrackingData(name: "error",
