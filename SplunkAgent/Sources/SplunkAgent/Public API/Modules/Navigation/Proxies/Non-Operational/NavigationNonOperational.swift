@@ -15,17 +15,39 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
+internal import SplunkCommon
+
 /// The class implementing Navigation public API in non-operational mode.
 ///
 /// This is especially the case when the module is stopped by remote configuration,
 /// but we still need to keep the API available to the user.
 final class NavigationNonOperational: NavigationModule {
 
+    // MARK: - Private
+
+    private let logger: DefaultLogAgent
+
+
     // MARK: - Preferences
 
-    var preferences: any NavigationModulePreferences
+    var preferences: any NavigationModulePreferences {
+        get {
+            logAccess(toApi: #function)
+
+            return NavigationPreferences()
+        }
+
+        // swiftlint:disable unused_setter_value
+        set {
+            logAccess(toApi: #function)
+        }
+        // swiftlint:enable unused_setter_value
+    }
 
     @discardableResult func preferences(_ preferences: any NavigationModulePreferences) -> any NavigationModule {
+        logAccess(toApi: #function)
+
         return self
     }
 
@@ -38,7 +60,24 @@ final class NavigationNonOperational: NavigationModule {
     // MARK: - Initialization
 
     init() {
-        preferences = NavigationPreferences()
+        logger = DefaultLogAgent(
+            poolName: PackageIdentifier.nonOperationalInstance(),
+            category: "SessionReplay"
+        )
+
+        // Build "dummy" Navigation module
         state = NavigationNonOperationalState()
+    }
+
+
+    // MARK: - Logger
+
+    func logAccess(toApi named: String) {
+        logger.log(level: .notice) {
+            """
+            Attempt to access the API of a non-operational Navigation module. \n
+            API: `\(named)`
+            """
+        }
     }
 }

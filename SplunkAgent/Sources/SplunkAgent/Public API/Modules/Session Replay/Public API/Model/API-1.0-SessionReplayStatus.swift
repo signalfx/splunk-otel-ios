@@ -37,13 +37,6 @@ public enum SessionReplayStatus: Equatable {
         /// The user stopped the previous recording session.
         case stopped
 
-        /// It was impossible to start the recording
-        /// because this project reached its limits.
-        ///
-        /// - Note: Typically it is the number of recorded
-        ///         month sessions or other backend metrics.
-        case projectLimitReached
-
         /// It was impossible to start the recording because the internal
         /// database could not be open, or another internal error occurred.
         case internalError
@@ -55,9 +48,6 @@ public enum SessionReplayStatus: Equatable {
         case unsupportedPlatform
 
         /// Disk cache overreached its allowed size.
-        case diskCacheCapacityOverreached
-
-        /// Disabled by remote configuration.
-        case remotelyDisabled
+        case storageLimitReached
     }
 }
