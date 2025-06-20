@@ -50,7 +50,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         with sessionReplayEndpoint: URL?,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
-        globalAttributes: [String: Any],
+        globalAttributes: @escaping () -> [String: AttributeValue],
         debugEnabled: Bool
     ) {
         guard let sessionReplayEndpoint else {
@@ -70,7 +70,10 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         )
 
         // Initialize attribute checker proxy exporter
-        let attributeCheckerExporter = AttributeCheckerLogExporter(proxy: backgroundLogExporter)
+        let attributeCheckerExporter = AttributeCheckerLogExporter(
+            proxy: debugEnabled
+            ? SplunkStdoutLogExporter(with: backgroundLogExporter)
+            : backgroundLogExporter)
 
         // Initialize LogRecordProcessor
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(
@@ -109,14 +112,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         #endif
 
         var processors: [LogRecordProcessor] = [globalAttributesLogRecordProcessor]
-
-        // Initialize optional stdout exporter
-        if debugEnabled {
-            let stdoutExporter = SplunkStdoutLogExporter()
-            let stdoutSpanProcessor = SimpleLogRecordProcessor(logRecordExporter: stdoutExporter)
-
-            processors.append(stdoutSpanProcessor)
-        }
 
         // Initialize logger provider
         let loggerProviderBuilder = LoggerProviderBuilder()

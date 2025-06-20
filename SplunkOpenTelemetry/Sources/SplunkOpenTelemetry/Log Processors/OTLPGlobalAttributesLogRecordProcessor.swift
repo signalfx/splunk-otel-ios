@@ -22,9 +22,9 @@ import SplunkCommon
 
 public class OTLPGlobalAttributesLogRecordProcessor: LogRecordProcessor {
     private let proxy: LogRecordProcessor
-    private let globalAttributes: [String: Any]
+    private let globalAttributes: () -> [String: AttributeValue]
 
-    public init(proxy: LogRecordProcessor, with globalAttributes: [String: Any]) {
+    public init(proxy: LogRecordProcessor, with globalAttributes: @escaping () -> [String: AttributeValue]) {
         self.proxy = proxy
         self.globalAttributes = globalAttributes
     }
@@ -33,29 +33,12 @@ public class OTLPGlobalAttributesLogRecordProcessor: LogRecordProcessor {
 
     public func onEmit(logRecord: ReadableLogRecord) {
 
-        // Convert global attributes to AttributeValue dictionary
-        var convertedAttributes: [String: AttributeValue] = [:]
-        for (key, value) in globalAttributes {
-            if let arrayValue = value as? [Any] {
-                var attributeValues: [AttributeValue] = []
-
-                for element in arrayValue {
-                    if let attributeValue = AttributeValue(element) {
-                        attributeValues.append(attributeValue)
-                    }
-                }
-
-                convertedAttributes[key] = .array(AttributeArray(values: attributeValues))
-
-            } else {
-                if let attributeValue = AttributeValue(value) {
-                    convertedAttributes[key] = attributeValue
-                }
-            }
+        var updatedAttributes = logRecord.attributes
+        
+        // Add global attributes into the log record's attributes
+        for (key, value) in globalAttributes() {
+            updatedAttributes[key] = value
         }
-
-        var mergedAttributes = convertedAttributes
-        mergedAttributes.merge(logRecord.attributes) { _, new in new }
 
         // Create a new log record with the merged attributes
         let updatedLogRecord = ReadableLogRecord(
@@ -66,7 +49,7 @@ public class OTLPGlobalAttributesLogRecordProcessor: LogRecordProcessor {
             spanContext: logRecord.spanContext,
             severity: logRecord.severity,
             body: logRecord.body,
-            attributes: mergedAttributes
+            attributes: updatedAttributes
         )
 
         // Pass the updated log record to the proxy processor

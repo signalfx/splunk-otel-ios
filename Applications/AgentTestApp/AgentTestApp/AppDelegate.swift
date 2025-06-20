@@ -57,10 +57,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Navigation Instrumentation
         SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
-
+        
+        // API to update Global Attributes
+        SplunkRum.shared.globalAttributes.setBool(true, for: "isWorkingHard")
+        SplunkRum.shared.globalAttributes[string: "secret"] = "Red bull"
         return true
     }
-
 
     // MARK: UISceneSession Lifecycle
 

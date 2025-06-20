@@ -101,7 +101,7 @@ class DefaultEventManager: AgentEventManager {
             with: configuration.endpoint.sessionReplayEndpoint,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
-            globalAttributes: agent.globalAttributes.all,
+            globalAttributes: { agent.globalAttributes.getAll() },
             debugEnabled: configuration.enableDebugLogging
         )
 
@@ -110,7 +110,7 @@ class DefaultEventManager: AgentEventManager {
             with: traceUrl,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
-            globalAttributes: agent.globalAttributes.all,
+            globalAttributes: { agent.globalAttributes.getAll() },
             debugEnabled: configuration.enableDebugLogging,
             spanInterceptor: configuration.spanInterceptor
         )
