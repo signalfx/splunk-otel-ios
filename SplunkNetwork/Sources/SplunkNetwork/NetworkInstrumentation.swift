@@ -31,7 +31,7 @@ public class NetworkInstrumentation {
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
 
     /// Holds regex patterns from IgnoreURLs API
-    private let ignoreURLs = IgnoreURLs()
+    private var ignoreURLs = IgnoreURLs()
 
     private let delegateClassNames = [
         "__NSURLSessionLocal",
@@ -66,6 +66,10 @@ public class NetworkInstrumentation {
 
         // Start the network instrumentation if it's enabled or if no configuration is provided.
         if config?.isEnabled ?? true {
+
+            if config?.ignoreURLs != nil {
+                ignoreURLs = config!.ignoreURLs
+            }
 
             // find concrete delegate classes
             for className in delegateClassNames {

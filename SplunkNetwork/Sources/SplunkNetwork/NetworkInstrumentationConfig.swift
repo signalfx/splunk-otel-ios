@@ -57,7 +57,7 @@ public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
     // MARK: - Protocol compliance
 
     public var enabled: Bool
-    public var IgnoreURLs: IgnoreURLs
+    public var ignoreURLs: IgnoreURLs
 
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
@@ -65,6 +65,6 @@ public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
         }
 
         enabled = root.configuration.mrum.networkTracing.enabled
-        IgnoreURLs = root.configuration.mrum.networkTracing.ignoreURLs
+        ignoreURLs = root.configuration.mrum.networkTracing.ignoreURLs
     }
 }
