@@ -85,6 +85,9 @@ extension MaskElement.MaskType {
 
         case .covering:
             self = .covering
+
+        @unknown default:
+            self = .covering
         }
     }
 }
