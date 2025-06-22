@@ -163,6 +163,11 @@ public class SplunkRumBuilder {
 
     // MARK: - Build translation method
 
+    @available(*, deprecated, message:
+        """
+        This builder method will be removed in a later version.
+        Use the `SplunkRum.install` API instead.
+        """)
     @discardableResult
     public func build() -> Bool {
 
