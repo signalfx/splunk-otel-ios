@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -16,13 +15,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
-
 import Foundation
 
 public extension SplunkRum {
-    
-    func getSessionId() -> String {
+
+    /// Identification of recorded session.
+    ///
+    /// When the agent is initialized, there is always some session ID.
+    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum` API instead.")
+    static func getSessionId() -> String {
         SplunkRum.shared.session.state.id
     }
+    
+    /// A boolean determinning the `Status` of agent recording.
+    ///
+    /// - Returns: True when the status resolves to `.running`.
+    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum` API instead.")
+    static func isInitialized() -> Bool {
+        SplunkRum.shared.state.status == .running
+    }
+
+    @available(*, deprecated, message: "This function will be removed in a later version.")
+    static func debugLog(_ msg: String) { }
 }
