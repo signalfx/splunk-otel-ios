@@ -175,8 +175,8 @@ class DefaultEventManager: AgentEventManager {
 
         // Custom Tracking module data
         case let (metadata as CustomTrackingMetadata, data as CustomTrackingData):
-            let sessionID = agent.session.sessionId(for: metadata.timestamp)
-            let event = CustomTrackingDataEvent(metadata: metadata, data: data, sessionID: sessionID)
+            let sessionId = agent.session.sessionId(for: metadata.timestamp)
+            let event = CustomTrackingDataEvent(metadata: metadata, data: data, sessionId: sessionId)
 
             logEventProcessor.sendEvent(
                 event: event,

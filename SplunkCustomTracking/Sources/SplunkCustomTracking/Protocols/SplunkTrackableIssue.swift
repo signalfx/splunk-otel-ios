@@ -22,21 +22,28 @@ import SplunkCommon
 
 // MARK: - SplunkTrackableIssue Protocol
 
+/// Protocol for marshalling CustomTracking issues of any type: `String`, `Error`, `NSError`, `NSExeption`
 public protocol SplunkTrackableIssue: SplunkTrackable {
+
+    /// The string message e. g. localizedDescription for the type
     var message: String { get }
+
+    /// The type of the error, e.g. `NSError`, to be reported as OTel `exception.type`
+    var exceptionType: String { get }
+
+    /// An actual or derived stack trace from the error. Empty for String message errors.
     var stacktrace: Stacktrace? { get }
 }
 
 
 // MARK: - Default Implementation for SplunkTrackableIssue
 
-
 public extension SplunkTrackableIssue {
     func toAttributesDictionary() -> [String: EventAttributeValue] {
         var attributes: [String: EventAttributeValue] = [:]
 
         // Set required attributes
-        attributes[ErrorAttributeKeys.Exception.type.rawValue] = .string(typeName)
+        attributes[ErrorAttributeKeys.Exception.type.rawValue] = .string(exceptionType)
         attributes[ErrorAttributeKeys.Exception.message.rawValue] = .string(message)
 
         // Optionally set stacktrace if it exists
@@ -48,81 +55,50 @@ public extension SplunkTrackableIssue {
     }
 }
 
-public extension SplunkTrackableIssue {
-    var typeFamily: String {
-        "Issue"
-    }
-}
-
 
 // MARK: - SplunkIssue Struct
 
 public struct SplunkIssue: SplunkTrackableIssue {
     public let message: String
-    public let typeName: String
+    public let exceptionType: String
     public let timestamp: Date
     public var stacktrace: Stacktrace?
+    public let exceptionCode: EventAttributeValue?
+    public let codeNamespace: String?
 
     // Initializers for SplunkIssue
     public init(from message: String) {
         self.message = message
-        typeName = "CustomIssue"
+        exceptionType = String(describing: type(of: message))
         timestamp = Date()
         stacktrace = nil
+        exceptionCode = nil
+        codeNamespace = nil
     }
 
     public init(from error: Error) {
-        message = (error as? LocalizedError)?.errorDescription ?? "Unknown error"
-        typeName = String(describing: type(of: error))
+        message = (error as? LocalizedError)?.errorDescription ?? String(describing: error)
+        exceptionType = String(describing: type(of: error))
         timestamp = Date()
-        stacktrace = Stacktrace(frames: Thread.callStackSymbols)
-    }
 
-    public init(from nsError: NSError) {
-        message = nsError.localizedDescription
-        typeName = nsError.domain
-        timestamp = Date()
+        // This is not necessarily the original error's throw site.
         stacktrace = Stacktrace(frames: Thread.callStackSymbols)
+
+        if let nsError = error as? NSError {
+            exceptionCode = .int(nsError.code)
+            codeNamespace = nsError.domain
+        } else {
+            exceptionCode = nil
+            codeNamespace = nil
+        }
     }
 
     public init(from exception: NSException) {
         message = exception.reason ?? "No reason provided"
-        typeName = exception.name.rawValue
+        exceptionType = String(describing: type(of: exception))
         timestamp = Date()
         stacktrace = Stacktrace(frames: exception.callStackSymbols)
-    }
-}
-
-
-// MARK: - NSError Extension for SplunkTrackableIssue
-
-extension NSError: SplunkTrackableIssue {
-    public var typeName: String {
-        return domain
-    }
-
-    public var message: String {
-        return localizedDescription
-    }
-
-    public var stacktrace: Stacktrace? {
-        return Stacktrace(frames: Thread.callStackSymbols)
-    }
-}
-
-
-// MARK: - NSException Extension for SplunkTrackableIssue
-
-extension NSException: SplunkTrackableIssue {
-    public var typeName: String {
-        return name.rawValue
-    }
-
-    public var message: String {
-        return reason ?? "No reason provided"
-    }
-
-    public var stacktrace: Stacktrace? {
-        return Stacktrace(frames: callStackSymbols)
+        exceptionCode = nil
+        codeNamespace = nil
     }
 }

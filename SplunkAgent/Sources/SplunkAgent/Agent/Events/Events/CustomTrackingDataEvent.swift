@@ -24,14 +24,13 @@ internal import SplunkCustomTracking
 
 struct CustomTrackingDataEvent: AgentEvent {
 
-
     // MARK: - Properties
 
     let domain: String
     let name: String
     let instrumentationScope: String
     let component: String
-    var sessionID: String?
+    var sessionId: String?
     var timestamp: Date?
     var attributes: [String: SplunkCommon.EventAttributeValue]?
     var body: SplunkCommon.EventAttributeValue?
@@ -41,19 +40,19 @@ struct CustomTrackingDataEvent: AgentEvent {
 
     // MARK: - Initialization
 
-    init(metadata: CustomTrackingMetadata, data: CustomTrackingData, sessionID: String?) {
+    init(metadata: CustomTrackingMetadata, data: CustomTrackingData, sessionId: String?) {
         domain = "data"
         name = data.name
         instrumentationScope = "com.splunk.rum.customtracking"
         component = data.component
-        self.sessionID = sessionID
+        self.sessionId = sessionId
         timestamp = metadata.timestamp
         attributes = data.attributes
 
         body = nil
-        if sessionID == nil {
+        if sessionId == nil {
             internalLogger.log(level: .warn) {
-                "sessionID is nil for CustomTrackingDataEvent"
+                "sessionId is nil for CustomTrackingDataEvent"
             }
         }
     }

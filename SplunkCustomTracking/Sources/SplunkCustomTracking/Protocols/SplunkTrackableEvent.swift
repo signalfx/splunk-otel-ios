@@ -23,26 +23,19 @@ import SplunkCommon
 // MARK: - SplunkTrackableEvent Struct
 
 public struct SplunkTrackableEvent: SplunkTrackable {
+    public var timestamp: Date
     public var timestampEnd: Date?
-    public var typeName: String
+    public var eventName: String
     public var attributes: [String: EventAttributeValue]
 
     // Simplified initializer for events
-    public init(typeName: String, attributes: [String: EventAttributeValue] = [:]) {
-        self.typeName = typeName
+    public init(eventName: String, attributes: [String: EventAttributeValue] = [:]) {
+        timestamp = Date()
+        self.eventName = eventName
         self.attributes = attributes
     }
 
     public func toAttributesDictionary() -> [String: EventAttributeValue] {
         return attributes
-    }
-}
-
-
-// MARK: - Protocol Conformance Extension
-
-public extension SplunkTrackableEvent {
-    var typeFamily: String {
-        "Event"
     }
 }

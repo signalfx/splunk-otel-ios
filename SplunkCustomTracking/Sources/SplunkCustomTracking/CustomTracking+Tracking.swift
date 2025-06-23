@@ -38,7 +38,7 @@ public extension CustomTrackingInternal {
         // Metadata and data for the event
         let metadata = CustomTrackingMetadata()
 
-        let data = CustomTrackingData(name: event.typeName,
+        let data = CustomTrackingData(name: event.eventName,
                                       component: "event",
                                       attributes: event.toAttributesDictionary())
 
@@ -62,10 +62,13 @@ public extension CustomTrackingInternal {
         let metadata = CustomTrackingMetadata()
 
         // Combine the provided attributes with attributes from the issue
-        let combinedAttributes = attributes.merging(issue.toAttributesDictionary()) { $1 }
+        // Our toAttributesDictionary() also injects the issue.exceptionType
+        let attributesToInject = ["error": EventAttributeValue.string("true")]
+        let augmented = attributes.merging(attributesToInject) { $1 }
+        let combinedAttributes = augmented.merging(issue.toAttributesDictionary()) { $1 }
 
         // Create the tracking data
-        let data = CustomTrackingData(name: issue.typeName,
+        let data = CustomTrackingData(name: "error",
                                       component: "error",
                                       attributes: combinedAttributes)
 

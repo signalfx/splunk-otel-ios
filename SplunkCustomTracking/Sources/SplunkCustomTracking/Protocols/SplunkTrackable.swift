@@ -22,30 +22,12 @@ import SplunkCommon
 
 // MARK: - SplunkTrackable Protocol
 
-/// Protocol defining the base requirements for any item that can be tracked.
-/// Foundation for both error tracking and custom data tracking.
+/// Protocol defining the base requirements for any CustomTracking item.
 public protocol SplunkTrackable {
-
-    /// `Issue` or `Event`
-    var typeFamily: String { get }
-
-    /// The type name of the trackable item, used for categorization inside a family.
-    /// Example: in the Issue family, `typeName`s are CustomType, Error, NSError, NSException
-    var typeName: String { get }
 
     /// Timestamp when the trackable item was created or when a duration started
     var timestamp: Date { get }
 
     /// Converts the trackable item to a dictionary representation using `[String: EventAttributeValue]`.
     func toAttributesDictionary() -> [String: EventAttributeValue]
-}
-
-
-// MARK: - Default Implementations
-
-public extension SplunkTrackable {
-
-    var timestamp: Date {
-        Date()
-    }
 }
