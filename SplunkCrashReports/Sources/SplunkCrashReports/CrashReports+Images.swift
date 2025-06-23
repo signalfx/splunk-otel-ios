@@ -36,7 +36,7 @@ extension CrashReports {
 
                 imageDictionary[.baseAddress] = image.imageBaseAddress
                 imageDictionary[.imageSize] = image.imageSize
-                imageDictionary[.imageName] = image.imageName
+                imageDictionary[.imagePath] = image.imageName
                 imageDictionary[.imageUUID] = image.imageUUID
 
                 outputImages.append(imageDictionary)

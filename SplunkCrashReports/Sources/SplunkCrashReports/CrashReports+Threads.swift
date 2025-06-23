@@ -73,6 +73,7 @@ extension CrashReports {
                 logger.log(level: .warn) {
                     "Agent could not locate image for instruction pointer."
                 }
+                frameDict[.imageName] = "???"
             } else {
                 frameDict[.imageName] = imageName
                 // Added to limit the number of images sent
