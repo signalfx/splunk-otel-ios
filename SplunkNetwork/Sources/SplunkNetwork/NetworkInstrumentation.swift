@@ -150,6 +150,8 @@ public class NetworkInstrumentation {
         let length = body?.count ?? 0
         span.setAttribute(key: key, value: length)
 
+        span.setAttribute(key: "component", value: "http")
+
         if let sharedState {
             let sessionID = sharedState.sessionId
             span.setAttribute(key: "session.id", value: sessionID)
@@ -161,9 +163,10 @@ public class NetworkInstrumentation {
         let serverTimingPattern = #"traceparent;desc=['"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['"]"#
 
         guard let regex = try? NSRegularExpression(pattern: serverTimingPattern) else {
-            self.logger.log(level: .fault) {
+            logger.log(level: .fault) {
                 "Regex failed to compile"
             }
+
             // Intentional hard failure in both Debug and Release builds
             preconditionFailure("Regex failed to compile. Likely programmer error in edit of serverTimingPattern regex: #\(serverTimingPattern)#")
         }
@@ -178,9 +181,11 @@ public class NetworkInstrumentation {
             // If the match or capture groups are invalid, log and return early
             // Also, prevent over-long log output
             let truncatedValStr = valStr.count > 255 ? String(valStr.prefix(252)) + "..." : valStr
-            self.logger.log(level: .debug) {
+
+            logger.log(level: .debug) {
                 "Failed to match traceparent string: \(truncatedValStr)"
             }
+
             return
         }
 

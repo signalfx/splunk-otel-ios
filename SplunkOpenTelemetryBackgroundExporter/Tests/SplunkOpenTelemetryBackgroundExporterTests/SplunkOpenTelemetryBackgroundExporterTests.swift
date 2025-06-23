@@ -20,13 +20,19 @@ import XCTest
 
 final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
 
+    // MARK: - Private
+
+    let fileKeyType: String = "logfile"
+
+
     // MARK: - Should send tests
 
     func testShouldSend_givenThreePreviousAttempts() throws {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0, fileKeyType: "logfile"
+            explicitTimeout: 0,
+            fileKeyType: fileKeyType
         )
 
         requestDescriotor.sentCount = 3
@@ -38,7 +44,8 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0, fileKeyType: "logfile"
+            explicitTimeout: 0,
+            fileKeyType: fileKeyType
         )
 
         requestDescriotor.sentCount = 6
@@ -53,7 +60,8 @@ final class SplunkOpenTelemetryBackgroundExporterTests: XCTestCase {
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
             endpoint: URL(string: "example.com")!,
-            explicitTimeout: 0, fileKeyType: "logfile"
+            explicitTimeout: 0,
+            fileKeyType: fileKeyType
         )
 
         requestDescriotor.sentCount = 3

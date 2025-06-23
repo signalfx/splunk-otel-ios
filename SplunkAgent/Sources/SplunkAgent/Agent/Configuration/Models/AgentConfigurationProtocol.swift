@@ -32,9 +32,17 @@ protocol AgentConfigurationProtocol: Codable, Equatable {
 
     var appVersion: String { get set }
     var enableDebugLogging: Bool { get set }
-    var sessionSamplingRate: Double { get set }
     var globalAttributes: MutableAttributes { get set }
     var spanInterceptor: ((SpanData) -> SpanData?)? { get set }
+
+    var user: UserConfiguration { get set }
+    var session: SessionConfiguration { get set }
+
+
+    // MARK: - Instrumentation properties (Legacy)
+
+    var screenNameSpans: Bool { get set }
+    var showVCInstrumentation: Bool { get set }
 
 
     // MARK: - Remote configuration parameters

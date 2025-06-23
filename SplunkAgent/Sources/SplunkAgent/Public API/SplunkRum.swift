@@ -17,6 +17,7 @@ limitations under the License.
 
 internal import CiscoLogger
 internal import SplunkCommon
+internal import SplunkNavigation
 
 import Combine
 import Foundation
@@ -53,10 +54,13 @@ public class SplunkRum: ObservableObject {
 
     let sessionSampler: any AgentSessionSampler
 
+    var screenNameChangeCallback: ((String) -> Void)?
+
 
     // MARK: - Internal (Modules Proxy)
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
+    lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
 
 
     // MARK: - Platform Support
@@ -100,9 +104,14 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Public API (Modules)
 
-    /// An object that holds session replay module.
+    /// An object that holds Session Replay module.
     public var sessionReplay: any SessionReplayModule {
         sessionReplayProxy
+    }
+
+    /// An object that holds Navigation module.
+    public var navigation: any NavigationModule {
+        navigationProxy
     }
 
 
@@ -200,6 +209,9 @@ public class SplunkRum: ObservableObject {
         // Assign and configure the session sampler
         self.sessionSampler = sessionSampler
         self.sessionSampler.configure(with: agentConfiguration)
+
+        // Set default screen names
+        runtimeAttributes.updateCustom(named: "screen.name", with: "unknown")
     }
 
     convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {
@@ -213,6 +225,10 @@ public class SplunkRum: ObservableObject {
 
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = Self.createConfigurationHandler(for: configuration)
+        let moduleConfigurations = Self.createDerivedModuleConfigurations(
+            from: configuration,
+            moduleConfigurations: moduleConfigurations
+        )
 
         // Initialize the agent
         self.init(
@@ -222,6 +238,9 @@ public class SplunkRum: ObservableObject {
             appStateManager: AppStateManager(),
             sessionSampler: DefaultAgentSessionSampler()
         )
+
+        // Set the configured user tracking mode
+        user.preferences.trackingMode = configuration.user.trackingMode
 
         initializeEvents["agent_instance_initialized"] = Date()
 
@@ -276,6 +295,30 @@ public class SplunkRum: ObservableObject {
 //            for: configuration,
 //            apiClient: APIClient(baseUrl: configuration.configUrl)
 //        )
+    }
+
+    /// Creates an array of module configurations based on passed module configurations
+    /// and derived configurations created by processing parameters from the agent configuration.
+    private static func createDerivedModuleConfigurations(
+        from agentConfiguration: any AgentConfigurationProtocol,
+        moduleConfigurations: [Any]? = nil
+    ) -> [Any]? {
+        var configurations = moduleConfigurations ?? []
+
+        // Navigation instrumentation (legacy)
+        let navigationModuleConfiguration = SplunkNavigation.NavigationConfiguration(
+            isEnabled: agentConfiguration.screenNameSpans,
+            enableAutomatedTracking: agentConfiguration.showVCInstrumentation
+        )
+
+        // The supplied configuration has lower priority than derived configuration from legacy APIs
+        configurations.removeAll { configuration in
+            configuration is SplunkNavigation.NavigationConfiguration
+        }
+
+        configurations.append(navigationModuleConfiguration)
+
+        return configurations
     }
 
 
