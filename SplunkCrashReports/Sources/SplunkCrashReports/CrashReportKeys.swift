@@ -57,7 +57,6 @@ public enum CrashReportKeys: String {
     case baseAddress
     case offset
     case imageSize
-    case imagePath
     case imageUUID
 
     // Primary group key
