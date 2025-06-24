@@ -26,6 +26,7 @@ public final class WebViewInstrumentation: NSObject {
     public var sharedState: AgentSharedState?
 
     // NSObject conformance
+    // swiftformat:disable:next modifierOrder
     public override init() {}
 
     // MARK: - Internal Methods
