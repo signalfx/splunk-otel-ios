@@ -108,13 +108,17 @@ public final class WebViewInstrumentation: NSObject {
                     },
                     // Recommended for BRUM use in new agents going forward.
                     getNativeSessionIdAsync: async function() {
-                        const newId = await self._fetchSessionId();
-                        if (newId !== self.cachedSessionId) {
-                            const oldId = self.cachedSessionId;
-                                    self.cachedSessionId = newId;
-                                    self._notifyChange(oldId, newId);
+                        try {
+                            const newId = await self._fetchSessionId();
+                            if (newId !== self.cachedSessionId) {
+                                const oldId = self.cachedSessionId;
+                                self.cachedSessionId = newId;
+                                self._notifyChange(oldId, newId);
+                            }
+                            return newId;
+                        } catch (error) {
+                            console.error("[SplunkRumNative] Failed to fetch native session ID asynchronously:", error);
                         }
-                        return newId;
                     }
                 };
                 console.log("[SplunkRumNative] Initialized with native session:", self.cachedSessionId)
