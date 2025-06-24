@@ -38,6 +38,9 @@ extension CrashReports {
 
     func convertToJSONString(_ item: Any) -> String? {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: normalizeToJSONReady(item), options: .prettyPrinted) else {
+            logger.log(level: .debug) {
+                "Crash Report data could not be converted to JSON."
+            }
             return nil
         }
         return String(data: jsonData, encoding: .utf8)

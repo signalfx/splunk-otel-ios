@@ -29,7 +29,7 @@ public class CrashReports {
     public unowned var sharedState: AgentSharedState?
 
     /// An array to hold images used in active crash threads
-    public var allUsedImageNames: [String] = []
+    var allUsedImageNames: [String] = []
 
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "CrashReports")
     private var crashReporter: PLCrashReporter?
