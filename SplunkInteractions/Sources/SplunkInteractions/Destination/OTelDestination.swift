@@ -36,7 +36,6 @@ struct OTelDestination: SplunkInteractionsDestination {
         var attributes: [String: AttributeValue] = [:]
         attributes["event.name"] = .string("action")
         attributes["component"] = .string("ui")
-        attributes["screen.name"] = .string("unknown")
         attributes["action.name"] = .string(actionName)
 
         if let elementId {
