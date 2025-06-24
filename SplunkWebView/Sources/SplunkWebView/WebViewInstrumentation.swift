@@ -19,25 +19,27 @@ internal import CiscoLogger
 import SplunkCommon
 import WebKit
 
-public final class WebViewInstrumentationInternal: NSObject {
-
-    public static var instance = WebViewInstrumentationInternal()
+public final class WebViewInstrumentation: NSObject {
 
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
 
     public var sharedState: AgentSharedState?
 
-    // Module conformance
-    public required override init() {}
+    // NSObject conformance
+    public override init() {}
 
     // MARK: - Internal Methods
 
     // swiftlint:disable function_body_length
     public func injectSessionId(into webView: WKWebView) {
 
+        logger.log(level: .notice, isPrivate: false) {
+            "WebViewInstrumentation injecting SessionId."
+        }
+
         guard let sessionId = sharedState?.sessionId else {
             logger.log(level: .warn) {
-                "Native Session ID not available for webview injection."
+                "Native Session ID not available for webview injection. Check that sharedState is set before use."
             }
             return
         }
@@ -135,9 +137,7 @@ public final class WebViewInstrumentationInternal: NSObject {
 
         // Needed at first load only; user script will persist across reloads and navigation
         webView.evaluateJavaScript(javaScript)
-    }
-
-    // swiftlint:enable function_body_length
+    } // swiftlint:enable function_body_length
 
     private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
         let contentController = webView.configuration.userContentController
@@ -149,7 +149,7 @@ public final class WebViewInstrumentationInternal: NSObject {
 
 // MARK: - WKScriptMessageHandlerWithReply
 
-extension WebViewInstrumentationInternal: WKScriptMessageHandlerWithReply {
+extension WebViewInstrumentation: WKScriptMessageHandlerWithReply {
 
     /// Handles JavaScript messages with a reply handler for asynchronous communication
     public func userContentController(

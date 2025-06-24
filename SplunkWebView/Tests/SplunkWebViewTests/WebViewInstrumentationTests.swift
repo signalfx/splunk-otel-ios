@@ -20,14 +20,14 @@ import SplunkCommon
 import WebKit
 import XCTest
 
-final class WebViewInstrumentationInternalTests: XCTestCase {
+final class WebViewInstrumentationTests: XCTestCase {
 
-    var webViewInstrumentation: WebViewInstrumentationInternal!
+    var webViewInstrumentation: WebViewInstrumentation!
     var mockWebView: MockWebView!
 
     override func setUp() {
         super.setUp()
-        webViewInstrumentation = WebViewInstrumentationInternal()
+        webViewInstrumentation = WebViewInstrumentation()
         mockWebView = MockWebView()
         webViewInstrumentation.sharedState = MockAgentSharedState()
     }
@@ -53,8 +53,6 @@ final class WebViewInstrumentationInternalTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1.0)
     }
-
-    // Add more tests here to cover error cases, etc.
 }
 
 // Mock WKWebView for testing

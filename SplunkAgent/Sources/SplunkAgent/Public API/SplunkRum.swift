@@ -18,6 +18,7 @@ limitations under the License.
 internal import CiscoLogger
 internal import SplunkCommon
 internal import SplunkNavigation
+internal import SplunkWebView
 
 import Combine
 import Foundation
@@ -61,7 +62,7 @@ public class SplunkRum: ObservableObject {
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
     lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
-
+    lazy var webViewProxy: any WebViewInstrumentationModule = WebViewNonOperational()
 
     // MARK: - Platform Support
 
@@ -112,6 +113,11 @@ public class SplunkRum: ObservableObject {
     /// An object that holds Navigation module.
     public var navigation: any NavigationModule {
         navigationProxy
+    }
+
+    /// An object that provides a bridge for WebView instrumentation.
+    public var webView: any WebViewInstrumentationModule {
+        webViewProxy
     }
 
 

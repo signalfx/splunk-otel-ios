@@ -44,7 +44,6 @@ internal import SplunkCommon
 
 #if canImport(SplunkWebView)
     internal import SplunkWebView
-    internal import SplunkWebViewProxy
 #endif
 
 
@@ -86,7 +85,7 @@ class DefaultModulesPool: AgentModulesPool {
 
         // Web View Instrumentation
         #if canImport(SplunkWebView)
-            knownModules.append(WebViewInstrumentationInternal.self)
+            knownModules.append(WebViewInstrumentation.self)
         #endif
 
         return knownModules

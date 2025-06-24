@@ -1,3 +1,4 @@
+
 //
 /*
 Copyright 2025 Splunk Inc.
@@ -15,21 +16,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkWebView
 import WebKit
 
+/// The public protocol defining the capabilities of the WebView Instrumentation module.
 public protocol WebViewInstrumentationModule {
-    func injectSessionId(into webView: WKWebView)
-}
-
-public final class WebViewInstrumentationProxy: WebViewInstrumentationModule {
-    public static let instance = WebViewInstrumentationProxy()
-
-    private let module = WebViewInstrumentationInternal.instance
-
-    init() {}
-
-    public func injectSessionId(into webView: WKWebView) {
-        module.injectSessionId(into: webView)
-    }
+    /// Injects the necessary JavaScript bridge into a given WKWebView to enable
+    /// communication between the web content and the native RUM agent.
+    func integrateWithBrowserRum(_ view: WKWebView)
 }

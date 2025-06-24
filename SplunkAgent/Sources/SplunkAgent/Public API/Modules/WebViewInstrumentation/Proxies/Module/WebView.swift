@@ -1,3 +1,4 @@
+
 //
 /*
 Copyright 2025 Splunk Inc.
@@ -15,23 +16,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkWebViewProxy
+internal import SplunkWebView
 import WebKit
 
-public class WebViewToNativeBridge {
+/// The public-facing proxy class that forwards calls to the internal WebView module.
+final class WebView: WebViewInstrumentationModule {
 
-    // Using the protocol here
-    private let module: WebViewInstrumentationModule
+    // This holds the *real* module instance from the SplunkWebView module.
+    private let module: SplunkWebView.WebViewInstrumentation
 
-    init(module: WebViewInstrumentationModule) {
+    init(module: SplunkWebView.WebViewInstrumentation) {
         self.module = module
     }
 
     public func integrateWithBrowserRum(_ view: WKWebView) {
         module.injectSessionId(into: view)
     }
-}
-
-public extension SplunkRum {
-    static let webView = WebViewToNativeBridge(module: WebViewInstrumentationProxy.instance)
 }

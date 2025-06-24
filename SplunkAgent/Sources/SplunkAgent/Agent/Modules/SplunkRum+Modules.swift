@@ -20,13 +20,12 @@ internal import CiscoSessionReplay
 internal import SplunkAppStart
 internal import SplunkNavigation
 internal import SplunkNetwork
+internal import SplunkWebView
 
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
 #endif
 
-internal import SplunkWebView
-internal import SplunkWebViewProxy
 
 extension SplunkRum {
 
@@ -151,16 +150,9 @@ extension SplunkRum {
 
     /// Configure WebView Instrumentation module with shared state.
     private func customizeWebView() {
-        // Get WebViewInstrumentation module, set its sharedState
-        let moduleType = SplunkWebView.WebViewInstrumentationInternal.self
-
-        if let webViewInstrumentationModule = modulesManager?.module(ofType: moduleType) {
+        if let webViewInstrumentationModule = modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentation.self) {
             webViewInstrumentationModule.sharedState = sharedState
-
-            logger.log(level: .notice, isPrivate: false) {
-                "WebViewInstrumentation module installed."
-            }
-
+            webViewProxy = WebView(module: webViewInstrumentationModule)
         } else {
             logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module not installed."
