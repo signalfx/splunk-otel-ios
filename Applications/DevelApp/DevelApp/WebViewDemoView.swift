@@ -23,45 +23,94 @@ import WebKit
 
 struct WebViewDemoView: View {
     @State private var modernWebView = WKWebView()
+    @State private var modernWebViewWithLegacyCall = WKWebView()
     @State private var legacyWebView = WKWebView()
+    @State private var legacyWebViewWithLegacyCall = WKWebView()
 
     // Store the script content in variables
     private let modernScriptContent = modernScriptExample()
     private let legacyScriptContent = legacyScriptExample()
+    private let colorForSync = Color(red: 0.80, green: 0.92, blue: 0.85)
+    private let colorForAsync = Color(red: 0.85, green: 0.82, blue: 0.95)
+
 
     var body: some View {
-        VStack {
-            DemoHeaderView()
+        ScrollView {
 
-            // Legacy WebView Section
-            WebViewSectionView(
-                caption: "WebView using current BRUM legacy API",
-                webView: legacyWebView,
-                buttonText: "Inject JavaScript (legacy, sync)",
-                backgroundColor: Color(red: 0.9, green: 0.93, blue: 1.0),
-                scriptContent: legacyScriptContent,
-                injectAction: injectIntoLegacyWebView
-            )
+            VStack {
+                DemoHeaderView()
 
-            // Modern WebView Section
-            WebViewSectionView(
-                caption: "WebView using future BRUM async API",
-                webView: modernWebView,
-                buttonText: "Inject JavaScript (modern, async)",
-                backgroundColor: Color(red: 0.88, green: 1.0, blue: 0.88),
-                scriptContent: modernScriptContent,
-                injectAction: injectIntoModernWebView
-            )
+                DemoNote()
 
-            Spacer()
-        }
-        .onAppear {
-            loadWebViewContent(for: modernWebView, scriptContent: modernScriptContent)
-            loadWebViewContent(for: legacyWebView, scriptContent: legacyScriptContent)
+                // Legacy WebView Section
+                WebViewSectionView(
+                    caption: "Current BRUM-style sync JavaScript API",
+                    webView: legacyWebView,
+                    buttonText: "Inject JavaScript and demo getNativeSessionId()",
+                    backgroundColor: colorForSync,
+                    scriptContent: legacyScriptContent,
+                    injectAction: injectIntoLegacyWebView
+                )
+
+                // Modern WebView Section
+                WebViewSectionView(
+                    caption: "Optional async JavaScript API",
+                    webView: modernWebView,
+                    buttonText: "Inject JavaScript and demo getNativeSessionIdAsync()",
+                    backgroundColor: colorForAsync,
+                    scriptContent: modernScriptContent,
+                    injectAction: injectIntoModernWebView
+                )
+
+                // Legacy WebView, Legacy Call Section
+                WebViewSectionView(
+                    caption: "Legacy SplunkRum.integrateWithBrowserRum(_:) call with current  sync JavaScript API",
+                    webView: legacyWebViewWithLegacyCall,
+                    buttonText: "Inject JavaScript and demo getNativeSessionId() using legacy call",
+                    backgroundColor: colorForSync,
+                    scriptContent: legacyScriptContent,
+                    injectAction: injectIntoLegacyWebViewWithLegacyCall
+                )
+
+                // Modern WebView, Legacy Call Section
+                WebViewSectionView(
+                    caption: "Legacy SplunkRum.integrateWithBrowserRum(_:) call with modern async JavaScript API",
+                    webView: modernWebViewWithLegacyCall,
+                    buttonText: "Inject JavaScript and demo getNativeSessionIdAsync() using legacy call",
+                    backgroundColor: colorForAsync,
+                    scriptContent: modernScriptContent,
+                    injectAction: injectIntoModernWebViewWithLegacyCall
+                )
+                Spacer()
+            }
+            .onAppear {
+                loadWebViewContent(for: legacyWebView, scriptContent: legacyScriptContent)
+                loadWebViewContent(for: modernWebView, scriptContent: modernScriptContent)
+                loadWebViewContent(for: modernWebViewWithLegacyCall, scriptContent: modernScriptContent)
+                loadWebViewContent(for: legacyWebViewWithLegacyCall, scriptContent: legacyScriptContent)
+            }
         }
         .navigationTitle("WebView Demo")
     }
 
+    struct DemoNote: View {
+        var body: some View {
+            (
+                Text("Note about the demo: ")
+                    .bold()
+                +
+                Text("These webviews use timers to poll the sessionId. Your first thought might be: ")
+                +
+                Text("this is not a model for how BRUM should work. ")
+                    .italic()
+                +
+                Text("But it demonstrates that if a JavaScript process wants to get the updated native sessionId, it can.")
+            )
+            .padding()
+        }
+    }
+
+    // Currently not used in the demo pending better infrastructure for handling tokens vis-a-vis git commits.
     private static func brumScript() -> String {
         return """
         <script src="https://cdn.signalfx.com/o11y-gdi-rum/latest/splunk-otel-web.js" crossorigin="anonymous">
@@ -88,6 +137,7 @@ struct WebViewDemoView: View {
         """
     }
 
+    // This provides an optional async version of the call, `getNativeSessionIdAsync()`, for BRUM when BRUM is ready to use that.
     private static func modernScriptExample() -> String {
         return """
         async function updateSessionId() {
@@ -103,6 +153,7 @@ struct WebViewDemoView: View {
         """
     }
 
+    // This is the default case today. Here "legacy" (not to be confused with "legacy call" which is about how the integration is done in the iOS code) refers to the BRUM agent using `getNativeSessionId()`, a sync function, as it currently does. Non-legacy would be a different hypothetical future rev of the BRUM agent that wants an async call; they would call `await getNativeSessionAsync()` as seen elsewhere in the "modern" examples.
     private static func legacyScriptExample() -> String {
         return """
         function updateSessionId() {
@@ -123,6 +174,36 @@ struct WebViewDemoView: View {
         <!DOCTYPE html>
         <html>
         <head>
+            <style>
+            #extra-height {
+              height: 200px;
+              background-color: transparent;
+            }
+            </style>
+            <script>
+                \(scriptContent)
+            </script>
+        </head>
+        <body style="font-size: 48px; font-family: sans-serif; background: #fafaff;">
+            <p style="font-size: 36px; font-variant: small-caps;">- web content -</p>
+            <h3>Current Native Session ID:</h3>
+            <p id="sessionId">unknown</p>
+            <div id="extra-height"></div>
+        </body>
+        </html>
+        """
+        webView.loadHTMLString(initialContent, baseURL: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            webView.scrollView.flashScrollIndicators()
+        }
+    }
+
+    // Does work, but currently not used in the demo. Use with demo code helper `brumScript()` and edit the SwiftUI content to add a section for using this.
+    private func loadWebViewContentWithBRUM(for webView: WKWebView, scriptContent: String) {
+        let initialContent = """
+        <!DOCTYPE html>
+        <html>
+        <head>
             \(WebViewDemoView.brumScript())
             <script>
                 \(scriptContent)
@@ -138,11 +219,21 @@ struct WebViewDemoView: View {
     }
 
     private func injectIntoModernWebView() {
-        SplunkRum.webView.integrateWithBrowserRum(modernWebView)
+        SplunkRum.shared.webView.integrateWithBrowserRum(modernWebView)
+    }
+
+    // "Legacy call" refers to a call to the inject API done directly off the SplunkRum namespace. Provided for compatibility for now. Deprecation warning in Xcode here is expected. Here we use the JavaScript async API.
+    private func injectIntoModernWebViewWithLegacyCall() {
+        SplunkRum.integrateWithBrowserRum(modernWebViewWithLegacyCall)
+    }
+
+    // "Legacy call" refers to a call to the inject API done directly off the SplunkRum namespace. Provided for compatibility. Deprecation warning in Xcode here is expected. Here we use the JavaScript sync API.
+    private func injectIntoLegacyWebViewWithLegacyCall() {
+        SplunkRum.integrateWithBrowserRum(legacyWebViewWithLegacyCall)
     }
 
     private func injectIntoLegacyWebView() {
-        SplunkRum.webView.integrateWithBrowserRum(legacyWebView)
+        SplunkRum.shared.webView.integrateWithBrowserRum(legacyWebView)
     }
 }
 
@@ -185,4 +276,3 @@ struct WebViewRepresentable: UIViewRepresentable {
         // Nothing to do here
     }
 }
-
