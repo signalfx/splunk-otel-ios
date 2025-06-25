@@ -40,6 +40,9 @@ public extension Navigation {
             await model.update(screenName: name)
             await model.update(isManualScreenName: true)
 
+            // Yield this change to the consumer
+            continuation.yield(name)
+
             // Send corresponding span
             send(screenName: name, lastScreenName: lastScreenName, start: start)
         }

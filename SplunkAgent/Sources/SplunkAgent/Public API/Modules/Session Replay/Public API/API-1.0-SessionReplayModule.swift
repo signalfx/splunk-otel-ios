@@ -40,12 +40,6 @@ public protocol SessionReplayModule: ObservableObject {
 
     // MARK: - Module preferences
 
-    // Temporarily removed with Rendering Modes.
-
-    // swiftformat:disable indent
-
-    /*
-
     /// An object that holds preferred settings for the recording.
     var preferences: SessionReplayModulePreferences { get set }
 
@@ -55,9 +49,6 @@ public protocol SessionReplayModule: ObservableObject {
     ///
     /// - Returns: The actual `SessionReplay` instance.
     @discardableResult func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule
-     */
-
-    // swiftformat:enable indent
 
 
     // MARK: - Recording management

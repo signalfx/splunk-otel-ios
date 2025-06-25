@@ -66,6 +66,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkAppStart",
                 "SplunkWebView",
                 "SplunkWebViewProxy",
+                "SplunkCustomTracking",
                 resolveDependency("logger")
             ],
             path: "SplunkAgent",
@@ -158,35 +159,38 @@ func generateMainTargets() -> [Target] {
         ),
 
 
-        // MARK: - Splunk Custom Data
+        // MARK: - SplunkCrashReporter
 
         .target(
-            name: "SplunkCustomData",
-            dependencies: [
-                "SplunkCommon"
+            name: "SplunkCrashReporter",
+            path: "SplunkCrashReporter",
+            exclude: [
+                "Source/dwarf_opstream.hpp",
+                "Source/dwarf_stack.hpp",
+                "Source/PLCrashAsyncDwarfCFAState.hpp",
+                "Source/PLCrashAsyncDwarfCIE.hpp",
+                "Source/PLCrashAsyncDwarfEncoding.hpp",
+                "Source/PLCrashAsyncDwarfExpression.hpp",
+                "Source/PLCrashAsyncDwarfFDE.hpp",
+                "Source/PLCrashAsyncDwarfPrimitives.hpp",
+                "Source/PLCrashAsyncLinkedList.hpp",
+                "Source/PLCrashReport.proto"
             ],
-            path: "SplunkCustomData/Sources"
-        ),
-        .testTarget(
-            name: "SplunkCustomDataTests",
-            dependencies: ["SplunkCustomData"],
-            path: "SplunkCustomData/Tests"
-        ),
-
-
-        // MARK: - Splunk Error Reporting
-
-        .target(
-            name: "SplunkErrorReporting",
-            dependencies: [
-                "SplunkCommon"
+            sources: [
+                "Source",
+                "Dependencies/protobuf-c"
             ],
-            path: "SplunkErrorReporting/Sources"
-        ),
-        .testTarget(
-            name: "SplunkErrorReportingTests",
-            dependencies: ["SplunkErrorReporting"],
-            path: "SplunkErrorReporting/Tests"
+            cSettings: [
+                .define("PLCR_PRIVATE"),
+                .define("PLCF_RELEASE_BUILD"),
+                .define("PLCRASHREPORTER_PREFIX", to: "SPLK"),
+                .define("SWIFT_PACKAGE"), // Should be defined by default, Xcode 11.1 workaround.
+                .headerSearchPath("Dependencies/protobuf-c"),
+                .unsafeFlags(["-w"]) // Suppresses "Implicit conversion" warnings in protobuf.c
+            ],
+            linkerSettings: [
+                .linkedFramework("Foundation")
+            ]
         ),
 
 
@@ -325,6 +329,29 @@ func generateMainTargets() -> [Target] {
         ),
 
 
+        // MARK: - Splunk Custom Tracking
+        
+        .target(
+            name: "SplunkCustomTracking",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                resolveDependency("logger")
+            ],
+            path: "SplunkCustomTracking/Sources"
+        ),
+        .testTarget(
+            name: "SplunkCustomTrackingTests",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                "SplunkCustomTracking",
+                resolveDependency("logger")
+            ],
+            path: "SplunkCustomTracking/Tests"
+        ),
+
+
         // MARK: - Session Replay Proxy
 
         .target(
@@ -443,57 +470,57 @@ struct SessionReplayBinaryRegistry {
     static let targets: [String: BinaryTargetInfo] = [
         "logger": BinaryTargetInfo(
             name: "CiscoLogger",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/logger-ios-sdk-1.0.1.zip",
-            checksum: "403cf7060207186c0d5a26a01fff0a1a4647cc81b608feb4eeb9230afa1e7b16",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.6/mh_dylib/cisco-logger-1.0.6.255.zip",
+            checksum: "d404caf437180d12dc3bbcef9567bce811268d671ca09a484cf8df51114d7777",
             productName: "CiscoLogger",
             wrapperName: "CiscoLoggerWrapper"
         ),
         "encryptor": BinaryTargetInfo(
             name: "CiscoEncryption",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/encryption-ios-sdk-1.0.254.zip",
-            checksum: "236d2ae950c7decb528d8290359c58c22c662cdc1e42899d7544edd9760d893c",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.6/mh_dylib/cisco-encryption-1.0.6.255.zip",
+            checksum: "4ddd3985b87102e9190649f4b9d655ffe2380f51d6e12ddc170cc414a333a4b9",
             productName: "CiscoEncryption",
             wrapperName: "CiscoEncryptionWrapper"
         ),
         "swizzling": BinaryTargetInfo(
             name: "CiscoSwizzling",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/swizzling-ios-sdk-1.0.254.zip",
-            checksum: "a6cd8fb5c463bb9e660f560acfa5b33e4c5271fda222047b417bd531a8c0c956",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.6/mh_dylib/cisco-swizzling-1.0.6.255.zip",
+            checksum: "a1581f336935215a54d74a1c208ed69213c23c4a3f9b7f4a5b6276d9d4e31790",
             productName: "CiscoSwizzling",
             wrapperName: "CiscoSwizzlingWrapper"
         ),
         "interactions": BinaryTargetInfo(
             name: "CiscoInteractions",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/interactions-ios-sdk-1.0.254.zip",
-            checksum: "65c53ade295f34ad7876919f935f428b2ebb016236b21add72b5946a9f57789c",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.6/mh_dylib/cisco-interactions-1.0.6.255.zip",
+            checksum: "63e7821824a58fdae5743a58d4d4ae3f32ef2f0c0e8e38e2d80742677e455877",
             productName: "CiscoInteractions",
             wrapperName: "CiscoInteractionsWrapper"
         ),
         "diskStorage": BinaryTargetInfo(
             name: "CiscoDiskStorage",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/disk-storage-ios-sdk-1.0.254.zip",
-            checksum: "1b47895f1793a690ce68fca431e72f689a38470423af392e9785135e514d93de",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.6/mh_dylib/cisco-disk-storage-1.0.6.255.zip",
+            checksum: "ac7d6b307d3a7b189561305f4ff2136876453efbfdba331c54cb1362a61e5c05",
             productName: "CiscoDiskStorage",
             wrapperName: "CiscoDiskStorageWrapper"
         ),
         "sessionReplay": BinaryTargetInfo(
             name: "CiscoSessionReplay",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/session-replay-ios-sdk-1.0.6.254.zip",
-            checksum: "d1cf5141c4710fcd5af8c957aa57e319c7f28ee338cc64e6f7283f19aaa66a71",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.6/mh_dylib/cisco-session-replay-1.0.6.255.zip",
+            checksum: "b9b3b0ad315430c637b728ad2a890f3796ba9025a572077d1247f0686f70fd4e",
             productName: "CiscoSessionReplay",
             wrapperName: "CiscoSessionReplayWrapper"
         ),
         "instanceManager": BinaryTargetInfo(
             name: "CiscoInstanceManager",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/instance-manager-ios-sdk-1.0.254.zip",
-            checksum: "fe0bc116914ef408ac2e015aa0fa482774a35868cf803f19a7e593bbaeae6ef3",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.6/mh_dylib/cisco-instance-manager-1.0.6.255.zip",
+            checksum: "a755d542cda53e366c3408c1256a4e8c4a1a49e1f0ff9b2d3f9fea5d25d2b46c",
             productName: "CiscoInstanceManager",
             wrapperName: "CiscoInstanceManagerWrapper"
         ),
         "runtimeCache": BinaryTargetInfo(
             name: "CiscoRuntimeCache",
-            url: "https://sdk.smartlook.com/splunk-agent-test/ios/runtime-cache-ios-sdk-1.0.254.zip",
-            checksum: "4bed11f441350f9b52726b2d8e88f1647bd702325e5128d956eb814b05ea028b",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.6/mh_dylib/cisco-runtime-cache-1.0.6.255.zip",
+            checksum: "705b69ec9fe687538f193f7585d4372fba00e0197e50fab07b91da64b49cd03a",
             productName: "CiscoRuntimeCache",
             wrapperName: "CiscoRuntimeCacheWrapper"
         )

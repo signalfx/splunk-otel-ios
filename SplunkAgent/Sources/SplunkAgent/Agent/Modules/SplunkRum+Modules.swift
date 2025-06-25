@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 internal import CiscoSessionReplay
 internal import SplunkAppStart
+internal import SplunkCustomTracking
 internal import SplunkNavigation
 internal import SplunkNetwork
 internal import SplunkInteractions
@@ -56,6 +57,7 @@ extension SplunkRum {
         customizeNavigation()
         customizeNetwork()
         customizeAppStart()
+        customizeCustomTracking()
         customizeInteractions()
         customizeWebView()
     }
@@ -69,7 +71,7 @@ extension SplunkRum {
             return
         }
 
-        guard let sessionReplayUrl = agentConfiguration.endpoint.sessionReplayEndpoint else {
+        guard agentConfiguration.endpoint.sessionReplayEndpoint != nil else {
             logger.log(level: .warn, isPrivate: false) {
                 """
                 Session Replay module was not installed (the valid URL for Session Replay \
@@ -99,6 +101,7 @@ extension SplunkRum {
         Task(priority: .userInitiated) {
             for await newValue in navigationModule.screenNameStream {
                 runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
+                screenNameChangeCallback?(newValue)
             }
         }
 
@@ -111,7 +114,7 @@ extension SplunkRum {
         let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
 
         // Assign an object providing the current state of the agent instance.
-        // We need to do this because we need to read `sessionID` from the agent continuously.
+        // We need to do this because we need to read `sessionId` from the agent continuously.
         networkModule?.sharedState = sharedState
 
         // We need the endpoint url to manage trace exclusion logic
@@ -178,6 +181,14 @@ extension SplunkRum {
             logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module not installed."
             }
+        }
+    }
+
+    /// Configure CustomTracking intrumentation module
+    private func customizeCustomTracking() {
+        if let customTrackingModule = modulesManager?.module(ofType: CustomTrackingInternal.self) {
+            // Initialize proxy API for this module
+            customTrackingProxy = CustomTracking(for: customTrackingModule)
         }
     }
 }

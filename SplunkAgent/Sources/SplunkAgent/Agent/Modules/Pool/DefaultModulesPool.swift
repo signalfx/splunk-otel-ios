@@ -47,6 +47,10 @@ internal import SplunkCommon
     internal import SplunkWebViewProxy
 #endif
 
+#if canImport(SplunkCustomTracking)
+    internal import SplunkCustomTracking
+#endif
+
 #if canImport(SplunkInteractions)
     internal import SplunkInteractions
 #endif
@@ -91,6 +95,11 @@ class DefaultModulesPool: AgentModulesPool {
         // Web View Instrumentation
         #if canImport(SplunkWebView)
             knownModules.append(WebViewInstrumentationInternal.self)
+        #endif
+
+        // Custom Tracking
+        #if canImport(SplunkCustomTracking)
+            knownModules.append(CustomTrackingInternal.self)
         #endif
 
         // Interactions

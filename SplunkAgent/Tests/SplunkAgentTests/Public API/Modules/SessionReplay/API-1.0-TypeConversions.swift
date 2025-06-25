@@ -24,11 +24,6 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
     // MARK: - Rendering mode
 
-    // Temporarily removed with Rendering Modes.
-
-    // swiftformat:disable indent
-
-    /*
     func testRenderingModesToProxyConversion() throws {
         /* From module to proxy */
         var moduleRenderingMode: SplunkSessionReplayRenderingMode = .default
@@ -44,11 +39,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
         moduleRenderingMode = .wireframe
         proxyRenderingMode = .init(with: moduleRenderingMode)
-        XCTAssertEqual(proxyRenderingMode, .wireframe)
-
-        moduleRenderingMode = .noRendering
-        proxyRenderingMode = .init(with: moduleRenderingMode)
-        XCTAssertEqual(proxyRenderingMode, .noRendering)
+        XCTAssertEqual(proxyRenderingMode, .wireframeOnly)
     }
 
     func testRenderingModesToModuleConversion() throws {
@@ -61,17 +52,10 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
         srRenderingMode = proxyRenderingMode.srRenderingMode
         XCTAssertEqual(srRenderingMode, .native)
 
-        proxyRenderingMode = .wireframe
+        proxyRenderingMode = .wireframeOnly
         srRenderingMode = proxyRenderingMode.srRenderingMode
         XCTAssertEqual(srRenderingMode, .wireframe)
-
-        proxyRenderingMode = .noRendering
-        srRenderingMode = proxyRenderingMode.srRenderingMode
-        XCTAssertEqual(srRenderingMode, .noRendering)
     }
-     */
-
-    // swiftformat:enable indent
 
 
     // MARK: - Status
@@ -90,7 +74,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
         // Not recording
         moduleStatus = .notRecording(.diskCacheCapacityOverreached)
         proxyStatus = .init(srStatus: moduleStatus)
-        XCTAssertEqual(proxyStatus, .notRecording(.diskCacheCapacityOverreached))
+        XCTAssertEqual(proxyStatus, .notRecording(.storageLimitReached))
 
         moduleStatus = .notRecording(.internalError)
         proxyStatus = .init(srStatus: moduleStatus)
@@ -118,11 +102,11 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
         moduleStatus = .notRecording(.diskCacheCapacityOverreached)
         proxyStatus = .init(srStatus: moduleStatus)
-        XCTAssertEqual(proxyStatus, .notRecording(.diskCacheCapacityOverreached))
+        XCTAssertEqual(proxyStatus, .notRecording(.storageLimitReached))
     }
 
     func testStatusToModuleConversion() throws {
-        /* From module to proxy */
+        /* From proxy to module */
         var proxyStatus: SplunkAgent.SessionReplayStatus = .recording
         var srStatus = proxyStatus.srStatus
 
@@ -132,7 +116,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
 
         // Not recording
-        proxyStatus = .notRecording(.diskCacheCapacityOverreached)
+        proxyStatus = .notRecording(.storageLimitReached)
         srStatus = proxyStatus.srStatus
         XCTAssertEqual(srStatus, .notRecording(.diskCacheCapacityOverreached))
 
@@ -155,11 +139,23 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
         proxyStatus = .notRecording(.unsupportedPlatform)
         srStatus = proxyStatus.srStatus
         XCTAssertEqual(srStatus, .notRecording(.unsupportedPlatform))
+    }
 
 
-        // Not recording (disabled from configuration)
-        proxyStatus = .notRecording(.remotelyDisabled)
-        srStatus = proxyStatus.srStatus
-        XCTAssertEqual(srStatus, .notRecording(.notStarted))
+    // MARK: - Masks type
+
+    func testMaskTypeToProxyConversion() throws {
+        /* From module to proxy */
+        var moduleMaskType: SplunkSessionReplayMaskType = .covering
+        var proxyMaskType: SplunkAgent.MaskElement.MaskType = .covering
+
+        // Covering
+        proxyMaskType = .init(from: moduleMaskType)
+        XCTAssertEqual(proxyMaskType, .covering)
+
+        // Erasing
+        moduleMaskType = .erasing
+        proxyMaskType = .init(from: moduleMaskType)
+        XCTAssertEqual(proxyMaskType, .erasing)
     }
 }
