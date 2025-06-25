@@ -235,6 +235,7 @@ func generateMainTargets() -> [Target] {
         .target(
             name: "SplunkOpenTelemetryBackgroundExporter",
             dependencies: [
+                "SplunkCommon",
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
                 resolveDependency("logger"),

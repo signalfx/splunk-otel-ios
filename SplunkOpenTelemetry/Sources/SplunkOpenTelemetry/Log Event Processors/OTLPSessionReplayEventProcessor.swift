@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetryProtocolExporterCommon
@@ -23,12 +24,44 @@ import SplunkCommon
 import SplunkOpenTelemetryBackgroundExporter
 
 /// OTLPSessionReplayEventProcessor sends Session Replay data enriched with Resources via an instantiated background exporter.
+///
+/// In order to support log record binary body, we bypass processors-exporters chain, to allow exporting log records with binary body.
+/// This is achieved by manually creating log records (`SplunkLogRecords`) and sending them to exporter directly.
+/// This allows us to use custom types (especially the `AttributeValue` with `Data` field) to send binary body.
+///
+/// In case the binary body is supported in the future in the upstream, we can revert back to the processors-exporters chain.
 public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
     // MARK: - Private properties
 
-    // OTel log provider
-    private let loggerProvider: LoggerProvider
+    private let backgroundLogExporter: OTLPBackgroundHTTPLogExporterBinary
+
+    // Runtime attributes added manually to each exported log record
+    private unowned let runtimeAttributes: any RuntimeAttributes
+
+    // Resource object, added to all exported logs manually
+    private let resource: Resource
+
+    // Print log record contents to standard output if debug is enabled
+    private let debugEnabled: Bool
+
+    // Internal Logger
+    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
+
+    // Date format style for the stdout log
+    private let dateFormatStyle: Date.FormatStyle = {
+        let dateFormat = Date.FormatStyle()
+            .month()
+            .day()
+            .year()
+            .hour(.twoDigits(amPM: .wide))
+            .minute(.twoDigits)
+            .second(.twoDigits)
+            .secondFraction(.fractional(3))
+            .timeZone(.iso8601(.short))
+
+        return dateFormat
+    }()
 
     // Logger background dispatch queues
     private let backgroundQueue = DispatchQueue(
@@ -38,7 +71,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
     // Stored properties for Unit tests
     #if DEBUG
-        public var resource: Resource?
         public var storedLastProcessedEvent: (any AgentEvent)?
         public var storedLastSentEvent: (any AgentEvent)?
     #endif
@@ -63,7 +95,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         let envVarHeaders = [(String, String)]()
 
         // Initialize background exporter
-        let backgroundLogExporter = OTLPBackgroundHTTPLogExporter(
+        backgroundLogExporter = OTLPBackgroundHTTPLogExporterBinary(
             endpoint: sessionReplayEndpoint,
             config: configuration,
             qosConfig: SessionQOSConfiguration(),
@@ -71,26 +103,8 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
             fileType: "replay"
         )
 
-        // Initialize attribute checker proxy exporter
-        let attributeCheckerExporter = AttributeCheckerLogExporter(proxy: backgroundLogExporter)
-
-        // Initialize LogRecordProcessor
-        let simpleLogRecordProcessor = SimpleLogRecordProcessor(
-            logRecordExporter: attributeCheckerExporter
-        )
-
-        // Initialize AttributesLogRecordProcessor as the first stage of processing,
-        // which adds runtime attributes to all processed log records
-        let attributesLogRecordProcessor = OTLPAttributesLogRecordProcessor(
-            proxy: simpleLogRecordProcessor,
-            with: runtimeAttributes
-        )
-
-        // Add in Global Attributes processor
-        let globalAttributesLogRecordProcessor = OTLPGlobalAttributesLogRecordProcessor(
-            proxy: attributesLogRecordProcessor,
-            with: globalAttributes
-        )
+        self.runtimeAttributes = runtimeAttributes
+        self.debugEnabled = debugEnabled
 
         // Experimental attributes for integration PoC
         let replayResources = Resource(attributes: [
@@ -109,23 +123,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         #if DEBUG
             self.resource = resource
         #endif
-
-        var processors: [LogRecordProcessor] = [globalAttributesLogRecordProcessor]
-
-        // Initialize optional stdout exporter
-        if debugEnabled {
-            let stdoutExporter = SplunkStdoutLogExporter()
-            let stdoutSpanProcessor = SimpleLogRecordProcessor(logRecordExporter: stdoutExporter)
-
-            processors.append(stdoutSpanProcessor)
-        }
-
-        // Initialize logger provider
-        let loggerProviderBuilder = LoggerProviderBuilder()
-            .with(processors: processors)
-            .with(resource: resource)
-
-        loggerProvider = loggerProviderBuilder.build()
     }
 
 
@@ -153,18 +150,74 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     // MARK: - Private methods
 
     private func processEvent(event: any AgentEvent, completion: @escaping (Bool) -> Void) {
-        let logger = loggerProvider.get(instrumentationScopeName: event.instrumentationScope)
+        // Initialize attribute dictionary
+        //
+        // As we are bypasing a Log event processor and LogRecordBuilder,
+        // we need to add attributes manually.
+        var attributes: [String: SplunkAttributeValue] = [:]
 
-        // Build LogRecordBuilder from LogEvent
-        let logRecordBuilder = logger
-            .logRecordBuilder()
-            .build(with: event)
+        // Merge runtime attributes
+        for (key, value) in runtimeAttributes.all {
+            if let attributeValue = SplunkAttributeValue(value) {
+                attributes[key] = attributeValue
+            }
+        }
 
-        // Set observation timestamp
-        _ = logRecordBuilder.setObservedTimestamp(Date())
+        // Add attributes from the AgentEvent
+        // ‼️ This code mirrors code from `LogRecordBuilder+AgentEvent.swift`, but utilizes `SplunkAttributeValue`
 
-        // Send event
-        logRecordBuilder.emit()
+        // Attributes - session ID
+        if let sessionId = event.sessionId {
+            attributes["session.id"] = SplunkAttributeValue(sessionId)
+        }
+
+        // Attributes - event.domain
+        attributes["event.domain"] = SplunkAttributeValue(event.domain)
+
+        // Attributes - event.name
+        attributes["event.name"] = SplunkAttributeValue(event.name)
+
+        // Attributes - component
+        attributes["component"] = SplunkAttributeValue(event.component)
+
+        // Merge with provided attributes
+        if let providedAttributes = event.attributes {
+            for (attributeName, eventAttributeValue) in providedAttributes {
+                let splunkAttributeValue = SplunkAttributeValue(eventAttributeValue: eventAttributeValue)
+                attributes[attributeName] = splunkAttributeValue
+            }
+        }
+
+        let eventTimestamp = Date()
+
+        // Manually create a Log record
+        var logRecord = SplunkReadableLogRecord(
+            resource: resource,
+            instrumentationScopeInfo: InstrumentationScopeInfo(name: event.instrumentationScope),
+            timestamp: eventTimestamp,
+            observedTimestamp: eventTimestamp,
+            attributes: attributes
+        )
+
+        // Add body
+        if let body = event.body {
+            let attributeBody = SplunkAttributeValue(eventAttributeValue: body)
+            logRecord.body = attributeBody
+        } else {
+            logger.log(level: .error) {
+                "Missing session replay data in the session replay event."
+            }
+        }
+
+        let logRecords = [logRecord]
+
+        // Export log record
+        backgroundLogExporter.export(logRecords: logRecords)
+
+        // Print contents to stdout
+        if debugEnabled {
+            log(logRecords)
+        }
 
         #if DEBUG
             storedLastSentEvent = event
@@ -173,6 +226,49 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         // TODO: MRUM_AC-1062 (Post GA) - Propagate OTel exporter API errors into the Agent
         DispatchQueue.main.async {
             completion(true)
+        }
+    }
+}
+
+extension OTLPSessionReplayEventProcessor {
+
+    /// Logs a log record to standard output.
+    ///
+    /// ‼️ This code mirrors `SplunkStdoutLogExporter`.
+    private func log(_ logRecords: [SplunkReadableLogRecord]) {
+        for logRecord in logRecords {
+            // Log LogRecord data
+            logger.log {
+                var message = ""
+
+                message += "------ 🪵 Log: ------\n"
+                message += "Severity: \(String(describing: logRecord.severity))\n"
+                message += "Body: \(String(describing: logRecord.body))\n"
+                message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
+                message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(self.dateFormatStyle)))\n"
+
+                if let observedTimestamp = logRecord.observedTimestamp {
+                    let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
+                    let observedTimestampFormatted = observedTimestamp.formatted(self.dateFormatStyle)
+                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
+                } else {
+                    message += "ObservedTimestamp: -\n"
+                }
+
+                message += "SpanContext: \(String(describing: logRecord.spanContext))\n"
+
+                // Log attributes
+                message += "Attributes:\n"
+                message += "  \(logRecord.attributes)\n"
+
+                // Log resources
+                message += "Resource:\n"
+                message += "  \(logRecord.resource.attributes)\n"
+
+                message += "--------------------\n"
+
+                return message
+            }
         }
     }
 }

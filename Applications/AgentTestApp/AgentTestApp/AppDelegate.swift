@@ -58,6 +58,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Navigation Instrumentation
         SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
 
+        // Start session replay
+        SplunkRum.shared.sessionReplay.start()
+
         return true
     }
 
