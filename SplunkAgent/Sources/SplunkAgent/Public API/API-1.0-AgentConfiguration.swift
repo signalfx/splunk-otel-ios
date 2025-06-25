@@ -91,6 +91,26 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     public var showVCInstrumentation: Bool = false
 
 
+    // MARK: - Network Instrumentation properties (Legacy)
+
+    /// Specifies whether the Network Instrumentation module should be activated and generate network spans.
+    ///
+    /// The default value is `nil`.
+    @available(*, deprecated, message: "This property will be removed in a later version.")
+    public var ignoreURLs: NSRegularExpression? = nil
+
+    /// A Boolean value determines whether the Network Instrumentation module
+    /// should automatically detect network activity in the application.
+    ///
+    /// The default value is `true`.
+    @available(*, deprecated, message:
+        """
+        This property will be removed in a later version.
+        Use `SplunkRum.shared.network.preferences.enabled` instead.
+        """)
+    public var networkInstrumentation: Bool = true
+
+
     // MARK: - Private
 
     var sessionTimeout: Double = ConfigurationDefaults.sessionTimeout
@@ -231,6 +251,41 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     public func showVCInstrumentation(_ show: Bool) -> Self {
         var updated = self
         updated.showVCInstrumentation = show
+
+        return updated
+    }
+
+
+    // MARK: - Network Instrumentation properties (Legacy)
+
+    /// Specifies whether the Network Instrumentation module should be activated and generate network spans.
+    ///
+    /// - Parameter ignoreURLs: A regular expression resolving to URLs to ignore.
+    ///
+    /// - Returns: The updated configuration structure.
+    @available(*, deprecated, message: "This property will be removed in a later version.")
+    @discardableResult
+    public func ignoreURLs(ignoreURLs: NSRegularExpression) -> Self {
+        var updated = self
+        updated.ignoreURLs = ignoreURLs
+        
+        return updated
+    }
+
+    /// Sets whether or not the Network Instrumentation module should automatically detect network activity in the application.
+    ///
+    /// - Parameter enable: If `true`, the Network Instrumentation module will automatically detect network activity..
+    ///
+    /// - Returns: The updated configuration structure.
+    @available(*, deprecated, message:
+        """
+        This method will be removed in a later version.
+        Use `SplunkRum.shared.network.preferences.enabled` instead.
+        """)
+    @discardableResult
+    public func networkInstrumentation(_ enable: Bool) -> Self {
+        var updated = self
+        updated.networkInstrumentation = enable
 
         return updated
     }
