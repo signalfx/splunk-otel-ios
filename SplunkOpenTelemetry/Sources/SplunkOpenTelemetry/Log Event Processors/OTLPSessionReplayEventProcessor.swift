@@ -51,6 +51,8 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
         globalAttributes: [String: Any],
+        initialSessionId: String,
+        scriptInstanceId: String,
         debugEnabled: Bool
     ) {
         guard let sessionReplayEndpoint else {
@@ -92,10 +94,10 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
         // Experimental attributes for integration PoC
         let replayResources = Resource(attributes: [
-            "splunk.scriptInstance": .string(""),
-            "splunk.rumVersion": .string(resources.agentVersion),
             "process.runtime.name": .string("mobile"),
-            "splunk.rumSessionId": .string("23fc7322c65d8f001ba15473d3e80317")
+            "splunk.rumSessionId": .string(initialSessionId),
+            "splunk.rumVersion": .string(resources.agentVersion),
+            "splunk.scriptInstance": .string(scriptInstanceId)
         ])
 
         // Build Resources
