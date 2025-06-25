@@ -15,24 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAgent
-import SwiftUI
+#import "ObjCExceptionHelper.h"
 
-struct TemplateView: View {
-    var body: some View {
-        VStack {
-            DemoHeaderView()
-            Text("Clone this and add your content")
-            Button("Do something") {
-                doSomething()
-            }
-            Spacer()
-        }
-        .navigationTitle("Your title")
-        Spacer()
-    }
+@implementation ObjCExceptionHelper
 
-    func doSomething() {
-        print("did something")
++ (nullable NSException *)performBlockAndCatchException:(void (^)(void))block {
+    @try {
+        block();
+    } @catch (NSException *exception) {
+        return exception;
     }
+    return nil;
 }
+
+@end

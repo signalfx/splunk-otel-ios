@@ -64,6 +64,7 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 "SplunkAppStart",
                 "SplunkWebView",
+                "SplunkCustomTracking",
                 resolveDependency("logger")
             ],
             path: "SplunkAgent",
@@ -156,35 +157,38 @@ func generateMainTargets() -> [Target] {
         ),
 
 
-        // MARK: - Splunk Custom Data
+        // MARK: - SplunkCrashReporter
 
         .target(
-            name: "SplunkCustomData",
-            dependencies: [
-                "SplunkCommon"
+            name: "SplunkCrashReporter",
+            path: "SplunkCrashReporter",
+            exclude: [
+                "Source/dwarf_opstream.hpp",
+                "Source/dwarf_stack.hpp",
+                "Source/PLCrashAsyncDwarfCFAState.hpp",
+                "Source/PLCrashAsyncDwarfCIE.hpp",
+                "Source/PLCrashAsyncDwarfEncoding.hpp",
+                "Source/PLCrashAsyncDwarfExpression.hpp",
+                "Source/PLCrashAsyncDwarfFDE.hpp",
+                "Source/PLCrashAsyncDwarfPrimitives.hpp",
+                "Source/PLCrashAsyncLinkedList.hpp",
+                "Source/PLCrashReport.proto"
             ],
-            path: "SplunkCustomData/Sources"
-        ),
-        .testTarget(
-            name: "SplunkCustomDataTests",
-            dependencies: ["SplunkCustomData"],
-            path: "SplunkCustomData/Tests"
-        ),
-
-
-        // MARK: - Splunk Error Reporting
-
-        .target(
-            name: "SplunkErrorReporting",
-            dependencies: [
-                "SplunkCommon"
+            sources: [
+                "Source",
+                "Dependencies/protobuf-c"
             ],
-            path: "SplunkErrorReporting/Sources"
-        ),
-        .testTarget(
-            name: "SplunkErrorReportingTests",
-            dependencies: ["SplunkErrorReporting"],
-            path: "SplunkErrorReporting/Tests"
+            cSettings: [
+                .define("PLCR_PRIVATE"),
+                .define("PLCF_RELEASE_BUILD"),
+                .define("PLCRASHREPORTER_PREFIX", to: "SPLK"),
+                .define("SWIFT_PACKAGE"), // Should be defined by default, Xcode 11.1 workaround.
+                .headerSearchPath("Dependencies/protobuf-c"),
+                .unsafeFlags(["-w"]) // Suppresses "Implicit conversion" warnings in protobuf.c
+            ],
+            linkerSettings: [
+                .linkedFramework("Foundation")
+            ]
         ),
 
 
@@ -287,6 +291,30 @@ func generateMainTargets() -> [Target] {
         ),
 
 
+        // MARK: - Splunk Custom Tracking
+        
+        .target(
+            name: "SplunkCustomTracking",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                resolveDependency("logger")
+            ],
+            path: "SplunkCustomTracking/Sources"
+        ),
+        .testTarget(
+            name: "SplunkCustomTrackingTests",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkOpenTelemetry",
+                "SplunkCustomTracking",
+                resolveDependency("logger")
+            ],
+            path: "SplunkCustomTracking/Tests"
+        ),
+
+
+>>>>>>> feature/next-gen
         // MARK: - Session Replay Proxy
 
         .target(

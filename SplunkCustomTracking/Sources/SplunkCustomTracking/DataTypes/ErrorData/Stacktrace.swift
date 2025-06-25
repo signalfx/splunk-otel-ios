@@ -15,24 +15,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAgent
-import SwiftUI
+import Foundation
 
-struct TemplateView: View {
-    var body: some View {
-        VStack {
-            DemoHeaderView()
-            Text("Clone this and add your content")
-            Button("Do something") {
-                doSomething()
-            }
-            Spacer()
-        }
-        .navigationTitle("Your title")
-        Spacer()
-    }
 
-    func doSomething() {
-        print("did something")
+// MARK: - Stacktrace
+
+public struct Stacktrace {
+    let frames: [String]
+}
+
+
+// MARK: - Stacktrace formatting
+
+public extension Stacktrace {
+    var formatted: String {
+        frames.joined(separator: "\n")
     }
 }
