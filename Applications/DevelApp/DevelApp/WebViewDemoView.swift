@@ -24,7 +24,7 @@ import WebKit
 
 struct WebViewDemoView: View {
 
-    private static let isBrumDemoEnabled = true
+    private static let isBrumDemoEnabled = false
 
     @State private var modernWebView = WKWebView()
     @State private var modernWebViewWithLegacyCall = WKWebView()
