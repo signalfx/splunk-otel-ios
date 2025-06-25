@@ -15,24 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAgent
-import SwiftUI
+import XCTest
 
-struct TemplateView: View {
-    var body: some View {
-        VStack {
-            DemoHeaderView()
-            Text("Clone this and add your content")
-            Button("Do something") {
-                doSomething()
-            }
-            Spacer()
-        }
-        .navigationTitle("Your title")
-        Spacer()
-    }
+final class SplunkCustomTrackingTests: XCTestCase {
+    func testExample() throws {
+        // XCTest Documentation
+        // https://developer.apple.com/documentation/xctest
 
-    func doSomething() {
-        print("did something")
+        // Defining Test Cases and Test Methods
+        // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
     }
 }

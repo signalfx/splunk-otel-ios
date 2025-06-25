@@ -15,24 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAgent
-import SwiftUI
+import Foundation
+import OpenTelemetryApi
+import SplunkCommon
 
-struct TemplateView: View {
-    var body: some View {
-        VStack {
-            DemoHeaderView()
-            Text("Clone this and add your content")
-            Button("Do something") {
-                doSomething()
-            }
-            Spacer()
-        }
-        .navigationTitle("Your title")
-        Spacer()
-    }
 
-    func doSomething() {
-        print("did something")
-    }
+// MARK: - SplunkTrackable Protocol
+
+/// Protocol defining the base requirements for any CustomTracking item.
+public protocol SplunkTrackable {
+
+    /// Timestamp when the trackable item was created or when a duration started
+    var timestamp: Date { get }
+
+    /// Converts the trackable item to a dictionary representation using `[String: EventAttributeValue]`.
+    func toAttributesDictionary() -> [String: EventAttributeValue]
 }

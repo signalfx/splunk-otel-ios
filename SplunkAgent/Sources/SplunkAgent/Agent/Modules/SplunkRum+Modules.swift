@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 internal import CiscoSessionReplay
 internal import SplunkAppStart
+internal import SplunkCustomTracking
 internal import SplunkNavigation
 internal import SplunkNetwork
 
@@ -55,6 +56,7 @@ extension SplunkRum {
         customizeNavigation()
         customizeNetwork()
         customizeAppStart()
+        customizeCustomTracking()
         customizeWebView()
     }
 
@@ -165,6 +167,14 @@ extension SplunkRum {
             logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module not installed."
             }
+        }
+    }
+
+    /// Configure CustomTracking intrumentation module
+    private func customizeCustomTracking() {
+        if let customTrackingModule = modulesManager?.module(ofType: CustomTrackingInternal.self) {
+            // Initialize proxy API for this module
+            customTrackingProxy = CustomTracking(for: customTrackingModule)
         }
     }
 }

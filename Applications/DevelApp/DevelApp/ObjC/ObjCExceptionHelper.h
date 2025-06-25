@@ -15,24 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAgent
-import SwiftUI
+#import <Foundation/Foundation.h>
 
-struct TemplateView: View {
-    var body: some View {
-        VStack {
-            DemoHeaderView()
-            Text("Clone this and add your content")
-            Button("Do something") {
-                doSomething()
-            }
-            Spacer()
-        }
-        .navigationTitle("Your title")
-        Spacer()
-    }
+NS_ASSUME_NONNULL_BEGIN
 
-    func doSomething() {
-        print("did something")
-    }
-}
+@interface ObjCExceptionHelper : NSObject
+
+/// Executes a block and returns any thrown NSException.
+/// @param block The block to execute.
+/// @return The NSException that was thrown, or nil if no exception was thrown.
++ (nullable NSException *)performBlockAndCatchException:(void (^)(void))block;
+
+@end
+
+NS_ASSUME_NONNULL_END
