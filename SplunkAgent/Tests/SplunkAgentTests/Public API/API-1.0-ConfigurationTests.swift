@@ -33,6 +33,27 @@ final class API10ConfigurationTests: XCTestCase {
 
     // MARK: - API Tests
 
+    func testMinimalConfiguration() throws {
+        // Minimal initialization
+        let minimal = try ConfigurationTestBuilder.buildMinimal()
+        XCTAssertNotNil(minimal)
+
+        // Properties (READ)
+        XCTAssertEqual(minimal.endpoint.realm, realm)
+        XCTAssertEqual(minimal.endpoint.rumAccessToken, rumAccessToken)
+        XCTAssertNotNil(minimal.endpoint.traceEndpoint)
+        XCTAssertNotNil(minimal.endpoint.sessionReplayEndpoint)
+        XCTAssertEqual(minimal.deploymentEnvironment, deploymentEnvironment)
+        XCTAssertEqual(minimal.appName, appName)
+        XCTAssertNotNil(minimal.appVersion)
+        XCTAssertEqual(minimal.enableDebugLogging, ConfigurationDefaults.enableDebugLogging)
+        XCTAssertEqual(minimal.session.samplingRate, ConfigurationDefaults.sessionSamplingRate)
+
+        // Deprecated properties (READ)
+        XCTAssertTrue(minimal.deprecatedScreenNameSpans)
+        XCTAssertFalse(minimal.deprecatedShowVCInstrumentation)
+    }
+
     func testConfiguration() throws {
         // Default initialization
         var full = try ConfigurationTestBuilder.buildDefault()
@@ -51,21 +72,9 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertNotNil(full.endpoint.traceEndpoint)
         XCTAssertNotNil(full.endpoint.sessionReplayEndpoint)
 
-
-        // Minimal initialization
-        let minimal = try ConfigurationTestBuilder.buildMinimal()
-        XCTAssertNotNil(minimal)
-
-        // Properties (READ)
-        XCTAssertEqual(minimal.endpoint.realm, realm)
-        XCTAssertEqual(minimal.endpoint.rumAccessToken, rumAccessToken)
-        XCTAssertNotNil(minimal.endpoint.traceEndpoint)
-        XCTAssertNotNil(minimal.endpoint.sessionReplayEndpoint)
-        XCTAssertEqual(minimal.deploymentEnvironment, deploymentEnvironment)
-        XCTAssertEqual(minimal.appName, appName)
-        XCTAssertNotNil(minimal.appVersion)
-        XCTAssertEqual(minimal.enableDebugLogging, ConfigurationDefaults.enableDebugLogging)
-        XCTAssertEqual(minimal.session.samplingRate, ConfigurationDefaults.sessionSamplingRate)
+        // Deprecated properties (READ)
+        XCTAssertTrue(full.deprecatedScreenNameSpans)
+        XCTAssertFalse(full.deprecatedShowVCInstrumentation)
 
         // Properties (WRITE)
         full.appVersion = "0.1"
@@ -80,6 +89,13 @@ final class API10ConfigurationTests: XCTestCase {
         full = full.enableDebugLogging(false)
         XCTAssertEqual(full.enableDebugLogging, false)
 
+        // Deprecated properties (WRITE)
+        full.deprecatedScreenNameSpans = false
+        XCTAssertFalse(full.deprecatedScreenNameSpans)
+
+        full.deprecatedShowVCInstrumentation = true
+        XCTAssertTrue(full.deprecatedShowVCInstrumentation)
+
         // Session configuration
         full.session.samplingRate = 0.7
         XCTAssertEqual(full.session.samplingRate, 0.7)
@@ -93,7 +109,7 @@ final class API10ConfigurationTests: XCTestCase {
         // User configuration
         full.user.trackingMode = .noTracking
         XCTAssertEqual(full.user.trackingMode, .noTracking)
-        
+
         var userConfiguration = UserConfiguration()
         userConfiguration.trackingMode = .anonymousTracking
         full = full.userConfiguration(userConfiguration)
@@ -161,7 +177,7 @@ final class API10ConfigurationTests: XCTestCase {
 
         var sessionConfiguration = SessionConfiguration()
         sessionConfiguration.samplingRate = 0.4
-        
+
         var userConfiguration = UserConfiguration()
         userConfiguration.trackingMode = .anonymousTracking
 
@@ -183,5 +199,19 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration.user.trackingMode, userTrackingMode)
         XCTAssertEqual(configuration.globalAttributes, globalAttributes)
         XCTAssertNotNil(configuration.spanInterceptor)
+    }
+
+    func testConfigurationBuilderDeprecated() throws {
+        let screenNameSpans = false
+        let showVCInstrumentation = true
+
+        // Deprecated builder methods
+        let configuration = try ConfigurationTestBuilder.buildMinimal()
+            .deprecatedScreenNameSpans(enabled: screenNameSpans)
+            .deprecatedShowVCInstrumentation(showVCInstrumentation)
+
+        // Check if the data has been written
+        XCTAssertFalse(configuration.deprecatedScreenNameSpans)
+        XCTAssertTrue(configuration.deprecatedShowVCInstrumentation)
     }
 }
