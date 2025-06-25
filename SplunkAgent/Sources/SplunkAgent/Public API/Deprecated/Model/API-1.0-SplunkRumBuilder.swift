@@ -142,6 +142,11 @@ public class SplunkRumBuilder {
 
     // MARK: - Instrumentations builder methods
 
+    /// Sets whether or not the Navigation module should automatically detect navigation in the application.
+    ///
+    /// - Parameter show: If `true`, the Navigation module will automatically detect navigation.
+    ///
+    /// - Returns: The updated builder instance.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -153,6 +158,12 @@ public class SplunkRumBuilder {
         return self
     }
 
+
+    /// Specifies whether the Navigation module should be activated and generate navigation spans.
+    ///
+    /// - Parameter enabled: If `true`, the Navigation module generates navigation spans.
+    ///
+    /// - Returns: The updated builder instance.
     @available(*, deprecated, message: "This builder method will be removed in a later version.")
     @discardableResult
     public func screenNameSpans(enabled: Bool) -> SplunkRumBuilder {
