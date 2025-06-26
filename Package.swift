@@ -60,6 +60,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkNetwork",
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
+                "SplunkInteractions",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 "SplunkAppStart",
@@ -250,6 +251,24 @@ func generateMainTargets() -> [Target] {
             name: "SplunkOpenTelemetryBackgroundExporterTests",
             dependencies: ["SplunkOpenTelemetryBackgroundExporter", "SplunkCommon"],
             path: "SplunkOpenTelemetryBackgroundExporter/Tests"
+        ),
+
+
+        // MARK: - Splunk Interactions
+
+        .target(
+                name: "SplunkInteractions",
+                dependencies: [
+                    "SplunkCommon",
+                    .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                    resolveDependency("logger")
+                ],
+                path: "SplunkInteractions/Sources"
+            ),
+        .testTarget(
+            name: "SplunkInteractionsTests",
+            dependencies: ["SplunkInteractions"],
+            path: "SplunkInteractions/Tests"
         ),
 
 

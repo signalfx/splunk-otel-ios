@@ -21,6 +21,7 @@ internal import SplunkAppStart
 internal import SplunkCustomTracking
 internal import SplunkNavigation
 internal import SplunkNetwork
+internal import SplunkInteractions
 
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
@@ -57,6 +58,7 @@ extension SplunkRum {
         customizeNetwork()
         customizeAppStart()
         customizeCustomTracking()
+        customizeInteractions()
         customizeWebView()
     }
 
@@ -149,6 +151,18 @@ extension SplunkRum {
         let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
 
         appStartModule?.sharedState = sharedState
+    }
+
+    /// Configure Interactions module
+    private func customizeInteractions() {
+        let interactionsModule = modulesManager?.module(ofType: SplunkInteractions.Interactions.self)
+
+        guard let interactionsModule else {
+            return
+        }
+
+        // Initialize proxy API for this module
+        interactions = Interactions(for: interactionsModule)
     }
 
     /// Configure WebView Instrumentation module with shared state.

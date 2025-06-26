@@ -18,6 +18,7 @@ limitations under the License.
 internal import CiscoLogger
 internal import SplunkCommon
 internal import SplunkNavigation
+internal import SplunkInteractions
 
 import Combine
 import Foundation
@@ -62,6 +63,7 @@ public class SplunkRum: ObservableObject {
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
     lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
     lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
+    lazy var interactions: any InteractionsModule = InteractionsNonOperational()
 
 
     // MARK: - Platform Support
