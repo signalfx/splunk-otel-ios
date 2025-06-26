@@ -33,4 +33,20 @@ public extension SplunkRum {
     static func integrateWithBrowserRum(_ webView: WKWebView) {
         shared.webView.integrateWithBrowserRum(webView)
     }
+
+#if DEBUG
+    /// **PoC API:** Forces the current session to end and a new one to begin.
+    /// This is for development and demonstration purposes only.
+    @available(
+        *,
+        deprecated,
+        message: "This method is for testing use only and should not be relied on."
+    )
+    static func poc_forceNewSession() {
+        #warning("DO NOT SHIP: The temporary '_poc_forceNewSession()' API is still present.")
+        if let sessionManager = shared.currentSession as? DefaultSession {
+            sessionManager.rotateSession()
+        }
+    }
+#endif
 }
