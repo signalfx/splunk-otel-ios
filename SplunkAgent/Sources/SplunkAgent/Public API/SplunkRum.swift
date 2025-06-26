@@ -17,8 +17,6 @@ limitations under the License.
 
 internal import CiscoLogger
 internal import SplunkCommon
-internal import SplunkNavigation
-internal import SplunkInteractions
 
 import Combine
 import Foundation
@@ -235,10 +233,6 @@ public class SplunkRum: ObservableObject {
 
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = Self.createConfigurationHandler(for: configuration)
-        let moduleConfigurations = Self.createDerivedModuleConfigurations(
-            from: configuration,
-            moduleConfigurations: moduleConfigurations
-        )
 
         // Initialize the agent
         self.init(
@@ -305,30 +299,6 @@ public class SplunkRum: ObservableObject {
 //            for: configuration,
 //            apiClient: APIClient(baseUrl: configuration.configUrl)
 //        )
-    }
-
-    /// Creates an array of module configurations based on passed module configurations
-    /// and derived configurations created by processing parameters from the agent configuration.
-    private static func createDerivedModuleConfigurations(
-        from agentConfiguration: any AgentConfigurationProtocol,
-        moduleConfigurations: [Any]? = nil
-    ) -> [Any]? {
-        var configurations = moduleConfigurations ?? []
-
-        // Navigation instrumentation (legacy)
-        let navigationModuleConfiguration = SplunkNavigation.NavigationConfiguration(
-            isEnabled: agentConfiguration.screenNameSpans,
-            enableAutomatedTracking: agentConfiguration.showVCInstrumentation
-        )
-
-        // The supplied configuration has lower priority than derived configuration from legacy APIs
-        configurations.removeAll { configuration in
-            configuration is SplunkNavigation.NavigationConfiguration
-        }
-
-        configurations.append(navigationModuleConfiguration)
-
-        return configurations
     }
 
 
