@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Alternative deprecated Builder setup
 //        let builder = SplunkRumBuilder(
-//            real: "realm",
+//            realm: "realm",
 //            rumAuth: "token"
 //        )
 //            .setApplicationName("App Name")

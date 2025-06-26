@@ -17,7 +17,6 @@ limitations under the License.
 
 internal import CiscoLogger
 internal import SplunkCommon
-internal import SplunkNavigation
 
 import Combine
 import Foundation

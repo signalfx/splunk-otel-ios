@@ -1,24 +1,25 @@
 //
 /*
- Copyright 2025 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
- http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- */
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+internal import CiscoLogger
+internal import SplunkCommon
+internal import SplunkNavigation
 
 import Foundation
-internal import SplunkCommon
-internal import CiscoLogger
-internal import SplunkNavigation
 
 @available(*, deprecated, message:
     """
@@ -46,6 +47,7 @@ public class SplunkRumBuilder {
 
 
     // MARK: - Logging
+
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkRumBuilder")
 
 
@@ -68,7 +70,7 @@ public class SplunkRumBuilder {
             return
         }
 
-        self.endpointConfiguration = EndpointConfiguration(trace: traceUrl)
+        endpointConfiguration = EndpointConfiguration(trace: traceUrl)
     }
 
     @available(*, deprecated, message:
@@ -77,10 +79,10 @@ public class SplunkRumBuilder {
         Use the `SplunkRum.install` API instead.
         """)
     public init(realm: String, rumAuth: String) {
-        self.beaconUrl = "https://rum-ingest.\(realm).signalfx.com/v1/rum"
+        beaconUrl = "https://rum-ingest.\(realm).signalfx.com/v1/rum"
         self.rumAuth = rumAuth
-        
-        self.endpointConfiguration = EndpointConfiguration(realm: realm, rumAccessToken: rumAuth)
+
+        endpointConfiguration = EndpointConfiguration(realm: realm, rumAccessToken: rumAuth)
     }
 
 
@@ -93,7 +95,7 @@ public class SplunkRumBuilder {
         """)
     @discardableResult
     public func debug(enabled: Bool) -> SplunkRumBuilder {
-        self.debug = enabled
+        debug = enabled
         return self
     }
 
@@ -115,7 +117,7 @@ public class SplunkRumBuilder {
         """)
     @discardableResult
     public func sessionSamplingRatio(samplingRatio: Double) -> SplunkRumBuilder {
-        self.sessionSamplingRatio = samplingRatio
+        sessionSamplingRatio = samplingRatio
         return self
     }
 
@@ -154,7 +156,7 @@ public class SplunkRumBuilder {
         """)
     @discardableResult
     public func showVCInstrumentation(_ show: Bool) -> SplunkRumBuilder {
-        self.showVCInstrumentation = show
+        showVCInstrumentation = show
         return self
     }
 
@@ -167,7 +169,7 @@ public class SplunkRumBuilder {
     @available(*, deprecated, message: "This builder method will be removed in a later version.")
     @discardableResult
     public func screenNameSpans(enabled: Bool) -> SplunkRumBuilder {
-        self.screenNameSpans = enabled
+        screenNameSpans = enabled
         return self
     }
 
@@ -211,16 +213,16 @@ public class SplunkRumBuilder {
         var moduleConfigurations: [ModuleConfiguration] = []
 
         let navigationModuleConfiguration = SplunkNavigation.NavigationConfiguration(
-            isEnabled: self.screenNameSpans,
-            enableAutomatedTracking: self.showVCInstrumentation
+            isEnabled: screenNameSpans,
+            enableAutomatedTracking: showVCInstrumentation
         )
 
         moduleConfigurations.append(navigationModuleConfiguration)
 
         // Construct AgentConfiguration with the supplied builder properties
         let agentConfiguration = AgentConfiguration(endpoint: endpointConfiguration, appName: appName, deploymentEnvironment: developmentEnvironment)
-            .sessionConfiguration(SessionConfiguration(samplingRate: self.sessionSamplingRatio))
-            .enableDebugLogging(self.debug)
+            .sessionConfiguration(SessionConfiguration(samplingRate: sessionSamplingRatio))
+            .enableDebugLogging(debug)
 
         // Call the `install` method
         do {

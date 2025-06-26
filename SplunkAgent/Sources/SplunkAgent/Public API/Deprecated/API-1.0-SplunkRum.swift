@@ -26,7 +26,7 @@ public extension SplunkRum {
     static func getSessionId() -> String {
         SplunkRum.shared.session.state.id
     }
-    
+
     /// A boolean determinning the `Status` of agent recording.
     ///
     /// - Returns: True when the status resolves to `.running`.
@@ -36,5 +36,5 @@ public extension SplunkRum {
     }
 
     @available(*, deprecated, message: "This function will be removed in a later version.")
-    static func debugLog(_ msg: String) { }
+    static func debugLog(_ msg: String) {}
 }
