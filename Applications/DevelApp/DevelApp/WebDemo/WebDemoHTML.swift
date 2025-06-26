@@ -43,7 +43,7 @@ public struct WebDemoHTML {
         <body>
             <p style="font-size: 36px; font-variant: small-caps;">- web content -</p>
             <h4>Current Native Session ID:</h4>
-            <p id="sessionId">unknown</p>
+            <p id="sessionId">unavailable</p>
             <div id="extra-height"></div>
         </body>
         </html>
@@ -100,9 +100,10 @@ public struct WebDemoHTML {
             </script>
         </head>
         <body style="font-size: 48px; font-family: sans-serif">
+            <p style="font-size: 36px; font-variant: small-caps;">- web content -</p>
             <h4>Current Native Session ID:</h4>
-            <p id="sessionId">unknown</p>
-            <p>Above session ID is not from BRUM's detection. To see whether BRUM picked up the session ID, watch the traffic over the wire as reported in the Xcode Console while tethered to Xcode (such as when running in the iOS Simulator).
+            <p id="sessionId">unavailable</p>
+            <p>Above session ID is not from BRUM's detection. To see whether BRUM picked up the session ID, watch the traffic over the wire as reported in the Xcode Console while tethered to Xcode (such as when running in the iOS Simulator). You will need to have set your token and realm in the brumScript() function in WebDemoJS.swift.
         </body>
         </html>
         """

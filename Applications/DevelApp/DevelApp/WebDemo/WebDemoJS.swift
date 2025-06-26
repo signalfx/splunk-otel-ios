@@ -17,7 +17,7 @@ limitations under the License.
 
 public struct WebDemoJS {
 
-    // Currently not used in the demo pending better infrastructure for handling tokens vis-a-vis git commits.
+    // Currently disabled in the demo pending better infrastructure for handling tokens vis-a-vis git commits.
     public static func brumScript() -> String {
         return """
         <script src="https://cdn.signalfx.com/o11y-gdi-rum/latest/splunk-otel-web.js" crossorigin="anonymous">
@@ -52,7 +52,7 @@ public struct WebDemoJS {
                 const response = await window.SplunkRumNative.getNativeSessionIdAsync();
                 document.getElementById('sessionId').innerText = response;
             } catch (error) {
-                document.getElementById('sessionId').innerText = "unknown";
+                document.getElementById('sessionId').innerText = "unavailable";
                 console.log(`Error getting native Session ID: ${error.message}`);
             }
         }
@@ -68,7 +68,7 @@ public struct WebDemoJS {
                 const sessionId = window.SplunkRumNative.getNativeSessionId();
                 document.getElementById('sessionId').innerText = sessionId;
             } catch (error) {
-                document.getElementById('sessionId').innerText = "unknown";
+                document.getElementById('sessionId').innerText = "unavailable";
                 console.log(`Error getting native Session ID: ${error.message}`);
             }
         }
