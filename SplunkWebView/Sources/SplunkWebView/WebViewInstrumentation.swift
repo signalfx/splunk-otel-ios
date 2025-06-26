@@ -21,6 +21,7 @@ import WebKit
 
 public final class WebViewInstrumentation: NSObject {
 
+    // TODO: DEMRUM-2592: find a better solution to this duplicative workaround code.
     private var sessionDidResetNotificationPrivateCopy: Notification.Name {
         Notification.Name(
             PackageIdentifier.default(named: "session-did-reset")
