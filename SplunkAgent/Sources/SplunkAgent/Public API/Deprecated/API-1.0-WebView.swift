@@ -34,6 +34,7 @@ public extension SplunkRum {
         shared.webViewNativeBridge.integrateWithBrowserRum(webView)
     }
 
+// TODO: DEMRUM-2591: Remove test helper function poc_forceNewSession from iOS codebase
 #if DEBUG
     /// **PoC API:** Forces the current session to end and a new one to begin.
     /// This is for development and demonstration purposes only.
