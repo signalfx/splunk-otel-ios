@@ -314,7 +314,6 @@ func generateMainTargets() -> [Target] {
         ),
 
 
->>>>>>> feature/next-gen
         // MARK: - Session Replay Proxy
 
         .target(
