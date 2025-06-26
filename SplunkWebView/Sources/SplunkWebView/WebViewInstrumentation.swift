@@ -29,11 +29,14 @@ public final class WebViewInstrumentation: NSObject {
     }
 
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
+
+    /// Hold weak references to all instrumented webviews so we can notify of Session ID updates.
     private var instrumentedWebViews = NSHashTable<WKWebView>.weakObjects()
+
     public weak var sharedState: AgentSharedState?
 
-    // NSObject conformance
-    // swiftformat:disable:next modifierOrder
+    /// NSObject conformance
+    /// swiftformat:disable:next modifierOrder
     public override init() {
         super.init()
         /// Listen for session changes.
@@ -93,7 +96,7 @@ public final class WebViewInstrumentation: NSObject {
         instrumentedWebViews.add(webView)
 
         logger.log(level: .notice, isPrivate: false) {
-            "WebViewInstrumentation injecting SessionId."
+            "WebViewInstrumentation injecting JavaScript APIs for fetching native Session ID."
         }
 
         guard let sessionId = sharedState?.sessionId else {
