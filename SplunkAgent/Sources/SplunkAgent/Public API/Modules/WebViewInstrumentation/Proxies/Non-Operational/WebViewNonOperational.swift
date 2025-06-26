@@ -1,4 +1,3 @@
-
 //
 /*
 Copyright 2025 Splunk Inc.
@@ -16,11 +15,46 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
+internal import SplunkCommon
 import WebKit
 
-/// A Non-Operational version to use as a default proxy when the real module isn't installed.
+/// The class implementing WebView public API in non-operational mode.
+///
+/// This is especially the case when the module is stopped by remote configuration,
+/// but we still need to keep the API available to the user.
 final class WebViewNonOperational: WebViewInstrumentationModule {
+
+    // MARK: - Private
+
+    private let logger: DefaultLogAgent
+
+
+    // MARK: - Initialization
+
+    init() {
+        logger = DefaultLogAgent(
+            poolName: PackageIdentifier.nonOperationalInstance(),
+            category: "WebView"
+        )
+    }
+
+
+    // MARK: - Public
+
     func integrateWithBrowserRum(_ view: WKWebView) {
-        // This is a no-op for when the module is not active.
+        logAccess(toApi: #function)
+    }
+
+
+    // MARK: - Logger
+
+    func logAccess(toApi named: String) {
+        logger.log(level: .notice) {
+            """
+            Attempt to access the API of a non-operational WebView module. \n
+            API: `\(named)`
+            """
+        }
     }
 }
