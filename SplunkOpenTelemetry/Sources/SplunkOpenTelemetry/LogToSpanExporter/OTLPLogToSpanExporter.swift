@@ -79,7 +79,21 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
     }
 
     private func spanName(from log: ReadableLogRecord) -> String? {
-        return log.attributes["event.name"]?.description
+        // Check for `eventName` property first
+        // ‼️ uncomment once the `eventName` log record attribute is implemented
+        // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.45.0/specification/logs/data-model.md#field-eventname
+        /*
+        if let eventName = log.eventName {
+            return eventName
+        } else
+         */
+        // Then check for `event.name` attribute
+        if let eventName = log.attributes[OpenTelemetryApi.SemanticAttributes.eventName.rawValue]?.description {
+            return eventName
+        }
+
+        // Add a defalt span name for all other logs
+        return "splunk.log"
     }
 
     public func shutdown(explicitTimeout: TimeInterval?) {}

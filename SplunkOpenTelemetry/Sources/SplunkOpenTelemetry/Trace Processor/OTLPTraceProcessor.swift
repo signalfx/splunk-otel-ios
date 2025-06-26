@@ -39,7 +39,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         with tracesEndpoint: URL,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
-        globalAttributes: [String: Any],
+        globalAttributes: @escaping () -> [String: AttributeValue],
         debugEnabled: Bool,
         spanInterceptor: SplunkSpanInterceptor?
     ) {

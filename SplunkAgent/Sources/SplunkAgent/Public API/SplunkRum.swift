@@ -46,7 +46,6 @@ public class SplunkRum: ObservableObject {
 
     lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
 
-    lazy var globalAttributes = agentConfiguration.globalAttributes
 
     let logProcessor: LogProcessor
     let logger: LogAgent
@@ -60,6 +59,8 @@ public class SplunkRum: ObservableObject {
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
     lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
+    lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
+    lazy var interactions: any InteractionsModule = InteractionsNonOperational()
 
 
     // MARK: - Platform Support
@@ -92,6 +93,9 @@ public class SplunkRum: ObservableObject {
     /// An object that holds current manages associated session.
     public private(set) lazy var session = Session(for: self)
 
+    /// An object that contains global attributes added to all signals
+    public private(set) lazy var globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
+
     /// An object reflects the current state and setting used for the recording.
     public private(set) lazy var state = RuntimeState(for: self)
 
@@ -106,6 +110,11 @@ public class SplunkRum: ObservableObject {
     /// An object that holds Session Replay module.
     public var sessionReplay: any SessionReplayModule {
         sessionReplayProxy
+    }
+
+    /// An object that holds Custom Tracking  module.
+    public var customTracking: any CustomTrackingModule {
+        customTrackingProxy
     }
 
     /// An object that holds Navigation module.
