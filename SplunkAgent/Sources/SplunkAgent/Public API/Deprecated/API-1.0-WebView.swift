@@ -31,7 +31,7 @@ public extension SplunkRum {
         message: "This method will be removed in a later version."
     )
     static func integrateWithBrowserRum(_ webView: WKWebView) {
-        shared.webView.integrateWithBrowserRum(webView)
+        shared.webViewNativeBridge.integrateWithBrowserRum(webView)
     }
 
 #if DEBUG

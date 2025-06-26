@@ -123,7 +123,7 @@ public class SplunkRum: ObservableObject {
     }
 
     /// An object that provides a bridge for WebView instrumentation.
-    public var webView: any WebViewInstrumentationModule {
+    public var webViewNativeBridge: any WebViewInstrumentationModule {
         webViewProxy
     }
 
