@@ -48,7 +48,7 @@ struct WebViewDemoView: View {
     }
 
     var callbackTestButton: WebDemoButton {
-        WebDemoButton(label: "Inject SplunkRumNative and Test Callback") {
+        WebDemoButton(label: "Inject and Test Callback (No Polling)") {
             SplunkRum.shared.webView.integrateWithBrowserRum(callbackTestWebView)
         }
     }
@@ -136,7 +136,7 @@ struct WebViewDemoView: View {
                 )
 
                 WebViewSectionView(
-                    caption: "Callback Test: onNativeSessionIdChanged",
+                    caption: "Callback Test: onNativeSessionIdChanged (no polling)",
                     webView: callbackTestWebView,
                     backgroundColor: colorForCallback,
                     buttons: [callbackTestButton, changeSessionIdButton],

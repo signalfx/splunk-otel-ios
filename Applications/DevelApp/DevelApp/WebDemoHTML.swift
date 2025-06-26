@@ -56,10 +56,7 @@ public struct WebDemoHTML {
                 word-wrap: break-word;
             }
             </style>
-            <!-- Script 1: The existing polling logic from legacyScriptExample -->
-            <script>
-                \(WebDemoJS.legacyScriptExample())
-            </script>
+            <!-- Polling script intentionally removed for this test. -->
             <!-- Script 2: Our new logic to set the callback handler -->
             <script>
                 \(WebDemoJS.callbackSetupScript())
@@ -67,8 +64,8 @@ public struct WebDemoHTML {
         </head>
         <body>
             <p style="font-size: 36px; font-variant: small-caps;">- web content -</p>
-            <h4>Current Native Session ID (Polled):</h4>
-            <p id="sessionId">unknown</p>
+            <h4>Current Native Session ID:</h4>
+            <p id="sessionId">No polling here. This will not update.</p>
 
             <!-- New section just for this test -->
             <h4>Callback Status:</h4>
