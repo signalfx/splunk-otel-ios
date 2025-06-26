@@ -15,11 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
+import Foundation
+@testable import SplunkInteractions
 
-/// The public protocol defining the capabilities of the WebView Instrumentation module.
-public protocol WebViewInstrumentationModule {
-    /// Injects the necessary JavaScript bridge into a given WKWebView to enable
-    /// communication between the web content and the native RUM agent.
-    func integrateWithBrowserRum(_ view: WKWebView)
+final class TestInteractionDestination: SplunkInteractionsDestination {
+    var didReceiveInteractionCallCount = 0
+    var actionName: String?
+
+    func send(actionName: String, elementId: String?, time: Date) {
+        self.actionName = actionName
+        didReceiveInteractionCallCount += 1
+    }
 }

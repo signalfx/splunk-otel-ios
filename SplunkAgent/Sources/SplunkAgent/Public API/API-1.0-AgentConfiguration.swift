@@ -71,26 +71,6 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     public var session = SessionConfiguration()
 
 
-    // MARK: - Instrumentation properties (Legacy)
-
-    /// Specifies whether the Navigation module should be activated and generate navigation spans.
-    ///
-    /// The default value is `true`.
-    @available(*, deprecated, message: "This property will be removed in a later version.")
-    public var screenNameSpans: Bool = true
-
-    /// A Boolean value determines whether the Navigation module
-    /// should automatically detect navigation in the application.
-    ///
-    /// The default value is `false`.
-    @available(*, deprecated, message:
-        """
-        This property will be removed in a later version.
-        Use `SplunkRum.shared.navigation.preferences.enableAutomatedTracking` instead.
-        """)
-    public var showVCInstrumentation: Bool = false
-
-
     // MARK: - Private
 
     var sessionTimeout: Double = ConfigurationDefaults.sessionTimeout
@@ -196,41 +176,6 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     public func spanInterceptor(_ spanInterceptor: ((SpanData) -> SpanData?)?) -> Self {
         var updated = self
         updated.spanInterceptor = spanInterceptor
-
-        return updated
-    }
-
-
-    // MARK: - Instrumentation methods (Legacy)
-
-    /// Specifies whether the Navigation module should be activated and generate navigation spans.
-    ///
-    /// - Parameter enabled: If `true`, the Navigation module generates navigation spans.
-    ///
-    /// - Returns: The updated configuration structure.
-    @available(*, deprecated, message: "This method will be removed in a later version.")
-    @discardableResult
-    public func screenNameSpans(enabled: Bool) -> Self {
-        var updated = self
-        updated.screenNameSpans = enabled
-
-        return updated
-    }
-
-    /// Sets whether or not the Navigation module should automatically detect navigation in the application.
-    ///
-    /// - Parameter show: If `true`, the Navigation module will automatically detect navigation.
-    ///
-    /// - Returns: The updated configuration structure.
-    @available(*, deprecated, message:
-        """
-        This method will be removed in a later version.
-        Use `SplunkRum.shared.navigation.preferences.enableAutomatedTracking` instead.
-        """)
-    @discardableResult
-    public func showVCInstrumentation(_ show: Bool) -> Self {
-        var updated = self
-        updated.showVCInstrumentation = show
 
         return updated
     }

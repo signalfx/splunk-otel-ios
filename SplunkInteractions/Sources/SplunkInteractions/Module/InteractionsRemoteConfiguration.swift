@@ -15,11 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
+import Foundation
+import SplunkCommon
 
-/// The public protocol defining the capabilities of the WebView Instrumentation module.
-public protocol WebViewInstrumentationModule {
-    /// Injects the necessary JavaScript bridge into a given WKWebView to enable
-    /// communication between the web content and the native RUM agent.
-    func integrateWithBrowserRum(_ view: WKWebView)
+/// Interactions remote configuration, minimal configuration for module conformance.
+public struct InteractionsRemoteConfiguration: RemoteModuleConfiguration {
+
+    // MARK: - Protocol compliance
+
+    public var enabled: Bool = true
+
+    public init?(from data: Data) {}
 }

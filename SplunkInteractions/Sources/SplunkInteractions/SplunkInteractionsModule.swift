@@ -15,11 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
+import Foundation
 
-/// The public protocol defining the capabilities of the WebView Instrumentation module.
-public protocol WebViewInstrumentationModule {
-    /// Injects the necessary JavaScript bridge into a given WKWebView to enable
-    /// communication between the web content and the native RUM agent.
-    func integrateWithBrowserRum(_ view: WKWebView)
+/// The SplunkInteractionsModule handles user interactions within the app.
+public protocol SplunkInteractionsModule {
+
+    /// Registers a custom identifier for a view.
+    /// - Parameters:
+    ///   - customId: A custom identifier to associate with the view.
+    ///   - viewId: The identifier of the view to register the customId for.
+    func register(customId: String?, for viewId: ObjectIdentifier)
 }

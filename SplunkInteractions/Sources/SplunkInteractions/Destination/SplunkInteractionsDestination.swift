@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
+import CiscoInteractions
+import Foundation
+import SplunkCommon
 
-/// The public protocol defining the capabilities of the WebView Instrumentation module.
-public protocol WebViewInstrumentationModule {
-    /// Injects the necessary JavaScript bridge into a given WKWebView to enable
-    /// communication between the web content and the native RUM agent.
-    func integrateWithBrowserRum(_ view: WKWebView)
+/// Describes a destination into which the AppStart module sends it's results.
+public protocol SplunkInteractionsDestination {
+
+    /// Sends results into a destination.
+    func send(actionName: String, elementId: String?, time: Date)
 }

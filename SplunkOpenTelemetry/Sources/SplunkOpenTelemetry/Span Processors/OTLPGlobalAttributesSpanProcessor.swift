@@ -20,9 +20,9 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 
 public class OTLPGlobalAttributesSpanProcessor: SpanProcessor {
-    private let globalAttributes: [String: Any]
+    private let globalAttributes: () -> [String: AttributeValue]
 
-    public init(with globalAttributes: [String: Any]) {
+    public init(with globalAttributes: @escaping () -> [String: AttributeValue]) {
         self.globalAttributes = globalAttributes
     }
 
@@ -32,24 +32,9 @@ public class OTLPGlobalAttributesSpanProcessor: SpanProcessor {
     public var isEndRequired: Bool { false }
 
     public func onStart(parentContext: SpanContext?, span: ReadableSpan) {
-        // Add global attributes to the span when it's created
-        for (key, value) in globalAttributes {
-            if let arrayValue = value as? [Any] {
-                var attributeValues: [AttributeValue] = []
-
-                for element in arrayValue {
-                    if let attributeValue = AttributeValue(element) {
-                        attributeValues.append(attributeValue)
-                    }
-                }
-
-                span.setAttribute(key: key, value: .array(AttributeArray(values: attributeValues)))
-
-            } else {
-                if let attributeValue = AttributeValue(value) {
-                    span.setAttribute(key: key, value: attributeValue)
-                }
-            }
+        // Add global attributes to the span attributes when it's created
+        for (key, value) in globalAttributes() {
+            span.setAttribute(key: key, value: value)
         }
     }
 

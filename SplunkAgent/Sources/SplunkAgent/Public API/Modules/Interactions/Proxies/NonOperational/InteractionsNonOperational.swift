@@ -15,11 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
+/// The class implementing Interactions public API in non-operational mode.
+final class InteractionsNonOperational: InteractionsModule {
 
-/// The public protocol defining the capabilities of the WebView Instrumentation module.
-public protocol WebViewInstrumentationModule {
-    /// Injects the necessary JavaScript bridge into a given WKWebView to enable
-    /// communication between the web content and the native RUM agent.
-    func integrateWithBrowserRum(_ view: WKWebView)
+    // MARK: - Custom ids
+
+    func register(customId: String?, for viewId: ObjectIdentifier) {}
 }
