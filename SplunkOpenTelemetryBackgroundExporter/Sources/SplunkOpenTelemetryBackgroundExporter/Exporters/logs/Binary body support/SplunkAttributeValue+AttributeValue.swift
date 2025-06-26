@@ -36,16 +36,16 @@ public extension SplunkAttributeValue {
             self = .double(attributeValue)
 
         case let .stringArray(attributeValue):
-            self = .stringArray(attributeValue)
+            self = .array(AttributeArray(values: attributeValue.map { AttributeValue.string($0) }))
 
         case let .boolArray(attributeValue):
-            self = .boolArray(attributeValue)
+            self = .array(AttributeArray(values: attributeValue.map { AttributeValue.bool($0) }))
 
         case let .intArray(attributeValue):
-            self = .intArray(attributeValue)
+            self = .array(AttributeArray(values: attributeValue.map { AttributeValue.int($0) }))
 
         case let .doubleArray(attributeValue):
-            self = .doubleArray(attributeValue)
+            self = .array(AttributeArray(values: attributeValue.map { AttributeValue.double($0) }))
 
         case let .array(attributeValue):
             self = .array(attributeValue)

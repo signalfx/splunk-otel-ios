@@ -21,19 +21,19 @@ import SplunkCommon
 public extension SplunkAttributeValue {
 
     /// Converts `EventAttributeValue` to `SplunkAttributeValue`.
-    init(eventAttributeValue eventAttributeValue: EventAttributeValue) {
-        switch eventAttributeValue {
-        case let .string(eventAttributeValue):
-            self = .string(eventAttributeValue)
+    init(eventAttributeValue attributeValue: EventAttributeValue) {
+        switch attributeValue {
+        case let .string(attributeValue):
+            self = .string(attributeValue)
 
-        case let .int(eventAttributeValue):
-            self = .int(eventAttributeValue)
+        case let .int(attributeValue):
+            self = .int(attributeValue)
 
-        case let .double(eventAttributeValue):
-            self = .double(eventAttributeValue)
+        case let .double(attributeValue):
+            self = .double(attributeValue)
 
-        case let .data(eventAttributeValue):
-            self = .data(eventAttributeValue)
+        case let .data(attributeValue):
+            self = .data(attributeValue)
         }
     }
 }

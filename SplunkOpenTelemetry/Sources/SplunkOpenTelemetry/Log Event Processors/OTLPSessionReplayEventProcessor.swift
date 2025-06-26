@@ -237,13 +237,22 @@ extension OTLPSessionReplayEventProcessor {
     /// ‼️ This code mirrors `SplunkStdoutLogExporter`.
     private func log(_ logRecords: [SplunkReadableLogRecord]) {
         for logRecord in logRecords {
+            var bodyDescription: String
+
+            switch logRecord.body {
+            case let .data(data):
+                bodyDescription = "\(data.count) bytes"
+            default:
+                bodyDescription = String(describing: logRecord.body)
+            }
+
             // Log LogRecord data
             logger.log {
                 var message = ""
 
                 message += "------ 🪵 Log: ------\n"
                 message += "Severity: \(String(describing: logRecord.severity))\n"
-                message += "Body: \(String(describing: logRecord.body))\n"
+                message += "Body: \(bodyDescription)\n"
                 message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
                 message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(self.dateFormatStyle)))\n"
 
