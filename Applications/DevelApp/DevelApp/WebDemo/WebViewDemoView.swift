@@ -70,7 +70,7 @@ struct WebViewDemoView: View {
                     )
                 }
 
-                // Standard Sections
+                // Standard WebViewSectionView Sections
                 ForEach(getSections(), id: \.caption) { section in
                     section
                 }
@@ -118,7 +118,7 @@ struct WebViewDemoView: View {
                 buttons: createWebDemoButton(isAsync: false, isLegacy: false, webView: legacyWebView)
             ),
             WebViewSectionView(
-                caption: "Modern BRUM-style async JavaScript API",
+                caption: "Future-proof async JavaScript API",
                 webView: modernWebView,
                 backgroundColor: colorForAsync,
                 buttons: createWebDemoButton(isAsync: true, isLegacy: false, webView: modernWebView)
