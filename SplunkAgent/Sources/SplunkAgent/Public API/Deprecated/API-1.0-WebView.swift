@@ -33,7 +33,6 @@ public extension SplunkRum {
     static func integrateWithBrowserRum(_ webView: WKWebView) {
         shared.webView.integrateWithBrowserRum(webView)
     }
-
 #if DEBUG
     /// **PoC API:** Forces the current session to end and a new one to begin.
     /// This is for development and demonstration purposes only.

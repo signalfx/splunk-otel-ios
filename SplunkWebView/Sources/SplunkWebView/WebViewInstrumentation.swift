@@ -21,9 +21,17 @@ import WebKit
 
 public final class WebViewInstrumentation: NSObject {
 
+    private var sessionDidResetNotificationPrivateCopy: Notification.Name {
+        Notification.Name(
+            PackageIdentifier.default(named: "session-did-reset")
+        )
+    }
+
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
 
-    public var sharedState: AgentSharedState?
+    private var instrumentedWebViews = NSHashTable<WKWebView>.weakObjects()
+
+    public weak var sharedState: AgentSharedState?
 
     // NSObject conformance
     // swiftformat:disable:next modifierOrder
@@ -33,6 +41,8 @@ public final class WebViewInstrumentation: NSObject {
 
     // swiftlint:disable function_body_length
     public func injectSessionId(into webView: WKWebView) {
+
+        instrumentedWebViews.add(webView)
 
         logger.log(level: .notice, isPrivate: false) {
             "WebViewInstrumentation injecting SessionId."
@@ -66,6 +76,13 @@ public final class WebViewInstrumentation: NSObject {
                                 console.error("[SplunkRumNative] Failed to fetch native session ID:", error);
                                 throw error;
                             });
+                    },
+                    _setNativeSessionId: function(newId) {
+                        if (newId !== self.cachedSessionId) {
+                            const oldId = self.cachedSessionId;
+                            self.cachedSessionId = newId;
+                            self._notifyChange(oldId, newId);
+                        }
                     },
                     _notifyChange: function(oldId, newId) {
                         if (typeof self.onNativeSessionIdChanged === "function") {
