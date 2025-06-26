@@ -105,10 +105,10 @@ public class NetworkInstrumentation {
         // Code here could filter based on URLRequest
 
         /* Save this until we add the feature into the Agent side API
-        guard agentConfiguration?.appDCloudShouldInstrument?(URLRequest) ?? true else {
-            return ((agentConfiguration?.appDCloudShouldInstrument!(URLRequest)) != nil)
-        }
-        */
+         guard agentConfiguration?.appDCloudShouldInstrument?(URLRequest) ?? true else {
+         return ((agentConfiguration?.appDCloudShouldInstrument!(URLRequest)) != nil)
+         }
+         */
 
         // Filter using ignoreURLs API
         if let urlToTest = URLRequest.url {
@@ -158,8 +158,28 @@ public class NetworkInstrumentation {
         let body = URLRequest.httpBody
         let length = body?.count ?? 0
         span.setAttribute(key: key, value: length)
-
         span.setAttribute(key: "component", value: "http")
+
+        if let url = URLRequest.url {
+            if let host = url.host {
+                span.setAttribute(key: "server.address", value: host)
+                // Preload with host in case IP cannot be determined
+                span.setAttribute(key: "network.peer.address", value: host)
+            }
+
+            if let port = url.port {
+                span.setAttribute(key: "network.peer.port", value: port)
+            } else {
+                let defaultPort = url.scheme?.lowercased() == "https" ? 443 : 80
+                span.setAttribute(key: "network.peer.port", value: defaultPort)
+            }
+
+            if let scheme = url.scheme?.lowercased() {
+                span.setAttribute(key: "network.protocol.name", value: scheme)
+            }
+
+            span.setAttribute(key: "url.full", value: url.absoluteString)
+        }
 
         if let sharedState {
             let sessionID = sharedState.sessionId
@@ -210,9 +230,23 @@ public class NetworkInstrumentation {
         let response = URLResponse as? HTTPURLResponse
         let length = response?.expectedContentLength ?? 0
         span.setAttribute(key: key, value: Int(length))
+        span.setAttribute(key: SemanticAttributes.httpResponseStatusCode, value: Int(response?.statusCode ?? 0))
 
-        if response != nil {
-            for (key, val) in response!.allHeaderFields {
+        // Try to capture IP address from the response/connection
+        if let httpResponse = response,
+           let url = httpResponse.url,
+           let host = url.host {
+            // Update network.peer.address with actual IP if we can get it
+            if let ipAddress = getIPAddressFromResponse(httpResponse) {
+                span.setAttribute(key: "network.peer.address", value: ipAddress)
+            }
+        }
+
+        if let httpResponse = response {
+            let protocolVersion = determineHTTPProtocolVersion(httpResponse)
+            span.setAttribute(key: "network.protocol.version", value: protocolVersion)
+
+            for (key, val) in httpResponse.allHeaderFields {
                 if let keyStr = key as? String,
                    let valStr = val as? String,
                    keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
@@ -232,7 +266,63 @@ public class NetworkInstrumentation {
         */
     }
 
+    private func determineHTTPProtocolVersion(_ response: HTTPURLResponse) -> String {
+        // Check for HTTP/2 server indicators
+        if let serverHeader = response.value(forHTTPHeaderField: "Server") {
+            if serverHeader.lowercased().contains("http/2") ||
+               serverHeader.lowercased().contains("h2") {
+                return "2.0"
+            }
+        }
+
+        // Check for HTTP/2 specific headers
+        if response.value(forHTTPHeaderField: "X-Firefox-Spdy") != nil ||
+           response.value(forHTTPHeaderField: "X-Google-Spdy") != nil {
+            return "2.0"
+        }
+
+        return "1.1"
+    }
+
+    private func getIPAddressFromResponse(_ response: HTTPURLResponse) -> String? {
+        // Some proxies or load balancers add headers with IP information
+        if let forwardedFor = response.value(forHTTPHeaderField: "X-Forwarded-For") {
+            // X-Forwarded-For can contain multiple IPs, take the first one
+            let ips = forwardedFor.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+            if let firstIP = ips.first, isValidIPAddress(firstIP) {
+                return firstIP
+            }
+        }
+        if let realIP = response.value(forHTTPHeaderField: "X-Real-IP") {
+            if isValidIPAddress(realIP) {
+                return realIP
+            }
+        }
+        return nil
+    }
+
+    private func isValidIPAddress(_ ipString: String) -> Bool {
+        // Check for IPv4
+        let ipv4Pattern = #"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"#
+        if ipString.range(of: ipv4Pattern, options: .regularExpression) != nil {
+            return true
+        }
+
+        // Check for IPv6
+        let ipv6Pattern = #"^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$"#
+        if ipString.range(of: ipv6Pattern, options: .regularExpression) != nil {
+            return true
+        }
+
+        return false
+    }
+
     func receivedError(error: Error, dataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, span: Span) {
+        span.setAttribute(key: "error", value: true)
+        span.setAttribute(key: "error.message", value: error.localizedDescription)
+        span.setAttribute(key: "error.type", value: String(describing: type(of: error)))
+        span.setAttribute(key: SemanticAttributes.httpResponseStatusCode, value: HTTPStatus)
+
         logger.log(level: .error) {
             "Error: \(error.localizedDescription), Status: \(HTTPStatus)"
         }
