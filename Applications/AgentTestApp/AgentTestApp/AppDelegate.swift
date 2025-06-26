@@ -26,6 +26,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
 
+        // Alternative deprecated Builder setup
+//        let builder = SplunkRumBuilder(
+//            realm: "realm",
+//            rumAuth: "token"
+//        )
+//            .setApplicationName("App Name")
+//            .deploymentEnvironment(environment: "dev")
+//            .debug(enabled: true)
+//            .sessionSamplingRatio(samplingRatio: 1)
+//            .showVCInstrumentation(true)
+//            .build()
+
         let endpointConfig = EndpointConfiguration(
             realm: "realm",
             rumAccessToken: "token"
@@ -61,9 +73,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Start session replay
         SplunkRum.shared.sessionReplay.start()
 
+        // API to update Global Attributes
+        SplunkRum.shared.globalAttributes.setBool(true, for: "isWorkingHard")
+        SplunkRum.shared.globalAttributes[string: "secret"] = "Red bull"
+
         return true
     }
-
 
     // MARK: UISceneSession Lifecycle
 

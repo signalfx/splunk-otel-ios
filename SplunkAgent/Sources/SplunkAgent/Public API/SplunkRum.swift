@@ -17,7 +17,6 @@ limitations under the License.
 
 internal import CiscoLogger
 internal import SplunkCommon
-internal import SplunkNavigation
 
 import Combine
 import Foundation
@@ -47,7 +46,6 @@ public class SplunkRum: ObservableObject {
 
     lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
 
-    lazy var globalAttributes = agentConfiguration.globalAttributes
 
     let logProcessor: LogProcessor
     let logger: LogAgent
@@ -61,6 +59,8 @@ public class SplunkRum: ObservableObject {
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
     lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
+    lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
+    lazy var interactions: any InteractionsModule = InteractionsNonOperational()
 
 
     // MARK: - Platform Support
@@ -93,6 +93,9 @@ public class SplunkRum: ObservableObject {
     /// An object that holds current manages associated session.
     public private(set) lazy var session = Session(for: self)
 
+    /// An object that contains global attributes added to all signals
+    public private(set) lazy var globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
+
     /// An object reflects the current state and setting used for the recording.
     public private(set) lazy var state = RuntimeState(for: self)
 
@@ -107,6 +110,11 @@ public class SplunkRum: ObservableObject {
     /// An object that holds Session Replay module.
     public var sessionReplay: any SessionReplayModule {
         sessionReplayProxy
+    }
+
+    /// An object that holds Custom Tracking  module.
+    public var customTracking: any CustomTrackingModule {
+        customTrackingProxy
     }
 
     /// An object that holds Navigation module.
@@ -225,10 +233,6 @@ public class SplunkRum: ObservableObject {
 
         // Prepare handler for stored configuration and download remote configuration
         let configurationHandler = Self.createConfigurationHandler(for: configuration)
-        let moduleConfigurations = Self.createDerivedModuleConfigurations(
-            from: configuration,
-            moduleConfigurations: moduleConfigurations
-        )
 
         // Initialize the agent
         self.init(
@@ -295,30 +299,6 @@ public class SplunkRum: ObservableObject {
 //            for: configuration,
 //            apiClient: APIClient(baseUrl: configuration.configUrl)
 //        )
-    }
-
-    /// Creates an array of module configurations based on passed module configurations
-    /// and derived configurations created by processing parameters from the agent configuration.
-    private static func createDerivedModuleConfigurations(
-        from agentConfiguration: any AgentConfigurationProtocol,
-        moduleConfigurations: [Any]? = nil
-    ) -> [Any]? {
-        var configurations = moduleConfigurations ?? []
-
-        // Navigation instrumentation (legacy)
-        let navigationModuleConfiguration = SplunkNavigation.NavigationConfiguration(
-            isEnabled: agentConfiguration.screenNameSpans,
-            enableAutomatedTracking: agentConfiguration.showVCInstrumentation
-        )
-
-        // The supplied configuration has lower priority than derived configuration from legacy APIs
-        configurations.removeAll { configuration in
-            configuration is SplunkNavigation.NavigationConfiguration
-        }
-
-        configurations.append(navigationModuleConfiguration)
-
-        return configurations
     }
 
 

@@ -82,7 +82,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         with sessionReplayEndpoint: URL?,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
-        globalAttributes: [String: Any],
+        globalAttributes: @escaping () -> [String: AttributeValue],
         initialSessionId: String,
         scriptInstanceId: String,
         debugEnabled: Bool
