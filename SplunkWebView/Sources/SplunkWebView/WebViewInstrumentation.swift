@@ -28,16 +28,63 @@ public final class WebViewInstrumentation: NSObject {
     }
 
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
-
     private var instrumentedWebViews = NSHashTable<WKWebView>.weakObjects()
-
     public weak var sharedState: AgentSharedState?
 
     // NSObject conformance
     // swiftformat:disable:next modifierOrder
-    public override init() {}
+    public override init() {
+        super.init()
+        /// Listen for session changes.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(sessionDidReset(_:)),
+            name: sessionDidResetNotificationPrivateCopy,
+            object: nil
+        )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
 
     // MARK: - Internal Methods
+
+    // MARK: - Notification handler for session resets.
+
+    @objc private func sessionDidReset(_ notification: Notification) {
+        // Extract new session ID from the notification's object.
+        guard let newId = notification.object as? String else {
+            logger.log(level: .warn) { "sessionDidResetNotification received without a valid session ID." }
+            return
+        }
+
+        logger.log(level: .info) { "Received sessionDidResetNotification. Pushing new session ID to web views." }
+
+        notifySessionIdChanged(newId: newId)
+    }
+
+    private func notifySessionIdChanged(newId: String) {
+        let script = "window.SplunkRumNative?._setNativeSessionId('\(newId)');"
+
+        // NSHashTable must be accessed on the main thread.
+        DispatchQueue.main.async {
+            for webView in self.instrumentedWebViews.allObjects {
+                webView.evaluateJavaScript(script, completionHandler: nil)
+            }
+        }
+    }
+
+    private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
+        let contentController = webView.configuration.userContentController
+        contentController.removeScriptMessageHandler(forName: name)
+        contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
+        return contentController
+    }
+
+
+    // MARK: - Public Methods
 
     // swiftlint:disable function_body_length
     public func injectSessionId(into webView: WKWebView) {
@@ -160,13 +207,6 @@ public final class WebViewInstrumentation: NSObject {
         // Needed at first load only; user script will persist across reloads and navigation
         webView.evaluateJavaScript(javaScript)
     } // swiftlint:enable function_body_length
-
-    private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
-        let contentController = webView.configuration.userContentController
-        contentController.removeScriptMessageHandler(forName: name)
-        contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
-        return contentController
-    }
 }
 
 // MARK: - WKScriptMessageHandlerWithReply
