@@ -48,10 +48,6 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertNotNil(minimal.appVersion)
         XCTAssertEqual(minimal.enableDebugLogging, ConfigurationDefaults.enableDebugLogging)
         XCTAssertEqual(minimal.session.samplingRate, ConfigurationDefaults.sessionSamplingRate)
-
-        // Deprecated properties (READ)
-        XCTAssertTrue(minimal.deprecatedScreenNameSpans)
-        XCTAssertFalse(minimal.deprecatedShowVCInstrumentation)
     }
 
     func testConfiguration() throws {
@@ -72,10 +68,6 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertNotNil(full.endpoint.traceEndpoint)
         XCTAssertNotNil(full.endpoint.sessionReplayEndpoint)
 
-        // Deprecated properties (READ)
-        XCTAssertTrue(full.deprecatedScreenNameSpans)
-        XCTAssertFalse(full.deprecatedShowVCInstrumentation)
-
         // Properties (WRITE)
         full.appVersion = "0.1"
         XCTAssertEqual(full.appVersion, "0.1")
@@ -88,13 +80,6 @@ final class API10ConfigurationTests: XCTestCase {
 
         full = full.enableDebugLogging(false)
         XCTAssertEqual(full.enableDebugLogging, false)
-
-        // Deprecated properties (WRITE)
-        full.deprecatedScreenNameSpans = false
-        XCTAssertFalse(full.deprecatedScreenNameSpans)
-
-        full.deprecatedShowVCInstrumentation = true
-        XCTAssertTrue(full.deprecatedShowVCInstrumentation)
 
         // Session configuration
         full.session.samplingRate = 0.7
@@ -199,19 +184,5 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration.user.trackingMode, userTrackingMode)
         XCTAssertEqual(configuration.globalAttributes, globalAttributes)
         XCTAssertNotNil(configuration.spanInterceptor)
-    }
-
-    func testConfigurationBuilderDeprecated() throws {
-        let screenNameSpans = false
-        let showVCInstrumentation = true
-
-        // Deprecated builder methods
-        let configuration = try ConfigurationTestBuilder.buildMinimal()
-            .deprecatedScreenNameSpans(enabled: screenNameSpans)
-            .deprecatedShowVCInstrumentation(showVCInstrumentation)
-
-        // Check if the data has been written
-        XCTAssertFalse(configuration.deprecatedScreenNameSpans)
-        XCTAssertTrue(configuration.deprecatedShowVCInstrumentation)
     }
 }

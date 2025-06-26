@@ -137,6 +137,18 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
         XCTAssertNotNil(isSensitive)
     }
 
+    // MARK: - Custom Ids
+
+    func testCustomIds() throws {
+        moduleProxy.customIdentifiers
+            .set(UIView(), "customId")
+            .set(UIView(), nil)
+
+        moduleProxy.customIdentifiers[UIView()] = "textCustomId"
+
+        _ = moduleProxy.customIdentifiers[UIView()]
+    }
+
 
     // MARK: - Rendering Mode
 

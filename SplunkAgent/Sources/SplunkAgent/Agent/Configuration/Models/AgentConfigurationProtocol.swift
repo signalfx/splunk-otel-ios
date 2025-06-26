@@ -39,17 +39,6 @@ protocol AgentConfigurationProtocol: Codable, Equatable {
     var session: SessionConfiguration { get set }
 
 
-    // MARK: - Instrumentation properties (Legacy)
-
-    var screenNameSpans: Bool { get set }
-    var showVCInstrumentation: Bool { get set }
-
-
-    // MARK: - Network Instrumentation properties (Legacy)
-
-    var ignoreURLs: NSRegularExpression? { get set }
-    var networkInstrumentation: Bool { get set }
-    
     // MARK: - Remote configuration parameters
 
     var sessionTimeout: Double { get set }
