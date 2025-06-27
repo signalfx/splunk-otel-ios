@@ -135,7 +135,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkNetworkMonitor",
             dependencies: [
                 "SplunkCommon",
-                "SplunkOpenTelemetry"
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
             ],
             path: "SplunkNetworkMonitor/Sources"
         ),
@@ -144,10 +144,10 @@ func generateMainTargets() -> [Target] {
             dependencies: ["SplunkNetworkMonitor"],
             path: "SplunkNetworkMonitor/Tests"
         ),
-        
-        
+
+
         // MARK: - Splunk Common
-        
+
         .target(
             name: "SplunkCommon",
             path: "SplunkCommon/Sources"

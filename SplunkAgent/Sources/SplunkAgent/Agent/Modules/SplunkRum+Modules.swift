@@ -57,13 +57,9 @@ extension SplunkRum {
         customizeNavigation()
         customizeNetwork()
         customizeAppStart()
-<<<<<<< feature/DEMRUM-773-Network-Info-Module
         customizeNetworkMonitor()
-=======
         customizeCustomTracking()
->>>>>>> feature/next-gen
         customizeWebView()
-
     }
 
     /// Perform operations specific to the SessionReplay module.

@@ -22,6 +22,10 @@ import OpenTelemetryApi
 import SplunkCommon
 
 public class NetworkMonitor {
+
+
+    // MARK: - Public
+
     public enum ConnectionType: String {
         case wifi
         case cellular
@@ -36,25 +40,34 @@ public class NetworkMonitor {
 
     public static let shared = NetworkMonitor()
 
+    public var statusChangeHandler: ((Bool, ConnectionType) -> Void)?
+
+
+    // MARK: - Private
+
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitorQueue")
-
-    private let telephonyInfo = CTTelephonyNetworkInfo()
-    public private(set) var currentRadioAccessTechnology: String?
-
-    public private(set) var isConnected: Bool = false
-    public private(set) var connectionType: ConnectionType = .unavailable
-
-    // Track previous state
     private var previousStatus: String?
     private var previousType: ConnectionType?
 
-    public var statusChangeHandler: ((Bool, ConnectionType) -> Void)?
+    private let telephonyInfo = CTTelephonyNetworkInfo()
+
+
+    // MARK: - Nested
+
+    public private(set) var currentRadioAccessTechnology: String?
+    public private(set) var isConnected: Bool = false
+    public private(set) var connectionType: ConnectionType = .unavailable
+
 
     // MARK: - Initialization
 
     // Module conformance
     public required init() {}
+
+    deinit {
+        stopDetection()
+    }
 
     public func startDetection() {
         monitor.pathUpdateHandler = { [weak self] path in
@@ -130,7 +143,7 @@ public class NetworkMonitor {
             .startSpan()
         span.setAttribute(key: "network.status", value: isConnected ? "available" : "lost")
         span.setAttribute(key: "network.connection.type", value: connectionType.rawValue)
-        if currentRadioAccessTechnology != "Unknown" {
+        if currentRadioAccessTechnology != nil {
             span.setAttribute(key: "network.connection.subtype", value: currentRadioAccessTechnology!)
         }
         span.end(time: timestamp)
@@ -147,7 +160,7 @@ public class NetworkMonitor {
 
     private func getCurrentRadioAccessTechnology() -> String? {
         // Pick the first available radio access technology
-        let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first ?? "Unknown"
+        let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first ?? nil
         switch radioTechnology {
         case CTRadioAccessTechnologyGPRS:
             return "GPRS (2G)"
@@ -176,7 +189,7 @@ public class NetworkMonitor {
         case CTRadioAccessTechnologyNR:
             return "NR (5G Standalone)"
         default:
-            return "Unknown"
+            return nil
         }
     }
 }
