@@ -255,21 +255,19 @@ class DefaultSession: AgentSession {
     func closeSession() {
         currentSession.closed = true
 
+        let currentSessionId = currentSession.id
+
         // Updates corresponding item in `SessionsModel`
         let currentSessionIndex = sessionsModel.sessions.firstIndex { item in
-            item.id == currentSession.id
+            item.id == currentSessionId
         }
 
         if let currentSessionIndex {
             sessionsModel.sessions[currentSessionIndex] = currentSession
         }
 
-        logger.log(level: .info) { [weak self] in
-            guard let sessionId = self?.currentSession.id else {
-                return "Current session has been closed."
-            }
-
-            return "Current session (id \(sessionId)) has been closed."
+        logger.log(level: .info) {
+            "Current session (id \(currentSessionId)) has been closed."
         }
     }
 
