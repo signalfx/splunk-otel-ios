@@ -27,14 +27,14 @@ struct OTelDestination: SlowFrameDetectorDestination {
 
     func send(type: String, count: Int, sharedState: AgentSharedState?) {
 
-        let spanTime = Date()
-
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
                 instrumentationName: "splunk-slow-frame",
                 instrumentationVersion: sharedState?.agentVersion
             )
+
+        let spanTime = Date()
 
         let span = tracer.spanBuilder(spanName: type)
             .setStartTime(time: spanTime)
