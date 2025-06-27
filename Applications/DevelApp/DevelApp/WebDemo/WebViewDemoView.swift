@@ -57,6 +57,7 @@ struct WebViewDemoView: View {
                         buttons: [
                             WebDemoButton(label: "Inject and Demo with Full BRUM") {
                                 SplunkRum.shared.webViewNativeBridge.integrateWithBrowserRum(brumWebView)
+                                WebDemoHTML.loadWebViewContentWithBRUM(for: brumWebView, scriptContent: WebDemoJS.legacyScriptExample())
                             }
                         ]
                     )
@@ -100,7 +101,6 @@ struct WebViewDemoView: View {
 
     // MARK: - Load WebView Content
     private func loadWebViewContent() {
-        WebDemoHTML.loadWebViewContentWithBRUM(for: brumWebView, scriptContent: WebDemoJS.legacyScriptExample())
         WebDemoHTML.loadWebViewContent(for: legacyWebView, scriptContent: WebDemoJS.legacyScriptExample())
         WebDemoHTML.loadWebViewContent(for: modernWebView, scriptContent: WebDemoJS.modernScriptExample())
         WebDemoHTML.loadWebViewContent(for: modernWebViewWithLegacyCall, scriptContent: WebDemoJS.modernScriptExample())
