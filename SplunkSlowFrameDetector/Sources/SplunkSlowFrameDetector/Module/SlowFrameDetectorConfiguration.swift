@@ -18,7 +18,13 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-public struct SlowFrameDetectorConfiguration: ModuleConfiguration {}
+public struct SlowFrameDetectorConfiguration: ModuleConfiguration {
+    public var isEnabled: Bool = true
+
+    public init(isEnabled: Bool = true) {
+        self.isEnabled = isEnabled
+    }
+}
 
 public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
 

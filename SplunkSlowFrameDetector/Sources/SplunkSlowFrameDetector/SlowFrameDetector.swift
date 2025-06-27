@@ -63,8 +63,12 @@ public final class SlowFrameDetector {
     }
 
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
-
-        config = remoteConfiguration as? SlowFrameDetectorRemoteConfiguration
+        guard let config = configuration as? SlowFrameDetectorConfiguration else {
+            /// The provided configuration did not pan out. Re-install with a default one.
+            install(with: SlowFrameDetectorConfiguration(), remoteConfiguration: remoteConfiguration)
+            return
+        }
+        guard config.isEnabled else { return }
         start()
     }
 
