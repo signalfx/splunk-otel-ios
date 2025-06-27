@@ -295,14 +295,16 @@ public class CrashReports {
                 instrumentationVersion: sharedState?.agentVersion
             )
 
+        let timestamp = Date()
+
         let crashSpan = tracer.spanBuilder(spanName: "SplunkCrashReport")
-            .setStartTime(time: Date())
+            .setStartTime(time: timestamp)
             .startSpan()
 
         for (key, value) in crashReport {
             crashSpan.setAttribute(key: key.rawValue, value: toAttributeValue(value))
         }
 
-        crashSpan.end(time: Date())
+        crashSpan.end(time: timestamp)
     }
 }
