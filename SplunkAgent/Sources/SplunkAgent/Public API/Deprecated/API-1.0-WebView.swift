@@ -44,7 +44,7 @@ public extension SplunkRum {
         message: "This method is for testing use only and should not be relied on."
     )
     static func poc_forceNewSession() {
-        #warning("DO NOT SHIP: The temporary '_poc_forceNewSession()' API is still present.")
+        #warning("DO NOT SHIP: The temporary 'poc_forceNewSession()' API is still present.")
         if let sessionManager = shared.currentSession as? DefaultSession {
             sessionManager.rotateSession()
         }
