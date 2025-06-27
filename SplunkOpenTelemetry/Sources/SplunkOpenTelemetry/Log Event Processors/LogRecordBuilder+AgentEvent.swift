@@ -31,8 +31,8 @@ extension LogRecordBuilder {
         var otelAttributes: [String: AttributeValue] = [:]
 
         // Attributes - session ID
-        if let sessionID = event.sessionID {
-            otelAttributes["session.id"] = AttributeValue(sessionID)
+        if let sessionId = event.sessionId {
+            otelAttributes["session.id"] = AttributeValue(sessionId)
         }
 
         // Attributes - event.domain

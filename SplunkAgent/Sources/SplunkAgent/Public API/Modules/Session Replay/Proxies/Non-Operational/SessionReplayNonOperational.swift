@@ -34,6 +34,11 @@ final class SessionReplayNonOperational: SessionReplayModule {
     let sensitivity: any SessionReplayModuleSensitivity
 
 
+    // MARK: - Custom Id
+
+    var customIdentifiers: any SessionReplayModuleCustomId
+
+
     // MARK: - State
 
     let state: any SessionReplayModuleState
@@ -49,6 +54,7 @@ final class SessionReplayNonOperational: SessionReplayModule {
 
         // Build "dummy" Session Replay module
         sensitivity = SessionReplayNonOperationalSensitivity(logger: logger)
+        customIdentifiers = SessionReplayNonOperationalCustomId(logger: logger)
         state = SessionReplayNonOperationalState()
     }
 

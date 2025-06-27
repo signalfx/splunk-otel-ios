@@ -221,7 +221,7 @@ extension AgentConfiguration {
 
     // MARK: - Validation
 
-    /// Validate a configuration by checking the endpoint first, then other configuration parameterers.
+    /// Validate a configuration by checking the endpoint first, then other configuration parameters.
     ///
     /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
     func validate() throws {

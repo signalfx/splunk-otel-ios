@@ -26,6 +26,12 @@ public protocol SessionReplayModule: ObservableObject {
     var sensitivity: SessionReplayModuleSensitivity { get }
 
 
+    // MARK: - Custom id
+
+    /// An object that holds and manages view elements sensitivity.
+    var customIdentifiers: SessionReplayModuleCustomId { get }
+
+
     // MARK: - State
 
     /// An object that reflects the current state and settings used for the recording.
@@ -33,12 +39,6 @@ public protocol SessionReplayModule: ObservableObject {
 
 
     // MARK: - Module preferences
-
-    // Temporarily removed with Rendering Modes.
-
-    // swiftformat:disable indent
-
-    /*
 
     /// An object that holds preferred settings for the recording.
     var preferences: SessionReplayModulePreferences { get set }
@@ -49,9 +49,6 @@ public protocol SessionReplayModule: ObservableObject {
     ///
     /// - Returns: The actual `SessionReplay` instance.
     @discardableResult func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule
-     */
-
-    // swiftformat:enable indent
 
 
     // MARK: - Recording management

@@ -31,9 +31,6 @@ final class SessionReplay: SessionReplayModule {
 
     // MARK: - Private
 
-    // Temporarily removed with Rendering Modes.
-    // var internalPreferences: (any SessionReplayModulePreferences)?
-
     private let logger: DefaultLogAgent
 
 
@@ -55,12 +52,6 @@ final class SessionReplay: SessionReplayModule {
 
     // MARK: - Module preferences
 
-    // Temporarily removed with Rendering Modes.
-
-    // swiftformat:disable indent
-
-    /*
-
     lazy var preferences: any SessionReplayModulePreferences = SessionReplayPreferences(for: module) {
         didSet {
             // Link preferences with module instance
@@ -76,14 +67,16 @@ final class SessionReplay: SessionReplayModule {
 
         return self
     }
-    */
-
-    // swiftformat:enable indent
 
 
     // MARK: - Sensitivity
 
     private(set) lazy var sensitivity: any SessionReplayModuleSensitivity = SessionReplaySensitivity(for: module)
+
+
+    // MARK: - Custom id
+
+    private(set) lazy var customIdentifiers: any SessionReplayModuleCustomId = SessionReplayCustomId()
 
 
     // MARK: - State

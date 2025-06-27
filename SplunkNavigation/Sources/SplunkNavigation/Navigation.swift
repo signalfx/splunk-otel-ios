@@ -38,7 +38,7 @@ public final class Navigation: Sendable {
     let model = NavigationModel()
 
     let appBundleName: String?
-    private let continuation: AsyncStream<String>.Continuation
+    let continuation: AsyncStream<String>.Continuation
 
     private let logger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),
@@ -296,10 +296,10 @@ public final class Navigation: Sendable {
         await model.update(screenName: screenName)
 
         // Yield this change to the consumer
-        continuation.yield(screenName)
-
-        // Send corresponding span
+        // and send corresponding span
         if screenName != lastScreenName {
+            continuation.yield(screenName)
+
             send(screenName: screenName, lastScreenName: lastScreenName, start: start)
         }
     }
