@@ -24,6 +24,13 @@ limitations under the License.
 /// deprecated APIs, and Swift does not provide a direct solution.
 public protocol SplunkRumDeprecated {
 
+    // MARK: - SplunkRum API
+
+    static func getSessionId() -> String
+    static func isInitialized() -> Bool
+    static func debugLog(_ msg: String)
+
+
     // MARK: - Screen name
 
     static func setScreenName(_ name: String)
@@ -42,4 +49,14 @@ extension SplunkRum: SplunkRumDeprecated {
     static func deprecatedAddScreenNameChangeCallback(_ callback: ((String) -> Void)?) {
         (Self.self as SplunkRumDeprecated.Type).addScreenNameChangeCallback(callback)
     }
+
+    static func deprecatedGetSessionId() -> String {
+        (Self.self as SplunkRumDeprecated.Type).getSessionId()
+    }
+
+    static func deprecatedIsInitialized() -> Bool {
+        (Self.self as SplunkRumDeprecated.Type).isInitialized()
+    }
+
+    static func deprecatedDebugLog(_ msg: String) { }
 }

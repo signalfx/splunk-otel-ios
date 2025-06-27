@@ -65,18 +65,12 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
 
         // Initialize LogRecordProcessor
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(
-            logRecordExporter: logToSpanExporter
+            logRecordExporter: debugEnabled
+            ? SplunkStdoutLogExporter(with: logToSpanExporter)
+            : logToSpanExporter
         )
 
         var processors: [LogRecordProcessor] = [simpleLogRecordProcessor]
-
-        // Initialize optional stdout exporter
-        if debugEnabled {
-            let stdoutExporter = SplunkStdoutLogExporter()
-            let stdoutSpanProcessor = SimpleLogRecordProcessor(logRecordExporter: stdoutExporter)
-
-            processors.append(stdoutSpanProcessor)
-        }
 
         // Initialize logger provider
         let loggerProviderBuilder = LoggerProviderBuilder()

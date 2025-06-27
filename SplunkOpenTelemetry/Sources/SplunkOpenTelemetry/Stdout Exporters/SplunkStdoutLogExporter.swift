@@ -25,6 +25,8 @@ class SplunkStdoutLogExporter: LogRecordExporter {
 
     // MARK: - Private
 
+    private let proxyExporter: LogRecordExporter
+
     // Internal Logger
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
@@ -43,7 +45,9 @@ class SplunkStdoutLogExporter: LogRecordExporter {
         return dateFormat
     }()
 
-    init() {}
+    init(with proxy: LogRecordExporter) {
+        proxyExporter = proxy
+    }
 
     func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         for logRecord in logRecords {
@@ -81,12 +85,14 @@ class SplunkStdoutLogExporter: LogRecordExporter {
             }
         }
 
-        return .success
+        return proxyExporter.export(logRecords: logRecords, explicitTimeout: explicitTimeout)
     }
 
     func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
-        return .success
+        return proxyExporter.forceFlush(explicitTimeout: explicitTimeout)
     }
 
-    func shutdown(explicitTimeout: TimeInterval?) {}
+    func shutdown(explicitTimeout: TimeInterval?) {
+        return proxyExporter.shutdown(explicitTimeout: explicitTimeout)
+    }
 }

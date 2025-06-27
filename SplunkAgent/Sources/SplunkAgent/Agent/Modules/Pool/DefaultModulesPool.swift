@@ -55,6 +55,10 @@ internal import SplunkCommon
     internal import SplunkCustomTracking
 #endif
 
+#if canImport(SplunkInteractions)
+    internal import SplunkInteractions
+#endif
+
 
 /// The class implements the default pool of available modules.
 class DefaultModulesPool: AgentModulesPool {
@@ -105,6 +109,11 @@ class DefaultModulesPool: AgentModulesPool {
         // Custom Tracking
         #if canImport(SplunkCustomTracking)
             knownModules.append(CustomTrackingInternal.self)
+        #endif
+
+        // Interactions
+        #if canImport(SplunkInteractions)
+            knownModules.append(SplunkInteractions.Interactions.self)
         #endif
 
         return knownModules
