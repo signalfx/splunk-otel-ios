@@ -60,6 +60,6 @@ public enum CrashReportKeys: String {
     case imagePath
     case imageUUID
 
-    // Primary group key
-    case crashReportMessageName = "ios.crash_report"
+    // Session ID
+    case sessionId = "session.id"
 }

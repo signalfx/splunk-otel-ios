@@ -23,6 +23,7 @@ import SplunkCommon
 
 public class CrashReports {
 
+
     // MARK: - Public
 
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
@@ -32,18 +33,28 @@ public class CrashReports {
     var allUsedImageNames: [String] = []
 
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "CrashReports")
-    private var crashReporter: PLCrashReporter?
-
-    /// Storage of periodically sampled device data
-    private var deviceDataDictionary: [String: String] = [:]
 
     /// A reference to the Module's data publishing callback.
     var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)?
 
 
+    // MARK: - Private
+
+    private var crashReporter: PLCrashReporter?
+
+    /// Storage of periodically sampled device data
+    private var deviceDataDictionary: [String: String] = [:]
+    private var dataUpdateTimer: Timer?
+
+
     // MARK: - Module methods
 
     public required init() {}
+
+    deinit {
+        dataUpdateTimer?.invalidate()
+        dataUpdateTimer = nil
+    }
 
 
     // MARK: - Public methods
@@ -145,8 +156,10 @@ public class CrashReports {
             return false
         }
 
-        // Init device stats collection
-        updateDeviceStats()
+        // async in order to load session.id
+        DispatchQueue.main.async { [weak self] in
+            self?.updateDeviceStats()
+        }
         startPollingForDeviceStats()
 
         return true
@@ -175,10 +188,13 @@ public class CrashReports {
         return debuggerIsAttached
     }
 
-    // Device stats handler.  This added device stats to PLCrashReporter
+    // Device stats handler.  This added device stats and Session ID to PLCrashReporter
     // so that it will be included in a future crash report
     private func updateDeviceStats() {
         do {
+            if let sessionId = sharedState?.sessionId {
+                deviceDataDictionary["sessionId"] = sessionId
+            }
             deviceDataDictionary["battery"] = CrashReportDeviceStats.batteryLevel
             deviceDataDictionary["disk"] = CrashReportDeviceStats.freeDiskSpace
             deviceDataDictionary["memory"] = CrashReportDeviceStats.freeMemory
@@ -192,14 +208,11 @@ public class CrashReports {
         }
     }
 
-    // Device data is collected every 5 seconds and sent to PLCrashReporter
+    // Device data and Session ID is collected every 5 seconds and sent to PLCrashReporter
     private func startPollingForDeviceStats() {
         let repeatSeconds: Double = 5
-        DispatchQueue.global(qos: .background).async {
-            let timer = Timer.scheduledTimer(withTimeInterval: repeatSeconds, repeats: true) { _ in
-                self.updateDeviceStats()
-            }
-            timer.fire()
+        dataUpdateTimer = Timer.scheduledTimer(withTimeInterval: repeatSeconds, repeats: true) { _ in
+            self.updateDeviceStats()
         }
     }
 
@@ -253,6 +266,9 @@ public class CrashReports {
         if report.customData != nil {
             let customData = NSKeyedUnarchiver.unarchiveObject(with: report.customData) as? [String: String]
             if customData != nil {
+                if let sessionId = customData?["sessionId"] {
+                    reportDict[.sessionId] = customData!["sessionId"]
+                }
                 reportDict[.batteryLevel] = customData!["battery"]
                 reportDict[.freeMemory] = customData!["disk"]
                 reportDict[.freeDiskSpace] = customData!["memory"]
