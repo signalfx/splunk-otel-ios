@@ -192,7 +192,7 @@ public class SplunkRumBuilder {
     /// - Parameter thresholdMs: The legacy threshold in milliseconds. This value is not used.
     ///
     /// - Returns: The builder instance to allow for continued chaining.
-    @available(*, deprecated, message: "This builder method will be removed in a later version.")
+    @available(*, deprecated, message: "This configuration has been discontinued and has no effect. Thresholds are now managed automatically.")
     @discardableResult
     public func slowFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
         // This method is intentionally empty as the feature is discontinued.
