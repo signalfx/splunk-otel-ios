@@ -36,6 +36,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            .debug(enabled: true)
 //            .sessionSamplingRatio(samplingRatio: 1)
 //            .showVCInstrumentation(true)
+//            .slowRenderingDetectionEnabled(true)
+//            .slowFrameDetectionThresholdMs(thresholdMs: 400)
+//            .frozenFrameDetectionThresholdMs(thresholdMs: 700)
 //            .build()
 
         let endpointConfig = EndpointConfiguration(
