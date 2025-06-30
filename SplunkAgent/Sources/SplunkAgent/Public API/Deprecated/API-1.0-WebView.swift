@@ -33,21 +33,4 @@ public extension SplunkRum {
     static func integrateWithBrowserRum(_ webView: WKWebView) {
         shared.webViewNativeBridge.integrateWithBrowserRum(webView)
     }
-
-// TODO: DEMRUM-2591: Remove test helper function poc_forceNewSession from iOS codebase
-#if DEBUG
-    /// **PoC API:** Forces the current session to end and a new one to begin.
-    /// This is for development and demonstration purposes only.
-    @available(
-        *,
-        deprecated,
-        message: "This method is for testing use only and should not be relied on."
-    )
-    static func poc_forceNewSession() {
-        #warning("DO NOT SHIP: The temporary 'poc_forceNewSession()' API is still present.")
-        if let sessionManager = shared.currentSession as? DefaultSession {
-            sessionManager.rotateSession()
-        }
-    }
-#endif
 }

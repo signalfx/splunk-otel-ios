@@ -21,64 +21,16 @@ import WebKit
 
 public final class WebViewInstrumentation: NSObject {
 
-    // TODO: DEMRUM-2592: find a better solution to this duplicative workaround code.
-    private var sessionDidResetNotificationPrivateCopy: Notification.Name {
-        Notification.Name(
-            PackageIdentifier.default(named: "session-did-reset")
-        )
-    }
-
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
-
-    /// Hold weak references to all instrumented webviews so we can notify of Session ID updates.
-    private var instrumentedWebViews = NSHashTable<WKWebView>.weakObjects()
 
     public weak var sharedState: AgentSharedState?
 
     /// NSObject conformance
     /// swiftformat:disable:next modifierOrder
-    public override init() {
-        super.init()
-        /// Listen for session changes.
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(sessionDidReset(_:)),
-            name: sessionDidResetNotificationPrivateCopy,
-            object: nil
-        )
-    }
-
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+    public override init() {}
 
 
     // MARK: - Internal Methods
-
-    // MARK: - Notification handler for session resets.
-
-    @objc private func sessionDidReset(_ notification: Notification) {
-        // Extract new session ID from the notification's object.
-        guard let newId = notification.object as? String else {
-            logger.log(level: .warn) { "sessionDidResetNotification received without a valid session ID." }
-            return
-        }
-
-        logger.log(level: .info) { "Received sessionDidResetNotification. Pushing new session ID to web views." }
-
-        notifySessionIdChanged(newId: newId)
-    }
-
-    private func notifySessionIdChanged(newId: String) {
-        let script = "window.SplunkRumNative?._setNativeSessionId('\(newId)');"
-
-        // NSHashTable must be accessed on the main thread.
-        DispatchQueue.main.async {
-            for webView in self.instrumentedWebViews.allObjects {
-                webView.evaluateJavaScript(script, completionHandler: nil)
-            }
-        }
-    }
 
     private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
         let contentController = webView.configuration.userContentController
@@ -92,8 +44,6 @@ public final class WebViewInstrumentation: NSObject {
 
     // swiftlint:disable function_body_length
     public func injectSessionId(into webView: WKWebView) {
-
-        instrumentedWebViews.add(webView)
 
         logger.log(level: .notice, isPrivate: false) {
             "WebViewInstrumentation injecting JavaScript APIs for fetching native Session ID."

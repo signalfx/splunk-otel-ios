@@ -78,7 +78,7 @@ struct WebViewDemoView: View {
 
                 // Callback Test Section
                 WebViewSectionView(
-                    caption: "Callback Test with Session Reset",
+                    caption: "(Disabled) Callback Test with Session Reset",
                     webView: callbackTestWebView,
                     backgroundColor: colorForCallback,
                     buttons: [
@@ -86,10 +86,12 @@ struct WebViewDemoView: View {
                             SplunkRum.shared.webViewNativeBridge.integrateWithBrowserRum(callbackTestWebView)
                         },
                         WebDemoButton(label: "Reset Session ID") {
-                            SplunkRum.poc_forceNewSession()
+                            //SplunkRum.poc_forceNewSession()
                         }
                     ]
                 )
+                .disabled(true)
+                .opacity(0.6)
             }
             .padding()
             .onAppear {
