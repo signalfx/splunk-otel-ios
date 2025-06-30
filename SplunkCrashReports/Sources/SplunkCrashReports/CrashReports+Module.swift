@@ -31,6 +31,7 @@ public struct CrashReportsMetadata: ModuleEventMetadata {
 
 extension CrashReports: Module {
 
+
     // MARK: - Module types
 
     public typealias Configuration = CrashReportsConfiguration
@@ -38,6 +39,22 @@ extension CrashReports: Module {
 
     public typealias EventMetadata = CrashReportsMetadata
     public typealias EventData = String
+
+
+    // MARK: - Module methods
+
+    public func install(with configuration: (any SplunkCommon.ModuleConfiguration)?, remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?) {
+
+        // Configure PLCrashReporter
+        configureCrashReporter()
+
+        // Start the crash reporter if it's enabled or if no configuration is provided.
+        let config = configuration as? Configuration
+        if config?.isEnabled ?? true {
+            _ = initializeCrashReporter()
+        }
+    }
+
 
     // MARK: - Module event data publishing
 
