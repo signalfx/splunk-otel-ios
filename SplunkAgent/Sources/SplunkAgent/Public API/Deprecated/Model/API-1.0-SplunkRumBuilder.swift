@@ -36,6 +36,7 @@ public class SplunkRumBuilder {
     private var environment: String?
     private var sessionSamplingRatio: Double = ConfigurationDefaults.sessionSamplingRate
     private var appName: String?
+    private var globalAttributes: [String: Any]?
 
     private var endpointConfiguration: EndpointConfiguration?
 
@@ -138,6 +139,16 @@ public class SplunkRumBuilder {
         """)
     @discardableResult
     public func enableDiskCache(enabled: Bool) -> SplunkRumBuilder {
+        return self
+    }
+
+    @available(*, deprecated, message:
+        """
+        This builder method will be removed in a later version.
+        """)
+    @discardableResult
+    public func globalAttributes(globalAttributes: [String: Any]) -> SplunkRumBuilder {
+        self.globalAttributes = globalAttributes
         return self
     }
 

@@ -35,6 +35,21 @@ public extension SplunkRum {
         SplunkRum.shared.state.status == .running
     }
 
+    /// [String: Any] added to global span attributes
+    ///
+    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum` API instead.")
+    static func setGlobalAttributes(_ attributes: [String: Any]) {
+        SplunkRum.shared.globalAttributes = attributes
+    }
+
+    /// Remove an element from global attributes
+    ///
+    /// When the agent is initialized, there is always some session ID.
+    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum` API instead.")
+    static func removeGlobalAttribute(_ key: String) {
+        SplunkRum.shared.globalAttributes[key] = nil
+    }
+
     @available(*, deprecated, message: "This function will be removed in a later version.")
     static func debugLog(_ msg: String) {}
 }
