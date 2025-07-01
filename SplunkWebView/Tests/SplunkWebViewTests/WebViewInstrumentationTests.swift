@@ -46,7 +46,6 @@ final class WebViewInstrumentationTests: XCTestCase {
         let expectation = XCTestExpectation(description: "JavaScript injected")
 
         mockWebView.evaluateJavaScriptHandler = { script, completionHandler in
-            // Assert that the script is the expected script
             XCTAssertTrue(script.contains("window.SplunkRumNative"))
             XCTAssertTrue(script.contains("getNativeSessionId"))
             expectation.fulfill()
