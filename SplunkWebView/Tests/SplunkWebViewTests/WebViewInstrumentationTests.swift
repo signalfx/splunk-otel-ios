@@ -24,17 +24,21 @@ final class WebViewInstrumentationTests: XCTestCase {
 
     var webViewInstrumentation: WebViewInstrumentation!
     var mockWebView: MockWebView!
+    var mockAgentSharedState: MockAgentSharedState!
 
     override func setUp() {
         super.setUp()
         webViewInstrumentation = WebViewInstrumentation()
         mockWebView = MockWebView()
-        webViewInstrumentation.sharedState = MockAgentSharedState()
+        // strong instance for testing
+        mockAgentSharedState = MockAgentSharedState()
+        webViewInstrumentation.sharedState = mockAgentSharedState
     }
 
     override func tearDown() {
         webViewInstrumentation = nil
         mockWebView = nil
+        mockAgentSharedState = nil
         super.tearDown()
     }
 
