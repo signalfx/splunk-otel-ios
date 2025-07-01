@@ -81,11 +81,10 @@ public class NetworkMonitor {
                let prevType = self.previousType,
                currentStatus != prevStatus || self.connectionType != prevType {
                 self.sendNetworkChangeSpan()
+                self.statusChangeHandler?(self.isConnected, self.connectionType)
             }
             self.previousStatus = currentStatus
             self.previousType = self.connectionType
-
-            self.statusChangeHandler?(self.isConnected, self.connectionType)
         }
         monitor.start(queue: queue)
 
