@@ -113,7 +113,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
             self.resource = resource
         #endif
 
-        var processors: [LogRecordProcessor] = [globalAttributesLogRecordProcessor]
+        let processors: [LogRecordProcessor] = [globalAttributesLogRecordProcessor]
 
         // Initialize logger provider
         let loggerProviderBuilder = LoggerProviderBuilder()
