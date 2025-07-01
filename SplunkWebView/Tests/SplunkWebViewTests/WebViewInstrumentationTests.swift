@@ -71,8 +71,8 @@ class MockWebView: WKWebView {
 }
 
 class MockAgentSharedState: AgentSharedState {
-    var sessionId: String = "testing-session-id"
-    var agentVersion: String = "testing-agent-version"
+    let sessionId: String = "testing-session-id"
+    let agentVersion: String = "testing-agent-version"
 
     func applicationState(for timestamp: Date) -> String? {
         "testing"
