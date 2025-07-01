@@ -199,4 +199,34 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         let authItem = comps.queryItems?.first { $0.name == "auth" }
         XCTAssertEqual(authItem?.value, token)
     }
+
+    func testBuildForDeprecatedSlowRenderingDetectionEnabled() throws {
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "authToken"
+        )
+            .setApplicationName("DeprecatedApp")
+            .deploymentEnvironment(environment: "Production")
+            .slowRenderingDetectionEnabled(false) // Deprecated method under test
+
+        XCTAssertTrue(builder.build())
+
+        let slowFrameConfig = SplunkRum.shared.slowFrameDetector.configuration
+        XCTAssertFalse(slowFrameConfig.isEnabled)
+    }
+
+    func testBuildSuccessForDiscontinuedSlowRenderingDetectionThresholdMethods() {
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "authToken"
+        )
+            .setApplicationName("NoOpApp")
+            .deploymentEnvironment(environment: "Production")
+            // These deprecated methods should have no effect
+            .slowFrameDetectionThresholdMs(thresholdMs: 100)
+            .frozenFrameDetectionThresholdMs(thresholdMs: 1000)
+
+        // Assert that building still succeeds
+        XCTAssertTrue(builder.build())
+    }
 }
