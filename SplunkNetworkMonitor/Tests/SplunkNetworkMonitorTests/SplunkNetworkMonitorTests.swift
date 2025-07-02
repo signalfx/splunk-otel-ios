@@ -16,8 +16,9 @@ limitations under the License.
 */
 
 import Network
-@testable import SplunkNetworkMonitor
 import XCTest
+
+@testable import SplunkNetworkMonitor
 
 final class NetworkMonitorTests: XCTestCase {
     func testInitialState() {
@@ -31,17 +32,17 @@ final class NetworkMonitorTests: XCTestCase {
         let exp = expectation(description: "Network status change")
 
         // Set up handler to verify network changes
-            NetworkMonitor.statusChangeHandler = { isConnected, connectionType in
-                // Assert the expected values after status change
-                XCTAssertTrue(isConnected)
-                XCTAssertEqual(connectionType, .wifi)
-                exp.fulfill()
-            }
+        NetworkMonitor.statusChangeHandler = { isConnected, connectionType in
+            // Assert the expected values after status change
+            XCTAssertTrue(isConnected)
+            XCTAssertEqual(connectionType, .wifi)
+            exp.fulfill()
+        }
 
-            // Simulate a change in network status
-            NetworkMonitor.statusChangeHandler?(true, .wifi)
+        // Simulate a change in network status
+        NetworkMonitor.statusChangeHandler?(true, .wifi)
 
-            // Wait for the expectation to be fulfilled
-            wait(for: [exp], timeout: 5.0)
+        // Wait for the expectation to be fulfilled
+        wait(for: [exp], timeout: 5.0)
     }
 }
