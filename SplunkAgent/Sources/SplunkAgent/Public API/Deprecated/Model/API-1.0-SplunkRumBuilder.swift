@@ -175,15 +175,14 @@ public class SplunkRumBuilder {
         return self
     }
 
-
     /// Specifies whether the SlowFrameDetection should be activated and generate slow frame detection spans.
     ///
     /// - Parameter enabled: If `true`, the SlowFrameDetection module generates slow frame detection spans.
     ///
     /// - Returns: The updated builder instance.
     @available(*, deprecated, message: "This builder method will be removed in a later version.")
-    public func slowRenderingDetectionEnabled(_ enabled: Bool) -> SplunkRumBuilder {
-        slowRenderingDetectionEnabled = enabled
+    public func slowRenderingDetectionEnabled(_ isEnabled: Bool) -> SplunkRumBuilder {
+        slowRenderingDetectionEnabled = isEnabled
         return self
     }
 
