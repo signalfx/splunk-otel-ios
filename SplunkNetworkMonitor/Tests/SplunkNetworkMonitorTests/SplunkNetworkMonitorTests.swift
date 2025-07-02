@@ -31,14 +31,17 @@ final class NetworkMonitorTests: XCTestCase {
         let exp = expectation(description: "Network status change")
 
         // Set up handler to verify network changes
-        NetworkMonitor.statusChangeHandler = { _, _ in
-            // Just verify we got a callback
-            exp.fulfill()
-        }
+            NetworkMonitor.statusChangeHandler = { isConnected, connectionType in
+                // Assert the expected values after status change
+                XCTAssertTrue(isConnected)
+                XCTAssertEqual(connectionType, .wifi)
+                exp.fulfill()
+            }
 
-        // Start monitoring
-        NetworkMonitor.statusChangeHandler?(true, .wifi)
+            // Simulate a change in network status
+            NetworkMonitor.statusChangeHandler?(true, .wifi)
 
-        wait(for: [exp], timeout: 5.0)
+            // Wait for the expectation to be fulfilled
+            wait(for: [exp], timeout: 5.0)
     }
 }
