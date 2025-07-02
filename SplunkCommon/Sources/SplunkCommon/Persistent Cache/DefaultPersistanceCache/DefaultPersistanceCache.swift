@@ -96,7 +96,7 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
         cacheName: String,
         diskStorage: DiskStorage = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: "Agent"),
-            rules: .default, encryption: NoneEncryption()
+            rules: .default
         ),
         maximumCapacity: Int?,
         maximumLifetime: TimeInterval?
