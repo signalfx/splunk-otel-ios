@@ -38,6 +38,8 @@ public final class SlowFrameDetector {
         }
     }
 
+    public var configuration: SlowFrameDetectorRemoteConfiguration?
+
     private var timer: Timer? = Timer()
     private var displayLink: CADisplayLink?
     private var displayLinkTask: Task<Void, Never>? // for async/await
@@ -46,8 +48,6 @@ public final class SlowFrameDetector {
     private var frozenFrames: ReportableFramesBuffer? = ReportableFramesBuffer()
 
     private var previousTimestamp: CFTimeInterval = 0.0
-
-    private var config: SlowFrameDetectorRemoteConfiguration?
 
     // Candidate future configuration options. If exposed, will need clamping.
     private var tolerancePercentage: Double = 15.0

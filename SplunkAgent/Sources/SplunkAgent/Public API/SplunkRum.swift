@@ -61,6 +61,7 @@ public class SplunkRum: ObservableObject {
     lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
     lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
     lazy var interactions: any InteractionsModule = InteractionsNonOperational()
+    lazy var slowFrameDetectorProxy: any SlowFrameDetectorModule = SlowFrameDetectorNonOperational()
 
 
     // MARK: - Platform Support
@@ -120,6 +121,11 @@ public class SplunkRum: ObservableObject {
     /// An object that holds Navigation module.
     public var navigation: any NavigationModule {
         navigationProxy
+    }
+
+    /// An object that holds SlowFrameDetector module.
+    public var slowFrameDetector: any SlowFrameDetectorModule {
+        slowFrameDetectorProxy
     }
 
 
