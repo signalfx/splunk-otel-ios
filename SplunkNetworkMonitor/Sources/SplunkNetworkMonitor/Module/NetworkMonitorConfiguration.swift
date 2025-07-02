@@ -18,8 +18,8 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// Crash reports module configuration, minimal configuration for module conformance.
-public struct CrashReportsConfiguration: ModuleConfiguration {
+/// NetworkMonitor module configuration, minimal configuration for module conformance.
+public struct NetworkMonitorConfiguration: ModuleConfiguration {
 
     // MARK: - Module management
 
@@ -32,38 +32,5 @@ public struct CrashReportsConfiguration: ModuleConfiguration {
     ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
     public init(isEnabled: Bool) {
         self.isEnabled = isEnabled
-    }
-}
-
-public struct CrashReportsRemoteConfiguration: RemoteModuleConfiguration {
-
-    // MARK: - Internal decoding
-
-    struct CrashReporting: Decodable {
-        let enabled: Bool
-    }
-
-    struct MRUMRoot: Decodable {
-        let crashReporting: CrashReporting
-    }
-
-    struct Configuration: Decodable {
-        let mrum: MRUMRoot
-    }
-
-    struct Root: Decodable {
-        let configuration: Configuration
-    }
-
-    // MARK: - Protocol compliance
-
-    public var enabled: Bool
-
-    public init?(from data: Data) {
-        guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
-            return nil
-        }
-
-        enabled = root.configuration.mrum.crashReporting.enabled
     }
 }

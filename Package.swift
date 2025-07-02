@@ -58,6 +58,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkSessionReplayProxy",
                 "SplunkNavigation",
                 "SplunkNetwork",
+                "SplunkNetworkMonitor",
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkInteractions",
@@ -126,6 +127,24 @@ func generateMainTargets() -> [Target] {
             name: "SplunkNetworkTests",
             dependencies: ["SplunkNetwork"],
             path: "SplunkNetwork/Tests"
+        ),
+        
+        
+        // MARK: - Splunk Network Monitor
+
+        .target(
+            name: "SplunkNetworkMonitor",
+            dependencies: [
+                "SplunkCommon",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                resolveDependency("logger")
+            ],
+            path: "SplunkNetworkMonitor/Sources"
+        ),
+        .testTarget(
+            name: "SplunkNetworkMonitorTests",
+            dependencies: ["SplunkNetworkMonitor"],
+            path: "SplunkNetworkMonitor/Tests"
         ),
 
 
@@ -240,6 +259,7 @@ func generateMainTargets() -> [Target] {
         .target(
             name: "SplunkOpenTelemetryBackgroundExporter",
             dependencies: [
+                "SplunkCommon",
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
                 resolveDependency("logger"),
