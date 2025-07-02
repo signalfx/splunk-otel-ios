@@ -154,16 +154,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplunkWebViewProxyTests"
-               BuildableName = "SplunkWebViewProxyTests"
-               BlueprintName = "SplunkWebViewProxyTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "SplunkWebViewTests"
                BuildableName = "SplunkWebViewTests"
                BlueprintName = "SplunkWebViewTests"
