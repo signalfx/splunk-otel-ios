@@ -59,7 +59,7 @@ final class WebViewInstrumentationInternalTests: XCTestCase {
 }
 
 // Mock WKWebView for testing
-class MockWebView: WKWebView {
+final class MockWebView: WKWebView {
     var evaluateJavaScriptHandler: ((String, @escaping (Any?, Error?) -> Void) -> Void)?
 
     func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
@@ -73,9 +73,9 @@ class MockWebView: WKWebView {
     }
 }
 
-class MockAgentSharedState: AgentSharedState {
-    var sessionId: String = "testing-session-id"
-    var agentVersion: String = "testing-agent-version"
+final class MockAgentSharedState: AgentSharedState {
+    let sessionId: String = "testing-session-id"
+    let agentVersion: String = "testing-agent-version"
 
     func applicationState(for timestamp: Date) -> String? {
         "testing"
