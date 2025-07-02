@@ -31,7 +31,7 @@ final class NetworkMonitorTests: XCTestCase {
         let exp = expectation(description: "Network status change")
 
         // Set up handler to verify network changes
-        NetworkMonitor.statusChangeHandler = { isConnected, type in
+        NetworkMonitor.statusChangeHandler = { _, _ in
             // Just verify we got a callback
             exp.fulfill()
         }
