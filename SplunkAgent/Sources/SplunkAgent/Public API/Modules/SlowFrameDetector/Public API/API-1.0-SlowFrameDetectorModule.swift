@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Marker protocol for operational and non-operational implementations.
+/// Shared protocol for operational and non-operational implementations.
 public protocol SlowFrameDetectorModule {
     /// An object that provides information about the current state of the module.
     var state: any SlowFrameDetectorModuleState { get }
