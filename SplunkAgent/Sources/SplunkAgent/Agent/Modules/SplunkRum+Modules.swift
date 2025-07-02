@@ -22,6 +22,7 @@ internal import SplunkCustomTracking
 internal import SplunkNavigation
 internal import SplunkNetwork
 internal import SplunkWebView
+internal import SplunkNetworkMonitor
 internal import SplunkInteractions
 
 #if canImport(SplunkCrashReports)
@@ -56,6 +57,7 @@ extension SplunkRum {
         customizeNavigation()
         customizeNetwork()
         customizeAppStart()
+        customizeNetworkMonitor()
         customizeCustomTracking()
         customizeInteractions()
         customizeWebView()
@@ -150,6 +152,13 @@ extension SplunkRum {
         let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
 
         appStartModule?.sharedState = sharedState
+    }
+
+    /// Configure NetworkMonitor module
+    private func customizeNetworkMonitor() {
+        let networkMonitorModule = modulesManager?.module(ofType: SplunkNetworkMonitor.NetworkMonitor.self)
+
+        networkMonitorModule?.sharedState = sharedState
     }
 
     /// Configure Interactions module
