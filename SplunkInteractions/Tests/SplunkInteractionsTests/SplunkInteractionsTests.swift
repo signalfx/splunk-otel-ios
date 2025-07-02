@@ -25,7 +25,7 @@ import XCTest
 final class SplunkInteractionsTests: XCTestCase {
 
     func testInteractionTypeReturnsCorrectStrings() {
-        let interactions = SplunkInteractions()
+        let interactions = Interactions()
 
         let types: [(CiscoInteractions.InteractionType, String)] = [
             (.gestureTap, "tap"),
@@ -44,7 +44,7 @@ final class SplunkInteractionsTests: XCTestCase {
     }
 
     func testHandlingStream() {
-        let interactions = SplunkInteractions()
+        let interactions = Interactions()
         interactions.startInteractionsDetection()
         let expectation = XCTestExpectation(description: "Waiting for async task")
 
@@ -60,7 +60,7 @@ final class SplunkInteractionsTests: XCTestCase {
 
     func testHandlingEvents() {
         let destination = TestInteractionDestination()
-        let interactions = SplunkInteractions(destination: destination)
+        let interactions = Interactions(destination: destination)
         interactions.startInteractionsDetection()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
