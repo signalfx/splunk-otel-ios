@@ -41,7 +41,7 @@ class DefaultEventManager: AgentEventManager {
 
     // Session Replay processor
     var sessionReplayProcessor: LogEventProcessor?
-    var sessionReplayEventIndex = 1
+    var sessionReplayIndexer: EventIndexer
     let scriptInstanceId: String
 
     // Trace processor
@@ -110,6 +110,8 @@ class DefaultEventManager: AgentEventManager {
             debugEnabled: configuration.enableDebugLogging
         )
 
+        sessionReplayIndexer = SessionReplayEventIndexer(named: "replay")
+
         // Initialize trace processor
         traceProcessor = OTLPTraceProcessor(
             with: traceUrl,
@@ -134,55 +136,15 @@ class DefaultEventManager: AgentEventManager {
 
         // Session Replay module data
         case let (metadata as Metadata, data as Data):
-            guard let sessionReplayProcessor else {
-                completion(false)
-
-                return
-            }
-
-            let sessionId = agent.session.sessionId(for: metadata.timestamp)
-            let event = SessionReplayDataEvent(
-                metadata: metadata,
-                data: data,
-                index: sessionReplayEventIndex,
-                sessionId: sessionId,
-                scriptInstanceId: scriptInstanceId
-            )
-
-            sessionReplayProcessor.sendEvent(
-                event: event,
-                immediateProcessing: false,
-                completion: completion
-            )
-
-            // TODO: This is only temporary solution for PoC
-
-            // NOTE:
-            // A better solution would be to store a sequence number for each session
-            // for processed events and update this continuously depending on how the data is processed.
-            sessionReplayEventIndex += 1
+            publishSessionReplay(data: data, metadata: metadata, completion: completion)
 
         // Crash Reports module data
         case let (metadata as CrashReportsMetadata, data as String):
-            let sessionId = agent.session.sessionId(for: metadata.timestamp)
-            let event = CrashReportsDataEvent(metadata: metadata, data: data, sessionID: sessionId)
-
-            logEventProcessor.sendEvent(
-                event: event,
-                immediateProcessing: true,
-                completion: completion
-            )
+            publishCrashReports(data: data, metadata: metadata, completion: completion)
 
         // Custom Tracking module data
         case let (metadata as CustomTrackingMetadata, data as CustomTrackingData):
-            let sessionId = agent.session.sessionId(for: metadata.timestamp)
-            let event = CustomTrackingDataEvent(metadata: metadata, data: data, sessionId: sessionId)
-
-            logEventProcessor.sendEvent(
-                event: event,
-                immediateProcessing: false,
-                completion: completion
-            )
+            publishCustomTracking(data: data, metadata: metadata, completion: completion)
 
         // Unknown module data
         default:
@@ -191,6 +153,107 @@ class DefaultEventManager: AgentEventManager {
             }
 
             completion(false)
+        }
+    }
+
+    private func publishSessionReplay(data: Data, metadata: Metadata, completion: @escaping (Bool) -> Void) {
+        guard
+            let sessionReplayProcessor,
+            let sessionId = agent.session.sessionId(for: metadata.timestamp)
+        else {
+            completion(false)
+
+            return
+        }
+
+        // Prepare and send the event as a separate transaction
+        Task {
+            guard let eventIndex = await prepareSessionReplayIndex(
+                sessionId: sessionId,
+                timestamp: metadata.timestamp
+            ) else {
+                completion(false)
+
+                return
+            }
+
+            let event = SessionReplayDataEvent(
+                metadata: metadata,
+                data: data,
+                index: eventIndex,
+                sessionId: sessionId,
+                scriptInstanceId: scriptInstanceId
+            )
+
+            sessionReplayProcessor.sendEvent(
+                event: event,
+                immediateProcessing: false,
+                completion: { [weak self] processed in
+                    if processed {
+                        self?.removeSessionReplayIndex(
+                            sessionId: sessionId,
+                            timestamp: metadata.timestamp
+                        )
+                    }
+
+                    completion(processed)
+                }
+            )
+        }
+    }
+
+    private func publishCrashReports(data: String, metadata: CrashReportsMetadata, completion: @escaping (Bool) -> Void) {
+        let sessionId = agent.session.sessionId(for: metadata.timestamp)
+        let event = CrashReportsDataEvent(metadata: metadata, data: data, sessionID: sessionId)
+
+        logEventProcessor.sendEvent(
+            event: event,
+            immediateProcessing: true,
+            completion: completion
+        )
+    }
+
+    private func publishCustomTracking(data: CustomTrackingData, metadata: CustomTrackingMetadata, completion: @escaping (Bool) -> Void) {
+        let sessionId = agent.session.sessionId(for: metadata.timestamp)
+        let event = CustomTrackingDataEvent(metadata: metadata, data: data, sessionId: sessionId)
+
+        logEventProcessor.sendEvent(
+            event: event,
+            immediateProcessing: false,
+            completion: completion
+        )
+    }
+
+
+    // MARK: - Module utils
+
+    private func prepareSessionReplayIndex(sessionId: String, timestamp: Date) async -> Int? {
+        do {
+            return try await sessionReplayIndexer.prepareIndex(
+                sessionId: sessionId,
+                eventTimestamp: timestamp
+            )
+        } catch {
+            logger.log(level: .debug, isPrivate: false) {
+                "Preparing the index for the Session Replay event ended with an error: \n\t\(error)"
+            }
+        }
+
+        return nil
+    }
+
+    private func removeSessionReplayIndex(sessionId: String, timestamp: Date) {
+        Task {
+            do {
+                try await sessionReplayIndexer.removeIndex(
+                    sessionId: sessionId,
+                    eventTimestamp: timestamp
+                )
+            } catch {
+                logger.log(level: .debug, isPrivate: false) {
+                    "Removing the index for the Session Replay event ended with an error: \n\t\(error)"
+                }
+            }
         }
     }
 }
