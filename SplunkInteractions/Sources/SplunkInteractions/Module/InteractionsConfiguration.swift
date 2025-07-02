@@ -20,5 +20,22 @@ import SplunkCommon
 
 /// SplunkInteractions module configuration, minimal configuration for module conformance.
 public struct InteractionsConfiguration: ModuleConfiguration {
+
+    // MARK: - Module management
+
+    /// Indicates whether the Module is enabled. Default value is `true`.
     public var isEnabled: Bool = true
+
+
+    // MARK: - Initialization
+
+    /// Initialize a new configuration.
+    public init() {}
+
+    /// Initializes new module configuration with preconfigured values.
+    /// 
+    /// - Parameter isEnabled: A `Boolean` value sets whether the module is enabled.
+    public init(isEnabled: Bool) {
+        self.isEnabled = isEnabled
+    }
 }
