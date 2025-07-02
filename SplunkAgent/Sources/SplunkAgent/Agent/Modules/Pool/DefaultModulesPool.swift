@@ -98,7 +98,7 @@ class DefaultModulesPool: AgentModulesPool {
 
         // Slow Frame Detector
         #if canImport(SplunkSlowFrameDetector)
-            knownModules.append(SlowFrameDetector.self)
+        knownModules.append(SplunkSlowFrameDetector.SlowFrameDetector.self)
         #endif
 
         // Web View Instrumentation
