@@ -20,7 +20,6 @@ internal import CiscoEncryption
 internal import CiscoLogger
 
 import Foundation
-import SplunkCommon
 
 /// A concurrency-safe persistent cache that stores elements as key-value pairs.
 public final class DefaultPersistentCache<Element: Codable & Sendable & Equatable>: AgentPersistentCache {
