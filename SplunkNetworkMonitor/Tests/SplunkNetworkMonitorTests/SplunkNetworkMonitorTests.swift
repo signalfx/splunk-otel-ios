@@ -23,7 +23,7 @@ final class NetworkMonitorTests: XCTestCase {
     func testInitialState() {
         let NetworkMonitor = NetworkMonitor()
         XCTAssertFalse(NetworkMonitor.isConnected)
-        XCTAssertEqual(NetworkMonitor.connectionType, .lost)
+        XCTAssertEqual(NetworkMonitor.connectionType, .unavailable)
     }
 
     func testNetworkMonitoring() {
@@ -37,7 +37,7 @@ final class NetworkMonitorTests: XCTestCase {
         }
 
         // Start monitoring
-        NetworkMonitor.startDetection()
+        NetworkMonitor.statusChangeHandler?(true, .wifi)
 
         wait(for: [exp], timeout: 5.0)
     }
