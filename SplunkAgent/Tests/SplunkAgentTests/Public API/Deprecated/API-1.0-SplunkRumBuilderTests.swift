@@ -201,18 +201,42 @@ final class API10SplunkRumBuilderTests: XCTestCase {
     }
 
     func testBuildForDeprecatedSlowRenderingDetectionEnabled() throws {
-        let builder = SplunkRumBuilder(
+        // MARK: - Test Case 1: Disabling the module
+
+        // Arrange: Configure the builder to disable the feature
+        let builderFalse = SplunkRumBuilder(
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "authToken"
         )
             .setApplicationName("DeprecatedApp")
             .deploymentEnvironment(environment: "Production")
-            .slowRenderingDetectionEnabled(false) // Deprecated method under test
+            .slowRenderingDetectionEnabled(false) // Method under test
 
-        XCTAssertTrue(builder.build())
+        // Act: Build the agent
+        XCTAssertTrue(builderFalse.build(), "Builder should successfully build when feature is disabled.")
 
-        let slowFrameConfig = SplunkRum.shared.slowFrameDetector.configuration
-        XCTAssertFalse(slowFrameConfig.isEnabled)
+        // Assert: Verify the module's state is correctly set to disabled
+        XCTAssertFalse(SplunkRum.shared.slowFrameDetector.state.isEnabled, "Slow frame detector should be disabled.")
+
+        // Teardown: Reset the singleton for the next test case
+        SplunkRum.resetSharedInstance()
+
+        // MARK: - Test Case 2: Enabling the module
+
+        // Arrange: Configure the builder to enable the feature
+        let builderTrue = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "authToken"
+        )
+            .setApplicationName("DeprecatedApp")
+            .deploymentEnvironment(environment: "Production")
+            .slowRenderingDetectionEnabled(true) // Method under test
+
+        // Act: Build the agent
+        XCTAssertTrue(builderTrue.build(), "Builder should successfully build when feature is enabled.")
+
+        // Assert: Verify the module's state is correctly set to enabled
+        XCTAssertTrue(SplunkRum.shared.slowFrameDetector.state.isEnabled, "Slow frame detector should be enabled.")
     }
 
     func testBuildSuccessForDiscontinuedSlowRenderingDetectionThresholdMethods() {
