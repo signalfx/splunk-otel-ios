@@ -200,11 +200,9 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertEqual(authItem?.value, token)
     }
 
-    func testBuildForDeprecatedSlowRenderingDetectionEnabled() throws {
-        // MARK: - Test Case 1: Disabling the module
+    func testBuild_withDeprecatedSlowRenderingEnabled_isCorrectlyDisabled() throws {
 
-        // Arrange: Configure the builder to disable the feature
-        let builderFalse = SplunkRumBuilder(
+        let builder = SplunkRumBuilder(
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "authToken"
         )
@@ -212,19 +210,14 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             .deploymentEnvironment(environment: "Production")
             .slowRenderingDetectionEnabled(false) // Method under test
 
-        // Act: Build the agent
-        XCTAssertTrue(builderFalse.build(), "Builder should successfully build when feature is disabled.")
+        XCTAssertTrue(builder.build(), "Builder should successfully build when feature is disabled.")
 
-        // Assert: Verify the module's state is correctly set to disabled
         XCTAssertFalse(SplunkRum.shared.slowFrameDetector.state.isEnabled, "Slow frame detector should be disabled.")
+    }
 
-        // Teardown: Reset the singleton for the next test case
-        SplunkRum.resetSharedInstance()
+    func testBuild_withDeprecatedSlowRenderingEnabled_isCorrectlyEnabled() throws {
 
-        // MARK: - Test Case 2: Enabling the module
-
-        // Arrange: Configure the builder to enable the feature
-        let builderTrue = SplunkRumBuilder(
+        let builder = SplunkRumBuilder(
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "authToken"
         )
@@ -232,10 +225,8 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             .deploymentEnvironment(environment: "Production")
             .slowRenderingDetectionEnabled(true) // Method under test
 
-        // Act: Build the agent
-        XCTAssertTrue(builderTrue.build(), "Builder should successfully build when feature is enabled.")
+        XCTAssertTrue(builder.build(), "Builder should successfully build when feature is enabled.")
 
-        // Assert: Verify the module's state is correctly set to enabled
         XCTAssertTrue(SplunkRum.shared.slowFrameDetector.state.isEnabled, "Slow frame detector should be enabled.")
     }
 

@@ -44,6 +44,8 @@ public final class SlowFrameDetector {
     private var displayLink: CADisplayLink?
     private var displayLinkTask: Task<Void, Never>? // for async/await
 
+    public private(set) var isEnabled: Bool = false
+
     private var slowFrames: ReportableFramesBuffer? = ReportableFramesBuffer()
     private var frozenFrames: ReportableFramesBuffer? = ReportableFramesBuffer()
 
@@ -68,7 +70,10 @@ public final class SlowFrameDetector {
             install(with: SlowFrameDetectorConfiguration(), remoteConfiguration: remoteConfiguration)
             return
         }
-        guard config.isEnabled else { return }
+
+        self.isEnabled = config.isEnabled
+        guard self.isEnabled else { return }
+
         start()
     }
 
