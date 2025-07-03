@@ -61,7 +61,8 @@ public class CrashReports {
         let signalConfig = PLCrashReporterConfig(
             signalHandlerType: signalHandlerType,
             symbolicationStrategy: [],
-            basePath: crashDirectory.path)
+            basePath: crashDirectory.path
+        )
         guard let crashReporterInstance = PLCrashReporter(configuration: signalConfig) else {
             logger.log(level: .error) {
                 "PLCrashReporter failed to initialize."

@@ -233,6 +233,7 @@ public class SplunkRumBuilder {
         // Construct AgentConfiguration with the supplied builder properties
         let agentConfiguration = AgentConfiguration(endpoint: endpointConfiguration, appName: appName, deploymentEnvironment: developmentEnvironment)
             .sessionConfiguration(SessionConfiguration(samplingRate: sessionSamplingRatio))
+            .globalAttributes(globalAttributes != nil ? MutableAttributes(from: globalAttributes!) : MutableAttributes())
             .enableDebugLogging(debug)
 
         // Call the `install` method

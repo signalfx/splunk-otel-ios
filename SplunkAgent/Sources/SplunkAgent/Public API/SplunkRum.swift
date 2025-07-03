@@ -94,7 +94,7 @@ public class SplunkRum: ObservableObject {
     public private(set) lazy var session = Session(for: self)
 
     /// An object that contains global attributes added to all signals
-    public lazy var globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
+    public private(set) lazy var globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 
     /// An object reflects the current state and setting used for the recording.
     public private(set) lazy var state = RuntimeState(for: self)
