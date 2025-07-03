@@ -58,7 +58,7 @@ public extension SplunkRum {
     static func removeGlobalAttribute(_ key: String) {
         SplunkRum.shared.globalAttributes[key] = nil
     }
-    
+
     /// Logs a debug message.
     ///
     /// - Parameters

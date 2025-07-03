@@ -200,7 +200,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         let authItem = comps.queryItems?.first { $0.name == "auth" }
         XCTAssertEqual(authItem?.value, token)
     }
-    
+
     func testBuildForGlobalAttributesInitializer() throws {
             let realm = "us0"
             let token = "auth-token"
