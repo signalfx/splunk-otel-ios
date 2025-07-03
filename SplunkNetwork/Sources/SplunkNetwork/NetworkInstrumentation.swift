@@ -57,6 +57,10 @@ public class NetworkInstrumentation {
     // For Module conformance
     public required init() {}
 
+    /// Installs the Network Instrumentation module
+    /// - Parameters:
+    ///   - configuration: Module specific local configuration
+    ///   - remoteConfiguration: Module specific remote configuration
     public func install(with configuration: (any ModuleConfiguration)?,
                         remoteConfiguration: (any RemoteModuleConfiguration)?) {
 
@@ -67,8 +71,8 @@ public class NetworkInstrumentation {
         // Start the network instrumentation if it's enabled or if no configuration is provided.
         if config?.isEnabled ?? true {
 
-            if config?.ignoreURLs != nil {
-                ignoreURLs = config!.ignoreURLs
+            if let ignoreURLsParameter  = config?.ignoreURLs {
+                ignoreURLs = ignoreURLsParameter
             }
 
             // find concrete delegate classes
