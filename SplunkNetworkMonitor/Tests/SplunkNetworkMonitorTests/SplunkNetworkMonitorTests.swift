@@ -23,7 +23,7 @@ final class NetworkMonitorTests: XCTestCase {
     func testInitialState() {
         let NetworkMonitor = NetworkMonitor()
         XCTAssertFalse(NetworkMonitor.isConnected)
-        XCTAssertEqual(NetworkMonitor.connectionType, .lost)
+        XCTAssertEqual(NetworkMonitor.connectionType, .unavailable)
     }
 
     func testNetworkMonitoring() {
