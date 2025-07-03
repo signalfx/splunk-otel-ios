@@ -248,6 +248,17 @@ public class SplunkRumBuilder {
 
         moduleConfigurations.append(navigationModuleConfiguration)
 
+        let legacyIgnoreURLs = IgnoreURLs()
+        if let ignoreURLs = ignoreURLs {
+            legacyIgnoreURLs.addRegexPattern(ignoreURLs)
+        }
+        let networkModuleConfiguration = SplunkNetwork.NetworkInstrumentationConfiguration(
+            isEnabled: true,
+            ignoreURLs: legacyIgnoreURLs
+        )
+
+        moduleConfigurations.append(networkModuleConfiguration)
+
         // Construct AgentConfiguration with the supplied builder properties
         let agentConfiguration = AgentConfiguration(endpoint: endpointConfiguration, appName: appName, deploymentEnvironment: developmentEnvironment)
             .sessionConfiguration(SessionConfiguration(samplingRate: sessionSamplingRatio))
