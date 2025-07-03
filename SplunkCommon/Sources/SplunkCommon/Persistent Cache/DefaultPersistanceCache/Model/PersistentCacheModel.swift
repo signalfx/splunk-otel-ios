@@ -33,7 +33,7 @@ actor PersistentCacheModel<Container: PersistedItemContainer> {
         // Filter containers by updated timestamp ...
         if start != nil || end != nil {
             let fromDate = start ?? .init(timeIntervalSince1970: 0)
-            let toDate = end ?? Date()
+            let toDate = end ?? .distantFuture
 
             matchingContainers = containers.filter {
                 $0.value.updated >= fromDate && $0.value.updated <= toDate
