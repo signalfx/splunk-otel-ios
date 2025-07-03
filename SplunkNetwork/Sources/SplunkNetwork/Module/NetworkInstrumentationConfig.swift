@@ -27,7 +27,7 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
     public var isEnabled: Bool = true
 
     /// Describes URLs to be ignored by the module when reporting on network activity.
-    public var ignoreURLs: IgnoreURLs
+    public var ignoreURLs: IgnoreURLs?
 
     // MARK: init()
 
@@ -36,7 +36,7 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
     /// - Parameters:
     ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
     ///   - ignoreURLs: If present, the module will not report on these URLs.
-    public init(isEnabled: Bool, ignoreURLs: IgnoreURLs) {
+    public init(isEnabled: Bool, ignoreURLs: IgnoreURLs?) {
         self.isEnabled = isEnabled
         self.ignoreURLs = ignoreURLs
     }
