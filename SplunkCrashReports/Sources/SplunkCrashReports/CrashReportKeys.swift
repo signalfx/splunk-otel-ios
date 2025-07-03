@@ -27,7 +27,6 @@ public enum CrashReportKeys: String {
     case freeDiskSpace = "crash.freeDiskSpace"
     case batteryLevel = "crash.batteryLevel"
     case freeMemory = "crash.freeMemory"
-    case appVersion
 
     case processPath = "crash.processPath"
     case isNative = "crash.isNative"
@@ -61,6 +60,6 @@ public enum CrashReportKeys: String {
     case imagePath
     case imageUUID
 
-    // Primary group key
-    case crashReportMessageName = "ios.crash_report"
+    // Session ID
+    case sessionId = "session.id"
 }

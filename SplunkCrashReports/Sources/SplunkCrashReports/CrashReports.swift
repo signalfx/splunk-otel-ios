@@ -18,35 +18,48 @@ limitations under the License.
 internal import CiscoLogger
 import CrashReporter
 import Foundation
+import OpenTelemetryApi
 import SplunkCommon
 
-// Temporarily remove local CrashReporter in favor of SPM version
-// internal import SplunkCrashReporter
-
 public class CrashReports {
+
 
     // MARK: - Public
 
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
 
-    private var crashReporter: PLCrashReporter?
-    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "CrashReports")
-    private var allUsedImageNames: [String] = []
-    private var deviceDataDictionary: [CrashReportKeys: String] = [:]
+    /// An array to hold images used in active crash threads
+    var allUsedImageNames: [String] = []
 
-    // A reference to the Module's data publishing callback.
+    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "CrashReports")
+
+    /// A reference to the Module's data publishing callback.
     var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)?
+
+
+    // MARK: - Private
+
+    private var crashReporter: PLCrashReporter?
+
+    /// Storage of periodically sampled device data
+    private var deviceDataDictionary: [String: String] = [:]
+    private var dataUpdateTimer: Timer?
 
 
     // MARK: - Module methods
 
     public required init() {}
 
+    deinit {
+        dataUpdateTimer?.invalidate()
+        dataUpdateTimer = nil
+    }
+
 
     // MARK: - Public methods
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    public func configureCrashReporter() {
 #if os(tvOS)
         let signalHandlerType = PLCrashReporterSignalHandlerType.BSD
 #else
@@ -63,6 +76,7 @@ public class CrashReports {
             symbolicationStrategy: [],
             basePath: crashDirectory.path
         )
+
         guard let crashReporterInstance = PLCrashReporter(configuration: signalConfig) else {
             logger.log(level: .error) {
                 "PLCrashReporter failed to initialize."
@@ -70,9 +84,6 @@ public class CrashReports {
             return
         }
         crashReporter = crashReporterInstance
-
-        // Initialize CrashReports module
-        _ = initializeCrashReporter()
     }
 
     /// Check whether a crash ended the previous run of the app
@@ -80,7 +91,7 @@ public class CrashReports {
 
         guard crashReporter != nil else {
             logger.log(level: .warn) {
-                "Could not report crash reporter: Not Installed."
+                "Could not report, crash reporter: Not Installed."
             }
             return
         }
@@ -101,35 +112,11 @@ public class CrashReports {
             // Retrieving crash reporter data.
             let report = try PLCrashReport(data: data)
 
-            // And collect stack frames
-            let stackFrames = stackFramesFromCrashReport(report: report)
+            // Process the report
+            let reportPayload = formatCrashReport(report: report)
 
-            // At this point we should send the report to the collector
-            let reportPayload = formatCrashReport(report: report, stackFrames: stackFrames)
-            let jsonPayload = CrashReportJSON.convertDictionaryToJSONString(reportPayload)
-
-            guard let jsonPayload else {
-                logger.log(level: .error) {
-                    "CrashReporter failed to parse the Crash Report JSON payload."
-                }
-                return
-            }
-
-            guard
-                let systemInfo = report.systemInfo,
-                let timestamp = systemInfo.timestamp
-            else {
-                logger.log(level: .error) {
-                    "CrashReporter did not receive a valid system info block."
-                }
-                return
-            }
-
-            // Send the serialized Crash Report to the Module data consumer for processing.
-            crashReportDataConsumer?(
-                CrashReportsMetadata(timestamp: timestamp),
-                jsonPayload
-            )
+            // Send the report to the backend
+            send(crashReport: reportPayload, sharedState: sharedState)
         } catch {
             logger.log(level: .error) {
                 "CrashReporter failed to load/parse with error: \(error)"
@@ -142,14 +129,14 @@ public class CrashReports {
 
         // And indicate that crash occured
         logger.log(level: .warn) {
-            "Crash ended previous execution of app."
+            "A crash ended the previous execution of app."
         }
     }
 
     // MARK: - Private methods
 
     // Starts up crash reporter if enable is true and no debugger attached
-    private func initializeCrashReporter() -> Bool {
+    public func initializeCrashReporter() -> Bool {
 
         guard crashReporter != nil else {
             logger.log(level: .warn) {
@@ -174,8 +161,10 @@ public class CrashReports {
             return false
         }
 
-        // Init device stats collection
-        updateDeviceStats()
+        // async in order to load session.id
+        DispatchQueue.main.async { [weak self] in
+            self?.updateDeviceStats()
+        }
         startPollingForDeviceStats()
 
         return true
@@ -204,13 +193,16 @@ public class CrashReports {
         return debuggerIsAttached
     }
 
-    // Device stats handler
-
+    // Device stats handler.  This added device stats and Session ID to PLCrashReporter
+    // so that it will be included in a future crash report
     private func updateDeviceStats() {
         do {
-            deviceDataDictionary[.batteryLevel] = CrashReportDeviceStats.batteryLevel
-            deviceDataDictionary[.freeDiskSpace] = CrashReportDeviceStats.freeDiskSpace
-            deviceDataDictionary[.freeMemory] = CrashReportDeviceStats.freeMemory
+            if let sessionId = sharedState?.sessionId {
+                deviceDataDictionary["sessionId"] = sessionId
+            }
+            deviceDataDictionary["battery"] = CrashReportDeviceStats.batteryLevel
+            deviceDataDictionary["disk"] = CrashReportDeviceStats.freeDiskSpace
+            deviceDataDictionary["memory"] = CrashReportDeviceStats.freeMemory
             let customData = try NSKeyedArchiver.archivedData(withRootObject: deviceDataDictionary, requiringSecureCoding: false)
             crashReporter?.customData = customData
         } catch {
@@ -221,209 +213,119 @@ public class CrashReports {
         }
     }
 
-    /*
-     Will poll every 5 seconds to update the device stats.
-     */
+    // Device data and Session ID is collected every 5 seconds and sent to PLCrashReporter
     private func startPollingForDeviceStats() {
         let repeatSeconds: Double = 5
-        DispatchQueue.global(qos: .background).async {
-            let timer = Timer.scheduledTimer(withTimeInterval: repeatSeconds, repeats: true) { _ in
-                self.updateDeviceStats()
-            }
-            timer.fire()
+        dataUpdateTimer = Timer.scheduledTimer(withTimeInterval: repeatSeconds, repeats: true) { _ in
+            self.updateDeviceStats()
         }
+    }
+
+    // AppState handler
+    private func appStateHandler(report: PLCrashReport) -> String {
+        var appState = "unknown"
+        if let sharedState {
+            let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
+
+            // TODO: This mapping code should be removed in favor of returning the line above once the backend is able to support it.
+
+            appState = switch timebasedAppState {
+            case "active": "foreground"
+            case "inactive", "terminate": "background"
+            default: timebasedAppState
+            }
+        }
+        return appState
     }
 
     // Report formatting
-
-    private func stackFramesFromCrashReport(report: PLCrashReport) -> [CrashReportKeys: Any] {
-        var stackFrames: [CrashReportKeys: Any] = [:]
-        var threads: [Any] = []
-
-        for thread in report.threads {
-            if let thread = thread as? PLCrashReportThreadInfo {
-                let thr = threadFromReport(thread: thread, report: report)
-
-                threads.append(thr)
-            }
-        }
-        stackFrames[CrashReportKeys.threads] = threads
-
-        return stackFrames
-    }
-
-    private func formatCrashReport(report: PLCrashReport, stackFrames: [CrashReportKeys: Any]) -> [CrashReportKeys: Any] {
+    private func formatCrashReport(report: PLCrashReport) -> [CrashReportKeys: Any] {
 
         var reportDict: [CrashReportKeys: Any] = [:]
 
         reportDict[.component] = "crash"
         reportDict[.error] = true
 
-        if report.systemInfo != nil {
-            reportDict[.crashTimestamp] = report.systemInfo.timestamp!
+        if let systemInfo = report.systemInfo {
             let formatter = DateFormatter()
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
+            reportDict[.crashTimestamp] = formatter.string(from: systemInfo.timestamp)
             reportDict[.currentTimestamp] = formatter.string(from: Date())
         }
-        if report.applicationInfo != nil {
-            reportDict[.appVersion] = report.applicationInfo.applicationMarketingVersion
-        }
+
         if report.hasProcessInfo {
             reportDict[.processPath] = report.processInfo.processPath
-            reportDict[.isNative] = report.processInfo.native ? "1" : "0"
+            reportDict[.isNative] = report.processInfo.native
         }
-        if report.signalInfo != nil {
-            reportDict[.signalName] = report.signalInfo.name
-            reportDict[.faultAddress] = String(report.signalInfo.address)
+
+        if let signalInfo = report.signalInfo {
+            reportDict[.signalName] = signalInfo.name
+            reportDict[.faultAddress] = String(signalInfo.address)
         }
+
         if report.hasExceptionInfo {
             reportDict[.exceptionName] = report.exceptionInfo.exceptionName ?? ""
             reportDict[.exceptionReason] = report.exceptionInfo.exceptionReason ?? ""
         }
+
         if report.customData != nil {
-            let customData = NSKeyedUnarchiver.unarchiveObject(with: report.customData) as? [CrashReportKeys: String]
+            let customData = NSKeyedUnarchiver.unarchiveObject(with: report.customData) as? [String: String]
             if customData != nil {
-                reportDict[.batteryLevel] = customData![.batteryLevel]
-                reportDict[.freeMemory] = customData![.freeMemory]
-                reportDict[.freeDiskSpace] = customData![.freeDiskSpace]
+                if let sessionId = customData?["sessionId"] {
+                    reportDict[.sessionId] = customData!["sessionId"]
+                }
+                reportDict[.batteryLevel] = customData!["battery"]
+                reportDict[.freeMemory] = customData!["disk"]
+                reportDict[.freeDiskSpace] = customData!["memory"]
             }
         }
 
-        let stackFramesSlice = stackFrames[CrashReportKeys.threads]
-        if let stackFramesSlice = stackFramesSlice as? [[CrashReportKeys: Any]] {
-            reportDict[.threads] = threadList(frames: stackFramesSlice)
-        }
+        // Collect threads with stack frames
+        let reportThreads = allThreadsFromCrashReport(report: report)
+        reportDict[.threads] = threadList(threads: reportThreads)
 
+        // Images referenced in threads
         reportDict[.images] = imageList(images: report.images)
 
-        var crashPayload: [CrashReportKeys: Any] = [:]
-        crashPayload[.crashReportMessageName] = reportDict
+        // App state
+        reportDict[.previousAppState] = appStateHandler(report: report)
 
-        // Place app state as a sibling to the crash report
-        crashPayload[.previousAppState] = "unknown"
-        if let sharedState {
-
-            // TODO: In a post GA release, once the backend is able to support we should enable this line of code and remove the 'mapping' code below
-            // crashPayload[.previousAppState] = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
-
-            // TODO: As related to above, this mapping code should be removed in favor of the line above once the backend is able to support it.
-            let appState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
-
-            switch appState {
-            case "active":
-                crashPayload[.previousAppState] = "foreground"
-            case "inactive":
-                crashPayload[.previousAppState] = "background"
-            case "terminate":
-                crashPayload[.previousAppState] = "background"
-            default:
-                crashPayload[.previousAppState] = appState
-            }
-            // End of mapping code
-        }
-        return crashPayload
+        return reportDict
     }
 
-    private func convertStackFrames(frames: [Any], report: PLCrashReport) -> [Any] {
-
-        var stackFrames: [Any] = []
-        var isFirstTime = true
-
-        guard let frames = frames as? [PLCrashReportStackFrameInfo] else {
-            logger.log(level: .error) {
-                "CrashReporter received incorrect stackFrame type."
-            }
-            return []
+    private func toAttributeValue(_ value: Any) -> AttributeValue {
+        switch value {
+        case let string as String:
+            return .string(string)
+        case let int as Int:
+            return .int(int)
+        case let double as Double:
+            return .double(double)
+        case let bool as Bool:
+            return .bool(bool)
+        default:
+            return .string(String(describing: value))
         }
-
-        for stackFrame in frames {
-            var frameDict: [CrashReportKeys: Any] = [:]
-
-            var instructionPointer = stackFrame.instructionPointer
-            if !isFirstTime {
-                instructionPointer -= 4
-            }
-            isFirstTime = false
-
-            frameDict[.instructionPointer] = instructionPointer
-
-            let imageInfo = report.image(forAddress: instructionPointer)
-            let imageName = imageInfo?.imageName
-            if imageName == nil {
-                logger.log(level: .warn) {
-                    "Agent could not locate image for instruction pointer."
-                }
-            } else {
-                frameDict[.imageName] = imageName
-                allUsedImageNames.append(imageName!)
-            }
-
-            var baseAddress: UInt64 = 0
-            var offset: UInt64 = 0
-            if let imageInfo {
-                baseAddress = imageInfo.imageBaseAddress
-                offset = instructionPointer - baseAddress
-            }
-            if stackFrame.symbolInfo != nil {
-                let symbolName = stackFrame.symbolInfo.symbolName
-                let symOffset = instructionPointer - stackFrame.symbolInfo.startAddress
-                frameDict[.symbolName] = symbolName
-                frameDict[.offset] = symOffset
-            } else {
-                frameDict[.baseAddress] = baseAddress
-                frameDict[.offset] = offset
-            }
-            stackFrames.append(frameDict)
-        }
-        return stackFrames
     }
 
-    private func threadFromReport(thread: PLCrashReportThreadInfo, report: PLCrashReport) -> [CrashReportKeys: Any] {
+    private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?) {
+        let tracer = OpenTelemetry.instance
+            .tracerProvider
+            .get(
+                instrumentationName: "splunk-crash-report",
+                instrumentationVersion: sharedState?.agentVersion
+            )
 
-        var oneThread: [CrashReportKeys: Any] = [:]
-        oneThread[.details] = thread
-        oneThread[.stackFrames] = convertStackFrames(frames: thread.stackFrames, report: report)
-        return oneThread
-    }
+        let timestamp = Date()
 
-    private func threadList(threads: [[CrashReportKeys: Any]], threadKey: CrashReportKeys) -> [Any] {
-        var outputThreads: [Any] = []
+        let crashSpan = tracer.spanBuilder(spanName: "SplunkCrashReport")
+            .setStartTime(time: timestamp)
+            .startSpan()
 
-        for thread in threads {
-
-            var threadDictionary: [CrashReportKeys: Any] = [:]
-            threadDictionary[.stackFrames] = thread[CrashReportKeys.stackFrames]
-
-            if let info = thread[CrashReportKeys.details] as? PLCrashReportThreadInfo {
-                threadDictionary[.threadNumber] = info.threadNumber
-                threadDictionary[threadKey] = info.crashed
-            }
-            outputThreads.append(threadDictionary)
+        for (key, value) in crashReport {
+            crashSpan.setAttribute(key: key.rawValue, value: toAttributeValue(value))
         }
-        return outputThreads
-    }
 
-    private func threadList(frames: [[CrashReportKeys: Any]]) -> [Any] {
-        return threadList(threads: frames, threadKey: .isCrashedThread)
-    }
-
-    private func imageList(images: [Any]) -> [Any] {
-        var outputImages: [Any] = []
-        for image in images {
-            var imageDictionary: [CrashReportKeys: Any] = [:]
-            guard let image = image as? PLCrashReportBinaryImageInfo else {
-                continue
-            }
-            // Only add the image to the list if it was noted in the stack traces
-            if allUsedImageNames.contains(image.imageName) {
-                imageDictionary[.baseAddress] = image.imageBaseAddress
-                imageDictionary[.imageSize] = image.imageSize
-                imageDictionary[.imagePath] = image.imageName
-                imageDictionary[.imageUUID] = image.imageUUID
-
-                outputImages.append(imageDictionary)
-            }
-        }
-        return outputImages
+        crashSpan.end(time: timestamp)
     }
 }
