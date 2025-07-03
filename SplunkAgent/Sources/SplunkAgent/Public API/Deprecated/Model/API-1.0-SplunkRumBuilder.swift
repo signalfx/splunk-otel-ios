@@ -248,13 +248,9 @@ public class SplunkRumBuilder {
 
         moduleConfigurations.append(navigationModuleConfiguration)
 
-        let legacyIgnoreURLs = IgnoreURLs()
-        if let ignoreURLs = ignoreURLs {
-            legacyIgnoreURLs.addRegexPattern(ignoreURLs)
-        }
         let networkModuleConfiguration = SplunkNetwork.NetworkInstrumentationConfiguration(
             isEnabled: true,
-            ignoreURLs: legacyIgnoreURLs
+            ignoreURLs: IgnoreURLs(containing: ignoreURLs)
         )
 
         moduleConfigurations.append(networkModuleConfiguration)

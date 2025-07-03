@@ -36,16 +36,14 @@ public class IgnoreURLs: Codable {
         }
     }
 
-    /// Initialize with an array of NSRegularExpression objects
-    /// - Parameter regexPatterns: Array of NSRegularExpression objects for URL patterns
-    public init(regexPatterns: [NSRegularExpression]) {
-        self.urlPatterns = regexPatterns
-    }
-
-    /// Initialize with a single NSRegularExpression object
-    /// - Parameter regexPattern: Single NSRegularExpression object for URL pattern
-    public init(regexPattern: NSRegularExpression) {
-        self.urlPatterns = [regexPattern]
+    /// Initialize with an optional NSRegularExpression pattern
+    /// - Parameter containing pattern: Optional NSRegularExpression for URL pattern matching
+    public init(containing pattern: NSRegularExpression?) {
+        if let pattern = pattern {
+            self.urlPatterns = [pattern]
+        } else {
+            self.urlPatterns = []
+        }
     }
 
     /// Initialize from a decoder
@@ -67,7 +65,7 @@ public class IgnoreURLs: Codable {
     /// Encode the instance to an encoder
     /// - Parameter encoder: The encoder to write data to
     /// - Throws: If the encoder fails to encode the data
-public func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Set(getAllPatterns()), forKey: .patterns)
     }
@@ -97,28 +95,15 @@ public func encode(to encoder: Encoder) throws {
         return uniqueNewPatterns.count
     }
 
-    /// Add additional NSRegularExpression objects to the existing set
-    /// - Parameter regexPatterns: Array of NSRegularExpression objects to add
-    /// - Returns: The number of patterns added
+    /// Add a single NSRegularExpression pattern to the existing set
+    /// - Parameter pattern: NSRegularExpression pattern to add
+    /// - Returns: true if the pattern was added, false if it already existed
     @discardableResult
-    public func addRegexPatterns(_ regexPatterns: [NSRegularExpression]) -> Int {
-        // Add only patterns that don't already exist
-        let existingPatternStrings = Set(urlPatterns.map { $0.pattern })
-        let uniqueNewPatterns = regexPatterns.filter { !existingPatternStrings.contains($0.pattern) }
-
-        urlPatterns.append(contentsOf: uniqueNewPatterns)
-        return uniqueNewPatterns.count
-    }
-
-    /// Add a single NSRegularExpression object to the existing set
-    /// - Parameter regexPattern: NSRegularExpression object to add
-    /// - Returns: True if the pattern was added, false if it already existed
-    @discardableResult
-    public func addRegexPattern(_ regexPattern: NSRegularExpression) -> Bool {
+    public func addPattern(_ pattern: NSRegularExpression) -> Bool {
         let existingPatternStrings = Set(urlPatterns.map { $0.pattern })
 
-        if !existingPatternStrings.contains(regexPattern.pattern) {
-            urlPatterns.append(regexPattern)
+        if !existingPatternStrings.contains(pattern.pattern) {
+            urlPatterns.append(pattern)
             return true
         }
 
