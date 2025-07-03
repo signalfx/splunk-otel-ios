@@ -18,21 +18,31 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
+/// Network Instrumentation module configuration.
 public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
 
     // MARK: - Public
 
+    /// Indicates whether the Module is enabled. Default value is `true`.
     public var isEnabled: Bool = true
+
+    /// Describes URLs to be ignored by the module when reporting on network activity.
     public var ignoreURLs: IgnoreURLs
 
     // MARK: init()
 
+    /// Initializes new module configuration with preconfigured values.
+    ///
+    /// - Parameters:
+    ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
+    ///   - ignoreURLs: If present, the module will not report on these URLs.
     public init(isEnabled: Bool, ignoreURLs: IgnoreURLs) {
         self.isEnabled = isEnabled
         self.ignoreURLs = ignoreURLs
     }
 }
 
+/// Network Instrumentation module remote configuration.
 public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
 
     // MARK: - Internal decoding
