@@ -200,48 +200,130 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertEqual(authItem?.value, token)
     }
 
-    func testBuild_withDeprecatedSlowRenderingEnabled_isCorrectlyDisabled() throws {
+
+    func testBuildSlowRenderingDisabledWhenFalse() throws {
 
         let builder = SplunkRumBuilder(
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "authToken"
         )
             .setApplicationName("DeprecatedApp")
-            .deploymentEnvironment(environment: "Production")
+            .deploymentEnvironment(environment: "Env")
             .slowRenderingDetectionEnabled(false) // Method under test
 
         XCTAssertTrue(builder.build(), "Builder should successfully build when feature is disabled.")
 
-        XCTAssertFalse(SplunkRum.shared.slowFrameDetector.state.isEnabled, "Slow frame detector should be disabled.")
+        // Verify agent is running.
+        XCTAssertEqual(SplunkRum.shared.state.status, .running, "The SplunkRum agent should be in the .running state.")
+
+        // Verify operational proxy is installed.
+        XCTAssert(
+            SplunkRum.shared.slowFrameDetector is SplunkAgent.SlowFrameDetector,
+            "The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead. This means the agent is refusing to install the module when disabled."
+        )
+
+        // Safely cast to operational proxy.
+        let operationalProxy = try XCTUnwrap(
+            SplunkRum.shared.slowFrameDetector as? SplunkAgent.SlowFrameDetector,
+            "Failed to cast the proxy to its operational type, even though the type check passed."
+        )
+
+        // Verify real module state is disabled.
+        XCTAssertFalse(
+            operationalProxy.module.state.isEnabled,
+            "The isEnabled property on the REAL underlying module's state object should be false."
+        )
+
+        // Verify proxy reports disabled state.
+        XCTAssertFalse(
+            operationalProxy.state.isEnabled,
+            "The isEnabled property exposed by the PROXY should be false."
+        )
     }
 
-    func testBuild_withDeprecatedSlowRenderingEnabled_isCorrectlyEnabled() throws {
+    func testBuildSlowRenderingEnabledWhenTrue() throws {
 
         let builder = SplunkRumBuilder(
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "authToken"
         )
             .setApplicationName("DeprecatedApp")
-            .deploymentEnvironment(environment: "Production")
+            .deploymentEnvironment(environment: "Env")
             .slowRenderingDetectionEnabled(true) // Method under test
 
         XCTAssertTrue(builder.build(), "Builder should successfully build when feature is enabled.")
 
-        XCTAssertTrue(SplunkRum.shared.slowFrameDetector.state.isEnabled, "Slow frame detector should be enabled.")
+        // Verify agent is running.
+        XCTAssertEqual(SplunkRum.shared.state.status, .running, "The SplunkRum agent should be in the .running state.")
+
+        // Verify operational proxy is installed.
+        XCTAssert(
+            SplunkRum.shared.slowFrameDetector is SplunkAgent.SlowFrameDetector,
+            "The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead. This means the module is not being initialized correctly."
+        )
+
+        // Safely cast to operational proxy.
+        let operationalProxy = try XCTUnwrap(
+            SplunkRum.shared.slowFrameDetector as? SplunkAgent.SlowFrameDetector,
+            "Failed to cast the proxy to its operational type, even though the type check passed."
+        )
+
+        // Verify real module state is enabled.
+        XCTAssertTrue(
+            operationalProxy.module.state.isEnabled,
+            "The isEnabled property on the REAL underlying module's state object should be true."
+        )
+
+        // Verify proxy reports enabled state.
+        XCTAssertTrue(
+            operationalProxy.state.isEnabled,
+            "The isEnabled property exposed by the PROXY should be true."
+        )
     }
 
-    func testBuildSuccessForDiscontinuedSlowRenderingDetectionThresholdMethods() {
+    func testBuildIgnoresDeprecatedSlowRenderingOptions() throws {
+
+        /// Ignore deprecated slowFrameRendering options:
+        /// * slowFrameDetectionThresholdMs
+        /// * frozenFrameDetectionThresholdMs
+
         let builder = SplunkRumBuilder(
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "authToken"
         )
             .setApplicationName("NoOpApp")
-            .deploymentEnvironment(environment: "Production")
+            .deploymentEnvironment(environment: "Env")
             // These deprecated methods should have no effect
             .slowFrameDetectionThresholdMs(thresholdMs: 100)
             .frozenFrameDetectionThresholdMs(thresholdMs: 1000)
 
-        // Assert that building still succeeds
-        XCTAssertTrue(builder.build())
+        XCTAssertTrue(builder.build(), "Builder should successfully build.")
+
+        // Verify agent is running.
+        XCTAssertEqual(SplunkRum.shared.state.status, .running, "The SplunkRum agent should be in the .running state.")
+
+        // Verify operational proxy is installed.
+        XCTAssert(
+            SplunkRum.shared.slowFrameDetector is SplunkAgent.SlowFrameDetector,
+            "The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead."
+        )
+
+        // Safely cast to operational proxy.
+        let operationalProxy = try XCTUnwrap(
+            SplunkRum.shared.slowFrameDetector as? SplunkAgent.SlowFrameDetector,
+            "Failed to cast the proxy to its operational type, even though the type check passed."
+        )
+
+        // Verify module is enabled by default.
+        XCTAssertTrue(
+            operationalProxy.module.state.isEnabled,
+            "The real module should be enabled by default when no explicit setting is provided."
+        )
+
+        // Verify proxy reports default enabled state.
+        XCTAssertTrue(
+            operationalProxy.state.isEnabled,
+            "The proxy should report the default enabled state."
+        )
     }
 }

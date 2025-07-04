@@ -259,8 +259,7 @@ public class SplunkRumBuilder {
         moduleConfigurations.append(navigationModuleConfiguration)
 
         /// SlowFrameDetector
-        var slowFrameDetectorConfiguration = SlowFrameDetectorConfiguration()
-        slowFrameDetectorConfiguration.isEnabled = slowRenderingDetectionEnabled
+        let slowFrameDetectorConfiguration = SlowFrameDetectorConfiguration(isEnabled: slowRenderingDetectionEnabled)
         moduleConfigurations.append(slowFrameDetectorConfiguration)
 
         // Construct AgentConfiguration with the supplied builder properties
