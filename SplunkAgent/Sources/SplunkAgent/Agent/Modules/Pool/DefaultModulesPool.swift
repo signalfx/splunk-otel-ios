@@ -48,7 +48,6 @@ internal import SplunkCommon
 
 #if canImport(SplunkWebView)
     internal import SplunkWebView
-    internal import SplunkWebViewProxy
 #endif
 
 #if canImport(SplunkCustomTracking)
@@ -103,7 +102,7 @@ class DefaultModulesPool: AgentModulesPool {
 
         // Web View Instrumentation
         #if canImport(SplunkWebView)
-            knownModules.append(WebViewInstrumentationInternal.self)
+            knownModules.append(WebViewInstrumentation.self)
         #endif
 
         // Custom Tracking

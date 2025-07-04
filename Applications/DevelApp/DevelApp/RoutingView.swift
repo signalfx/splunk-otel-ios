@@ -31,7 +31,7 @@ struct RoutingView: View {
                     Text("Session Replay Demo")
                 }
                 NavigationLink(destination: WebViewDemoView()) {
-                    Text("WebView Demo")
+                    Text("WebViewNativeBridge Demo")
                 }
                 NavigationLink(destination: TemplateView()) {
                     Text("Template for New Screens")

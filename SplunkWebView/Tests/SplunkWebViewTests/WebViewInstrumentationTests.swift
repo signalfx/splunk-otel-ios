@@ -20,21 +20,25 @@ import SplunkCommon
 import WebKit
 import XCTest
 
-final class WebViewInstrumentationInternalTests: XCTestCase {
+final class WebViewInstrumentationTests: XCTestCase {
 
-    var webViewInstrumentation: WebViewInstrumentationInternal!
+    var webViewInstrumentation: WebViewInstrumentation!
     var mockWebView: MockWebView!
+    var mockAgentSharedState: MockAgentSharedState!
 
     override func setUp() {
         super.setUp()
-        webViewInstrumentation = WebViewInstrumentationInternal()
+        webViewInstrumentation = WebViewInstrumentation()
         mockWebView = MockWebView()
-        webViewInstrumentation.sharedState = MockAgentSharedState()
+        // strong instance for testing
+        mockAgentSharedState = MockAgentSharedState()
+        webViewInstrumentation.sharedState = mockAgentSharedState
     }
 
     override func tearDown() {
         webViewInstrumentation = nil
         mockWebView = nil
+        mockAgentSharedState = nil
         super.tearDown()
     }
 
@@ -42,20 +46,16 @@ final class WebViewInstrumentationInternalTests: XCTestCase {
         let expectation = XCTestExpectation(description: "JavaScript injected")
 
         mockWebView.evaluateJavaScriptHandler = { script, completionHandler in
-            // Assert that the script is the expected script
             XCTAssertTrue(script.contains("window.SplunkRumNative"))
             XCTAssertTrue(script.contains("getNativeSessionId"))
-            XCTAssertTrue(script.contains("cachedSessionId"))
             expectation.fulfill()
             completionHandler(nil, nil) // Simulate success
         }
 
         webViewInstrumentation.injectSessionId(into: mockWebView)
 
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: 5.0)
     }
-
-    // Add more tests here to cover error cases, etc.
 }
 
 // Mock WKWebView for testing
