@@ -83,9 +83,9 @@ public final class SlowFrameDetector {
         let localConfiguration = configuration as? SlowFrameDetectorConfiguration
 
         // If localConfiguration is nil, default to true.
-        self.state.isEnabled = localConfiguration?.isEnabled ?? true
+        state.isEnabled = localConfiguration?.isEnabled ?? true
 
-        if self.state.isEnabled {
+        if state.isEnabled {
             start()
         }
     }
