@@ -15,23 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkWebViewProxy
 import WebKit
 
-public class WebViewToNativeBridge {
-
-    // Using the protocol here
-    private let module: WebViewInstrumentationModule
-
-    init(module: WebViewInstrumentationModule) {
-        self.module = module
-    }
-
-    public func integrateWithBrowserRum(_ view: WKWebView) {
-        module.injectSessionId(into: view)
-    }
-}
-
-public extension SplunkRum {
-    static let webView = WebViewToNativeBridge(module: WebViewInstrumentationProxy.instance)
+/// The public protocol defining the capabilities of the WebView Instrumentation module.
+public protocol WebViewInstrumentationModule {
+    /// Injects the necessary JavaScript bridge into a given WKWebView to enable
+    /// communication between the web content and the native RUM agent.
+    func integrateWithBrowserRum(_ view: WKWebView)
 }

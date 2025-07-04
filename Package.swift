@@ -66,7 +66,6 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 "SplunkAppStart",
                 "SplunkWebView",
-                "SplunkWebViewProxy",
                 "SplunkCustomTracking",
                 resolveDependency("logger")
             ],
@@ -328,24 +327,6 @@ func generateMainTargets() -> [Target] {
                 "SplunkWebView",
             ],
             path: "SplunkWebView/Tests"
-        ),
-
-
-        // MARK: - Splunk Web Instrumentation Proxy
-
-        .target(
-            name: "SplunkWebViewProxy",
-            dependencies: [
-                "SplunkWebView"
-            ],
-            path: "SplunkWebViewProxy/Sources"
-        ),
-        .testTarget(
-            name: "SplunkWebViewProxyTests",
-            dependencies: [
-                "SplunkWebViewProxy"
-            ],
-            path: "SplunkWebViewProxy/Tests"
         ),
 
 
