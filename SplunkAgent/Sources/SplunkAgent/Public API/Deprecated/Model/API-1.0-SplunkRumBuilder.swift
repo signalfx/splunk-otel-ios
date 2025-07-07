@@ -249,7 +249,7 @@ public class SplunkRumBuilder {
         moduleConfigurations.append(navigationModuleConfiguration)
 
         let networkModuleConfiguration = SplunkNetwork.NetworkInstrumentationConfiguration(
-            isEnabled: true,
+            isEnabled: networkInstrumentation,
             ignoreURLs: IgnoreURLs(containing: ignoreURLs)
         )
 
