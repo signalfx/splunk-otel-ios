@@ -72,8 +72,8 @@ func generateMainTargets() -> [Target] {
             ],
             path: "SplunkAgent/Sources",
             resources: [
-                .copy("Resources/PrivacyInfo.xcprivacy"),
-                .copy("Resources/NOTICES")
+                .copy("../Resources/PrivacyInfo.xcprivacy"),
+                .copy("../Resources/NOTICES")
             ]
         ),
         .testTarget(

@@ -34,7 +34,7 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
     private nonisolated(unsafe) let storage: DiskStorage
     private nonisolated(unsafe) let cacheKey: KeyBuilder
 
-    private let model = PersistentCacheModel<ElementContainer>()
+    let model = PersistentCacheModel<ElementContainer>()
 
     private let logger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),
@@ -132,7 +132,7 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
     // MARK: - Custom filtering
 
-    public func elements(from start: Date?, to end: Date?) async throws -> [String: Element] {
+    public func elements(from start: Date? = nil, to end: Date? = nil) async -> [String: Element] {
         await model.items(from: start, to: end)
     }
 
@@ -211,7 +211,7 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
     /// Deletes all elements that were last updated before the specified date.
     ///
     /// - Parameter timestamp: The decisive moment for deleting records.
-    func delete(before timestamp: Date) async {
+    private func delete(before timestamp: Date) async {
         let outdatedKeys = await model.items(to: timestamp).keys
 
         for key in outdatedKeys {
@@ -222,7 +222,7 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
     /// Deletes all old elements whose number exceeds the specified number.
     ///
     /// - Parameter number: Position in ordered data from newest to oldest.
-    func delete(exceedingOrder position: Int) async {
+    private func delete(exceedingOrder position: Int) async {
         let containers = await model.containers
 
         guard containers.count > position else {

@@ -26,10 +26,10 @@ final class PersistentCacheModelTests: XCTestCase {
 
 
     // MARK: - Constants
-    
-    private let firstKey = "first"
-    private let secondKey = "second"
-    private let thirdKey = "third"
+
+    private let firstKey = PersistentCacheContent.firstKey
+    private let secondKey = PersistentCacheContent.secondKey
+    private let thirdKey = PersistentCacheContent.thirdKey
 
 
     // MARK: - Private
@@ -60,7 +60,7 @@ final class PersistentCacheModelTests: XCTestCase {
     func testInitialization() throws {
         let stringCacheModel = PersistentCacheModel<DefaultItemContainer<String>>()
         XCTAssertNotNil(stringCacheModel)
-        
+
         let dataCacheModel = PersistentCacheModel<DefaultItemContainer<CustomDataItem>>()
         XCTAssertNotNil(dataCacheModel)
     }
@@ -74,11 +74,11 @@ final class PersistentCacheModelTests: XCTestCase {
 
         let customCacheModel = PersistentCacheModel<DefaultItemContainer<CustomDataItem>>()
 
-        let content = buildModelContent()
+        let content = PersistentCacheContent.customData
         let firstItem = content[firstKey]?.value
         let secondItem = content[secondKey]?.value
         let thirdItem = content[thirdKey]?.value
-        
+
         await customCacheModel.restore(to: content)
 
 
@@ -113,7 +113,7 @@ final class PersistentCacheModelTests: XCTestCase {
     func testItemForKey() async throws {
         let firstValue = await model.item(forKey: firstKey)
         let unmanagedValue = await model.item(forKey: "unknown")
-        
+
         XCTAssertEqual(firstValue, 1)
         XCTAssertNil(unmanagedValue)
     }
@@ -153,7 +153,7 @@ final class PersistentCacheModelTests: XCTestCase {
 
     func testRestore() async throws {
         let customCacheModel = PersistentCacheModel<DefaultItemContainer<CustomDataItem>>()
-        let content = buildModelContent()
+        let content = PersistentCacheContent.customData
 
         await customCacheModel.restore(to: content)
 
@@ -162,52 +162,5 @@ final class PersistentCacheModelTests: XCTestCase {
         XCTAssertEqual(items[firstKey]?.text, "Hello")
         XCTAssertEqual(items[secondKey]?.text, "World")
         XCTAssertEqual(items[thirdKey]?.text, "!")
-    }
-
-
-    // MARK: - Private methods
-
-    private func buildModelContent() -> [String: DefaultItemContainer<CustomDataItem>] {
-        var nextDate = Date()
-        let fiveMinutes: TimeInterval = 5 * 60
-
-        let customData: [String: CustomDataItem] = [
-            firstKey: .init(id: 1, text: "Hello"),
-            secondKey: .init(id: 2, text: "World"),
-            thirdKey: .init(id: 3, text: "!")
-        ]
-
-        let sortedKeys = customData.keys.sorted { first, second in
-            first < second
-        }
-
-        var content: [String: DefaultItemContainer<CustomDataItem>] = [:]
-
-
-        // Encapsulate dictionary values into item containers
-        for key in sortedKeys {
-            if let value = customData[key] {
-                content[key] = .init(value: value, updated: nextDate)
-            }
-
-            nextDate += fiveMinutes
-        }
-
-        return content
-    }
-}
-
-
-struct CustomDataItem: Codable, Equatable, CustomStringConvertible {
-
-    // MARK: - Public
-
-    let id: Int
-    let text: String
-
-
-    // MARK: - Computed properties
-    var description: String {
-        "\(id): \(text)"
     }
 }
