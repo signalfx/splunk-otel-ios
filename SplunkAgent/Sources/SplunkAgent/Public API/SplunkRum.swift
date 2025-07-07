@@ -59,6 +59,7 @@ public class SplunkRum: ObservableObject {
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
     lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
+    lazy var webViewProxy: any WebViewInstrumentationModule = WebViewNonOperational()
     lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
     lazy var interactions: any InteractionsModule = InteractionsNonOperational()
 
@@ -120,6 +121,11 @@ public class SplunkRum: ObservableObject {
     /// An object that holds Navigation module.
     public var navigation: any NavigationModule {
         navigationProxy
+    }
+
+    /// An object that provides a bridge for WebView instrumentation.
+    public var webViewNativeBridge: any WebViewInstrumentationModule {
+        webViewProxy
     }
 
 

@@ -31,7 +31,7 @@ public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfigurati
     }
 }
 
-extension WebViewInstrumentationInternal: Module {
+extension WebViewInstrumentation: Module {
 
     public typealias Configuration = WebViewInstrumentationConfiguration
     public typealias RemoteConfiguration = WebViewInstrumentationRemoteConfiguration
