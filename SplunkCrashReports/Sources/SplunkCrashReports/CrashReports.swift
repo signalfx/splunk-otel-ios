@@ -71,7 +71,12 @@ public class CrashReports {
         let crashDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("SplunkCrashReports", isDirectory: true)
         try? fileManager.createDirectory(at: crashDirectory, withIntermediateDirectories: true)
 
-        let signalConfig = PLCrashReporterConfig(signalHandlerType: signalHandlerType, symbolicationStrategy: [], basePath: crashDirectory.path)
+        let signalConfig = PLCrashReporterConfig(
+            signalHandlerType: signalHandlerType,
+            symbolicationStrategy: [],
+            basePath: crashDirectory.path
+        )
+
         guard let crashReporterInstance = PLCrashReporter(configuration: signalConfig) else {
             logger.log(level: .error) {
                 "PLCrashReporter failed to initialize."

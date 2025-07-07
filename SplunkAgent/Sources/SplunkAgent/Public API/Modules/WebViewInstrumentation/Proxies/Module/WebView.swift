@@ -15,21 +15,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkWebView
+internal import SplunkWebView
 import WebKit
 
-public protocol WebViewInstrumentationModule {
-    func injectSessionId(into webView: WKWebView)
-}
+/// The public-facing proxy class that forwards calls to the internal WebView module.
+final class WebView: WebViewInstrumentationModule {
 
-public final class WebViewInstrumentationProxy: WebViewInstrumentationModule {
-    public static let instance = WebViewInstrumentationProxy()
+    // This holds the *real* module instance from the SplunkWebView module.
+    private let module: SplunkWebView.WebViewInstrumentation
 
-    private let module = WebViewInstrumentationInternal.instance
+    init(module: SplunkWebView.WebViewInstrumentation) {
+        self.module = module
+    }
 
-    init() {}
-
-    public func injectSessionId(into webView: WKWebView) {
-        module.injectSessionId(into: webView)
+    public func integrateWithBrowserRum(_ view: WKWebView) {
+        module.injectSessionId(into: view)
     }
 }
