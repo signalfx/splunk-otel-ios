@@ -135,7 +135,7 @@ public class SplunkRumBuilder {
 
     @available(*, deprecated, message:
         """
-        This builder method will be removed in a later version.
+        This builder method is a no-op and will be removed in a later version.
         """)
     @discardableResult
     public func enableDiskCache(enabled: Bool) -> SplunkRumBuilder {
@@ -230,10 +230,18 @@ public class SplunkRumBuilder {
 
         moduleConfigurations.append(navigationModuleConfiguration)
 
+        // Construct global attributes
+        let attributes: MutableAttributes
+        if let globalAttributes = globalAttributes {
+            attributes = MutableAttributes(from: globalAttributes)
+        } else {
+            attributes = MutableAttributes()
+        }
+
         // Construct AgentConfiguration with the supplied builder properties
         let agentConfiguration = AgentConfiguration(endpoint: endpointConfiguration, appName: appName, deploymentEnvironment: developmentEnvironment)
             .sessionConfiguration(SessionConfiguration(samplingRate: sessionSamplingRatio))
-            .globalAttributes(globalAttributes != nil ? MutableAttributes(from: globalAttributes!) : MutableAttributes())
+            .globalAttributes(attributes)
             .enableDebugLogging(debug)
 
         // Call the `install` method
