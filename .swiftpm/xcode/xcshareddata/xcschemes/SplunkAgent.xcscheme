@@ -34,16 +34,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplunkANRReporterTests"
-               BuildableName = "SplunkANRReporterTests"
-               BlueprintName = "SplunkANRReporterTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "SplunkAgentTests"
                BuildableName = "SplunkAgentTests"
                BlueprintName = "SplunkAgentTests"
@@ -77,26 +67,6 @@
                BlueprintIdentifier = "SplunkCrashReportsTests"
                BuildableName = "SplunkCrashReportsTests"
                BlueprintName = "SplunkCrashReportsTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplunkCustomDataTests"
-               BuildableName = "SplunkCustomDataTests"
-               BlueprintName = "SplunkCustomDataTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplunkErrorReportingTests"
-               BuildableName = "SplunkErrorReportingTests"
-               BlueprintName = "SplunkErrorReportingTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -154,9 +124,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplunkWebViewProxyTests"
-               BuildableName = "SplunkWebViewProxyTests"
-               BlueprintName = "SplunkWebViewProxyTests"
+               BlueprintIdentifier = "SplunkWebViewTests"
+               BuildableName = "SplunkWebViewTests"
+               BlueprintName = "SplunkWebViewTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -164,9 +134,59 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplunkWebViewTests"
-               BuildableName = "SplunkWebViewTests"
-               BlueprintName = "SplunkWebViewTests"
+               BlueprintIdentifier = "SplunkNavigationTests"
+               BuildableName = "SplunkNavigationTests"
+               BlueprintName = "SplunkNavigationTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SplunkCustomTrackingTests"
+               BuildableName = "SplunkCustomTrackingTests"
+               BlueprintName = "SplunkCustomTrackingTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SplunkInteractionsTests"
+               BuildableName = "SplunkInteractionsTests"
+               BlueprintName = "SplunkInteractionsTests"               
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SplunkNetworkMonitorTests"
+               BuildableName = "SplunkNetworkMonitorTests"
+               BlueprintName = "SplunkNetworkMonitorTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SplunkCustomTrackingTests"
+               BuildableName = "SplunkCustomTrackingTests"
+               BlueprintName = "SplunkCustomTrackingTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SplunkInteractionsTests"
+               BuildableName = "SplunkInteractionsTests"
+               BlueprintName = "SplunkInteractionsTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
