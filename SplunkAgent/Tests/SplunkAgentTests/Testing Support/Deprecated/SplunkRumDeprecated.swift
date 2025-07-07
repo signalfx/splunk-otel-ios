@@ -58,5 +58,5 @@ extension SplunkRum: SplunkRumDeprecated {
         (Self.self as SplunkRumDeprecated.Type).isInitialized()
     }
 
-    static func deprecatedDebugLog(_ msg: String) { }
+    static func deprecatedDebugLog(_ msg: String) {}
 }

@@ -40,6 +40,7 @@ struct DemoHeaderView: View {
         }
         .padding()
         .background(Color.gray.opacity(0.1))
+        .frame(maxWidth: .infinity)
         .cornerRadius(8)
     }
 }
