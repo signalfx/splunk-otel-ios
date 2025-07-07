@@ -24,7 +24,7 @@ public extension SplunkRum {
     /// When the agent is initialized, there is always some session ID.
     /// - Returns: The current session ID as a 'String'.
     /// - Note: This function is deprecated and will be removed in a later version.
-    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum` API instead.")
+    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.session.state.id` API instead.")
     static func getSessionId() -> String {
         SplunkRum.shared.session.state.id
     }
@@ -33,17 +33,17 @@ public extension SplunkRum {
     ///
     /// - Returns: True when the status resolves to `.running`.
     /// - Note: This function is deprecated and will be removed in a later version.
-    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum` API instead.")
+    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.state.status` API instead.")
     static func isInitialized() -> Bool {
         SplunkRum.shared.state.status == .running
     }
 
     /// Sets global attributes to be added to all spans.
     ///
-    /// - Parameters
+    /// - Parameters:
     ///   - attributes: A dictionary of key-value pairs to add as global attributes.
     /// - Note: This function is deprecated and will be removed in a later version.
-    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum` API instead.")
+    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.globalAttributes` API instead.")
     static func setGlobalAttributes(_ attributes: [String: Any]) {
         let globalAttributes = MutableAttributes(from: attributes)
         SplunkRum.shared.globalAttributes.addDictionary(globalAttributes.getAll())
@@ -51,17 +51,17 @@ public extension SplunkRum {
 
     /// Removes a global attribute by key.
     ///
-    /// - Parameters
+    /// - Parameters:
     ///   - key: The key of the attribute to remove from global attributes.
     /// - Note: This function is deprecated and will be removed in a later version.
-    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum` API instead.")
+    @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.globalAttributes` API instead.")
     static func removeGlobalAttribute(_ key: String) {
         SplunkRum.shared.globalAttributes[key] = nil
     }
 
     /// Logs a debug message.
     ///
-    /// - Parameters
+    /// - Parameters:
     ///   - msg: The debug message to log.
     /// - Note: This function is deprecated and will be removed in a later version.
     @available(*, deprecated, message: "This function will be removed in a later version.")
