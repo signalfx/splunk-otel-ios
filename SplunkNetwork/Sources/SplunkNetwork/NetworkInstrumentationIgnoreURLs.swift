@@ -17,7 +17,8 @@ limitations under the License.
 
 import Foundation
 
-/// A class that holds an array of regular expressions for URL patterns to ignore and provides functionality to work with them.
+/// A class that holds an array of regular expressions for URL patterns to ignore
+/// and provides functionality to work with them.
 public class IgnoreURLs: Codable {
     /// The stored regular expressions
     private var urlPatterns: [NSRegularExpression]

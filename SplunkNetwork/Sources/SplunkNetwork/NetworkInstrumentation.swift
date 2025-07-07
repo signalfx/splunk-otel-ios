@@ -45,7 +45,6 @@ public class NetworkInstrumentation {
         "NSURLSessionDefault"
     ]
 
-
     // MARK: - Public
 
     /// Endpoints excluded from network instrumentation.
@@ -86,7 +85,10 @@ public class NetworkInstrumentation {
                 delegateClassesToInstrument = delegateClasses
             } else {
                 logger.log(level: .debug) {
-                    "Standard Delegate classes not found, using exhaustive delegate class search.  This may incur performance overhead during startup."
+                    """
+                    Standard Delegate classes not found, using exhaustive delegate class search.
+                    This may incur performance overhead during startup.
+                    """
                 }
             }
 
@@ -201,7 +203,11 @@ public class NetworkInstrumentation {
             }
 
             // Intentional hard failure in both Debug and Release builds
-            preconditionFailure("Regex failed to compile. Likely programmer error in edit of serverTimingPattern regex: #\(serverTimingPattern)#")
+            preconditionFailure("""
+                                Regex failed to compile. Likely programmer error in
+                                edit of serverTimingPattern
+                                regex: #\(serverTimingPattern)#
+                                """)
         }
 
         // Match the regex against the input string
@@ -307,7 +313,9 @@ public class NetworkInstrumentation {
 
     private func isValidIPAddress(_ ipString: String) -> Bool {
         // Check for IPv4
-        let ipv4Pattern = #"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"#
+        let ipv4Pattern = #"""
+            ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+            """#
         if ipString.range(of: ipv4Pattern, options: .regularExpression) != nil {
             return true
         }
