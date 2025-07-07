@@ -36,6 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            .debug(enabled: true)
 //            .sessionSamplingRatio(samplingRatio: 1)
 //            .showVCInstrumentation(true)
+//            .globalAttributes(globalAttributes: ["isWorkingHard": true, "secret": "Red bull"])
 //            .build()
 
         let endpointConfig = EndpointConfiguration(

@@ -119,10 +119,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         resource.merge(with: resources)
         resource.merge(other: replayResources)
 
-        // Store resources object for Unit tests
-        #if DEBUG
-            self.resource = resource
-        #endif
+        self.resource = resource
     }
 
 
