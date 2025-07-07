@@ -156,7 +156,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "SplunkInteractionsTests"
                BuildableName = "SplunkInteractionsTests"
-               BlueprintName = "SplunkInteractionsTests"               
+               BlueprintName = "SplunkInteractionsTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -167,36 +167,6 @@
                BlueprintIdentifier = "SplunkNetworkMonitorTests"
                BuildableName = "SplunkNetworkMonitorTests"
                BlueprintName = "SplunkNetworkMonitorTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplunkCustomTrackingTests"
-               BuildableName = "SplunkCustomTrackingTests"
-               BlueprintName = "SplunkCustomTrackingTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplunkInteractionsTests"
-               BuildableName = "SplunkInteractionsTests"
-               BlueprintName = "SplunkInteractionsTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplunkNavigationTests"
-               BuildableName = "SplunkNavigationTests"
-               BlueprintName = "SplunkNavigationTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
