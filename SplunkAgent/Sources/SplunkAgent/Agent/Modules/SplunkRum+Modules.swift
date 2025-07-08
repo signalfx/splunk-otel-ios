@@ -30,6 +30,10 @@ internal import SplunkSlowFrameDetector
     internal import SplunkCrashReports
 #endif
 
+#if os(iOS) || os(visionOS)
+    import WebKit
+#endif
+
 
 extension SplunkRum {
 
@@ -84,6 +88,11 @@ extension SplunkRum {
 
             return
         }
+
+        // By default, we turn off the default sensitivity for `WKWebView`
+        #if os(iOS) || os(visionOS)
+            sessionReplayModule.sensitivity.set(WKWebView.self, nil)
+        #endif
 
         // Initialize proxy API for this module
         sessionReplayProxy = SessionReplay(for: sessionReplayModule)

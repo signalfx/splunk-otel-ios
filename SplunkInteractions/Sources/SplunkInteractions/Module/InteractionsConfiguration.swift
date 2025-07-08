@@ -33,7 +33,7 @@ public struct InteractionsConfiguration: ModuleConfiguration {
     public init() {}
 
     /// Initializes new module configuration with preconfigured values.
-    /// 
+    ///
     /// - Parameter isEnabled: A `Boolean` value sets whether the module is enabled.
     public init(isEnabled: Bool) {
         self.isEnabled = isEnabled
