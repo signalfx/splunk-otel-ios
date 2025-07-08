@@ -37,6 +37,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            .sessionSamplingRatio(samplingRatio: 1)
 //            .showVCInstrumentation(true)
 //            .globalAttributes(globalAttributes: ["isWorkingHard": true, "secret": "Red bull"])
+//            .ignoreURLs(try! NSRegularExpression(pattern: ".*\\.(jpg|jpeg|png|gif)$"))
+//            .networkInstrumentation(true)
 //            .build()
 
         let endpointConfig = EndpointConfiguration(

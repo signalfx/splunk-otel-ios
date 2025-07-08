@@ -18,14 +18,38 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-public struct NetworkInstrumentationConfiguration: ModuleConfiguration {}
+/// Network Instrumentation module configuration.
+public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
 
+    // MARK: - Public
+
+    /// Indicates whether the Module is enabled. Default value is `true`.
+    public var isEnabled: Bool = true
+
+    /// Describes URLs to be ignored by the module when reporting on network activity.
+    public var ignoreURLs: IgnoreURLs?
+
+    // MARK: init()
+
+    /// Initializes new module configuration with preconfigured values.
+    ///
+    /// - Parameters:
+    ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
+    ///   - ignoreURLs: If present, the module will not report on these URLs.
+    public init(isEnabled: Bool, ignoreURLs: IgnoreURLs?) {
+        self.isEnabled = isEnabled
+        self.ignoreURLs = ignoreURLs
+    }
+}
+
+/// Network Instrumentation module remote configuration.
 public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
 
     // MARK: - Internal decoding
 
     struct NetworkTracing: Decodable {
         let enabled: Bool
+        let ignoreURLs: IgnoreURLs
     }
 
     struct MRUMRoot: Decodable {
@@ -43,6 +67,7 @@ public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
     // MARK: - Protocol compliance
 
     public var enabled: Bool
+    public var ignoreURLs: IgnoreURLs
 
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
@@ -50,5 +75,6 @@ public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
         }
 
         enabled = root.configuration.mrum.networkTracing.enabled
+        ignoreURLs = root.configuration.mrum.networkTracing.ignoreURLs
     }
 }
