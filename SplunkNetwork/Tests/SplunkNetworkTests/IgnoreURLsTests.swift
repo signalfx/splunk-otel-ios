@@ -119,7 +119,6 @@ final class IgnoreURLsTests: XCTestCase {
         XCTAssertEqual(ignoreURLs.getAllPatterns().count, 0)
     }
 
-
     // MARK: - URL Matching Tests
 
     func testMatchesWithStringURLs() throws {
@@ -162,7 +161,6 @@ final class IgnoreURLsTests: XCTestCase {
         // No patterns should mean no matches
         XCTAssertFalse(ignoreURLs.matches("https://example.com/image.jpg"))
     }
-
 
     // MARK: - Edge Cases
 
