@@ -24,9 +24,15 @@ struct CustomTrackingDemoView: View {
             VStack(spacing: 16) {
                 DemoHeaderView()
 
-                FeatureSection(title: "Custom Event Tracking") {
+                FeatureSection(title: "Custom Event Tracking with attributes argument") {
                     FeatureButton(label: "Track Event") {
-                        trackCustomEvent()
+                        trackCustomEventWithAttributes()
+                    }
+                }
+
+                FeatureSection(title: "Custom Event Tracking without attributes argument") {
+                    FeatureButton(label: "Track Event") {
+                        trackCustomEventWithoutAttributes()
                     }
                 }
 
@@ -91,13 +97,17 @@ struct CustomTrackingDemoView: View {
         .navigationTitle("Custom Tracking")
     }
 
-    func trackCustomEvent() {
+    func trackCustomEventWithAttributes() {
         let attributes = MutableAttributes()
         attributes["UIElementType"] = .string("Button")
         attributes["ActionType"] = .string("Primary Action")
         attributes["Timestamp"] = .string(Date().description)
         attributes["EventID"] = .int(12345)
         SplunkRum.shared.customTracking.trackCustomEvent("Demo Button Clicked", attributes)
+    }
+
+    func trackCustomEventWithoutAttributes() {
+        SplunkRum.shared.customTracking.trackCustomEvent("Demo Button Clicked - no attributes argument")
     }
 
     func trackWorkflow() {
