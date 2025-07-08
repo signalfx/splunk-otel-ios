@@ -247,18 +247,18 @@ public class SplunkRumBuilder {
             return false
         }
 
-        // MARK: - Module Configurations
+        // Construct module configurations
 
         var moduleConfigurations: [ModuleConfiguration] = []
 
-        /// Navigation
+        // Navigation
         let navigationModuleConfiguration = SplunkNavigation.NavigationConfiguration(
             isEnabled: screenNameSpans,
             enableAutomatedTracking: showVCInstrumentation
         )
         moduleConfigurations.append(navigationModuleConfiguration)
 
-        /// SlowFrameDetector
+        // SlowFrameDetector
         let slowFrameDetectorConfiguration = SlowFrameDetectorConfiguration(isEnabled: slowRenderingDetectionEnabled)
         moduleConfigurations.append(slowFrameDetectorConfiguration)
 
