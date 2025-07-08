@@ -37,6 +37,7 @@ public class SplunkRumBuilder {
     private var environment: String?
     private var sessionSamplingRatio: Double = ConfigurationDefaults.sessionSamplingRate
     private var appName: String?
+    private var globalAttributes: [String: Any]?
 
     private var endpointConfiguration: EndpointConfiguration?
 
@@ -136,10 +137,20 @@ public class SplunkRumBuilder {
 
     @available(*, deprecated, message:
         """
-        This builder method will be removed in a later version.
+        This builder method is a no-op and will be removed in a later version.
         """)
     @discardableResult
     public func enableDiskCache(enabled: Bool) -> SplunkRumBuilder {
+        return self
+    }
+
+    @available(*, deprecated, message:
+        """
+        This builder method will be removed in a later version.
+        """)
+    @discardableResult
+    public func globalAttributes(globalAttributes: [String: Any]) -> SplunkRumBuilder {
+        self.globalAttributes = globalAttributes
         return self
     }
 
@@ -262,9 +273,18 @@ public class SplunkRumBuilder {
         let slowFrameDetectorConfiguration = SlowFrameDetectorConfiguration(isEnabled: slowRenderingDetectionEnabled)
         moduleConfigurations.append(slowFrameDetectorConfiguration)
 
+        // Construct global attributes
+        let attributes: MutableAttributes
+        if let globalAttributes = globalAttributes {
+            attributes = MutableAttributes(from: globalAttributes)
+        } else {
+            attributes = MutableAttributes()
+        }
+
         // Construct AgentConfiguration with the supplied builder properties
         let agentConfiguration = AgentConfiguration(endpoint: endpointConfiguration, appName: appName, deploymentEnvironment: developmentEnvironment)
             .sessionConfiguration(SessionConfiguration(samplingRate: sessionSamplingRatio))
+            .globalAttributes(attributes)
             .enableDebugLogging(debug)
 
         // Call the `install` method

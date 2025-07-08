@@ -15,6 +15,7 @@
  limitations under the License.
  */
 
+import OpenTelemetryApi
 @testable import SplunkAgent
 import XCTest
 
@@ -53,7 +54,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
 
         // Verify the shared agent state after full build
         let status = SplunkRum.shared.state.status
-        let expected: Status = {
+        let expected: SplunkAgent.Status = {
             if PlatformSupport.current.scope == .full {
                 return .running
             } else {
@@ -200,7 +201,6 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertEqual(authItem?.value, token)
     }
 
-
     func testBuildSlowRenderingDisabledWhenFalse() throws {
 
         let builder = SplunkRumBuilder(
@@ -325,5 +325,22 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             operationalProxy.state.isEnabled,
             "The proxy should report the default enabled state."
         )
+    }
+
+    func testBuildForGlobalAttributesInitializer() throws {
+        let realm = "us0"
+        let token = "auth-token"
+        let builder = SplunkRumBuilder(realm: realm, rumAuth: token)
+            .setApplicationName("GlobalAttributesTest")
+            .deploymentEnvironment(environment: "Dev")
+            .globalAttributes(globalAttributes: ["key1": "value1", "key2": true])
+
+        XCTAssertTrue(builder.build())
+
+        let config = SplunkRum.shared.agentConfiguration
+        XCTAssertTrue(config.globalAttributes.attributes.contains(key: "key1"))
+        XCTAssertTrue(config.globalAttributes.attributes.contains(key: "key2"))
+        XCTAssertEqual(config.globalAttributes.attributes["key1"], AttributeValue.string("value1"))
+        XCTAssertEqual(config.globalAttributes.attributes["key2"], AttributeValue.bool(true))
     }
 }

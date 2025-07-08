@@ -39,6 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            .slowRenderingDetectionEnabled(true)
 //            .slowFrameDetectionThresholdMs(thresholdMs: 400)
 //            .frozenFrameDetectionThresholdMs(thresholdMs: 700)
+//            .globalAttributes(globalAttributes: ["isWorkingHard": true, "secret": "Red bull"])
 //            .build()
 
         let endpointConfig = EndpointConfiguration(
