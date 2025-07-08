@@ -18,6 +18,7 @@ limitations under the License.
 internal import CiscoLogger
 internal import SplunkCommon
 internal import SplunkNavigation
+internal import SplunkNetwork
 
 import Foundation
 
@@ -45,6 +46,8 @@ public class SplunkRumBuilder {
 
     private var screenNameSpans: Bool = true
     private var showVCInstrumentation: Bool = false
+    private var networkInstrumentation: Bool = true
+    private var ignoreURLs: NSRegularExpression?
 
 
     // MARK: - Logging
@@ -185,6 +188,32 @@ public class SplunkRumBuilder {
     }
 
 
+    /// Specifies whether the Network Instrumentation module should be activated and generate spans.
+    ///
+    /// - Parameter enabled: If `true`, the Network Instrumentation module generates spans.
+    ///
+    /// - Returns: The updated builder instance.
+    @available(*, deprecated, message: "This builder method will be removed in a later version.")
+    @discardableResult
+    public func networkInstrumentation(_ enabled: Bool) -> SplunkRumBuilder {
+        networkInstrumentation = enabled
+        return self
+    }
+
+
+    /// Network Instrumention can ignore URLs as appropriate
+    ///
+    /// - Parameter ignoreURLs: A regular expression that resolves to URLs to be ignored during network activity
+    ///
+    /// - Returns: The updated builder instance.
+    @available(*, deprecated, message: "This builder method will be removed in a later version.")
+    @discardableResult
+    public func ignoreURLs(_ ignoreURLs: NSRegularExpression?) -> SplunkRumBuilder {
+        self.ignoreURLs = ignoreURLs
+        return self
+    }
+
+
     // MARK: - Build translation method
 
     @available(*, deprecated, message:
@@ -230,7 +259,14 @@ public class SplunkRumBuilder {
 
         moduleConfigurations.append(navigationModuleConfiguration)
 
-        // Construct global attributes
+        let networkModuleConfiguration = SplunkNetwork.NetworkInstrumentationConfiguration(
+            isEnabled: networkInstrumentation,
+            ignoreURLs: IgnoreURLs(containing: ignoreURLs)
+        )
+
+        moduleConfigurations.append(networkModuleConfiguration)
+
+      // Construct global attributes
         let attributes: MutableAttributes
         if let globalAttributes = globalAttributes {
             attributes = MutableAttributes(from: globalAttributes)
