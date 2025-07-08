@@ -24,6 +24,7 @@ internal import SplunkNetwork
 internal import SplunkWebView
 internal import SplunkNetworkMonitor
 internal import SplunkInteractions
+internal import SplunkSlowFrameDetector
 
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
@@ -61,6 +62,7 @@ extension SplunkRum {
         customizeCustomTracking()
         customizeInteractions()
         customizeWebView()
+        customizeSlowFrameDetector()
     }
 
     /// Perform operations specific to the SessionReplay module.
@@ -190,6 +192,14 @@ extension SplunkRum {
         if let customTrackingModule = modulesManager?.module(ofType: CustomTrackingInternal.self) {
             // Initialize proxy API for this module
             customTrackingProxy = CustomTracking(for: customTrackingModule)
+        }
+    }
+
+    /// Configure SlowFrameDetector module
+    private func customizeSlowFrameDetector() {
+        if let slowFrameDetectorModule = modulesManager?.module(ofType: SplunkSlowFrameDetector.SlowFrameDetector.self) {
+            // Initialize proxy API for this module
+            slowFrameDetectorProxy = SlowFrameDetector(for: slowFrameDetectorModule)
         }
     }
 }

@@ -22,6 +22,8 @@ import UIKit
 
 public final class SlowFrameDetector {
 
+    // MARK: - Nested Types
+
     typealias FrameBuffer = [String: Int]
 
     actor ReportableFramesBuffer {
@@ -38,25 +40,35 @@ public final class SlowFrameDetector {
         }
     }
 
-    private var timer: Timer? = Timer()
+    // MARK: - Public Properties
+
+    /// An object that reflects the current state for the module, just `isEnabled` in our case.
+    public let state = SlowFrameDetectorState()
+
+    /// The configuration received from a remote source.
+    public var configuration: SlowFrameDetectorRemoteConfiguration?
+
+    // MARK: - Private Properties
+
+    // Frame Detection Machinery
     private var displayLink: CADisplayLink?
-    private var displayLinkTask: Task<Void, Never>? // for async/await
+    private var timer: Timer?
+    private var displayLinkTask: Task<Void, Never>?
 
-    private var slowFrames: ReportableFramesBuffer? = ReportableFramesBuffer()
-    private var frozenFrames: ReportableFramesBuffer? = ReportableFramesBuffer()
+    // Frame Buffers
+    private var slowFrames = ReportableFramesBuffer()
+    private var frozenFrames = ReportableFramesBuffer()
 
+    // Calculation State
     private var previousTimestamp: CFTimeInterval = 0.0
 
-    private var config: SlowFrameDetectorRemoteConfiguration?
-
-    // Candidate future configuration options. If exposed, will need clamping.
+    // Tuning Parameters
     private var tolerancePercentage: Double = 15.0
     private var frozenDurationMultiplier: Double = 40.0
 
+    // MARK: - Lifecycle
 
-    // MARK: - SlowFrameDetector lifecycle
-
-    public required init() {} // For Module conformance
+    public required init() {}
 
     deinit {
         stop()
@@ -64,8 +76,18 @@ public final class SlowFrameDetector {
 
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
 
-        config = remoteConfiguration as? SlowFrameDetectorRemoteConfiguration
-        start()
+        // Ignore `remoteConfiguration` because when it eventually comes into
+        // play, DefaultModulesManager will be using it if needed to veto the
+        // installation before we ever get here.
+
+        let localConfiguration = configuration as? SlowFrameDetectorConfiguration
+
+        // If localConfiguration is nil, default to true.
+        state.isEnabled = localConfiguration?.isEnabled ?? true
+
+        if state.isEnabled {
+            start()
+        }
     }
 
     public func start() {
@@ -108,8 +130,8 @@ public final class SlowFrameDetector {
         displayLink = nil
         displayLinkTask?.cancel()
         displayLinkTask = nil
-        slowFrames = nil
-        frozenFrames = nil
+        slowFrames = ReportableFramesBuffer()
+        frozenFrames = ReportableFramesBuffer()
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIApplication.willResignActiveNotification, object: nil)
     }
@@ -189,12 +211,12 @@ public final class SlowFrameDetector {
         // Apply isFrozen check first because it's a subset of isSlow
         if isFrozen {
             displayLinkTask = Task { [weak self] in
-                await self?.frozenFrames?.incrementFrames()
+                await self?.frozenFrames.incrementFrames()
                 self?.displayLinkTask = nil
             }
         } else if isSlow {
             displayLinkTask = Task { [weak self] in
-                await self?.slowFrames?.incrementFrames()
+                await self?.slowFrames.incrementFrames()
                 self?.displayLinkTask = nil
             }
         }
@@ -207,13 +229,15 @@ public final class SlowFrameDetector {
 
         let destination = OTelDestination()
 
-        if let slowReportable = await slowFrames?.framesToReport() {
+        let slowReportable = await slowFrames.framesToReport()
+        if !slowReportable.isEmpty {
             for (_, count) in slowReportable {
                 destination.send(type: "slowRenders", count: count, sharedState: nil)
             }
         }
 
-        if let frozenReportable = await frozenFrames?.framesToReport() {
+        let frozenReportable = await frozenFrames.framesToReport()
+        if !frozenReportable.isEmpty {
             for (_, count) in frozenReportable {
                 destination.send(type: "frozenRenders", count: count, sharedState: nil)
             }

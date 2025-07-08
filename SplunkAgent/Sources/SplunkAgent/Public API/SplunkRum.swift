@@ -62,6 +62,7 @@ public class SplunkRum: ObservableObject {
     lazy var webViewProxy: any WebViewInstrumentationModule = WebViewNonOperational()
     lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
     lazy var interactions: any InteractionsModule = InteractionsNonOperational()
+    lazy var slowFrameDetectorProxy: any SlowFrameDetectorModule = SlowFrameDetectorNonOperational()
 
 
     // MARK: - Platform Support
@@ -123,6 +124,11 @@ public class SplunkRum: ObservableObject {
         navigationProxy
     }
 
+    /// An object that holds SlowFrameDetector module.
+    public var slowFrameDetector: any SlowFrameDetectorModule {
+        slowFrameDetectorProxy
+    }
+    
     /// An object that provides a bridge for WebView instrumentation.
     public var webViewNativeBridge: any WebViewInstrumentationModule {
         webViewProxy

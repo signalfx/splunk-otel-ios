@@ -1,4 +1,5 @@
 //
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -16,9 +17,17 @@ limitations under the License.
 */
 
 import Foundation
-@testable import SplunkSlowFrameDetector
-import XCTest
+import SplunkCommon
 
-final class SplunkSlowFrameDetectorTests: XCTestCase {
-    // See tests in API10SplunkRumBuilderTests
+/// SlowFrameDetector module remote configuration.
+public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
+
+    // MARK: - Module management
+
+    public var enabled: Bool = true
+
+
+    // MARK: - Initialization
+
+    public init?(from data: Data) {}
 }

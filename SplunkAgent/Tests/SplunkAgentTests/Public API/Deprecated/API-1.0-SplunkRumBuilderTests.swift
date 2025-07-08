@@ -201,20 +201,146 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertEqual(authItem?.value, token)
     }
 
+    func testBuildSlowRenderingDisabledWhenFalse() throws {
+
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "authToken"
+        )
+            .setApplicationName("DeprecatedApp")
+            .deploymentEnvironment(environment: "Env")
+            .slowRenderingDetectionEnabled(false) // Method under test
+
+        XCTAssertTrue(builder.build(), "Builder should successfully build when feature is disabled.")
+
+        // Verify agent is running.
+        XCTAssertEqual(SplunkRum.shared.state.status, .running, "The SplunkRum agent should be in the .running state.")
+
+        // Verify operational proxy is installed.
+        XCTAssert(
+            SplunkRum.shared.slowFrameDetector is SplunkAgent.SlowFrameDetector,
+            "The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead. This means the agent is refusing to install the module when disabled."
+        )
+
+        // Safely cast to operational proxy.
+        let operationalProxy = try XCTUnwrap(
+            SplunkRum.shared.slowFrameDetector as? SplunkAgent.SlowFrameDetector,
+            "Failed to cast the proxy to its operational type, even though the type check passed."
+        )
+
+        // Verify real module state is disabled.
+        XCTAssertFalse(
+            operationalProxy.module.state.isEnabled,
+            "The isEnabled property on the REAL underlying module's state object should be false."
+        )
+
+        // Verify proxy reports disabled state.
+        XCTAssertFalse(
+            operationalProxy.state.isEnabled,
+            "The isEnabled property exposed by the PROXY should be false."
+        )
+    }
+
+    func testBuildSlowRenderingEnabledWhenTrue() throws {
+
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "authToken"
+        )
+            .setApplicationName("DeprecatedApp")
+            .deploymentEnvironment(environment: "Env")
+            .slowRenderingDetectionEnabled(true) // Method under test
+
+        XCTAssertTrue(builder.build(), "Builder should successfully build when feature is enabled.")
+
+        // Verify agent is running.
+        XCTAssertEqual(SplunkRum.shared.state.status, .running, "The SplunkRum agent should be in the .running state.")
+
+        // Verify operational proxy is installed.
+        XCTAssert(
+            SplunkRum.shared.slowFrameDetector is SplunkAgent.SlowFrameDetector,
+            "The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead. This means the module is not being initialized correctly."
+        )
+
+        // Safely cast to operational proxy.
+        let operationalProxy = try XCTUnwrap(
+            SplunkRum.shared.slowFrameDetector as? SplunkAgent.SlowFrameDetector,
+            "Failed to cast the proxy to its operational type, even though the type check passed."
+        )
+
+        // Verify real module state is enabled.
+        XCTAssertTrue(
+            operationalProxy.module.state.isEnabled,
+            "The isEnabled property on the REAL underlying module's state object should be true."
+        )
+
+        // Verify proxy reports enabled state.
+        XCTAssertTrue(
+            operationalProxy.state.isEnabled,
+            "The isEnabled property exposed by the PROXY should be true."
+        )
+    }
+
+    func testBuildIgnoresDeprecatedSlowRenderingOptions() throws {
+
+        /// Ignore deprecated slowFrameRendering options:
+        /// * slowFrameDetectionThresholdMs
+        /// * frozenFrameDetectionThresholdMs
+
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "authToken"
+        )
+            .setApplicationName("NoOpApp")
+            .deploymentEnvironment(environment: "Env")
+            // These deprecated methods should have no effect
+            .slowFrameDetectionThresholdMs(thresholdMs: 100)
+            .frozenFrameDetectionThresholdMs(thresholdMs: 1000)
+
+        XCTAssertTrue(builder.build(), "Builder should successfully build.")
+
+        // Verify agent is running.
+        XCTAssertEqual(SplunkRum.shared.state.status, .running, "The SplunkRum agent should be in the .running state.")
+
+        // Verify operational proxy is installed.
+        XCTAssert(
+            SplunkRum.shared.slowFrameDetector is SplunkAgent.SlowFrameDetector,
+            "The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead."
+        )
+
+        // Safely cast to operational proxy.
+        let operationalProxy = try XCTUnwrap(
+            SplunkRum.shared.slowFrameDetector as? SplunkAgent.SlowFrameDetector,
+            "Failed to cast the proxy to its operational type, even though the type check passed."
+        )
+
+        // Verify module is enabled by default.
+        XCTAssertTrue(
+            operationalProxy.module.state.isEnabled,
+            "The real module should be enabled by default when no explicit setting is provided."
+        )
+
+        // Verify proxy reports default enabled state.
+        XCTAssertTrue(
+            operationalProxy.state.isEnabled,
+            "The proxy should report the default enabled state."
+        )
+    }
+
     func testBuildForGlobalAttributesInitializer() throws {
-            let realm = "us0"
-            let token = "auth-token"
-            let builder = SplunkRumBuilder(realm: realm, rumAuth: token)
-                .setApplicationName("GlobalAttributesTest")
-                .deploymentEnvironment(environment: "Dev")
-                .globalAttributes(globalAttributes: ["key1": "value1", "key2": true])
+        let realm = "us0"
+        let token = "auth-token"
+        let builder = SplunkRumBuilder(realm: realm, rumAuth: token)
+            .setApplicationName("GlobalAttributesTest")
+            .deploymentEnvironment(environment: "Dev")
+            .globalAttributes(globalAttributes: ["key1": "value1", "key2": true])
 
-            XCTAssertTrue(builder.build())
+        XCTAssertTrue(builder.build())
 
-            let config = SplunkRum.shared.agentConfiguration
-            XCTAssertTrue(config.globalAttributes.attributes.contains(key: "key1"))
-            XCTAssertTrue(config.globalAttributes.attributes.contains(key: "key2"))
-            XCTAssertEqual(config.globalAttributes.attributes["key1"], AttributeValue.string("value1"))
-            XCTAssertEqual(config.globalAttributes.attributes["key2"], AttributeValue.bool(true))
-        }
+        let config = SplunkRum.shared.agentConfiguration
+        XCTAssertTrue(config.globalAttributes.attributes.contains(key: "key1"))
+        XCTAssertTrue(config.globalAttributes.attributes.contains(key: "key2"))
+        XCTAssertEqual(config.globalAttributes.attributes["key1"], AttributeValue.string("value1"))
+        XCTAssertEqual(config.globalAttributes.attributes["key2"], AttributeValue.bool(true))
+    }
 }

@@ -15,10 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-@testable import SplunkSlowFrameDetector
-import XCTest
+/// A state object that is representation for the current state of the SlowFrameDetector module.
+public final class SlowFrameDetectorState: Sendable {
 
-final class SplunkSlowFrameDetectorTests: XCTestCase {
-    // See tests in API10SplunkRumBuilderTests
+    /// Indicates whether the SlowFrameDetector feature is enabled.
+    ///
+    /// The default value is `false`.
+    public internal(set) nonisolated(unsafe) var isEnabled: Bool = false
 }
