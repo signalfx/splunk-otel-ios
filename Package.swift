@@ -232,6 +232,7 @@ func generateMainTargets() -> [Target] {
             dependencies: [
                 "SplunkCrashReports",
                 "SplunkCommon",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "CrashReporter", package: "PLCrashReporter")
             ],
             path: "SplunkCrashReports/Tests"

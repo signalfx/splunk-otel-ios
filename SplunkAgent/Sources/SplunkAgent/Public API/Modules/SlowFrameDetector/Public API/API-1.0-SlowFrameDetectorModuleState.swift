@@ -15,10 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-@testable import SplunkSlowFrameDetector
-import XCTest
-
-final class SplunkSlowFrameDetectorTests: XCTestCase {
-    // See tests in API10SplunkRumBuilderTests
+/// Defines a public API for the current state of the `SlowFrameDetector` module.
+public protocol SlowFrameDetectorModuleState {
+    /// Indicates whether the slow and frozen frame detection feature is enabled.
+    var isEnabled: Bool { get }
 }

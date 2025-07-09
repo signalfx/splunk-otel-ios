@@ -15,10 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-@testable import SplunkSlowFrameDetector
-import XCTest
-
-final class SplunkSlowFrameDetectorTests: XCTestCase {
-    // See tests in API10SplunkRumBuilderTests
+/// Shared protocol for operational and non-operational implementations.
+public protocol SlowFrameDetectorModule {
+    /// An object that provides information about the current state of the module.
+    var state: any SlowFrameDetectorModuleState { get }
 }

@@ -18,40 +18,20 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-public struct SlowFrameDetectorConfiguration: ModuleConfiguration {}
+/// SlowFrameDetector module configuration, minimal configuration for module conformance.
+public struct SlowFrameDetectorConfiguration: ModuleConfiguration {
 
-public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
+    /// Indicates whether the Module is enabled. Default value is `true`.
+    public var isEnabled: Bool = true
 
-    // MARK: - Internal decoding
+    /// Initialize a new configuration.
+    public init() {}
 
-    struct SlowFrameDetector: Decodable {
-        let enabled: Bool
-    }
-
-    struct MRUMRoot: Decodable {
-        let slowFrameDetector: SlowFrameDetector
-    }
-
-    struct Configuration: Decodable {
-        let mrum: MRUMRoot
-    }
-
-    struct Root: Decodable {
-        let configuration: Configuration
-    }
-
-
-    // MARK: - Protocol conformance
-
-
-    // MARK: - Internal variables
-
-    public var enabled: Bool
-
-    public init?(from data: Data) {
-        guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
-            return nil
-        }
-        enabled = root.configuration.mrum.slowFrameDetector.enabled
+    /// Initializes new module configuration using value provided for isEnabled.
+    ///
+    /// - Parameters:
+    ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
+    public init(isEnabled: Bool = true) {
+        self.isEnabled = isEnabled
     }
 }
