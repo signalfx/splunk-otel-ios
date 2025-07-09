@@ -128,7 +128,7 @@ public class SplunkRum: ObservableObject {
     public var slowFrameDetector: any SlowFrameDetectorModule {
         slowFrameDetectorProxy
     }
-    
+
     /// An object that provides a bridge for WebView instrumentation.
     public var webViewNativeBridge: any WebViewInstrumentationModule {
         webViewProxy
