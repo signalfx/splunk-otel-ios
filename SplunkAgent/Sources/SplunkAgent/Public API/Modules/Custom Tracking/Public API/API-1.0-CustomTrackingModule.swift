@@ -80,7 +80,7 @@ public protocol CustomTrackingModule {
 
     // MARK: - Single argument helpers (signatures)
 
-    @discardableResult func trackCustomEvent(_ name: String) -> any CustomTrackingModule;
+    @discardableResult func trackCustomEvent(_ name: String) -> any CustomTrackingModule
 
     @discardableResult func trackError(_ message: String) -> any CustomTrackingModule
 
