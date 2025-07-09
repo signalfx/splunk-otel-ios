@@ -394,8 +394,6 @@ public final class Navigation: Sendable {
             return typeName
         }
 
-        let prefix = "\(bundleName)."
-
-        return String(typeName.dropFirst(prefix.count))
+        return String(typeName.dropFirst("\(bundleName).".count))
     }
 }

@@ -69,11 +69,10 @@ func generateMainTargets() -> [Target] {
                 "SplunkCustomTracking",
                 resolveDependency("logger")
             ],
-            path: "SplunkAgent",
-            sources: ["Sources"],
+            path: "SplunkAgent/Sources",
             resources: [
-                .copy("Resources/PrivacyInfo.xcprivacy"),
-                .copy("Resources/NOTICES")
+                .copy("../Resources/PrivacyInfo.xcprivacy"),
+                .copy("../Resources/NOTICES")
             ]
         ),
         .testTarget(
@@ -151,6 +150,10 @@ func generateMainTargets() -> [Target] {
 
         .target(
             name: "SplunkCommon",
+            dependencies: [
+                resolveDependency("diskStorage"),
+                resolveDependency("encryptor")
+            ],
             path: "SplunkCommon/Sources"
         ),
         .testTarget(
@@ -282,6 +285,7 @@ func generateMainTargets() -> [Target] {
                 dependencies: [
                     "SplunkCommon",
                     .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                    resolveDependency("runtimeCache"),
                     resolveDependency("logger")
                 ],
                 path: "SplunkInteractions/Sources"

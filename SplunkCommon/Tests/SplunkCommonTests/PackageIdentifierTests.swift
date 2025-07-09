@@ -68,4 +68,26 @@ final class PackageIdentifierTests: XCTestCase {
         let expectedNamed = "\(defaultIdentifier)-\(namedExtension)"
         XCTAssertEqual(namedInstanceIdentifier, expectedNamed)
     }
+
+    func testNonOperationalInstanceIdentification() throws {
+        let defaultExtension = "noop-default"
+        let namedExtension = "named"
+        let defaultIdentifier = PackageIdentifier.default
+
+        let defaultNonOpIdentifier = PackageIdentifier.nonOperationalInstance()
+        let emptyNonOpIdentifier = PackageIdentifier.nonOperationalInstance(named: "")
+        let namedNonOpIdentifier = PackageIdentifier.nonOperationalInstance(named: namedExtension)
+
+        // Check format for the default instance
+        let expectedDefault = "\(defaultIdentifier)-\(defaultExtension)"
+        XCTAssertEqual(defaultNonOpIdentifier, expectedDefault)
+
+        // Checks format for the identifier generated with an empty extension
+        let expectedEmpty = "\(defaultIdentifier)-\(defaultExtension)"
+        XCTAssertEqual(emptyNonOpIdentifier, expectedEmpty)
+
+        // Check if the identifier has the expected format
+        let expectedNamed = "\(defaultIdentifier)-noop-\(namedExtension)"
+        XCTAssertEqual(namedNonOpIdentifier, expectedNamed)
+    }
 }

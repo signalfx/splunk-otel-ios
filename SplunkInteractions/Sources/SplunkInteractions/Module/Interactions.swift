@@ -185,9 +185,6 @@ public final class Interactions: SplunkInteractionsModule {
         case .gestureRotation:
             "rotation"
 
-        case .focus:
-            "focus"
-
         case .softKeyboard:
             "soft_keyboard"
 
