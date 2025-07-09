@@ -194,6 +194,9 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
         if let storedContainers {
             await model.restore(to: storedContainers)
         }
+
+        // The restoration has been successfully completed
+        await model.update(isRestored: true)
     }
 
 

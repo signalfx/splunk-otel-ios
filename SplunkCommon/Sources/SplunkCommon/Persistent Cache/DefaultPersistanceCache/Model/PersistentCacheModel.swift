@@ -73,4 +73,11 @@ actor PersistentCacheModel<Container: PersistedItemContainer> {
         containers = content
         isRestored = true
     }
+
+
+    // MARK: - Restore state management
+
+    func update(isRestored restored: Bool) {
+        isRestored = restored
+    }
 }
