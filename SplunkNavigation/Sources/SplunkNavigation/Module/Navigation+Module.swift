@@ -67,8 +67,10 @@ extension Navigation: Module {
         preferences.enableAutomatedTracking = configuration.enableAutomatedTracking
 
         // Update module mode
+        let isEnabled = configuration.isEnabled
+
         Task {
-            await model.update(moduleEnabled: configuration.isEnabled)
+            await model.update(moduleEnabled: isEnabled)
         }
     }
 }

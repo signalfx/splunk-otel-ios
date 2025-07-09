@@ -70,7 +70,7 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
             : logToSpanExporter
         )
 
-        var processors: [LogRecordProcessor] = [simpleLogRecordProcessor]
+        let processors: [LogRecordProcessor] = [simpleLogRecordProcessor]
 
         // Initialize logger provider
         let loggerProviderBuilder = LoggerProviderBuilder()
