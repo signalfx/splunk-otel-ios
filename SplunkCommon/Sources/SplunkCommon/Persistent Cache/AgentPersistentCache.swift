@@ -40,6 +40,9 @@ public protocol AgentPersistentCache<Element>: Sendable {
     /// Maximum lifetime of managed records. Default value is not defined (no lifetime).
     var maximumLifetime: TimeInterval? { get }
 
+    /// Determines if the cache content has already been restored following initialization.
+    var isRestored: Bool { get async }
+
 
     // MARK: - Keys and values
 

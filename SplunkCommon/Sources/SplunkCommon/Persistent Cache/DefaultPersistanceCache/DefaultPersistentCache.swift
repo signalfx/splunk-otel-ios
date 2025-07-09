@@ -48,6 +48,12 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
     public let maximumCapacity: Int
     public let maximumLifetime: TimeInterval?
 
+    public var isRestored: Bool {
+        get async {
+            await model.isRestored
+        }
+    }
+
 
     // MARK: - Keys and values
 

@@ -168,10 +168,13 @@ class DefaultEventManager: AgentEventManager {
 
         // Prepare and send the event as a separate transaction
         Task {
-            guard let eventIndex = await prepareSessionReplayIndex(
-                sessionId: sessionId,
-                timestamp: metadata.timestamp
-            ) else {
+            guard
+                await sessionReplayIndexer.isReady,
+                let eventIndex = await prepareSessionReplayIndex(
+                    sessionId: sessionId,
+                    timestamp: metadata.timestamp
+                )
+            else {
                 completion(false)
 
                 return

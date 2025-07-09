@@ -21,14 +21,27 @@ internal import SplunkCommon
 /// Implementation of the indexer for events from the Session Replay module.
 final class SessionReplayEventIndexer: EventIndexer {
 
+    /// Maximum number of managed items.
+    static let maximumCapacity: Int = 1000
+
+    /// Maximum lifetime of managed items. The value corresponds to 31 days.
+    static let maximumLifetime: TimeInterval = 2_678_400
+
+
     // MARK: - Private
 
-    private var indexCache: any AgentPersistentCache<Int>
+    var indexCache: any AgentPersistentCache<Int>
 
 
     // MARK: - Public
 
     let name: String
+
+    var isReady: Bool {
+        get async {
+            await indexCache.isRestored
+        }
+    }
 
 
     // MARK: - Initialization
@@ -38,7 +51,12 @@ final class SessionReplayEventIndexer: EventIndexer {
     /// - Parameter named: The name of the indexer.
     init(named: String) {
         name = named
-        indexCache = DefaultPersistentCache(uniqueCacheName: "\(named)IndexCache")
+
+        indexCache = DefaultPersistentCache(
+            uniqueCacheName: "\(named)IndexCache",
+            maximumCapacity: Self.maximumCapacity,
+            maximumLifetime: Self.maximumLifetime
+        )
     }
 
 

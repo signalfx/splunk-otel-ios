@@ -24,6 +24,8 @@ actor PersistentCacheModel<Container: PersistedItemContainer> {
 
     public private(set) var containers: [String: Container] = [:]
 
+    public private(set) var isRestored: Bool = false
+
 
     // MARK: - Items management
 
@@ -64,9 +66,11 @@ actor PersistentCacheModel<Container: PersistedItemContainer> {
 
     func removeAll() {
         containers.removeAll()
+        isRestored = false
     }
 
     func restore(to content: [String: Container]) {
         containers = content
+        isRestored = true
     }
 }
