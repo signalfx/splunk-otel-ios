@@ -19,6 +19,7 @@ internal import CiscoLogger
 internal import SplunkCommon
 internal import SplunkNavigation
 internal import SplunkNetwork
+internal import SplunkSlowFrameDetector
 
 import Foundation
 
@@ -46,6 +47,7 @@ public class SplunkRumBuilder {
 
     private var screenNameSpans: Bool = true
     private var showVCInstrumentation: Bool = false
+    private var slowRenderingDetectionEnabled: Bool = true
     private var networkInstrumentation: Bool = true
     private var ignoreURLs: NSRegularExpression?
 
@@ -187,6 +189,42 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// Specifies whether the SlowFrameDetection should be activated and generate slow frame detection spans.
+    ///
+    /// - Parameter enabled: If `true`, the SlowFrameDetection module generates slow frame detection spans.
+    ///
+    /// - Returns: The updated builder instance.
+    @available(*, deprecated, message: "This builder method will be removed in a later version.")
+    public func slowRenderingDetectionEnabled(_ isEnabled: Bool) -> SplunkRumBuilder {
+        slowRenderingDetectionEnabled = isEnabled
+        return self
+    }
+
+    /// Specifies the legacy threshold for slow frame detection. This setting is now ignored.
+    ///
+    /// - Parameter thresholdMs: The legacy threshold in milliseconds. This value is not used.
+    ///
+    /// - Returns: The builder instance to allow for continued chaining.
+    @available(*, deprecated, message: "This configuration has been discontinued and has no effect. Thresholds are now managed automatically.")
+    @discardableResult
+    public func slowFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
+        // This method is intentionally empty as the feature is discontinued.
+        // We return 'self' to allow for continued builder chaining.
+        return self
+    }
+
+    /// Specifies the legacy threshold for frozen frame detection. This setting is now ignored.
+    ///
+    /// - Parameter thresholdMs: The legacy threshold in milliseconds. This value is not used.
+    ///
+    /// - Returns: The builder instance to allow for continued chaining.
+    @available(*, deprecated, message: "This configuration has been discontinued and has no effect. Thresholds are now managed automatically.")
+    @discardableResult
+    public func frozenFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
+        // Intentionally empty.
+        // We return 'self' to allow for continued builder chaining.
+        return self
+    }
 
     /// Specifies whether the Network Instrumentation module should be activated and generate spans.
     ///
@@ -250,23 +288,30 @@ public class SplunkRumBuilder {
         }
 
         // Construct module configurations
+
         var moduleConfigurations: [ModuleConfiguration] = []
 
+        // Navigation
         let navigationModuleConfiguration = SplunkNavigation.NavigationConfiguration(
             isEnabled: screenNameSpans,
             enableAutomatedTracking: showVCInstrumentation
         )
-
         moduleConfigurations.append(navigationModuleConfiguration)
 
+        // SlowFrameDetector
+        let slowFrameDetectorConfiguration = SlowFrameDetectorConfiguration(
+            isEnabled: slowRenderingDetectionEnabled
+        )
+        moduleConfigurations.append(slowFrameDetectorConfiguration)
+
+        // Network
         let networkModuleConfiguration = SplunkNetwork.NetworkInstrumentationConfiguration(
             isEnabled: networkInstrumentation,
             ignoreURLs: IgnoreURLs(containing: ignoreURLs)
         )
-
         moduleConfigurations.append(networkModuleConfiguration)
 
-      // Construct global attributes
+        // Construct global attributes
         let attributes: MutableAttributes
         if let globalAttributes = globalAttributes {
             attributes = MutableAttributes(from: globalAttributes)

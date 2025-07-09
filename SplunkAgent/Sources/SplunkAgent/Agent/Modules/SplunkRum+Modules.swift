@@ -24,9 +24,14 @@ internal import SplunkNetwork
 internal import SplunkWebView
 internal import SplunkNetworkMonitor
 internal import SplunkInteractions
+internal import SplunkSlowFrameDetector
 
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
+#endif
+
+#if os(iOS) || os(visionOS)
+    import WebKit
 #endif
 
 
@@ -61,6 +66,7 @@ extension SplunkRum {
         customizeCustomTracking()
         customizeInteractions()
         customizeWebView()
+        customizeSlowFrameDetector()
     }
 
     /// Perform operations specific to the SessionReplay module.
@@ -82,6 +88,11 @@ extension SplunkRum {
 
             return
         }
+
+        // By default, we turn off the default sensitivity for `WKWebView`
+        #if os(iOS) || os(visionOS)
+            sessionReplayModule.sensitivity.set(WKWebView.self, nil)
+        #endif
 
         // Initialize proxy API for this module
         sessionReplayProxy = SessionReplay(for: sessionReplayModule)
@@ -190,6 +201,14 @@ extension SplunkRum {
         if let customTrackingModule = modulesManager?.module(ofType: CustomTrackingInternal.self) {
             // Initialize proxy API for this module
             customTrackingProxy = CustomTracking(for: customTrackingModule)
+        }
+    }
+
+    /// Configure SlowFrameDetector module
+    private func customizeSlowFrameDetector() {
+        if let slowFrameDetectorModule = modulesManager?.module(ofType: SplunkSlowFrameDetector.SlowFrameDetector.self) {
+            // Initialize proxy API for this module
+            slowFrameDetectorProxy = SlowFrameDetector(for: slowFrameDetectorModule)
         }
     }
 }

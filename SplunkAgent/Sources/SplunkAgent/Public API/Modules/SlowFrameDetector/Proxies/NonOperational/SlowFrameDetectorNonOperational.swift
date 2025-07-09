@@ -1,4 +1,3 @@
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -15,10 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-@testable import SplunkSlowFrameDetector
-import XCTest
+private final class SlowFrameDetectorNonOperationalState: SlowFrameDetectorModuleState {
+    var isEnabled: Bool { false }
+}
 
-final class SplunkSlowFrameDetectorTests: XCTestCase {
-    // See tests in API10SplunkRumBuilderTests
+/// The class implementing SlowFrameDetector public API in non-operational mode.
+final class SlowFrameDetectorNonOperational: SlowFrameDetectorModule {
+    /// The state of the non-operational module, which is always disabled.
+    let state: any SlowFrameDetectorModuleState = SlowFrameDetectorNonOperationalState()
 }

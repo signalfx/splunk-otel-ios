@@ -84,13 +84,9 @@ public struct SplunkIssue: SplunkTrackableIssue {
         // This is not necessarily the original error's throw site.
         stacktrace = Stacktrace(frames: Thread.callStackSymbols)
 
-        if let nsError = error as? NSError {
-            exceptionCode = .int(nsError.code)
-            codeNamespace = nsError.domain
-        } else {
-            exceptionCode = nil
-            codeNamespace = nil
-        }
+        let nsError = error as NSError
+        exceptionCode = .int(nsError.code)
+        codeNamespace = nsError.domain
     }
 
     public init(from exception: NSException) {
