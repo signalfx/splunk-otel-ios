@@ -69,11 +69,10 @@ func generateMainTargets() -> [Target] {
                 "SplunkCustomTracking",
                 resolveDependency("logger")
             ],
-            path: "SplunkAgent",
-            sources: ["Sources"],
+            path: "SplunkAgent/Sources",
             resources: [
-                .copy("Resources/PrivacyInfo.xcprivacy"),
-                .copy("Resources/NOTICES")
+                .copy("../Resources/PrivacyInfo.xcprivacy"),
+                .copy("../Resources/NOTICES")
             ]
         ),
         .testTarget(

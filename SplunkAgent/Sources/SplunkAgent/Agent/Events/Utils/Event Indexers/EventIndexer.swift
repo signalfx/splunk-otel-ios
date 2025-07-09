@@ -27,6 +27,9 @@ protocol EventIndexer {
     /// The used name should be unique whenever possible.
     var name: String { get }
 
+    /// Determines if the indexer is operational and all its data is available.
+    var isReady: Bool { get async }
+
 
     // MARK: - Indexer methods
 

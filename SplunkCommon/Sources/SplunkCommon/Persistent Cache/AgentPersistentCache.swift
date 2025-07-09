@@ -40,6 +40,9 @@ public protocol AgentPersistentCache<Element>: Sendable {
     /// Maximum lifetime of managed records. Default value is not defined (no lifetime).
     var maximumLifetime: TimeInterval? { get }
 
+    /// Determines if the cache content has already been restored following initialization.
+    var isRestored: Bool { get async }
+
 
     // MARK: - Keys and values
 
@@ -61,7 +64,7 @@ public protocol AgentPersistentCache<Element>: Sendable {
     ///   - end: The ending of the search period.
     ///
     /// - Returns: A dictionary with all the elements belonging to the searched period.
-    func elements(from start: Date?, to end: Date?) async throws -> [String: Element]
+    func elements(from start: Date?, to end: Date?) async -> [String: Element]
 
 
     // MARK: - CRUD operations

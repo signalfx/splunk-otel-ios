@@ -24,6 +24,8 @@ actor PersistentCacheModel<Container: PersistedItemContainer> {
 
     public private(set) var containers: [String: Container] = [:]
 
+    public private(set) var isRestored: Bool = false
+
 
     // MARK: - Items management
 
@@ -33,7 +35,7 @@ actor PersistentCacheModel<Container: PersistedItemContainer> {
         // Filter containers by updated timestamp ...
         if start != nil || end != nil {
             let fromDate = start ?? .init(timeIntervalSince1970: 0)
-            let toDate = end ?? Date()
+            let toDate = end ?? .distantFuture
 
             matchingContainers = containers.filter {
                 $0.value.updated >= fromDate && $0.value.updated <= toDate
@@ -64,9 +66,11 @@ actor PersistentCacheModel<Container: PersistedItemContainer> {
 
     func removeAll() {
         containers.removeAll()
+        isRestored = false
     }
 
     func restore(to content: [String: Container]) {
         containers = content
+        isRestored = true
     }
 }
