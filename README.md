@@ -53,8 +53,8 @@ import SplunkAgent
 
 // In your application:didFinishLaunchingWithOptions or init()
 let agentConfig = AgentConfiguration(
-    endpoint: .init(realm: "<YOUR_REALM>", rumAccessToken: "<YOUR_RUM_ACCESS_TOKEN>"), 
-    appName: "<YOUR_APP_NAME>", 
+    endpoint: .init(realm: "<YOUR_REALM>", rumAccessToken: "<YOUR_RUM_ACCESS_TOKEN>"),
+    appName: "<YOUR_APP_NAME>",
     deploymentEnvironment: "<YOUR_DEPLOYMENT_ENVIRONMENT>"
 )
 
@@ -66,15 +66,15 @@ try! SplunkRum.install(with: agentConfig)
 
 The agent provides several instrumentations to capture telemetry. Most are enabled by default and can be configured or disabled during initialization.
 
-*   **Crash Reporting:** Captures and reports application crashes. (Enabled by default)
-*   **Network Monitoring:** Reports network requests, connectivity changes, and errors. (Enabled by default)
-*   **Application Startup:** Measures cold and warm application start times. (Enabled by default)
-*   **Slow & Frozen Frame Detection:** Reports instances of slow or frozen UI frames. (Enabled by default)
-*   **UI Interaction Tracking:** Captures user taps on UI elements. (Enabled by default)
-*   **Navigation Tracking:** Reports screen transitions as `screen.name` attributes. (Disabled by default)
-*   **Session Replay:** Provides visual replay of user sessions. (Requires separate module)
-*   **WebView Instrumentation:** Links native RUM sessions with Browser RUM sessions in WebViews.
-*   **Custom Event & Workflow Reporting:** APIs to manually track custom events and workflows.
+* **Crash Reporting:** Captures and reports application crashes. (Enabled by default)
+* **Network Monitoring:** Reports network requests, connectivity changes, and errors. (Enabled by default)
+* **Application Startup:** Measures cold and warm application start times. (Enabled by default)
+* **Slow & Frozen Frame Detection:** Reports instances of slow or frozen UI frames. (Enabled by default)
+* **UI Interaction Tracking:** Captures user taps on UI elements. (Enabled by default)
+* **Navigation Tracking:** Reports screen transitions as `screen.name` attributes. (Disabled by default)
+* **Session Replay:** Provides visual replay of user sessions. (Requires separate module)
+* **WebView Instrumentation:** Links native RUM sessions with Browser RUM sessions in WebViews.
+* **Custom Event & Workflow Reporting:** APIs to manually track custom events and workflows.
 
 ## Contributing
 
@@ -85,6 +85,4 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for instructions on building, running t
 This library is licensed under the terms of the Apache Software License version 2.0.
 See [the license file](./LICENSE) for more details.
 
->ℹ️&nbsp;&nbsp;SignalFx was acquired by Splunk in October 2019. See [Splunk SignalFx](https://www.splunk.com/en_us/investor-relations/acquisitions/signalfx.html) for more information.  
- 
-
+ℹ️  SignalFx was acquired by Splunk in October 2019. See [Splunk SignalFx](https://www.splunk.com/en_us/investor-relations/acquisitions/signalfx.html) for more information.

@@ -4,9 +4,9 @@ This project is distributed as a Swift Package. The release process is driven by
 
 ### 1. Prepare the Release
 
-1.  Ensure the `main` branch is stable and all changes for the release have been merged.
-2.  Update `CHANGELOG.md` by moving all items from the `[Unreleased]` section to a new version heading (e.g., `[2.0.0] - YYYY-MM-DD`).
-3.  Update the `version` constant in `SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift`.
+1. Ensure the `main` branch is stable and all changes for the release have been merged.
+2. Update `CHANGELOG.md` by moving all items from the `[Unreleased]` section to a new version heading (e.g., `[2.0.0] - YYYY-MM-DD`).
+3. Update the `version` constant in `SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift`.
 
 ### 2. Run Final Checks
 
@@ -34,8 +34,8 @@ git push origin v2.0.0
 
 ### 4. Publish on GitHub
 
-1.  Go to the "Releases" page in the GitHub repository and click "Draft a new release".
-2.  Choose the tag you just pushed.
-3.  For the release notes, copy and paste the content from the corresponding version section in `CHANGELOG.md`.
-4.  Click the **Publish release** button. This will finalize the release, making it public and visible to the community.
+1. Go to the "Releases" page in the GitHub repository and click "Draft a new release".
+2. Choose the tag you just pushed.
+3. For the release notes, copy and paste the content from the corresponding version section in `CHANGELOG.md`.
+4. Click the **Publish release** button. This will finalize the release, making it public and visible to the community.
 

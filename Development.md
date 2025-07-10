@@ -35,5 +35,5 @@ brew install swiftlint
 
 ## Contributing
 
-See [the CONTRIBUTING document](./CONTRIBUTING.md) for details on our contribution process, including how to submit pull requests.  
+See [the CONTRIBUTING document](./CONTRIBUTING.md) for details on our contribution process, including how to submit pull requests.
 
