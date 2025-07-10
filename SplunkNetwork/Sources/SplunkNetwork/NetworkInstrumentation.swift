@@ -243,9 +243,7 @@ public class NetworkInstrumentation {
         span.setAttribute(key: SemanticAttributes.httpResponseStatusCode, value: Int(response?.statusCode ?? 0))
 
         // Try to capture IP address from the response/connection
-        if let httpResponse = response,
-           let url = httpResponse.url,
-           let host = url.host {
+        if let httpResponse = response {
             // Update network.peer.address with actual IP if we can get it
             if let ipAddress = getIPAddressFromResponse(httpResponse) {
                 span.setAttribute(key: "network.peer.address", value: ipAddress)

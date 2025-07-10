@@ -77,7 +77,10 @@ public protocol CustomTrackingModule {
     /// - Returns: A Span object representing the workflow.
     func trackWorkflow(_ workflowName: String) -> Span
 
+
     // MARK: - Single argument helpers (signatures)
+
+    @discardableResult func trackCustomEvent(_ name: String) -> any CustomTrackingModule
 
     @discardableResult func trackError(_ message: String) -> any CustomTrackingModule
 
@@ -86,10 +89,18 @@ public protocol CustomTrackingModule {
     @discardableResult func trackException(_ exception: NSException) -> any CustomTrackingModule
 }
 
+extension CustomTrackingModule {
+
+    // MARK: - Custom Event single argument helper
+
+    @discardableResult func trackCustomEvent(_ name: String) -> any CustomTrackingModule {
+        return trackCustomEvent(name, MutableAttributes())
+    }
+}
 
 extension CustomTrackingModule {
 
-    // MARK: - Single argument helpers (implementations)
+    // MARK: - Error single argument helpers
 
     @discardableResult func trackError(_ message: String) -> any CustomTrackingModule {
         return trackError(message, MutableAttributes())

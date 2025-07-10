@@ -268,15 +268,25 @@ public class CrashReports {
             reportDict[.exceptionReason] = report.exceptionInfo.exceptionReason ?? ""
         }
 
-        if report.customData != nil {
-            let customData = NSKeyedUnarchiver.unarchiveObject(with: report.customData) as? [String: String]
-            if customData != nil {
-                if let sessionId = customData?["sessionId"] {
-                    reportDict[.sessionId] = customData!["sessionId"]
+        do {
+            if let customData = report.customData,
+               let unarchivedData = try NSKeyedUnarchiver.unarchivedDictionary(
+                ofKeyClass: NSString.self,
+                objectClass: NSString.self,
+                from: customData
+               ) as? [String: String] {
+
+                if let sessionId = unarchivedData["sessionId"] {
+                    reportDict[.sessionId] = sessionId
                 }
-                reportDict[.batteryLevel] = customData!["battery"]
-                reportDict[.freeMemory] = customData!["disk"]
-                reportDict[.freeDiskSpace] = customData!["memory"]
+
+                reportDict[.batteryLevel] = unarchivedData["battery"]
+                reportDict[.freeMemory] = unarchivedData["disk"]
+                reportDict[.freeDiskSpace] = unarchivedData["memory"]
+            }
+        } catch {
+            logger.log(level: .warn) {
+                "Crash reporter could not report custom data, error: \(error)"
             }
         }
 
