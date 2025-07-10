@@ -21,9 +21,9 @@ To build the scheme for a simulated iOS device:
 xcodebuild build -scheme SplunkAgent -destination 'generic/platform=iOS Simulator'
 ```
 
-To run the unit tests:
+To run the unit tests (example; your Simulator version may vary):
 ```bash
-xcodebuild test -scheme SplunkAgent -destination 'generic/platform=iOS Simulator'
+xcodebuild test -scheme SplunkAgent -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
 ### Linting
