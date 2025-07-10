@@ -75,11 +75,11 @@ request](https://help.github.com/articles/creating-a-pull-request/).
 ## Documentation
 
 The Splunk Observability documentation is hosted on the [Splunk Observability
-Cloud docs site](https://docs.splunk.com/Observability), which contains all the
-prescriptive guidance for Splunk Observability products. Prescriptive guidance
-consists of step-by-step instructions, conceptual material, and decision support
-for customers. Reference documentation and development documentation is still
-hosted on this repository.
+Cloud docs site](https://help.splunk.com/en/splunk-observability-cloud), which
+contains all the prescriptive guidance for Splunk Observability products.
+Prescriptive guidance consists of step-by-step instructions, conceptual material,
+and decision support for customers. Reference documentation and development
+documentation is still hosted on this repository.
 
 To contribute documentation for this project, open a pull request in the
 [public-o11y-docs](https://github.com/splunk/public-o11y-docs) repository. See
