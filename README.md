@@ -40,7 +40,7 @@ Splunk RUM agent for iOS supports iOS 15 and higher, including iPadOS 15 and hig
 
 You can add Splunk RUM for iOS to your project using Swift Package Manager.
 
-1. In Xcode, select **File > Add Packages...**
+1. In Xcode, select **File > Add Package Dependencies...**
 2. Enter the package URL: `https://github.com/signalfx/splunk-otel-ios`
 3. Select the `SplunkAgent` package product and add it to your application target.
 
