@@ -11,8 +11,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Re-architected the SDK to be a modular Swift Package.
 * Added Session Replay integration.
-* Added `spanInterceptor` functionality for modifying or dropping spans.
+* Added Crash Report Symbolication integration.
 * Added new Interaction Tracking feature to automatically capture user taps.
+* Added `spanInterceptor` functionality for modifying or dropping spans.
 
 ### Changed
 
