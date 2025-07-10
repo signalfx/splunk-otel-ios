@@ -35,9 +35,9 @@ See [SECURITY.md](SECURITY.md#reporting-security-issues) for instructions.
 
 To contribute code, you will need to be able to build and test the project locally.
 
-1.  Fork and clone the repository.
-2.  Open the `Package.swift` file at the root of the repository in Xcode. Xcode will automatically resolve all dependencies.
-3.  Select the `SplunkAgent` scheme to build the library, run the demo apps, or run the unit tests.
+1. Fork and clone the repository.
+2. Open the `Package.swift` file at the root of the repository in Xcode. Xcode will automatically resolve all dependencies.
+3. Select the `SplunkAgent` scheme to build the library, run the demo apps, or run the unit tests.
 
 For more detailed instructions on building from the command line and running the linter, please see our [Development Guide](Development.md).
 
