@@ -52,14 +52,26 @@ In your `AppDelegate.swift` or `@main` content file, import `SplunkAgent` and in
 import SplunkAgent
 
 // In your application:didFinishLaunchingWithOptions or init()
+
 let agentConfig = AgentConfiguration(
     endpoint: .init(realm: "<YOUR_REALM>", rumAccessToken: "<YOUR_RUM_ACCESS_TOKEN>"),
     appName: "<YOUR_APP_NAME>",
     deploymentEnvironment: "<YOUR_DEPLOYMENT_ENVIRONMENT>"
 )
 
-// This will throw an exception if the configuration is invalid
-try! SplunkRum.install(with: agentConfig)
+var agent: SplunkRum?
+
+do {
+    agent = try SplunkRum.install(with: agentConfig)
+} catch {
+    print("Unable to start the Splunk agent, error: \(error)")
+}
+
+// Enable automated navigation tracking
+agent?.navigation.preferences.enableAutomatedTracking = true
+
+// Start session replay
+agent?.sessionReplay.start()
 ```
 
 ## Features
