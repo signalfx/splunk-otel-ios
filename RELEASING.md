@@ -17,7 +17,7 @@ Build the project and run the full test suite from the command line to ensure ev
 xcodebuild build -scheme SplunkAgent -destination 'generic/platform=iOS Simulator'
 
 # Run the tests
-xcodebuild test -scheme SplunkAgent -destination 'generic/platform=iOS Simulator'
+xcodebuild test -scheme SplunkAgent -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
 ### 3. Tag and Push the Release
