@@ -209,7 +209,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         let logRecords = [logRecord]
 
         // Export log record
-        backgroundLogExporter.export(logRecords: logRecords)
+        _ = backgroundLogExporter.export(logRecords: logRecords)
 
         // Print contents to stdout
         if debugEnabled {
@@ -234,7 +234,7 @@ extension OTLPSessionReplayEventProcessor {
     /// ‼️ This code mirrors `SplunkStdoutLogExporter`.
     private func log(_ logRecords: [SplunkReadableLogRecord]) {
         for logRecord in logRecords {
-            var bodyDescription: String
+            let bodyDescription: String
 
             switch logRecord.body {
             case let .data(data):
