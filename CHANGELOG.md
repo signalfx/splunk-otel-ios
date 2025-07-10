@@ -62,20 +62,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     * `setSpanSchedulingDelay(seconds: TimeInterval)`
     * `allowInsecureBeacon(enabled: Bool)`
 
-## Unreleased
-
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
-
 ## [0.11.3](https://github.com/signalfx/splunk-otel-ios/releases/tag/0.11.3)
 
 ### Added
