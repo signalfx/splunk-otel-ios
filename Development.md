@@ -1,32 +1,39 @@
-# Bulding, testing, and contributing to this project
+# Building, testing, and contributing to this project
 
 ## Dependencies
 
-Due to Swift's package management not being compatible with CocoaPods and OpenTelemetry Swift not supporting it either, it was decided all dependencies would be included in-source.
+This project is a Swift Package and manages most of its dependencies via the `Package.swift` manifest. The core dependency is [OpenTelemetry Swift](https://github.com/open-telemetry/opentelemetry-swift), which provides the foundation for tracing.
 
-The list of dependencies can be found in `dependencies.txt` with a link to the repository and a specific commit.
+Some dependencies, such as Session Replay, are included as pre-compiled binaries. A reference list of major dependencies can also be found in `dependencies.txt`.
 
-OpenTelemetry Swift is a minimal version where unnecessary parts are stripped out, meaning only Zipkin and Stdout exporters along with the tracing SDK are brought in.
+## Building and Testing
 
-## Building
+The recommended way to work on this project is to open the `Package.swift` file in Xcode. This will resolve all package dependencies and set up the project for development.
 
-Open SplunkRumWorkspace in Xcode; everything should be wired up correctly to
-run unit tests in SplunkRum or use one of the test apps to try things out.
+Once the project is open, select the **`SplunkAgent`** scheme. From there, you can choose a target to run, such as one of the demo applications (e.g., `AgentTestApp`), or run the test suite for the library.
 
-`./fullbuild.sh` is what the CI runs, and it requires `swiftlint`:
-`brew install swiftlint` or your local equivalent first.  This also runs
-the unit tests and can take a couple of minutes; be patient.
+### Command Line
 
-Note that `swift build` will not work since the code depends on UIKit which is
-not available on MacOS.  Accordingly, `fullbuild.sh` executes a `swift build` with 
-options to perform an iOS build.
+To build from the command line, you must use `xcodebuild`. The `xcodebuild -list` command confirms that `SplunkAgent` is the correct scheme to use.
 
-## Releasing
+To build the scheme for a simulated iOS device:
+```bash
+xcodebuild build -scheme SplunkAgent -destination 'generic/platform=iOS Simulator'
+```
 
-- Branch to vX.Y.Z.  Update the constant `SplunkRumVersionString` in `SplunkRum.swift`.  Merge this as usual.
-- git tag -s x.y.z (exactly like the semver string, no "v" prefix, etc.)
-- git push origin x.y.z
+To run the unit tests (example; your Simulator version may vary):
+```bash
+xcodebuild test -scheme SplunkAgent -destination 'platform=iOS Simulator,name=iPhone 16'
+```
+
+### Linting
+
+This project uses SwiftLint to enforce code style. It is recommended to install it to ensure your contributions match the project's standards.
+```bash
+brew install swiftlint
+```
 
 ## Contributing
 
-See [the CONTRIBUTING document](./CONTRIBUTING.md)
+See [the CONTRIBUTING document](./CONTRIBUTING.md) for details on our contribution process, including how to submit pull requests.
+
