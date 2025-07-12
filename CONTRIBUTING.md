@@ -31,19 +31,15 @@ When filing an issue, do *NOT* include:
 
 See [SECURITY.md](SECURITY.md#reporting-security-issues) for instructions.
 
-## Documentation
+## Setting Up Your Environment
 
-The Splunk Observability documentation is hosted on the [Splunk Observability
-Cloud docs site](https://docs.splunk.com/Observability), which contains all the
-prescriptive guidance for Splunk Observability products. Prescriptive guidance
-consists of step-by-step instructions, conceptual material, and decision support
-for customers. Reference documentation and development documentation is still
-hosted on this repository.
+To contribute code, you will need to be able to build and test the project locally.
 
-To contribute documentation for this project, open a pull request in the
-[public-o11y-docs](https://github.com/splunk/public-o11y-docs) repository. See
-the [CONTRIBUTING.md](https://github.com/splunk/public-o11y-docs/blob/main/CONTRIBUTING.md)
-guide of the Splunk Observability Cloud documentation for more information.
+1. Fork and clone the repository.
+2. Open the `Package.swift` file at the root of the repository in Xcode. Xcode will automatically resolve all dependencies.
+3. Select the `SplunkAgent` scheme to build the library, run the demo apps, or run the unit tests.
+
+For more detailed instructions on building from the command line and running the linter, please see our [Development Guide](Development.md).
 
 ## Contributing via Pull Requests
 
@@ -55,7 +51,7 @@ pull request, make sure that:
    someone else hasn't addressed the problem already.
 3. You open an issue to discuss any significant work - we would hate for your
    time to be wasted.
-4. You submit PRs that are easy to review and ideally less 500 lines of code.
+4. You submit PRs that are easy to review and ideally less than 500 lines of code.
    Multiple PRs can be submitted for larger contributions.
 
 To send us a pull request:
@@ -76,6 +72,20 @@ GitHub provides additional documentation on [forking a
 repository](https://help.github.com/articles/fork-a-repo/) and [creating a pull
 request](https://help.github.com/articles/creating-a-pull-request/).
 
+## Documentation
+
+The Splunk Observability documentation is hosted on the [Splunk Observability
+Cloud docs site](https://help.splunk.com/en/splunk-observability-cloud), which
+contains all the prescriptive guidance for Splunk Observability products.
+Prescriptive guidance consists of step-by-step instructions, conceptual material,
+and decision support for customers. Reference documentation and development
+documentation is still hosted on this repository.
+
+To contribute documentation for this project, open a pull request in the
+[public-o11y-docs](https://github.com/splunk/public-o11y-docs) repository. See
+the [CONTRIBUTING.md](https://github.com/splunk/public-o11y-docs/blob/main/CONTRIBUTING.md)
+guide of the Splunk Observability Cloud documentation for more information.
+
 ## Finding contributions to work on
 
 Looking at the existing issues is a great way to find something to contribute
@@ -91,3 +101,5 @@ confirm the licensing of your contribution.
 ### Contributor License Agreement
 
 Before contributing, you must sign the [Splunk Contributor License Agreement (CLA)](https://www.splunk.com/en_us/form/contributions.html).
+
+

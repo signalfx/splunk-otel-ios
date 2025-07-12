@@ -1,5 +1,3 @@
----
-
 <p align="center">
   <strong>
     <a href="CONTRIBUTING.md">Getting Involved</a>
@@ -10,8 +8,8 @@
 
 <p align="center">
   <img alt="Stable" src="https://img.shields.io/badge/status-stable-informational?style=for-the-badge">
-  <a href="https://github.com/open-telemetry/opentelemetry-swift/releases/tag/1.5.0">
-    <img alt="OpenTelemetry Swift" src="https://img.shields.io/badge/otel-1.5.0-blueviolet?style=for-the-badge">
+  <a href="https://github.com/open-telemetry/opentelemetry-swift/releases/tag/1.14.0">
+    <img alt="OpenTelemetry Swift" src="https://img.shields.io/badge/otel-1.14.0-blueviolet?style=for-the-badge">
   </a>
   <a href="https://github.com/signalfx/gdi-specification/releases/tag/v1.6.0">
     <img alt="Splunk GDI specification" src="https://img.shields.io/badge/GDI-1.6.0-blueviolet?style=for-the-badge">
@@ -28,44 +26,75 @@
 
 # Splunk RUM agent for iOS
 
-The Splunk RUM agent for iOS provides a Swift package that captures:
+The Splunk RUM agent for iOS is a modular Swift package for Real User Monitoring.
 
-- HTTP requests, using `URLSession` instrumentation
-- Application startup information
-- UI activity - screen name (typically ViewController name), actions, and PresentationTransitions
-- Crashes/unhandled exceptions using [SplunkRumCrashReporting](https://github.com/signalfx/splunk-otel-ios-crashreporting)
-
-> :construction: This project is currently in **BETA**. It is **officially supported** by Splunk. However, breaking changes **MAY** be introduced.
+> :construction: This project is currently in **ALPHA**. It is **officially supported** by Splunk. However, breaking changes **MAY** be introduced.
 
 ## Requirements
 
-Splunk RUM agent for iOS supports iOS 11 and higher, including iPadOS 13 and higher.
+Splunk RUM agent for iOS supports iOS 15 and higher, including iPadOS 15 and higher.
 
 ## Getting Started
 
-To get started, see [Instrument iOS applications for Splunk RUM](https://quickdraw.splunk.com/redirect/?product=Observability&version=current&location=rum.ios.getstarted) in the Splunk Observability Cloud documentation.
+### Installation
 
-### Crash Reporting
+You can add Splunk RUM for iOS to your project using Swift Package Manager.
 
-The Splunk iOS Crash Reporting module adds crash reporting to the iOS RUM agent using PLCrashReporter.
+1. In Xcode, select **File > Add Package Dependencies...**
+2. Enter the package URL: `https://github.com/signalfx/splunk-otel-ios`
+3. Select the `SplunkAgent` package product and add it to your application target.
 
-To activate Crash Reporting, see [Activate crash reporting](https://quickdraw.splunk.com/redirect/?product=Observability&version=current&location=rum.ios.crashreporting) in the Splunk Observability Cloud documentation.
+### Initialization
 
-### Manual OpenTelemetry instrumentation
+In your `AppDelegate.swift` or `@main` content file, import `SplunkAgent` and initialize it with your configuration.
 
-You can manually instrument iOS applications for Splunk RUM using the iOS RUM agent to collect additional telemetry, sanitize Personal Identifiable Information (PII), add global attributes, and more. See [Manually instrument iOS applications](https://quickdraw.splunk.com/redirect/?product=Observability&version=current&location=rum.ios.manual) in the Splunk Observability Cloud documentation.
+```swift
+import SplunkAgent
+
+// In your application:didFinishLaunchingWithOptions or init()
+
+let agentConfig = AgentConfiguration(
+    endpoint: .init(realm: "<YOUR_REALM>", rumAccessToken: "<YOUR_RUM_ACCESS_TOKEN>"),
+    appName: "<YOUR_APP_NAME>",
+    deploymentEnvironment: "<YOUR_DEPLOYMENT_ENVIRONMENT>"
+)
+
+var agent: SplunkRum?
+
+do {
+    agent = try SplunkRum.install(with: agentConfig)
+} catch {
+    print("Unable to start the Splunk agent, error: \(error)")
+}
+
+// Enable automated navigation tracking
+agent?.navigation.preferences.enableAutomatedTracking = true
+
+// Start session replay
+agent?.sessionReplay.start()
+```
+
+## Features
+
+The agent provides several instrumentations to capture telemetry. Most are enabled by default and can be configured or disabled during initialization.
+
+* **Crash Reporting:** Captures and reports application crashes. (Enabled by default)
+* **Network Monitoring:** Reports network requests, connectivity changes, and errors. (Enabled by default)
+* **Application Startup:** Measures cold and warm application start times. (Enabled by default)
+* **Slow & Frozen Frame Detection:** Reports instances of slow or frozen UI frames. (Enabled by default)
+* **UI Interaction Tracking:** Captures user taps on UI elements. (Enabled by default)
+* **Navigation Tracking:** Reports screen transitions as `screen.name` attributes. (Disabled by default)
+* **Session Replay:** Provides visual replay of user sessions. (Requires separate module)
+* **WebView Instrumentation:** Links native RUM sessions with Browser RUM sessions in WebViews.
+* **Custom Event & Workflow Reporting:** APIs to manually track custom events and workflows.
 
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for instructions on building, running tests, and so on.
 
-## Troubleshooting
-
-For troubleshooting issues with the Splunk OpenTelemetry iOS instrumentation, see [Troubleshoot iOS instrumentation for Splunk Observability Cloud](https://help.splunk.com/Observability/gdi/get-data-in/rum/ios/troubleshooting.html) in the official documentation.
-
 ## License
 
-This library is licensed under the terms of the Apache Softare License version 2.0.
+This library is licensed under the terms of the Apache Software License version 2.0.
 See [the license file](./LICENSE) for more details.
 
->ℹ️&nbsp;&nbsp;SignalFx was acquired by Splunk in October 2019. See [Splunk SignalFx](https://www.splunk.com/en_us/investor-relations/acquisitions/signalfx.html) for more information.
+> :information_source:️ SignalFx was acquired by Splunk in October 2019. See [Splunk SignalFx](https://www.splunk.com/en_us/investor-relations/acquisitions/signalfx.html) for more information.
