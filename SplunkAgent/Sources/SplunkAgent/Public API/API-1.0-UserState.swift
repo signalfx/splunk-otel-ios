@@ -15,16 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A state object reflects the current user's state.
+/// A state object that provides read-only access to the current user's state.
 public final class UserState {
 
     // MARK: - Internal
 
+    // The SplunkRum instance that owns this user state.
     private unowned let owner: SplunkRum
 
 
     // MARK: - Initialization
 
+    /// Initializes the user state with its owning `SplunkRum` instance.
     init(for owner: SplunkRum) {
         self.owner = owner
     }
@@ -35,7 +37,9 @@ public extension UserState {
 
     // MARK: - User identification
 
-    /// The currently used tracking mode.
+    /// The tracking mode currently being used to identify the user.
+    ///
+    /// See ``UserTrackingMode`` for available options.
     var trackingMode: UserTrackingMode {
         owner.currentUser.trackingMode
     }

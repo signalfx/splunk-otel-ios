@@ -15,16 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// The user preferences object represents the preferred settings related to the user.
+/// An object for managing user-specific preferences, such as the tracking mode.
 public final class UserPreferences {
 
     // MARK: - Internal
 
+    // The SplunkRum instance that owns these user preferences.
     private unowned let owner: SplunkRum
 
 
     // MARK: - Initialization
 
+    /// Initializes the user preferences with its owning `SplunkRum` instance.
     init(for owner: SplunkRum) {
         self.owner = owner
     }
@@ -35,7 +37,9 @@ public extension UserPreferences {
 
     // MARK: - User identification
 
-    /// The required tracking mode for user identification.
+    /// The tracking mode that controls how the user is identified.
+    ///
+    /// See ``UserTrackingMode`` for available options.
     var trackingMode: UserTrackingMode {
         get {
             owner.currentUser.trackingMode
@@ -45,11 +49,15 @@ public extension UserPreferences {
         }
     }
 
-    /// Sets required tracking mode for user identification.
+    /// Sets the tracking mode for user identification.
     ///
-    /// - Parameter trackingMode: The required tracking mode.
-    ///
+    /// - Parameter trackingMode: The tracking mode to apply.
     /// - Returns: The updated user preferences object.
+    ///
+    /// ### Example ###
+    /// ```
+    /// SplunkRum.user.preferences.trackingMode(.anonymous)
+    /// ```
     @discardableResult func trackingMode(_ trackingMode: UserTrackingMode) -> UserPreferences {
         owner.currentUser.trackingMode = trackingMode
 

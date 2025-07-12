@@ -23,50 +23,73 @@ import Foundation
 import OpenTelemetryApi
 
 
-/// The class implementing Splunk Agent public API.
+/// The primary class for interacting with the Splunk RUM agent.
+///
+/// Use the ``shared`` singleton instance to access all agent functionality.
 public class SplunkRum: ObservableObject {
 
     // MARK: - Internal properties
 
+    // Manages the agent's configuration, including remote updates.
     var agentConfigurationHandler: AgentConfigurationHandler
 
+    // The current, effective agent configuration.
     var agentConfiguration: any AgentConfigurationProtocol {
         agentConfigurationHandler.configuration
     }
 
+    // The object representing the current user.
     var currentUser: AgentUser
+    // The object representing the current session.
     var currentSession: AgentSession
+    // The current operational status of the agent.
     var currentStatus: Status
 
+    // Manages the lifecycle and communication of all agent modules.
     var modulesManager: AgentModulesManager?
+    // Manages the processing and export of telemetry events.
     var eventManager: AgentEventManager?
 
+    // Manages the application's state, such as foreground/background transitions.
     var appStateManager: AgentAppStateManager
+    // Provides a shared state accessible by various agent components.
     lazy var sharedState: AgentSharedState = DefaultSharedState(for: self)
 
+    // Manages runtime attributes that can change during the agent's lifecycle.
     lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
 
 
+    // The processor for internal agent logs.
     let logProcessor: LogProcessor
+    // The internal logger for the agent.
     let logger: LogAgent
 
+    // The sampler that decides whether a session should be recorded.
     let sessionSampler: any AgentSessionSampler
 
+    // A callback for screen name changes.
     var screenNameChangeCallback: ((String) -> Void)?
 
 
     // MARK: - Internal (Modules Proxy)
 
+    // A proxy for the Session Replay module.
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
+    // A proxy for the Navigation module.
     lazy var navigationProxy: any NavigationModule = NavigationNonOperational()
+    // A proxy for the WebView Instrumentation module.
     lazy var webViewProxy: any WebViewInstrumentationModule = WebViewNonOperational()
+    // A proxy for the Custom Tracking module.
     lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
+    // A proxy for the Interactions module.
     lazy var interactions: any InteractionsModule = InteractionsNonOperational()
+    // A proxy for the Slow Frame Detector module.
     lazy var slowFrameDetectorProxy: any SlowFrameDetectorModule = SlowFrameDetectorNonOperational()
 
 
     // MARK: - Platform Support
 
+    // A check to determine if the current platform is fully supported.
     private static var isSupportedPlatform: Bool {
         PlatformSupport.current.scope == .full
     }
@@ -74,9 +97,9 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Agent singleton
 
-    /// A singleton shared instance of the Agent library.
+    /// The singleton instance of the RUM agent.
     ///
-    /// This shared instance is used to access all SDK functions.
+    /// Use this instance to configure the agent and access all of its features.
     public internal(set) static var shared = SplunkRum(
         configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
         user: NoOpUser(),
@@ -89,19 +112,19 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Public API
 
-    /// An object that holds current user.
+    /// An object for managing user-specific information and preferences.
     public private(set) lazy var user = User(for: self)
 
-    /// An object that holds current manages associated session.
+    /// An object for managing the current user session.
     public private(set) lazy var session = Session(for: self)
 
-    /// An object that contains global attributes added to all signals
+    /// A collection of attributes that will be added to all telemetry signals.
     public private(set) lazy var globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 
-    /// An object reflects the current state and setting used for the recording.
+    /// An object that provides read-only access to the agent's current runtime state.
     public private(set) lazy var state = RuntimeState(for: self)
 
-    /// OpenTelemetry instance.
+    /// The underlying OpenTelemetry instance used by the agent.
     public var openTelemetry: OpenTelemetry {
         return OpenTelemetry.instance
     }
@@ -109,27 +132,27 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Public API (Modules)
 
-    /// An object that holds Session Replay module.
+    /// The interface for controlling Session Replay recordings.
     public var sessionReplay: any SessionReplayModule {
         sessionReplayProxy
     }
 
-    /// An object that holds Custom Tracking  module.
+    /// The interface for tracking custom events, errors, and workflows.
     public var customTracking: any CustomTrackingModule {
         customTrackingProxy
     }
 
-    /// An object that holds Navigation module.
+    /// The interface for tracking screen navigation events.
     public var navigation: any NavigationModule {
         navigationProxy
     }
 
-    /// An object that holds SlowFrameDetector module.
+    /// The interface for detecting slow and frozen frames.
     public var slowFrameDetector: any SlowFrameDetectorModule {
         slowFrameDetectorProxy
     }
 
-    /// An object that provides a bridge for WebView instrumentation.
+    /// The interface for integrating with browser RUM in a `WKWebView`.
     public var webViewNativeBridge: any WebViewInstrumentationModule {
         webViewProxy
     }
@@ -137,15 +160,35 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Agent builder
 
-    /// Creates and initializes the singleton instance.
+    /// Initializes and starts the RUM agent with a given configuration.
+    ///
+    /// This method should be called once, typically in your `AppDelegate`'s `application(_:didFinishLaunchingWithOptions:)` method.
     ///
     /// - Parameters:
-    ///   - configuration: A configuration for the initial SDK setup.
-    ///   - moduleConfigurations: An array of individual module-specific configurations.
+    ///   - configuration: The ``AgentConfiguration`` for the agent.
+    ///   - moduleConfigurations: An array of module-specific configurations.
+    /// - Returns: The initialized `SplunkRum` instance.
+    /// - Throws: `AgentConfigurationError` if the provided configuration is invalid.
     ///
-    /// - Returns: A newly initialized `SplunkRum` instance.
+    /// ### Example ###
+    /// ```
+    /// func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    ///     let endpointConfig = EndpointConfiguration(realm: "us0", rumAccessToken: "YOUR_RUM_TOKEN")
+    ///     let agentConfig = AgentConfiguration(
+    ///         endpoint: endpointConfig,
+    ///         appName: "MyAwesomeApp",
+    ///         deploymentEnvironment: "production"
+    ///     )
     ///
-    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
+    ///     do {
+    ///         _ = try SplunkRum.install(with: agentConfig)
+    ///     } catch {
+    ///         print("Splunk RUM installation failed: \(error)")
+    ///     }
+    ///
+    ///     return true
+    /// }
+    /// ```
     public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws -> SplunkRum {
 
         // Install is allowed only once.
@@ -193,6 +236,7 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Initialization
 
+    /// Initializes a base `SplunkRum` instance with its core components.
     required init(
         configurationHandler: AgentConfigurationHandler,
         user: AgentUser,
@@ -234,6 +278,7 @@ public class SplunkRum: ObservableObject {
         runtimeAttributes.updateCustom(named: "screen.name", with: "unknown")
     }
 
+    /// Initializes a fully operational `SplunkRum` instance with all modules.
     convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {
 
         // Initialization metrics to be sent in the Initialize span
@@ -298,6 +343,7 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Configuration handler
 
+    // Creates the appropriate configuration handler based on platform support.
     private static func createConfigurationHandler(for configuration: any AgentConfigurationProtocol) -> AgentConfigurationHandler {
         // If the platform is not fully supported, we use the dummy handler.
         guard isSupportedPlatform else {
@@ -316,6 +362,6 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Version
 
-    /// A version of this agent.
+    /// The version of the Splunk RUM agent.
     public static let version = "24.4.1"
 }

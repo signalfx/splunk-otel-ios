@@ -15,27 +15,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A mode of user tracking.
+/// An enumeration that defines how the user is tracked and identified.
 ///
-/// Determines whether and, if necessary, how the user will be tracked.
+/// You can set this mode in the ``UserConfiguration`` to control user privacy.
+///
+/// ### Example ###
+/// ```
+/// var config = UserConfiguration()
+/// config.trackingMode = .anonymousTracking
+/// ```
 public enum UserTrackingMode: Codable, Equatable {
 
-    /// No tracking. Individual user sessions are not linked in any way.
+    /// Disables user tracking.
     ///
-    /// This is a default option for user tracking.
+    /// When this mode is active, individual user sessions are not linked together.
     case noTracking
 
-    /// Anonymous tracking. Allows you to link individual sessions
-    /// under an anonymized user ID.
+    /// Enables anonymous user tracking.
     ///
-    /// - Note: An anonymous user ID is used, which cannot be traced
-    /// to an individual for tracking across applications.
+    /// This mode links individual sessions together under a single, anonymized user ID.
+    ///
+    /// - Note: The anonymous user ID is generated locally and cannot be used to
+    ///         identify the user across different applications or devices.
     case anonymousTracking
 }
 
 
 public extension UserTrackingMode {
 
-    /// Default user tracking mode.
+    /// The default user tracking mode, which is ``noTracking``.
     static let `default`: UserTrackingMode = .noTracking
 }

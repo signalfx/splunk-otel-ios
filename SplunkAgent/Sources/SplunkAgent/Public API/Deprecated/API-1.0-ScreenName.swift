@@ -19,9 +19,11 @@ public extension SplunkRum {
 
     // MARK: - Screen name
 
-    /// Sets a manual screen name. This setting is valid until a new name is set.
+    /// Sets a custom screen name.
     ///
-    /// - Parameter name: The name to be tracked as the screen name until being changed.
+    /// This name will be used for all subsequent screen-related spans until a new name is set.
+    ///
+    /// - Parameter name: The custom screen name.
     @available(
         *,
         deprecated,
@@ -32,9 +34,10 @@ public extension SplunkRum {
         shared.navigation.track(screen: name)
     }
 
-    /// Observe screen name changes in the Navigation module.
+    /// Registers a callback to observe screen name changes.
     ///
-    /// - Parameter callback: A closure for taking over screen name change.
+    /// - Parameter callback: A closure that receives the new screen name as a `String`.
+    ///                       Pass `nil` to remove a previously registered callback.
     @available(*, deprecated, message: "This method will be removed in a later version.")
     static func addScreenNameChangeCallback(_ callback: ((String) -> Void)?) {
         shared.screenNameChangeCallback = callback

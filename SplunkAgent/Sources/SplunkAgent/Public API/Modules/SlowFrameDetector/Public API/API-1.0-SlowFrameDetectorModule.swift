@@ -15,8 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Shared protocol for operational and non-operational implementations.
+/// An interface for the module that detects and reports slow and frozen frames in the user interface.
+///
+/// ### Example ###
+/// ```
+/// if SplunkRum.shared.slowFrames.state.isEnabled {
+///     print("Slow frame detection is active.")
+/// }
+/// ```
 public protocol SlowFrameDetectorModule {
-    /// An object that provides information about the current state of the module.
+    /// An object that provides read-only access to the current state of the slow frame detector.
+    ///
+    /// See ``SlowFrameDetectorModuleState`` for more details.
     var state: any SlowFrameDetectorModuleState { get }
 }

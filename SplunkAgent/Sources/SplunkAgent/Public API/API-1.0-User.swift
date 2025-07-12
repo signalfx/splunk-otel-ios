@@ -15,25 +15,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A user object is a representation of the user.
+/// An object that represents the current user, providing access to their preferences and state.
 public final class User {
 
     // MARK: - Internal
 
+    // The SplunkRum instance that owns this user object.
     private unowned let owner: SplunkRum
 
 
     // MARK: - Public API
 
-    /// An object that holds preferred settings for the user.
+    /// An object for managing the user's preferences.
+    ///
+    /// See ``UserPreferences`` for more details.
     public private(set) lazy var preferences = UserPreferences(for: owner)
 
-    /// An object reflects the current user's state.
+    /// An object that reflects the current state of the user.
+    ///
+    /// See ``UserState`` for more details.
     public private(set) lazy var state = UserState(for: owner)
 
 
     // MARK: - Initialization
 
+    /// Initializes the user object with its owning `SplunkRum` instance.
     init(for owner: SplunkRum) {
         self.owner = owner
     }
@@ -44,7 +50,7 @@ extension User {
 
     // MARK: - Identifier
 
-    /// Identification of the recorded user.
+    /// The unique identifier for the current user.
     var identifier: String {
         owner.currentUser.userIdentifier
     }

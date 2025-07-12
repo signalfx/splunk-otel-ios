@@ -15,16 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A state object that reflects the current session's state.
+/// A state object that provides read-only access to the current session's state.
 public final class SessionState {
 
     // MARK: - Internal
 
+    // The SplunkRum instance that owns this session state.
     private unowned let owner: SplunkRum
 
 
     // MARK: - Initialization
 
+    /// Initializes the session state with its owning `SplunkRum` instance.
     init(for owner: SplunkRum) {
         self.owner = owner
     }
@@ -34,14 +36,16 @@ public extension SessionState {
 
     // MARK: - Public properties
 
-    /// Identification of recorded session.
+    /// The unique identifier of the current session.
     ///
-    /// When the agent is initialized, there is always some session ID.
+    /// A session ID is always available when the agent is initialized.
     var id: String {
         owner.currentSession.currentSessionId
     }
 
-    /// Value of the currently used session sampling rate.
+    /// The sampling rate applied to the current session.
+    ///
+    /// This is a value between 0.0 and 1.0 that determines the percentage of sessions being recorded.
     var samplingRate: Double {
         owner.agentConfiguration.session.samplingRate
     }

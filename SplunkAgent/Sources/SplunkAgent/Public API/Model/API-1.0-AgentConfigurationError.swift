@@ -17,19 +17,25 @@ limitations under the License.
 
 import Foundation
 
-/// Describes an invalid agent configuration.
+/// An error that indicates an invalid agent configuration.
 enum AgentConfigurationError: Error, Equatable {
 
-    /// Invalid endpoint. Either one of the supplied endpoint urls (traces, session replay) is invalid, or the supplied realm is empty.
+    /// An error indicating that the provided endpoint configuration is invalid.
+    ///
+    /// This can occur if the endpoint URLs cannot be constructed or are missing.
+    /// - Parameter supplied: The invalid ``EndpointConfiguration`` that was provided.
     case invalidEndpoint(supplied: EndpointConfiguration)
 
-    /// Invalid app name.
+    /// An error indicating that the application name is missing or empty.
+    /// - Parameter supplied: The invalid app name that was provided.
     case invalidAppName(supplied: String?)
 
-    /// Invalid RUM access token.
+    /// An error indicating that the RUM access token is missing or empty.
+    /// - Parameter supplied: The invalid token that was provided.
     case invalidRumAccessToken(supplied: String?)
 
-    /// Invalid deployment environment.
+    /// An error indicating that the deployment environment is missing or empty.
+    /// - Parameter supplied: The invalid environment string that was provided.
     case invalidDeploymentEnvironment(supplied: String?)
 }
 

@@ -17,36 +17,55 @@ limitations under the License.
 
 import Combine
 
-/// Defines a public API for the Navigation module.
+/// An interface for tracking screen transitions and other navigation-related events.
+///
+/// This module can be configured to track navigation automatically or can be used to
+/// track screen views manually.
 public protocol NavigationModule: ObservableObject {
 
     // MARK: - Preferences
 
-    // An object that holds preferred settings for the module.
+    /// The preferences that control the behavior of the navigation module.
+    ///
+    /// See ``NavigationModulePreferences`` for available options.
     var preferences: NavigationModulePreferences { get set }
 
-    /// Sets preferred settings for the module.
+    /// Sets the preferences for the navigation module.
     ///
-    /// - Parameter preferences: The preferred settings for the module.
+    /// - Parameter preferences: The ``NavigationModulePreferences`` to apply.
+    /// - Returns: The `NavigationModule` instance to allow for chaining.
     ///
-    /// - Returns: The actual `Navigation` instance.
+    /// ### Example ###
+    /// ```
+    /// var navPrefs = NavigationModulePreferences()
+    /// navPrefs.enableAutomatedTracking = false
+    /// SplunkRum.shared.navigation.preferences(navPrefs)
+    /// ```
     @discardableResult func preferences(_ preferences: NavigationModulePreferences) -> any NavigationModule
 
 
     // MARK: - State
 
-    /// An object that reflects the current state and settings used for the module.
+    /// An object that reflects the current state of the navigation module.
+    ///
+    /// See ``NavigationModuleState`` for more details.
     var state: NavigationModuleState { get }
 
 
     // MARK: - Manual detection
 
-    /// Sets a manual screen name. This setting is valid until a new name is set.
+    /// Manually tracks a screen view with a custom name.
     ///
-    /// - Parameter name: The name to be tracked as the screen name until being changed.
+    /// This name will be used for all subsequent screen-related spans until a new name is set.
     ///
-    /// - Returns: The actual `Navigation` instance.
+    /// - Parameter name: The custom name for the screen.
+    /// - Returns: The `NavigationModule` instance to allow for chaining.
     ///
-    /// - Note: The set value is not linked to any specific UI element.
+    /// - Note: The screen name set via this method is not linked to any specific UI element.
+    ///
+    /// ### Example ###
+    /// ```
+    /// SplunkRum.shared.navigation.track(screen: "ProductDetailsView")
+    /// ```
     @discardableResult func track(screen name: String) -> any NavigationModule
 }

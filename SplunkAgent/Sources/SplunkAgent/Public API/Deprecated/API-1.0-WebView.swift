@@ -21,9 +21,19 @@ public extension SplunkRum {
 
     // MARK: - WebView
 
-    /// Injects JavaScript `getNativeSessionId()` function into `WKWebView`. Legacy mapping.
+    /// Integrates the native RUM agent with a browser RUM agent running in a `WKWebView`.
     ///
-    /// - Parameter webView: The `WKWebView` instance into which the JavaScript `getNativeSessionId()` and `getNativeSessionIdAsync()` APIs will be injected.
+    /// This method injects a JavaScript bridge into the web view, allowing the browser RUM agent
+    /// to retrieve the native session ID. This links the user's session across both the native
+    /// and web portions of your application.
+    ///
+    /// - Parameter webView: The `WKWebView` instance to integrate with.
+    ///
+    /// ### Example ###
+    /// ```
+    /// let myWebView = WKWebView()
+    /// SplunkRum.integrateWithBrowserRum(myWebView)
+    /// ```
     @available(
         *,
         deprecated,

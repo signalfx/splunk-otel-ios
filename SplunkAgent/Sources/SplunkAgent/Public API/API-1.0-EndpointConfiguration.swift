@@ -17,34 +17,44 @@ limitations under the License.
 
 import Foundation
 
-/// Endpoint configuration builds OTel collector urls.
+/// A configuration that defines the endpoints for sending telemetry data.
 ///
-/// URLs can be defined either by providing the `realm`, which sends all instrumentation to the Splunk RUM collector to a specified realm;
-/// or by providing a custom `traces` and optionally a custom `session replay` url.
+/// You can configure endpoints in two ways:
+/// 1. By providing a `realm` to send data to the Splunk RUM cloud.
+/// 2. By providing custom URLs for a self-hosted or third-party collector.
 public struct EndpointConfiguration: Codable, Equatable {
 
     // MARK: - Public
 
-    /// Defines a Splunk RUM realm to which all instrumentation will be sent to.
+    /// The Splunk RUM realm to which instrumentation is sent.
     public let realm: String?
 
-    /// A RUM access token, authenticates requests to the RUM instrumentation collector.
+    /// The RUM access token for authenticating requests.
     public let rumAccessToken: String?
 
-    /// Defines a custom trace endpoint to which all traces will be sent to.
+    /// The endpoint URL for sending traces.
     public let traceEndpoint: URL?
 
-    /// Defines an optional custom session replay endpoint to which all session replay data will be sent to.
+    /// The optional endpoint URL for sending session replay data.
     public let sessionReplayEndpoint: URL?
 
 
     // MARK: - Initialization
 
-    /// Initialize the endpoint configuration with the Splunk RUM realm and RUM access token.
+    /// Initializes the endpoint configuration with a Splunk RUM realm and access token.
     ///
-    /// - Parameters:
-    ///   - realm: A Splunk RUM realm to which all instrumentation will be sent to.
-    ///   - rumAccessToken: A required RUM access token to authenticate requests with the RUM instrumentation collector.
+    /// This is the recommended approach for sending data to the Splunk RUM cloud.
+    ///
+    /// - Parameter realm: The Splunk RUM realm (e.g., "us0").
+    /// - Parameter rumAccessToken: The RUM access token for authenticating requests.
+    ///
+    /// ### Example ###
+    /// ```
+    /// let config = EndpointConfiguration(
+    ///     realm: "us0",
+    ///     rumAccessToken: "YOUR_RUM_ACCESS_TOKEN"
+    /// )
+    /// ```
     public init(realm: String, rumAccessToken: String) {
         self.realm = realm
         self.rumAccessToken = rumAccessToken
@@ -67,11 +77,19 @@ public struct EndpointConfiguration: Codable, Equatable {
         }
     }
 
-    /// Initialize the endpoint configuration with a custom trace url and an optional session replay url.
+    /// Initializes the endpoint configuration with custom endpoint URLs.
     ///
-    /// - Parameters:
-    ///   - trace: A trace URL to which all traces wil be sent to.
-    ///   - sessionReplay: An optional session replay url, to which session replay data will be sent to. Required if session replay functionality is enabled.
+    /// Use this initializer if you are hosting your own OTel collector or using a different backend.
+    ///
+    /// - Parameter trace: The URL for sending traces.
+    /// - Parameter sessionReplay: The optional URL for sending session replay data. This is required if session replay is enabled.
+    ///
+    /// ### Example ###
+    /// ```
+    /// if let traceURL = URL(string: "https://my-collector.com/v1/traces") {
+    ///     let config = EndpointConfiguration(trace: traceURL)
+    /// }
+    /// ```
     public init(trace: URL, sessionReplay: URL? = nil) {
         traceEndpoint = trace
         sessionReplayEndpoint = sessionReplay
@@ -83,6 +101,7 @@ public struct EndpointConfiguration: Codable, Equatable {
 
     // MARK: - Private methods
 
+    // Constructs the full URL for a given Splunk RUM realm and path.
     private static func realmUrl(for realm: String, path: String) -> URL? {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
@@ -114,9 +133,11 @@ extension EndpointConfiguration {
 
     // MARK: - Authentication
 
-    /// Authenticates an endpoint URL by appending the auth token to the URL's query.
+    /// Authenticates an endpoint URL by appending an authentication token to its query string.
     ///
-    /// - Returns: Authenticated url, or `nil` if building the url fails.
+    /// - Parameter url: The URL to authenticate.
+    /// - Parameter authToken: The authentication token to append.
+    /// - Returns: The authenticated URL, or `nil` if the URL could not be constructed.
     private static func authenticate(url: URL, with authToken: String) -> URL? {
 
         guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
@@ -142,13 +163,13 @@ extension EndpointConfiguration {
 
     // MARK: - Validation
 
-    /// Validate endpoint configuration.
+    /// Validates the endpoint configuration.
     ///
-    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
+    /// - Throws: `AgentConfigurationError` if the configuration is invalid.
     func validate() throws {
 
         // Validate rum access token if supplied
-        if realm != nil, rumAccessToken?.isEmpty ?? true {
+        if realm != nil,  rumAccessToken?.isEmpty ?? true {
             throw AgentConfigurationError.invalidRumAccessToken(supplied: rumAccessToken)
         }
 

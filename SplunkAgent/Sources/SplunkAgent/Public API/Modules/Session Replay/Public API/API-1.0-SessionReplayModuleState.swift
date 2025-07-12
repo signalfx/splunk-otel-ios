@@ -15,28 +15,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Defines a public API for the current state of the Session Replay.
+/// An interface that provides read-only access to the current state of the Session Replay module.
 ///
-/// The individual properties are a combination of:
-/// - Default settings.
-/// - Initial default configuration.
-/// - Settings retrieved from the backend.
-/// - Preferred behavior.
+/// The state properties reflect the final, effective settings being used by the module,
+/// which are a combination of:
+/// - Default SDK settings.
+/// - The initial module configuration.
+/// - Settings retrieved from a remote configuration source.
+/// - User-defined preferences.
 ///
-/// - Note: The states of individual properties in this class can
-///         and usually also change during the application's runtime.
+/// - Note: The values of these properties can change during the application's runtime.
+///
+/// ### Example ###
+/// ```
+/// if SplunkRum.shared.sessionReplay.state.isRecording {
+///     print("Session Replay is currently recording.")
+/// }
+/// ```
 public protocol SessionReplayModuleState {
 
     // MARK: - Recording
 
-    /// A `Status` of module recording.
+    /// The detailed recording status of the module.
     ///
-    /// The default value is `.notRecording(.notStarted)`.
+    /// See ``SessionReplayStatus`` for all possible states.
     var status: SessionReplayStatus { get }
 
-    /// Indicates whether module is recording.
+    /// A Boolean value indicating whether the module is currently recording.
     ///
-    /// For detailed info about status, see ``status``.
+    /// This is a convenience property. For more detailed information, check the ``status`` property.
     var isRecording: Bool { get }
 
 

@@ -21,9 +21,24 @@ import UIKit
 
 public extension UIView {
 
-    /// Element sensitivity for the specified `UIView` instance.
+    /// A Boolean value that controls whether this view and its subviews are masked during Session Replay recordings.
     ///
-    /// Assigning `nil` removes previously assigned explicit sensitivity.
+    /// This property has three states:
+    /// - `true`: Masks the view, treating it as sensitive.
+    /// - `false`: Unmasks the view, treating it as not sensitive. This can override a parent's sensitive setting.
+    /// - `nil`: The view inherits its sensitivity from its parent. Setting this property to `nil` reverts it to the default inherited behavior.
+    ///
+    /// ### Example ###
+    /// ```
+    /// // Mask a view containing sensitive user information
+    /// let userProfileView = UIView()
+    /// userProfileView.srSensitive = true
+    ///
+    /// // Unmask a specific public label within that sensitive view
+    /// let publicLabel = UILabel()
+    /// userProfileView.addSubview(publicLabel)
+    /// publicLabel.srSensitive = false
+    /// ```
     var srSensitive: Bool? {
         get {
             SplunkRum.shared.sessionReplay.sensitivity[self]

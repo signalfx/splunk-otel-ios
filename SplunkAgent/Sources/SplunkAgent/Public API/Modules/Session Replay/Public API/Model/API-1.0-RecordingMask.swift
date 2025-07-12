@@ -18,43 +18,40 @@ limitations under the License.
 import CoreGraphics
 import Foundation
 
-/// The mask element structure defines one area and its role in the recording mask.
+/// A building block for a ``RecordingMask``, defining a rectangular area to be either masked or unmasked.
 public struct MaskElement: Codable, Equatable {
 
     // MARK: - Inline types
 
-    /// A type of mask element.
+    /// The type of a mask element, which determines its behavior.
     public enum MaskType: Int, Codable {
 
-        /// Covers area that will not be recorded.
+        /// Masks an area, preventing it from being recorded.
         ///
-        /// Covering masks can be partially erased if at least
-        /// partially covered by erasing masks on higher layers.
+        /// Covering masks can be partially erased by an `.erasing` mask on a higher layer.
         case covering
 
-        /// Erases the lower layers of the mask.
+        /// Unmasks an area, revealing content even if it is covered by a `.covering` mask on a lower layer.
         case erasing
     }
 
 
     // MARK: - Public
 
-    /// A rectangle that bounds the masked area.
+    /// The rectangular frame of the mask element, in screen coordinates.
     public let rect: CGRect
 
-    /// A type of mask element.
+    /// The type of mask, which determines if the area is covered or erased.
     public let type: MaskType
 
 
     // MARK: - Initialization
 
-    /// Creates a new mask element structure with prepared preconfigured values.
+    /// Initializes a mask element with a specific frame and type.
     ///
     /// - Parameters:
-    ///   - rect: A rectangle that bounds the masked area.
-    ///   - type: A type of mask element.
-    ///
-    ///   - Returns: A newly created `MaskElement` structure.
+    ///   - rect: The rectangular frame for the mask element.
+    ///   - type: The type of mask, either `.covering` or `.erasing`. Defaults to `.covering`.
     public init(rect: CGRect, type: MaskType = .covering) {
         self.rect = rect
         self.type = type
@@ -62,30 +59,38 @@ public struct MaskElement: Codable, Equatable {
 }
 
 
-/// The recording mask structure defines an overlay that masks
-/// a specified screen part to protect it from unwanted recording.
+/// An overlay composed of one or more ``MaskElement`` instances that masks specified parts of the screen during a Session Replay recording.
 ///
-/// It is primarily designed for situations where it is not possible
-/// or convenient to use the standard methods for sensitivity settings.
+/// This is primarily designed for situations where it is not possible or convenient to use
+/// the standard view-based sensitivity settings.
 ///
-/// Individual mask elements will be added to the final record by their
-/// index from lowest to highest. An erasing mask can partially cut places
-/// covered by a covering mask and vice versa.
+/// Individual mask elements are layered in the order they appear in the `elements` array, from bottom to top.
+/// An `.erasing` mask can cut holes in a `.covering` mask on a lower layer, and vice versa.
+///
+/// ### Example ###
+/// ```
+/// // Create a mask that covers the whole screen except for a small window
+/// let screenBounds = UIScreen.main.bounds
+///
+/// let fullScreenCover = MaskElement(rect: screenBounds, type: .covering)
+/// let revealWindow = MaskElement(rect: CGRect(x: 50, y: 50, width: 100, height: 100), type: .erasing)
+///
+/// let recordingMask = RecordingMask(elements: [fullScreenCover, revealWindow])
+/// SplunkRum.shared.sessionReplay.recordingMask = recordingMask
+/// ```
 public struct RecordingMask: Codable, Equatable {
 
     // MARK: - Elements
 
-    /// A list of individual areas to cover or erase.
+    /// An array of ``MaskElement`` instances that define the mask, ordered from bottom to top.
     public var elements: [MaskElement]
 
 
     // MARK: - Initialization
 
-    /// Creates a new recording mask structure with prepared mask elements.
+    /// Initializes a recording mask with an array of mask elements.
     ///
-    /// - Parameter elements: A list of individual areas to cover or erase.
-    ///
-    /// - Returns: A newly created `RecordingMask` structure.
+    /// - Parameter elements: An array of ``MaskElement`` instances. Defaults to an empty array.
     public init(elements: [MaskElement] = []) {
         self.elements = elements
     }

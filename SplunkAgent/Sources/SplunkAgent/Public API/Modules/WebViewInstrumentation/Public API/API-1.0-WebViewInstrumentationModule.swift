@@ -17,9 +17,23 @@ limitations under the License.
 
 import WebKit
 
-/// The public protocol defining the capabilities of the WebView Instrumentation module.
+/// An interface for integrating the native RUM agent with browser RUM running in a `WKWebView`.
+///
+/// This integration allows the browser RUM agent to access the native session ID,
+/// linking user sessions across both the native and web portions of your application.
+///
+/// ### Example ###
+/// ```
+/// let myWebView = WKWebView()
+/// SplunkRum.shared.webView.integrateWithBrowserRum(myWebView)
+/// ```
 public protocol WebViewInstrumentationModule {
-    /// Injects the necessary JavaScript bridge into a given WKWebView to enable
-    /// communication between the web content and the native RUM agent.
+    /// Integrates the native RUM agent with a browser RUM agent running in a given `WKWebView`.
+    ///
+    /// This method injects a JavaScript bridge into the web view, which exposes a `getNativeSessionId()`
+    /// function to the web content. The browser RUM agent can then use this function to retrieve
+    /// the native session ID.
+    ///
+    /// - Parameter view: The ``WKWebView`` instance to integrate with.
     func integrateWithBrowserRum(_ view: WKWebView)
 }

@@ -15,29 +15,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Defines a public API for the user's preferred settings.
+/// An interface for configuring Session Replay settings, such as the video rendering mode.
 public protocol SessionReplayModulePreferences {
 
     // MARK: - Rendering
 
-    /// The video rendering mode for captured data.
+    /// The rendering mode used for Session Replay videos.
+    ///
+    /// See ``RenderingMode`` for available options. Setting this property to `nil`
+    /// restores the default rendering mode.
     var renderingMode: RenderingMode? { get set }
 
-    /// Sets video rendering mode for captured data.
+    /// Sets the rendering mode for Session Replay videos.
     ///
-    /// - Parameter renderingMode: The required rendering mode.
-    ///
-    /// - Returns: The updated preferences object.
+    /// - Parameter renderingMode: The ``RenderingMode`` to apply. Pass `nil` to restore the default behavior.
+    /// - Returns: The updated preferences object to allow for chaining.
     @discardableResult func renderingMode(_ renderingMode: RenderingMode?) -> any SessionReplayModulePreferences
 
 
     // MARK: - Convenience init
 
-    /// Initializes new preferences object with preconfigured values.
+    /// Initializes a new preferences object with a specific rendering mode.
     ///
-    /// - Parameters:
-    ///   - renderingMode: The required rendering mode.
+    /// - Parameter renderingMode: The ``RenderingMode`` to use for recordings.
     ///
-    /// - Returns: A newly initialized `Preferences` object.
+    /// ### Example ###
+    /// ```
+    /// // Create preferences to use the screen-based rendering mode
+    /// let srPrefs = ConcreteSessionReplayPreferences(renderingMode: .screen)
+    /// SplunkRum.shared.sessionReplay.preferences(srPrefs)
+    /// ```
     init(renderingMode: RenderingMode)
 }

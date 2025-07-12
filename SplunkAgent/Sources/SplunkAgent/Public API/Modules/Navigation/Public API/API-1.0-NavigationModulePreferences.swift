@@ -15,26 +15,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Defines a public API for the user's preferred settings.
+/// An interface for configuring the behavior of the navigation module.
 public protocol NavigationModulePreferences {
 
     // MARK: - Automated tracking
 
-    /// A `Boolean` value determines whether the module should automatically detect navigation in the application.
+    /// A Boolean value that enables or disables automatic tracking of view controller transitions.
+    ///
+    /// If set to `true`, the module automatically creates screen name spans for view controller appearances.
+    /// If `false`, you must track screen views manually using ``NavigationModule/track(screen:)``.
+    /// A value of `nil` restores the default behavior.
     var enableAutomatedTracking: Bool? { get set }
 
-    /// Sets whether or not the module should automatically detect navigation in the application.
+    /// Enables or disables automatic tracking of view controller transitions.
     ///
-    /// - Parameter enable: If `true`, the module will automatically detect navigation.
-    ///
-    /// - Returns: The updated preferences object.
+    /// - Parameter enable: A `Bool` to enable or disable tracking. Pass `nil` to restore the default behavior.
+    /// - Returns: The updated preferences object to allow for chaining.
     @discardableResult func enableAutomatedTracking(_ enable: Bool?) -> any NavigationModulePreferences
 
 
     // MARK: - Convenience init
 
-    /// Initializes new preferences object with preconfigured values.
+    /// Initializes a new preferences object.
     ///
-    /// - Parameter enableAutomatedTracking: If `true`, the module will automatically detect navigation.
+    /// - Parameter enableAutomatedTracking: A `Bool` to enable or disable automatic tracking.
+    ///   Pass `nil` to use the default setting.
+    ///
+    /// ### Example ###
+    /// ```
+    /// // Create preferences to disable automatic screen tracking
+    /// let navPrefs = ConcreteNavigationPreferences(enableAutomatedTracking: false)
+    /// SplunkRum.shared.navigation.preferences(navPrefs)
+    /// ```
     init(enableAutomatedTracking: Bool?)
 }

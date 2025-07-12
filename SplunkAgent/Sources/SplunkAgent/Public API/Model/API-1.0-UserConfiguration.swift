@@ -15,28 +15,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A configuration object representing properties of the Agent's `User`.
+/// A configuration for user-related settings, such as the user tracking mode.
 public struct UserConfiguration: Codable, Equatable {
 
     // MARK: - Public properties
 
-    /// Sets the preferred `UserTrackingMode`.
+    /// The mode for tracking and identifying the user.
     ///
-    /// Defaults to `.noTracking`
+    /// Defaults to `.default`. See ``UserTrackingMode`` for all available options.
     public var trackingMode: UserTrackingMode = .default
 
 
     // MARK: - Initialization
 
-    /// Default empty constructor.
-    ///
-    /// Initializes the configuration object's properties with default values.
+    /// Initializes the user configuration with default values.
     public init() {}
 
-    /// Initializes the configuration object.
+    /// Initializes the user configuration with a specific tracking mode.
     ///
-    /// - Parameters:
-    /// - trackingMode: The preferred `UserTrackingMode`.
+    /// - Parameter trackingMode: The preferred ``UserTrackingMode``.
+    ///
+    /// ### Example ###
+    /// ```
+    /// // Configure user tracking to be anonymous
+    /// let userConfig = UserConfiguration(trackingMode: .anonymous)
+    /// ```
     public init(trackingMode: UserTrackingMode) {
         self.trackingMode = trackingMode
     }

@@ -15,8 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Defines a public API for the current state of the `SlowFrameDetector` module.
+/// An interface that provides read-only access to the current state of the `SlowFrameDetector` module.
+///
+/// ### Example ###
+/// ```
+/// if SplunkRum.shared.slowFrames.state.isEnabled {
+///     print("Slow and frozen frame detection is active.")
+/// }
+/// ```
 public protocol SlowFrameDetectorModuleState {
-    /// Indicates whether the slow and frozen frame detection feature is enabled.
+    /// A Boolean value indicating whether the slow and frozen frame detection feature is enabled.
     var isEnabled: Bool { get }
 }

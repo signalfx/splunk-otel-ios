@@ -17,37 +17,46 @@ limitations under the License.
 
 import Foundation
 
-/// A status of Session Replay recording.
+/// An enumeration that represents the detailed lifecycle status of a Session Replay recording.
 ///
-/// Describes the possible states for recording in which module can be during its lifecycle.
+/// You can check this status to understand the current state of the recording.
+///
+/// ### Example ###
+/// ```
+/// switch SplunkRum.shared.sessionReplay.state.status {
+/// case .recording:
+///     print("Session Replay is recording.")
+/// case .notRecording(let cause):
+///     print("Session Replay is not recording: \(cause)")
+/// }
+/// ```
 public enum SessionReplayStatus: Equatable {
 
-    /// Recording has been started and is currently in progress.
+    /// The Session Replay is actively recording.
     case recording
 
-    /// Recording is not in progress. A ``Cause`` determines the reason for this status.
+    /// The Session Replay is not recording. The associated `Cause` provides the specific reason.
     case notRecording(Cause)
 
 
-    /// The cause why the recording is currently not running.
+    /// The reason why the Session Replay status is `.notRecording`.
     public enum Cause {
-        /// During this application launch, the recording has not yet started.
+        /// The recording has not yet been started in the current application session.
         case notStarted
 
-        /// The user stopped the previous recording session.
+        /// The recording was explicitly stopped by a call to `stop()`.
         case stopped
 
-        /// It was impossible to start the recording because the internal
-        /// database could not be open, or another internal error occurred.
+        /// The recording could not be started or was interrupted due to an internal error, such as a database issue.
         case internalError
 
-        /// Custom preferences do not allow recording in the SwiftUI Preview context.
+        /// The recording is disabled because the application is running in a SwiftUI Preview.
         case swiftUIPreviewContext
 
-        /// Recording is not supported on the current platform.
+        /// Session Replay is not supported on the current operating system or platform.
         case unsupportedPlatform
 
-        /// Disk cache overreached its allowed size.
+        /// The recording was stopped because the on-disk storage limit was reached.
         case storageLimitReached
     }
 }

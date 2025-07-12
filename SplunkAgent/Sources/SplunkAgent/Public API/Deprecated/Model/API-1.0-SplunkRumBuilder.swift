@@ -23,6 +23,7 @@ internal import SplunkSlowFrameDetector
 
 import Foundation
 
+/// A deprecated builder for initializing the RUM agent.
 @available(*, deprecated, message:
     """
     The SplunkRumBuilder class is no longer supported and will be removed in a later version.
@@ -32,33 +33,47 @@ public class SplunkRumBuilder {
 
     // MARK: - Configuration properties
 
+    // The beacon URL for sending trace data.
     private var beaconUrl: String
+    // The RUM authentication token.
     private var rumAuth: String
+    // A flag to enable or disable debug logging.
     private var debug: Bool = false
+    // The deployment environment string.
     private var environment: String?
+    // The session sampling ratio, from 0.0 to 1.0.
     private var sessionSamplingRatio: Double = ConfigurationDefaults.sessionSamplingRate
+    // The name of the application.
     private var appName: String?
+    // A dictionary of global attributes.
     private var globalAttributes: [String: Any]?
-
+    // The modern endpoint configuration object.
     private var endpointConfiguration: EndpointConfiguration?
 
 
     // MARK: - Instrumentations properties
 
+    // A flag to enable or disable screen name spans.
     private var screenNameSpans: Bool = true
+    // A flag to enable or disable automatic view controller instrumentation.
     private var showVCInstrumentation: Bool = false
+    // A flag to enable or disable slow rendering detection.
     private var slowRenderingDetectionEnabled: Bool = true
+    // A flag to enable or disable network instrumentation.
     private var networkInstrumentation: Bool = true
+    // A regex for URLs to ignore in network instrumentation.
     private var ignoreURLs: NSRegularExpression?
 
 
     // MARK: - Logging
 
+    // The internal logger for the builder.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkRumBuilder")
 
 
     // MARK: - Builder initialization
 
+    /// Initializes the builder with a beacon URL and RUM authentication token.
     @available(*, deprecated, message:
         """
         This initializer will be removed in a later version.
@@ -79,6 +94,7 @@ public class SplunkRumBuilder {
         endpointConfiguration = EndpointConfiguration(trace: traceUrl)
     }
 
+    /// Initializes the builder with a realm and RUM authentication token.
     @available(*, deprecated, message:
         """
         This initializer will be removed in a later version.
@@ -94,6 +110,7 @@ public class SplunkRumBuilder {
 
     // MARK: - Public configuration builder methods
 
+    /// Enables or disables debug logging.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -105,6 +122,7 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// Sets the deployment environment.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -116,6 +134,7 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// Sets the session sampling ratio.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -127,6 +146,7 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// Sets the application name.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -138,6 +158,7 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// This method is a no-op and has no effect.
     @available(*, deprecated, message:
         """
         This builder method is a no-op and will be removed in a later version.
@@ -147,6 +168,7 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// Sets global attributes to be included in all spans.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -160,10 +182,9 @@ public class SplunkRumBuilder {
 
     // MARK: - Instrumentations builder methods
 
-    /// Sets whether or not the Navigation module should automatically detect navigation in the application.
+    /// Enables or disables automatic tracking of view controller appearances.
     ///
-    /// - Parameter show: If `true`, the Navigation module will automatically detect navigation.
-    ///
+    /// - Parameter show: If `true`, the Navigation module will automatically track view controllers.
     /// - Returns: The updated builder instance.
     @available(*, deprecated, message:
         """
@@ -177,10 +198,9 @@ public class SplunkRumBuilder {
     }
 
 
-    /// Specifies whether the Navigation module should be activated and generate navigation spans.
+    /// Enables or disables the creation of screen name spans.
     ///
-    /// - Parameter enabled: If `true`, the Navigation module generates navigation spans.
-    ///
+    /// - Parameter enabled: If `true`, the Navigation module generates screen name spans.
     /// - Returns: The updated builder instance.
     @available(*, deprecated, message: "This builder method will be removed in a later version.")
     @discardableResult
@@ -189,10 +209,9 @@ public class SplunkRumBuilder {
         return self
     }
 
-    /// Specifies whether the SlowFrameDetection should be activated and generate slow frame detection spans.
+    /// Enables or disables slow and frozen frame detection.
     ///
-    /// - Parameter enabled: If `true`, the SlowFrameDetection module generates slow frame detection spans.
-    ///
+    /// - Parameter isEnabled: If `true`, the agent will detect and report slow and frozen frames.
     /// - Returns: The updated builder instance.
     @available(*, deprecated, message: "This builder method will be removed in a later version.")
     public func slowRenderingDetectionEnabled(_ isEnabled: Bool) -> SplunkRumBuilder {
@@ -200,10 +219,9 @@ public class SplunkRumBuilder {
         return self
     }
 
-    /// Specifies the legacy threshold for slow frame detection. This setting is now ignored.
+    /// This method is a no-op and has no effect. Thresholds are now managed automatically.
     ///
-    /// - Parameter thresholdMs: The legacy threshold in milliseconds. This value is not used.
-    ///
+    /// - Parameter thresholdMs: This parameter is ignored.
     /// - Returns: The builder instance to allow for continued chaining.
     @available(*, deprecated, message: "This configuration has been discontinued and has no effect. Thresholds are now managed automatically.")
     @discardableResult
@@ -213,10 +231,9 @@ public class SplunkRumBuilder {
         return self
     }
 
-    /// Specifies the legacy threshold for frozen frame detection. This setting is now ignored.
+    /// This method is a no-op and has no effect. Thresholds are now managed automatically.
     ///
-    /// - Parameter thresholdMs: The legacy threshold in milliseconds. This value is not used.
-    ///
+    /// - Parameter thresholdMs: This parameter is ignored.
     /// - Returns: The builder instance to allow for continued chaining.
     @available(*, deprecated, message: "This configuration has been discontinued and has no effect. Thresholds are now managed automatically.")
     @discardableResult
@@ -226,10 +243,9 @@ public class SplunkRumBuilder {
         return self
     }
 
-    /// Specifies whether the Network Instrumentation module should be activated and generate spans.
+    /// Enables or disables network instrumentation.
     ///
-    /// - Parameter enabled: If `true`, the Network Instrumentation module generates spans.
-    ///
+    /// - Parameter enabled: If `true`, the agent will automatically instrument network requests.
     /// - Returns: The updated builder instance.
     @available(*, deprecated, message: "This builder method will be removed in a later version.")
     @discardableResult
@@ -239,10 +255,9 @@ public class SplunkRumBuilder {
     }
 
 
-    /// Network Instrumention can ignore URLs as appropriate
+    /// Sets a regular expression to exclude certain URLs from network instrumentation.
     ///
-    /// - Parameter ignoreURLs: A regular expression that resolves to URLs to be ignored during network activity
-    ///
+    /// - Parameter ignoreURLs: A regular expression matching URLs to be ignored.
     /// - Returns: The updated builder instance.
     @available(*, deprecated, message: "This builder method will be removed in a later version.")
     @discardableResult
@@ -254,6 +269,7 @@ public class SplunkRumBuilder {
 
     // MARK: - Build translation method
 
+    /// Translates the builder settings into the modern configuration and initializes the RUM agent.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.

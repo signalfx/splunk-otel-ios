@@ -20,76 +20,97 @@ import Foundation
 import OpenTelemetrySdk
 internal import SplunkCommon
 
-/// Structure that holds a configuration for an initial SDK setup.
+/// A configuration object for initializing the agent.
 ///
-/// Configuration is always bound to a specific URL.
+/// This object holds all the settings required for the agent to connect to the collector and report data.
 ///
-/// - Note: If you want to set up a parameter, you can change the appropriate property
-///         or use the proper method. Both approaches are comparable and give the same result.
+/// - Note: You can configure the agent by setting properties directly or by using the builder-style methods.
+///         Both approaches achieve the same result.
 public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable {
 
     // MARK: - Public mandatory properties
 
-    /// A required endpoint configuration defining URLs to the instrumentation collector.
+    /// The endpoint configuration defining URLs to the instrumentation collector.
     public let endpoint: EndpointConfiguration
 
-    /// Required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
+    /// The application name, which identifies the application in the RUM dashboard.
+    ///
+    /// The app name is sent in all signals as a resource.
     public let appName: String
 
-    /// Required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
-    /// Deployment environment is sent in all signals as a resource.
+    /// The deployment environment of the application, e.g., `dev` or `production`.
+    ///
+    /// The deployment environment is sent in all signals as a resource and helps identify the environment in the RUM dashboard.
     public let deploymentEnvironment: String
 
 
     // MARK: - Public optional properties
 
-    /// A `String` containing the current application version. Application version is sent in all signals as a resource.
+    /// The version of the application.
     ///
-    /// The default value corresponds to the value of `CFBundleShortVersionString`.
+    /// The application version is sent in all signals as a resource. The default value corresponds to `CFBundleShortVersionString`.
     public var appVersion: String = ConfigurationDefaults.appVersion
 
-    /// Enables or disables debug logging. Debug logging prints span contents into the console.
+    /// A Boolean value that enables or disables debug logging.
     ///
-    /// Defaults to `false`.
+    /// When enabled, debug logging prints span contents to the console. Defaults to `false`.
     public var enableDebugLogging: Bool = ConfigurationDefaults.enableDebugLogging
 
-    /// Sets global attributes, which are sent with all signals.
+    /// A dictionary of global attributes that are sent with all signals.
     ///
-    /// Defaults to an empty MutableAttributes object.
+    /// Defaults to an empty ``MutableAttributes`` object.
     public var globalAttributes: MutableAttributes = ConfigurationDefaults.globalAttributes
 
-    /// Span interceptor to be used to filter or modify all outgoing spans.
+    /// A closure that intercepts outgoing spans, allowing for modification or filtering.
     ///
-    /// If the callback is provided, all spans are funneled through the callback, and can be either approved by returning the span in the callback,
-    /// or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
+    /// If this closure is provided, all spans are passed through it before being exported.
+    /// You can return the `SpanData` to approve it, return a modified `SpanData` to alter it, or return `nil` to discard the span entirely.
     public var spanInterceptor: ((SpanData) -> SpanData?)?
 
-    /// Sets the `UserConfiguration` object.
+    /// The configuration for user-specific information.
+    ///
+    /// See ``UserConfiguration`` for more details.
     public var user = UserConfiguration()
 
-    /// Sets the `SessionConfiguration` object.
+    /// The configuration for session handling.
+    ///
+    /// See ``SessionConfiguration`` for more details.
     public var session = SessionConfiguration()
 
 
     // MARK: - Private
 
+    /// The time, in seconds, after which a session is considered expired.
     var sessionTimeout: Double = ConfigurationDefaults.sessionTimeout
+    /// The maximum duration, in seconds, for a single session.
     var maxSessionLength: Double = ConfigurationDefaults.maxSessionLength
+    /// A Boolean value that enables or disables session recording.
     var recordingEnabled: Bool = ConfigurationDefaults.recordingEnabled
+    // The internal logger for the agent.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Initialization
 
-    /// Initializes a new Agent configuration with which the Agent is initialized.
+    /// Initializes the agent configuration with required settings.
     ///
-    /// - Parameters:
-    ///   - endpoint: A required endpoint configuration defining URLs to the RUM instrumentation collector.
-    ///   - appName: A required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
-    ///   - deploymentEnvironment: A required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
-    ///   Deployment environment is sent in all signals as a resource.
+    /// - Parameter endpoint: The endpoint configuration, such as ``EndpointConfiguration/init(realm:rumAccessToken:)``.
+    /// - Parameter appName: The application name for identifying the app in the RUM dashboard.
+    /// - Parameter deploymentEnvironment: The deployment environment, e.g., `dev` or `production`.
     ///
-    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
+    /// ### Example ###
+    /// ```
+    /// let endpointConfig = EndpointConfiguration(
+    ///     realm: "us0",
+    ///     rumAccessToken: "YOUR_RUM_ACCESS_TOKEN"
+    /// )
+    ///
+    /// let agentConfig = AgentConfiguration(
+    ///     endpoint: endpointConfig,
+    ///     appName: "MyAwesomeApp",
+    ///     deploymentEnvironment: "production"
+    /// )
+    /// ```
     public init(endpoint: EndpointConfiguration, appName: String, deploymentEnvironment: String) {
         self.endpoint = endpoint
         self.appName = appName
@@ -99,10 +120,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Builder methods
 
-    /// Sets the application version. `appVersion` is sent in all signals as a resource.
+    /// Sets the application version.
     ///
     /// - Parameter appVersion: A `String` containing the application version.
-    ///
     /// - Returns: The updated configuration structure.
     @discardableResult
     public func appVersion(_ appVersion: String) -> Self {
@@ -113,10 +133,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     }
 
 
-    /// Enables or disables debug logging. Debug logging prints span contents into the console.
+    /// Enables or disables debug logging.
     ///
     /// - Parameter enableDebugLogging: A `Bool` to enable or disable debug logging.
-    ///
     /// - Returns: The updated configuration structure.
     @discardableResult
     public func enableDebugLogging(_ enableDebugLogging: Bool) -> Self {
@@ -126,10 +145,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         return updated
     }
 
-    /// Sets the `UserConfiguration` object.
+    /// Sets the user configuration.
     ///
-    /// - Parameter userConfiguration: A configuration object representing properties of the Agent's `User`.
-    ///
+    /// - Parameter userConfiguration: A configuration object for the agent's user.
     /// - Returns: The updated configuration structure.
     @discardableResult
     public func userConfiguration(_ userConfiguration: UserConfiguration) -> Self {
@@ -139,10 +157,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         return updated
     }
 
-    /// Sets the `SessionConfiguration` object.
+    /// Sets the session configuration.
     ///
-    /// - Parameter sessionConfiguration: A configuration object representing properties of the Agent's `Session`.
-    ///
+    /// - Parameter sessionConfiguration: A configuration object for the agent's session.
     /// - Returns: The updated configuration structure.
     @discardableResult
     public func sessionConfiguration(_ sessionConfiguration: SessionConfiguration) -> Self {
@@ -152,10 +169,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         return updated
     }
 
-    /// Sets global attributes, which are sent with all signals.
+    /// Sets global attributes to be sent with all signals.
     ///
-    /// - Parameter globalAttributes: A dictionary containing the global attributes to be sent with all signals.
-    ///
+    /// - Parameter globalAttributes: A dictionary of global attributes.
     /// - Returns: The updated configuration structure.
     @discardableResult
     public func globalAttributes(_ globalAttributes: MutableAttributes) -> Self {
@@ -165,12 +181,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         return updated
     }
 
-    /// Sets the span interceptor callback. If the callback is provided, all spans will be funneled through the callback,
-    /// and can be either approved by returning the span in the callback, or discarded by returning `nil`.
-    /// Spans can also be modified by the callback.
+    /// Sets the span interceptor callback.
     ///
-    /// - Parameter spanInterceptor: A span interceptor callback.
-    ///
+    /// - Parameter spanInterceptor: A closure to intercept, modify, or discard spans.
     /// - Returns: The updated configuration structure.
     @discardableResult
     public func spanInterceptor(_ spanInterceptor: ((SpanData) -> SpanData?)?) -> Self {
@@ -183,6 +196,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Codable
 
+    // Defines the keys used for encoding and decoding the configuration.
     private enum CodingKeys: String, CodingKey {
 
         // Public mandatory properties
@@ -221,9 +235,9 @@ extension AgentConfiguration {
 
     // MARK: - Validation
 
-    /// Validate a configuration by checking the endpoint first, then other configuration parameters.
+    /// Validates the agent configuration.
     ///
-    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
+    /// - Throws: `AgentConfigurationError` if the endpoint configuration is invalid.
     func validate() throws {
         try endpoint.validate()
 

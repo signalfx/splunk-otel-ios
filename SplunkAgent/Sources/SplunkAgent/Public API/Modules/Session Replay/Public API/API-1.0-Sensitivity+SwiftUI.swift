@@ -21,15 +21,26 @@ public extension View {
 
     // MARK: - View sensitivity (SwiftUI)
 
-    /// Sets an recording sensitivity for the specified `View`.
+    /// Masks this view and its subviews during Session Replay recordings to protect sensitive information.
     ///
-    /// To set the sensitivity of Views that encapsulate native UIKit elements,
-    /// you must first set their sensitivity using the UIKit methods
-    /// and then hide the View using this modifier.
+    /// By default, this modifier treats the view as sensitive and applies a masking effect.
     ///
-    /// - Parameter sensitive: A new state of element sensitivity.
+    /// - Note: This modifier only affects SwiftUI views. If your view wraps a UIKit element
+    ///   (e.g., using `UIViewRepresentable`), you must also configure the sensitivity
+    ///   of the underlying `UIView` for masking to work correctly.
     ///
-    /// - Returns: The `View` with defined sensitivity for recording in Session Replay module.
+    /// - Parameter sensitive: A Boolean value that determines whether the view should be masked.
+    ///   Defaults to `true`.
+    /// - Returns: A view that is configured for sensitivity in Session Replay recordings.
+    ///
+    /// ### Example ###
+    /// ```
+    /// VStack {
+    ///     Text("This is public information.")
+    ///     TextField("Password", text: $password)
+    ///         .sessionReplaySensitive() // This TextField will be masked
+    /// }
+    /// ```
     func sessionReplaySensitive(_ sensitive: Bool = true) -> some View {
         return modifier(SensitivityModifier(sensitive: sensitive))
     }

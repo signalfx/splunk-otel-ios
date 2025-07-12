@@ -18,70 +18,71 @@ limitations under the License.
 
 import UIKit
 
-/// Defines a public API for the view element's sensitivity.
+/// An interface for managing which UI elements are masked (`sensitive`) during Session Replay recordings.
 ///
-/// The resulting instance sensitivity consists of setting the sensitivity for the class
-/// or its ancestors and explicitly setting on the custom view instance.
+/// You can set sensitivity for individual view instances or for all instances of a specific `UIView` class.
+/// The sensitivity settings are evaluated with the following precedence:
+/// 1. **Instance Sensitivity:** A setting on a specific `UIView` instance always takes highest priority.
+/// 2. **Class Sensitivity:** If no instance sensitivity is set, the setting for the view's class is used.
 ///
-/// If multiple sensitivity settings have been applied to an instance, either directly
-/// or indirectly through inheritance, they are evaluated using the following
-/// sequence: `Instance`, `Class`. The setting for the instance always
-/// takes precedence over other methods.
+/// - Note: For convenience, some classes are sensitive by default: `UITextView`, `UITextField`, and `WKWebView`.
 ///
-/// - Note: For convenience, some classes are set sensitive by default:
-///      `UITextView`, `UITextField` and `WKWebView`.
+/// - Important: Sensitive elements are **masked locally** on the device. No sensitive data is ever
+///              transferred over the network or stored in your dashboard.
 ///
-/// - Important: Sensitive elements are **hidden locally** on the device.
-///     No sensitive data are transferred over the network and stored in the dashboard.
+/// ### Example ###
+/// ```
+/// // Mask all instances of a custom view class
+/// SplunkRum.shared.sessionReplay.sensitivity[MyCustomSensitiveView.self] = true
+///
+/// // Unmask a specific instance of that class
+/// let publicView = MyCustomSensitiveView()
+/// SplunkRum.shared.sessionReplay.sensitivity[publicView] = false
+/// ```
 public protocol SessionReplayModuleSensitivity: AnyObject {
 
     // MARK: - View sensitivity
 
-    /// Retrieves or adds an element sensitivity for the specified `UIView` instance.
+    /// Retrieves or sets the explicit sensitivity for a specific `UIView` instance.
     ///
-    /// Assigning `nil` removes previously assigned explicit sensitivity.
+    /// This setting overrides any class-level sensitivity.
     ///
-    /// - Parameter view: A view instance to add or remove sensitivity preferences.
-    ///
-    /// - Returns: The view sensitivity as combination of instance and class/protocol defined
-    ///     sensitivity. If the view is sensitive, then return `true`. If it is
-    ///     non-sensitive, then return `false`. In all other states, it returns `nil`.
+    /// - Parameter view: The `UIView` instance to configure.
+    /// - Returns: `true` if the instance is explicitly masked, `false` if explicitly unmasked,
+    ///            or `nil` if its sensitivity is inherited from its class.
     subscript(view: UIView) -> Bool? { get set }
 
-    /// Sets element sensitivity for the specified `UIView` instance.
+    /// Sets the explicit sensitivity for a specific `UIView` instance.
     ///
-    /// Assigning `nil` removes previously assigned explicit sensitivity.
+    /// - Note: This method provides the same functionality as the subscript and is included
+    ///   for chaining convenience.
     ///
     /// - Parameters:
-    ///   - view: A view instance to add or remove sensitivity preferences.
-    ///   - sensitive: A new state of view instance sensitivity.
-    ///
-    /// - Returns: The updated sensitivity object.
+    ///   - view: The `UIView` instance to configure.
+    ///   - sensitive: The sensitivity state to apply. Pass `true` to mask, `false` to unmask,
+    ///                or `nil` to revert to class-level sensitivity.
+    /// - Returns: The updated sensitivity object to allow for chaining.
     @discardableResult func set(_ view: UIView, _ sensitive: Bool?) -> any SessionReplayModuleSensitivity
 
 
     // MARK: - Class sensitivity
 
-    /// Retrieves or adds sensitivity for the specified member of `UIView` class.
+    /// Retrieves or sets the sensitivity for all instances of a given `UIView` class.
     ///
-    /// Assigning `nil` removes previously assigned explicit sensitivity.
-    ///
-    /// - Parameter viewClass: A view class to add or remove sensitivity preferences.
-    ///
-    /// - Returns: The view class sensitivity. If the class is explicitly marked
-    ///     as sensitive, then return `true`. If it is explicitly marked
-    ///     as non-sensitive, then return `false`. In all other states,
-    ///     it returns `nil`.
+    /// - Parameter viewClass: The `UIView` class to configure (e.g., `UILabel.self`).
+    /// - Returns: `true` if the class is explicitly masked, `false` if explicitly unmasked,
+    ///            or `nil` if no class-level rule is set.
     subscript(viewClass: UIView.Type) -> Bool? { get set }
 
-    /// Sets sensitivity for the specified member of `UIView` class.
+    /// Sets the sensitivity for all instances of a given `UIView` class.
     ///
-    /// Assigning `nil` removes previously assigned explicit sensitivity.
+    /// - Note: This method provides the same functionality as the subscript and is included
+    ///   for chaining convenience.
     ///
     /// - Parameters:
-    ///   - viewClass: A view class to add or remove sensitivity preferences.
-    ///   - sensitive: A new state of view class sensitivity.
-    ///
-    /// - Returns: The updated sensitivity object.
+    ///   - viewClass: The `UIView` class to configure.
+    ///   - sensitive: The sensitivity state to apply. Pass `true` to mask, `false` to unmask,
+    ///                or `nil` to remove the class-level rule.
+    /// - Returns: The updated sensitivity object to allow for chaining.
     @discardableResult func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> any SessionReplayModuleSensitivity
 }

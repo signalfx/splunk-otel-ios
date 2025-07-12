@@ -21,9 +21,9 @@ public extension SplunkRum {
 
     // MARK: - Custom Tracking
 
-    /// Reports an error using a String. Legacy mapping.
+    /// Reports a string-based error.
     ///
-    /// - Parameter string: A String error message.
+    /// - Parameter string: The error message.
     @available(
         *,
         deprecated,
@@ -34,9 +34,9 @@ public extension SplunkRum {
         _ = shared.customTracking.trackError(string)
     }
 
-    /// Reports an error with a Swift Error or NSError. Legacy mapping.
+    /// Reports an error from a Swift `Error` or `NSError` instance.
     ///
-    /// - Parameter error: An instance of an Error-conforming type.
+    /// - Parameter error: An object that conforms to the `Error` protocol.
     @available(
         *,
         deprecated,
@@ -47,9 +47,9 @@ public extension SplunkRum {
         _ = shared.customTracking.trackError(error)
     }
 
-    /// Reports an exception with an NSException. Legacy mapping.
+    /// Reports an error from an `NSException` instance.
     ///
-    /// - Parameter exception: An NSException instance.
+    /// - Parameter exception: An `NSException` instance.
     @available(
         *,
         deprecated,
@@ -60,10 +60,10 @@ public extension SplunkRum {
         _ = shared.customTracking.trackException(exception)
     }
 
-    /// Reports a custom event with name and attributes. Legacy mapping.
+    /// Reports a custom event with a name and attributes.
     ///
-    /// - Parameter name: A user-assigned String name for the event.
-    /// - Parameter attribues: An NSDictionary with user-provided event attributes.
+    /// - Parameter name: The name of the custom event.
+    /// - Parameter attributes: A dictionary of attributes to associate with the event.
     @available(
         *,
         deprecated,

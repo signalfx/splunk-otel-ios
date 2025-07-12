@@ -18,28 +18,29 @@ limitations under the License.
 import Combine
 import Foundation
 
-/// A state object that is representation for the current state of the Agent.
+/// An observable object that represents the current runtime state of the agent.
 ///
-/// The individual properties are a combination of:
+/// This class provides read-only access to the agent's configuration and status.
+/// The values are a combination of:
 /// - Default SDK settings.
-/// - Initial configuration specified by  ``Configuration``.
+/// - The initial ``AgentConfiguration`` provided by the user.
 /// - Settings retrieved from the backend.
 ///
-/// - Note: The states of individual properties in this class can
-///         change during the application's runtime.
+/// - Note: The state of individual properties can change during the application's runtime.
 ///
-/// The class conforms to `Combine.ObservableObject` protocol to make
-/// the published properties available for Combine and SwiftUI.
-///
+/// This class conforms to `Combine.ObservableObject`, allowing you to subscribe to state
+/// changes in SwiftUI and other Combine-based frameworks.
 public final class RuntimeState: AgentState, ObservableObject {
 
     // MARK: - Internal
 
+    // The SplunkRum instance that owns and provides the runtime state.
     private unowned let owner: SplunkRum
 
 
     // MARK: - Initialization
 
+    /// Initializes the runtime state with its owning `SplunkRum` instance.
     init(for owner: SplunkRum) {
         self.owner = owner
     }
@@ -50,7 +51,7 @@ public extension RuntimeState {
 
     // MARK: - Agent status
 
-    /// A `Status` of agent recording.
+    /// The current recording status of the agent.
     var status: Status {
         owner.currentStatus
     }
@@ -58,27 +59,29 @@ public extension RuntimeState {
 
     // MARK: - User configuration
 
-    /// A `String` that contains the name used for the application identification.
+    /// The name of the application.
     var appName: String {
         owner.agentConfiguration.appName
     }
 
-    /// A `String` that contains the used application version.
+    /// The version of the application.
     var appVersion: String {
         owner.agentConfiguration.appVersion
     }
 
-    /// A `EndpointConfiguration` containing either the specified realm, or endpoint urls.
+    /// The endpoint configuration for the agent.
+    ///
+    /// See ``EndpointConfiguration`` for more details.
     var endpointConfiguration: EndpointConfiguration {
         owner.agentConfiguration.endpoint
     }
 
-    /// A `String` containing the used application deployment environment.
+    /// The deployment environment of the application (e.g., `dev`, `production`).
     var deploymentEnvironment: String {
         owner.agentConfiguration.deploymentEnvironment
     }
 
-    /// A `Bool` value determining whether the debug logging has been enabled.
+    /// A Boolean value indicating whether debug logging is enabled.
     var isDebugLoggingEnabled: Bool {
         owner.agentConfiguration.enableDebugLogging
     }

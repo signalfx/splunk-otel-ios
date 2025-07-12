@@ -15,28 +15,39 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A status of agent instance.
+/// An enumeration that represents the lifecycle status of the agent.
 ///
-/// Describes the possible states for agent in which can be during its lifecycle.
+/// You can check this status to understand whether the agent is actively recording and sending data.
+///
+/// ### Example ###
+/// ```
+/// switch SplunkRum.shared.state.status {
+/// case .running:
+///     print("Agent is running.")
+/// case .notRunning(let cause):
+///     print("Agent is not running due to: \(cause)")
+/// }
+/// ```
 public enum Status: Equatable {
 
-    /// Recording is in progress.
+    /// The agent is actively recording and sending telemetry data.
     case running
 
-    /// Recording is not in progress. A ``Cause`` determines the reason for this status.
+    /// The agent is not recording. The associated `Cause` value provides the specific reason.
     case notRunning(Cause)
 
 
-    /// The cause why the recording is currently not running.
+    /// The reason why the agent's status is `.notRunning`.
     public enum Cause {
 
-        /// The agent has not been installed.
+        /// The agent has not been installed via `SplunkRum.install`.
         case notInstalled
 
-        /// The agent is not supported on the current platform.
+        /// The agent does not support the current operating system or platform.
         case unsupportedPlatform
 
-        /// The agent is not running because of being sampled out locally.
+        /// The agent is not running for this session because it has been sampled out
+        /// based on the configured sampling rate.
         case sampledOut
     }
 }
@@ -46,6 +57,7 @@ extension Status.Cause: CustomStringConvertible, CustomDebugStringConvertible {
 
     // MARK: - StringConvertible methods
 
+    /// A human-readable description of the cause.
     public var description: String {
         switch self {
         case .notInstalled:

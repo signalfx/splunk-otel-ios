@@ -15,13 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A configuration object representing properties of the Agent's `Session`.
+/// A configuration for session-related settings, such as the session sampling rate.
 public struct SessionConfiguration: Codable, Equatable {
 
     // MARK: - Public properties
 
-    /// A sampling rate in the `<0.0, 1.0>` interval.
-    /// `1.0` equals to zero sampling (all instrumentation is sent), `0.0` equals to all session being sampled, `0.5` equals to 50% sampling.
+    /// The session sampling rate, controlling what percentage of sessions are recorded.
+    ///
+    /// This value must be in the range `0.0` to `1.0`.
+    /// - `1.0` means 100% of sessions are recorded.
+    /// - `0.5` means 50% of sessions are recorded.
+    /// - `0.0` means 0% of sessions are recorded.
     ///
     /// Defaults to `1.0`.
     public var samplingRate = ConfigurationDefaults.sessionSamplingRate
@@ -29,17 +33,18 @@ public struct SessionConfiguration: Codable, Equatable {
 
     // MARK: - Initialization
 
-    /// Default empty constructor.
-    ///
-    /// Initializes the configuration object's properties with default values.
+    /// Initializes the session configuration with default values.
     public init() {}
 
-    /// Initializes the configuration object.
+    /// Initializes the session configuration with a custom sampling rate.
     ///
-    /// - Parameters:
-    /// - samplingRate: A sampling rate in the `<0.0, 1.0>` interval.
-    /// `1.0` equals to zero sampling (all instrumentation is sent),
-    /// `0.0` equals to all session being sampled, `0.5` equals to 50% sampling.
+    /// - Parameter samplingRate: The session sampling rate, a value between `0.0` and `1.0`.
+    ///
+    /// ### Example ###
+    /// ```
+    /// // Record 25% of all user sessions
+    /// let sessionConfig = SessionConfiguration(samplingRate: 0.25)
+    /// ```
     public init(samplingRate: Double) {
         self.samplingRate = samplingRate
     }

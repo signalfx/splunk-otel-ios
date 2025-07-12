@@ -20,9 +20,24 @@ import UIKit
 
 public extension UIView {
 
-    /// Element custom id for the specified `UIView` instance.
+    /// A custom identifier for this view, used for Session Replay and Interaction Tracking.
     ///
-    /// Assigning `nil` removes previously assigned custom id.
+    /// Setting this ID allows you to uniquely identify and reference this specific view in your RUM data.
+    /// This is particularly useful for masking or unmasking sensitive content in Session Replay or for
+    /// tracking user interactions with specific UI elements.
+    ///
+    /// Assigning `nil` to this property removes any previously set identifier.
+    ///
+    /// ### Example ###
+    /// ```
+    /// let loginButton = UIButton()
+    /// loginButton.splunkRumId = "login-button"
+    ///
+    /// // Later, you can retrieve it
+    /// if let id = loginButton.splunkRumId {
+    ///     print("Button ID: \(id)") // Prints "Button ID: login-button"
+    /// }
+    /// ```
     var splunkRumId: String? {
         get {
             SplunkRum.shared.sessionReplay.customIdentifiers[self]

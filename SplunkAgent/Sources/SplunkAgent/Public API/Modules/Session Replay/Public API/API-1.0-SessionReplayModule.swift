@@ -17,70 +17,82 @@ limitations under the License.
 
 import Combine
 
-/// Defines a public API for the Session Replay module.
+/// An interface for controlling Session Replay recordings, including starting/stopping,
+/// managing view sensitivity, and setting preferences.
 public protocol SessionReplayModule: ObservableObject {
 
     // MARK: - Sensitivity
 
-    /// An object that holds and manages view elements sensitivity.
+    /// An object for managing the masking of sensitive views.
+    ///
+    /// See ``SessionReplayModuleSensitivity`` for more details.
     var sensitivity: SessionReplayModuleSensitivity { get }
 
 
     // MARK: - Custom id
 
-    /// An object that holds and manages view elements sensitivity.
+    /// An object for assigning custom identifiers to views for tracking and masking purposes.
+    ///
+    /// See ``SessionReplayModuleCustomId`` for more details.
     var customIdentifiers: SessionReplayModuleCustomId { get }
 
 
     // MARK: - State
 
-    /// An object that reflects the current state and settings used for the recording.
+    /// An object that provides read-only access to the current state of the Session Replay module.
+    ///
+    /// See ``SessionReplayModuleState`` for more details.
     var state: SessionReplayModuleState { get }
 
 
     // MARK: - Module preferences
 
-    /// An object that holds preferred settings for the recording.
+    /// The preferences that control the behavior of Session Replay recordings.
+    ///
+    /// See ``SessionReplayModulePreferences`` for available options.
     var preferences: SessionReplayModulePreferences { get set }
 
-    /// Sets preferred settings for the recording.
+    /// Sets the preferences for Session Replay recordings.
     ///
-    /// - Parameter preferences: The preferred settings for the recording.
-    ///
-    /// - Returns: The actual `SessionReplay` instance.
+    /// - Parameter preferences: The ``SessionReplayModulePreferences`` to apply.
+    /// - Returns: The `SessionReplayModule` instance to allow for chaining.
     @discardableResult func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule
 
 
     // MARK: - Recording management
 
-    /// Starts recording.
+    /// Starts a new Session Replay recording if one is not already in progress.
     ///
-    /// If the recording is already running, then it does nothing.
-    ///
-    /// - Returns: The actual `SessionReplay` instance.
+    /// ### Example ###
+    /// ```
+    /// SplunkRum.shared.sessionReplay.start()
+    /// ```
+    /// - Returns: The `SessionReplayModule` instance to allow for chaining.
     @discardableResult func start() -> any SessionReplayModule
 
-    /// Stops the currently running recording.
+    /// Stops the current Session Replay recording.
     ///
-    /// If the recording is not running, then it does nothing.
+    /// - Note: You do not need to call this method when the application is closed by the user;
+    ///         the module handles this automatically.
     ///
-    /// This method is primarily used to pause the recording and does not need to call
-    /// when the application exits. If the application is closed by the user,
-    /// the module itself will call it.
-    ///
-    /// - Returns: The actual `SessionReplay` instance.
+    /// ### Example ###
+    /// ```
+    /// SplunkRum.shared.sessionReplay.stop()
+    /// ```
+    /// - Returns: The `SessionReplayModule` instance to allow for chaining.
     @discardableResult func stop() -> any SessionReplayModule
 
 
     // MARK: - Recording masks
 
-    /// The recording mask, covers possibly sensitive areas.
+    /// A view that overlays the entire screen to mask sensitive content during recordings.
+    ///
+    /// See ``RecordingMask`` for more details.
     var recordingMask: RecordingMask? { get set }
 
-    /// Sets a recording mask that covers possibly sensitive areas.
+    /// Sets a custom view to overlay the screen and mask sensitive content.
     ///
-    /// - Parameter recordingMask: The predefined recording mask for recording.
-    ///
-    /// - Returns: The actual `SessionReplay` instance.
+    /// - Parameter recordingMask: A ``RecordingMask`` to apply. Pass `nil` to remove the mask.
+    /// - Returns: The `SessionReplayModule` instance to allow for chaining.
     @discardableResult func recordingMask(_ recordingMask: RecordingMask?) -> any SessionReplayModule
 }
