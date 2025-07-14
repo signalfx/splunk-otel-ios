@@ -95,6 +95,8 @@ public struct EndpointConfiguration: Codable, Equatable {
 
 
 extension EndpointConfiguration: CustomStringConvertible, CustomDebugStringConvertible {
+
+    /// A human-readable string representation of the `EndpointConfiguration` instance.
     public var description: String {
         return """
         Realm: \(realm ?? "nil"), \
@@ -104,6 +106,7 @@ extension EndpointConfiguration: CustomStringConvertible, CustomDebugStringConve
         """
     }
 
+    /// A string representation of the `EndpointConfiguration` instance intended for diagnostic output, identical to `description`.
     public var debugDescription: String {
         return description
     }
