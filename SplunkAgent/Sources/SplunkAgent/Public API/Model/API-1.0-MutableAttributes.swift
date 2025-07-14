@@ -18,28 +18,57 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 
+/// A thread-safe object that provides a mutable collection of attributes for enriching telemetry data.
+///
+/// This class offers a dictionary-like interface for managing attributes that conform to
+/// `OpenTelemetryApi.AttributeValue`. It is designed for safe use across multiple threads.
+///
+/// ### Usage
+///
+/// You can initialize an empty collection and add attributes using the typed subscripts.
+/// To remove an attribute, set its value to `nil`.
+///
+/// ```swift
+/// let attributes = MutableAttributes()
+/// attributes[string: "user.name"] = "Alice"
+/// attributes[int: "login.count"] = 5
+/// attributes[bool: "is.subscribed"] = true
+///
+/// // Removes the 'is.subscribed' attribute.
+/// attributes[bool: "is.subscribed"] = nil
+/// ```
 public class MutableAttributes {
 
     // MARK: - Private
 
+    // The underlying thread-safe storage for attributes.
     var attributes: ThreadSafeDictionary<String, AttributeValue>
 
 
     // MARK: - Initialize
 
+    /// Initializes an empty collection of attributes.
     public init() {
         attributes = ThreadSafeDictionary<String, AttributeValue>()
     }
 
+    /// Initializes the collection with attributes from a given dictionary.
+    /// - Parameter dictionary: A dictionary of key-value pairs to add to the collection.
     public init(dictionary: [String: AttributeValue]) {
         attributes = ThreadSafeDictionary<String, AttributeValue>(dictionary: dictionary)
     }
 
+    /// Initializes the collection with attributes from a given `AttributeSet`.
+    /// - Parameter attributeSet: An ``AttributeSet`` whose labels will be added to the collection.
     public init(attributeSet: AttributeSet) {
         attributes = ThreadSafeDictionary<String, AttributeValue>()
         addAttributeSet(attributeSet)
     }
 
+    /// Initializes the collection by decoding from a `Decoder`.
+    ///
+    /// This initializer is used to conform to the `Decodable` protocol.
+    /// - Throws: An error if decoding fails.
     public required init(from decoder: Decoder) throws {
         attributes = ThreadSafeDictionary<String, AttributeValue>()
         let container = try decoder.container(keyedBy: StringCodingKey.self)
@@ -335,7 +364,7 @@ public extension MutableAttributes {
         return result
     }
 
-    var all: [String: Any] {
+     var all: [String: Any] {
         return getAllAsAny()
     }
 }
@@ -344,6 +373,7 @@ extension MutableAttributes: CustomStringConvertible {
 
     // MARK: - Description
 
+    /// A human-readable description of the attributes, sorted by key.
     public var description: String {
         var result = "[\n"
 

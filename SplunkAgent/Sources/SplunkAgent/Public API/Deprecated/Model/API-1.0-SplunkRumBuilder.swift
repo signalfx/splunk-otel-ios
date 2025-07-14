@@ -23,6 +23,7 @@ internal import SplunkSlowFrameDetector
 
 import Foundation
 
+/// A deprecated builder for initializing the RUM agent.
 @available(*, deprecated, message:
     """
     The SplunkRumBuilder class is no longer supported and will be removed in a later version.
@@ -59,6 +60,7 @@ public class SplunkRumBuilder {
 
     // MARK: - Builder initialization
 
+    /// Initializes the builder with a beacon URL and RUM authentication token.
     @available(*, deprecated, message:
         """
         This initializer will be removed in a later version.
@@ -79,6 +81,7 @@ public class SplunkRumBuilder {
         endpointConfiguration = EndpointConfiguration(trace: traceUrl)
     }
 
+    /// Initializes the builder with a realm and RUM authentication token.
     @available(*, deprecated, message:
         """
         This initializer will be removed in a later version.
@@ -94,6 +97,7 @@ public class SplunkRumBuilder {
 
     // MARK: - Public configuration builder methods
 
+    /// Enables or disables debug logging.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -105,6 +109,7 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// Sets the deployment environment.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -116,6 +121,7 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// Sets the session sampling ratio.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -127,6 +133,7 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// Sets the application name.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -138,6 +145,7 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// This method is a no-op and has no effect.
     @available(*, deprecated, message:
         """
         This builder method is a no-op and will be removed in a later version.
@@ -147,6 +155,7 @@ public class SplunkRumBuilder {
         return self
     }
 
+    /// Sets global attributes to be included in all spans.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
@@ -254,6 +263,7 @@ public class SplunkRumBuilder {
 
     // MARK: - Build translation method
 
+    /// Translates the builder settings into the modern configuration and initializes the RUM agent.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version.
