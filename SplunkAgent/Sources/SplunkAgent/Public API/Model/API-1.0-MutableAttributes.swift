@@ -364,7 +364,7 @@ public extension MutableAttributes {
         return result
     }
 
-     var all: [String: Any] {
+    var all: [String: Any] {
         return getAllAsAny()
     }
 }
