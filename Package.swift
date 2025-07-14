@@ -9,10 +9,7 @@ import PackageDescription
 let package = Package(
     name: "SplunkAgent",
     platforms: [
-        .iOS(.v15),
-        .tvOS(.v15),
-        .visionOS(.v1),
-        .macCatalyst(.v13)
+        .iOS(.v15)
     ],
     products: [
         .library(
