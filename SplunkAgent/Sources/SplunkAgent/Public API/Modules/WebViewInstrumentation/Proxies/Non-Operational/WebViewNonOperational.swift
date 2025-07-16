@@ -17,7 +17,10 @@ limitations under the License.
 
 internal import CiscoLogger
 internal import SplunkCommon
-import WebKit
+
+#if canImport(WebKit)
+    import WebKit
+#endif
 
 /// The class implementing WebView public API in non-operational mode.
 ///
@@ -42,9 +45,11 @@ final class WebViewNonOperational: WebViewInstrumentationModule {
 
     // MARK: - Public
 
-    func integrateWithBrowserRum(_ view: WKWebView) {
-        logAccess(toApi: #function)
-    }
+    #if canImport(WebKit)
+        func integrateWithBrowserRum(_ view: WKWebView) {
+            logAccess(toApi: #function)
+        }
+    #endif
 
 
     // MARK: - Logger
