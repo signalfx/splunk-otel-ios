@@ -23,10 +23,16 @@ final class SessionReplayNonOperationalState: SessionReplayModuleState {
 
     // MARK: - Recording
 
+    /// The session replay status when the module is non-operational.
+    ///
+    /// This property always returns ``SessionReplayStatus/notRecording(_:)`` with a reason of `.notStarted`.
     public var status: SessionReplayStatus {
         .notRecording(.notStarted)
     }
 
+    /// A boolean indicating if recording is active when the module is non-operational.
+    ///
+    /// This property always returns `false`.
     public var isRecording: Bool {
         false
     }

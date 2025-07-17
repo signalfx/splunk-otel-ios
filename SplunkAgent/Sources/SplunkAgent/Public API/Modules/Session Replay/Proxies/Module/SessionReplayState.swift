@@ -35,10 +35,17 @@ final class SessionReplayState: SessionReplayModuleState {
 
     // MARK: - Recording
 
+    /// The current operational status of the Session Replay module.
+    ///
+    /// See ``SessionReplayStatus`` for possible values.
     public var status: SessionReplayStatus {
         SessionReplayStatus(srStatus: module.state.status)
     }
 
+    /// A boolean value indicating whether the session is currently being recorded.
+    ///
+    /// This is a convenience property that returns `true` if the ``status`` is `.recording`,
+    /// and `false` otherwise.
     public var isRecording: Bool {
         module.state.isRecording
     }

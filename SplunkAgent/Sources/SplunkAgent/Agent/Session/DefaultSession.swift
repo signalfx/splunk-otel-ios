@@ -75,12 +75,16 @@ class DefaultSession: AgentSession {
 
     // MARK: - Computed properties
 
+    /// The unique identifier for the current session.
     public var currentSessionId: String {
         accessQueue.sync {
             currentSession.id
         }
     }
 
+    /// The data object representing the current session's properties.
+    ///
+    /// This item includes the session ID and its start time.
     public var currentSessionItem: SessionItem {
         accessQueue.sync {
             currentSession

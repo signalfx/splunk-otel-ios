@@ -56,12 +56,22 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
 
     // MARK: - Rendering
 
+    /// The preferred rendering mode for the session replay.
+    ///
+    /// This setting determines how the session replay is visually captured. The actual rendering
+    /// mode in use can be confirmed by checking the ``SessionReplayModuleState``.
     public var renderingMode: RenderingMode? {
         didSet {
             module?.preferences.renderingMode = renderingMode?.srRenderingMode
         }
     }
 
+    /// Sets the preferred rendering mode for the session replay.
+    ///
+    /// This method provides a fluent interface for configuring the rendering mode.
+    ///
+    /// - Parameter renderingMode: The desired rendering mode.
+    /// - Returns: The ``SessionReplayModulePreferences`` instance for chaining further configurations.
     @discardableResult public func renderingMode(_ renderingMode: RenderingMode?) -> SessionReplayModulePreferences {
         self.renderingMode = renderingMode
 
@@ -74,6 +84,9 @@ public extension SessionReplayPreferences {
 
     // MARK: - Convenience init
 
+    /// Initializes the preferences with a specific rendering mode.
+    ///
+    /// - Parameter renderingMode: The rendering mode to use for the session replay.
     convenience init(renderingMode: RenderingMode) {
         self.init(for: nil)
 

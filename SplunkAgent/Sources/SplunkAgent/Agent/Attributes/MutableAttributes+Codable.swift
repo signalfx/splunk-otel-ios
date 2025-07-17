@@ -21,6 +21,13 @@ extension MutableAttributes: Codable {
 
     // MARK: - Codable
 
+    /// Encodes this set of attributes into the given encoder.
+    ///
+    /// This method is part of the `Codable` conformance and is used to serialize the attributes
+    /// into a flat dictionary of key-value pairs.
+    ///
+    /// - Parameter encoder: The encoder to write data to.
+    /// - Throws: An error if any attribute value cannot be encoded.
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: StringCodingKey.self)
         let dictionary = attributes.getAll()

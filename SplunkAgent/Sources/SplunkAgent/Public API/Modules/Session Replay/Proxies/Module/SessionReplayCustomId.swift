@@ -23,6 +23,13 @@ final class SessionReplayCustomId: SessionReplayModuleCustomId {
 
     // MARK: - View sensitivity
 
+    /// Gets or sets a custom identifier for a specific `UIView` instance.
+    ///
+    /// This identifier can be used to uniquely identify UI elements in the session replay
+    /// data, which is useful for analysis and debugging.
+    ///
+    /// - Note: Setting the value to `nil` will remove any previously set custom identifier
+    ///   from the view.
     public subscript(view: UIView) -> String? {
         get {
             view.customId
@@ -32,6 +39,14 @@ final class SessionReplayCustomId: SessionReplayModuleCustomId {
         }
     }
 
+    /// Sets a custom identifier for a specific `UIView` instance.
+    ///
+    /// This method provides a fluent interface for assigning a custom ID.
+    ///
+    /// - Parameters:
+    ///   - view: The `UIView` instance to identify.
+    ///   - customId: The unique identifier string to assign. Pass `nil` to remove an existing ID.
+    /// - Returns: The ``SessionReplayModuleCustomId`` instance for chaining further configurations.
     @discardableResult public func set(_ view: UIView, _ customId: String?) -> SessionReplayModuleCustomId {
         self[view] = customId
 

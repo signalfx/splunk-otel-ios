@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -39,6 +38,11 @@ final class SessionReplayNonOperationalCustomId: SessionReplayModuleCustomId {
 
     // MARK: - View sensitivity
 
+    /// A non-operational implementation for getting or setting a custom view identifier.
+    ///
+    /// When the Session Replay module is disabled (e.g., via remote configuration), this
+    /// property ensures the API remains available but performs no action. Accessing it
+    /// will log a notice. The getter always returns `nil`.
     public subscript(view: UIView) -> String? {
         get {
             logAccess(toApi: #function)
@@ -53,7 +57,15 @@ final class SessionReplayNonOperationalCustomId: SessionReplayModuleCustomId {
         // swiftlint:enable unused_setter_value
     }
 
-
+    /// A non-operational implementation for setting a custom view identifier.
+    ///
+    /// When the Session Replay module is disabled, calling this method will log a notice
+    /// and will not assign a custom ID to the view.
+    ///
+    /// - Parameters:
+    ///   - view: The view that would have received the custom ID.
+    ///   - customId: The custom ID that is being ignored.
+    /// - Returns: The current ``SessionReplayModuleCustomId`` instance to maintain API compatibility.
     @discardableResult public func set(_ view: UIView, _ customId: String?) -> any SessionReplayModuleCustomId {
         logAccess(toApi: #function)
 
