@@ -18,22 +18,22 @@ limitations under the License.
 import CoreTelephony
 import Foundation
 import Network
-import OpenTelemetryApi
+internal import OpenTelemetryApi
 import SplunkCommon
 
+
+// MARK: - Public
+
+public enum ConnectionType: String {
+    case wifi
+    case cellular
+    case wiredEthernet
+    case vpn
+    case other
+    case unavailable
+}
+
 public class NetworkMonitor {
-
-
-    // MARK: - Public
-
-    public enum ConnectionType: String {
-        case wifi
-        case cellular
-        case wiredEthernet
-        case vpn
-        case other
-        case unavailable
-    }
 
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
