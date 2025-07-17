@@ -19,8 +19,28 @@ import Foundation
 
 /// Represents Network Change span's data.
 struct NetworkMonitorEvent {
-    let timestamp: Date
-    let isConnected: Bool
-    let connectionType: ConnectionType
-    let radioType: String?
+    var timestamp: Date
+    var isConnected: Bool
+    var connectionType: ConnectionType
+    var radioType: String?
+}
+
+// MARK: - Comparison Extension
+
+extension NetworkMonitorEvent {
+    /// Compares two NetworkMonitorEvents to determine if they represent different network states.
+    /// Excludes the timestamp from comparison as it will always be different, but
+    /// returns false if they are less than 3 ms apart to reduce noise
+    /// - Parameter other: The NetworkMonitorEvent to compare against
+    /// - Returns: `true` if the events represent different network states, `false` if they are the same or noise
+    func isDifferent(from other: NetworkMonitorEvent) -> Bool {
+        let timeDifference = abs(timestamp.timeIntervalSince(other.timestamp))
+        if timeDifference < 0.003 {
+            return false
+        }
+
+        return isConnected != other.isConnected ||
+               connectionType != other.connectionType ||
+               radioType != other.radioType
+    }
 }

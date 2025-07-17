@@ -28,7 +28,7 @@ public struct NetworkMonitorRemoteConfiguration: RemoteModuleConfiguration {
     }
 
     struct MRUMRoot: Decodable {
-        let NetworkMonitor: NetworkMonitor
+        let networkMonitor: NetworkMonitor
     }
 
     struct Configuration: Decodable {
@@ -39,7 +39,6 @@ public struct NetworkMonitorRemoteConfiguration: RemoteModuleConfiguration {
         let configuration: Configuration
     }
 
-
     // MARK: - Public
 
     public var enabled: Bool
@@ -49,6 +48,6 @@ public struct NetworkMonitorRemoteConfiguration: RemoteModuleConfiguration {
             return nil
         }
 
-        enabled = root.configuration.mrum.NetworkMonitor.enabled
+        enabled = root.configuration.mrum.networkMonitor.enabled
     }
 }

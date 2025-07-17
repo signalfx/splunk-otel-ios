@@ -35,10 +35,10 @@ extension NetworkMonitor: Module {
     public typealias EventMetadata = NetworkMonitorMetadata
     public typealias EventData = NetworkMonitorData
 
-
     // MARK: - Module methods
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    public func install(with configuration: (any ModuleConfiguration)?,
+                        remoteConfiguration: (any RemoteModuleConfiguration)?) {
         let config = configuration as? Configuration
 
         // Start the network monitor if it's enabled or if no configuration is provided.
@@ -46,7 +46,6 @@ extension NetworkMonitor: Module {
             startDetection()
         }
     }
-
 
     // MARK: - Type transparency helpers
 

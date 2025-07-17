@@ -27,7 +27,6 @@ class DebugDestination: NetworkMonitorDestination {
     // Internal Logger
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkMonitor")
 
-
     // MARK: - Sending
 
     func send(networkEvent: NetworkMonitorEvent, sharedState: (any AgentSharedState)?) {
