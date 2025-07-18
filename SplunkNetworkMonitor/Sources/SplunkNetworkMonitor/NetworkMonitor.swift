@@ -23,6 +23,7 @@ import SplunkCommon
 
 // MARK: - Public
 
+/// Represents the type of network connection available to the device.
 public enum ConnectionType: String {
     case wifi
     case cellular
@@ -37,6 +38,7 @@ public class NetworkMonitor {
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
 
+    /// Shared instance of NetworkMonitor for singleton access.
     public static let shared = NetworkMonitor()
 
     /// An optional callback for network changes
@@ -74,6 +76,12 @@ public class NetworkMonitor {
         stopDetection()
     }
 
+    /// Starts monitoring network connectivity changes.
+    ///
+    /// ## Important
+    ///
+    /// Call this method after setting up your `statusChangeHandler` if you want to receive
+    /// network change callbacks.
     public func startDetection() {
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self = self else { return }
@@ -103,6 +111,7 @@ public class NetworkMonitor {
         )
     }
 
+    /// Stops monitoring network connectivity changes.
     public func stopDetection() {
         monitor.cancel()
         monitor.pathUpdateHandler = nil

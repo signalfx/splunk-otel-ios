@@ -28,9 +28,11 @@ struct NetworkMonitorEvent {
 // MARK: - Comparison Extension
 
 extension NetworkMonitorEvent {
+
     /// Compares two NetworkMonitorEvents to determine if they represent different network states.
     /// Excludes the timestamp from comparison as it will always be different, but
     /// returns false if they are less than 3 ms apart to reduce noise
+    /// 
     /// - Parameter other: The NetworkMonitorEvent to compare against
     /// - Returns: `true` if the events represent different network states, `false` if they are the same or noise
     func isDifferent(from other: NetworkMonitorEvent) -> Bool {

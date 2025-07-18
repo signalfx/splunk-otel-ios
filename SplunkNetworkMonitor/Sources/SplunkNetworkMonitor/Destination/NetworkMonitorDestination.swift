@@ -21,6 +21,10 @@ import SplunkCommon
 /// Describes a destination into which the Network Monitor module sends it's data.
 protocol NetworkMonitorDestination {
 
-    /// Sends data into a destination.
+    /// Sends a network event to the destination.
+    /// 
+    /// - Parameters:
+    ///   - networkEvent: The network change event to send
+    ///   - sharedState: The agent's shared state
     func send(networkEvent: NetworkMonitorEvent, sharedState: AgentSharedState?)
 }

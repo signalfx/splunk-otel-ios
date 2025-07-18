@@ -24,11 +24,16 @@ class DebugDestination: NetworkMonitorDestination {
 
     // MARK: - Private
 
-    // Internal Logger
+    /// Internal logger for outputting debug information.
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkMonitor")
 
     // MARK: - Sending
 
+    /// Logs a network event for debugging purposes.
+    /// 
+    /// - Parameters:
+    ///   - networkEvent: The network change event to log
+    ///   - sharedState: The agent's shared state (not used in debug logging)
     func send(networkEvent: NetworkMonitorEvent, sharedState: (any AgentSharedState)?) {
 
         logger.log(level: .info) {
