@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/// Adds methods for creating instance-specific and non-operational package identifiers.
 public extension PackageIdentifier {
 
     // MARK: - Package identification for instances

@@ -22,11 +22,21 @@ public struct PackageIdentifier: PackageIdentification {
 
     // MARK: - Package identification
 
+    /// The default base package identifier string, used as a prefix for more specific identifiers.
+    ///
+    /// The value of this identifier is `com.splunk.rum`.
     public static var `default` = "com.splunk.rum"
 
 
     // MARK: - Package identification methods
 
+    /// Constructs a new package identifier by appending a name to the ``default`` identifier.
+    ///
+    /// If the `named` parameter is empty, this method returns the ``default`` identifier string
+    /// without any changes. Otherwise, it returns a new string in the format `com.splunk.rum.named`.
+    ///
+    /// - Parameter named: The specific name to append to the base identifier.
+    /// - Returns: The fully constructed package identifier string.
     public static func `default`(named: String) -> String {
         guard !named.isEmpty else {
             return `default`

@@ -19,11 +19,16 @@ import Foundation
 
 /// Attribute value for AgentEvent attributes. Supported types: `String`, `Int`, `Double`, `Data`.
 public enum EventAttributeValue: Equatable, Hashable {
+    /// A string attribute value.
     case string(String)
+    /// An integer attribute value.
     case int(Int)
+    /// A double-precision floating-point attribute value.
     case double(Double)
+    /// A raw data attribute value.
     case data(Data)
 
+    /// A string representation of the attribute's underlying value.
     public var description: String {
         switch self {
         case let .string(value):
@@ -41,19 +46,24 @@ public enum EventAttributeValue: Equatable, Hashable {
     }
 }
 
+/// Adds convenience initializers for creating `EventAttributeValue` instances from raw types.
 public extension EventAttributeValue {
+    /// Initializes a `.string` case with the given `String` value.
     init(_ value: String) {
         self = .string(value)
     }
 
+    /// Initializes an `.int` case with the given `Int` value.
     init(_ value: Int) {
         self = .int(value)
     }
 
+    /// Initializes a `.double` case with the given `Double` value.
     init(_ value: Double) {
         self = .double(value)
     }
 
+    /// Initializes a `.data` case with the given `Data` value.
     init(_ value: Data) {
         self = .data(value)
     }

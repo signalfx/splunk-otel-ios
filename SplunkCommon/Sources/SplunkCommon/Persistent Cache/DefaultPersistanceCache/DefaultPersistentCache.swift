@@ -44,10 +44,16 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
     // MARK: - Public
 
+    /// The unique name identifying this cache instance.
     public let uniqueCacheName: String
+    /// The maximum number of elements the cache can hold.
     public let maximumCapacity: Int
+    /// The maximum duration for which an element is considered valid.
+    ///
+    /// If this value is `nil`, elements stored in the cache do not expire based on their age.
     public let maximumLifetime: TimeInterval?
 
+    /// A Boolean value indicating whether the cache has finished its initial restoration from persistent storage.
     public var isRestored: Bool {
         get async {
             await model.isRestored
@@ -57,12 +63,14 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
     // MARK: - Keys and values
 
+    /// An array containing all the keys currently present in the cache.
     public var keys: [String] {
         get async {
             await Array(model.containers.keys)
         }
     }
 
+    /// An array containing all the values currently present in the cache.
     public var values: [Element] {
         get async {
             await Array(model.containers.values).map(\.value)
@@ -138,6 +146,16 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
     // MARK: - Custom filtering
 
+    /// Retrieves a dictionary of elements that were last updated within a specific date range.
+    ///
+    /// You can specify a start date, an end date, or both to define the time window for the filter.
+    /// If both `start` and `end` are `nil`, this method returns all elements in the cache.
+    ///
+    /// - Parameters:
+    ///   - start: The beginning of the date range. If `nil`, the range has no lower bound.
+    ///   - end: The end of the date range. If `nil`, the range has no upper bound.
+    /// - Returns: A dictionary where keys are the element identifiers and values are the elements themselves,
+    ///   filtered by the specified date range.
     public func elements(from start: Date? = nil, to end: Date? = nil) async -> [String: Element] {
         await model.items(from: start, to: end)
     }
@@ -145,10 +163,28 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
     // MARK: - CRUD operations
 
+    /// Retrieves the element associated with a specific key.
+    ///
+    /// - Parameter key: The key for which to retrieve the element.
+    /// - Returns: The element corresponding to the key, or `nil` if the key is not found.
+    /// - Throws: An error if the value cannot be retrieved.
     public func value(forKey key: String) async throws -> Element? {
         await model.item(forKey: key)
     }
 
+    /// Adds or updates an element in the cache for a given key.
+    ///
+    /// If an element with the same key already exists, its value is updated and its modification timestamp is refreshed.
+    /// If the key does not exist, a new element is added. After the modification, the cache state is
+    /// synchronized with the persistent storage.
+    ///
+    /// - Note: If an element with the same value already exists for the key, no update is performed, and the
+    ///   cache is not synchronized to storage.
+    ///
+    /// - Parameters:
+    ///   - element: The element to add or update.
+    ///   - key: The key to associate with the element.
+    /// - Throws: An error if the cache state cannot be synchronized to persistent storage after the update.
     public func update(_ element: Element, forKey key: String) async throws {
         let oldValue = try await value(forKey: key)
 
@@ -158,6 +194,12 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
         }
     }
 
+    /// Removes the element associated with the specified key from the cache.
+    ///
+    /// After removing the element, the cache state is synchronized with the persistent storage.
+    ///
+    /// - Parameter key: The key of the element to remove.
+    /// - Throws: An error if the cache state cannot be synchronized to persistent storage after the removal.
     public func remove(forKey key: String) async throws {
         await model.remove(key: key)
         try await sync()
@@ -168,7 +210,7 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
     /// Saves actual state into storage.
     public func sync() async throws {
-        let cacheKey: KeyBuilder = .init(uniqueCacheName)
+        let cacheKey: KeyBuilder =  .init(uniqueCacheName)
         let containers = await model.containers
 
         let caches: [ItemInfo]? = try? storage.list(forKey: .init(""))
@@ -234,29 +276,4 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
     private func delete(exceedingOrder position: Int) async {
         let containers = await model.containers
 
-        guard containers.count > position else {
-            return
-        }
-
-        // At first we need to order keys by updated timestamp
-        let keysAndUpdates: [(key: String, update: Date)] = containers.map { key, value in
-            (key, value.updated)
-        }
-
-        let sortedKeys = keysAndUpdates
-            .sorted { first, second in
-                first.update < second.update
-            }
-            .map { $0.key }
-
-        // Creates list of keys with too old elements
-        let firstUsedIndex = sortedKeys.count - position
-        let oldKeysSlice = sortedKeys[0 ..< firstUsedIndex]
-        let oldKeys = Array(oldKeysSlice)
-
-        // Delete old elements from cache
-        for key in oldKeys {
-            await model.remove(key: key)
-        }
-    }
-}
+        guard containers.count >
