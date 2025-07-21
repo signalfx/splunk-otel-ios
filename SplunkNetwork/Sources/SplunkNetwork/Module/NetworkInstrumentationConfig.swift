@@ -66,9 +66,16 @@ public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
 
     // MARK: - Protocol compliance
 
+    /// A Boolean value that indicates whether the Network Instrumentation module is enabled or disabled through remote configuration.
     public var enabled: Bool
+    /// A set of URL patterns to be ignored by the module, as specified by the remote configuration.
     public var ignoreURLs: IgnoreURLs
 
+    /// Initializes the remote configuration from a `Data` object, typically received from a remote source.
+    ///
+    /// This initializer decodes the JSON data to configure the module's `enabled` state and the `ignoreURLs` patterns.
+    /// - Note: The initializer will fail and return `nil` if the provided data cannot be decoded into the expected format.
+    /// - Parameter data: The `Data` object containing the JSON configuration.
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
             return nil

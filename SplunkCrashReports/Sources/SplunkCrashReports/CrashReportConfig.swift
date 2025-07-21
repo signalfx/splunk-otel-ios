@@ -35,6 +35,10 @@ public struct CrashReportsConfiguration: ModuleConfiguration {
     }
 }
 
+/// A structure that represents the remote configuration for the Crash Reports module.
+///
+/// This configuration is typically fetched from a remote server and allows for dynamic control
+/// over the module's behavior.
 public struct CrashReportsRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Internal decoding
@@ -57,8 +61,14 @@ public struct CrashReportsRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Protocol compliance
 
+    /// A Boolean value that indicates whether the Crash Reports module is enabled or disabled through remote configuration.
     public var enabled: Bool
 
+    /// Initializes the remote configuration from a `Data` object, typically received from a remote source.
+    ///
+    /// This initializer decodes the JSON data to configure the Crash Reports module's `enabled` state.
+    /// - Note: The initializer will fail and return `nil` if the provided data cannot be decoded into the expected format.
+    /// - Parameter data: The `Data` object containing the JSON configuration.
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
             return nil

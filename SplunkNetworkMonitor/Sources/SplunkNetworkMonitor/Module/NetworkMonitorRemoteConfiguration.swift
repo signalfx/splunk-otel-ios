@@ -42,8 +42,14 @@ public struct NetworkMonitorRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Public
 
+    /// A Boolean value that indicates whether the Network Monitor module is enabled or disabled through remote configuration.
     public var enabled: Bool
 
+    /// Initializes the remote configuration from a `Data` object, typically received from a remote source.
+    ///
+    /// This initializer decodes the JSON data to configure the Network Monitor module's `enabled` state.
+    /// - Note: The initializer will fail and return `nil` if the provided data cannot be decoded into the expected format.
+    /// - Parameter data: The `Data` object containing the JSON configuration.
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
             return nil

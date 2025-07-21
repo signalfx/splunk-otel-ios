@@ -19,7 +19,16 @@ import Foundation
 import System
 import UIKit
 
+/// A utility class that provides static properties for retrieving device statistics relevant to crash reporting.
+///
+/// These statistics are captured at the time of a crash to provide context about the device's state.
 public class CrashReportDeviceStats {
+    /// The current battery level of the device, formatted as a percentage string.
+    ///
+    /// This property enables battery monitoring to fetch the current level. If the level cannot be determined,
+    /// it may return a value indicating an unknown state.
+    ///
+    /// - Note: `isBatteryMonitoringEnabled` is set to `true` each time this property is accessed.
     class var batteryLevel: String {
 
         UIDevice.current.isBatteryMonitoringEnabled = true
@@ -27,6 +36,9 @@ public class CrashReportDeviceStats {
         return "\(level)%"
     }
 
+    /// The amount of free disk space on the device, formatted as a human-readable string (e.g., "1.23 GB").
+    ///
+    /// If the free space cannot be determined, this property returns "Unknown".
     class var freeDiskSpace: String {
 
         do {
@@ -41,6 +53,10 @@ public class CrashReportDeviceStats {
         }
     }
 
+    /// The amount of free memory available to the application, formatted as a human-readable string (e.g., "512 MB").
+    ///
+    /// This is calculated by subtracting the memory used by the current process from the total physical memory.
+    /// If the memory usage cannot be determined, this property returns "Unknown".
     class var freeMemory: String {
         var usedBytes: Float = 0
         let totalBytes = Float(ProcessInfo.processInfo.physicalMemory)

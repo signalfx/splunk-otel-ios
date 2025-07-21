@@ -21,25 +21,41 @@ import Network
 import OpenTelemetryApi
 import SplunkCommon
 
+/// A class that monitors network connectivity changes and reports them as OTel spans.
+///
+/// This class uses `NWPathMonitor` to detect changes in network status (e.g., connected, disconnected) and
+/// connection type (e.g., Wi-Fi, cellular). It also tracks changes in cellular radio access technology.
 public class NetworkMonitor {
 
 
     // MARK: - Public
 
+    /// An enumeration representing the type of network connection.
     public enum ConnectionType: String {
+        /// A Wi-Fi network connection.
         case wifi
+        /// A cellular network connection.
         case cellular
+        /// A wired Ethernet network connection.
         case wiredEthernet
+        /// A Virtual Private Network (VPN) connection.
         case vpn
+        /// Any other type of network connection.
         case other
+        /// The network connection is unavailable.
         case unavailable
     }
 
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
 
+    /// A shared singleton instance of `NetworkMonitor`.
     public static let shared = NetworkMonitor()
 
+    /// A callback that is invoked when the network status or connection type changes.
+    ///
+    /// The closure receives two arguments: a `Bool` indicating if the network is connected,
+    /// and a `ConnectionType` specifying the current connection type.
     public var statusChangeHandler: ((Bool, ConnectionType) -> Void)?
 
 
@@ -55,20 +71,30 @@ public class NetworkMonitor {
 
     // MARK: - Nested
 
+    /// The current cellular radio access technology (e.g., "LTE (4G)").
+    ///
+    /// This property is `nil` if the device is not on a cellular network or the technology cannot be determined.
     public private(set) var currentRadioAccessTechnology: String?
+    /// A Boolean value indicating whether the device is currently connected to a network.
     public private(set) var isConnected: Bool = false
+    /// The current type of network connection.
     public private(set) var connectionType: ConnectionType = .unavailable
 
 
     // MARK: - Initialization
 
     // Module conformance
+    /// Initializes a new instance of the `NetworkMonitor`.
     public required init() {}
 
     deinit {
         stopDetection()
     }
 
+    /// Starts monitoring for network changes.
+    ///
+    /// This method sets up the `NWPathMonitor` and registers for notifications about changes
+    /// in radio access technology. When a change is detected, a `network.change` span is emitted.
     public func startDetection() {
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self = self else { return }
@@ -100,6 +126,9 @@ public class NetworkMonitor {
         updateRadioAccessTechnologies()
     }
 
+    /// Stops monitoring for network changes.
+    ///
+    /// This method cancels the `NWPathMonitor` and unregisters from system notifications.
     public func stopDetection() {
         monitor.cancel()
         monitor.pathUpdateHandler = nil

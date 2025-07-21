@@ -21,6 +21,11 @@ import Foundation
 import OpenTelemetryApi
 import SplunkCommon
 
+/// A class responsible for capturing, formatting, and reporting application crash data.
+///
+/// This class uses `PLCrashReporter` to detect and collect crash information. Upon the next
+/// application launch after a crash, it processes the pending crash report, enriches it with
+/// additional metadata like device stats and session ID, and sends it as an OTel span.
 public class CrashReports {
 
 
@@ -49,6 +54,7 @@ public class CrashReports {
 
     // MARK: - Module methods
 
+    /// Initializes a new instance of the `CrashReports` module.
     public required init() {}
 
     deinit {
@@ -59,6 +65,12 @@ public class CrashReports {
 
     // MARK: - Public methods
 
+    /// Configures the underlying `PLCrashReporter` instance.
+    ///
+    /// This method sets up the signal handler type and symbolication strategy. It also creates a
+    /// dedicated directory for storing crash reports to avoid conflicts with other crash reporting tools.
+    ///
+    /// - Note: This must be called before `initializeCrashReporter()` or `reportCrashIfPresent()`.
     public func configureCrashReporter() {
 #if os(tvOS)
         let signalHandlerType = PLCrashReporterSignalHandlerType.BSD
@@ -87,6 +99,9 @@ public class CrashReports {
     }
 
     /// Check whether a crash ended the previous run of the app
+    ///
+    /// If a pending crash report is found, this method loads, formats, and sends the report.
+    /// After successful reporting, it purges the pending report from disk.
     public func reportCrashIfPresent() {
 
         guard crashReporter != nil else {
@@ -136,6 +151,14 @@ public class CrashReports {
     // MARK: - Private methods
 
     // Starts up crash reporter if enable is true and no debugger attached
+    /// Enables the crash reporter to begin monitoring for crashes.
+    ///
+    /// This method will not enable the reporter if a debugger is attached, as this can interfere with
+    /// crash detection mechanisms. Once enabled, it starts a timer to periodically collect and
+    /// store device statistics for inclusion in future crash reports.
+    ///
+    /// - Warning: This method should only be called after `configureCrashReporter()`.
+    /// - Returns: `true` if the crash reporter was successfully enabled, `false` otherwise.
     public func initializeCrashReporter() -> Bool {
 
         guard crashReporter != nil else {

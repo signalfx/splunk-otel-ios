@@ -24,6 +24,10 @@ internal import SignPostIntegration
 import SplunkCommon
 internal import URLSessionInstrumentation
 
+/// A class that provides network instrumentation for `URLSession` requests.
+///
+/// This class automatically captures HTTP requests and reports them as OTel spans. It provides hooks
+/// to customize instrumentation behavior, such as filtering requests and enriching spans with additional data.
 public class NetworkInstrumentation {
 
     // MARK: - Private
@@ -54,6 +58,7 @@ public class NetworkInstrumentation {
     public unowned var sharedState: AgentSharedState?
 
     // For Module conformance
+    /// Initializes a new instance of the `NetworkInstrumentation` module.
     public required init() {}
 
     /// Installs the Network Instrumentation module
