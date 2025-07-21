@@ -71,13 +71,35 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
     // Stored properties for Unit tests
     #if DEBUG
+        /// The last event received for processing.
+        ///
+        /// - Note: This property is available only in `DEBUG` builds and is intended for testing purposes.
         public var storedLastProcessedEvent: (any AgentEvent)?
+        /// The last event that was successfully processed and sent.
+        ///
+        /// - Note: This property is available only in `DEBUG` builds and is intended for testing purposes.
         public var storedLastSentEvent: (any AgentEvent)?
     #endif
 
 
     // MARK: - Initialization
 
+    /// Initializes a new session replay event processor.
+    ///
+    /// This initializer sets up a dedicated background exporter for sending binary session replay data.
+    /// It also builds a `Resource` object by merging the provided agent resources with session-replay-specific
+    /// attributes like the session ID and script instance ID.
+    ///
+    /// - Note: This processor bypasses the standard OpenTelemetry processor chain to handle binary payloads directly.
+    ///
+    /// - Parameters:
+    ///   - sessionReplayEndpoint: The URL for the session replay OTLP/HTTP endpoint. If `nil`, initialization fails.
+    ///   - resources: A set of static attributes describing the application, device, and OS.
+    ///   - runtimeAttributes: An object providing dynamic attributes to be added to each log record.
+    ///   - globalAttributes: A closure providing global attributes. This parameter is currently unused.
+    ///   - initialSessionId: The initial RUM session ID to associate with the replay data.
+    ///   - scriptInstanceId: A unique identifier for the running instance of the session replay script.
+    ///   - debugEnabled: A Boolean value that, when `true`, prints the contents of each log record to the console.
     public required init?(
         with sessionReplayEndpoint: URL?,
         resources: AgentResources,
@@ -125,10 +147,26 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
     // MARK: - Events
 
+    /// Sends a log event for asynchronous processing.
+    ///
+    /// This method schedules the event to be processed on a background queue.
+    ///
+    /// - Parameters:
+    ///   - event: The `AgentEvent` to be sent.
+    ///   - completion: A closure that is called upon completion. The `Bool` value indicates success.
     public func sendEvent(_ event: any AgentEvent, completion: @escaping (Bool) -> Void) {
         sendEvent(event: event, immediateProcessing: false, completion: completion)
     }
 
+    /// Sends a log event, with an option for immediate, synchronous processing.
+    ///
+    /// This method converts the given `AgentEvent` into a `SplunkReadableLogRecord`, enriches it with
+    /// runtime attributes and resources, and exports it.
+    ///
+    /// - Parameters:
+    ///   - event: The `AgentEvent` to be sent.
+    ///   - immediateProcessing: If `true`, the event is processed synchronously on the current thread. If `false`, it is processed asynchronously on a background queue.
+    ///   - completion: A closure that is called upon completion. The `Bool` value indicates success.
     public func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void) {
         #if DEBUG
             storedLastProcessedEvent = event

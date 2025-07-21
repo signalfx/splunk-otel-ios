@@ -38,14 +38,34 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
 
     // Stored properties for Unit tests
     #if DEBUG
+        /// The `Resource` object built during initialization.
+        ///
+        /// - Note: This property is available only in `DEBUG` builds and is intended for testing purposes.
         public var resource: Resource?
+        /// The last event received for processing.
+        ///
+        /// - Note: This property is available only in `DEBUG` builds and is intended for testing purposes.
         public var storedLastProcessedEvent: (any AgentEvent)?
+        /// The last event that was successfully processed and sent.
+        ///
+        /// - Note: This property is available only in `DEBUG` builds and is intended for testing purposes.
         public var storedLastSentEvent: (any AgentEvent)?
     #endif
 
 
     // MARK: - Initialization
 
+    /// Initializes the log-to-span event processing pipeline.
+    ///
+    /// This initializer sets up the OpenTelemetry `LoggerProvider` with a chain of processors
+    /// that culminates in the `OTLPLogToSpanExporter`. This exporter is responsible for converting
+    /// log records into spans, which are then handled by the standard trace pipeline.
+    /// The resulting `LoggerProvider` is registered as the global default.
+    ///
+    /// - Parameters:
+    ///   - logsEndpoint: The URL for the logs endpoint. This parameter is currently unused but reserved for future use.
+    ///   - resources: A set of static attributes describing the application, device, and OS.
+    ///   - debugEnabled: A Boolean value that, when `true`, chains a `stdout` exporter to print log data to the console before it is converted to a span.
     public required init(
         with logsEndpoint: URL,
         resources: AgentResources,
@@ -87,10 +107,26 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
 
     // MARK: - Events
 
+    /// Sends a log event for asynchronous processing.
+    ///
+    /// This method schedules the event to be processed and converted to a span on a background queue.
+    ///
+    /// - Parameters:
+    ///   - event: The `AgentEvent` to be sent.
+    ///   - completion: A closure that is called upon completion. The `Bool` value indicates success.
     public func sendEvent(_ event: any AgentEvent, completion: @escaping (Bool) -> Void) {
         sendEvent(event: event, immediateProcessing: false, completion: completion)
     }
 
+    /// Sends a log event, with an option for immediate, synchronous processing.
+    ///
+    /// This method converts the given `AgentEvent` into an OpenTelemetry `LogRecord` and emits it
+    /// through the configured `LoggerProvider`.
+    ///
+    /// - Parameters:
+    ///   - event: The `AgentEvent` to be sent.
+    ///   - immediateProcessing: If `true`, the event is processed synchronously on the current thread. If `false`, it is processed asynchronously on a background queue.
+    ///   - completion: A closure that is called upon completion. The `Bool` value indicates success.
     public func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void) {
         #if DEBUG
             storedLastProcessedEvent = event

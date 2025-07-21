@@ -22,6 +22,11 @@ import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import SplunkCommon
 
+/// An exporter that transforms OpenTelemetry `ReadableLogRecord` instances into `Span` instances.
+///
+/// This class is a key component of the "log-to-span" architecture. It receives log records,
+/// creates a new span for each one using the global `TracerProvider`, and copies the log's
+/// attributes and body to the span. The span is started and ended immediately with the log's timestamp.
 public class OTLPLogToSpanExporter: LogRecordExporter {
 
     // MARK: - Private properties
@@ -41,6 +46,16 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
 
     // MARK: - LogRecordExporter protocol implementation
 
+    /// Transforms and exports a batch of log records as spans.
+    ///
+    /// For each log record in the batch, this method creates a new span, sets its name based on the
+    /// log's `event.name` attribute, copies all attributes, and sets the log's body as a span attribute.
+    /// The span's start and end time are set to the log's timestamp.
+    ///
+    /// - Parameters:
+    ///   - logRecords: An array of `ReadableLogRecord` to be exported.
+    ///   - explicitTimeout: This parameter is ignored as the export is synchronous.
+    /// - Returns: Always returns `.success` as there is no remote endpoint to fail.
     public func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
 
         let tracer = OpenTelemetry.instance
@@ -96,8 +111,17 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
         return "splunk.log"
     }
 
+    /// Performs a no-op shutdown.
+    ///
+    /// This exporter is stateless and does not require any cleanup.
+    /// - Parameter explicitTimeout: This parameter is ignored.
     public func shutdown(explicitTimeout: TimeInterval?) {}
 
+    /// Performs a no-op flush and returns a success result.
+    ///
+    /// Since logs are converted to spans immediately upon export, there is no internal buffer to flush.
+    /// - Parameter explicitTimeout: This parameter is ignored.
+    /// - Returns: Always returns `.success`.
     public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         return .success
     }

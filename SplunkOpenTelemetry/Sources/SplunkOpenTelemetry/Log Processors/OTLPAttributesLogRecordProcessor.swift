@@ -45,6 +45,11 @@ public class OTLPAttributesLogRecordProcessor: LogRecordProcessor {
 
     // MARK: - LogRecordProcessor methods
 
+    /// Called when a `ReadableLogRecord` is emitted.
+    ///
+    /// This method adds all current runtime attributes from the `runtimeAttributes` provider
+    /// to the log record before passing it to the proxied processor.
+    /// - Parameter logRecord: The log record to be processed.
     public func onEmit(logRecord: OpenTelemetrySdk.ReadableLogRecord) {
         var updatedAttributes = logRecord.attributes
 
@@ -76,10 +81,16 @@ public class OTLPAttributesLogRecordProcessor: LogRecordProcessor {
         proxy.shutdown()
     }
 
+    /// Shuts down the processor and forwards the call to the proxied processor.
+    /// - Parameter explicitTimeout: The explicit timeout for the shutdown operation.
+    /// - Returns: The result of the shutdown operation from the proxied processor.
     public func shutdown(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         proxy.shutdown(explicitTimeout: explicitTimeout)
     }
 
+    /// Forces the proxied processor to flush any pending log records.
+    /// - Parameter explicitTimeout: The explicit timeout for the flush operation.
+    /// - Returns: The result of the flush operation from the proxied processor.
     public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         proxy.forceFlush(explicitTimeout: explicitTimeout)
     }

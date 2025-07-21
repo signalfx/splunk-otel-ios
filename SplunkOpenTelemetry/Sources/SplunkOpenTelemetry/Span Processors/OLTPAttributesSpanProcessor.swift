@@ -30,8 +30,10 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
 
     // MARK: - SpanProcessor settings
 
+    /// A Boolean value indicating that the `onStart(parentContext:span:)` method should be called for each span.
     public let isStartRequired = true
 
+    /// A Boolean value indicating that the `onEnd(span:)` method is not required for each span.
     public let isEndRequired = false
 
 
@@ -50,14 +52,32 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
 
     // MARK: - SpanProcessor methods
 
+    /// Called when a `ReadableSpan` is started.
+    ///
+    /// This method injects all current runtime attributes from the `runtimeAttributes` provider into the span.
+    /// - Parameters:
+    ///   - parentContext: The context of the parent span, if any.
+    ///   - span: The `ReadableSpan` that is starting.
     public func onStart(parentContext: OpenTelemetryApi.SpanContext?, span: any OpenTelemetrySdk.ReadableSpan) {
         inject(attributes: runtimeAttributes.all, to: span)
     }
 
+    /// Called when a `ReadableSpan` has ended.
+    ///
+    /// This method performs no action.
+    /// - Parameter span: The `ReadableSpan` that has ended.
     public func onEnd(span: any OpenTelemetrySdk.ReadableSpan) {}
 
+    /// Shuts down the processor.
+    ///
+    /// This method performs no action as there are no resources to clean up.
+    /// - Parameter explicitTimeout: This parameter is ignored.
     public func shutdown(explicitTimeout: TimeInterval?) {}
 
+    /// Forces the processor to flush any pending spans.
+    ///
+    /// This method performs no action as it does not buffer spans.
+    /// - Parameter timeout: This parameter is ignored.
     public func forceFlush(timeout: TimeInterval?) {}
 
 

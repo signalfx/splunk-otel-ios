@@ -15,7 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/// A utility class providing static information about the OpenTelemetry layer.
 public class OTel {
 
+    /// The version of the SplunkOpenTelemetry module.
     public static let version = "OTel 0.0.1"
 }

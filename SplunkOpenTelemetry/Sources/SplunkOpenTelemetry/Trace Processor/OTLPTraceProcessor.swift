@@ -35,6 +35,23 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Initialization
 
+    /// Initializes the trace processing pipeline.
+    ///
+    /// This initializer sets up the complete OpenTelemetry trace provider, which includes:
+    /// - A background-capable OTLP/HTTP exporter.
+    /// - Span processors for enriching spans with runtime and global attributes.
+    /// - An optional interceptor for modifying spans before they are exported.
+    /// - An optional `stdout` exporter for debugging purposes.
+    ///
+    /// The resulting `TracerProvider` is registered as the global default for the application.
+    ///
+    /// - Parameters:
+    ///   - tracesEndpoint: The URL of the OTLP/HTTP endpoint where traces will be sent.
+    ///   - resources: A set of static attributes describing the application, device, and OS.
+    ///   - runtimeAttributes: An object providing dynamic attributes to be added to every span.
+    ///   - globalAttributes: A closure that provides a dictionary of attributes to be added to every span.
+    ///   - debugEnabled: A Boolean value that, when `true`, chains a `stdout` exporter to print trace data to the console.
+    ///   - spanInterceptor: An optional closure that can inspect or modify `SpanData` before it is exported.
     public required init(
         with tracesEndpoint: URL,
         resources: AgentResources,

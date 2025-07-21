@@ -19,6 +19,14 @@ import Foundation
 import OpenTelemetrySdk
 import SplunkCommon
 
+/// A closure type that allows for inspecting or modifying `SpanData` before it is exported.
+///
+/// The interceptor receives the `SpanData` for a single span. It can return a modified
+/// version of the `SpanData`, or it can return `nil` to prevent the span from being exported.
+/// This is useful for filtering, redacting, or enriching span data at the last moment.
+///
+/// - Parameter span: The `SpanData` to be processed.
+/// - Returns: A modified `SpanData` instance to be exported, or `nil` to drop the span.
 public typealias SplunkSpanInterceptor = (SpanData) -> SpanData?
 
 class SpanInterceptorExporter: SpanExporter {

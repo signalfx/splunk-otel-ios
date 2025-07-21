@@ -96,10 +96,15 @@ class SplunkStdoutSpanExporter: SpanExporter {
         return proxyExporter.export(spans: spans)
     }
 
+    /// Forwards the flush call to the proxied exporter.
+    /// - Parameter explicitTimeout: The explicit timeout for the flush operation.
+    /// - Returns: The result of the flush operation from the proxied exporter.
     public func flush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
         return proxyExporter.flush(explicitTimeout: explicitTimeout)
     }
 
+    /// Forwards the shutdown call to the proxied exporter.
+    /// - Parameter explicitTimeout: The explicit timeout for the shutdown operation.
     public func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
     }

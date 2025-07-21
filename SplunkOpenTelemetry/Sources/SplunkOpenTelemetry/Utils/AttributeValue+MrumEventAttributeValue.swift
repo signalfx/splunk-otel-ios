@@ -19,7 +19,18 @@ import Foundation
 import OpenTelemetryApi
 import SplunkCommon
 
+/// Provides an initializer to convert from `SplunkCommon.EventAttributeValue` to an OpenTelemetry `AttributeValue`.
+///
+/// This extension simplifies the process of mapping attribute types between the Splunk agent's internal
+/// event model and the OpenTelemetry standard.
 public extension AttributeValue {
+    /// Initializes an `AttributeValue` from a `SplunkCommon.EventAttributeValue`.
+    ///
+    /// This initializer maps the cases of `EventAttributeValue` (`.string`, `.int`, `.double`) directly
+    /// to their corresponding `AttributeValue` types.
+    ///
+    /// - Note: The `.data` case is currently converted to a Base64-encoded string as a placeholder.
+    /// - Parameter eventAttributeValue: The `EventAttributeValue` to convert.
     init(_ eventAttributeValue: EventAttributeValue) {
         switch eventAttributeValue {
         case let .string(eventAttributeValue):
