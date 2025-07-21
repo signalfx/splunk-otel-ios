@@ -19,9 +19,12 @@ import Foundation
 import SplunkCommon
 
 
+/// A data object that represents a navigation event, currently serving as a placeholder to conform to the ``Module`` protocol.
 public struct NavigationData: ModuleEventData {}
 
+/// An object that holds metadata for a navigation event.
 public struct NavigationMetadata: ModuleEventMetadata {
+    /// The timestamp when the navigation event occurred.
     public var timestamp = Date()
 }
 
@@ -30,15 +33,27 @@ extension Navigation: Module {
 
     // MARK: - Module types
 
+    /// The configuration type for the Navigation module.
     public typealias Configuration = NavigationConfiguration
+    /// The remote configuration type for the Navigation module.
     public typealias RemoteConfiguration = NavigationRemoteConfiguration
 
+    /// The metadata type for navigation events.
     public typealias EventMetadata = NavigationMetadata
+    /// The data type for navigation events.
     public typealias EventData = NavigationData
 
 
     // MARK: - Module methods
 
+    /// Installs and configures the Navigation module.
+    ///
+    /// This method sets up the initial preferences based on the provided `configuration`
+    /// and starts the navigation detection process unless explicitly disabled.
+    ///
+    /// - Parameters:
+    ///   - configuration: The local configuration settings for the module.
+    ///   - remoteConfiguration: The remote configuration settings for the module (currently unused).
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
         let configuration = configuration as? Configuration
 
@@ -51,8 +66,10 @@ extension Navigation: Module {
         }
     }
 
+    /// Deletes data associated with a specific event. This method is currently not implemented.
     public func deleteData(for metadata: any ModuleEventMetadata) {}
 
+    /// A closure that is called when new navigation data is ready to be published. This method is currently not implemented.
     public func onPublish(data: @escaping (NavigationMetadata, NavigationData) -> Void) {}
 
 
