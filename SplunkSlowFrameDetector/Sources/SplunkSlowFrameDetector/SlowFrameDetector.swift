@@ -20,6 +20,15 @@ import QuartzCore
 import SplunkCommon
 import UIKit
 
+/// A detector that monitors the application's main thread for slow and frozen frames.
+///
+/// This class uses a `CADisplayLink` to observe frame rendering times. It reports "slow" frames
+/// when the actual render time exceeds the expected time by a certain tolerance, and "frozen" frames
+/// when the render time is significantly longer. These incidents are reported as spans.
+///
+/// The detector can be enabled or disabled through local configuration and can be started
+/// or stopped manually. It also automatically pauses and resumes its monitoring in response
+/// to application lifecycle events like `willResignActive` and `didBecomeActive`.
 public final class SlowFrameDetector {
 
     // MARK: - Nested Types
@@ -68,12 +77,24 @@ public final class SlowFrameDetector {
 
     // MARK: - Lifecycle
 
+    /// Initializes a new instance of the `SlowFrameDetector`.
     public required init() {}
 
     deinit {
         stop()
     }
 
+    /// Installs the slow frame detector based on the provided local configuration.
+    ///
+    /// This method checks the `isEnabled` property of the `SlowFrameDetectorConfiguration`. If enabled,
+    /// it calls the `start()` method to begin monitoring for slow and frozen frames.
+    ///
+    /// - Note: Remote configuration is handled by the `DefaultModulesManager` and does not directly
+    ///   affect the installation logic within this method.
+    ///
+    /// - Parameters:
+    ///   - configuration: The local configuration for the module, which determines if the detector should be enabled.
+    ///   - remoteConfiguration: The remote configuration for the module. This parameter is ignored in the current implementation.
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
 
         // Ignore `remoteConfiguration` because when it eventually comes into
@@ -90,6 +111,13 @@ public final class SlowFrameDetector {
         }
     }
 
+    /// Starts monitoring for slow and frozen frames.
+    ///
+    /// This method sets up a `CADisplayLink` to receive per-frame callbacks and a `Timer` to periodically
+    /// report any detected slow or frozen frames. It also registers for application lifecycle notifications
+    /// to pause monitoring when the app is in the background.
+    ///
+    /// - Note: Calling this method when the detector is already running has no effect.
     public func start() {
 
         // If we already have a displayLink instance, start must have already been called.

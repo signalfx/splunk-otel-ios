@@ -18,9 +18,18 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
+/// A placeholder data structure for `SlowFrameDetector` events, conforming to `ModuleEventData`.
+///
+/// This module emits spans directly and does not require a specific data payload for its events.
 public struct SlowFrameData: ModuleEventData {}
 
 extension EventMetadataSlowFrameDetector: ModuleEventMetadata {
+    /// Compares two `EventMetadataSlowFrameDetector` instances for equality.
+    ///
+    /// - Parameters:
+    ///   - lhs: The left-hand side instance to compare.
+    ///   - rhs: The right-hand side instance to compare.
+    /// - Returns: `true` if the `timestamp` and `id` properties of both instances are equal.
     public static func == (lhs: EventMetadataSlowFrameDetector, rhs: EventMetadataSlowFrameDetector) -> Bool {
         return lhs.timestamp == rhs.timestamp
                    && lhs.id == rhs.id
@@ -33,10 +42,14 @@ extension SlowFrameDetector: Module {
 
     // MARK: - Module types
 
+    /// The local configuration type for the `SlowFrameDetector` module.
     public typealias Configuration = SlowFrameDetectorConfiguration
+    /// The remote configuration type for the `SlowFrameDetector` module.
     public typealias RemoteConfiguration = SlowFrameDetectorRemoteConfiguration
 
+    /// The event metadata type associated with the `SlowFrameDetector` module.
     public typealias EventMetadata = EventMetadataSlowFrameDetector
+    /// The event data type associated with the `SlowFrameDetector` module.
     public typealias EventData = SlowFrameData
 
 
@@ -45,10 +58,18 @@ extension SlowFrameDetector: Module {
 
     // MARK: - Type transparency helpers
 
+    /// A placeholder implementation for data deletion, which is not required for this module.
+    ///
+    /// - Parameter metadata: The metadata for which data should be deleted. This parameter is ignored.
     public func deleteData(for metadata: any ModuleEventMetadata) {
         // In SlowFrameDetector we don't have any data to delete.
     }
 
+    /// A placeholder implementation for the data publishing hook.
+    ///
+    /// The `SlowFrameDetector` emits spans directly and does not use this callback mechanism.
+    ///
+    /// - Parameter data: A closure to be called when new data is available. This parameter is ignored.
     public func onPublish(data: @escaping (EventMetadataSlowFrameDetector, SlowFrameData) -> Void) {
         // We are emitting spans directly instead of using this.
     }

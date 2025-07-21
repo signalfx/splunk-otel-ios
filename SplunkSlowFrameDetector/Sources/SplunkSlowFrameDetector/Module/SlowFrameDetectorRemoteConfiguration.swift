@@ -24,10 +24,15 @@ public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Module management
 
+    /// A boolean value that indicates whether the Slow Frame Detector module is enabled or disabled through remote settings.
     public var enabled: Bool = true
 
 
     // MARK: - Initialization
 
+    /// Initializes the remote configuration from raw data.
+    ///
+    /// - Note: This initializer is currently a placeholder and does not parse the provided data.
+    /// - Parameter data: The raw `Data` from the remote configuration source. This parameter is ignored.
     public init?(from data: Data) {}
 }
