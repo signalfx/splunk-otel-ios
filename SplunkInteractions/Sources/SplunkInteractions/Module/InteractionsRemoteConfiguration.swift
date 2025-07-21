@@ -23,7 +23,15 @@ public struct InteractionsRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Protocol compliance
 
+    /// A boolean value that indicates whether the module is enabled.
+    ///
+    /// The default value is `true`.
     public var enabled: Bool = true
 
+    /// Initializes the remote configuration from a `Data` object.
+    ///
+    /// This initializer is required for `RemoteModuleConfiguration` conformance but is not implemented for interactions, as remote configuration is not supported for this module.
+    /// It will always result in a `nil` instance.
+    /// - Parameter data: The data to decode the configuration from. This parameter is ignored.
     public init?(from data: Data) {}
 }
