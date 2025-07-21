@@ -18,6 +18,7 @@ limitations under the License.
 
 import OpenTelemetryApi
 
+/// An extension to provide compatibility between `SplunkAttributeValue` and OpenTelemetry's `AttributeValue`.
 public extension SplunkAttributeValue {
 
     /// Converts `AttributeValue` to `SplunkAttributeValue`.

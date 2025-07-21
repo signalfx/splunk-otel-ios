@@ -18,6 +18,7 @@ limitations under the License.
 
 import SplunkCommon
 
+/// An extension to provide compatibility between `SplunkAttributeValue` and `EventAttributeValue`.
 public extension SplunkAttributeValue {
 
     /// Converts `EventAttributeValue` to `SplunkAttributeValue`.

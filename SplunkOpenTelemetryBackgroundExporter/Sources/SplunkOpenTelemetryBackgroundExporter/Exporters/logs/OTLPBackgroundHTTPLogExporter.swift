@@ -20,10 +20,26 @@ import Foundation
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 
+/// An implementation of the `LogRecordExporter` that exports logs to an OTLP/HTTP endpoint.
+///
+/// This exporter is designed for background operation. It first saves log data to disk and then
+/// uses a background `URLSession` to upload the data. This approach ensures that data is not lost
+/// if the app is suspended or terminated before the upload is complete.
 public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogRecordExporter {
 
     // MARK: - Implementation LogRecordExporter protocol
 
+    /// Exports a batch of log records by serializing them and saving them to disk for asynchronous background upload.
+    ///
+    /// This method returns `.success` if the log records are successfully written to a temporary file. The actual
+    /// HTTP upload is managed by a background `URLSession` and will be attempted later, even if the
+    /// app is suspended.
+    ///
+    /// - Parameters:
+    ///   - logRecords: An array of `ReadableLogRecord` to be exported.
+    ///   - explicitTimeout: An optional timeout. This is used to ensure the disk write operation completes
+    ///     within a reasonable time, but it does not apply to the background network request.
+    /// - Returns: `.success` if the data is successfully persisted to disk for later upload; otherwise, `.failure`.
     public func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval? = nil) -> OpenTelemetrySdk.ExportResult {
         let body = Opentelemetry_Proto_Collector_Logs_V1_ExportLogsServiceRequest.with { request in
             request.resourceLogs = LogRecordAdapter.toProtoResourceRecordLog(logRecordList: logRecords)
@@ -64,6 +80,13 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
         }
     }
 
+    /// Forces any pending data to be submitted for upload.
+    ///
+    /// This method blocks the current thread until the background `URLSession` has been flushed,
+    /// ensuring that all previously queued data has been processed.
+    ///
+    /// - Parameter explicitTimeout: This parameter is ignored in the current implementation.
+    /// - Returns: Always returns `.success`.
     public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         let semaphore = DispatchSemaphore(value: 0)
 
@@ -75,6 +98,13 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
         return .success
     }
 
+    /// Shuts down the exporter.
+    ///
+    /// - Note: This method is a no-op in the current implementation. The background `URLSession`
+    ///   is managed by the operating system and will continue to attempt uploads even after
+    ///   the application is suspended.
+    ///
+    /// - Parameter explicitTimeout: This parameter is ignored.
     public func shutdown(explicitTimeout: TimeInterval? = nil) {}
 
 

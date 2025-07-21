@@ -18,18 +18,30 @@ import OpenTelemetryApi
 
 /// An enum that represents all the possible values for an attribute.
 public enum SplunkAttributeValue: Equatable, CustomStringConvertible, Hashable {
+  /// A `String` attribute value.
   case string(String)
+  /// A `Bool` attribute value.
   case bool(Bool)
+  /// An `Int` attribute value.
   case int(Int)
+  /// A `Double` attribute value.
   case double(Double)
+  /// A `Data` attribute value.
   case data(Data)
+  /// An array of `String`s attribute value.
   @available(*, deprecated, message: "replaced by .array(AttributeArray)") case stringArray([String])
+  /// An array of `Bool`s attribute value.
   @available(*, deprecated, message: "replaced by .array(AttributeArray)") case boolArray([Bool])
+  /// An array of `Int`s attribute value.
   @available(*, deprecated, message: "replaced by .array(AttributeArray)") case intArray([Int])
+  /// An array of `Double`s attribute value.
   @available(*, deprecated, message: "replaced by .array(AttributeArray)") case doubleArray([Double])
+  /// An array of `AttributeValue`s.
   case array(AttributeArray)
+  /// A set of attributes.
   case set(AttributeSet)
 
+  /// A string representation of the attribute value.
   public var description: String {
     switch self {
     case let .string(value):
@@ -58,6 +70,11 @@ public enum SplunkAttributeValue: Equatable, CustomStringConvertible, Hashable {
   }
 
   // swiftlint:disable cyclomatic_complexity
+  /// Initializes a `SplunkAttributeValue` from an `Any` type.
+  ///
+  /// This failable initializer attempts to convert the given value to one of the supported attribute types.
+  /// If the conversion is not possible for the given type, it returns `nil`.
+  /// - Parameter value: The value to convert into a `SplunkAttributeValue`.
   public init?(_ value: Any) {
     switch value {
     case is String:
@@ -91,55 +108,67 @@ public enum SplunkAttributeValue: Equatable, CustomStringConvertible, Hashable {
   // swiftlint:enable cyclomatic_complexity
 }
 
+/// Provides convenience initializers for creating `SplunkAttributeValue` instances from various literal types.
 public extension SplunkAttributeValue {
+  /// Initializes with a `String` value.
   init(_ value: String) {
     self = .string(value)
   }
 
+  /// Initializes with a `Bool` value.
   init(_ value: Bool) {
     self = .bool(value)
   }
 
+  /// Initializes with an `Int` value.
   init(_ value: Int) {
     self = .int(value)
   }
 
+  /// Initializes with a `Double` value.
   init(_ value: Double) {
     self = .double(value)
   }
 
+  /// Initializes with a `Data` value.
   init(_ value: Data) {
     self = .data(value)
   }
 
+  /// Initializes with an array of `String` values.
   init(_ value: [String]) {
     self = .array(AttributeArray(values: value.map { element in
       return AttributeValue.string(element)
     }))
   }
 
+  /// Initializes with an array of `Int` values.
   init(_ value: [Int]) {
     self = .array(AttributeArray(values: value.map { element in
       return AttributeValue.int(element)
     }))
   }
 
+  /// Initializes with an array of `Double` values.
   init(_ value: [Double]) {
     self = .array(AttributeArray(values: value.map { element in
       return AttributeValue.double(element)
     }))
   }
 
+  /// Initializes with an array of `Bool` values.
   init(_ value: [Bool]) {
     self = .array(AttributeArray(values: value.map { element in
       return AttributeValue.bool(element)
     }))
   }
 
+  /// Initializes with an `AttributeArray` value.
   init(_ value: AttributeArray) {
     self = .array(value)
   }
 
+  /// Initializes with an `AttributeSet` value.
   init(_ value: AttributeSet) {
     self = .set(value)
   }
