@@ -20,6 +20,10 @@ import Foundation
 
 // MARK: - Stacktrace
 
+/// A representation of a call stack trace, composed of individual string frames.
+///
+/// This struct encapsulates the stack trace information associated with an error or exception,
+/// typically obtained from `Thread.callStackSymbols` or `NSException.callStackSymbols`.
 public struct Stacktrace {
     let frames: [String]
 }
@@ -28,6 +32,7 @@ public struct Stacktrace {
 // MARK: - Stacktrace formatting
 
 public extension Stacktrace {
+    /// A single string representation of the stack trace, with each frame separated by a newline character.
     var formatted: String {
         frames.joined(separator: "\n")
     }

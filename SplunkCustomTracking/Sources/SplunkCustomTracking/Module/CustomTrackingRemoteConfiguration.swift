@@ -19,6 +19,10 @@ import Foundation
 import SplunkCommon
 
 // Minimal protocol conformance.
+/// Decodes and stores remote configuration settings for the Custom Tracking module.
+///
+/// This structure conforms to `RemoteModuleConfiguration` and is responsible for parsing
+/// a `Data` object (typically JSON) to determine if the custom tracking feature should be enabled.
 public struct CustomTrackingRemoteConfiguration: RemoteModuleConfiguration {
 
 
@@ -43,8 +47,16 @@ public struct CustomTrackingRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Protocol compliance
 
+    /// A boolean flag indicating whether the Custom Tracking module is enabled according to the remote configuration.
+    /// Defaults to `true`.
     public var enabled: Bool = true
 
+    /// Failable initializer that decodes the remote configuration from a `Data` object.
+    ///
+    /// This initializer attempts to parse a specific JSON structure to find the `enabled` flag for custom tracking.
+    /// If the `Data` cannot be decoded into the expected format, the initializer returns `nil`.
+    ///
+    /// - Parameter data: The `Data` object containing the remote configuration settings.
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
             return nil
