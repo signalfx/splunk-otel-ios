@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// SplunkInteractions module configuration, minimal configuration for module conformance.
+/// Interactions module configuration.
 public struct InteractionsConfiguration: ModuleConfiguration {
 
     // MARK: - Module management

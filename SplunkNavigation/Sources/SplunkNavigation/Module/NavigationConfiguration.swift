@@ -17,7 +17,7 @@ limitations under the License.
 
 import SplunkCommon
 
-/// Navigation module configuration, minimal configuration for module conformance.
+/// Navigation module configuration.
 public struct NavigationConfiguration: ModuleConfiguration {
 
     // MARK: - Module management

@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// SlowFrameDetector module configuration, minimal configuration for module conformance.
+/// SlowFrameDetector module configuration.
 public struct SlowFrameDetectorConfiguration: ModuleConfiguration {
 
     /// Indicates whether the Module is enabled. Default value is `true`.

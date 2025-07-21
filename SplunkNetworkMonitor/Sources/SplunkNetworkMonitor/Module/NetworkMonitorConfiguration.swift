@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// NetworkMonitor module configuration, minimal configuration for module conformance.
+/// NetworkMonitor module configuration.
 public struct NetworkMonitorConfiguration: ModuleConfiguration {
 
     // MARK: - Module management
