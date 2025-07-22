@@ -35,7 +35,7 @@ extension NetworkMonitorEvent {
     /// 
     /// - Parameter other: The NetworkMonitorEvent to compare against
     /// - Returns: `true` if the events represent different network states, `false` if they are the same or noise
-    func isDifferent(from other: NetworkMonitorEvent) -> Bool {
+    func isDebouncedChange(from other: NetworkMonitorEvent) -> Bool {
         let timeDifference = abs(timestamp.timeIntervalSince(other.timestamp))
         if timeDifference < 0.003 {
             return false

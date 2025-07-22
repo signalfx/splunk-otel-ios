@@ -42,7 +42,7 @@ class DebugDestination: NetworkMonitorDestination {
                 timestamp: \(networkEvent.timestamp),
                 status: \(networkEvent.isConnected ? "available" : "lost"),
                 type: \(networkEvent.connectionType.rawValue),
-                subType: \(networkEvent.radioType != nil ? networkEvent.radioType! : "na"),
+                subType: \(networkEvent.radioType ?? "na"),
             """
 
             return string

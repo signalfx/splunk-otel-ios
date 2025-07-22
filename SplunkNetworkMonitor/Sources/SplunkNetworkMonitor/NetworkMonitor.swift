@@ -45,7 +45,8 @@ public class NetworkMonitor {
     public static let shared = NetworkMonitor()
 
     /// An optional callback for network changes
-    public var statusChangeHandler: ((Bool, ConnectionType, String?) -> Void)?
+    public typealias NetworkStatusChangeHandler = (_ isConnected: Bool, _ connectionType: ConnectionType, _ radioType: String?) -> Void
+    public var statusChangeHandler: NetworkStatusChangeHandler?
 
     // MARK: - Private
 
@@ -100,7 +101,7 @@ public class NetworkMonitor {
                 isInitialEvent = false
                 previousChangeEvent = networkChangeEvent
             } else {
-                if networkChangeEvent.isDifferent(from: previousChangeEvent) {
+                if networkChangeEvent.isDebouncedChange(from: previousChangeEvent) {
                     sendNetworkChangeSpan()
                 }
             }
@@ -118,7 +119,7 @@ public class NetworkMonitor {
         #endif
 
         // Initial fetch of radio access technologies
-        updateRadioAccessTechnologies()
+        networkChangeEvent.radioType = getCurrentRadioAccessTechnology()
     }
 
     /// Stops monitoring network connectivity changes.
@@ -154,6 +155,7 @@ public class NetworkMonitor {
 
     private func sendNetworkChangeSpan() {
         destination.send(networkEvent: networkChangeEvent, sharedState: sharedState)
+
         self.statusChangeHandler?(
             networkChangeEvent.isConnected,
             networkChangeEvent.connectionType,

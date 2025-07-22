@@ -43,8 +43,8 @@ struct OTelDestination: NetworkMonitorDestination {
 
         span.setAttribute(key: "network.status", value: networkEvent.isConnected ? "available" : "lost")
         span.setAttribute(key: "network.connection.type", value: networkEvent.connectionType.rawValue)
-        if networkEvent.radioType != nil {
-            span.setAttribute(key: "network.connection.subtype", value: networkEvent.radioType!)
+        if let radioType = networkEvent.radioType {
+            span.setAttribute(key: "network.connection.subtype", value: radioType)
         }
 
         span.end(time: networkEvent.timestamp)
