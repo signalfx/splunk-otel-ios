@@ -23,7 +23,7 @@ final class SessionReplayTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func buildDefault() -> SplunkAgent.SessionReplay {
+    static func buildDefault() -> SplunkAgent.SessionReplay {
         // Build Session Replay proxy with actual Session Replay module
         let module = CiscoSessionReplay.SessionReplay.instance
         let moduleProxy = SessionReplay(for: module)
@@ -34,7 +34,7 @@ final class SessionReplayTestBuilder {
 
     // MARK: - Non-operational builds
 
-    public static func buildNonOperational() -> SessionReplayNonOperational {
+    static func buildNonOperational() -> SessionReplayNonOperational {
         let moduleProxy = SessionReplayNonOperational()
 
         return moduleProxy
@@ -43,7 +43,7 @@ final class SessionReplayTestBuilder {
 
     // MARK: - Session replay data event
 
-    public static func buildDataEvent() throws -> SessionReplayDataEvent {
+    static func buildDataEvent() throws -> SessionReplayDataEvent {
         let sampleVideoData = try Self.sampleVideoData()
 
         let sessionId = UUID().uuidString
@@ -66,7 +66,7 @@ final class SessionReplayTestBuilder {
         return event
     }
 
-    public static func sampleVideoData() throws -> Data {
+    static func sampleVideoData() throws -> Data {
         #if SPM_TESTS
         let fileUrl = Bundle.module.url(forResource: "v", withExtension: "mp4")!
 

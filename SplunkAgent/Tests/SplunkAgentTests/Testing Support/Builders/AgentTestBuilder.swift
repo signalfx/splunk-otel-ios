@@ -21,7 +21,7 @@ final class AgentTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func buildDefault() throws -> SplunkRum {
+    static func buildDefault() throws -> SplunkRum {
         // We use prepared configuration
         let configuration = try ConfigurationTestBuilder.buildDefault()
 
@@ -31,7 +31,7 @@ final class AgentTestBuilder {
         return agent
     }
 
-    public static func build(
+    static func build(
         with configuration: AgentConfiguration,
         session: AgentSession = DefaultSession(),
         user: AgentUser = DefaultUser(),

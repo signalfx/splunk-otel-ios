@@ -132,9 +132,9 @@ final class SessionsModelTests: XCTestCase {
         })
         XCTAssertNil(containedItem)
 
-        let containsOldItems = sessionModel.sessions.filter { sessionItem in
+        let containsOldItems = sessionModel.sessions.contains { sessionItem in
             sessionItem.start < weekAgo
-        }.count > 0
+        }
         XCTAssertFalse(containsOldItems)
     }
 

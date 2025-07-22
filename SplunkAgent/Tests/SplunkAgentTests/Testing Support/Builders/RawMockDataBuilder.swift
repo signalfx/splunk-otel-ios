@@ -38,7 +38,7 @@ final class RawMockDataBuilder {
 
     // MARK: - Basic builds
 
-    public static func build(mockFile: FileName) throws -> Data {
+    static func build(mockFile: FileName) throws -> Data {
 
         #if SPM_TESTS
         let mockFilePath = Bundle.module.path(forResource: mockFile.rawValue, ofType: "json")

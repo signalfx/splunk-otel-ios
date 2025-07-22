@@ -25,7 +25,7 @@ final class DefaultPersistentCacheTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func build(named: String, maximumCapacity: Int? = nil, maximumLifetime: TimeInterval? = nil) -> DefaultPersistentCache<Int> {
+    static func build(named: String, maximumCapacity: Int? = nil, maximumLifetime: TimeInterval? = nil) -> DefaultPersistentCache<Int> {
         // Build cache with preconfigured storage
         let storage = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: "Tests"),

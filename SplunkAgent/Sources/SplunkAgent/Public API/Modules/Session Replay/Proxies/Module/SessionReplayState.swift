@@ -35,11 +35,11 @@ final class SessionReplayState: SessionReplayModuleState {
 
     // MARK: - Recording
 
-    public var status: SessionReplayStatus {
+    var status: SessionReplayStatus {
         SessionReplayStatus(srStatus: module.state.status)
     }
 
-    public var isRecording: Bool {
+    var isRecording: Bool {
         module.state.isRecording
     }
 

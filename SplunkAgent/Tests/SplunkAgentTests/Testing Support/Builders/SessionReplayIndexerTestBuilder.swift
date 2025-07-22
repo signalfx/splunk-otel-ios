@@ -31,7 +31,7 @@ final class SessionReplayIndexerTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func build(named: String) -> SessionReplayEventIndexer {
+    static func build(named: String) -> SessionReplayEventIndexer {
         // Build cache with preconfigured storage
         let storage = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: moduleName),
@@ -57,7 +57,7 @@ final class SessionReplayIndexerTestBuilder {
 
     // MARK: - Storage utils
 
-    public static func removeStorage(named: String) throws {
+    static func removeStorage(named: String) throws {
         let storage = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: moduleName),
             rules: .default,

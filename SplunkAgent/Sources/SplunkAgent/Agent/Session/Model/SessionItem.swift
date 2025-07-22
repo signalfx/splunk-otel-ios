@@ -23,11 +23,11 @@ struct SessionItem: Codable, Equatable {
     // MARK: - Public
 
     /// Identification of recorded session.
-    public let id: String
+    let id: String
 
     /// The moment when the session started.
-    public let start: Date
+    let start: Date
 
     /// Marks this session as explicitly closed.
-    public var closed: Bool?
+    var closed: Bool?
 }

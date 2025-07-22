@@ -22,7 +22,7 @@ final class DefaultModulesManagerTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func buildDefault() throws -> DefaultModulesManager {
+    static func buildDefault() throws -> DefaultModulesManager {
         // Load raw configuration mock
         let rawConfiguration = try RawMockDataBuilder.build(mockFile: .remoteConfiguration)
 
@@ -37,8 +37,8 @@ final class DefaultModulesManagerTestBuilder {
         return manager
     }
 
-    public static func build(rawConfiguration: Data? = nil, moduleConfigurations: [Any]? = nil,
-                             for pool: AgentModulesPool.Type) throws -> DefaultModulesManager {
+    static func build(rawConfiguration: Data? = nil, moduleConfigurations: [Any]? = nil,
+                      for pool: AgentModulesPool.Type) throws -> DefaultModulesManager {
 
         // Build modules manager with preconfigured pool and configurations
         let manager = DefaultModulesManager(

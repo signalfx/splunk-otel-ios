@@ -27,7 +27,7 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, S
 
     public func export(metrics: [StableMetricData]) -> ExportResult {
         let body = Opentelemetry_Proto_Collector_Metrics_V1_ExportMetricsServiceRequest.with {
-            $0.resourceMetrics = MetricsAdapter.toProtoResourceMetrics(stableMetricData: metrics)
+            $0.resourceMetrics = MetricsAdapter.toProtoResourceMetrics(metricData: metrics)
         }
 
         let requestId = UUID()

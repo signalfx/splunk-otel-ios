@@ -21,7 +21,7 @@ final class DefaultUserTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func build(named: String) throws -> DefaultUser {
+    static func build(named: String) throws -> DefaultUser {
         // Build user with preconfigured storage
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: named)
         let userModel = UserModel(storage: storage)
