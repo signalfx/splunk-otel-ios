@@ -294,9 +294,9 @@ public class CrashReports {
         do {
             if let customData = report.customData,
                let unarchivedData = try NSKeyedUnarchiver.unarchivedDictionary(
-                ofKeyClass: NSString.self,
-                objectClass: NSString.self,
-                from: customData
+                   ofKeyClass: NSString.self,
+                   objectClass: NSString.self,
+                   from: customData
                ) as? [String: String] {
 
                 if let sessionId = unarchivedData["sessionId"] {

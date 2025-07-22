@@ -161,6 +161,10 @@ public class SplunkRum: ObservableObject {
         guard isSupportedPlatform else {
             shared.currentStatus = .notRunning(.unsupportedPlatform)
 
+            shared.logger.log(level: .notice, isPrivate: false) {
+                "\(CompileInfo.platform) is not supported, Agent will not start."
+            }
+
             return shared
         }
 
@@ -317,5 +321,5 @@ public class SplunkRum: ObservableObject {
     // MARK: - Version
 
     /// A version of this agent.
-    public static let version = "24.4.1"
+    public static let version = "2.0.0-alpha.1"
 }

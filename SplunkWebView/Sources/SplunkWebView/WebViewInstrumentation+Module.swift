@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import SplunkCommon
-import WebKit
 
 // ModuleConfiguration conformance
 /// A placeholder for local configuration of the WebView Instrumentation module.

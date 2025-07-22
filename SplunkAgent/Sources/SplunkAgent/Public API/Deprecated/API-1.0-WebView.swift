@@ -15,22 +15,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import WebKit
+#if canImport(WebKit)
+    import WebKit
 
-public extension SplunkRum {
+    public extension SplunkRum {
 
-    // MARK: - WebView
+        // MARK: - WebView
 
-    /// Injects JavaScript `getNativeSessionId()` function into `WKWebView`. Legacy mapping.
-    ///
-    /// - Parameter webView: The `WKWebView` instance into which the JavaScript `getNativeSessionId()` and `getNativeSessionIdAsync()` APIs will be injected.
-    @available(
-        *,
-        deprecated,
-        renamed: "SplunkRum.shared.webView.integrateWithBrowserRum(_:)",
-        message: "This method will be removed in a later version."
-    )
-    static func integrateWithBrowserRum(_ webView: WKWebView) {
-        shared.webViewNativeBridge.integrateWithBrowserRum(webView)
+        /// Injects JavaScript `getNativeSessionId()` function into `WKWebView`. Legacy mapping.
+        ///
+        /// - Parameter webView: The `WKWebView` instance into which the JavaScript
+        /// `getNativeSessionId()` and `getNativeSessionIdAsync()` APIs will be injected.
+        @available(
+            *,
+            deprecated,
+            renamed: "SplunkRum.shared.webView.integrateWithBrowserRum(_:)",
+            message: "This method will be removed in a later version."
+        )
+        static func integrateWithBrowserRum(_ webView: WKWebView) {
+            shared.webViewNativeBridge.integrateWithBrowserRum(webView)
+        }
     }
-}
+#endif // canImport(WebKit)

@@ -25,24 +25,13 @@ import OpenTelemetrySdk
 /// This exporter is designed for background operation. It first saves metric data to disk and then
 /// uses a background `URLSession` to upload the data. This approach ensures that data is not lost
 
-/// if the app is suspended or terminated before the upload is complete.
-public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, MetricExporter {
+public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, StableMetricExporter {
 
-    // MARK: - Implementation MetricExporter protocol
+    // MARK: - Implementation StableMetricExporter protocol
 
-    /// Exports a batch of metrics by serializing them and saving them to disk for asynchronous background upload.
-    ///
-    /// This method returns `.success` if the metrics are successfully written to a temporary file. The actual
-    /// HTTP upload is managed by a background `URLSession` and will be attempted later, even if the
-    /// app is suspended.
-    ///
-    /// - Parameters:
-    ///   - metrics: An array of `Metric` data to be exported.
-    ///   - shouldCancel: An optional closure to check if the export operation should be cancelled. This is not used in this implementation.
-    /// - Returns: `.success` if the data is successfully persisted to disk for later upload; otherwise, `.failureNotRetryable`.
-    public func export(metrics: [Metric], shouldCancel: (() -> Bool)?) -> MetricExporterResultCode {
+    public func export(metrics: [StableMetricData]) -> ExportResult {
         let body = Opentelemetry_Proto_Collector_Metrics_V1_ExportMetricsServiceRequest.with {
-            $0.resourceMetrics = MetricsAdapter.toProtoResourceMetrics(metricDataList: metrics)
+            $0.resourceMetrics = MetricsAdapter.toProtoResourceMetrics(stableMetricData: metrics)
         }
 
         let requestId = UUID()
@@ -58,7 +47,7 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
             )
         } catch {
 
-            return .failureNotRetryable
+            return .failure
         }
 
         let requestDescriptor = RequestDescriptor(
@@ -74,18 +63,11 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
             return .success
         } catch {
 
-            return .failureNotRetryable
+            return .failure
         }
     }
 
-    /// Forces any pending data to be submitted for upload.
-    ///
-    /// This method blocks the current thread until the background `URLSession` has been flushed,
-    /// ensuring that all previously queued data has been processed.
-    ///
-    /// - Parameter explicitTimeout: This parameter is ignored in the current implementation.
-    /// - Returns: Always returns `.success`.
-    public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
+    public func flush() -> ExportResult {
         let semaphore = DispatchSemaphore(value: 0)
 
         httpClient.flush {
@@ -96,6 +78,13 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
         return .success
     }
 
+    public func shutdown() -> ExportResult {
+        return .success
+    }
+
+    public func getAggregationTemporality(for instrument: OpenTelemetrySdk.InstrumentType) -> OpenTelemetrySdk.AggregationTemporality {
+        return .delta
+    }
 
     // MARK: - Local override
 

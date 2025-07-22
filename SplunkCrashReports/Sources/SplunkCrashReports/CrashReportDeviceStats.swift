@@ -31,9 +31,13 @@ public class CrashReportDeviceStats {
     /// - Note: `isBatteryMonitoringEnabled` is set to `true` each time this property is accessed.
     class var batteryLevel: String {
 
-        UIDevice.current.isBatteryMonitoringEnabled = true
-        let level = abs(UIDevice.current.batteryLevel * 100)
-        return "\(level)%"
+        #if !os(tvOS)
+            UIDevice.current.isBatteryMonitoringEnabled = true
+            let level = abs(UIDevice.current.batteryLevel * 100)
+            return "\(level)%"
+        #else
+            return "Unknown"
+        #endif
     }
 
     /// The amount of free disk space on the device, formatted as a human-readable string (e.g., "1.23 GB").
