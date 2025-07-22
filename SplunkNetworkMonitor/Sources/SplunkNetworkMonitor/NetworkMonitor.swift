@@ -15,7 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CoreTelephony
+#if canImport(CoreTelephony)
+    import CoreTelephony
+#endif
+
 import Foundation
 import Network
 internal import OpenTelemetryApi
@@ -49,6 +52,10 @@ public class NetworkMonitor {
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitorQueue")
 
+    #if canImport(CoreTelephony)
+        private let telephonyInfo = CTTelephonyNetworkInfo()
+    #endif
+
     private var networkChangeEvent = NetworkMonitorEvent(
         timestamp: Date(),
         isConnected: false,
@@ -62,8 +69,6 @@ public class NetworkMonitor {
         radioType: nil
     )
     private var isInitialEvent = true
-
-    private let telephonyInfo = CTTelephonyNetworkInfo()
 
     private var destination: NetworkMonitorDestination = OTelDestination()
 
@@ -102,20 +107,28 @@ public class NetworkMonitor {
         }
         monitor.start(queue: queue)
 
-        // Radio Access Technologies detection (connection subtype in Otel)
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(radioAccessChanged),
-            name: .CTServiceRadioAccessTechnologyDidChange,
-            object: nil
-        )
+        #if canImport(CoreTelephony)
+            // Radio Access Technologies detection (connection subtype in Otel)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(radioAccessChanged),
+                name: .CTServiceRadioAccessTechnologyDidChange,
+                object: nil
+            )
+        #endif
+
+        // Initial fetch of radio access technologies
+        updateRadioAccessTechnologies()
     }
 
     /// Stops monitoring network connectivity changes.
     public func stopDetection() {
         monitor.cancel()
         monitor.pathUpdateHandler = nil
-        NotificationCenter.default.removeObserver(self, name: .CTServiceRadioAccessTechnologyDidChange, object: nil)
+
+        #if canImport(CoreTelephony)
+            NotificationCenter.default.removeObserver(self, name: .CTServiceRadioAccessTechnologyDidChange, object: nil)
+        #endif
     }
 
     private func getConnectionType(_ path: NWPath) -> ConnectionType {
@@ -158,38 +171,42 @@ public class NetworkMonitor {
 
     // swiftlint:disable cyclomatic_complexity
     private func getCurrentRadioAccessTechnology() -> String? {
-        // Pick the first available radio access technology
-        let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first ?? nil
-        switch radioTechnology {
-        case CTRadioAccessTechnologyGPRS:
-            return "GPRS (2G)"
-        case CTRadioAccessTechnologyEdge:
-            return "EDGE (2G)"
-        case CTRadioAccessTechnologyWCDMA:
-            return "WCDMA (3G)"
-        case CTRadioAccessTechnologyHSDPA:
-            return "HSDPA (3G)"
-        case CTRadioAccessTechnologyHSUPA:
-            return "HSUPA (3G)"
-        case CTRadioAccessTechnologyCDMA1x:
-            return "CDMA1x (2G)"
-        case CTRadioAccessTechnologyCDMAEVDORev0:
-            return "CDMA EV-DO Rev. 0 (3G)"
-        case CTRadioAccessTechnologyCDMAEVDORevA:
-            return "CDMA EV-DO Rev. A (3G)"
-        case CTRadioAccessTechnologyCDMAEVDORevB:
-            return "CDMA EV-DO Rev. B (3G)"
-        case CTRadioAccessTechnologyeHRPD:
-            return "eHRPD (3G)"
-        case CTRadioAccessTechnologyLTE:
-            return "LTE (4G)"
-        case CTRadioAccessTechnologyNRNSA:
-            return "NRNSA (5G Non-Standalone)"
-        case CTRadioAccessTechnologyNR:
-            return "NR (5G Standalone)"
-        default:
+        #if canImport(CoreTelephony)
+            // Pick the first available radio access technology
+            let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first ?? nil
+            switch radioTechnology {
+            case CTRadioAccessTechnologyGPRS:
+                return "GPRS (2G)"
+            case CTRadioAccessTechnologyEdge:
+                return "EDGE (2G)"
+            case CTRadioAccessTechnologyWCDMA:
+                return "WCDMA (3G)"
+            case CTRadioAccessTechnologyHSDPA:
+                return "HSDPA (3G)"
+            case CTRadioAccessTechnologyHSUPA:
+                return "HSUPA (3G)"
+            case CTRadioAccessTechnologyCDMA1x:
+                return "CDMA1x (2G)"
+            case CTRadioAccessTechnologyCDMAEVDORev0:
+                return "CDMA EV-DO Rev. 0 (3G)"
+            case CTRadioAccessTechnologyCDMAEVDORevA:
+                return "CDMA EV-DO Rev. A (3G)"
+            case CTRadioAccessTechnologyCDMAEVDORevB:
+                return "CDMA EV-DO Rev. B (3G)"
+            case CTRadioAccessTechnologyeHRPD:
+                return "eHRPD (3G)"
+            case CTRadioAccessTechnologyLTE:
+                return "LTE (4G)"
+            case CTRadioAccessTechnologyNRNSA:
+                return "NRNSA (5G Non-Standalone)"
+            case CTRadioAccessTechnologyNR:
+                return "NR (5G Standalone)"
+            default:
+                return nil
+            }
+        #else
             return nil
-        }
+        #endif
     }
     // swiftlint:enable cyclomatic_complexity
 }

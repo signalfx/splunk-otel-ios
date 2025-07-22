@@ -16,7 +16,10 @@ limitations under the License.
 */
 
 internal import SplunkWebView
-import WebKit
+
+#if canImport(WebKit)
+    import WebKit
+#endif
 
 /// The public-facing proxy class that forwards calls to the internal WebView module.
 final class WebView: WebViewInstrumentationModule {
@@ -28,7 +31,9 @@ final class WebView: WebViewInstrumentationModule {
         self.module = module
     }
 
-    public func integrateWithBrowserRum(_ view: WKWebView) {
-        module.injectSessionId(into: view)
-    }
+    #if canImport(WebKit)
+        public func integrateWithBrowserRum(_ view: WKWebView) {
+            module.injectSessionId(into: view)
+        }
+    #endif
 }
