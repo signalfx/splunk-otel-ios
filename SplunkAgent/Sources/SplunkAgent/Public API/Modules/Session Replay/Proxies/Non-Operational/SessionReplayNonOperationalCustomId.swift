@@ -18,7 +18,7 @@ limitations under the License.
 internal import CiscoLogger
 import UIKit
 
-/// The class implementing public API for the view element's sensitivity in non-operational mode.
+/// The class implementing the public API for view element custom identifiers in non-operational mode.
 ///
 /// This is especially the case when the module is stopped by remote configuration,
 /// but we still need to keep the API available to the user.
@@ -36,7 +36,7 @@ final class SessionReplayNonOperationalCustomId: SessionReplayModuleCustomId {
     }
 
 
-    // MARK: - View sensitivity
+    // MARK: - View Custom ID
 
     /// A non-operational implementation for getting or setting a custom view identifier.
     ///
