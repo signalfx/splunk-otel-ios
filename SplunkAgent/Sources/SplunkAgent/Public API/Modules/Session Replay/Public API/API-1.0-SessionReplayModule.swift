@@ -47,7 +47,7 @@ public protocol SessionReplayModule: ObservableObject {
     ///
     /// - Parameter preferences: The preferred settings for the recording.
     ///
-    /// - Returns: The actual `SessionReplay` instance.
+    /// - Returns: The module instance for chaining further configurations.
     @discardableResult func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule
 
 
@@ -57,7 +57,7 @@ public protocol SessionReplayModule: ObservableObject {
     ///
     /// If the recording is already running, then it does nothing.
     ///
-    /// - Returns: The actual `SessionReplay` instance.
+    /// - Returns: The module instance for chaining further configurations.
     @discardableResult func start() -> any SessionReplayModule
 
     /// Stops the currently running recording.
@@ -68,7 +68,7 @@ public protocol SessionReplayModule: ObservableObject {
     /// when the application exits. If the application is closed by the user,
     /// the module itself will call it.
     ///
-    /// - Returns: The actual `SessionReplay` instance.
+    /// - Returns: The module instance for chaining further configurations.
     @discardableResult func stop() -> any SessionReplayModule
 
 
@@ -81,6 +81,6 @@ public protocol SessionReplayModule: ObservableObject {
     ///
     /// - Parameter recordingMask: The predefined recording mask for recording.
     ///
-    /// - Returns: The actual `SessionReplay` instance.
+    /// - Returns: The module instance for chaining further configurations.
     @discardableResult func recordingMask(_ recordingMask: RecordingMask?) -> any SessionReplayModule
 }
