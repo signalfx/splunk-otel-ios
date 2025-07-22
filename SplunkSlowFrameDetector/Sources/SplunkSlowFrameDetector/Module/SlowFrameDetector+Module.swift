@@ -56,8 +56,6 @@ extension SlowFrameDetector: Module {
     // MARK: - Module methods
 
 
-    // MARK: - Type transparency helpers
-
     /// A placeholder implementation for data deletion, which is not required for this module.
     ///
     /// - Parameter metadata: The metadata for which data should be deleted. This parameter is ignored.

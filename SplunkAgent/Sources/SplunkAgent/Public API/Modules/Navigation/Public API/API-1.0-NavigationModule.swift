@@ -22,7 +22,7 @@ public protocol NavigationModule: ObservableObject {
 
     // MARK: - Preferences
 
-    // An object that holds preferred settings for the module.
+    /// An object that holds preferred settings for the module.
     var preferences: NavigationModulePreferences { get set }
 
     /// Sets preferred settings for the module.
