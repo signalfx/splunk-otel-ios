@@ -19,8 +19,8 @@ import Foundation
 import SplunkCommon
 
 
-// Defines CustomTracking conformance to `Module` protocol
-// and implements methods that are missing in the original `CustomTracking`.
+/// Defines CustomTracking conformance to `Module` protocol
+/// and implements methods that are missing in the original `CustomTracking`.
 extension CustomTrackingInternal: Module {
 
     /// Specifies the local configuration type for this module, ``CustomTrackingConfiguration``.

@@ -69,13 +69,13 @@ public final class AppStart {
 
     // MARK: - Public
 
-    // Shared state
+    /// Shared state
     public unowned var sharedState: AgentSharedState?
 
 
     // MARK: - Initialization
 
-    // Module conformance
+    /// Module conformance
     public required init() {}
 
 

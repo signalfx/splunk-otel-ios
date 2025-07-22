@@ -36,8 +36,8 @@ extension EventMetadataSlowFrameDetector: ModuleEventMetadata {
     }
 }
 
-// Defines SlowFrameDetector conformance to `Module` protocol
-// and implements methods that are missing in the original `SlowFrameDetector`.
+/// Defines SlowFrameDetector conformance to `Module` protocol
+/// and implements methods that are missing in the original `SlowFrameDetector`.
 extension SlowFrameDetector: Module {
 
     // MARK: - Module types
