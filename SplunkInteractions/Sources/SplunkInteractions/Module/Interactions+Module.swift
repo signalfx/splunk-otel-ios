@@ -28,7 +28,12 @@ public struct InteractionEventData: ModuleEventData {
 extension InteractionEvent: @retroactive Equatable {}
 
 extension CiscoInteractions.InteractionEvent: ModuleEventMetadata {
-    /// Compares two `InteractionEvent` instances for equality based on their unique identifiers.
+    /// Conformance to the `Equatable` protocol.
+    ///
+    /// - Parameters:
+    ///   - lhs: The left-hand side instance to compare.
+    ///   - rhs: The right-hand side instance to compare.
+    /// - Returns: `true` if `id` properties are equal; otherwise, `false`.
     public static func == (lhs: CiscoInteractions.InteractionEvent, rhs: CiscoInteractions.InteractionEvent) -> Bool {
         lhs.id == rhs.id
     }

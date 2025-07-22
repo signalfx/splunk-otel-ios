@@ -203,6 +203,12 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Equatable
 
+    /// Conformance to the `Equatable` protocol.
+    ///
+    /// - Parameters:
+    ///   - lhs: The left-hand side instance to compare.
+    ///   - rhs: The right-hand side instance to compare.
+    /// - Returns: `true` if selected properties are equal; otherwise, `false`.
     public static func == (lhs: AgentConfiguration, rhs: AgentConfiguration) -> Bool {
         return
             lhs.endpoint == rhs.endpoint &&

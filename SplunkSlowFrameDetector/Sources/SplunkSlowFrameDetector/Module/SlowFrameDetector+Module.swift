@@ -24,12 +24,12 @@ import SplunkCommon
 public struct SlowFrameData: ModuleEventData {}
 
 extension EventMetadataSlowFrameDetector: ModuleEventMetadata {
-    /// Compares two `EventMetadataSlowFrameDetector` instances for equality.
+    /// Conformance to the `Equatable` protocol.
     ///
     /// - Parameters:
     ///   - lhs: The left-hand side instance to compare.
     ///   - rhs: The right-hand side instance to compare.
-    /// - Returns: `true` if the `timestamp` and `id` properties of both instances are equal.
+    /// - Returns: `true` if selected properties are equal; otherwise, `false`.
     public static func == (lhs: EventMetadataSlowFrameDetector, rhs: EventMetadataSlowFrameDetector) -> Bool {
         return lhs.timestamp == rhs.timestamp
                    && lhs.id == rhs.id

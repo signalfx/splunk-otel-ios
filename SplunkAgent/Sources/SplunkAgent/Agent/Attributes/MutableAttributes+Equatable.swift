@@ -21,16 +21,12 @@ extension MutableAttributes: Equatable {
 
     // MARK: - Equatable
 
-    /// Determines if two `MutableAttributes` instances are equal.
-    ///
-    /// Two instances are considered equal if they contain the same number of attributes and if,
-    /// for every key in one instance, the corresponding value is equal to the value in the other instance.
-    /// The order of attributes does not affect equality.
+    /// Conformance to the `Equatable` protocol.
     ///
     /// - Parameters:
-    ///   - lhs: The left-hand side `MutableAttributes` instance to compare.
-    ///   - rhs: The right-hand side `MutableAttributes` instance to compare.
-    /// - Returns: `true` if the two instances are equal, `false` otherwise.
+    ///   - lhs: The left-hand side instance to compare.
+    ///   - rhs: The right-hand side instance to compare.
+    /// - Returns: `true` if selected properties are equal; otherwise, `false`.
     public static func == (lhs: MutableAttributes, rhs: MutableAttributes) -> Bool {
         let lhsDict = lhs.attributes.getAll()
         let rhsDict = rhs.attributes.getAll()
