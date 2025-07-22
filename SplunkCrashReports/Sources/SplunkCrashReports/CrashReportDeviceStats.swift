@@ -22,9 +22,13 @@ import UIKit
 public class CrashReportDeviceStats {
     class var batteryLevel: String {
 
-        UIDevice.current.isBatteryMonitoringEnabled = true
-        let level = abs(UIDevice.current.batteryLevel * 100)
-        return "\(level)%"
+        #if !os(tvOS)
+            UIDevice.current.isBatteryMonitoringEnabled = true
+            let level = abs(UIDevice.current.batteryLevel * 100)
+            return "\(level)%"
+        #else
+            return "Unknown"
+        #endif
     }
 
     class var freeDiskSpace: String {

@@ -9,7 +9,10 @@ import PackageDescription
 let package = Package(
     name: "SplunkAgent",
     platforms: [
-        .iOS(.v15)
+        .iOS(.v15),
+        .tvOS(.v15),
+        .visionOS(.v1),
+        .macCatalyst(.v15)
     ],
     products: [
         .library(
@@ -20,7 +23,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/open-telemetry/opentelemetry-swift",
-            exact: "1.14.0"
+            branch: "main"
         ),
         .package(
             url:"https://github.com/microsoft/plcrashreporter",

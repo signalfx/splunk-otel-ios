@@ -30,7 +30,7 @@ internal import SplunkSlowFrameDetector
     internal import SplunkCrashReports
 #endif
 
-#if os(iOS) || os(visionOS)
+#if canImport(WebKit)
     import WebKit
 #endif
 
@@ -90,7 +90,7 @@ extension SplunkRum {
         }
 
         // By default, we turn off the default sensitivity for `WKWebView`
-        #if os(iOS) || os(visionOS)
+        #if canImport(WebKit)
             sessionReplayModule.sensitivity.set(WKWebView.self, nil)
         #endif
 

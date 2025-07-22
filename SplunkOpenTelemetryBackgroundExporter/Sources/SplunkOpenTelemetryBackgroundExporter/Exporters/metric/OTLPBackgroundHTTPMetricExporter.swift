@@ -21,13 +21,13 @@ import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 
 
-public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, MetricExporter {
+public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, StableMetricExporter {
 
-    // MARK: - Implementation MetricExporter protocol
+    // MARK: - Implementation StableMetricExporter protocol
 
-    public func export(metrics: [Metric], shouldCancel: (() -> Bool)?) -> MetricExporterResultCode {
+    public func export(metrics: [StableMetricData]) -> ExportResult {
         let body = Opentelemetry_Proto_Collector_Metrics_V1_ExportMetricsServiceRequest.with {
-            $0.resourceMetrics = MetricsAdapter.toProtoResourceMetrics(metricDataList: metrics)
+            $0.resourceMetrics = MetricsAdapter.toProtoResourceMetrics(stableMetricData: metrics)
         }
 
         let requestId = UUID()
@@ -43,7 +43,7 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
             )
         } catch {
 
-            return .failureNotRetryable
+            return .failure
         }
 
         let requestDescriptor = RequestDescriptor(
@@ -59,11 +59,11 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
             return .success
         } catch {
 
-            return .failureNotRetryable
+            return .failure
         }
     }
 
-    public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
+    public func flush() -> ExportResult {
         let semaphore = DispatchSemaphore(value: 0)
 
         httpClient.flush {
@@ -74,6 +74,13 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
         return .success
     }
 
+    public func shutdown() -> ExportResult {
+        return .success
+    }
+
+    public func getAggregationTemporality(for instrument: OpenTelemetrySdk.InstrumentType) -> OpenTelemetrySdk.AggregationTemporality {
+        return .delta
+    }
 
     // MARK: - Local override
 
