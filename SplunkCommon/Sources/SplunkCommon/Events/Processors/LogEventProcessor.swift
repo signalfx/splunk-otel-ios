@@ -27,8 +27,8 @@ public protocol LogEventProcessor {
     /// The default processing strategy (e.g., synchronous or asynchronous) is determined by the conforming type.
     ///
     /// - Parameters:
-    ///   - event: Event to be sent to exporter.
-    ///   - completion: Completion block, returns `true` if the event was sent correctly.
+    ///   - Parameter: The event to be sent to the exporter.
+    ///   - completion: A closure called after processing is attempted. Returns `true` on success.
     func sendEvent(_: any AgentEvent, completion: @escaping (Bool) -> Void)
 
     /// Sends Log Event to an exporter.

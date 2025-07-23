@@ -58,8 +58,10 @@ public protocol Module {
     /// Creates an module instance.
     init()
 
-    /// Initialize the Module.
-    /// - Parameter configuration: A Module-specific configuration.
+    /// Installs and configures the module.
+    /// - Parameters:
+    ///   - configuration: A module-specific configuration.
+    ///   - remoteConfiguration: A remotely-provided configuration for this module.
     func install(with configuration: ModuleConfiguration?, remoteConfiguration: RemoteModuleConfiguration?)
 
 
