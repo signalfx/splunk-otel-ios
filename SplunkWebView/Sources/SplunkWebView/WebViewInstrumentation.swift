@@ -68,7 +68,7 @@ public final class WebViewInstrumentation: NSObject {
             logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation injecting JavaScript APIs for fetching native Session ID."
             }
-            
+
             guard let sessionId = sharedState?.sessionId else {
                 logger.log(level: .warn) {
                     "Native Session ID not available for webview injection. Check that sharedState is set before use."

@@ -210,7 +210,7 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
     /// Saves actual state into storage.
     public func sync() async throws {
-        let cacheKey: KeyBuilder =  .init(uniqueCacheName)
+        let cacheKey: KeyBuilder = .init(uniqueCacheName)
         let containers = await model.containers
 
         let caches: [ItemInfo]? = try? storage.list(forKey: .init(""))
