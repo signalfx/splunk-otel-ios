@@ -17,6 +17,5 @@ limitations under the License.
 
 import Foundation
 
-/// TraceProcessor processes Spans - enriches them with provided Resources, and sends those events to
-/// an exporter.
+/// An interface for types responsible for processing and exporting trace data.
 public protocol TraceProcessor {}

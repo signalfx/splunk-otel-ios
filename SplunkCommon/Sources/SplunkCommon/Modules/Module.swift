@@ -35,9 +35,9 @@ public protocol ModuleEventMetadata: Equatable {
 }
 
 
-/// Internal Module protocol.
+/// Defines the interface for a pluggable unit of functionality within the agent.
 ///
-/// The protocol is used internally by Agent to manage Modules and their Events.
+/// The agent uses this protocol to manage the lifecycle and event production of its modules.
 public protocol Module {
 
     // MARK: - Associated types
@@ -55,7 +55,7 @@ public protocol Module {
 
     // MARK: - Initialization
 
-    /// Creates an module instance.
+    /// Creates a module instance.
     init()
 
     /// Installs and configures the module.

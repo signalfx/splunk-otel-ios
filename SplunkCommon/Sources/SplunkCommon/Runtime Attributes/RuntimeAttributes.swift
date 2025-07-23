@@ -18,6 +18,6 @@ limitations under the License.
 /// Defines list of attributes that change continuously over time.
 public protocol RuntimeAttributes: AnyObject {
 
-    /// A list of attributes to use at signal start.
+    /// A dictionary containing all current runtime attributes.
     var all: [String: Any] { get }
 }

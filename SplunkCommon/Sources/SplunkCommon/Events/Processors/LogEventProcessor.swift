@@ -22,7 +22,7 @@ public protocol LogEventProcessor {
 
     // MARK: - Events
 
-    /// Sends Log Event to an exporter.
+    /// Sends a log event to an exporter.
     ///
     /// The default processing strategy (e.g., synchronous or asynchronous) is determined by the conforming type.
     ///
@@ -31,7 +31,7 @@ public protocol LogEventProcessor {
     ///   - completion: A closure called after processing is attempted. Returns `true` on success.
     func sendEvent(_: any AgentEvent, completion: @escaping (Bool) -> Void)
 
-    /// Sends Log Event to an exporter.
+    /// Sends a log event to an exporter with a specific processing requirement.
     ///
     /// Using `immediateProcessing = true` forces synchronous processing, which is useful for time-critical operations
     /// like sending a crash report.
