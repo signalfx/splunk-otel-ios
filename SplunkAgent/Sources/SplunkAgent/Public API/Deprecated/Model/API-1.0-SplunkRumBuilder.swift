@@ -27,7 +27,7 @@ import Foundation
 @available(*, deprecated, message:
     """
     The SplunkRumBuilder class is no longer supported and will be removed in a later version.
-    Use the ``SplunkRum.install(with:moduleConfigurations:)`` API instead.
+    Use the `SplunkRum.install(with:moduleConfigurations:)` API instead.
     """)
 public class SplunkRumBuilder {
 
