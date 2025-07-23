@@ -49,7 +49,7 @@ class DefaultSession: AgentSession {
 
     // MARK: - Public
 
-    /// The agent instance to which the session belongs.
+    /// The ``SplunkRum`` agent instance to which the session belongs.
     public unowned var owner: SplunkRum?
 
     /// Defines the minimum session refresh interval (defined in seconds). Default value is 1 second.
@@ -82,7 +82,7 @@ class DefaultSession: AgentSession {
         }
     }
 
-    /// The data object representing the current session's properties.
+    /// The data object (``SessionItem``) representing the current session's properties.
     ///
     /// This item includes the session ID and its start time.
     public var currentSessionItem: SessionItem {

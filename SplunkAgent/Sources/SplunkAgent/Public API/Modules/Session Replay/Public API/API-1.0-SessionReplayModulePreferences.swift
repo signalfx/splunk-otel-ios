@@ -20,14 +20,14 @@ public protocol SessionReplayModulePreferences {
 
     // MARK: - Rendering
 
-    /// The video rendering mode for captured data.
+    /// The video ``RenderingMode`` for captured data.
     var renderingMode: RenderingMode? { get set }
 
-    /// Sets video rendering mode for captured data.
+    /// Sets video ``RenderingMode`` for captured data.
     ///
-    /// - Parameter renderingMode: The required rendering mode.
+    /// - Parameter renderingMode: The required ``RenderingMode``.
     ///
-    /// - Returns: The updated preferences object.
+    /// - Returns: The updated ``SessionReplayModulePreferences`` object.
     @discardableResult func renderingMode(_ renderingMode: RenderingMode?) -> any SessionReplayModulePreferences
 
 
@@ -36,7 +36,7 @@ public protocol SessionReplayModulePreferences {
     /// Initializes new preferences object with preconfigured values.
     ///
     /// - Parameters:
-    ///   - renderingMode: The required rendering mode.
+    ///   - renderingMode: The required ``RenderingMode``.
     ///
     /// - Returns: A newly initialized `Preferences` object.
     init(renderingMode: RenderingMode)

@@ -20,7 +20,7 @@ internal import SplunkNavigation
 /// The preferences object allows the user to set navigation instrumentation's preferred settings.
 ///
 /// These preferred settings may not represent the actual state,
-/// which can be checked with the `NavigationState` object.
+/// which can be checked with the ``NavigationState`` object.
 ///
 /// To find out the current state, use the information from the ``NavigationState`` object.
 ///
@@ -68,7 +68,7 @@ public extension NavigationPreferences {
 
     /// Initializes new preferences object with preconfigured values.
     ///
-    /// - Parameter enableAutomatedTracking: If `true`, the module will automatically detect navigation.
+    /// - Parameter enableAutomatedTracking: If `true`, the ``NavigationModule`` will automatically detect navigation.
     convenience init(enableAutomatedTracking: Bool?) {
         self.init()
 

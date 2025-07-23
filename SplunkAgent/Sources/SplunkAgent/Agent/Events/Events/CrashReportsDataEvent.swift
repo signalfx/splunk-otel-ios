@@ -43,7 +43,7 @@ class CrashReportsDataEvent: AgentEvent {
     /// Initializes a Crash Report data event.
     ///
     /// - Parameters:
-    ///   - metadata: `CrashReportsMetadata` describing the actual Crash Report event metadata.
+    ///   - metadata: ``CrashReportsMetadata`` describing the actual Crash Report event metadata.
     ///   - data: Crash Report data serialized as a `String`.
     ///   - sessionID: The `session ID` of a session in which the event occured.
     public init(metadata: CrashReportsMetadata, data: String, sessionID: String?) {

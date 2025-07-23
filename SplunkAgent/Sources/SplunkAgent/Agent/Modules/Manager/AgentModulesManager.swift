@@ -27,7 +27,7 @@ protocol AgentModulesManager {
 
     // MARK: - Public
 
-    /// Array of all module instances managed by this agent instance.
+    /// Array of all ``Module`` instances managed by this agent instance.
     var modules: [any Module] { get }
 
 
@@ -38,7 +38,7 @@ protocol AgentModulesManager {
     /// - Parameters:
     ///   - rawConfiguration: A `Data` with raw remote configuration in JSON format.
     ///   - moduleConfigurations: List of user configurations for managed modules.
-    ///   - pool: The pool type of available modules.
+    ///   - pool: The pool type of available modules, conforming to ``AgentModulesPool``.
     init(rawConfiguration: Data?, moduleConfigurations: [Any]?, for pool: AgentModulesPool.Type)
 
 
@@ -47,9 +47,9 @@ protocol AgentModulesManager {
     /// Connects and initializes individual modules and performs their initial configuration.
     ///
     /// - Parameters:
-    ///   - modules: List of connected modules.
-    ///   - configurations: A set of relevant module configurations.
-    ///   - remoteConfigurations: A set of relevant remote configurations.
+    ///   - modules: List of connected ``Module`` instances.
+    ///   - configurations: A set of relevant ``ModuleConfiguration`` instances.
+    ///   - remoteConfigurations: A set of relevant ``RemoteModuleConfiguration`` instances.
     func connect(modules: [any Module], with configurations: [any ModuleConfiguration],
                  remoteConfigurations: [any RemoteModuleConfiguration])
 
@@ -57,7 +57,7 @@ protocol AgentModulesManager {
     ///
     /// - Parameter type: The requested module type.
     ///
-    /// - Returns: Module instance or `nil` if this instance does not manage that module.
+    /// - Returns: ``Module`` instance or `nil` if this instance does not manage that module.
     func module<T: Module>(ofType type: T.Type) -> T?
 
 
@@ -66,14 +66,14 @@ protocol AgentModulesManager {
     /// Observe published data from all modules.
     ///
     /// The published data isn't deleted by default until we have
-    /// an exact request to delete it via the `deleteModuleData(for:)` method.
+    /// an exact request to delete it via the ``deleteModuleData(for:)`` method.
     ///
-    /// - Parameter block: A closure for taking over published data.
+    /// - Parameter block: A closure for taking over published data, with ``ModuleEventMetadata`` and ``ModuleEventData``.
     func onModulePublish(data block: @escaping (any ModuleEventMetadata, any ModuleEventData) -> Void)
 
     /// Asks the module manager to delete specific data that it has previously published.
     ///
-    /// - Parameter metadata: A struct with essential data identification.
+    /// - Parameter metadata: A struct conforming to ``ModuleEventMetadata`` with essential data identification.
     func deleteModuleData(for metadata: any ModuleEventMetadata)
 
 

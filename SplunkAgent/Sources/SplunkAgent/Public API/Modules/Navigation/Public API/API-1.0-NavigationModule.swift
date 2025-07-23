@@ -22,20 +22,20 @@ public protocol NavigationModule: ObservableObject {
 
     // MARK: - Preferences
 
-    /// An object that holds preferred settings for the module.
+    /// An object that holds preferred settings for the module, a ``NavigationModulePreferences`` instance.
     var preferences: NavigationModulePreferences { get set }
 
     /// Sets preferred settings for the module.
     ///
-    /// - Parameter preferences: The preferred settings for the module.
+    /// - Parameter preferences: The preferred ``NavigationModulePreferences`` for the module.
     ///
-    /// - Returns: The actual `Navigation` instance.
+    /// - Returns: The actual ``NavigationModule`` instance.
     @discardableResult func preferences(_ preferences: NavigationModulePreferences) -> any NavigationModule
 
 
     // MARK: - State
 
-    /// An object that reflects the current state and settings used for the module.
+    /// An object that reflects the current state and settings used for the module, a ``NavigationModuleState`` instance.
     var state: NavigationModuleState { get }
 
 
@@ -45,7 +45,7 @@ public protocol NavigationModule: ObservableObject {
     ///
     /// - Parameter name: The name to be tracked as the screen name until being changed.
     ///
-    /// - Returns: The actual `Navigation` instance.
+    /// - Returns: The actual ``NavigationModule`` instance.
     ///
     /// - Note: The set value is not linked to any specific UI element.
     @discardableResult func track(screen name: String) -> any NavigationModule

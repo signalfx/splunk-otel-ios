@@ -20,7 +20,7 @@ internal import CiscoSessionReplay
 
 /// The preferences object is a representation of the user's preferred settings.
 ///
-/// These are the settings that the user would like the Session Replay module to use.
+/// These are the settings that the user would like the ``SessionReplayModule`` to use.
 /// The entered values always represent only the preferred settings, and the resulting state
 /// in which the module works may be different for each property.
 ///
@@ -56,7 +56,7 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
 
     // MARK: - Rendering
 
-    /// The preferred rendering mode for the session replay.
+    /// The preferred ``RenderingMode`` for the session replay.
     ///
     /// This setting determines how the session replay is visually captured. The actual rendering
     /// mode in use can be confirmed by checking the ``SessionReplayModuleState``.
@@ -70,7 +70,7 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
     ///
     /// This method provides a fluent interface for configuring the rendering mode.
     ///
-    /// - Parameter renderingMode: The desired rendering mode.
+    /// - Parameter renderingMode: The desired ``RenderingMode``.
     /// - Returns: The ``SessionReplayModulePreferences`` instance for chaining further configurations.
     @discardableResult public func renderingMode(_ renderingMode: RenderingMode?) -> SessionReplayModulePreferences {
         self.renderingMode = renderingMode
@@ -86,7 +86,7 @@ public extension SessionReplayPreferences {
 
     /// Initializes the preferences with a specific rendering mode.
     ///
-    /// - Parameter renderingMode: The rendering mode to use for the session replay.
+    /// - Parameter renderingMode: The ``RenderingMode`` to use for the session replay.
     convenience init(renderingMode: RenderingMode) {
         self.init(for: nil)
 

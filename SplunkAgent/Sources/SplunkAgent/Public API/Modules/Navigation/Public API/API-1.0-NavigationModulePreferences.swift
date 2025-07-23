@@ -20,21 +20,21 @@ public protocol NavigationModulePreferences {
 
     // MARK: - Automated tracking
 
-    /// A `Boolean` value determines whether the module should automatically detect navigation in the application.
+    /// A `Boolean` value determines whether the ``NavigationModule`` should automatically detect navigation in the application.
     var enableAutomatedTracking: Bool? { get set }
 
-    /// Sets whether or not the module should automatically detect navigation in the application.
+    /// Sets whether or not the ``NavigationModule`` should automatically detect navigation in the application.
     ///
-    /// - Parameter enable: If `true`, the module will automatically detect navigation.
+    /// - Parameter enable: If `true`, the ``NavigationModule`` will automatically detect navigation.
     ///
-    /// - Returns: The updated preferences object.
+    /// - Returns: The updated ``NavigationModulePreferences`` object.
     @discardableResult func enableAutomatedTracking(_ enable: Bool?) -> any NavigationModulePreferences
 
 
     // MARK: - Convenience init
 
-    /// Initializes new preferences object with preconfigured values.
+    /// Initializes new ``NavigationModulePreferences`` object with preconfigured values.
     ///
-    /// - Parameter enableAutomatedTracking: If `true`, the module will automatically detect navigation.
+    /// - Parameter enableAutomatedTracking: If `true`, the ``NavigationModule`` will automatically detect navigation.
     init(enableAutomatedTracking: Bool?)
 }

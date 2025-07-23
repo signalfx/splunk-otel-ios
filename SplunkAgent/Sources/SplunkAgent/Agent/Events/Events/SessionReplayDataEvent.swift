@@ -43,7 +43,7 @@ class SessionReplayDataEvent: AgentEvent {
     /// Initializes Session Replay data event.
     ///
     /// - Parameters:
-    ///   - metadata: `Metadata` describing the session replay record.
+    ///   - metadata: ``Metadata`` describing the session replay record.
     ///   - data: Session replay blob of type `Data`.
     ///   - index: Event sequence number within the session.
     ///   - sessionId: The `session Id` of a session in which the event occurred.

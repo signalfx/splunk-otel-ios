@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// Describes an invalid agent configuration.
+/// Describes an invalid ``AgentConfiguration``.
 enum AgentConfigurationError: Error, Equatable {
 
     /// Invalid endpoint. Either one of the supplied endpoint urls (traces, session replay) is invalid, or the supplied realm is empty.

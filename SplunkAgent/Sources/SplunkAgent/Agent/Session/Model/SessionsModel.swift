@@ -37,7 +37,7 @@ class SessionsModel {
 
     // MARK: - Public
 
-    /// An array of all available sessions in this instance.
+    /// An array of all available ``SessionItem`` instances in this instance.
     public var sessions = [SessionItem]()
 
 
@@ -47,7 +47,7 @@ class SessionsModel {
     ///
     /// - Parameters:
     ///   - named: The `String` with name of this session list.
-    ///   - storage: Instance of key-value storage for data persistence.
+    ///   - storage: Instance of ``KeyValueStorage`` for data persistence.
     init(named: String = "sessions", storage: KeyValueStorage = UserDefaultsStorage()) {
         storageKey = named
         self.storage = storage
