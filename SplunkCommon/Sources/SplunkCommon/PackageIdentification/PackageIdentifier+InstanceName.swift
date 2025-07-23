@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Adds methods for creating instance-specific and non-operational package identifiers.
+/// Adds methods to ``PackageIdentifier`` for creating instance-specific and non-operational package identifiers.
 public extension PackageIdentifier {
 
     // MARK: - Package identification for instances
 
-    /// Creates an identifier based on `default` extended by
+    /// Creates an identifier based on ``PackageIdentifier/default`` extended by
     /// a suffix with the instance name.
     ///
     /// - Parameter named: A `String` with instance extension.
@@ -35,7 +35,7 @@ public extension PackageIdentifier {
     }
 
     /// Creates an identifier for non-operational instances
-    /// based on `default` extended by a suffix with the instance name.
+    /// based on ``PackageIdentifier/default`` extended by a suffix with the instance name.
     ///
     /// - Parameter named: A `String` with instance extension.
     ///

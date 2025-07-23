@@ -30,7 +30,7 @@ public protocol PackageIdentification {
 
     // MARK: - Identification
 
-    /// Creates combined identifier based on `default` identifier
+    /// Creates combined identifier based on the ``default`` identifier
     /// and its extension defined with `named`.
     ///
     /// - Parameter named: A `String` with identifier extension.

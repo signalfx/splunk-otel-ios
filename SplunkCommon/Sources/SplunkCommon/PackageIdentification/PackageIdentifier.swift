@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// Implements internal package identification for the Splunk Agent.
+/// Implements the ``PackageIdentification`` protocol for the Splunk Agent.
 public struct PackageIdentifier: PackageIdentification {
 
     // MARK: - Package identification

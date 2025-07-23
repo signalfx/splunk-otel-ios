@@ -22,7 +22,7 @@ public protocol RemoteModuleConfiguration {
 
     // MARK: - Module management
 
-    /// Indicates whether the Module is enabled.
+    /// Indicates whether the ``Module`` is enabled.
     var enabled: Bool { get }
 
 

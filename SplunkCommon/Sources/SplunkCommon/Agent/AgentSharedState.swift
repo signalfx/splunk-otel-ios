@@ -17,9 +17,9 @@ limitations under the License.
 
 import Foundation
 
-/// Internal protocol for sharing agent state with modules.
+/// Internal protocol for sharing agent state with ``Module`` instances.
 ///
-/// The Agent uses the protocol internally to manage Modules and their Events.
+/// The Agent uses the protocol internally to manage ``Module`` instances and their ``AgentEvent`` items.
 public protocol AgentSharedState: AnyObject, Sendable {
 
     // MARK: - General state

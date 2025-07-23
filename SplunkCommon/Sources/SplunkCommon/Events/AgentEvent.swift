@@ -49,6 +49,6 @@ public protocol AgentEvent {
     /// Event attributes.
     var attributes: [String: EventAttributeValue]? { get set }
 
-    /// Event body, enclosed in `EventAttributeValue`.
+    /// Event body, enclosed in an ``EventAttributeValue``.
     var body: EventAttributeValue? { get set }
 }

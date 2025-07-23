@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// Attribute value for AgentEvent attributes. Supported types: `String`, `Int`, `Double`, `Data`.
+/// An attribute value for ``AgentEvent`` attributes. Supported types: `String`, `Int`, `Double`, `Data`.
 public enum EventAttributeValue: Equatable, Hashable {
     /// A string attribute value.
     case string(String)
@@ -46,7 +46,7 @@ public enum EventAttributeValue: Equatable, Hashable {
     }
 }
 
-/// Adds convenience initializers for creating `EventAttributeValue` instances from raw types.
+/// Adds convenience initializers for creating ``EventAttributeValue`` instances from raw types.
 public extension EventAttributeValue {
     /// Initializes a `.string` case with the given `String` value.
     init(_ value: String) {

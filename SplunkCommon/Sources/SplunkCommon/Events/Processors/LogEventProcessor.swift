@@ -37,7 +37,7 @@ public protocol LogEventProcessor {
     /// like sending a crash report.
     ///
     /// - Parameters:
-    ///   - event: The event to be sent to the exporter.
+    ///   - event: The ``AgentEvent`` to be sent to the exporter.
     ///   - immediateProcessing: If `true`, the event is processed synchronously. If `false`, the event may be
     ///   processed asynchronously.
     ///   - completion: A closure called after processing is attempted. Returns `true` on success.

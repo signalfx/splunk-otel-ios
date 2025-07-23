@@ -60,8 +60,8 @@ public protocol Module {
 
     /// Installs and configures the module.
     /// - Parameters:
-    ///   - configuration: A module-specific configuration.
-    ///   - remoteConfiguration: A remotely-provided configuration for this module.
+    ///   - configuration: A module-specific ``ModuleConfiguration``.
+    ///   - remoteConfiguration: A remotely-provided ``RemoteModuleConfiguration`` for this module.
     func install(with configuration: ModuleConfiguration?, remoteConfiguration: RemoteModuleConfiguration?)
 
 
@@ -70,14 +70,14 @@ public protocol Module {
     /// Module event publisher.
     ///
     /// Module calls the provided method for each emitted Event. The Event is then kept
-    /// by the Module till `deleteData(for:)` method is called with the corresponding Metadata.
+    /// by the Module till ``deleteData(for:)`` method is called with the corresponding Metadata.
     ///
     /// - Parameter data: Callback function called for every Event emitted by Module.
     func onPublish(data: @escaping (EventMetadata, EventData) -> Void)
 
     /// Event processing confirmation.
     ///
-    /// Agent calls this method to confirm that the Event identified by the Metadata is processed
+    /// Agent calls this method to confirm that the Event identified by the ``ModuleEventMetadata`` is processed
     /// and no longer needs be kept by the Module for eventual re-emission.
     ///
     /// - Parameter metadata: Metadata uniquely identifying the Event.

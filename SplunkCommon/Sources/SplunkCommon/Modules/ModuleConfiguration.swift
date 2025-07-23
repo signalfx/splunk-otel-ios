@@ -17,5 +17,5 @@ limitations under the License.
 
 import Foundation
 
-/// The basic protocol for user configuration of the module.
+/// The basic protocol for user configuration of a ``Module``.
 public protocol ModuleConfiguration: Encodable {}
