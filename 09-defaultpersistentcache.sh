@@ -1,3 +1,6 @@
+#!/bin/sh
+# 09-defaultpersistentcache.sh
+cat > "SplunkCommon/Sources/SplunkCommon/Persistent Cache/DefaultPersistanceCache/DefaultPersistentCache.swift" << 'EOF'
 //
 /*
 Copyright 2025 Splunk Inc.
@@ -302,3 +305,4 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
         }
     }
 }
+EOF
