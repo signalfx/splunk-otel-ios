@@ -126,8 +126,8 @@ func generateMainTargets() -> [Target] {
             dependencies: ["SplunkNetwork"],
             path: "SplunkNetwork/Tests"
         ),
-        
-        
+
+
         // MARK: - Splunk Network Monitor
 
         .target(
@@ -337,7 +337,7 @@ func generateMainTargets() -> [Target] {
 
 
         // MARK: - Splunk Custom Tracking
-        
+
         .target(
             name: "SplunkCustomTracking",
             dependencies: [
@@ -379,7 +379,7 @@ func generateMainTargets() -> [Target] {
 
 /// Generates binary targets from the registry, based on the current `DependencyResolutionStrategy`.
 func generateBinaryTargets() -> [Target] {
-    
+
     // First check the deps resolution whether we want to generate.
     guard DependencyResolutionStrategy.current == .binaryTargets else {
         return []
