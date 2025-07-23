@@ -34,10 +34,10 @@ public protocol AgentPersistentCache<Element>: Sendable {
     /// multiple cache instances side by side in a single place, it should have a unique name.
     var uniqueCacheName: String { get }
 
-    /// Maximum number of managed elements. Default value is `Int.max`.
+    /// The maximum number of elements the cache can hold.
     var maximumCapacity: Int { get }
 
-    /// Maximum lifetime of managed records. Default value is not defined (no lifetime).
+    /// The maximum age of a cached element in seconds. If `nil`, elements do not expire based on age.
     var maximumLifetime: TimeInterval? { get }
 
     /// Determines if the cache content has already been restored following initialization.
@@ -55,15 +55,15 @@ public protocol AgentPersistentCache<Element>: Sendable {
 
     // MARK: - Custom filtering
 
-    /// Returns a new dictionary containing the key-value pairs of the dictionary that satisfy the given period.
+    /// Returns a dictionary of elements that were last modified within the specified date range.
     ///
-    /// If method is called without any parameters, it will return all managed elements.
+    /// Passing `nil` for `start` or `end` creates an open-ended range. If both are `nil`, all elements are returned.
     ///
     /// - Parameters:
-    ///   - start: The beginning of the search period.
-    ///   - end: The ending of the search period.
+    ///   - start: The beginning of the date range.
+    ///   - end: The end of the date range.
     ///
-    /// - Returns: A dictionary with all the elements belonging to the searched period.
+    /// - Returns: A dictionary containing the filtered key-value pairs.
     func elements(from start: Date?, to end: Date?) async -> [String: Element]
 
 
@@ -93,6 +93,6 @@ public protocol AgentPersistentCache<Element>: Sendable {
 
     // MARK: - Storage management
 
-    /// Saves actual state into permanent cache.
+    /// Persists the current in-memory state of the cache to storage.
     func sync() async throws
 }

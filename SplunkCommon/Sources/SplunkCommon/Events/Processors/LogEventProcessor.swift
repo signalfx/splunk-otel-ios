@@ -17,15 +17,14 @@ limitations under the License.
 
 import Foundation
 
-/// LogEventProcessor processes Events - enriches them with provided Resources, and sends those events to
-/// an exporter.
+/// Defines an interface for processing and exporting log events.
 public protocol LogEventProcessor {
 
     // MARK: - Events
 
     /// Sends Log Event to an exporter.
     ///
-    /// Implementation should decide whether to send the event synchronously or asynchronously by default.
+    /// The default processing strategy (e.g., synchronous or asynchronous) is determined by the conforming type.
     ///
     /// - Parameters:
     ///   - event: Event to be sent to exporter.
@@ -34,14 +33,13 @@ public protocol LogEventProcessor {
 
     /// Sends Log Event to an exporter.
     ///
-    /// Implementation should decide whether to send the event synchronously or asynchronously by default.
-    /// Using `immediateProcessing = true`  processes the event synchronously, useful for time critical operations
+    /// Using `immediateProcessing = true` forces synchronous processing, which is useful for time-critical operations
     /// like sending a crash report.
     ///
     /// - Parameters:
-    ///   - event: Event to be sent to exporter.
-    ///   - immediateProcessing: `true` processes the event synchronously,
-    ///   `false` processes the event on a background thread.
-    ///   - completion: Completion block, returns `true` if the event was sent correctly.
+    ///   - event: The event to be sent to the exporter.
+    ///   - immediateProcessing: If `true`, the event is processed synchronously. If `false`, the event may be
+    ///   processed asynchronously.
+    ///   - completion: A closure called after processing is attempted. Returns `true` on success.
     func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void)
 }
