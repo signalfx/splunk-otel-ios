@@ -38,7 +38,7 @@ class SessionsModel {
     // MARK: - Public
 
     /// An array of all available sessions in this instance.
-    public var sessions = [SessionItem]()
+    var sessions = [SessionItem]()
 
 
     // MARK: - Initialization

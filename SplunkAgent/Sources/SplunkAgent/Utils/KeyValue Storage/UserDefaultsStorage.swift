@@ -35,7 +35,7 @@ class UserDefaultsStorage: KeyValueStorage {
     /// Defines prefix for all entries managed by this instance.
     ///
     /// - Note: This prefix is used only internally in the preferences `.plist` file.
-    public var keysPrefix: String? = "\(PackageIdentifier.default)."
+    var keysPrefix: String? = "\(PackageIdentifier.default)."
 
 
     // MARK: - KeyValueStorage methods

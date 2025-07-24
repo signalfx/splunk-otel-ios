@@ -27,7 +27,7 @@ struct Service {
     let httpMethod: Method
 
     /// Define methods used for request
-    public enum Method: String {
+    enum Method: String {
         case get = "GET"
         case post = "POST"
         case delete = "DELETE"

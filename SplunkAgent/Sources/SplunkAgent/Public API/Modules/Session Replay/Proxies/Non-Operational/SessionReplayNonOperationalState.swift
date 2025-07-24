@@ -23,11 +23,11 @@ final class SessionReplayNonOperationalState: SessionReplayModuleState {
 
     // MARK: - Recording
 
-    public var status: SessionReplayStatus {
+    var status: SessionReplayStatus {
         .notRecording(.notStarted)
     }
 
-    public var isRecording: Bool {
+    var isRecording: Bool {
         false
     }
 }

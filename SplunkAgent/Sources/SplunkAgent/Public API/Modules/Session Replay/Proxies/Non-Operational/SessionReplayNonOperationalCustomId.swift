@@ -39,7 +39,7 @@ final class SessionReplayNonOperationalCustomId: SessionReplayModuleCustomId {
 
     // MARK: - View sensitivity
 
-    public subscript(view: UIView) -> String? {
+    subscript(view: UIView) -> String? {
         get {
             logAccess(toApi: #function)
 
@@ -54,7 +54,7 @@ final class SessionReplayNonOperationalCustomId: SessionReplayModuleCustomId {
     }
 
 
-    @discardableResult public func set(_ view: UIView, _ customId: String?) -> any SessionReplayModuleCustomId {
+    @discardableResult func set(_ view: UIView, _ customId: String?) -> any SessionReplayModuleCustomId {
         logAccess(toApi: #function)
 
         return self

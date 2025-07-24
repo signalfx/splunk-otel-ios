@@ -22,9 +22,9 @@ actor PersistentCacheModel<Container: PersistedItemContainer> {
 
     // MARK: - Public
 
-    public private(set) var containers: [String: Container] = [:]
+    private(set) var containers: [String: Container] = [:]
 
-    public private(set) var isRestored: Bool = false
+    private(set) var isRestored: Bool = false
 
 
     // MARK: - Items management

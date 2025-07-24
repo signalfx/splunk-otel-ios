@@ -23,7 +23,7 @@ final class SessionReplayCustomId: SessionReplayModuleCustomId {
 
     // MARK: - View sensitivity
 
-    public subscript(view: UIView) -> String? {
+    subscript(view: UIView) -> String? {
         get {
             view.customId
         }
@@ -32,7 +32,7 @@ final class SessionReplayCustomId: SessionReplayModuleCustomId {
         }
     }
 
-    @discardableResult public func set(_ view: UIView, _ customId: String?) -> SessionReplayModuleCustomId {
+    @discardableResult func set(_ view: UIView, _ customId: String?) -> SessionReplayModuleCustomId {
         self[view] = customId
 
         return self

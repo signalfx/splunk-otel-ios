@@ -22,12 +22,12 @@ final class UserDefaultsStorageTestBuilder {
 
     // MARK: - Static constants
 
-    public static let defaultKey = "sessions"
+    static let defaultKey = "sessions"
 
 
     // MARK: - Basic builds
 
-    public static func buildCleanStorage(named: String) -> KeyValueStorage {
+    static func buildCleanStorage(named: String) -> KeyValueStorage {
         let keysPrefix = "\(PackageIdentifier.default).\(named)."
 
         // Clean storage before test run

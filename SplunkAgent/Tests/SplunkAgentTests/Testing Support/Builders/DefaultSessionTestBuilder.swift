@@ -21,7 +21,7 @@ final class DefaultSessionTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func build(named: String) throws -> DefaultSession {
+    static func build(named: String) throws -> DefaultSession {
         // Build session with preconfigured storage
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: named)
         let sessionModel = SessionsModel(storage: storage)

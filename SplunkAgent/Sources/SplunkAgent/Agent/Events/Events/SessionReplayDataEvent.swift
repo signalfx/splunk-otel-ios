@@ -48,7 +48,7 @@ class SessionReplayDataEvent: AgentEvent {
     ///   - index: Event sequence number within the session.
     ///   - sessionId: The `session Id` of a session in which the event occurred.
     ///               Optional so that we can see sessions with no session id in the backend.
-    public init(metadata: Metadata, data: Data, index: Int, sessionId: String?, scriptInstanceId: String) {
+    init(metadata: Metadata, data: Data, index: Int, sessionId: String?, scriptInstanceId: String) {
         // Event properties
         timestamp = metadata.timestamp
         body = EventAttributeValue(data)

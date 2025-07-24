@@ -35,7 +35,7 @@ final class SessionReplaySensitivity: SessionReplayModuleSensitivity {
 
     // MARK: - View sensitivity
 
-    public subscript(view: UIView) -> Bool? {
+    subscript(view: UIView) -> Bool? {
         get {
             module.sensitivity[view]
         }
@@ -44,7 +44,7 @@ final class SessionReplaySensitivity: SessionReplayModuleSensitivity {
         }
     }
 
-    @discardableResult public func set(_ view: UIView, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
+    @discardableResult func set(_ view: UIView, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
         self[view] = sensitive
 
         return self
@@ -53,7 +53,7 @@ final class SessionReplaySensitivity: SessionReplayModuleSensitivity {
 
     // MARK: - Class sensitivity
 
-    public subscript(viewClass: UIView.Type) -> Bool? {
+    subscript(viewClass: UIView.Type) -> Bool? {
         get {
             module.sensitivity[viewClass]
         }
@@ -62,7 +62,7 @@ final class SessionReplaySensitivity: SessionReplayModuleSensitivity {
         }
     }
 
-    @discardableResult public func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
+    @discardableResult func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
         self[viewClass] = sensitive
 
         return self

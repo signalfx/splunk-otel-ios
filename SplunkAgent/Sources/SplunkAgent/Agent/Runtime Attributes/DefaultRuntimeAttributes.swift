@@ -38,7 +38,7 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
     /// A list of attributes to use at signal start.
     ///
     ///  This list also contains custom attributes.
-    public var all: [String: Any] {
+    var all: [String: Any] {
         var allAttributes: [String: Any] = [:]
 
         // Attributes added directly should come from sources

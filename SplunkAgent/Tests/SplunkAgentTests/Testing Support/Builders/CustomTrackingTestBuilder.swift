@@ -22,7 +22,7 @@ final class CustomTrackingTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func buildDefault() -> SplunkAgent.CustomTracking {
+    static func buildDefault() -> SplunkAgent.CustomTracking {
         // Build CustomTracking proxy with actual CustomTracking module
         let module = SplunkCustomTracking.CustomTrackingInternal()
         let moduleProxy = SplunkAgent.CustomTracking(for: module)
@@ -33,7 +33,7 @@ final class CustomTrackingTestBuilder {
 
     // MARK: - Non-operational builds
 
-    public static func buildNonOperational() -> CustomTrackingNonOperational {
+    static func buildNonOperational() -> CustomTrackingNonOperational {
         let moduleProxy = CustomTrackingNonOperational()
 
         return moduleProxy

@@ -219,7 +219,11 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         // Verify operational proxy is installed.
         XCTAssert(
             SplunkRum.shared.slowFrameDetector is SplunkAgent.SlowFrameDetector,
-            "The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead. This means the agent is refusing to install the module when disabled."
+            """
+            The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, \
+            but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead. This means \
+            the agent is refusing to install the module when disabled.
+            """
         )
 
         // Safely cast to operational proxy.
@@ -259,7 +263,11 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         // Verify operational proxy is installed.
         XCTAssert(
             SplunkRum.shared.slowFrameDetector is SplunkAgent.SlowFrameDetector,
-            "The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead. This means the module is not being initialized correctly."
+            """
+            The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, \
+            but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead. This means \
+            the module is not being initialized correctly.
+            """
         )
 
         // Safely cast to operational proxy.
@@ -305,7 +313,10 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         // Verify operational proxy is installed.
         XCTAssert(
             SplunkRum.shared.slowFrameDetector is SplunkAgent.SlowFrameDetector,
-            "The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead."
+            """
+            The slowFrameDetector proxy should be the OPERATIONAL `SplunkAgent.SlowFrameDetector` type, \
+            but it is `\(type(of: SplunkRum.shared.slowFrameDetector))` instead.
+            """
         )
 
         // Safely cast to operational proxy.

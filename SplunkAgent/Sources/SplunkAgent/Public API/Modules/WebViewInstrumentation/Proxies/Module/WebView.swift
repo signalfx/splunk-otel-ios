@@ -32,7 +32,7 @@ final class WebView: WebViewInstrumentationModule {
     }
 
     #if canImport(WebKit)
-        public func integrateWithBrowserRum(_ view: WKWebView) {
+        func integrateWithBrowserRum(_ view: WKWebView) {
             module.injectSessionId(into: view)
         }
     #endif
