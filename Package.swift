@@ -18,6 +18,10 @@ let package = Package(
         .library(
             name: "SplunkAgent",
             targets: ["SplunkAgent"]
+        ),
+        .library(
+            name: "SplunkAgentObjC",
+            targets: ["SplunkAgentObjC"]
         )
     ],
     dependencies: [
@@ -48,7 +52,7 @@ resolveSessionReplayRepositoryDependency()
 func generateMainTargets() -> [Target] {
     return [
 
-        // MARK: Splunk Agent
+        // MARK: - Splunk Agent
 
         .target(
             name: "SplunkAgent",
@@ -69,23 +73,41 @@ func generateMainTargets() -> [Target] {
                 "SplunkCustomTracking",
                 resolveDependency("logger")
             ],
-            path: "SplunkAgent/Sources",
+            path: "SplunkAgent/Sources/SplunkAgent",
             resources: [
-                .copy("../Resources/PrivacyInfo.xcprivacy"),
-                .copy("../Resources/NOTICES")
+                .copy("../../Resources/PrivacyInfo.xcprivacy"),
+                .copy("../../Resources/NOTICES")
             ]
         ),
         .testTarget(
             name: "SplunkAgentTests",
             dependencies: ["SplunkAgent", "SplunkCommon"],
-            path: "SplunkAgent/Tests",
+            path: "SplunkAgent/Tests/SplunkAgentTests",
             resources: [
-                .copy("SplunkAgentTests/Testing Support/Assets/v.mp4"),
-                .copy("SplunkAgentTests/Testing Support/Mock Data/AlternativeRemoteConfiguration.json"),
-                .copy("SplunkAgentTests/Testing Support/Mock Data/RemoteConfiguration.json"),
-                .copy("SplunkAgentTests/Testing Support/Mock Data/RemoteError.json")
+                .copy("Testing Support/Assets/v.mp4"),
+                .copy("Testing Support/Mock Data/AlternativeRemoteConfiguration.json"),
+                .copy("Testing Support/Mock Data/RemoteConfiguration.json"),
+                .copy("Testing Support/Mock Data/RemoteError.json")
             ],
             swiftSettings: [.define("SPM_TESTS")]
+        ),
+
+
+        // MARK: - Splunk Agent (Objective-C bridge)
+
+        .target(
+            name: "SplunkAgentObjC",
+            dependencies: ["SplunkAgent"],
+            path: "SplunkAgent/Sources/SplunkAgentObjC",
+            resources: [
+                .copy("../../Resources/PrivacyInfo.xcprivacy"),
+                .copy("../../Resources/NOTICES")
+            ]
+        ),
+        .testTarget(
+            name: "SplunkAgentObjCTests",
+            dependencies: ["SplunkAgentObjC"],
+            path: "SplunkAgent/Tests/SplunkAgentObjCTests"
         ),
 
 
