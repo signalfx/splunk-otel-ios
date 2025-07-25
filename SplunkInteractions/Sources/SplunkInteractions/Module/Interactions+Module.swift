@@ -28,17 +28,10 @@ public struct InteractionEventData: ModuleEventData {
 extension InteractionEvent: @retroactive Equatable {}
 
 extension CiscoInteractions.InteractionEvent: ModuleEventMetadata {
-    /// Conformance to the `Equatable` protocol.
-    ///
-    /// - Parameters:
-    ///   - lhs: The left-hand side instance to compare.
-    ///   - rhs: The right-hand side instance to compare.
-    /// - Returns: `true` if `id` properties are equal; otherwise, `false`.
     public static func == (lhs: CiscoInteractions.InteractionEvent, rhs: CiscoInteractions.InteractionEvent) -> Bool {
         lhs.id == rhs.id
     }
 
-    /// The timestamp when the interaction event occurred.
     public var timestamp: Date {
         time
     }
@@ -48,26 +41,14 @@ extension Interactions: Module {
 
     // MARK: - Module types
 
-    /// The configuration type for the `Interactions` module, conforming to ``ModuleConfiguration``.
     public typealias Configuration = InteractionsConfiguration
-    /// The remote configuration type for the `Interactions` module, conforming to ``RemoteModuleConfiguration``.
     public typealias RemoteConfiguration = InteractionsRemoteConfiguration
-
-    /// The type representing the metadata for an interaction event, conforming to ``ModuleEventMetadata``.
     public typealias EventMetadata = InteractionEvent
-    /// The type representing the supplementary data for an interaction event, conforming to ``ModuleEventData``.
     public typealias EventData = InteractionEventData
 
 
     // MARK: - Module methods
 
-    /// Installs and configures the `Interactions` module.
-    ///
-    /// This method is called during the agent's initialization process. It starts the user interaction detection
-    /// if the module is enabled in the provided configuration.
-    /// - Parameters:
-    ///   - configuration: The local configuration for the module.
-    ///   - remoteConfiguration: The remote configuration for the module. This parameter is ignored.
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
         let configuration = configuration as? Configuration
 
@@ -80,13 +61,7 @@ extension Interactions: Module {
 
     // MARK: - Type transparency helpers
 
-    /// A placeholder method to conform to the `Module` protocol.
-    ///
-    /// - Note: This method is not implemented and has no effect in the `Interactions` module.
     public func onPublish(data: @escaping (CiscoInteractions.InteractionEvent, InteractionEventData) -> Void) {}
 
-    /// A placeholder method to conform to the `Module` protocol.
-    ///
-    /// - Note: This method is not implemented and has no effect in the `Interactions` module.
     public func deleteData(for metadata: any ModuleEventMetadata) {}
 }

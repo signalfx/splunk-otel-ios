@@ -35,9 +35,6 @@ final class SessionReplayState: SessionReplayModuleState {
 
     // MARK: - Recording
 
-    /// The current operational status of the Session Replay module.
-    ///
-    /// See ``SessionReplayStatus`` for possible values.
     public var status: SessionReplayStatus {
         SessionReplayStatus(srStatus: module.state.status)
     }

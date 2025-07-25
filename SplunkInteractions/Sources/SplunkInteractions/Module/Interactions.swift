@@ -116,17 +116,6 @@ public final class Interactions: SplunkInteractionsModule {
 
     // MARK: - Custom view identifiers
 
-    /// Registers a custom identifier for a view, allowing for more meaningful names in traces.
-    ///
-    /// When an interaction is detected on a view, the agent will check if a custom identifier has been
-    /// registered for it. If found, this custom ID will be used as the `elementId` in the resulting span.
-    /// If no custom ID is registered, a default identifier based on the view's `ObjectIdentifier` will be used.
-    ///
-    /// - Note: Registration is performed asynchronously.
-    ///
-    /// - Parameters:
-    ///   - customId: A `String` to use as a custom identifier for the view. If `nil`, any existing custom identifier for the view will be removed.
-    ///   - viewId: The `ObjectIdentifier` of the view to associate with the custom ID.
     public func register(customId: String?, for viewId: ObjectIdentifier) {
         Task {
             await customIdentifiers.append(value: customId, for: self, with: viewId)

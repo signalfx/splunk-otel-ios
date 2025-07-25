@@ -42,14 +42,9 @@ extension SlowFrameDetector: Module {
 
     // MARK: - Module types
 
-    /// The local configuration type for the `SlowFrameDetector` module.
     public typealias Configuration = SlowFrameDetectorConfiguration
-    /// The remote configuration type for the `SlowFrameDetector` module.
     public typealias RemoteConfiguration = SlowFrameDetectorRemoteConfiguration
-
-    /// The event metadata type associated with the `SlowFrameDetector` module.
     public typealias EventMetadata = EventMetadataSlowFrameDetector
-    /// The event data type associated with the `SlowFrameDetector` module.
     public typealias EventData = SlowFrameData
 
 

@@ -33,14 +33,9 @@ extension Navigation: Module {
 
     // MARK: - Module types
 
-    /// The configuration type for the Navigation module.
     public typealias Configuration = NavigationConfiguration
-    /// The remote configuration type for the Navigation module.
     public typealias RemoteConfiguration = NavigationRemoteConfiguration
-
-    /// The metadata type for navigation events.
     public typealias EventMetadata = NavigationMetadata
-    /// The data type for navigation events.
     public typealias EventData = NavigationData
 
 

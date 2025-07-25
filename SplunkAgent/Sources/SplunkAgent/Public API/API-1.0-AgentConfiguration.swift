@@ -30,32 +30,15 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Public mandatory properties
 
-    /// A required ``EndpointConfiguration`` defining URLs to the instrumentation collector.
     public let endpoint: EndpointConfiguration
-
-    /// Required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
     public let appName: String
-
-    /// Required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
-    /// Deployment environment is sent in all signals as a resource.
     public let deploymentEnvironment: String
 
 
     // MARK: - Public optional properties
 
-    /// A `String` containing the current application version. Application version is sent in all signals as a resource.
-    ///
-    /// The default value corresponds to the value of `CFBundleShortVersionString`.
     public var appVersion: String = ConfigurationDefaults.appVersion
-
-    /// Enables or disables debug logging. Debug logging prints span contents into the console.
-    ///
-    /// Defaults to `false`.
     public var enableDebugLogging: Bool = ConfigurationDefaults.enableDebugLogging
-
-    /// Sets global attributes, which are sent with all signals.
-    ///
-    /// Defaults to an empty ``MutableAttributes`` object.
     public var globalAttributes: MutableAttributes = ConfigurationDefaults.globalAttributes
 
     /// Span interceptor to be used to filter or modify all outgoing ``SpanData`` instances.
@@ -64,10 +47,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
     public var spanInterceptor: ((SpanData) -> SpanData?)?
 
-    /// Sets the ``UserConfiguration`` object.
     public var user = UserConfiguration()
-
-    /// Sets the ``SessionConfiguration`` object.
     public var session = SessionConfiguration()
 
 
@@ -81,15 +61,6 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Initialization
 
-    /// Initializes a new Agent configuration with which the Agent is initialized.
-    ///
-    /// - Parameters:
-    ///   - endpoint: A required ``EndpointConfiguration`` defining URLs to the RUM instrumentation collector.
-    ///   - appName: A required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
-    ///   - deploymentEnvironment: A required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
-    ///   Deployment environment is sent in all signals as a resource.
-    ///
-    /// - Throws: ``AgentConfigurationError`` if provided configuration is invalid.
     public init(endpoint: EndpointConfiguration, appName: String, deploymentEnvironment: String) {
         self.endpoint = endpoint
         self.appName = appName
@@ -203,12 +174,6 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Equatable
 
-    /// Conformance to the `Equatable` protocol.
-    ///
-    /// - Parameters:
-    ///   - lhs: The left-hand side instance to compare.
-    ///   - rhs: The right-hand side instance to compare.
-    /// - Returns: `true` if selected properties are equal; otherwise, `false`.
     public static func == (lhs: AgentConfiguration, rhs: AgentConfiguration) -> Bool {
         return
             lhs.endpoint == rhs.endpoint &&

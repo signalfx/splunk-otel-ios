@@ -21,12 +21,6 @@ extension MutableAttributes: Equatable {
 
     // MARK: - Equatable
 
-    /// Conformance to the `Equatable` protocol.
-    ///
-    /// - Parameters:
-    ///   - lhs: The left-hand side instance to compare.
-    ///   - rhs: The right-hand side instance to compare.
-    /// - Returns: `true` if selected properties are equal; otherwise, `false`.
     public static func == (lhs: MutableAttributes, rhs: MutableAttributes) -> Bool {
         let lhsDict = lhs.attributes.getAll()
         let rhsDict = rhs.attributes.getAll()

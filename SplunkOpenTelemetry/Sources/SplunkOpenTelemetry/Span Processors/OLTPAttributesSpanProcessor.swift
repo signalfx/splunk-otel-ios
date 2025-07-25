@@ -30,10 +30,7 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
 
     // MARK: - SpanProcessor settings
 
-    /// A Boolean value indicating that the `onStart(parentContext:span:)` method should be called for each span.
     public let isStartRequired = true
-
-    /// A Boolean value indicating that the `onEnd(span:)` method is not required for each span.
     public let isEndRequired = false
 
 

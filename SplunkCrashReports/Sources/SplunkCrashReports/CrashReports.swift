@@ -54,7 +54,6 @@ public class CrashReports {
 
     // MARK: - Module methods
 
-    /// Initializes a new instance of the `CrashReports` module.
     public required init() {}
 
     deinit {

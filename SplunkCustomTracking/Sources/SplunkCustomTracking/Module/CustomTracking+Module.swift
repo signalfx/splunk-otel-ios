@@ -23,14 +23,9 @@ import SplunkCommon
 /// and implements methods that are missing in the original `CustomTracking`.
 extension CustomTrackingInternal: Module {
 
-    /// Specifies the local configuration type for this module, ``CustomTrackingConfiguration``.
     public typealias Configuration = CustomTrackingConfiguration
-    /// Specifies the remote configuration type for this module, ``CustomTrackingRemoteConfiguration``.
     public typealias RemoteConfiguration = CustomTrackingRemoteConfiguration
-
-    /// Specifies the event metadata type for this module, ``CustomTrackingMetadata``.
     public typealias EventMetadata = CustomTrackingMetadata
-    /// Specifies the event data type for this module, ``CustomTrackingData``.
     public typealias EventData = CustomTrackingData
 
     /// Installs the Custom Tracking module.

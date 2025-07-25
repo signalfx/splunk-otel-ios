@@ -61,7 +61,6 @@ public struct CrashReportsRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Protocol compliance
 
-    /// A Boolean value that indicates whether the Crash Reports module is enabled or disabled through remote configuration.
     public var enabled: Bool
 
     /// Initializes the remote configuration from a `Data` object, typically received from a remote source.
