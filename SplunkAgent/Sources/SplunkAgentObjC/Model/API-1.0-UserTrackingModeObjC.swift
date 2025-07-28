@@ -82,5 +82,5 @@ public extension UserTrackingModeObjC {
 
     /// Default user tracking mode.
     @objc(defaultTracking)
-    public static var `default` = value(for: UserTrackingMode.default)
+    static var `default` = value(for: UserTrackingMode.default)
 }

@@ -52,7 +52,7 @@ public final class UserConfigurationObjC: NSObject {
     ///
     /// Initializes the configuration object's properties with default values.
     @objc
-    public override convenience init() {
+    override public convenience init() {
         let userConfiguration = UserConfiguration()
 
         self.init(for: userConfiguration)
