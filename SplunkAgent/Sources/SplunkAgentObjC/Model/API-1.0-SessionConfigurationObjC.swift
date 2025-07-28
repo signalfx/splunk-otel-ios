@@ -50,6 +50,7 @@ public final class SessionConfigurationObjC: NSObject {
     /// Default empty constructor.
     ///
     /// Initializes the configuration object's properties with default values.
+    @objc
     override public convenience init() {
         let sessionConfiguration = SessionConfiguration()
 
@@ -62,6 +63,7 @@ public final class SessionConfigurationObjC: NSObject {
     /// - samplingRate: A sampling rate in the `<0.0, 1.0>` interval.
     /// `1.0` equals to zero sampling (all instrumentation is sent),
     /// `0.0` equals to all session being sampled, `0.5` equals to 50% sampling.
+    @objc
     public convenience init(samplingRate: Double) {
         let sessionConfiguration = SessionConfiguration(
             samplingRate: samplingRate
