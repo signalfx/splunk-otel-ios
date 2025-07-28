@@ -57,7 +57,7 @@ extension AgentConfigurationError: CustomStringConvertible, CustomDebugStringCon
     }
 
     /// A string representation of an `AgentConfigurationError` instance intended for diagnostic output, identical to `description`.
-    public var debugDescription: String {
+    var debugDescription: String {
         return description
     }
 }

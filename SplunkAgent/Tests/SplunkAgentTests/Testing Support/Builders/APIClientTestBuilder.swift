@@ -19,16 +19,16 @@ import Foundation
 @testable import SplunkAgent
 
 final class APIClientTestBuilder {
-    public static func buildError() -> APIClient {
+    static func buildError() -> APIClient {
         build(with: URLProtocolMock.testErrorPath)
     }
 
-    public static func buildServerError() -> APIClient {
+    static func buildServerError() -> APIClient {
         let errorData = try? RawMockDataBuilder.build(mockFile: .remoteError)
         return build(with: URLProtocolMock.testServerErrorPath, response: errorData)
     }
 
-    public static func build(with path: String, response: Data? = nil) -> APIClient {
+    static func build(with path: String, response: Data? = nil) -> APIClient {
         if let response {
             URLProtocolMock.testURLs = [
                 path: response

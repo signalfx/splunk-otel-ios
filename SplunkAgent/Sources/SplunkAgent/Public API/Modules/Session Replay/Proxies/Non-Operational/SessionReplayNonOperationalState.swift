@@ -15,25 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// The class implementing public API for the current state in non-operational mode.
-///
-/// This is especially the case when the module is stopped by remote configuration,
-/// but we still need to keep the API available to the user.
+// The class implementing the API for the current state in non-operational mode.
+//
+// This is especially the case when the module is stopped by remote configuration,
+// but we still need to keep the API available to the user.
 final class SessionReplayNonOperationalState: SessionReplayModuleState {
 
     // MARK: - Recording
 
-    /// The session replay status when the module is non-operational.
-    ///
-    /// This property always returns ``SessionReplayStatus/notRecording(_:)`` with a reason of `.notStarted`.
-    public var status: SessionReplayStatus {
+    var status: SessionReplayStatus {
         .notRecording(.notStarted)
     }
 
-    /// A boolean indicating if recording is active when the module is non-operational.
-    ///
-    /// This property always returns `false`.
-    public var isRecording: Bool {
+    var isRecording: Bool {
         false
     }
 }

@@ -23,18 +23,18 @@ final class ConfigurationTestBuilder {
 
     // MARK: - Static constants
 
-    public static let customTraceUrl = URL(string: "http://sampledomain.com/tenant/traces")!
-    public static let customSessionReplayUrl = URL(string: "http://sampledomain.com/tenant/sessionreplay")!
-    public static let realm = "dev"
-    public static let deploymentEnvironment = "testenv"
-    public static let appName = "Tests"
-    public static let appVersion = "1.0.1"
-    public static let rumAccessToken = "token"
+    static let customTraceUrl = URL(string: "http://sampledomain.com/tenant/traces")!
+    static let customSessionReplayUrl = URL(string: "http://sampledomain.com/tenant/sessionreplay")!
+    static let realm = "dev"
+    static let deploymentEnvironment = "testenv"
+    static let appName = "Tests"
+    static let appVersion = "1.0.1"
+    static let rumAccessToken = "token"
 
 
     // MARK: - Basic builds
 
-    public static func buildDefault() throws -> AgentConfiguration {
+    static func buildDefault() throws -> AgentConfiguration {
 
         // Default endpoint configuration for unit testing
         let endpoint = EndpointConfiguration(
@@ -63,7 +63,7 @@ final class ConfigurationTestBuilder {
         return configuration
     }
 
-    public static func buildDefaultSampledOut() throws -> AgentConfiguration {
+    static func buildDefaultSampledOut() throws -> AgentConfiguration {
 
         // Default endpoint configuration for unit testing
         let endpoint = EndpointConfiguration(
@@ -92,7 +92,7 @@ final class ConfigurationTestBuilder {
         return configuration
     }
 
-    public static func buildMinimal() throws -> AgentConfiguration {
+    static func buildMinimal() throws -> AgentConfiguration {
         // Minimal endpoint configuration for unit testing
         let endpoint = EndpointConfiguration(
             realm: realm,
@@ -109,7 +109,7 @@ final class ConfigurationTestBuilder {
         return minimal
     }
 
-    public static func buildWithCustomUrls() throws -> AgentConfiguration {
+    static func buildWithCustomUrls() throws -> AgentConfiguration {
         // Endpoint configuration with custom traces and session replay urls
         let endpoint = EndpointConfiguration(
             trace: customTraceUrl,
@@ -125,7 +125,7 @@ final class ConfigurationTestBuilder {
         return configuration
     }
 
-    public static func buildInvalidEndpoint() throws -> AgentConfiguration {
+    static func buildInvalidEndpoint() throws -> AgentConfiguration {
         // Build invalid endpoint endpoint configuration
         let endpoint = EndpointConfiguration(
             realm: "\\//",

@@ -78,7 +78,7 @@ final class NavigationTests: XCTestCase {
         let customName = "Test Screen"
         navigationModule.track(screen: customName)
 
-        let screenName = await navigationModule.model.screenName
+        let _ = await navigationModule.model.screenName
         // XCTAssertEqual(screenName, customName)
     }
 }

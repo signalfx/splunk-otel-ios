@@ -17,16 +17,14 @@ limitations under the License.
 
 import Foundation
 
-/// Model actor for data used in persistent cache.
+// Model actor for data used in persistent cache.
 actor PersistentCacheModel<Container: PersistedItemContainer> {
 
     // MARK: - Public
 
-    /// The collection of all cached items, stored as a dictionary of `Container` objects keyed by a unique string.
-    public private(set) var containers: [String: Container] = [:]
+    private(set) var containers: [String: Container] = [:]
 
-    /// A Boolean value indicating whether the cache has been successfully restored from persistent storage.
-    public private(set) var isRestored: Bool = false
+    private(set) var isRestored: Bool = false
 
 
     // MARK: - Items management

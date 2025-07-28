@@ -23,7 +23,7 @@ internal import SplunkCommon
     import UIKit
 #endif
 
-/// The object implements the management of the current session.
+// The object implements the management of the current session.
 class DefaultSession: AgentSession {
 
     // MARK: - Private
@@ -47,16 +47,16 @@ class DefaultSession: AgentSession {
     var testSessionTimeout: Double?
 
 
-    // MARK: - Public
+    // MARK: - Internal
 
-    /// The ``SplunkRum`` agent instance to which the session belongs.
-    public unowned var owner: SplunkRum?
+    // The ``SplunkRum`` agent instance to which the session belongs.
+    unowned var owner: SplunkRum?
 
-    /// Defines the minimum session refresh interval (defined in seconds). Default value is 1 second.
-    public var sessionRefreshInterval: Double = 1
+    // Defines the minimum session refresh interval (defined in seconds). Default value is 1 second.
+    var sessionRefreshInterval: Double = 1
 
-    /// Session inactivity timeout (defined in seconds). Default value is 15 minutes.
-    public var sessionTimeout: Double {
+    // Session inactivity timeout (defined in seconds). Default value is 15 minutes.
+    var sessionTimeout: Double {
         let unitTest = testSessionTimeout
         let configuration = owner?.agentConfiguration.sessionTimeout
         let defaultValue = ConfigurationDefaults.sessionTimeout
@@ -64,8 +64,8 @@ class DefaultSession: AgentSession {
         return unitTest ?? configuration ?? defaultValue
     }
 
-    /// The maximal length of one session (defined in seconds). Default value is 1 hour.
-    public var maxSessionLength: Double {
+    // The maximal length of one session (defined in seconds). Default value is 1 hour.
+    var maxSessionLength: Double {
         let configuration = owner?.agentConfiguration.maxSessionLength
         let defaultValue = ConfigurationDefaults.maxSessionLength
 
@@ -75,13 +75,13 @@ class DefaultSession: AgentSession {
 
     // MARK: - Computed properties
 
-    public var currentSessionId: String {
+    var currentSessionId: String {
         accessQueue.sync {
             currentSession.id
         }
     }
 
-    public var currentSessionItem: SessionItem {
+    var currentSessionItem: SessionItem {
         accessQueue.sync {
             currentSession
         }
@@ -154,7 +154,7 @@ class DefaultSession: AgentSession {
 
     // MARK: - Business logic
 
-    /// Starts a new session by first purging old data, closing previous session and then starting a new session.
+    // Starts a new session by first purging old data, closing previous session and then starting a new session.
     func startSession() -> SessionItem {
         // Before restoring the session,
         // we need to delete the outdated data

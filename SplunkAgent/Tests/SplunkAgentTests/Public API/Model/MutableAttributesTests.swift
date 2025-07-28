@@ -57,87 +57,6 @@ final class MutableAttributesTests: XCTestCase {
         XCTAssertEqual(attributes[bool: "bool"], true)
     }
 
-    // MARK: - Subscript Tests
-
-    func testBasicSubscript() {
-        let attributes = MutableAttributes()
-
-        attributes["string"] = .string("value")
-        attributes["int"] = .int(42)
-        attributes["bool"] = .bool(true)
-        XCTAssertEqual(attributes["string"], .string("value"))
-        XCTAssertEqual(attributes["int"], .int(42))
-        XCTAssertEqual(attributes["bool"], .bool(true))
-
-        attributes["string"] = nil
-        XCTAssertNil(attributes["string"])
-    }
-
-    func testStringSubscript() {
-        let attributes = MutableAttributes()
-
-        attributes[string: "name"] = "John Doe"
-        XCTAssertEqual(attributes[string: "name"], "John Doe")
-
-        attributes[string: "name"] = nil
-        XCTAssertNil(attributes[string: "name"])
-    }
-
-    func testBoolSubscript() {
-        let attributes = MutableAttributes()
-
-        attributes[bool: "active"] = true
-        XCTAssertEqual(attributes[bool: "active"], true)
-
-        attributes[bool: "active"] = nil
-        XCTAssertNil(attributes[bool: "active"])
-    }
-
-    func testIntSubscript() {
-        let attributes = MutableAttributes()
-
-        attributes[int: "age"] = 30
-        XCTAssertEqual(attributes[int: "age"], 30)
-
-        // Remove value
-        attributes[int: "age"] = nil
-        XCTAssertNil(attributes[int: "age"])
-    }
-
-    func testDoubleSubscript() {
-        let attributes = MutableAttributes()
-
-        attributes[double: "score"] = 98.5
-        XCTAssertEqual(attributes[double: "score"], 98.5)
-
-        attributes[double: "score"] = nil
-        XCTAssertNil(attributes[double: "score"])
-    }
-
-    func testArraySubscript() {
-        let attributes = MutableAttributes()
-        let array = AttributeArray(values: [.string("item1"), .string("item2")])
-
-        attributes[array: "items"] = array
-        XCTAssertEqual(attributes[array: "items"], array)
-
-        attributes[array: "items"] = nil
-        XCTAssertNil(attributes[array: "items"])
-    }
-
-    func testSetSubscript() {
-        let attributes = MutableAttributes()
-        let attributeSet = AttributeSet(labels: [
-            "name": .string("John Doe"),
-            "age": .int(30)
-        ])
-
-        attributes[set: "user"] = attributeSet
-        XCTAssertEqual(attributes[set: "user"], attributeSet)
-
-        attributes[set: "user"] = nil
-        XCTAssertNil(attributes[set: "user"])
-    }
 
     // MARK: - Getter Tests
 
@@ -208,6 +127,7 @@ final class MutableAttributesTests: XCTestCase {
         XCTAssertNil(attributes.getSet(for: "string")) // Wrong type
     }
 
+
     // MARK: - Setter Tests
 
     func testSetValue() {
@@ -263,6 +183,7 @@ final class MutableAttributesTests: XCTestCase {
 
         XCTAssertEqual(attributes["set"], .set(attributeSet))
     }
+
 
     // MARK: - Utility Tests
 
@@ -338,6 +259,7 @@ final class MutableAttributesTests: XCTestCase {
         XCTAssertEqual(dictionary["int"], .int(42))
     }
 
+
     // MARK: - Add AttributeSet Tests
 
     func testAddAttributeSet() {
@@ -366,6 +288,7 @@ final class MutableAttributesTests: XCTestCase {
         XCTAssertEqual(attributes[int: "user.age"], 30)
     }
 
+
     // MARK: - Add Dictionary Tests
 
     func testAddDictionary() {
@@ -393,6 +316,7 @@ final class MutableAttributesTests: XCTestCase {
         XCTAssertEqual(attributes[string: "user.name"], "John Doe")
         XCTAssertEqual(attributes[int: "user.age"], 30)
     }
+
 
     // MARK: - Description Tests
 

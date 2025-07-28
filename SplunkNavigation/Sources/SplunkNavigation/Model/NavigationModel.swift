@@ -20,12 +20,12 @@ actor NavigationModel {
 
     // MARK: - Public
 
-    public private(set) var moduleEnabled: Bool = true
-    public private(set) var screenName: String = "unknown"
-    public private(set) var isManualScreenName = false
+    private(set) var moduleEnabled: Bool = true
+    private(set) var screenName: String = "unknown"
+    private(set) var isManualScreenName = false
 
-    public private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
-    public private(set) var agentVersion: String?
+    private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
+    private(set) var agentVersion: String?
 
 
     // MARK: - Module management

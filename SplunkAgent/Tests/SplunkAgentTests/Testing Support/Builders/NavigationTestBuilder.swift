@@ -22,7 +22,7 @@ final class NavigationTestBuilder {
 
     // MARK: - Basic builds
 
-    public static func buildDefault() -> SplunkAgent.Navigation {
+    static func buildDefault() -> SplunkAgent.Navigation {
         // Build Navigation proxy with actual Navigation module
         let module = SplunkNavigation.Navigation()
         let moduleProxy = SplunkAgent.Navigation(for: module)
@@ -33,7 +33,7 @@ final class NavigationTestBuilder {
 
     // MARK: - Non-operational builds
 
-    public static func buildNonOperational() -> NavigationNonOperational {
+    static func buildNonOperational() -> NavigationNonOperational {
         let moduleProxy = NavigationNonOperational()
 
         return moduleProxy

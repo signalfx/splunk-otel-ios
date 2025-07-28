@@ -22,7 +22,7 @@ class UserDefaultsUtils {
 
     // MARK: - Cleanup methods
 
-    public static func cleanItem(prefix: String?, key: String) {
+    static func cleanItem(prefix: String?, key: String) {
         let userDefaults = UserDefaults.standard
 
         let storage = UserDefaultsStorage()
