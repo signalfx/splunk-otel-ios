@@ -23,7 +23,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/open-telemetry/opentelemetry-swift",
-            branch: "main"
+            exact: "2.0.0"
         ),
         .package(
             url:"https://github.com/microsoft/plcrashreporter",
