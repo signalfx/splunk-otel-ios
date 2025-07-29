@@ -84,7 +84,7 @@ final class NetworkMonitorTests: XCTestCase {
             radioType: "LTE (4G)"
         )
 
-        XCTAssertTrue(event1.isDifferent(from: event2))
+        XCTAssertTrue(event1.isDebouncedChange(from: event2))
     }
 
     func testNetworkMonitorEventIsDifferent_WhenEventsAreSame() {
@@ -102,7 +102,7 @@ final class NetworkMonitorTests: XCTestCase {
             radioType: nil
         )
 
-        XCTAssertFalse(event1.isDifferent(from: event2))
+        XCTAssertFalse(event1.isDebouncedChange(from: event2))
     }
 
     func testNetworkMonitorEventIsDifferent_WhenEventsAreCloseInTime() {
@@ -121,7 +121,7 @@ final class NetworkMonitorTests: XCTestCase {
         )
 
         // Should return false even though properties are different due to time proximity
-        XCTAssertFalse(event1.isDifferent(from: event2))
+        XCTAssertFalse(event1.isDebouncedChange(from: event2))
     }
 
     func testNetworkMonitorEventIsDifferent_WhenEventsAreFarApartInTime() {
@@ -140,7 +140,7 @@ final class NetworkMonitorTests: XCTestCase {
         )
 
         // Should return true since events are far enough apart and properties are different
-        XCTAssertTrue(event1.isDifferent(from: event2))
+        XCTAssertTrue(event1.isDebouncedChange(from: event2))
     }
 
     // MARK: - ConnectionType Tests
@@ -372,7 +372,7 @@ final class NetworkMonitorEdgeCaseTests: XCTestCase {
         )
 
         // Should return false since they're identical
-        XCTAssertFalse(event1.isDifferent(from: event2))
+        XCTAssertFalse(event1.isDebouncedChange(from: event2))
     }
 
     func testNetworkMonitorEventComparisonWithDifferentRadioTypes() {
@@ -391,7 +391,7 @@ final class NetworkMonitorEdgeCaseTests: XCTestCase {
         )
 
         // Should return true since radio types are different
-        XCTAssertTrue(event1.isDifferent(from: event2))
+        XCTAssertTrue(event1.isDebouncedChange(from: event2))
     }
 
     func testNetworkMonitorEventComparisonWithNilVsNonNilRadioType() {
@@ -410,7 +410,7 @@ final class NetworkMonitorEdgeCaseTests: XCTestCase {
         )
 
         // Should return true since one has radio type and the other doesn't
-        XCTAssertTrue(event1.isDifferent(from: event2))
+        XCTAssertTrue(event1.isDebouncedChange(from: event2))
     }
 }
 
@@ -435,7 +435,7 @@ final class NetworkMonitorPerformanceTests: XCTestCase {
 
         measure {
             for _ in 0..<1000 {
-                _ = event1.isDifferent(from: event2)
+                _ = event1.isDebouncedChange(from: event2)
             }
         }
     }
