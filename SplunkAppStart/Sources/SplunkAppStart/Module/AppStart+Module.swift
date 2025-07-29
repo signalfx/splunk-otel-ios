@@ -58,13 +58,13 @@ extension AppStart: Module {
 
     /// A placeholder for handling the deletion of data associated with a specific event.
     ///
-    - Note: This method is a no-op as the AppStart module does not persist data that requires explicit deletion.
+    /// - Note: This method is a no-op as the AppStart module does not persist data that requires explicit deletion.
     /// - Parameter metadata: The metadata of the event whose data should be deleted.
     public func deleteData(for metadata: any ModuleEventMetadata) {}
 
     /// A placeholder for registering a callback to publish AppStart event data.
     ///
-    - Note: This method is a no-op because the AppStart module reports data directly through the OTel pipeline
+    /// - Note: This method is a no-op because the AppStart module reports data directly through the OTel pipeline
     /// rather than publishing it through a callback mechanism.
     /// - Parameter data: A closure to be called when new event data is available.
     public func onPublish(data: @escaping (AppStartMetadata, AppStartData) -> Void) {}

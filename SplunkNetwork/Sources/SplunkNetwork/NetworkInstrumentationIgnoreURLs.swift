@@ -38,7 +38,7 @@ public class IgnoreURLs: Codable {
     }
 
     /// Initialize with an optional NSRegularExpression pattern
-    /// - Parameter containing pattern: Optional NSRegularExpression for URL pattern matching
+    /// - Parameter `containing pattern`: Optional NSRegularExpression for URL pattern matching
     public init(containing pattern: NSRegularExpression?) {
         if let pattern = pattern {
             self.urlPatterns = [pattern]

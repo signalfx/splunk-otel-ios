@@ -70,11 +70,11 @@ public protocol CustomTrackingModule {
 
     // MARK: - Track Custom Workflow
 
-    /// Track a workflow with a name and return a ``Span`` object.
+    /// Track a workflow with a name and return a `Span` object.
     ///
     /// - Parameter workflowName: The name of the workflow to track.
     ///
-    /// - Returns: A ``Span`` object representing the workflow.
+    /// - Returns: A `Span` object representing the workflow.
     func trackWorkflow(_ workflowName: String) -> Span
 
 

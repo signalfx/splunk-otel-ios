@@ -145,7 +145,7 @@ public class SplunkRum: ObservableObject {
     ///
     /// - Returns: A newly initialized ``SplunkRum`` instance.
     ///
-    /// - Throws: ``AgentConfigurationError`` if provided configuration is invalid.
+    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
     public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws -> SplunkRum {
 
         // Install is allowed only once.

@@ -41,7 +41,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     public var enableDebugLogging: Bool = ConfigurationDefaults.enableDebugLogging
     public var globalAttributes: MutableAttributes = ConfigurationDefaults.globalAttributes
 
-    /// Span interceptor to be used to filter or modify all outgoing ``SpanData`` instances.
+    /// Span interceptor to be used to filter or modify all outgoing `SpanData` instances.
     ///
     /// If the callback is provided, all spans are funneled through the callback, and can be either approved by returning the span in the callback,
     /// or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
@@ -140,7 +140,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// and can be either approved by returning the span in the callback, or discarded by returning `nil`.
     /// Spans can also be modified by the callback.
     ///
-    /// - Parameter spanInterceptor: A ``SpanData`` interceptor callback.
+    /// - Parameter spanInterceptor: A `SpanData` interceptor callback.
     ///
     /// - Returns: The updated configuration structure.
     @discardableResult

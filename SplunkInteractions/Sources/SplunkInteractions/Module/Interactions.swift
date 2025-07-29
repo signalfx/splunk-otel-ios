@@ -51,7 +51,7 @@ public final class Interactions: SplunkInteractionsModule {
 
     /// Initializes the `Interactions` module.
     ///
-    /// This initializer is required for ``Module`` conformance and sets up the default `OTelDestination`
+    /// This initializer sets up the default `OTelDestination`
     /// to handle and export interaction events.
     public required init() {
         destination = OTelDestination()

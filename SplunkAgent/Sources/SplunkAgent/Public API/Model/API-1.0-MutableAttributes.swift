@@ -59,7 +59,7 @@ public class MutableAttributes {
     }
 
     /// Initializes the collection with attributes from a given `AttributeSet`.
-    /// - Parameter attributeSet: An ``AttributeSet`` whose labels will be added to the collection.
+    /// - Parameter attributeSet: An `AttributeSet` whose labels will be added to the collection.
     public init(attributeSet: AttributeSet) {
         attributes = ThreadSafeDictionary<String, AttributeValue>()
         addAttributeSet(attributeSet)

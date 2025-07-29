@@ -33,6 +33,7 @@ public class OTLPAttributesLogRecordProcessor: LogRecordProcessor {
 
     /// Initializes new log record processor with given runtime attributes.
     ///
+    /// - Parameter proxy: The processor to which modified log records are forwarded.
     /// - Parameter runtimeAttributes: An object that holds and manages runtime attributes.
     ///
     /// - Note: The processor itself does not own the object with runtime attributes.

@@ -54,7 +54,7 @@ public struct MaskElement: Codable, Equatable {
     ///   - rect: A rectangle that bounds the masked area.
     ///   - type: A type of mask element, a ``MaskType``.
     ///
-    ///   - Returns: A newly created ``MaskElement`` structure.
+    /// - Returns: A newly created ``MaskElement`` structure.
     public init(rect: CGRect, type: MaskType = .covering) {
         self.rect = rect
         self.type = type

@@ -19,7 +19,7 @@ import Foundation
 import SplunkCommon
 
 
-/// A data object that represents a navigation event, currently serving as a placeholder to conform to the ``Module`` protocol.
+/// A data object that represents a navigation event, currently serving as a placeholder to conform to the `ModuleEventData` protocol.
 public struct NavigationData: ModuleEventData {}
 
 /// An object that holds metadata for a navigation event.
