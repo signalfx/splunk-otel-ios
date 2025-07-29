@@ -160,7 +160,7 @@ public class NetworkInstrumentation {
     }
 
     func createdRequest(URLRequest: URLRequest, span: Span) {
-        let key = SemanticAttributes.httpRequestContentLength
+        let key = SemanticAttributes.httpRequestBodySize
         let body = URLRequest.httpBody
         let length = body?.count ?? 0
         span.setAttribute(key: key, value: length)
@@ -236,7 +236,7 @@ public class NetworkInstrumentation {
     }
 
     func receivedResponse(URLResponse: URLResponse, dataOrFile: DataOrFile?, span: Span) {
-        let key = SemanticAttributes.httpResponseContentLength
+        let key = SemanticAttributes.httpResponseBodySize
         let response = URLResponse as? HTTPURLResponse
         let length = response?.expectedContentLength ?? 0
         span.setAttribute(key: key, value: Int(length))
