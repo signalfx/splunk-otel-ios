@@ -74,6 +74,10 @@ agent?.navigation.preferences.enableAutomatedTracking = true
 agent?.sessionReplay.start()
 ```
 
+## Documentation
+
+For a comprehensive API reference, build the documentation directly in Xcode by selecting **Product > Build Documentation**.
+
 ## Features
 
 The agent provides several instrumentations to capture telemetry. Most are enabled by default and can be configured or disabled during initialization.
