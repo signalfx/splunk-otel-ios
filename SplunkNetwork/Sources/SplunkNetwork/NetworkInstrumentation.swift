@@ -164,9 +164,15 @@ public class NetworkInstrumentation {
         let body = URLRequest.httpBody
         let length = body?.count ?? 0
         span.setAttribute(key: key, value: length)
+        let method = URLRequest.httpMethod ?? "unknown_method"
+        span.setAttribute(key: SemanticAttributes.httpRequestMethod, value: method)
         span.setAttribute(key: "component", value: "http")
 
         if let url = URLRequest.url {
+            if let scheme = url.scheme {
+                span.setAttribute(key: SemanticAttributes.urlScheme, value: scheme)
+            }
+
             if let host = url.host {
                 span.setAttribute(key: "server.address", value: host)
                 // Preload with host in case IP cannot be determined
@@ -264,6 +270,9 @@ public class NetworkInstrumentation {
             }
         }
 
+        // removes obsolete attributes
+        removeObsoleteAttributesFromSpan(span)
+
         /* Save this until we add the feature into the Agent side API
         guard ((agentConfiguration?.appDCloudNetworkResponseCallback?(URLResponse)) == nil) else {
             let newUrl = ((agentConfiguration?.appDCloudNetworkResponseCallback!(URLResponse)) != nil)
@@ -325,6 +334,24 @@ public class NetworkInstrumentation {
         }
 
         return false
+    }
+
+    /// Removes obsolete attributes from the span
+    /// - Parameter span: The span to be modified
+    private func removeObsoleteAttributesFromSpan(_ span: Span) {
+        // Attributes to be removed
+        let attributesToRemove = [
+            "http.url",
+            "net.peer.name",
+            "http.status_code",
+            "http.method",
+            "http.scheme"
+        ]
+
+        for key in attributesToRemove {
+            // Setting the value to nil will remove the key
+            span.setAttribute(key: key, value: nil)
+        }
     }
 
     func receivedError(error: Error, dataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, span: Span) {
