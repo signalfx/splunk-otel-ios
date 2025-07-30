@@ -71,12 +71,16 @@ final class DefaultSessionTests: XCTestCase {
     }
 
     func testSessionForLogic() throws {
-        var configuration = try ConfigurationTestBuilder.buildDefault()
-        configuration.maxSessionLength = 5
+        let maxSessionLength = 5.0
+        let sessionTimeout = 1.0
+
+        let configuration = try ConfigurationTestBuilder.buildDefault()
 
         // After the object is created, there should be one open session
         let testName = "sessionForLogicTest"
         let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
+        defaultSession.testMaxSessionLength = maxSessionLength
+        defaultSession.testSessionTimeout = sessionTimeout
 
         // We need to create a full agent as our session runner for this test
         let agent = try AgentTestBuilder.build(with: configuration, session: defaultSession)
@@ -136,13 +140,13 @@ final class DefaultSessionTests: XCTestCase {
         XCTAssertEqual(retrievedSessionId, lastSessionId)
 
         // Test session right before the second session's end
-        timestamp = lastSessionItem.start + configuration.maxSessionLength - threshold
+        timestamp = lastSessionItem.start + maxSessionLength - threshold
         retrievedSessionId = defaultSession.sessionId(for: timestamp)
         XCTAssertEqual(retrievedSessionId, lastSessionId)
 
         // Test session right after the second session's end
         let tolerance = defaultSession.sessionRefreshInterval + (defaultSession.refreshJob?.tolerance ?? 0.0)
-        timestamp = lastSessionItem.start + configuration.maxSessionLength + tolerance + threshold
+        timestamp = lastSessionItem.start + maxSessionLength + tolerance + threshold
         retrievedSessionId = defaultSession.sessionId(for: timestamp)
         XCTAssertNil(retrievedSessionId)
     }
