@@ -334,6 +334,9 @@ extension DefaultSession {
                 // We need to mark the time of this transition
                 if self?.enterBackground != nil {
                     self?.leaveBackground = Date()
+
+                    // Refresh session immediately
+                    self?.refreshSession()
                 }
             }
 
