@@ -21,49 +21,57 @@ limitations under the License.
 
 import Foundation
 import Network
-import OpenTelemetryApi
+internal import OpenTelemetryApi
 import SplunkCommon
 
+// MARK: - Public
+
+/// Represents the type of network connection available to the device.
+public enum ConnectionType: String {
+    case wifi
+    case cellular
+    case wiredEthernet
+    case vpn
+    case other
+    case unavailable
+}
+
 public class NetworkMonitor {
-
-
-    // MARK: - Public
-
-    public enum ConnectionType: String {
-        case wifi
-        case cellular
-        case wiredEthernet
-        case vpn
-        case other
-        case unavailable
-    }
 
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
 
+    /// Shared instance of NetworkMonitor for singleton access.
     public static let shared = NetworkMonitor()
 
-    public var statusChangeHandler: ((Bool, ConnectionType) -> Void)?
-
+    /// An optional callback for network changes
+    public typealias NetworkStatusChangeHandler = (_ isConnected: Bool, _ connectionType: ConnectionType, _ radioType: String?) -> Void
+    public var statusChangeHandler: NetworkStatusChangeHandler?
 
     // MARK: - Private
 
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitorQueue")
-    private var previousStatus: String?
-    private var previousType: ConnectionType?
 
     #if canImport(CoreTelephony)
         private let telephonyInfo = CTTelephonyNetworkInfo()
     #endif
 
+    private var networkChangeEvent = NetworkMonitorEvent(
+        timestamp: Date(),
+        isConnected: false,
+        connectionType: .unavailable,
+        radioType: nil
+    )
+    private var previousChangeEvent = NetworkMonitorEvent(
+        timestamp: Date(),
+        isConnected: false,
+        connectionType: .unavailable,
+        radioType: nil
+    )
+    private var isInitialEvent = true
 
-    // MARK: - Nested
-
-    public private(set) var currentRadioAccessTechnology: String?
-    public private(set) var isConnected: Bool = false
-    public private(set) var connectionType: ConnectionType = .unavailable
-
+    private var destination: NetworkMonitorDestination = OTelDestination()
 
     // MARK: - Initialization
 
@@ -74,22 +82,29 @@ public class NetworkMonitor {
         stopDetection()
     }
 
+    /// Starts monitoring network connectivity changes.
+    ///
+    /// ## Important
+    ///
+    /// Call this method after setting up your `statusChangeHandler` if you want to receive
+    /// network change callbacks.
     public func startDetection() {
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self = self else { return }
-            self.isConnected = path.status == .satisfied
-            self.connectionType = self.getConnectionType(path)
 
-            let currentStatus = self.isConnected ? "available" : "lost"
+            networkChangeEvent.timestamp = Date()
+            networkChangeEvent.isConnected = path.status == .satisfied
+            networkChangeEvent.connectionType = self.getConnectionType(path)
+            networkChangeEvent.radioType = self.getCurrentRadioAccessTechnology()
 
-            if let prevStatus = self.previousStatus,
-               let prevType = self.previousType,
-               currentStatus != prevStatus || self.connectionType != prevType {
-                self.sendNetworkChangeSpan()
-                self.statusChangeHandler?(self.isConnected, self.connectionType)
+            if isInitialEvent {
+                isInitialEvent = false
+                previousChangeEvent = networkChangeEvent
+            } else {
+                if networkChangeEvent.isDebouncedChange(from: previousChangeEvent) {
+                    sendNetworkChangeSpan()
+                }
             }
-            self.previousStatus = currentStatus
-            self.previousType = self.connectionType
         }
         monitor.start(queue: queue)
 
@@ -104,9 +119,10 @@ public class NetworkMonitor {
         #endif
 
         // Initial fetch of radio access technologies
-        updateRadioAccessTechnologies()
+        networkChangeEvent.radioType = getCurrentRadioAccessTechnology()
     }
 
+    /// Stops monitoring network connectivity changes.
     public func stopDetection() {
         monitor.cancel()
         monitor.pathUpdateHandler = nil
@@ -138,35 +154,24 @@ public class NetworkMonitor {
     }
 
     private func sendNetworkChangeSpan() {
-        let tracer = OpenTelemetry.instance
-            .tracerProvider
-            .get(
-                instrumentationName: "NetworkMonitor",
-                instrumentationVersion: sharedState?.agentVersion
-            )
+        destination.send(networkEvent: networkChangeEvent, sharedState: sharedState)
 
-        // Getting current timestamp to set zero length span as start and end time
-        let timestamp = Date()
-        let span = tracer.spanBuilder(spanName: "network.change")
-            .setStartTime(time: timestamp)
-            .startSpan()
-        span.setAttribute(key: "network.status", value: isConnected ? "available" : "lost")
-        span.setAttribute(key: "network.connection.type", value: connectionType.rawValue)
-        if currentRadioAccessTechnology != nil {
-            span.setAttribute(key: "network.connection.subtype", value: currentRadioAccessTechnology!)
-        }
-        span.end(time: timestamp)
-    }
-
-    private func updateRadioAccessTechnologies() {
-        currentRadioAccessTechnology = getCurrentRadioAccessTechnology()
+        self.statusChangeHandler?(
+            networkChangeEvent.isConnected,
+            networkChangeEvent.connectionType,
+            networkChangeEvent.radioType
+        )
+        previousChangeEvent = networkChangeEvent
     }
 
     @objc private func radioAccessChanged() {
-        updateRadioAccessTechnologies()
+        isInitialEvent = false
+        networkChangeEvent.timestamp = Date()
+        networkChangeEvent.radioType = getCurrentRadioAccessTechnology()
         sendNetworkChangeSpan()
     }
 
+    // swiftlint:disable cyclomatic_complexity
     private func getCurrentRadioAccessTechnology() -> String? {
         #if canImport(CoreTelephony)
             // Pick the first available radio access technology
@@ -205,4 +210,5 @@ public class NetworkMonitor {
             return nil
         #endif
     }
+    // swiftlint:enable cyclomatic_complexity
 }

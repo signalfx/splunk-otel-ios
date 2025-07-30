@@ -28,7 +28,7 @@ public struct NetworkMonitorRemoteConfiguration: RemoteModuleConfiguration {
     }
 
     struct MRUMRoot: Decodable {
-        let NetworkMonitor: NetworkMonitor
+        let networkMonitor: NetworkMonitor
     }
 
     struct Configuration: Decodable {
@@ -39,16 +39,21 @@ public struct NetworkMonitorRemoteConfiguration: RemoteModuleConfiguration {
         let configuration: Configuration
     }
 
-
     // MARK: - Public
 
+    /// This property indicates whether the NetworkMonitor should be enabled
+    /// according to the remote configuration.
     public var enabled: Bool
 
+    /// Initializes a NetworkMonitorRemoteConfiguration from JSON data.
+    ///
+    /// - Parameter data: The JSON data containing the remote configuration
+    /// - Returns: A NetworkMonitorRemoteConfiguration if decoding succeeds, nil otherwise
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
             return nil
         }
 
-        enabled = root.configuration.mrum.NetworkMonitor.enabled
+        enabled = root.configuration.mrum.networkMonitor.enabled
     }
 }
