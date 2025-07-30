@@ -9,9 +9,7 @@ The `AgentConfiguration` struct defines the initial setup parameters for the Spl
 ### Initializers
 
 - ``init(url:)``
-  Initializes the configuration with a specific URL.
 - ``init(from:)``
-  Initializes the configuration from a decoder.
 
 ### Endpoint Settings
 
