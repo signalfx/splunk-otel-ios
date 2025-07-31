@@ -33,5 +33,3 @@ To make the most of the agent, it's helpful to understand its main components an
 - ``SplunkRum``
 - ``AgentConfiguration``
 
-### Modules
-- <doc:Modules-Overview>

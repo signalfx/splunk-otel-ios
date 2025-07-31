@@ -66,4 +66,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-Once initialized, the agent will automatically begin collecting data. To explore what you can do next, see our <doc:Modules-Overview>.
+Once initialized, the agent will automatically begin collecting data.

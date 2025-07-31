@@ -30,5 +30,3 @@ You can also provide optional configurations for global attributes and other set
 ## Module Configurations
 
 While the main ``AgentConfiguration`` handles global settings, some modules have their own specific configuration structs (e.g., `SplunkNetwork.NetworkInstrumentationConfiguration`). These are passed as an optional array to the `SplunkRum.install(with:moduleConfigurations:)` method to override default module behaviors.
-
-For a complete list of available modules and their capabilities, see the <doc:Modules-Overview>.
