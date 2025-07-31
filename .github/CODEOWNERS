@@ -1,17 +1,7 @@
-#  https://help.github.com/en/articles/about-code-owners
-#
-# Global Owners
-* @signalfx/gdi-ios-maintainers @signalfx/gdi-ios-approvers
+# Global Owners:
+# All files in the repository require review by the MRUM iOS maintainers.
+* @signalfx/mrum-ios-maintainers
 
-.github/CODEOWNERS @signalfx/gdi-ios-maintainers
-
-#####################################################
-#
-# Docs reviewers
-#
-#####################################################
-
-*.md    @signalfx/gdi-ios-maintainers @signalfx/gdi-ios-approvers @signalfx/gdi-docs
-*.rst   @signalfx/gdi-ios-maintainers @signalfx/gdi-ios-approvers @signalfx/gdi-docs
-docs/   @signalfx/gdi-ios-maintainers @signalfx/gdi-ios-approvers @signalfx/gdi-docs
-README* @signalfx/gdi-ios-maintainers @signalfx/gdi-ios-approvers @signalfx/gdi-docs
+# CODEOWNERS File:
+# Changes to this CODEOWNERS file specifically require approval from MRUM iOS admins.
+.github/CODEOWNERS @signalfx/mrum-ios-admins

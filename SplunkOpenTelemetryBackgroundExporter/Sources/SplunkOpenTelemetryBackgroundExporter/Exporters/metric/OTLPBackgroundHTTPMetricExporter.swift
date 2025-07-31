@@ -21,11 +21,11 @@ import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 
 
-public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, StableMetricExporter {
+public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, MetricExporter {
 
-    // MARK: - Implementation StableMetricExporter protocol
+    // MARK: - Implementation MetricExporter protocol
 
-    public func export(metrics: [StableMetricData]) -> ExportResult {
+    public func export(metrics: [MetricData]) -> ExportResult {
         let body = Opentelemetry_Proto_Collector_Metrics_V1_ExportMetricsServiceRequest.with {
             $0.resourceMetrics = MetricsAdapter.toProtoResourceMetrics(metricData: metrics)
         }
