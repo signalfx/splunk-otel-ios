@@ -27,7 +27,7 @@ import OpenTelemetrySdk
 
 public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, MetricExporter {
 
-    // MARK: - Implementation StableMetricExporter protocol
+    // MARK: - Implementation MetricExporter protocol
 
     public func export(metrics: [MetricData]) -> ExportResult {
         let body = Opentelemetry_Proto_Collector_Metrics_V1_ExportMetricsServiceRequest.with {
