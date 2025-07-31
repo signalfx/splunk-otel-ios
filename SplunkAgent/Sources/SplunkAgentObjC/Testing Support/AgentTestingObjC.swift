@@ -19,7 +19,7 @@ import Foundation
 @_spi(objc) import SplunkAgent
 
 /// Private class for supporting automated API testing.
-/// 
+///
 /// **Warning:** This class is not meant for client applications and may produce
 ///            unexpected results.
 @objc(STSAgentTesting) @objcMembers
@@ -48,7 +48,7 @@ public class AgentTestingObjC: NSObject {
 
 
     // MARK: - Agent builds
-    
+
     /// Private method for creating test instances of the agent.
     ///
     /// **Warning:** This method is not meant for client applications and may produce
