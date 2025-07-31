@@ -61,15 +61,9 @@ public final class AgentConfigurationObjC: NSObject {
 
     /// Sets global attributes, which are sent with all signals.
     ///
-    /// Defaults to an empty `NSMutableDictionary` object.
+    /// Defaults to an empty `NSDictionary` object.
     @objc
-    public var globalAttributes: NSMutableDictionary = [:] {
-        // TODO: Resolve as part of a follow-up implementation ticket.
-
-        didSet {
-            //
-        }
-    }
+    public var globalAttributes: NSDictionary = [:]
 
     /// Sets the `SPLKUserConfiguration` object.
     @objc
