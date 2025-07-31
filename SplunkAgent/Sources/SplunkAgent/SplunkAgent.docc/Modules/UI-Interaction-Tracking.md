@@ -8,9 +8,9 @@ The UI Interaction module automatically captures user taps on UI elements.
 | **Enabled by Default?** | Yes |
 | **Public API?** | Yes (for custom IDs) |
 
-## Overview
-
 This module creates spans for user interactions, such as button taps, to help you understand how users navigate and use your app. It automatically captures the element's class and accessibility label.
+
+> SplunkRum instance property: none
 
 ## Custom Identifiers
 

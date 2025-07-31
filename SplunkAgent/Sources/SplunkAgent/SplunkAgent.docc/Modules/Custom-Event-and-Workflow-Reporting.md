@@ -2,7 +2,6 @@
 
 This module provides APIs to manually track custom events, errors, and multi-step workflows.
 
-> ``SplunkRum/customTracking``
 
 | | |
 |---|---|
@@ -10,15 +9,17 @@ This module provides APIs to manually track custom events, errors, and multi-ste
 | **Enabled by Default?** | Yes |
 | **Public API?** | Yes |
 
-## Overview
-
 Use this module to report business-specific events or to trace the duration of custom workflows within your application.
+
+> SplunkRum instance property: ``SplunkRum/customTracking``
 
 ## Usage Examples
 
+Assuming `agent` is the ``SplunkRum`` instance you retained after installation.
+
 ### Tracking a Custom Event
 ```swift
-SplunkRum.shared.customTracking.trackCustomEvent("user_signed_up")
+agent?.customTracking.trackCustomEvent("user_signed_up")
 ```
 
 ### Tracking an Error
@@ -26,7 +27,7 @@ SplunkRum.shared.customTracking.trackCustomEvent("user_signed_up")
 do {
     try performRiskyOperation()
 } catch {
-    SplunkRum.shared.customTracking.trackError(error)
+    agent?.customTracking.trackError(error)
 }
 ```
 
@@ -34,9 +35,9 @@ do {
 The trackWorkflow method returns a Span object that you are responsible for ending.
 
 ```swift
-let checkoutSpan = SplunkRum.shared.customTracking.trackWorkflow("checkout_process")
+let checkoutSpan = agent?.customTracking.trackWorkflow("checkout_process")
 
 // ... perform checkout steps ...
 
-checkoutSpan.end() // The duration is now recorded
+checkoutSpan?.end() // The duration is now recorded
 ```

@@ -1,37 +1,37 @@
+@main
 # ``SplunkAgent``
 
-The Splunk RUM agent for iOS is a modular Swift package for Real User Monitoring. It provides several instrumentations to capture telemetry, helping you understand and improve your application's performance and user experience.
+The Splunk RUM agent for iOS provides Real User Monitoring (RUM) capabilities for your native iOS applications.
 
 > :construction: This project is currently in **ALPHA**. It is **officially supported** by Splunk. However, breaking changes **MAY** be introduced.
 
-## Topics
+## Overview
 
-### Getting Started
+The agent automatically instruments your application to capture performance metrics, crashes, user interactions, and more. All interactions with the agent are primarily done through the ``SplunkRum`` instance returned during installation.
 
-- <doc:Getting-Started-article>
+Getting started is simple: you add the package, provide an ``AgentConfiguration``, and install the agent by calling the `SplunkRum.install(with:)` method. From there, you can customize which modules are active and how they behave using the agent instance you've retained.
+
+## Getting Started
+
+To begin integrating the agent into your app, start with our step-by-step guide.
+
+- <doc:Getting-Started>
+
+## Core Concepts
+
+To make the most of the agent, it's helpful to understand its main components and design.
+
 - <doc:Core-Concepts>
 
-### Key APIs
+## Topics
 
+### Essentials
+- <doc:Getting-Started>
+- <doc:Core-Concepts>
+
+### Configuration
 - ``SplunkRum``
 - ``AgentConfiguration``
 
-### Instrumentation Modules
-
-A collection of articles detailing each of the available instrumentation modules.
-
-- <doc:App-Startup-Tracking>
-- <doc:Crash-Reporting>
-- <doc:Custom-Event-and-Workflow-Reporting>
-- <doc:UI-Interaction-Tracking>
-- <doc:Navigation-Tracking>
-- <doc:Network-Monitoring>
-- <doc:Session-Replay>
-- <doc:Slow-and-Frozen-Frame-Detection>
-- <doc:WebView-Instrumentation>
-
-### Advanced API Reference
-
-- ``RuntimeState``
-- ``Session``
-- ``User``
+### Modules
+- <doc:Modules-Overview>

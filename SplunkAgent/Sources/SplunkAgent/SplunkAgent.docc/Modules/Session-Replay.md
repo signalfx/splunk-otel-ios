@@ -2,25 +2,25 @@
 
 Session Replay provides a visual replay of user sessions, helping you understand user behavior and debug issues.
 
-> ``SplunkRum/sessionReplay``
-
 | | |
 |---|---|
 | **Module** | `SplunkSessionReplayProxy` |
 | **Enabled by Default?** | No (Requires manual start) |
 | **Public API?** | Yes |
 
-## Overview
-
 This module captures the application's UI and user interactions to create a video-like replay of the user's session. It includes powerful privacy controls to mask sensitive information.
+
+> SplunkRum instance property: ``SplunkRum/sessionReplay``
 
 ## Usage
 
-Session Replay must be started manually after the agent is initialized.
+Assuming `agent` is the ``SplunkRum`` instance you retained after installation.
+
+Session Replay must be started manually.
 
 ```swift
 // Start recording the user session
-SplunkRum.shared.sessionReplay.start()
+agent?.sessionReplay.start()
 ```
 
 ## Privacy and Sensitivity
@@ -33,5 +33,3 @@ sensitiveLabel.srSensitive = true
 ```
 
 For SwiftUI, use the `.sessionReplaySensitive()` view modifier.
-
-

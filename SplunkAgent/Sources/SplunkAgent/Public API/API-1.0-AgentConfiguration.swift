@@ -23,9 +23,6 @@ internal import SplunkCommon
 /// Structure that holds a configuration for an initial SDK setup.
 ///
 /// Configuration is always bound to a specific URL.
-///
-/// - Note: If you want to set up a parameter, you can change the appropriate property
-///         or use the proper method. Both approaches are comparable and give the same result.
 public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable {
 
     // MARK: - Public mandatory properties

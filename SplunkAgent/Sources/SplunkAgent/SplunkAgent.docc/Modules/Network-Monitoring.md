@@ -8,11 +8,11 @@ The Network Monitoring modules automatically instrument `URLSession` requests an
 | **Enabled by Default?** | Yes |
 | **Public API?** | Yes (for configuration) |
 
-## Overview
-
 **`SplunkNetwork`** automatically captures HTTP requests made via `URLSession`, reporting them as spans with details like URL, method, status code, and duration. Requests to the Splunk ingest endpoint are automatically ignored.
 
 **`SplunkNetworkMonitor`** detects changes in network status (e.g., connected/disconnected) and connection type (Wi-Fi/cellular) and reports them as events.
+
+> SplunkRum instance property: none
 
 ## Configuration
 
