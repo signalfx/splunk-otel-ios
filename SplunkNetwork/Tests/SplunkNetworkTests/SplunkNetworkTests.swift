@@ -198,7 +198,7 @@ final class SplunkNetworkTests: XCTestCase {
         sut.createdRequest(URLRequest: request, span: mockSpan)
 
         // Then
-        let attributeValue = mockSpan.attributes[SemanticAttributes.httpRequestContentLength.rawValue]
+        let attributeValue = mockSpan.attributes[SemanticAttributes.httpRequestBodySize.rawValue]
         XCTAssertNotNil(attributeValue)
         if case .int(let value) = attributeValue {
             XCTAssertEqual(value, body.count)
@@ -224,7 +224,7 @@ final class SplunkNetworkTests: XCTestCase {
         sut.receivedResponse(URLResponse: response, dataOrFile: nil, span: mockSpan)
 
         // Then
-        let attributeValue = mockSpan.attributes[SemanticAttributes.httpResponseContentLength.rawValue]
+        let attributeValue = mockSpan.attributes[SemanticAttributes.httpResponseBodySize.rawValue]
         XCTAssertNotNil(attributeValue)
         if case .int = attributeValue {
             // Success - we just want to verify it's an int value
