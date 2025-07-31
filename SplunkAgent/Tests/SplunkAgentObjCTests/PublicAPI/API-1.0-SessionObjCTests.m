@@ -30,8 +30,10 @@ limitations under the License.
 // MARK: - API Tests
 
 - (void)testSession {
+    NSString *testName = @"sessionTest";
+    
     // Touch `.session` property
-    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefaultForTestNamed:testName];
     SPLKSession *session = agent.session;
     XCTAssertNotNil(session);
 

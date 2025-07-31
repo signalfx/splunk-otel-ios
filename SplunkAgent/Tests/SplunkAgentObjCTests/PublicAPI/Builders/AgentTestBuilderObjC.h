@@ -15,34 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#import <XCTest/XCTest.h>
-#import "Builders/AgentTestBuilderObjC.h"
-
+#import <Foundation/Foundation.h>
 @import SplunkAgentObjC;
 
-@interface API10UserObjCTests : XCTestCase
+@interface AgentTestBuilderObjC : NSObject
 
-@end
+// MARK: - Basic builds
 
-
-@implementation API10UserObjCTests
-
-// MARK: - API Tests
-
-- (void)testUser {
-    NSString *testName = @"userTest";
-    
-    // Touch `.user` property
-    SPLKAgent *agent = [AgentTestBuilderObjC buildDefaultForTestNamed:testName];
-    SPLKUser *user = agent.user;
-    XCTAssertNotNil(user);
-
-    // Properties (READ)
-    SPLKUserPreferences *preferences = user.preferences;
-    XCTAssertNotNil(preferences);
-
-    SPLKUserState *state = user.state;
-    XCTAssertNotNil(state);
-}
++ (SPLKAgent *)buildDefault;
++ (SPLKAgent *)buildDefaultForTestNamed:(NSString *)testName;
 
 @end

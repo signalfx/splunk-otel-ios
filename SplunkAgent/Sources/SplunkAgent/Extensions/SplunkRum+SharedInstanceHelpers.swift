@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// MARK: - Internal SplunkRum singleton helpers
-
 extension SplunkRum {
+
+    // MARK: - Internal SplunkRum singleton helpers
 
     /// Resets the `shared` singleton instance to a non-operational state.
     ///

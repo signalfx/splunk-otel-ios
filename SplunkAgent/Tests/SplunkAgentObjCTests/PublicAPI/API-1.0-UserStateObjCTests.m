@@ -30,8 +30,10 @@ limitations under the License.
 // MARK: - API Tests
 
 - (void)testState {
+    NSString *testName = @"userStateTest";
+    
     // Touch `.user.state` property
-    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefaultForTestNamed:testName];
     SPLKUserState *userState = agent.user.state;
     XCTAssertNotNil(userState);
 

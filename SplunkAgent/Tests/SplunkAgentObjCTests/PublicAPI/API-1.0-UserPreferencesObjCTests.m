@@ -30,8 +30,10 @@ limitations under the License.
 // MARK: - API Tests
 
 - (void)testPreferences {
+    NSString *testName = @"userPreferencesTest";
+    
     // Touch `.user.preferences` property
-    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefaultForTestNamed:testName];
     SPLKUserPreferences *userPreferences = agent.user.preferences;
     XCTAssertNotNil(userPreferences);
 

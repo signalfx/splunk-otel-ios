@@ -84,7 +84,8 @@ limitations under the License.
 }
 
 - (void)testProperties {
-    agent = [AgentTestBuilderObjC buildDefault];
+    NSString *testName = @"agentPropertiesTest";
+    agent = [AgentTestBuilderObjC buildDefaultForTestNamed:testName];
 
     // Touch main agent properties
     SPLKState *state = agent.state;
