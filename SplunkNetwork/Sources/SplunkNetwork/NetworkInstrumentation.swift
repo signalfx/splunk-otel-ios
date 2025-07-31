@@ -169,6 +169,8 @@ public class NetworkInstrumentation {
         span.setAttribute(key: "component", value: "http")
 
         if let url = URLRequest.url {
+            span.setAttribute(key: SemanticAttributes.urlPath, value: url.path)
+            span.setAttribute(key: SemanticAttributes.urlQuery, value: url.query ?? "")
             if let scheme = url.scheme {
                 span.setAttribute(key: SemanticAttributes.urlScheme, value: scheme)
             }
@@ -342,6 +344,7 @@ public class NetworkInstrumentation {
         // Attributes to be removed
         let attributesToRemove = [
             "http.url",
+            "http.target",
             "net.peer.name",
             "http.status_code",
             "http.method",
