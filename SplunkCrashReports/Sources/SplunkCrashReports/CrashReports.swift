@@ -213,6 +213,11 @@ public class CrashReports {
         }
     }
 
+    public func crashReportUpdateScreenName(_ screenName: Any) {
+        deviceDataDictionary["screenName"] = "\(screenName)"
+        updateDeviceStats()
+    }
+
     // Device data and Session ID is collected every 5 seconds and sent to PLCrashReporter
     private func startPollingForDeviceStats() {
         let repeatSeconds: Double = 5
@@ -283,6 +288,7 @@ public class CrashReports {
                 reportDict[.batteryLevel] = unarchivedData["battery"]
                 reportDict[.freeMemory] = unarchivedData["disk"]
                 reportDict[.freeDiskSpace] = unarchivedData["memory"]
+                reportDict[.screenName] = unarchivedData["screenName"]
             }
         } catch {
             logger.log(level: .warn) {
