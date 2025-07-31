@@ -140,7 +140,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// - Returns: The updated configuration structure.
     @discardableResult
     public func globalAttributes(_ globalAttributes: MutableAttributes) -> Self {
-         var updated = self
+        var updated = self
         updated.globalAttributes = globalAttributes
 
         return updated
