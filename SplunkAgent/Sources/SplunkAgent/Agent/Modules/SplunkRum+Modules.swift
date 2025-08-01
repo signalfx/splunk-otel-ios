@@ -107,9 +107,9 @@ extension SplunkRum {
             return
         }
 
-    #if canImport(SplunkCrashReports)
+#if canImport(SplunkCrashReports)
         let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
-    #endif
+#endif
 
         navigationModule.agentVersion(sharedState.agentVersion)
 
@@ -118,7 +118,9 @@ extension SplunkRum {
             for await newValue in navigationModule.screenNameStream {
                 runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
                 screenNameChangeCallback?(newValue)
+#if canImport(SplunkCrashReports)
                 crashReportsModule?.crashReportUpdateScreenName(newValue)
+#endif
             }
         }
 
