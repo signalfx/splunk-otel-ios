@@ -273,7 +273,7 @@ public class NetworkInstrumentation {
         }
 
         // removes obsolete attributes
-        removeObsoleteAttributesFromSpan(span)
+        removeObsoleteAttributes(from: span)
 
         /* Save this until we add the feature into the Agent side API
         guard ((agentConfiguration?.appDCloudNetworkResponseCallback?(URLResponse)) == nil) else {
@@ -340,7 +340,7 @@ public class NetworkInstrumentation {
 
     /// Removes obsolete attributes from the span
     /// - Parameter span: The span to be modified
-    private func removeObsoleteAttributesFromSpan(_ span: Span) {
+    private func removeObsoleteAttributes(from span: Span) {
         // Attributes to be removed
         let attributesToRemove = [
             SemanticAttributes.httpUrl,
@@ -364,7 +364,7 @@ public class NetworkInstrumentation {
         span.setAttribute(key: SemanticAttributes.httpResponseStatusCode, value: HTTPStatus)
 
         // removes obsolete attributes
-        removeObsoleteAttributesFromSpan(span)
+        removeObsoleteAttributes(from: span)
 
         logger.log(level: .error) {
             "Error: \(error.localizedDescription), Status: \(HTTPStatus)"
