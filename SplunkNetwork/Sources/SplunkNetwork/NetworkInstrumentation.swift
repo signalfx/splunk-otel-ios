@@ -164,7 +164,7 @@ public class NetworkInstrumentation {
         let body = URLRequest.httpBody
         let length = body?.count ?? 0
         span.setAttribute(key: key, value: length)
-        let method = URLRequest.httpMethod ?? "unknown_method"
+        let method = URLRequest.httpMethod ?? "_OTHER"
         span.setAttribute(key: SemanticAttributes.httpRequestMethod, value: method)
         span.setAttribute(key: "component", value: "http")
 
@@ -343,17 +343,17 @@ public class NetworkInstrumentation {
     private func removeObsoleteAttributesFromSpan(_ span: Span) {
         // Attributes to be removed
         let attributesToRemove = [
-            "http.url",
-            "http.target",
-            "net.peer.name",
-            "http.status_code",
-            "http.method",
-            "http.scheme"
+            SemanticAttributes.httpUrl,
+            SemanticAttributes.httpTarget,
+            SemanticAttributes.netPeerName,
+            SemanticAttributes.httpStatusCode,
+            SemanticAttributes.httpMethod,
+            SemanticAttributes.httpScheme
         ]
 
         for key in attributesToRemove {
             // Setting the value to nil will remove the key
-            span.setAttribute(key: key, value: nil)
+            span.setAttribute(key: key.rawValue, value: nil)
         }
     }
 
@@ -362,6 +362,9 @@ public class NetworkInstrumentation {
         span.setAttribute(key: "error.message", value: error.localizedDescription)
         span.setAttribute(key: "error.type", value: String(describing: type(of: error)))
         span.setAttribute(key: SemanticAttributes.httpResponseStatusCode, value: HTTPStatus)
+
+        // removes obsolete attributes
+        removeObsoleteAttributesFromSpan(span)
 
         logger.log(level: .error) {
             "Error: \(error.localizedDescription), Status: \(HTTPStatus)"
