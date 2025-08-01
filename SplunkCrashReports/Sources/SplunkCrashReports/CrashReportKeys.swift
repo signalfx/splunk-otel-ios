@@ -27,7 +27,7 @@ public enum CrashReportKeys: String {
     case freeDiskSpace = "crash.freeDiskSpace"
     case batteryLevel = "crash.batteryLevel"
     case freeMemory = "crash.freeMemory"
-    case screenName = "crash.screenName"
+    case screenName = "crash.screen.name"
 
     case processPath = "crash.processPath"
     case isNative = "crash.isNative"
