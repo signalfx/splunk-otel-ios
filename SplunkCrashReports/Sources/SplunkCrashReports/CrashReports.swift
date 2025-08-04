@@ -213,8 +213,8 @@ public class CrashReports {
         }
     }
 
-    public func crashReportUpdateScreenName(_ screenName: Any) {
-        deviceDataDictionary["screenName"] = "\(screenName)"
+    public func crashReportUpdateScreenName(_ screenName: String) {
+        deviceDataDictionary["screenName"] = screenName
         updateDeviceStats()
     }
 
