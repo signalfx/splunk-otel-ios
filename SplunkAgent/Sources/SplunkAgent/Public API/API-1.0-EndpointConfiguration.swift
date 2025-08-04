@@ -86,7 +86,7 @@ public struct EndpointConfiguration: Codable, Equatable {
     private static func realmUrl(for realm: String, path: String) -> URL? {
         var urlComponents = URLComponents()
         urlComponents.scheme = "https"
-        urlComponents.host = "rum-ingest.\(realm).signalfx.com"
+        urlComponents.host = "external-rum-ingest.\(realm).signalfx.com"
         urlComponents.path = path
 
         return urlComponents.url
