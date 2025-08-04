@@ -36,11 +36,11 @@ import SplunkCommon
 // we can add module conformance to any desired type.
 
 
-// `Data` can be used as an event type that the module produces.
+/// `Data` can be used as an event type that the module produces.
 extension Data: ModuleEventData {}
 
-// Struct `RecordMetadata` describes event metadata.
-// This type must be unique in the module/agent space.
+/// Struct `RecordMetadata` describes event metadata.
+/// This type must be unique in the module/agent space.
 extension Metadata: ModuleEventMetadata {
     /// The timestamp derived from the start time of the session replay record.
     public var timestamp: Date {
@@ -49,11 +49,11 @@ extension Metadata: ModuleEventMetadata {
 }
 
 
-// Minimal implementation that ensures protocol conformance.
+/// Minimal implementation that ensures protocol conformance.
 /// A placeholder for local configuration of the Session Replay module.
 public struct SessionReplayConfiguration: ModuleConfiguration {}
 
-// Minimal implementation that ensures protocol conformance.
+/// Minimal implementation that ensures protocol conformance.
 /// A structure representing the remote configuration for the Session Replay module.
 public struct SessionReplayRemoteConfiguration: RemoteModuleConfiguration {
 
@@ -95,8 +95,8 @@ public struct SessionReplayRemoteConfiguration: RemoteModuleConfiguration {
 }
 
 
-// Defines SessionReplay conformance to `Module` protocol
-// and implements methods that are missing in the original `SessionReplay`.
+/// Defines SessionReplay conformance to `Module` protocol
+/// and implements methods that are missing in the original `SessionReplay`.
 /// Extends `SessionReplay` to conform to the `Module` protocol, enabling its integration within the agent framework.
 extension SessionReplay: Module {
 
