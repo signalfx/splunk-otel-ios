@@ -22,7 +22,7 @@ import Foundation
 ///
 /// The individual properties are a combination of:
 /// - Default SDK settings.
-/// - Initial configuration specified by ``AgentConfiguration``.
+/// - Initial configuration specified by  ``AgentConfiguration``.
 /// - Settings retrieved from the backend.
 ///
 /// - Note: The states of individual properties in this class can
@@ -50,6 +50,7 @@ public extension RuntimeState {
 
     // MARK: - Agent status
 
+    /// A `Status` of agent recording.
     var status: Status {
         owner.currentStatus
     }
@@ -57,22 +58,27 @@ public extension RuntimeState {
 
     // MARK: - User configuration
 
+    /// A `String` that contains the name used for the application identification.
     var appName: String {
         owner.agentConfiguration.appName
     }
 
+    /// A `String` that contains the used application version.
     var appVersion: String {
         owner.agentConfiguration.appVersion
     }
 
+    /// A ``EndpointConfiguration`` containing either the specified realm, or endpoint urls.
     var endpointConfiguration: EndpointConfiguration {
         owner.agentConfiguration.endpoint
     }
 
+    /// A `String` containing the used application deployment environment.
     var deploymentEnvironment: String {
         owner.agentConfiguration.deploymentEnvironment
     }
 
+    /// A `Bool` value determining whether the debug logging has been enabled.
     var isDebugLoggingEnabled: Bool {
         owner.agentConfiguration.enableDebugLogging
     }
