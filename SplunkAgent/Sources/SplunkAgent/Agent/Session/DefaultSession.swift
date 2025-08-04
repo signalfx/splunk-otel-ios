@@ -45,6 +45,7 @@ class DefaultSession: AgentSession {
     // MARK: - Test support
 
     var testSessionTimeout: Double?
+    var testMaxSessionLength: Double?
 
 
     // MARK: - Internal
@@ -66,10 +67,11 @@ class DefaultSession: AgentSession {
 
     // The maximal length of one session (defined in seconds). Default value is 1 hour.
     var maxSessionLength: Double {
+        let unitTest = testMaxSessionLength
         let configuration = owner?.agentConfiguration.maxSessionLength
         let defaultValue = ConfigurationDefaults.maxSessionLength
 
-        return configuration ?? defaultValue
+        return unitTest ?? configuration ?? defaultValue
     }
 
 
@@ -332,6 +334,9 @@ extension DefaultSession {
                 // We need to mark the time of this transition
                 if self?.enterBackground != nil {
                     self?.leaveBackground = Date()
+
+                    // Refresh session immediately
+                    self?.refreshSession()
                 }
             }
 
