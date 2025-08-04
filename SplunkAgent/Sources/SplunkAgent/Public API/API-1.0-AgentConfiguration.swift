@@ -27,25 +27,32 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Public mandatory properties
 
-    /// The endpoint configuration specifying the Splunk realm and RUM access token.
+    /// A required endpoint configuration defining URLs to the instrumentation collector.
     public let endpoint: EndpointConfiguration
 
-    /// The name of your application, used to identify your data in Splunk RUM.
+    /// Required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
     public let appName: String
 
-    /// The deployment environment (e.g., "production", "staging", "development") for your application.
+    /// Required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
+    /// Deployment environment is sent in all signals as a resource.
     public let deploymentEnvironment: String
 
 
     // MARK: - Public optional properties
 
-    /// The version of the application. This is sent as a resource attribute with all telemetry.
+    /// A `String` containing the current application version. Application version is sent in all signals as a resource.
+    ///
+    /// The default value corresponds to the value of `CFBundleShortVersionString`.
     public var appVersion: String = ConfigurationDefaults.appVersion
 
-    /// A boolean indicating whether debug logging is enabled for the agent.
+    /// Enables or disables debug logging. Debug logging prints span contents into the console.
+    ///
+    /// Defaults to `false`.
     public var enableDebugLogging: Bool = ConfigurationDefaults.enableDebugLogging
 
-    /// A collection of global attributes that will be attached to all telemetry sent by the agent.
+    /// Sets global attributes, which are sent with all signals.
+    ///
+    /// Defaults to an empty MutableAttributes object.
     public var globalAttributes: MutableAttributes = ConfigurationDefaults.globalAttributes
 
     /// Span interceptor to be used to filter or modify all outgoing `SpanData` instances.
@@ -54,10 +61,10 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
     public var spanInterceptor: ((SpanData) -> SpanData?)?
 
-    /// Configuration related to user tracking, including the user tracking mode.
+    /// Sets the `UserConfiguration` object.
     public var user = UserConfiguration()
 
-    /// Configuration related to session sampling, including the session sampling rate.
+    /// Sets the `SessionConfiguration` object.
     public var session = SessionConfiguration()
 
 
@@ -71,6 +78,15 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Initialization
 
+    /// Initializes a new Agent configuration with which the Agent is initialized.
+    ///
+    /// - Parameters:
+    ///   - endpoint: A required endpoint configuration defining URLs to the RUM instrumentation collector.
+    ///   - appName: A required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
+    ///   - deploymentEnvironment: A required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
+    ///   Deployment environment is sent in all signals as a resource.
+    ///
+    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
     public init(endpoint: EndpointConfiguration, appName: String, deploymentEnvironment: String) {
         self.endpoint = endpoint
         self.appName = appName
