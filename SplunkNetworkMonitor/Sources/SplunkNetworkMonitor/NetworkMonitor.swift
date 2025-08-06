@@ -152,7 +152,7 @@ public class NetworkMonitor {
             .startSpan()
         span.setAttribute(key: "network.status", value: isConnected ? "available" : "lost")
         span.setAttribute(key: "network.connection.type", value: connectionType.rawValue)
-        if currentRadioAccessTechnology != nil {
+        if connectionType == .cellular && currentRadioAccessTechnology != nil {
             span.setAttribute(key: "network.connection.subtype", value: currentRadioAccessTechnology!)
         }
         span.end(time: timestamp)
