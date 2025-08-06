@@ -15,14 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoLogger
+import CiscoLogger
 import Foundation
-internal import OpenTelemetryApi
-internal import OpenTelemetrySdk
-internal import ResourceExtension
-internal import SignPostIntegration
+import OpenTelemetryApi
+import OpenTelemetrySdk
+import ResourceExtension
+import SignPostIntegration
 import SplunkCommon
-internal import URLSessionInstrumentation
+import URLSessionInstrumentation
 
 public class NetworkInstrumentation {
 
@@ -70,7 +70,7 @@ public class NetworkInstrumentation {
         // Start the network instrumentation if it's enabled or if no configuration is provided.
         if config?.isEnabled ?? true {
 
-            if let ignoreURLsParameter  = config?.ignoreURLs {
+            if let ignoreURLsParameter = config?.ignoreURLs {
                 ignoreURLs = ignoreURLsParameter
             }
 
