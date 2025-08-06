@@ -85,7 +85,7 @@ final class SplunkNetworkTests: XCTestCase {
             }
         }
 
-        func setAttributes(_ attributes: [String : OpenTelemetryApi.AttributeValue]) {
+        func setAttributes(_ attributes: [String: OpenTelemetryApi.AttributeValue]) {
             self.attributes = attributes
         }
 

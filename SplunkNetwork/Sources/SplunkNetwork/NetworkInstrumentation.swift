@@ -338,8 +338,7 @@ public class NetworkInstrumentation {
         return false
     }
 
-    /// Removes obsolete attributes from the span
-    /// - Parameter span: The span to be modified
+    // Removes obsolete attributes from the span
     private func removeObsoleteAttributes(from span: Span) {
         // Attributes to be removed
         let attributesToRemove = [
