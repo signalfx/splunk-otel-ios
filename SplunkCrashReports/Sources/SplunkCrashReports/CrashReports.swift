@@ -45,6 +45,9 @@ public class CrashReports {
     /// Storage of periodically sampled device data
     private var deviceDataDictionary: [String: String] = [:]
     private var dataUpdateTimer: Timer?
+    
+    /// Serial queue for thread-safe access to deviceDataDictionary
+    private let deviceDataQueue = DispatchQueue(label: "com.splunk.crashreports.devicedata", qos: .utility)
 
 
     // MARK: - Module methods
@@ -196,25 +199,33 @@ public class CrashReports {
     // Device stats handler.  This added device stats and Session ID to PLCrashReporter
     // so that it will be included in a future crash report
     private func updateDeviceStats() {
-        do {
-            if let sessionId = sharedState?.sessionId {
-                deviceDataDictionary["sessionId"] = sessionId
-            }
-            deviceDataDictionary["battery"] = CrashReportDeviceStats.batteryLevel
-            deviceDataDictionary["disk"] = CrashReportDeviceStats.freeDiskSpace
-            deviceDataDictionary["memory"] = CrashReportDeviceStats.freeMemory
-            let customData = try NSKeyedArchiver.archivedData(withRootObject: deviceDataDictionary, requiringSecureCoding: false)
-            crashReporter?.customData = customData
-        } catch {
-            // We have failed to archive the custom data dictionary.
-            logger.log(level: .warn) {
-                "Failed to add the device stats to the crash reports data."
+        deviceDataQueue.async {
+            do {
+                if let sessionId = self.sharedState?.sessionId {
+                    self.deviceDataDictionary["sessionId"] = sessionId
+                }
+                self.deviceDataDictionary["battery"] = CrashReportDeviceStats.batteryLevel
+                self.deviceDataDictionary["disk"] = CrashReportDeviceStats.freeDiskSpace
+                self.deviceDataDictionary["memory"] = CrashReportDeviceStats.freeMemory
+                let customData = try NSKeyedArchiver.archivedData(withRootObject: self.deviceDataDictionary, requiringSecureCoding: false)
+
+                // Update crash reporter on main queue since it might touch UI-related properties
+                DispatchQueue.main.async {
+                    self.crashReporter?.customData = customData
+                }
+            } catch {
+                // We have failed to archive the custom data dictionary.
+                self.logger.log(level: .warn) {
+                    "Failed to add the device stats to the crash reports data."
+                }
             }
         }
     }
 
     public func crashReportUpdateScreenName(_ screenName: String) {
-        deviceDataDictionary["screenName"] = screenName
+        deviceDataQueue.async {
+            self.deviceDataDictionary["screenName"] = screenName
+        }
         updateDeviceStats()
     }
 
