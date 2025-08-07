@@ -99,11 +99,11 @@ public final class SlowFrameDetector {
 
         // Ignore `remoteConfiguration` because when it eventually comes into
         // play, DefaultModulesManager will be using it if needed to veto the
-        // installation before we ever get here.
+        // installation before we ever get here
 
         let localConfiguration = configuration as? SlowFrameDetectorConfiguration
 
-        // If localConfiguration is nil, default to true.
+        // If localConfiguration is nil, default to true
         state.isEnabled = localConfiguration?.isEnabled ?? true
 
         if state.isEnabled {
@@ -120,7 +120,7 @@ public final class SlowFrameDetector {
     /// - Note: Calling this method when the detector is already running has no effect.
     public func start() {
 
-        // If we already have a displayLink instance, start must have already been called.
+        // If we already have a displayLink instance, start must have already been called
         if displayLink != nil {
             return
         }
@@ -184,7 +184,7 @@ public final class SlowFrameDetector {
 
     @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
 
-        // We are working off of some ambiguous documentation from Apple.
+        // We are working off of some ambiguous documentation from Apple
         // https://developer.apple.com/documentation/quartzcore/cadisplaylink
         //
         // On the one hand, they say:
@@ -202,12 +202,12 @@ public final class SlowFrameDetector {
         // current value the system has chosen being the "actual" rate -- as
         // distinct from the "actual empirically observed" rate, a different
         // concept entirely, which I believe would be most people's reasonable
-        // quick (and mistaken) interpretation of the second passage.
+        // quick (and mistaken) interpretation of the second passage
         //
         // The current implementation of this function relies on the
         // understanding that the first of their two passages quoted above
         // resolves the ambiguity: they mean the /expected/ duration is what
-        // results from the calculation they show.
+        // results from the calculation they show
 
         let actualTimestamp = displayLink.timestamp
         let targetTimestamp = displayLink.targetTimestamp

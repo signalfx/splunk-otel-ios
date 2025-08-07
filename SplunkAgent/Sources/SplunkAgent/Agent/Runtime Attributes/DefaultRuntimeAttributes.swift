@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 internal import SplunkCommon
 
-// The class implements default runtime attributes for the agent.
+// The class implements default runtime attributes for the agent
 final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
 
     // MARK: - Internal

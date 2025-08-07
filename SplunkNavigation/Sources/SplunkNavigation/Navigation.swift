@@ -123,11 +123,11 @@ public final class Navigation: Sendable {
     func startDetection() {
         // NOTE:
         //
-        // This is a temporary solution that will later be replaced by a more modern approach.
+        // This is a temporary solution that will later be replaced by a more modern approach
         //
-        // However, there is currently insufficient support in `CiscoSwizzling`.
+        // However, there is currently insufficient support in `CiscoSwizzling`
         // Once the support is implemented, the solution will adopt modern approach,
-        // and the legacy solution will be removed.
+        // and the legacy solution will be removed
         if Self.useLegacySolution {
             startLegacyDetection()
 

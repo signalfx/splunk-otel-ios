@@ -217,8 +217,8 @@ public class SplunkRumBuilder {
     @available(*, deprecated, message: "This configuration has been discontinued and has no effect. Thresholds are now managed automatically.")
     @discardableResult
     public func slowFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
-        // This method is intentionally empty as the feature is discontinued.
-        // We return 'self' to allow for continued builder chaining.
+        // This method is intentionally empty as the feature is discontinued
+        // We return 'self' to allow for continued builder chaining
         return self
     }
 
@@ -230,8 +230,8 @@ public class SplunkRumBuilder {
     @available(*, deprecated, message: "This configuration has been discontinued and has no effect. Thresholds are now managed automatically.")
     @discardableResult
     public func frozenFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
-        // Intentionally empty.
-        // We return 'self' to allow for continued builder chaining.
+        // Intentionally empty
+        // We return 'self' to allow for continued builder chaining
         return self
     }
 

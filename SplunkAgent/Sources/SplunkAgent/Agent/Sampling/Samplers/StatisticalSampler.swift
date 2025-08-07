@@ -46,17 +46,17 @@ extension StatisticalSampler {
     /// - Returns: A `SamplingDecision`.
     func sample(randomNumberProvider: RandomNumberProvider = SystemRandomNumberProvider()) -> SamplingDecision {
 
-        // Filter out miss-configured bounds.
+        // Filter out miss-configured bounds
         guard lowerBound <= upperBound, lowerBound >= 0.0, upperBound <= 1.0 else {
             return .sampledOut
         }
 
-        // The user-configured sampling rate is 1, meaning we want to record all Agent sessions.
+        // The user-configured sampling rate is 1, meaning we want to record all Agent sessions
         if probability == 1.0 {
             return .notSampledOut
         }
 
-        // The user-configured sampling rate is 0, meaning we want to record no Agent sessions.
+        // The user-configured sampling rate is 0, meaning we want to record no Agent sessions
         if probability == 0.0 {
             return .sampledOut
         }
@@ -64,7 +64,7 @@ extension StatisticalSampler {
         // For any other value, we want to generate a random constant...
         let randomNumber = randomNumberProvider.randomNumber(in: lowerBound ... upperBound)
 
-        // ... and do a bound comparison against the configured sampling rate.
+        // ... and do a bound comparison against the configured sampling rate
         if randomNumber <= probability {
             return .notSampledOut
         }

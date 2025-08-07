@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-// Model actor for data used in persistent cache.
+// Model actor for data used in persistent cache
 actor PersistentCacheModel<Container: PersistedItemContainer> {
 
     // MARK: - Public

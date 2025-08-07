@@ -104,7 +104,7 @@ public struct SplunkIssue: SplunkTrackableIssue {
         exceptionType = String(describing: type(of: error))
         timestamp = Date()
 
-        // This is not necessarily the original error's throw site.
+        // This is not necessarily the original error's throw site
         stacktrace = Stacktrace(frames: Thread.callStackSymbols)
 
         let nsError = error as NSError

@@ -55,7 +55,7 @@ extension SlowFrameDetector: Module {
     ///
     /// - Parameter metadata: The metadata for which data should be deleted. This parameter is ignored.
     public func deleteData(for metadata: any ModuleEventMetadata) {
-        // In SlowFrameDetector we don't have any data to delete.
+        // In SlowFrameDetector we don't have any data to delete
     }
 
     /// A placeholder implementation for the data publishing hook.
@@ -64,6 +64,6 @@ extension SlowFrameDetector: Module {
     ///
     /// - Parameter data: A closure to be called when new data is available. This parameter is ignored.
     public func onPublish(data: @escaping (EventMetadataSlowFrameDetector, SlowFrameData) -> Void) {
-        // We are emitting spans directly instead of using this.
+        // We are emitting spans directly instead of using this
     }
 }

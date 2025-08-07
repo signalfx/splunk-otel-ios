@@ -17,7 +17,7 @@ limitations under the License.
 
 public struct WebDemoJS {
 
-    // Currently disabled in the demo pending better infrastructure for handling tokens vis-a-vis git commits.
+    // Currently disabled in the demo pending better infrastructure for handling tokens vis-a-vis git commits
     public static func brumScript() -> String {
         return """
         <script src="https://cdn.signalfx.com/o11y-gdi-rum/latest/splunk-otel-web.js" crossorigin="anonymous">
@@ -44,7 +44,7 @@ public struct WebDemoJS {
         """
     }
 
-    // This provides an optional async version of the call, `getNativeSessionIdAsync()`, for BRUM when BRUM is ready to use that.
+    // This provides an optional async version of the call, `getNativeSessionIdAsync()`, for BRUM when BRUM is ready to use that
     public static func modernScriptExample() -> String {
         return """
         async function updateSessionId() {
@@ -76,8 +76,8 @@ public struct WebDemoJS {
         """
     }
 
-    // This script's only purpose is to set the callback.
-    // It will be injected alongside the existing polling script.
+    // This script's only purpose is to set the callback
+    // It will be injected alongside the existing polling script
     public static func callbackSetupScript() -> String {
         return """
         function handleSessionIdChange(change) {
@@ -96,7 +96,7 @@ public struct WebDemoJS {
             statusElement.style.borderRadius = '5px';
         }
 
-        // Wait for the injected SplunkRumNative object to become available, then set the callback.
+        // Wait for the injected SplunkRumNative object to become available, then set the callback
         function initializeCallback() {
             if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                 console.log("[CallbackTest] SplunkRumNative found. Setting onNativeSessionIdChanged callback.");
@@ -107,7 +107,7 @@ public struct WebDemoJS {
             }
         }
         
-        // Start the process once the document is loaded.
+        // Start the process once the document is loaded
         document.addEventListener('DOMContentLoaded', initializeCallback);
         """
     }

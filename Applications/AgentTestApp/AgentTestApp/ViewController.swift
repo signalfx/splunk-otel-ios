@@ -36,7 +36,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // Register the table view cell class and its reuse id
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
 
-        // This view controller itself will provide the delegate methods and row data for the table view.
+        // This view controller itself will provide the delegate methods and row data for the table view
         tableView.delegate = self
         tableView.dataSource = self
     }

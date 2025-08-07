@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-// JSON Support for Crash Reports.
+// JSON Support for Crash Reports
 
 extension CrashReports {
 

@@ -50,7 +50,7 @@ extension NetworkMonitor: Module {
                         remoteConfiguration: (any RemoteModuleConfiguration)?) {
         let config = configuration as? Configuration
 
-        // Start the network monitor if it's enabled or if no configuration is provided.
+        // Start the network monitor if it's enabled or if no configuration is provided
         if config?.isEnabled ?? true {
             startDetection()
         }

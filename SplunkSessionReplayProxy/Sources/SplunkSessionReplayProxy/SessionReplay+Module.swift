@@ -21,19 +21,19 @@ import SplunkCommon
 
 // IMPORTANT NOTES:
 //
-// This file declares conformance to `Module` protocol and related protocols.
-// After creating the API proxy interface for the `SessionReplay` module, this code can be moved to another place.
+// This file declares conformance to `Module` protocol and related protocols
+// After creating the API proxy interface for the `SessionReplay` module, this code can be moved to another place
 //
 //
 // PURPOSE FOR THIS CODE:
 //
 // This definition assumes that the module has the same interface as is defined in the Module protocol
-// but does not conform to this protocol because we do not want circular dependencies between modules and agents.
-// In our situation, we must add this conformance in the Agent code by declaring that the module conforms to the protocol.
+// but does not conform to this protocol because we do not want circular dependencies between modules and agents
+// In our situation, we must add this conformance in the Agent code by declaring that the module conforms to the protocol
 //
 // If the module has the same interface, then it conforms (by default) to these protocols,
 // and we do not need a code module interface (preferred way). But if serious reasons exist,
-// we can add module conformance to any desired type.
+// we can add module conformance to any desired type
 
 
 /// `Data` can be used as an event type that the module produces.

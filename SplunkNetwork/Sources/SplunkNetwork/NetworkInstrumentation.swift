@@ -72,7 +72,7 @@ public class NetworkInstrumentation {
         var delegateClasses: [AnyClass] = []
         let config = configuration as? Configuration
 
-        // Start the network instrumentation if it's enabled or if no configuration is provided.
+        // Start the network instrumentation if it's enabled or if no configuration is provided
         if config?.isEnabled ?? true {
 
             if let ignoreURLsParameter  = config?.ignoreURLs {
@@ -146,7 +146,7 @@ public class NetworkInstrumentation {
             return false
         }
         // Leave the localhost test in place for the test case where we have two endpoints,
-        // both collector and zipkin on local.
+        // both collector and zipkin on local
         if requestEndpoint.hasPrefix("http://localhost") {
             logger.log(level: .debug) {
                 "Should Not Instrument Localhost \(URLRequest.description)"

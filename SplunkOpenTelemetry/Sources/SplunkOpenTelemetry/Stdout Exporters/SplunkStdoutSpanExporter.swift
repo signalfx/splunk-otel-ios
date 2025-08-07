@@ -20,7 +20,7 @@ import Foundation
 import OpenTelemetrySdk
 import SplunkCommon
 
-// Prints Span contents into the console using an internal logger.
+// Prints Span contents into the console using an internal logger
 class SplunkStdoutSpanExporter: SpanExporter {
 
     // MARK: - Private

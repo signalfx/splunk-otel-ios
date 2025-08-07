@@ -80,7 +80,7 @@ extension UserModel {
             return identifier
         }
 
-        // No cached identifier. We need to create a new one and cache it.
+        // No cached identifier; we need to create a new one and cache it
         let newIdentifier = String.uniqueHexIdentifier(ofLength: 32)
         try? storage.insert(newIdentifier, forKey: key)
 

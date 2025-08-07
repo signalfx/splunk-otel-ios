@@ -18,9 +18,9 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-// `String` can be used as an event type that the module produces.
+// `String` can be used as an event type that the module produces
 // This is due to the fact the Crash Reports module serializes
-// the whole Crash payload JSON in place to `String`.
+// the whole Crash payload JSON in place to `String`
 extension String: ModuleEventData {}
 
 /// Describes the Crash Report event metadata.
@@ -57,7 +57,7 @@ extension CrashReports: Module {
         // Configure PLCrashReporter
         configureCrashReporter()
 
-        // Start the crash reporter if it's enabled or if no configuration is provided.
+        // Start the crash reporter if it's enabled or if no configuration is provided
         let config = configuration as? Configuration
         if config?.isEnabled ?? true {
             _ = initializeCrashReporter()

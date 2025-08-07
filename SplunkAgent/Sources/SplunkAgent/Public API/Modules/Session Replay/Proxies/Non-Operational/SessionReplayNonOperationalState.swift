@@ -15,10 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// The class implementing the API for the current state in non-operational mode.
+// The class implementing the API for the current state in non-operational mode
 //
 // This is especially the case when the module is stopped by remote configuration,
-// but we still need to keep the API available to the user.
+// but we still need to keep the API available to the user
 final class SessionReplayNonOperationalState: SessionReplayModuleState {
 
     // MARK: - Recording

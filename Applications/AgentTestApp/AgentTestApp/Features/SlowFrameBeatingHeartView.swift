@@ -55,7 +55,7 @@ class SlowFrameBeatingHeartView: UIView {
 
     func startAnimation() {
         // Even with 0.04 it's still not the smoothest but
-        // it serves the purpose.
+        // it serves the purpose
         timer = Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { [weak self] _ in
             self?.updateAnimation()
         }
@@ -75,7 +75,7 @@ class SlowFrameBeatingHeartView: UIView {
         // background worker thread and it would not (reliably)
         // pause when the main thread pauses, such as during a
         // sleep on the main thread, so the results would not
-        // be visible or clearly shown in this test app.
+        // be visible or clearly shown in this test app
 
         // get the scale component of the transform matrix
         let currentScale = heartImageView.transform.a

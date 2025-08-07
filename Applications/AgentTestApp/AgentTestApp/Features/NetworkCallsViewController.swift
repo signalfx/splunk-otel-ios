@@ -25,7 +25,7 @@ class NetworkCallsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        // Do any additional setup after loading the view
         
         let savedUrl = UserDefaults.standard.string(forKey: "SampleURL") ?? "https://httpbin.org/get"
         sampleUrl.text = savedUrl

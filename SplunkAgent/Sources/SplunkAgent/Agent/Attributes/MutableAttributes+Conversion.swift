@@ -89,12 +89,12 @@ extension MutableAttributes {
         }
     } // swiftlint:enable cyclomatic_complexity
 
-    // Convert Attribute values to target type using provided closure.
+    // Convert Attribute values to target type using provided closure
     // - Parameters:
-    //   - targetType: Desired type for the values.
-    //   - transform: Closure to convert `AttributeValue` to an optional target type.
-    //     note: specific to OpenTelemetryApi.AttributeValue source type.
-    // - Returns: [String: T] with converted values, omitting non-convertible ones.
+    //   - targetType: Desired type for the values
+    //   - transform: Closure to convert `AttributeValue` to an optional target type
+    //     note: specific to OpenTelemetryApi.AttributeValue source type
+    // - Returns: [String: T] with converted values, omitting non-convertible ones
     func converted<T>(
         to targetType: T.Type,
         using transform: (AttributeValue) -> T?
@@ -137,7 +137,7 @@ extension MutableAttributes {
         }
     }
 
-    // Convert Attributes to `[String: EventAttributeValue]`.
+    // Convert Attributes to `[String: EventAttributeValue]`
     // - Parameters: none
     // - Returns: [String: EventAttributeValue] omitting non-convertible elements
     func toEventAttributes() -> [String: EventAttributeValue] {
@@ -168,7 +168,7 @@ extension MutableAttributes {
         self.init(from: dictionary, maxDepth: maxDepth)
     }
 
-    // Convert a dictionary to `[String: AttributeValue]`, enforcing depth constraints.
+    // Convert a dictionary to `[String: AttributeValue]`, enforcing depth constraints
     private static func _convertDictionaryToAttributes(
         _ dictionary: [String: Any],
         maxDepth: Int,
@@ -189,7 +189,7 @@ extension MutableAttributes {
         return result
     }
 
-    // Convert a value to an `AttributeValue`, enforcing depth constraints.
+    // Convert a value to an `AttributeValue`, enforcing depth constraints
     private static func _convertValueToAttribute(
         _ value: Any,
         maxDepth: Int,

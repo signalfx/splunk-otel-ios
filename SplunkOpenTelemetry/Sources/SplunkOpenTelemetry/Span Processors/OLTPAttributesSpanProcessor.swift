@@ -84,7 +84,7 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
         // Attributes with a type not supported in OpenTelemetry are omitted
         for (key, value) in attributes {
             if let attributeValue = AttributeValue(value) {
-                // Regarding screen spans, we do not directly assign the screen name.
+                // Regarding screen spans, we do not directly assign the screen name
                 // Instead, we utilize the entry that is already part of the span
                 if key == "screen.name", isScreenSpan(span) {
                     continue

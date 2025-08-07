@@ -42,8 +42,8 @@ public protocol SessionReplayModuleState {
 
     // MARK: - Rendering
 
-    // Temporarily removed with Rendering Modes.
+    // Temporarily removed with Rendering Modes
 
-    // /// Indicates the rendering mode for capturing video.
+    // /// Indicates the rendering mode for capturing video
     // var renderingMode: RenderingMode { get }
 }

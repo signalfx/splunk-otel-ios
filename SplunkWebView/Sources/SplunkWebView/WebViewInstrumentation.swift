@@ -118,7 +118,7 @@ public final class WebViewInstrumentation: NSObject {
                                 }
                             }
                         },
-                        // This must be synchronous for legacy BRUM compatibility.
+                        // This must be synchronous for legacy BRUM compatibility
                         getNativeSessionId: function() {
                             const now = Date.now();
                             const stale = (now - self._lastCheckTime) > staleAfterDurationMs;
@@ -141,10 +141,10 @@ public final class WebViewInstrumentation: NSObject {
                                     });
                             }
                             // Here we finish before above promise is fulfilled, and
-                            // return cached ID immediately for legacy compatibility.
+                            // return cached ID immediately for legacy compatibility
                             return self.cachedSessionId;
                         },
-                        // Recommended for BRUM use in new agents going forward.
+                        // Recommended for BRUM use in new agents going forward
                         getNativeSessionIdAsync: async function() {
                             try {
                                 const newId = await self._fetchSessionId();

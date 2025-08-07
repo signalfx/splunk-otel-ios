@@ -41,9 +41,9 @@ extension NetworkInstrumentation: Module {
 
     // MARK: - Type transparency helpers
 
-    // An empty implementation as the module publishes data internally through the OTel trace exporter SDK.
+    // An empty implementation as the module publishes data internally through the OTel trace exporter SDK
     public func onPublish(data: @escaping (NetworkInstrumentationMetadata, NetworkInstrumentationData) -> Void) {}
 
-    // An empty implementation as the module does not store any data.
+    // An empty implementation as the module does not store any data
     public func deleteData(for metadata: any ModuleEventMetadata) {}
 }

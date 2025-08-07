@@ -55,7 +55,7 @@ public struct WebDemoHTML {
     }
 
     public static func loadCallbackTestWebViewContent(for webView: WKWebView) {
-        // Element 'callbackStatus' will show the callback's output.
+        // Element 'callbackStatus' will show the callback's output
         let initialContent = """
         <!DOCTYPE html>
         <html>

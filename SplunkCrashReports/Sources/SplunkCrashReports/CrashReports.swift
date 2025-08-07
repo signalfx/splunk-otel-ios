@@ -123,7 +123,7 @@ public class CrashReports {
             allUsedImageNames.removeAll()
             let data = try crashReporter?.loadPendingCrashReportDataAndReturnError()
 
-            // Retrieving crash reporter data.
+            // Retrieving crash reporter data
             let report = try PLCrashReport(data: data)
 
             // Process the report
@@ -138,7 +138,7 @@ public class CrashReports {
             return
         }
 
-        // Purge the report.
+        // Purge the report
         crashReporter?.purgePendingCrashReport()
 
         // And indicate that crash occured
@@ -228,7 +228,7 @@ public class CrashReports {
             let customData = try NSKeyedArchiver.archivedData(withRootObject: deviceDataDictionary, requiringSecureCoding: false)
             crashReporter?.customData = customData
         } catch {
-            // We have failed to archive the custom data dictionary.
+            // We have failed to archive the custom data dictionary
             logger.log(level: .warn) {
                 "Failed to add the device stats to the crash reports data."
             }

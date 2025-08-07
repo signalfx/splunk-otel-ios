@@ -41,7 +41,7 @@ public class MutableAttributes {
 
     // MARK: - Private
 
-    // The underlying thread-safe storage for attributes.
+    // The underlying thread-safe storage for attributes
     var attributes: ThreadSafeDictionary<String, AttributeValue>
 
 

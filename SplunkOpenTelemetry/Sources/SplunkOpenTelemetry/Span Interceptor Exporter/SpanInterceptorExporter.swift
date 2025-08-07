@@ -58,12 +58,12 @@ class SpanInterceptorExporter: SpanExporter {
 
     func export(spans: [OpenTelemetrySdk.SpanData], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.SpanExporterResultCode {
 
-        // Simply re-export the spans if no interceptor was set.
+        // Simply re-export the spans if no interceptor was set
         guard let spanInterceptor else {
             return proxyExporter.export(spans: spans)
         }
 
-        // Invoke the interceptor and only pass through non-nil spans.
+        // Invoke the interceptor and only pass through non-nil spans
         let interceptedSpans = spans.compactMap { span in
             spanInterceptor(span)
         }

@@ -148,7 +148,7 @@ public class SplunkRum: ObservableObject {
     /// - Throws: ``AgentConfigurationError`` if provided configuration is invalid.
     public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws -> SplunkRum {
 
-        // Install is allowed only once.
+        // Install is allowed only once
         //
         // ‼️ This condition check implies that other checks (supported platform check, sampling check) are performed only once,
         // and agent's shared instance can't be reinstalled
@@ -168,11 +168,11 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
-        // Re-configure and call the Session Sampler.
+        // Re-configure and call the Session Sampler
         shared.sessionSampler.configure(with: configuration)
         let samplingDecision = shared.sessionSampler.sample()
 
-        // Continue with a noop instance in case of sampling out.
+        // Continue with a noop instance in case of sampling out
         if samplingDecision == .sampledOut {
             shared.currentStatus = .notRunning(.sampledOut)
 
@@ -303,14 +303,14 @@ public class SplunkRum: ObservableObject {
     // MARK: - Configuration handler
 
     private static func createConfigurationHandler(for configuration: any AgentConfigurationProtocol) -> AgentConfigurationHandler {
-        // If the platform is not fully supported, we use the dummy handler.
+        // If the platform is not fully supported, we use the dummy handler
         guard isSupportedPlatform else {
             return ConfigurationHandlerNonOperational(for: configuration)
         }
 
         return SplunkConfigurationHandler(for: configuration)
 
-        // Temporarily commented-out code until O11y implements a proper backend config endpoint.
+        // Temporarily commented-out code until O11y implements a proper backend config endpoint
 //        return ConfigurationHandler(
 //            for: configuration,
 //            apiClient: APIClient(baseUrl: configuration.configUrl)

@@ -92,9 +92,9 @@ class PlatformSupport: PlatformSupporting {
 
     private static func iOSAppOnVisionDevice() -> Bool {
         // On visionOS, an adequate method for detecting an app running in
-        // `Apple Vision (Designed for iPad)` mode is not yet available.
+        // `Apple Vision (Designed for iPad)` mode is not yet available
         //
-        // This method serves as a fallback until Apple adds an appropriate solution.
+        // This method serves as a fallback until Apple adds an appropriate solution
         NSClassFromString("UIWindowSceneGeometryPreferencesVision") != nil
     }
 }

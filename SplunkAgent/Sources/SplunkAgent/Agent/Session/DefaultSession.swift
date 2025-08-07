@@ -23,7 +23,7 @@ internal import SplunkCommon
     import UIKit
 #endif
 
-// The object implements the management of the current session.
+// The object implements the management of the current session
 class DefaultSession: AgentSession {
 
     // MARK: - Private
@@ -111,8 +111,8 @@ class DefaultSession: AgentSession {
 
         // Start a perpetual check of the session state
         refreshJob = RepeatingJob(interval: sessionRefreshInterval, block: { [weak self] in
-            // We constantly check the situation.
-            // If the current state requires it, we create a new session.
+            // We constantly check the situation
+            // If the current state requires it, we create a new session
             self?.refreshSession()
         }).resume()
 
@@ -136,7 +136,7 @@ class DefaultSession: AgentSession {
 
     private func session(for timestamp: Date) -> SessionItem? {
         // The individual records should follow each other by time,
-        // but we won't rely on that for this case.
+        // but we won't rely on that for this case
         let sorted = sessionsModel.sessions
             .sorted { first, second in
                 first.start > second.start
@@ -161,7 +161,7 @@ class DefaultSession: AgentSession {
 
     // MARK: - Business logic
 
-    // Starts a new session by first purging old data, closing previous session and then starting a new session.
+    // Starts a new session by first purging old data, closing previous session and then starting a new session
     func startSession() -> SessionItem {
         // Before restoring the session,
         // we need to delete the outdated data
@@ -189,7 +189,7 @@ class DefaultSession: AgentSession {
             }
         }
 
-        // Create a new session and save changes.
+        // Create a new session and save changes
         let newSession = createSession()
         sessionsModel.sync()
 

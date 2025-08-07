@@ -72,7 +72,7 @@ class UserDefaultsStorage: KeyValueStorage {
             return nil
         }
 
-        // We try to decode data into target type.
+        // We try to decode data into target type
         guard let value = try? JSONDecoder().decode(T.self, from: data) else {
             logger.log(level: .info) {
                 "Read operation for key: \(storageKey) failed while decoding data for type \(T.self)."

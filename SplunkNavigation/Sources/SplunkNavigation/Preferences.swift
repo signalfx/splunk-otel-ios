@@ -87,7 +87,7 @@ extension Preferences {
 
     // MARK: - Codable
 
-    // Private variables are excluded from serialization.
+    // Private variables are excluded from serialization
     enum CodingKeys: String, CodingKey {
         case enableAutomatedTracking
     }

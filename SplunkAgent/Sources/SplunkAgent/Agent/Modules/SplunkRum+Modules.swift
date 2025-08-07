@@ -98,7 +98,7 @@ extension SplunkRum {
         sessionReplayProxy = SessionReplay(for: sessionReplayModule)
     }
 
-    // Configure Navigation module.
+    // Configure Navigation module
     private func customizeNavigation() {
         let moduleType = SplunkNavigation.Navigation.self
         let navigationModule = modulesManager?.module(ofType: moduleType)
@@ -109,7 +109,7 @@ extension SplunkRum {
 
         navigationModule.agentVersion(sharedState.agentVersion)
 
-        // Set up forwarding of screen name changes to runtime attributes.
+        // Set up forwarding of screen name changes to runtime attributes
         Task(priority: .userInitiated) {
             for await newValue in navigationModule.screenNameStream {
                 runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
@@ -125,8 +125,8 @@ extension SplunkRum {
     private func customizeNetwork() {
         let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
 
-        // Assign an object providing the current state of the agent instance.
-        // We need to do this because we need to read `sessionId` from the agent continuously.
+        // Assign an object providing the current state of the agent instance
+        // We need to do this because we need to read `sessionId` from the agent continuously
         networkModule?.sharedState = sharedState
 
         // We need the endpoint url to manage trace exclusion logic
@@ -148,8 +148,8 @@ extension SplunkRum {
     #if canImport(SplunkCrashReports)
         let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
 
-        // Assign an object providing the current state of the agent instance.
-        // We need to do this because we need to read `appState` from the agent in the instance of a crash.
+        // Assign an object providing the current state of the agent instance
+        // We need to do this because we need to read `appState` from the agent in the instance of a crash
         crashReportsModule?.sharedState = sharedState
 
         // Check if a crash ended the previous run of the app

@@ -65,7 +65,7 @@ public class OTLPBackgroundHTTPBaseExporter {
         httpClient = BackgroundHTTPClient(sessionQosConfiguration: qosConfig, diskStorage: diskStorage)
 
         // Get incomplete requests and check for stalled files
-        // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
+        // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files
         let cleanTime = DispatchTime.now() + .seconds(Int.random(in: 5 ... 8))
 
         DispatchQueue.global(qos: .utility).asyncAfter(deadline: cleanTime) { [weak self] in

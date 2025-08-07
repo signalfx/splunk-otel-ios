@@ -81,7 +81,7 @@ extension NavigationPreferences {
 
     // MARK: - Codable
 
-    // Private preferences are excluded from serialization.
+    // Private preferences are excluded from serialization
     enum CodingKeys: String, CodingKey {
         case enableAutomatedTracking
     }

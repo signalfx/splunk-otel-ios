@@ -73,7 +73,7 @@ class RepeatingJob: AgentRepeatingJob {
         }
 
         // Due to the nature of the Timer API,
-        // the current timer needs to be invalidated.
+        // the current timer needs to be invalidated
         invalidateTimer()
 
         return self

@@ -63,7 +63,7 @@ public final class AppStart {
     var prewarmDetected = false
 
     // Background launch detection, optional because we need to detect
-    // background launch only once during the initial application launch.
+    // background launch only once during the initial application launch
     var backgroundLaunchDetected: Bool?
 
 

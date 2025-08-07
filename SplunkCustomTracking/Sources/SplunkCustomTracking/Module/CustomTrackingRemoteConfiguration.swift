@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-// Minimal protocol conformance.
+// Minimal protocol conformance
 /// Decodes and stores remote configuration settings for the Custom Tracking module.
 ///
 /// This structure conforms to `RemoteModuleConfiguration` and is responsible for parsing

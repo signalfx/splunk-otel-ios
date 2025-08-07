@@ -188,7 +188,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         // Initialize attribute dictionary
         //
         // As we are bypasing a Log event processor and LogRecordBuilder,
-        // we need to add attributes manually.
+        // we need to add attributes manually
         var attributes: [String: SplunkAttributeValue] = [:]
 
         // Merge runtime attributes
