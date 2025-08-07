@@ -172,8 +172,11 @@ public class NetworkMonitor {
     @objc private func radioAccessChanged() {
         isInitialEvent = false
         networkChangeEvent.timestamp = Date()
-        networkChangeEvent.radioType = getCurrentRadioType()
-        sendNetworkChangeSpan()
+        networkChangeEvent.radioType = networkChangeEvent.connectionType == .cellular ?
+            self.getCurrentRadioType() : nil
+        if networkChangeEvent.isDebouncedChange(from: previousChangeEvent) {
+            sendNetworkChangeSpan()
+        }
     }
 
     // swiftlint:disable cyclomatic_complexity
