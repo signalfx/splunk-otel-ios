@@ -40,15 +40,15 @@ class SessionReplayDataEvent: AgentEvent {
 
     // MARK: - Initialization
 
-    // Initializes Session Replay data event.
-    //
-    // - Parameters:
-    //   - metadata: ``Metadata`` describing the session replay record.
-    //   - data: Session replay blob of type `Data`.
-    //   - index: Event sequence number within the session.
-    //   - sessionId: The `session Id` of a session in which the event occurred.
-    //               Optional so that we can see sessions with no session id in the backend.
-    //   - scriptInstanceId: The script instance ID for the session.
+    /// Initializes Session Replay data event.
+    ///
+    /// - Parameters:
+    ///   - metadata: `Metadata` describing the session replay record.
+    ///   - data: Session replay blob of type `Data`.
+    ///   - index: Event sequence number within the session.
+    ///   - sessionId: The `session Id` of a session in which the event occurred.
+    ///               Optional so that we can see sessions with no session id in the backend.
+    ///   - scriptInstanceId: The script instance ID for the session.
     init(metadata: Metadata, data: Data, index: Int, sessionId: String?, scriptInstanceId: String) {
         // Event properties
         timestamp = metadata.timestamp

@@ -50,13 +50,13 @@ class DefaultSession: AgentSession {
 
     // MARK: - Internal
 
-    // The ``SplunkRum`` agent instance to which the session belongs.
+    /// The ``SplunkRum`` agent instance to which the session belongs.
     unowned var owner: SplunkRum?
 
-    // Defines the minimum session refresh interval (defined in seconds). Default value is 1 second.
+    /// Defines the minimum session refresh interval (defined in seconds). Default value is 1 second.
     var sessionRefreshInterval: Double = 1
 
-    // Session inactivity timeout (defined in seconds). Default value is 15 minutes.
+    /// Session inactivity timeout (defined in seconds). Default value is 15 minutes.
     var sessionTimeout: Double {
         let unitTest = testSessionTimeout
         let configuration = owner?.agentConfiguration.sessionTimeout
@@ -65,7 +65,7 @@ class DefaultSession: AgentSession {
         return unitTest ?? configuration ?? defaultValue
     }
 
-    // The maximal length of one session (defined in seconds). Default value is 1 hour.
+    /// The maximal length of one session (defined in seconds). Default value is 1 hour.
     var maxSessionLength: Double {
         let unitTest = testMaxSessionLength
         let configuration = owner?.agentConfiguration.maxSessionLength
@@ -77,12 +77,14 @@ class DefaultSession: AgentSession {
 
     // MARK: - Computed properties
 
+    /// The current session identifier.
     var currentSessionId: String {
         accessQueue.sync {
             currentSession.id
         }
     }
 
+    /// The current `SessionItem` representing the session's state.
     var currentSessionItem: SessionItem {
         accessQueue.sync {
             currentSession
@@ -92,6 +94,9 @@ class DefaultSession: AgentSession {
 
     // MARK: - Initialization
 
+    /// Initializes a new session instance.
+    ///
+    /// - Parameter sessionsModel: The `SessionsModel` instance to manage session data.
     required init(sessionsModel: SessionsModel = SessionsModel()) {
         self.sessionsModel = sessionsModel
 

@@ -168,9 +168,7 @@ public class SplunkRumBuilder {
     }
 
 
-    
     // MARK: - Instrumentations builder methods
-
 
     /// Sets whether or not the Navigation module should automatically detect navigation in the application.
     ///

@@ -70,17 +70,16 @@ extension CrashReports: Module {
     /// Registers a callback to consume crash report data.
     ///
     /// The provided block will be invoked when a crash report is processed and ready for publishing.
-    /// - Parameter block: A closure that takes `CrashReportsMetadata` and a `String` (the crash report) as arguments.
+    /// - Parameter block: A closure that takes ``CrashReportsMetadata`` and a `String` (the crash
+    ///   report) as arguments.
     public func onPublish(data block: @escaping (CrashReportsMetadata, String) -> Void) {
        crashReportDataConsumer = block
     }
 
-    // An empty implementation as the purging of the actual crash report data
-    // is handled by the PL Crash Reporter internally.
     /// A placeholder for handling the deletion of data associated with a specific event.
     ///
-    /// - Note: This method is a no-op because the underlying `PLCrashReporter` framework manages the lifecycle
-    /// of crash report files, including their deletion after processing.
+    /// - Note: This method is a no-op because the underlying `PLCrashReporter` framework manages
+    ///   the lifecycle of crash report files, including their deletion after processing.
     /// - Parameter metadata: The metadata of the event whose data should be deleted.
     public func deleteData(for metadata: any ModuleEventMetadata) {}
 }

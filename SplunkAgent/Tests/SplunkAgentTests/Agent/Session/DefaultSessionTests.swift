@@ -242,7 +242,7 @@ extension DefaultSessionTests {
 
         /* Going into the background for *too long* time */
         try simulateBackgroundStay(for: defaultSession, duration: 12)
- 
+
         // The current session should *not* be the same immediately
         XCTAssertNotEqual(lastSessionId, defaultSession.currentSessionId)
         XCTAssertNotNil(agent)
