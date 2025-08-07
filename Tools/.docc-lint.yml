@@ -53,12 +53,13 @@ excluded:
 
 custom_rules:
 
+  # experimental rules. These may be useful despite giving some false negatives and false positives.
+
   docc_comment_should_end_with_period:
     name: "DocC Comment Period"
     message: "Documentation comments (///) should end with a period."
-    # This rule checks for lines starting with '///' that contain at least one letter/number
-    # and do not end with a period, allowing for trailing whitespace.
-    # It uses a negative lookahead to avoid flagging markdown list items or empty '///' lines.
+    # This rule is not aware of multi-line sentences and will do false
+    # positive reports in the middle of sentences.
     regex: '^(?:\t| {4})*///\s(?!-|\s*$).*[a-zA-Z0-9][^.\n]*$'
     severity: warning
 
@@ -67,13 +68,12 @@ custom_rules:
     message: "Regular, single-line comments (//) should not end with a period."
     # This rule flags single-line comments that start with '//' (but not '///')
     # and end with a period.
-    # regex hacked to avoid a bug in the re engine
     regex: '^(?:\t| {4})*//(?!/)[^\n\.]+\.\s*$'
     severity: warning
 
   prefer_docc_for_declarations:
     name: "Prefer DocC for Declarations"
-    message: "Use '///' for documenting declarations, not '//'. (Ignores MARK/TODO/FIXME and conformance notes)"
+    message: "Use '///' for documenting declarations, not '//'."
     # This regex matches a line that starts with '//' and is NOT a directive or a common
     # conformance/implementation note. It then checks if the next line is a declaration.
     # It also ignores lines that contain only '//' such as in the copyright header.
