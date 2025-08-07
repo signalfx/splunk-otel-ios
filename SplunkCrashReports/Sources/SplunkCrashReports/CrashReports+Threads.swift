@@ -36,7 +36,10 @@ extension CrashReports {
         return threads
     }
 
-    private func oneThreadFromCrashReport(thread: PLCrashReportThreadInfo, report: PLCrashReport) -> [CrashReportKeys: Any] {
+    private func oneThreadFromCrashReport(
+        thread: PLCrashReportThreadInfo,
+        report: PLCrashReport
+    ) -> [CrashReportKeys: Any] {
 
         var oneThread: [CrashReportKeys: Any] = [:]
         oneThread[.details] = thread

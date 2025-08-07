@@ -45,7 +45,7 @@ public class CrashReports {
     /// Storage of periodically sampled device data
     private var deviceDataDictionary: [String: String] = [:]
     private var dataUpdateTimer: Timer?
-    
+
     /// Serial queue for thread-safe access to deviceDataDictionary
     private let deviceDataQueue = DispatchQueue(label: "com.splunk.crashreports.devicedata", qos: .utility)
 
@@ -71,7 +71,8 @@ public class CrashReports {
         // Setup private path for crash reports to avoid conflict with other
         // instances of PLCrashReporter present in the client app
         let fileManager = FileManager.default
-        let crashDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("SplunkCrashReports", isDirectory: true)
+        let crashDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("SplunkCrashReports", isDirectory: true)
         try? fileManager.createDirectory(at: crashDirectory, withIntermediateDirectories: true)
 
         let signalConfig = PLCrashReporterConfig(
@@ -207,7 +208,10 @@ public class CrashReports {
                 self.deviceDataDictionary["battery"] = CrashReportDeviceStats.batteryLevel
                 self.deviceDataDictionary["disk"] = CrashReportDeviceStats.freeDiskSpace
                 self.deviceDataDictionary["memory"] = CrashReportDeviceStats.freeMemory
-                let customData = try NSKeyedArchiver.archivedData(withRootObject: self.deviceDataDictionary, requiringSecureCoding: false)
+                let customData = try NSKeyedArchiver.archivedData(
+                    withRootObject: self.deviceDataDictionary,
+                    requiringSecureCoding: false
+                )
 
                 // Update crash reporter on main queue since it might touch UI-related properties
                 DispatchQueue.main.async {
@@ -243,7 +247,8 @@ public class CrashReports {
         if let sharedState {
             let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
 
-            // TODO: This mapping code should be removed in favor of returning the line above once the backend is able to support it.
+            // TODO: This mapping code should be removed in favor of returning the line above
+            // once the backend is able to support it.
 
             appState = switch timebasedAppState {
             case "active": "foreground"
