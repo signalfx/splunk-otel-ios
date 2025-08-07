@@ -28,7 +28,7 @@ class AppStateManagerTests: XCTestCase {
         try? storage.update([oldEvent], forKey: "appStateEvents")
 
         let appStateModel = AppStateModel(storage: storage)
-        let _ = AppStateManager(appStateModel: appStateModel)
+        _ = AppStateManager(appStateModel: appStateModel)
 
         for _ in 0 ... 120 {
             appStateModel.saveEvent(.inactive)

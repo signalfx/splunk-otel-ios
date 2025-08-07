@@ -49,6 +49,10 @@ public extension Session {
     /// or an application crash.
     ///
     /// This method returns the respective session ID for the timestamp the event originates.
+    ///
+    /// - Parameter timestamp: The timestamp for which the session identifier is requested.
+    ///
+    /// - Returns: The corresponding `sessionId` or `nil` if the session did not exist at that time.
     func sessionId(for timestamp: Date) -> String? {
         owner.currentSession.sessionId(for: timestamp)
     }

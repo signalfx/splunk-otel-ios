@@ -15,14 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoLogger
+import CiscoLogger
 import Foundation
-internal import OpenTelemetryApi
-internal import OpenTelemetrySdk
-internal import ResourceExtension
-internal import SignPostIntegration
+import OpenTelemetryApi
+import OpenTelemetrySdk
+import ResourceExtension
+import SignPostIntegration
 import SplunkCommon
-internal import URLSessionInstrumentation
+import URLSessionInstrumentation
 
 /// A class that provides network instrumentation for `URLSession` requests.
 ///
@@ -75,7 +75,7 @@ public class NetworkInstrumentation {
         // Start the network instrumentation if it's enabled or if no configuration is provided
         if config?.isEnabled ?? true {
 
-            if let ignoreURLsParameter  = config?.ignoreURLs {
+            if let ignoreURLsParameter = config?.ignoreURLs {
                 ignoreURLs = ignoreURLsParameter
             }
 
@@ -165,13 +165,21 @@ public class NetworkInstrumentation {
     }
 
     func createdRequest(URLRequest: URLRequest, span: Span) {
-        let key = SemanticAttributes.httpRequestContentLength
+        let key = SemanticAttributes.httpRequestBodySize
         let body = URLRequest.httpBody
         let length = body?.count ?? 0
         span.setAttribute(key: key, value: length)
+        let method = URLRequest.httpMethod ?? "_OTHER"
+        span.setAttribute(key: SemanticAttributes.httpRequestMethod, value: method)
         span.setAttribute(key: "component", value: "http")
 
         if let url = URLRequest.url {
+            span.setAttribute(key: SemanticAttributes.urlPath, value: url.path)
+            span.setAttribute(key: SemanticAttributes.urlQuery, value: url.query ?? "")
+            if let scheme = url.scheme {
+                span.setAttribute(key: SemanticAttributes.urlScheme, value: scheme)
+            }
+
             if let host = url.host {
                 span.setAttribute(key: "server.address", value: host)
                 // Preload with host in case IP cannot be determined
@@ -241,7 +249,7 @@ public class NetworkInstrumentation {
     }
 
     func receivedResponse(URLResponse: URLResponse, dataOrFile: DataOrFile?, span: Span) {
-        let key = SemanticAttributes.httpResponseContentLength
+        let key = SemanticAttributes.httpResponseBodySize
         let response = URLResponse as? HTTPURLResponse
         let length = response?.expectedContentLength ?? 0
         span.setAttribute(key: key, value: Int(length))
@@ -268,6 +276,9 @@ public class NetworkInstrumentation {
                 }
             }
         }
+
+        // removes obsolete attributes
+        removeObsoleteAttributes(from: span)
 
         /* Save this until we add the feature into the Agent side API
         guard ((agentConfiguration?.appDCloudNetworkResponseCallback?(URLResponse)) == nil) else {
@@ -332,11 +343,32 @@ public class NetworkInstrumentation {
         return false
     }
 
+    // Removes obsolete attributes from the span
+    private func removeObsoleteAttributes(from span: Span) {
+        // Attributes to be removed
+        let attributesToRemove = [
+            SemanticAttributes.httpUrl,
+            SemanticAttributes.httpTarget,
+            SemanticAttributes.netPeerName,
+            SemanticAttributes.httpStatusCode,
+            SemanticAttributes.httpMethod,
+            SemanticAttributes.httpScheme
+        ]
+
+        for key in attributesToRemove {
+            // Setting the value to nil will remove the key
+            span.setAttribute(key: key.rawValue, value: nil)
+        }
+    }
+
     func receivedError(error: Error, dataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, span: Span) {
         span.setAttribute(key: "error", value: true)
         span.setAttribute(key: "error.message", value: error.localizedDescription)
         span.setAttribute(key: "error.type", value: String(describing: type(of: error)))
         span.setAttribute(key: SemanticAttributes.httpResponseStatusCode, value: HTTPStatus)
+
+        // removes obsolete attributes
+        removeObsoleteAttributes(from: span)
 
         logger.log(level: .error) {
             "Error: \(error.localizedDescription), Status: \(HTTPStatus)"

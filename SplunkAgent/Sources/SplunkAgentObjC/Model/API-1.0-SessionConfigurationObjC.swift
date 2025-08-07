@@ -15,17 +15,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A configuration object representing properties of the Agent's `Session`.
-public struct SessionConfiguration: Codable, Equatable {
+import Foundation
+import SplunkAgent
 
-    // MARK: - Public properties
+/// A configuration object representing properties of the Agent's `SPLKSession`.
+@objc(SPLKSessionConfiguration)
+public final class SessionConfigurationObjC: NSObject {
+
+    // MARK: - Private
+
+    private var configuration: SessionConfiguration
+
+
+    // MARK: - Public API
 
     /// A sampling rate in the `<0.0, 1.0>` interval.
     /// `1.0` equals to zero sampling (all instrumentation is sent),
     /// `0.0` equals to all session being sampled, `0.5` equals to 50% sampling.
     ///
     /// Defaults to `1.0`.
-    public var samplingRate = ConfigurationDefaults.sessionSamplingRate
+    @objc
+    public var samplingRate: Double {
+        get {
+            configuration.samplingRate
+        }
+        set {
+            configuration.samplingRate = newValue
+        }
+    }
 
 
     // MARK: - Initialization
@@ -33,7 +50,12 @@ public struct SessionConfiguration: Codable, Equatable {
     /// Default empty constructor.
     ///
     /// Initializes the configuration object's properties with default values.
-    public init() {}
+    @objc
+    override public convenience init() {
+        let sessionConfiguration = SessionConfiguration()
+
+        self.init(for: sessionConfiguration)
+    }
 
     /// Initializes the configuration object.
     ///
@@ -41,7 +63,25 @@ public struct SessionConfiguration: Codable, Equatable {
     /// - samplingRate: A sampling rate in the `<0.0, 1.0>` interval.
     /// `1.0` equals to zero sampling (all instrumentation is sent),
     /// `0.0` equals to all session being sampled, `0.5` equals to 50% sampling.
-    public init(samplingRate: Double) {
-        self.samplingRate = samplingRate
+    @objc
+    public convenience init(samplingRate: Double) {
+        let sessionConfiguration = SessionConfiguration(
+            samplingRate: samplingRate
+        )
+
+        self.init(for: sessionConfiguration)
+    }
+
+
+    // MARK: - Conversion utils
+
+    init(for sessionConfiguration: SessionConfiguration) {
+        // Initialize according to the native Swift variant
+        configuration = sessionConfiguration
+    }
+
+    func sessionConfiguration() -> SessionConfiguration {
+        // We return a native variant for Swift language
+        configuration
     }
 }
