@@ -25,7 +25,7 @@ struct OTelDestination: NetworkMonitorDestination {
     // MARK: - Sending
 
     /// Sends a network event as an OpenTelemetry span.
-    /// 
+    ///
     /// - Parameters:
     ///   - networkEvent: The network change event to send as a span
     ///   - sharedState: The agent's shared state, used for agent version information
