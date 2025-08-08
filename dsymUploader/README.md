@@ -2,13 +2,30 @@
 
 The `upload-dsyms.sh` script automatically uploads debug symbol files (dSYMs) generated during your iOS app builds to Splunk RUM for crash report symbolication. The script directly uploads dSYMs without requiring the Splunk RUM CLI.
 
+### Example Usage
+You can configure the script using either environment variables or command-line arguments. Command-line arguments will always take precedence over environment variables.
+
+```bash
+# Basic usage using command line arguments
+./upload-dsyms.sh --realm realm --token YOUR_API_TOKEN --directory ./build/dSYMs
+
+# With debug logging
+./upload-dsyms.sh --realm realm --token YOUR_API_TOKEN --directory ./build/dSYMs --debug
+
+# Dry run to test configuration
+./upload-dsyms.sh --realm realm --token YOUR_API_TOKEN --directory ./build/dSYMs --dry-run
+
+# Using environment variables
+export SPLUNK_REALM=realm
+export SPLUNK_API_ACCESS_TOKEN=YOUR_API_TOKEN
+./upload-dsyms.sh --directory ./build/dSYMs
+
 ### Prerequisites
 
 1. **System Requirements:**
    - bash shell
    - curl (for HTTP uploads)
    - zip (for creating archives)
-   - find (for locating files)
 
 2. **Obtain your Splunk RUM configuration:**
    - Splunk realm (e.g., "us0", "eu0", "ap0")
@@ -26,7 +43,7 @@ The `upload-dsyms.sh` script automatically uploads debug symbol files (dSYMs) ge
 6. In the script text area, add:
 
 ```bash
-# Path to the upload script (adjust if using a different integration method)
+# Path to the upload script
 SCRIPT_PATH="${SRCROOT}/path/to/dsymUploader/upload-dsyms.sh"
 
 # Check if script exists and is executable
@@ -77,7 +94,7 @@ If you prefer to include the script directly in your project:
 - name: Upload dSYMs to Splunk RUM
   run: |
     ./dsymUploader/upload-dsyms.sh \
-      --realm "us0" \
+      --realm "${SPLUNK_REALM}" \
       --token "${{ secrets.SPLUNK_API_ACCESS_TOKEN }}" \
       --directory "${{ runner.temp }}/build/dSYMs" \
 ```
@@ -111,7 +128,7 @@ The script can be configured using command line arguments or environment variabl
 
 ### Behavior
 
-- **dSYM Processing:** The script finds all `.dSYM` files in the specified directory, creates ZIP archives, and uploads them directly to the Splunk API.
+- **dSYM Processing:** The script finds all `.dSYM` in the specified directory, creates ZIP archives, and uploads them directly to the Splunk API.
 - **Error Handling:** Upload failures are logged with detailed error messages and exit codes.
 - **Timeout:** Uploads have a configurable timeout to prevent hanging builds (default: 300 seconds).
 - **Dry Run:** Use `--dry-run` to test configuration without actually uploading files.
@@ -141,11 +158,11 @@ ERROR: Splunk RUM realm not specified
 
 #### No dSYMs Found
 ```
-ERROR: No dSYM files found in directory
+ERROR: No dSYMs found in directory
 ```
 - Ensure your build settings generate dSYMs (`DEBUG_INFORMATION_FORMAT = dwarf-with-dsym`)
 - Check that the build completed successfully before the script runs
-- Verify the directory path contains `.dSYM` files or bundles
+- Verify the directory path contains `.dSYM` or bundles
 - Use `--debug` flag to see detailed search information
 
 #### Upload Failures
@@ -182,22 +199,6 @@ ERROR: Could not resolve host
 - **Timeout:** Uploads are limited by timeout setting to prevent hanging builds
 - **Network:** Uses HTTP/1.1 with connection reuse for multiple uploads
 
-### Example Usage
-
-```bash
-# Basic usage
-./upload-dsyms.sh --realm us0 --token YOUR_TOKEN --directory ./build/dSYMs
-
-# With debug logging
-./upload-dsyms.sh --realm us0 --token YOUR_TOKEN --directory ./build/dSYMs --debug
-
-# Dry run to test configuration
-./upload-dsyms.sh --realm us0 --token YOUR_TOKEN --directory ./build/dSYMs --dry-run
-
-# Using environment variables
-export SPLUNK_REALM=us0
-export SPLUNK_API_ACCESS_TOKEN=YOUR_TOKEN
-./upload-dsyms.sh --directory ./build/dSYMs
 
 ## Support
 

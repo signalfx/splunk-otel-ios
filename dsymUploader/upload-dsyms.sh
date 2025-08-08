@@ -23,7 +23,7 @@
 #   ./upload-dsyms.sh [OPTIONS]
 #
 # Options:
-#   -d, --directory DIR    Directory containing dSYM files (required)
+#   -d, --directory DIR    Directory containing dSYMs or path to .dSYM bundle (required)
 #   -r, --realm REALM      Splunk RUM realm (required)
 #   -t, --token TOKEN      Splunk API access token (required)
 #   --timeout SECONDS      Upload timeout in seconds (default: 300)
@@ -34,7 +34,7 @@
 # Environment Variables:
 #   SPLUNK_REALM            - Splunk RUM realm
 #   SPLUNK_API_ACCESS_TOKEN     - Splunk API access token
-#   SPLUNK_DSYM_DIRECTORY       - Directory containing dSYMs
+#   SPLUNK_DSYM_DIRECTORY       - Directory containing dSYMs or path to .dSYM bundle
 #   SPLUNK_DSYM_UPLOAD_TIMEOUT  - Upload timeout in seconds (default: 300)
 #   SPLUNK_DSYM_UPLOAD_ENABLED  - Set to "false" to disable upload (default: true)
 #   SPLUNK_DSYM_UPLOAD_DEBUG    - Set to "true" for verbose output (default: false)
@@ -93,13 +93,13 @@ log_success() {
 
 show_help() {
     cat << EOF
-$SCRIPT_NAME - Upload iOS dSYM files to Splunk RUM
+$SCRIPT_NAME - Upload iOS dSYMs to Splunk RUM
 
 USAGE:
     $SCRIPT_NAME [OPTIONS]
 
 OPTIONS:
-    -d, --directory DIR    Directory containing dSYM files (required)
+    -d, --directory DIR    Directory containing dSYMs or path to .dSYM bundle (required)
     -r, --realm REALM      Splunk RUM realm (required)
     -t, --token TOKEN      Splunk API access token (required)
     --timeout SECONDS      Upload timeout in seconds (default: $DEFAULT_TIMEOUT)
@@ -110,20 +110,34 @@ OPTIONS:
 ENVIRONMENT VARIABLES:
     SPLUNK_REALM            Splunk RUM realm
     SPLUNK_API_ACCESS_TOKEN     Splunk API access token
-    SPLUNK_DSYM_DIRECTORY       Directory containing dSYMs
+    SPLUNK_DSYM_DIRECTORY       Directory containing dSYMs or path to .dSYM bundle
     SPLUNK_DSYM_UPLOAD_TIMEOUT  Upload timeout in seconds (default: $DEFAULT_TIMEOUT)
     SPLUNK_DSYM_UPLOAD_ENABLED  Set to "false" to disable upload (default: true)
     SPLUNK_DSYM_UPLOAD_DEBUG    Set to "true" for verbose output (default: false)
 
 EXAMPLES:
-    # Upload dSYMs from specific directory
-    $SCRIPT_NAME -d /path/to/dsyms -r us0 -t your_access_token
+    # Use command line arguments
+    $SCRIPT_NAME -d /path/to/dsyms -r realm -t your_access_token
 
     # Use environment variables
-    export SPLUNK_REALM=us0
-    export SPLUNK_API_ACCESS_TOKEN=your_token
+    export SPLUNK_REALM=realm 
+    export SPLUNK_API_ACCESS_TOKEN=your_access_token
     $SCRIPT_NAME -d /path/to/dsyms
 
+
+EOF
+}
+
+show_usage_example() {
+    cat << EOF
+    # Example usage:
+    # Use command line arguments
+    $SCRIPT_NAME -d /path/to/dsyms -r realm -t your_access_token
+
+    # Use environment variables
+    export SPLUNK_REALM=realm
+    export SPLUNK_API_ACCESS_TOKEN=your_access_token
+    $SCRIPT_NAME -d /path/to/dsyms
 
 EOF
 }
@@ -230,6 +244,8 @@ validate_configuration() {
         for error in "${errors[@]}"; do
             log_error "  - $error"
         done
+        echo ""
+        show_usage_example
         return 1
     fi
     
@@ -239,6 +255,8 @@ validate_configuration() {
 validate_dsym_input() {
     if [[ -z "$DSYM_DIRECTORY" ]]; then
         log_error "dSYM directory input not specified"
+        echo ""
+        show_usage_example
         return 1
     fi
     
@@ -249,7 +267,12 @@ validate_dsym_input() {
             return 1
         fi
         
-        log_debug "Validated dSYM directory: $DSYM_DIRECTORY"
+        # Check if the directory itself is a .dSYM bundle
+        if [[ "$DSYM_DIRECTORY" =~ \.dSYM$ ]]; then
+            log_debug "Validated single dSYM bundle: $DSYM_DIRECTORY"
+        else
+            log_debug "Validated dSYM directory: $DSYM_DIRECTORY"
+        fi
         return 0
     fi
     
@@ -313,7 +336,8 @@ validate_dsym_bundle() {
 }
 
 # ============================================================================
-# ZIP Creation Functions  
+
+# ZIP Creation Functions
 # ============================================================================
 
 create_temp_directory() {
@@ -365,9 +389,10 @@ upload_dsym_file() {
     local zip_path="$1"
     local endpoint
     endpoint="$(build_upload_endpoint)"
+    file_name="$(basename "$zip_path")"
     
     if [[ "$DRY_RUN_MODE" == "true" ]]; then
-        log_info "DRY RUN: Would upload $zip_path to $endpoint"
+        log_info "DRY RUN: Identified dSYM: $file_name"
         return 0
     fi
     
@@ -386,9 +411,13 @@ upload_dsym_file() {
     if [[ "$DEBUG_MODE" != "true" ]]; then
         curl_args+=(--silent)
     else
-        curl_args+=(--verbose)
+        # In debug mode, don't use --verbose to avoid exposing X-SF-Token
+        # Instead, provide detailed debug logging without sensitive data
         log_debug "Upload endpoint: $endpoint"
         log_debug "Timeout: ${UPLOAD_TIMEOUT}s"
+        log_debug "User-Agent: $USER_AGENT"
+        log_debug "X-SF-Token: [REDACTED]"
+        log_debug "Upload file: $zip_path"
     fi
     
     # Perform the upload
@@ -506,10 +535,10 @@ handle_upload_error() {
             fi
             ;;
     esac
-}   
+}
 
 # ============================================================================
-# Cleanup Functions
+# Cleanup/Users/aditis3/codeRepos/splunk-otel-ios/dsymUploader Functions
 # ============================================================================
 
 cleanup_temp_directory() {
@@ -528,7 +557,7 @@ main() {
     local temp_dir=""
     local exit_code=0
     
-    # Trap to ensure cleanup on exit  
+    # Trap to ensure cleanup on exit
     trap 'cleanup_temp_directory "${temp_dir:-}"' EXIT
     
     log_debug "Starting dSYM upload process"
@@ -559,10 +588,10 @@ main() {
         return 1
     fi
     
-    if [[ -f "$DSYM_DIRECTORY" ]]; then
-        log_info "Using dSYM file: $DSYM_DIRECTORY"
+    if [[ "$DSYM_DIRECTORY" =~ \.dSYM$ ]]; then
+        log_info "Using dSYM bundle: $DSYM_DIRECTORY"
     else
-        log_info "Using dSYM directory: $DSYM_DIRECTORY"
+        log_info "Using directory: $DSYM_DIRECTORY"
     fi
     log_info "Using realm: $REALM"
     
@@ -572,11 +601,43 @@ main() {
     fi
     log_debug "Created temporary directory: $temp_dir"
 
-    process_directory "$DSYM_DIRECTORY" "$temp_dir"
+    # Check if the provided directory is itself a .dSYM bundle
+    if [[ "$DSYM_DIRECTORY" =~ \.dSYM$ ]]; then
+        log_debug "Processing single dSYM bundle: $DSYM_DIRECTORY"
+        # Validate that it's a proper dSYM bundle
+        if validate_dsym_bundle "$DSYM_DIRECTORY"; then
+            found_dsym=1
+            if zip_path="$(zip_dsym_file "$DSYM_DIRECTORY" "$temp_dir")"; then
+                # Upload the ZIP file
+                if upload_dsym_file "$zip_path"; then
+                    ((successful_uploads++))
+                else
+                    ((failed_uploads++))
+                    exit_code=1 # Set exit_code to non-zero on failure
+                fi
+                # Clean up ZIP file after upload attempt
+                log_debug "Cleaning up ZIP file: $zip_path"
+                rm -f "$zip_path"
+            else
+                log_error "Failed to zip dSYM: $DSYM_DIRECTORY"
+                ((failed_uploads++)) # Count zip failure as a failed upload
+                exit_code=1 # Set exit_code to non-zero on failure
+            fi
+        else
+            log_error "Invalid dSYM bundle: $DSYM_DIRECTORY"
+            exit_code=1
+        fi
+    else
+        # It's a regular directory, process it recursively
+        process_directory "$DSYM_DIRECTORY" "$temp_dir"
+    fi
 
     if [[ $found_dsym -eq 0 ]]; then
-        log_error "No dSYM files found in '$DSYM_DIRECTORY'."
+        log_error "No dSYMs found in '$DSYM_DIRECTORY'."
         return 1
+    elif [[ "$DRY_RUN_MODE" == "true" ]]; then
+        log_info "DRY RUN complete: Found $successful_uploads dSYM(s) that would be uploaded"
+    
     else
         log_info "Processing complete:  Successful uploads: $successful_uploads, Failed uploads: $failed_uploads"
     fi
