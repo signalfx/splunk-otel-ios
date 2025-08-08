@@ -99,16 +99,13 @@ public class NetworkMonitor {
             networkChangeEvent.timestamp = Date()
             networkChangeEvent.isConnected = path.status == .satisfied
             networkChangeEvent.connectionType = self.getConnectionType(path)
-            networkChangeEvent.radioType = networkChangeEvent.connectionType == .cellular ?
-                self.getCurrentRadioType() : nil
+            networkChangeEvent.radioType = self.getCurrentRadioType()
 
             if isInitialEvent {
                 isInitialEvent = false
                 previousChangeEvent = networkChangeEvent
             } else {
-                if networkChangeEvent.isDebouncedChange(from: previousChangeEvent) {
-                    sendNetworkChangeSpan()
-                }
+                sendNetworkChangeSpan()
             }
         }
         monitor.start(queue: queue)
@@ -159,24 +156,26 @@ public class NetworkMonitor {
     }
 
     private func sendNetworkChangeSpan() {
-        destination.send(networkEvent: networkChangeEvent, sharedState: sharedState)
+        if networkChangeEvent.connectionType != .cellular {
+            networkChangeEvent.radioType = nil
+        }
+        if networkChangeEvent.isDebouncedChange(from: previousChangeEvent) {
+            destination.send(networkEvent: networkChangeEvent, sharedState: sharedState)
 
-        statusChangeHandler?(
-            networkChangeEvent.isConnected,
-            networkChangeEvent.connectionType,
-            networkChangeEvent.radioType
-        )
-        previousChangeEvent = networkChangeEvent
+            statusChangeHandler?(
+                networkChangeEvent.isConnected,
+                networkChangeEvent.connectionType,
+                networkChangeEvent.radioType
+            )
+            previousChangeEvent = networkChangeEvent
+        }
     }
 
     @objc private func radioAccessChanged() {
         isInitialEvent = false
         networkChangeEvent.timestamp = Date()
-        networkChangeEvent.radioType = networkChangeEvent.connectionType == .cellular ?
-            self.getCurrentRadioType() : nil
-        if networkChangeEvent.isDebouncedChange(from: previousChangeEvent) {
-            sendNetworkChangeSpan()
-        }
+        networkChangeEvent.radioType = getCurrentRadioType()
+        sendNetworkChangeSpan()
     }
 
     // swiftlint:disable cyclomatic_complexity
