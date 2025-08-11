@@ -19,7 +19,7 @@ You can configure the script using either environment variables or command-line 
 export SPLUNK_REALM=realm
 export SPLUNK_API_ACCESS_TOKEN=YOUR_API_TOKEN
 ./upload-dsyms.sh --directory ./build/dSYMs
-
+```
 ### Prerequisites
 
 1. **System Requirements:**
