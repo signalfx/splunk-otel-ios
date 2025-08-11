@@ -198,16 +198,24 @@ limitations under the License.
     XCTAssertNil(storedIntegerNumber);
 }
 
-- (void)testAttributeValueTypes {
-    SPLKAttributeValueType boolType = SPLKAttributeValueTypeBool;
-    SPLKAttributeValueType doubleType = SPLKAttributeValueTypeDouble;
-    SPLKAttributeValueType integerType = SPLKAttributeValueTypeInteger;
-    SPLKAttributeValueType stringType = SPLKAttributeValueTypeString;
+- (void)testAttributeValueDescriptions {
+    SPLKAttributeValue *boolAttribute = [[SPLKAttributeValue alloc] initWithBool:self.sampleBool];
+    SPLKAttributeValue *doubleAttribute = [[SPLKAttributeValue alloc] initWithDouble:self.sampleDouble];
+    SPLKAttributeValue *integerAttribute = [[SPLKAttributeValue alloc] initWithInteger:self.sampleInteger];
+    SPLKAttributeValue *stringAttribute = [[SPLKAttributeValue alloc] initWithString:self.sampleString];
 
-    XCTAssertEqual(boolType, 0);
-    XCTAssertEqual(doubleType, 1);
-    XCTAssertEqual(integerType, 2);
-    XCTAssertEqual(stringType, 3);
+    XCTAssertNotNil(boolAttribute.description);
+    XCTAssertNotNil(doubleAttribute.description);
+    XCTAssertNotNil(integerAttribute.description);
+    XCTAssertNotNil(stringAttribute.description);
+
+    XCTAssertNotNil(boolAttribute.debugDescription);
+    XCTAssertNotNil(doubleAttribute.debugDescription);
+    XCTAssertNotNil(integerAttribute.debugDescription);
+    XCTAssertNotNil(stringAttribute.debugDescription);
+
+    XCTAssertTrue([boolAttribute.description isEqualToString:@"false"]);
+    XCTAssertTrue([boolAttribute.debugDescription isEqualToString:@"SPLKAttributeValue<BOOL>: false"]);
 }
 
 @end

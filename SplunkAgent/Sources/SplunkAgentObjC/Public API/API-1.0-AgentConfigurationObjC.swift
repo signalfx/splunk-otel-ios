@@ -63,7 +63,7 @@ public final class AgentConfigurationObjC: NSObject {
     ///
     /// Defaults to an empty `NSDictionary` object.
     @objc
-    public var globalAttributes: NSDictionary = [:]
+    public var globalAttributes: [String: AttributeValueObjC]
 
     /// Sets the `SPLKUserConfiguration` object.
     @objc
@@ -108,8 +108,7 @@ public final class AgentConfigurationObjC: NSObject {
         appVersion = agentConfiguration.appVersion
         enableDebugLogging = agentConfiguration.enableDebugLogging
 
-        // TODO: Resolve as part of a follow-up implementation ticket.
-        globalAttributes = [:]
+        globalAttributes = agentConfiguration.globalAttributes.attributesDictionary
 
         user = UserConfigurationObjC(for: agentConfiguration.user)
         session = SessionConfigurationObjC(for: agentConfiguration.session)
@@ -126,8 +125,7 @@ public final class AgentConfigurationObjC: NSObject {
         agentConfiguration.appVersion = appVersion
         agentConfiguration.enableDebugLogging = enableDebugLogging
 
-        // TODO: Resolve as part of a follow-up implementation ticket.
-        agentConfiguration.globalAttributes = MutableAttributes()
+        agentConfiguration.globalAttributes = MutableAttributes(with: globalAttributes)
 
         agentConfiguration.user = user.userConfiguration()
         agentConfiguration.session = session.sessionConfiguration()

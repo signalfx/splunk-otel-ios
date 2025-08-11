@@ -59,7 +59,7 @@ public final class AttributeValueObjC: NSObject {
     public convenience init(double: Double) {
         self.init(doubleNumber: NSNumber(value: double))
     }
-    
+
     /// Initializes a new instance of an attribute for a `double` type value, encapsulated as a `NSNumber`.
     ///
     /// - Parameter doubleNumber: The value for the new attribute, encapsulated as a `NSNumber`.
@@ -95,7 +95,7 @@ public final class AttributeValueObjC: NSObject {
 
 
     // MARK: - Typed getters
-    
+
     /// The value of the `BOOL` attribute, encapsulated as a `NSNumber`.
     ///
     /// If the attribute has not been initialized with a `BOOL`, it will return `nil`.
@@ -103,7 +103,7 @@ public final class AttributeValueObjC: NSObject {
         guard type == .bool else {
             return nil
         }
-        
+
         return value as? NSNumber
     }
 
@@ -135,10 +135,10 @@ public final class AttributeValueObjC: NSObject {
     public var asString: NSString? {
         return value as? NSString
     }
-    
-    
+
+
     // MARK: - Factory methods
-    
+
     /// Creates a new instance of an attribute for a `BOOL` type value.
     ///
     /// - Parameter bool: The value for the new attribute.
@@ -165,7 +165,7 @@ public final class AttributeValueObjC: NSObject {
     public static func attributeWithInteger(_ integer: Int) -> AttributeValueObjC {
         return .init(integer: integer)
     }
-    
+
     /// Creates a new instance of an attribute for a `NSString` type value.
     ///
     /// - Parameter string: A `NSString` with value for the new attribute.
@@ -212,16 +212,16 @@ extension AttributeValueObjC {
 
     convenience init?(with otelAttributeValue: AttributeValue) {
         switch otelAttributeValue {
-        case .bool(let bool):
+        case let .bool(bool):
             self.init(bool: bool)
 
-        case .double(let double):
+        case let .double(double):
             self.init(double: double)
 
-        case .int(let int):
+        case let .int(int):
             self.init(integer: int)
 
-        case .string(let string):
+        case let .string(string):
             self.init(string: string)
 
         default:

@@ -20,13 +20,13 @@ limitations under the License.
 public enum AttributeValueTypeObjC: Int {
     /// The stored value is of the `BOOL` type.
     case bool
-    
+
     /// The stored value is of the `double` type.
     case double
-    
+
     /// The stored value is of the `integer` type.
     case integer
-    
+
     /// The stored value is of the `NSString` type.
     case string
 }
