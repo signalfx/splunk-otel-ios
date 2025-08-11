@@ -2,7 +2,7 @@
 
 The `upload-dsyms.sh` script automatically uploads debug symbol files (dSYMs) generated during your iOS app builds to Splunk RUM for crash report symbolication. The script directly uploads dSYMs without requiring the Splunk RUM CLI.
 
-### Example Usage
+## Example Usage
 You can configure the script using either environment variables or command-line arguments. Command-line arguments will always take precedence over environment variables.
 
 ```bash
@@ -19,8 +19,9 @@ You can configure the script using either environment variables or command-line 
 export SPLUNK_REALM=realm
 export SPLUNK_API_ACCESS_TOKEN=YOUR_API_TOKEN
 ./upload-dsyms.sh --directory ./build/dSYMs
+```
 
-### Prerequisites
+## Prerequisites
 
 1. **System Requirements:**
    - bash shell
@@ -28,67 +29,87 @@ export SPLUNK_API_ACCESS_TOKEN=YOUR_API_TOKEN
    - zip (for creating archives)
 
 2. **Obtain your Splunk RUM configuration:**
-   - Splunk realm (e.g., "us0", "eu0", "ap0")
+   - Splunk realm (e.g., "us0", "eu0", "au0")
    - API access token [Docs Link](https://help.splunk.com/en/splunk-observability-cloud/administer/authentication-and-security/authentication-tokens/api-access-tokens)
 
-### Integration with Xcode
+## Integration Methods
 
-#### Method 1: Xcode Build Phase (Recommended)
+### Method 1: Xcode Build Phase
 
-1. In Xcode, select your project in the navigator
-2. Select your app target
-3. Go to the "Build Phases" tab
-4. Click the "+" button and choose "New Run Script Phase"
-5. Rename the phase to "Upload dSYMs to Splunk RUM"
-6. In the script text area, add:
+1. **Copy the script to your project:**
+   - Copy `upload-dsyms.sh` to your Xcode project directory
+   - Add it to your Xcode project (but don't add it to any target)
+   - Ensure the script file has execute permissions (`chmod +x`)
+
+2. **Set up the build phase:**
+   - In Xcode, select your project in the navigator
+   - Select your app target
+   - Go to the "Build Phases" tab
+   - Click the "+" button and choose "New Run Script Phase"
+   - Rename the phase to "Upload dSYMs to Splunk RUM"
+   - **Important:** Position this phase after "Copy Bundle Resources" or any other phases that generate the build artifacts to ensure dSYMs are available
+   - Specify SCRIPT_PATH to specify path to upload-dsyms.sh script
+ 
+
+3. **Configure the script:**
+   In the script text area, add:
 
 ```bash
-# Path to the upload script
-SCRIPT_PATH="${SRCROOT}/path/to/dsymUploader/upload-dsyms.sh"
+
+# Path to the upload script (update to location in your project)
+SCRIPT_PATH="${SRCROOT}/path/to/upload-dsyms.sh"
 
 # Check if script exists and is executable
 if [[ -x "$SCRIPT_PATH" ]]; then
+    echo "Running Splunk dSYM upload script..."
+    
     # Run the script with your configuration
+    # Capture the exit code of the upload script
     "$SCRIPT_PATH" \
         --realm "YOUR_REALM" \
         --token "YOUR_API_ACCESS_TOKEN" \
         --directory "${DWARF_DSYM_FOLDER_PATH}" \
-        --debug
+        --debug  # Optional: Enable verbose logging
+    
+    UPLOAD_SCRIPT_EXIT_CODE=$? # Get the exit code of the last executed command
+
+    if [[ $UPLOAD_SCRIPT_EXIT_CODE -ne 0 ]]; then
+        echo "Error: Splunk dSYM upload failed with exit code $UPLOAD_SCRIPT_EXIT_CODE."
+        exit 1 # Fail the Xcode build
+    else
+        echo "Splunk dSYM upload completed successfully."
+    fi
 else
-    echo "Warning: Splunk dSYM upload script not found or not executable at: $SCRIPT_PATH"
+    echo "Error: Splunk dSYM upload script not found or not executable at: $SCRIPT_PATH"
+    exit 1 # Fail the Xcode build if the script itself is missing or not executable
 fi
 ```
 
-7. **Configure Input Files** (Optional but recommended for better build caching):
-   - Add `$(DWARF_DSYM_FOLDER_PATH)/$(DWARF_DSYM_FILE_NAME)`
+4. **RECOMMENDED** Run script: 
+   - &#x2611; For install builds only
+   - &#x2610; Based on dependency analysis
+5. **Set your configuration (by either)**:
+      
+- **Method A - Command Line Arguments:**
+   Replace `DWARF_DSYM_FOLDER_PATH`, `YOUR_REALM` and `YOUR_API_ACCESS_TOKEN` in the script above with your actual values.
 
-8. **Set your configuration** by either:
+- **Method B - Environment Variables:**
+   ```bash
+   export DWARF_DSYM_FOLDER_PATH="path/to/dSYMs"
+   export SPLUNK_REALM="YOUR_REALM"  # Your Splunk realm
+   export SPLUNK_API_ACCESS_TOKEN="YOUR_API_ACCESS_TOKEN"
+   export SPLUNK_DSYM_UPLOAD_DEBUG="true"  # Optional: Enable verbose logging
+   ```
+- **NOTE:** \
+   DWARF_DSYM_FOLDER_PATH is the path of the directory containing the dSYM bundle(s).
+     - If building locally, this is typically ${BUILT_PRODUCTS_DIR}
+     - For distribution builds, use the path to your .xcarchive. Default: (~/Library/Developer/Xcode/Archives/AppName.xcarchive)
 
-**Method A - Command Line Arguments (Recommended):**
-Replace `YOUR_REALM` and `YOUR_API_ACCESS_TOKEN` in the script above with your actual values.
+#### Method 2: GitHub Actions (CI/CD)
 
-**Method B - Environment Variables:**
-```bash
-export SPLUNK_RUM_REALM="YOUR_REALM"  # Your Splunk realm
-export SPLUNK_API_ACCESS_TOKEN="YOUR_API_ACCESS_TOKEN"
-export SPLUNK_DSYM_UPLOAD_DEBUG="true"  # Optional: Enable verbose logging
-```
-
-#### Method 2: Direct Script Integration
-
-If you prefer to include the script directly in your project:
-
-1. Copy `upload-dsyms.sh` to your Xcode project directory
-2. Add it to your Xcode project (but don't add it to any target)
-3. Follow the same build phase setup as Method 1, but use:
-
-```bash
-"${SRCROOT}/upload-dsyms.sh" --realm "YOUR_REALM" --token "YOUR_TOKEN" --directory "${DSYM_FOLDER_PATH}"
-```
-
-### Integration with CI/CD
-
-#### GitHub Actions Example
+  - Set SPLUNK_API_ACCESS_TOKEN as a secret in Github, 
+  - Set SPLUNK_REALM as a variable or replace with your realm
+  - Replace /path/to/dSYMs with directory that contains dSYMs
 
 ```yaml
 - name: Upload dSYMs to Splunk RUM
@@ -96,7 +117,7 @@ If you prefer to include the script directly in your project:
     ./dsymUploader/upload-dsyms.sh \
       --realm "${SPLUNK_REALM}" \
       --token "${{ secrets.SPLUNK_API_ACCESS_TOKEN }}" \
-      --directory "${{ runner.temp }}/build/dSYMs" \
+      --directory "${{ runner.temp }}/path/to/dSYMs" \
 ```
 
 ### Configuration
@@ -107,9 +128,9 @@ The script can be configured using command line arguments or environment variabl
 
 | Argument | Description | Example |
 |----------|-------------|---------|
-| `-r, --realm REALM` | Splunk realm (required) | `us0`, `eu0`, `ap0` |
+| `-r, --realm REALM` | Splunk realm (required) | `us0`, `eu0`, `au0` |
 | `-t, --token TOKEN` | API access token (required) | `ABC123...` |
-| `-d, --directory DIR` | Directory containing dSYMs | `/path/to/dsyms` |
+| `-d, --directory DIR` | Directory containing dSYMs or path to .dSYM bundle | `/path/to/dsyms` |
 | `--timeout SECONDS` | Upload timeout in seconds | `300` |
 | `--debug` | Enable verbose logging | - |
 | `--dry-run` | Show what would be uploaded | - |
@@ -119,9 +140,9 @@ The script can be configured using command line arguments or environment variabl
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `SPLUNK_REALM` | Splunk  Realm | - |
+| `SPLUNK_REALM` | Splunk Realm | - |
 | `SPLUNK_API_ACCESS_TOKEN` | API access token | - |
-| `SPLUNK_DSYM_DIRECTORY` | Directory containing dSYMs |
+| `SPLUNK_DSYM_DIRECTORY` | Directory containing dSYMs or path to .dSYM bundle | - |
 | `SPLUNK_DSYM_UPLOAD_TIMEOUT` | Upload timeout in seconds | `300` |
 | `SPLUNK_DSYM_UPLOAD_ENABLED` | Enable/disable upload | `true` |
 | `SPLUNK_DSYM_UPLOAD_DEBUG` | Enable verbose logging | `false` |
@@ -142,6 +163,12 @@ Warning: Splunk dSYM upload script not found or not executable
 - Verify the script path in your build phase
 - Ensure the script file has execute permissions (`chmod +x`)
 
+####  Operation Not Permitted
+```
+Sandbox: bash(23865) deny(1) file-read-data /../upload-dsyms.sh
+```
+- Set 'User Script Sandboxing' to No in the Build Settings of Xcode
+
 #### Missing Dependencies
 ```
 ERROR: Missing required dependencies: curl
@@ -151,7 +178,7 @@ ERROR: Missing required dependencies: curl
 
 #### Configuration Errors
 ```
-ERROR: Splunk RUM realm not specified
+ERROR: Splunk RUM realm not specified OR ERROR: Splunk API access token not specified
 ```
 - Provide realm using `--realm` argument or `SPLUNK_REALM` environment variable
 - Provide access token using `--token` argument or `SPLUNK_API_ACCESS_TOKEN` environment variable
@@ -162,7 +189,7 @@ ERROR: No dSYMs found in directory
 ```
 - Ensure your build settings generate dSYMs (`DEBUG_INFORMATION_FORMAT = dwarf-with-dsym`)
 - Check that the build completed successfully before the script runs
-- Verify the directory path contains `.dSYM` or bundles
+- Verify the directory is .dSYM extension or contains `.dSYM` bundles
 - Use `--debug` flag to see detailed search information
 
 #### Upload Failures
@@ -178,9 +205,15 @@ ERROR: Authentication failed - check your access token
 ```
 ERROR: Could not resolve host
 ```
-- Verify your realm is correct (e.g., "us0", "eu0", "ap0")
+- Verify your realm is correct (e.g., "us0", "eu0", "au0")
 - Check network connectivity and DNS resolution
 - Verify firewall allows outbound HTTPS connections to api.{realm}.signalfx.com
+
+#### Build Output Warning 
+```
+Run script build phase 'Upload dSYMs to Splunk RUM' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase.
+```
+- Uncheck "Based on dependency analysis" in the script phase
 
 ### Security Considerations
 
@@ -194,7 +227,6 @@ ERROR: Could not resolve host
 
 ### Performance Impact
 
-- **Build Time:** dSYM uploads can run in parallel with other build phases
 - **File Size:** Upload time depends on dSYM size (typically 1-10MB per binary)
 - **Timeout:** Uploads are limited by timeout setting to prevent hanging builds
 - **Network:** Uses HTTP/1.1 with connection reuse for multiple uploads
