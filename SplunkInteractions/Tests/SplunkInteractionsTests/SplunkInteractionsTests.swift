@@ -34,6 +34,7 @@ final class SplunkInteractionsTests: XCTestCase {
             (.gestureRageTap, "rage_tap"),
             (.gesturePinch, "pinch"),
             (.gestureRotation, "rotation"),
+            (.focus, "focus"),
             (.softKeyboard, "soft_keyboard")
         ]
 
