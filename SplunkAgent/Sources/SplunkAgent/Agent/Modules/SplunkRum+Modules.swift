@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 internal import CiscoSessionReplay
 internal import SplunkAppStart
+internal import SplunkAppState
 internal import SplunkCustomTracking
 internal import SplunkNavigation
 internal import SplunkNetwork
@@ -62,6 +63,7 @@ extension SplunkRum {
         customizeNavigation()
         customizeNetwork()
         customizeAppStart()
+        customizeAppState()
         customizeNetworkMonitor()
         customizeCustomTracking()
         customizeInteractions()
@@ -163,6 +165,13 @@ extension SplunkRum {
         let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
 
         appStartModule?.sharedState = sharedState
+    }
+
+    /// Configure App state module with shared state.
+    private func customizeAppState() {
+        let appStateModule = modulesManager?.module(ofType: SplunkAppState.AppStateModule.self)
+
+        appStateModule?.sharedState = sharedState
     }
 
     /// Configure NetworkMonitor module
