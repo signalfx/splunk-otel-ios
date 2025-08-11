@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2AFBAA8D2E4A942100FDFE6C /* upload-dsyms.sh in Resources */ = {isa = PBXBuildFile; fileRef = 2AFBAA8C2E4A942100FDFE6C /* upload-dsyms.sh */; };
 		4BD024D62DE79FB800ADB31D /* SplunkAgent in Frameworks */ = {isa = PBXBuildFile; productRef = 4BD024D52DE79FB800ADB31D /* SplunkAgent */; };
 		52705BE02D08FDF600445B8E /* SlowFrameBeatingHeartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52705BDF2D08FDF600445B8E /* SlowFrameBeatingHeartView.swift */; };
 		52705BE12D08FDF600445B8E /* SlowFrameDetectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52705BDE2D08FDF600445B8E /* SlowFrameDetectorViewController.swift */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2AFBAA8C2E4A942100FDFE6C /* upload-dsyms.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-dsyms.sh"; sourceTree = "<group>"; };
 		52705BDE2D08FDF600445B8E /* SlowFrameDetectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorViewController.swift; sourceTree = "<group>"; };
 		52705BDF2D08FDF600445B8E /* SlowFrameBeatingHeartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameBeatingHeartView.swift; sourceTree = "<group>"; };
 		BA188B1E2BA0C91B00DACB15 /* CrashesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashesViewController.swift; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 		BA5E5A422B6859BC0022CEB2 /* AgentTestApp */ = {
 			isa = PBXGroup;
 			children = (
+				2AFBAA8C2E4A942100FDFE6C /* upload-dsyms.sh */,
 				BA5E5A572B6864A60022CEB2 /* Features */,
 				BA5E5A432B6859BC0022CEB2 /* AppDelegate.swift */,
 				BA5E5A452B6859BC0022CEB2 /* SceneDelegate.swift */,
@@ -120,6 +123,7 @@
 				BA5E5A3C2B6859BC0022CEB2 /* Sources */,
 				BA5E5A3D2B6859BC0022CEB2 /* Frameworks */,
 				BA5E5A3E2B6859BC0022CEB2 /* Resources */,
+				2AE628EA2E4A71B700C10555 /* Upload dSYMs to Splunk RUM */,
 			);
 			buildRules = (
 			);
@@ -176,6 +180,7 @@
 			files = (
 				BA5E5A502B6859BD0022CEB2 /* LaunchScreen.storyboard in Resources */,
 				BA5E5A4D2B6859BD0022CEB2 /* Assets.xcassets in Resources */,
+				2AFBAA8D2E4A942100FDFE6C /* upload-dsyms.sh in Resources */,
 				BA5E5A4B2B6859BC0022CEB2 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -183,6 +188,26 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		2AE628EA2E4A71B700C10555 /* Upload dSYMs to Splunk RUM */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 12;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(DWARF_DSYM_FOLDER_PATH)",
+			);
+			name = "Upload dSYMs to Splunk RUM";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Path to the upload script (update to location in your project)\nSCRIPT_PATH=\"${SRCROOT}/AgentTestApp/upload-dsyms.sh\"\n\n# Check if script exists and is executable\nif [[ -x \"$SCRIPT_PATH\" ]]; then\n    echo \"Running Splunk dSYM upload script...\"\n    \n    # Run the script with your configuration\n    # Capture the exit code of the upload script\n    \"$SCRIPT_PATH\" \\\n        --realm \"\" \\\n        --token \"\" \\\n        --directory \"${DWARF_DSYM_FOLDER_PATH}\" \\\n        --debug\n    \n    UPLOAD_SCRIPT_EXIT_CODE=$? # Get the exit code of the last executed command\n\n    if [[ $UPLOAD_SCRIPT_EXIT_CODE -ne 0 ]]; then\n        echo \"Error: Splunk dSYM upload failed with exit code $UPLOAD_SCRIPT_EXIT_CODE.\"\n        exit 1 # Fail the Xcode build\n    else\n        echo \"Splunk dSYM upload completed successfully.\"\n    fi\nelse\n    echo \"Error: Splunk dSYM upload script not found or not executable at: $SCRIPT_PATH\"\n    exit 1 # Fail the Xcode build if the script itself is missing or not executable\nfi\n";
+		};
 		4BD024D82DE7AA2400ADB31D /* Swift Lint & Swift Format */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -372,6 +397,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DWARF_DSYM_FOLDER_PATH = "/Users/aditis3/Library/Developer/Xcode/Archives/2025-08-11";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgentTestApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -403,6 +430,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9J84E5CFM9;
+				DWARF_DSYM_FOLDER_PATH = "/Users/aditis3/Library/Developer/Xcode/Archives/2025-08-11";
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AgentTestApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
