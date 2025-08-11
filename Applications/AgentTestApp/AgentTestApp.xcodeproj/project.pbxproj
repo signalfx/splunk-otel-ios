@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2AFBAA8D2E4A942100FDFE6C /* upload-dsyms.sh in Resources */ = {isa = PBXBuildFile; fileRef = 2AFBAA8C2E4A942100FDFE6C /* upload-dsyms.sh */; };
 		4BD024D62DE79FB800ADB31D /* SplunkAgent in Frameworks */ = {isa = PBXBuildFile; productRef = 4BD024D52DE79FB800ADB31D /* SplunkAgent */; };
 		52705BE02D08FDF600445B8E /* SlowFrameBeatingHeartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52705BDF2D08FDF600445B8E /* SlowFrameBeatingHeartView.swift */; };
 		52705BE12D08FDF600445B8E /* SlowFrameDetectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52705BDE2D08FDF600445B8E /* SlowFrameDetectorViewController.swift */; };
@@ -26,7 +25,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2AFBAA8C2E4A942100FDFE6C /* upload-dsyms.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "upload-dsyms.sh"; sourceTree = "<group>"; };
 		52705BDE2D08FDF600445B8E /* SlowFrameDetectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameDetectorViewController.swift; sourceTree = "<group>"; };
 		52705BDF2D08FDF600445B8E /* SlowFrameBeatingHeartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SlowFrameBeatingHeartView.swift; sourceTree = "<group>"; };
 		BA188B1E2BA0C91B00DACB15 /* CrashesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrashesViewController.swift; sourceTree = "<group>"; };
@@ -84,7 +82,6 @@
 		BA5E5A422B6859BC0022CEB2 /* AgentTestApp */ = {
 			isa = PBXGroup;
 			children = (
-				2AFBAA8C2E4A942100FDFE6C /* upload-dsyms.sh */,
 				BA5E5A572B6864A60022CEB2 /* Features */,
 				BA5E5A432B6859BC0022CEB2 /* AppDelegate.swift */,
 				BA5E5A452B6859BC0022CEB2 /* SceneDelegate.swift */,
@@ -180,7 +177,6 @@
 			files = (
 				BA5E5A502B6859BD0022CEB2 /* LaunchScreen.storyboard in Resources */,
 				BA5E5A4D2B6859BD0022CEB2 /* Assets.xcassets in Resources */,
-				2AFBAA8D2E4A942100FDFE6C /* upload-dsyms.sh in Resources */,
 				BA5E5A4B2B6859BC0022CEB2 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
