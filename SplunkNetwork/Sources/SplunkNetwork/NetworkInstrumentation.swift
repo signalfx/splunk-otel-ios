@@ -160,43 +160,55 @@ public class NetworkInstrumentation {
     }
 
     func createdRequest(URLRequest: URLRequest, span: Span) {
-        let key = SemanticAttributes.httpRequestBodySize
         let body = URLRequest.httpBody
         let length = body?.count ?? 0
-        span.setAttribute(key: key, value: length)
+        span.setAttribute(key: SemanticAttributes.httpRequestBodySize.rawValue, value: nil)
+        span.setAttribute(key: SemanticAttributes.httpRequestBodySize, value: length)
         let method = URLRequest.httpMethod ?? "_OTHER"
+        span.setAttribute(key: SemanticAttributes.httpRequestMethod.rawValue, value: nil)
         span.setAttribute(key: SemanticAttributes.httpRequestMethod, value: method)
+        span.setAttribute(key: "component", value: nil)
         span.setAttribute(key: "component", value: "http")
 
         if let url = URLRequest.url {
+            span.setAttribute(key: SemanticAttributes.urlPath.rawValue, value: nil)
             span.setAttribute(key: SemanticAttributes.urlPath, value: url.path)
+            span.setAttribute(key: SemanticAttributes.urlQuery.rawValue, value: nil)
             span.setAttribute(key: SemanticAttributes.urlQuery, value: url.query ?? "")
             if let scheme = url.scheme {
+                span.setAttribute(key: SemanticAttributes.urlScheme.rawValue, value: nil)
                 span.setAttribute(key: SemanticAttributes.urlScheme, value: scheme)
             }
 
             if let host = url.host {
+                span.setAttribute(key: "server.address", value: nil)
                 span.setAttribute(key: "server.address", value: host)
                 // Preload with host in case IP cannot be determined
+                span.setAttribute(key: "network.peer.address", value: nil)
                 span.setAttribute(key: "network.peer.address", value: host)
             }
 
             if let port = url.port {
+                span.setAttribute(key: "network.peer.port", value: nil)
                 span.setAttribute(key: "network.peer.port", value: port)
             } else {
                 let defaultPort = url.scheme?.lowercased() == "https" ? 443 : 80
+                span.setAttribute(key: "network.peer.port", value: nil)
                 span.setAttribute(key: "network.peer.port", value: defaultPort)
             }
 
             if let scheme = url.scheme?.lowercased() {
+                span.setAttribute(key: "network.protocol.name", value: nil)
                 span.setAttribute(key: "network.protocol.name", value: scheme)
             }
 
+            span.setAttribute(key: "url.full", value: nil)
             span.setAttribute(key: "url.full", value: url.absoluteString)
         }
 
         if let sharedState {
             let sessionID = sharedState.sessionId
+            span.setAttribute(key: "session.id", value: nil)
             span.setAttribute(key: "session.id", value: sessionID)
         }
     }
@@ -239,27 +251,32 @@ public class NetworkInstrumentation {
         let traceId = String(valStr[traceIdRange])
         let spanId = String(valStr[spanIdRange])
 
+        span.setAttribute(key: "link.traceId", value: nil)
         span.setAttribute(key: "link.traceId", value: traceId)
+        span.setAttribute(key: "link.spanId", value: nil)
         span.setAttribute(key: "link.spanId", value: spanId)
     }
 
     func receivedResponse(URLResponse: URLResponse, dataOrFile: DataOrFile?, span: Span) {
-        let key = SemanticAttributes.httpResponseBodySize
         let response = URLResponse as? HTTPURLResponse
         let length = response?.expectedContentLength ?? 0
-        span.setAttribute(key: key, value: Int(length))
+        span.setAttribute(key: SemanticAttributes.httpResponseBodySize.rawValue, value: nil)
+        span.setAttribute(key: SemanticAttributes.httpResponseBodySize, value: Int(length))
+        span.setAttribute(key: SemanticAttributes.httpResponseStatusCode.rawValue, value: nil)
         span.setAttribute(key: SemanticAttributes.httpResponseStatusCode, value: Int(response?.statusCode ?? 0))
 
         // Try to capture IP address from the response/connection
         if let httpResponse = response {
             // Update network.peer.address with actual IP if we can get it
             if let ipAddress = getIPAddressFromResponse(httpResponse) {
+                span.setAttribute(key: "network.peer.address", value: nil)
                 span.setAttribute(key: "network.peer.address", value: ipAddress)
             }
         }
 
         if let httpResponse = response {
             let protocolVersion = determineHTTPProtocolVersion(httpResponse)
+            span.setAttribute(key: "network.protocol.version", value: nil)
             span.setAttribute(key: "network.protocol.version", value: protocolVersion)
 
             for (key, val) in httpResponse.allHeaderFields {
@@ -357,9 +374,13 @@ public class NetworkInstrumentation {
     }
 
     func receivedError(error: Error, dataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, span: Span) {
+        span.setAttribute(key: "error", value: nil)
         span.setAttribute(key: "error", value: true)
+        span.setAttribute(key: "error.message", value: nil)
         span.setAttribute(key: "error.message", value: error.localizedDescription)
+        span.setAttribute(key: "error.type", value: nil)
         span.setAttribute(key: "error.type", value: String(describing: type(of: error)))
+        span.setAttribute(key: SemanticAttributes.httpResponseStatusCode.rawValue, value: nil)
         span.setAttribute(key: SemanticAttributes.httpResponseStatusCode, value: HTTPStatus)
 
         // removes obsolete attributes
