@@ -120,7 +120,6 @@
 				BA5E5A3C2B6859BC0022CEB2 /* Sources */,
 				BA5E5A3D2B6859BC0022CEB2 /* Frameworks */,
 				BA5E5A3E2B6859BC0022CEB2 /* Resources */,
-				2AE628EA2E4A71B700C10555 /* Upload dSYMs to Splunk RUM */,
 			);
 			buildRules = (
 			);
@@ -184,26 +183,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		2AE628EA2E4A71B700C10555 /* Upload dSYMs to Splunk RUM */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 12;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(DWARF_DSYM_FOLDER_PATH)",
-			);
-			name = "Upload dSYMs to Splunk RUM";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Path to the upload script (update to location in your project)\nSCRIPT_PATH=\"${SRCROOT}/AgentTestApp/upload-dsyms.sh\"\n\n# Check if script exists and is executable\nif [[ -x \"$SCRIPT_PATH\" ]]; then\n    echo \"Running Splunk dSYM upload script...\"\n    \n    # Run the script with your configuration\n    # Capture the exit code of the upload script\n    \"$SCRIPT_PATH\" \\\n        --realm \"\" \\\n        --token \"\" \\\n        --directory \"${DWARF_DSYM_FOLDER_PATH}\" \\\n        --debug\n    \n    UPLOAD_SCRIPT_EXIT_CODE=$? # Get the exit code of the last executed command\n\n    if [[ $UPLOAD_SCRIPT_EXIT_CODE -ne 0 ]]; then\n        echo \"Error: Splunk dSYM upload failed with exit code $UPLOAD_SCRIPT_EXIT_CODE.\"\n        exit 1 # Fail the Xcode build\n    else\n        echo \"Splunk dSYM upload completed successfully.\"\n    fi\nelse\n    echo \"Error: Splunk dSYM upload script not found or not executable at: $SCRIPT_PATH\"\n    exit 1 # Fail the Xcode build if the script itself is missing or not executable\nfi\n";
-		};
 		4BD024D82DE7AA2400ADB31D /* Swift Lint & Swift Format */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
