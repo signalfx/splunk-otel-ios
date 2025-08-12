@@ -17,17 +17,23 @@ limitations under the License.
 
 import Foundation
 
+/// Defines a read-only view of the agent's current state and key configuration details.
 protocol AgentState {
 
     // MARK: - Agent status
 
+    /// The current operational status of the agent, represented by a ``Status`` value.
     var status: Status { get }
 
 
     // MARK: - Current Configuration
 
+    /// The configuration for the agent's communication endpoint, represented by an ``EndpointConfiguration`` object.
     var endpointConfiguration: EndpointConfiguration { get }
 
+    /// The name of the application being monitored.
     var appName: String { get }
+
+    /// The version of the application being monitored.
     var appVersion: String { get }
 }
