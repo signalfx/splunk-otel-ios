@@ -10,7 +10,7 @@ The Navigation module reports screen transitions and attaches the current screen
 
 This module can be configured to automatically track `UIViewController` transitions or be used to set screen names manually. The active screen name (or "unknown" if not set) is added as a `screen.name` attribute to all telemetry.
 
-> SplunkRum instance property: ``SplunkRum/navigation``
+> Tip: You can access all related API via SplunkRum instance property: ``SplunkRum/navigation``
 
 ## Configuration and Usage
 

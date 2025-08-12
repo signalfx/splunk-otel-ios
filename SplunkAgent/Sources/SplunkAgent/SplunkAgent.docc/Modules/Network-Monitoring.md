@@ -12,8 +12,6 @@ The Network Monitoring modules automatically instrument `URLSession` requests an
 
 **`SplunkNetworkMonitor`** detects changes in network status (e.g., connected/disconnected) and connection type (Wi-Fi/cellular) and reports them as events.
 
-> SplunkRum instance property: none
-
 ## Configuration
 
 You can provide an `NSRegularExpression` to ignore certain URL patterns during initialization.

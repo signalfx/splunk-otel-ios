@@ -11,7 +11,7 @@ This module provides APIs to manually track custom events, errors, and multi-ste
 
 Use this module to report business-specific events or to trace the duration of custom workflows within your application.
 
-> SplunkRum instance property: ``SplunkRum/customTracking``
+> Tip: You can access all related API via SplunkRum instance property: ``SplunkRum/customTracking``
 
 ## Usage Examples
 

@@ -10,7 +10,7 @@ Session Replay provides a visual replay of user sessions, helping you understand
 
 This module captures the application's UI and user interactions to create a video-like replay of the user's session. It includes powerful privacy controls to mask sensitive information.
 
-> SplunkRum instance property: ``SplunkRum/sessionReplay``
+> Tip: You can access all related API via SplunkRum instance property: ``SplunkRum/sessionReplay``
 
 ## Usage
 

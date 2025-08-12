@@ -10,8 +10,6 @@ The UI Interaction module automatically captures user taps on UI elements.
 
 This module creates spans for user interactions, such as button taps, to help you understand how users navigate and use your app. It automatically captures the element's class and accessibility label.
 
-> SplunkRum instance property: none
-
 ## Custom Identifiers
 
 To provide more meaningful names for your interaction spans, you can assign a custom identifier to your views.

@@ -10,7 +10,7 @@ This module reports instances of slow or frozen UI frames, which are indicators 
 
 The module uses `CADisplayLink` to monitor the main thread's responsiveness. It automatically creates spans when slow or frozen frames are detected. No manual setup is required.
 
-> SplunkRum instance property: ``SplunkRum/slowFrameDetector``
+> Tip: You can access all related API via SplunkRum instance property: ``SplunkRum/slowFrameDetector``
 
 Assuming `agent` is the ``SplunkRum`` instance you retained after installation.
 

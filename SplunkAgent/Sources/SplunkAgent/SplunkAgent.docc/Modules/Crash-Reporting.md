@@ -10,8 +10,6 @@ The Crash Reporting module captures and reports application crashes.
 
 This module automatically detects both native (e.g., `SIGSEGV`) and unhandled Swift/Objective-C exceptions. When the application is next launched, the crash report is processed and sent to Splunk RUM, enriched with device stats and the active session ID at the time of the crash.
 
-> SplunkRum instance property: none
-
 ## Configuration
 
 You can disable crash reporting during initialization by providing a `CrashReportsConfiguration` object.

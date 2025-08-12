@@ -10,7 +10,7 @@ This module provides a bridge to link native RUM sessions with Browser RUM sessi
 
 If you use Splunk Browser RUM in your web content, this module allows you to correlate the native session with the browser session, providing a complete end-to-end view of the user's journey.
 
-> SplunkRum instance property: ``SplunkRum/webViewNativeBridge``
+> Tip: You can access all related API via SplunkRum instance property: ``SplunkRum/webViewNativeBridge``
 
 ## Usage
 
