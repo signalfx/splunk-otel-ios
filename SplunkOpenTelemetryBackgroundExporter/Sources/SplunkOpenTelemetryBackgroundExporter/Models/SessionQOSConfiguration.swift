@@ -17,18 +17,30 @@ limitations under the License.
 
 import Foundation
 
-/// Define basic qos handling
+/// A configuration object that defines the Quality of Service (QOS) settings for background network sessions.
+///
+/// These settings control how the system handles network tasks based on the current network conditions.
 public struct SessionQOSConfiguration {
 
     // MARK: - Public
 
+    /// A Boolean value indicating whether to allow network access over cellular connections.
     public let allowsCellularAccess: Bool
+
+    /// A Boolean value indicating whether to allow network access over constrained networks, such as Low Data Mode.
     public let allowsConstrainedNetworkAccess: Bool
+
+    /// A Boolean value indicating whether to allow network access over networks considered expensive by the system (e.g., personal hotspots).
     public let allowsExpensiveNetworkAccess: Bool
 
 
     // MARK: - Initialization
 
+    /// Initializes the QOS configuration with specific network access settings.
+    /// - Parameters:
+    ///   - allowsCellularAccess: The setting for cellular network access. Defaults to `true`.
+    ///   - allowsConstrainedNetworkAccess: The setting for constrained network access. Defaults to `true`.
+    ///   - allowsExpensiveNetworkAccess: The setting for expensive network access. Defaults to `true`.
     public init(
         allowsCellularAccess: Bool = true,
         allowsConstrainedNetworkAccess: Bool = true,
