@@ -22,7 +22,10 @@ import CiscoSwizzling
 import Foundation
 import SplunkCommon
 
-/// Handles interaction events and send them into destination.
+/// A module that automatically detects and reports user interactions, such as taps and gestures.
+///
+/// This class uses the underlying `CiscoInteractions` framework to capture events and sends them
+/// to a configured destination for observability.
 public final class Interactions: SplunkInteractionsModule {
 
     // MARK: - Private properties
@@ -116,6 +119,14 @@ public final class Interactions: SplunkInteractionsModule {
 
     // MARK: - Custom view identifiers
 
+    /// Registers a custom, human-readable identifier for a specific view.
+    ///
+    /// This allows reported interactions to be associated with a meaningful name rather than an
+    /// auto-generated identifier. The association is stored in a runtime cache.
+    ///
+    /// - Parameters:
+    ///   - customId: A string to use as the custom identifier for the view. Providing `nil` removes any existing custom identifier.
+    ///   - viewId: The `ObjectIdentifier` of the view instance to which the custom ID will be assigned.
     public func register(customId: String?, for viewId: ObjectIdentifier) {
         Task {
             await customIdentifiers.append(value: customId, for: self, with: viewId)
