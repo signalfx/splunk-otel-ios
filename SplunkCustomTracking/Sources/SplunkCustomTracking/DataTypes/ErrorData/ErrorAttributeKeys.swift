@@ -23,6 +23,7 @@ import SplunkCommon
 
 /// Protocol defining the base requirements for attribute keys.
 protocol AttributeKey {
+    /// The raw string representation of the attribute key.
     var rawValue: String { get }
 }
 
