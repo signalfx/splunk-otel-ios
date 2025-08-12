@@ -22,7 +22,9 @@ import OpenTelemetryProtocolExporterCommon
 import SwiftProtobuf
 
 
-/// Basic implementation of exporters
+/// A base class that provides common functionality for OTLP exporters that use background HTTP requests.
+///
+/// This class handles disk storage, request creation, and recovery of stalled uploads.
 public class OTLPBackgroundHTTPBaseExporter {
 
     // MARK: - Private
@@ -32,15 +34,32 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     // MARK: - Public
 
-    let endpoint: URL
-    let httpClient: BackgroundHTTPClient
-    let envVarHeaders: [(String, String)]?
-    let config: OtlpConfiguration
-    let diskStorage: DiskStorage
+    /// The URL endpoint where data will be sent.
+    public let endpoint: URL
+
+    /// The client responsible for handling background HTTP requests and disk storage.
+    public let httpClient: BackgroundHTTPClient
+
+    /// Optional HTTP headers to be added to requests, typically derived from environment variables.
+    public let envVarHeaders: [(String, String)]?
+
+    /// The OTLP configuration settings, such as timeout values.
+    public let config: OtlpConfiguration
+
+    /// The storage mechanism for caching requests on disk before they are sent.
+    public let diskStorage: DiskStorage
 
 
     // MARK: - Initialization
 
+    /// Initializes the base exporter with the necessary configuration.
+    /// - Parameters:
+    ///   - endpoint: The URL endpoint for data submission.
+    ///   - config: The OTLP configuration settings.
+    ///   - qosConfig: The Quality of Service settings for the background network session.
+    ///   - envVarHeaders: Optional HTTP headers to add to each request.
+    ///   - diskStorage: The disk storage instance for caching request data.
+    ///   - fileType: An optional string to differentiate file types in storage, used for constructing storage keys.
     public init(
         endpoint: URL,
         config: OtlpConfiguration = OtlpConfiguration(),
@@ -78,6 +97,9 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     // MARK: - Request method
 
+    /// Creates a new `URLRequest` configured for sending OTLP protobuf data.
+    /// - Parameter endpoint: The URL for the request.
+    /// - Returns: A configured `URLRequest` instance.
     public func createRequest(endpoint: URL) -> URLRequest {
         var request = URLRequest(url: endpoint)
 
