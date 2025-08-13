@@ -52,7 +52,10 @@ extension CrashReports: Module {
     /// - Parameters:
     ///   - configuration: The local configuration, which determines if the module is enabled.
     ///   - remoteConfiguration: The remote configuration. This parameter is currently unused.
-    public func install(with configuration: (any SplunkCommon.ModuleConfiguration)?, remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?) {
+    public func install(
+        with configuration: (any SplunkCommon.ModuleConfiguration)?,
+        remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?
+    ) {
 
         // Configure PLCrashReporter
         configureCrashReporter()

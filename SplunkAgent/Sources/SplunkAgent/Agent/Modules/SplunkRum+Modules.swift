@@ -107,6 +107,10 @@ extension SplunkRum {
             return
         }
 
+#if canImport(SplunkCrashReports)
+        let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
+#endif
+
         navigationModule.agentVersion(sharedState.agentVersion)
 
         // Set up forwarding of screen name changes to runtime attributes
@@ -114,6 +118,9 @@ extension SplunkRum {
             for await newValue in navigationModule.screenNameStream {
                 runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
                 screenNameChangeCallback?(newValue)
+#if canImport(SplunkCrashReports)
+                crashReportsModule?.crashReportUpdateScreenName(newValue)
+#endif
             }
         }
 

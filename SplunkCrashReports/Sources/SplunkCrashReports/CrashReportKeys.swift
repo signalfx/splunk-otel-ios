@@ -36,6 +36,7 @@ public enum CrashReportKeys: String {
     case batteryLevel = "crash.batteryLevel"
     /// The amount of free memory on the device at the time of the crash.
     case freeMemory = "crash.freeMemory"
+    case screenName = "screen.name"
 
     /// The file path of the crashed process.
     case processPath = "crash.processPath"
