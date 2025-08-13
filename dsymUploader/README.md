@@ -44,19 +44,19 @@ export SPLUNK_API_ACCESS_TOKEN=YOUR_API_TOKEN
 2. **Set up the build phase:**
    - In Xcode, select your project in the navigator
    - Select your app target
+   - **For Xcode 15 or later**, Go to "Build Settings" tab, Set "User Script Sandboxing" to `No` 
    - Go to the "Build Phases" tab
    - Click the "+" button and choose "New Run Script Phase"
    - Rename the phase to "Upload dSYMs to Splunk RUM"
    - **Important:** Position this phase after "Copy Bundle Resources" or any other phases that generate the build artifacts to ensure dSYMs are available
-   - Specify SCRIPT_PATH to specify path to upload-dsyms.sh script
- 
 
-3. **Configure the script:**
-   In the script text area, add:
+3. **Configure the script phase:**
+   In the Shell script text area of the "Upload dSYMs to Splunk RUM" build phase, add:
 
 ```bash
 
-# Path to the upload script (update to location in your project)
+# IMPORTANT: Update this path to the actual location where you copied upload-dsyms.sh in your project.
+# For example: SCRIPT_PATH="${SRCROOT}/Scripts/upload-dsyms.sh"
 SCRIPT_PATH="${SRCROOT}/path/to/upload-dsyms.sh"
 
 # Check if script exists and is executable
@@ -84,37 +84,39 @@ else
     exit 1 # Fail the Xcode build if the script itself is missing or not executable
 fi
 ```
-
-4. **RECOMMENDED** Run script: 
-   - &#x2611; For install builds only
-   - &#x2610; Based on dependency analysis
-5. **Set your configuration (by either)**:
+   
+4. **Set your configuration (by either)**:
       
-- **Method A - Command Line Arguments:**
-   Replace `DWARF_DSYM_FOLDER_PATH`, `YOUR_REALM` and `YOUR_API_ACCESS_TOKEN` in the script above with your actual values.
+   - **Method A - Command Line Arguments:**
+        Replace `DWARF_DSYM_FOLDER_PATH`, `YOUR_REALM` and `YOUR_API_ACCESS_TOKEN` in the script above with your actual values. Refer to the NOTE below for guidance on DWARF_DSYM_FOLDER_PATH
 
-- **Method B - Environment Variables:**
+   - **Method B - Environment Variables:**
    ```bash
-   export DWARF_DSYM_FOLDER_PATH="path/to/dSYMs"
+   export DWARF_DSYM_FOLDER_PATH="path/to/dSYMs" 
    export SPLUNK_REALM="YOUR_REALM"  # Your Splunk realm
-   export SPLUNK_API_ACCESS_TOKEN="YOUR_API_ACCESS_TOKEN"
+   export SPLUNK_API_ACCESS_TOKEN="YOUR_API_ACCESS_TOKEN"  # Your Splunk API access token
    export SPLUNK_DSYM_UPLOAD_DEBUG="true"  # Optional: Enable verbose logging
    ```
-- **NOTE:** \
-   DWARF_DSYM_FOLDER_PATH is the path of the directory containing the dSYM bundle(s).
-     - If building locally, this is typically ${BUILT_PRODUCTS_DIR}
-     - For distribution builds, use the path to your .xcarchive. Default: (~/Library/Developer/Xcode/Archives/AppName.xcarchive)
+   - **NOTE:** \
+      DWARF_DSYM_FOLDER_PATH is the path of the directory containing the dSYM bundle(s).
+         - If building locally, this is typically ${BUILT_PRODUCTS_DIR} for non-install local builds
+         - For distribution builds, use the path to your .xcarchive. Default: (~/Library/Developer/Xcode/Archives/AppName.xcarchive)
 
-#### Method 2: GitHub Actions (CI/CD)
+5. **RECOMMENDED** Run script: 
+   - Check: For install builds only
+   - Uncheck: Based on dependency analysis
+
+### Method 2: GitHub Actions (CI/CD)
 
   - Set SPLUNK_API_ACCESS_TOKEN as a secret in Github, 
   - Set SPLUNK_REALM as a variable or replace with your realm
   - Replace /path/to/dSYMs with directory that contains dSYMs
+  - Replace /path/to/upload-dsyms.sh with the location of the script relative to your GitHub Actions workflow's working directory 
 
 ```yaml
 - name: Upload dSYMs to Splunk RUM
   run: |
-    ./dsymUploader/upload-dsyms.sh \
+    /path/to/upload-dsyms.sh \
       --realm "${SPLUNK_REALM}" \
       --token "${{ secrets.SPLUNK_API_ACCESS_TOKEN }}" \
       --directory "${{ runner.temp }}/path/to/dSYMs" \
@@ -239,4 +241,4 @@ For issues or questions:
 2. Enable debug logging (`--debug`) for more detailed output
 3. Test with dry run (`--dry-run`) to validate configuration
 4. Consult the Splunk RUM documentation
-5. File an issue in the splunk-otel-ios repository
+5. File an issue in the [splunk-otel-ios](https://github.com/signalfx/splunk-otel-ios) repository
