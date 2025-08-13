@@ -27,10 +27,10 @@ class SplunkStdoutLogExporter: LogRecordExporter {
 
     private let proxyExporter: LogRecordExporter
 
-    // Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    // Date format
+    /// Date format.
     private let dateFormatStyle: Date.FormatStyle = {
         let dateFormat = Date.FormatStyle()
             .month()

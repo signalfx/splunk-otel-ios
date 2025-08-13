@@ -59,19 +59,19 @@ public final class SlowFrameDetector {
 
     // MARK: - Private Properties
 
-    // Frame Detection Machinery
+    /// Frame Detection Machinery.
     private var displayLink: CADisplayLink?
     private var timer: Timer?
     private var displayLinkTask: Task<Void, Never>?
 
-    // Frame Buffers
+    /// Frame Buffers.
     private var slowFrames = ReportableFramesBuffer()
     private var frozenFrames = ReportableFramesBuffer()
 
-    // Calculation State
+    /// Calculation State.
     private var previousTimestamp: CFTimeInterval = 0.0
 
-    // Tuning Parameters
+    /// Tuning Parameters.
     private var tolerancePercentage: Double = 15.0
     private var frozenDurationMultiplier: Double = 40.0
 

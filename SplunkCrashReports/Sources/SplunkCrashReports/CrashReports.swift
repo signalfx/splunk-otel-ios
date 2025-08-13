@@ -192,7 +192,7 @@ public class CrashReports {
         return true
     }
 
-    // Returns true if debugger is attached
+    /// Returns true if debugger is attached.
     private func isDebuggerAttached() -> Bool {
         var debuggerIsAttached = false
 
@@ -215,8 +215,9 @@ public class CrashReports {
         return debuggerIsAttached
     }
 
-    // Device stats handler.  This added device stats and Session ID to PLCrashReporter
-    // so that it will be included in a future crash report
+    /// Device stats handler. This added device stats and Session ID to
+    /// PLCrashReporter so that it will be included in a future crash
+    /// report.
     private func updateDeviceStats() {
         do {
             if let sessionId = sharedState?.sessionId {
@@ -235,7 +236,7 @@ public class CrashReports {
         }
     }
 
-    // Device data and Session ID is collected every 5 seconds and sent to PLCrashReporter
+    /// Device data and Session ID is collected every 5 seconds and sent to PLCrashReporter.
     private func startPollingForDeviceStats() {
         let repeatSeconds: Double = 5
         dataUpdateTimer = Timer.scheduledTimer(withTimeInterval: repeatSeconds, repeats: true) { _ in
@@ -243,7 +244,7 @@ public class CrashReports {
         }
     }
 
-    // AppState handler
+    /// AppState handler.
     private func appStateHandler(report: PLCrashReport) -> String {
         var appState = "unknown"
         if let sharedState {
@@ -260,7 +261,7 @@ public class CrashReports {
         return appState
     }
 
-    // Report formatting
+    /// Report formatting.
     private func formatCrashReport(report: PLCrashReport) -> [CrashReportKeys: Any] {
 
         var reportDict: [CrashReportKeys: Any] = [:]

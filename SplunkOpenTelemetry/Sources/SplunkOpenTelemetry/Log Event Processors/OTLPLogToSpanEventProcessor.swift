@@ -27,10 +27,10 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
 
     // MARK: - Private properties
 
-    // OTel logger provider
+    /// OTel logger provider.
     private let loggerProvider: LoggerProvider
 
-    // Logger background dispatch queue
+    /// Logger background dispatch queue.
     private let backgroundQueue = DispatchQueue(
         label: PackageIdentifier.default(named: "LogToSpanEventProcessor"),
         qos: .utility

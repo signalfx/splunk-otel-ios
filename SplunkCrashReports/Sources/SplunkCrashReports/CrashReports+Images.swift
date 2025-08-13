@@ -23,7 +23,13 @@ import Foundation
 
 extension CrashReports {
 
-    // The image list returned as a JSON encoded string
+    /// The image list returned as a JSON encoded string.
+    ///
+    /// - Parameter:
+    ///   - images: An array of items which, if they are eligible images,
+    ///     will be added to the output.
+    /// - Returns: A list of image data dictionaries if any, serialized as
+    ///     a JSON string.
     func imageList(images: [Any]) -> String {
         var outputImages: [Any] = []
         for image in images {

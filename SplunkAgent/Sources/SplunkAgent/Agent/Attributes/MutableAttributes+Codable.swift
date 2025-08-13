@@ -37,7 +37,7 @@ extension MutableAttributes: Codable {
         }
     }
 
-    // Helper for coding with string keys
+    /// Helper for coding with string keys.
     struct StringCodingKey: CodingKey {
         var stringValue: String
         var intValue: Int?

@@ -36,16 +36,17 @@ public enum AppStartType: String {
     case hot
 }
 
-/// AppStart determines and measures an application's start type (cold, warm, hot), by listening to Application's lifecycle notifications,
+/// AppStart determines and measures an application's start type (cold, warm,
+/// hot), by listening to Application's lifecycle notifications,
 /// and sends results into a destination (OTel span as a default).
 public final class AppStart {
 
     // MARK: - Private
 
-    // Internal Logger
+    /// Internal Logger.
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "AppStart")
 
-    // Notifications and process start
+    /// Notifications and process start.
     var notificationTokens: [NSObjectProtocol]?
     var didFinishLaunchingTimestamp: Date?
     var willEnterForegroundTimestamp: Date?
@@ -53,17 +54,17 @@ public final class AppStart {
     var didBecomeActiveTimestamp: Date?
     var processStartTimestamp: Date?
 
-    // Destination
+    /// Destination.
     var destination: AppStartDestination = OTelDestination()
 
-    // Initialize span data
+    /// Initialize span data.
     var agentInitializeSpanData: AgentInitializeSpanData?
 
-    // Application prewarm detection
+    /// Application prewarm detection.
     var prewarmDetected = false
 
-    // Background launch detection, optional because we need to detect
-    // background launch only once during the initial application launch
+    /// Background launch detection, optional because we need to detect
+    /// background launch only once during the initial application launch.
     var backgroundLaunchDetected: Bool?
 
 

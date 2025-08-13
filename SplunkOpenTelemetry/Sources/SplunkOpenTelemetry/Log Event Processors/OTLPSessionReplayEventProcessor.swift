@@ -39,16 +39,16 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     // Runtime attributes added manually to each exported log record
     private unowned let runtimeAttributes: any RuntimeAttributes
 
-    // Resource object, added to all exported logs manually
+    /// Resource object, added to all exported logs manually.
     private let resource: Resource
 
-    // Print log record contents to standard output if debug is enabled
+    /// Print log record contents to standard output if debug is enabled.
     private let debugEnabled: Bool
 
-    // Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    // Date format style for the stdout log
+    /// Date format style for the stdout log.
     private let dateFormatStyle: Date.FormatStyle = {
         let dateFormat = Date.FormatStyle()
             .month()
@@ -63,7 +63,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         return dateFormat
     }()
 
-    // Logger background dispatch queues
+    /// Logger background dispatch queues.
     private let backgroundQueue = DispatchQueue(
         label: PackageIdentifier.default(named: "SessionReplayEventProcessor"),
         qos: .utility

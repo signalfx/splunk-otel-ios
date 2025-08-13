@@ -24,13 +24,13 @@ class DebugDestination: AppStartDestination {
 
     // MARK: - Private
 
-    // Stored app start
+    /// Stored app start.
     var storedAppStart: AppStartSpanData?
 
-    // Stored initialize
+    /// Stored initialize.
     var storedInitialize: AgentInitializeSpanData?
 
-    // Internal Logger
+    /// Internal Logger.
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "AppStart")
 
 

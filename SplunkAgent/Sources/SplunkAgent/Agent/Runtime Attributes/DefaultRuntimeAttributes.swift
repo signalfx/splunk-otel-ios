@@ -29,7 +29,7 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
 
     // MARK: - Private
 
-    // Internal value store for custom attributes
+    /// Internal value store for custom attributes.
     private var customValue: [String: Any]
 
 

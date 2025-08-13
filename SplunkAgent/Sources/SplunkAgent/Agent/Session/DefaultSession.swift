@@ -28,7 +28,7 @@ class DefaultSession: AgentSession {
 
     // MARK: - Private
 
-    // Serializes external access to stored data
+    /// Serializes external access to stored data.
     private let accessQueue: DispatchQueue
 
     var refreshJob: RepeatingJob?
@@ -84,7 +84,7 @@ class DefaultSession: AgentSession {
         }
     }
 
-    /// The current `SessionItem` representing the session's state.
+    /// The current ``SessionItem`` representing the session's state.
     var currentSessionItem: SessionItem {
         accessQueue.sync {
             currentSession
@@ -161,7 +161,7 @@ class DefaultSession: AgentSession {
 
     // MARK: - Business logic
 
-    // Starts a new session by first purging old data, closing previous session and then starting a new session
+    /// Starts a new session by first purging old data, closing previous session and then starting a new session.
     func startSession() -> SessionItem {
         // Before restoring the session,
         // we need to delete the outdated data

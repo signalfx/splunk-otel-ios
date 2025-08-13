@@ -20,17 +20,17 @@ import Foundation
 import OpenTelemetrySdk
 import SplunkCommon
 
-// Prints Span contents into the console using an internal logger
+/// Prints Span contents into the console using an internal logger.
 class SplunkStdoutSpanExporter: SpanExporter {
 
     // MARK: - Private
 
     private let proxyExporter: SpanExporter
 
-    // Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    // Date format
+    /// Date format.
     private let dateFormatStyle: Date.FormatStyle = {
         let dateFormat = Date.FormatStyle()
             .month()

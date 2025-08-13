@@ -55,21 +55,21 @@ custom_rules:
 
   # experimental rules. These may be useful despite giving some false negatives and false positives.
 
-  docc_comment_should_end_with_period:
-    name: "DocC Comment Period"
-    message: "Documentation comments (///) should end with a period."
-    # This rule is not aware of multi-line sentences and will do false
-    # positive reports in the middle of sentences.
-    regex: '^(?:\t| {4})*///\s(?!-|\s*$).*[a-zA-Z0-9][^.\n]*$'
-    severity: warning
+#  docc_comment_should_end_with_period:
+#    name: "DocC Comment Period"
+#    message: "Documentation comments (///) should end with a period."
+#    # This rule is not aware of multi-line sentences and will do false
+#    # positive reports in the middle of sentences.
+#    regex: '^(?:\t| {4})*///\s(?!-|\s*$).*[a-zA-Z0-9][^.\n]*$'
+#    severity: warning
 
-  regular_comment_should_not_end_with_period:
-    name: "Regular Comment Period"
-    message: "Regular, single-line comments (//) should not end with a period."
-    # This rule flags single-line comments that start with '//' (but not '///')
-    # and end with a period.
-    regex: '^(?:\t| {4})*//(?!/)[^\n\.]+\.\s*$'
-    severity: warning
+#  regular_comment_should_not_end_with_period:
+#    name: "Regular Comment Period"
+#    message: "Regular, single-line comments (//) should not end with a period."
+#    # This rule flags single-line comments that start with '//' (but not '///')
+#    # and end with a period.
+#    regex: '^(?:\t| {4})*//(?!/)[^\n\.]+\.\s*$'
+#    severity: warning
 
   prefer_docc_for_declarations:
     name: "Prefer DocC for Declarations"

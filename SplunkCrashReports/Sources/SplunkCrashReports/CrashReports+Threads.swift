@@ -100,7 +100,15 @@ extension CrashReports {
         return stackFrames
     }
 
-    // The thread list returned as a JSON encoded string
+    /// The thread list returned as a JSON encoded string.
+    ///
+    /// - Parameter:
+    ///   - threads: An array of dictionaries containing thread data keyed by
+    ///     `CrashReportKeys`. Thread data includes stack frames, the thread
+    ///     number, and whether this is the thread that crashed.
+    /// - Returns:
+    ///   - A JSON-encoded string made by serializing the threadDictionary
+    ///   constructed from the thread data.
     func threadList(threads: [[CrashReportKeys: Any]]) -> String {
         var outputThreads: [Any] = []
 

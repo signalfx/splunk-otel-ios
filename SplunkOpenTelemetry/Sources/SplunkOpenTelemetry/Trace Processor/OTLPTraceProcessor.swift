@@ -29,7 +29,7 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Private properties
 
-    // OTel tracer provider
+    /// OTel tracer provider.
     private let tracerProvider: TracerProvider
 
 

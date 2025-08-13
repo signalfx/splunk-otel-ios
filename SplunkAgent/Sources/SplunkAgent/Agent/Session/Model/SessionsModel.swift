@@ -22,10 +22,10 @@ class SessionsModel {
 
     // MARK: - Static constants
 
-    // Maximum number of managed sessions
+    /// Maximum number of managed sessions.
     static let maxDataCapacity: Int = 100
 
-    // Maximum lifetime of managed records; the value corresponds to 31 days
+    /// Maximum lifetime of managed records; the value corresponds to 31 days.
     static let maxDataLifetime: TimeInterval = 2_678_400
 
 
@@ -37,7 +37,7 @@ class SessionsModel {
 
     // MARK: - Public
 
-    // An array of all available ``SessionItem`` instances in this instance
+    /// An array of all available ``SessionItem`` instances in this instance.
     var sessions = [SessionItem]()
 
 
@@ -62,12 +62,12 @@ extension SessionsModel {
 
     // MARK: - Storage management
 
-    // Saves actual state into permanent cache
+    /// Saves actual state into permanent cache.
     func sync() {
         try? storage.update(sessions, forKey: storageKey)
     }
 
-    // Performs a cache purge by deleting entries that are too old or bloated
+    /// Performs a cache purge by deleting entries that are too old or bloated.
     func purge() {
         // Too old records
         let monthAgo = Date() - Self.maxDataLifetime
@@ -83,7 +83,7 @@ extension SessionsModel {
 
     // MARK: - Storage utils
 
-    // Reads model data from cache
+    /// Reads model data from cache.
     private func read() -> [SessionItem] {
         // Read the sessions from the permanent cache
         let cachedSessions: [SessionItem]? = try? storage.read(forKey: storageKey)
@@ -95,18 +95,18 @@ extension SessionsModel {
         return []
     }
 
-    // Deletes all records that were created before the specified date
-    //
-    // - Parameter timestamp: The decisive moment for deleting records
+    /// Deletes all records that were created before the specified date.
+    ///
+    /// - Parameter timestamp: The decisive moment for deleting records.
     func delete(before timestamp: Date) {
         sessions.removeAll { item in
             item.start <= timestamp
         }
     }
 
-    // Deletes all old records whose number exceeds the specified number
-    //
-    // - Parameter number: Position in ordered data from newest to oldest
+    /// Deletes all old records whose number exceeds the specified number.
+    ///
+    /// - Parameter number: Position in ordered data from newest to oldest.
     func delete(exceedingOrder position: Int) {
         guard sessions.count > position else {
             return

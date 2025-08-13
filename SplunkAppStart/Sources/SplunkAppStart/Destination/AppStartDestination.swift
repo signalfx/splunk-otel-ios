@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// Describes a destination into which the AppStart module sends it's results.
+/// Describes a destination into which the AppStart module sends its results.
 protocol AppStartDestination {
 
     /// Sends results into a destination.

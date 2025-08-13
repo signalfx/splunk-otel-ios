@@ -98,7 +98,7 @@ extension SplunkRum {
         sessionReplayProxy = SessionReplay(for: sessionReplayModule)
     }
 
-    // Configure Navigation module
+    /// Configure Navigation module.
     private func customizeNavigation() {
         let moduleType = SplunkNavigation.Navigation.self
         let navigationModule = modulesManager?.module(ofType: moduleType)
