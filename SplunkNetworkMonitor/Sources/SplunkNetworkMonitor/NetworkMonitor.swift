@@ -45,7 +45,11 @@ public class NetworkMonitor {
     public static let shared = NetworkMonitor()
 
     /// An optional callback for network changes
-    public typealias NetworkStatusChangeHandler = (_ isConnected: Bool, _ connectionType: ConnectionType, _ radioType: String?) -> Void
+    public typealias NetworkStatusChangeHandler = (
+        _ isConnected: Bool,
+        _ connectionType: ConnectionType,
+        _ radioType: String?
+    ) -> Void
     public var statusChangeHandler: NetworkStatusChangeHandler?
 
     // MARK: - Private
@@ -95,15 +99,13 @@ public class NetworkMonitor {
             networkChangeEvent.timestamp = Date()
             networkChangeEvent.isConnected = path.status == .satisfied
             networkChangeEvent.connectionType = self.getConnectionType(path)
-            networkChangeEvent.radioType = self.getCurrentRadioAccessTechnology()
+            networkChangeEvent.radioType = self.getCurrentRadioType()
 
             if isInitialEvent {
                 isInitialEvent = false
                 previousChangeEvent = networkChangeEvent
             } else {
-                if networkChangeEvent.isDebouncedChange(from: previousChangeEvent) {
-                    sendNetworkChangeSpan()
-                }
+                sendNetworkChangeSpan()
             }
         }
         monitor.start(queue: queue)
@@ -119,7 +121,7 @@ public class NetworkMonitor {
         #endif
 
         // Initial fetch of radio access technologies
-        networkChangeEvent.radioType = getCurrentRadioAccessTechnology()
+        networkChangeEvent.radioType = networkChangeEvent.connectionType == .cellular ? getCurrentRadioType() : nil
     }
 
     /// Stops monitoring network connectivity changes.
@@ -154,25 +156,30 @@ public class NetworkMonitor {
     }
 
     private func sendNetworkChangeSpan() {
-        destination.send(networkEvent: networkChangeEvent, sharedState: sharedState)
+        if networkChangeEvent.connectionType != .cellular {
+            networkChangeEvent.radioType = nil
+        }
+        if networkChangeEvent.isDebouncedChange(from: previousChangeEvent) {
+            destination.send(networkEvent: networkChangeEvent, sharedState: sharedState)
 
-        self.statusChangeHandler?(
-            networkChangeEvent.isConnected,
-            networkChangeEvent.connectionType,
-            networkChangeEvent.radioType
-        )
-        previousChangeEvent = networkChangeEvent
+            statusChangeHandler?(
+                networkChangeEvent.isConnected,
+                networkChangeEvent.connectionType,
+                networkChangeEvent.radioType
+            )
+            previousChangeEvent = networkChangeEvent
+        }
     }
 
     @objc private func radioAccessChanged() {
         isInitialEvent = false
         networkChangeEvent.timestamp = Date()
-        networkChangeEvent.radioType = getCurrentRadioAccessTechnology()
+        networkChangeEvent.radioType = getCurrentRadioType()
         sendNetworkChangeSpan()
     }
 
     // swiftlint:disable cyclomatic_complexity
-    private func getCurrentRadioAccessTechnology() -> String? {
+    private func getCurrentRadioType() -> String? {
         #if canImport(CoreTelephony)
             // Pick the first available radio access technology
             let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first ?? nil
