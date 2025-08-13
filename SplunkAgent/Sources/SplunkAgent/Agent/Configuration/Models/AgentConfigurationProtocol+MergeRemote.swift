@@ -19,6 +19,13 @@ import Foundation
 
 extension AgentConfigurationProtocol {
 
+    /// Merges remote configuration settings into the current configuration.
+    ///
+    /// This method updates properties such as `sessionTimeout` and `maxSessionLength`
+    /// with values fetched from a remote source. If the remote configuration is `nil`,
+    /// no changes are made.
+    ///
+    /// - Parameter remote: An optional ``RemoteConfiguration`` object containing the settings to merge.
     mutating func mergeRemote(_ remote: RemoteConfiguration?) {
         guard let remote else {
             return
