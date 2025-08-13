@@ -57,6 +57,7 @@ public class CrashReports {
 
     // MARK: - Module methods
 
+    /// Initializes a new instance of the `CrashReports` class.
     public required init() {}
 
     deinit {
@@ -249,6 +250,10 @@ public class CrashReports {
         }
     }
 
+    /// Updates the screen name that will be associated with any subsequent crash report.
+    ///
+    /// This allows the crash report to include the name of the screen the user was on when the crash occurred.
+    /// - Parameter screenName: The name of the current screen.
     public func crashReportUpdateScreenName(_ screenName: String) {
         deviceDataQueue.async {
             self.deviceDataDictionary["screenName"] = screenName
