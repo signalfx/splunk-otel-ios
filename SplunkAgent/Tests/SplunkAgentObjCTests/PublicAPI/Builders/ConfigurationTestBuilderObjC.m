@@ -66,8 +66,9 @@ limitations under the License.
     SPLKSessionConfiguration *sessionConfiguration = [[SPLKSessionConfiguration alloc]
         initWithSamplingRate:1.0];
 
-    NSMutableDictionary *globalAttributes = [[NSMutableDictionary alloc] init];
-    [globalAttributes setObject:@"value" forKey:@"attribute"];
+    NSMutableDictionary<NSString *, SPLKAttributeValue *> *globalAttributes = [[NSMutableDictionary alloc] init];
+    SPLKAttributeValue *stringAttribute = [SPLKAttributeValue attributeWithString:@"value"];
+    [globalAttributes setObject:stringAttribute forKey:@"attribute"];
 
     configuration.appVersion = [self appVersion];
     configuration.enableDebugLogging = NO;

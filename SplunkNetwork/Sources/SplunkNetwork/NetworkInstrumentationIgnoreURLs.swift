@@ -41,9 +41,9 @@ public class IgnoreURLs: Codable {
     /// - Parameter containing pattern: Optional NSRegularExpression for URL pattern matching
     public init(containing pattern: NSRegularExpression?) {
         if let pattern = pattern {
-            self.urlPatterns = [pattern]
+            urlPatterns = [pattern]
         } else {
-            self.urlPatterns = []
+            urlPatterns = []
         }
     }
 

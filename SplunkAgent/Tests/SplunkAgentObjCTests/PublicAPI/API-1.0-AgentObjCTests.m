@@ -93,7 +93,7 @@ limitations under the License.
     SPLKUser *user = agent.user;
 
     // Touch global attributes
-    NSMutableDictionary *globalAttributes = agent.globalAttributes;
+    NSDictionary<NSString *, SPLKAttributeValue *> *globalAttributes = agent.globalAttributes;
 
     // Touch the root properties for the modules API
     SPLKCustomTrackingModule *customTracking = agent.customTracking;
@@ -119,6 +119,49 @@ limitations under the License.
     XCTAssertNotNil(webViewNativeBridge);
 
     XCTAssertNotNil(agentVersion);
+}
+
+- (void)testGlobalAttributes {
+    NSString *testName = @"agentGlobalAttributesTest";
+    agent = [AgentTestBuilderObjC buildDefaultForTestNamed:testName];
+    
+    // Basic supported types
+    BOOL boolValue = NO;
+    double doubleValue = 1.1;
+    NSInteger integerValue = -1;
+    NSString *stringValue = @"Test";
+    
+    // Attributes for supported types
+    SPLKAttributeValue *boolAttribute = [SPLKAttributeValue attributeWithBool:boolValue];
+    SPLKAttributeValue *doubleAttribute = [SPLKAttributeValue attributeWithDouble:doubleValue];
+    SPLKAttributeValue *integerAttribute = [SPLKAttributeValue attributeWithInteger:integerValue];
+    SPLKAttributeValue *stringAttribute = [SPLKAttributeValue attributeWithString:stringValue];
+    
+    // Add supported values as attributes
+    NSMutableDictionary<NSString *, SPLKAttributeValue *> *attributes = [[NSMutableDictionary alloc] init];
+    attributes[@"bool"] = boolAttribute;
+    attributes[@"double"] = doubleAttribute;
+    attributes[@"integer"] = integerAttribute;
+    attributes[@"string"] = stringAttribute;
+
+
+    // We transform attributes into Swift types by assignment
+    // and then load them back using the reverse transformation
+    agent.globalAttributes = attributes;
+    NSDictionary<NSString *, SPLKAttributeValue *> *readedAttributes = agent.globalAttributes;
+
+
+    // It's important to check that precision and type compatibility are properly maintained
+    bool readedBoolValue = readedAttributes[@"bool"].asBoolNumber.boolValue;
+    double readedDoubleValue = readedAttributes[@"double"].asDoubleNumber.doubleValue;
+    NSInteger readedIntegerValue = readedAttributes[@"integer"].asIntegerNumber.integerValue;
+    NSString *readedStringValue = readedAttributes[@"string"].asString;
+
+    XCTAssertEqual(readedAttributes.count, 4);
+    XCTAssertEqual(boolValue, readedBoolValue);
+    XCTAssertEqual(doubleValue, readedDoubleValue);
+    XCTAssertEqual(integerValue, readedIntegerValue);
+    XCTAssertTrue([stringValue isEqualToString:readedStringValue]);
 }
 
 @end

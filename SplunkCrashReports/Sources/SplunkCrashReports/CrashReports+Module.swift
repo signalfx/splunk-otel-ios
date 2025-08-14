@@ -43,7 +43,10 @@ extension CrashReports: Module {
 
     // MARK: - Module methods
 
-    public func install(with configuration: (any SplunkCommon.ModuleConfiguration)?, remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?) {
+    public func install(
+        with configuration: (any SplunkCommon.ModuleConfiguration)?,
+        remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?
+    ) {
 
         // Configure PLCrashReporter
         configureCrashReporter()
