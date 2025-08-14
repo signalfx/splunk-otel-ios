@@ -181,14 +181,20 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
             }
         }
 
-        let eventTimestamp = Date()
+        guard let eventTimestamp = event.timestamp else {
+            logger.log(level: .error) {
+                "Missing session replay data timestamp."
+            }
+
+            return
+        }
 
         // Manually create a Log record
         var logRecord = SplunkReadableLogRecord(
             resource: resource,
             instrumentationScopeInfo: InstrumentationScopeInfo(name: event.instrumentationScope),
             timestamp: eventTimestamp,
-            observedTimestamp: eventTimestamp,
+            observedTimestamp: Date(),
             attributes: attributes
         )
 
