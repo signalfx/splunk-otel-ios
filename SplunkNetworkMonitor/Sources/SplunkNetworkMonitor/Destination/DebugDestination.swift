@@ -30,7 +30,7 @@ class DebugDestination: NetworkMonitorDestination {
     // MARK: - Sending
 
     /// Logs a network event for debugging purposes.
-    /// 
+    ///
     /// - Parameters:
     ///   - networkEvent: The network change event to log
     ///   - sharedState: The agent's shared state (not used in debug logging)

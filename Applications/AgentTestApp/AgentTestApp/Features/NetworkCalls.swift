@@ -18,16 +18,15 @@ limitations under the License.
 import Foundation
 
 class NetworkCalls {
-    
+
     func simpleNetworkCallWith(targetURL: String) {
-        
+
         guard let url = URL(string: targetURL) else { return }
         let request = URLRequest(url: url)
         let semaphore = DispatchSemaphore(value: 0)
 
         let task = URLSession.shared.dataTask(with: request) { data, _, _ in
-            if let data = data {
-                let string = String(decoding: data, as: UTF8.self)
+            if let data = data, let string = String(data: data, encoding: .utf8) {
                 print(string)
             }
             semaphore.signal()
@@ -51,7 +50,7 @@ class NetworkCalls {
         let request = URLRequest(url: url)
 
         let delegate = SessionDelegate()
-        let session = URLSession(configuration: .default, delegate: delegate, delegateQueue:nil)
+        let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
 
         let task = session.dataTask(with: request)
         task.resume()
@@ -59,4 +58,3 @@ class NetworkCalls {
         delegate.semaphore.wait()
     }
 }
-

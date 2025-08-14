@@ -274,25 +274,19 @@ public class SplunkRumBuilder {
 
         // Check the properties required for new AgentConfiguration
         guard let appName = appName else {
-            logger.log(level: .error) {
-                "Application name must be set."
-            }
+            logger.log(level: .error) { "Application name must be set." }
 
             return false
         }
 
         guard let developmentEnvironment = environment else {
-            logger.log(level: .error) {
-                "Environment must be set."
-            }
+            logger.log(level: .error) { "Environment must be set." }
 
             return false
         }
 
         guard let endpointConfiguration = endpointConfiguration else {
-            logger.log(level: .error) {
-                "Endpoint must be set."
-            }
+            logger.log(level: .error) { "Endpoint must be set." }
 
             return false
         }
@@ -339,9 +333,7 @@ public class SplunkRumBuilder {
         do {
             _ = try SplunkRum.install(with: agentConfiguration, moduleConfigurations: moduleConfigurations)
         } catch {
-            logger.log(level: .error) {
-                "SplunkRum installation failed: \(error)"
-            }
+            logger.log(level: .error) { "SplunkRum installation failed: \(error)" }
 
             return false
         }

@@ -94,4 +94,3 @@ class SlowFrameBeatingHeartView: UIView {
         heartImageView.transform = CGAffineTransform(scaleX: newScale, y: newScale)
     }
 }
-

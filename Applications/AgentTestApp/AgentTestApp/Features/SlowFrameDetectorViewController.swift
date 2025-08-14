@@ -24,10 +24,6 @@ class SlowFrameDetectorViewController: UIViewController {
     @IBOutlet var frozenFramesButton: UIButton!
     @IBOutlet var beatingHeartView: SlowFrameBeatingHeartView!
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-
     @IBAction func slowFramesClick(_ sender: UIButton) {
         // Sleep for 0.5 seconds on the main thread
         print("Sleeping for 0.5 seconds to force slow frames")
@@ -44,5 +40,3 @@ class SlowFrameDetectorViewController: UIViewController {
         }
     }
 }
-
-

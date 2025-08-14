@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 
 class Crashes {
-    
+
     func fatalErrorCrash() {
         fatalError("Default Fatal Error")
     }
@@ -26,14 +26,13 @@ class Crashes {
     func preconditionCrash() {
         preconditionFailure("Precondition Failure")
     }
-    
+
     func unwrapException() {
         let number: Int? = nil
         _ = number!
     }
-    
+
     func infiniteLoop() {
-        self.infiniteLoop()
+        infiniteLoop()
     }
 }
-

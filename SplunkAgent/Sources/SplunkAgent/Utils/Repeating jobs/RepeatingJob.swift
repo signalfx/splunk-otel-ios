@@ -83,6 +83,7 @@ class RepeatingJob: AgentRepeatingJob {
     // MARK: - Private methods
 
     private func createTimer() -> Timer {
+        // swiftlint:disable:next unowned_variable_capture
         let newTimer = Timer(timeInterval: interval, repeats: true) { [unowned self] _ in
             self.executionBlock()
         }

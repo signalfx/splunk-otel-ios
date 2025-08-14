@@ -39,10 +39,15 @@ struct DevelAppApp: App {
         )
             .enableDebugLogging(true)
             // Sampled-out agent
-            //.sessionConfiguration(SessionConfiguration(samplingRate: 0))
+            // .sessionConfiguration(SessionConfiguration(samplingRate: 0))
             .sessionConfiguration(SessionConfiguration(samplingRate: 1))
 
-        let agent = try! SplunkRum.install(with: agentConfig)
+        var agent: SplunkRum?
+        do {
+            agent = try SplunkRum.install(with: agentConfig)
+        } catch {
+            print("Unable to start the Splunk agent, error: \(error)")
+        }
 
         return agent
     }

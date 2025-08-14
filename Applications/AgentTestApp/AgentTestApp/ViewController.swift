@@ -65,4 +65,3 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         performSegue(withIdentifier: segueName[indexPath.row], sender: self)
     }
 }
-

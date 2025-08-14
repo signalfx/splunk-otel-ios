@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import UIKit
-import SplunkAgent
 import OpenTelemetryApi
+import SplunkAgent
+import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -57,7 +57,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             .enableDebugLogging(true)
             .globalAttributes(MutableAttributes(dictionary: [
                 "teststring": .string("value"),
-                "testint": .int(100)]))
+                "testint": .int(100)
+            ]))
             .spanInterceptor { spanData in
                 var attributes = spanData.attributes
                 attributes["test_attribute"] = AttributeValue("test_value")
@@ -88,7 +89,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // MARK: UISceneSession Lifecycle
 
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    func application(_ application: UIApplication,
+                     configurationForConnecting connectingSceneSession: UISceneSession,
+                     options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        print("configurationForConnecting")
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)

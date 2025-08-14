@@ -103,7 +103,9 @@ public struct WebDemoHTML {
             <p style="font-size: 36px; font-variant: small-caps;">- web content -</p>
             <h4>Current Native Session ID:</h4>
             <p id="sessionId">unavailable</p>
-            <p>Above session ID is not from BRUM's detection. To see whether BRUM picked up the session ID, watch the traffic over the wire as reported in the Xcode Console while tethered to Xcode (such as when running in the iOS Simulator). You will need to have set your token and realm in the brumScript() function in WebDemoJS.swift.
+            <p>Above session ID is not from BRUM's detection. </p>
+            <p>Check if BRUM picked up the session ID by monitoring the traffic in the Xcode Console. </p>
+            <p>You will need to have set your token and realm in the brumScript() function in WebDemoJS.swift. </p>
         </body>
         </html>
         """

@@ -156,7 +156,7 @@ public class NetworkMonitor {
     private func sendNetworkChangeSpan() {
         destination.send(networkEvent: networkChangeEvent, sharedState: sharedState)
 
-        self.statusChangeHandler?(
+        statusChangeHandler?(
             networkChangeEvent.isConnected,
             networkChangeEvent.connectionType,
             networkChangeEvent.radioType

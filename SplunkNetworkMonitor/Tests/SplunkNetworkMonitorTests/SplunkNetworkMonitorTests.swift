@@ -14,11 +14,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+// swiftlint:disable file_length
 
-import XCTest
+import CoreTelephony
 import Foundation
 import Network
-import CoreTelephony
+import XCTest
 
 @testable import SplunkNetworkMonitor
 
@@ -184,7 +185,7 @@ final class NetworkMonitorTests: XCTestCase {
         }
         """
 
-        let jsonData = jsonString.data(using: .utf8)!
+        let jsonData = Data(jsonString.utf8)
         let config = NetworkMonitorRemoteConfiguration(from: jsonData)
 
         XCTAssertNotNil(config)
@@ -212,7 +213,7 @@ final class NetworkMonitorTests: XCTestCase {
     }
 
     func testNetworkMonitorRemoteConfigurationInvalidJSON() {
-        let invalidJSON = "invalid json".data(using: .utf8)!
+        let invalidJSON = Data("invalid json".utf8)
         let config = NetworkMonitorRemoteConfiguration(from: invalidJSON)
 
         XCTAssertNil(config)
@@ -230,7 +231,7 @@ final class NetworkMonitorTests: XCTestCase {
         }
         """
 
-        let jsonData = jsonString.data(using: .utf8)!
+        let jsonData = Data(jsonString.utf8)
         let config = NetworkMonitorRemoteConfiguration(from: jsonData)
 
         XCTAssertNil(config)
@@ -434,7 +435,7 @@ final class NetworkMonitorPerformanceTests: XCTestCase {
         )
 
         measure {
-            for _ in 0..<1000 {
+            for _ in 0 ..< 1000 {
                 _ = event1.isDebouncedChange(from: event2)
             }
         }
@@ -442,7 +443,7 @@ final class NetworkMonitorPerformanceTests: XCTestCase {
 
     func testNetworkMonitorEventCreationPerformance() {
         measure {
-            for _ in 0..<1000 {
+            for _ in 0 ..< 1000 {
                 _ = NetworkMonitorEvent(
                     timestamp: Date(),
                     isConnected: true,

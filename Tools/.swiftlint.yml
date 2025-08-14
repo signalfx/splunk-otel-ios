@@ -31,6 +31,9 @@ opt_in_rules:
  - sorted_first_last
  - file_header
 
+disabled_rules: 
+  - todo
+
 file_header:
   required_pattern: |
                     \/.
@@ -50,3 +53,4 @@ file_header:
 
 excluded:
  - ${PWD}/Package.swift
+ - ${PWD}/SplunkCrashReporter/Package.swift

@@ -189,7 +189,7 @@ final class SplunkNetworkTests: XCTestCase {
 
     func testCreatedRequest_SetsContentLengthAttribute() {
         // Given
-        let body = "test body".data(using: .utf8)!
+        let body = Data("test body".utf8)
         var request = URLRequest(url: URL(string: "https://example.com")!)
         request.httpBody = body
 
