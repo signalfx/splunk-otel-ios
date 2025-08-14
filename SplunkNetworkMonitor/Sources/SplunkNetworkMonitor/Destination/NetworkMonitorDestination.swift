@@ -22,7 +22,7 @@ import SplunkCommon
 protocol NetworkMonitorDestination {
 
     /// Sends a network event to the destination.
-    /// 
+    ///
     /// - Parameters:
     ///   - networkEvent: The network change event to send
     ///   - sharedState: The agent's shared state

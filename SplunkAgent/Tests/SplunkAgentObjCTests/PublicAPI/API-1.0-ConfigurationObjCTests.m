@@ -111,7 +111,7 @@ limitations under the License.
 - (void)testConfigurationWriteProperties {
     // Default initialization
     SPLKAgentConfiguration *configuration = [ConfigurationTestBuilderObjC buildDefault];
-    
+
     // Properties (WRITE)
     configuration.appVersion = @"0.1";
     XCTAssertTrue([configuration.appVersion isEqualToString:@"0.1"]);
@@ -130,7 +130,7 @@ limitations under the License.
     configuration.session = sessionConfiguration;
     XCTAssertEqual(configuration.session.samplingRate, 0.5);
 
-    
+
     // User configuration
     configuration.user.trackingMode = SPLKUserTrackingMode.anonymousTracking;
     NSInteger expectedUserTrackingModeValue = SPLKUserTrackingMode.anonymousTracking.integerValue;
@@ -138,18 +138,37 @@ limitations under the License.
 
     SPLKUserConfiguration *userConfiguration = [[SPLKUserConfiguration alloc]
         initWithTrackingMode:SPLKUserTrackingMode.noTracking];
-    
+
     configuration.user = userConfiguration;
     expectedUserTrackingModeValue = SPLKUserTrackingMode.noTracking.integerValue;
     XCTAssertEqual(configuration.user.trackingMode.integerValue, expectedUserTrackingModeValue);
 
     NSString *attributeKey = @"key_one";
     NSString *attributeValue = @"value_one";
-    NSMutableDictionary *testAttributes = [[NSMutableDictionary alloc] init];
-    [testAttributes setObject:attributeValue forKey:attributeKey];
+
+    NSMutableDictionary<NSString *, SPLKAttributeValue *> *testAttributes = [[NSMutableDictionary alloc] init];
+    SPLKAttributeValue *stringAttribute = [SPLKAttributeValue attributeWithInteger:attributeValue];
+    [testAttributes setObject:stringAttribute forKey:attributeKey];
 
     configuration.globalAttributes = testAttributes;
     XCTAssertTrue([configuration.globalAttributes isEqualToDictionary:testAttributes]);
+}
+
+- (void)testGlobalAttributes {
+    // Default initialization
+    SPLKAgentConfiguration *configuration = [ConfigurationTestBuilderObjC buildDefault];
+
+    SPLKAttributeValue *integerAttribute = [SPLKAttributeValue attributeWithInteger:-1];
+    SPLKAttributeValue *stringAttribute = [SPLKAttributeValue attributeWithString:@"Test"];
+
+    // Add some supported values as attributes
+    NSMutableDictionary<NSString *, SPLKAttributeValue *> *attributes = [[NSMutableDictionary alloc] init];
+    attributes[@"integer"] = integerAttribute;
+    attributes[@"string"] = stringAttribute;
+    configuration.globalAttributes = attributes;
+
+    NSDictionary<NSString *, SPLKAttributeValue *> *readedAttributes = configuration.globalAttributes;
+    XCTAssertTrue([attributes isEqualToDictionary:readedAttributes]);
 }
 
 @end

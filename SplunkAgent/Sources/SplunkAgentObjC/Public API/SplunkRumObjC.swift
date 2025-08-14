@@ -45,10 +45,22 @@ public final class SplunkRumObjC: NSObject {
     @objc
     public private(set) lazy var session = SessionObjC(for: self)
 
-    // TODO: Solve this logic later!
     /// A dictionary that contains global attributes added to all signals.
+    ///
+    /// Defaults to an empty `NSDictionary` object.
     @objc
-    public private(set) lazy var globalAttributes: NSMutableDictionary = [:]
+    public var globalAttributes: [String: AttributeValueObjC] {
+        get {
+            agent.globalAttributes.attributesDictionary
+        }
+        set {
+            let attributes = MutableAttributes(with: newValue).getAll()
+
+            // The original attributes are always replaced with the `newValue`
+            agent.globalAttributes.removeAll()
+            agent.globalAttributes.addDictionary(attributes)
+        }
+    }
 
     /// An object reflects the current state and setting used for the recording.
     @objc

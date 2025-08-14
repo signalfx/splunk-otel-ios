@@ -42,7 +42,7 @@ extension NetworkMonitor: Module {
     // MARK: - Module methods
 
     /// Installs the NetworkMonitor module with the specified configuration.
-    /// 
+    ///
     /// - Parameters:
     ///   - configuration: The local configuration for the module, or nil for default settings
     ///   - remoteConfiguration: The remote configuration for the module, or nil for default settings

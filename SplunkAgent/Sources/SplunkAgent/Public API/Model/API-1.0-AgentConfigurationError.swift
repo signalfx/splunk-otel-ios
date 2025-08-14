@@ -17,8 +17,8 @@ limitations under the License.
 
 import Foundation
 
-/// Describes an invalid ``AgentConfiguration``.
-enum AgentConfigurationError: Error, Equatable {
+/// Describes an invalid agent configuration.
+public enum AgentConfigurationError: Error, Equatable {
 
     /// Invalid endpoint. Either one of the supplied endpoint urls (traces, session replay) is invalid, or the supplied realm is empty.
     case invalidEndpoint(supplied: EndpointConfiguration)
@@ -33,10 +33,11 @@ enum AgentConfigurationError: Error, Equatable {
     case invalidDeploymentEnvironment(supplied: String?)
 }
 
+
 extension AgentConfigurationError: CustomStringConvertible, CustomDebugStringConvertible {
 
     /// A human-readable string representation of the `AgentConfigurationError` instance.
-    var description: String {
+    public var description: String {
         switch self {
         case let .invalidEndpoint(endpointConfiguration):
             return """
@@ -57,7 +58,16 @@ extension AgentConfigurationError: CustomStringConvertible, CustomDebugStringCon
     }
 
     /// A string representation of an `AgentConfigurationError` instance intended for diagnostic output, identical to `description`.
-    var debugDescription: String {
+    public var debugDescription: String {
+        return description
+    }
+}
+
+
+extension AgentConfigurationError: LocalizedError {
+
+    /// A string with localized message describing the error and why it occurred.
+    public var errorDescription: String? {
         return description
     }
 }
