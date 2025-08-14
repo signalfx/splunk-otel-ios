@@ -39,9 +39,10 @@ public final class AttributeValueObjC: NSObject {
 
     /// Initializes a new instance of an attribute for a `BOOL` type value.
     ///
-    /// - Parameter bool: The value for the new attribute.
-    public convenience init(bool: Bool) {
-        self.init(boolNumber: NSNumber(value: bool))
+    /// - Parameter value: The value for the new attribute.
+    @objc(initWithBool:)
+    public convenience init(value: Bool) {
+        self.init(boolNumber: NSNumber(value: value))
     }
 
     /// Initializes a new instance of an attribute for a `BOOL` type value, encapsulated as a `NSNumber`.
@@ -55,9 +56,10 @@ public final class AttributeValueObjC: NSObject {
 
     /// Initializes a new instance of an attribute for a `double` type value.
     ///
-    /// - Parameter double: The value for the new attribute.
-    public convenience init(double: Double) {
-        self.init(doubleNumber: NSNumber(value: double))
+    /// - Parameter value: The value for the new attribute.
+    @objc(initWithDouble:)
+    public convenience init(value: Double) {
+        self.init(doubleNumber: NSNumber(value: value))
     }
 
     /// Initializes a new instance of an attribute for a `double` type value, encapsulated as a `NSNumber`.
@@ -71,9 +73,10 @@ public final class AttributeValueObjC: NSObject {
 
     /// Initializes a new instance of an attribute for a `NSInteger` type value.
     ///
-    /// - Parameter integer: The value for the new attribute.
-    public convenience init(integer: Int) {
-        self.init(integerNumber: NSNumber(value: integer))
+    /// - Parameter value: The value for the new attribute.
+    @objc(initWithInteger:)
+    public convenience init(value: Int) {
+        self.init(integerNumber: NSNumber(value: value))
     }
 
     /// Initializes a new instance of an attribute for a `NSInteger` type value, encapsulated as a `NSNumber`.
@@ -87,9 +90,10 @@ public final class AttributeValueObjC: NSObject {
 
     /// Initializes a new instance of an attribute for an `NSString` type value.
     ///
-    /// - Parameter string: A `NSString` with value for the new attribute.
-    public init(string: String) {
-        value = string
+    /// - Parameter value: A `NSString` with value for the new attribute.
+    @objc(initWithString:)
+    public init(value: String) {
+        self.value = value
         type = .string
     }
 
@@ -141,38 +145,38 @@ public final class AttributeValueObjC: NSObject {
 
     /// Creates a new instance of an attribute for a `BOOL` type value.
     ///
-    /// - Parameter bool: The value for the new attribute.
+    /// - Parameter value: The value for the new attribute.
     ///
     /// - Returns: A new `BOOL` attribute, encapsulated as a `NSNumber`.
-    public static func attributeWithBool(_ bool: Bool) -> AttributeValueObjC {
-        return .init(bool: bool)
+    public static func attributeWithBool(_ value: Bool) -> AttributeValueObjC {
+        return .init(value: value)
     }
 
     /// Creates a new instance of an attribute for a `double` type value.
     ///
-    /// - Parameter double: The value for the new attribute.
+    /// - Parameter value: The value for the new attribute.
     ///
     /// - Returns: A new `double` attribute, encapsulated as a `NSNumber`.
-    public static func attributeWithDouble(_ double: Double) -> AttributeValueObjC {
-        return .init(double: double)
+    public static func attributeWithDouble(_ value: Double) -> AttributeValueObjC {
+        return .init(value: value)
     }
 
     /// Creates a new instance of an attribute for a `NSInteger` type value.
     ///
-    /// - Parameter integer: The value for the new attribute.
+    /// - Parameter value: The value for the new attribute.
     ///
     /// - Returns: A new `NSInteger` attribute, encapsulated as a `NSNumber`.
-    public static func attributeWithInteger(_ integer: Int) -> AttributeValueObjC {
-        return .init(integer: integer)
+    public static func attributeWithInteger(_ value: Int) -> AttributeValueObjC {
+        return .init(value: value)
     }
 
     /// Creates a new instance of an attribute for a `NSString` type value.
     ///
-    /// - Parameter string: A `NSString` with value for the new attribute.
+    /// - Parameter value: A `NSString` with value for the new attribute.
     ///
     /// - Returns: A new `NSString` attribute.
-    public static func attributeWithString(_ string: String) -> AttributeValueObjC {
-        return .init(string: string)
+    public static func attributeWithString(_ value: String) -> AttributeValueObjC {
+        return .init(value: value)
     }
 }
 
@@ -213,16 +217,16 @@ extension AttributeValueObjC {
     convenience init?(with otelAttributeValue: AttributeValue) {
         switch otelAttributeValue {
         case let .bool(bool):
-            self.init(bool: bool)
+            self.init(value: bool)
 
         case let .double(double):
-            self.init(double: double)
+            self.init(value: double)
 
         case let .int(int):
-            self.init(integer: int)
+            self.init(value: int)
 
         case let .string(string):
-            self.init(string: string)
+            self.init(value: string)
 
         default:
             return nil
