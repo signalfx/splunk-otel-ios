@@ -28,7 +28,9 @@ extension CrashReports {
         }
 
         if let dict = value as? [CrashReportKeys: Any] {
-            return Dictionary(uniqueKeysWithValues: dict.map { ($0.key.rawValue, normalizeToJSONReady($0.value, depth: depth + 1)) })
+            return Dictionary(uniqueKeysWithValues: dict.map {
+                ($0.key.rawValue, normalizeToJSONReady($0.value, depth: depth + 1))
+            })
         } else if let array = value as? [[CrashReportKeys: Any]] {
             return array.map { normalizeToJSONReady($0, depth: depth + 1) }
         } else {
@@ -37,7 +39,10 @@ extension CrashReports {
     }
 
     func convertToJSONString(_ item: Any) -> String? {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: normalizeToJSONReady(item), options: .prettyPrinted) else {
+        guard let jsonData = try? JSONSerialization.data(
+            withJSONObject: normalizeToJSONReady(item),
+            options: .prettyPrinted
+        ) else {
             logger.log(level: .debug) {
                 "Crash Report data could not be converted to JSON."
             }
