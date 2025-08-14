@@ -27,7 +27,7 @@ protocol AgentModulesManager {
 
     // MARK: - Public
 
-    /// Array of all `Module` instances managed by this agent instance.
+    /// Array of all module instances managed by this agent instance.
     var modules: [any Module] { get }
 
 
