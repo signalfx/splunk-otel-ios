@@ -32,22 +32,22 @@ public class OTLPBackgroundHTTPBaseExporter {
     let fileType: String?
 
 
-    // MARK: - Public
+    // MARK: - Internal
 
     /// The URL endpoint where data will be sent.
-    public let endpoint: URL
+    let endpoint: URL
 
     /// The client responsible for handling background HTTP requests and disk storage.
-    public let httpClient: BackgroundHTTPClient
+    let httpClient: BackgroundHTTPClient
 
     /// Optional HTTP headers to be added to requests, typically derived from environment variables.
-    public let envVarHeaders: [(String, String)]?
+    let envVarHeaders: [(String, String)]?
 
     /// The OTLP configuration settings, such as timeout values.
-    public let config: OtlpConfiguration
+    let config: OtlpConfiguration
 
     /// The storage mechanism for caching requests on disk before they are sent.
-    public let diskStorage: DiskStorage
+    let diskStorage: DiskStorage
 
 
     // MARK: - Initialization
