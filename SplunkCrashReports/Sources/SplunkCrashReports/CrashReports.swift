@@ -333,6 +333,7 @@ public class CrashReports {
             .startSpan()
 
         for (key, value) in crashReport {
+            crashSpan.setAttribute(key: key.rawValue, value: nil)
             crashSpan.setAttribute(key: key.rawValue, value: toAttributeValue(value))
         }
 
