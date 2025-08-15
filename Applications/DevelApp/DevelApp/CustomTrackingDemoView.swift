@@ -112,6 +112,7 @@ struct CustomTrackingDemoView: View {
 
     func trackWorkflow() {
         let customSpan = SplunkRum.shared.customTracking.trackWorkflow("Custom Workflow")
+        customSpan.setAttribute(key: "test", value: nil)
         customSpan.setAttribute(key: "test", value: "qwerty")
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
