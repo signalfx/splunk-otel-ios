@@ -36,8 +36,11 @@ struct OTelDestination: AppStartDestination {
             .setStartTime(time: appStart.start)
             .startSpan()
 
+        appStartSpan.setAttribute(key: "component", value: nil)
         appStartSpan.setAttribute(key: "component", value: "appstart")
+        appStartSpan.setAttribute(key: "screen.name", value: nil)
         appStartSpan.setAttribute(key: "screen.name", value: "unknown")
+        appStartSpan.setAttribute(key: "start.type", value: nil)
         appStartSpan.setAttribute(key: "start.type", value: typeIdentifier(for: appStart.type))
 
         appStart.events?.forEach { event in
@@ -53,11 +56,14 @@ struct OTelDestination: AppStartDestination {
                 .setParent(appStartSpan)
                 .startSpan()
 
+            initializeSpan.setAttribute(key: "component", value: nil)
             initializeSpan.setAttribute(key: "component", value: "appstart")
+            initializeSpan.setAttribute(key: "screen.name", value: nil)
             initializeSpan.setAttribute(key: "screen.name", value: "unknown")
 
             // Add config settings
             if let configSettings = agentInitialize.formattedConfigurationSettings {
+                initializeSpan.setAttribute(key: "config_settings", value: nil)
                 initializeSpan.setAttribute(key: "config_settings", value: configSettings)
             }
 
