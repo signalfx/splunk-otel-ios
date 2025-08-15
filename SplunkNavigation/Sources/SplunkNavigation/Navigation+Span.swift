@@ -57,10 +57,13 @@ extension Navigation {
             .setStartTime(time: navigation.start)
             .startSpan()
 
+        navigationSpan.setAttribute(key: Self.componentKey, value: nil)
         navigationSpan.setAttribute(key: Self.componentKey, value: Self.component)
 
         let screenName = navigation.screenName
+        navigationSpan.setAttribute(key: Self.lastScreenNameKey, value: nil)
         navigationSpan.setAttribute(key: Self.lastScreenNameKey, value: screenName)
+        navigationSpan.setAttribute(key: Self.screenNameKey, value: nil)
         navigationSpan.setAttribute(key: Self.screenNameKey, value: screenName)
 
         let navigationEnd = navigation.end ?? Date()
@@ -74,8 +77,11 @@ extension Navigation {
             .setStartTime(time: start)
             .startSpan()
 
+        screenNameSpan.setAttribute(key: Self.componentKey, value: nil)
         screenNameSpan.setAttribute(key: Self.componentKey, value: Self.component)
+        screenNameSpan.setAttribute(key: Self.lastScreenNameKey, value: nil)
         screenNameSpan.setAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        screenNameSpan.setAttribute(key: Self.screenNameKey, value: nil)
         screenNameSpan.setAttribute(key: Self.screenNameKey, value: screenName)
 
         screenNameSpan.end(time: start)
