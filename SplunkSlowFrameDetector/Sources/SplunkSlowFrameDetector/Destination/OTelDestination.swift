@@ -40,7 +40,9 @@ struct OTelDestination: SlowFrameDetectorDestination {
             .setStartTime(time: spanTime)
             .startSpan()
 
+        span.setAttribute(key: "component", value: nil)
         span.setAttribute(key: "component", value: "ui")
+        span.setAttribute(key: "count", value: nil)
         span.setAttribute(key: "count", value: count)
 
         span.end(time: spanTime)
