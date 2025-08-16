@@ -73,6 +73,7 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
                     continue
                 }
 
+                span.setAttribute(key: key, value: nil)
                 span.setAttribute(key: key, value: attributeValue)
             }
         }
