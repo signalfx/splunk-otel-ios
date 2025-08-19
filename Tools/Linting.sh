@@ -61,7 +61,7 @@ else
 fi
 
 if which swiftformat >/dev/null; then
-  swiftformat . --lenient --lint --commas inline --stripunusedargs closure-only --swiftversion 5 --disable indent,consecutiveBlankLines,wrapMultilineStatementBraces, braces,enumNamespaces,blankLinesAtStartOfScope
+  swiftformat . --lenient --lint --commas inline --stripunusedargs closure-only --swiftversion 5 --disable indent,consecutiveBlankLines,wrapMultilineStatementBraces, braces,enumNamespaces,blankLinesAtStartOfScope,trailingCommas
 else
   echo "warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat"
 fi
