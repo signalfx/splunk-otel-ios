@@ -30,7 +30,7 @@ let package = Package(
             exact: "2.0.0"
         ),
         .package(
-            url:"https://github.com/microsoft/plcrashreporter",
+            url: "https://github.com/microsoft/plcrashreporter",
             from: "1.12.0"
         )
     ],
@@ -148,8 +148,8 @@ func generateMainTargets() -> [Target] {
             dependencies: ["SplunkNetwork"],
             path: "SplunkNetwork/Tests"
         ),
-        
-        
+
+
         // MARK: - Splunk Network Monitor
 
         .target(
@@ -303,15 +303,15 @@ func generateMainTargets() -> [Target] {
         // MARK: - Splunk Interactions
 
         .target(
-                name: "SplunkInteractions",
-                dependencies: [
-                    "SplunkCommon",
-                    .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
-                    resolveDependency("runtimeCache"),
-                    resolveDependency("logger")
-                ],
-                path: "SplunkInteractions/Sources"
-            ),
+            name: "SplunkInteractions",
+            dependencies: [
+                "SplunkCommon",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                resolveDependency("runtimeCache"),
+                resolveDependency("logger")
+            ],
+            path: "SplunkInteractions/Sources"
+        ),
         .testTarget(
             name: "SplunkInteractionsTests",
             dependencies: ["SplunkInteractions"],
@@ -359,7 +359,7 @@ func generateMainTargets() -> [Target] {
 
 
         // MARK: - Splunk Custom Tracking
-        
+
         .target(
             name: "SplunkCustomTracking",
             dependencies: [
@@ -401,7 +401,7 @@ func generateMainTargets() -> [Target] {
 
 /// Generates binary targets from the registry, based on the current `DependencyResolutionStrategy`.
 func generateBinaryTargets() -> [Target] {
-    
+
     // First check the deps resolution whether we want to generate.
     guard DependencyResolutionStrategy.current == .binaryTargets else {
         return []
