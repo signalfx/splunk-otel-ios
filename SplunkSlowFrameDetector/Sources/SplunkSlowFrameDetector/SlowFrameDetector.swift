@@ -16,231 +16,131 @@ limitations under the License.
 */
 
 import Foundation
-import QuartzCore
-import SplunkCommon
 import UIKit
+import SplunkCommon
 
+// MARK: - SlowFrameDetector
+
+/// Detects and reports slow and frozen frames in the user interface.
+///
+/// This class monitors the application's frame rate using `CADisplayLink`. It identifies "slow frames" when the time between frames exceeds the expected duration plus a tolerance. It also detects "frozen frames" when the main thread is unresponsive for a significant period.
+///
+/// These events are reported as metrics to the configured destination.
 public final class SlowFrameDetector {
 
-    // MARK: - Nested Types
+    /// The percentage of the frame's expected duration that is added as a tolerance when detecting slow frames.
+    ///
+    /// A frame is considered "slow" if its actual duration exceeds the expected duration (e.g., 16.67ms for 60Hz) plus this tolerance percentage. The default value is `15.0`.
+    public static let slowFrameTolerancePercentage: Double = 15.0
 
-    typealias FrameBuffer = [String: Int]
+    /// The time interval, in seconds, after which a frame is considered "frozen."
+    ///
+    /// If the main thread does not process frames for a period longer than this threshold, a frozen frame is reported. The default value is `0.7` seconds.
+    public static let frozenFrameThreshold: TimeInterval = 0.7
 
-    actor ReportableFramesBuffer {
-        private var buffer: FrameBuffer = [:]
-
-        func incrementFrames() async {
-            buffer["shared", default: 0] += 1
-        }
-
-        func framesToReport() async -> FrameBuffer {
-            let bufferCopy = buffer
-            buffer.removeAll()
-            return bufferCopy
-        }
-    }
-
-    // MARK: - Public Properties
-
-    /// An object that reflects the current state for the module, just `isEnabled` in our case.
+    /// The current state of the `SlowFrameDetector`.
+    ///
+    /// This object provides information about the detector's status, such as whether it is currently enabled.
     public let state = SlowFrameDetectorState()
 
-    /// The configuration received from a remote source.
+    /// The remote configuration for the `SlowFrameDetector`.
+    ///
+    /// This property can be used to update the detector's behavior based on settings fetched from a remote source.
     public var configuration: SlowFrameDetectorRemoteConfiguration?
+    private let logic: SlowFrameLogic
+    private var ticker: SlowFrameTicker
 
-    // MARK: - Private Properties
-
-    // Frame Detection Machinery
-    private var displayLink: CADisplayLink?
-    private var timer: Timer?
-    private var displayLinkTask: Task<Void, Never>?
-
-    // Frame Buffers
-    private var slowFrames = ReportableFramesBuffer()
-    private var frozenFrames = ReportableFramesBuffer()
-
-    // Calculation State
-    private var previousTimestamp: CFTimeInterval = 0.0
-
-    // Tuning Parameters
-    private var tolerancePercentage: Double = 15.0
-    private var frozenDurationMultiplier: Double = 40.0
-
-    // MARK: - Lifecycle
-
-    public required init() {}
-
-    deinit {
-        stop()
+    internal init(
+        ticker: SlowFrameTicker,
+        destinationFactory: @escaping () -> SlowFrameDetectorDestination
+    ) {
+        self.ticker = ticker
+        self.logic = SlowFrameLogic(destinationFactory: destinationFactory)
     }
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    /// Initializes a new instance of the `SlowFrameDetector`.
+    ///
+    /// This convenience initializer sets up the detector with default dependencies, including a `DisplayLinkTicker` for frame monitoring and an `OTelDestination` for reporting.
+    public convenience required init() {
+        self.init(ticker: DisplayLinkTicker(), destinationFactory: { OTelDestination() })
+    }
 
-        // Ignore `remoteConfiguration` because when it eventually comes into
-        // play, DefaultModulesManager will be using it if needed to veto the
-        // installation before we ever get here.
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+        ticker.stop()
 
-        let localConfiguration = configuration as? SlowFrameDetectorConfiguration
+        // We need a strong reference to the actor because self is going away
+        let logicToStop = self.logic
 
-        // If localConfiguration is nil, default to true.
-        state.isEnabled = localConfiguration?.isEnabled ?? true
+        // deinit does not need to wait for this so we wrap it in a task
+        Task {
+            await logicToStop.stop()
+        }
+    }
 
+    /// Installs and configures the slow frame detector.
+    ///
+    /// This method should be called as part of the module initialization process. It enables or disables the detector based on the provided local configuration.
+    /// - Parameters:
+    ///   - configuration: The local configuration for the module, which determines if the feature is enabled.
+    ///   - remoteConfiguration: The remote configuration for the module.
+    public func install(
+        with configuration: (any ModuleConfiguration)?,
+        remoteConfiguration: (any RemoteModuleConfiguration)?
+    ) {
+        let localConfig = configuration as? SlowFrameDetectorConfiguration
+        state.isEnabled = localConfig?.isEnabled ?? true
         if state.isEnabled {
             start()
         }
     }
 
+    /// Starts the slow and frozen frame detection process.
+    ///
+    /// This method sets up the frame ticker and registers for application lifecycle notifications to automatically pause and resume monitoring.
     public func start() {
+        Task {
+            let started = await logic.start()
+            guard started else { return }
 
-        // If we already have a displayLink instance, start must have already been called.
-        if displayLink != nil {
-            return
-        }
-
-        // Stay on top of app lifecycle so we can pause things if needed
-        let center = NotificationCenter.default
-        center.addObserver(self,
-                           selector: #selector(appWillResignActive(notification:)),
-                           name: UIApplication.willResignActiveNotification,
-                           object: nil)
-
-        center.addObserver(self,
-                           selector: #selector(appDidBecomeActive(notification:)),
-                           name: UIApplication.didBecomeActiveNotification,
-                           object: nil)
-
-
-        // Runs every frame to detect if any frame took longer than expected
-        displayLink = CADisplayLink(target: self, selector: #selector(displayLinkCallback))
-        displayLink?.add(to: .main, forMode: .common)
-
-
-        // Timer for flushing frames
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            Task {
-                await self?.dumpFrames()
+            self.ticker.onFrame = { [weak self] timestamp, duration in
+                guard let self else { return }
+                Task { await self.logic.handleFrame(timestamp: timestamp, duration: duration) }
             }
+
+            let nc = NotificationCenter.default
+            nc.addObserver(self, selector: #selector(appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
+            nc.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+            nc.addObserver(self, selector: #selector(appWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
+
+            self.ticker.start()
         }
     }
 
-    private func stop() {
-        timer?.invalidate()
-        timer = nil
-        displayLink?.invalidate()
-        displayLink = nil
-        displayLinkTask?.cancel()
-        displayLinkTask = nil
-        slowFrames = ReportableFramesBuffer()
-        frozenFrames = ReportableFramesBuffer()
-        NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIApplication.willResignActiveNotification, object: nil)
+    /// Stops the slow and frozen frame detection process.
+    ///
+    /// This method invalidates the frame ticker, removes notification observers, and flushes any buffered data.
+    public func stop() async {
+        NotificationCenter.default.removeObserver(self)
+        ticker.stop()
+        await logic.stop()
     }
 
-
-    // MARK: - App lifecycle events we hook into
-
-    @objc func appWillResignActive(notification: Notification) {
-        displayLink?.isPaused = true
-        Task { [weak self] in
-            await self?.dumpFrames()
-        }
+    @objc private func appWillResignActive(_ note: Notification) {
+        ticker.pause()
+        Task { await logic.appWillResignActive() }
     }
 
-    @objc func appDidBecomeActive(notification: Notification) {
-        previousTimestamp = 0.0
-        displayLink?.isPaused = false
+    @objc private func appDidBecomeActive(_ note: Notification) {
+        ticker.resume()
+        Task { await logic.appDidBecomeActive() }
     }
 
+    @objc private func appWillTerminate(_ note: Notification) {
+        Task { await logic.appWillTerminate() }
+    }
 
-    // MARK: - CADisplayLink callback, check is here
-
-    @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
-
-        // We are working off of some ambiguous documentation from Apple.
-        // https://developer.apple.com/documentation/quartzcore/cadisplaylink
-        //
-        // On the one hand, they say:
-        //   You calculate the expected amount of time your app has to render
-        //   each frame by using targetTimestamp-timestamp
-        //
-        // On the other hand, they also say:
-        //   To calculate the actual frame duration, use targetTimestamp-timestamp
-        //
-        // Notice the two calculations they show are the same. It seems in the
-        // second excerpt they are using a special meaning of "actual frame
-        // duration" which means "actual expected frame duration under the
-        // system's current (actual) frame rate" The word "actual" being added
-        // because they are cognizant that their frame rate varies, with the
-        // current value the system has chosen being the "actual" rate -- as
-        // distinct from the "actual empirically observed" rate, a different
-        // concept entirely, which I believe would be most people's reasonable
-        // quick (and mistaken) interpretation of the second passage.
-        //
-        // The current implementation of this function relies on the
-        // understanding that the first of their two passages quoted above
-        // resolves the ambiguity: they mean the /expected/ duration is what
-        // results from the calculation they show.
-
-        let actualTimestamp = displayLink.timestamp
-        let targetTimestamp = displayLink.targetTimestamp
-
-        if previousTimestamp == 0.0 {
-            previousTimestamp = actualTimestamp
-            return
-        }
-
-        // Set the previousTimestamp before any potential short circuit
-        let actualDuration = actualTimestamp - previousTimestamp
-        previousTimestamp = actualTimestamp
-
-        // Short circuit if we already have a Task underway, so they don't pile up
-        guard displayLinkTask == nil else { return }
-
-        // Set up the expectation
-        let expectedDuration = targetTimestamp - actualTimestamp
-
-        // `tolerancePercentage` percent of the expected duration, used for slow frames
-        let tolerance = expectedDuration * tolerancePercentage
-
-        // Duration is too long... slow frame
-        let isSlow = actualDuration > expectedDuration + tolerance
-
-        // Frozen is much longer duration than simply "slow"
-        let isFrozen = actualDuration > expectedDuration * frozenDurationMultiplier
-
-        // Apply isFrozen check first because it's a subset of isSlow
-        if isFrozen {
-            displayLinkTask = Task { [weak self] in
-                await self?.frozenFrames.incrementFrames()
-                self?.displayLinkTask = nil
-            }
-        } else if isSlow {
-            displayLinkTask = Task { [weak self] in
-                await self?.slowFrames.incrementFrames()
-                self?.displayLinkTask = nil
-            }
-        }
-     }
-
-
-    // MARK: - Reporting
-
-    private func dumpFrames() async {
-
-        let destination = OTelDestination()
-
-        let slowReportable = await slowFrames.framesToReport()
-        if !slowReportable.isEmpty {
-            for (_, count) in slowReportable {
-                destination.send(type: "slowRenders", count: count, sharedState: nil)
-            }
-        }
-
-        let frozenReportable = await frozenFrames.framesToReport()
-        if !frozenReportable.isEmpty {
-            for (_, count) in frozenReportable {
-                destination.send(type: "frozenRenders", count: count, sharedState: nil)
-            }
-        }
+    internal func flushBuffers() async {
+        await logic.flushBuffers()
     }
 }
