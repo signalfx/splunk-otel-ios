@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -17,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import QuartzCore
 
 // MARK: - SlowFrameLogic Actor
 

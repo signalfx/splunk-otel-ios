@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -18,7 +17,10 @@ limitations under the License.
 
 import Foundation
 import QuartzCore
+#if os(iOS) || os(tvOS) || os(visionOS)
 import UIKit
+#endif
+
 
 // MARK: - SlowFrameTicker for Testability
 
@@ -33,6 +35,7 @@ internal protocol SlowFrameTicker {
     func resume()
 }
 
+#if os(iOS) || os(tvOS) || os(visionOS)
 internal final class DisplayLinkTicker: SlowFrameTicker {
     private var displayLink: CADisplayLink?
     var onFrame: ((TimeInterval, TimeInterval) -> Void)?
@@ -64,3 +67,4 @@ internal final class DisplayLinkTicker: SlowFrameTicker {
         onFrame?(link.timestamp, link.duration)
     }
 }
+#endif // os(iOS) || os(tvOS) || os(visionOS)

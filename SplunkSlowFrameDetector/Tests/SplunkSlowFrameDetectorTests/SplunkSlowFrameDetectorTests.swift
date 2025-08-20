@@ -15,9 +15,11 @@
  limitations under the License.
  */
 
-import XCTest
 import SplunkCommon
+import XCTest
+#if os(iOS) || os(tvOS) || os(visionOS)
 @testable import SplunkSlowFrameDetector
+import UIKit
 
 final class MockTicker: SlowFrameTicker {
     var onFrame: ((TimeInterval, TimeInterval) -> Void)?
@@ -339,3 +341,4 @@ private class MockDestination: SlowFrameDetectorDestination {
         onSend?(type, count)
     }
 }
+#endif // os(iOS) || os(tvOS) || os(visionOS)

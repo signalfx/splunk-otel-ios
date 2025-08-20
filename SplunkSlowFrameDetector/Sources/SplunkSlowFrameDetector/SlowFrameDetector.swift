@@ -16,8 +16,10 @@ limitations under the License.
 */
 
 import Foundation
-import UIKit
 import SplunkCommon
+#if os(iOS) || os(tvOS) || os(visionOS)
+import UIKit
+#endif
 
 // MARK: - SlowFrameDetector
 
@@ -48,26 +50,35 @@ public final class SlowFrameDetector {
     /// This property can be used to update the detector's behavior based on settings fetched from a remote source.
     public var configuration: SlowFrameDetectorRemoteConfiguration?
     private let logic: SlowFrameLogic
-    private var ticker: SlowFrameTicker
+    private var ticker: SlowFrameTicker?
 
     internal init(
-        ticker: SlowFrameTicker,
+        ticker: SlowFrameTicker?,
         destinationFactory: @escaping () -> SlowFrameDetectorDestination
     ) {
         self.ticker = ticker
         self.logic = SlowFrameLogic(destinationFactory: destinationFactory)
     }
 
+    #if os(iOS) || os(tvOS) || os(visionOS)
     /// Initializes a new instance of the `SlowFrameDetector`.
     ///
     /// This convenience initializer sets up the detector with default dependencies, including a `DisplayLinkTicker` for frame monitoring and an `OTelDestination` for reporting.
     public convenience required init() {
         self.init(ticker: DisplayLinkTicker(), destinationFactory: { OTelDestination() })
     }
+    #else
+    // nil ticker for unsupported platforms
+    public convenience required init() {
+        self.init(ticker: nil, destinationFactory: { OTelDestination() })
+    }
+    #endif
 
     deinit {
+        #if os(iOS) || os(tvOS) || os(visionOS)
         NotificationCenter.default.removeObserver(self)
-        ticker.stop()
+        #endif
+        ticker?.stop()
 
         // We need a strong reference to the actor because self is going away
         let logicToStop = self.logic
@@ -99,21 +110,29 @@ public final class SlowFrameDetector {
     ///
     /// This method sets up the frame ticker and registers for application lifecycle notifications to automatically pause and resume monitoring.
     public func start() {
-        Task {
-            let started = await logic.start()
+        guard self.ticker != nil else {
+            return
+        }
+
+        Task { [weak self] in
+            guard let self = self else { return }
+
+            let started = await self.logic.start()
             guard started else { return }
 
-            self.ticker.onFrame = { [weak self] timestamp, duration in
-                guard let self else { return }
+            self.ticker?.onFrame = { [weak self] timestamp, duration in
+                guard let self = self else { return }
                 Task { await self.logic.handleFrame(timestamp: timestamp, duration: duration) }
             }
 
+            #if os(iOS) || os(tvOS) || os(visionOS)
             let nc = NotificationCenter.default
-            nc.addObserver(self, selector: #selector(appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
-            nc.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
-            nc.addObserver(self, selector: #selector(appWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
+            nc.addObserver(self, selector: #selector(self.appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
+            nc.addObserver(self, selector: #selector(self.appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
+            nc.addObserver(self, selector: #selector(self.appWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
+            #endif
 
-            self.ticker.start()
+            self.ticker?.start()
         }
     }
 
@@ -121,24 +140,28 @@ public final class SlowFrameDetector {
     ///
     /// This method invalidates the frame ticker, removes notification observers, and flushes any buffered data.
     public func stop() async {
+        #if os(iOS) || os(tvOS) || os(visionOS)
         NotificationCenter.default.removeObserver(self)
-        ticker.stop()
+        #endif
+        ticker?.stop()
         await logic.stop()
     }
 
+    #if os(iOS) || os(tvOS) || os(visionOS)
     @objc private func appWillResignActive(_ note: Notification) {
-        ticker.pause()
+        ticker?.pause()
         Task { await logic.appWillResignActive() }
     }
 
     @objc private func appDidBecomeActive(_ note: Notification) {
-        ticker.resume()
+        ticker?.resume()
         Task { await logic.appDidBecomeActive() }
     }
 
     @objc private func appWillTerminate(_ note: Notification) {
         Task { await logic.appWillTerminate() }
     }
+    #endif
 
     internal func flushBuffers() async {
         await logic.flushBuffers()
