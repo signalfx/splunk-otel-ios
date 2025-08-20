@@ -30,4 +30,11 @@ final class SessionReplayNonOperationalState: SessionReplayModuleState {
     var isRecording: Bool {
         false
     }
+
+
+    // MARK: - Rendering
+
+    var renderingMode: RenderingMode {
+        .default
+    }
 }

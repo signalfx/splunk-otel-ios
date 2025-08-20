@@ -46,9 +46,7 @@ final class SessionReplayState: SessionReplayModuleState {
 
     // MARK: - Rendering
 
-    // Temporarily removed with Rendering Modes.
-
-    //    public var renderingMode: RenderingMode {
-    //      RenderingMode(with: module.state.renderingMode)
-    //  }
+    var renderingMode: RenderingMode {
+        RenderingMode(with: module.state.renderingMode)
+    }
 }

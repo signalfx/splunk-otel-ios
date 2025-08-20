@@ -26,9 +26,9 @@ public protocol SessionReplayModule: ObservableObject {
     var sensitivity: SessionReplayModuleSensitivity { get }
 
 
-    // MARK: - Custom id
+    // MARK: - Custom ID
 
-    /// An object that holds and manages view elements sensitivity.
+    /// An object that holds and manages the view elements' custom IDs.
     var customIdentifiers: SessionReplayModuleCustomId { get }
 
 
