@@ -105,8 +105,6 @@ class DefaultEventManager: AgentEventManager {
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
             globalAttributes: { agent.globalAttributes.getAll() },
-            initialSessionId: agent.currentSession.currentSessionId,
-            scriptInstanceId: scriptInstanceId,
             debugEnabled: configuration.enableDebugLogging
         )
 
