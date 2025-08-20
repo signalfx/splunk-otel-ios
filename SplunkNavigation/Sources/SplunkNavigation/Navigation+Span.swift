@@ -25,8 +25,6 @@ extension Navigation {
     private static let component = "ui"
     private static let componentKey = "component"
 
-    static let defaultScreenName = "unknown"
-
     private static let screenNameKey = "screen.name"
     private static let lastScreenNameKey = "last.screen.name"
 

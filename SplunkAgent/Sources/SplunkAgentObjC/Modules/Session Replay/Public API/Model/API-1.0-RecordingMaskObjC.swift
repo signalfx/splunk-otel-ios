@@ -33,7 +33,7 @@ public final class RecordingMaskObjC: NSObject {
     // MARK: - Elements
 
     /// A list of individual areas to cover or erase.
-    public var elements: [MaskElementObjC]
+    public let elements: [MaskElementObjC]
 
 
     // MARK: - Initialization
@@ -59,7 +59,11 @@ extension RecordingMaskObjC {
 
     // MARK: - Conversion init
 
-    convenience init(with recordingMask: RecordingMask) {
+    convenience init?(with recordingMask: RecordingMask?) {
+        guard let recordingMask else {
+            return nil
+        }
+
         let elements = recordingMask.elements.map { element in
             MaskElementObjC(with: element)
         }
