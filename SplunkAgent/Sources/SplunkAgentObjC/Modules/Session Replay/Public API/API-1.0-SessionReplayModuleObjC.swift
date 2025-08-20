@@ -27,6 +27,33 @@ public final class SessionReplayModuleObjC: NSObject {
     private unowned let owner: SplunkRumObjC
 
 
+    // MARK: - Sensitivity
+
+    /// An object that holds and manages view elements sensitivity.
+    @objc
+    public private(set) lazy var sensitivity = SessionReplayModuleSensitivityObjC(for: owner)
+
+
+    // MARK: - Custom ID
+
+    /// An object that holds and manages the view elements' custom IDs.
+    @objc
+    public private(set) lazy var customIdentifiers = SessionReplayModuleCustomIdObjC(for: owner)
+
+    // MARK: - State
+
+    /// An object that reflects the current state and settings used for the recording.
+    @objc
+    public private(set) lazy var state = SessionReplayModuleStateObjC(for: owner)
+
+
+    // MARK: - Module preferences
+
+    /// An object that holds preferred settings for the recording.
+    @objc
+    public private(set) lazy var preferences = SessionReplayModulePreferencesObjC(for: owner)
+
+
     // MARK: - Recording management
 
     /// Starts recording.
@@ -50,9 +77,21 @@ public final class SessionReplayModuleObjC: NSObject {
     }
 
 
-    // MARK: - Public API
+    // MARK: - Recording masks
 
-    // ...
+    /// The recording mask, covers possibly sensitive areas.
+    @objc
+    var recordingMask: RecordingMaskObjC? {
+        get {
+            let mask = owner.agent.sessionReplay.recordingMask
+
+            return RecordingMaskObjC(with: mask)
+        }
+        set {
+            let mask = newValue?.recordingMask
+            owner.agent.sessionReplay.recordingMask = mask
+        }
+    }
 
 
     // MARK: - Initialization
