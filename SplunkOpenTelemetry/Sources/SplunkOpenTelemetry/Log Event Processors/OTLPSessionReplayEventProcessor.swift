@@ -83,8 +83,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
         globalAttributes: @escaping () -> [String: AttributeValue],
-        initialSessionId: String,
-        scriptInstanceId: String,
         debugEnabled: Bool
     ) {
         guard let sessionReplayEndpoint else {
@@ -106,18 +104,16 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         self.runtimeAttributes = runtimeAttributes
         self.debugEnabled = debugEnabled
 
-        // Experimental attributes for integration PoC
-        let replayResources = Resource(attributes: [
-            "process.runtime.name": .string("mobile"),
-            "splunk.rumSessionId": .string(initialSessionId),
-            "splunk.rumVersion": .string(resources.agentVersion),
-            "splunk.scriptInstance": .string(scriptInstanceId)
+        // Session replay specific resource
+        let replayResource = Resource(attributes: [
+            ResourceAttributes.processRuntimeName.rawValue: .string("mobile"),
+            "splunk.rumVersion": .string(resources.agentVersion)
         ])
 
         // Build Resources
         var resource = Resource()
         resource.merge(with: resources)
-        resource.merge(other: replayResources)
+        resource.merge(other: replayResource)
 
         self.resource = resource
     }
@@ -185,14 +181,20 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
             }
         }
 
-        let eventTimestamp = Date()
+        guard let eventTimestamp = event.timestamp else {
+            logger.log(level: .error) {
+                "Missing session replay data timestamp."
+            }
+
+            return
+        }
 
         // Manually create a Log record
         var logRecord = SplunkReadableLogRecord(
             resource: resource,
             instrumentationScopeInfo: InstrumentationScopeInfo(name: event.instrumentationScope),
             timestamp: eventTimestamp,
-            observedTimestamp: eventTimestamp,
+            observedTimestamp: Date(),
             attributes: attributes
         )
 
