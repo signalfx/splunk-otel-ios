@@ -42,7 +42,7 @@ final class SessionReplayState: SessionReplayModuleState {
 
     // A boolean value indicating whether the session is currently being recorded
     //
-    // This is a convenience property that returns `true` if the ``status`` is `.recording`,
+    // This is a convenience property that returns `true` if the `status` is `.recording`,
     // and `false` otherwise
     var isRecording: Bool {
         module.state.isRecording

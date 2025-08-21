@@ -272,7 +272,7 @@ public class SplunkRumBuilder {
     @discardableResult
     public func build() -> Bool {
 
-        // Check the properties required for new ``AgentConfiguration``
+        // Check the properties required for new `AgentConfiguration`
         guard let appName = appName else {
             logger.log(level: .error) {
                 "Application name must be set."
@@ -329,13 +329,13 @@ public class SplunkRumBuilder {
             attributes = MutableAttributes()
         }
 
-        // Construct ``AgentConfiguration`` with the supplied builder properties
+        // Construct `AgentConfiguration` with the supplied builder properties
         let agentConfiguration = AgentConfiguration(endpoint: endpointConfiguration, appName: appName, deploymentEnvironment: developmentEnvironment)
             .sessionConfiguration(SessionConfiguration(samplingRate: sessionSamplingRatio))
             .globalAttributes(attributes)
             .enableDebugLogging(debug)
 
-        // Call the ``SplunkRum.install(with:moduleConfigurations:)`` method
+        // Call the `SplunkRum.install(with:moduleConfigurations:)` method
         do {
             _ = try SplunkRum.install(with: agentConfiguration, moduleConfigurations: moduleConfigurations)
         } catch {
