@@ -176,7 +176,8 @@ public class SplunkRumBuilder {
     /// - Returns: The updated builder instance.
     @available(*, deprecated, message:
         """
-        This builder method will be removed in a later version. Use `NavigationModulePreferences.enableAutomatedTracking` instead.
+        This builder method will be removed in a later version.
+        Use `agentInstance.navigation.preferences.enableAutomatedTracking` instead.
         """)
     @discardableResult
     public func showVCInstrumentation(_ show: Bool) -> SplunkRumBuilder {
