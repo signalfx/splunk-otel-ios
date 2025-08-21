@@ -15,7 +15,7 @@ jobs:
       - name: Smoke Test
         run: ./smoketest.sh
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.4.1
+        uses: codecov/codecov-action@v5.5.0
   xcframework:
     runs-on: macos-15
     steps:
