@@ -18,7 +18,9 @@ limitations under the License.
 import Foundation
 import QuartzCore
 import SplunkCommon
+#if os(iOS) || os(tvOS) || os(visionOS)
 import UIKit
+#endif
 
 // Note: This component is being updated to improve its testability.
 // The work is tracked in a central PR and will be merged incrementally.
@@ -52,25 +54,45 @@ public final class SlowFrameDetector {
 
     // MARK: - Private Properties
 
-    // Frame Detection Machinery
+    // New properties for dependency injection
+    private let logic: SlowFrameLogic
+    private var ticker: SlowFrameTicker?
+
+    // Frame Detection Machinery (Old implementation, to be removed)
     private var displayLink: CADisplayLink?
     private var timer: Timer?
     private var displayLinkTask: Task<Void, Never>?
 
-    // Frame Buffers
+    // Frame Buffers (Old implementation, to be removed)
     private var slowFrames = ReportableFramesBuffer()
     private var frozenFrames = ReportableFramesBuffer()
 
-    // Calculation State
+    // Calculation State (Old implementation, to be removed)
     private var previousTimestamp: CFTimeInterval = 0.0
 
-    // Tuning Parameters
+    // Tuning Parameters (Old implementation, to be removed)
     private var tolerancePercentage: Double = 15.0
     private var frozenDurationMultiplier: Double = 40.0
 
     // MARK: - Lifecycle
 
-    public required init() {}
+    internal init(
+        ticker: SlowFrameTicker?,
+        destinationFactory: @escaping () -> SlowFrameDetectorDestination
+    ) {
+        self.ticker = ticker
+        self.logic = SlowFrameLogic(destinationFactory: destinationFactory)
+    }
+
+    #if os(iOS) || os(tvOS) || os(visionOS)
+    public convenience required init() {
+        self.init(ticker: DisplayLinkTicker(), destinationFactory: { OTelDestination() })
+    }
+    #else
+    public convenience required init() {
+        self.init(ticker: nil, destinationFactory: { OTelDestination() })
+    }
+    #endif
 
     deinit {
         stop()
