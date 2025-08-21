@@ -174,7 +174,6 @@ public class SplunkRumBuilder {
     ///
     /// - Parameter show: If `true`, the Navigation module will automatically detect navigation.
     /// - Returns: The updated builder instance.
-    /// - Note: Deprecated. Use `NavigationModulePreferences.enableAutomatedTracking` instead.
     @available(*, deprecated, message:
         """
         This builder method will be removed in a later version. Use `NavigationModulePreferences.enableAutomatedTracking` instead.
