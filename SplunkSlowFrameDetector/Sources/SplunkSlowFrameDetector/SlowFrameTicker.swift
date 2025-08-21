@@ -1,4 +1,4 @@
-// SlowFrameTicker.swift
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -17,5 +17,15 @@ limitations under the License.
 
 import Foundation
 
-// Placeholder for the SlowFrameTicker protocol, an abstraction over
-// CADisplayLink to enable unit testing.
+/// An abstraction for a timer that "ticks" on every frame refresh of the display.
+///
+/// This protocol provides a consistent interface for receiving frame updates,
+/// abstracting the underlying mechanism (like `CADisplayLink`) to allow for easier
+/// testing and dependency injection.
+internal protocol SlowFrameTicker {
+    var onFrame: ((_ timestamp: TimeInterval, _ duration: TimeInterval) -> Void)? { get set }
+    func start()
+    func stop()
+    func pause()
+    func resume()
+}

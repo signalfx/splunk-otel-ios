@@ -18,9 +18,41 @@ limitations under the License.
 import Foundation
 @testable import SplunkSlowFrameDetector
 import XCTest
+import SplunkCommon
 
 final class SplunkSlowFrameDetectorTests: XCTestCase {
     // Note: This file will be populated with a comprehensive suite of unit tests
     // as part of the effort to improve the detector's testability.
     // The new tests will use mock objects to verify behavior.
+}
+
+// MARK: - Test Mocks
+
+final class MockTicker: SlowFrameTicker {
+    var onFrame: ((TimeInterval, TimeInterval) -> Void)?
+    var started = false
+    var stopped = false
+
+    func start() {
+        started = true
+    }
+
+    func stop() {
+        stopped = true
+    }
+
+    func pause() {}
+    func resume() {}
+
+    func simulateFrame(timestamp: TimeInterval, duration: TimeInterval) {
+        onFrame?(timestamp, duration)
+    }
+}
+
+final class MockDestination: SlowFrameDetectorDestination {
+    var onSend: ((String, Int) -> Void)?
+
+    func send(type: String, count: Int, sharedState: AgentSharedState?) {
+        onSend?(type, count)
+    }
 }
