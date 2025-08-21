@@ -71,6 +71,7 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
     /// This method provides a fluent interface for configuring the rendering mode.
     ///
     /// - Parameter renderingMode: The desired ``RenderingMode``.
+    ///
     /// - Returns: The ``SessionReplayModulePreferences`` instance for chaining further configurations.
     @discardableResult public func renderingMode(_ renderingMode: RenderingMode?) -> SessionReplayModulePreferences {
         self.renderingMode = renderingMode
