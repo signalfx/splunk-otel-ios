@@ -1,4 +1,4 @@
-//
+// SlowFrameLogic.swift
 /*
 Copyright 2025 Splunk Inc.
 
@@ -16,11 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-@testable import SplunkSlowFrameDetector
-import XCTest
 
-final class SplunkSlowFrameDetectorTests: XCTestCase {
-    // Note: This file will be populated with a comprehensive suite of unit tests
-    // as part of the effort to improve the detector's testability.
-    // The new tests will use mock objects to verify behavior.
-}
+// Placeholder for the SlowFrameLogic actor. The goal is to isolate the
+// core business logic here to make it directly testable.

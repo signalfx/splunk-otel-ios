@@ -20,6 +20,8 @@ import QuartzCore
 import SplunkCommon
 import UIKit
 
+// Note: This component is being updated to improve its testability.
+// The work is tracked in a central PR and will be merged incrementally.
 public final class SlowFrameDetector {
 
     // MARK: - Nested Types
