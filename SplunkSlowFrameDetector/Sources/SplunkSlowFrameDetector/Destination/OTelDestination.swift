@@ -21,11 +21,13 @@ import SplunkCommon
 
 // MARK: - OTelDestination for SlowFrameDetector data
 
-struct OTelDestination: SlowFrameDetectorDestination {
+public struct OTelDestination: SlowFrameDetectorDestination {
+
+    public init() {}
 
     // MARK: - Sending
 
-    func send(type: String, count: Int, sharedState: AgentSharedState?) {
+    public func send(type: String, count: Int, sharedState: AgentSharedState?) async {
 
         let tracer = OpenTelemetry.instance
             .tracerProvider
