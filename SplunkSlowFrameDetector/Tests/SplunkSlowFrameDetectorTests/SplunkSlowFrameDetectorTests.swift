@@ -188,7 +188,7 @@ final class SlowFrameDetectorTests: XCTestCase {
 
     func test_slowFrame_atBoundary_isDetected() async throws {
         let reportExpectation = XCTestExpectation(description: "Slow frame report at boundary received")
-         mockDestination.onSend = { type, count in
+        mockDestination.onSend = { type, count in
             if type == "slowRenders" {
                 XCTAssertEqual(count, 1)
                 reportExpectation.fulfill()
