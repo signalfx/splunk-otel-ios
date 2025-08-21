@@ -178,6 +178,7 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
         maskElements.append(MaskElement(rect: CGRect(x: 0, y: 0, width: 100, height: 100), type: .covering))
         maskElements.append(MaskElement(rect: CGRect(x: 50, y: 120, width: 100, height: 100), type: .erasing))
 
+        
         let recordingMask = RecordingMask(elements: maskElements)
 
         moduleProxy.recordingMask = recordingMask

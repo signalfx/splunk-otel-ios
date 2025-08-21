@@ -81,7 +81,7 @@ public final class SessionReplayModuleObjC: NSObject {
 
     /// The recording mask, covers possibly sensitive areas.
     @objc
-    var recordingMask: RecordingMaskObjC? {
+    public var recordingMask: RecordingMaskObjC? {
         get {
             let mask = owner.agent.sessionReplay.recordingMask
 

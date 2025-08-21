@@ -41,7 +41,7 @@ public final class SessionReplayStatusObjC: NSObject {
 
     /// Custom preferences do not allow recording in the SwiftUI Preview context.
     @objc
-    public static let notRecordingSwiftUIPreviewContext = NSNumber(value: -101)
+    public static let notRecordingSwiftUIPreviewContext = NSNumber(value: -102)
 
     /// Recording is not in progress because the user stopped
     /// the previous recording session.
