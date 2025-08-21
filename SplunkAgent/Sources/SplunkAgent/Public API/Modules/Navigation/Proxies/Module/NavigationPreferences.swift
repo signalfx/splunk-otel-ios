@@ -20,7 +20,7 @@ internal import SplunkNavigation
 /// The preferences object allows the user to set navigation instrumentation's preferred settings.
 ///
 /// These preferred settings may not represent the actual state,
-/// which can be checked with the `NavigationState` object.
+/// which can be checked with the ``NavigationState`` object.
 ///
 /// To find out the current state, use the information from the ``NavigationState`` object.
 ///
@@ -48,12 +48,16 @@ public final class NavigationPreferences: NavigationModulePreferences, Codable {
 
     // MARK: - Automated tracking
 
+    /// The preferred setting for enabling or disabling automated navigation tracking.
     public var enableAutomatedTracking: Bool? {
         didSet {
             module?.preferences.enableAutomatedTracking = enableAutomatedTracking
         }
     }
 
+    /// Sets the preference for automated navigation tracking.
+    /// - Parameter enable: A Boolean value to indicate whether automated tracking should be enabled.
+    /// - Returns: The ``NavigationModulePreferences`` instance for chaining further configurations.
     @discardableResult public func enableAutomatedTracking(_ enable: Bool?) -> any NavigationModulePreferences {
         enableAutomatedTracking = enable
 
@@ -68,7 +72,7 @@ public extension NavigationPreferences {
 
     /// Initializes new preferences object with preconfigured values.
     ///
-    /// - Parameter enableAutomatedTracking: If `true`, the module will automatically detect navigation.
+    /// - Parameter enableAutomatedTracking: If `true`, the ``NavigationModule`` will automatically detect navigation.
     convenience init(enableAutomatedTracking: Bool?) {
         self.init()
 
@@ -81,7 +85,7 @@ extension NavigationPreferences {
 
     // MARK: - Codable
 
-    // Private preferences are excluded from serialization.
+    // Private preferences are excluded from serialization
     enum CodingKeys: String, CodingKey {
         case enableAutomatedTracking
     }

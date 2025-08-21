@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// The user preferences object represents the preferred settings related to the user.
+/// The user preferences object represents the preferred settings related to the ``User``.
 public final class UserPreferences {
 
     // MARK: - Internal
@@ -35,7 +35,7 @@ public extension UserPreferences {
 
     // MARK: - User identification
 
-    /// The required tracking mode for user identification.
+    /// The required ``UserTrackingMode`` for user identification.
     var trackingMode: UserTrackingMode {
         get {
             owner.currentUser.trackingMode
@@ -47,9 +47,9 @@ public extension UserPreferences {
 
     /// Sets required tracking mode for user identification.
     ///
-    /// - Parameter trackingMode: The required tracking mode.
+    /// - Parameter trackingMode: The required ``UserTrackingMode``.
     ///
-    /// - Returns: The updated user preferences object.
+    /// - Returns: The updated ``UserPreferences`` object.
     @discardableResult func trackingMode(_ trackingMode: UserTrackingMode) -> UserPreferences {
         owner.currentUser.trackingMode = trackingMode
 

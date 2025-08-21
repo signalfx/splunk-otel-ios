@@ -63,7 +63,7 @@ public extension SplunkRum {
     /// Reports a custom event with name and attributes. Legacy mapping.
     ///
     /// - Parameter name: A user-assigned String name for the event.
-    /// - Parameter attribues: An NSDictionary with user-provided event attributes.
+    /// - Parameter attributes: An NSDictionary with user-provided event attributes.
     @available(
         *,
         deprecated,

@@ -35,9 +35,9 @@ public protocol SessionReplayModuleCustomId: AnyObject {
     /// Assigning `nil` removes previously assigned custom id.
     ///
     /// - Parameters:
-    ///   - view: A view instance to add or remove sensitivity preferences.
+    ///   - view: A view instance for which to set the custom ID.
     ///   - customId: A new custom id.
     ///
-    /// - Returns: The updated object.
+    /// - Returns: The updated ``SessionReplayModuleCustomId`` object.
     @discardableResult func set(_ view: UIView, _ customId: String?) -> any SessionReplayModuleCustomId
 }

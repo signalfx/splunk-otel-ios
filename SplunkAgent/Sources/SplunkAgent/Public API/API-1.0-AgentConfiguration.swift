@@ -23,9 +23,6 @@ internal import SplunkCommon
 /// Structure that holds a configuration for an initial SDK setup.
 ///
 /// Configuration is always bound to a specific URL.
-///
-/// - Note: If you want to set up a parameter, you can change the appropriate property
-///         or use the proper method. Both approaches are comparable and give the same result.
 public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable {
 
     // MARK: - Public mandatory properties
@@ -58,7 +55,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// Defaults to an empty MutableAttributes object.
     public var globalAttributes: MutableAttributes = ConfigurationDefaults.globalAttributes
 
-    /// Span interceptor to be used to filter or modify all outgoing spans.
+    /// Span interceptor to be used to filter or modify all outgoing `SpanData` instances.
     ///
     /// If the callback is provided, all spans are funneled through the callback, and can be either approved by returning the span in the callback,
     /// or discarded by returning `nil` in the callback. Spans can also be modified by the callback.
@@ -126,9 +123,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         return updated
     }
 
-    /// Sets the `UserConfiguration` object.
+    /// Sets the ``UserConfiguration`` object.
     ///
-    /// - Parameter userConfiguration: A configuration object representing properties of the Agent's `User`.
+    /// - Parameter userConfiguration: A configuration object representing properties of the Agent's ``User``.
     ///
     /// - Returns: The updated configuration structure.
     @discardableResult
@@ -139,9 +136,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         return updated
     }
 
-    /// Sets the `SessionConfiguration` object.
+    /// Sets the ``SessionConfiguration`` object.
     ///
-    /// - Parameter sessionConfiguration: A configuration object representing properties of the Agent's `Session`.
+    /// - Parameter sessionConfiguration: A configuration object representing properties of the Agent's ``Session``.
     ///
     /// - Returns: The updated configuration structure.
     @discardableResult
@@ -154,7 +151,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     /// Sets global attributes, which are sent with all signals.
     ///
-    /// - Parameter globalAttributes: A dictionary containing the global attributes to be sent with all signals.
+    /// - Parameter globalAttributes: A ``MutableAttributes`` object containing the global attributes to be sent with all signals.
     ///
     /// - Returns: The updated configuration structure.
     @discardableResult
@@ -169,7 +166,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// and can be either approved by returning the span in the callback, or discarded by returning `nil`.
     /// Spans can also be modified by the callback.
     ///
-    /// - Parameter spanInterceptor: A span interceptor callback.
+    /// - Parameter spanInterceptor: A `SpanData` interceptor callback.
     ///
     /// - Returns: The updated configuration structure.
     @discardableResult
@@ -223,7 +220,7 @@ extension AgentConfiguration {
 
     /// Validate a configuration by checking the endpoint first, then other configuration parameters.
     ///
-    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
+    /// - Throws: ``AgentConfigurationError`` if provided configuration is invalid.
     func validate() throws {
         try endpoint.validate()
 

@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A configuration object representing properties of the Agent's `User`.
+/// A configuration object representing properties of the Agent's ``User``.
 public struct UserConfiguration: Codable, Equatable {
 
     // MARK: - Public properties
 
-    /// Sets the preferred `UserTrackingMode`.
+    /// Sets the preferred ``UserTrackingMode``.
     ///
     /// Defaults to `.noTracking`
     public var trackingMode: UserTrackingMode = .default
@@ -36,7 +36,7 @@ public struct UserConfiguration: Codable, Equatable {
     /// Initializes the configuration object.
     ///
     /// - Parameters:
-    /// - trackingMode: The preferred `UserTrackingMode`.
+    /// - trackingMode: The preferred ``UserTrackingMode``.
     public init(trackingMode: UserTrackingMode) {
         self.trackingMode = trackingMode
     }
