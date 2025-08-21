@@ -56,7 +56,7 @@ public protocol SessionReplayModuleSensitivity: AnyObject {
     ///   - view: A view instance to add or remove sensitivity preferences.
     ///   - sensitive: A new state of view instance sensitivity.
     ///
-    /// - Returns: The updated sensitivity object.
+    /// - Returns: The updated ``SessionReplayModuleSensitivity`` object.
     @discardableResult func set(_ view: UIView, _ sensitive: Bool?) -> any SessionReplayModuleSensitivity
 
 
@@ -82,6 +82,6 @@ public protocol SessionReplayModuleSensitivity: AnyObject {
     ///   - viewClass: A view class to add or remove sensitivity preferences.
     ///   - sensitive: A new state of view class sensitivity.
     ///
-    /// - Returns: The updated sensitivity object.
+    /// - Returns: The updated ``SessionReplayModuleSensitivity`` object.
     @discardableResult func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> any SessionReplayModuleSensitivity
 }

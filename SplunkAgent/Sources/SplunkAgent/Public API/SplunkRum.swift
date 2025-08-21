@@ -89,16 +89,16 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Public API
 
-    /// An object that holds current user.
+    /// An object that holds the current ``User``.
     public private(set) lazy var user = User(for: self)
 
-    /// An object that holds current manages associated session.
+    /// An object that manages the associated ``Session``.
     public private(set) lazy var session = Session(for: self)
 
-    /// An object that contains global attributes added to all signals
+    /// An object that contains global attributes (a ``MutableAttributes`` instance) added to all signals.
     public private(set) lazy var globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 
-    /// An object reflects the current state and setting used for the recording.
+    /// An object that reflects the current state and settings used for the recording (a ``RuntimeState`` instance).
     public private(set) lazy var state = RuntimeState(for: self)
 
     /// OpenTelemetry instance.
@@ -109,27 +109,27 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Public API (Modules)
 
-    /// An object that holds Session Replay module.
+    /// An object that holds the ``SessionReplayModule``.
     public var sessionReplay: any SessionReplayModule {
         sessionReplayProxy
     }
 
-    /// An object that holds Custom Tracking  module.
+    /// An object that holds the ``CustomTrackingModule``.
     public var customTracking: any CustomTrackingModule {
         customTrackingProxy
     }
 
-    /// An object that holds Navigation module.
+    /// An object that holds the ``NavigationModule``.
     public var navigation: any NavigationModule {
         navigationProxy
     }
 
-    /// An object that holds SlowFrameDetector module.
+    /// An object that holds the ``SlowFrameDetectorModule``.
     public var slowFrameDetector: any SlowFrameDetectorModule {
         slowFrameDetectorProxy
     }
 
-    /// An object that provides a bridge for WebView instrumentation.
+    /// An object that provides a bridge for WebView instrumentation (a ``WebViewInstrumentationModule`` instance).
     public var webViewNativeBridge: any WebViewInstrumentationModule {
         webViewProxy
     }
@@ -140,15 +140,15 @@ public class SplunkRum: ObservableObject {
     /// Creates and initializes the singleton instance.
     ///
     /// - Parameters:
-    ///   - configuration: A configuration for the initial SDK setup.
+    ///   - configuration: An ``AgentConfiguration`` for the initial SDK setup.
     ///   - moduleConfigurations: An array of individual module-specific configurations.
     ///
-    /// - Returns: A newly initialized `SplunkRum` instance.
+    /// - Returns: A newly initialized ``SplunkRum`` instance.
     ///
-    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
+    /// - Throws: ``AgentConfigurationError`` if provided configuration is invalid.
     public static func install(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws -> SplunkRum {
 
-        // Install is allowed only once.
+        // Install is allowed only once
         //
         // ‼️ This condition check implies that other checks (supported platform check, sampling check) are performed only once,
         // and agent's shared instance can't be reinstalled
@@ -168,11 +168,11 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
-        // Re-configure and call the Session Sampler.
+        // Re-configure and call the Session Sampler
         shared.sessionSampler.configure(with: configuration)
         let samplingDecision = shared.sessionSampler.sample()
 
-        // Continue with a noop instance in case of sampling out.
+        // Continue with a noop instance in case of sampling out
         if samplingDecision == .sampledOut {
             shared.currentStatus = .notRunning(.sampledOut)
 
@@ -303,14 +303,14 @@ public class SplunkRum: ObservableObject {
     // MARK: - Configuration handler
 
     private static func createConfigurationHandler(for configuration: any AgentConfigurationProtocol) -> AgentConfigurationHandler {
-        // If the platform is not fully supported, we use the dummy handler.
+        // If the platform is not fully supported, we use the dummy handler
         guard isSupportedPlatform else {
             return ConfigurationHandlerNonOperational(for: configuration)
         }
 
         return SplunkConfigurationHandler(for: configuration)
 
-        // Temporarily commented-out code until O11y implements a proper backend config endpoint.
+        // Temporarily commented-out code until O11y implements a proper backend config endpoint
 //        return ConfigurationHandler(
 //            for: configuration,
 //            apiClient: APIClient(baseUrl: configuration.configUrl)

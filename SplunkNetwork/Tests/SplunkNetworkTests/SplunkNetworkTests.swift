@@ -15,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import XCTest
 import OpenTelemetryApi
 import OpenTelemetrySdk
-import URLSessionInstrumentation
 @testable import SplunkNetwork
+import URLSessionInstrumentation
+import XCTest
 
 final class SplunkNetworkTests: XCTestCase {
     var sut: NetworkInstrumentation!
@@ -38,14 +38,14 @@ final class SplunkNetworkTests: XCTestCase {
         var attributes: [String: AttributeValue] = [:]
         var events: [SpanData.Event] = []
         var links: [SpanData.Link] = []
-        var startTime: Date = Date()
+        var startTime = Date()
         var endTime: Date?
         var hasEnded: Bool = false
         var totalRecordedEvents: Int = 0
         var totalRecordedLinks: Int = 0
         var totalAttributeCount: Int = 0
         var parentSpanId: SpanId?
-        var instrumentationScopeInfo: InstrumentationScopeInfo = InstrumentationScopeInfo()
+        var instrumentationScopeInfo = InstrumentationScopeInfo()
 
         // Required SpanBase properties
         var kind: SpanKind { return .internal }
@@ -59,11 +59,12 @@ final class SplunkNetworkTests: XCTestCase {
             let spanId = SpanId.random()
             let traceFlags = TraceFlags()
             let traceState = TraceState()
-            self.context = SpanContext.create(
+            context = SpanContext.create(
                 traceId: traceId,
                 spanId: spanId,
                 traceFlags: traceFlags,
-                traceState: traceState)
+                traceState: traceState
+            )
         }
 
         func setAttribute(key: String, value: Any) {
@@ -85,7 +86,7 @@ final class SplunkNetworkTests: XCTestCase {
             }
         }
 
-        func setAttributes(_ attributes: [String : OpenTelemetryApi.AttributeValue]) {
+        func setAttributes(_ attributes: [String: OpenTelemetryApi.AttributeValue]) {
             self.attributes = attributes
         }
 
@@ -198,9 +199,9 @@ final class SplunkNetworkTests: XCTestCase {
         sut.createdRequest(URLRequest: request, span: mockSpan)
 
         // Then
-        let attributeValue = mockSpan.attributes[SemanticAttributes.httpRequestContentLength.rawValue]
+        let attributeValue = mockSpan.attributes[SemanticAttributes.httpRequestBodySize.rawValue]
         XCTAssertNotNil(attributeValue)
-        if case .int(let value) = attributeValue {
+        if case let .int(value) = attributeValue {
             XCTAssertEqual(value, body.count)
         } else {
             XCTFail("Expected int attribute value")
@@ -224,7 +225,7 @@ final class SplunkNetworkTests: XCTestCase {
         sut.receivedResponse(URLResponse: response, dataOrFile: nil, span: mockSpan)
 
         // Then
-        let attributeValue = mockSpan.attributes[SemanticAttributes.httpResponseContentLength.rawValue]
+        let attributeValue = mockSpan.attributes[SemanticAttributes.httpResponseBodySize.rawValue]
         XCTAssertNotNil(attributeValue)
         if case .int = attributeValue {
             // Success - we just want to verify it's an int value
@@ -240,7 +241,8 @@ final class SplunkNetworkTests: XCTestCase {
             statusCode: 200,
             httpVersion: nil,
             headerFields: [
-                "server-timing": "traceparent;desc='00-1234567890abcdef1234567890abcdef-1234567890abcdef-01'"]
+                "server-timing": "traceparent;desc='00-1234567890abcdef1234567890abcdef-1234567890abcdef-01'"
+            ]
         )!
 
         let mockSpan = MockSpan()
@@ -255,13 +257,13 @@ final class SplunkNetworkTests: XCTestCase {
         XCTAssertNotNil(traceIdValue)
         XCTAssertNotNil(spanIdValue)
 
-        if case .string(let traceId) = traceIdValue {
+        if case let .string(traceId) = traceIdValue {
             XCTAssertEqual(traceId, "1234567890abcdef1234567890abcdef")
         } else {
             XCTFail("Expected string attribute value for traceId")
         }
 
-        if case .string(let spanId) = spanIdValue {
+        if case let .string(spanId) = spanIdValue {
             XCTAssertEqual(spanId, "1234567890abcdef")
         } else {
             XCTFail("Expected string attribute value for spanId")

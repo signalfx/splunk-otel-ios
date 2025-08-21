@@ -1,0 +1,37 @@
+@main
+# ``SplunkAgent``
+
+The Splunk RUM agent for iOS provides Real User Monitoring (RUM) capabilities for your native iOS applications.
+
+> :construction: This project is currently in **ALPHA**. It is **officially supported** by Splunk. However, breaking changes **MAY** be introduced.
+
+## Overview
+
+The agent automatically instruments your application to capture performance metrics, crashes, user interactions, and more. All interactions with the agent are primarily done through the ``SplunkRum`` instance returned during installation.
+
+Getting started is simple: you add the package, provide an ``AgentConfiguration``, and install the agent by calling the `SplunkRum.install(with:)` method. From there, you can customize which modules are active and how they behave using the agent instance you've retained.
+
+## Getting Started
+
+To begin integrating the agent into your app, start with our step-by-step guide.
+
+- <doc:Getting-Started>
+
+## Core Concepts
+
+To make the most of the agent, it's helpful to understand its main components and design.
+
+- <doc:Core-Concepts>
+
+## Topics
+
+### Essentials
+- <doc:Getting-Started>
+- <doc:Core-Concepts>
+
+### Configuration
+- ``SplunkRum``
+- ``AgentConfiguration``
+
+### Modules
+- <doc:Modules-Overview>

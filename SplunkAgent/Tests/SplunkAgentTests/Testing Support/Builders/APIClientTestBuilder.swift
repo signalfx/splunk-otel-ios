@@ -39,7 +39,6 @@ final class APIClientTestBuilder {
         config.protocolClasses = [URLProtocolMock.self]
 
         let session = URLSession(configuration: config)
-
         let url = URL(string: path, relativeTo: URLProtocolMock.mainUrl)
 
         return APIClient(baseUrl: url!, session: session)

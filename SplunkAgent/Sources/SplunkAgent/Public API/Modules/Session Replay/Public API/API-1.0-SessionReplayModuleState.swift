@@ -23,13 +23,13 @@ limitations under the License.
 /// - Settings retrieved from the backend.
 /// - Preferred behavior.
 ///
-/// - Note: The states of individual properties in this class can
+/// - Note: The states of individual properties in types conforming to this protocol can
 ///         and usually also change during the application's runtime.
 public protocol SessionReplayModuleState {
 
     // MARK: - Recording
 
-    /// A `Status` of module recording.
+    /// A ``SessionReplayStatus`` of module recording.
     ///
     /// The default value is `.notRecording(.notStarted)`.
     var status: SessionReplayStatus { get }
@@ -42,8 +42,8 @@ public protocol SessionReplayModuleState {
 
     // MARK: - Rendering
 
-    // Temporarily removed with Rendering Modes.
+    // Temporarily removed with Rendering Modes
 
-    // /// Indicates the rendering mode for capturing video.
+    // /// Indicates the rendering mode for capturing video
     // var renderingMode: RenderingMode { get }
 }
