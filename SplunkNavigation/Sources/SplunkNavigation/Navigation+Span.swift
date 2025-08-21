@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 internal import OpenTelemetryApi
+@_spi(SplunkInternal) import SplunkCommon
 
 extension Navigation {
 
@@ -57,14 +58,11 @@ extension Navigation {
             .setStartTime(time: navigation.start)
             .startSpan()
 
-        navigationSpan.setAttribute(key: Self.componentKey, value: nil)
-        navigationSpan.setAttribute(key: Self.componentKey, value: Self.component)
+        navigationSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
 
         let screenName = navigation.screenName
-        navigationSpan.setAttribute(key: Self.lastScreenNameKey, value: nil)
-        navigationSpan.setAttribute(key: Self.lastScreenNameKey, value: screenName)
-        navigationSpan.setAttribute(key: Self.screenNameKey, value: nil)
-        navigationSpan.setAttribute(key: Self.screenNameKey, value: screenName)
+        navigationSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: screenName)
+        navigationSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
         let navigationEnd = navigation.end ?? Date()
         navigationSpan.end(time: navigationEnd)
@@ -77,12 +75,9 @@ extension Navigation {
             .setStartTime(time: start)
             .startSpan()
 
-        screenNameSpan.setAttribute(key: Self.componentKey, value: nil)
-        screenNameSpan.setAttribute(key: Self.componentKey, value: Self.component)
-        screenNameSpan.setAttribute(key: Self.lastScreenNameKey, value: nil)
-        screenNameSpan.setAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
-        screenNameSpan.setAttribute(key: Self.screenNameKey, value: nil)
-        screenNameSpan.setAttribute(key: Self.screenNameKey, value: screenName)
+        screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
+        screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
         screenNameSpan.end(time: start)
     }

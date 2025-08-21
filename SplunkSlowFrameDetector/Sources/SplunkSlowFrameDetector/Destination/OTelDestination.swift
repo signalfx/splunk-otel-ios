@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
-import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 
 // MARK: - OTelDestination for SlowFrameDetector data
 
@@ -40,10 +40,8 @@ struct OTelDestination: SlowFrameDetectorDestination {
             .setStartTime(time: spanTime)
             .startSpan()
 
-        span.setAttribute(key: "component", value: nil)
-        span.setAttribute(key: "component", value: "ui")
-        span.setAttribute(key: "count", value: nil)
-        span.setAttribute(key: "count", value: count)
+        span.clearAndSetAttribute(key: "component", value: "ui")
+        span.clearAndSetAttribute(key: "count", value: count)
 
         span.end(time: spanTime)
     }
