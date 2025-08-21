@@ -125,7 +125,7 @@ final class API10ConfigurationTests: XCTestCase {
         let urlComponents = try XCTUnwrap(URLComponents(url: traceUrl, resolvingAgainstBaseURL: false))
 
         XCTAssertEqual(urlComponents.scheme, "https")
-        XCTAssertEqual(urlComponents.host, "rum-ingest.\(realm).signalfx.com")
+        XCTAssertEqual(urlComponents.host, "external-rum-ingest.\(realm).signalfx.com")
         XCTAssertEqual(urlComponents.path, "/v1/rumotlp")
 
         let queryItems = try XCTUnwrap(urlComponents.queryItems)
