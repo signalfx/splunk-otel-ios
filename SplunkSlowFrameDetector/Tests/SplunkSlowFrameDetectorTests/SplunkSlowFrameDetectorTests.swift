@@ -90,22 +90,18 @@ final class SlowFrameDetectorTests: XCTestCase {
     }
 
     func test_firstFrame_doesNotTriggerReport() async {
-        // ARRANGE: The destination should not be called.
         mockDestination.onSend = { _, _ in
             XCTFail("The first frame should never trigger a slow frame report.")
         }
 
         await awaitDetectorStart()
 
-        // ACT: Simulate only one frame.
+        // Simulate only one frame.
         mockTicker.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
         await detector.flushBuffers()
-
-        // ASSERT: The test passes if XCTFail is not called.
     }
 
     func test_slowFrame_isDetected() async throws {
-        // ARRANGE
         let reportExpectation = XCTestExpectation(description: "Slow frame report received")
         mockDestination.onSend = { type, count in
             if type == "slowRenders" {
@@ -118,7 +114,6 @@ final class SlowFrameDetectorTests: XCTestCase {
 
         let normalFrameDuration: TimeInterval = 1.0 / 60.0 // ~16.7ms
 
-        // ACT
         // Frame 1: The baseline.
         mockTicker.simulateFrame(timestamp: 0.0, duration: normalFrameDuration)
 
@@ -129,12 +124,10 @@ final class SlowFrameDetectorTests: XCTestCase {
         await Task.yield()
         await detector.flushBuffers()
 
-        // ASSERT
         await fulfillment(of: [reportExpectation], timeout: 1.0)
     }
 
     func test_slowFrame_atBoundary_isDetected() async throws {
-        // ARRANGE
         let reportExpectation = XCTestExpectation(description: "Slow frame report at boundary received")
         mockDestination.onSend = { type, count in
             if type == "slowRenders" {
@@ -152,7 +145,6 @@ final class SlowFrameDetectorTests: XCTestCase {
         // 2. Calculate the exact threshold
         let slowFrameThreshold = expectedDuration + toleranceValue
 
-        // ACT
         // Frame 1: The baseline
         mockTicker.simulateFrame(timestamp: 0.0, duration: expectedDuration)
 
@@ -164,7 +156,6 @@ final class SlowFrameDetectorTests: XCTestCase {
         await Task.yield()
         await detector.flushBuffers()
 
-        // ASSERT
         await fulfillment(of: [reportExpectation], timeout: 1.0)
     }
 
@@ -177,6 +168,74 @@ final class SlowFrameDetectorTests: XCTestCase {
         mockTicker.simulateFrame(timestamp: 0.0, duration: expectedDuration)
         mockTicker.simulateFrame(timestamp: expectedDuration, duration: expectedDuration)
         await detector.flushBuffers()
+    }
+
+    func test_frozenFrame_isDetected_whenFramesStop() async throws {
+        let reportExpectation = XCTestExpectation(description: "Frozen frame report received")
+        mockDestination.onSend = { type, count in
+            if type == "frozenRenders" {
+                XCTAssertGreaterThanOrEqual(count, 1)
+                reportExpectation.fulfill()
+            }
+        }
+
+        await awaitDetectorStart()
+
+        let hangTime = SlowFrameDetector.frozenFrameThreshold
+
+        mockTicker.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+        try await Task.sleep(nanoseconds: UInt64((hangTime + 0.1) * 1_000_000_000))
+        await detector.flushBuffers()
+
+        await fulfillment(of: [reportExpectation], timeout: 1.0)
+    }
+
+    func test_longFreeze_reportsMultipleEvents() async throws {
+        await awaitDetectorStart()
+
+        // 1. Simulate one frame to establish a heartbeat.
+        mockTicker.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+        await Task.yield() // Ensure the heartbeat is set before sleeping.
+
+        // 2. Sleep for a period that allows the watchdog AND the automatic flush to run.
+        // We will sleep for ~2.5 seconds.
+        // Watchdog runs at: ~0.7s, ~1.4s, ~2.1s (3 times)
+        // Auto-flush runs at: ~1.0s, ~2.0s (2 times)
+        let hangTime = SlowFrameDetector.frozenFrameThreshold * 3.5 // ~2.45s
+        try await Task.sleep(nanoseconds: UInt64(hangTime * 1_000_000_000))
+
+        // 3. Manually flush any remaining counts at the end of the test.
+        await detector.flushBuffers()
+
+        // Check the final accumulated count in the mock destination.
+        // The watchdog should have fired 3 times.
+        let finalCount = mockDestination.reportedCounts["frozenRenders"]
+        XCTAssertEqual(finalCount, 3, "The total count of frozen events should be 3 after ~2.45s.")
+    }
+
+    func test_automaticFlush_reportsPendingFrames() async {
+        let reportExpectation = XCTestExpectation(description: "Automatic flush loop sends report")
+        mockDestination.onSend = { type, count in
+            if type == "slowRenders" {
+                XCTAssertEqual(count, 1)
+                reportExpectation.fulfill()
+            }
+        }
+        await awaitDetectorStart()
+
+        // 1. Simulate a slow frame.
+        mockTicker.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+        mockTicker.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
+
+        // FIX: Yield to ensure the async tasks to process the frames have completed.
+        await Task.yield()
+
+        // 2. Wait for longer than the automatic flush interval (1 second).
+        // DO NOT call flushBuffers() manually.
+        try? await Task.sleep(nanoseconds: 1_100_000_000)
+
+        // The expectation should be fulfilled by the automatic flush loop.
+        await fulfillment(of: [reportExpectation], timeout: 1.5)
     }
 }
 
