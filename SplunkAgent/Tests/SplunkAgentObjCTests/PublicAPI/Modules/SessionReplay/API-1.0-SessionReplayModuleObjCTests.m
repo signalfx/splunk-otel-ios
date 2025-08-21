@@ -195,5 +195,4 @@ limitations under the License.
     XCTAssertNil(renderingMode);
 }
 
-
 @end
