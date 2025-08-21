@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 internal import OpenTelemetryApi
-import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 
 /// Creates and sends an OpenTelemetry span from supplied network monitor data.
 struct OTelDestination: NetworkMonitorDestination {
@@ -41,13 +41,10 @@ struct OTelDestination: NetworkMonitorDestination {
             .setStartTime(time: networkEvent.timestamp)
             .startSpan()
 
-        span.setAttribute(key: "network.status", value: nil)
-        span.setAttribute(key: "network.status", value: networkEvent.isConnected ? "available" : "lost")
-        span.setAttribute(key: "network.connection.type", value: nil)
-        span.setAttribute(key: "network.connection.type", value: networkEvent.connectionType.rawValue)
+        span.clearAndSetAttribute(key: "network.status", value: networkEvent.isConnected ? "available" : "lost")
+        span.clearAndSetAttribute(key: "network.connection.type", value: networkEvent.connectionType.rawValue)
         if let radioType = networkEvent.radioType {
-            span.setAttribute(key: "network.connection.subtype", value: nil)
-            span.setAttribute(key: "network.connection.subtype", value: radioType)
+            span.clearAndSetAttribute(key: "network.connection.subtype", value: radioType)
         }
 
         span.end(time: networkEvent.timestamp)
