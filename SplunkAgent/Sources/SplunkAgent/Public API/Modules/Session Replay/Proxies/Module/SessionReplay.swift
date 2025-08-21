@@ -45,7 +45,7 @@ final class SessionReplay: SessionReplayModule {
         self.module = module
         logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SessionReplay")
 
-        // Monitor session changes in the agent.
+        // Monitor session changes in the agent
         hookToAgentLifecycle()
     }
 
@@ -98,9 +98,9 @@ extension SessionReplay {
         ) { [weak self] _ in
 
             // If the session has been changed during the agent run, we need to pass this change
-            // to the module. Opening a new session in the module closes the old one and ends the current record.
+            // to the module. Opening a new session in the module closes the old one and ends the current record
             //
-            // This ensures the current record will end before a new session exists in the agent.
+            // This ensures the current record will end before a new session exists in the agent
             // self?.module.openNewSession()
 
             // Log the change for easier debugging

@@ -18,7 +18,7 @@ limitations under the License.
 internal import CiscoLogger
 import UIKit
 
-/// The class implementing public API for the view element's sensitivity in non-operational mode.
+/// The class implementing API for the view element's sensitivity in non-operational mode.
 ///
 /// This is especially the case when the module is stopped by remote configuration,
 /// but we still need to keep the API available to the user.
@@ -38,6 +38,11 @@ final class SessionReplayNonOperationalSensitivity: SessionReplayModuleSensitivi
 
     // MARK: - View sensitivity
 
+    /// A non-operational implementation for getting or setting view instance sensitivity.
+    ///
+    /// When the Session Replay module is disabled, this property ensures the API remains
+    /// available but performs no action. Accessing it will log a notice.
+    /// The getter always returns `nil`, and the setter is a no-op.
     subscript(view: UIView) -> Bool? {
         get {
             logAccess(toApi: #function)

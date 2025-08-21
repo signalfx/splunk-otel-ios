@@ -17,6 +17,6 @@ limitations under the License.
 
 /// Shared protocol for operational and non-operational implementations.
 public protocol SlowFrameDetectorModule {
-    /// An object that provides information about the current state of the module.
+    /// An object that provides information about the current state of the module, a ``SlowFrameDetectorModuleState`` instance.
     var state: any SlowFrameDetectorModuleState { get }
 }
