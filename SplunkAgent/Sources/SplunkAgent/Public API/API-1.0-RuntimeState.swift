@@ -18,11 +18,11 @@ limitations under the License.
 import Combine
 import Foundation
 
-/// A state object that is representation for the current state of the Agent.
+/// A state object that is representation for the current state of the ``SplunkRum`` Agent.
 ///
 /// The individual properties are a combination of:
 /// - Default SDK settings.
-/// - Initial configuration specified by  ``Configuration``.
+/// - Initial configuration specified by  ``AgentConfiguration``.
 /// - Settings retrieved from the backend.
 ///
 /// - Note: The states of individual properties in this class can
@@ -68,7 +68,7 @@ public extension RuntimeState {
         owner.agentConfiguration.appVersion
     }
 
-    /// A `EndpointConfiguration` containing either the specified realm, or endpoint urls.
+    /// A ``EndpointConfiguration`` containing either the specified realm, or endpoint urls.
     var endpointConfiguration: EndpointConfiguration {
         owner.agentConfiguration.endpoint
     }

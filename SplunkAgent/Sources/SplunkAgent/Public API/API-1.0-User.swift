@@ -25,10 +25,10 @@ public final class User {
 
     // MARK: - Public API
 
-    /// An object that holds preferred settings for the user.
+    /// An object that holds preferred settings for the user, a ``UserPreferences`` instance.
     public private(set) lazy var preferences = UserPreferences(for: owner)
 
-    /// An object reflects the current user's state.
+    /// An object that reflects the current user's state, a ``UserState`` instance.
     public private(set) lazy var state = UserState(for: owner)
 
 

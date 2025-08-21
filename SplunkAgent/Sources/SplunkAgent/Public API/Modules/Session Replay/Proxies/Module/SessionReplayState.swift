@@ -18,7 +18,8 @@ limitations under the License.
 import Foundation
 internal import CiscoSessionReplay
 
-/// The state object implements public API for the current state of the Session Replay module.
+/// An internal object that bridges the core module's state to the public API.
+/// It translates the internal status into the public `SessionReplayStatus` enum.
 final class SessionReplayState: SessionReplayModuleState {
 
     // MARK: - Internal
@@ -39,6 +40,10 @@ final class SessionReplayState: SessionReplayModuleState {
         SessionReplayStatus(srStatus: module.state.status)
     }
 
+    /// A boolean value indicating whether the session is currently being recorded.
+    ///
+    /// This is a convenience property that returns `true` if the ``status`` is `.recording`,
+    /// and `false` otherwise.
     var isRecording: Bool {
         module.state.isRecording
     }

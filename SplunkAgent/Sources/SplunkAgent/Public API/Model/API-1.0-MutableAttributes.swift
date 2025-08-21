@@ -41,7 +41,7 @@ public class MutableAttributes {
 
     // MARK: - Private
 
-    // The underlying thread-safe storage for attributes.
+    /// The underlying thread-safe storage for attributes.
     var attributes: ThreadSafeDictionary<String, AttributeValue>
 
 
@@ -59,7 +59,7 @@ public class MutableAttributes {
     }
 
     /// Initializes the collection with attributes from a given `AttributeSet`.
-    /// - Parameter attributeSet: An ``AttributeSet`` whose labels will be added to the collection.
+    /// - Parameter attributeSet: An `AttributeSet` whose labels will be added to the collection.
     public init(attributeSet: AttributeSet) {
         attributes = ThreadSafeDictionary<String, AttributeValue>()
         addAttributeSet(attributeSet)

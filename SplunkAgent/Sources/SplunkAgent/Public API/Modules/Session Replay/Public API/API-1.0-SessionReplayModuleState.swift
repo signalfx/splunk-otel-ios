@@ -22,13 +22,13 @@ limitations under the License.
 /// - Initial default configuration.
 /// - Preferred behavior.
 ///
-/// - Note: The states of individual properties in this class can
+/// - Note: The states of individual properties in types conforming to this protocol can
 ///         and usually also change during the application's runtime.
 public protocol SessionReplayModuleState {
 
     // MARK: - Recording
 
-    /// A `Status` of module recording.
+    /// A ``SessionReplayStatus`` of module recording.
     ///
     /// The default value is `.notRecording(.notStarted)`.
     var status: SessionReplayStatus { get }

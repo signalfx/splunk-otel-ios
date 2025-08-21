@@ -21,7 +21,7 @@ internal import CiscoSessionReplay
 typealias SplunkSessionReplayPreferences = CiscoSessionReplay.Preferences
 
 // Internal extensions to convert `SessionReplayModulePreferences` proxy model to
-// the underlying SessionReplay's `Preferences` model and vice versa.
+// the underlying SessionReplay's `Preferences` model and vice versa
 extension SplunkSessionReplayPreferences {
 
     // MARK: - Initialization conversion
