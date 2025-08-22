@@ -18,6 +18,10 @@ limitations under the License.
 import Foundation
 import SplunkAgent
 
+#if canImport(WebKit)
+    import WebKit
+#endif
+
 /// The class implements a public API for the WebView Instrumentation module.
 @objc(SPLKWebViewInstrumentationModule)
 public final class WebViewModuleObjC: NSObject {
@@ -29,7 +33,16 @@ public final class WebViewModuleObjC: NSObject {
 
     // MARK: - Public API
 
-    // ...
+    #if canImport(WebKit)
+
+    /// Injects the necessary JavaScript bridge into a given `WKWebView` to enable
+    /// communication between the web content and the native RUM agent.
+    @objc
+    public func integrateWithBrowserRum(view: WKWebView) {
+        owner.agent.webViewNativeBridge.integrateWithBrowserRum(view)
+    }
+
+    #endif
 
 
     // MARK: - Initialization

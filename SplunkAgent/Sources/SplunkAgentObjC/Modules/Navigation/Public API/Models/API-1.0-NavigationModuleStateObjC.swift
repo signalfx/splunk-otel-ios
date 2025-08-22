@@ -18,9 +18,18 @@ limitations under the License.
 import Foundation
 import SplunkAgent
 
-/// The class implements a public API for the SlowFrame Detector module.
-@objc(SPLKSlowFrameDetectorModule)
-public final class SlowFrameDetectorModuleObjC: NSObject {
+/// Defines a public API for the current state of the `Navigation` module.
+///
+/// The individual properties are a combination of:
+/// - Default settings.
+/// - Initial default configuration.
+/// - Settings retrieved from the backend.
+/// - Preferred behavior.
+///
+/// - Note: The states of individual properties in this class can
+///         and usually also change during the application's runtime.
+@objc(SPLKNavigationModuleState)
+public final class NavigationModuleStateObjC: NSObject {
 
     // MARK: - Internal
 
@@ -29,10 +38,12 @@ public final class SlowFrameDetectorModuleObjC: NSObject {
 
     // MARK: - Public API
 
-    /// Indicates whether the slow and frozen frame detection feature is enabled.
+    /// Indicates whether automatic navigation detection is enabled.
+    ///
+    /// The default value is `false`.
     @objc
-    public var isEnabled: Bool {
-        owner.agent.slowFrameDetector.state.isEnabled
+    public var isAutomatedTrackingEnabled: Bool {
+        owner.agent.navigation.state.isAutomatedTrackingEnabled
     }
 
 

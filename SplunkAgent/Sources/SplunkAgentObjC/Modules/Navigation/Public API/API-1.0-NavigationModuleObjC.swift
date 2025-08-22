@@ -27,9 +27,61 @@ public final class NavigationModuleObjC: NSObject {
     private unowned let owner: SplunkRumObjC
 
 
-    // MARK: - Public API
+    // MARK: - Preferences
 
-    // ...
+    /// An object that holds preferred settings for the module, a ``NavigationModulePreferencesObjc`` instance.
+    @objc
+    public var preferences: NavigationModulePreferencesObjc {
+        get {
+            let preferences = NavigationModulePreferencesObjc(enableAutomatedTracking: owner.agent.navigation.preferences.enableAutomatedTracking ?? false)
+            preferences.owner = owner
+            return preferences
+        }
+
+        set {
+            newValue.owner = owner
+            owner.agent.navigation.preferences = NavigationPreferences(enableAutomatedTracking: newValue.enableAutomatedTracking)
+        }
+    }
+
+    /// Sets preferred settings for the module.
+    ///
+    /// - Parameter preferences: The preferred ``NavigationModulePreferencesObjc`` for the module.
+    ///
+    /// - Returns: The actual ``NavigationModuleObjC`` instance.
+    @discardableResult
+    @objc public func setPreferences(preferences: NavigationModulePreferencesObjc) -> NavigationModuleObjC {
+        preferences.owner = owner
+        owner.agent.navigation.preferences = NavigationPreferences(enableAutomatedTracking: preferences.enableAutomatedTracking)
+
+        return self
+    }
+
+
+    // MARK: - State
+
+    /// An object that reflects the current state and settings used for the module, a ``NavigationModuleStateObjC`` instance.
+    @objc
+    public var state: NavigationModuleStateObjC {
+        NavigationModuleStateObjC(for: owner)
+    }
+
+
+    // MARK: - Manual detection
+
+    /// Sets a manual screen name. This setting is valid until a new name is set.
+    ///
+    /// - Parameter name: The name to be tracked as the screen name until being changed.
+    ///
+    /// - Returns: The actual ``NavigationModuleObjC`` instance.
+    ///
+    /// - Note: The set value is not linked to any specific UI element.
+    @discardableResult
+    @objc public func track(screen name: String) -> NavigationModuleObjC {
+        owner.agent.navigation.track(screen: name)
+
+        return self
+    }
 
 
     // MARK: - Initialization
