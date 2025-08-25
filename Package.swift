@@ -101,7 +101,10 @@ func generateMainTargets() -> [Target] {
             dependencies: [
                 "SplunkAgent",
                 "SplunkCommon",
-                "SplunkNavigation"
+                "SplunkInteractions",
+                "SplunkNavigation",
+                "SplunkNetworkMonitor",
+                "SplunkSlowFrameDetector"
             ],
             path: "SplunkAgent/Sources/SplunkAgentObjC",
             resources: [

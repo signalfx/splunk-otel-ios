@@ -16,16 +16,13 @@ limitations under the License.
 */
 
 internal import SplunkCommon
-internal import SplunkNavigation
+internal import SplunkSlowFrameDetector
 
-extension NavigationConfigurationObjC: ModuleConfigurationSwift {
+extension SlowFrameDetectorConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 
     var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
-        NavigationConfiguration(
-            isEnabled: isEnabled,
-            enableAutomatedTracking: enableAutomatedTracking
-        )
+        SlowFrameDetectorConfiguration(isEnabled: isEnabled)
     }
 }

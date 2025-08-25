@@ -16,16 +16,13 @@ limitations under the License.
 */
 
 internal import SplunkCommon
-internal import SplunkNavigation
+internal import SplunkInteractions
 
-extension NavigationConfigurationObjC: ModuleConfigurationSwift {
+extension InteractionsConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 
     var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
-        NavigationConfiguration(
-            isEnabled: isEnabled,
-            enableAutomatedTracking: enableAutomatedTracking
-        )
+        InteractionsConfiguration(isEnabled: isEnabled)
     }
 }
