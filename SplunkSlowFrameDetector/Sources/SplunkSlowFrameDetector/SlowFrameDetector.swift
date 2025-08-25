@@ -199,7 +199,7 @@ public final class SlowFrameDetector {
         // Set up the expectation
         let expectedDuration = targetTimestamp - actualTimestamp
 
-        // Threshold for extra duration above which a frame is considered slow.
+        // Tolerance for extra duration above which a frame is considered slow.
         let tolerance = expectedDuration * (tolerancePercentage / 100.0)
 
         // Duration is too long... slow frame
