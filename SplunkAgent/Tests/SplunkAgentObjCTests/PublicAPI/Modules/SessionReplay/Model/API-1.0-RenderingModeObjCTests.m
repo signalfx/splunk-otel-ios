@@ -16,23 +16,30 @@ limitations under the License.
 */
 
 #import <XCTest/XCTest.h>
-#import "../../Builders/AgentTestBuilderObjC.h"
 
 @import SplunkAgentObjC;
 
-
-@interface SessionReplayAPI10ModuleObjCTests : XCTestCase
+@interface API10RenderingModeObjCTests : XCTestCase
 
 @end
 
 
-@implementation SessionReplayAPI10ModuleObjCTests
+@implementation API10RenderingModeObjCTests
 
 // MARK: - API Tests
 
-- (void)testExample {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
+- (void)testModes {
+    // Default mode (same as Native)
+    NSNumber *defaultRenderingMode = SPLKRenderingMode.defaultRenderingMode;
+    XCTAssertEqual(defaultRenderingMode.integerValue, 0);
+
+    // Native
+    NSNumber *nativeMode = SPLKRenderingMode.native;
+    XCTAssertEqual(nativeMode.integerValue, 0);
+
+    // Wireframe Only
+    NSNumber *wireframeOnlyMode = SPLKRenderingMode.wireframeOnly;
+    XCTAssertEqual(wireframeOnlyMode.integerValue, 1);
 }
 
 @end

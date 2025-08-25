@@ -15,26 +15,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// The class implementing the API for the current state in non-operational mode
-//
-// This is especially the case when the module is stopped by remote configuration,
-// but we still need to keep the API available to the user
-final class SessionReplayNonOperationalState: SessionReplayModuleState {
+import Foundation
+import SplunkAgent
+import UIKit
 
-    // MARK: - Recording
+@objc
+public extension UIView {
 
-    var status: SessionReplayStatus {
-        .notRecording(.notStarted)
-    }
-
-    var isRecording: Bool {
-        false
-    }
-
-
-    // MARK: - Rendering
-
-    var renderingMode: RenderingMode {
-        .default
+    /// Element custom ID for the specified `UIView` instance.
+    ///
+    /// Assigning `nil` removes previously assigned custom ID.
+    @objc(splk_splunkRumID)
+    var splunkCustomId: String? {
+        get {
+            splunkRumId
+        }
+        set {
+            splunkRumId = newValue
+        }
     }
 }

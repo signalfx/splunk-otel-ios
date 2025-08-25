@@ -52,10 +52,10 @@ public final class UserTrackingModeObjC: NSObject {
 
     static func userTrackingMode(for value: NSNumber) -> UserTrackingMode {
         switch value {
-        case UserTrackingModeObjC.noTracking:
+        case noTracking:
             return .noTracking
 
-        case UserTrackingModeObjC.anonymousTracking:
+        case anonymousTracking:
             return .anonymousTracking
 
         default:
@@ -66,10 +66,10 @@ public final class UserTrackingModeObjC: NSObject {
     static func value(for userTrackingMode: UserTrackingMode) -> NSNumber {
         switch userTrackingMode {
         case .noTracking:
-            return UserTrackingModeObjC.noTracking
+            return noTracking
 
         case .anonymousTracking:
-            return UserTrackingModeObjC.anonymousTracking
+            return anonymousTracking
         }
     }
 }
