@@ -26,9 +26,21 @@
 
 # Splunk RUM agent for iOS
 
-The Splunk RUM agent for iOS is a modular Swift package for Real User Monitoring.
+The Splunk RUM agent for iOS is a modular Swift package for Real User Monitoring (RUM).
 
 > :construction: This project is currently in **ALPHA**. It is **officially supported** by Splunk. However, breaking changes **MAY** be introduced.
+
+### Table of Contents
+- [Requirements](#requirements)
+- [Getting Started](#getting-started)
+- [Modules Overview](#modules-overview)
+- [Crash Symbolication (dSYM Upload)](#crash-symbolication-dsym-upload)
+- [Advanced Configuration](#advanced-configuration)
+- [Common Usage Examples](#common-usage-examples)
+- [Objective-C Usage](#objective-c-usage)
+- [Upgrading from Older Versions](#upgrading-from-older-versions)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Requirements
 
@@ -44,61 +56,209 @@ You can add Splunk RUM for iOS to your project using Swift Package Manager.
 2. Enter the package URL: `https://github.com/signalfx/splunk-otel-ios`
 3. Select the `SplunkAgent` package product and add it to your application target.
 
-### Initialization
+### Basic Configuration
 
-In your `AppDelegate.swift` or `@main` content file, import `SplunkAgent` and initialize it with your configuration.
+In your `AppDelegate.swift` or main `@main` App file, import `SplunkAgent` and initialize it with your configuration. Retain the `SplunkRum` instance to interact with the agent's modules.
 
 ```swift
 import SplunkAgent
 
 // In your application:didFinishLaunchingWithOptions or init()
-
-let agentConfig = AgentConfiguration(
-    endpoint: .init(realm: "<YOUR_REALM>", rumAccessToken: "<YOUR_RUM_ACCESS_TOKEN>"),
-    appName: "<YOUR_APP_NAME>",
-    deploymentEnvironment: "<YOUR_DEPLOYMENT_ENVIRONMENT>"
-)
-
 var agent: SplunkRum?
 
-do {
-    agent = try SplunkRum.install(with: agentConfig)
-} catch {
-    print("Unable to start the Splunk agent, error: \(error)")
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    let agentConfig = AgentConfiguration(
+        endpoint: .init(realm: "<YOUR_REALM>", rumAccessToken: "<YOUR_RUM_ACCESS_TOKEN>"),
+        appName: "<YOUR_APP_NAME>",
+        deploymentEnvironment: "<YOUR_DEPLOYMENT_ENVIRONMENT>"
+    )
+
+    do {
+        agent = try SplunkRum.install(with: agentConfig)
+    } catch {
+        print("Unable to start the Splunk agent, error: \(error)")
+    }
+    
+    return true
 }
-
-// Enable automated navigation tracking
-agent?.navigation.preferences.enableAutomatedTracking = true
-
-// Start session replay
-agent?.sessionReplay.start()
 ```
 
-## Documentation
+## Modules Overview
 
-For a comprehensive API reference, build the documentation directly in Xcode by selecting **Product > Build Documentation**.
+The agent is composed of several modules, each responsible for a specific type of instrumentation.
 
-## Features
+| Module | Summary | Enabled by Default? |
+|---|---|---|
+| **App Startup Tracking** | Measures cold, warm, and hot application start times. | Yes |
+| **Crash Reporting** | Captures and reports application crashes on the next launch. | Yes |
+| **Custom Tracking** | Manually track custom events, errors, and workflows. See [examples](#common-usage-examples). | Yes |
+| **Navigation Tracking** | Tracks screen transitions, either automatically or manually. See [examples](#common-usage-examples). | No |
+| **Network Monitoring** | Instruments `URLSession` requests and network status changes. | Yes |
+| **Session Replay** | Provides a visual replay of user sessions. See [examples](#common-usage-examples). | No |
+| **Slow & Frozen Frames** | Detects and reports UI frames that are slow or frozen. | Yes |
+| **UI Interaction Tracking** | Automatically captures user taps on UI elements. | Yes |
+| **WebView Instrumentation** | Links native RUM sessions with Browser RUM in `WKWebView`. | Yes |
 
-The agent provides several instrumentations to capture telemetry. Most are enabled by default and can be configured or disabled during initialization.
+## Crash Symbolication (dSYM Upload)
 
-* **Crash Reporting:** Captures and reports application crashes. (Enabled by default)
-* **Network Monitoring:** Reports network requests, connectivity changes, and errors. (Enabled by default)
-* **Application Startup:** Measures cold and warm application start times. (Enabled by default)
-* **Slow & Frozen Frame Detection:** Reports instances of slow or frozen UI frames. (Enabled by default)
-* **UI Interaction Tracking:** Captures user taps on UI elements. (Enabled by default)
-* **Navigation Tracking:** Reports screen transitions as `screen.name` attributes. (Disabled by default)
-* **Session Replay:** Provides visual replay of user sessions. (Requires separate module)
-* **WebView Instrumentation:** Links native RUM sessions with Browser RUM sessions in WebViews.
-* **Custom Event & Workflow Reporting:** APIs to manually track custom events and workflows.
+To get human-readable, symbolicated crash reports in Splunk RUM, you must upload your application's dSYM files. This repository includes a helper script to automate this process.
+
+1.  **Locate the script** in your cloned repository at `dsymUploader/upload-dsyms.sh`.
+2.  **Add a "Run Script" Build Phase** in Xcode to your app's target. Place it after the "Copy Bundle Resources" phase.
+3.  **Add the following to the script area**, replacing the placeholder values:
+
+```bash
+# IMPORTANT: Update this path to where you've placed the script in your project.
+SCRIPT_PATH="${SRCROOT}/path/to/upload-dsyms.sh"
+
+if [[ -x "$SCRIPT_PATH" ]]; then
+    echo "Running Splunk dSYM upload script..."
+    "$SCRIPT_PATH" \
+        --realm "YOUR_REALM" \
+        --token "YOUR_API_ACCESS_TOKEN" \
+        --directory "${DWARF_DSYM_FOLDER_PATH}"
+else
+    echo "Warning: Splunk dSYM upload script not found or not executable at: $SCRIPT_PATH"
+fi
+```
+
+For detailed instructions, CI/CD integration, and troubleshooting, please see the full documentation in [`dsymUploader/README.md`](./dsymUploader/README.md).
+
+## Advanced Configuration
+
+You can customize the agent's behavior at initialization.
+
+### Module-Specific Configurations
+Override default module settings by passing an array of configuration objects to the `install` method. For example, to disable Crash Reporting:
+
+```swift
+import SplunkAgent
+import SplunkCrashReports // Required for the configuration type
+
+let crashConfig = CrashReportsConfiguration(isEnabled: false)
+
+try SplunkRum.install(
+    with: agentConfig,
+    moduleConfigurations: [crashConfig]
+)
+```
+
+### Global Attributes
+Add custom attributes to all telemetry data by setting `globalAttributes` on your `AgentConfiguration`.
+
+```swift
+var agentConfig = AgentConfiguration(...)
+agentConfig.globalAttributes["customer.tier"] = "premium"
+agentConfig.globalAttributes["build.number"] = 1234
+
+try SplunkRum.install(with: agentConfig)
+```
+
+## Common Usage Examples
+
+Interact with agent modules using the `SplunkRum` instance you retained after installation.
+
+### Manual Screen Navigation
+Manually track screen names, which is especially useful for SwiftUI applications.
+
+```swift
+agent?.navigation.track(screen: "ProductDetailView")
+```
+
+### Custom Event Reporting
+Track business-specific events with custom attributes.
+
+```swift
+var attributes = MutableAttributes()
+attributes["product.id"] = "SKU-123"
+agent?.customTracking.trackCustomEvent("item_added_to_cart", attributes)
+```
+
+### Error Reporting
+Manually report handled errors or exceptions.
+
+```swift
+do {
+    try performRiskyOperation()
+} catch {
+    agent?.customTracking.trackError(error)
+}
+```
+
+### Session Replay Privacy (Masking)
+Protect user privacy by masking sensitive views from session recordings.
+
+**UIKit:**
+```swift
+let sensitiveLabel = UILabel()
+sensitiveLabel.srSensitive = true
+```
+
+**SwiftUI:**
+```swift
+Text("Card Number: XXXX-XXXX-XXXX-1234")
+    .sessionReplaySensitive()
+```
+
+## Objective-C Usage
+
+This SDK provides a fully supported, idiomatic API for Objective-C. The concepts are the same as Swift, but you will use the `...ObjC` suffixed classes.
+
+```objc
+#import <SplunkAgent/SplunkAgent-Swift.h>
+
+// In your AppDelegate.m
+@property (nonatomic, strong) SplunkRumObjC *agent;
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    SPLKEndpointConfigurationObjC *endpoint = [[SPLKEndpointConfigurationObjC alloc] initWithRealm:@"<YOUR_REALM>" rumAccessToken:@"<YOUR_RUM_ACCESS_TOKEN>"];
+    
+    SPLKAgentConfigurationObjC *config = [[SPLKAgentConfigurationObjC alloc] initWithEndpoint:endpoint appName:@"<YOUR_APP_NAME>" deploymentEnvironment:@"<YOUR_DEPLOYMENT_ENVIRONMENT>"];
+    
+    NSError *error = nil;
+    self.agent = [SplunkRumObjC installWithConfiguration:config error:&error];
+    
+    if (error) {
+        NSLog(@"Splunk RUM installation failed: %@", error);
+    }
+    
+    return YES;
+}
+```
+
+## Upgrading from Older Versions
+
+If you are upgrading from a version that used `SplunkRumBuilder`, you will need to migrate to the new `SplunkRum.install(with:)` API.
+
+**Before:**
+```swift
+// Deprecated SplunkRumBuilder pattern
+SplunkRumBuilder(realm: "...", rumAuth: "...")
+    .setApplicationName("MyApp")
+    .deploymentEnvironment("production")
+    .build()
+```
+
+**After:**
+```swift
+// New AgentConfiguration pattern
+let config = AgentConfiguration(
+    endpoint: .init(realm: "...", rumAccessToken: "..."),
+    appName: "MyApp",
+    deploymentEnvironment: "production"
+)
+try SplunkRum.install(with: config)
+```
+
+Static methods like `SplunkRum.reportError()` have also moved to their respective modules, such as `SplunkRum.shared.customTracking.trackError()`.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for instructions on building, running tests, and so on.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for instructions on building, running tests, etc.
 
 ## License
 
 This library is licensed under the terms of the Apache Software License version 2.0.
 See [the license file](./LICENSE) for more details.
 
-> :information_source:️ SignalFx was acquired by Splunk in October 2019. See [Splunk SignalFx](https://www.splunk.com/en_us/investor-relations/acquisitions/signalfx.html) for more information.
+> :information_source: SignalFx was acquired by Splunk in October 2019. See [Splunk SignalFx](https://www.splunk.com/en_us/investor-relations/acquisitions/signalfx.html) for more information.
