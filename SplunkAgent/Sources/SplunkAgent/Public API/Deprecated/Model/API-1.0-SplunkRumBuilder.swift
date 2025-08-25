@@ -242,7 +242,7 @@ public class SplunkRumBuilder {
     /// - Returns: The updated builder instance.
     @available(*, deprecated, message: "This builder method will be removed in a later version. Use the `NetworkInstrumentationModule` configuration instead.")
     @discardableResult
-    public func networkInstrumentation(_ enabled: Bool) -> SplunkRumBuilder {
+    public func networkInstrumentation(enabled: Bool) -> SplunkRumBuilder {
         networkInstrumentation = enabled
         return self
     }
@@ -255,7 +255,7 @@ public class SplunkRumBuilder {
     /// - Returns: The updated builder instance.
     @available(*, deprecated, message: "This builder method will be removed in a later version. Use the `NetworkInstrumentationConfiguration` instead.")
     @discardableResult
-    public func ignoreURLs(_ ignoreURLs: NSRegularExpression?) -> SplunkRumBuilder {
+    public func ignoreURLs(ignoreURLs: NSRegularExpression?) -> SplunkRumBuilder {
         self.ignoreURLs = ignoreURLs
         return self
     }
