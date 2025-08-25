@@ -69,6 +69,7 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 "SplunkAppStart",
+                "SplunkAppState",
                 "SplunkWebView",
                 "SplunkCustomTracking",
                 resolveDependency("logger")
@@ -340,6 +341,25 @@ func generateMainTargets() -> [Target] {
                 "SplunkAppStart"
             ],
             path: "SplunkAppStart/Tests"
+        ),
+
+
+        // MARK: - Splunk App State
+
+        .target(
+            name: "SplunkAppState",
+            dependencies: [
+                "SplunkCommon",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
+            ],
+            path: "SplunkAppState/Sources"
+        ),
+        .testTarget(
+            name: "SplunkAppStateTests",
+            dependencies: [
+                "SplunkAppState"
+            ],
+            path: "SplunkAppState/Tests"
         ),
 
 

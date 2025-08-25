@@ -47,6 +47,7 @@ final class SessionReplayTestBuilder {
         let sampleVideoData = try Self.sampleVideoData()
 
         let sessionId = UUID().uuidString
+        let scriptInstanceId = String(sessionId.prefix(upTo: sessionId.index(sessionId.startIndex, offsetBy: 16)))
         let timestamp = Date()
         let endTimestamp = Date()
 
@@ -60,7 +61,7 @@ final class SessionReplayTestBuilder {
             data: sampleVideoData,
             index: 1,
             sessionId: sessionId,
-            scriptInstanceId: UUID().uuidString
+            scriptInstanceId: scriptInstanceId
         )
 
         return event
