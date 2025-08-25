@@ -97,7 +97,11 @@ func generateMainTargets() -> [Target] {
 
         .target(
             name: "SplunkAgentObjC",
-            dependencies: ["SplunkAgent"],
+            dependencies: [
+                "SplunkAgent",
+                "SplunkCommon",
+                "SplunkNavigation"
+            ],
             path: "SplunkAgent/Sources/SplunkAgentObjC",
             resources: [
                 .copy("../../Resources/PrivacyInfo.xcprivacy"),
