@@ -54,7 +54,8 @@ public final class CustomTrackingModuleObjC: NSObject {
     ///
     /// - Returns: The updated `CustomTrackingModuleObjC` instance.
     @discardableResult
-    @objc public func trackErrorMessage(message: String, attributes: [String: AttributeValueObjC]) -> CustomTrackingModuleObjC {
+    @objc(trackErrorMessage:attributes:)
+    public func trackErrorMessage(message: String, attributes: [String: AttributeValueObjC]) -> CustomTrackingModuleObjC {
         owner.agent.customTracking.trackError(message, MutableAttributes(with: attributes))
 
         return self
@@ -68,7 +69,8 @@ public final class CustomTrackingModuleObjC: NSObject {
     ///
     /// - Returns: The updated `CustomTrackingModuleObjC` instance.
     @discardableResult
-    @objc public func trackError(error: NSError, attributes: [String: AttributeValueObjC]) -> CustomTrackingModuleObjC {
+    @objc(trackError:attributes:)
+    public func trackError(error: NSError, attributes: [String: AttributeValueObjC]) -> CustomTrackingModuleObjC {
         owner.agent.customTracking.trackError(error, MutableAttributes(with: attributes))
 
         return self
@@ -83,7 +85,8 @@ public final class CustomTrackingModuleObjC: NSObject {
     ///
     /// - Returns: The updated `CustomTrackingModuleObjC` instance.
     @discardableResult
-    @objc public func trackException(exception: NSException, attributes: [String: AttributeValueObjC]) -> CustomTrackingModuleObjC {
+    @objc(trackException:attributes:)
+    public func trackException(exception: NSException, attributes: [String: AttributeValueObjC]) -> CustomTrackingModuleObjC {
         owner.agent.customTracking.trackException(exception, MutableAttributes(with: attributes))
 
         return self
@@ -100,21 +103,24 @@ public final class CustomTrackingModuleObjC: NSObject {
     }
 
     @discardableResult
-    @objc public func trackErrorMessage(message: String) -> CustomTrackingModuleObjC {
+    @objc(trackErrorMessage:)
+    public func trackErrorMessage(message: String) -> CustomTrackingModuleObjC {
         owner.agent.customTracking.trackError(message)
 
         return self
     }
 
     @discardableResult
-    @objc public func trackError(error: NSError) -> CustomTrackingModuleObjC {
+    @objc(trackError:)
+    public func trackError(error: NSError) -> CustomTrackingModuleObjC {
         owner.agent.customTracking.trackError(error)
 
         return self
     }
 
     @discardableResult
-    @objc public func trackException(exception: NSException) -> CustomTrackingModuleObjC {
+    @objc(trackException:)
+    public func trackException(exception: NSException) -> CustomTrackingModuleObjC {
         owner.agent.customTracking.trackException(exception)
 
         return self

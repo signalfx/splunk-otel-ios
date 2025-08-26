@@ -15,8 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+
+
 #import <XCTest/XCTest.h>
 #import "../../Builders/AgentTestBuilderObjC.h"
+
+#if __has_include(<WebKit/WebKit.h>)
 
 @import SplunkAgentObjC;
 @import WebKit;
@@ -32,7 +36,9 @@ limitations under the License.
     SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
     WKWebView *webview = [WKWebView new];
 
-    XCTAssertNoThrow([agent.webViewNativeBridge integrateWithBrowserRumWithView:webview]);
+    XCTAssertNoThrow([agent.webViewNativeBridge integrateWithBrowserRumView:webview]);
 }
 
 @end
+
+#endif

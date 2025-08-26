@@ -39,18 +39,6 @@ public final class NavigationModulePreferencesObjC: NSObject {
         }
     }
 
-    /// Sets whether or not the module should automatically detect navigation in the application.
-    ///
-    /// - Parameter enable: If `true`, the module will automatically detect navigation.
-    ///
-    /// - Returns: The updated preferences object.
-    @discardableResult
-    @objc public func enableAutomatedTracking(_ enable: Bool) -> NavigationModulePreferencesObjC {
-        enableAutomatedTracking = enable
-
-        return self
-    }
-
 
     // MARK: - Convenience init
 

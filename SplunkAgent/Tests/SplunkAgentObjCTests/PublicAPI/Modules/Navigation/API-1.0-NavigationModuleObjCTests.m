@@ -45,7 +45,7 @@ limitations under the License.
 
 - (void)testTracking {
     SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
-    XCTAssertNoThrow([agent.navigation trackWithScreen:@"Test"]);
+    XCTAssertNoThrow([agent.navigation trackScreen:@"Test"]);
 }
 
 @end

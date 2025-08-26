@@ -44,19 +44,6 @@ public final class NavigationModuleObjC: NSObject {
         }
     }
 
-    /// Sets preferred settings for the module.
-    ///
-    /// - Parameter preferences: The preferred ``NavigationModulePreferencesObjc`` for the module.
-    ///
-    /// - Returns: The actual ``NavigationModuleObjC`` instance.
-    @discardableResult
-    @objc public func setPreferences(preferences: NavigationModulePreferencesObjC) -> NavigationModuleObjC {
-        preferences.owner = owner
-        owner.agent.navigation.preferences = NavigationPreferences(enableAutomatedTracking: preferences.enableAutomatedTracking)
-
-        return self
-    }
-
 
     // MARK: - State
 
@@ -77,7 +64,8 @@ public final class NavigationModuleObjC: NSObject {
     ///
     /// - Note: The set value is not linked to any specific UI element.
     @discardableResult
-    @objc public func track(screen name: String) -> NavigationModuleObjC {
+    @objc(trackScreen:)
+    public func track(screen name: String) -> NavigationModuleObjC {
         owner.agent.navigation.track(screen: name)
 
         return self
