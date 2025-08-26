@@ -121,7 +121,7 @@ else
 fi
 ```
 
-For detailed instructions, CI/CD integration, and troubleshooting, please see the full documentation in [`dsymUploader/README.md`](./dsymUploader/README.md).
+For detailed instructions on CI/CD integration, troubleshooting, and how to set up the variables shown in the script, please see the full documentation in [`dsymUploader/README.md`](./dsymUploader/README.md).
 
 ## Advanced Configuration
 
