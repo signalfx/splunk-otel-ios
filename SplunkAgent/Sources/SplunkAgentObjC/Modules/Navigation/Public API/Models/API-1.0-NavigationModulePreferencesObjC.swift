@@ -46,7 +46,7 @@ public final class NavigationModulePreferencesObjC: NSObject {
     /// - Returns: The updated preferences object.
     @discardableResult
     @objc public func enableAutomatedTracking(_ enable: Bool) -> NavigationModulePreferencesObjC {
-        self.enableAutomatedTracking = enable
+        enableAutomatedTracking = enable
 
         return self
     }
