@@ -1,29 +1,3 @@
-<p align="center">
-  <strong>
-    <a href="CONTRIBUTING.md">Getting Involved</a>
-    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="SECURITY.md">Security</a>
-  </strong>
-</p>
-
-<p align="center">
-  <img alt="Stable" src="https://img.shields.io/badge/status-stable-informational?style=for-the-badge">
-  <a href="https://github.com/open-telemetry/opentelemetry-swift/releases/tag/1.14.0">
-    <img alt="OpenTelemetry Swift" src="https://img.shields.io/badge/otel-1.14.0-blueviolet?style=for-the-badge">
-  </a>
-  <a href="https://github.com/signalfx/gdi-specification/releases/tag/v1.6.0">
-    <img alt="Splunk GDI specification" src="https://img.shields.io/badge/GDI-1.6.0-blueviolet?style=for-the-badge">
-  </a>
-  <a href="https://github.com/signalfx/splunk-otel-ios/releases">
-    <img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/signalfx/splunk-otel-ios?include_prereleases&style=for-the-badge">
-  </a>
-  <a href="https://github.com/signalfx/splunk-otel-ios/actions/workflows/ci.yml">
-    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/signalfx/splunk-otel-ios/.github/workflows/ci.yml?branch=main&style=for-the-badge">
-  </a>
-</p>
-
----
-
 # Splunk RUM Agent for iOS
 
 The Splunk RUM Agent for iOS is a modular Swift package for Real User Monitoring (RUM).
@@ -61,7 +35,6 @@ In your `AppDelegate.swift` or main `@main` App file, import `SplunkAgent` and i
 ```swift
 import SplunkAgent
 
-// In your application:didFinishLaunchingWithOptions or init()
 var agent: SplunkRum?
 
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -77,7 +50,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
         print("Unable to start the Splunk agent, error: \(error)")
     }
 
-    ... your other existing code in this method ...
+    // ... your other existing code in this method ...
     
     return true
 }
@@ -234,7 +207,7 @@ This SDK provides an idiomatic API for Objective-C. The concepts are the same as
 
 ## Upgrading from a Previous Version
 
-The most significant change in version 2.0.0 is the renaming of the Swift Package from `SplunkOtel` to `SplunkAgent`. If you are upgrading from a 1.x version, you must perform the following steps to get your project building again:
+The most significant change in version 2.0.0 is the renaming of the Swift Package from `SplunkOtel` to `SplunkAgent`. If you are upgrading from a 0.x version, you must perform the following steps to get your project building again:
 
 1.  **Update Swift Package Dependency:** In Xcode, update your package dependency to use version `2.0.0` or higher.
 2.  **Update Target Library:** In your target's "General" -> "Frameworks, Libraries, and Embedded Content" section, remove the old `SplunkOtel` library and add the new `SplunkAgent` library.
