@@ -50,6 +50,8 @@ jobs:
       fail-fast: false
       matrix:
         platform: [ ios, tvos, visionos, maccatalyst ]
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
     steps:
       - uses: actions/checkout@v4
 
@@ -57,22 +59,37 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: Verify toolchain
+        run: |
+          which xcodebuild
+          xcodebuild -version
+          echo "DEVELOPER_DIR=$DEVELOPER_DIR"
+          xcode-select -p
+
       - name: Install tools
         run: |
           brew update
           brew install xcbeautify jq
 
       - name: Generate workspace (.swiftpm/xcode/package.xcworkspace)
-        run: xed -b .
+        run: |
+          xed -b .
+          for i in {1..10}; do
+            [ -d .swiftpm/xcode/package.xcworkspace ] && break
+            sleep 1
+          done
+          test -d .swiftpm/xcode/package.xcworkspace
 
       - name: Detect scheme
         id: scheme
         run: |
+          set -euo pipefail
           SCHEMES_JSON=$(xcodebuild -list -workspace .swiftpm/xcode/package.xcworkspace -json)
           PKG_SCHEME=$(echo "$SCHEMES_JSON" | jq -r '.workspace.schemes[] | select(test("-Package$"))' | head -n1)
           if [ -z "$PKG_SCHEME" ]; then
             PKG_SCHEME=$(echo "$SCHEMES_JSON" | jq -r '.workspace.schemes[0]')
           fi
+          echo "Using scheme: $PKG_SCHEME"
           echo "scheme=$PKG_SCHEME" >> "$GITHUB_OUTPUT"
 
       - name: Run tests (iOS)
