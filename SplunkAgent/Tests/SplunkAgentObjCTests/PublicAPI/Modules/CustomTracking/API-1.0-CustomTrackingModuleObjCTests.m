@@ -87,10 +87,4 @@ limitations under the License.
     XCTAssertNoThrow([agent.customTracking trackExceptionWithException:exception attributes:attrs]);
 }
 
-- (void)testTrackWorkflow {
-    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
-    XCTAssertNoThrow([agent.customTracking trackWorkflowWithWorkflowName:@"Test Custom Workflow"]);
-}
-
-
 @end

@@ -90,16 +90,6 @@ public final class CustomTrackingModuleObjC: NSObject {
     }
 
 
-    // MARK: - Track Custom Workflow
-
-    /// Track a workflow with a name.
-    ///
-    /// - Parameter workflowName: The name of the workflow to track.
-    @objc public func trackWorkflow(workflowName: String) {
-        _ = owner.agent.customTracking.trackWorkflow(workflowName)
-    }
-
-
     // MARK: - Single argument helpers (signatures)
 
     @discardableResult
