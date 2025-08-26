@@ -38,6 +38,7 @@ public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
     ///
     /// - Parameters:
     ///   - isEnabled: A `BOOL` value sets whether the module is enabled.
+    @objc(initWithEnabled:)
     public convenience init(isEnabled: Bool) {
         self.init(isEnabled: isEnabled, enableAutomatedTracking: false)
     }
@@ -47,6 +48,7 @@ public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
     /// - Parameters:
     ///   - isEnabled: A `BOOL` value sets whether the module is enabled.
     ///   - enableAutomatedTracking: If `YES`, the module will automatically detect navigation.
+    @objc(initWithEnabled:automatedTracking:)
     public init(isEnabled: Bool, enableAutomatedTracking: Bool) {
         super.init()
 

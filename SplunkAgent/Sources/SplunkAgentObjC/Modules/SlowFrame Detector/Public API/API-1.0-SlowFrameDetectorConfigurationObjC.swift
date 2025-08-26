@@ -31,6 +31,7 @@ public final class SlowFrameDetectorConfigurationObjC: ModuleConfigurationObjC {
     /// Initializes new module configuration with preconfigured values.
     ///
     /// - Parameter isEnabled: A `BOOL` value sets whether the module is enabled.
+    @objc(initWithEnabled:)
     public init(isEnabled: Bool) {
         super.init()
 
