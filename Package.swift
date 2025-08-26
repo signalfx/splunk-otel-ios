@@ -182,7 +182,8 @@ func generateMainTargets() -> [Target] {
             name: "SplunkCommon",
             dependencies: [
                 resolveDependency("diskStorage"),
-                resolveDependency("encryptor")
+                resolveDependency("encryptor"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
             ],
             path: "SplunkCommon/Sources"
         ),
