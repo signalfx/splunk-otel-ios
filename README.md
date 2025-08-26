@@ -38,7 +38,7 @@ The Splunk RUM agent for iOS is a modular Swift package for Real User Monitoring
 - [Advanced Configuration](#advanced-configuration)
 - [Common Usage Examples](#common-usage-examples)
 - [Objective-C Usage](#objective-c-usage)
-- [Upgrading from Older Versions](#upgrading-from-older-versions)
+- [Upgrading from a Previous Version](#upgrading-from-a-previous-version)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -226,31 +226,19 @@ This SDK provides a fully supported, idiomatic API for Objective-C. The concepts
 }
 ```
 
-## Upgrading from Older Versions
+## Upgrading from a Previous Version
 
-If you are upgrading from a version that used `SplunkRumBuilder`, you will need to migrate to the new `SplunkRum.install(with:)` API.
+The most significant change in version 2.0.0 is the renaming of the Swift Package from `SplunkOtel` to `SplunkAgent`. If you are upgrading from a 1.x version, you must perform the following steps to get your project building again:
 
-**Before:**
-```swift
-// Deprecated SplunkRumBuilder pattern
-SplunkRumBuilder(realm: "...", rumAuth: "...")
-    .setApplicationName("MyApp")
-    .deploymentEnvironment("production")
-    .build()
-```
+1.  **Update Swift Package Dependency:** In Xcode, update your package dependency to use version `2.0.0` or higher.
+2.  **Update Target Library:** In your target's "General" -> "Frameworks, Libraries, and Embedded Content" section, remove the old `SplunkOtel` library and add the new `SplunkAgent` library.
+3.  **Update Import Statements:** In your source code, replace all instances of `import SplunkOtel` with `import SplunkAgent`.
+4.  **Update Crash Reporting:**
+    *   Remove the separate `SplunkOtelCrashReporting` package dependency if it exists.
+    *   Remove any code that calls `SplunkRumCrashReporting.start()`. Crash reporting is now an integrated module, enabled by default.
+5.  **Clean and Rebuild:** It is highly recommended to clean your build folder (`Product -> Clean Build Folder`) and delete `Package.resolved` from your project workspace to avoid caching issues.
 
-**After:**
-```swift
-// New AgentConfiguration pattern
-let config = AgentConfiguration(
-    endpoint: .init(realm: "...", rumAccessToken: "..."),
-    appName: "MyApp",
-    deploymentEnvironment: "production"
-)
-try SplunkRum.install(with: config)
-```
-
-Static methods like `SplunkRum.reportError()` have also moved to their respective modules, such as `SplunkRum.shared.customTracking.trackError()`.
+Your existing initialization code will continue to work due to backward compatibility.
 
 ## Contributing
 
