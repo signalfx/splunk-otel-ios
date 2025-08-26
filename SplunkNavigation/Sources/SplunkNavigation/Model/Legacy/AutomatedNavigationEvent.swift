@@ -23,6 +23,7 @@ struct AutomatedNavigationEvent: NavigationActionEvent {
 
     // MARK: - Public
 
+    var timestamp: Date
     var type: NavigationActionEventType
     var controllerTypeName: String
     var controllerIdentifier: ObjectIdentifier
