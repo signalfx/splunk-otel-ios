@@ -73,7 +73,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
     do {
         agent = try SplunkRum.install(with: agentConfig)
-    } catch {
+    } catch let error {
         print("Unable to start the Splunk agent, error: \(error)")
     }
     
@@ -179,7 +179,7 @@ Manually report handled errors or exceptions.
 ```swift
 do {
     try performRiskyOperation()
-} catch {
+} catch let error {
     agent?.customTracking.trackError(error)
 }
 ```
