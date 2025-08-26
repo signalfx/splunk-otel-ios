@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
-import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 
 /// The class implements a generic span processor that adds runtime attributes to all spans.
 public class OLTPAttributesSpanProcessor: SpanProcessor {
@@ -73,7 +73,7 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
                     continue
                 }
 
-                span.setAttribute(key: key, value: attributeValue)
+                span.clearAndSetAttribute(key: key, value: attributeValue)
             }
         }
     }

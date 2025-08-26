@@ -19,7 +19,7 @@ internal import CiscoLogger
 import CrashReporter
 import Foundation
 import OpenTelemetryApi
-import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 
 public class CrashReports {
 
@@ -362,7 +362,7 @@ public class CrashReports {
             .startSpan()
 
         for (key, value) in crashReport {
-            crashSpan.setAttribute(key: key.rawValue, value: toAttributeValue(value))
+            crashSpan.clearAndSetAttribute(key: key.rawValue, value: toAttributeValue(value))
         }
 
         crashSpan.end(time: timestamp)
