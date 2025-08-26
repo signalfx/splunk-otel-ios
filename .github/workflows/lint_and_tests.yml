@@ -31,7 +31,14 @@ jobs:
                     swiftlint lint \
                         --config ../Tools/.swiftlint.yml \
                         --reporter github-actions-logging \
-                        --force-exclude
+                        --force-exclude || {
+                          code=$?
+                          if [ $code -eq 2 ]; then
+                            echo "No Swift files found in $dir, skipping"
+                          else
+                            exit $code
+                          fi
+                        }
                     cd ..
                 )
             done
