@@ -119,8 +119,18 @@ public class CrashReports {
             // Process the report
             let reportPayload = formatCrashReport(report: report)
 
+            // Fetch the crash timestamp
+            var timestamp = Date() // Default to now, if no sytemInfo, should not ever happen
+            if let systemInfo = report.systemInfo {
+                timestamp = systemInfo.timestamp
+            } else {
+                logger.log(level: .error) {
+                    "CrashReporter failed to report systemInfo timestamp"
+                }
+            }
+
             // Send the report to the backend
-            send(crashReport: reportPayload, sharedState: sharedState)
+            send(crashReport: reportPayload, sharedState: sharedState, timestamp: timestamp)
         } catch {
             logger.log(level: .error) {
                 "CrashReporter failed to load/parse with error: \(error)"
@@ -247,9 +257,8 @@ public class CrashReports {
         if let sharedState {
             let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
 
-            // TODO: This mapping code should be removed in favor of returning the line above
-            // once the backend is able to support it.
-
+            // This mapping code below may be able to be removed in the future should
+            // the backend is able to support all options.
             appState = switch timebasedAppState {
             case "active": "foreground"
             case "inactive", "terminate": "background"
@@ -340,15 +349,13 @@ public class CrashReports {
         }
     }
 
-    private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?) {
+    private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?, timestamp: Date) {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
                 instrumentationName: "splunk-crash-report",
                 instrumentationVersion: sharedState?.agentVersion
             )
-
-        let timestamp = Date()
 
         let crashSpan = tracer.spanBuilder(spanName: "SplunkCrashReport")
             .setStartTime(time: timestamp)
