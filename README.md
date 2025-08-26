@@ -221,7 +221,12 @@ This SDK provides an idiomatic API for Objective-C. The concepts are the same as
     
     if (error) {
         NSLog(@"Splunk RUM installation failed: %@", error);
+    } else {
+        // Examples of additional configuration; see documents for more.
+        self.agent.navigation.preferences.enableAutomatedTracking = YES;
+        [self.agent.sessionReplay start];
     }
+
     
     return YES;
 }
