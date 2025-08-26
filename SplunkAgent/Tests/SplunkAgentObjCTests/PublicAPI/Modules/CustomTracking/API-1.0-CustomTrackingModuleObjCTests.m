@@ -30,9 +30,61 @@ limitations under the License.
 
 // MARK: - API Tests
 
-- (void)testExample {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
+- (NSDictionary<NSString *, SPLKAttributeValue *> *)sampleAttributes {
+    return @{
+        @"str": [SPLKAttributeValue attributeWithString :@"value"],
+        @"int": [SPLKAttributeValue attributeWithInteger:@1],
+        @"dbl": [SPLKAttributeValue attributeWithDouble:2.5],
+        @"bol": [SPLKAttributeValue attributeWithBool:@YES]
+    };
+}
+
+- (void)testTrackCustomEvent {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    XCTAssertNoThrow([agent.customTracking trackCustomEventWithName:@"testEvent"]);
+}
+
+- (void)testTrackCustomEvent_withAttributes {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    NSDictionary<NSString *, SPLKAttributeValue *> *attrs = [self sampleAttributes];
+    XCTAssertNoThrow([agent.customTracking trackCustomEventWithName:@"testEvent" attributes:attrs]);
+}
+
+- (void)testTrackError_withString {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    XCTAssertNoThrow([agent.customTracking trackErrorMessage:@"Test error message"]);
+}
+
+- (void)testTrackError_withString_andAttributes {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    NSDictionary<NSString *, SPLKAttributeValue *> *attrs = [self sampleAttributes];
+    XCTAssertNoThrow([agent.customTracking trackErrorMessage:@"Test error message" attributes:attrs]);
+}
+
+- (void)testTrackError_withNSError {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    NSError *nsError = [NSError errorWithDomain:@"com.splunk.test" code:1 userInfo:nil];
+    XCTAssertNoThrow([agent.customTracking trackError:nsError]);
+}
+
+- (void)testTrackError_withNSError_andAttributes {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    NSError *nsError = [NSError errorWithDomain:@"com.splunk.test" code:1 userInfo:nil];
+    NSDictionary<NSString *, SPLKAttributeValue *> *attrs = [self sampleAttributes];
+    XCTAssertNoThrow([agent.customTracking trackError:nsError attributes:attrs]);
+}
+
+- (void)testTrackError_withNSException {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    NSException *exception = [NSException exceptionWithName:NSGenericException reason:@"Test exception" userInfo:nil];
+    XCTAssertNoThrow([agent.customTracking trackException:exception]);
+}
+
+- (void)testTrackError_withNSException_andAttributes {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    NSException *exception = [NSException exceptionWithName:NSGenericException reason:@"Test exception" userInfo:nil];
+    NSDictionary<NSString *, SPLKAttributeValue *> *attrs = [self sampleAttributes];
+    XCTAssertNoThrow([agent.customTracking trackException:exception attributes:attrs]);
 }
 
 @end
