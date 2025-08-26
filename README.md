@@ -90,6 +90,7 @@ The agent is composed of several modules, each responsible for a specific type o
 | Module | Summary | Enabled by Default? |
 |---|---|---|
 | **App Startup Tracking** | Measures cold, warm, and hot application start times. | Yes |
+| **Application Lifecycle** | Automatically tracks app state changes (e.g., foreground, background). | Yes |
 | **Crash Reporting** | Captures and reports application crashes on the next launch. | Yes |
 | **Custom Tracking** | Manually track custom events, errors, and workflows. See [examples](#common-usage-examples). | Yes |
 | **Navigation Tracking** | Tracks screen transitions, either automatically or manually. See [examples](#common-usage-examples). | No |
