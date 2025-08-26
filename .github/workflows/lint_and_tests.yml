@@ -25,10 +25,14 @@ jobs:
       - name: SwiftLint
         run: |
             for dir in $(find . -maxdepth 1 -type d -name "Splunk*"); do
-                cd "$dir"
-                  swiftlint lint \
-                    --config Tools/.swiftlint.yml \
-                    --reporter github-actions-logging \
+                echo "Linting $dir"
+                (
+                    cd "$dir"
+                    swiftlint lint \
+                        --config ../Tools/.swiftlint.yml \
+                        --reporter github-actions-logging
+                    cd ..
+                )
             done
 
   tests:
