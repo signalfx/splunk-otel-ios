@@ -24,9 +24,9 @@
 
 ---
 
-# Splunk RUM agent for iOS
+# Splunk RUM Agent for iOS
 
-The Splunk RUM agent for iOS is a modular Swift package for Real User Monitoring (RUM).
+The Splunk RUM Agent for iOS is a modular Swift package for Real User Monitoring (RUM).
 
 > :construction: This project is currently in **ALPHA**. It is **officially supported** by Splunk. However, breaking changes **MAY** be introduced.
 
@@ -44,7 +44,7 @@ The Splunk RUM agent for iOS is a modular Swift package for Real User Monitoring
 
 ## Requirements
 
-Splunk RUM agent for iOS supports iOS 15 and higher, including iPadOS 15 and higher.
+Splunk RUM Agent for iOS supports iOS 15 and higher, including iPadOS 15 and higher.
 
 ## Getting Started
 
