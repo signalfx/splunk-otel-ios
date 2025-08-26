@@ -201,7 +201,7 @@ Text("Card Number: XXXX-XXXX-XXXX-1234")
 
 ## Objective-C Usage
 
-This SDK provides a fully supported, idiomatic API for Objective-C. The concepts are the same as Swift, but you will use the `...ObjC` suffixed classes.
+This SDK provides an idiomatic API for Objective-C. The concepts are the same as Swift, but you will use the `...ObjC` suffixed classes.
 
 ```objc
 #import <SplunkAgent/SplunkAgent-Swift.h>
