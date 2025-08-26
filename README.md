@@ -76,6 +76,8 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
     } catch let error {
         print("Unable to start the Splunk agent, error: \(error)")
     }
+
+    ... your other existing code in this method ...
     
     return true
 }
