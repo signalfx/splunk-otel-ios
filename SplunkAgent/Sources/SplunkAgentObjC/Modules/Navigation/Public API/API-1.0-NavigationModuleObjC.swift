@@ -31,9 +31,9 @@ public final class NavigationModuleObjC: NSObject {
 
     /// An object that holds preferred settings for the module, a ``NavigationModulePreferencesObjc`` instance.
     @objc
-    public var preferences: NavigationModulePreferencesObjc {
+    public var preferences: NavigationModulePreferencesObjC {
         get {
-            let preferences = NavigationModulePreferencesObjc(enableAutomatedTracking: owner.agent.navigation.preferences.enableAutomatedTracking ?? false)
+            let preferences = NavigationModulePreferencesObjC(enableAutomatedTracking: owner.agent.navigation.preferences.enableAutomatedTracking ?? false)
             preferences.owner = owner
             return preferences
         }
@@ -50,7 +50,7 @@ public final class NavigationModuleObjC: NSObject {
     ///
     /// - Returns: The actual ``NavigationModuleObjC`` instance.
     @discardableResult
-    @objc public func setPreferences(preferences: NavigationModulePreferencesObjc) -> NavigationModuleObjC {
+    @objc public func setPreferences(preferences: NavigationModulePreferencesObjC) -> NavigationModuleObjC {
         preferences.owner = owner
         owner.agent.navigation.preferences = NavigationPreferences(enableAutomatedTracking: preferences.enableAutomatedTracking)
 

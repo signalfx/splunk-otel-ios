@@ -20,7 +20,7 @@ import SplunkAgent
 
 /// Defines a public API for the user's preferred settings.
 @objc(SPLKNavigationModulePreferences)
-public final class NavigationModulePreferencesObjc: NSObject {
+public final class NavigationModulePreferencesObjC: NSObject {
 
     // MARK: - Internal
 
@@ -45,7 +45,7 @@ public final class NavigationModulePreferencesObjc: NSObject {
     ///
     /// - Returns: The updated preferences object.
     @discardableResult
-    @objc public func enableAutomatedTracking(_ enable: Bool) -> NavigationModulePreferencesObjc {
+    @objc public func enableAutomatedTracking(_ enable: Bool) -> NavigationModulePreferencesObjC {
         self.enableAutomatedTracking = enable
 
         return self
