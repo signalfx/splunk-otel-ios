@@ -30,7 +30,8 @@ jobs:
                     cd "$dir"
                     swiftlint lint \
                         --config ../Tools/.swiftlint.yml \
-                        --reporter github-actions-logging
+                        --reporter github-actions-logging \
+                        --force-exclude
                     cd ..
                 )
             done
