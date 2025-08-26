@@ -25,7 +25,7 @@ jobs:
       - name: SwiftLint
         run: |
             for dir in $(find . -maxdepth 1 -type d -name "Splunk*"); do
-                echo "Linting $dir"
+                echo "Start Linting $dir"
                 (
                     cd "$dir"
                     swiftlint lint \
