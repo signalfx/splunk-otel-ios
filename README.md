@@ -144,7 +144,7 @@ Track business-specific events with custom attributes.
 
 ```swift
 var attributes = MutableAttributes()
-attributes["product.id"] = "SKU-123"
+attributes["product.id"] = .string("SKU-123")
 agent?.customTracking.trackCustomEvent("item_added_to_cart", attributes)
 ```
 
@@ -176,33 +176,35 @@ Text("Card Number: XXXX-XXXX-XXXX-1234")
 
 ## Objective-C Usage
 
-This SDK provides an idiomatic API for Objective-C. The concepts are the same as Swift, but you will use the `...ObjC` suffixed classes.
+This SDK provides full support for Objective-C. For projects that use Objective-C, you need to import the optimized API with `@import SplunkAgentObjC;` instead of the default API for Swift projects. 
+
+This API is better suited for an Objective-C project with the same functionality as its Swift counterpart.
 
 ```objc
-#import <SplunkAgent/SplunkAgent-Swift.h>
+@import SplunkAgentObjC;
 
 // In your AppDelegate.m
-@property (nonatomic, strong) SplunkRumObjC *agent;
+@property (nonatomic, strong) SPLKAgent *agent;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    SPLKEndpointConfigurationObjC *endpoint = [[SPLKEndpointConfigurationObjC alloc] initWithRealm:@"<YOUR_REALM>" rumAccessToken:@"<YOUR_RUM_ACCESS_TOKEN>"];
-    
-    SPLKAgentConfigurationObjC *config = [[SPLKAgentConfigurationObjC alloc] initWithEndpoint:endpoint appName:@"<YOUR_APP_NAME>" deploymentEnvironment:@"<YOUR_DEPLOYMENT_ENVIRONMENT>"];
-    
+    SPLKEndpointConfiguration *endpoint = [[SPLKEndpointConfiguration alloc] initWithRealm:@"<YOUR_REALM>" rumAccessToken:@"<YOUR_RUM_ACCESS_TOKEN>"];
+
+    SPLKAgentConfiguration *config = [[SPLKAgentConfiguration alloc] initWithEndpoint:endpoint appName:@"<YOUR_APP_NAME>" deploymentEnvironment:@"<YOUR_DEPLOYMENT_ENVIRONMENT>"];
+
     NSError *error = nil;
-    self.agent = [SplunkRumObjC installWithConfiguration:config error:&error];
-    
+    self.agent = [SPLKAgent installWith:config error:&error];
+
     if (error) {
         NSLog(@"Splunk RUM installation failed: %@", error);
     } else {
-        // Examples of additional configuration; see documents for more.
+        // Example of configuring preferences and starting Session Replay
         self.agent.navigation.preferences.enableAutomatedTracking = YES;
         [self.agent.sessionReplay start];
     }
-
     
+    // ... your other existing code in this method ...
     return YES;
-}
+} 
 ```
 
 ## Upgrading from a Previous Version
