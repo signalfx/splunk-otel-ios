@@ -39,5 +39,6 @@ public protocol SessionReplayModuleCustomId: AnyObject {
     ///   - customId: A new custom id.
     ///
     /// - Returns: The updated ``SessionReplayModuleCustomId`` object.
-    @discardableResult func set(_ view: UIView, _ customId: String?) -> any SessionReplayModuleCustomId
+    @discardableResult
+    func set(_ view: UIView, _ customId: String?) -> any SessionReplayModuleCustomId
 }

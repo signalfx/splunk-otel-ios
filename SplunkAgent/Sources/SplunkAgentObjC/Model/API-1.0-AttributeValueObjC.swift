@@ -21,7 +21,8 @@ import OpenTelemetryApi
 /// Object wrapper for basic attribute types used in OpenTelemetry.
 ///
 /// The supported value types are `NSString`, `NSInteger`, `BOOL`, and `double`.
-@objc(SPLKAttributeValue) @objcMembers
+@objc(SPLKAttributeValue)
+@objcMembers
 public final class AttributeValueObjC: NSObject {
 
     // MARK: - Private
@@ -137,7 +138,7 @@ public final class AttributeValueObjC: NSObject {
     ///
     /// If the attribute has not been initialized with a `NSString`, it will return `nil`.
     public var asString: NSString? {
-        return value as? NSString
+        value as? NSString
     }
 
 
@@ -149,7 +150,7 @@ public final class AttributeValueObjC: NSObject {
     ///
     /// - Returns: A new `BOOL` attribute, encapsulated as a `NSNumber`.
     public static func attributeWithBool(_ value: Bool) -> AttributeValueObjC {
-        return .init(value: value)
+        .init(value: value)
     }
 
     /// Creates a new instance of an attribute for a `double` type value.
@@ -158,7 +159,7 @@ public final class AttributeValueObjC: NSObject {
     ///
     /// - Returns: A new `double` attribute, encapsulated as a `NSNumber`.
     public static func attributeWithDouble(_ value: Double) -> AttributeValueObjC {
-        return .init(value: value)
+        .init(value: value)
     }
 
     /// Creates a new instance of an attribute for a `NSInteger` type value.
@@ -167,7 +168,7 @@ public final class AttributeValueObjC: NSObject {
     ///
     /// - Returns: A new `NSInteger` attribute, encapsulated as a `NSNumber`.
     public static func attributeWithInteger(_ value: Int) -> AttributeValueObjC {
-        return .init(value: value)
+        .init(value: value)
     }
 
     /// Creates a new instance of an attribute for a `NSString` type value.
@@ -176,7 +177,7 @@ public final class AttributeValueObjC: NSObject {
     ///
     /// - Returns: A new `NSString` attribute.
     public static func attributeWithString(_ value: String) -> AttributeValueObjC {
-        return .init(value: value)
+        .init(value: value)
     }
 }
 
@@ -268,6 +269,6 @@ public extension AttributeValueObjC {
 
     /// A string representation of an `SPLKAttributeValue` instance intended for diagnostic output.
     override var debugDescription: String {
-        return "SPLKAttributeValue<\(type)>: \(description)"
+        "SPLKAttributeValue<\(type)>: \(description)"
     }
 }

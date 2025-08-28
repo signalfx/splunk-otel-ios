@@ -19,7 +19,8 @@ extension NavigationNonOperational {
 
     // MARK: - Manual detection
 
-    @discardableResult func track(screen name: String) -> any NavigationModule {
+    @discardableResult
+    func track(screen name: String) -> any NavigationModule {
         logAccess(toApi: #function)
 
         return self

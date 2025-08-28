@@ -86,7 +86,7 @@ public extension MutableAttributes {
 
     subscript(key: String) -> AttributeValue? {
         get {
-            return attributes[key]
+            attributes[key]
         }
         set {
             if let newValue = newValue {
@@ -199,7 +199,7 @@ public extension MutableAttributes {
     // MARK: - Getters and setters
 
     func getValue(for key: String) -> AttributeValue? {
-        return attributes[key]
+        attributes[key]
     }
 
     func getString(for key: String) -> String? {
@@ -326,7 +326,7 @@ public extension MutableAttributes {
 
     @discardableResult
     func remove(for key: String) -> AttributeValue? {
-        return attributes.removeValue(forKey: key)
+        attributes.removeValue(forKey: key)
     }
 
     func removeAll() {
@@ -334,23 +334,23 @@ public extension MutableAttributes {
     }
 
     func contains(key: String) -> Bool {
-        return attributes.contains(key: key)
+        attributes.contains(key: key)
     }
 
     func getAll() -> [String: AttributeValue] {
-        return attributes.getAll()
+        attributes.getAll()
     }
 
     func getAllKeys() -> [String] {
-        return attributes.allKeys()
+        attributes.allKeys()
     }
 
     func getAllValues() -> [AttributeValue] {
-        return attributes.allValues()
+        attributes.allValues()
     }
 
     func count() -> Int {
-        return attributes.count()
+        attributes.count()
     }
 
     private func getAllAsAny() -> [String: Any] {
@@ -365,7 +365,7 @@ public extension MutableAttributes {
     }
 
     var all: [String: Any] {
-        return getAllAsAny()
+        getAllAsAny()
     }
 }
 

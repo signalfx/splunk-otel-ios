@@ -64,7 +64,7 @@ class ThreadSafeDictionary<Key: Hashable, Value> {
     // MARK: - Get and Set
 
     func value(forKey key: Key) -> Value? {
-        return self[key]
+        self[key]
     }
 
     func setValue(_ value: Value?, forKey key: Key) {

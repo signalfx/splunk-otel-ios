@@ -41,6 +41,6 @@ final class AlwaysOnAgentSampler: AgentSessionSampler {
     ///
     /// - Returns: Always returns `.notSampledOut`.
     func sample() -> SamplingDecision {
-        return .notSampledOut
+        .notSampledOut
     }
 }

@@ -20,7 +20,8 @@ import Foundation
 /// Base class for implementing module configurations.
 ///
 /// - Warning: Not intended for direct use by SDK users.
-@objc(SPLKModuleConfiguration) @objcMembers
+@objc(SPLKModuleConfiguration)
+@objcMembers
 public class ModuleConfigurationObjC: NSObject {
 
     // MARK: - Module management

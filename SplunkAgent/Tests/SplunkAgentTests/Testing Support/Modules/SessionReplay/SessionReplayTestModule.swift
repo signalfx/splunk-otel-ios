@@ -16,8 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-@testable import SplunkAgent
 import SplunkCommon
+
+@testable import SplunkAgent
 
 /// A dummy module skeleton for testing logic around modules.
 class SessionReplayTestModule {
@@ -93,8 +94,10 @@ extension SessionReplayTestModule: Module {
 
     // MARK: - Protocol compliance
 
-    func install(with configuration: (any ModuleConfiguration)?,
-                 remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    func install(
+        with configuration: (any ModuleConfiguration)?,
+        remoteConfiguration: (any RemoteModuleConfiguration)?
+    ) {
 
         // The configurations obtained are stored for later evaluation
         self.configuration = configuration as? SessionReplayTestConfiguration

@@ -50,7 +50,8 @@ public extension UserPreferences {
     /// - Parameter trackingMode: The required ``UserTrackingMode``.
     ///
     /// - Returns: The updated ``UserPreferences`` object.
-    @discardableResult func trackingMode(_ trackingMode: UserTrackingMode) -> UserPreferences {
+    @discardableResult
+    func trackingMode(_ trackingMode: UserTrackingMode) -> UserPreferences {
         owner.currentUser.trackingMode = trackingMode
 
         return self

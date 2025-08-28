@@ -74,10 +74,9 @@ class APIClient: AgentAPIClient {
         }
 
         // Check for server error response or return loaded data
-        if let errorModel = try? JSONDecoder().decode(APIClientError.ServerDetail.self, from: data) {
-            throw APIClientError.server(errorModel)
-        } else {
+        guard let errorModel = try? JSONDecoder().decode(APIClientError.ServerDetail.self, from: data) else {
             return data
         }
+        throw APIClientError.server(errorModel)
     }
 }

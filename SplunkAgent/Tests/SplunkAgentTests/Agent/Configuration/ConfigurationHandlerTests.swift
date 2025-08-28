@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import XCTest
+
+@testable import SplunkAgent
 
 class ConfigurationHandlerTests: XCTestCase {
 
@@ -55,15 +56,16 @@ class ConfigurationHandlerTests: XCTestCase {
             storage: storage
         )
 
-        DispatchQueue.global().asyncAfter(deadline: .now() + 5) {
-            XCTAssertEqual(configurationHandler.configurationData, dataResponse)
-            XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
+        DispatchQueue.global()
+            .asyncAfter(deadline: .now() + 5) {
+                XCTAssertEqual(configurationHandler.configurationData, dataResponse)
+                XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
 
-            let storedData: Data? = try? storage.read(forKey: ConfigurationHandler.configurationStoreKey)
-            XCTAssertEqual(storedData, dataResponse)
+                let storedData: Data? = try? storage.read(forKey: ConfigurationHandler.configurationStoreKey)
+                XCTAssertEqual(storedData, dataResponse)
 
-            expectation.fulfill()
-        }
+                expectation.fulfill()
+            }
 
         wait(for: [expectation], timeout: 10)
     }

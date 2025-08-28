@@ -19,8 +19,8 @@ internal import CiscoLogger
 internal import CiscoSessionReplay
 import Foundation
 internal import SplunkCommon
-internal import SplunkCustomTracking
 internal import SplunkCrashReports
+internal import SplunkCustomTracking
 internal import SplunkOpenTelemetry
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
@@ -192,10 +192,11 @@ class DefaultEventManager: AgentEventManager {
                 immediateProcessing: false,
                 completion: { [weak self] processed in
                     if processed {
-                        self?.removeSessionReplayIndex(
-                            sessionId: sessionId,
-                            timestamp: metadata.timestamp
-                        )
+                        self?
+                            .removeSessionReplayIndex(
+                                sessionId: sessionId,
+                                timestamp: metadata.timestamp
+                            )
                     }
 
                     completion(processed)

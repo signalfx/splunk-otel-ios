@@ -33,7 +33,8 @@ extension SessionReplayNonOperational {
         // swiftlint:enable unused_setter_value
     }
 
-    @discardableResult func recordingMask(_ recordingMask: RecordingMask?) -> any SessionReplayModule {
+    @discardableResult
+    func recordingMask(_ recordingMask: RecordingMask?) -> any SessionReplayModule {
         logAccess(toApi: #function)
 
         return self

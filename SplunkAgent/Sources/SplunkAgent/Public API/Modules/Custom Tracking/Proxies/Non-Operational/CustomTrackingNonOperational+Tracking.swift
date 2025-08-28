@@ -15,9 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 internal import CiscoLogger
-
+import Foundation
 
 /// Extensions implementing CustomTracking public API in non-operational mode.
 ///
@@ -28,7 +27,8 @@ extension CustomTrackingNonOperational {
 
     // MARK: - Implement logging-only functions
 
-    @discardableResult func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) -> any CustomTrackingModule {
+    @discardableResult
+    func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) -> any CustomTrackingModule {
         logAccess(toApi: "trackCustomEvent(name:attributes:)")
         return self
     }
@@ -36,17 +36,20 @@ extension CustomTrackingNonOperational {
 
     // MARK: - Track Errors
 
-    @discardableResult func trackError(_ message: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
+    @discardableResult
+    func trackError(_ message: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         logAccess(toApi: "trackError(message:attributes:)")
         return self
     }
 
-    @discardableResult func trackError(_ error: Error, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
+    @discardableResult
+    func trackError(_ error: Error, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         logAccess(toApi: "trackError(error:attributes:)")
         return self
     }
 
-    @discardableResult func trackException(_ exception: NSException, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
+    @discardableResult
+    func trackException(_ exception: NSException, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         logAccess(toApi: "trackException(exception:attributes:)")
         return self
     }

@@ -60,7 +60,8 @@ public final class NavigationPreferences: NavigationModulePreferences, Codable {
     /// - Parameter enable: A Boolean value to indicate whether automated tracking should be enabled.
     ///
     /// - Returns: The ``NavigationModulePreferences`` instance for chaining further configurations.
-    @discardableResult public func enableAutomatedTracking(_ enable: Bool?) -> any NavigationModulePreferences {
+    @discardableResult
+    public func enableAutomatedTracking(_ enable: Bool?) -> any NavigationModulePreferences {
         enableAutomatedTracking = enable
 
         return self

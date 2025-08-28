@@ -30,7 +30,8 @@ public protocol NavigationModule: ObservableObject {
     /// - Parameter preferences: The preferred ``NavigationModulePreferences`` for the module.
     ///
     /// - Returns: The actual ``NavigationModule`` instance.
-    @discardableResult func preferences(_ preferences: NavigationModulePreferences) -> any NavigationModule
+    @discardableResult
+    func preferences(_ preferences: NavigationModulePreferences) -> any NavigationModule
 
 
     // MARK: - State
@@ -48,5 +49,6 @@ public protocol NavigationModule: ObservableObject {
     /// - Returns: The actual ``NavigationModule`` instance.
     ///
     /// - Note: The set value is not linked to any specific UI element.
-    @discardableResult func track(screen name: String) -> any NavigationModule
+    @discardableResult
+    func track(screen name: String) -> any NavigationModule
 }

@@ -16,11 +16,11 @@ limitations under the License.
 */
 
 import CiscoSessionReplay
+import XCTest
+
 @testable import SplunkAgent
 @testable import SplunkCommon
 @testable import SplunkOpenTelemetry
-
-import XCTest
 
 final class EventsTests: XCTestCase {
 
@@ -52,9 +52,12 @@ final class EventsTests: XCTestCase {
         let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
         let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
 
-        sessionReplayProcessor.sendEvent(event, completion: { _ in
-            requestExpectation.fulfill()
-        })
+        sessionReplayProcessor.sendEvent(
+            event,
+            completion: { _ in
+                requestExpectation.fulfill()
+            }
+        )
 
         let processedEvent = try XCTUnwrap(sessionReplayProcessor.storedLastProcessedEvent)
         try checkEventAttributes(processedEvent)
@@ -75,11 +78,15 @@ final class EventsTests: XCTestCase {
         let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
         let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
 
-        sessionReplayProcessor.sendEvent(event: event, immediateProcessing: true, completion: { success in
-            XCTAssert(success)
+        sessionReplayProcessor.sendEvent(
+            event: event,
+            immediateProcessing: true,
+            completion: { success in
+                XCTAssert(success)
 
-            requestExpectation.fulfill()
-        })
+                requestExpectation.fulfill()
+            }
+        )
 
         XCTAssertNotNil(sessionReplayProcessor.storedLastProcessedEvent)
         XCTAssertNotNil(sessionReplayProcessor.storedLastSentEvent)
@@ -92,11 +99,14 @@ final class EventsTests: XCTestCase {
         let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
         let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
 
-        sessionReplayProcessor.sendEvent(event, completion: { success in
-            XCTAssert(success)
+        sessionReplayProcessor.sendEvent(
+            event,
+            completion: { success in
+                XCTAssert(success)
 
-            requestExpectation.fulfill()
-        })
+                requestExpectation.fulfill()
+            }
+        )
 
         XCTAssertNotNil(sessionReplayProcessor.storedLastProcessedEvent)
         XCTAssertNil(sessionReplayProcessor.storedLastSentEvent)
