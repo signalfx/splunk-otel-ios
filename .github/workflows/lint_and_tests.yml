@@ -51,11 +51,11 @@ jobs:
       matrix:
         include:
           - platform: ios
-            destination: "platform=iOS Simulator,name=iPhone 16,OS=17.5"
+            destination: "platform=iOS Simulator,name=iPhone 16,OS=latest"
 #         - platform: tvos
-#           destination: "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=17.5"
+#           destination: "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=latest"
 #         - platform: visionos
-#           destination: "platform=visionOS Simulator,name=Apple Vision Pro,OS=1.1"
+#           destination: "platform=visionOS Simulator,name=Apple Vision Pro,OS=latest"
 #         - platform: maccatalyst
 #           destination: "platform=macOS,variant=Mac Catalyst"
     env:
