@@ -43,7 +43,7 @@ jobs:
                 )
             done
 
-  tests:
+    tests:
     name: Tests
     runs-on: macos-15
     strategy:
