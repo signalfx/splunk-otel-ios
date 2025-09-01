@@ -43,7 +43,7 @@ jobs:
                 )
             done
 
-  tests:
+    tests:
     name: Tests
     runs-on: macos-15
     strategy:
@@ -65,6 +65,7 @@ jobs:
           xcodebuild -version
           echo "DEVELOPER_DIR=$DEVELOPER_DIR"
           xcode-select -p
+          swift --version
 
       - name: Install tools
         run: |
@@ -72,8 +73,7 @@ jobs:
           brew install xcbeautify jq
 
       - name: Generate workspace (.swiftpm/xcode/package.xcworkspace)
-        run: |
-          xed -b .
+        run: xed -b .
 
       - name: Detect scheme
         id: scheme
@@ -84,69 +84,73 @@ jobs:
           if [ -z "$PKG_SCHEME" ]; then
             PKG_SCHEME=$(echo "$SCHEMES_JSON" | jq -r '.workspace.schemes[0]')
           fi
-          echo "Using scheme: $PKG_SCHEME"
           echo "scheme=$PKG_SCHEME" >> "$GITHUB_OUTPUT"
 
       - name: Run tests (iOS)
         if: matrix.platform == 'ios'
         run: |
+          set -euo pipefail
+          set -o pipefail
           xcodebuild \
             -workspace .swiftpm/xcode/package.xcworkspace \
             -scheme "${{ steps.scheme.outputs.scheme }}" \
             -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
             -resultBundlePath "TestResults_ios.xcresult" \
-            clean test | xcbeautify --report junit --junit-report-filename "junit-ios.xml"
+            clean test | xcbeautify --report junit --junit-report-filename "junit-${{ matrix.platform }}.xml"
 
       - name: Run tests (tvOS)
         if: matrix.platform == 'tvos'
         run: |
+          set -euo pipefail
+          set -o pipefail
           xcodebuild \
             -workspace .swiftpm/xcode/package.xcworkspace \
             -scheme "${{ steps.scheme.outputs.scheme }}" \
             -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=latest' \
             -resultBundlePath "TestResults_tvos.xcresult" \
-            clean test | xcbeautify --report junit --junit-report-filename "junit-tvos.xml"
+            clean test | xcbeautify --report junit --junit-report-filename "junit-${{ matrix.platform }}.xml"
 
       - name: Run tests (visionOS)
         if: matrix.platform == 'visionos'
         run: |
+          set -euo pipefail
+          set -o pipefail
           xcodebuild \
             -workspace .swiftpm/xcode/package.xcworkspace \
             -scheme "${{ steps.scheme.outputs.scheme }}" \
             -destination 'platform=visionOS Simulator,name=Apple Vision Pro,OS=latest' \
             -resultBundlePath "TestResults_visionos.xcresult" \
-            clean test | xcbeautify --report junit --junit-report-filename "junit-visionos.xml"
+            clean test | xcbeautify --report junit --junit-report-filename "junit-${{ matrix.platform }}.xml"
 
       - name: Run tests (Mac Catalyst)
         if: matrix.platform == 'maccatalyst'
         run: |
+          set -euo pipefail
+          set -o pipefail
           xcodebuild \
             -workspace .swiftpm/xcode/package.xcworkspace \
             -scheme "${{ steps.scheme.outputs.scheme }}" \
             -destination 'platform=macOS,variant=Mac Catalyst' \
             -resultBundlePath "TestResults_maccatalyst.xcresult" \
-            clean test | xcbeautify --report junit --junit-report-filename "junit-maccatalyst.xml"
+            clean test | xcbeautify --report junit --junit-report-filename "junit-${{ matrix.platform }}.xml"
+
+      - name: Assert JUnit exists
+        if: always()
+        run: |
+          ls -l "junit-${{ matrix.platform }}.xml"
 
       - name: Publish JUnit to Checks
         uses: mikepenz/action-junit-report@v4
         if: always()
         with:
-          report_paths: |
-            junit-ios.xml
-            junit-tvos.xml
-            junit-visionos.xml
-            junit-maccatalyst.xml
+          report_paths: junit-${{ matrix.platform }}.xml
           check_name: Tests (${{ matrix.platform }})
-          require_tests: false
+          require_tests: true
 
       - name: Upload .xcresult artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: xcresult-${{ matrix.platform }}
-          path: |
-            TestResults_ios.xcresult
-            TestResults_tvos.xcresult
-            TestResults_visionos.xcresult
-            TestResults_maccatalyst.xcresult
+          path: TestResults_${{ matrix.platform }}.xcresult
           if-no-files-found: ignore
