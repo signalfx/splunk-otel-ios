@@ -74,11 +74,6 @@ jobs:
       - name: Generate workspace (.swiftpm/xcode/package.xcworkspace)
         run: |
           xed -b .
-          for i in {1..10}; do
-            [ -d .swiftpm/xcode/package.xcworkspace ] && break
-            sleep 1
-          done
-          test -d .swiftpm/xcode/package.xcworkspace
 
       - name: Detect scheme
         id: scheme
