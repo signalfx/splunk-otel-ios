@@ -476,7 +476,7 @@ if outputStream.isReady {
 }
 ```
 
-Use a formating that places each check on a separate line under the guard keyword for a guard with multiple checks.
+Use a formatting that places each check on a separate line under the guard keyword for a guard with multiple checks.
 
 **DO:**
 ```swift
