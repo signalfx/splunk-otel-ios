@@ -567,7 +567,7 @@ init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum) throw
 Comments that use `///` must always end with a period. This adheres to a commonly accepted standard of typographical form in documentation.
 
 
-## In-line comments
+## Comments in the code
 
 Use `//` only Inside method/function/property code blocks. Using `//` for comments on internal methods or variables is **not recommended**, and is likely to be flagged by the reviewer as incorrect. 
 
