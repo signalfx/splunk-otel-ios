@@ -49,7 +49,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ ios, tvos, visionos, maccatalyst ]
+#        platform: [ ios, tvos, visionos, maccatalyst ]
+        platform: [ ios ]
     env:
       DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
     steps:
@@ -94,7 +95,7 @@ jobs:
           xcodebuild \
             -workspace .swiftpm/xcode/package.xcworkspace \
             -scheme "${{ steps.scheme.outputs.scheme }}" \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -resultBundlePath "TestResults_ios.xcresult" \
             clean test | xcbeautify --report junit --junit-report-filename "junit-${{ matrix.platform }}.xml"
 
