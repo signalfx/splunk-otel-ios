@@ -16,27 +16,11 @@ limitations under the License.
 */
 
 @testable import SplunkCommon
-@testable import SplunkCustomTracking
 import XCTest
 
-// Extension to provide shared helper methods across test files
 extension XCTestCase {
-    func getStringValue(for key: String, in data: CustomTrackingData) -> String? {
-        if case let .string(value) = data.attributes[key] {
-            return value
-        }
-        return nil
-    }
-
     func getStringValue(for key: String, in attributes: [String: EventAttributeValue]) -> String? {
         if case let .string(value) = attributes[key] {
-            return value
-        }
-        return nil
-    }
-
-    func getIntValue(for key: String, in data: CustomTrackingData) -> Int? {
-        if case let .int(value) = data.attributes[key] {
             return value
         }
         return nil
