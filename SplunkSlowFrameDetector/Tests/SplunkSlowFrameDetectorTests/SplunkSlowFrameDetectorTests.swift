@@ -89,6 +89,66 @@ final class SlowFrameDetectorTests: XCTestCase {
         await fulfillment(of: [startExpectation], timeout: 1.0)
     }
 
+    func test_start_isIdempotent() async {
+        XCTAssertEqual(mockTicker.startCallCount, 0)
+
+        await awaitDetectorStart()
+        XCTAssertEqual(mockTicker.startCallCount, 1, "start() should be called on the ticker the first time.")
+
+        // Call start on the detector again.
+        detector.start()
+        await Task.yield() // Allow async logic to run.
+
+        // Assert that the ticker's start() was not called a second time.
+        XCTAssertEqual(mockTicker.startCallCount, 1, "Calling start() multiple times should not restart the ticker.")
+    }
+    
+    func test_stateIsReset_onAppDidBecomeActive() async {
+        mockDestination.onSend = { type, count in
+            XCTFail("No report should be sent after app becomes active, as state should be reset.")
+        }
+
+        await awaitDetectorStart()
+
+        // 1. Simulate a first frame to establish a baseline timestamp.
+        mockTicker.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+
+        // 2. Simulate the app returning to the foreground. This should reset the logic.
+        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+        await Task.yield() // Allow the async notification handler to run.
+
+        // 3. Simulate a second frame after a long delay. Without the reset, this would be a slow frame.
+        mockTicker.simulateFrame(timestamp: 10.0, duration: 1.0 / 60.0)
+
+        // 4. Manually flush to check for any pending reports.
+        await detector.flushBuffers()
+    }
+
+    func test_buffersAreFlushed_onAppWillResignActive() async {
+        let reportExpectation = XCTestExpectation(description: "Report is sent when app resigns active")
+        mockDestination.onSend = { type, count in
+            if type == "slowRenders" {
+                XCTAssertEqual(count, 1)
+                reportExpectation.fulfill()
+            }
+        }
+
+        await awaitDetectorStart()
+
+        // 1. Simulate a slow frame.
+        mockTicker.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+        mockTicker.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
+        await Task.yield() // Allow the slow frame to be processed.
+
+        // 2. Simulate the app going to the background. This should trigger a flush.
+        NotificationCenter.default.post(name: UIApplication.willResignActiveNotification, object: nil)
+
+        // Give things a second (well a 5th of a second) for the notification.
+        try? await Task.sleep(nanoseconds: 200_000_000) // 0.2 seconds
+
+        await fulfillment(of: [reportExpectation], timeout: 1.0)
+    }
+
     func test_firstFrame_doesNotTriggerReport() async {
         mockDestination.onSend = { _, _ in
             XCTFail("The first frame should never trigger a slow frame report.")
@@ -96,7 +156,6 @@ final class SlowFrameDetectorTests: XCTestCase {
 
         await awaitDetectorStart()
 
-        // Simulate only one frame.
         mockTicker.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
         await detector.flushBuffers()
     }
@@ -190,6 +249,18 @@ final class SlowFrameDetectorTests: XCTestCase {
         await fulfillment(of: [reportExpectation], timeout: 1.0)
     }
 
+    func test_startAndStop_correctlyControlTicker() async {
+        XCTAssertFalse(mockTicker.started)
+        XCTAssertFalse(mockTicker.stopped)
+
+        await awaitDetectorStart()
+        XCTAssertTrue(mockTicker.started, "The ticker should be started.")
+
+        await detector.stop()
+
+        XCTAssertTrue(mockTicker.stopped, "The ticker should be stopped.")
+    }
+
     func test_longFreeze_reportsMultipleEvents() async throws {
         await awaitDetectorStart()
 
@@ -227,7 +298,6 @@ final class SlowFrameDetectorTests: XCTestCase {
         mockTicker.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
         mockTicker.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
 
-        // FIX: Yield to ensure the async tasks to process the frames have completed.
         await Task.yield()
 
         // 2. Wait for longer than the automatic flush interval (1 second).
@@ -237,6 +307,6 @@ final class SlowFrameDetectorTests: XCTestCase {
         // The expectation should be fulfilled by the automatic flush loop.
         await fulfillment(of: [reportExpectation], timeout: 1.5)
     }
-}
 
+}
 #endif // os(iOS) || os(tvOS) || os(visionOS)

@@ -15,11 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A state object that is representation for the current state of the SlowFrameDetector module.
+/// A thread-safe representation of the current state of the `SlowFrameDetector` module.
 public final class SlowFrameDetectorState: Sendable {
 
-    /// Indicates whether the SlowFrameDetector feature is enabled.
-    ///
-    /// The default value is `false`.
+    /// Indicates whether the slow frame detection feature is currently enabled.
     public internal(set) nonisolated(unsafe) var isEnabled: Bool = false
 }
