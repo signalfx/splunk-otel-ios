@@ -19,9 +19,6 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-// A collection of local, high-quality test helpers for OpenTelemetry objects.
-// These are designed to be easily moved to a shared test utility module later.
-
 // MARK: - MockTracerProvider
 
 class MockTracerProvider: TracerProvider {
