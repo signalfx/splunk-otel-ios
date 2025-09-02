@@ -15,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import XCTest
 import OpenTelemetryApi
 import OpenTelemetrySdk
 @testable import SplunkCommon
 @testable import SplunkCustomTracking
+import XCTest
 
 final class CustomWorkflowTrackingTests: XCTestCase {
     private var module: CustomTrackingInternal!

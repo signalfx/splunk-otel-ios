@@ -23,6 +23,7 @@ import OpenTelemetrySdk
 // These are designed to be easily moved to a shared test utility module later.
 
 // MARK: - MockTracerProvider
+
 class MockTracerProvider: TracerProvider {
     let mockTracer = MockTracer()
 
@@ -31,12 +32,16 @@ class MockTracerProvider: TracerProvider {
     }
 
     // Required for full protocol conformance
-    func get(instrumentationName: String, instrumentationVersion: String?, schemaUrl: String?, attributes: [String: OpenTelemetryApi.AttributeValue]?) -> OpenTelemetryApi.Tracer {
+    func get(instrumentationName: String,
+             instrumentationVersion: String?,
+             schemaUrl: String?,
+             attributes: [String: OpenTelemetryApi.AttributeValue]?) -> OpenTelemetryApi.Tracer {
         return mockTracer
     }
 }
 
 // MARK: - MockTracer
+
 class MockTracer: Tracer {
     func spanBuilder(spanName: String) -> SpanBuilder {
         return MockSpanBuilder(spanName: spanName)
@@ -44,6 +49,7 @@ class MockTracer: Tracer {
 }
 
 // MARK: - MockSpanBuilder
+
 class MockSpanBuilder: SpanBuilder {
     let spanName: String
     var attributes: [String: AttributeValue] = [:]
@@ -60,7 +66,7 @@ class MockSpanBuilder: SpanBuilder {
     func setSpanKind(spanKind: SpanKind) -> Self { return self }
     func setStartTime(time: Date) -> Self { return self }
     func setAttribute(key: String, value: AttributeValue) -> Self {
-        self.attributes[key] = value
+        attributes[key] = value
         return self
     }
 
@@ -70,6 +76,7 @@ class MockSpanBuilder: SpanBuilder {
         let span = startSpan()
         return try operation(span)
     }
+
     func withActiveSpan<T>(_ operation: (any SpanBase) async throws -> T) async rethrows -> T {
         let span = startSpan()
         return try await operation(span)
@@ -77,29 +84,30 @@ class MockSpanBuilder: SpanBuilder {
 
     func startSpan() -> Span {
         let span = MockSpan(name: spanName)
-        span.attributes = self.attributes
+        span.attributes = attributes
         return span
     }
 }
 
 // MARK: - MockSpan (The "Readable" Span)
+
 class MockSpan: Span {
     var name: String
     var kind: SpanKind = .internal
     var context: SpanContext
     var status: Status = .unset
     var isRecording: Bool = true
-    var startTime: Date = Date()
+    var startTime = Date()
     var endTime: Date?
 
     var attributes: [String: AttributeValue] = [:]
 
     init(name: String) {
         self.name = name
-        self.context = SpanContext.create(traceId: TraceId.random(),
-                                          spanId: SpanId.random(),
-                                          traceFlags: TraceFlags(),
-                                          traceState: TraceState())
+        context = SpanContext.create(traceId: TraceId.random(),
+                                     spanId: SpanId.random(),
+                                     traceFlags: TraceFlags(),
+                                     traceState: TraceState())
     }
 
     func setAttribute(key: String, value: AttributeValue?) {
@@ -113,23 +121,24 @@ class MockSpan: Span {
             self.attributes[key] = value
         }
     }
+
     func recordException(_ exception: any SpanException) {}
     func recordException(_ exception: any SpanException, attributes: [String: AttributeValue]) {}
     func recordException(_ exception: any SpanException, timestamp: Date) {}
     func recordException(_ exception: any SpanException, attributes: [String: AttributeValue], timestamp: Date) {}
 
-    func addEvent(name: String, attributes: [String: AttributeValue]) { }
-    func addEvent(name: String) { }
-    func addEvent(name: String, timestamp: Date) { }
-    func addEvent(name: String, attributes: [String: AttributeValue], timestamp: Date) { }
+    func addEvent(name: String, attributes: [String: AttributeValue]) {}
+    func addEvent(name: String) {}
+    func addEvent(name: String, timestamp: Date) {}
+    func addEvent(name: String, attributes: [String: AttributeValue], timestamp: Date) {}
 
     func end() {
         end(time: Date())
     }
 
     func end(time: Date) {
-        self.isRecording = false
-        self.endTime = time
+        isRecording = false
+        endTime = time
     }
 
     var description: String {
