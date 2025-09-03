@@ -116,7 +116,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BA5E5A542B6859BD0022CEB2 /* Build configuration list for PBXNativeTarget "AgentTestApp" */;
 			buildPhases = (
-				4BD024D82DE7AA2400ADB31D /* Swift Lint & Swift Format */,
 				BA5E5A3C2B6859BC0022CEB2 /* Sources */,
 				BA5E5A3D2B6859BC0022CEB2 /* Frameworks */,
 				BA5E5A3E2B6859BC0022CEB2 /* Resources */,
@@ -181,27 +180,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		4BD024D82DE7AA2400ADB31D /* Swift Lint & Swift Format */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Swift Lint & Swift Format";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/../../Tools\"\n\n# Check SplunkAgent directory\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkAgent/\necho \"$(pwd)\"\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCommon module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkCommon/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkAppStart module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkAppStart/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCustomTracking module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkCustomTracking/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork module\n# cd \"${PROJECT_DIR}\"\n# cd ../../SplunkNetwork/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkOpenTelemetry module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkOpenTelemetry/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkOpenTelemetryBackgroundExporter module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkOpenTelemetryBackgroundExporter/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkWebView module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkWebView/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNavigation module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkNavigation/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkInteractions module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkInteractions/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BA5E5A3C2B6859BC0022CEB2 /* Sources */ = {

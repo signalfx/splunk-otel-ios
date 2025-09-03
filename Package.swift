@@ -32,12 +32,30 @@ let package = Package(
         .package(
             url:"https://github.com/microsoft/plcrashreporter",
             from: "1.12.0"
+        ),
+
+        // SwiftLint (realm)
+        .package(
+            url: "https://github.com/SimplyDanny/SwiftLintPlugins",
+            from: "0.59.1"
+        ),
+
+        // swift-format (swiftlang)
+        .package(
+            url: "https://github.com/StarLard/SwiftFormatPlugins",
+            from: "1.1.0"
+        ),
+
+        // SwiftFormat (nicklockwood)
+        .package(
+            url: "https://github.com/nicklockwood/SwiftFormat",
+            from: "0.57.2"
         )
     ],
     targets: []
 )
 
-//  Modify it based on current dependency resolution and add all targets to the package
+// Modify it based on current dependency resolution and add all targets to the package
 package.targets.append(contentsOf: generateBinaryTargets())
 package.targets.append(contentsOf: generateWrapperTargets())
 package.targets.append(contentsOf: generateMainTargets())
@@ -78,6 +96,9 @@ func generateMainTargets() -> [Target] {
             resources: [
                 .copy("../../Resources/PrivacyInfo.xcprivacy"),
                 .copy("../../Resources/NOTICES")
+            ],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
         .testTarget(
@@ -90,7 +111,12 @@ func generateMainTargets() -> [Target] {
                 .copy("Testing Support/Mock Data/RemoteConfiguration.json"),
                 .copy("Testing Support/Mock Data/RemoteError.json")
             ],
-            swiftSettings: [.define("SPM_TESTS")]
+            swiftSettings: [
+                .define("SPM_TESTS")
+            ],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
 
 
@@ -110,12 +136,18 @@ func generateMainTargets() -> [Target] {
             resources: [
                 .copy("../../Resources/PrivacyInfo.xcprivacy"),
                 .copy("../../Resources/NOTICES")
+            ],
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]
         ),
         .testTarget(
             name: "SplunkAgentObjCTests",
             dependencies: ["SplunkAgentObjC"],
-            path: "SplunkAgent/Tests/SplunkAgentObjCTests"
+            path: "SplunkAgent/Tests/SplunkAgentObjCTests",
+            plugins: [
+                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
+            ]
         ),
 
 
