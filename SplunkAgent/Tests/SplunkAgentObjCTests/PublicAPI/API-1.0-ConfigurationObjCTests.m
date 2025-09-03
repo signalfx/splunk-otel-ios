@@ -45,7 +45,7 @@ limitations under the License.
 
     XCTAssertTrue([urlComponents.scheme isEqualToString:@"https"]);
     XCTAssertTrue([urlComponents.host isEqualToString:expectedHost]);
-    XCTAssertTrue([urlComponents.path isEqualToString:@"/v1/rumotlp"]);
+    XCTAssertTrue([urlComponents.path isEqualToString:@"/v1/traces"]);
 
 
     // Authentication

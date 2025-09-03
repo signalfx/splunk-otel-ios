@@ -49,8 +49,8 @@ public struct EndpointConfiguration: Codable, Equatable {
         self.realm = realm
         self.rumAccessToken = rumAccessToken
 
-        let traceUrl = Self.realmUrl(for: realm, path: "/v1/rumotlp")
-        let sessionReplayUrl = Self.realmUrl(for: realm, path: "/v1/rumreplay")
+        let traceUrl = Self.realmUrl(for: realm, path: "/v1/traces")
+        let sessionReplayUrl = Self.realmUrl(for: realm, path: "/v1/logs")
 
         // Authenticate trace url
         if let traceUrl {
