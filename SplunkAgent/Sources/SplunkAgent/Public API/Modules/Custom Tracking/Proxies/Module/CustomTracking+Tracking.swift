@@ -16,9 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryApi
 internal import SplunkCommon
 internal import SplunkCustomTracking
+import OpenTelemetryApi
 
 extension CustomTracking {
 
@@ -29,8 +29,7 @@ extension CustomTracking {
     // MARK: - Custom Tracking - Events
 
     /// Track a custom event by name with attributes.
-    @discardableResult
-    func trackCustomEvent(_ name: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
+    @discardableResult func trackCustomEvent(_ name: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         module.track(SplunkTrackableEvent(eventName: name, attributes: attributes.toEventAttributes()))
         return self
     }
@@ -38,20 +37,17 @@ extension CustomTracking {
 
     // MARK: - Custom Tracking - Errors
 
-    @discardableResult
-    func trackError(_ message: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
+    @discardableResult func trackError(_ message: String, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         module.track(SplunkIssue(from: message), attributes.toEventAttributes())
         return self
     }
 
-    @discardableResult
-    func trackError(_ error: Error, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
+    @discardableResult func trackError(_ error: Error, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         module.track(SplunkIssue(from: error), attributes.toEventAttributes())
         return self
     }
 
-    @discardableResult
-    func trackException(_ exception: NSException, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
+    @discardableResult func trackException(_ exception: NSException, _ attributes: MutableAttributes = MutableAttributes()) -> any CustomTrackingModule {
         module.track(SplunkIssue(from: exception), attributes.toEventAttributes())
         return self
     }
@@ -59,6 +55,6 @@ extension CustomTracking {
     // MARK: - Custom Tracking - Workflows
 
     func trackWorkflow(_ workflowName: String) -> Span {
-        module.track(workflowName)
+        return module.track(workflowName)
     }
 }

@@ -15,10 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+@testable import SplunkAgent
 import SplunkCommon
 import XCTest
-
-@testable import SplunkAgent
 
 final class DefaultSessionTests: XCTestCase {
 
@@ -208,74 +207,74 @@ final class DefaultSessionTests: XCTestCase {
 // swiftformat:disable indent
 #if os(iOS) || os(tvOS) || os(visionOS)
 
-    extension DefaultSessionTests {
+extension DefaultSessionTests {
 
-        // MARK: - Application lifecycle
+    // MARK: - Application lifecycle
 
-        func testEnterBackground() throws {
-            let configuration = try ConfigurationTestBuilder.buildDefault()
+    func testEnterBackground() throws {
+        let configuration = try ConfigurationTestBuilder.buildDefault()
 
-            // After the object is created, there should be one open session
-            let testName = "enterBackgroundTest"
-            let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
-            defaultSession.testSessionTimeout = 10
+        // After the object is created, there should be one open session
+        let testName = "enterBackgroundTest"
+        let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
+        defaultSession.testSessionTimeout = 10
 
-            // We need to create a full agent as our session runner for this test
-            let agent = try AgentTestBuilder.build(with: configuration, session: defaultSession)
+        // We need to create a full agent as our session runner for this test
+        let agent = try AgentTestBuilder.build(with: configuration, session: defaultSession)
 
-            /* Going into the background for *allowed* time */
-            let resumedSessionId = defaultSession.currentSessionId
-            try simulateBackgroundStay(for: defaultSession, duration: 3)
-            simulateMainThreadWait(duration: 2)
+        /* Going into the background for *allowed* time */
+        let resumedSessionId = defaultSession.currentSessionId
+        try simulateBackgroundStay(for: defaultSession, duration: 3)
+        simulateMainThreadWait(duration: 2)
 
-            // The current session should be the same
-            var lastSessionId = defaultSession.currentSessionId
-            XCTAssertEqual(lastSessionId, resumedSessionId)
+        // The current session should be the same
+        var lastSessionId = defaultSession.currentSessionId
+        XCTAssertEqual(lastSessionId, resumedSessionId)
 
-            // Simulate some inactivity
-            simulateMainThreadWait(duration: 8)
+        // Simulate some inactivity
+        simulateMainThreadWait(duration: 8)
 
-            // After a previous stay in the background and some inactivity time,
-            // there should be the same session ID.
-            lastSessionId = defaultSession.currentSessionId
-            XCTAssertEqual(lastSessionId, resumedSessionId)
-
-
-            /* Going into the background for *too long* time */
-            try simulateBackgroundStay(for: defaultSession, duration: 12)
-
-            // The current session should *not* be the same immediately
-            XCTAssertNotEqual(lastSessionId, defaultSession.currentSessionId)
-            XCTAssertNotNil(agent)
-        }
-
-        func testTerminateApplication() throws {
-            // After the object is created, there should be one open session
-            let testName = "terminateApplicationTest"
-            let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
+        // After a previous stay in the background and some inactivity time,
+        // there should be the same session ID.
+        lastSessionId = defaultSession.currentSessionId
+        XCTAssertEqual(lastSessionId, resumedSessionId)
 
 
-            // Watch for notification emitted from simulated UIKit
-            _ = expectation(
-                forNotification: UIApplication.willTerminateNotification,
-                object: nil,
-                handler: nil
-            )
+        /* Going into the background for *too long* time */
+        try simulateBackgroundStay(for: defaultSession, duration: 12)
 
-            // Send simulated termination
-            NotificationCenter.default.post(
-                name: UIApplication.willTerminateNotification,
-                object: nil
-            )
-
-            // We need to wait for notification delivery
-            waitForExpectations(timeout: 5, handler: nil)
-
-            // Current session should be closed
-            let currentSession = defaultSession.currentSession
-            XCTAssertTrue(currentSession.closed!)
-        }
+        // The current session should *not* be the same immediately
+        XCTAssertNotEqual(lastSessionId, defaultSession.currentSessionId)
+        XCTAssertNotNil(agent)
     }
+
+    func testTerminateApplication() throws {
+        // After the object is created, there should be one open session
+        let testName = "terminateApplicationTest"
+        let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
+
+
+        // Watch for notification emitted from simulated UIKit
+        _ = expectation(
+            forNotification: UIApplication.willTerminateNotification,
+            object: nil,
+            handler: nil
+        )
+
+        // Send simulated termination
+        NotificationCenter.default.post(
+            name: UIApplication.willTerminateNotification,
+            object: nil
+        )
+
+        // We need to wait for notification delivery
+        waitForExpectations(timeout: 5, handler: nil)
+
+        // Current session should be closed
+        let currentSession = defaultSession.currentSession
+        XCTAssertTrue(currentSession.closed!)
+    }
+}
 
 #endif
 // swiftformat:enable indent

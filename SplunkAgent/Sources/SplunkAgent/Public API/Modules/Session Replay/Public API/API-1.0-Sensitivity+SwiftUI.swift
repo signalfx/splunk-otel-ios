@@ -31,6 +31,6 @@ public extension View {
     ///
     /// - Returns: The `View` with defined sensitivity for recording in Session Replay module.
     func sessionReplaySensitive(_ sensitive: Bool = true) -> some View {
-        modifier(SensitivityModifier(sensitive: sensitive))
+        return modifier(SensitivityModifier(sensitive: sensitive))
     }
 }

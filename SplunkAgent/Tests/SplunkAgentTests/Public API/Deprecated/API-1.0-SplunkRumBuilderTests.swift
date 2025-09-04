@@ -16,9 +16,8 @@ limitations under the License.
 */
 
 import OpenTelemetryApi
-import XCTest
-
 @testable import SplunkAgent
+import XCTest
 
 final class API10SplunkRumBuilderTests: XCTestCase {
 
@@ -44,22 +43,23 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "authToken"
         )
-        .setApplicationName("MyApp")
-        .deploymentEnvironment(environment: "Production")
-        .debug(enabled: true)
-        .sessionSamplingRatio(samplingRatio: 1)
-        .showVCInstrumentation(true)
-        .screenNameSpans(enabled: false)
+            .setApplicationName("MyApp")
+            .deploymentEnvironment(environment: "Production")
+            .debug(enabled: true)
+            .sessionSamplingRatio(samplingRatio: 1)
+            .showVCInstrumentation(true)
+            .screenNameSpans(enabled: false)
 
         XCTAssertTrue(builder.build())
 
         // Verify the shared agent state after full build
         let status = SplunkRum.shared.state.status
         let expected: SplunkAgent.Status = {
-            guard PlatformSupport.current.scope == .full else {
+            if PlatformSupport.current.scope == .full {
+                return .running
+            } else {
                 return .notRunning(.unsupportedPlatform)
             }
-            return .running
         }()
 
         XCTAssertEqual(status, expected)
@@ -70,8 +70,8 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             realm: "eu0",
             rumAuth: "token123"
         )
-        .setApplicationName("RealmApp")
-        .deploymentEnvironment(environment: "Staging")
+            .setApplicationName("RealmApp")
+            .deploymentEnvironment(environment: "Staging")
 
         XCTAssertTrue(builder.build())
 
@@ -85,8 +85,8 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "abc"
         )
-        .setApplicationName("AppityApp")
-        .deploymentEnvironment(environment: "QA")
+            .setApplicationName("AppityApp")
+            .deploymentEnvironment(environment: "QA")
 
         XCTAssertTrue(builder.build())
         let first = SplunkRum.shared
@@ -104,7 +104,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "auth"
         )
-        .deploymentEnvironment(environment: "Prod")
+            .deploymentEnvironment(environment: "Prod")
 
         XCTAssertFalse(builder.build())
     }
@@ -114,7 +114,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "auth"
         )
-        .setApplicationName("NoEnvApp")
+            .setApplicationName("NoEnvApp")
 
         XCTAssertFalse(builder.build())
     }
@@ -125,8 +125,8 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             beaconUrl: invalidUrl,
             rumAuth: "token"
         )
-        .setApplicationName("BadUrlApp")
-        .deploymentEnvironment(environment: "Dev")
+            .setApplicationName("BadUrlApp")
+            .deploymentEnvironment(environment: "Dev")
 
         XCTAssertTrue(builder.build())
 
@@ -187,7 +187,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         let config = SplunkRum.shared.agentConfiguration
 
         guard let url = config.endpoint.traceEndpoint,
-            let comps = URLComponents(url: url, resolvingAgainstBaseURL: false)
+              let comps = URLComponents(url: url, resolvingAgainstBaseURL: false)
         else {
             XCTFail("traceEndpoint should be a valid URL")
             return
@@ -207,9 +207,9 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "authToken"
         )
-        .setApplicationName("DeprecatedApp")
-        .deploymentEnvironment(environment: "Env")
-        .slowRenderingDetectionEnabled(false) // Method under test
+            .setApplicationName("DeprecatedApp")
+            .deploymentEnvironment(environment: "Env")
+            .slowRenderingDetectionEnabled(false) // Method under test
 
         XCTAssertTrue(builder.build(), "Builder should successfully build when feature is disabled.")
 
@@ -251,9 +251,9 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "authToken"
         )
-        .setApplicationName("DeprecatedApp")
-        .deploymentEnvironment(environment: "Env")
-        .slowRenderingDetectionEnabled(true) // Method under test
+            .setApplicationName("DeprecatedApp")
+            .deploymentEnvironment(environment: "Env")
+            .slowRenderingDetectionEnabled(true) // Method under test
 
         XCTAssertTrue(builder.build(), "Builder should successfully build when feature is enabled.")
 
@@ -299,11 +299,11 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             beaconUrl: "https://example.com/v1/rum",
             rumAuth: "authToken"
         )
-        .setApplicationName("NoOpApp")
-        .deploymentEnvironment(environment: "Env")
-        // These deprecated methods should have no effect
-        .slowFrameDetectionThresholdMs(thresholdMs: 100)
-        .frozenFrameDetectionThresholdMs(thresholdMs: 1000)
+            .setApplicationName("NoOpApp")
+            .deploymentEnvironment(environment: "Env")
+            // These deprecated methods should have no effect
+            .slowFrameDetectionThresholdMs(thresholdMs: 100)
+            .frozenFrameDetectionThresholdMs(thresholdMs: 1000)
 
         XCTAssertTrue(builder.build(), "Builder should successfully build.")
 

@@ -23,7 +23,7 @@ final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
     // MARK: - Configuration
 
     var configurationData: Data? {
-        nil
+        return nil
     }
 
     let configuration: any AgentConfigurationProtocol

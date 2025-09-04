@@ -16,9 +16,8 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkCommon
-
 @testable import SplunkAgent
+import SplunkCommon
 
 /// A dummy module skeleton for testing logic around modules.
 class CrashReportsTestModule {
@@ -94,10 +93,8 @@ extension CrashReportsTestModule: Module {
 
     // MARK: - Protocol compliance
 
-    func install(
-        with configuration: (any ModuleConfiguration)?,
-        remoteConfiguration: (any RemoteModuleConfiguration)?
-    ) {
+    func install(with configuration: (any ModuleConfiguration)?,
+                 remoteConfiguration: (any RemoteModuleConfiguration)?) {
 
         // The configurations obtained are stored for later evaluation
         self.configuration = configuration as? CrashReportsTestConfiguration

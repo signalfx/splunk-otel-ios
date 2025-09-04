@@ -22,8 +22,7 @@ import Foundation
 ///
 /// **Warning:** This class is not meant for client applications and may produce
 ///            unexpected results.
-@objc(STSAgentTesting)
-@objcMembers
+@objc(STSAgentTesting) @objcMembers
 public class AgentTestingObjC: NSObject {
 
     // MARK: - Configurations builds

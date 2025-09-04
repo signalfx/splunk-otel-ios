@@ -60,6 +60,6 @@ struct SystemInfo {
     }
 
     static var type: String {
-        "darwin"
+        return "darwin"
     }
 }

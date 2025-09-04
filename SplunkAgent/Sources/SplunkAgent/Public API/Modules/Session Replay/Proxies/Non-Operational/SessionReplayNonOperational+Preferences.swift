@@ -35,8 +35,7 @@ extension SessionReplayNonOperational {
         // swiftlint:enable unused_setter_value
     }
 
-    @discardableResult
-    func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule {
+    @discardableResult func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule {
         logAccess(toApi: #function)
 
         return self

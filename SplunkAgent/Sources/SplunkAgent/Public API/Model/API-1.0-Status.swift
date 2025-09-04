@@ -60,6 +60,6 @@ extension Status.Cause: CustomStringConvertible, CustomDebugStringConvertible {
     }
 
     public var debugDescription: String {
-        description
+        return description
     }
 }

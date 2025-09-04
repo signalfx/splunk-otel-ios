@@ -38,11 +38,8 @@ class DefaultModulesManager: AgentModulesManager {
 
     // MARK: - Initialization
 
-    required init(
-        rawConfiguration: Data?,
-        moduleConfigurations: [Any]?,
-        for pool: AgentModulesPool.Type = DefaultModulesPool.self
-    ) {
+    required init(rawConfiguration: Data?, moduleConfigurations: [Any]?,
+                  for pool: AgentModulesPool.Type = DefaultModulesPool.self) {
 
         modulesPool = pool
 
@@ -53,11 +50,9 @@ class DefaultModulesManager: AgentModulesManager {
 
 
         // All local module configurations
-        let configurations =
-            moduleConfigurations?
-            .compactMap { moduleConfiguration in
-                moduleConfiguration as? ModuleConfiguration
-            } ?? []
+        let configurations = moduleConfigurations?.compactMap { moduleConfiguration in
+            moduleConfiguration as? ModuleConfiguration
+        } ?? []
 
         // Creates remote module configurations from raw data
         let remoteConfigurations: [any RemoteModuleConfiguration] = modulesPool.default.compactMap { moduleType in
@@ -80,7 +75,7 @@ class DefaultModulesManager: AgentModulesManager {
 
     /// Helper method for generic module initialization.
     private func initializeModule<T: Module>(type: T.Type) -> T {
-        T()
+        return T()
     }
 
     /// Helper method for generic initialization of remote configuration.
@@ -95,11 +90,8 @@ class DefaultModulesManager: AgentModulesManager {
 
     // MARK: - Business Logic
 
-    func connect(
-        modules: [any Module],
-        with configurations: [any ModuleConfiguration],
-        remoteConfigurations: [any RemoteModuleConfiguration]
-    ) {
+    func connect(modules: [any Module], with configurations: [any ModuleConfiguration],
+                 remoteConfigurations: [any RemoteModuleConfiguration]) {
         // Connect all modules with corresponding configurations (if exists)
         for module in modules {
             // Get corresponding configuration
@@ -128,11 +120,8 @@ class DefaultModulesManager: AgentModulesManager {
         }
     }
 
-    private func connect(
-        module: any Module,
-        with configuration: (any ModuleConfiguration)?,
-        remoteConfiguration: (any RemoteModuleConfiguration)?
-    ) {
+    private func connect(module: any Module, with configuration: (any ModuleConfiguration)?,
+                         remoteConfiguration: (any RemoteModuleConfiguration)?) {
         // We will not add remotely disabled modules
         guard remoteConfiguration?.enabled ?? true else {
             return
@@ -194,11 +183,11 @@ class DefaultModulesManager: AgentModulesManager {
     // MARK: - Metrics
 
     var modulesInitializationTimes: [String: Date] {
-        initializationTimes
+        return initializationTimes
     }
 
     var modulesConfigurationDescription: [String: String] {
-        configurationDescription
+        return configurationDescription
     }
 
     /// Prepares modules configuration description, in a format of a `[String: String]` dictionary,

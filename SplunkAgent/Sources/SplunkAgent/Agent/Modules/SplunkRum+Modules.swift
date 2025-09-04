@@ -15,17 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoSessionReplay
 import Foundation
+internal import CiscoSessionReplay
 internal import SplunkAppStart
 internal import SplunkAppState
 internal import SplunkCustomTracking
-internal import SplunkInteractions
 internal import SplunkNavigation
 internal import SplunkNetwork
-internal import SplunkNetworkMonitor
-internal import SplunkSlowFrameDetector
 internal import SplunkWebView
+internal import SplunkNetworkMonitor
+internal import SplunkInteractions
+internal import SplunkSlowFrameDetector
 
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
@@ -42,17 +42,15 @@ extension SplunkRum {
 
     func registerModulePublish() {
         // Send events on data publish
-        modulesManager?
-            .onModulePublish(data: { metadata, data in
-                self.eventManager?
-                    .publish(data: data, metadata: metadata) { success in
-                        if success {
-                            self.modulesManager?.deleteModuleData(for: metadata)
-                        } else {
-                            // TODO: MRUM_AC-1061 (post GA): Handle a case where data is not sent.
-                        }
-                    }
-            })
+        modulesManager?.onModulePublish(data: { metadata, data in
+            self.eventManager?.publish(data: data, metadata: metadata) { success in
+                if success {
+                    self.modulesManager?.deleteModuleData(for: metadata)
+                } else {
+                    // TODO: MRUM_AC-1061 (post GA): Handle a case where data is not sent.
+                }
+            }
+        })
     }
 
 
@@ -111,9 +109,9 @@ extension SplunkRum {
             return
         }
 
-        #if canImport(SplunkCrashReports)
-            let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
-        #endif
+#if canImport(SplunkCrashReports)
+        let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
+#endif
 
         navigationModule.agentVersion(sharedState.agentVersion)
 
@@ -122,9 +120,9 @@ extension SplunkRum {
             for await newValue in navigationModule.screenNameStream {
                 runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
                 screenNameChangeCallback?(newValue)
-                #if canImport(SplunkCrashReports)
-                    crashReportsModule?.crashReportUpdateScreenName(newValue)
-                #endif
+#if canImport(SplunkCrashReports)
+                crashReportsModule?.crashReportUpdateScreenName(newValue)
+#endif
             }
         }
 
@@ -155,18 +153,18 @@ extension SplunkRum {
 
     /// Configure Crash Reports module with shared state.
     private func customizeCrashReports() {
-        // swiftformat:disable indent
-        #if canImport(SplunkCrashReports)
-            let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
+    // swiftformat:disable indent
+    #if canImport(SplunkCrashReports)
+        let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
 
-            // Assign an object providing the current state of the agent instance.
-            // We need to do this because we need to read `appState` from the agent in the instance of a crash.
-            crashReportsModule?.sharedState = sharedState
+        // Assign an object providing the current state of the agent instance.
+        // We need to do this because we need to read `appState` from the agent in the instance of a crash.
+        crashReportsModule?.sharedState = sharedState
 
-            // Check if a crash ended the previous run of the app
-            crashReportsModule?.reportCrashIfPresent()
-        #endif
-        // swiftformat:enable indent
+        // Check if a crash ended the previous run of the app
+        crashReportsModule?.reportCrashIfPresent()
+    #endif
+    // swiftformat:enable indent
     }
 
     /// Configure App start module with shared state.

@@ -26,6 +26,6 @@ struct NoOpSession: AgentSession {
     }
 
     func sessionId(for timestamp: Date) -> String? {
-        currentSessionItem.id
+        return currentSessionItem.id
     }
 }

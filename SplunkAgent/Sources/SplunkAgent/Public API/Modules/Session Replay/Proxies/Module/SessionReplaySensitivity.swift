@@ -67,8 +67,7 @@ final class SessionReplaySensitivity: SessionReplayModuleSensitivity {
     ///     or should revert to default behavior (`nil`).
     ///
     /// - Returns: The `SessionReplayModuleSensitivity` instance for chaining further configurations.
-    @discardableResult
-    func set(_ view: UIView, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
+    @discardableResult func set(_ view: UIView, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
         self[view] = sensitive
 
         return self
@@ -109,8 +108,7 @@ final class SessionReplaySensitivity: SessionReplayModuleSensitivity {
     ///     not sensitive (`false`), or should revert to default behavior (`nil`).
     ///
     /// - Returns: The `SessionReplayModuleSensitivity` instance for chaining further configurations.
-    @discardableResult
-    func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
+    @discardableResult func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
         self[viewClass] = sensitive
 
         return self

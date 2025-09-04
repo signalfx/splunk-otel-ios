@@ -17,7 +17,6 @@ limitations under the License.
 
 import CiscoSessionReplay
 import Foundation
-
 @testable import SplunkAgent
 
 final class SessionReplayTestBuilder {
@@ -70,11 +69,11 @@ final class SessionReplayTestBuilder {
 
     static func sampleVideoData() throws -> Data {
         #if SPM_TESTS
-            let fileUrl = Bundle.module.url(forResource: "v", withExtension: "mp4")!
+        let fileUrl = Bundle.module.url(forResource: "v", withExtension: "mp4")!
 
         #else
-            let bundle = Bundle(for: EventsTests.self)
-            let fileUrl = bundle.url(forResource: "v", withExtension: "mp4")!
+        let bundle = Bundle(for: EventsTests.self)
+        let fileUrl = bundle.url(forResource: "v", withExtension: "mp4")!
         #endif
 
         let data = try Data(contentsOf: fileUrl)

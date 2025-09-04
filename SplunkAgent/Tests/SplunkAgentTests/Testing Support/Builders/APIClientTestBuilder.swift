@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-
 @testable import SplunkAgent
 
 final class APIClientTestBuilder {
@@ -51,7 +50,7 @@ struct MockEndpoint: Endpoint {
     typealias RequestHeaders = MockHeaders
 
     struct MockHeaders: APIClientHeaders {
-        var headers: [String: String] = [:]
+        var headers = [String: String]()
     }
 
     static var service = Service(path: "", httpMethod: .get)
@@ -60,18 +59,18 @@ struct MockEndpoint: Endpoint {
 }
 
 class URLProtocolMock: URLProtocol {
-    static var testURLs: [String: Data] = [:]
+    static var testURLs = [String: Data]()
 
     static let mainUrl = URL(string: "https://www.SplunkAgent.test")!
     static let testErrorPath = "error"
     static let testServerErrorPath = "testServerError"
 
     override class func canInit(with request: URLRequest) -> Bool {
-        true
+        return true
     }
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        request
+        return request
     }
 
     override func startLoading() {
@@ -84,9 +83,9 @@ class URLProtocolMock: URLProtocol {
             client?.urlProtocol(self, didLoad: Data())
             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         } else {
-            if let errorData = try? RawMockDataBuilder.build(mockFile: .remoteError),
-                path == Self.testServerErrorPath
-            {
+            if
+                let errorData = try? RawMockDataBuilder.build(mockFile: .remoteError),
+                path == Self.testServerErrorPath {
                 client?.urlProtocol(self, didLoad: errorData)
 
             } else if let data = URLProtocolMock.testURLs[path] {

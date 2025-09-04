@@ -16,21 +16,19 @@ limitations under the License.
 */
 
 internal import CiscoLogger
-import Foundation
 internal import SplunkCommon
 internal import SplunkNavigation
 internal import SplunkNetwork
 internal import SplunkSlowFrameDetector
 
+import Foundation
+
 /// A deprecated builder for initializing the RUM agent.
-@available(
-    *,
-    deprecated,
-    message: """
-        The SplunkRumBuilder class is no longer supported and will be removed in a later version.
-        Use the `SplunkRum.install(with:moduleConfigurations:)` API instead.
-        """
-)
+@available(*, deprecated, message:
+    """
+    The SplunkRumBuilder class is no longer supported and will be removed in a later version.
+    Use the `SplunkRum.install(with:moduleConfigurations:)` API instead.
+    """)
 public class SplunkRumBuilder {
 
     // MARK: - Configuration properties
@@ -63,14 +61,11 @@ public class SplunkRumBuilder {
     // MARK: - Builder initialization
 
     /// Initializes the builder with a beacon URL and RUM authentication token.
-    @available(
-        *,
-        deprecated,
-        message: """
-            This initializer will be removed in a later version.
-            Use the `SplunkRum.install(with:moduleConfigurations:)` API instead.
-            """
-    )
+    @available(*, deprecated, message:
+        """
+        This initializer will be removed in a later version.
+        Use the `SplunkRum.install(with:moduleConfigurations:)` API instead.
+        """)
     public init(beaconUrl: String, rumAuth: String) {
         self.beaconUrl = beaconUrl
         self.rumAuth = rumAuth
@@ -87,14 +82,11 @@ public class SplunkRumBuilder {
     }
 
     /// Initializes the builder with a realm and RUM authentication token.
-    @available(
-        *,
-        deprecated,
-        message: """
-            This initializer will be removed in a later version.
-            Use the `SplunkRum.install(with:moduleConfigurations:)` API instead.
-            """
-    )
+    @available(*, deprecated, message:
+        """
+        This initializer will be removed in a later version.
+        Use the `SplunkRum.install(with:moduleConfigurations:)` API instead.
+        """)
     public init(realm: String, rumAuth: String) {
         beaconUrl = "https://rum-ingest.\(realm).signalfx.com/v1/rum"
         self.rumAuth = rumAuth
@@ -106,14 +98,11 @@ public class SplunkRumBuilder {
     // MARK: - Public configuration builder methods
 
     /// Enables or disables debug logging.
-    @available(
-        *,
-        deprecated,
-        message: """
-            This builder method will be removed in a later version.
-            Use `AgentConfiguration` `enableDebugLogging` instead.
-            """
-    )
+    @available(*, deprecated, message:
+        """
+        This builder method will be removed in a later version.
+        Use `AgentConfiguration` `enableDebugLogging` instead.
+        """)
     @discardableResult
     public func debug(enabled: Bool) -> SplunkRumBuilder {
         debug = enabled
@@ -121,14 +110,11 @@ public class SplunkRumBuilder {
     }
 
     /// Sets the deployment environment.
-    @available(
-        *,
-        deprecated,
-        message: """
-            This builder method will be removed in a later version.
-            Use `AgentConfiguration` `deploymentEnvironment` instead.
-            """
-    )
+    @available(*, deprecated, message:
+        """
+        This builder method will be removed in a later version.
+        Use `AgentConfiguration` `deploymentEnvironment` instead.
+        """)
     @discardableResult
     public func deploymentEnvironment(environment: String) -> SplunkRumBuilder {
         self.environment = environment
@@ -136,14 +122,11 @@ public class SplunkRumBuilder {
     }
 
     /// Sets the session sampling ratio.
-    @available(
-        *,
-        deprecated,
-        message: """
-            This builder method will be removed in a later version.
-            Use `AgentConfiguration` `SessionConfiguration` instead.
-            """
-    )
+    @available(*, deprecated, message:
+        """
+        This builder method will be removed in a later version.
+        Use `AgentConfiguration` `SessionConfiguration` instead.
+        """)
     @discardableResult
     public func sessionSamplingRatio(samplingRatio: Double) -> SplunkRumBuilder {
         sessionSamplingRatio = samplingRatio
@@ -151,14 +134,11 @@ public class SplunkRumBuilder {
     }
 
     /// Sets the application name.
-    @available(
-        *,
-        deprecated,
-        message: """
-            This builder method will be removed in a later version.
-            Use `AgentConfiguration` `appName` instead.
-            """
-    )
+    @available(*, deprecated, message:
+        """
+        This builder method will be removed in a later version.
+        Use `AgentConfiguration` `appName` instead.
+        """)
     @discardableResult
     public func setApplicationName(_ appName: String) -> SplunkRumBuilder {
         self.appName = appName
@@ -166,27 +146,21 @@ public class SplunkRumBuilder {
     }
 
     /// This method is a no-op and has no effect.
-    @available(
-        *,
-        deprecated,
-        message: """
-            This builder method is a no-op and will be removed in a later version.
-            """
-    )
+    @available(*, deprecated, message:
+        """
+        This builder method is a no-op and will be removed in a later version.
+        """)
     @discardableResult
     public func enableDiskCache(enabled: Bool) -> SplunkRumBuilder {
-        self
+        return self
     }
 
     /// Sets global attributes to be included in all spans.
-    @available(
-        *,
-        deprecated,
-        message: """
-            This builder method will be removed in a later version.
-            Use `AgentConfiguration` `MutableAttributes` instead.
-            """
-    )
+    @available(*, deprecated, message:
+        """
+        This builder method will be removed in a later version.
+        Use `AgentConfiguration` `MutableAttributes` instead.
+        """)
     @discardableResult
     public func globalAttributes(globalAttributes: [String: Any]) -> SplunkRumBuilder {
         self.globalAttributes = globalAttributes
@@ -200,14 +174,11 @@ public class SplunkRumBuilder {
     ///
     /// - Parameter show: If `true`, the Navigation module will automatically detect navigation.
     /// - Returns: The updated builder instance.
-    @available(
-        *,
-        deprecated,
-        message: """
-            This builder method will be removed in a later version.
-            Use `agentInstance.navigation.preferences.enableAutomatedTracking` instead.
-            """
-    )
+    @available(*, deprecated, message:
+        """
+        This builder method will be removed in a later version.
+        Use `agentInstance.navigation.preferences.enableAutomatedTracking` instead.
+        """)
     @discardableResult
     public func showVCInstrumentation(_ show: Bool) -> SplunkRumBuilder {
         showVCInstrumentation = show
@@ -248,7 +219,7 @@ public class SplunkRumBuilder {
     public func slowFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
         // This method is intentionally empty as the feature is discontinued
         // We return 'self' to allow for continued builder chaining
-        self
+        return self
     }
 
     /// Specifies the legacy threshold for frozen frame detection. This setting is now ignored.
@@ -261,7 +232,7 @@ public class SplunkRumBuilder {
     public func frozenFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
         // Intentionally empty
         // We return 'self' to allow for continued builder chaining
-        self
+        return self
     }
 
     /// Specifies whether the Network Instrumentation module should be activated and generate spans.
@@ -293,14 +264,11 @@ public class SplunkRumBuilder {
     // MARK: - Build translation method
 
     /// Translates the builder settings into the modern configuration and initializes the RUM agent.
-    @available(
-        *,
-        deprecated,
-        message: """
-            This builder method will be removed in a later version.
-            Use the `SplunkRum.install(with:moduleConfigurations:)` API instead.
-            """
-    )
+    @available(*, deprecated, message:
+        """
+        This builder method will be removed in a later version.
+        Use the `SplunkRum.install(with:moduleConfigurations:)` API instead.
+        """)
     @discardableResult
     public func build() -> Bool {
 

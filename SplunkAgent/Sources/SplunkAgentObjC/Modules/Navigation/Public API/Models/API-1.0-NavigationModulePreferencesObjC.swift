@@ -45,8 +45,7 @@ public final class NavigationModulePreferencesObjC: NSObject {
     /// Initializes new preferences object with preconfigured values.
     ///
     /// - Parameter enableAutomatedTracking: If `true`, the module will automatically detect navigation.
-    @objc
-    public init(enableAutomatedTracking: Bool) {
+    @objc public init(enableAutomatedTracking: Bool) {
         self.enableAutomatedTracking = enableAutomatedTracking
     }
 }

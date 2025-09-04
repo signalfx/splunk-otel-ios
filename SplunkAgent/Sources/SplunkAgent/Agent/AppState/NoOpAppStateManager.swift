@@ -21,6 +21,6 @@ import Foundation
 struct NoOpAppStateManager: AgentAppStateManager {
 
     func appState(for timestamp: Date) -> AppState? {
-        nil
+        return nil
     }
 }

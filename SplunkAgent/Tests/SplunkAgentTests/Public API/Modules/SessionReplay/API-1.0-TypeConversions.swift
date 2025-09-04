@@ -16,9 +16,9 @@ limitations under the License.
 */
 
 import CiscoSessionReplay
-import XCTest
-
 @testable import SplunkAgent
+
+import XCTest
 
 final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 

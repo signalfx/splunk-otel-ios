@@ -110,7 +110,7 @@ public final class SplunkRumObjC: NSObject {
     ///   - configuration: A configuration for the initial SDK setup.
     @objc
     public static func install(with configuration: AgentConfigurationObjC) throws -> SplunkRumObjC {
-        try install(with: configuration, moduleConfigurations: nil)
+        return try install(with: configuration, moduleConfigurations: nil)
     }
 
     /// Creates and initializes the singleton instance.
@@ -123,10 +123,9 @@ public final class SplunkRumObjC: NSObject {
     @objc
     public static func install(with configuration: AgentConfigurationObjC, moduleConfigurations: [ModuleConfigurationObjC]?) throws -> SplunkRumObjC {
         // Converts module configurations to their Swift counterparts
-        let swiftModuleConfigurations = moduleConfigurations?
-            .compactMap { moduleConfiguration in
-                (moduleConfiguration as? ModuleConfigurationSwift)?.moduleConfiguration
-            }
+        let swiftModuleConfigurations = moduleConfigurations?.compactMap { moduleConfiguration in
+            (moduleConfiguration as? ModuleConfigurationSwift)?.moduleConfiguration
+        }
 
         // Create an agent instance or emit errors
         let agentConfiguration = configuration.agentConfiguration()

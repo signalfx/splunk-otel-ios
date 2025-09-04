@@ -41,10 +41,10 @@ extension AgentConfigurationError: CustomStringConvertible, CustomDebugStringCon
         switch self {
         case let .invalidEndpoint(endpointConfiguration):
             return """
-                The supplied endpoint configuration is invalid. \
-                Please check the agent configuration.
-                Supplied endpoint configuration: \(endpointConfiguration.description)
-                """
+            The supplied endpoint configuration is invalid. \
+            Please check the agent configuration.
+            Supplied endpoint configuration: \(endpointConfiguration.description)
+            """
 
         case let .invalidAppName(appName):
             return "Invalid app name supplied, please check your configuration settings. Supplied app name: \"\(appName ?? "nil")\""
@@ -59,7 +59,7 @@ extension AgentConfigurationError: CustomStringConvertible, CustomDebugStringCon
 
     /// A string representation of an `AgentConfigurationError` instance intended for diagnostic output, identical to `description`.
     public var debugDescription: String {
-        description
+        return description
     }
 }
 
@@ -68,6 +68,6 @@ extension AgentConfigurationError: LocalizedError {
 
     /// A string with localized message describing the error and why it occurred.
     public var errorDescription: String? {
-        description
+        return description
     }
 }

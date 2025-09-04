@@ -18,8 +18,7 @@ limitations under the License.
 import Foundation
 
 /// The class implements the Interactions module configuration.
-@objc(SPLKInteractionsConfiguration)
-@objcMembers
+@objc(SPLKInteractionsConfiguration) @objcMembers
 public final class InteractionsConfigurationObjC: ModuleConfigurationObjC {
 
     // MARK: - Initialization

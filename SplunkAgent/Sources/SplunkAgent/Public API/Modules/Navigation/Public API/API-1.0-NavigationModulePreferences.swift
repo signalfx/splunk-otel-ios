@@ -28,8 +28,7 @@ public protocol NavigationModulePreferences {
     /// - Parameter enable: If `true`, the ``NavigationModule`` will automatically detect navigation.
     ///
     /// - Returns: The updated ``NavigationModulePreferences`` object.
-    @discardableResult
-    func enableAutomatedTracking(_ enable: Bool?) -> any NavigationModulePreferences
+    @discardableResult func enableAutomatedTracking(_ enable: Bool?) -> any NavigationModulePreferences
 
 
     // MARK: - Convenience init

@@ -41,11 +41,11 @@ final class RawMockDataBuilder {
     static func build(mockFile: FileName) throws -> Data {
 
         #if SPM_TESTS
-            let mockFilePath = Bundle.module.path(forResource: mockFile.rawValue, ofType: "json")
+        let mockFilePath = Bundle.module.path(forResource: mockFile.rawValue, ofType: "json")
 
         #else
-            let currentBundle = Bundle(for: self)
-            let mockFilePath = currentBundle.path(forResource: mockFile.rawValue, ofType: "json")
+        let currentBundle = Bundle(for: self)
+        let mockFilePath = currentBundle.path(forResource: mockFile.rawValue, ofType: "json")
         #endif
 
         // File must exist

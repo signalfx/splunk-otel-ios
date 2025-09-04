@@ -19,15 +19,13 @@ extension SessionReplayNonOperational {
 
     // MARK: - Recording management
 
-    @discardableResult
-    func start() -> any SessionReplayModule {
+    @discardableResult func start() -> any SessionReplayModule {
         logAccess(toApi: #function)
 
         return self
     }
 
-    @discardableResult
-    func stop() -> any SessionReplayModule {
+    @discardableResult func stop() -> any SessionReplayModule {
         logAccess(toApi: #function)
 
         return self

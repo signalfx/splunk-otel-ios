@@ -15,9 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import XCTest
-
 @testable import SplunkAgent
+import XCTest
 
 class ThreadSafeDictionaryTests: XCTestCase {
 
@@ -216,11 +215,10 @@ class ThreadSafeDictionaryTests: XCTestCase {
 
         // Perform concurrent reads
         for _ in 0 ..< 100 {
-            DispatchQueue.global()
-                .async {
-                    _ = dict["key\(Int.random(in: 0 ..< 10))"]
-                    expectation.fulfill()
-                }
+            DispatchQueue.global().async {
+                _ = dict["key\(Int.random(in: 0 ..< 10))"]
+                expectation.fulfill()
+            }
         }
 
         wait(for: [expectation], timeout: 5.0)
@@ -233,11 +231,10 @@ class ThreadSafeDictionaryTests: XCTestCase {
 
         // Perform concurrent writes
         for index in 0 ..< 100 {
-            DispatchQueue.global()
-                .async {
-                    dict["key\(index)"] = index
-                    expectation.fulfill()
-                }
+            DispatchQueue.global().async {
+                dict["key\(index)"] = index
+                expectation.fulfill()
+            }
         }
 
         wait(for: [expectation], timeout: 5.0)
@@ -262,20 +259,18 @@ class ThreadSafeDictionaryTests: XCTestCase {
 
         // Perform concurrent reads
         for _ in 0 ..< 100 {
-            DispatchQueue.global()
-                .async {
-                    _ = dict["key\(Int.random(in: 0 ..< 10))"]
-                    readExpectation.fulfill()
-                }
+            DispatchQueue.global().async {
+                _ = dict["key\(Int.random(in: 0 ..< 10))"]
+                readExpectation.fulfill()
+            }
         }
 
         // Perform concurrent writes
         for index in 0 ..< 100 {
-            DispatchQueue.global()
-                .async {
-                    dict["key\(index + 10)"] = index + 10
-                    writeExpectation.fulfill()
-                }
+            DispatchQueue.global().async {
+                dict["key\(index + 10)"] = index + 10
+                writeExpectation.fulfill()
+            }
         }
 
         wait(for: [readExpectation, writeExpectation], timeout: 5.0)

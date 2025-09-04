@@ -23,6 +23,6 @@ extension TimeInterval {
     ///
     /// ⚠️ Warning: 64-bit platforms only.
     var nanoseconds: Int {
-        Int(self * 1_000_000_000.0)
+        return Int(self * 1_000_000_000.0)
     }
 }

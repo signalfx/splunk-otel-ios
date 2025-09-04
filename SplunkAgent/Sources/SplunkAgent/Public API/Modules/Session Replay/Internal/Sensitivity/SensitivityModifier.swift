@@ -47,7 +47,7 @@ private struct SmartlookSensitiveView: UIViewRepresentable {
     // MARK: - UIViewRepresentable methods
 
     func makeUIView(context: Context) -> UIView {
-        SLSensitiveView()
+        return SLSensitiveView()
     }
 
     func updateUIView(_ uiView: UIView, context: Context) {

@@ -105,15 +105,11 @@ class DefaultSession: AgentSession {
         hookToAppLifecycle()
 
         // Start a perpetual check of the session state
-        refreshJob = RepeatingJob(
-            interval: sessionRefreshInterval,
-            block: { [weak self] in
-                // We constantly check the situation.
-                // If the current state requires it, we create a new session.
-                self?.refreshSession()
-            }
-        )
-        .resume()
+        refreshJob = RepeatingJob(interval: sessionRefreshInterval, block: { [weak self] in
+            // We constantly check the situation.
+            // If the current state requires it, we create a new session.
+            self?.refreshSession()
+        }).resume()
 
         // Set up the session immediately
         refreshSession()
@@ -148,9 +144,9 @@ class DefaultSession: AgentSession {
 
         // Verify that the session falls within the limits
         // defined by the configurations
-        if let session,
-            session.start + maxSessionLength + sessionRefreshInterval + (refreshJob?.tolerance ?? 0.0) > timestamp
-        {
+        if
+            let session,
+            session.start + maxSessionLength + sessionRefreshInterval + (refreshJob?.tolerance ?? 0.0) > timestamp {
             return session
         }
 
@@ -167,9 +163,9 @@ class DefaultSession: AgentSession {
         sessionsModel.purge()
 
         // Close previous session
-        if var previousSession = sessionsModel.sessions.last,
-            !(previousSession.closed ?? false)
-        {
+        if
+            var previousSession = sessionsModel.sessions.last,
+            !(previousSession.closed ?? false) {
             previousSession.closed = true
 
             // Updates corresponding item in `SessionsModel`

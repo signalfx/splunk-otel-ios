@@ -57,8 +57,7 @@ final class SessionReplayNonOperationalSensitivity: SessionReplayModuleSensitivi
         // swiftlint:enable unused_setter_value
     }
 
-    @discardableResult
-    func set(_ view: UIView, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
+    @discardableResult func set(_ view: UIView, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
         logAccess(toApi: #function)
 
         return self
@@ -81,8 +80,7 @@ final class SessionReplayNonOperationalSensitivity: SessionReplayModuleSensitivi
         // swiftlint:enable unused_setter_value
     }
 
-    @discardableResult
-    func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
+    @discardableResult func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
         logAccess(toApi: #function)
 
         return self

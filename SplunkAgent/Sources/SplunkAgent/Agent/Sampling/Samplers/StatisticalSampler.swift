@@ -77,6 +77,6 @@ extension StatisticalSampler {
     ///
     /// - Returns: A `SamplingDecision`.
     func sample() -> SamplingDecision {
-        sample(randomNumberProvider: SystemRandomNumberProvider())
+        return sample(randomNumberProvider: SystemRandomNumberProvider())
     }
 }

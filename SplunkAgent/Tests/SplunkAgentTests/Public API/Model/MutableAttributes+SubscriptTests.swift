@@ -16,9 +16,8 @@ limitations under the License.
 */
 
 import OpenTelemetryApi
-import XCTest
-
 @testable import SplunkAgent
+import XCTest
 
 final class MutableAttributesSubscriptTests: XCTestCase {
 

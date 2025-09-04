@@ -15,9 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkCustomTracking
-
 @testable import SplunkAgent
+import SplunkCustomTracking
 
 final class CustomTrackingTestBuilder {
 

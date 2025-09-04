@@ -20,52 +20,52 @@ import XCTest
 // swiftformat:disable indent
 #if os(iOS) || os(tvOS) || os(visionOS)
 
-    extension XCTestCase {
+extension XCTestCase {
 
-        // MARK: - Constants
+    // MARK: - Constants
 
-        /// We need time to deliver and evaluate the expectations.
-        private var deliveryTime: TimeInterval {
-            0.05
-        }
-
-
-        // MARK: - Simulated UIKit notifications
-
-        /// Simulates sending for `didEnterBackgroundNotification` from the system.
-        func sendEnterBackgroundNotification() {
-            // Send notification emitted from simulated UIKit
-            sendSimulatedNotification(UIApplication.didEnterBackgroundNotification)
-        }
-
-        /// Simulates sending for `willEnterForegroundNotification` from the system.
-        func sendEnterForegroundNotification() {
-            // Send notification emitted from simulated UIKit
-            sendSimulatedNotification(UIApplication.willEnterForegroundNotification)
-        }
-
-
-        // MARK: - Simulated notifications
-
-        /// Simulates sending a notification as in the case of a running application.
-        func sendSimulatedNotification(_ notification: NSNotification.Name) {
-            // Watch for emitted notification
-            _ = expectation(
-                forNotification: notification,
-                object: nil,
-                handler: nil
-            )
-
-            // Send simulated notification
-            NotificationCenter.default.post(
-                name: notification,
-                object: nil
-            )
-
-            // We need to wait for notification delivery
-            waitForExpectations(timeout: deliveryTime, handler: nil)
-        }
+    /// We need time to deliver and evaluate the expectations.
+    private var deliveryTime: TimeInterval {
+        0.05
     }
+
+
+    // MARK: - Simulated UIKit notifications
+
+    /// Simulates sending for `didEnterBackgroundNotification` from the system.
+    func sendEnterBackgroundNotification() {
+        // Send notification emitted from simulated UIKit
+        sendSimulatedNotification(UIApplication.didEnterBackgroundNotification)
+    }
+
+    /// Simulates sending for `willEnterForegroundNotification` from the system.
+    func sendEnterForegroundNotification() {
+        // Send notification emitted from simulated UIKit
+        sendSimulatedNotification(UIApplication.willEnterForegroundNotification)
+    }
+
+
+    // MARK: - Simulated notifications
+
+    /// Simulates sending a notification as in the case of a running application.
+    func sendSimulatedNotification(_ notification: NSNotification.Name) {
+        // Watch for emitted notification
+        _ = expectation(
+            forNotification: notification,
+            object: nil,
+            handler: nil
+        )
+
+        // Send simulated notification
+        NotificationCenter.default.post(
+            name: notification,
+            object: nil
+        )
+
+        // We need to wait for notification delivery
+        waitForExpectations(timeout: deliveryTime, handler: nil)
+    }
+}
 
 #endif
 // swiftformat:enable indent
