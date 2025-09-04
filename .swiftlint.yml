@@ -1,3 +1,5 @@
+strict: true
+
 analyzer_rules:
   - capture_variable
   - explicit_self
@@ -140,3 +142,4 @@ file_header:
 
 excluded:
  - ${PWD}/Package.swift
+ - ${PWD}/.build

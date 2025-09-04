@@ -30,7 +30,7 @@ let package = Package(
             exact: "2.0.0"
         ),
         .package(
-            url:"https://github.com/microsoft/plcrashreporter",
+            url: "https://github.com/microsoft/plcrashreporter",
             from: "1.12.0"
         ),
 
@@ -144,10 +144,7 @@ func generateMainTargets() -> [Target] {
         .testTarget(
             name: "SplunkAgentObjCTests",
             dependencies: ["SplunkAgentObjC"],
-            path: "SplunkAgent/Tests/SplunkAgentObjCTests",
-            plugins: [
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
-            ]
+            path: "SplunkAgent/Tests/SplunkAgentObjCTests"
         ),
 
 
