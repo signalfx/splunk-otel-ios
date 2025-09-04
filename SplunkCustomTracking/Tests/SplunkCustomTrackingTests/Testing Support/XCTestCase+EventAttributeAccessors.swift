@@ -15,14 +15,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+@testable import SplunkCommon
 import XCTest
 
-final class SplunkCustomTrackingTests: XCTestCase {
-    func testExample() throws {
-        // XCTest Documentation
-        // https://developer.apple.com/documentation/xctest
+extension XCTestCase {
+    func getStringValue(for key: String, in attributes: [String: EventAttributeValue]) -> String? {
+        if case let .string(value) = attributes[key] {
+            return value
+        }
+        return nil
+    }
 
-        // Defining Test Cases and Test Methods
-        // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
+    func getIntValue(for key: String, in attributes: [String: EventAttributeValue]) -> Int? {
+        if case let .int(value) = attributes[key] {
+            return value
+        }
+        return nil
     }
 }
