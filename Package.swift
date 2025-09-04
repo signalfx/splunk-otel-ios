@@ -403,7 +403,9 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 "SplunkOpenTelemetry",
                 "SplunkCustomTracking",
-                resolveDependency("logger")
+                resolveDependency("logger"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift")
             ],
             path: "SplunkCustomTracking/Tests"
         ),
