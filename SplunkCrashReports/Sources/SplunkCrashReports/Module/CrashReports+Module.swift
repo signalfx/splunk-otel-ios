@@ -31,7 +31,6 @@ public struct CrashReportsMetadata: ModuleEventMetadata {
 
 extension CrashReports: Module {
 
-
     // MARK: - Module types
 
     public typealias Configuration = CrashReportsConfiguration

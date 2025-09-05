@@ -34,36 +34,3 @@ public struct CrashReportsConfiguration: ModuleConfiguration {
         self.isEnabled = isEnabled
     }
 }
-
-public struct CrashReportsRemoteConfiguration: RemoteModuleConfiguration {
-
-    // MARK: - Internal decoding
-
-    struct CrashReporting: Decodable {
-        let enabled: Bool
-    }
-
-    struct MRUMRoot: Decodable {
-        let crashReporting: CrashReporting
-    }
-
-    struct Configuration: Decodable {
-        let mrum: MRUMRoot
-    }
-
-    struct Root: Decodable {
-        let configuration: Configuration
-    }
-
-    // MARK: - Protocol compliance
-
-    public var enabled: Bool
-
-    public init?(from data: Data) {
-        guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
-            return nil
-        }
-
-        enabled = root.configuration.mrum.crashReporting.enabled
-    }
-}
