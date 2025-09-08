@@ -57,11 +57,6 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Install tools
-        run: |
-          brew update
-          brew install xcbeautify jq
-
       - name: Generate workspace (.swiftpm/xcode/package.xcworkspace)
         run: xed -b .
 
@@ -84,8 +79,7 @@ jobs:
             -destination "${{ matrix.destination }}" \
             -configuration Debug \
             -skipPackagePluginValidation \
-            clean build \
-          | xcbeautify --report github-actions
+            clean build
 
   tests:
     name: Tests
