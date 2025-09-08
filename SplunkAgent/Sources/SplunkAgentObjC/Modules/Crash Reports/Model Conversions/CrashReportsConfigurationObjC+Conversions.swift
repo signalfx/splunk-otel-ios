@@ -15,17 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-internal import CiscoSwizzling
+internal import SplunkCommon
+internal import SplunkCrashReports
 
-/// Represents automatic navigation event. Used for legacy solution compatibility.
-struct AutomatedNavigationEvent: NavigationActionEvent {
+extension CrashReportsConfigurationObjC: ModuleConfigurationSwift {
 
-    // MARK: - Public
+    // MARK: - Swift variant
 
-    var timestamp: Date
-    var type: NavigationActionEventType
-    var controllerTypeName: String
-    var controllerIdentifier: ObjectIdentifier
-    var viewFrame: CGRect?
+    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
+        CrashReportsConfiguration(isEnabled: isEnabled)
+    }
 }

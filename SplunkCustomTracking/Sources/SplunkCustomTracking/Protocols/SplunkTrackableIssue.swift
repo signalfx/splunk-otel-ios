@@ -51,6 +51,16 @@ public extension SplunkTrackableIssue {
             attributes[ErrorAttributeKeys.Exception.stacktrace.rawValue] = .string(stacktrace.formatted)
         }
 
+        // Add code and domain for NSErrors if they exist
+        if let issue = self as? SplunkIssue {
+            if let code = issue.exceptionCode {
+                attributes["code"] = code
+            }
+            if let domain = issue.codeNamespace {
+                attributes["domain"] = .string(domain)
+            }
+        }
+
         return attributes
     }
 }
@@ -77,21 +87,21 @@ public struct SplunkIssue: SplunkTrackableIssue {
     }
 
     public init(from error: Error) {
-        message = (error as? LocalizedError)?.errorDescription ?? String(describing: error)
+        let nsError = error as NSError
+        message = nsError.localizedDescription
         exceptionType = String(describing: type(of: error))
         timestamp = Date()
 
         // This is not necessarily the original error's throw site.
         stacktrace = Stacktrace(frames: Thread.callStackSymbols)
 
-        let nsError = error as NSError
         exceptionCode = .int(nsError.code)
         codeNamespace = nsError.domain
     }
 
     public init(from exception: NSException) {
         message = exception.reason ?? "No reason provided"
-        exceptionType = String(describing: type(of: exception))
+        exceptionType = exception.name.rawValue
         timestamp = Date()
         stacktrace = Stacktrace(frames: exception.callStackSymbols)
         exceptionCode = nil

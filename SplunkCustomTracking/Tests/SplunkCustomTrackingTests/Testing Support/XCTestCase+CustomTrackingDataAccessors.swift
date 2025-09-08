@@ -15,17 +15,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-internal import CiscoSwizzling
+@testable import SplunkCommon
+@testable import SplunkCustomTracking
+import XCTest
 
-/// Represents automatic navigation event. Used for legacy solution compatibility.
-struct AutomatedNavigationEvent: NavigationActionEvent {
+extension XCTestCase {
+    func getStringValue(for key: String, in data: CustomTrackingData) -> String? {
+        if case let .string(value) = data.attributes[key] {
+            return value
+        }
+        return nil
+    }
 
-    // MARK: - Public
-
-    var timestamp: Date
-    var type: NavigationActionEventType
-    var controllerTypeName: String
-    var controllerIdentifier: ObjectIdentifier
-    var viewFrame: CGRect?
+    func getIntValue(for key: String, in data: CustomTrackingData) -> Int? {
+        if case let .int(value) = data.attributes[key] {
+            return value
+        }
+        return nil
+    }
 }
