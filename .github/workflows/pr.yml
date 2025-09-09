@@ -55,6 +55,8 @@ jobs:
             destination: "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=latest"
           - platform: visionos
             destination: "platform=visionOS Simulator,name=Apple Vision Pro,OS=latest"
+          - platform: macCatalyst
+            destination: "platform=macOS,variant=Mac Catalyst"
     steps:
       - uses: actions/checkout@v4
 
