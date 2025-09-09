@@ -69,7 +69,7 @@ public final class SlowFrameDetector {
     ///
     /// This convenience initializer sets up the detector with default dependencies, including a
     /// `DisplayLinkTicker` for frame monitoring and an `OTelDestination` for reporting.
-    public required init() {
+    public required convenience init() {
         self.init(ticker: DisplayLinkTicker(), destinationFactory: { OTelDestination() })
     }
     #else
