@@ -64,7 +64,7 @@ class ConfigurationHandlerTests: XCTestCase {
 
             expectation.fulfill()
         }
-        // FIXME: [DEMRUM-2782] Fix tests
+        // TODO: [DEMRUM-2782] Fix tests
 //        wait(for: [expectation], timeout: 10)
     }
 }

@@ -214,7 +214,7 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
         simulateMainThreadWait(duration: 0.5)
 
         // There should be processed one request to rotate session in module
-        // FIXME: [DEMRUM-2782] Fix tests
+        // TODO: [DEMRUM-2782] Fix tests
 //        XCTAssertEqual(initialCount, 0)
 //        XCTAssertEqual(moduleProxy.newSessionsCount, 1)
     }
