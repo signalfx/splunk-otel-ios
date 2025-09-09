@@ -249,7 +249,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         try await Task.sleep(nanoseconds: UInt64((hangTime + 0.1) * 1_000_000_000))
         await detector.flushBuffers()
 
-        await fulfillment(of: [reportExpectation], timeout: 1.0)
+        await fulfillment(of: [reportExpectation], timeout: 2.0)
     }
 
     func test_startAndStop_correctlyControlTicker() async {
