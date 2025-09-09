@@ -1,4 +1,4 @@
-// SlowFrameTicker.swift
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -16,6 +16,55 @@ limitations under the License.
 */
 
 import Foundation
+import QuartzCore
+#if os(iOS) || os(tvOS) || os(visionOS)
+import UIKit
+#endif
 
-// Placeholder for the SlowFrameTicker protocol, an abstraction over
-// CADisplayLink to enable unit testing.
+
+// MARK: - SlowFrameTicker for Testability
+
+/// An abstraction for a timer that "ticks" on every frame refresh of the display.
+///
+/// This protocol provides a consistent interface for receiving frame updates via a regular signal, abstracting the underlying mechanism (like `CADisplayLink`) to allow for easier testing and dependency injection.
+internal protocol SlowFrameTicker {
+    var onFrame: ((_ timestamp: TimeInterval, _ duration: TimeInterval) -> Void)? { get set }
+    func start()
+    func stop()
+    func pause()
+    func resume()
+}
+
+#if os(iOS) || os(tvOS) || os(visionOS)
+internal final class DisplayLinkTicker: SlowFrameTicker {
+    private var displayLink: CADisplayLink?
+    var onFrame: ((TimeInterval, TimeInterval) -> Void)?
+
+    func start() {
+        DispatchQueue.main.async {
+            guard self.displayLink == nil else { return }
+            self.displayLink = CADisplayLink(target: self, selector: #selector(self.displayLinkCallback(_:)))
+            self.displayLink?.add(to: .main, forMode: .common)
+        }
+    }
+
+    func stop() {
+        DispatchQueue.main.async {
+            self.displayLink?.invalidate()
+            self.displayLink = nil
+        }
+    }
+
+    func pause() {
+        DispatchQueue.main.async { self.displayLink?.isPaused = true }
+    }
+
+    func resume() {
+        DispatchQueue.main.async { self.displayLink?.isPaused = false }
+    }
+
+    @objc private func displayLinkCallback(_ link: CADisplayLink) {
+        onFrame?(link.timestamp, link.duration)
+    }
+}
+#endif // os(iOS) || os(tvOS) || os(visionOS)
