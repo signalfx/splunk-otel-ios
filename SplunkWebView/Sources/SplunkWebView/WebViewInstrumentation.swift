@@ -20,19 +20,26 @@ limitations under the License.
 #else
     import Foundation
 #endif
-
 internal import CiscoLogger
 import SplunkCommon
 
 public final class WebViewInstrumentation: NSObject {
 
-    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
+    private let logger: LogAgent
 
     public weak var sharedState: AgentSharedState?
 
     /// NSObject conformance
     /// swiftformat:disable:next modifierOrder
-    public override init() {}
+    public override init() {
+        self.logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
+    }
+
+    // Initializer for testing purposes
+    internal init(logger: LogAgent, sharedState: AgentSharedState? = nil) {
+        self.logger = logger
+        self.sharedState = sharedState
+    }
 
 
     // MARK: - Internal Methods
@@ -41,7 +48,7 @@ public final class WebViewInstrumentation: NSObject {
         private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
             let contentController = webView.configuration.userContentController
             contentController.removeScriptMessageHandler(forName: name)
-            contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
+            contentController.add(self, contentWorld: .page, name: name)
             return contentController
         }
 
@@ -56,7 +63,7 @@ public final class WebViewInstrumentation: NSObject {
             }
 
             guard let sessionId = sharedState?.sessionId else {
-                logger.log(level: .warn) {
+                logger.log(level: .warn, isPrivate: false) {
                     "Native Session ID not available for webview injection. Check that sharedState is set before use."
                 }
                 return
@@ -170,12 +177,20 @@ public final class WebViewInstrumentation: NSObject {
     #endif // canImport(WebKit)
 }
 
-// MARK: - WKScriptMessageHandlerWithReply
+// MARK: - WKScriptMessageHandler & WKScriptMessageHandlerWithReply
 
 #if canImport(WebKit)
-    extension WebViewInstrumentation: WKScriptMessageHandlerWithReply {
+    extension WebViewInstrumentation: WKScriptMessageHandler, WKScriptMessageHandlerWithReply {
 
-        /// Handles JavaScript messages with a reply handler for asynchronous communication
+        /// This is the handler for the base `WKScriptMessageHandler` protocol.
+        /// It is required for conformance, but is not expected to be called by our JS bridge.
+        public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            logger.log(level: .warn, isPrivate: false) {
+                "SplunkWebView: Synchronous message handler was called, but this is not supported. The 'WithReply' handler should be used."
+            }
+        }
+
+        /// Handles JavaScript messages with a reply handler for asynchronous communication.
         public func userContentController(
             _ userContentController: WKUserContentController,
             didReceive message: WKScriptMessage,
