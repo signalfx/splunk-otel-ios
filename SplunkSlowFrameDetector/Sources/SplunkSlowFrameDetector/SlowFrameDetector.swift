@@ -25,19 +25,23 @@ import UIKit
 
 /// Detects and reports slow and frozen frames in the user interface.
 ///
-/// This class monitors the application's frame rate using `CADisplayLink`. It identifies "slow frames" when the time between frames exceeds the expected duration plus a tolerance. It also detects "frozen frames" when the main thread is unresponsive for a significant period.
+/// This class monitors the application's frame rate using `CADisplayLink`. It identifies "slow frames"
+/// when the time between frames exceeds the expected duration plus a (percentage) tolerance. It also
+/// detects "frozen frames" when the main thread is unresponsive for a significant period.
 ///
 /// These events are reported as metrics to the configured destination.
 public final class SlowFrameDetector {
 
     /// The percentage of the frame's expected duration that is added as a tolerance when detecting slow frames.
     ///
-    /// A frame is considered "slow" if its actual duration exceeds the expected duration (e.g., 16.67ms for 60Hz) plus this tolerance percentage. The default value is `15.0`.
+    /// A frame is considered "slow" if its actual duration exceeds the expected duration (e.g., 16.67ms
+    /// for 60Hz) plus this tolerance percentage. The default value is `15.0`.
     public static let slowFrameTolerancePercentage: Double = 15.0
 
     /// The time interval, in seconds, after which a frame is considered "frozen."
     ///
-    /// If the main thread does not process frames for a period longer than this threshold, a frozen frame is reported. The default value is `0.7` seconds.
+    /// If the main thread does not process frames for a period longer than this threshold, a frozen frame
+    /// is reported. The default value is `0.7` seconds.
     public static let frozenFrameThreshold: TimeInterval = 0.7
 
     /// The current state of the `SlowFrameDetector`.
@@ -52,24 +56,25 @@ public final class SlowFrameDetector {
     private let logic: SlowFrameLogic
     private var ticker: SlowFrameTicker?
 
-    internal init(
+    init(
         ticker: SlowFrameTicker?,
         destinationFactory: @escaping () -> SlowFrameDetectorDestination
     ) {
         self.ticker = ticker
-        self.logic = SlowFrameLogic(destinationFactory: destinationFactory)
+        logic = SlowFrameLogic(destinationFactory: destinationFactory)
     }
 
     #if os(iOS) || os(tvOS) || os(visionOS)
     /// Initializes a new instance of the `SlowFrameDetector`.
     ///
-    /// This convenience initializer sets up the detector with default dependencies, including a `DisplayLinkTicker` for frame monitoring and an `OTelDestination` for reporting.
-    public convenience required init() {
+    /// This convenience initializer sets up the detector with default dependencies, including a
+    /// `DisplayLinkTicker` for frame monitoring and an `OTelDestination` for reporting.
+    public required init() {
         self.init(ticker: DisplayLinkTicker(), destinationFactory: { OTelDestination() })
     }
     #else
     // nil ticker for unsupported platforms
-    public convenience required init() {
+    public required init() {
         self.init(ticker: nil, destinationFactory: { OTelDestination() })
     }
     #endif
@@ -91,7 +96,8 @@ public final class SlowFrameDetector {
 
     /// Installs and configures the slow frame detector.
     ///
-    /// This method should be called as part of the module initialization process. It enables or disables the detector based on the provided local configuration.
+    /// This method should be called as part of the module initialization process. It enables or disables
+    /// the detector based on the provided local configuration.
     /// - Parameters:
     ///   - configuration: The local configuration for the module, which determines if the feature is enabled.
     ///   - remoteConfiguration: The remote configuration for the module.
@@ -108,9 +114,10 @@ public final class SlowFrameDetector {
 
     /// Starts the slow and frozen frame detection process.
     ///
-    /// This method sets up the frame ticker and registers for application lifecycle notifications to automatically pause and resume monitoring.
+    /// This method sets up the frame ticker and registers for application lifecycle notifications to
+    /// automatically pause and resume monitoring.
     public func start() {
-        guard self.ticker != nil else {
+        guard ticker != nil else {
             return
         }
 
@@ -163,7 +170,7 @@ public final class SlowFrameDetector {
     }
     #endif
 
-    internal func flushBuffers() async {
+    func flushBuffers() async {
         await logic.flushBuffers()
     }
 }

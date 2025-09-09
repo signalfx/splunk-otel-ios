@@ -22,8 +22,9 @@ import QuartzCore
 
 /// An actor that encapsulates the core state and logic for the `SlowFrameDetector`.
 ///
-/// It isolates the complex, concurrent operations of frame analysis and reporting from the main class, which serves as a simple public API facade. The name "Logic" reflects its role in containing the business logic of the feature.
-internal actor SlowFrameLogic {
+/// It isolates the complex, concurrent operations and logic of frame analysis and reporting
+/// from the main class, which serves as a simple public API facade.
+actor SlowFrameLogic {
 
     typealias FrameBuffer = [String: Int]
     actor ReportableFramesBuffer {
@@ -94,7 +95,7 @@ internal actor SlowFrameLogic {
             try? await Task.sleep(nanoseconds: UInt64(SlowFrameDetector.frozenFrameThreshold * 1_000_000_000))
             if Task.isCancelled { break }
             let now = CACurrentMediaTime()
-            if lastHeartbeatTimestamp > 0 && (now - lastHeartbeatTimestamp) >= SlowFrameDetector.frozenFrameThreshold {
+            if lastHeartbeatTimestamp > 0, (now - lastHeartbeatTimestamp) >= SlowFrameDetector.frozenFrameThreshold {
                 await frozenFrames.increment()
             }
         }
@@ -110,7 +111,7 @@ internal actor SlowFrameLogic {
 
     func flushBuffers() async {
         guard let destination else { return }
-        for (type, buffer) in [("slowRenders",   slowFrames), ("frozenRenders", frozenFrames)] {
+        for (type, buffer) in [("slowRenders", slowFrames), ("frozenRenders", frozenFrames)] {
             let counts = await buffer.drain()
             guard let count = counts["shared"], count > 0 else { continue }
             await destination.send(type: type, count: count, sharedState: nil)

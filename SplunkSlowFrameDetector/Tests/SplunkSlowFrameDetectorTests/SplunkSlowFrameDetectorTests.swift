@@ -34,8 +34,11 @@ final class MockTicker: SlowFrameTicker {
         startCallCount += 1
         onStart?()
     }
+
     func stop() { stopped = true }
+
     func pause() {}
+
     func resume() {}
 
     func simulateFrame(timestamp: TimeInterval, duration: TimeInterval) {
@@ -102,9 +105,9 @@ final class SlowFrameDetectorTests: XCTestCase {
         // Assert that the ticker's start() was not called a second time.
         XCTAssertEqual(mockTicker.startCallCount, 1, "Calling start() multiple times should not restart the ticker.")
     }
-    
+
     func test_stateIsReset_onAppDidBecomeActive() async {
-        mockDestination.onSend = { type, count in
+        mockDestination.onSend = { _, _ in
             XCTFail("No report should be sent after app becomes active, as state should be reset.")
         }
 
@@ -307,6 +310,5 @@ final class SlowFrameDetectorTests: XCTestCase {
         // The expectation should be fulfilled by the automatic flush loop.
         await fulfillment(of: [reportExpectation], timeout: 1.5)
     }
-
 }
 #endif // os(iOS) || os(tvOS) || os(visionOS)

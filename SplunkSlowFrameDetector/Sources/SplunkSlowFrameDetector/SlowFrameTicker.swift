@@ -26,8 +26,9 @@ import UIKit
 
 /// An abstraction for a timer that "ticks" on every frame refresh of the display.
 ///
-/// This protocol provides a consistent interface for receiving frame updates via a regular signal, abstracting the underlying mechanism (like `CADisplayLink`) to allow for easier testing and dependency injection.
-internal protocol SlowFrameTicker {
+/// This protocol provides a consistent interface for receiving frame updates via a regular signal,
+/// abstracting the underlying mechanism (like `CADisplayLink`) to allow for easier testing and dependency injection.
+protocol SlowFrameTicker {
     var onFrame: ((_ timestamp: TimeInterval, _ duration: TimeInterval) -> Void)? { get set }
     func start()
     func stop()
@@ -36,7 +37,7 @@ internal protocol SlowFrameTicker {
 }
 
 #if os(iOS) || os(tvOS) || os(visionOS)
-internal final class DisplayLinkTicker: SlowFrameTicker {
+final class DisplayLinkTicker: SlowFrameTicker {
     private var displayLink: CADisplayLink?
     var onFrame: ((TimeInterval, TimeInterval) -> Void)?
 
