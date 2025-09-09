@@ -42,7 +42,6 @@ class DefaultEventManager: AgentEventManager {
     // Session Replay processor
     var sessionReplayProcessor: LogEventProcessor?
     var sessionReplayIndexer: EventIndexer
-    let scriptInstanceId: String
 
     // Trace processor
     var traceProcessor: TraceProcessor
@@ -99,7 +98,6 @@ class DefaultEventManager: AgentEventManager {
         )
 
         // Initialize session replay processor (optional)
-        scriptInstanceId = .uniqueHexIdentifier(ofLength: 16)
         sessionReplayProcessor = OTLPSessionReplayEventProcessor(
             with: configuration.endpoint.sessionReplayEndpoint,
             resources: resources,
@@ -177,6 +175,9 @@ class DefaultEventManager: AgentEventManager {
 
                 return
             }
+
+            // Use scriptInstanceId as a 16 character substring of a sessionId
+            let scriptInstanceId = String(sessionId.prefix(upTo: sessionId.index(sessionId.startIndex, offsetBy: 16)))
 
             let event = SessionReplayDataEvent(
                 metadata: metadata,

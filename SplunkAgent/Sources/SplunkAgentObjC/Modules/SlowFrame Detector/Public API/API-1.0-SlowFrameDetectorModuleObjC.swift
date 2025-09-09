@@ -29,7 +29,11 @@ public final class SlowFrameDetectorModuleObjC: NSObject {
 
     // MARK: - Public API
 
-    // ...
+    /// Indicates whether the slow and frozen frame detection feature is enabled.
+    @objc
+    public var isEnabled: Bool {
+        owner.agent.slowFrameDetector.state.isEnabled
+    }
 
 
     // MARK: - Initialization

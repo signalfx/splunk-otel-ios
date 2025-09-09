@@ -40,8 +40,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            .slowFrameDetectionThresholdMs(thresholdMs: 400)
 //            .frozenFrameDetectionThresholdMs(thresholdMs: 700)
 //            .globalAttributes(globalAttributes: ["isWorkingHard": true, "secret": "Red bull"])
-//            .ignoreURLs(try! NSRegularExpression(pattern: ".*\\.(jpg|jpeg|png|gif)$"))
-//            .networkInstrumentation(true)
+//            .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*\\.(jpg|jpeg|png|gif)$"))
+//            .networkInstrumentation(enabled: true)
 //            .build()
 
         let endpointConfig = EndpointConfiguration(

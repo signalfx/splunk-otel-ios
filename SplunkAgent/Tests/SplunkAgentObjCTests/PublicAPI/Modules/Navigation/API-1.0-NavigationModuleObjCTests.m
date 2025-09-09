@@ -28,11 +28,24 @@ limitations under the License.
 
 @implementation NavigationAPI10ModuleObjCTests
 
-// MARK: - API Tests
+- (void)testPreferences {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
 
-- (void)testExample {
-    // This is an example of a functional test case.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
+    SPLKNavigationModulePreferences *preferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:NO];
+    agent.navigation.preferences = preferences;
+    XCTAssertFalse(agent.navigation.preferences.enableAutomatedTracking);
+}
+
+- (void)testState {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    SPLKNavigationModuleState *state = agent.navigation.state;
+    XCTAssertNotNil(state);
+    XCTAssertFalse(state.isAutomatedTrackingEnabled);
+}
+
+- (void)testTracking {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    XCTAssertNoThrow([agent.navigation trackScreen:@"Test"]);
 }
 
 @end

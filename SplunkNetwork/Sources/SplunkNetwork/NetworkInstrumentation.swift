@@ -21,7 +21,7 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 import ResourceExtension
 import SignPostIntegration
-import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 import URLSessionInstrumentation
 
 public class NetworkInstrumentation {
@@ -160,44 +160,43 @@ public class NetworkInstrumentation {
     }
 
     func createdRequest(URLRequest: URLRequest, span: Span) {
-        let key = SemanticAttributes.httpRequestBodySize
         let body = URLRequest.httpBody
         let length = body?.count ?? 0
-        span.setAttribute(key: key, value: length)
+        span.clearAndSetAttribute(key: SemanticAttributes.httpRequestBodySize, value: length)
         let method = URLRequest.httpMethod ?? "_OTHER"
-        span.setAttribute(key: SemanticAttributes.httpRequestMethod, value: method)
-        span.setAttribute(key: "component", value: "http")
+        span.clearAndSetAttribute(key: SemanticAttributes.httpRequestMethod, value: method)
+        span.clearAndSetAttribute(key: "component", value: "http")
 
         if let url = URLRequest.url {
-            span.setAttribute(key: SemanticAttributes.urlPath, value: url.path)
-            span.setAttribute(key: SemanticAttributes.urlQuery, value: url.query ?? "")
+            span.clearAndSetAttribute(key: SemanticAttributes.urlPath, value: url.path)
+            span.clearAndSetAttribute(key: SemanticAttributes.urlQuery, value: url.query ?? "")
             if let scheme = url.scheme {
-                span.setAttribute(key: SemanticAttributes.urlScheme, value: scheme)
+                span.clearAndSetAttribute(key: SemanticAttributes.urlScheme, value: scheme)
             }
 
             if let host = url.host {
-                span.setAttribute(key: "server.address", value: host)
+                span.clearAndSetAttribute(key: "server.address", value: host)
                 // Preload with host in case IP cannot be determined
-                span.setAttribute(key: "network.peer.address", value: host)
+                span.clearAndSetAttribute(key: "network.peer.address", value: host)
             }
 
             if let port = url.port {
-                span.setAttribute(key: "network.peer.port", value: port)
+                span.clearAndSetAttribute(key: "network.peer.port", value: port)
             } else {
                 let defaultPort = url.scheme?.lowercased() == "https" ? 443 : 80
-                span.setAttribute(key: "network.peer.port", value: defaultPort)
+                span.clearAndSetAttribute(key: "network.peer.port", value: defaultPort)
             }
 
             if let scheme = url.scheme?.lowercased() {
-                span.setAttribute(key: "network.protocol.name", value: scheme)
+                span.clearAndSetAttribute(key: "network.protocol.name", value: scheme)
             }
 
-            span.setAttribute(key: "url.full", value: url.absoluteString)
+            span.clearAndSetAttribute(key: "url.full", value: url.absoluteString)
         }
 
         if let sharedState {
             let sessionID = sharedState.sessionId
-            span.setAttribute(key: "session.id", value: sessionID)
+            span.clearAndSetAttribute(key: "session.id", value: sessionID)
         }
     }
 
@@ -239,28 +238,27 @@ public class NetworkInstrumentation {
         let traceId = String(valStr[traceIdRange])
         let spanId = String(valStr[spanIdRange])
 
-        span.setAttribute(key: "link.traceId", value: traceId)
-        span.setAttribute(key: "link.spanId", value: spanId)
+        span.clearAndSetAttribute(key: "link.traceId", value: traceId)
+        span.clearAndSetAttribute(key: "link.spanId", value: spanId)
     }
 
     func receivedResponse(URLResponse: URLResponse, dataOrFile: DataOrFile?, span: Span) {
-        let key = SemanticAttributes.httpResponseBodySize
         let response = URLResponse as? HTTPURLResponse
         let length = response?.expectedContentLength ?? 0
-        span.setAttribute(key: key, value: Int(length))
-        span.setAttribute(key: SemanticAttributes.httpResponseStatusCode, value: Int(response?.statusCode ?? 0))
+        span.clearAndSetAttribute(key: SemanticAttributes.httpResponseBodySize, value: Int(length))
+        span.clearAndSetAttribute(key: SemanticAttributes.httpResponseStatusCode, value: Int(response?.statusCode ?? 0))
 
         // Try to capture IP address from the response/connection
         if let httpResponse = response {
             // Update network.peer.address with actual IP if we can get it
             if let ipAddress = getIPAddressFromResponse(httpResponse) {
-                span.setAttribute(key: "network.peer.address", value: ipAddress)
+                span.clearAndSetAttribute(key: "network.peer.address", value: ipAddress)
             }
         }
 
         if let httpResponse = response {
             let protocolVersion = determineHTTPProtocolVersion(httpResponse)
-            span.setAttribute(key: "network.protocol.version", value: protocolVersion)
+            span.clearAndSetAttribute(key: "http.protocol.version", value: protocolVersion)
 
             for (key, val) in httpResponse.allHeaderFields {
                 if let keyStr = key as? String,
@@ -357,10 +355,10 @@ public class NetworkInstrumentation {
     }
 
     func receivedError(error: Error, dataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, span: Span) {
-        span.setAttribute(key: "error", value: true)
-        span.setAttribute(key: "error.message", value: error.localizedDescription)
-        span.setAttribute(key: "error.type", value: String(describing: type(of: error)))
-        span.setAttribute(key: SemanticAttributes.httpResponseStatusCode, value: HTTPStatus)
+        span.clearAndSetAttribute(key: "error", value: true)
+        span.clearAndSetAttribute(key: "error.message", value: error.localizedDescription)
+        span.clearAndSetAttribute(key: "error.type", value: String(describing: type(of: error)))
+        span.clearAndSetAttribute(key: SemanticAttributes.httpResponseStatusCode, value: HTTPStatus)
 
         // removes obsolete attributes
         removeObsoleteAttributes(from: span)

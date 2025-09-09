@@ -1,0 +1,50 @@
+//
+/*
+Copyright 2025 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import Foundation
+import SplunkAgent
+import UIKit
+
+@objc
+public extension UIView {
+
+    /// Element sensitivity for the specified `UIView` instance.
+    ///
+    /// - Set `@YES` to flag the view instance as explicitly sensitive.
+    /// - Set `@NO` to flag the view instance as explicitly non-sensitive.
+    ///
+    /// Assigning `nil` removes previously assigned explicit sensitivity.
+    @objc(splk_srSensitive)
+    var splunkSensitive: NSNumber? {
+        get {
+            guard let sensitive = srSensitive else {
+                return nil
+            }
+
+            return NSNumber(value: sensitive)
+        }
+        set {
+            guard let newValue else {
+                srSensitive = nil
+
+                return
+            }
+
+            srSensitive = newValue.boolValue
+        }
+    }
+}

@@ -32,9 +32,9 @@ public protocol CustomTrackingModule {
     ///
     /// - Parameter name: The event name assigned by the user.
     ///
-    /// - Parameter attributes: MutableAttributes instance.
+    /// - Parameter attributes: ``MutableAttributes`` instance.
     ///
-    /// - Returns: The updated `CustomTrackingModule` instance.
+    /// - Returns: The updated ``CustomTrackingModule`` instance.
     @discardableResult func trackCustomEvent(_ name: String, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
     // MARK: - Track Errors
@@ -43,18 +43,18 @@ public protocol CustomTrackingModule {
     ///
     /// - Parameter message: A concise summary of the error condition.
     ///
-    /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
+    /// - Parameter attributes: Optional ``MutableAttributes`` instance to associate with the error.
     ///
-    /// - Returns: The updated `CustomTrackingModule` instance.
+    /// - Returns: The updated ``CustomTrackingModule`` instance.
     @discardableResult func trackError(_ message: String, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
     /// Track an Error, including NSError (any Swift Error conforming type) with optional attributes.
     ///
     /// - Parameter error: An instance of a type conforming to the Swift Error protocol.
     ///
-    /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
+    /// - Parameter attributes: Optional ``MutableAttributes`` instance to associate with the error.
     ///
-    /// - Returns: The updated `CustomTrackingModule` instance.
+    /// - Returns: The updated ``CustomTrackingModule`` instance.
     @discardableResult func trackError(_ error: Error, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
 
@@ -62,19 +62,19 @@ public protocol CustomTrackingModule {
     ///
     /// - Parameter exception: An NSException instance such as one caught after a throw.
     ///
-    /// - Parameter attributes: Optional MutableAttributes instance to associate with the error.
+    /// - Parameter attributes: Optional ``MutableAttributes`` instance to associate with the error.
     ///
-    /// - Returns: The updated `CustomTrackingModule` instance.
+    /// - Returns: The updated ``CustomTrackingModule`` instance.
     @discardableResult func trackException(_ exception: NSException, _ attributes: MutableAttributes) -> any CustomTrackingModule
 
 
     // MARK: - Track Custom Workflow
 
-    /// Track a workflow with a name and return a Span object.
+    /// Track a workflow with a name and return a `Span` object.
     ///
     /// - Parameter workflowName: The name of the workflow to track.
     ///
-    /// - Returns: A Span object representing the workflow.
+    /// - Returns: A `Span` object representing the workflow.
     func trackWorkflow(_ workflowName: String) -> Span
 
 

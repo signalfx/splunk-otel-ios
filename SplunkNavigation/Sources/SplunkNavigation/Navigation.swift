@@ -155,6 +155,7 @@ public final class Navigation: Sendable {
                 // If we have set manual naming, then we prefer it
                 if await model.isManualScreenName {
                     processedEvent = AutomatedNavigationEvent(
+                        timestamp: Date.now,
                         type: event.type,
                         controllerTypeName: screenName,
                         controllerIdentifier: event.controllerIdentifier
@@ -248,6 +249,7 @@ public final class Navigation: Sendable {
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
+            timestamp: Date.now,
             type: eventType,
             controllerTypeName: screenName,
             controllerIdentifier: ObjectIdentifier(visibleController)
@@ -267,6 +269,7 @@ public final class Navigation: Sendable {
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
+            timestamp: Date.now,
             type: eventType,
             controllerTypeName: screenName,
             controllerIdentifier: ObjectIdentifier(visibleController)
