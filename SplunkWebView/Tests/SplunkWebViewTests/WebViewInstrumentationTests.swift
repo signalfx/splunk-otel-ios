@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkCommon
 @testable import SplunkWebView
 import WebKit
 import XCTest
@@ -23,61 +22,188 @@ import XCTest
 final class WebViewInstrumentationTests: XCTestCase {
 
     var webViewInstrumentation: WebViewInstrumentation!
-    var mockWebView: MockWebView!
+    var mockWebView: MockWKWebView!
     var mockAgentSharedState: MockAgentSharedState!
+    var mockLogAgent: MockLogAgent!
 
     override func setUp() {
         super.setUp()
-        webViewInstrumentation = WebViewInstrumentation()
-        mockWebView = MockWebView()
-        // strong instance for testing
-        mockAgentSharedState = MockAgentSharedState()
-        webViewInstrumentation.sharedState = mockAgentSharedState
+        mockLogAgent = MockLogAgent()
+        mockAgentSharedState = MockAgentSharedState(sessionId: "testing-session-id")
+        webViewInstrumentation = WebViewInstrumentation(logger: mockLogAgent, sharedState: mockAgentSharedState)
+        mockWebView = MockWKWebView()
     }
 
-    override func tearDown() {
-        webViewInstrumentation = nil
-        mockWebView = nil
-        mockAgentSharedState = nil
-        super.tearDown()
-    }
+    // MARK: - Injection Tests
 
-    func testInjectSessionId() {
-        let expectation = XCTestExpectation(description: "JavaScript injected")
-
-        mockWebView.evaluateJavaScriptHandler = { script, completionHandler in
-            XCTAssertTrue(script.contains("window.SplunkRumNative"))
-            XCTAssertTrue(script.contains("getNativeSessionId"))
-            expectation.fulfill()
-            completionHandler(nil, nil) // Simulate success
-        }
+    func testInjectSessionId_addsUserScriptAndMessageHandler() {
+        let mockContentController = mockWebView.configuration.userContentController as! MockWKUserContentController
 
         webViewInstrumentation.injectSessionId(into: mockWebView)
 
-        wait(for: [expectation], timeout: 5.0)
+        XCTAssertTrue(mockContentController.addUserScriptCalled)
+        XCTAssertTrue(mockContentController.addScriptMessageHandlerCalled)
+        XCTAssertEqual(mockContentController.lastAddedMessageHandlerName, "SplunkRumNativeUpdate")
     }
-}
 
-// Mock WKWebView for testing
-final class MockWebView: WKWebView {
-    var evaluateJavaScriptHandler: ((String, @escaping (Any?, Error?) -> Void) -> Void)?
+    func testInjectSessionId_evaluatesJavaScript() {
+        webViewInstrumentation.injectSessionId(into: mockWebView)
 
-    func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
-        if Thread.isMainThread {
-            evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })
-        } else {
-            DispatchQueue.main.async {
-                self.evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })
-            }
+        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 1)
+        XCTAssertNotNil(mockWebView.lastEvaluatedJavaScript)
+    }
+
+    func testInjectSessionId_whenSharedStateIsNil_logsWarningAndAborts() {
+        // This tests the case where the entire sharedState object is missing.
+        webViewInstrumentation.sharedState = nil
+
+        webViewInstrumentation.injectSessionId(into: mockWebView)
+
+        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 0, "Should not evaluate JS if sharedState is nil")
+
+        let messages = mockLogAgent.logMessages
+        let warningFound = messages.contains { $0.level == .warn && $0.message.contains("Native Session ID not available") }
+        XCTAssertTrue(warningFound, "A warning should be logged when sharedState is not available")
+    }
+
+    // MARK: - Usage Warning Tests
+
+    func testInjectSessionId_whenWebViewIsAlreadyLoading_logsWarning() {
+        mockWebView.isLoading = true
+
+        webViewInstrumentation.injectSessionId(into: mockWebView)
+
+        let warningFound = mockLogAgent.logMessages.contains { $0.level == .warn && $0.message.contains("has already started loading content") }
+        XCTAssertTrue(warningFound, "A warning should be logged for a webview that is already loading.")
+    }
+
+    func testInjectSessionId_whenWebViewHasAlreadyLoadedURL_logsWarning() {
+        mockWebView.url = URL(string: "https://www.splunk.com")!
+
+        webViewInstrumentation.injectSessionId(into: mockWebView)
+
+        let warningFound = mockLogAgent.logMessages.contains { $0.level == .warn && $0.message.contains("has already started loading content") }
+        XCTAssertTrue(warningFound, "A warning should be logged for a webview that has a non-blank URL.")
+    }
+
+    func testInjectSessionId_whenWebViewIsNew_doesNotLogWarning() {
+        // A fresh mockWebView has isLoading = false and url = nil
+
+        webViewInstrumentation.injectSessionId(into: mockWebView)
+
+        let warningFound = mockLogAgent.logMessages.contains { $0.level == .warn && $0.message.contains("has already started loading content") }
+        XCTAssertFalse(warningFound, "A new webview should not trigger a usage warning.")
+    }
+
+    // MARK: - State Integrity Tests
+
+    func testInjectSessionId_isIdempotent() {
+        let mockContentController = mockWebView.configuration.userContentController as! MockWKUserContentController
+
+        webViewInstrumentation.injectSessionId(into: mockWebView)
+
+        XCTAssertTrue(mockContentController.removeScriptMessageHandlerCalled)
+        XCTAssertTrue(mockContentController.addScriptMessageHandlerCalled)
+        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 1)
+
+        // Call inject second time
+        webViewInstrumentation.injectSessionId(into: mockWebView)
+
+        // Then: The setup should be run again, proving it's safe to re-run.
+        // The JS itself has an internal guard, so it won't re-initialize,
+        // but the native side safely re-establishes the bridge.
+        XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 2)
+    }
+
+    func testMessageHandler_whenSessionIdChanges_repliesWithNewSessionId() {
+
+        let initialSessionId = "session-1"
+        let updatedSessionId = "session-2"
+        mockAgentSharedState.updateSessionId(initialSessionId)
+        let mockMessage = MockWKScriptMessage(name: "SplunkRumNativeUpdate", body: [:])
+
+        // First call
+        let expectation1 = XCTestExpectation(description: "Reply handler should be called with initial session ID")
+        let replyHandler1: @MainActor @Sendable (Any?, String?) -> Void = { reply, _ in
+            let sessionId = (reply as? [String: String])?["sessionId"]
+            XCTAssertEqual(sessionId, initialSessionId)
+            expectation1.fulfill()
         }
+        webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler1)
+        wait(for: [expectation1], timeout: 1.0)
+
+        // Session ID changes and handler is called again
+        mockAgentSharedState.updateSessionId(updatedSessionId)
+        let expectation2 = XCTestExpectation(description: "Reply handler should be called with updated session ID")
+        let replyHandler2: @MainActor @Sendable (Any?, String?) -> Void = { reply, _ in
+            let sessionId = (reply as? [String: String])?["sessionId"]
+            XCTAssertEqual(sessionId, updatedSessionId)
+            expectation2.fulfill()
+        }
+        webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler2)
+        wait(for: [expectation2], timeout: 1.0)
     }
-}
 
-final class MockAgentSharedState: AgentSharedState {
-    let sessionId: String = "testing-session-id"
-    let agentVersion: String = "testing-agent-version"
+    // MARK: - JavaScript Content Tests
 
-    func applicationState(for timestamp: Date) -> String? {
-        "testing"
+    func testJavascriptContent_containsSessionId() {
+        let expectedSessionId = "my-special-session-id"
+        mockAgentSharedState.updateSessionId(expectedSessionId)
+
+        webViewInstrumentation.injectSessionId(into: mockWebView)
+
+        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        XCTAssertTrue(script.contains("cachedSessionId: '\(expectedSessionId)'"), "The injected script must contain the session ID")
+    }
+
+    func testJavascriptContent_hasCorrectApiFunctions() {
+        webViewInstrumentation.injectSessionId(into: mockWebView)
+
+        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        XCTAssertTrue(script.contains("getNativeSessionId: function()"), "JS should contain getNativeSessionId")
+        XCTAssertTrue(script.contains("getNativeSessionIdAsync: async function()"), "JS should contain getNativeSessionIdAsync")
+        XCTAssertTrue(script.contains("onNativeSessionIdChanged: null"), "JS should contain onNativeSessionIdChanged")
+        XCTAssertTrue(script.contains("window.SplunkRumNative"), "JS should define window.SplunkRumNative")
+    }
+
+    // MARK: - Message Handler Tests
+
+    func testMessageHandler_whenSessionIdIsValid_repliesWithSessionId() {
+        let expectedSessionId = "valid-session-id-for-reply"
+        mockAgentSharedState.updateSessionId(expectedSessionId)
+        let mockMessage = MockWKScriptMessage(name: "SplunkRumNativeUpdate", body: [:])
+        let expectation = XCTestExpectation(description: "Reply handler should be called with session ID")
+
+        let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+            XCTAssertNil(error)
+            XCTAssertNotNil(reply)
+            guard let replyDict = reply as? [String: String] else {
+                XCTFail("Reply should be a dictionary")
+                return
+            }
+            XCTAssertEqual(replyDict["sessionId"], expectedSessionId)
+            expectation.fulfill()
+        }
+
+        webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler)
+
+        wait(for: [expectation], timeout: 1.0)
+    }
+
+    func testMessageHandler_whenSharedStateIsNil_repliesWithError() {
+        webViewInstrumentation.sharedState = nil
+        let mockMessage = MockWKScriptMessage(name: "SplunkRumNativeUpdate", body: [:])
+        let expectation = XCTestExpectation(description: "Reply handler should be called with an error")
+
+        let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+            XCTAssertNil(reply)
+            XCTAssertNotNil(error)
+            XCTAssertEqual(error, "Native Session ID not available")
+            expectation.fulfill()
+        }
+
+        webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler)
+
+        wait(for: [expectation], timeout: 1.0)
     }
 }
