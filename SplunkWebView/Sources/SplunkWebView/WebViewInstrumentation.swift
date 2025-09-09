@@ -58,6 +58,14 @@ public final class WebViewInstrumentation: NSObject {
         // swiftlint:disable function_body_length
         public func injectSessionId(into webView: WKWebView) {
 
+            // A webview is considered "already in use" if it is actively loading
+            // or has already finished loading a URL other than the default empty page.
+            if webView.isLoading || (webView.url != nil && webView.url?.absoluteString != "about:blank") {
+                logger.log(level: .warn, isPrivate: false) {
+                    "SplunkWebView: `injectSessionId` was called on a WKWebView that has already started loading content. To ensure proper correlation with Browser RUM, this method should be called before `loadHTMLString`, `load`, or similar methods."
+                }
+            }
+
             logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation injecting JavaScript APIs for fetching native Session ID."
             }
