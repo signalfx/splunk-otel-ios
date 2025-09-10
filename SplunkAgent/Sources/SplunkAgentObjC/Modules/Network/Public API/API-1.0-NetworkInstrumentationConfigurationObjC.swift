@@ -24,7 +24,7 @@ public final class NetworkInstrumentationConfigurationObjC: ModuleConfigurationO
     // MARK: - Module management
 
     /// A `NSRegularExpression` determines which URLs to ignore by the Network instrumentation.
-    public var ignoreURLs: NSRegularExpression? = nil
+    public var ignoreURLs: NSRegularExpression?
 
 
     // MARK: - Initialization
@@ -56,5 +56,4 @@ public final class NetworkInstrumentationConfigurationObjC: ModuleConfigurationO
         self.isEnabled = isEnabled
         self.ignoreURLs = ignoreURLs
     }
-
 }
