@@ -19,7 +19,7 @@ import Foundation
 import SplunkCommon
 
 /// Network Instrumentation module remote configuration.
-public struct NetworkInstrumentationRemoteConfig: RemoteModuleConfiguration {
+public struct NetworkInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Internal decoding
 
