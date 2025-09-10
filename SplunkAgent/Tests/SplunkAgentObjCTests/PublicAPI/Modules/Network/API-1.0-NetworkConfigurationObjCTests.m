@@ -30,20 +30,20 @@ limitations under the License.
 // MARK: - API Tests
 
 - (void)testInitialization {
-    SPLKNetworkConfiguration *defaultConfiguration = [[SPLKNetworkConfiguration alloc] initWithEnabled:NO ignoreURLs:[[NSRegularExpression alloc] initWithPattern:@"a" options:0 error:nil]];
+    SPLKNetworkInstrumentationConfiguration *defaultConfiguration = [[SPLKNetworkInstrumentationConfiguration alloc] initWithEnabled:NO ignoreURLs:[[NSRegularExpression alloc] initWithPattern:@"a" options:0 error:nil]];
 
-    SPLKNetworkConfiguration *minimalConfiguration = [[SPLKNetworkConfiguration alloc] initWithEnabled:NO];
+    SPLKNetworkInstrumentationConfiguration *minimalConfiguration = [[SPLKNetworkInstrumentationConfiguration alloc] initWithEnabled:NO];
 
     XCTAssertNotNil(defaultConfiguration);
     XCTAssertNotNil(minimalConfiguration);
 }
 
 - (void)testProperties {
-    SPLKNetworkConfiguration *configuration = [[SPLKNetworkConfiguration alloc] init];
+    SPLKNetworkInstrumentationConfiguration *configuration = [[SPLKNetworkInstrumentationConfiguration alloc] init];
 
     // Properties (READ)
     BOOL initialIsEnabled = configuration.isEnabled;
-    NSRegularExpression ignoreUrls = configuration.ignoreURLs;
+    NSRegularExpression* ignoreUrls = configuration.ignoreURLs;
 
     // Properties (WRITE)
     configuration.isEnabled = NO;

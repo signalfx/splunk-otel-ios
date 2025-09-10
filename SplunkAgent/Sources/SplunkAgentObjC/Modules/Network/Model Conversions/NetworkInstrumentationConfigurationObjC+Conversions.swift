@@ -20,7 +20,7 @@ import Foundation
 internal import SplunkCommon
 internal import SplunkNetwork
 
-extension NetworkConfigurationObjC: ModuleConfigurationSwift {
+extension NetworkInstrumentationConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 

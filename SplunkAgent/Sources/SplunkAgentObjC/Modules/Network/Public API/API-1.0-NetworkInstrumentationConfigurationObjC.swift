@@ -18,8 +18,8 @@ limitations under the License.
 import Foundation
 
 /// The class implements the Network module configuration.
-@objc(SPLKNetworkConfiguration) @objcMembers
-public final class NetworkConfigurationObjC: ModuleConfigurationObjC {
+@objc(SPLKNetworkInstrumentationConfiguration) @objcMembers
+public final class NetworkInstrumentationConfigurationObjC: ModuleConfigurationObjC {
 
     // MARK: - Module management
 
