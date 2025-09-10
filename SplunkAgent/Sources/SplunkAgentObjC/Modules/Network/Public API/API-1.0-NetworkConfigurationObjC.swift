@@ -21,6 +21,12 @@ import Foundation
 @objc(SPLKNetworkConfiguration) @objcMembers
 public final class NetworkConfigurationObjC: ModuleConfigurationObjC {
 
+    // MARK: - Module management
+
+    /// A `NSRegularExpression` determines which URLs to ignore by the Network instrumentation.
+    public var ignoreURLs: NSRegularExpression? = nil
+
+
     // MARK: - Initialization
 
     /// Initializes new module configuration.
@@ -37,4 +43,18 @@ public final class NetworkConfigurationObjC: ModuleConfigurationObjC {
 
         self.isEnabled = isEnabled
     }
+
+    /// Initializes new module configuration with custom settings.
+    ///
+    /// - Parameters:
+    ///   - isEnabled: A `BOOL` value sets whether the module is enabled.
+    ///   - ignoreURLs: A `NSRegularExpression` determines which URLs to ignore by the Network instrumentation.
+    @objc(initWithEnabled:ignoreURLs:)
+    public init(isEnabled: Bool, ignoreURLs: NSRegularExpression?) {
+        super.init()
+
+        self.isEnabled = isEnabled
+        self.ignoreURLs = ignoreURLs
+    }
+
 }

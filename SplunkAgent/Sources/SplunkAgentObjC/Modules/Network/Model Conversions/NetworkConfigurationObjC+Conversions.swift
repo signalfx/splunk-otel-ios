@@ -25,6 +25,11 @@ extension NetworkConfigurationObjC: ModuleConfigurationSwift {
     // MARK: - Swift variant
 
     var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
-        NetworkConfiguration(isEnabled: isEnabled)
+        let ignoreUrls = IgnoreURLs(containing: ignoreURLs)
+
+        return NetworkInstrumentationConfiguration(
+            isEnabled: isEnabled,
+            ignoreURLs: ignoreUrls
+        )
     }
 }
