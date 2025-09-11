@@ -28,12 +28,14 @@ final class MockWKWebView: WKWebView {
         get { _isLoading }
         set { _isLoading = newValue }
     }
+
     private var _isLoading = false
 
     override var url: URL? {
         get { _url }
         set { _url = newValue }
     }
+
     private var _url: URL?
 
     private let mockConfiguration: WKWebViewConfiguration
@@ -43,7 +45,7 @@ final class MockWKWebView: WKWebView {
     }
 
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
-        self.mockConfiguration = configuration
+        mockConfiguration = configuration
         super.init(frame: frame, configuration: configuration)
     }
 
@@ -61,8 +63,8 @@ final class MockWKWebView: WKWebView {
     // signature of the underlying API.
     @MainActor
     override func evaluateJavaScript(_ javaScriptString: String, completionHandler: (@MainActor (Any?, Error?) -> Void)? = nil) {
-        self.evaluateJavaScriptCallCount += 1
-        self.lastEvaluatedJavaScript = javaScriptString
+        evaluateJavaScriptCallCount += 1
+        lastEvaluatedJavaScript = javaScriptString
         completionHandler?(nil, nil) // Simulate success
     }
 }
@@ -131,8 +133,8 @@ final class MockWKScriptMessage: WKScriptMessage {
     }
 
     init(name: String, body: Any) {
-        self.mockName = name
-        self.mockBody = body
+        mockName = name
+        mockBody = body
         super.init()
     }
 }

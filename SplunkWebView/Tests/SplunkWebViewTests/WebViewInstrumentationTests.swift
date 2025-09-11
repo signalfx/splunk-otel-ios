@@ -37,12 +37,13 @@ final class WebViewInstrumentationTests: XCTestCase {
     // MARK: - Injection Tests
 
     func testInjectSessionId_addsUserScriptAndMessageHandler() {
-        let mockContentController = mockWebView.configuration.userContentController as! MockWKUserContentController
+        let mockContentController = mockWebView.configuration.userContentController as? MockWKUserContentController
 
         webViewInstrumentation.injectSessionId(into: mockWebView)
 
-        XCTAssertTrue(mockContentController.addUserScriptCalled)
-        XCTAssertTrue(mockContentController.addScriptMessageHandlerCalled)
+        XCTAssertNotNil(mockContentController)
+        XCTAssertTrue(mockContentController?.addUserScriptCalled)
+        XCTAssertTrue(mockContentController?.addScriptMessageHandlerCalled)
         XCTAssertEqual(mockContentController.lastAddedMessageHandlerName, "SplunkRumNativeUpdate")
     }
 
@@ -98,12 +99,13 @@ final class WebViewInstrumentationTests: XCTestCase {
     // MARK: - State Integrity Tests
 
     func testInjectSessionId_isIdempotent() {
-        let mockContentController = mockWebView.configuration.userContentController as! MockWKUserContentController
+        let mockContentController = mockWebView.configuration.userContentController as? MockWKUserContentController
 
         webViewInstrumentation.injectSessionId(into: mockWebView)
 
-        XCTAssertTrue(mockContentController.removeScriptMessageHandlerCalled)
-        XCTAssertTrue(mockContentController.addScriptMessageHandlerCalled)
+        XCTAssertNotNil(mockContentController)
+        XCTAssertTrue(mockContentController?.removeScriptMessageHandlerCalled)
+        XCTAssertTrue(mockContentController?.addScriptMessageHandlerCalled)
         XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 1)
 
         // Call inject second time

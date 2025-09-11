@@ -27,22 +27,20 @@ final class MockAgentSharedState: @unchecked Sendable, AgentSharedState {
 
     private var _sessionId: String
     nonisolated var sessionId: String {
-        get {
-            lock.lock()
-            defer { lock.unlock() }
-            return _sessionId
-        }
+        lock.lock()
+        defer { lock.unlock() }
+        return _sessionId
     }
 
     nonisolated let agentVersion: String = "testing-agent-version"
 
     init(sessionId: String) {
-        self._sessionId = sessionId
+        _sessionId = sessionId
     }
 
     func updateSessionId(_ newId: String) {
         lock.lock()
-        self._sessionId = newId
+        _sessionId = newId
         lock.unlock()
     }
 
@@ -66,11 +64,9 @@ final class MockLogAgent: @unchecked Sendable, LogAgent {
 
     private var _logMessages: [LogMessage] = []
     var logMessages: [LogMessage] {
-        get {
-            lock.lock()
-            defer { lock.unlock() }
-            return _logMessages
-        }
+        lock.lock()
+        defer { lock.unlock() }
+        return _logMessages
     }
 
     init(poolName: String, category: String? = nil) {
