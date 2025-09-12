@@ -381,6 +381,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkWebViewTests",
             dependencies: [
                 "SplunkWebView",
+                "SplunkCommon"
             ],
             path: "SplunkWebView/Tests"
         ),
