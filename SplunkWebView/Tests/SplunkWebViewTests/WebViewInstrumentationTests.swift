@@ -42,14 +42,15 @@ final class WebViewInstrumentationTests: XCTestCase {
         webViewInstrumentation.injectSessionId(into: mockWebView)
 
         XCTAssertNotNil(mockContentController)
-        XCTAssertTrue(mockContentController?.addUserScriptCalled)
-        XCTAssertTrue(mockContentController?.addScriptMessageHandlerCalled)
-        XCTAssertEqual(mockContentController.lastAddedMessageHandlerName, "SplunkRumNativeUpdate")
+        XCTAssertTrue(mockContentController?.addUserScriptCalled ?? false)
+        XCTAssertTrue(mockContentController?.addScriptMessageHandlerCalled ?? false)
+        XCTAssertEqual(mockContentController?.lastAddedMessageHandlerName, "SplunkRumNativeUpdate")
     }
 
     func testInjectSessionId_evaluatesJavaScript() {
         webViewInstrumentation.injectSessionId(into: mockWebView)
 
+        // The new implementation calls evaluateJavaScript once for the immediate injection
         XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 1)
         XCTAssertNotNil(mockWebView.lastEvaluatedJavaScript)
     }
@@ -104,16 +105,16 @@ final class WebViewInstrumentationTests: XCTestCase {
         webViewInstrumentation.injectSessionId(into: mockWebView)
 
         XCTAssertNotNil(mockContentController)
-        XCTAssertTrue(mockContentController?.removeScriptMessageHandlerCalled)
-        XCTAssertTrue(mockContentController?.addScriptMessageHandlerCalled)
+        XCTAssertTrue(mockContentController?.removeScriptMessageHandlerCalled ?? false)
+        XCTAssertTrue(mockContentController?.addScriptMessageHandlerCalled ?? false)
         XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 1)
 
         // Call inject second time
         webViewInstrumentation.injectSessionId(into: mockWebView)
 
-        // Then: The setup should be run again, proving it's safe to re-run.
-        // The JS itself has an internal guard, so it won't re-initialize,
-        // but the native side safely re-establishes the bridge.
+        // Then: The native side safely re-establishes the bridge.
+        // The JS itself has an internal guard, so it won't re-initialize.
+        // The evaluateJavaScript call will run again but the script will bail early.
         XCTAssertEqual(mockWebView.evaluateJavaScriptCallCount, 2)
     }
 

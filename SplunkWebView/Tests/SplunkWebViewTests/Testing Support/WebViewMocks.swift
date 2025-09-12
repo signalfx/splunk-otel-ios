@@ -54,13 +54,11 @@ final class MockWKWebView: WKWebView {
         self.init(frame: .zero, configuration: mockConfig)
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // The method override must be on the MainActor, and the completion handler
-    // must also be explicitly annotated as `@MainActor` to match the true
-    // signature of the underlying API.
     @MainActor
     override func evaluateJavaScript(_ javaScriptString: String, completionHandler: (@MainActor (Any?, Error?) -> Void)? = nil) {
         evaluateJavaScriptCallCount += 1
@@ -99,22 +97,15 @@ final class MockWKUserContentController: WKUserContentController {
         addUserScriptCalled = true
     }
 
-    override func add(_ scriptMessageHandler: WKScriptMessageHandler, name: String) {
+    override func addScriptMessageHandler(_ scriptMessageHandler: WKScriptMessageHandlerWithReply, contentWorld: WKContentWorld, name: String) {
         addScriptMessageHandlerCalled = true
         lastAddedMessageHandlerName = name
     }
 
-    override func add(_ scriptMessageHandler: WKScriptMessageHandler, contentWorld world: WKContentWorld, name: String) {
-        addScriptMessageHandlerCalled = true
-        lastAddedMessageHandlerName = name
-    }
-
-    // This override was missing, which caused calls to leak to the real
-    // framework implementation and created unpredictable behavior.
+    // Override in the mock to prevent spurious calls to the
+    // real framework implementation.
     override func removeScriptMessageHandler(forName name: String) {
         removeScriptMessageHandlerCalled = true
-        // In a real scenario, we might remove a handler, but for this mock,
-        // simply recording the call is sufficient to prevent the leak.
     }
 }
 

@@ -22,13 +22,22 @@ import SplunkCommon
 public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
 
 // RemoteModuleConfiguration conformance
+// swiftlint:disable type_name
 public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
-    public var enabled: Bool
+    public var enabled: Bool = true
 
     public init?(from data: Data) {
         return nil
     }
 }
+// swiftlint:enable type_name
+
+// Add placeholder types to satisfy Module conformance, as this module does not produce events.
+public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
+    public var timestamp = Date()
+}
+
+public struct WebViewInstrumentationData: ModuleEventData {}
 
 extension WebViewInstrumentation: Module {
 

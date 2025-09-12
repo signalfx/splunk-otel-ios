@@ -20,6 +20,7 @@ limitations under the License.
 #else
     import Foundation
 #endif
+
 internal import CiscoLogger
 import SplunkCommon
 
@@ -48,7 +49,7 @@ public final class WebViewInstrumentation: NSObject {
         private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
             let contentController = webView.configuration.userContentController
             contentController.removeScriptMessageHandler(forName: name)
-            contentController.add(self, contentWorld: .page, name: name)
+            contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
             return contentController
         }
 
@@ -186,18 +187,10 @@ public final class WebViewInstrumentation: NSObject {
     #endif // canImport(WebKit)
 }
 
-// MARK: - WKScriptMessageHandler & WKScriptMessageHandlerWithReply
+// MARK: - WKScriptMessageHandlerWithReply
 
 #if canImport(WebKit)
-    extension WebViewInstrumentation: WKScriptMessageHandler, WKScriptMessageHandlerWithReply {
-
-        /// This is the handler for the base `WKScriptMessageHandler` protocol.
-        /// It is required for conformance, but is not expected to be called by our JS bridge.
-        public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-            logger.log(level: .warn, isPrivate: false) {
-                "SplunkWebView: Synchronous message handler was called, but this is not supported. The 'WithReply' handler should be used."
-            }
-        }
+    extension WebViewInstrumentation: WKScriptMessageHandlerWithReply {
 
         /// Handles JavaScript messages with a reply handler for asynchronous communication.
         public func userContentController(
@@ -214,11 +207,3 @@ public final class WebViewInstrumentation: NSObject {
         }
     }
 #endif
-
-// Type for conforming to ModuleEventMetadata
-public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
-    public var timestamp = Date()
-}
-
-// Type for conforming to ModuleEventData
-public struct WebViewInstrumentationData: ModuleEventData {}
