@@ -23,7 +23,7 @@ public final class NetworkInstrumentationConfigurationObjC: ModuleConfigurationO
 
     // MARK: - Module management
 
-    /// A `NSRegularExpression` determines which URLs to ignore by the Network instrumentation.
+    /// An `NSRegularExpression` used to exclude matching URLs from Network instrumentation.
     public var ignoreURLs: NSRegularExpression?
 
 
@@ -48,7 +48,7 @@ public final class NetworkInstrumentationConfigurationObjC: ModuleConfigurationO
     ///
     /// - Parameters:
     ///   - isEnabled: A `BOOL` value sets whether the module is enabled.
-    ///   - ignoreURLs: A `NSRegularExpression` determines which URLs to ignore by the Network instrumentation.
+    ///   - ignoreURLs: An `NSRegularExpression` used to exclude matching URLs from Network instrumentation.
     @objc(initWithEnabled:ignoreURLs:)
     public init(isEnabled: Bool, ignoreURLs: NSRegularExpression?) {
         super.init()

@@ -43,15 +43,17 @@ limitations under the License.
 
     // Properties (READ)
     BOOL initialIsEnabled = configuration.isEnabled;
-    NSRegularExpression* ignoreUrls = configuration.ignoreURLs;
+    NSRegularExpression* initialIgnoreUrls = configuration.ignoreURLs;
 
     // Properties (WRITE)
     configuration.isEnabled = NO;
     configuration.ignoreURLs = [[NSRegularExpression alloc] initWithPattern:@"a" options:0 error:nil];
-
-
+    
     XCTAssertEqual(initialIsEnabled, YES);
+    XCTAssertNil(initialIgnoreUrls);
     XCTAssertEqual(configuration.isEnabled, NO);
+    XCTAssertNotNil(configuration.ignoreURLs);
+    XCTAssertTrue([configuration.ignoreURLs isEqual:[[NSRegularExpression alloc] initWithPattern:@"a" options:0 error:nil]]);
 }
 
 @end
