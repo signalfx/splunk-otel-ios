@@ -257,12 +257,13 @@ public final class Navigation: Sendable {
     }
 
     private func transitionEvent(for presentationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
-        let presentationController = presentationObject as? UIViewController
+        let presentationController = presentationObject as? UIPresentationController
+        let uiViewController = presentationObject as? UIViewController
         let presentedController = await presentationController?.presentedViewController
 
         guard
             await shouldProcessEvent(),
-            let visibleController = presentedController ?? presentationController
+            let visibleController = presentedController ?? uiViewController
         else {
             return nil
         }
