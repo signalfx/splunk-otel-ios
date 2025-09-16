@@ -50,11 +50,11 @@ jobs:
       matrix:
         include:
           - platform: ios
-            destination: "platform=iOS Simulator,name=iPhone 16,OS=latest"
+            destination: "platform=iOS Simulator,name=iPhone 16,OS=18.4"
           - platform: tvos
-            destination: "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=latest"
+            destination: "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=18.4"
           - platform: visionos
-            destination: "platform=visionOS Simulator,name=Apple Vision Pro,OS=latest"
+            destination: "platform=visionOS Simulator,name=Apple Vision Pro,OS=18.4"
           - platform: macCatalyst
             destination: "platform=macOS,variant=Mac Catalyst"
     steps:
@@ -96,7 +96,7 @@ jobs:
       matrix:
         include:
           - platform: ios
-            destination: "platform=iOS Simulator,name=iPhone 16,OS=latest"
+            destination: "platform=iOS Simulator,name=iPhone 16,OS=18.4"
 #           - platform: tvos
 #             destination: "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=latest"
 #           - platform: visionos
