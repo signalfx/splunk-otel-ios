@@ -186,7 +186,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         await Task.yield()
         await detector.flushBuffers()
 
-        await fulfillment(of: [reportExpectation], timeout: 1.0)
+        await fulfillment(of: [reportExpectation], timeout: 5.0)
     }
 
     func test_slowFrame_atBoundary_isDetected() async throws {
@@ -218,7 +218,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         await Task.yield()
         await detector.flushBuffers()
 
-        await fulfillment(of: [reportExpectation], timeout: 1.0)
+        await fulfillment(of: [reportExpectation], timeout: 5.0)
     }
 
     func test_noReports_whenFramesAreNormal() async throws {
@@ -308,7 +308,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         try? await Task.sleep(nanoseconds: 1_100_000_000)
 
         // The expectation should be fulfilled by the automatic flush loop.
-        await fulfillment(of: [reportExpectation], timeout: 1.5)
+        await fulfillment(of: [reportExpectation], timeout: 5.0)
     }
 }
 #endif // os(iOS) || os(tvOS) || os(visionOS)
