@@ -21,13 +21,13 @@ import OpenTelemetryApi
 
 // MARK: - OTelDestination for SlowFrameDetector data
 
-public struct OTelDestination: SlowFrameDetectorDestination {
+struct OTelDestination: SlowFrameDetectorDestination {
 
-    public init() {}
+    init() {}
 
     // MARK: - Sending
 
-    public func send(type: String, count: Int, sharedState: AgentSharedState?) async {
+    func send(type: String, count: Int, sharedState: AgentSharedState?) async {
 
         let tracer = OpenTelemetry.instance
             .tracerProvider
