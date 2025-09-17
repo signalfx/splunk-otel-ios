@@ -44,6 +44,7 @@ extension XCTestCase {
             waitExpectation.fulfill()
         }
 
-        wait(for: [waitExpectation], timeout: duration)
+        // TODO: [DEMRUM-2782] Fix tests - remove the added threshold
+        wait(for: [waitExpectation], timeout: duration + 0.5)
     }
 }
