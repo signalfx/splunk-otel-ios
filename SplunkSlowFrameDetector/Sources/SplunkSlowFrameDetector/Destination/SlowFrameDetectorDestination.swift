@@ -19,7 +19,7 @@ import Foundation
 import SplunkCommon
 
 /// Describes a destination into which the SlowFrameDetector module sends its results.
-public protocol SlowFrameDetectorDestination {
+protocol SlowFrameDetectorDestination {
 
     /// Sends results into a destination.
     func send(type: String, count: Int, sharedState: AgentSharedState?) async
