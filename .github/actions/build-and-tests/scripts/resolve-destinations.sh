@@ -50,5 +50,8 @@ printf 'test_matrix=%s\n'  "$TEST_MATRIX"  >> "$GITHUB_OUTPUT"
 mkdir -p .gh-cache
 printf 'BUILD_MATRIX=%s\nTEST_MATRIX=%s\n' "$BUILD_MATRIX" "$TEST_MATRIX" > .gh-cache/destinations.env
 
-echo "[resolve-destinations] outputs: build_matrix=$BUILD_INCLUDE"
-echo "[resolve-destinations] outputs: test_matrix=$TEST_INCLUDE"
+echo "[resolve-destinations] outputs: BUILD_INCLUDE=$BUILD_INCLUDE"
+echo "[resolve-destinations] outputs: TEST_INCLUDE=$TEST_INCLUDE"
+
+echo "[resolve-destinations] outputs: build_matrix=$BUILD_MATRIX"
+echo "[resolve-destinations] outputs: test_matrix=$TEST_MATRIX"
