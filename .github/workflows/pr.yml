@@ -48,7 +48,6 @@ jobs:
           xcode-version: latest-stable
 
       - name: Build & Tests
-        id: run
         uses: ./.github/actions/build-and-tests
 
       - name: Publish JUnit

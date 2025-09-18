@@ -7,27 +7,27 @@ runs:
   steps:
     - name: Ensure scripts are executable
       shell: bash
-      run: chmod +x scripts/*.sh
+      run: chmod +x ./.github/actions/build-and-tests/scripts/*.sh
 
     - name: Neutralize SDK
       shell: bash
-      run: ./scripts/neutralize-sdk.sh
+      run: ./.github/actions/build-and-tests/scripts/neutralize-sdk.sh
 
     - name: Prepare workspace
       shell: bash
-      run: ./scripts/prepare-workspace.sh
+      run: ./.github/actions/build-and-tests/scripts/prepare-workspace.sh
 
     - name: Detect scheme
       id: scheme
       shell: bash
-      run: ./scripts/prepare-scheme.sh
+      run: ./.github/actions/build-and-tests/scripts/prepare-scheme.sh
 
     - name: Resolve destinations
       id: dest
       shell: bash
       env:
         SCHEME: ${{ steps.scheme.outputs.scheme }}
-      run: ./scripts/resolve-destinations.sh
+      run: ./.github/actions/build-and-tests/scripts/resolve-destinations.sh
 
     - name: Build all platforms
       shell: bash
