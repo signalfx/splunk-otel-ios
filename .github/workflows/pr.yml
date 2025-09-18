@@ -40,8 +40,8 @@ jobs:
     runs-on: macos-latest
     outputs:
       scheme: ${{ steps.scheme.outputs.scheme }}
-      build_matrix: ${{ steps.capture.outputs.build_matrix }}
-      test_matrix: ${{ steps.capture.outputs.test_matrix }}
+      build_matrix: ${{ steps.capture.outputs.build_matrix_safe }}
+      test_matrix: ${{ steps.capture.outputs.test_matrix_safe }}
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
@@ -61,50 +61,34 @@ jobs:
         run: |
           set -euo pipefail
           command -v jq >/dev/null 2>&1 || { brew update >/dev/null && brew install -q jq >/dev/null; }
-          if [ ! -f .gh-cache/destinations.env ]; then
-            echo "destinations.env missing"; exit 1
-          fi
           source .gh-cache/destinations.env
-          if [ -z "${BUILD_MATRIX:-}" ] || [ "$BUILD_MATRIX" = "null" ]; then
-            if [ -n "${BUILD_INCLUDE:-}" ] && [ "$BUILD_INCLUDE" != "null" ]; then
-              BUILD_MATRIX="$(jq -c --argjson inc "$BUILD_INCLUDE" '{include:$inc}')"
-            else
-              BUILD_MATRIX='{"include":[]}'
-            fi
-          fi
-          if [ -z "${TEST_MATRIX:-}" ] || [ "$TEST_MATRIX" = "null" ]; then
-            if [ -n "${TEST_INCLUDE:-}" ] && [ "$TEST_INCLUDE" != "null" ]; then
-              TEST_MATRIX="$(jq -c --argjson inc "$TEST_INCLUDE" '{include:$inc}')"
-            else
-              TEST_MATRIX='{"include":[]}'
-            fi
-          fi
+          [ -n "${BUILD_MATRIX:-}" ] || BUILD_MATRIX='{"include":[]}'
+          [ -n "${TEST_MATRIX:-}" ]  || TEST_MATRIX='{"include":[]}'
+          SAFE_BUILD=$(printf '%s' "$BUILD_MATRIX" | jq -aRs .)
+          SAFE_TEST=$(printf  '%s' "$TEST_MATRIX"  | jq -aRs .)
           {
-            echo 'build_matrix<<JSON'
-            echo "$BUILD_MATRIX"
-            echo 'JSON'
-            echo 'test_matrix<<JSON'
-            echo "$TEST_MATRIX"
-            echo 'JSON'
+            echo "build_matrix_safe=$SAFE_BUILD"
+            echo "test_matrix_safe=$SAFE_TEST"
           } >> "$GITHUB_OUTPUT"
       - name: Debug matrices
         run: |
-          echo "::notice::build_matrix=${{ steps.capture.outputs.build_matrix }}"
-          echo "::notice::test_matrix=${{ steps.capture.outputs.test_matrix }}"
-          echo "---- RAW file ----"
-          cat .gh-cache/destinations.env || true
+          echo "::notice::build_matrix_safe=${{ steps.capture.outputs.build_matrix_safe }}"
+          echo "::notice::test_matrix_safe=${{ steps.capture.outputs.test_matrix_safe }}"
 
   build:
     runs-on: macos-latest
     needs: prepare
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.prepare.outputs.build_matrix) }}
+      matrix: ${{ fromJSON(fromJSON(needs.prepare.outputs.build_matrix)) }}
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
+      - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
+      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
+      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
       - name: Build ${{ matrix.platform }}
         env:
           SCHEME: ${{ needs.prepare.outputs.scheme }}
@@ -116,12 +100,15 @@ jobs:
     needs: prepare
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.prepare.outputs.test_matrix) }}
+      matrix: ${{ fromJSON(fromJSON(needs.prepare.outputs.test_matrix)) }}
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
+      - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
+      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
+      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
       - id: run
         env:
           SCHEME: ${{ needs.prepare.outputs.scheme }}
