@@ -38,5 +38,8 @@ jobs:
             }
 
   build_and_tests:
-    needs: [validate-title, lint]
-    uses: ./.github/actions/build-and-tests
+    runs-on: macos-latest
+    steps:
+        - uses: actions/checkout@v4.2.2
+        - name: Build & Tests
+          uses: ./.github/actions/build-and-tests
