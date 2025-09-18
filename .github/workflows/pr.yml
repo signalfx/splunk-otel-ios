@@ -20,7 +20,6 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-
       - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
       - run: |
           brew update
@@ -38,40 +37,6 @@ jobs:
               fi
             }
 
-  build-and-test:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-
-      - name: Build & Tests
-        uses: ./.github/actions/build-and-tests
-
-      - name: Publish JUnit
-        if: always()
-        uses: mikepenz/action-junit-report@v4
-        with:
-          report_paths: reports/junit-ios.xml
-          check_name: Tests (iOS)
-          require_tests: true
-          include_passed: true
-          fail_on_failure: false
-          detailed_summary: true
-
-      - name: Upload .xcresult
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: TestResults_iOS.xcresult
-          path: TestResults_iOS.xcresult
-          if-no-files-found: warn
-
-      - name: Fail on test errors
-        if: always()
-        run: |
-          code="${{ steps.run.outputs.test_status }}"
-          if [ -z "$code" ]; then exit 0; fi
-          if [ "$code" -ne 0 ]; then exit "$code"; fi
+  build_and_tests:
+    needs: [validate-title, lint]
+    uses: ./.github/actions/build-and-tests
