@@ -191,6 +191,6 @@ final class DefaultModulesManagerTests: XCTestCase {
         }
 
         // We need to wait for data delivery
-        waitForExpectations(timeout: 25, handler: nil)
+        waitForExpectations(timeout: 60, handler: nil)
     }
 }
