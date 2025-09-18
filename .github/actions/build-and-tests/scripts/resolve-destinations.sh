@@ -41,8 +41,11 @@ add_row macCatalyst "platform=macOS,variant=Mac Catalyst"
 BUILD_INCLUDE="$(echo "$json" | jq -c '.')"
 TEST_INCLUDE="$(echo "$json" | jq -c '[.[] | select(.platform=="ios")]')"
 
-printf 'build_matrix=%s\n' "$(jq -c --argjson inc "$BUILD_INCLUDE" '{include:$inc}')" >> "$GITHUB_OUTPUT"
-printf 'test_matrix=%s\n'  "$(jq -c --argjson inc "$TEST_INCLUDE"  '{include:$inc}')"  >> "$GITHUB_OUTPUT"
+BUILD_MATRIX="$(jq -c --argjson inc "$BUILD_INCLUDE" '{include:$inc}')"
+TEST_MATRIX="$(jq -c --argjson inc "$TEST_INCLUDE"  '{include:$inc}')"
+
+printf 'build_matrix=%s\n' "$BUILD_MATRIX" >> "$GITHUB_OUTPUT"
+printf 'test_matrix=%s\n'  "$TEST_MATRIX"  >> "$GITHUB_OUTPUT"
 
 echo "[resolve-destinations] outputs: build_matrix=$BUILD_INCLUDE"
 echo "[resolve-destinations] outputs: test_matrix=$TEST_INCLUDE"

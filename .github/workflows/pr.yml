@@ -57,6 +57,10 @@ jobs:
         env:
           SCHEME: ${{ steps.scheme.outputs.scheme }}
         run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
+      - name: Debug matrices
+        run: |
+          echo "::notice::build_matrix=${{ steps.dest.outputs.build_matrix }}"
+          echo "::notice::test_matrix=${{ steps.dest.outputs.test_matrix }}"
 
   build:
     runs-on: macos-latest
