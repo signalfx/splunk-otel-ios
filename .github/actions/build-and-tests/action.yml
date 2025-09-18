@@ -3,7 +3,6 @@ description: "Ensures Agent can build and tests are working."
 author: "Filip Ruzicka (fruzicka@splunk.com)"
 
 runs:
-  using: "composite"
   steps:
     - name: Ensure scripts are executable
       shell: bash
