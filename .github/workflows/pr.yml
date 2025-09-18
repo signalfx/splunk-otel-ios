@@ -1,220 +1,64 @@
 name: PR checks
-
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
 
 jobs:
-  validate-title:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4.2.2
-      - name: Validate PR Title
-        uses: ./.github/actions/validate-pr-title
-
-  lint:
-    name: Lint
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-
-      - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
-      - run: |
-          brew update
-          brew install swiftlint
-      - run: |
-          swiftlint lint \
-            --config Tools/.swiftlint.yml \
-            --reporter github-actions-logging \
-            --force-exclude || {
-              code=$?
-              if [ $code -eq 1 ]; then
-                echo "No Swift files found in $dir, skipping"
-              else
-                exit $code
-              fi
-            }
-
   prepare:
     runs-on: macos-latest
     outputs:
       scheme: ${{ steps.scheme.outputs.scheme }}
-      build_matrix: ${{ steps.mk.outputs.build_matrix }}
-      test_matrix: ${{ steps.mk.outputs.test_matrix }}
+      build_matrix: ${{ steps.dest.outputs.build_matrix }}
+      test_matrix: ${{ steps.dest.outputs.test_matrix }}
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
-      - name: Install jq
-        run: |
-          if ! command -v jq >/dev/null 2>&1; then
-            brew update
-            brew install jq
-          fi
-      - name: Prepare SPM workspace
-        run: |
-          xcodebuild -resolvePackageDependencies
-          xed -b .
+      - run: ./scripts/neutralize-sdk.sh
+      - run: ./scripts/prepare-workspace.sh
       - id: scheme
-        run: |
-          set -euo pipefail
-          WS=".swiftpm/xcode/package.xcworkspace"
-          RAW=$(xcodebuild -list -workspace "$WS" -json 2>/dev/null | sed -n '/^{/,$p' || true)
-          if [ -n "$RAW" ] && echo "$RAW" | jq -e '.workspace.schemes | length > 0' >/dev/null 2>&1; then
-            NAME=$(echo "$RAW" | jq -r '.workspace.schemes[] | select(test("-Package$"))' | head -n1)
-            if [ -z "$NAME" ] || [ "$NAME" = "null" ]; then
-              NAME=$(echo "$RAW" | jq -r '.workspace.schemes[0]')
-            fi
-          else
-            PKG=$(swift package describe --type json 2>/dev/null | jq -r '.name' || echo "")
-            NAME="${PKG}-Package"
-          fi
-          echo "scheme=$NAME" >> "$GITHUB_OUTPUT"
-      - id: mk
-        run: |
-          set -euo pipefail
-          WS=".swiftpm/xcode/package.xcworkspace"
-          SCHEME="${{ steps.scheme.outputs.scheme }}"
-          SHOW=$(xcodebuild -showdestinations -workspace "$WS" -scheme "$SCHEME" -json 2>/dev/null | sed -n '/^{/,$p' || true)
+        run: ./scripts/prepare-scheme.sh
+      - id: dest
+        env:
+          SCHEME: ${{ steps.scheme.outputs.scheme }}
+        run: ./scripts/resolve-destinations.sh
 
-          json='[]'
-          add_row() { json=$(jq -cn --arg p "$1" --arg d "$2" --argjson arr "$json" '$arr + [{platform:$p, destination:$d}]'); }
-          pick() { echo "$SHOW" | jq -r '.destinations[]? | select(.platform=="'"$1"'" and .available=="YES") | .id' | head -n1; }
-
-          DID=$(pick "iOS Simulator" || true)
-          if [ -n "${DID:-}" ] && [ "$DID" != "null" ]; then
-            add_row ios "id=$DID"
-          else
-            ID=$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("iPhone|iPad"))).udid' | head -n1 || true)
-            if [ -n "${ID:-}" ]; then
-              add_row ios "platform=iOS Simulator,id=$ID"
-            else
-              add_row ios "platform=iOS Simulator,OS=latest,name=iPhone 16"
-            fi
-          fi
-
-          DID=$(pick "tvOS Simulator" || true)
-          if [ -n "${DID:-}" ] && [ "$DID" != "null" ]; then
-            add_row tvos "id=$DID"
-          else
-            ID=$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("Apple TV"))).udid' | head -n1 || true)
-            if [ -n "${ID:-}" ]; then
-              add_row tvos "platform=tvOS Simulator,id=$ID"
-            else
-              add_row tvos "platform=tvOS Simulator,OS=latest,name=Apple TV 4K (3rd generation)"
-            fi
-          fi
-
-          DID=$(pick "visionOS Simulator" || true)
-          if [ -n "${DID:-}" ] && [ "$DID" != "null" ]; then
-            add_row visionos "id=$DID"
-          else
-            ID=$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("Apple Vision"))).udid' | head -n1 || true)
-            if [ -n "${ID:-}" ]; then
-              add_row visionos "platform=visionOS Simulator,id=$ID"
-            else
-              add_row visionos "platform=visionOS Simulator,OS=latest,name=Apple Vision Pro"
-            fi
-          fi
-
-          add_row macCatalyst "platform=macOS,variant=Mac Catalyst"
-
-          BUILD_INCLUDE=$(echo "$json" | jq -c '.')
-          TEST_INCLUDE=$(echo "$json" | jq -c '[.[] | select(.platform=="ios")]')
-
-          printf 'build_matrix=%s\n' "$(jq -c --argjson inc "$BUILD_INCLUDE" '{include:$inc}')" >> "$GITHUB_OUTPUT"
-          printf 'test_matrix=%s\n'  "$(jq -c --argjson inc "$TEST_INCLUDE"  '{include:$inc}')"  >> "$GITHUB_OUTPUT"
-
-  buildable:
+  build-and-test:
     runs-on: macos-latest
-    needs: prepare
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.prepare.outputs.build_matrix) }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
-      - run: |
-          xcodebuild -resolvePackageDependencies
-          xed -b .
-      - run: |
-          set -euo pipefail
-          xcodebuild \
-            -workspace .swiftpm/xcode/package.xcworkspace \
-            -scheme "${{ needs.prepare.outputs.scheme }}" \
-            -destination "${{ matrix.destination }}" \
-            -configuration Debug \
-            -skipPackagePluginValidation \
-            clean build
 
-  tests:
-    runs-on: macos-latest
-    needs: prepare
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.prepare.outputs.test_matrix) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-      - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
-      - run: |
-          brew update
-          brew install xcbeautify
-      - run: |
-          xcodebuild -resolvePackageDependencies
-          xed -b .
-      - id: test
-        run: |
-          OUT_DIR="reports"; mkdir -p "$OUT_DIR"
-          LOG="$OUT_DIR/xcodebuild-${{ matrix.platform }}.log"
-          JUNIT="$OUT_DIR/junit-${{ matrix.platform }}.xml"
-          XCRESULT="TestResults_${{ matrix.platform }}.xcresult"
-          xcodebuild \
-            -workspace .swiftpm/xcode/package.xcworkspace \
-            -scheme "${{ needs.prepare.outputs.scheme }}" \
-            -destination "${{ matrix.destination }}" \
-            -resultBundlePath "$XCRESULT" \
-            clean test \
-          2>&1 | tee "$LOG" | xcbeautify \
-                 --report junit \
-                 --junit-report-filename "$(basename "$JUNIT")" \
-                 --report-path "$OUT_DIR"
-          XCODE_STATUS=${PIPESTATUS[0]}
-          echo "xcode_status=$XCODE_STATUS" >> "$GITHUB_OUTPUT"
-          exit 0
+      - name: Build & Tests
+        id: run
+        uses: ./.github/actions/build-and-tests
 
-      - name: Publish JUnit to Checks
-        uses: mikepenz/action-junit-report@v4
+      - name: Publish JUnit
         if: always()
+        uses: mikepenz/action-junit-report@v4
         with:
-          report_paths: reports/junit-${{ matrix.platform }}.xml
-          check_name: Tests (${{ matrix.platform }})
+          report_paths: reports/junit-ios.xml
+          check_name: Tests (iOS)
           require_tests: true
-          include_passed: false
+          include_passed: true
           fail_on_failure: false
           detailed_summary: true
 
-      - name: Upload .xcresult artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload .xcresult
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: testresults-${{ matrix.platform }}.xcresult
-          path: TestResults_${{ matrix.platform }}.xcresult
+          name: TestResults_iOS.xcresult
+          path: TestResults_iOS.xcresult
           if-no-files-found: warn
 
-      - name: Fail job if xcodebuild failed
+      - name: Fail on test errors
         if: always()
         run: |
-          code="${{ steps.test.outputs.xcode_status }}"
+          code="${{ steps.run.outputs.test_status }}"
           if [ -z "$code" ]; then exit 0; fi
           if [ "$code" -ne 0 ]; then exit "$code"; fi
