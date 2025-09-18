@@ -47,7 +47,8 @@ jobs:
     runs-on: macos-latest
     strategy:
       fail-fast: false
-      platform: [ios, tvos, visionos, macCatalyst]
+      matrix:
+        platform: [ios, tvos, visionos, macCatalyst]
     steps:
       - uses: actions/checkout@v4
 
@@ -124,7 +125,8 @@ jobs:
     runs-on: macos-latest
     strategy:
       fail-fast: false
-      platform: [ios]
+      matrix:
+        platform: [ios]
     steps:
       - uses: actions/checkout@v4
 
