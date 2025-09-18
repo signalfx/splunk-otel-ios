@@ -42,15 +42,22 @@ jobs:
     runs-on: macos-latest
     outputs:
       scheme: ${{ steps.scheme.outputs.scheme }}
-      build_matrix: ${{ steps.matrix.outputs.build_matrix }}
-      test_matrix: ${{ steps.matrix.outputs.test_matrix }}
+      build_matrix: ${{ steps.mk.outputs.build_matrix }}
+      test_matrix: ${{ steps.mk.outputs.test_matrix }}
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
       - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
-      - run: |
+      - name: Install jq
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            brew update
+            brew install jq
+          fi
+      - name: Prepare SPM workspace
+        run: |
           xcodebuild -resolvePackageDependencies
           xed -b .
       - id: scheme
@@ -60,13 +67,15 @@ jobs:
           RAW=$(xcodebuild -list -workspace "$WS" -json 2>/dev/null | sed -n '/^{/,$p' || true)
           if [ -n "$RAW" ] && echo "$RAW" | jq -e '.workspace.schemes | length > 0' >/dev/null 2>&1; then
             NAME=$(echo "$RAW" | jq -r '.workspace.schemes[] | select(test("-Package$"))' | head -n1)
-            [ -z "$NAME" -o "$NAME" = "null" ] && NAME=$(echo "$RAW" | jq -r '.workspace.schemes[0]')
+            if [ -z "$NAME" ] || [ "$NAME" = "null" ]; then
+              NAME=$(echo "$RAW" | jq -r '.workspace.schemes[0]')
+            fi
           else
             PKG=$(swift package describe --type json 2>/dev/null | jq -r '.name' || echo "")
             NAME="${PKG}-Package"
           fi
           echo "scheme=$NAME" >> "$GITHUB_OUTPUT"
-      - id: matrix
+      - id: mk
         run: |
           set -euo pipefail
           WS=".swiftpm/xcode/package.xcworkspace"
@@ -74,15 +83,19 @@ jobs:
           SHOW=$(xcodebuild -showdestinations -workspace "$WS" -scheme "$SCHEME" -json 2>/dev/null | sed -n '/^{/,$p' || true)
 
           json='[]'
-          pick() { echo "$SHOW" | jq -r '.destinations[]? | select(.platform=="'"$1"'" and .available=="YES") | .id' | head -n1; }
           add_row() { json=$(jq -cn --arg p "$1" --arg d "$2" --argjson arr "$json" '$arr + [{platform:$p, destination:$d}]'); }
+          pick() { echo "$SHOW" | jq -r '.destinations[]? | select(.platform=="'"$1"'" and .available=="YES") | .id' | head -n1; }
 
           DID=$(pick "iOS Simulator" || true)
           if [ -n "${DID:-}" ] && [ "$DID" != "null" ]; then
             add_row ios "id=$DID"
           else
             ID=$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("iPhone|iPad"))).udid' | head -n1 || true)
-            [ -n "${ID:-}" ] && add_row ios "platform=iOS Simulator,id=$ID" || true
+            if [ -n "${ID:-}" ]; then
+              add_row ios "platform=iOS Simulator,id=$ID"
+            else
+              add_row ios "platform=iOS Simulator,OS=latest,name=iPhone 16"
+            fi
           fi
 
           DID=$(pick "tvOS Simulator" || true)
@@ -90,7 +103,11 @@ jobs:
             add_row tvos "id=$DID"
           else
             ID=$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("Apple TV"))).udid' | head -n1 || true)
-            [ -n "${ID:-}" ] && add_row tvos "platform=tvOS Simulator,id=$ID" || true
+            if [ -n "${ID:-}" ]; then
+              add_row tvos "platform=tvOS Simulator,id=$ID"
+            else
+              add_row tvos "platform=tvOS Simulator,OS=latest,name=Apple TV 4K (3rd generation)"
+            fi
           fi
 
           DID=$(pick "visionOS Simulator" || true)
@@ -98,7 +115,11 @@ jobs:
             add_row visionos "id=$DID"
           else
             ID=$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("Apple Vision"))).udid' | head -n1 || true)
-            [ -n "${ID:-}" ] && add_row visionos "platform=visionOS Simulator,id=$ID" || true
+            if [ -n "${ID:-}" ]; then
+              add_row visionos "platform=visionOS Simulator,id=$ID"
+            else
+              add_row visionos "platform=visionOS Simulator,OS=latest,name=Apple Vision Pro"
+            fi
           fi
 
           add_row macCatalyst "platform=macOS,variant=Mac Catalyst"
