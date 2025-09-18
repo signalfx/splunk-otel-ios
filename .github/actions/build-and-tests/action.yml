@@ -5,9 +5,73 @@ author: "Filip Ruzicka (fruzicka@splunk.com)"
 runs:
   using: "composite"
   steps:
-    - name: Build 
+    - name: Ensure scripts are executable
+      shell: bash
+      run: chmod +x scripts/*.sh
+
+    - name: Neutralize SDK
+      shell: bash
+      run: ./scripts/neutralize-sdk.sh
+
+    - name: Prepare workspace
+      shell: bash
+      run: ./scripts/prepare-workspace.sh
+
+    - name: Detect scheme
+      id: scheme
+      shell: bash
+      run: ./scripts/prepare-scheme.sh
+
+    - name: Resolve destinations
+      id: dest
       shell: bash
       env:
-        PR_TITLE: ${{ github.event.pull_request.title }}
-        PR_AUTHOR: ${{ github.event.pull_request.user.login }}
-      run: bash ./.github/actions/validate-pr-title/pr_title_check.sh
+        SCHEME: ${{ steps.scheme.outputs.scheme }}
+      run: ./scripts/resolve-destinations.sh
+
+    - name: Build all platforms
+      shell: bash
+      env:
+        SCHEME: ${{ steps.scheme.outputs.scheme }}
+      run: |
+        command -v jq >/dev/null 2>&1 || { brew update && brew install -q jq; }
+        BM='${{ steps.dest.outputs.build_matrix }}'
+        echo "$BM" | jq -e '.include | length > 0' >/dev/null
+        echo "$BM" | jq -r '.include[] | @base64' | while read -r row; do
+          obj="$(echo "$row" | base64 --decode)"
+          DEST="$(echo "$obj" | jq -r '.destination')"
+          echo "[build-all] platform=$(echo "$obj" | jq -r '.platform') destination=$DEST"
+          SCHEME="${SCHEME:?}" DESTINATION="$DEST" ./scripts/build.sh
+        done
+
+    - name: Run iOS tests
+      id: tests
+      shell: bash
+      env:
+        SCHEME: ${{ steps.scheme.outputs.scheme }}
+      run: |
+        command -v jq >/dev/null 2>&1 || { brew update && brew install -q jq; }
+        TM='${{ steps.dest.outputs.test_matrix }}'
+        echo "$TM" | jq -e '.include | length > 0' >/dev/null
+        FAIL=0
+        echo "$TM" | jq -r '.include[] | @base64' | while read -r row; do
+          obj="$(echo "$row" | base64 --decode)"
+          DEST="$(echo "$obj" | jq -r '.destination')"
+          echo "[tests] platform=$(echo "$obj" | jq -r '.platform') destination=$DEST"
+          export GITHUB_OUTPUT="$(mktemp)"
+          SCHEME="${SCHEME:?}" DESTINATION="$DEST" ./scripts/test.sh
+          code="$(sed -n 's/^xcode_status=//p' "$GITHUB_OUTPUT")"
+          echo "[tests] xcode_status=$code"
+          if [ -z "$code" ] || [ "$code" -ne 0 ]; then FAIL=1; fi
+        done
+        echo "status=$FAIL" >> "$GITHUB_OUTPUT"
+
+outputs:
+  scheme:
+    value: ${{ steps.scheme.outputs.scheme }}
+  build_matrix:
+    value: ${{ steps.dest.outputs.build_matrix }}
+  test_matrix:
+    value: ${{ steps.dest.outputs.test_matrix }}
+  test_status:
+    value: ${{ steps.tests.outputs.status }}

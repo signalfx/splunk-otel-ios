@@ -1,28 +1,42 @@
 name: PR checks
+
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
 
 jobs:
-  prepare:
+  validate-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Validate PR Title
+        uses: ./.github/actions/validate-pr-title
+
+  lint:
+    name: Lint
     runs-on: macos-latest
-    outputs:
-      scheme: ${{ steps.scheme.outputs.scheme }}
-      build_matrix: ${{ steps.dest.outputs.build_matrix }}
-      test_matrix: ${{ steps.dest.outputs.test_matrix }}
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - run: ./scripts/neutralize-sdk.sh
-      - run: ./scripts/prepare-workspace.sh
-      - id: scheme
-        run: ./scripts/prepare-scheme.sh
-      - id: dest
-        env:
-          SCHEME: ${{ steps.scheme.outputs.scheme }}
-        run: ./scripts/resolve-destinations.sh
+
+      - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
+      - run: |
+          brew update
+          brew install swiftlint
+      - run: |
+          swiftlint lint \
+            --config Tools/.swiftlint.yml \
+            --reporter github-actions-logging \
+            --force-exclude || {
+              code=$?
+              if [ $code -eq 1 ]; then
+                echo "No Swift files found in $dir, skipping"
+              else
+                exit $code
+              fi
+            }
 
   build-and-test:
     runs-on: macos-latest
