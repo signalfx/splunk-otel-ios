@@ -103,11 +103,11 @@ jobs:
 
           add_row macCatalyst "platform=macOS,variant=Mac Catalyst"
 
-          BUILD_MATRIX=$(echo "$json" | jq -c '.')
-          TEST_MATRIX=$(echo "$json" | jq -c '[.[] | select(.platform=="ios")]')
+          BUILD_INCLUDE=$(echo "$json" | jq -c '.')
+          TEST_INCLUDE=$(echo "$json" | jq -c '[.[] | select(.platform=="ios")]')
 
-          printf 'build_matrix=%s\n' "$BUILD_MATRIX" >> "$GITHUB_OUTPUT"
-          printf 'test_matrix=%s\n' "$TEST_MATRIX" >> "$GITHUB_OUTPUT"
+          printf 'build_matrix=%s\n' "$(jq -c --argjson inc "$BUILD_INCLUDE" '{include:$inc}')" >> "$GITHUB_OUTPUT"
+          printf 'test_matrix=%s\n'  "$(jq -c --argjson inc "$TEST_INCLUDE"  '{include:$inc}')"  >> "$GITHUB_OUTPUT"
 
   buildable:
     runs-on: macos-latest
