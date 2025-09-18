@@ -14,13 +14,13 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: macos-15
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.3'#latest-stable
+          xcode-version: latest-stable
 
       - name: Install SwiftLint
         run: |
@@ -44,25 +44,16 @@ jobs:
 
   buildable:
     name: Buildable
-    runs-on: macos-15
+    runs-on: macos-latest
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - platform: ios
-            destination: "platform=iOS Simulator,name=iPhone 16,OS=latest"
-          - platform: tvos
-            destination: "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=latest"
-          - platform: visionos
-            destination: "platform=visionOS Simulator,name=Apple Vision Pro,OS=latest"
-          - platform: macCatalyst
-            destination: "platform=macOS,variant=Mac Catalyst"
+      platform: [ios, tvos, visionos, macCatalyst]
     steps:
       - uses: actions/checkout@v4
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.3'
+          xcode-version: latest-stable
 
       - name: Generate workspace (.swiftpm/xcode/package.xcworkspace)
         run: xed -b .
@@ -77,6 +68,46 @@ jobs:
           fi
           echo "scheme=$PKG_SCHEME" >> "$GITHUB_OUTPUT"
 
+      - name: Resolve destination
+        id: dest
+        run: |
+          set -euo pipefail
+          PLATFORM="${{ matrix.platform }}"
+          WORKSPACE=".swiftpm/xcode/package.xcworkspace"
+          SCHEME="${{ steps.scheme.outputs.scheme }}"
+
+          if [ "$PLATFORM" = "macCatalyst" ]; then
+            echo "dest=platform=macOS,variant=Mac Catalyst" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          RAW=$(xcodebuild -showdestinations -workspace "$WORKSPACE" -scheme "$SCHEME" -json || echo '{}')
+          if [ "$PLATFORM" = "ios" ]; then
+            DID=$(echo "$RAW" | jq -r '.destinations[]? | select(.platform=="iOS Simulator" and .available=="YES") | .id' | head -n1)
+            if [ -z "${DID:-}" ] || [ "$DID" = "null" ]; then
+              ID=$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("iPhone|iPad"))).udid' | head -n1)
+              echo "dest=platform=iOS Simulator,id=$ID" >> "$GITHUB_OUTPUT"
+            else
+              echo "dest=id=$DID" >> "$GITHUB_OUTPUT"
+            fi
+          elif [ "$PLATFORM" = "tvos" ]; then
+            DID=$(echo "$RAW" | jq -r '.destinations[]? | select(.platform=="tvOS Simulator" and .available=="YES") | .id' | head -n1)
+            if [ -z "${DID:-}" ] || [ "$DID" = "null" ]; then
+              ID=$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("Apple TV"))).udid' | head -n1)
+              echo "dest=platform=tvOS Simulator,id=$ID" >> "$GITHUB_OUTPUT"
+            else
+              echo "dest=id=$DID" >> "$GITHUB_OUTPUT"
+            fi
+          elif [ "$PLATFORM" = "visionos" ]; then
+            DID=$(echo "$RAW" | jq -r '.destinations[]? | select(.platform=="visionOS Simulator" and .available=="YES") | .id' | head -n1)
+            if [ -z "${DID:-}" ] || [ "$DID" = "null" ]; then
+              ID=$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("Apple Vision"))).udid' | head -n1)
+              echo "dest=platform=visionOS Simulator,id=$ID" >> "$GITHUB_OUTPUT"
+            else
+              echo "dest=id=$DID" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
       - name: Build (${{ matrix.platform }})
         run: |
           set -euo pipefail
@@ -90,25 +121,16 @@ jobs:
 
   tests:
     name: Tests
-    runs-on: macos-15
+    runs-on: macos-latest
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - platform: ios
-            destination: "platform=iOS Simulator,name=iPhone 16,OS=latest"
-#           - platform: tvos
-#             destination: "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=latest"
-#           - platform: visionos
-#             destination: "platform=visionOS Simulator,name=Apple Vision Pro,OS=latest"
-#           - platform: maccatalyst
-#             destination: "platform=macOS,variant=Mac Catalyst"
+      platform: [ios]
     steps:
       - uses: actions/checkout@v4
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.3'
+          xcode-version: latest-stable
 
       - name: Generate workspace (.swiftpm/xcode/package.xcworkspace)
         run: xed -b .
@@ -119,6 +141,21 @@ jobs:
           SCHEMES_JSON=$(xcodebuild -list -workspace .swiftpm/xcode/package.xcworkspace -json)
           PKG_SCHEME=$(echo "$SCHEMES_JSON" | jq -r '.workspace.schemes[0]')
           echo "scheme=$PKG_SCHEME" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve destination
+        id: dest
+        run: |
+          set -euo pipefail
+          WORKSPACE=".swiftpm/xcode/package.xcworkspace"
+          SCHEME="${{ steps.scheme.outputs.scheme }}"
+          RAW=$(xcodebuild -showdestinations -workspace "$WORKSPACE" -scheme "$SCHEME" -json || echo '{}')
+          DID=$(echo "$RAW" | jq -r '.destinations[]? | select(.platform=="iOS Simulator" and .available=="YES") | .id' | head -n1)
+          if [ -z "${DID:-}" ] || [ "$DID" = "null" ]; then
+            ID=$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("iPhone|iPad"))).udid' | head -n1)
+            echo "dest=platform=iOS Simulator,id=$ID" >> "$GITHUB_OUTPUT"
+          else
+            echo "dest=id=$DID" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Run tests (${{ matrix.platform }})
         id: test
@@ -150,7 +187,7 @@ jobs:
           report_paths: reports/junit-${{ matrix.platform }}.xml
           check_name: Tests (${{ matrix.platform }})
           require_tests: true
-          include_passed: true
+          include_passed: false
           fail_on_failure: false
           detailed_summary: true
 
@@ -158,7 +195,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: xcresult-${{ matrix.platform }}
+          name: testresults-${{ matrix.platform }}.xcresult
           path: TestResults_${{ matrix.platform }}.xcresult
           if-no-files-found: warn
 
