@@ -47,5 +47,8 @@ TEST_MATRIX="$(jq -c --argjson inc "$TEST_INCLUDE"  '{include:$inc}')"
 printf 'build_matrix=%s\n' "$BUILD_MATRIX" >> "$GITHUB_OUTPUT"
 printf 'test_matrix=%s\n'  "$TEST_MATRIX"  >> "$GITHUB_OUTPUT"
 
+mkdir -p .gh-cache
+printf 'BUILD_MATRIX=%s\nTEST_MATRIX=%s\n' "$BUILD_MATRIX" "$TEST_MATRIX" > .gh-cache/destinations.env
+
 echo "[resolve-destinations] outputs: build_matrix=$BUILD_INCLUDE"
 echo "[resolve-destinations] outputs: test_matrix=$TEST_INCLUDE"

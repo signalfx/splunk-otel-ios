@@ -38,11 +38,10 @@ jobs:
 
   prepare:
     runs-on: macos-latest
-    needs: [validate-title, lint]
     outputs:
       scheme: ${{ steps.scheme.outputs.scheme }}
-      build_matrix: ${{ steps.dest.outputs.build_matrix }}
-      test_matrix: ${{ steps.dest.outputs.test_matrix }}
+      build_matrix: ${{ steps.capture.outputs.build_matrix }}
+      test_matrix: ${{ steps.capture.outputs.test_matrix }}
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
@@ -57,10 +56,20 @@ jobs:
         env:
           SCHEME: ${{ steps.scheme.outputs.scheme }}
         run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
+      - name: Capture matrices (robust outputs)
+        id: capture
+        run: |
+          set -euo pipefail
+          if [ ! -f .gh-cache/destinations.env ]; then
+            echo "destinations.env missing"; exit 1
+          fi
+          source .gh-cache/destinations.env
+          printf 'build_matrix=%s\n' "$BUILD_MATRIX" >> "$GITHUB_OUTPUT"
+          printf 'test_matrix=%s\n'  "$TEST_MATRIX"  >> "$GITHUB_OUTPUT"
       - name: Debug matrices
         run: |
-          echo "::notice::build_matrix=${{ steps.dest.outputs.build_matrix }}"
-          echo "::notice::test_matrix=${{ steps.dest.outputs.test_matrix }}"
+          echo "::notice::build_matrix=${{ steps.capture.outputs.build_matrix }}"
+          echo "::notice::test_matrix=${{ steps.capture.outputs.test_matrix }}"
 
   build:
     runs-on: macos-latest
@@ -73,9 +82,6 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
-      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
-      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
       - name: Build ${{ matrix.platform }}
         env:
           SCHEME: ${{ needs.prepare.outputs.scheme }}
@@ -93,9 +99,6 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
-      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
-      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
       - id: run
         env:
           SCHEME: ${{ needs.prepare.outputs.scheme }}
