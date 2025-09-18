@@ -2,10 +2,10 @@
 set -euo pipefail
 
 : "${GITHUB_OUTPUT:=}"
-echo "[resolve-destinations] inputs: WORKSPACE=${WORKSPACE:-.swiftpm/xcode/package.xcworkspace} SCHEME=${SCHEME:?}"
-
 WS="${WORKSPACE:-.swiftpm/xcode/package.xcworkspace}"
 SCHEME="${SCHEME:?}"
+
+echo "[resolve-destinations] inputs: WORKSPACE=${WS} SCHEME=${SCHEME}"
 
 command -v jq >/dev/null 2>&1 || { brew update >/dev/null && brew install -q jq >/dev/null; }
 
@@ -44,8 +44,13 @@ add_row macCatalyst "platform=macOS,variant=Mac Catalyst"
 BUILD_INCLUDE="$(echo "$json" | jq -c '.')"
 TEST_INCLUDE="$(echo "$json" | jq -c '[.[] | select(.platform=="ios")]')"
 
-BUILD_MATRIX="$(jq -c --argjson inc "$BUILD_INCLUDE" '{include:$inc}')"
-TEST_MATRIX="$(jq -c --argjson inc "$TEST_INCLUDE"  '{include:$inc}')"
+validate_json() { if jq -e . >/dev/null 2>&1 <<<"${1:-}"; then echo "$1"; else echo '[]'; fi; }
+
+BUILD_INCLUDE="$(validate_json "$BUILD_INCLUDE")"
+TEST_INCLUDE="$(validate_json "$TEST_INCLUDE")"
+
+BUILD_MATRIX="$(jq -c -n --argjson inc "$BUILD_INCLUDE" '{include:$inc}')"
+TEST_MATRIX="$(jq -c -n --argjson inc "$TEST_INCLUDE"  '{include:$inc}')"
 
 if [ -n "${GITHUB_OUTPUT}" ]; then
   {
