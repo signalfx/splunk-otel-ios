@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
-: "${GITHUB_OUTPUT:?}"
+
+: "${GITHUB_OUTPUT:=}"
 echo "[resolve-destinations] inputs: WORKSPACE=${WORKSPACE:-.swiftpm/xcode/package.xcworkspace} SCHEME=${SCHEME:?}"
 
 WS="${WORKSPACE:-.swiftpm/xcode/package.xcworkspace}"
 SCHEME="${SCHEME:?}"
-command -v jq >/dev/null 2>&1 || { brew update && brew install -q jq; }
+
+command -v jq >/dev/null 2>&1 || { brew update >/dev/null && brew install -q jq >/dev/null; }
+
 SHOW="$(xcodebuild -showdestinations -workspace "$WS" -scheme "$SCHEME" -json 2>/dev/null | sed -n '/^{/,$p' || true)"
 
 json='[]'
@@ -44,14 +47,26 @@ TEST_INCLUDE="$(echo "$json" | jq -c '[.[] | select(.platform=="ios")]')"
 BUILD_MATRIX="$(jq -c --argjson inc "$BUILD_INCLUDE" '{include:$inc}')"
 TEST_MATRIX="$(jq -c --argjson inc "$TEST_INCLUDE"  '{include:$inc}')"
 
-printf 'build_matrix=%s\n' "$BUILD_MATRIX" >> "$GITHUB_OUTPUT"
-printf 'test_matrix=%s\n'  "$TEST_MATRIX"  >> "$GITHUB_OUTPUT"
+if [ -n "${GITHUB_OUTPUT}" ]; then
+  {
+    echo 'build_matrix<<JSON'
+    echo "$BUILD_MATRIX"
+    echo 'JSON'
+    echo 'test_matrix<<JSON'
+    echo "$TEST_MATRIX"
+    echo 'JSON'
+  } >> "$GITHUB_OUTPUT"
+fi
 
 mkdir -p .gh-cache
-printf 'BUILD_MATRIX=%s\nTEST_MATRIX=%s\n' "$BUILD_MATRIX" "$TEST_MATRIX" > .gh-cache/destinations.env
+{
+  printf 'BUILD_INCLUDE=%s\n' "$BUILD_INCLUDE"
+  printf 'TEST_INCLUDE=%s\n' "$TEST_INCLUDE"
+  printf 'BUILD_MATRIX=%s\n'  "$BUILD_MATRIX"
+  printf 'TEST_MATRIX=%s\n'   "$TEST_MATRIX"
+} > .gh-cache/destinations.env
 
-echo "[resolve-destinations] outputs: BUILD_INCLUDE=$BUILD_INCLUDE"
-echo "[resolve-destinations] outputs: TEST_INCLUDE=$TEST_INCLUDE"
-
-echo "[resolve-destinations] outputs: build_matrix=$BUILD_MATRIX"
-echo "[resolve-destinations] outputs: test_matrix=$TEST_MATRIX"
+echo "[resolve-destinations] outputs(include): build=$BUILD_INCLUDE"
+echo "[resolve-destinations] outputs(include): test=$TEST_INCLUDE"
+echo "[resolve-destinations] outputs(matrix): build=$BUILD_MATRIX"
+echo "[resolve-destinations] outputs(matrix): test=$TEST_MATRIX"

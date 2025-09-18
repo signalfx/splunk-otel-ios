@@ -60,10 +60,25 @@ jobs:
         id: capture
         run: |
           set -euo pipefail
+          command -v jq >/dev/null 2>&1 || { brew update >/dev/null && brew install -q jq >/dev/null; }
           if [ ! -f .gh-cache/destinations.env ]; then
             echo "destinations.env missing"; exit 1
           fi
           source .gh-cache/destinations.env
+          if [ -z "${BUILD_MATRIX:-}" ] || [ "$BUILD_MATRIX" = "null" ]; then
+            if [ -n "${BUILD_INCLUDE:-}" ] && [ "$BUILD_INCLUDE" != "null" ]; then
+              BUILD_MATRIX="$(jq -c --argjson inc "$BUILD_INCLUDE" '{include:$inc}')"
+            else
+              BUILD_MATRIX='{"include":[]}'
+            fi
+          fi
+          if [ -z "${TEST_MATRIX:-}" ] || [ "$TEST_MATRIX" = "null" ]; then
+            if [ -n "${TEST_INCLUDE:-}" ] && [ "$TEST_INCLUDE" != "null" ]; then
+              TEST_MATRIX="$(jq -c --argjson inc "$TEST_INCLUDE" '{include:$inc}')"
+            else
+              TEST_MATRIX='{"include":[]}'
+            fi
+          fi
           {
             echo 'build_matrix<<JSON'
             echo "$BUILD_MATRIX"
