@@ -45,10 +45,10 @@ public final class SlowFrameDetector: NSObject {
     // MARK: - Internal Constants
 
     /// The percentage by which a frame's duration must exceed the expected duration to trigger a slow frame report.
-    internal static let slowFrameTolerancePercentage: Double = 15.0
+    static let slowFrameTolerancePercentage: Double = 15.0
 
     /// The duration of main thread unresponsiveness that triggers a frozen frame report.
-    internal static let frozenFrameThreshold: TimeInterval = 0.7
+    static let frozenFrameThreshold: TimeInterval = 0.7
 
     // MARK: - Private Properties
 
@@ -64,12 +64,12 @@ public final class SlowFrameDetector: NSObject {
     // MARK: - Test-only Properties
 
     #if DEBUG
-    internal var logicForTest: SlowFrameLogic { logic }
+    var logicForTest: SlowFrameLogic { logic }
     #endif
 
     // MARK: - Initialization
 
-    internal init(
+    init(
         ticker: (any SlowFrameTicker)?,
         destinationFactory: @escaping () -> SlowFrameDetectorDestination
     ) {
@@ -122,7 +122,7 @@ public final class SlowFrameDetector: NSObject {
     ///
     /// This method sets up the frame ticker and registers for application lifecycle notifications to
     /// automatically pause and resume monitoring. This method is idempotent.
-    public func start() {
+    func start() {
         guard ticker != nil, detectorTask == nil else {
             return
         }
@@ -166,7 +166,7 @@ public final class SlowFrameDetector: NSObject {
     /// Stops the slow and frozen frame detection process.
     ///
     /// This method invalidates the frame ticker, removes notification observers, and flushes any buffered data.
-    public func stop() async {
+    func stop() async {
         // Run the two independent cleanup operations concurrently.
         async let detectorTaskCleanup: () = cleanupDetectorTask()
         async let logicCleanup: () = logic.stop()
@@ -177,7 +177,7 @@ public final class SlowFrameDetector: NSObject {
 
     // MARK: - Internal Methods
 
-    internal func flushBuffers() async {
+    func flushBuffers() async {
         await logic.flushBuffers()
     }
 

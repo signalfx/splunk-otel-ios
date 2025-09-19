@@ -142,7 +142,7 @@ actor SlowFrameLogic {
     // MARK: - Internal Methods
 
     /// Flushes the collected slow and frozen frame counts to the destination.
-    internal func flushBuffers() async {
+    func flushBuffers() async {
         guard let destination else {
             return
         }
