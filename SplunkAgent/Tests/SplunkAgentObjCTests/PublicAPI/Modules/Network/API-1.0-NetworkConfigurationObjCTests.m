@@ -30,7 +30,7 @@ limitations under the License.
 // MARK: - API Tests
 
 - (void)testInitialization {
-    SPLKNetworkInstrumentationConfiguration *defaultConfiguration = [[SPLKNetworkInstrumentationConfiguration alloc] initWithEnabled:NO ignoreURLs:[[NSRegularExpression alloc] initWithPattern:@"a" options:0 error:nil]];
+    SPLKNetworkInstrumentationConfiguration *defaultConfiguration = [[SPLKNetworkInstrumentationConfiguration alloc] initWithEnabled:NO ignoreURLs:[[NSRegularExpression alloc] initWithPattern:@"." options:0 error:nil]];
 
     SPLKNetworkInstrumentationConfiguration *minimalConfiguration = [[SPLKNetworkInstrumentationConfiguration alloc] initWithEnabled:NO];
 
@@ -47,13 +47,13 @@ limitations under the License.
 
     // Properties (WRITE)
     configuration.isEnabled = NO;
-    configuration.ignoreURLs = [[NSRegularExpression alloc] initWithPattern:@"a" options:0 error:nil];
+    configuration.ignoreURLs = [[NSRegularExpression alloc] initWithPattern:@"." options:0 error:nil];
     
     XCTAssertEqual(initialIsEnabled, YES);
     XCTAssertNil(initialIgnoreUrls);
     XCTAssertEqual(configuration.isEnabled, NO);
     XCTAssertNotNil(configuration.ignoreURLs);
-    XCTAssertTrue([configuration.ignoreURLs isEqual:[[NSRegularExpression alloc] initWithPattern:@"a" options:0 error:nil]]);
+    XCTAssertTrue([configuration.ignoreURLs isEqual:[[NSRegularExpression alloc] initWithPattern:@"." options:0 error:nil]]);
 }
 
 @end
