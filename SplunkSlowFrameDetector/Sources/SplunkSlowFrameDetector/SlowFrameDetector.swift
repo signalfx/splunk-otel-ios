@@ -21,8 +21,6 @@ import SplunkCommon
 import UIKit
 #endif
 
-// MARK: - SlowFrameDetector
-
 /// Detects and reports slow and frozen frames in the user interface.
 ///
 /// This class monitors the application's frame rate using `CADisplayLink`. It identifies "slow frames"
@@ -30,19 +28,7 @@ import UIKit
 /// detects "frozen frames" when the main thread is unresponsive for a significant period.
 ///
 /// These events are reported as metrics to the configured destination.
-public final class SlowFrameDetector {
-
-    /// The percentage of the frame's expected duration that is added as a tolerance when detecting slow frames.
-    ///
-    /// A frame is considered "slow" if its actual duration exceeds the expected duration (e.g., 16.67ms
-    /// for 60Hz) plus this tolerance percentage. The default value is `15.0`.
-    public static let slowFrameTolerancePercentage: Double = 15.0
-
-    /// The time interval, in seconds, after which a frame is considered "frozen."
-    ///
-    /// If the main thread does not process frames for a period longer than this threshold, a frozen frame
-    /// is reported. The default value is `0.7` seconds.
-    public static let frozenFrameThreshold: TimeInterval = 0.7
+public final class SlowFrameDetector: NSObject {
 
     /// The current state of the `SlowFrameDetector`.
     ///
@@ -53,11 +39,30 @@ public final class SlowFrameDetector {
     ///
     /// This property can be used to update the detector's behavior based on settings fetched from a remote source.
     public var configuration: SlowFrameDetectorRemoteConfiguration?
+
+    // The percentage by which a frame's duration must exceed
+    // the expected duration to trigger a slow frame report
+    internal static let slowFrameTolerancePercentage: Double = 15.0
+
+    // The duration of main thread unresponsiveness that
+    // triggers a frozen frame report
+    internal static let frozenFrameThreshold: TimeInterval = 0.7
+
     private let logic: SlowFrameLogic
-    private var ticker: SlowFrameTicker?
+    private var ticker: (any SlowFrameTicker)?
+    private var detectorTask: Task<Void, Never>?
+
+    #if DEBUG
+    internal var logicForTest: SlowFrameLogic { logic }
+    #endif
+
+    #if os(iOS) || os(tvOS) || os(visionOS)
+    // A helper encapsulating lifecycle observers
+    private lazy var lifecycleObserver = LifecycleObserver(observer: self)
+    #endif
 
     init(
-        ticker: SlowFrameTicker?,
+        ticker: (any SlowFrameTicker)?,
         destinationFactory: @escaping () -> SlowFrameDetectorDestination
     ) {
         self.ticker = ticker
@@ -69,29 +74,19 @@ public final class SlowFrameDetector {
     ///
     /// This convenience initializer sets up the detector with default dependencies, including a
     /// `DisplayLinkTicker` for frame monitoring and an `OTelDestination` for reporting.
-    public required convenience init() {
+    public required convenience override init() {
         self.init(ticker: DisplayLinkTicker(), destinationFactory: { OTelDestination() })
     }
     #else
     // nil ticker for unsupported platforms
-    public required init() {
+    public required convenience init() {
         self.init(ticker: nil, destinationFactory: { OTelDestination() })
     }
     #endif
 
     deinit {
-        #if os(iOS) || os(tvOS) || os(visionOS)
-        NotificationCenter.default.removeObserver(self)
-        #endif
-        ticker?.stop()
-
-        // We need a strong reference to the actor because self is going away
-        let logicToStop = self.logic
-
-        // deinit does not need to wait for this so we wrap it in a task
-        Task {
-            await logicToStop.stop()
-        }
+        // Cancel the main detector task to ensure all managed resources are cleaned up.
+        detectorTask?.cancel()
     }
 
     /// Installs and configures the slow frame detector.
@@ -115,31 +110,45 @@ public final class SlowFrameDetector {
     /// Starts the slow and frozen frame detection process.
     ///
     /// This method sets up the frame ticker and registers for application lifecycle notifications to
-    /// automatically pause and resume monitoring.
+    /// automatically pause and resume monitoring. This method is idempotent.
     public func start() {
-        guard ticker != nil else {
+        guard ticker != nil, detectorTask == nil else {
             return
         }
 
-        Task { [weak self] in
-            guard let self = self else { return }
+        // This task is the main run loop for the detector. It runs on a background thread
+        // and dispatches UI work to the main actor, preventing deadlocks.
+        detectorTask = Task { [weak self] in
+            guard let self else { return }
+            do {
+                try await self.logic.start()
 
-            let started = await self.logic.start()
-            guard started else { return }
+                self.ticker?.onFrame = { [weak self] timestamp, duration in
+                    guard let self else { return }
+                    Task { await self.logic.handleFrame(timestamp: timestamp, duration: duration) }
+                }
 
-            self.ticker?.onFrame = { [weak self] timestamp, duration in
-                guard let self = self else { return }
-                Task { await self.logic.handleFrame(timestamp: timestamp, duration: duration) }
+                // Dispatch UI-related setup to the main actor.
+                await MainActor.run {
+                    self.lifecycleObserver.add()
+                    self.ticker?.start()
+                }
+
+                // The task will suspend here indefinitely until it is cancelled.
+                try await Task.sleep(nanoseconds: .max)
+            } catch is CancellationError {
+                // Task was cancelled. Dispatch cleanup to the main actor.
+                await MainActor.run {
+                    self.ticker?.stop()
+                    self.lifecycleObserver.remove()
+                }
+            } catch {
+                // An error occurred during startup. Dispatch cleanup to the main actor.
+                await MainActor.run {
+                    self.ticker?.stop()
+                    self.lifecycleObserver.remove()
+                }
             }
-
-            #if os(iOS) || os(tvOS) || os(visionOS)
-            let nc = NotificationCenter.default
-            nc.addObserver(self, selector: #selector(self.appWillResignActive), name: UIApplication.willResignActiveNotification, object: nil)
-            nc.addObserver(self, selector: #selector(self.appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
-            nc.addObserver(self, selector: #selector(self.appWillTerminate), name: UIApplication.willTerminateNotification, object: nil)
-            #endif
-
-            self.ticker?.start()
         }
     }
 
@@ -147,19 +156,29 @@ public final class SlowFrameDetector {
     ///
     /// This method invalidates the frame ticker, removes notification observers, and flushes any buffered data.
     public func stop() async {
-        #if os(iOS) || os(tvOS) || os(visionOS)
-        NotificationCenter.default.removeObserver(self)
-        #endif
-        ticker?.stop()
-        await logic.stop()
+        // Run the two independent cleanup operations concurrently.
+        async let detectorTaskCleanup: () = cleanupDetectorTask()
+        async let logicCleanup: () = logic.stop()
+
+        // Await both to ensure all cleanup is complete before this method returns.
+        _ = await (detectorTaskCleanup, logicCleanup)
+    }
+
+    /// Cancels and waits for the main detector task to finish its cleanup.
+    private func cleanupDetectorTask() async {
+        detectorTask?.cancel()
+        _ = await detectorTask?.result
+        detectorTask = nil
     }
 
     #if os(iOS) || os(tvOS) || os(visionOS)
+    @MainActor
     @objc private func appWillResignActive(_ note: Notification) {
         ticker?.pause()
         Task { await logic.appWillResignActive() }
     }
 
+    @MainActor
     @objc private func appDidBecomeActive(_ note: Notification) {
         ticker?.resume()
         Task { await logic.appDidBecomeActive() }
@@ -170,7 +189,49 @@ public final class SlowFrameDetector {
     }
     #endif
 
-    func flushBuffers() async {
+    internal func flushBuffers() async {
         await logic.flushBuffers()
     }
 }
+
+// MARK: - Nested Helper Class
+#if os(iOS) || os(tvOS) || os(visionOS)
+@MainActor
+private extension SlowFrameDetector {
+    // Encapsulate the state and registration of application
+    // lifecycle notification observers to keep call sites lean.
+    final class LifecycleObserver {
+        private weak var observer: NSObject?
+        private var isRegistered = false
+
+        // declarative notification, selector configuration
+        private let specs: [(name: Notification.Name, selector: Selector)] = [
+            (UIApplication.willResignActiveNotification, #selector(SlowFrameDetector.appWillResignActive(_:))),
+            (UIApplication.didBecomeActiveNotification, #selector(SlowFrameDetector.appDidBecomeActive(_:))),
+            (UIApplication.willTerminateNotification, #selector(SlowFrameDetector.appWillTerminate(_:)))
+        ]
+
+        init(observer: NSObject) {
+            self.observer = observer
+        }
+
+        func add() {
+            guard let observer = observer, !isRegistered else { return }
+            let notificationCenter = NotificationCenter.default
+            specs.forEach { spec in
+                notificationCenter.addObserver(observer, selector: spec.selector, name: spec.name, object: nil)
+            }
+            isRegistered = true
+        }
+
+        func remove() {
+            guard let observer = observer, isRegistered else { return }
+            let notificationCenter = NotificationCenter.default
+            specs.forEach { spec in
+                notificationCenter.removeObserver(observer, name: spec.name, object: nil)
+            }
+            isRegistered = false
+        }
+    }
+}
+#endif

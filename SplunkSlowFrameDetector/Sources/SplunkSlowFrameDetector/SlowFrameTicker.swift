@@ -30,38 +30,59 @@ import UIKit
 /// abstracting the underlying mechanism (like `CADisplayLink`) to allow for easier testing and dependency injection.
 protocol SlowFrameTicker {
     var onFrame: ((_ timestamp: TimeInterval, _ duration: TimeInterval) -> Void)? { get set }
+
+    @MainActor
     func start()
-    func stop()
+
+    func stop() // Intentionally not @MainActor so it can be used in deinit
+
+    @MainActor
     func pause()
+
+    @MainActor
     func resume()
 }
 
 #if os(iOS) || os(tvOS) || os(visionOS)
 final class DisplayLinkTicker: SlowFrameTicker {
     private var displayLink: CADisplayLink?
-    var onFrame: ((TimeInterval, TimeInterval) -> Void)?
+    var onFrame: ((_ timestamp: TimeInterval, _ duration: TimeInterval) -> Void)?
 
-    func start() {
-        DispatchQueue.main.async {
-            guard self.displayLink == nil else { return }
-            self.displayLink = CADisplayLink(target: self, selector: #selector(self.displayLinkCallback(_:)))
-            self.displayLink?.add(to: .main, forMode: .common)
-        }
+    deinit {
+        // As a fail-safe, ensure the display link is invalidated when the ticker is deallocated.
+        // The owner is responsible for calling stop() for intentional cleanup.
+        stop()
     }
 
+    @MainActor
+    func start() {
+        guard self.displayLink == nil else { return }
+        self.displayLink = CADisplayLink(target: self, selector: #selector(self.displayLinkCallback(_:)))
+        self.displayLink?.add(to: .main, forMode: .common)
+    }
+
+    // Not @MainActor, to allow calling from deinit
     func stop() {
-        DispatchQueue.main.async {
+        if Thread.isMainThread {
             self.displayLink?.invalidate()
             self.displayLink = nil
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.displayLink?.invalidate()
+                self.displayLink = nil
+            }
         }
     }
 
+    @MainActor
     func pause() {
-        DispatchQueue.main.async { self.displayLink?.isPaused = true }
+        self.displayLink?.isPaused = true
     }
 
+    @MainActor
     func resume() {
-        DispatchQueue.main.async { self.displayLink?.isPaused = false }
+        self.displayLink?.isPaused = false
     }
 
     @objc private func displayLinkCallback(_ link: CADisplayLink) {

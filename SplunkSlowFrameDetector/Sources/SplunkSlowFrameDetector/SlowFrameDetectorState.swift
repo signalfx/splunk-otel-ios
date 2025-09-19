@@ -15,9 +15,38 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A thread-safe representation of the current state of the `SlowFrameDetector` module.
-public final class SlowFrameDetectorState: Sendable {
+import os.lock
 
-    /// Indicates whether the slow frame detection feature is currently enabled.
-    public internal(set) nonisolated(unsafe) var isEnabled: Bool = false
+/// A thread-safe representation of the current state of the `SlowFrameDetector` module.
+/// This class uses an internal lock to safely manage its state across concurrent contexts.
+public final class SlowFrameDetectorState: @unchecked Sendable {
+
+    // A private lock to synchronize access. os_unfair_lock is a high-performance, low-level lock.
+    private let lock = os_unfair_lock_t.allocate(capacity: 1)
+
+    // The actual storage for the property.
+    private var _isEnabled: Bool = false
+
+    /// Indicates whether the slow frame detection feature is currently enabled. Access is synchronized.
+    public internal(set) var isEnabled: Bool {
+        get {
+            os_unfair_lock_lock(lock)
+            defer { os_unfair_lock_unlock(lock) }
+            return _isEnabled
+        }
+        set {
+            os_unfair_lock_lock(lock)
+            defer { os_unfair_lock_unlock(lock) }
+            _isEnabled = newValue
+        }
+    }
+
+    public init() {
+        lock.initialize(to: os_unfair_lock())
+    }
+
+    deinit {
+        lock.deinitialize(count: 1)
+        lock.deallocate()
+    }
 }
