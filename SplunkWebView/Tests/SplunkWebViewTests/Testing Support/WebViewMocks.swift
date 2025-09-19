@@ -19,6 +19,7 @@ import WebKit
 
 // MARK: - Mock WKWebView
 
+/// A mock `WKWebView` for testing instrumentation logic, allowing control over properties like `isLoading` and `url`.
 final class MockWKWebView: WKWebView {
     var evaluateJavaScriptCallCount = 0
     var lastEvaluatedJavaScript: String?
@@ -69,6 +70,7 @@ final class MockWKWebView: WKWebView {
 
 // MARK: - Mock WKWebViewConfiguration
 
+/// A mock `WKWebViewConfiguration` that provides a `MockWKUserContentController`.
 final class MockWKWebViewConfiguration: WKWebViewConfiguration {
     // Hold a private instance of our mock to ensure it's the one being used.
     private let mockUCC = MockWKUserContentController()
@@ -87,6 +89,7 @@ final class MockWKWebViewConfiguration: WKWebViewConfiguration {
 
 // MARK: - Mock WKUserContentController
 
+/// A mock `WKUserContentController` to track calls to `addUserScript`, `addScriptMessageHandler`, and `removeScriptMessageHandler`.
 final class MockWKUserContentController: WKUserContentController {
     var addUserScriptCalled = false
     var addScriptMessageHandlerCalled = false
@@ -111,6 +114,7 @@ final class MockWKUserContentController: WKUserContentController {
 
 // MARK: - Mock WKScriptMessage
 
+/// A mock `WKScriptMessage` to simulate messages sent from JavaScript to the native message handler.
 final class MockWKScriptMessage: WKScriptMessage {
     private let mockName: String
     private let mockBody: Any

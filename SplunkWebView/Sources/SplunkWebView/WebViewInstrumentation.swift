@@ -24,39 +24,52 @@ limitations under the License.
 internal import CiscoLogger
 import SplunkCommon
 
+/// Provides the ability to inject a JavaScript bridge into `WKWebView` instances for Browser RUM correlation.
 public final class WebViewInstrumentation: NSObject {
+
+    // MARK: - Private
 
     private let logger: LogAgent
 
+    // MARK: - Public
+
+    /// The shared state provider, used to access the current native session ID.
     public weak var sharedState: AgentSharedState?
 
-    /// NSObject conformance
-    /// swiftformat:disable:next modifierOrder
+    // MARK: - Initialization
+
+    /// Initializes the `WebViewInstrumentation` module.
+    ///
+    /// This is the default public initializer.
     public override init() {
         logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
     }
 
-    // Initializer for testing purposes
+    /// Initializes the `WebViewInstrumentation` module for testing purposes.
+    ///
+    /// - Parameters:
+    ///   - logger: A `LogAgent` for logging messages.
+    ///   - sharedState: An `AgentSharedState` for accessing the session ID.
     init(logger: LogAgent, sharedState: AgentSharedState? = nil) {
         self.logger = logger
         self.sharedState = sharedState
     }
 
-
-    // MARK: - Internal Methods
+    // MARK: - Public Methods
 
     #if canImport(WebKit)
-        private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
-            let contentController = webView.configuration.userContentController
-            contentController.removeScriptMessageHandler(forName: name)
-            contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
-            return contentController
-        }
-
-
-        // MARK: - Public Methods
-
         // swiftlint:disable function_body_length
+        /// Injects the necessary JavaScript bridge into a given `WKWebView` to enable
+        /// communication between the web content and the native RUM agent.
+        ///
+        /// This method sets up a message handler and injects JavaScript that provides
+        /// `window.SplunkRumNative.getNativeSessionId()` and `getNativeSessionIdAsync()` functions
+        /// for the web content to use.
+        ///
+        /// - Note: To ensure proper correlation, this method should be called before the `WKWebView`
+        ///   starts loading any content (e.g., before `load`, `loadHTMLString`, etc.).
+        ///
+        /// - Parameter webView: The `WKWebView` instance to be instrumented.
         public func injectSessionId(into webView: WKWebView) {
 
             // A webview is considered "already in use" if it is actively loading
@@ -183,8 +196,20 @@ public final class WebViewInstrumentation: NSObject {
 
             // Needed at first load only; user script will persist across reloads and navigation
             webView.evaluateJavaScript(javaScript)
-        } // swiftlint:enable function_body_length
+        }
+        // swiftlint:enable function_body_length
     #endif // canImport(WebKit)
+
+    // MARK: - Private Methods
+
+    #if canImport(WebKit)
+        private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
+            let contentController = webView.configuration.userContentController
+            contentController.removeScriptMessageHandler(forName: name)
+            contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
+            return contentController
+        }
+    #endif
 }
 
 // MARK: - WKScriptMessageHandlerWithReply
@@ -193,6 +218,14 @@ public final class WebViewInstrumentation: NSObject {
     extension WebViewInstrumentation: WKScriptMessageHandlerWithReply {
 
         /// Handles JavaScript messages with a reply handler for asynchronous communication.
+        ///
+        /// This method is called when the web content calls `window.webkit.messageHandlers.SplunkRumNativeUpdate.postMessage()`.
+        /// It retrieves the current native session ID and sends it back to the JavaScript context.
+        ///
+        /// - Parameters:
+        ///   - userContentController: The controller that received the script message.
+        ///   - message: The script message received from the web content.
+        ///   - replyHandler: A block to be called with the reply data or an error string.
         public func userContentController(
             _ userContentController: WKUserContentController,
             didReceive message: WKScriptMessage,

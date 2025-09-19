@@ -22,10 +22,16 @@ internal import CiscoLogger
 
 // MARK: - Mock AgentSharedState
 
+/// A thread-safe mock implementation of `AgentSharedState` for testing purposes.
 final class MockAgentSharedState: @unchecked Sendable, AgentSharedState {
-    private let lock = NSLock()
 
+    // MARK: - Private
+
+    private let lock = NSLock()
     private var _sessionId: String
+
+    // MARK: - Public
+
     nonisolated var sessionId: String {
         lock.lock()
         defer { lock.unlock() }
@@ -34,9 +40,13 @@ final class MockAgentSharedState: @unchecked Sendable, AgentSharedState {
 
     nonisolated let agentVersion: String = "testing-agent-version"
 
+    // MARK: - Initialization
+
     init(sessionId: String) {
         _sessionId = sessionId
     }
+
+    // MARK: - Public Methods
 
     func updateSessionId(_ newId: String) {
         lock.lock()
@@ -51,23 +61,33 @@ final class MockAgentSharedState: @unchecked Sendable, AgentSharedState {
 
 // MARK: - Mock LogAgent
 
+/// A thread-safe mock implementation of `LogAgent` that captures log messages for verification in tests.
 final class MockLogAgent: @unchecked Sendable, LogAgent {
+
+    // MARK: - Inline types
+
     struct LogMessage {
         let level: LogLevel
         let message: String
     }
 
+    // MARK: - Private
+
     private let lock = NSLock()
+    private var _logMessages: [LogMessage] = []
+
+    // MARK: - Public
 
     nonisolated let poolName: String
     nonisolated let category: String?
 
-    private var _logMessages: [LogMessage] = []
     var logMessages: [LogMessage] {
         lock.lock()
         defer { lock.unlock() }
         return _logMessages
     }
+
+    // MARK: - Initialization
 
     init(poolName: String, category: String? = nil) {
         self.poolName = poolName
@@ -77,6 +97,8 @@ final class MockLogAgent: @unchecked Sendable, LogAgent {
     convenience init() {
         self.init(poolName: "mock-pool", category: "mock-category")
     }
+
+    // MARK: - LogAgent methods
 
     nonisolated func process(configuration: CiscoLogger.ConfigurationMessage) {
         // No-op for testing

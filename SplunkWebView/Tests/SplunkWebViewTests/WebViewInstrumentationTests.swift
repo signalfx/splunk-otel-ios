@@ -21,10 +21,14 @@ import XCTest
 
 final class WebViewInstrumentationTests: XCTestCase {
 
-    var webViewInstrumentation: WebViewInstrumentation!
-    var mockWebView: MockWKWebView!
-    var mockAgentSharedState: MockAgentSharedState!
-    var mockLogAgent: MockLogAgent!
+    // MARK: - Private
+
+    private var webViewInstrumentation: WebViewInstrumentation!
+    private var mockWebView: MockWKWebView!
+    private var mockAgentSharedState: MockAgentSharedState!
+    private var mockLogAgent: MockLogAgent!
+
+    // MARK: - Test Lifecycle
 
     override func setUp() {
         super.setUp()

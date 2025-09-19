@@ -18,42 +18,56 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-// ModuleConfiguration conformance
+// MARK: - Module Configuration
+
+/// Configuration for the `WebViewInstrumentation` module. This is a placeholder as the module currently has no user-configurable options.
 public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
 
-// RemoteModuleConfiguration conformance
 // swiftlint:disable type_name
+/// Remote configuration for the `WebViewInstrumentation` module.
 public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
+    /// A boolean flag to enable or disable the module remotely.
     public var enabled: Bool = true
 
+    /// Initializes the remote configuration from data. This module does not support remote configuration beyond enabling/disabling.
     public init?(from data: Data) {
         return nil
     }
 }
 // swiftlint:enable type_name
 
-// Add placeholder types to satisfy Module conformance, as this module does not produce events.
+// MARK: - Module Events
+
+/// Placeholder metadata for events produced by `WebViewInstrumentation`. This module does not produce events.
 public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
+    /// The timestamp of the event.
     public var timestamp = Date()
 }
 
+/// Placeholder data for events produced by `WebViewInstrumentation`. This module does not produce events.
 public struct WebViewInstrumentationData: ModuleEventData {}
+
+// MARK: - Module Conformance
 
 extension WebViewInstrumentation: Module {
 
     public typealias Configuration = WebViewInstrumentationConfiguration
     public typealias RemoteConfiguration = WebViewInstrumentationRemoteConfiguration
-
-    // Module conformance
     public typealias EventMetadata = WebViewInstrumentationMetadata
     public typealias EventData = WebViewInstrumentationData
 
     public func install(
         with configuration: (any ModuleConfiguration)?,
         remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?
-    ) {}
+    ) {
+        // This module has no installation logic
+    }
 
-    public func onPublish(data: @escaping (WebViewInstrumentationMetadata, WebViewInstrumentationData) -> Void) {}
+    public func onPublish(data: @escaping (WebViewInstrumentationMetadata, WebViewInstrumentationData) -> Void) {
+        // This module does not publish data
+    }
 
-    public func deleteData(for metadata: any SplunkCommon.ModuleEventMetadata) {}
+    public func deleteData(for metadata: any SplunkCommon.ModuleEventMetadata) {
+        // This module does not store data to be deleted
+    }
 }
