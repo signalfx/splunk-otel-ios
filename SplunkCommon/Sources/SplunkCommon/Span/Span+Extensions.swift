@@ -56,13 +56,13 @@ public extension Span {
         case let boolValue as Bool:
             attributeValue = .bool(boolValue)
         case let arrayValue as [String]:
-            attributeValue = .stringArray(arrayValue)
+            attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.string($0) }))
         case let arrayValue as [Int]:
-            attributeValue = .intArray(arrayValue)
+            attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.int($0) }))
         case let arrayValue as [Double]:
-            attributeValue = .doubleArray(arrayValue)
+            attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.double($0) }))
         case let arrayValue as [Bool]:
-            attributeValue = .boolArray(arrayValue)
+            attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.bool($0) }))
         default:
             // For unsupported types, convert to string representation
             attributeValue = .string(String(describing: value))
