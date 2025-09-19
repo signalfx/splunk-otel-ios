@@ -78,12 +78,11 @@ jobs:
           - platform: macCatalyst
     steps:
       - uses: actions/checkout@v4
+
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
-      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
-      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
+
       - name: Select destination
         id: pick
         run: |
@@ -95,6 +94,7 @@ jobs:
           esac
           echo "Platform=${{ matrix.platform }}"
           echo "Destination=$DEST"
+
       - name: Build ${{ matrix.platform }}
         env:
           SCHEME: ${{ needs.prepare.outputs.scheme }}
@@ -109,41 +109,58 @@ jobs:
       matrix:
         include:
           - platform: ios
+
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
-      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
-      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
-      - name: Run tests (iOS)
+
+      - name: Select destination
+        id: pick
+        run: |
+          case "${{ matrix.platform }}" in
+            ios) echo "DEST=${{ needs.prepare.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
+            tvos) echo "DEST=${{ needs.prepare.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
+            visionos) echo "DEST=${{ needs.prepare.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
+            macCatalyst) echo "DEST=${{ needs.prepare.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
+          esac
+          echo "Platform=${{ matrix.platform }}"
+          echo "Destination=$DEST"
+
+      - name: Run tests (${{ matrix.platform }})
         id: run
         env:
           SCHEME: ${{ needs.prepare.outputs.scheme }}
-          DESTINATION: ${{ needs.prepare.outputs.ios_dest }}
+          DESTINATION: ${{ env.DEST }}
         run: |
           export GITHUB_OUTPUT="$(mktemp)"
           .github/actions/build-and-tests/scripts/test.sh
           code="$(sed -n 's/^xcode_status=//p' "$GITHUB_OUTPUT")"
           echo "status=${code:-1}" >> "$GITHUB_OUTPUT"
-      - uses: mikepenz/action-junit-report@v4
+
+      - name: Publish JUnit to Checks
+        uses: mikepenz/action-junit-report@v4
         if: always()
         with:
-          report_paths: reports/junit-ios.xml
-          check_name: Tests (iOS)
+          report_paths: reports/junit-${{ matrix.platform }}.xml
+          check_name: Tests (${{ matrix.platform }})
           require_tests: true
-          include_passed: true
+          include_passed: false
           fail_on_failure: false
           detailed_summary: true
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload .xcresult artifact
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: TestResults_iOS.xcresult
-          path: TestResults_iOS.xcresult
+          name: xcresult-${{ matrix.platform }}
+          path: TestResults_${{ matrix.platform }}.xcresult
           if-no-files-found: warn
-      - if: always()
+
+      - name: Fail job if xcodebuild failed
+        if: always()
         run: |
-          code="${{ steps.run.outputs.status }}"
+          code="${{ steps.test.outputs.xcode_status }}"
           if [ -z "$code" ]; then exit 0; fi
           if [ "$code" -ne 0 ]; then exit "$code"; fi

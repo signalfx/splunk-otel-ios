@@ -46,15 +46,10 @@ if [ -n "${GITHUB_OUTPUT:-}" ]; then
     echo "tvos_dest=$TVOS_DEST"
     echo "visionos_dest=$VISIONOS_DEST"
     echo "maccatalyst_dest=$MACCAT_DEST"
-  } >> "$GITHUB_ENV"
+  } >> "$GITHUB_OUTPUT"
 fi
 
 echo "[resolve-destinations] outputs: ios_dest=$IOS_DEST"
 echo "[resolve-destinations] outputs: tvos_dest=$TVOS_DEST"
 echo "[resolve-destinations] outputs: visionos_dest=$VISIONOS_DEST"
 echo "[resolve-destinations] outputs: maccatalyst_dest=$MACCAT_DEST"
-
-echo "::set-output name=ios_dest::$IOS_DEST"
-echo "::set-output name=tvos_dest::$TVOS_DEST"
-echo "::set-output name=visionos_dest::$VISIONOS_DEST"
-echo "::set-output name=maccatalyst_dest::$MACCAT_DEST"
