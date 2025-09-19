@@ -41,7 +41,7 @@ public final class WebViewInstrumentation: NSObject {
     /// Initializes the `WebViewInstrumentation` module.
     ///
     /// This is the default public initializer.
-    public override init() {
+    override public init() {
         logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SplunkWebView")
     }
 

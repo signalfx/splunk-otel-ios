@@ -33,8 +33,7 @@ public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfigurati
     public init?(from data: Data) {
         return nil
     }
-}
-// swiftlint:enable type_name
+} // swiftlint:enable type_name
 
 // MARK: - Module Events
 
