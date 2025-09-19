@@ -25,8 +25,9 @@ final class BackgroundHTTPClient: NSObject {
 
     // MARK: - Private properties
 
-    private let urlSessionDelegateQueue = OperationQueue("URLSessionDelegate", maxConcurrents: 1, qualityOfService: .utility)
+    private let urlSessionDelegateQueue: OperationQueue
     private let sessionQosConfiguration: SessionQOSConfiguration
+    private let nameSpace: String
 
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "BackgroundExporter")
 
@@ -36,7 +37,7 @@ final class BackgroundHTTPClient: NSObject {
     // MARK: - Computed properties
 
     private lazy var session: URLSession = {
-        let identifier = "com.otel.config.session"
+        let identifier = "com.otel.config.session.\(nameSpace)"
         let configuration = URLSessionConfiguration.background(withIdentifier: identifier)
 
         configuration.networkServiceType = .background
@@ -53,9 +54,12 @@ final class BackgroundHTTPClient: NSObject {
 
     // MARK: - Initialization
 
-    init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage) {
+    init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage, namespace: String) {
         self.sessionQosConfiguration = sessionQosConfiguration
         self.diskStorage = diskStorage
+        self.nameSpace = namespace
+
+        urlSessionDelegateQueue = OperationQueue("URLSessionDelegate-\(namespace)", maxConcurrents: 1, qualityOfService: .utility)
 
         super.init()
     }
@@ -152,21 +156,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             return
         }
 
-        if
-            let httpResponse = task.response as? HTTPURLResponse,
-            !(200 ... 299).contains(httpResponse.statusCode) {
-
-            logger.log(level: .info) {
-                """
-                Request to: \(requestDescriptor.endpoint.absoluteString) \n
-                with a data task id: \(requestDescriptor.id) \n
-                failed with an error status code: \(httpResponse.statusCode).
-                """
-            }
-
-            try? send(requestDescriptor)
-
-        } else if let error {
+        if let error {
             logger.log(level: .info) {
                 """
                 Request to: \(requestDescriptor.endpoint.absoluteString) \n
@@ -181,8 +171,8 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             if let httpResponse = task.response as? HTTPURLResponse {
                 logger.log(level: .info) {
                     """
-                    Request to: \(requestDescriptor.endpoint.absoluteString) \n
-                    has been successfully received with status code \(httpResponse.statusCode).
+                    Request to: \(requestDescriptor.endpoint.absoluteString) with id \(requestDescriptor.id.uuidString) \n
+                    has been received with status code \(httpResponse.statusCode).
                     """
                 }
             }

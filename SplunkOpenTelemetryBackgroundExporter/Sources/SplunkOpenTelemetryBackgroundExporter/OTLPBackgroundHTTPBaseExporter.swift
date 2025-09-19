@@ -27,17 +27,20 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     // MARK: - Private
 
+    private let qosConfig: SessionQOSConfiguration
+
+
+    // MARK: - Internal
+
     let fileType: String?
-
-
-    // MARK: - Public
-
     let endpoint: URL
-    let httpClient: BackgroundHTTPClient
     let envVarHeaders: [(String, String)]?
     let config: OtlpConfiguration
     let diskStorage: DiskStorage
 
+    lazy var httpClient: BackgroundHTTPClient = {
+        BackgroundHTTPClient(sessionQosConfiguration: qosConfig, diskStorage: diskStorage, namespace: getFileKeyType())
+    }()
 
     // MARK: - Initialization
 
@@ -61,8 +64,7 @@ public class OTLPBackgroundHTTPBaseExporter {
         self.config = config
         self.diskStorage = diskStorage
         self.fileType = fileType
-
-        httpClient = BackgroundHTTPClient(sessionQosConfiguration: qosConfig, diskStorage: diskStorage)
+        self.qosConfig = qosConfig
 
         // Get incomplete requests and check for stalled files
         // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
