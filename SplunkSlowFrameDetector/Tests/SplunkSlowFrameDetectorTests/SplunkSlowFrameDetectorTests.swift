@@ -21,8 +21,9 @@ import XCTest
 @testable import SplunkSlowFrameDetector
 import UIKit
 
+// MARK: - Mock Ticker
 @MainActor
-final class MockTicker: SlowFrameTicker {
+private final class MockTicker: SlowFrameTicker {
     var onFrame: ((TimeInterval, TimeInterval) -> Void)?
     var started = false
     var stopped = false
@@ -36,7 +37,9 @@ final class MockTicker: SlowFrameTicker {
         onStart?()
     }
 
-    func stop() { stopped = true }
+    func stop() {
+        stopped = true
+    }
 
     func pause() {}
 
@@ -47,6 +50,7 @@ final class MockTicker: SlowFrameTicker {
     }
 }
 
+// MARK: - Mock Destination
 private class MockDestination: SlowFrameDetectorDestination {
     // This dictionary will store the accumulated counts.
     var reportedCounts: [String: Int] = [:]
@@ -60,13 +64,16 @@ private class MockDestination: SlowFrameDetectorDestination {
     }
 }
 
+// MARK: - SlowFrameDetectorTests
+@MainActor
 final class SlowFrameDetectorTests: XCTestCase {
 
+    // MARK: - Test Properties
     private var mockTicker: MockTicker!
     private var detector: SlowFrameDetector!
     private var mockDestination: MockDestination!
 
-    @MainActor
+    // MARK: - Test Lifecycle
     override func setUp() {
         super.setUp()
         mockTicker = MockTicker()
@@ -84,8 +91,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         try await super.tearDown()
     }
 
-    // Helper function to wait for the detector to start up.
-    @MainActor
+    // MARK: - Helper Methods
     private func awaitDetectorStart() async {
         let startExpectation = XCTestExpectation(description: "Detector has started")
         mockTicker.onStart = {
@@ -95,7 +101,8 @@ final class SlowFrameDetectorTests: XCTestCase {
         await fulfillment(of: [startExpectation], timeout: 1.0)
     }
 
-    @MainActor
+    // MARK: - Start/Stop Tests
+    /// Verifies that calling `start()` multiple times is idempotent.
     func test_start_isIdempotent() async {
         XCTAssertEqual(mockTicker.startCallCount, 0)
 
@@ -110,7 +117,28 @@ final class SlowFrameDetectorTests: XCTestCase {
         XCTAssertEqual(mockTicker.startCallCount, 1, "Calling start() multiple times should not restart the ticker.")
     }
 
-    @MainActor
+    /// Verifies that `start()` and `stop()` correctly control the ticker's state.
+    func test_startAndStop_correctlyControlTicker() async {
+        XCTAssertFalse(mockTicker.started)
+        XCTAssertFalse(mockTicker.stopped)
+
+        await awaitDetectorStart()
+        XCTAssertTrue(mockTicker.started, "The ticker should be started.")
+
+        let stopDidCompleteExpectation = XCTestExpectation(description: "detector.stop() completed")
+
+        Task {
+            await detector.stop()
+            stopDidCompleteExpectation.fulfill()
+        }
+
+        await fulfillment(of: [stopDidCompleteExpectation], timeout: 2.0)
+
+        XCTAssertTrue(mockTicker.stopped, "The ticker should be stopped.")
+    }
+
+    // MARK: - Lifecycle Notification Tests
+    /// Verifies that the logic state is reset when the app becomes active.
     func test_stateIsReset_onAppDidBecomeActive() async {
         mockDestination.onSend = { _, _ in
             XCTFail("No report should be sent after app becomes active, as state should be reset.")
@@ -132,7 +160,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         await detector.flushBuffers()
     }
 
-    @MainActor
+    /// Verifies that pending buffers are flushed when the app resigns active.
     func test_buffersAreFlushed_onAppWillResignActive() async {
         let reportExpectation = XCTestExpectation(description: "Report is sent when app resigns active")
         mockDestination.onSend = { type, count in
@@ -158,7 +186,8 @@ final class SlowFrameDetectorTests: XCTestCase {
         await fulfillment(of: [reportExpectation], timeout: 0.1)
     }
 
-    @MainActor
+    // MARK: - Frame Detection Tests
+    /// Verifies that the very first frame processed does not trigger a report.
     func test_firstFrame_doesNotTriggerReport() async {
         mockDestination.onSend = { _, _ in
             XCTFail("The first frame should never trigger a slow frame report.")
@@ -170,7 +199,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         await detector.flushBuffers()
     }
 
-    @MainActor
+    /// Verifies that a clearly slow frame is detected and reported.
     func test_slowFrame_isDetected() async throws {
         let reportExpectation = XCTestExpectation(description: "Slow frame report received")
         mockDestination.onSend = { type, count in
@@ -197,7 +226,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         await fulfillment(of: [reportExpectation], timeout: 5.0)
     }
 
-    @MainActor
+    /// Verifies that a frame at the exact slow-frame threshold is correctly detected.
     func test_slowFrame_atBoundary_isDetected() async throws {
         let reportExpectation = XCTestExpectation(description: "Slow frame report at boundary received")
         mockDestination.onSend = { type, count in
@@ -230,7 +259,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         await fulfillment(of: [reportExpectation], timeout: 5.0)
     }
 
-    @MainActor
+    /// Verifies that no reports are sent when frame times are normal.
     func test_noReports_whenFramesAreNormal() async throws {
         mockDestination.onSend = { _, _ in XCTFail("No reports should be sent for normal frames.") }
 
@@ -242,7 +271,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         await detector.flushBuffers()
     }
 
-    @MainActor
+    /// Verifies that a frozen frame is detected when the ticker stops firing.
     func test_frozenFrame_isDetected_whenFramesStop() async throws {
         let reportExpectation = XCTestExpectation(description: "Frozen frame report received")
         mockDestination.onSend = { type, count in
@@ -263,27 +292,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         await fulfillment(of: [reportExpectation], timeout: 2.0)
     }
 
-    @MainActor
-    func test_startAndStop_correctlyControlTicker() async {
-        XCTAssertFalse(mockTicker.started)
-        XCTAssertFalse(mockTicker.stopped)
-
-        await awaitDetectorStart()
-        XCTAssertTrue(mockTicker.started, "The ticker should be started.")
-
-        let stopDidCompleteExpectation = XCTestExpectation(description: "detector.stop() completed")
-
-        Task {
-            await detector.stop()
-            stopDidCompleteExpectation.fulfill()
-        }
-
-        await fulfillment(of: [stopDidCompleteExpectation], timeout: 2.0)
-
-        XCTAssertTrue(mockTicker.stopped, "The ticker should be stopped.")
-    }
-
-    @MainActor
+    /// Verifies that a long freeze correctly reports multiple frozen frame events.
     func test_longFreeze_reportsMultipleEvents() async throws {
         await awaitDetectorStart()
 
@@ -308,7 +317,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         XCTAssertLessThanOrEqual(finalCount ?? 0, 4, "Should report no more than 4 frozen events in ~2.45s")
     }
 
-    @MainActor
+    /// Verifies that the automatic flush loop correctly reports pending frames.
     func test_automaticFlush_reportsPendingFrames() async {
         // 1. Create an expectation for the report itself.
         let reportExpectation = XCTestExpectation(description: "Report for slowRenders was sent")

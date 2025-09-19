@@ -24,40 +24,39 @@ import QuartzCore
 /// from the main class, which serves as a simple public API facade.
 actor SlowFrameLogic {
 
+    // MARK: - Types
+
+    /// An error type specific to the `SlowFrameLogic` actor.
     enum LogicError: Error {
+        /// Indicates that `start()` was called when the logic was already running.
         case alreadyRunning
     }
 
-    typealias FrameBuffer = [String: Int]
-    actor ReportableFramesBuffer {
-        private var buffer: FrameBuffer = [:]
-        func increment() { buffer["shared", default: 0] += 1 }
-        func drain() -> FrameBuffer {
-            defer { buffer.removeAll() }
-            return buffer
-        }
-    }
+    // MARK: - Private Properties
 
     private var isRunning = false
     private var flushTask: Task<Void, Never>?
     private var watchdogTask: Task<Void, Never>?
     private var destinationFactory: () -> SlowFrameDetectorDestination
     private var destination: SlowFrameDetectorDestination?
-    private let slowFrames = ReportableFramesBuffer()
-    private let frozenFrames = ReportableFramesBuffer()
+
+    private var slowFrameCount: Int = 0
+    private var frozenFrameCount: Int = 0
+
     private var lastFrameTimestamp: TimeInterval?
     private var lastHeartbeatTimestamp: TimeInterval = 0
 
-    #if DEBUG
-    // A test-only hook called after a flush completes
-    var onFlushDidComplete: (() -> Void)?
+    // MARK: - Test-only Properties
 
-    // A test-only method to set the flush completion handler
-    func setOnFlushDidComplete(_ handler: (() -> Void)?) {
-        self.onFlushDidComplete = handler
-    }
+    #if DEBUG
+    /// A test-only hook called after a flush completes.
+    private var onFlushDidComplete: (() -> Void)?
     #endif
 
+    // MARK: - Initialization
+
+    /// Initializes the logic actor with a factory for creating the destination.
+    /// - Parameter destinationFactory: A closure that creates the destination for reporting frame data.
     init(destinationFactory: @escaping () -> SlowFrameDetectorDestination) {
         self.destinationFactory = destinationFactory
     }
@@ -68,8 +67,16 @@ actor SlowFrameLogic {
         flushTask?.cancel()
     }
 
+    // MARK: - Public Methods
+
+    /// Starts the background tasks for the watchdog and flush loop.
+    ///
+    /// - Throws: `LogicError.alreadyRunning` if the logic is already running.
     func start() throws {
-        guard !isRunning else { throw LogicError.alreadyRunning }
+        guard !isRunning else {
+            throw LogicError.alreadyRunning
+        }
+
         isRunning = true
         destination = destinationFactory()
         // Use a regular Task, as there's no need for it to be detached from the actor's context.
@@ -77,8 +84,12 @@ actor SlowFrameLogic {
         flushTask = Task { [weak self] in await self?.runFlushLoop() }
     }
 
+    /// Stops the background tasks and flushes any remaining data.
     func stop() async {
-        guard isRunning else { return }
+        guard isRunning else {
+            return
+        }
+
         isRunning = false
         watchdogTask?.cancel()
         flushTask?.cancel()
@@ -88,10 +99,10 @@ actor SlowFrameLogic {
         destination = nil
     }
 
-    func appWillResignActive() async { await flushBuffers() }
-    func appDidBecomeActive() { lastFrameTimestamp = nil; lastHeartbeatTimestamp = 0 }
-    func appWillTerminate() async { await flushBuffers() }
-
+    /// Handles an incoming frame update from the ticker.
+    /// - Parameters:
+    ///   - timestamp: The timestamp of the frame.
+    ///   - duration: The expected duration of the frame.
     func handleFrame(timestamp: TimeInterval, duration: TimeInterval) {
         lastHeartbeatTimestamp = CACurrentMediaTime()
 
@@ -104,43 +115,94 @@ actor SlowFrameLogic {
         let tolerance = duration * (SlowFrameDetector.slowFrameTolerancePercentage / 100.0)
 
         if deltaTime >= duration + tolerance {
-            Task { await slowFrames.increment() }
+            slowFrameCount += 1
         }
 
         lastFrameTimestamp = timestamp
     }
 
+    // MARK: - Lifecycle Handlers
+
+    /// Called when the app is about to resign its active state. Flushes any pending data.
+    func appWillResignActive() async {
+        await flushBuffers()
+    }
+
+    /// Called when the app becomes active. Resets the frame timing state.
+    func appDidBecomeActive() {
+        lastFrameTimestamp = nil
+        lastHeartbeatTimestamp = 0
+    }
+
+    /// Called when the app is about to terminate. Flushes any pending data.
+    func appWillTerminate() async {
+        await flushBuffers()
+    }
+
+    // MARK: - Internal Methods
+
+    /// Flushes the collected slow and frozen frame counts to the destination.
+    internal func flushBuffers() async {
+        guard let destination else {
+            return
+        }
+
+        // Drain slow frames
+        if slowFrameCount > 0 {
+            let count = slowFrameCount
+            slowFrameCount = 0
+            await destination.send(type: "slowRenders", count: count, sharedState: nil)
+        }
+
+        // Drain frozen frames
+        if frozenFrameCount > 0 {
+            let count = frozenFrameCount
+            frozenFrameCount = 0
+            await destination.send(type: "frozenRenders", count: count, sharedState: nil)
+        }
+
+        #if DEBUG
+        onFlushDidComplete?()
+        #endif
+    }
+
+    // MARK: - Test-only Methods
+
+    #if DEBUG
+    /// A test-only method to set the flush completion handler.
+    /// - Parameter handler: The closure to call when a flush completes.
+    func setOnFlushDidComplete(_ handler: (() -> Void)?) {
+        self.onFlushDidComplete = handler
+    }
+    #endif
+
+    // MARK: - Private Methods
+
     /// Periodically checks if the main thread has been unresponsive (frozen).
+    ///
+    /// This loop runs continuously in the background, sleeping for the duration of the
+    /// frozen frame threshold. If the `lastHeartbeatTimestamp` (updated by `handleFrame`)
+    /// has not changed within that time, it indicates a frozen frame.
     private func runWatchdog() async {
         while !Task.isCancelled {
             try? await Task.sleep(nanoseconds: UInt64(SlowFrameDetector.frozenFrameThreshold * 1_000_000_000))
             if Task.isCancelled { break }
             let now = CACurrentMediaTime()
             if lastHeartbeatTimestamp > 0, (now - lastHeartbeatTimestamp) >= SlowFrameDetector.frozenFrameThreshold {
-                await frozenFrames.increment()
+                frozenFrameCount += 1
             }
         }
     }
 
     /// Periodically flushes the collected frame data to the destination.
+    ///
+    /// This loop runs continuously in the background, triggering a flush of the
+    /// slow and frozen frame buffers every second.
     private func runFlushLoop() async {
         while !Task.isCancelled {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
             if Task.isCancelled { break }
             await flushBuffers()
         }
-    }
-
-    internal func flushBuffers() async {
-        guard let destination else { return }
-        for (type, buffer) in [("slowRenders", slowFrames), ("frozenRenders", frozenFrames)] {
-            let counts = await buffer.drain()
-            guard let count = counts["shared"], count > 0 else { continue }
-            await destination.send(type: type, count: count, sharedState: nil)
-        }
-
-        #if DEBUG
-        onFlushDidComplete?()
-        #endif
     }
 }

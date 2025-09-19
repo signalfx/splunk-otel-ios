@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -19,15 +18,18 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// SlowFrameDetector module remote configuration.
+/// The remote configuration for the `SlowFrameDetector` module.
 public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
 
-    // MARK: - Module management
+    // MARK: - Public
 
+    /// A boolean value indicating whether the module is enabled via remote configuration.
     public var enabled: Bool = true
-
 
     // MARK: - Initialization
 
+    /// Initializes the remote configuration from data.
+    ///
+    /// - Parameter data: The data to decode the configuration from. This is currently a no-op.
     public init?(from data: Data) {}
 }

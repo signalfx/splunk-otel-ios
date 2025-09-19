@@ -30,6 +30,8 @@ import UIKit
 /// These events are reported as metrics to the configured destination.
 public final class SlowFrameDetector: NSObject {
 
+    // MARK: - Public Properties
+
     /// The current state of the `SlowFrameDetector`.
     ///
     /// This object provides information about the detector's status, such as whether it is currently enabled.
@@ -40,28 +42,34 @@ public final class SlowFrameDetector: NSObject {
     /// This property can be used to update the detector's behavior based on settings fetched from a remote source.
     public var configuration: SlowFrameDetectorRemoteConfiguration?
 
-    // The percentage by which a frame's duration must exceed
-    // the expected duration to trigger a slow frame report
+    // MARK: - Internal Constants
+
+    /// The percentage by which a frame's duration must exceed the expected duration to trigger a slow frame report.
     internal static let slowFrameTolerancePercentage: Double = 15.0
 
-    // The duration of main thread unresponsiveness that
-    // triggers a frozen frame report
+    /// The duration of main thread unresponsiveness that triggers a frozen frame report.
     internal static let frozenFrameThreshold: TimeInterval = 0.7
+
+    // MARK: - Private Properties
 
     private let logic: SlowFrameLogic
     private var ticker: (any SlowFrameTicker)?
     private var detectorTask: Task<Void, Never>?
 
+    #if os(iOS) || os(tvOS) || os(visionOS)
+    /// A helper encapsulating lifecycle observers.
+    private lazy var lifecycleObserver = LifecycleObserver(observer: self)
+    #endif
+
+    // MARK: - Test-only Properties
+
     #if DEBUG
     internal var logicForTest: SlowFrameLogic { logic }
     #endif
 
-    #if os(iOS) || os(tvOS) || os(visionOS)
-    // A helper encapsulating lifecycle observers
-    private lazy var lifecycleObserver = LifecycleObserver(observer: self)
-    #endif
+    // MARK: - Initialization
 
-    init(
+    internal init(
         ticker: (any SlowFrameTicker)?,
         destinationFactory: @escaping () -> SlowFrameDetectorDestination
     ) {
@@ -78,8 +86,9 @@ public final class SlowFrameDetector: NSObject {
         self.init(ticker: DisplayLinkTicker(), destinationFactory: { OTelDestination() })
     }
     #else
-    // nil ticker for unsupported platforms
+    /// Initializes a new instance of the `SlowFrameDetector` for unsupported platforms.
     public required convenience init() {
+        // nil ticker for unsupported platforms
         self.init(ticker: nil, destinationFactory: { OTelDestination() })
     }
     #endif
@@ -88,6 +97,8 @@ public final class SlowFrameDetector: NSObject {
         // Cancel the main detector task to ensure all managed resources are cleaned up.
         detectorTask?.cancel()
     }
+
+    // MARK: - Public Methods
 
     /// Installs and configures the slow frame detector.
     ///
@@ -164,12 +175,22 @@ public final class SlowFrameDetector: NSObject {
         _ = await (detectorTaskCleanup, logicCleanup)
     }
 
+    // MARK: - Internal Methods
+
+    internal func flushBuffers() async {
+        await logic.flushBuffers()
+    }
+
+    // MARK: - Private Methods
+
     /// Cancels and waits for the main detector task to finish its cleanup.
     private func cleanupDetectorTask() async {
         detectorTask?.cancel()
         _ = await detectorTask?.result
         detectorTask = nil
     }
+
+    // MARK: - Lifecycle Handlers
 
     #if os(iOS) || os(tvOS) || os(visionOS)
     @MainActor
@@ -188,23 +209,18 @@ public final class SlowFrameDetector: NSObject {
         Task { await logic.appWillTerminate() }
     }
     #endif
-
-    internal func flushBuffers() async {
-        await logic.flushBuffers()
-    }
 }
 
 // MARK: - Nested Helper Class
 #if os(iOS) || os(tvOS) || os(visionOS)
 @MainActor
 private extension SlowFrameDetector {
-    // Encapsulate the state and registration of application
-    // lifecycle notification observers to keep call sites lean.
+    /// Encapsulates the state and registration of application lifecycle notification observers.
     final class LifecycleObserver {
         private weak var observer: NSObject?
         private var isRegistered = false
 
-        // declarative notification, selector configuration
+        // Declarative notification/selector configuration.
         private let specs: [(name: Notification.Name, selector: Selector)] = [
             (UIApplication.willResignActiveNotification, #selector(SlowFrameDetector.appWillResignActive(_:))),
             (UIApplication.didBecomeActiveNotification, #selector(SlowFrameDetector.appDidBecomeActive(_:))),
@@ -216,7 +232,9 @@ private extension SlowFrameDetector {
         }
 
         func add() {
-            guard let observer = observer, !isRegistered else { return }
+            guard let observer, !isRegistered else {
+                return
+            }
             let notificationCenter = NotificationCenter.default
             specs.forEach { spec in
                 notificationCenter.addObserver(observer, selector: spec.selector, name: spec.name, object: nil)
@@ -225,7 +243,9 @@ private extension SlowFrameDetector {
         }
 
         func remove() {
-            guard let observer = observer, isRegistered else { return }
+            guard let observer, isRegistered else {
+                return
+            }
             let notificationCenter = NotificationCenter.default
             specs.forEach { spec in
                 notificationCenter.removeObserver(observer, name: spec.name, object: nil)

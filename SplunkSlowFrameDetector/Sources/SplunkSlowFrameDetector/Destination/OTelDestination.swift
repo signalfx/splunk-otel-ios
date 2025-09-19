@@ -19,14 +19,24 @@ import Foundation
 import OpenTelemetryApi
 @_spi(SplunkInternal) import SplunkCommon
 
-// MARK: - OTelDestination for SlowFrameDetector data
+// MARK: - OTelDestination
 
+/// An implementation of `SlowFrameDetectorDestination` that sends data as OpenTelemetry spans.
 struct OTelDestination: SlowFrameDetectorDestination {
 
+    // MARK: - Initialization
+
+    /// Initializes a new OTel destination.
     init() {}
 
-    // MARK: - Sending
+    // MARK: - SlowFrameDetectorDestination
 
+    /// Sends the frame count data as an OTel span.
+    ///
+    /// - Parameters:
+    ///   - type: The type of event (e.g., "slowRenders"). This becomes the span name.
+    ///   - count: The number of detected events. This is added as a "count" attribute.
+    ///   - sharedState: The shared agent state, used to get the agent version.
     func send(type: String, count: Int, sharedState: AgentSharedState?) async {
 
         let tracer = OpenTelemetry.instance

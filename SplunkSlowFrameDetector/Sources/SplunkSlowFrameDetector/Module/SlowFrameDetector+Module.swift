@@ -18,8 +18,10 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
+/// A placeholder data structure for `SlowFrameDetector` module events.
 public struct SlowFrameData: ModuleEventData {}
 
+// MARK: - ModuleEventMetadata Conformance
 extension EventMetadataSlowFrameDetector: ModuleEventMetadata {
     public static func == (lhs: EventMetadataSlowFrameDetector, rhs: EventMetadataSlowFrameDetector) -> Bool {
         return lhs.timestamp == rhs.timestamp
@@ -27,8 +29,7 @@ extension EventMetadataSlowFrameDetector: ModuleEventMetadata {
     }
 }
 
-// Defines SlowFrameDetector conformance to `Module` protocol
-// and implements methods that are missing in the original `SlowFrameDetector`.
+// MARK: - Module Conformance
 extension SlowFrameDetector: Module {
 
     // MARK: - Module types
@@ -39,11 +40,7 @@ extension SlowFrameDetector: Module {
     public typealias EventMetadata = EventMetadataSlowFrameDetector
     public typealias EventData = SlowFrameData
 
-
     // MARK: - Module methods
-
-
-    // MARK: - Type transparency helpers
 
     public func deleteData(for metadata: any ModuleEventMetadata) {
         // In SlowFrameDetector we don't have any data to delete.

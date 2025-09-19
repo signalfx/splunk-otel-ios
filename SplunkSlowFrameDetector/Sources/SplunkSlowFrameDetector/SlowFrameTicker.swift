@@ -21,54 +21,78 @@ import QuartzCore
 import UIKit
 #endif
 
-
-// MARK: - SlowFrameTicker for Testability
+// MARK: - SlowFrameTicker Protocol
 
 /// An abstraction for a timer that "ticks" on every frame refresh of the display.
 ///
-/// This protocol provides a consistent interface for receiving frame updates via a regular signal,
-/// abstracting the underlying mechanism (like `CADisplayLink`) to allow for easier testing and dependency injection.
+/// This protocol provides a consistent interface for receiving frame updates, abstracting
+/// the underlying mechanism (like `CADisplayLink`) for easier testing and dependency injection.
 protocol SlowFrameTicker {
+    /// A closure that is called for each frame update.
     var onFrame: ((_ timestamp: TimeInterval, _ duration: TimeInterval) -> Void)? { get set }
 
+    /// Starts the ticker on the main thread.
     @MainActor
     func start()
 
-    func stop() // Intentionally not @MainActor so it can be used in deinit
+    /// Stops the ticker.
+    ///
+    /// This method is intentionally not marked with `@MainActor` so it can be safely called from `deinit`.
+    func stop()
 
+    /// Pauses the ticker on the main thread.
     @MainActor
     func pause()
 
+    /// Resumes the ticker on the main thread.
     @MainActor
     func resume()
 }
 
 #if os(iOS) || os(tvOS) || os(visionOS)
+
+// MARK: - DisplayLinkTicker Implementation
+
+/// A concrete implementation of `SlowFrameTicker` that uses `CADisplayLink`.
 final class DisplayLinkTicker: SlowFrameTicker {
-    private var displayLink: CADisplayLink?
+
+    // MARK: - Public Properties
+
+    /// A closure that is called for each frame update.
     var onFrame: ((_ timestamp: TimeInterval, _ duration: TimeInterval) -> Void)?
 
+    // MARK: - Private Properties
+
+    private var displayLink: CADisplayLink?
+
+    // MARK: - Initialization
+
     deinit {
-        // As a fail-safe, ensure the display link is invalidated when the ticker is deallocated.
-        // The owner is responsible for calling stop() for intentional cleanup.
+        // As a fail-safe, ensure the display link is invalidated when the ticker is deallocated
+        // The owner is responsible for calling stop() for intentional cleanup
         stop()
     }
 
+    // MARK: - SlowFrameTicker methods
+
     @MainActor
     func start() {
-        guard self.displayLink == nil else { return }
+        guard self.displayLink == nil else {
+            return
+        }
         self.displayLink = CADisplayLink(target: self, selector: #selector(self.displayLinkCallback(_:)))
         self.displayLink?.add(to: .main, forMode: .common)
     }
 
-    // Not @MainActor, to allow calling from deinit
     func stop() {
         if Thread.isMainThread {
             self.displayLink?.invalidate()
             self.displayLink = nil
         } else {
             DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
+                guard let self else {
+                    return
+                }
                 self.displayLink?.invalidate()
                 self.displayLink = nil
             }
@@ -84,6 +108,8 @@ final class DisplayLinkTicker: SlowFrameTicker {
     func resume() {
         self.displayLink?.isPaused = false
     }
+
+    // MARK: - Private Methods
 
     @objc private func displayLinkCallback(_ link: CADisplayLink) {
         onFrame?(link.timestamp, link.duration)

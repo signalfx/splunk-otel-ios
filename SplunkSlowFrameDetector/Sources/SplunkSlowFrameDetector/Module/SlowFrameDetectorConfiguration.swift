@@ -18,19 +18,24 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// SlowFrameDetector module configuration, minimal configuration for module conformance.
+/// The configuration for the `SlowFrameDetector` module.
 public struct SlowFrameDetectorConfiguration: ModuleConfiguration {
 
-    /// Indicates whether the Module is enabled. Default value is `true`.
+    // MARK: - Public
+
+    /// A boolean value indicating whether the `SlowFrameDetector` module is enabled.
+    /// The default value is `true`.
     public var isEnabled: Bool = true
 
-    /// Initialize a new configuration.
+    // MARK: - Initialization
+
+    /// Initializes a new configuration with default values.
     public init() {}
 
-    /// Initializes new module configuration using value provided for isEnabled.
+    /// Initializes a new module configuration.
     ///
     /// - Parameters:
-    ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
+    ///   - isEnabled: A `Boolean` value that sets whether the module is enabled. The default is `true`.
     public init(isEnabled: Bool = true) {
         self.isEnabled = isEnabled
     }
