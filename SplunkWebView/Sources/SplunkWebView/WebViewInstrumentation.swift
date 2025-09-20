@@ -82,6 +82,16 @@ public final class WebViewInstrumentation: NSObject {
         ///
         /// - Parameter webView: The `WKWebView` instance to be instrumented.
         public func injectSessionId(into webView: WKWebView) {
+            // Ensure this method is called on the main thread as WKWebView APIs are UI-bound.
+            guard Thread.isMainThread else {
+                logger.log(level: .warn, isPrivate: false) {
+                    "SplunkWebView: `injectSessionId` called from a background thread. Dispatching to main thread."
+                }
+                DispatchQueue.main.async { [weak self] in
+                    self?.injectSessionId(into: webView)
+                }
+                return
+            }
 
             // A webview is considered "already in use" if it is actively loading
             // or has already finished loading a URL other than the default empty page.
@@ -251,6 +261,21 @@ public final class WebViewInstrumentation: NSObject {
             replyHandler: @escaping @MainActor @Sendable (Any?, String?) -> Void
         ) {
             // hint: parse message.body["action"] here if you need to add features
+            // Ensure the replyHandler is called on the main thread, as it may interact with UI.
+            guard Thread.isMainThread else {
+                logger.log(level: .warn, isPrivate: false) {
+                    "SplunkWebView: `WKScriptMessageHandlerWithReply` reply handler invoked on background thread. Dispatching to main thread."
+                }
+                DispatchQueue.main.async {
+                    if let sessionId = self.sharedState?.sessionId {
+                        replyHandler(["sessionId": sessionId], nil)
+                    } else {
+                        replyHandler(nil, "Native Session ID not available")
+                    }
+                }
+                return
+            }
+
             if let sessionId = sharedState?.sessionId {
                 replyHandler(["sessionId": sessionId], nil)
             } else {
