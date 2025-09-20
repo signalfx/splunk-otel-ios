@@ -29,6 +29,10 @@ import SplunkCommon
 /// Provides the ability to inject a JavaScript bridge into `WKWebView` instances for Browser RUM correlation.
 public final class WebViewInstrumentation: NSObject {
 
+    // MARK: - Static constants
+
+    private static let handlerName = "SplunkRumNativeUpdate"
+
     // MARK: - Private
 
     private let logger: LogAgent
@@ -99,6 +103,7 @@ public final class WebViewInstrumentation: NSObject {
                 return
             }
 
+            let handlerName = Self.handlerName
             let javaScript = """
             if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                 console.log("[SplunkRumNative] Already initialized; skipping.");
@@ -113,7 +118,7 @@ public final class WebViewInstrumentation: NSObject {
                         onNativeSessionIdChanged: null,
 
                         _fetchSessionId: function() {
-                            return window.webkit.messageHandlers.SplunkRumNativeUpdate
+                            return window.webkit.messageHandlers.\(handlerName)
                                 .postMessage({})
                                 .then((r) => r.sessionId)
                                 .catch( function(error) {
@@ -183,7 +188,7 @@ public final class WebViewInstrumentation: NSObject {
                         }
                     };
                     console.log("[SplunkRumNative] Initialized with native session:", self.cachedSessionId)
-                    console.log("[SplunkRumNative] Bridge available:", Boolean(window.webkit?.messageHandlers?.SplunkRumNativeUpdate));
+                    console.log("[SplunkRumNative] Bridge available:", Boolean(window.webkit?.messageHandlers?.\(handlerName)));
                     self._isInitialized = true;
                     return self;
                 }());
@@ -196,8 +201,8 @@ public final class WebViewInstrumentation: NSObject {
                 forMainFrameOnly: false // expected by legacy BRUM
             )
 
-            contentController(
-                forName: "SplunkRumNativeUpdate",
+            let controller = contentController(
+                forName: handlerName,
                 forWebView: webView
             )
 
