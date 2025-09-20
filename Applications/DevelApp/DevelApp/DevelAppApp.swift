@@ -31,7 +31,7 @@ struct DevelAppApp: App {
         )
             .enableDebugLogging(true)
         // Sampled-out agent
-        //.sessionConfiguration(SessionConfiguration(samplingRate: 0))
+        // .sessionConfiguration(SessionConfiguration(samplingRate: 0))
             .sessionConfiguration(SessionConfiguration(samplingRate: 1))
 
         do {

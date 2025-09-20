@@ -106,7 +106,7 @@ public struct WebDemoJS {
                 setTimeout(initializeCallback, 100);
             }
         }
-        
+
         // Start the process once the document is loaded.
         document.addEventListener('DOMContentLoaded', initializeCallback);
         """

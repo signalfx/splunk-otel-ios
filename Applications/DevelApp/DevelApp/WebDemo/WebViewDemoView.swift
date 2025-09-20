@@ -25,7 +25,9 @@ struct WebViewDemoView: View {
 
     private static let isBrumDemoEnabled = false
 
+
     // MARK: - State Variables for WebViews
+
     @State private var modernWebView = WKWebView()
     @State private var modernWebViewWithLegacyCall = WKWebView()
     @State private var legacyWebView = WKWebView()
@@ -33,7 +35,9 @@ struct WebViewDemoView: View {
     @State private var callbackTestWebView = WKWebView()
     @State private var brumWebView = WKWebView()
 
+
     // MARK: - Background Colors
+
     private let colorForSync = Color(red: 0.80, green: 0.92, blue: 0.85)
     private let colorForAsync = Color(red: 0.85, green: 0.82, blue: 0.95)
     private let colorForCallback = Color(red: 0.95, green: 0.90, blue: 0.80)
@@ -86,7 +90,7 @@ struct WebViewDemoView: View {
                             SplunkRum.shared.webViewNativeBridge.integrateWithBrowserRum(callbackTestWebView)
                         },
                         WebDemoButton(label: "Reset Session ID") {
-                            //SplunkRum.poc_forceNewSession()
+                            // SplunkRum.poc_forceNewSession()
                         }
                     ]
                 )
@@ -101,7 +105,9 @@ struct WebViewDemoView: View {
         .navigationTitle("WebViewNativeBridge")
     }
 
+
     // MARK: - Load WebView Content
+
     private func loadWebViewContent() {
         WebDemoHTML.loadWebViewContent(for: legacyWebView, scriptContent: WebDemoJS.legacyScriptExample())
         WebDemoHTML.loadWebViewContent(for: modernWebView, scriptContent: WebDemoJS.modernScriptExample())
@@ -110,7 +116,9 @@ struct WebViewDemoView: View {
         WebDemoHTML.loadCallbackTestWebViewContent(for: callbackTestWebView)
     }
 
+
     // MARK: - Standard Sections
+
     private func getSections() -> [WebViewSectionView] {
         [
             WebViewSectionView(
@@ -206,6 +214,7 @@ struct WebViewSectionView: View {
 }
 
 // MARK: - WebDemoButton Model
+
 struct WebDemoButton: View, Identifiable {
     let id = UUID()
     let label: String
@@ -220,6 +229,7 @@ struct WebDemoButton: View, Identifiable {
 }
 
 // MARK: - Helper Function for Button Creation
+
 func createWebDemoButton(
     isAsync: Bool,
     isLegacy: Bool,
@@ -229,7 +239,7 @@ func createWebDemoButton(
 
     // Dynamic label based on parameters
     let legacyPart = isLegacy ? " using legacy call" : ""
-    let label = "Inject JavaScript and demo getNativeSessionId\((isAsync ? "Async" : ""))()\(legacyPart)"
+    let label = "Inject JavaScript and demo getNativeSessionId\(isAsync ? "Async" : "")()\(legacyPart)"
 
     // Button action
     let action: () -> Void = {
@@ -247,6 +257,7 @@ func createWebDemoButton(
 }
 
 // MARK: - UIKit SwiftUI Wrapper
+
 struct WebViewRepresentable: UIViewRepresentable {
     let webView: WKWebView
 
