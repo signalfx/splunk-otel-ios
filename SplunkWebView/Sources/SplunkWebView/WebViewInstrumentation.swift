@@ -15,6 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Foundation
+
 #if canImport(WebKit)
     import WebKit
 #else
@@ -30,6 +32,11 @@ public final class WebViewInstrumentation: NSObject {
     // MARK: - Private
 
     private let logger: LogAgent
+
+    #if canImport(WebKit)
+        // Tracks which web views have had the user script installed to prevent duplication.
+        private let instrumentedWebViews = NSHashTable<WKWebView>.weakObjects()
+    #endif
 
     // MARK: - Public
 
@@ -192,9 +199,16 @@ public final class WebViewInstrumentation: NSObject {
             contentController(
                 forName: "SplunkRumNativeUpdate",
                 forWebView: webView
-            ).addUserScript(userScript)
+            )
 
-            // Needed at first load only; user script will persist across reloads and navigation
+            // Add the user script only once per web view to avoid duplication.
+            if instrumentedWebViews.allObjects.contains(where: { $0 === webView }) == false {
+                controller.addUserScript(userScript)
+                instrumentedWebViews.add(webView)
+            }
+
+            // Needed at first load only; user script will persist across reloads and navigation.
+            // Re-evaluating is safe and idempotent due to the JS guard.
             webView.evaluateJavaScript(javaScript)
         }
         // swiftlint:enable function_body_length

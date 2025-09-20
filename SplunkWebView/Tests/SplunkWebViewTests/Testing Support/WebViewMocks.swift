@@ -92,12 +92,14 @@ final class MockWKWebViewConfiguration: WKWebViewConfiguration {
 /// A mock `WKUserContentController` to track calls to `addUserScript`, `addScriptMessageHandler`, and `removeScriptMessageHandler`.
 final class MockWKUserContentController: WKUserContentController {
     var addUserScriptCalled = false
+    var addUserScriptCallCount = 0
     var addScriptMessageHandlerCalled = false
     var removeScriptMessageHandlerCalled = false
     var lastAddedMessageHandlerName: String?
 
     override func addUserScript(_ userScript: WKUserScript) {
         addUserScriptCalled = true
+        addUserScriptCallCount += 1
     }
 
     override func addScriptMessageHandler(_ scriptMessageHandler: WKScriptMessageHandlerWithReply, contentWorld: WKContentWorld, name: String) {
