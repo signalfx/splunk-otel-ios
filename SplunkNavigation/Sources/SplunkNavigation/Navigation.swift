@@ -245,7 +245,7 @@ public final class Navigation: Sendable {
             return nil
         }
 
-        let controllerTypeName = NSStringFromClass(type(of: visibleController))
+        let controllerTypeName = preferredControllerName(for: visibleController)
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
@@ -268,7 +268,7 @@ public final class Navigation: Sendable {
             return nil
         }
 
-        let controllerTypeName = NSStringFromClass(type(of: visibleController))
+        let controllerTypeName = preferredControllerName(for: visibleController)
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
@@ -381,6 +381,10 @@ public final class Navigation: Sendable {
         }
 
         return controllerTypeName
+    }
+
+    func preferredControllerName(for controller: UIViewController) -> String {
+        return String(describing: type(of: controller))
     }
 
 
