@@ -245,7 +245,7 @@ public final class Navigation: Sendable {
             return nil
         }
 
-        let controllerTypeName = NSStringFromClass(type(of: visibleController))
+        let controllerTypeName = preferredControllerName(for: visibleController)
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
@@ -257,15 +257,18 @@ public final class Navigation: Sendable {
     }
 
     private func transitionEvent(for presentationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
+        let presentationController = presentationObject as? UIPresentationController
+        let uiViewController = presentationObject as? UIViewController
+        let presentedController = await presentationController?.presentedViewController
+
         guard
             await shouldProcessEvent(),
-            let presentationController = presentationObject as? UIPresentationController
+            let visibleController = presentedController ?? uiViewController
         else {
             return nil
         }
 
-        let visibleController = await presentationController.presentedViewController
-        let controllerTypeName = NSStringFromClass(type(of: visibleController))
+        let controllerTypeName = preferredControllerName(for: visibleController)
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
@@ -378,6 +381,10 @@ public final class Navigation: Sendable {
         }
 
         return controllerTypeName
+    }
+
+    func preferredControllerName(for controller: UIViewController) -> String {
+        return String(describing: type(of: controller))
     }
 
 

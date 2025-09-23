@@ -79,6 +79,6 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
     }
 
     private func isScreenSpan(_ span: any OpenTelemetrySdk.ReadableSpan) -> Bool {
-        span.name == "screen name change" || span.name == "ShowVC"
+        span.name == "screen name change" || span.name == "ShowVC" || span.name == "PresentationTransition"
     }
 }
