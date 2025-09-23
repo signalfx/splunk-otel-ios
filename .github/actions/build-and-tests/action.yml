@@ -1,0 +1,87 @@
+name: "Build & Tests"
+description: "Ensures Agent can build and tests are working."
+author: "Filip Ruzicka (fruzicka@splunk.com)"
+
+on:
+  workflow_call:
+
+jobs:
+  prepare:
+    runs-on: macos-latest
+    outputs:
+      scheme: ${{ steps.scheme.outputs.scheme }}
+      build_matrix: ${{ steps.dest.outputs.build_matrix }}
+      test_matrix: ${{ steps.dest.outputs.test_matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
+      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
+      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
+      - id: scheme
+        run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
+      - id: dest
+        env:
+          SCHEME: ${{ steps.scheme.outputs.scheme }}
+        run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
+
+  build:
+    runs-on: macos-latest
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.build_matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
+      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
+      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
+      - name: Build ${{ matrix.platform }}
+        env:
+          SCHEME: ${{ needs.prepare.outputs.scheme }}
+          DESTINATION: ${{ matrix.destination }}
+        run: .github/actions/build-and-tests/scripts/build.sh
+
+  tests:
+    runs-on: macos-latest
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.test_matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
+      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
+      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
+      - id: run
+        env:
+          SCHEME: ${{ needs.prepare.outputs.scheme }}
+          DESTINATION: ${{ matrix.destination }}
+        run: |
+          export GITHUB_OUTPUT="$(mktemp)"
+          .github/actions/build-and-tests/scripts/test.sh
+          code="$(sed -n 's/^xcode_status=//p' "$GITHUB_OUTPUT")"
+          echo "status=${code:-1}" >> "$GITHUB_OUTPUT"
+      - uses: mikepenz/action-junit-report@v4
+        if: always()
+        with:
+          report_paths: reports/junit-ios.xml
+          check_name: Tests (iOS)
+          require_tests: true
+          include_passed: true
+          fail_on_failure: false
+          detailed_summary: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: TestResults_iOS.xcresult
+          path: TestResults_iOS.xcresult
+          if-no-files-found: warn
