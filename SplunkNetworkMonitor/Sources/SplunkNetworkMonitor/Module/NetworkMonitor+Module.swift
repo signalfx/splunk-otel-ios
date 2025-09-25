@@ -43,10 +43,12 @@ extension NetworkMonitor: Module {
     /// Installs the NetworkMonitor module with the specified configuration.
     ///
     /// - Parameters:
-    ///   - configuration: The local configuration for the module, or nil for default settings
-    ///   - remoteConfiguration: The remote configuration for the module, or nil for default settings
-    public func install(with configuration: (any ModuleConfiguration)?,
-                        remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    ///   - configuration: The local configuration for the module, or nil for default settings.
+    ///   - remoteConfiguration: The remote configuration for the module, or nil for default settings.
+    public func install(
+        with configuration: (any ModuleConfiguration)?,
+        remoteConfiguration _: (any RemoteModuleConfiguration)?
+    ) {
         let config = configuration as? Configuration
 
         // Start the network monitor if it's enabled or if no configuration is provided.
@@ -59,11 +61,11 @@ extension NetworkMonitor: Module {
 
     /// Deletes data associated with the specified metadata.
     ///
-    /// - Parameter metadata: The metadata identifying the data to delete
-    public func deleteData(for metadata: any ModuleEventMetadata) {}
+    /// - Parameter metadata: The metadata identifying the data to delete.
+    public func deleteData(for _: any ModuleEventMetadata) {}
 
     /// Sets up a callback for when network monitor data is published.
     ///
-    /// - Parameter data: The callback closure to execute when data is published
-    public func onPublish(data: @escaping (NetworkMonitorMetadata, NetworkMonitorData) -> Void) {}
+    /// - Parameter data: The callback closure to execute when data is published.
+    public func onPublish(data _: @escaping (NetworkMonitorMetadata, NetworkMonitorData) -> Void) {}
 }

@@ -18,9 +18,8 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-
-// Defines CustomTracking conformance to `Module` protocol
-// and implements methods that are missing in the original `CustomTracking`.
+/// Defines CustomTracking conformance to `Module` protocol
+/// and implements methods that are missing in the original `CustomTracking`.
 extension CustomTrackingInternal: Module {
 
     public typealias Configuration = CustomTrackingConfiguration
@@ -29,7 +28,7 @@ extension CustomTrackingInternal: Module {
     public typealias EventMetadata = CustomTrackingMetadata
     public typealias EventData = CustomTrackingData
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?) {
+    public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any SplunkCommon.RemoteModuleConfiguration)?) {
         _ = CustomTrackingInternal.instance
     }
 
@@ -37,5 +36,5 @@ extension CustomTrackingInternal: Module {
         onPublishBlock = data
     }
 
-    public func deleteData(for metadata: any SplunkCommon.ModuleEventMetadata) {}
+    public func deleteData(for _: any SplunkCommon.ModuleEventMetadata) {}
 }

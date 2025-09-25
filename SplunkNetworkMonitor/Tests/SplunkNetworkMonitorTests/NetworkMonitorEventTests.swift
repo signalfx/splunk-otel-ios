@@ -240,7 +240,7 @@ final class NetworkMonitorEventPerformanceTests: XCTestCase {
         )
 
         measure {
-            for _ in 0 ..< 1000 {
+            for _ in 0 ..< 1_000 {
                 _ = event1.isDebouncedChange(from: event2)
             }
         }
@@ -248,7 +248,7 @@ final class NetworkMonitorEventPerformanceTests: XCTestCase {
 
     func testNetworkMonitorEventCreationPerformance() {
         measure {
-            for _ in 0 ..< 1000 {
+            for _ in 0 ..< 1_000 {
                 _ = NetworkMonitorEvent(
                     timestamp: Date(),
                     isConnected: true,

@@ -15,14 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#if canImport(CoreTelephony)
-    import CoreTelephony
-#endif
-
 import Foundation
 import Network
 internal import OpenTelemetryApi
 import SplunkCommon
+
+#if canImport(CoreTelephony)
+    import CoreTelephony
+#endif
+
 
 // MARK: - Public
 
@@ -79,7 +80,6 @@ public class NetworkMonitor {
 
     // MARK: - Initialization
 
-    // Module conformance
     public required init() {}
 
     deinit {
@@ -94,17 +94,20 @@ public class NetworkMonitor {
     /// network change callbacks.
     public func startDetection() {
         monitor.pathUpdateHandler = { [weak self] path in
-            guard let self = self else { return }
+            guard let self else {
+                return
+            }
 
             networkChangeEvent.timestamp = Date()
             networkChangeEvent.isConnected = path.status == .satisfied
-            networkChangeEvent.connectionType = self.getConnectionType(path)
-            networkChangeEvent.radioType = self.getCurrentRadioType()
+            networkChangeEvent.connectionType = getConnectionType(path)
+            networkChangeEvent.radioType = getCurrentRadioType()
 
             if isInitialEvent {
                 isInitialEvent = false
                 previousChangeEvent = networkChangeEvent
-            } else {
+            }
+            else {
                 sendNetworkChangeSpan()
             }
         }
@@ -137,19 +140,21 @@ public class NetworkMonitor {
     private func getConnectionType(_ path: NWPath) -> ConnectionType {
         if path.usesInterfaceType(.wifi) {
             return .wifi
-        } else if path.usesInterfaceType(.cellular) {
+        }
+        else if path.usesInterfaceType(.cellular) {
             return .cellular
-        } else if path.usesInterfaceType(.wiredEthernet) {
+        }
+        else if path.usesInterfaceType(.wiredEthernet) {
             return .wiredEthernet
-        } else if path.status == .unsatisfied {
+        }
+        else if path.status == .unsatisfied {
             return .unavailable
-        } else {
+        }
+        else {
             // Check for VPN
             let isVPN = path.availableInterfaces.contains(where: { iface in
-                iface.type == .other &&
-                (iface.name.lowercased().contains("utun") ||
-                 iface.name.lowercased().contains("ppp") ||
-                 iface.name.lowercased().contains("ipsec"))
+                iface.type == .other
+                    && (iface.name.lowercased().contains("utun") || iface.name.lowercased().contains("ppp") || iface.name.lowercased().contains("ipsec"))
             })
             return isVPN ? .vpn : .other
         }
@@ -171,7 +176,8 @@ public class NetworkMonitor {
         }
     }
 
-    @objc private func radioAccessChanged() {
+    @objc
+    private func radioAccessChanged() {
         isInitialEvent = false
         networkChangeEvent.timestamp = Date()
         networkChangeEvent.radioType = getCurrentRadioType()
@@ -181,35 +187,48 @@ public class NetworkMonitor {
     // swiftlint:disable cyclomatic_complexity
     private func getCurrentRadioType() -> String? {
         #if canImport(CoreTelephony)
-            // Pick the first available radio access technology
+            /// Pick the first available radio access technology
             let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first ?? nil
             switch radioTechnology {
             case CTRadioAccessTechnologyGPRS:
                 return "GPRS (2G)"
+
             case CTRadioAccessTechnologyEdge:
                 return "EDGE (2G)"
+
             case CTRadioAccessTechnologyWCDMA:
                 return "WCDMA (3G)"
+
             case CTRadioAccessTechnologyHSDPA:
                 return "HSDPA (3G)"
+
             case CTRadioAccessTechnologyHSUPA:
                 return "HSUPA (3G)"
+
             case CTRadioAccessTechnologyCDMA1x:
                 return "CDMA1x (2G)"
+
             case CTRadioAccessTechnologyCDMAEVDORev0:
                 return "CDMA EV-DO Rev. 0 (3G)"
+
             case CTRadioAccessTechnologyCDMAEVDORevA:
                 return "CDMA EV-DO Rev. A (3G)"
+
             case CTRadioAccessTechnologyCDMAEVDORevB:
                 return "CDMA EV-DO Rev. B (3G)"
+
             case CTRadioAccessTechnologyeHRPD:
                 return "eHRPD (3G)"
+
             case CTRadioAccessTechnologyLTE:
                 return "LTE (4G)"
+
             case CTRadioAccessTechnologyNRNSA:
                 return "NRNSA (5G Non-Standalone)"
+
             case CTRadioAccessTechnologyNR:
                 return "NR (5G Standalone)"
+
             default:
                 return nil
             }

@@ -61,6 +61,5 @@ public enum CrashReportKeys: String {
     case imagePath
     case imageUUID
 
-    // Session ID
     case sessionId = "session.id"
 }

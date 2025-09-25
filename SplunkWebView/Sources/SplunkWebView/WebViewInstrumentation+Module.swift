@@ -18,15 +18,15 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-// ModuleConfiguration conformance
+/// ModuleConfiguration conformance.
 public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
 
-// RemoteModuleConfiguration conformance
+/// RemoteModuleConfiguration conformance.
 public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
     public var enabled: Bool
 
-    public init?(from data: Data) {
-        return nil
+    public init?(from _: Data) {
+        nil
     }
 }
 
@@ -40,11 +40,11 @@ extension WebViewInstrumentation: Module {
     public typealias EventData = WebViewInstrumentationData
 
     public func install(
-        with configuration: (any ModuleConfiguration)?,
-        remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?
+        with _: (any ModuleConfiguration)?,
+        remoteConfiguration _: (any SplunkCommon.RemoteModuleConfiguration)?
     ) {}
 
-    public func onPublish(data: @escaping (WebViewInstrumentationMetadata, WebViewInstrumentationData) -> Void) {}
+    public func onPublish(data _: @escaping (WebViewInstrumentationMetadata, WebViewInstrumentationData) -> Void) {}
 
-    public func deleteData(for metadata: any SplunkCommon.ModuleEventMetadata) {}
+    public func deleteData(for _: any SplunkCommon.ModuleEventMetadata) {}
 }

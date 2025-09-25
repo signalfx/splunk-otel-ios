@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkCrashReports
 import XCTest
+
+@testable import SplunkCrashReports
 
 final class SplunkCrashReportsTests: XCTestCase {
     func testExample() throws {

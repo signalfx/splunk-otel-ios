@@ -20,7 +20,6 @@ import Foundation
 import OpenTelemetryApi
 import SplunkCommon
 
-
 public struct CustomTrackingMetadata: ModuleEventMetadata {
     public var timestamp = Date()
 }
@@ -45,16 +44,11 @@ public final class CustomTrackingInternal {
     public static var instance = CustomTrackingInternal()
 
 
-    // MARK: - Private Properties
-
-    private let internalLogger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "LogCustomTracking")
-
-
     // Shared state
     public unowned var sharedState: AgentSharedState?
     public var onPublishBlock: ((CustomTrackingMetadata, CustomTrackingData) -> Void)?
 
 
-    // Module conformance
+    /// Module conformance
     public required init() {}
 }
