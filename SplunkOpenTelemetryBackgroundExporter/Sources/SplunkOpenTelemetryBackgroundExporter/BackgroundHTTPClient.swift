@@ -45,9 +45,7 @@ final class BackgroundHTTPClient: NSObject {
         configuration.allowsConstrainedNetworkAccess = sessionQosConfiguration.allowsConstrainedNetworkAccess
         configuration.allowsExpensiveNetworkAccess = sessionQosConfiguration.allowsExpensiveNetworkAccess
 
-        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: urlSessionDelegateQueue)
-
-        return session
+        return URLSession(configuration: configuration, delegate: self, delegateQueue: urlSessionDelegateQueue)
     }()
 
 
@@ -116,7 +114,7 @@ final class BackgroundHTTPClient: NSObject {
 
 extension BackgroundHTTPClient: URLSessionDataDelegate {
 
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+    func urlSession(_: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         guard
             let httpResponse = dataTask.response as? HTTPURLResponse,
             let receivedData = String(data: data, encoding: .utf8),
@@ -140,7 +138,7 @@ extension BackgroundHTTPClient: URLSessionDataDelegate {
 
 extension BackgroundHTTPClient: URLSessionTaskDelegate {
 
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    func urlSession(_: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         guard
             let taskDescription = task.taskDescription,
             let requestDescriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
@@ -152,9 +150,9 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             return
         }
 
-        if
-            let httpResponse = task.response as? HTTPURLResponse,
-            !(200 ... 299).contains(httpResponse.statusCode) {
+        if let httpResponse = task.response as? HTTPURLResponse,
+            !(200 ... 299).contains(httpResponse.statusCode)
+        {
 
             logger.log(level: .info) {
                 """
@@ -165,8 +163,8 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             }
 
             try? send(requestDescriptor)
-
-        } else if let error {
+        }
+        else if let error {
             logger.log(level: .info) {
                 """
                 Request to: \(requestDescriptor.endpoint.absoluteString) \n
@@ -176,8 +174,8 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             }
 
             try? send(requestDescriptor)
-
-        } else {
+        }
+        else {
             if let httpResponse = task.response as? HTTPURLResponse {
                 logger.log(level: .info) {
                     """

@@ -40,7 +40,8 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
                     parrentKeyBuilder: getStorageKey()
                 )
             )
-        } catch {
+        }
+        catch {
 
             return .failure
         }
@@ -58,13 +59,14 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
             try httpClient.send(requestDescriptor)
 
             return .success
-        } catch {
+        }
+        catch {
 
             return .failure
         }
     }
 
-    public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
+    public func forceFlush(explicitTimeout _: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         let semaphore = DispatchSemaphore(value: 0)
 
         httpClient.flush {
@@ -75,7 +77,7 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
         return .success
     }
 
-    public func shutdown(explicitTimeout: TimeInterval? = nil) {}
+    public func shutdown(explicitTimeout _: TimeInterval? = nil) {}
 
 
     // MARK: - Local override
