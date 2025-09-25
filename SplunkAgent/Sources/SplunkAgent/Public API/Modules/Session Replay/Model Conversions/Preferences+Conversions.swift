@@ -15,13 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 internal import CiscoSessionReplay
+import Foundation
 
 typealias SplunkSessionReplayPreferences = CiscoSessionReplay.Preferences
 
-// Internal extensions to convert `SessionReplayModulePreferences` proxy model to
-// the underlying SessionReplay's `Preferences` model and vice versa
+/// Internal extensions to convert `SessionReplayModulePreferences` proxy model to
+/// the underlying SessionReplay's `Preferences` model and vice versa.
 extension SplunkSessionReplayPreferences {
 
     // MARK: - Initialization conversion

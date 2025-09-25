@@ -22,13 +22,13 @@ enum SamplerFactory {
     ///
     /// - Returns: An `AgentSessionSampler` instance.
     static func alwaysOnSampler() -> AgentSessionSampler {
-        return AlwaysOnAgentSampler()
+        AlwaysOnAgentSampler()
     }
 
     /// Creates an agent session sampler that always  returns `.sampledOut`.
     ///
     /// - Returns: An instance of `NoOpAgentSessionSampler`.
     static func alwaysOffSampler() -> AgentSessionSampler {
-        return AlwaysOffAgentSampler()
+        AlwaysOffAgentSampler()
     }
 }

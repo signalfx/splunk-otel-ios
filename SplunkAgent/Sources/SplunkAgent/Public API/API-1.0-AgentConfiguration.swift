@@ -202,17 +202,13 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Equatable
 
-    public static func == (lhs: AgentConfiguration, rhs: AgentConfiguration) -> Bool {
-        return
-            lhs.endpoint == rhs.endpoint &&
-            lhs.appName == rhs.appName &&
-            lhs.deploymentEnvironment == rhs.deploymentEnvironment &&
+    public static func == (lhs: Self, rhs: Self) -> Bool {
 
-            lhs.appVersion == rhs.appVersion &&
-            lhs.enableDebugLogging == rhs.enableDebugLogging &&
-            lhs.globalAttributes == rhs.globalAttributes &&
-            lhs.user == rhs.user &&
-            lhs.session == rhs.session
+        lhs.endpoint == rhs.endpoint && lhs.appName == rhs.appName && lhs.deploymentEnvironment == rhs.deploymentEnvironment
+            &&
+
+            lhs.appVersion == rhs.appVersion && lhs.enableDebugLogging == rhs.enableDebugLogging && lhs.globalAttributes == rhs.globalAttributes
+            && lhs.user == rhs.user && lhs.session == rhs.session
     }
 }
 

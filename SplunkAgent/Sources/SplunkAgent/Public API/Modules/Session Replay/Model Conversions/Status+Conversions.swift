@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 internal import CiscoSessionReplay
+import Foundation
 
 typealias SplunkSessionReplayStatus = CiscoSessionReplay.Status
 
-// Internal extension to convert `Status` proxy model to the underlying SessionReplay's `Status` model
+/// Internal extension to convert `Status` proxy model to the underlying SessionReplay's `Status` model.
 extension SessionReplayStatus {
 
     // MARK: - Computed properties

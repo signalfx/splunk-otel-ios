@@ -18,7 +18,7 @@ limitations under the License.
 #if canImport(WebKit)
     import WebKit
 
-    public extension SplunkRum {
+    extension SplunkRum {
 
         // MARK: - WebView
 
@@ -32,7 +32,7 @@ limitations under the License.
             renamed: "SplunkRum.shared.webView.integrateWithBrowserRum(_:)",
             message: "This method will be removed in a later version."
         )
-        static func integrateWithBrowserRum(_ webView: WKWebView) {
+        public static func integrateWithBrowserRum(_ webView: WKWebView) {
             shared.webViewNativeBridge.integrateWithBrowserRum(webView)
         }
     }

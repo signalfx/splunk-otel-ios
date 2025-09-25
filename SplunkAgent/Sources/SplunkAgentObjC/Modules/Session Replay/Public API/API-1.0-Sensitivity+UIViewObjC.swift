@@ -20,7 +20,7 @@ import SplunkAgent
 import UIKit
 
 @objc
-public extension UIView {
+extension UIView {
 
     /// Element sensitivity for the specified `UIView` instance.
     ///
@@ -29,7 +29,7 @@ public extension UIView {
     ///
     /// Assigning `nil` removes previously assigned explicit sensitivity.
     @objc(splk_srSensitive)
-    var splunkSensitive: NSNumber? {
+    public var splunkSensitive: NSNumber? {
         get {
             guard let sensitive = srSensitive else {
                 return nil

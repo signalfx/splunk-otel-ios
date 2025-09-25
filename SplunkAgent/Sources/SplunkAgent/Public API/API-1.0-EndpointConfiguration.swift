@@ -55,14 +55,16 @@ public struct EndpointConfiguration: Codable, Equatable {
         // Authenticate trace url
         if let traceUrl {
             traceEndpoint = Self.authenticate(url: traceUrl, with: rumAccessToken)
-        } else {
+        }
+        else {
             traceEndpoint = nil
         }
 
         // Authenticate session replay url
         if let sessionReplayUrl {
             sessionReplayEndpoint = Self.authenticate(url: sessionReplayUrl, with: rumAccessToken)
-        } else {
+        }
+        else {
             sessionReplayEndpoint = nil
         }
     }
@@ -98,7 +100,7 @@ extension EndpointConfiguration: CustomStringConvertible, CustomDebugStringConve
 
     /// A human-readable string representation of the `EndpointConfiguration` instance.
     public var description: String {
-        return """
+        """
         Realm: \(realm ?? "nil"), \
         RUM access token: \(rumAccessToken ?? "nil"), \
         Trace endpoint: \(traceEndpoint?.absoluteString ?? "nil"), \
@@ -108,7 +110,7 @@ extension EndpointConfiguration: CustomStringConvertible, CustomDebugStringConve
 
     /// A string representation of the `EndpointConfiguration` instance intended for diagnostic output, identical to `description`.
     public var debugDescription: String {
-        return description
+        description
     }
 }
 
@@ -161,9 +163,9 @@ extension EndpointConfiguration {
         }
 
         // Validate session replay endpoint
-        if
-            realm != nil, rumAccessToken != nil,
-            sessionReplayEndpoint == nil {
+        if realm != nil, rumAccessToken != nil,
+            sessionReplayEndpoint == nil
+        {
 
             throw AgentConfigurationError.invalidEndpoint(supplied: self)
         }
