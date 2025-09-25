@@ -16,19 +16,25 @@ limitations under the License.
 */
 
 import Foundation
+
 @testable import SplunkAgent
 
+enum APIClientTestBuilderError: Error {
+    case invalidPath(String)
+    case invalidURL(String)
+}
+
 final class APIClientTestBuilder {
-    static func buildError() -> APIClient {
-        build(with: URLProtocolMock.testErrorPath)
+    static func buildError() throws -> APIClient {
+        try build(with: URLProtocolMock.testErrorPath)
     }
 
-    static func buildServerError() -> APIClient {
+    static func buildServerError() throws -> APIClient {
         let errorData = try? RawMockDataBuilder.build(mockFile: .remoteError)
-        return build(with: URLProtocolMock.testServerErrorPath, response: errorData)
+        return try build(with: URLProtocolMock.testServerErrorPath, response: errorData)
     }
 
-    static func build(with path: String, response: Data? = nil) -> APIClient {
+    static func build(with path: String, response: Data? = nil) throws -> APIClient {
         if let response {
             URLProtocolMock.testURLs = [
                 path: response
@@ -41,7 +47,11 @@ final class APIClientTestBuilder {
         let session = URLSession(configuration: config)
         let url = URL(string: path, relativeTo: URLProtocolMock.mainUrl)
 
-        return APIClient(baseUrl: url!, session: session)
+        guard let url else {
+            throw APIClientTestBuilderError.invalidPath(path)
+        }
+
+        return APIClient(baseUrl: url, session: session)
     }
 }
 
@@ -50,7 +60,7 @@ struct MockEndpoint: Endpoint {
     typealias RequestHeaders = MockHeaders
 
     struct MockHeaders: APIClientHeaders {
-        var headers = [String: String]()
+        var headers: [String: String] = [:]
     }
 
     static var service = Service(path: "", httpMethod: .get)
@@ -59,18 +69,18 @@ struct MockEndpoint: Endpoint {
 }
 
 class URLProtocolMock: URLProtocol {
-    static var testURLs = [String: Data]()
+    static var testURLs: [String: Data] = [:]
 
-    static let mainUrl = URL(string: "https://www.SplunkAgent.test")!
+    static let mainUrl = URL(string: "https://www.SplunkAgent.test")
     static let testErrorPath = "error"
     static let testServerErrorPath = "testServerError"
 
-    override class func canInit(with request: URLRequest) -> Bool {
-        return true
+    override class func canInit(with _: URLRequest) -> Bool {
+        true
     }
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        return request
+        request
     }
 
     override func startLoading() {
@@ -78,17 +88,20 @@ class URLProtocolMock: URLProtocol {
             return
         }
 
-        if path == Self.testErrorPath {
-            let response = HTTPURLResponse(url: request.url!, statusCode: Self.testErrorCode, httpVersion: "HTTP/1.1", headerFields: nil)!
+        if path == Self.testErrorPath,
+            let requestUrl = request.url,
+            let response = HTTPURLResponse(url: requestUrl, statusCode: Self.testErrorCode, httpVersion: "HTTP/1.1", headerFields: nil)
+        {
             client?.urlProtocol(self, didLoad: Data())
             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        } else {
-            if
-                let errorData = try? RawMockDataBuilder.build(mockFile: .remoteError),
-                path == Self.testServerErrorPath {
+        }
+        else {
+            if let errorData = try? RawMockDataBuilder.build(mockFile: .remoteError),
+                path == Self.testServerErrorPath
+            {
                 client?.urlProtocol(self, didLoad: errorData)
-
-            } else if let data = URLProtocolMock.testURLs[path] {
+            }
+            else if let data = Self.testURLs[path] {
                 client?.urlProtocol(self, didLoad: data)
             }
 
@@ -98,7 +111,7 @@ class URLProtocolMock: URLProtocol {
         client?.urlProtocolDidFinishLoading(self)
     }
 
-    // this method is required but doesn't need to do anything
+    /// Method is required but doesn't need to do anything.
     override func stopLoading() {}
 
     static let testErrorCode = 404

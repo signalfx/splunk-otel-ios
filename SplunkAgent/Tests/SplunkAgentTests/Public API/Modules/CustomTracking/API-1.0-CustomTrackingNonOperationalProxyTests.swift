@@ -15,15 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import XCTest
+
 @testable import SplunkAgent
 @testable import SplunkCommon
-import XCTest
 
 final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Private
 
-    let moduleProxy = CustomTrackingTestBuilder.buildNonOperational()
+    private let moduleProxy = CustomTrackingTestBuilder.buildNonOperational()
 
 
     // MARK: - Custom Tracking: Event
@@ -48,7 +49,7 @@ final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
     }
 
     func testTrackNSError() throws {
-	let testNSError = NSError(domain: "TestDomain", code: 0, userInfo: nil)
+        let testNSError = NSError(domain: "TestDomain", code: 0, userInfo: nil)
         XCTAssertNotNil(moduleProxy.trackError(testNSError))
     }
 

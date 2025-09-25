@@ -15,15 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import XCTest
+
+@testable import SplunkAgent
 
 final class API10ConfigurationTests: XCTestCase {
 
     // MARK: - Private
 
-    private let customTraceUrl = ConfigurationTestBuilder.customTraceUrl
-    private let customSessionReplayUrl = ConfigurationTestBuilder.customSessionReplayUrl
+    private let customTraceAddress = ConfigurationTestBuilder.customTraceAddress
+    private let customSessionReplayAddress = ConfigurationTestBuilder.customSessionReplayAddress
     private let deploymentEnvironment = ConfigurationTestBuilder.deploymentEnvironment
     private let appName = ConfigurationTestBuilder.appName
     private let appVersion = ConfigurationTestBuilder.appVersion
@@ -140,6 +141,9 @@ final class API10ConfigurationTests: XCTestCase {
 
         let traceUrl = try XCTUnwrap(configuration.endpoint.traceEndpoint)
         let sessionReplayUrl = try XCTUnwrap(configuration.endpoint.sessionReplayEndpoint)
+
+        let customTraceUrl = try ConfigurationTestBuilder.customUrl(for: customTraceAddress)
+        let customSessionReplayUrl = try ConfigurationTestBuilder.customUrl(for: customSessionReplayAddress)
 
         XCTAssertEqual(traceUrl, customTraceUrl)
         XCTAssertEqual(sessionReplayUrl, customSessionReplayUrl)
