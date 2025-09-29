@@ -40,9 +40,10 @@ public class IgnoreURLs: Codable {
     /// Initialize with an optional NSRegularExpression pattern
     /// - Parameter containing pattern: Optional NSRegularExpression for URL pattern matching
     public init(containing pattern: NSRegularExpression?) {
-        if let pattern = pattern {
+        if let pattern {
             urlPatterns = [pattern]
-        } else {
+        }
+        else {
             urlPatterns = []
         }
     }
@@ -90,7 +91,7 @@ public class IgnoreURLs: Codable {
             try NSRegularExpression(pattern: pattern, options: [])
         }
 
-        let existingPatternStrings = Set(urlPatterns.map { $0.pattern })
+        let existingPatternStrings = Set(urlPatterns.map(\.pattern))
         let uniqueNewPatterns = newPatterns.filter { !existingPatternStrings.contains($0.pattern) }
         urlPatterns.append(contentsOf: uniqueNewPatterns)
         return uniqueNewPatterns.count
@@ -101,7 +102,7 @@ public class IgnoreURLs: Codable {
     /// - Returns: true if the pattern was added, false if it already existed
     @discardableResult
     public func addPattern(_ pattern: NSRegularExpression) -> Bool {
-        let existingPatternStrings = Set(urlPatterns.map { $0.pattern })
+        let existingPatternStrings = Set(urlPatterns.map(\.pattern))
 
         if !existingPatternStrings.contains(pattern.pattern) {
             urlPatterns.append(pattern)
@@ -113,20 +114,20 @@ public class IgnoreURLs: Codable {
 
     /// Get the number of URL patterns
     public func count() -> Int {
-        return urlPatterns.count
+        urlPatterns.count
     }
 
     /// Get all URL patterns as strings
     /// - Returns: Array of pattern strings
     public func getAllPatterns() -> [String] {
-        return urlPatterns.map { $0.pattern }
+        urlPatterns.map(\.pattern)
     }
 
     /// Check if a URL string matches any of the ignore patterns
     /// - Parameter urlString: The URL string to check
     /// - Returns: True if the URL matches any pattern
     public func matches(_ urlString: String) -> Bool {
-        return urlPatterns.contains { regex in
+        urlPatterns.contains { regex in
             let range = NSRange(urlString.startIndex..., in: urlString)
             return regex.firstMatch(in: urlString, options: [], range: range) != nil
         }
@@ -136,6 +137,6 @@ public class IgnoreURLs: Codable {
     /// - Parameter url: The URL to check
     /// - Returns: True if the URL matches any pattern
     public func matches(url: URL) -> Bool {
-        return matches(url.absoluteString)
+        matches(url.absoluteString)
     }
 }

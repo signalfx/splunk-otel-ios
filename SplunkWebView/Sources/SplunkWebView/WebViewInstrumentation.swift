@@ -15,14 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
+import SplunkCommon
+
 #if canImport(WebKit)
     import WebKit
 #else
     import Foundation
 #endif
 
-internal import CiscoLogger
-import SplunkCommon
 
 public final class WebViewInstrumentation: NSObject {
 
@@ -30,9 +31,10 @@ public final class WebViewInstrumentation: NSObject {
 
     public weak var sharedState: AgentSharedState?
 
-    /// NSObject conformance
-    /// swiftformat:disable:next modifierOrder
-    public override init() {}
+
+    // MARK: - Initialization
+
+    override public init() {}
 
 
     // MARK: - Internal Methods
@@ -63,95 +65,95 @@ public final class WebViewInstrumentation: NSObject {
             }
 
             let javaScript = """
-            if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
-                console.log("[SplunkRumNative] Already initialized; skipping.");
-            } else {
-                window.SplunkRumNative = (function() {
-                    const staleAfterDurationMs = 5000;
-                    const self = {
-                        cachedSessionId: '\(sessionId)',
-                        _isInitialized: false,
-                        _lastCheckTime: Date.now(),
-                        _updateInProgress: false,
-                        onNativeSessionIdChanged: null,
+                if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
+                    console.log("[SplunkRumNative] Already initialized; skipping.");
+                } else {
+                    window.SplunkRumNative = (function() {
+                        const staleAfterDurationMs = 5000;
+                        const self = {
+                            cachedSessionId: '\(sessionId)',
+                            _isInitialized: false,
+                            _lastCheckTime: Date.now(),
+                            _updateInProgress: false,
+                            onNativeSessionIdChanged: null,
 
-                        _fetchSessionId: function() {
-                            return window.webkit.messageHandlers.SplunkRumNativeUpdate
-                                .postMessage({})
-                                .then((r) => r.sessionId)
-                                .catch( function(error) {
-                                    console.error("[SplunkRumNative] Failed to fetch native session ID:", error);
-                                    throw error;
-                                });
-                        },
-                        _setNativeSessionId: function(newId) {
-                            if (newId !== self.cachedSessionId) {
-                                const oldId = self.cachedSessionId;
-                                self.cachedSessionId = newId;
-                                self._notifyChange(oldId, newId);
-                            }
-                        },
-                        _notifyChange: function(oldId, newId) {
-                            if (typeof self.onNativeSessionIdChanged === "function") {
-                                try {
-                                    self.onNativeSessionIdChanged({
-                                        currentId: newId,
-                                        previousId: oldId,
-                                        timestamp: Date.now()
-                                    });
-                                } catch (error) {
-                                    console.error("[SplunkRumNative] Error in application-provided callback for onNativeSessionIdChanged:", error);
-                                }
-                            }
-                        },
-                        // This must be synchronous for legacy BRUM compatibility.
-                        getNativeSessionId: function() {
-                            const now = Date.now();
-                            const stale = (now - self._lastCheckTime) > staleAfterDurationMs;
-                            if (stale && !self._updateInProgress) {
-                                self._updateInProgress = true;
-                                self._lastCheckTime = now;
-                                self._fetchSessionId()
-                                    .then( function(newId) {
-                                        if (newId !== self.cachedSessionId) {
-                                            const oldId = self.cachedSessionId;
-                                            self.cachedSessionId = newId;
-                                            self._notifyChange(oldId, newId);
-                                        }
-                                    })
+                            _fetchSessionId: function() {
+                                return window.webkit.messageHandlers.SplunkRumNativeUpdate
+                                    .postMessage({})
+                                    .then((r) => r.sessionId)
                                     .catch( function(error) {
-                                        console.error("[SplunkRumNative] Failed to fetch session ID from native:", error);
-                                    })
-                                    .finally( function() {
-                                        self._updateInProgress = false;
+                                        console.error("[SplunkRumNative] Failed to fetch native session ID:", error);
+                                        throw error;
                                     });
-                            }
-                            // Here we finish before above promise is fulfilled, and
-                            // return cached ID immediately for legacy compatibility.
-                            return self.cachedSessionId;
-                        },
-                        // Recommended for BRUM use in new agents going forward.
-                        getNativeSessionIdAsync: async function() {
-                            try {
-                                const newId = await self._fetchSessionId();
+                            },
+                            _setNativeSessionId: function(newId) {
                                 if (newId !== self.cachedSessionId) {
                                     const oldId = self.cachedSessionId;
                                     self.cachedSessionId = newId;
                                     self._notifyChange(oldId, newId);
                                 }
-                                return newId;
-                            } catch (error) {
-                                console.error("[SplunkRumNative] Failed to fetch native session ID asynchronously:", error);
+                            },
+                            _notifyChange: function(oldId, newId) {
+                                if (typeof self.onNativeSessionIdChanged === "function") {
+                                    try {
+                                        self.onNativeSessionIdChanged({
+                                            currentId: newId,
+                                            previousId: oldId,
+                                            timestamp: Date.now()
+                                        });
+                                    } catch (error) {
+                                        console.error("[SplunkRumNative] Error in application-provided callback for onNativeSessionIdChanged:", error);
+                                    }
+                                }
+                            },
+                            // This must be synchronous for legacy BRUM compatibility.
+                            getNativeSessionId: function() {
+                                const now = Date.now();
+                                const stale = (now - self._lastCheckTime) > staleAfterDurationMs;
+                                if (stale && !self._updateInProgress) {
+                                    self._updateInProgress = true;
+                                    self._lastCheckTime = now;
+                                    self._fetchSessionId()
+                                        .then( function(newId) {
+                                            if (newId !== self.cachedSessionId) {
+                                                const oldId = self.cachedSessionId;
+                                                self.cachedSessionId = newId;
+                                                self._notifyChange(oldId, newId);
+                                            }
+                                        })
+                                        .catch( function(error) {
+                                            console.error("[SplunkRumNative] Failed to fetch session ID from native:", error);
+                                        })
+                                        .finally( function() {
+                                            self._updateInProgress = false;
+                                        });
+                                }
+                                // Here we finish before above promise is fulfilled, and
+                                // return cached ID immediately for legacy compatibility.
+                                return self.cachedSessionId;
+                            },
+                            // Recommended for BRUM use in new agents going forward.
+                            getNativeSessionIdAsync: async function() {
+                                try {
+                                    const newId = await self._fetchSessionId();
+                                    if (newId !== self.cachedSessionId) {
+                                        const oldId = self.cachedSessionId;
+                                        self.cachedSessionId = newId;
+                                        self._notifyChange(oldId, newId);
+                                    }
+                                    return newId;
+                                } catch (error) {
+                                    console.error("[SplunkRumNative] Failed to fetch native session ID asynchronously:", error);
+                                }
                             }
-                        }
-                    };
-                    console.log("[SplunkRumNative] Initialized with native session:", self.cachedSessionId)
-                    console.log("[SplunkRumNative] Bridge available:", Boolean(window.webkit?.messageHandlers?.SplunkRumNativeUpdate));
-                    self._isInitialized = true;
-                    return self;
-                }());
-            }
-            """
+                        };
+                        console.log("[SplunkRumNative] Initialized with native session:", self.cachedSessionId)
+                        console.log("[SplunkRumNative] Bridge available:", Boolean(window.webkit?.messageHandlers?.SplunkRumNativeUpdate));
+                        self._isInitialized = true;
+                        return self;
+                    }());
+                }
+                """
 
             let userScript = WKUserScript(
                 source: javaScript,
@@ -162,7 +164,8 @@ public final class WebViewInstrumentation: NSObject {
             contentController(
                 forName: "SplunkRumNativeUpdate",
                 forWebView: webView
-            ).addUserScript(userScript)
+            )
+            .addUserScript(userScript)
 
             // Needed at first load only; user script will persist across reloads and navigation
             webView.evaluateJavaScript(javaScript)
@@ -177,24 +180,25 @@ public final class WebViewInstrumentation: NSObject {
 
         /// Handles JavaScript messages with a reply handler for asynchronous communication
         public func userContentController(
-            _ userContentController: WKUserContentController,
-            didReceive message: WKScriptMessage,
+            _: WKUserContentController,
+            didReceive _: WKScriptMessage,
             replyHandler: @escaping @MainActor @Sendable (Any?, String?) -> Void
         ) {
             // hint: parse message.body["action"] here if you need to add features
             if let sessionId = sharedState?.sessionId {
                 replyHandler(["sessionId": sessionId], nil)
-            } else {
+            }
+            else {
                 replyHandler(nil, "Native Session ID not available")
             }
         }
     }
 #endif
 
-// Type for conforming to ModuleEventMetadata
+/// Type for conforming to ModuleEventMetadata
 public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
     public var timestamp = Date()
 }
 
-// Type for conforming to ModuleEventData
+/// Type for conforming to ModuleEventData
 public struct WebViewInstrumentationData: ModuleEventData {}
