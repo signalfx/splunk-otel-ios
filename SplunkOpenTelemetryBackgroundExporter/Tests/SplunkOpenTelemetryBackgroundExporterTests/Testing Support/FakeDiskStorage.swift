@@ -80,6 +80,9 @@ final class FakeDiskStorage: DiskStorage {
     /// If true, `finalDestination(forKey:)` will throw an error to simulate disk failure.
     var shouldThrowOnFinalDestination = false
 
+    /// If true, `list(forKey:)` will throw an error to simulate disk failure.
+    var shouldThrowOnlist = false
+
     /// Converts any supported key type to a string for lookup.
     ///
     /// - Parameter key: The key as TestKeyBuilder, CiscoDiskStorage.KeyBuilder, or String.
@@ -128,7 +131,8 @@ final class FakeDiskStorage: DiskStorage {
 
     /// Returns an empty list; not used in tests.
     func list(forKey key: CiscoDiskStorage.KeyBuilder) throws -> [CiscoDiskStorage.ItemInfo] {
-        []
+        if shouldThrowOnlist { throw NSError(domain: "FakeDiskStorage", code: 1) }
+        return []
     }
 
     /// No-op; not used in test storage.

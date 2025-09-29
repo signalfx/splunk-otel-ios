@@ -18,7 +18,7 @@ limitations under the License.
 @testable import SplunkOpenTelemetryBackgroundExporter
 import XCTest
 
-final class SplunkOTelBackgroundExporterTests: XCTestCase {
+final class SplunkRequestDescriptorTests: XCTestCase {
 
     // MARK: - Private
 

@@ -20,8 +20,14 @@ internal import CiscoLogger
 import Foundation
 import SplunkCommon
 
+protocol BackgroundHTTPClientProtocol: NSObjectProtocol {
+    func send(_ requestDescriptor: RequestDescriptorProtocol) throws
+    func flush(completion: @escaping () -> Void)
+    func getAllSessionsTasks(_ completionHandler: @escaping ([URLSessionTask]) -> Void)
+}
+
 /// Client for sending requests over HTTP.
-final class BackgroundHTTPClient: NSObject {
+final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
 
     // MARK: - Private properties
 
@@ -67,7 +73,7 @@ final class BackgroundHTTPClient: NSObject {
 
     // MARK: - Client logic
 
-    func send(_ requestDescriptor: RequestDescriptor) throws {
+    func send(_ requestDescriptor: RequestDescriptorProtocol) throws {
         let fileKey = KeyBuilder(
             requestDescriptor.id.uuidString,
             parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
