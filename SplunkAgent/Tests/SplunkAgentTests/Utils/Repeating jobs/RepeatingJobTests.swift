@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import XCTest
+
+@testable import SplunkAgent
 
 final class RepeatingJobTests: XCTestCase {
 
@@ -70,7 +71,8 @@ final class RepeatingJobTests: XCTestCase {
         let resumedJob = RepeatingJob(
             named: resumedName,
             interval: resumedInterval
-        ) {}.resume()
+        ) {}
+        .resume()
 
         // Default job is suspended after initialization
         let suspendedJob = try XCTUnwrap(defaultJob)

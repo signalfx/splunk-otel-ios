@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import XCTest
+
+@testable import SplunkAgent
 
 final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
@@ -48,7 +49,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
         let encodedPreferences = try? JSONEncoder().encode(moduleProxy.preferences as? SessionReplayPreferences)
         XCTAssertNotNil(encodedPreferences)
 
-        if let encodedPreferences = encodedPreferences {
+        if let encodedPreferences {
             XCTAssertNoThrow(try JSONDecoder().decode(SessionReplayPreferences.self, from: encodedPreferences))
         }
     }
@@ -126,7 +127,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Rendering Mode
 
-     func testRenderingModes() throws {
+    func testRenderingModes() throws {
         let renderingMode = RenderingMode.default
         switch renderingMode {
         case .native:
@@ -147,7 +148,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
     // MARK: - Recording Masks
 
     func testRecordingMask() throws {
-        var maskElements = [MaskElement]()
+        var maskElements: [MaskElement] = []
         maskElements.append(
             MaskElement(rect: CGRect(x: 0, y: 0, width: 100, height: 100), type: .covering)
         )
