@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swiftformat:disable sortImports
 import Foundation
 import OpenTelemetryApi
 @_spi(SplunkInternal) @testable import SplunkCommon
@@ -349,36 +350,39 @@ private class MockSpan: Span {
 
     init(name: String) {
         self.name = name
-        context = SpanContext.create(traceId: TraceId.random(),
-                                     spanId: SpanId.random(),
-                                     traceFlags: TraceFlags(),
-                                     traceState: TraceState())
+        context = SpanContext.create(
+            traceId: TraceId.random(),
+            spanId: SpanId.random(),
+            traceFlags: TraceFlags(),
+            traceState: TraceState()
+        )
     }
 
     func setAttribute(key: String, value: AttributeValue?) {
-        if let value = value {
+        if let value {
             attributes[key] = value
-        } else {
+        }
+        else {
             attributes.removeValue(forKey: key)
         }
     }
 
-    // Required for full protocol conformance
+    /// Required for full protocol conformance
     func setAttributes(_ attributes: [String: AttributeValue]) {
         for (key, value) in attributes {
             self.attributes[key] = value
         }
     }
 
-    func recordException(_ exception: any SpanException) {}
-    func recordException(_ exception: any SpanException, attributes: [String: AttributeValue]) {}
-    func recordException(_ exception: any SpanException, timestamp: Date) {}
-    func recordException(_ exception: any SpanException, attributes: [String: AttributeValue], timestamp: Date) {}
+    func recordException(_: any SpanException) {}
+    func recordException(_: any SpanException, attributes _: [String: AttributeValue]) {}
+    func recordException(_: any SpanException, timestamp _: Date) {}
+    func recordException(_: any SpanException, attributes _: [String: AttributeValue], timestamp _: Date) {}
 
-    func addEvent(name: String, attributes: [String: AttributeValue]) {}
-    func addEvent(name: String) {}
-    func addEvent(name: String, timestamp: Date) {}
-    func addEvent(name: String, attributes: [String: AttributeValue], timestamp: Date) {}
+    func addEvent(name _: String, attributes _: [String: AttributeValue]) {}
+    func addEvent(name _: String) {}
+    func addEvent(name _: String, timestamp _: Date) {}
+    func addEvent(name _: String, attributes _: [String: AttributeValue], timestamp _: Date) {}
 
     func end() {
         end(time: Date())
@@ -390,6 +394,6 @@ private class MockSpan: Span {
     }
 
     var description: String {
-        return "MockSpan"
+        "MockSpan"
     }
 }

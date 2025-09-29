@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkOpenTelemetry
 import XCTest
+
+@testable import SplunkOpenTelemetry
 
 final class SplunkOpenTelemetryTests: XCTestCase {
     func testExample() throws {
