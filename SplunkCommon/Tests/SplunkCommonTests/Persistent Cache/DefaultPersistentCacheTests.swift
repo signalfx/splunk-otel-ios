@@ -140,8 +140,6 @@ final class DefaultPersistentCacheTests: XCTestCase {
         XCTAssertEqual(thirdValue, 3)
     }
 
-    // TODO: [DEMRUM-2782] Fix tests
-    /*
     func testUpdateForKey() async throws {
         let testName = "persistentCacheUpdate"
 
@@ -159,7 +157,6 @@ final class DefaultPersistentCacheTests: XCTestCase {
         XCTAssertEqual(firstValue, 0)
         XCTAssertEqual(secondValue, 5)
     }
-     */
 
     func testRemoveForKey() async throws {
         let testName = "persistentCacheRemove"

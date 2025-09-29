@@ -56,8 +56,6 @@ final class API10ScreenNameTests: XCTestCase {
         SplunkRum.deprecatedAddScreenNameChangeCallback(nil)
     }
 
-    // TODO: [DEMRUM-2782] Fix tests
-    /*
     func testBusinessLogic() throws {
         let expectation = XCTestExpectation(description: "Delayed execution")
 
@@ -82,5 +80,4 @@ final class API10ScreenNameTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
     }
-     */
 }
