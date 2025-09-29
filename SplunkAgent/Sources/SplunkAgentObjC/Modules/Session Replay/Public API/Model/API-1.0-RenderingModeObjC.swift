@@ -36,8 +36,8 @@ public final class RenderingModeObjC: NSObject {
 
     // MARK: - Initialization
 
-    // Initialization is hidden from the public API
-    // as we only need to work with the class type.
+    /// Initialization is hidden from the public API
+    /// as we only need to work with the class type.
     override init() {}
 
 
@@ -69,11 +69,11 @@ public final class RenderingModeObjC: NSObject {
 
 
 @objc
-public extension RenderingModeObjC {
+extension RenderingModeObjC {
 
     // MARK: - Default preset
 
     /// Default video rendering mode.
     @objc(defaultRenderingMode)
-    static let `default` = value(for: RenderingMode.default)
+    public static let `default` = value(for: RenderingMode.default)
 }

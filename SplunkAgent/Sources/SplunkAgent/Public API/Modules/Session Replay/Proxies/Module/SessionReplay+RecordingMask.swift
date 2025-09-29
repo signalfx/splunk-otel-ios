@@ -30,7 +30,8 @@ extension SessionReplay {
         }
     }
 
-    @discardableResult func recordingMask(_ recordingMask: RecordingMask?) -> any SessionReplayModule {
+    @discardableResult
+    func recordingMask(_ recordingMask: RecordingMask?) -> any SessionReplayModule {
         self.recordingMask = recordingMask
 
         return self

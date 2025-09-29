@@ -19,13 +19,15 @@ extension SessionReplay {
 
     // MARK: - Recording management
 
-    @discardableResult func start() -> any SessionReplayModule {
+    @discardableResult
+    func start() -> any SessionReplayModule {
         module.start()
 
         return self
     }
 
-    @discardableResult func stop() -> any SessionReplayModule {
+    @discardableResult
+    func stop() -> any SessionReplayModule {
         module.stop()
 
         return self
