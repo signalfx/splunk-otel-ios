@@ -123,6 +123,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				E45CC9562E8A924A00A6FF28 /* PBXTargetDependency */,
 			);
 			name = AgentTestApp;
 			packageProductDependencies = (
@@ -157,6 +158,9 @@
 			mainGroup = BA5E5A372B6859BC0022CEB2;
 			packageReferences = (
 				4BD024D42DE79FB800ADB31D /* XCLocalSwiftPackageReference "../../../splunk-otel-ios" */,
+				E45CC9542E8A924000A6FF28 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				E45CC9572E8AA31500A6FF28 /* XCRemoteSwiftPackageReference "SwiftFormatPlugins" */,
+				E45CC9582E8AA35600A6FF28 /* XCRemoteSwiftPackageReference "SwiftFormat" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BA5E5A412B6859BC0022CEB2 /* Products */;
@@ -201,6 +205,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E45CC9562E8A924A00A6FF28 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E45CC9552E8A924A00A6FF28 /* SwiftLintBuildToolPlugin */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		BA5E5A492B6859BC0022CEB2 /* Main.storyboard */ = {
@@ -434,10 +445,42 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		E45CC9542E8A924000A6FF28 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.61.0;
+			};
+		};
+		E45CC9572E8AA31500A6FF28 /* XCRemoteSwiftPackageReference "SwiftFormatPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/StarLard/SwiftFormatPlugins.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1;
+			};
+		};
+		E45CC9582E8AA35600A6FF28 /* XCRemoteSwiftPackageReference "SwiftFormat" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nicklockwood/SwiftFormat";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.58.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		4BD024D52DE79FB800ADB31D /* SplunkAgent */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SplunkAgent;
+		};
+		E45CC9552E8A924A00A6FF28 /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E45CC9542E8A924000A6FF28 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
