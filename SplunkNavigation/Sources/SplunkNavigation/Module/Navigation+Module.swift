@@ -18,14 +18,13 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-
 public struct NavigationData: ModuleEventData {}
 
 public struct NavigationMetadata: ModuleEventMetadata {
     public var timestamp = Date()
 }
 
-// Defines Navigation conformance to `Module` protocol
+/// Defines Navigation conformance to `Module` protocol
 extension Navigation: Module {
 
     // MARK: - Module types
@@ -39,7 +38,7 @@ extension Navigation: Module {
 
     // MARK: - Module methods
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
         let configuration = configuration as? Configuration
 
         // Setup initial configuration
@@ -51,9 +50,9 @@ extension Navigation: Module {
         }
     }
 
-    public func deleteData(for metadata: any ModuleEventMetadata) {}
+    public func deleteData(for _: any ModuleEventMetadata) {}
 
-    public func onPublish(data: @escaping (NavigationMetadata, NavigationData) -> Void) {}
+    public func onPublish(data _: @escaping (NavigationMetadata, NavigationData) -> Void) {}
 
 
     // MARK: - Private methods

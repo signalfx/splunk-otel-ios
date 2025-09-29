@@ -17,11 +17,11 @@ limitations under the License.
 
 import Foundation
 
-public extension Navigation {
+extension Navigation {
 
     // MARK: - Manual detection
 
-    func track(screen name: String) {
+    public func track(screen name: String) {
         let start = Date()
 
         Task {

@@ -15,6 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import XCTest
+
 @testable import SplunkNavigation
 
 #if canImport(SwiftUI)
@@ -23,8 +25,6 @@ limitations under the License.
 #if canImport(UIKit)
     import UIKit
 #endif
-
-import XCTest
 
 
 final class NavigationControllerNameTests: XCTestCase {
@@ -44,7 +44,7 @@ final class NavigationControllerNameTests: XCTestCase {
             XCTAssertEqual(controllerName, "UIHostingController<TestView>")
         }
     #endif
-    
+
     #if canImport(UIKit)
         func testUIKitPreferredControllerName() throws {
             // Test UIViewController name
