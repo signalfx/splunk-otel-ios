@@ -15,24 +15,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import XCTest
+
+@testable import SplunkAgent
 
 final class SystemRandomNumberProviderTests: XCTestCase {
 
-    var provider: SystemRandomNumberProvider!
+    // MARK: - Private
+
+    private var provider: SystemRandomNumberProvider?
+
+
+    // MARK: - Tests lifecycle
 
     override func setUp() {
         super.setUp()
+
         provider = SystemRandomNumberProvider()
     }
 
     override func tearDown() {
         provider = nil
+
         super.tearDown()
     }
 
-    func testRandomNumberWithinRange() {
+
+    // MARK: - Basic logic
+
+    func testRandomNumberWithinRange() throws {
+        let provider = try XCTUnwrap(provider)
         let testRange = 0.25 ... 0.75
 
         // Silly simulate randomness...
@@ -43,8 +55,10 @@ final class SystemRandomNumberProviderTests: XCTestCase {
         }
     }
 
-    func testRandomNumberWithZeroLengthRange() {
+    func testRandomNumberWithZeroLengthRange() throws {
+        let provider = try XCTUnwrap(provider)
         let testRange = 0.5 ... 0.5
+
         let randomNumber = provider.randomNumber(in: testRange)
         XCTAssertEqual(randomNumber, 0.5)
     }

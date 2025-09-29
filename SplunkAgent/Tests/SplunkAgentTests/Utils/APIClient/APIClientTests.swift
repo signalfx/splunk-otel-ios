@@ -15,30 +15,39 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import XCTest
 
-class APIClientTests: XCTestCase {
+@testable import SplunkAgent
+
+final class APIClientTests: XCTestCase {
+
+    // MARK: - Static constants
+
+    private static let testSuccessPath = "success"
+    private static let testSuccessResponse = Data("Mrum agent test data".utf8)
+
+
+    // MARK: - Basic tests
 
     func testLoadSuccess() async throws {
-        let client = APIClientTestBuilder.build(with: Self.testSuccessPath, response: Self.testSuccessResponse)
+        let client = try APIClientTestBuilder.build(with: Self.testSuccessPath, response: Self.testSuccessResponse)
 
         let endpoint = MockEndpoint()
-
         let result = try await client.sendRequest(endpoint: endpoint)
 
         XCTAssertEqual(result, Self.testSuccessResponse)
     }
 
-    func testLoadErrorCode() async {
+    func testLoadErrorCode() async throws {
 
-        let client = APIClientTestBuilder.buildError()
+        let client = try APIClientTestBuilder.buildError()
         let endpoint = MockEndpoint()
 
         do {
             _ = try await client.sendRequest(endpoint: endpoint)
             XCTFail("Expected to throw an error but did not")
-        } catch let error as APIClientError {
+        }
+        catch let error as APIClientError {
             switch error {
             case let .statusCode(code):
                 XCTAssertEqual(code, URLProtocolMock.testErrorCode)
@@ -46,20 +55,22 @@ class APIClientTests: XCTestCase {
             default:
                 XCTFail("Unexpected error type: \(error)")
             }
-        } catch {
+        }
+        catch {
             XCTFail("Unexpected error: \(error)")
         }
     }
 
 
-    func testLoadAPIServerError() async {
-        let client = APIClientTestBuilder.buildServerError()
+    func testLoadAPIServerError() async throws {
+        let client = try APIClientTestBuilder.buildServerError()
         let endpoint = MockEndpoint()
 
         do {
             _ = try await client.sendRequest(endpoint: endpoint)
             XCTFail("Expected to throw an error but did not")
-        } catch let error as APIClientError {
+        }
+        catch let error as APIClientError {
             switch error {
             case let .server(serverDetail):
                 XCTAssertEqual(serverDetail.statusCode, 500)
@@ -67,11 +78,9 @@ class APIClientTests: XCTestCase {
             default:
                 XCTFail("Unexpected error type: \(error)")
             }
-        } catch {
+        }
+        catch {
             XCTFail("Unexpected error: \(error)")
         }
     }
-
-    static let testSuccessPath = "success"
-    static let testSuccessResponse = Data("Mrum agent test data".utf8)
 }

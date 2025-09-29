@@ -39,6 +39,6 @@ struct SystemRandomNumberProvider: RandomNumberProvider {
     /// - Parameter range: The inclusive range within which to generate the random number.
     /// - Returns: A random `Double` within the specified range.
     func randomNumber(in range: ClosedRange<Double>) -> Double {
-        return Double.random(in: range)
+        Double.random(in: range)
     }
 }

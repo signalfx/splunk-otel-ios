@@ -16,8 +16,9 @@ limitations under the License.
 */
 
 import OpenTelemetryApi
-@testable import SplunkAgent
 import XCTest
+
+@testable import SplunkAgent
 
 final class MutableAttributesTests: XCTestCase {
 
@@ -275,7 +276,7 @@ final class MutableAttributesTests: XCTestCase {
         XCTAssertEqual(attributes[int: "age"], 30)
     }
 
-      func testAddAttributeSetIntoNamespace() {
+    func testAddAttributeSetIntoNamespace() {
         let attributes = MutableAttributes()
         let attributeSet = AttributeSet(labels: [
             "name": .string("John Doe"),
@@ -304,7 +305,7 @@ final class MutableAttributesTests: XCTestCase {
         XCTAssertEqual(attributes[int: "age"], 30)
     }
 
-     func testAddDictionaryIntoNamespace() {
+    func testAddDictionaryIntoNamespace() {
         let attributes = MutableAttributes()
         let dictionary: [String: AttributeValue] = [
             "name": .string("John Doe"),

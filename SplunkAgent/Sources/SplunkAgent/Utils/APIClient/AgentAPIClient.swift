@@ -17,9 +17,9 @@ limitations under the License.
 
 import Foundation
 
-/// Defines basic methods of API client
+/// Defines basic methods of API client.
 protocol AgentAPIClient {
 
-    /// Will send request to endpoint based on `Endpoint` model. Will return non empty data or throw an `APIClientError`
-    func sendRequest<T: Endpoint>(endpoint: T) async throws -> Data
+    /// Will send request to endpoint based on `Endpoint` model. Will return non empty data or throw an `APIClientError`.
+    func sendRequest(endpoint: some Endpoint) async throws -> Data
 }

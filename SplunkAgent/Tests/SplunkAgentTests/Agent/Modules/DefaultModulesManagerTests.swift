@@ -15,9 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import SplunkCommon
 import XCTest
+
+@testable import SplunkAgent
 
 final class DefaultModulesManagerTests: XCTestCase {
 
@@ -141,9 +142,10 @@ final class DefaultModulesManagerTests: XCTestCase {
             remoteConfigurations: []
         )
 
-        let addedSessionReplayModules = modulesManager.modules.filter { module in
-            type(of: module) == SessionReplayTestModule.self
-        } as? [SessionReplayTestModule]
+        let addedSessionReplayModules =
+            modulesManager.modules.filter { module in
+                type(of: module) == SessionReplayTestModule.self
+            } as? [SessionReplayTestModule]
 
         let managedSessionReplayModule = try XCTUnwrap(addedSessionReplayModules?.first)
         let isOriginalInstance = (sessionReplayModule === managedSessionReplayModule)
@@ -174,7 +176,6 @@ final class DefaultModulesManagerTests: XCTestCase {
             else {
                 return
             }
-
 
             // The returned data matches the last data returned by the module
             let moduleData = crashReportsModule?.publishedData

@@ -80,24 +80,25 @@ public class MutableAttributes {
     }
 }
 
-public extension MutableAttributes {
+extension MutableAttributes {
 
     // MARK: - Subscripts
 
-    subscript(key: String) -> AttributeValue? {
+    public subscript(key: String) -> AttributeValue? {
         get {
-            return attributes[key]
+            attributes[key]
         }
         set {
-            if let newValue = newValue {
+            if let newValue {
                 attributes[key] = newValue
-            } else {
+            }
+            else {
                 attributes.removeValue(forKey: key)
             }
         }
     }
 
-    subscript(string key: String) -> String? {
+    public subscript(string key: String) -> String? {
         get {
             if case let .string(string) = attributes[key] {
                 return string
@@ -105,15 +106,16 @@ public extension MutableAttributes {
             return nil
         }
         set {
-            if let newValue = newValue {
+            if let newValue {
                 attributes[key] = AttributeValue.string(newValue)
-            } else {
+            }
+            else {
                 attributes.removeValue(forKey: key)
             }
         }
     }
 
-    subscript(bool key: String) -> Bool? {
+    public subscript(bool key: String) -> Bool? {
         get {
             if case let .bool(bool) = attributes[key] {
                 return bool
@@ -121,15 +123,16 @@ public extension MutableAttributes {
             return nil
         }
         set {
-            if let newValue = newValue {
+            if let newValue {
                 attributes[key] = AttributeValue.bool(newValue)
-            } else {
+            }
+            else {
                 attributes.removeValue(forKey: key)
             }
         }
     }
 
-    subscript(int key: String) -> Int? {
+    public subscript(int key: String) -> Int? {
         get {
             if case let .int(int) = attributes[key] {
                 return int
@@ -137,15 +140,16 @@ public extension MutableAttributes {
             return nil
         }
         set {
-            if let newValue = newValue {
+            if let newValue {
                 attributes[key] = AttributeValue.int(newValue)
-            } else {
+            }
+            else {
                 attributes.removeValue(forKey: key)
             }
         }
     }
 
-    subscript(double key: String) -> Double? {
+    public subscript(double key: String) -> Double? {
         get {
             if case let .double(double) = attributes[key] {
                 return double
@@ -153,15 +157,16 @@ public extension MutableAttributes {
             return nil
         }
         set {
-            if let newValue = newValue {
+            if let newValue {
                 attributes[key] = AttributeValue.double(newValue)
-            } else {
+            }
+            else {
                 attributes.removeValue(forKey: key)
             }
         }
     }
 
-    subscript(array key: String) -> AttributeArray? {
+    public subscript(array key: String) -> AttributeArray? {
         get {
             if case let .array(array) = attributes[key] {
                 return array
@@ -169,15 +174,16 @@ public extension MutableAttributes {
             return nil
         }
         set {
-            if let newValue = newValue {
+            if let newValue {
                 attributes[key] = AttributeValue.array(newValue)
-            } else {
+            }
+            else {
                 attributes.removeValue(forKey: key)
             }
         }
     }
 
-    subscript(set key: String) -> AttributeSet? {
+    public subscript(set key: String) -> AttributeSet? {
         get {
             if case let .set(attributeSet) = attributes[key] {
                 return attributeSet
@@ -185,100 +191,101 @@ public extension MutableAttributes {
             return nil
         }
         set {
-            if let newValue = newValue {
+            if let newValue {
                 attributes[key] = AttributeValue.set(newValue)
-            } else {
+            }
+            else {
                 attributes.removeValue(forKey: key)
             }
         }
     }
 }
 
-public extension MutableAttributes {
+extension MutableAttributes {
 
     // MARK: - Getters and setters
 
-    func getValue(for key: String) -> AttributeValue? {
-        return attributes[key]
+    public func getValue(for key: String) -> AttributeValue? {
+        attributes[key]
     }
 
-    func getString(for key: String) -> String? {
+    public func getString(for key: String) -> String? {
         if case let .string(string) = attributes[key] {
             return string
         }
         return nil
     }
 
-    func getBool(for key: String) -> Bool? {
+    public func getBool(for key: String) -> Bool? {
         if case let .bool(bool) = attributes[key] {
             return bool
         }
         return nil
     }
 
-    func getInt(for key: String) -> Int? {
+    public func getInt(for key: String) -> Int? {
         if case let .int(int) = attributes[key] {
             return int
         }
         return nil
     }
 
-    func getDouble(for key: String) -> Double? {
+    public func getDouble(for key: String) -> Double? {
         if case let .double(double) = attributes[key] {
             return double
         }
         return nil
     }
 
-    func getArray(for key: String) -> AttributeArray? {
+    public func getArray(for key: String) -> AttributeArray? {
         if case let .array(array) = attributes[key] {
             return array
         }
         return nil
     }
 
-    func getSet(for key: String) -> AttributeSet? {
+    public func getSet(for key: String) -> AttributeSet? {
         if case let .set(attributeSet) = attributes[key] {
             return attributeSet
         }
         return nil
     }
 
-    func setValue(_ value: AttributeValue, for key: String) {
+    public func setValue(_ value: AttributeValue, for key: String) {
         attributes[key] = value
     }
 
-    func setString(_ string: String, for key: String) {
+    public func setString(_ string: String, for key: String) {
         attributes[key] = AttributeValue.string(string)
     }
 
-    func setBool(_ bool: Bool, for key: String) {
+    public func setBool(_ bool: Bool, for key: String) {
         attributes[key] = AttributeValue.bool(bool)
     }
 
-    func setInt(_ int: Int, for key: String) {
+    public func setInt(_ int: Int, for key: String) {
         attributes[key] = AttributeValue.int(int)
     }
 
-    func setDouble(_ double: Double, for key: String) {
+    public func setDouble(_ double: Double, for key: String) {
         attributes[key] = AttributeValue.double(double)
     }
 
-    func setArray(_ array: AttributeArray, for key: String) {
+    public func setArray(_ array: AttributeArray, for key: String) {
         attributes[key] = AttributeValue.array(array)
     }
 
-    func setSet(_ attributeSet: AttributeSet, for key: String) {
+    public func setSet(_ attributeSet: AttributeSet, for key: String) {
         attributes[key] = AttributeValue.set(attributeSet)
     }
 }
 
-public extension MutableAttributes {
+extension MutableAttributes {
 
     // MARK: - Iterative setters
 
     @discardableResult
-    func addDictionary(_ dictionary: [String: AttributeValue]) -> Int {
+    public func addDictionary(_ dictionary: [String: AttributeValue]) -> Int {
         var count = 0
         for (key, value) in dictionary {
             attributes[key] = value
@@ -288,7 +295,7 @@ public extension MutableAttributes {
     }
 
     @discardableResult
-    func addDictionary(_ dictionary: [String: AttributeValue], intoNamespace namespace: String) -> Int {
+    public func addDictionary(_ dictionary: [String: AttributeValue], intoNamespace namespace: String) -> Int {
         var count = 0
         for (key, value) in dictionary {
             let namespaceKey = "\(namespace).\(key)"
@@ -299,7 +306,7 @@ public extension MutableAttributes {
     }
 
     @discardableResult
-    func addAttributeSet(_ attributeSet: AttributeSet) -> Int {
+    public func addAttributeSet(_ attributeSet: AttributeSet) -> Int {
         var count = 0
         for (key, value) in attributeSet.labels {
             attributes[key] = value
@@ -309,7 +316,7 @@ public extension MutableAttributes {
     }
 
     @discardableResult
-    func addAttributeSet(_ attributeSet: AttributeSet, intoNamespace namespace: String) -> Int {
+    public func addAttributeSet(_ attributeSet: AttributeSet, intoNamespace namespace: String) -> Int {
         var count = 0
         for (key, value) in attributeSet.labels {
             let namespaceKey = "\(namespace).\(key)"
@@ -320,37 +327,37 @@ public extension MutableAttributes {
     }
 }
 
-public extension MutableAttributes {
+extension MutableAttributes {
 
     // MARK: - Utilities
 
     @discardableResult
-    func remove(for key: String) -> AttributeValue? {
-        return attributes.removeValue(forKey: key)
+    public func remove(for key: String) -> AttributeValue? {
+        attributes.removeValue(forKey: key)
     }
 
-    func removeAll() {
+    public func removeAll() {
         attributes.removeAll()
     }
 
-    func contains(key: String) -> Bool {
-        return attributes.contains(key: key)
+    public func contains(key: String) -> Bool {
+        attributes.contains(key: key)
     }
 
-    func getAll() -> [String: AttributeValue] {
-        return attributes.getAll()
+    public func getAll() -> [String: AttributeValue] {
+        attributes.getAll()
     }
 
-    func getAllKeys() -> [String] {
-        return attributes.allKeys()
+    public func getAllKeys() -> [String] {
+        attributes.allKeys()
     }
 
-    func getAllValues() -> [AttributeValue] {
-        return attributes.allValues()
+    public func getAllValues() -> [AttributeValue] {
+        attributes.allValues()
     }
 
-    func count() -> Int {
-        return attributes.count()
+    public func count() -> Int {
+        attributes.count()
     }
 
     private func getAllAsAny() -> [String: Any] {
@@ -364,8 +371,8 @@ public extension MutableAttributes {
         return result
     }
 
-    var all: [String: Any] {
-        return getAllAsAny()
+    public var all: [String: Any] {
+        getAllAsAny()
     }
 }
 

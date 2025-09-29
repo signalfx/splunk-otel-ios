@@ -20,13 +20,13 @@ import SplunkAgent
 import UIKit
 
 @objc
-public extension UIView {
+extension UIView {
 
     /// Element custom ID for the specified `UIView` instance.
     ///
     /// Assigning `nil` removes previously assigned custom ID.
     @objc(splk_splunkRumID)
-    var splunkCustomId: String? {
+    public var splunkCustomId: String? {
         get {
             splunkRumId
         }
