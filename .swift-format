@@ -63,7 +63,7 @@
     "TypeNamesShouldBeCapitalized" : true,
     "UseEarlyExits" : true,
     "UseExplicitNilCheckInConditions" : true,
-    "UseLetInEveryBoundCaseVariable" : true,
+    "UseLetInEveryBoundCaseVariable" : false,
     "UseShorthandTypeNames" : true,
     "UseSingleLinePropertyGetter" : true,
     "UseSynthesizedInitializer" : true,

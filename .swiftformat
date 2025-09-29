@@ -1,19 +1,22 @@
 # Format options
 
 --allman false
+--blank-line-after-switch-case always
 --call-site-paren balanced
 --closing-paren balanced
+--decimal-grouping 3,4
 --else-position next-line
 --extension-acl on-declarations
 --func-attributes prev-line
 --guard-else next-line
 --header ignore
---importgrouping testable-bottom
+--import-grouping testable-last
 --indent 4
 --indent-case false
 --indent-strings true
 --line-between-guards true
 --max-width 160
+--pattern-let hoist
 --property-types infer-locals-only
 --semicolons never
 --swift-version 5.9
