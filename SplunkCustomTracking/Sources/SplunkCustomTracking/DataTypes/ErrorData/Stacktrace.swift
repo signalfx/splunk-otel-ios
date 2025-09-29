@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - Stacktrace
 
 public struct Stacktrace {
@@ -27,8 +26,8 @@ public struct Stacktrace {
 
 // MARK: - Stacktrace formatting
 
-public extension Stacktrace {
-    var formatted: String {
+extension Stacktrace {
+    public var formatted: String {
         frames.joined(separator: "\n")
     }
 }

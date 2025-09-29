@@ -16,8 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-@testable import SplunkSlowFrameDetector
 import XCTest
+
+@testable import SplunkSlowFrameDetector
 
 final class SplunkSlowFrameDetectorTests: XCTestCase {
     // See tests in API10SplunkRumBuilderTests

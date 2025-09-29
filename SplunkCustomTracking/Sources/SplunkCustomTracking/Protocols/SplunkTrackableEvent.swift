@@ -19,7 +19,6 @@ import Foundation
 import OpenTelemetryApi
 import SplunkCommon
 
-
 // MARK: - SplunkTrackableEvent Struct
 
 public struct SplunkTrackableEvent: SplunkTrackable {
@@ -28,7 +27,7 @@ public struct SplunkTrackableEvent: SplunkTrackable {
     public var eventName: String
     public var attributes: [String: EventAttributeValue]
 
-    // Simplified initializer for events
+    /// Simplified initializer for events.
     public init(eventName: String, attributes: [String: EventAttributeValue] = [:]) {
         timestamp = Date()
         self.eventName = eventName
@@ -36,6 +35,6 @@ public struct SplunkTrackableEvent: SplunkTrackable {
     }
 
     public func toAttributesDictionary() -> [String: EventAttributeValue] {
-        return attributes
+        attributes
     }
 }

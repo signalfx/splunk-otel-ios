@@ -17,9 +17,10 @@ limitations under the License.
 
 import OpenTelemetryApi
 import OpenTelemetrySdk
+import XCTest
+
 @testable import SplunkCommon
 @testable import SplunkCustomTracking
-import XCTest
 
 final class CustomWorkflowTrackingTests: XCTestCase {
     private var module: CustomTrackingInternal!
@@ -77,7 +78,7 @@ final class CustomWorkflowTrackingTests: XCTestCase {
 
         // Set custom attributes on the span, as a user would
         span.setAttribute(key: "job_id", value: .string("job-5678"))
-        span.setAttribute(key: "data_size_kb", value: .int(1024))
+        span.setAttribute(key: "data_size_kb", value: .int(1_024))
 
         let mockSpan = try XCTUnwrap(span as? MockSpan)
 
@@ -89,13 +90,13 @@ final class CustomWorkflowTrackingTests: XCTestCase {
     }
 }
 
-// A minimal, final mock class to satisfy the AgentSharedState protocol.
-// Making it final resolves the Sendable warning.
+/// A minimal, final mock class to satisfy the AgentSharedState protocol.
+/// Making it final resolves the Sendable warning.
 private final class AgentSharedStateMock: AgentSharedState {
     let agentVersion: String = "1.2.3-test"
     let sessionId: String = "test-session-id"
 
-    func applicationState(for timestamp: Date) -> String? {
-        return "active"
+    func applicationState(for _: Date) -> String? {
+        "active"
     }
 }
