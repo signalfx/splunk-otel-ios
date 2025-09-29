@@ -16,9 +16,10 @@ limitations under the License.
 */
 
 import SplunkCommon
-@testable import SplunkWebView
 import WebKit
 import XCTest
+
+@testable import SplunkWebView
 
 final class WebViewInstrumentationTests: XCTestCase {
 
@@ -55,18 +56,19 @@ final class WebViewInstrumentationTests: XCTestCase {
         webViewInstrumentation.injectSessionId(into: mockWebView)
 
         // TODO: [DEMRUM-2125] Fix test
-//        wait(for: [expectation], timeout: 5.0)
+        //        wait(for: [expectation], timeout: 5.0)
     }
 }
 
-// Mock WKWebView for testing
+/// Mock `WKWebView` for testing.
 final class MockWebView: WKWebView {
     var evaluateJavaScriptHandler: ((String, @escaping (Any?, Error?) -> Void) -> Void)?
 
     func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
         if Thread.isMainThread {
             evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })
-        } else {
+        }
+        else {
             DispatchQueue.main.async {
                 self.evaluateJavaScriptHandler?(javaScriptString, completionHandler ?? { _, _ in })
             }
@@ -78,7 +80,7 @@ final class MockAgentSharedState: AgentSharedState {
     let sessionId: String = "testing-session-id"
     let agentVersion: String = "testing-agent-version"
 
-    func applicationState(for timestamp: Date) -> String? {
+    func applicationState(for _: Date) -> String? {
         "testing"
     }
 }

@@ -77,7 +77,8 @@ extension CrashReports {
                     "Agent could not locate image for instruction pointer."
                 }
                 frameDict[.imageName] = "???"
-            } else {
+            }
+            else {
                 frameDict[.imageName] = imageName
                 // Added to limit the number of images sent
                 allUsedImageNames.append(imageName!)
@@ -94,7 +95,8 @@ extension CrashReports {
                 let symOffset = instructionPointer - stackFrame.symbolInfo.startAddress
                 frameDict[.symbolName] = symbolName
                 frameDict[.offset] = symOffset
-            } else {
+            }
+            else {
                 frameDict[.baseAddress] = baseAddress
                 frameDict[.offset] = offset
             }
@@ -103,7 +105,7 @@ extension CrashReports {
         return stackFrames
     }
 
-    // The thread list returned as a JSON encoded string
+    /// The thread list returned as a JSON encoded string.
     func threadList(threads: [[CrashReportKeys: Any]]) -> String {
         var outputThreads: [Any] = []
 

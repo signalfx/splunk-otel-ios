@@ -24,16 +24,18 @@ import OpenTelemetrySdk
 class MockTracerProvider: TracerProvider {
     let mockTracer = MockTracer()
 
-    func get(instrumentationName: String, instrumentationVersion: String?) -> OpenTelemetryApi.Tracer {
-        return mockTracer
+    func get(instrumentationName _: String, instrumentationVersion _: String?) -> OpenTelemetryApi.Tracer {
+        mockTracer
     }
 
-    // Required for full protocol conformance
-    func get(instrumentationName: String,
-             instrumentationVersion: String?,
-             schemaUrl: String?,
-             attributes: [String: OpenTelemetryApi.AttributeValue]?) -> OpenTelemetryApi.Tracer {
-        return mockTracer
+    /// Required for full protocol conformance
+    func get(
+        instrumentationName _: String,
+        instrumentationVersion _: String?,
+        schemaUrl _: String?,
+        attributes _: [String: OpenTelemetryApi.AttributeValue]?
+    ) -> OpenTelemetryApi.Tracer {
+        mockTracer
     }
 }
 
@@ -41,7 +43,7 @@ class MockTracerProvider: TracerProvider {
 
 class MockTracer: Tracer {
     func spanBuilder(spanName: String) -> SpanBuilder {
-        return MockSpanBuilder(spanName: spanName)
+        MockSpanBuilder(spanName: spanName)
     }
 }
 
@@ -55,20 +57,20 @@ class MockSpanBuilder: SpanBuilder {
         self.spanName = spanName
     }
 
-    func setParent(_ parent: Span) -> Self { return self }
-    func setParent(_ parentContext: SpanContext) -> Self { return self }
-    func setNoParent() -> Self { return self }
-    func addLink(spanContext: SpanContext) -> Self { return self }
-    func addLink(spanContext: SpanContext, attributes: [String: AttributeValue]) -> Self { return self }
-    func setSpanKind(spanKind: SpanKind) -> Self { return self }
-    func setStartTime(time: Date) -> Self { return self }
+    func setParent(_: Span) -> Self { self }
+    func setParent(_: SpanContext) -> Self { self }
+    func setNoParent() -> Self { self }
+    func addLink(spanContext _: SpanContext) -> Self { self }
+    func addLink(spanContext _: SpanContext, attributes _: [String: AttributeValue]) -> Self { self }
+    func setSpanKind(spanKind _: SpanKind) -> Self { self }
+    func setStartTime(time _: Date) -> Self { self }
     func setAttribute(key: String, value: AttributeValue) -> Self {
         attributes[key] = value
         return self
     }
 
     // Required for full protocol conformance
-    func setActive(_ active: Bool) -> Self { return self }
+    func setActive(_: Bool) -> Self { self }
     func withActiveSpan<T>(_ operation: (any SpanBase) throws -> T) rethrows -> T {
         let span = startSpan()
         return try operation(span)
@@ -101,33 +103,38 @@ class MockSpan: Span {
 
     init(name: String) {
         self.name = name
-        context = SpanContext.create(traceId: TraceId.random(),
-                                     spanId: SpanId.random(),
-                                     traceFlags: TraceFlags(),
-                                     traceState: TraceState())
+        context = SpanContext.create(
+            traceId: TraceId.random(),
+            spanId: SpanId.random(),
+            traceFlags: TraceFlags(),
+            traceState: TraceState()
+        )
     }
 
     func setAttribute(key: String, value: AttributeValue?) {
-        guard let value = value else { return }
+        guard let value else {
+            return
+        }
+
         attributes[key] = value
     }
 
-    // Required for full protocol conformance
+    /// Required for full protocol conformance
     func setAttributes(_ attributes: [String: AttributeValue]) {
         for (key, value) in attributes {
             self.attributes[key] = value
         }
     }
 
-    func recordException(_ exception: any SpanException) {}
-    func recordException(_ exception: any SpanException, attributes: [String: AttributeValue]) {}
-    func recordException(_ exception: any SpanException, timestamp: Date) {}
-    func recordException(_ exception: any SpanException, attributes: [String: AttributeValue], timestamp: Date) {}
+    func recordException(_: any SpanException) {}
+    func recordException(_: any SpanException, attributes _: [String: AttributeValue]) {}
+    func recordException(_: any SpanException, timestamp _: Date) {}
+    func recordException(_: any SpanException, attributes _: [String: AttributeValue], timestamp _: Date) {}
 
-    func addEvent(name: String, attributes: [String: AttributeValue]) {}
-    func addEvent(name: String) {}
-    func addEvent(name: String, timestamp: Date) {}
-    func addEvent(name: String, attributes: [String: AttributeValue], timestamp: Date) {}
+    func addEvent(name _: String, attributes _: [String: AttributeValue]) {}
+    func addEvent(name _: String) {}
+    func addEvent(name _: String, timestamp _: Date) {}
+    func addEvent(name _: String, attributes _: [String: AttributeValue], timestamp _: Date) {}
 
     func end() {
         end(time: Date())
@@ -139,6 +146,6 @@ class MockSpan: Span {
     }
 
     var description: String {
-        return "MockSpan"
+        "MockSpan"
     }
 }

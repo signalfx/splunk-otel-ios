@@ -21,7 +21,6 @@ import Foundation
 import OpenTelemetryProtocolExporterCommon
 import SwiftProtobuf
 
-
 /// Basic implementation of exporters
 public class OTLPBackgroundHTTPBaseExporter {
 

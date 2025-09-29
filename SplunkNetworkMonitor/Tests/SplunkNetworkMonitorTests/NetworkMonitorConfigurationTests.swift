@@ -41,16 +41,16 @@ final class NetworkMonitorConfigurationTests: XCTestCase {
 
     func testNetworkMonitorRemoteConfigurationValidJSON() {
         let jsonString = """
-        {
-            "configuration": {
-                "mrum": {
-                    "networkMonitor": {
-                        "enabled": true
+            {
+                "configuration": {
+                    "mrum": {
+                        "networkMonitor": {
+                            "enabled": true
+                        }
                     }
                 }
             }
-        }
-        """
+            """
 
         let jsonData = Data(jsonString.utf8)
         let config = NetworkMonitorRemoteConfiguration(from: jsonData)
@@ -61,16 +61,16 @@ final class NetworkMonitorConfigurationTests: XCTestCase {
 
     func testNetworkMonitorRemoteConfigurationDisabled() {
         let jsonString = """
-        {
-            "configuration": {
-                "mrum": {
-                    "networkMonitor": {
-                        "enabled": false
+            {
+                "configuration": {
+                    "mrum": {
+                        "networkMonitor": {
+                            "enabled": false
+                        }
                     }
                 }
             }
-        }
-        """
+            """
 
         let jsonData = Data(jsonString.utf8)
         let config = NetworkMonitorRemoteConfiguration(from: jsonData)
@@ -88,15 +88,15 @@ final class NetworkMonitorConfigurationTests: XCTestCase {
 
     func testNetworkMonitorRemoteConfigurationMissingFields() {
         let jsonString = """
-        {
-            "configuration": {
-                "mrum": {
-                    "networkMonitor": {
+            {
+                "configuration": {
+                    "mrum": {
+                        "networkMonitor": {
+                        }
                     }
                 }
             }
-        }
-        """
+            """
 
         let jsonData = Data(jsonString.utf8)
         let config = NetworkMonitorRemoteConfiguration(from: jsonData)

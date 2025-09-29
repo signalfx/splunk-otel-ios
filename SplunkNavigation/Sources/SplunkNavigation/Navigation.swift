@@ -17,10 +17,8 @@ limitations under the License.
 
 internal import CiscoLogger
 internal import CiscoSwizzling
-
 import Foundation
 import SplunkCommon
-
 import UIKit
 
 /// The navigation module detects and tracks navigation in the application.
@@ -28,8 +26,10 @@ public final class Navigation: Sendable {
 
     // MARK: - Static constants
 
-    // It is used to switch the implementation for testing
-    // and during further development of the module
+    /// Detection solution switch.
+    ///
+    /// It is used to switch the implementation for testing
+    /// and during further development of the module
     private static let useLegacySolution = true
 
 
@@ -97,7 +97,7 @@ public final class Navigation: Sendable {
 
     // MARK: - Initialization
 
-    // Module protocol conformance
+    /// Module protocol conformance
     public required init() {
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
@@ -130,8 +130,8 @@ public final class Navigation: Sendable {
         // and the legacy solution will be removed.
         if Self.useLegacySolution {
             startLegacyDetection()
-
-        } else {
+        }
+        else {
             startModernDetection()
         }
     }
@@ -144,10 +144,7 @@ public final class Navigation: Sendable {
             let navigationStream = try await DefaultSwizzling.navigation
 
             // Process navigation events
-            for await event in navigationStream {
-                guard await shouldProcessEvent() else {
-                    continue
-                }
+            for await event in navigationStream where await shouldProcessEvent() {
 
                 var processedEvent = event
                 let screenName = await preferredScreenName(for: event.controllerTypeName)
@@ -245,7 +242,7 @@ public final class Navigation: Sendable {
             return nil
         }
 
-        let controllerTypeName = NSStringFromClass(type(of: visibleController))
+        let controllerTypeName = preferredControllerName(for: visibleController)
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
@@ -257,15 +254,18 @@ public final class Navigation: Sendable {
     }
 
     private func transitionEvent(for presentationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
+        let presentationController = presentationObject as? UIPresentationController
+        let uiViewController = presentationObject as? UIViewController
+        let presentedController = await presentationController?.presentedViewController
+
         guard
             await shouldProcessEvent(),
-            let presentationController = presentationObject as? UIPresentationController
+            let visibleController = presentedController ?? uiViewController
         else {
             return nil
         }
 
-        let visibleController = await presentationController.presentedViewController
-        let controllerTypeName = NSStringFromClass(type(of: visibleController))
+        let controllerTypeName = preferredControllerName(for: visibleController)
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
@@ -378,6 +378,10 @@ public final class Navigation: Sendable {
         }
 
         return controllerTypeName
+    }
+
+    func preferredControllerName(for controller: UIViewController) -> String {
+        String(describing: type(of: controller))
     }
 
 

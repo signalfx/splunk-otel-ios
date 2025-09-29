@@ -15,16 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import SplunkNavigation
 import XCTest
+
+@testable import SplunkAgent
 
 final class NavigationAPI10ModuleProxyTests: XCTestCase {
 
     // MARK: - Private
 
-    private var module: SplunkNavigation.Navigation!
-    private var moduleProxy: SplunkAgent.Navigation!
+    private var module: SplunkNavigation.Navigation?
+    private var moduleProxy: SplunkAgent.Navigation?
 
 
     // MARK: - Tests lifecycle
@@ -33,13 +34,25 @@ final class NavigationAPI10ModuleProxyTests: XCTestCase {
         super.setUp()
 
         module = SplunkNavigation.Navigation()
-        moduleProxy = SplunkAgent.Navigation(for: module)
+
+        if let module {
+            moduleProxy = SplunkAgent.Navigation(for: module)
+        }
+    }
+
+    override func tearDown() {
+        super.tearDown()
+
+        module = nil
+        moduleProxy = nil
     }
 
 
     // MARK: - Preferences
 
     func testPreferences() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+
         let preferences = NavigationPreferences()
             .enableAutomatedTracking(true)
 
@@ -63,6 +76,7 @@ final class NavigationAPI10ModuleProxyTests: XCTestCase {
     // MARK: - State
 
     func testState() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
         let state = moduleProxy.state
 
         // Properties with default module configuration (READ)
@@ -75,6 +89,7 @@ final class NavigationAPI10ModuleProxyTests: XCTestCase {
     // MARK: - Manual detection
 
     func testTracking() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
         XCTAssertNotNil(moduleProxy.track(screen: "Test"))
     }
 }

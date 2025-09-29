@@ -60,8 +60,4 @@ extension Resource {
             merge(other: Resource(attributes: attribute))
         }
     }
-
-    private static func serviceVersion(fromAppVersion appVersion: String, appBuild: String) -> String {
-        return "\(appVersion) (\(appBuild))"
-    }
 }

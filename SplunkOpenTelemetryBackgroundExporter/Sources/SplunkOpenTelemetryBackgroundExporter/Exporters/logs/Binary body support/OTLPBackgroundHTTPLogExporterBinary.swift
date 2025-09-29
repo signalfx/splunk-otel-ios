@@ -46,7 +46,8 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
                     parrentKeyBuilder: getStorageKey()
                 )
             )
-        } catch {
+        }
+        catch {
 
             return .failure
         }
@@ -64,7 +65,8 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
             try httpClient.send(requestDescriptor)
 
             return .success
-        } catch {
+        }
+        catch {
 
             return .failure
         }

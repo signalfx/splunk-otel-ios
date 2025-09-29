@@ -20,5 +20,5 @@ final class InteractionsNonOperational: InteractionsModule {
 
     // MARK: - Custom ids
 
-    func register(customId: String?, for viewId: ObjectIdentifier) {}
+    func register(customId _: String?, for _: ObjectIdentifier) {}
 }

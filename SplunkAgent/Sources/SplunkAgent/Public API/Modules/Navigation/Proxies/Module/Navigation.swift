@@ -29,7 +29,8 @@ final class Navigation: NavigationModule {
 
     var preferences: any NavigationModulePreferences
 
-    @discardableResult func preferences(_ preferences: any NavigationModulePreferences) -> any NavigationModule {
+    @discardableResult
+    func preferences(_ preferences: any NavigationModulePreferences) -> any NavigationModule {
         self.preferences = preferences
 
         return self

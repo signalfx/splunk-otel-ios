@@ -27,7 +27,8 @@ import SplunkAgent
 /// Individual mask elements will be added to the final record by their
 /// index from lowest to highest. An erasing mask can partially cut places
 /// covered by a covering mask and vice versa.
-@objc(SPLKRecordingMask) @objcMembers
+@objc(SPLKRecordingMask)
+@objcMembers
 public final class RecordingMaskObjC: NSObject {
 
     // MARK: - Elements
@@ -52,9 +53,9 @@ extension RecordingMaskObjC {
     // MARK: - Computed properties
 
     var recordingMask: RecordingMask {
-        RecordingMask(elements: elements.map { element in
-            element.maskElement
-        })
+        RecordingMask(
+            elements: elements.map(\.maskElement)
+        )
     }
 
     // MARK: - Conversion init

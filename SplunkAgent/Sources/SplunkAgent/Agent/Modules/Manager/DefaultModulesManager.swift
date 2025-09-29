@@ -38,8 +38,11 @@ class DefaultModulesManager: AgentModulesManager {
 
     // MARK: - Initialization
 
-    required init(rawConfiguration: Data?, moduleConfigurations: [Any]?,
-                  for pool: AgentModulesPool.Type = DefaultModulesPool.self) {
+    required init(
+        rawConfiguration: Data?,
+        moduleConfigurations: [Any]?,
+        for pool: AgentModulesPool.Type = DefaultModulesPool.self
+    ) {
 
         modulesPool = pool
 
@@ -50,9 +53,11 @@ class DefaultModulesManager: AgentModulesManager {
 
 
         // All local module configurations
-        let configurations = moduleConfigurations?.compactMap { moduleConfiguration in
-            moduleConfiguration as? ModuleConfiguration
-        } ?? []
+        let configurations =
+            moduleConfigurations?
+            .compactMap { moduleConfiguration in
+                moduleConfiguration as? ModuleConfiguration
+            } ?? []
 
         // Creates remote module configurations from raw data
         let remoteConfigurations: [any RemoteModuleConfiguration] = modulesPool.default.compactMap { moduleType in
@@ -74,12 +79,12 @@ class DefaultModulesManager: AgentModulesManager {
     }
 
     /// Helper method for generic module initialization.
-    private func initializeModule<T: Module>(type: T.Type) -> T {
-        return T()
+    private func initializeModule<T: Module>(type _: T.Type) -> T {
+        T()
     }
 
     /// Helper method for generic initialization of remote configuration.
-    private func initializeRemoteConfiguration<T: Module>(from data: Data?, forModule type: T.Type) -> T.RemoteConfiguration? {
+    private func initializeRemoteConfiguration<T: Module>(from data: Data?, forModule _: T.Type) -> T.RemoteConfiguration? {
         guard let data else {
             return nil
         }
@@ -90,8 +95,11 @@ class DefaultModulesManager: AgentModulesManager {
 
     // MARK: - Business Logic
 
-    func connect(modules: [any Module], with configurations: [any ModuleConfiguration],
-                 remoteConfigurations: [any RemoteModuleConfiguration]) {
+    func connect(
+        modules: [any Module],
+        with configurations: [any ModuleConfiguration],
+        remoteConfigurations: [any RemoteModuleConfiguration]
+    ) {
         // Connect all modules with corresponding configurations (if exists)
         for module in modules {
             // Get corresponding configuration
@@ -120,8 +128,11 @@ class DefaultModulesManager: AgentModulesManager {
         }
     }
 
-    private func connect(module: any Module, with configuration: (any ModuleConfiguration)?,
-                         remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    private func connect(
+        module: any Module,
+        with configuration: (any ModuleConfiguration)?,
+        remoteConfiguration: (any RemoteModuleConfiguration)?
+    ) {
         // We will not add remotely disabled modules
         guard remoteConfiguration?.enabled ?? true else {
             return
@@ -136,7 +147,6 @@ class DefaultModulesManager: AgentModulesManager {
             return
         }
 
-
         // Add module instance into managed modules
         modules.append(module)
 
@@ -148,7 +158,7 @@ class DefaultModulesManager: AgentModulesManager {
 
     // MARK: - Data forwarding
 
-    // Forwards data from modules to consumer class (some DataProcessor)
+    /// Forwards data from modules to consumer class (some DataProcessor).
     private func onModulePublish(metadata: any ModuleEventMetadata, data: any ModuleEventData) {
         // Gets data from modules and forwards then into assigned data processor
         modulesDataConsumer?(metadata, data)
@@ -157,13 +167,13 @@ class DefaultModulesManager: AgentModulesManager {
 
     // MARK: - Data publication
 
-    // Observe published data from all modules
+    /// Observe published data from all modules.
     func onModulePublish(data block: @escaping (any ModuleEventMetadata, any ModuleEventData) -> Void) {
         modulesDataConsumer = block
     }
 
-    // Asks the module manager to delete specific data
-    // that was previously published by some of the modules
+    /// Asks the module manager to delete specific data
+    /// that was previously published by some of the modules.
     func deleteModuleData(for metadata: any ModuleEventMetadata) {
         // Finds a module that understands the format of this metadata
         let module: (any Module)? = modules.first { module in
@@ -183,11 +193,11 @@ class DefaultModulesManager: AgentModulesManager {
     // MARK: - Metrics
 
     var modulesInitializationTimes: [String: Date] {
-        return initializationTimes
+        initializationTimes
     }
 
     var modulesConfigurationDescription: [String: String] {
-        return configurationDescription
+        configurationDescription
     }
 
     /// Prepares modules configuration description, in a format of a `[String: String]` dictionary,
@@ -210,7 +220,8 @@ class DefaultModulesManager: AgentModulesManager {
             }
 
             configurationDescription = description
-        } catch {
+        }
+        catch {
             logger.log(level: .error) {
                 "An error when preparing modules configuration description: \(error.localizedDescription)"
             }

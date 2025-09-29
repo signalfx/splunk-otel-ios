@@ -65,7 +65,10 @@ extension AppStateModule {
 
     private func addObserver(_ name: Notification.Name, handler: @escaping () -> Void) {
         let token = NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
-            guard self != nil else { return }
+            guard self != nil else {
+                return
+            }
+
             handler()
         }
         var tokens = notificationObservers

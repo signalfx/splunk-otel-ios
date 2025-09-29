@@ -19,12 +19,16 @@ import Foundation
 import OpenTelemetrySdk
 import SplunkAgent
 
+enum ConfigurationTestBuilderError: Error {
+    case invalidURL(String)
+}
+
 final class ConfigurationTestBuilder {
 
     // MARK: - Static constants
 
-    static let customTraceUrl = URL(string: "http://sampledomain.com/tenant/traces")!
-    static let customSessionReplayUrl = URL(string: "http://sampledomain.com/tenant/sessionreplay")!
+    static let customTraceAddress = "http://sampledomain.com/tenant/traces"
+    static let customSessionReplayAddress = "http://sampledomain.com/tenant/sessionreplay"
     static let realm = "dev"
     static let deploymentEnvironment = "testenv"
     static let appName = "Tests"
@@ -56,6 +60,8 @@ final class ConfigurationTestBuilder {
         configuration.enableDebugLogging = true
         configuration.session = sessionConfiguration
         configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
+
+        // swiftlint:disable:next prefer_key_path
         configuration.spanInterceptor = { spanData in
             spanData
         }
@@ -85,6 +91,8 @@ final class ConfigurationTestBuilder {
         configuration.enableDebugLogging = true
         configuration.session = sessionConfiguration
         configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
+
+        // swiftlint:disable:next prefer_key_path
         configuration.spanInterceptor = { spanData in
             spanData
         }
@@ -100,29 +108,25 @@ final class ConfigurationTestBuilder {
         )
 
         // Minimal configuration for unit testing
-        let minimal = AgentConfiguration(
+        return AgentConfiguration(
             endpoint: endpoint,
             appName: appName,
             deploymentEnvironment: deploymentEnvironment
         )
-
-        return minimal
     }
 
     static func buildWithCustomUrls() throws -> AgentConfiguration {
         // Endpoint configuration with custom traces and session replay urls
-        let endpoint = EndpointConfiguration(
-            trace: customTraceUrl,
-            sessionReplay: customSessionReplayUrl
+        let endpoint = try EndpointConfiguration(
+            trace: customUrl(for: customTraceAddress),
+            sessionReplay: customUrl(for: customSessionReplayAddress)
         )
 
-        let configuration = AgentConfiguration(
+        return AgentConfiguration(
             endpoint: endpoint,
             appName: appName,
             deploymentEnvironment: deploymentEnvironment
         )
-
-        return configuration
     }
 
     static func buildInvalidEndpoint() throws -> AgentConfiguration {
@@ -132,12 +136,21 @@ final class ConfigurationTestBuilder {
             rumAccessToken: rumAccessToken
         )
 
-        let configuration = AgentConfiguration(
+        return AgentConfiguration(
             endpoint: endpoint,
             appName: appName,
             deploymentEnvironment: deploymentEnvironment
         )
+    }
 
-        return configuration
+
+    // MARK: - URL builders
+
+    static func customUrl(for string: String) throws -> URL {
+        guard let url = URL(string: string) else {
+            throw ConfigurationTestBuilderError.invalidURL(string)
+        }
+
+        return url
     }
 }

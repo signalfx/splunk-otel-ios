@@ -41,20 +41,20 @@ public enum EventAttributeValue: Equatable, Hashable {
     }
 }
 
-public extension EventAttributeValue {
-    init(_ value: String) {
+extension EventAttributeValue {
+    public init(_ value: String) {
         self = .string(value)
     }
 
-    init(_ value: Int) {
+    public init(_ value: Int) {
         self = .int(value)
     }
 
-    init(_ value: Double) {
+    public init(_ value: Double) {
         self = .double(value)
     }
 
-    init(_ value: Data) {
+    public init(_ value: Data) {
         self = .data(value)
     }
 }

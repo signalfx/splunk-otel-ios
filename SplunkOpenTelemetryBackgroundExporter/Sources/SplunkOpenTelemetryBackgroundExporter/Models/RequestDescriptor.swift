@@ -58,7 +58,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
     }
 
     var shouldSend: Bool {
-        return sentCount <= 5
+        sentCount <= 5
     }
 
 
@@ -76,9 +76,9 @@ struct RequestDescriptor: RequestDescriptorProtocol {
     }
 }
 
-private extension RequestDescriptor {
+extension RequestDescriptor {
 
-    var nextRequestDelay: DateComponents {
+    private var nextRequestDelay: DateComponents {
         var delay = DateComponents()
 
         switch sentCount {

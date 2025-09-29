@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkCommon
 import XCTest
+
+@testable import SplunkCommon
 
 final class DefaultPersistentCacheTests: XCTestCase {
 
@@ -180,7 +181,7 @@ final class DefaultPersistentCacheTests: XCTestCase {
     func testPurge() async throws {
         let testName = "persistentCachePurge"
 
-        var items = [String: Int]()
+        var items: [String: Int] = [:]
         let thirtyMinutes: TimeInterval = 30 * 60
 
         for value in 0 ... 9 {
