@@ -27,23 +27,19 @@ class SplunkStdoutLogExporter: LogRecordExporter {
 
     private let proxyExporter: LogRecordExporter
 
-    // Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    // Date format
-    private let dateFormatStyle: Date.FormatStyle = {
-        let dateFormat = Date.FormatStyle()
-            .month()
-            .day()
-            .year()
-            .hour(.twoDigits(amPM: .wide))
-            .minute(.twoDigits)
-            .second(.twoDigits)
-            .secondFraction(.fractional(3))
-            .timeZone(.iso8601(.short))
-
-        return dateFormat
-    }()
+    /// Date format.
+    private let dateFormatStyle: Date.FormatStyle = .init()
+        .month()
+        .day()
+        .year()
+        .hour(.twoDigits(amPM: .wide))
+        .minute(.twoDigits)
+        .second(.twoDigits)
+        .secondFraction(.fractional(3))
+        .timeZone(.iso8601(.short))
 
     init(with proxy: LogRecordExporter) {
         proxyExporter = proxy
@@ -65,7 +61,8 @@ class SplunkStdoutLogExporter: LogRecordExporter {
                     let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
                     let observedTimestampFormatted = observedTimestamp.formatted(self.dateFormatStyle)
                     message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-                } else {
+                }
+                else {
                     message += "ObservedTimestamp: -\n"
                 }
 
@@ -89,10 +86,10 @@ class SplunkStdoutLogExporter: LogRecordExporter {
     }
 
     func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
-        return proxyExporter.forceFlush(explicitTimeout: explicitTimeout)
+        proxyExporter.forceFlush(explicitTimeout: explicitTimeout)
     }
 
     func shutdown(explicitTimeout: TimeInterval?) {
-        return proxyExporter.shutdown(explicitTimeout: explicitTimeout)
+        proxyExporter.shutdown(explicitTimeout: explicitTimeout)
     }
 }

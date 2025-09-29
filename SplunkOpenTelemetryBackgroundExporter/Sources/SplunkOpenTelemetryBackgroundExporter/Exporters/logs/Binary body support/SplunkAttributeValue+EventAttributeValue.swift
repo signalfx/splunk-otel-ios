@@ -18,10 +18,10 @@ limitations under the License.
 
 import SplunkCommon
 
-public extension SplunkAttributeValue {
+extension SplunkAttributeValue {
 
     /// Converts `EventAttributeValue` to `SplunkAttributeValue`.
-    init(eventAttributeValue attributeValue: EventAttributeValue) {
+    public init(eventAttributeValue attributeValue: EventAttributeValue) {
         switch attributeValue {
         case let .string(attributeValue):
             self = .string(attributeValue)
