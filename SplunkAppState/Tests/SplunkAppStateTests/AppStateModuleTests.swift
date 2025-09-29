@@ -16,17 +16,18 @@ limitations under the License.
 */
 
 import XCTest
+
 @testable import SplunkAppState
 
 final class AppStateModuleTests: XCTestCase {
 
     // MARK: - Private properties
 
-#if os(iOS) || os(tvOS) || os(visionOS)
-    private let expectedObserverCount = 5
-#else
-    private let expectedObserverCount = 0
-#endif
+    #if os(iOS) || os(tvOS) || os(visionOS)
+        private let expectedObserverCount = 5
+    #else
+        private let expectedObserverCount = 0
+    #endif
 
 
     // MARK: - Test functions
@@ -88,72 +89,72 @@ final class AppStateModuleTests: XCTestCase {
 
     #if os(iOS) || os(tvOS) || os(visionOS)
 
-    func testDidBecomeActiveSendsActive() {
-        let mock = MockDestination()
-        let module = makeModule(with: mock)
-        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
-        expectEventCount(mock, count: 1)
-        XCTAssertEqual(mock.events.last?.state, .active)
-        module.removeNotifications()
-    }
+        func testDidBecomeActiveSendsActive() {
+            let mock = MockDestination()
+            let module = makeModule(with: mock)
+            NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+            expectEventCount(mock, count: 1)
+            XCTAssertEqual(mock.events.last?.state, .active)
+            module.removeNotifications()
+        }
 
-    func testDidEnterBackgroundSendsBackground() {
-        let mock = MockDestination()
-        let module = makeModule(with: mock)
-        NotificationCenter.default.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
-        expectEventCount(mock, count: 1)
-        XCTAssertEqual(mock.events.last?.state, .background)
-        module.removeNotifications()
-    }
+        func testDidEnterBackgroundSendsBackground() {
+            let mock = MockDestination()
+            let module = makeModule(with: mock)
+            NotificationCenter.default.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
+            expectEventCount(mock, count: 1)
+            XCTAssertEqual(mock.events.last?.state, .background)
+            module.removeNotifications()
+        }
 
-    func testWillEnterForegroundSendsForeground() {
-        let mock = MockDestination()
-        let module = makeModule(with: mock)
-        NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
-        expectEventCount(mock, count: 1)
-        XCTAssertEqual(mock.events.last?.state, .foreground)
-        module.removeNotifications()
-    }
+        func testWillEnterForegroundSendsForeground() {
+            let mock = MockDestination()
+            let module = makeModule(with: mock)
+            NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+            expectEventCount(mock, count: 1)
+            XCTAssertEqual(mock.events.last?.state, .foreground)
+            module.removeNotifications()
+        }
 
-    func testWillResignActiveSendsInactive() {
-        let mock = MockDestination()
-        let module = makeModule(with: mock)
-        NotificationCenter.default.post(name: UIApplication.willResignActiveNotification, object: nil)
-        expectEventCount(mock, count: 1)
-        XCTAssertEqual(mock.events.last?.state, .inactive)
-        module.removeNotifications()
-    }
+        func testWillResignActiveSendsInactive() {
+            let mock = MockDestination()
+            let module = makeModule(with: mock)
+            NotificationCenter.default.post(name: UIApplication.willResignActiveNotification, object: nil)
+            expectEventCount(mock, count: 1)
+            XCTAssertEqual(mock.events.last?.state, .inactive)
+            module.removeNotifications()
+        }
 
-    func testWillTerminateSendsTerminate() {
-        let mock = MockDestination()
-        let module = makeModule(with: mock)
-        NotificationCenter.default.post(name: UIApplication.willTerminateNotification, object: nil)
-        expectEventCount(mock, count: 1)
-        XCTAssertEqual(mock.events.last?.state, .terminate)
-        module.removeNotifications()
-    }
+        func testWillTerminateSendsTerminate() {
+            let mock = MockDestination()
+            let module = makeModule(with: mock)
+            NotificationCenter.default.post(name: UIApplication.willTerminateNotification, object: nil)
+            expectEventCount(mock, count: 1)
+            XCTAssertEqual(mock.events.last?.state, .terminate)
+            module.removeNotifications()
+        }
 
-    func testSequenceOrderIsPreserved() {
-        let mock = MockDestination()
-        let module = makeModule(with: mock)
-        NotificationCenter.default.post(name: UIApplication.willResignActiveNotification, object: nil)
-        NotificationCenter.default.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
-        NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
-        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
-        expectEventCount(mock, count: 4)
-        XCTAssertEqual(mock.events.map(\.state), [.inactive, .background, .foreground, .active])
-        module.removeNotifications()
-    }
+        func testSequenceOrderIsPreserved() {
+            let mock = MockDestination()
+            let module = makeModule(with: mock)
+            NotificationCenter.default.post(name: UIApplication.willResignActiveNotification, object: nil)
+            NotificationCenter.default.post(name: UIApplication.didEnterBackgroundNotification, object: nil)
+            NotificationCenter.default.post(name: UIApplication.willEnterForegroundNotification, object: nil)
+            NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+            expectEventCount(mock, count: 4)
+            XCTAssertEqual(mock.events.map(\.state), [.inactive, .background, .foreground, .active])
+            module.removeNotifications()
+        }
 
-    func testNoEventsAfterStopDetection() {
-        let mock = MockDestination()
-        let module = makeModule(with: mock)
-        module.stopDetection()
-        mock.reset()
-        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
-        RunLoop.current.run(until: Date().addingTimeInterval(0.1))
-        XCTAssertTrue(mock.events.isEmpty)
-    }
+        func testNoEventsAfterStopDetection() {
+            let mock = MockDestination()
+            let module = makeModule(with: mock)
+            module.stopDetection()
+            mock.reset()
+            NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
+            RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+            XCTAssertTrue(mock.events.isEmpty)
+        }
 
     #endif
 
@@ -171,9 +172,13 @@ final class AppStateModuleTests: XCTestCase {
     private func expectEventCount(_ mock: MockDestination, count: Int, timeout: TimeInterval = 1.0) {
         let exp = expectation(description: "events \(count)")
         mock.onSend = { [weak mock] in
-            if (mock?.events.count ?? 0) >= count { exp.fulfill() }
+            if (mock?.events.count ?? 0) >= count {
+                exp.fulfill()
+            }
         }
-        if mock.events.count >= count { exp.fulfill() }
+        if mock.events.count >= count {
+            exp.fulfill()
+        }
         wait(for: [exp], timeout: timeout)
         mock.onSend = nil
     }

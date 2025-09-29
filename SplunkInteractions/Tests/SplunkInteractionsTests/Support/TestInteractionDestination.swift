@@ -16,13 +16,14 @@ limitations under the License.
 */
 
 import Foundation
+
 @testable import SplunkInteractions
 
 final class TestInteractionDestination: SplunkInteractionsDestination {
     var didReceiveInteractionCallCount = 0
     var actionName: String?
 
-    func send(actionName: String, elementId: String?, time: Date) {
+    func send(actionName: String, elementId _: String?, time _: Date) {
         self.actionName = actionName
         didReceiveInteractionCallCount += 1
     }

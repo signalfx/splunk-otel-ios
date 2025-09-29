@@ -28,5 +28,5 @@ public struct NavigationRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Initialization
 
-    public init?(from data: Data) {}
+    public init?(from _: Data) {}
 }

@@ -18,7 +18,6 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-
 public struct AppStartData: ModuleEventData {}
 
 public struct AppStartMetadata: ModuleEventMetadata {
@@ -38,13 +37,13 @@ extension AppStart: Module {
 
     // MARK: - Module methods
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
         startDetection()
     }
 
 
     // MARK: - Type transparency helpers
 
-    public func deleteData(for metadata: any ModuleEventMetadata) {}
-    public func onPublish(data: @escaping (AppStartMetadata, AppStartData) -> Void) {}
+    public func deleteData(for _: any ModuleEventMetadata) {}
+    public func onPublish(data _: @escaping (AppStartMetadata, AppStartData) -> Void) {}
 }
