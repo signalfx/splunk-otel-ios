@@ -46,12 +46,12 @@ public final class RuntimeState: AgentState, ObservableObject {
 }
 
 
-public extension RuntimeState {
+extension RuntimeState {
 
     // MARK: - Agent status
 
     /// A `Status` of agent recording.
-    var status: Status {
+    public var status: Status {
         owner.currentStatus
     }
 
@@ -59,27 +59,27 @@ public extension RuntimeState {
     // MARK: - User configuration
 
     /// A `String` that contains the name used for the application identification.
-    var appName: String {
+    public var appName: String {
         owner.agentConfiguration.appName
     }
 
     /// A `String` that contains the used application version.
-    var appVersion: String {
+    public var appVersion: String {
         owner.agentConfiguration.appVersion
     }
 
     /// A ``EndpointConfiguration`` containing either the specified realm, or endpoint urls.
-    var endpointConfiguration: EndpointConfiguration {
+    public var endpointConfiguration: EndpointConfiguration {
         owner.agentConfiguration.endpoint
     }
 
     /// A `String` containing the used application deployment environment.
-    var deploymentEnvironment: String {
+    public var deploymentEnvironment: String {
         owner.agentConfiguration.deploymentEnvironment
     }
 
     /// A `Bool` value determining whether the debug logging has been enabled.
-    var isDebugLoggingEnabled: Bool {
+    public var isDebugLoggingEnabled: Bool {
         owner.agentConfiguration.enableDebugLogging
     }
 }

@@ -21,7 +21,6 @@ import Foundation
 import OpenTelemetryProtocolExporterCommon
 import SwiftProtobuf
 
-
 /// Basic implementation of exporters
 public class OTLPBackgroundHTTPBaseExporter {
 
@@ -70,11 +69,13 @@ public class OTLPBackgroundHTTPBaseExporter {
         // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
         let cleanTime = DispatchTime.now() + .seconds(Int.random(in: 5 ... 8))
 
-        DispatchQueue.global(qos: .utility).asyncAfter(deadline: cleanTime) { [weak self] in
-            self?.httpClient.getAllSessionsTasks { [weak self] tasks in
-                self?.checkStalledUploadsOperation(tasks: tasks)
+        DispatchQueue.global(qos: .utility)
+            .asyncAfter(deadline: cleanTime) { [weak self] in
+                self?.httpClient
+                    .getAllSessionsTasks { [weak self] tasks in
+                        self?.checkStalledUploadsOperation(tasks: tasks)
+                    }
             }
-        }
     }
 
 
@@ -95,8 +96,9 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     private func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
         // Get ids from all incomplete requests
-        let taskDescriptions = tasks
-            .compactMap { $0.taskDescription }
+        let taskDescriptions =
+            tasks
+            .compactMap(\.taskDescription)
             .compactMap {
                 try? JSONDecoder().decode(RequestDescriptor.self, from: Data($0.utf8))
             }
@@ -111,9 +113,9 @@ public class OTLPBackgroundHTTPBaseExporter {
             // If there is no upload task for file in cache folder, create RequestDescriptor and plan its upload to server
             // Note:
             //      File names are UUIDs of tasks
-            if
-                let requestId = UUID(uuidString: file.key),
-                let taskDescription = taskDescriptions.first(where: { $0.id == requestId }) {
+            if let requestId = UUID(uuidString: file.key),
+                let taskDescription = taskDescriptions.first(where: { $0.id == requestId })
+            {
                 let requestDescriptor = RequestDescriptor(
                     id: requestId,
                     endpoint: endpoint,

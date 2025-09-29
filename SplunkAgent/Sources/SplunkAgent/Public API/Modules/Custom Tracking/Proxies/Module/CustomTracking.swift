@@ -17,7 +17,6 @@ limitations under the License.
 
 internal import SplunkCustomTracking
 
-
 final class CustomTracking: CustomTrackingModule {
 
     unowned let module: CustomTrackingInternal

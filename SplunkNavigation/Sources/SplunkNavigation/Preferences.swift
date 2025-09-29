@@ -45,7 +45,8 @@ public final class Preferences: Codable, Sendable {
     /// - Parameter enable: If `true`, the module will automatically detect navigation.
     ///
     /// - Returns: The updated preferences object.
-    @discardableResult public func enableAutomatedTracking(_ enable: Bool?) -> Preferences {
+    @discardableResult
+    public func enableAutomatedTracking(_ enable: Bool?) -> Preferences {
         enableAutomatedTracking = enable
 
         return self
@@ -53,14 +54,14 @@ public final class Preferences: Codable, Sendable {
 }
 
 
-public extension Preferences {
+extension Preferences {
 
     // MARK: - Convenience init
 
     /// Initializes new preferences object with preconfigured values.
     ///
     /// - Parameter enableAutomatedTracking: If `true`, the module will automatically detect navigation.
-    convenience init(
+    public convenience init(
         enableAutomatedTracking: Bool? = nil
     ) {
         self.init()
@@ -87,7 +88,7 @@ extension Preferences {
 
     // MARK: - Codable
 
-    // Private variables are excluded from serialization.
+    /// Private variables are excluded from serialization.
     enum CodingKeys: String, CodingKey {
         case enableAutomatedTracking
     }

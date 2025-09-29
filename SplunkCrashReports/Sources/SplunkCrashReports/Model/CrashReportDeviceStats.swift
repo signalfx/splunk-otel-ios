@@ -39,8 +39,10 @@ public class CrashReportDeviceStats {
             guard let freeSpace = maybeFreeSpace else {
                 return "Unknown"
             }
+
             return ByteCountFormatter.string(fromByteCount: freeSpace, countStyle: .file)
-        } catch {
+        }
+        catch {
             return "Unknown"
         }
     }
@@ -60,11 +62,11 @@ public class CrashReportDeviceStats {
                 )
             }
         }
-        if kerr == KERN_SUCCESS {
-            usedBytes = Float(info.resident_size)
-        } else {
+        guard kerr == KERN_SUCCESS else {
             return "Unknown"
         }
+
+        usedBytes = Float(info.resident_size)
         let freeBytes = totalBytes - usedBytes
         return ByteCountFormatter.string(fromByteCount: Int64(freeBytes), countStyle: .memory)
     }

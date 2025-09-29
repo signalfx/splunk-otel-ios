@@ -46,7 +46,7 @@ public protocol SessionReplayModuleSensitivity: AnyObject {
     /// - Returns: The view sensitivity as combination of instance and class/protocol defined
     ///     sensitivity. If the view is sensitive, then return `true`. If it is
     ///     non-sensitive, then return `false`. In all other states, it returns `nil`.
-    subscript(view: UIView) -> Bool? { get set }
+    subscript(_: UIView) -> Bool? { get set }
 
     /// Sets element sensitivity for the specified `UIView` instance.
     ///
@@ -57,7 +57,8 @@ public protocol SessionReplayModuleSensitivity: AnyObject {
     ///   - sensitive: A new state of view instance sensitivity.
     ///
     /// - Returns: The updated ``SessionReplayModuleSensitivity`` object.
-    @discardableResult func set(_ view: UIView, _ sensitive: Bool?) -> any SessionReplayModuleSensitivity
+    @discardableResult
+    func set(_ view: UIView, _ sensitive: Bool?) -> any SessionReplayModuleSensitivity
 
 
     // MARK: - Class sensitivity
@@ -72,7 +73,7 @@ public protocol SessionReplayModuleSensitivity: AnyObject {
     ///     as sensitive, then return `true`. If it is explicitly marked
     ///     as non-sensitive, then return `false`. In all other states,
     ///     it returns `nil`.
-    subscript(viewClass: UIView.Type) -> Bool? { get set }
+    subscript(_: UIView.Type) -> Bool? { get set }
 
     /// Sets sensitivity for the specified member of `UIView` class.
     ///
@@ -83,5 +84,6 @@ public protocol SessionReplayModuleSensitivity: AnyObject {
     ///   - sensitive: A new state of view class sensitivity.
     ///
     /// - Returns: The updated ``SessionReplayModuleSensitivity`` object.
-    @discardableResult func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> any SessionReplayModuleSensitivity
+    @discardableResult
+    func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> any SessionReplayModuleSensitivity
 }

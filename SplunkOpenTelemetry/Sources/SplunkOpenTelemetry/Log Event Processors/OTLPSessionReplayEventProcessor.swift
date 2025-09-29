@@ -36,40 +36,36 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
     private let backgroundLogExporter: OTLPBackgroundHTTPLogExporterBinary
 
-    // Runtime attributes added manually to each exported log record
+    /// Runtime attributes added manually to each exported log record.
     private unowned let runtimeAttributes: any RuntimeAttributes
 
-    // Resource object, added to all exported logs manually
+    /// Resource object, added to all exported logs manually.
     private let resource: Resource
 
-    // Print log record contents to standard output if debug is enabled
+    /// Print log record contents to standard output if debug is enabled.
     private let debugEnabled: Bool
 
-    // Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    // Date format style for the stdout log
-    private let dateFormatStyle: Date.FormatStyle = {
-        let dateFormat = Date.FormatStyle()
-            .month()
-            .day()
-            .year()
-            .hour(.twoDigits(amPM: .wide))
-            .minute(.twoDigits)
-            .second(.twoDigits)
-            .secondFraction(.fractional(3))
-            .timeZone(.iso8601(.short))
+    /// Date format style for the stdout log.
+    private let dateFormatStyle: Date.FormatStyle = .init()
+        .month()
+        .day()
+        .year()
+        .hour(.twoDigits(amPM: .wide))
+        .minute(.twoDigits)
+        .second(.twoDigits)
+        .secondFraction(.fractional(3))
+        .timeZone(.iso8601(.short))
 
-        return dateFormat
-    }()
-
-    // Logger background dispatch queues
+    /// Logger background dispatch queues.
     private let backgroundQueue = DispatchQueue(
         label: PackageIdentifier.default(named: "SessionReplayEventProcessor"),
         qos: .utility
     )
 
-    // Stored properties for Unit tests
+    // Stored properties for Unit tests.
     #if DEBUG
         public var storedLastProcessedEvent: (any AgentEvent)?
         public var storedLastSentEvent: (any AgentEvent)?
@@ -82,7 +78,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         with sessionReplayEndpoint: URL?,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
-        globalAttributes: @escaping () -> [String: AttributeValue],
+        globalAttributes _: @escaping () -> [String: AttributeValue],
         debugEnabled: Bool
     ) {
         guard let sessionReplayEndpoint else {
@@ -90,7 +86,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         }
 
         let configuration = OtlpConfiguration()
-        let envVarHeaders = [(String, String)]()
+        let envVarHeaders: [(String, String)] = []
 
         // Initialize background exporter
         backgroundLogExporter = OTLPBackgroundHTTPLogExporterBinary(
@@ -132,7 +128,8 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
         if immediateProcessing {
             processEvent(event: event, completion: completion)
-        } else {
+        }
+        else {
             backgroundQueue.async {
                 self.processEvent(event: event, completion: completion)
             }
@@ -202,7 +199,8 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         if let body = event.body {
             let attributeBody = SplunkAttributeValue(eventAttributeValue: body)
             logRecord.body = attributeBody
-        } else {
+        }
+        else {
             logger.log(level: .error) {
                 "Missing session replay data in the session replay event."
             }
@@ -241,6 +239,7 @@ extension OTLPSessionReplayEventProcessor {
             switch logRecord.body {
             case let .data(data):
                 bodyDescription = "\(data.count) bytes"
+
             default:
                 bodyDescription = String(describing: logRecord.body)
             }
@@ -259,7 +258,8 @@ extension OTLPSessionReplayEventProcessor {
                     let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
                     let observedTimestampFormatted = observedTimestamp.formatted(self.dateFormatStyle)
                     message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-                } else {
+                }
+                else {
                     message += "ObservedTimestamp: -\n"
                 }
 

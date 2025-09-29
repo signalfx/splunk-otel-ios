@@ -20,7 +20,7 @@ import Foundation
 /// This struct implements a non operational variant of the AgentAppStateManager.
 struct NoOpAppStateManager: AgentAppStateManager {
 
-    func appState(for timestamp: Date) -> AppState? {
-        return nil
+    func appState(for _: Date) -> AppState? {
+        nil
     }
 }

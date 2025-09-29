@@ -29,8 +29,8 @@ public enum RenderingMode: Equatable, Codable {
 }
 
 
-public extension RenderingMode {
+extension RenderingMode {
 
     /// Default video rendering mode.
-    static let `default` = RenderingMode.native
+    public static let `default` = RenderingMode.native
 }

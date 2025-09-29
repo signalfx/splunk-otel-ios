@@ -47,7 +47,7 @@ final class SessionReplayNonOperationalCustomId: SessionReplayModuleCustomId {
     /// When the Session Replay module is disabled (e.g., via remote configuration), this
     /// property ensures the API remains available but performs no action. Accessing it
     /// will log a notice. The getter always returns `nil`.
-    subscript(view: UIView) -> String? {
+    subscript(_: UIView) -> String? {
         get {
             logAccess(toApi: #function)
 
@@ -69,7 +69,8 @@ final class SessionReplayNonOperationalCustomId: SessionReplayModuleCustomId {
     ///   - view: The `UIView` instance to identify.
     ///   - customId: The unique identifier string to assign. Pass `nil` to remove an existing ID.
     /// - Returns: The current `SessionReplayModuleCustomId` instance to maintain API compatibility.
-    @discardableResult func set(_ view: UIView, _ customId: String?) -> any SessionReplayModuleCustomId {
+    @discardableResult
+    func set(_: UIView, _: String?) -> any SessionReplayModuleCustomId {
         logAccess(toApi: #function)
 
         return self

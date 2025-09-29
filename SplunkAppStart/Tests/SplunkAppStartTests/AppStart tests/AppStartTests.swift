@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAppStart
 import XCTest
+
+@testable import SplunkAppStart
 
 final class AppStartTests: XCTestCase {
 

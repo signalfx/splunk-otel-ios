@@ -32,7 +32,7 @@ class AttributeCheckerSpanExporter: SpanExporter {
 
     private let proxyExporter: SpanExporter
 
-    // Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
 

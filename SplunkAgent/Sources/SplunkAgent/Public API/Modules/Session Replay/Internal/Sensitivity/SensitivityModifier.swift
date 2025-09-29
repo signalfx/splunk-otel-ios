@@ -30,7 +30,8 @@ struct SensitivityModifier: ViewModifier {
         if sensitive {
             content
                 .background(SmartlookSensitiveView(sensitive: sensitive))
-        } else {
+        }
+        else {
             content
         }
     }
@@ -46,11 +47,11 @@ private struct SmartlookSensitiveView: UIViewRepresentable {
 
     // MARK: - UIViewRepresentable methods
 
-    func makeUIView(context: Context) -> UIView {
-        return SLSensitiveView()
+    func makeUIView(context _: Context) -> UIView {
+        SLSensitiveView()
     }
 
-    func updateUIView(_ uiView: UIView, context: Context) {
+    func updateUIView(_ uiView: UIView, context _: Context) {
         uiView.srSensitive = sensitive
     }
 }

@@ -48,7 +48,7 @@ class SpanInterceptorExporter: SpanExporter {
         proxyExporter.flush(explicitTimeout: explicitTimeout)
     }
 
-    func export(spans: [OpenTelemetrySdk.SpanData], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.SpanExporterResultCode {
+    func export(spans: [OpenTelemetrySdk.SpanData], explicitTimeout _: TimeInterval?) -> OpenTelemetrySdk.SpanExporterResultCode {
 
         // Simply re-export the spans if no interceptor was set.
         guard let spanInterceptor else {
@@ -60,19 +60,18 @@ class SpanInterceptorExporter: SpanExporter {
             spanInterceptor(span)
         }
 
-        /*
-         Recalculate `totalAttributeCount`.
 
-         We allow attribute mutation in the `spanInterceptor`. SpanData stores information
-         about total number of attributes (`totalAttributeCount`), which is used to calculate and track
-         a number of dropped attributes in case of exceeding maximum number of attributes.
-         Having `span.attributes.count` larger than `span.totalAttributeCount` causes a crash when calculating
-         `droppedAttributesCount`.
-
-         ‼️ By recalculating the `totalAttributeCount`, we effectively disable the `droppedAttributesCount` calculation,
-         which means that the `droppedAttributesCount` will have a wrong value. If the `droppedAttributesCount` parameter
-         is required in the future, we should consider another approach.
-        */
+        // Recalculate `totalAttributeCount`.
+        //
+        // We allow attribute mutation in the `spanInterceptor`. SpanData stores information
+        // about total number of attributes (`totalAttributeCount`), which is used to calculate and track
+        // a number of dropped attributes in case of exceeding maximum number of attributes.
+        // Having `span.attributes.count` larger than `span.totalAttributeCount` causes a crash when calculating
+        // `droppedAttributesCount`.
+        //
+        // ‼️ By recalculating the `totalAttributeCount`, we effectively disable the `droppedAttributesCount` calculation,
+        // which means that the `droppedAttributesCount` will have a wrong value. If the `droppedAttributesCount` parameter
+        // is required in the future, we should consider another approach.
         let recalculatedSpans = interceptedSpans.map {
             var span = $0
             let attributeCount = span.attributes.count

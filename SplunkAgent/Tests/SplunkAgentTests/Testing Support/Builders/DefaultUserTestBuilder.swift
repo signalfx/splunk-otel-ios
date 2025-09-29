@@ -25,8 +25,6 @@ final class DefaultUserTestBuilder {
         // Build user with preconfigured storage
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: named)
         let userModel = UserModel(storage: storage)
-        let user = DefaultUser(userModel: userModel)
-
-        return user
+        return DefaultUser(userModel: userModel)
     }
 }

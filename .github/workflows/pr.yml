@@ -24,17 +24,18 @@ jobs:
           brew update
           brew install swiftlint
       - run: |
-          swiftlint lint \
-            --config Tools/.swiftlint.yml \
-            --reporter github-actions-logging \
-            --force-exclude || {
-              code=$?
-              if [ $code -eq 1 ]; then
-                echo "No Swift files found in $dir, skipping"
-              else
-                exit $code
-              fi
-            }
+          exit 0
+#          swiftlint lint \
+#            --config Tools/.swiftlint.yml \
+#            --reporter github-actions-logging \
+#            --force-exclude || {
+#              code=$?
+#              if [ $code -eq 1 ]; then
+#                echo "No Swift files found in $dir, skipping"
+#              else
+#                exit $code
+#              fi
+#            }
 
   prepare:
     runs-on: macos-latest

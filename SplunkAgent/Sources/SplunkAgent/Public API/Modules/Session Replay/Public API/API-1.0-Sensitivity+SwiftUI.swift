@@ -17,7 +17,7 @@ limitations under the License.
 
 import SwiftUI
 
-public extension View {
+extension View {
 
     // MARK: - View sensitivity (SwiftUI)
 
@@ -30,7 +30,7 @@ public extension View {
     /// - Parameter sensitive: A new state of element sensitivity.
     ///
     /// - Returns: The `View` with defined sensitivity for recording in Session Replay module.
-    func sessionReplaySensitive(_ sensitive: Bool = true) -> some View {
-        return modifier(SensitivityModifier(sensitive: sensitive))
+    public func sessionReplaySensitive(_ sensitive: Bool = true) -> some View {
+        modifier(SensitivityModifier(sensitive: sensitive))
     }
 }
