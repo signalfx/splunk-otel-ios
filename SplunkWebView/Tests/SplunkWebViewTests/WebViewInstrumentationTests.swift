@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkWebView
 import WebKit
 import XCTest
+@testable import SplunkWebView
 
 final class WebViewInstrumentationTests: XCTestCase {
 
