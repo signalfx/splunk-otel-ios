@@ -20,47 +20,6 @@ import Foundation
 internal import CiscoLogger
 @testable import SplunkWebView
 
-// MARK: - Mock AgentSharedState
-
-/// A thread-safe mock implementation of `AgentSharedState` for testing purposes.
-final class MockAgentSharedState: @unchecked Sendable, AgentSharedState {
-
-    // MARK: - Private
-
-    private let lock = NSLock()
-    private var _sessionId: String
-
-    // MARK: - Public
-
-    nonisolated var sessionId: String {
-        lock.lock()
-        defer { lock.unlock() }
-        return _sessionId
-    }
-
-    nonisolated let agentVersion: String = "testing-agent-version"
-
-    // MARK: - Initialization
-
-    init(sessionId: String) {
-        _sessionId = sessionId
-    }
-
-    // MARK: - Public Methods
-
-    func updateSessionId(_ newId: String) {
-        lock.lock()
-        _sessionId = newId
-        lock.unlock()
-    }
-
-    nonisolated func applicationState(for timestamp: Date) -> String? {
-        return "testing-application-state"
-    }
-}
-
-// MARK: - Mock LogAgent
-
 /// A thread-safe mock implementation of `LogAgent` that captures log messages for verification in tests.
 final class MockLogAgent: @unchecked Sendable, LogAgent {
 
