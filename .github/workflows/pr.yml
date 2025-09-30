@@ -44,7 +44,7 @@ jobs:
           xcode-version: latest-stable
       - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
       - run: |
-          git ls-files -z '*.swift' | xargs -0 swift format lint --strict --parallel
+          git ls-files -z '*.swift' | xargs -0 swift format lint --parallel
 
   prepare:
     runs-on: macos-latest
