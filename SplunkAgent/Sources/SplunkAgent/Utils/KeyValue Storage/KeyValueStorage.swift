@@ -46,12 +46,12 @@ protocol KeyValueStorage {
     ///
     /// - Parameters:
     ///   - value: General encodable data for storing.
-    ///   - forKey: An access key in the storage.
+    ///   - key: An access key in the storage.
     func insert(_ value: Codable, forKey key: String) throws
 
     /// Reads data for given key.
     ///
-    /// - Parameter forKey: An access key in the storage.
+    /// - Parameter key: An access key in the storage.
     ///
     /// - Returns: Previously stored data or `nil`.
     func read<T: Codable>(forKey key: String) throws -> T?
@@ -62,11 +62,11 @@ protocol KeyValueStorage {
     ///
     /// - Parameters:
     ///   - value: New version of stored data.
-    ///   - forKey: An access key in the storage.
+    ///   - key: An access key in the storage.
     func update(_ value: Codable, forKey key: String) throws
 
     /// Read data for given key.
     ///
-    /// - Parameter forKey: An access key in the storage.
+    /// - Parameter key: An access key in the storage.
     func delete(forKey key: String) throws
 }

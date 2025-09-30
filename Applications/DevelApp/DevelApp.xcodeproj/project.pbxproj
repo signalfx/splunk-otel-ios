@@ -164,6 +164,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				E4FD11662E8BECA100BB46E6 /* PBXTargetDependency */,
 				E46C01D32E8AAECE0095CF6A /* PBXTargetDependency */,
 			);
 			name = DevelApp;
@@ -252,6 +253,10 @@
 		E46C01D32E8AAECE0095CF6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = E46C01D22E8AAECE0095CF6A /* SwiftLintBuildToolPlugin */;
+		};
+		E4FD11662E8BECA100BB46E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E4FD11652E8BECA100BB46E6 /* Lint */;
 		};
 /* End PBXTargetDependency section */
 
@@ -539,6 +544,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E46C01CD2E8AAE990095CF6A /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		E4FD11652E8BECA100BB46E6 /* Lint */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E46C01CE2E8AAEA90095CF6A /* XCRemoteSwiftPackageReference "SwiftFormatPlugins" */;
+			productName = "plugin:Lint";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

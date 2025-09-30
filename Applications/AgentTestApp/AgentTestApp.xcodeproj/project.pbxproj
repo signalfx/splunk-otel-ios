@@ -123,6 +123,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				E4EF58042E8BEB85006D0E02 /* PBXTargetDependency */,
 				E45CC9562E8A924A00A6FF28 /* PBXTargetDependency */,
 			);
 			name = AgentTestApp;
@@ -210,6 +211,10 @@
 		E45CC9562E8A924A00A6FF28 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = E45CC9552E8A924A00A6FF28 /* SwiftLintBuildToolPlugin */;
+		};
+		E4EF58042E8BEB85006D0E02 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E4EF58032E8BEB85006D0E02 /* Lint */;
 		};
 /* End PBXTargetDependency section */
 
@@ -481,6 +486,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E45CC9542E8A924000A6FF28 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		E4EF58032E8BEB85006D0E02 /* Lint */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E45CC9572E8AA31500A6FF28 /* XCRemoteSwiftPackageReference "SwiftFormatPlugins" */;
+			productName = "plugin:Lint";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -88,7 +88,9 @@ public struct WebDemoHTML {
         webView.loadHTMLString(initialContent, baseURL: nil)
     }
 
-    /// Does work, but currently not used in the demo. Use with demo code helper `brumScript()`
+    /// Does work, but currently not used in the demo.
+    ///
+    /// Use with demo code helper `brumScript()`
     /// and edit the SwiftUI content to add a section for using this.
     public static func loadWebViewContentWithBRUM(for webView: WKWebView, scriptContent: String) {
         let initialContent = """

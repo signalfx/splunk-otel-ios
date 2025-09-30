@@ -80,8 +80,11 @@ extension CrashReports {
             }
             else {
                 frameDict[.imageName] = imageName
+
                 // Added to limit the number of images sent
-                allUsedImageNames.append(imageName!)
+                if let imageName {
+                    allUsedImageNames.append(imageName)
+                }
             }
 
             var baseAddress: UInt64 = 0

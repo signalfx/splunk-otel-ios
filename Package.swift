@@ -161,14 +161,13 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("logger")
             ],
             path: "SplunkNavigation/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkNavigationTests",
             dependencies: ["SplunkNavigation"],
             path: "SplunkNavigation/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -185,14 +184,13 @@ func generateMainTargets() -> [Target] {
                 .product(name: "SignPostIntegration", package: "opentelemetry-swift")
             ],
             path: "SplunkNetwork/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkNetworkTests",
             dependencies: ["SplunkNetwork"],
-            path: "SplunkNetwork/Tests"
+            path: "SplunkNetwork/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -206,14 +204,13 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("logger")
             ],
             path: "SplunkNetworkMonitor/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkNetworkMonitorTests",
             dependencies: ["SplunkNetworkMonitor"],
-            path: "SplunkNetworkMonitor/Tests"
+            path: "SplunkNetworkMonitor/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -227,14 +224,13 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
             ],
             path: "SplunkCommon/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkCommonTests",
             dependencies: ["SplunkCommon"],
-            path: "SplunkCommon/Tests"
+            path: "SplunkCommon/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -247,14 +243,13 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
             ],
             path: "SplunkSlowFrameDetector/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkSlowFrameDetectorTests",
             dependencies: ["SplunkSlowFrameDetector", "SplunkCommon"],
-            path: "SplunkSlowFrameDetector/Tests"
+            path: "SplunkSlowFrameDetector/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -268,9 +263,7 @@ func generateMainTargets() -> [Target] {
                 .product(name: "CrashReporter", package: "PLCrashReporter")
             ],
             path: "SplunkCrashReports/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkCrashReportsTests",
@@ -280,7 +273,8 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "CrashReporter", package: "PLCrashReporter")
             ],
-            path: "SplunkCrashReports/Tests"
+            path: "SplunkCrashReports/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -296,14 +290,13 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("logger")
             ],
             path: "SplunkOpenTelemetry/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkOpenTelemetryTests",
             dependencies: ["SplunkOpenTelemetry", "SplunkCommon"],
-            path: "SplunkOpenTelemetry/Tests"
+            path: "SplunkOpenTelemetry/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -319,14 +312,13 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("diskStorage")
             ],
             path: "SplunkOpenTelemetryBackgroundExporter/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkOpenTelemetryBackgroundExporterTests",
             dependencies: ["SplunkOpenTelemetryBackgroundExporter", "SplunkCommon"],
-            path: "SplunkOpenTelemetryBackgroundExporter/Tests"
+            path: "SplunkOpenTelemetryBackgroundExporter/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -341,14 +333,13 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("logger")
             ],
             path: "SplunkInteractions/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkInteractionsTests",
             dependencies: ["SplunkInteractions"],
-            path: "SplunkInteractions/Tests"
+            path: "SplunkInteractions/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -362,16 +353,15 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("logger")
             ],
             path: "SplunkAppStart/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkAppStartTests",
             dependencies: [
                 "SplunkAppStart"
             ],
-            path: "SplunkAppStart/Tests"
+            path: "SplunkAppStart/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -384,16 +374,15 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
             ],
             path: "SplunkAppState/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkAppStateTests",
             dependencies: [
                 "SplunkAppState"
             ],
-            path: "SplunkAppState/Tests"
+            path: "SplunkAppState/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -406,16 +395,15 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("logger")
             ],
             path: "SplunkWebView/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkWebViewTests",
             dependencies: [
                 "SplunkWebView"
             ],
-            path: "SplunkWebView/Tests"
+            path: "SplunkWebView/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -429,9 +417,7 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("logger")
             ],
             path: "SplunkCustomTracking/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkCustomTrackingTests",
@@ -443,7 +429,8 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift")
             ],
-            path: "SplunkCustomTracking/Tests"
+            path: "SplunkCustomTracking/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -456,14 +443,13 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("sessionReplay")
             ],
             path: "SplunkSessionReplayProxy/Sources",
-            plugins: [
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkSessionReplayProxyTests",
             dependencies: ["SplunkSessionReplayProxy"],
-            path: "SplunkSessionReplayProxy/Tests"
+            path: "SplunkSessionReplayProxy/Tests",
+            plugins: lintTargetPlugins()
         )
     ]
 }
@@ -471,7 +457,7 @@ func generateMainTargets() -> [Target] {
 /// Generates binary targets from the registry, based on the current `DependencyResolutionStrategy`.
 func generateBinaryTargets() -> [Target] {
 
-    // First check the deps resolution whether we want to generate.
+    // First check the dependency resolution whether we want to generate.
     guard DependencyResolutionStrategy.current == .binaryTargets else {
         return []
     }
@@ -488,7 +474,7 @@ func generateBinaryTargets() -> [Target] {
 /// Generates wrapper targets, based on the current `DependencyResolutionStrategy`.
 func generateWrapperTargets() -> [Target] {
 
-    // First check the deps resolution whether we want to generate.
+    // First check the dependency resolution whether we want to generate.
     guard DependencyResolutionStrategy.current == .binaryTargets else {
         return []
     }
@@ -547,6 +533,16 @@ func generateBinaryWrapperTargets() -> [Target] {
             ],
             path: "TargetWrappers/CiscoSessionReplayWrapper/Sources"
         )
+    ]
+}
+
+
+// MARK: - Target plugins
+
+/// List of used lint plugins in every target.
+func lintTargetPlugins() -> [Target.PluginUsage] {
+    [
+        .plugin(name: "Lint", package: "SwiftFormatPlugins")
     ]
 }
 

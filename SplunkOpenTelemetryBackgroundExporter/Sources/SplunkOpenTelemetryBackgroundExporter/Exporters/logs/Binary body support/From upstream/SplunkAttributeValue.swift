@@ -71,11 +71,9 @@ public enum SplunkAttributeValue: Equatable, CustomStringConvertible, Hashable {
     // swiftlint:disable cyclomatic_complexity
     public init?(_ value: Any) {
         switch value {
-        case is String:
-            // swiftlint:disable force_cast
-            self = .string(value as! String)
+        case let val as String:
+            self = .string(val)
 
-        // swiftlint:enable force_cast
         case let val as Bool:
             self = .bool(val)
 

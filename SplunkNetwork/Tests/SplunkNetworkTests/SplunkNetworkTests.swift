@@ -150,7 +150,7 @@ final class SplunkNetworkTests: XCTestCase {
         let request = URLRequest(url: excludedURL)
 
         // When
-        let result = sut.shouldInstrument(URLRequest: request)
+        let result = sut.shouldInstrument(urlRequest: request)
 
         // Then
         XCTAssertFalse(result)
@@ -162,7 +162,7 @@ final class SplunkNetworkTests: XCTestCase {
         let request = URLRequest(url: localhostURL)
 
         // When
-        let result = sut.shouldInstrument(URLRequest: request)
+        let result = sut.shouldInstrument(urlRequest: request)
 
         // Then
         XCTAssertFalse(result)
@@ -175,7 +175,7 @@ final class SplunkNetworkTests: XCTestCase {
         let request = URLRequest(url: validURL)
 
         // When
-        let result = sut.shouldInstrument(URLRequest: request)
+        let result = sut.shouldInstrument(urlRequest: request)
 
         // Then
         XCTAssertTrue(result)
@@ -188,7 +188,7 @@ final class SplunkNetworkTests: XCTestCase {
         let request = URLRequest(url: validURL)
 
         // When
-        let result = sut.shouldInstrument(URLRequest: request)
+        let result = sut.shouldInstrument(urlRequest: request)
 
         // Then
         XCTAssertFalse(result)
@@ -218,7 +218,7 @@ final class SplunkNetworkTests: XCTestCase {
         let mockSpan = MockSpan()
 
         // When
-        sut.createdRequest(URLRequest: request, span: mockSpan)
+        sut.createdRequest(urlRequest: request, span: mockSpan)
 
         // Then
         let attributeValue = mockSpan.attributes[SemanticAttributes.httpRequestBodySize.rawValue]
@@ -245,7 +245,7 @@ final class SplunkNetworkTests: XCTestCase {
         let mockSpan = MockSpan()
 
         // When
-        sut.receivedResponse(URLResponse: response, dataOrFile: nil, span: mockSpan)
+        sut.receivedResponse(urlResponse: response, dataOrFile: nil, span: mockSpan)
 
         // Then
         let attributeValue = mockSpan.attributes[SemanticAttributes.httpResponseBodySize.rawValue]
@@ -272,7 +272,7 @@ final class SplunkNetworkTests: XCTestCase {
         let mockSpan = MockSpan()
 
         // When
-        sut.receivedResponse(URLResponse: response, dataOrFile: nil, span: mockSpan)
+        sut.receivedResponse(urlResponse: response, dataOrFile: nil, span: mockSpan)
 
         // Then
         let traceIdValue = mockSpan.attributes["link.traceId"]
