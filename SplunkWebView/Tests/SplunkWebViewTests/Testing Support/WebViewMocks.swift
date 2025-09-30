@@ -24,7 +24,7 @@ final class MockWKWebView: WKWebView {
     var evaluateJavaScriptCallCount = 0
     var lastEvaluatedJavaScript: String?
 
-    // Add properties to control the mock's state for testing the warning logic.
+    /// Add properties to control the mock's state for testing the warning logic.
     override var isLoading: Bool {
         get { _isLoading }
         set { _isLoading = newValue }
@@ -42,7 +42,7 @@ final class MockWKWebView: WKWebView {
     private let mockConfiguration: WKWebViewConfiguration
 
     override var configuration: WKWebViewConfiguration {
-        return mockConfiguration
+        mockConfiguration
     }
 
     override init(frame: CGRect, configuration: WKWebViewConfiguration) {
@@ -56,7 +56,7 @@ final class MockWKWebView: WKWebView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -72,13 +72,13 @@ final class MockWKWebView: WKWebView {
 
 /// A mock `WKWebViewConfiguration` that provides a `MockWKUserContentController`.
 final class MockWKWebViewConfiguration: WKWebViewConfiguration {
-    // Hold a private instance of our mock to ensure it's the one being used.
+    /// Hold a private instance of our mock to ensure it's the one being used.
     private let mockUCC = MockWKUserContentController()
 
-    // Override as a mutable computed property to match the superclass.
+    /// Override as a mutable computed property to match the superclass.
     override var userContentController: WKUserContentController {
         get {
-            return mockUCC
+            mockUCC
         }
         set {
             // The setter is required to match the superclass property, but we can ignore it
@@ -97,19 +97,19 @@ final class MockWKUserContentController: WKUserContentController {
     var removeScriptMessageHandlerCalled = false
     var lastAddedMessageHandlerName: String?
 
-    override func addUserScript(_ userScript: WKUserScript) {
+    override func addUserScript(_: WKUserScript) {
         addUserScriptCalled = true
         addUserScriptCallCount += 1
     }
 
-    override func addScriptMessageHandler(_ scriptMessageHandler: WKScriptMessageHandlerWithReply, contentWorld: WKContentWorld, name: String) {
+    override func addScriptMessageHandler(_: WKScriptMessageHandlerWithReply, contentWorld _: WKContentWorld, name: String) {
         addScriptMessageHandlerCalled = true
         lastAddedMessageHandlerName = name
     }
 
-    // Override in the mock to prevent spurious calls to the
-    // real framework implementation.
-    override func removeScriptMessageHandler(forName name: String) {
+    /// Override in the mock to prevent spurious calls to the
+    /// real framework implementation.
+    override func removeScriptMessageHandler(forName _: String) {
         removeScriptMessageHandlerCalled = true
     }
 }
@@ -122,11 +122,11 @@ final class MockWKScriptMessage: WKScriptMessage {
     private let mockBody: Any
 
     override var name: String {
-        return mockName
+        mockName
     }
 
     override var body: Any {
-        return mockBody
+        mockBody
     }
 
     init(name: String, body: Any) {

@@ -58,15 +58,9 @@ extension WebViewInstrumentation: Module {
     public func install(
         with configuration: (any ModuleConfiguration)?,
         remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?
-    ) {
-        // This module has no installation logic
-    }
+    ) {}
 
-    public func onPublish(data: @escaping (WebViewInstrumentationMetadata, WebViewInstrumentationData) -> Void) {
-        // This module does not publish data
-    }
+    public func onPublish(data: @escaping (WebViewInstrumentationMetadata, WebViewInstrumentationData) -> Void) {}
 
-    public func deleteData(for metadata: any SplunkCommon.ModuleEventMetadata) {
-        // This module does not store data to be deleted
-    }
+    public func deleteData(for metadata: any SplunkCommon.ModuleEventMetadata) {}
 }

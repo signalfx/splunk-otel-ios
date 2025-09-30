@@ -100,11 +100,9 @@ final class MockLogAgent: @unchecked Sendable, LogAgent {
 
     // MARK: - LogAgent methods
 
-    nonisolated func process(configuration: CiscoLogger.ConfigurationMessage) {
-        // No-op for testing
-    }
+    nonisolated func process(configuration _: CiscoLogger.ConfigurationMessage) {}
 
-    func log(level: CiscoLogger.LogLevel, isPrivate: Bool, message: @escaping @Sendable () -> String) {
+    func log(level: CiscoLogger.LogLevel, isPrivate _: Bool, message: @escaping @Sendable () -> String) {
         lock.lock()
         _logMessages.append(LogMessage(level: level, message: message()))
         lock.unlock()

@@ -200,6 +200,7 @@ final class WebViewInstrumentationTests: XCTestCase {
                 XCTFail("Reply should be a dictionary")
                 return
             }
+
             XCTAssertEqual(replyDict["sessionId"], expectedSessionId)
             expectation.fulfill()
         }
