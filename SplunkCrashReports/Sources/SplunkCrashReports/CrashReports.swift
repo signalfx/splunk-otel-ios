@@ -212,7 +212,9 @@ public class CrashReports {
         return debuggerIsAttached
     }
 
-    /// Device stats handler. This added device stats and Session ID to PLCrashReporter
+    /// Device stats handler.
+    ///
+    /// This added device stats and Session ID to PLCrashReporter
     /// so that it will be included in a future crash report.
     private func updateDeviceStats() {
         deviceDataQueue.async {

@@ -28,7 +28,7 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
 
     private let agentVersion: String
 
-    /// Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Log to Span Exporter")
 
 

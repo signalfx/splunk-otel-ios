@@ -17,16 +17,16 @@ limitations under the License.
 
 import Foundation
 
-/// Defines a base Service model
+/// Defines a base Service model.
 struct Service {
 
-    /// Service relative path
+    /// Service relative path.
     let path: String
 
-    /// Method used for request
+    /// Method used for request.
     let httpMethod: Method
 
-    /// Define methods used for request
+    /// Define methods used for request.
     enum Method: String {
         case get = "GET"
         case post = "POST"

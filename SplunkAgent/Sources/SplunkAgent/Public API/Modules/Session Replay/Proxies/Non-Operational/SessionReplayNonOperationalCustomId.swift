@@ -68,6 +68,7 @@ final class SessionReplayNonOperationalCustomId: SessionReplayModuleCustomId {
     /// - Parameters:
     ///   - view: The `UIView` instance to identify.
     ///   - customId: The unique identifier string to assign. Pass `nil` to remove an existing ID.
+    ///
     /// - Returns: The current `SessionReplayModuleCustomId` instance to maintain API compatibility.
     @discardableResult
     func set(_: UIView, _: String?) -> any SessionReplayModuleCustomId {

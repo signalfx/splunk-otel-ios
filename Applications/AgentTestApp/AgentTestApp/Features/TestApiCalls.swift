@@ -18,19 +18,25 @@ limitations under the License.
 import Foundation
 
 class TestApiCalls {
-    
+
+    // MARK: - Simple API calls
+
     func simpleGetWith(targetURL: String) {
-        
-        guard let url = URL(string: targetURL) else { return }
+        guard let url = URL(string: targetURL) else {
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         let semaphore = DispatchSemaphore(value: 0)
 
         print("GET Network Call to \(targetURL)")
-        
+
+
         let task = URLSession.shared.dataTask(with: request) { data, _, _ in
-            if let data = data {
-                let string = String(decoding: data, as: UTF8.self)
+            if let data,
+                let string = String(bytes: data, encoding: .utf8)
+            {
                 print(string)
             }
             semaphore.signal()
@@ -41,8 +47,10 @@ class TestApiCalls {
     }
 
     func simplePutWith(targetURL: String, body: Data) {
-        
-        guard let url = URL(string: targetURL) else { return }
+        guard let url = URL(string: targetURL) else {
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -52,8 +60,9 @@ class TestApiCalls {
         print("PUT Network Call to \(targetURL)")
 
         let task = URLSession.shared.dataTask(with: request) { data, _, _ in
-            if let data = data {
-                let string = String(decoding: data, as: UTF8.self)
+            if let data,
+                let string = String(bytes: data, encoding: .utf8)
+            {
                 print(string)
             }
             semaphore.signal()
@@ -64,8 +73,10 @@ class TestApiCalls {
     }
 
     func simplePostWith(targetURL: String, body: Data) {
-        
-        guard let url = URL(string: targetURL) else { return }
+        guard let url = URL(string: targetURL) else {
+            return
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -75,8 +86,9 @@ class TestApiCalls {
         print("POST Network Call to \(targetURL)")
 
         let task = URLSession.shared.dataTask(with: request) { data, _, _ in
-            if let data = data {
-                let string = String(decoding: data, as: UTF8.self)
+            if let data,
+                let string = String(bytes: data, encoding: .utf8)
+            {
                 print(string)
             }
             semaphore.signal()
@@ -85,7 +97,4 @@ class TestApiCalls {
 
         semaphore.wait()
     }
-
-    
-    
 }

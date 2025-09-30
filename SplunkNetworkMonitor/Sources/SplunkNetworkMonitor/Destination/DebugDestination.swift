@@ -32,9 +32,9 @@ class DebugDestination: NetworkMonitorDestination {
     /// Logs a network event for debugging purposes.
     ///
     /// - Parameters:
-    ///   - networkEvent: The network change event to log
-    ///   - sharedState: The agent's shared state (not used in debug logging)
-    func send(networkEvent: NetworkMonitorEvent, sharedState _: (any AgentSharedState)?) {
+    ///   - networkEvent: The network change event to log.
+    ///   - sharedState: The agent's shared state (not used in debug logging).
+    func send(networkEvent: NetworkMonitorEvent, sharedState: (any AgentSharedState)?) {
 
         logger.log(level: .info) {
             """

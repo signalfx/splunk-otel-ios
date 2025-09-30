@@ -61,7 +61,9 @@ public final class Navigation: Sendable {
         }
     }
 
-    /// Sets used version of the agent. It should correspond to the `SplunkRum.version`.
+    /// Sets used version of the agent.
+    ///
+    /// It should correspond to the `SplunkRum.version`.
     ///
     /// - Parameter agentVersion: A configured version of the agent.
     ///
@@ -97,7 +99,7 @@ public final class Navigation: Sendable {
 
     // MARK: - Initialization
 
-    /// Module protocol conformance
+    /// Module protocol conformance.
     public required init() {
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)

@@ -56,7 +56,7 @@ public final class NavigationModuleObjC: NSObject {
 
     // MARK: - Manual detection
 
-    /// Sets a manual screen name. This setting is valid until a new name is set.
+    /// Sets a manual screen name (setting is valid until a new name is set).
     ///
     /// - Parameter name: The name to be tracked as the screen name until being changed.
     ///

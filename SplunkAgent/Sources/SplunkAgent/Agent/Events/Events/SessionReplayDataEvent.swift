@@ -19,7 +19,9 @@ internal import CiscoSessionReplay
 import Foundation
 internal import SplunkCommon
 
-/// Session Replay data event. Sends session replay blob with metadata.
+/// Session Replay data event.
+///
+/// Sends session replay blob with metadata.
 class SessionReplayDataEvent: AgentEvent {
 
     // MARK: - Event Identification

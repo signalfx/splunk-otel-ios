@@ -23,6 +23,7 @@ import OpenTelemetryApi
 extension Span {
 
     /// Clears the existing value for a key and sets a new value atomically.
+    ///
     /// This is useful for ensuring clean attribute updates without leftover values.
     ///
     /// - Parameters:
@@ -37,6 +38,7 @@ extension Span {
     }
 
     /// Clears the existing value for a key and sets a new value atomically.
+    ///
     /// This is a convenience method that accepts Any and converts it to AttributeValue.
     ///
     /// - Parameters:
@@ -82,6 +84,7 @@ extension Span {
     // MARK: - SemanticAttributes Convenience Methods
 
     /// Clears the existing value for a semantic attribute key and sets a new value atomically.
+    ///
     /// This is useful for ensuring clean attribute updates without leftover values.
     ///
     /// - Parameters:
@@ -92,6 +95,7 @@ extension Span {
     }
 
     /// Clears the existing value for a semantic attribute key and sets a new value atomically.
+    ///
     /// This is a convenience method that accepts Any and converts it to AttributeValue.
     ///
     /// - Parameters:

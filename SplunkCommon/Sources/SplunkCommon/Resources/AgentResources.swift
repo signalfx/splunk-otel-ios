@@ -18,7 +18,9 @@ limitations under the License.
 import Foundation
 
 /// Agent resources represent immutable information about the Agent, the application,
-/// an operating system and a device. This information is used for decorating Events.
+/// an operating system and a device.
+///
+/// This information is used for decorating Events.
 public protocol AgentResources {
 
     // MARK: - App info

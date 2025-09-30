@@ -239,7 +239,7 @@ public class SplunkRumBuilder {
         return self
     }
 
-    /// Specifies the legacy threshold for slow frame detection. This setting is now ignored.
+    /// Specifies the legacy threshold for slow frame detection (setting is now ignored).
     ///
     /// - Parameter thresholdMs: The legacy threshold in milliseconds. This value is not used.
     ///

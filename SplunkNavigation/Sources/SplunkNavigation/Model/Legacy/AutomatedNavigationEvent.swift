@@ -18,7 +18,9 @@ limitations under the License.
 internal import CiscoSwizzling
 import Foundation
 
-/// Represents automatic navigation event. Used for legacy solution compatibility.
+/// Represents automatic navigation event.
+///
+/// Used for legacy solution compatibility.
 struct AutomatedNavigationEvent: NavigationActionEvent {
 
     // MARK: - Public

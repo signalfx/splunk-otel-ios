@@ -20,7 +20,7 @@ internal import SplunkAppStart
 
 extension SplunkRum {
 
-    /// Reports agent initialization metrics
+    /// Reports agent initialization metrics.
     func reportAgentInitialization(start: Date, initializeEvents: [String: Date]) {
         var initializeEvents = initializeEvents
 
@@ -43,7 +43,7 @@ extension SplunkRum {
     }
 
     private var configurationSettings: [String: String] {
-        var settings = [String: String]()
+        var settings: [String: String] = [:]
 
         settings["enableDebugLogging"] = String(agentConfigurationHandler.configuration.enableDebugLogging)
         settings["sessionSamplingRate"] = String(agentConfigurationHandler.configuration.session.samplingRate)

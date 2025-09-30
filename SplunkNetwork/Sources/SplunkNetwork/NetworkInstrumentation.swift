@@ -30,7 +30,7 @@ public class NetworkInstrumentation {
 
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
 
-    /// Holds regex patterns from IgnoreURLs API
+    /// Holds regex patterns from IgnoreURLs API.
     private var ignoreURLs = IgnoreURLs()
 
     private let delegateClassNames = [
@@ -55,10 +55,11 @@ public class NetworkInstrumentation {
 
     public required init() {}
 
-    /// Installs the Network Instrumentation module
+    /// Installs the Network Instrumentation module.
+    ///
     /// - Parameters:
-    ///   - configuration: Module specific local configuration
-    ///   - remoteConfiguration: Module specific remote configuration
+    ///   - configuration: Module specific local configuration.
+    ///   - remoteConfiguration: Module specific remote configuration.
     public func install(
         with configuration: (any ModuleConfiguration)?,
         remoteConfiguration _: (any RemoteModuleConfiguration)?
@@ -75,13 +76,13 @@ public class NetworkInstrumentation {
                 ignoreURLs = ignoreURLsParameter
             }
 
-            // find concrete delegate classes
+            // Find concrete delegate classes
             for className in delegateClassNames {
                 if let concreteClass = NSClassFromString(className) {
                     delegateClasses.append(concreteClass)
                 }
             }
-            // empty array defaults to standard exhaustive search
+            // Empty array defaults to standard exhaustive search
             if !delegateClasses.isEmpty {
                 delegateClassesToInstrument = delegateClasses
             }
@@ -341,7 +342,7 @@ public class NetworkInstrumentation {
         return false
     }
 
-    /// Removes obsolete attributes from the span
+    /// Removes obsolete attributes from the span.
     private func removeObsoleteAttributes(from span: Span) {
         // Attributes to be removed
         let attributesToRemove = [

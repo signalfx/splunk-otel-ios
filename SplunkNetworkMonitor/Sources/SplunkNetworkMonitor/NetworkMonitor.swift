@@ -45,7 +45,7 @@ public class NetworkMonitor {
     /// Shared instance of NetworkMonitor for singleton access.
     public static let shared = NetworkMonitor()
 
-    /// An optional callback for network changes
+    /// An optional callback for network changes.
     public typealias NetworkStatusChangeHandler = (
         _ isConnected: Bool,
         _ connectionType: ConnectionType,

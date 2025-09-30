@@ -23,8 +23,7 @@ extension LogRecordBuilder {
 
     /// Builds LogRecordBuilder from supplied AgentEvent and initial LogRecordBuilder.
     ///
-    /// - Parameters:
-    ///   - event: An event with which the LogRecordBuilder is built from.
+    /// - Parameter event: An event with which the LogRecordBuilder is built from.
     func build(with event: any AgentEvent) -> LogRecordBuilder {
 
         // Initialize attribute dictionary

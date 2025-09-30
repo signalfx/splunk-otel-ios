@@ -36,9 +36,6 @@ public protocol SessionReplayModulePreferences {
 
     /// Initializes new preferences object with preconfigured values.
     ///
-    /// - Parameters:
-    ///   - renderingMode: The required ``RenderingMode``.
-    ///
-    /// - Returns: A newly initialized `Preferences` object.
+    /// - Parameter renderingMode: The required ``RenderingMode``.
     init(renderingMode: RenderingMode)
 }
