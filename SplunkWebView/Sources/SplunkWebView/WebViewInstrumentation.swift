@@ -69,9 +69,6 @@ public final class WebViewInstrumentation: NSObject {
     // MARK: - Public Methods
 
     #if canImport(WebKit)
-        /// Injects the necessary JavaScript bridge into a given `WKWebView` to enable
-        /// communication between the web content and the native RUM agent.
-        ///
         /// This method sets up a message handler and injects JavaScript that provides
         /// `window.SplunkRumNative.getNativeSessionId()` and `getNativeSessionIdAsync()` functions
         /// for the web content to use.

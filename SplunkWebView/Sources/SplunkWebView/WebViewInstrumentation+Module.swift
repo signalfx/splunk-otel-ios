@@ -23,19 +23,18 @@ import SplunkCommon
 /// Configuration for the `WebViewInstrumentation` module. This is a placeholder as the module currently has no user-configurable options.
 public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
 
-// swiftlint:disable type_name
-/// Remote configuration for the `WebViewInstrumentation` module.
-public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
-    /// A boolean flag to enable or disable the module remotely.
+/// RemoteModuleConfiguration conformance.
+public struct WebViewRemoteConfiguration: RemoteModuleConfiguration {
+
+    /// This property indicates whether the WebViewInstrumentationModule should be enabled
+    /// according to the remote configuration.
     public var enabled: Bool = true
 
     /// Initializes the remote configuration from data. This module does not support remote configuration beyond enabling/disabling.
     public init?(from data: Data) {
         return nil
     }
-} // swiftlint:enable type_name
-
-// MARK: - Module Events
+}
 
 /// Placeholder metadata for events produced by `WebViewInstrumentation`. This module does not produce events.
 public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
@@ -46,15 +45,17 @@ public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
 /// Placeholder data for events produced by `WebViewInstrumentation`. This module does not produce events.
 public struct WebViewInstrumentationData: ModuleEventData {}
 
-// MARK: - Module Conformance
-
+/// Module conformance.
 extension WebViewInstrumentation: Module {
 
     public typealias Configuration = WebViewInstrumentationConfiguration
-    public typealias RemoteConfiguration = WebViewInstrumentationRemoteConfiguration
+    public typealias RemoteConfiguration = WebViewRemoteConfiguration
     public typealias EventMetadata = WebViewInstrumentationMetadata
     public typealias EventData = WebViewInstrumentationData
 
+    /// When enabled, allows the injection of the necessary JavaScript bridge into a given `WKWebView`
+    /// to enable a BRUM (Browser RUM) instance instrumenting web content to access the native RUM
+    /// agent Session ID.
     public func install(
         with configuration: (any ModuleConfiguration)?,
         remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?
