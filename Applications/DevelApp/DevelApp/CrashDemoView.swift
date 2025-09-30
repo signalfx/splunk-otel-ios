@@ -26,7 +26,7 @@ struct CrashDemoView: View {
             Button("Crash") {
                 // Simulate a crash
                 #if DEBUG
-                fatalError("Test fatal error from DevelApp")
+                    fatalError("Test fatal error from DevelApp")
                 #endif
             }
             Spacer()
