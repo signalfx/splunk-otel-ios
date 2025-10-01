@@ -22,10 +22,10 @@
 
 ### Generative AI usage
 
-- [ ] \(Optional) GAI was not used (or, no additional notation is required)
-- [ ] \(Optional) Coder created a draft manually that was non-substantively modified by GAI (e.g., refactoring was performed by GAI on manually written code)
-- [ ] \(Optional) GAI was used to create a draft that was subsequently customized or modified
-- [ ] \(Optional) Code was generated entirely by GAI
+- [ ] GAI was not used (or, no additional notation is required)
+- [ ] Coder created a draft manually that was non-substantively modified by GAI (e.g., refactoring was performed by GAI on manually written code)
+- [ ] GAI was used to create a draft that was subsequently customized or modified
+- [ ] Code was generated entirely by GAI
 
 ### How to Test These Changes
 
