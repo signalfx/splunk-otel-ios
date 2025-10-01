@@ -115,11 +115,11 @@ public class NetworkInstrumentation {
     func shouldInstrument(urlRequest: URLRequest) -> Bool {
         // Code here could filter based on URLRequest
 
-        /* Save this until we add the feature into the Agent side API
-         guard agentConfiguration?.appDCloudShouldInstrument?(URLRequest) ?? true else {
-         return ((agentConfiguration?.appDCloudShouldInstrument!(URLRequest)) != nil)
-         }
-         */
+        // Save this until we add the feature into the Agent side API
+        //
+        // guard agentConfiguration?.appDCloudShouldInstrument?(URLRequest) ?? true else {
+        //     return ((agentConfiguration?.appDCloudShouldInstrument!(URLRequest)) != nil)
+        // }
 
         // Filter using ignoreURLs API
         if let urlToTest = urlRequest.url {

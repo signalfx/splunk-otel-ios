@@ -65,5 +65,8 @@ extension SplunkRum {
     ///
     /// - Note: This function is deprecated and will be removed in a later version.
     @available(*, deprecated, message: "This function will be removed in a later version.")
-    public static func debugLog(_: String) {}
+    public static func debugLog(_ msg: String) {
+        // Intentionally unused
+        _ = msg
+    }
 }

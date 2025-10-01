@@ -142,6 +142,7 @@ public final class Navigation: Sendable {
     // MARK: - Instrumentation (Modern solution)
 
     private func startModernDetection() {
+        // swiftlint:disable:next unhandled_throwing_task
         Task(priority: .userInitiated) {
             let navigationStream = try await DefaultSwizzling.navigation
 
@@ -384,25 +385,5 @@ public final class Navigation: Sendable {
 
     func preferredControllerName(for controller: UIViewController) -> String {
         String(describing: type(of: controller))
-    }
-
-
-    // MARK: - Class name sanitization
-
-    /// Returns the bundle name for the guest application.
-    private static func applicationBundleName() -> String? {
-        Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as? String
-    }
-
-    /// Drops module prefix for types from the application naming space.
-    private func sanitize(typeName: String) -> String {
-        guard
-            let bundleName = appBundleName,
-            typeName.hasPrefix(bundleName)
-        else {
-            return typeName
-        }
-
-        return String(typeName.dropFirst("\(bundleName).".count))
     }
 }

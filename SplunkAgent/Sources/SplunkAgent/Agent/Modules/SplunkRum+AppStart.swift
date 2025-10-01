@@ -22,17 +22,20 @@ extension SplunkRum {
 
     /// Reports agent initialization metrics.
     func reportAgentInitialization(start: Date, initializeEvents: [String: Date]) {
+        guard let modulesManager else {
+            return
+        }
+
         var initializeEvents = initializeEvents
 
         // Fetch modules initialization times from the Modules manager
-        modulesManager?.modulesInitializationTimes
-            .forEach { moduleName, time in
-                let moduleName = "\(moduleName)_initialized"
-                initializeEvents[moduleName] = time
-            }
+        for (moduleName, time) in modulesManager.modulesInitializationTimes {
+            let moduleName = "\(moduleName)_initialized"
+            initializeEvents[moduleName] = time
+        }
 
         // Report initialize events to App Start module
-        if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
+        if let appStartModule = modulesManager.module(ofType: SplunkAppStart.AppStart.self) {
             appStartModule.reportAgentInitialize(
                 start: start,
                 end: Date(),

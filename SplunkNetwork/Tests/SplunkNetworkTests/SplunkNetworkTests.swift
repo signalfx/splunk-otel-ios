@@ -23,10 +23,10 @@ import XCTest
 @testable import SplunkNetwork
 
 final class SplunkNetworkTests: XCTestCase {
-    var sut: NetworkInstrumentation!
+    private var sut: NetworkInstrumentation?
 
     /// Mock IgnoreURLs.
-    class MockIgnoreURLs: IgnoreURLs {
+    private class MockIgnoreURLs: IgnoreURLs {
         var shouldMatch = false
 
         override func matches(url _: URL) -> Bool {
@@ -35,7 +35,7 @@ final class SplunkNetworkTests: XCTestCase {
     }
 
     /// Mock Span that conforms to all required protocols.
-    class MockSpan: Span {
+    private class MockSpan: Span {
 
         // MARK: - Public
 
@@ -133,19 +133,24 @@ final class SplunkNetworkTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+
         sut = NetworkInstrumentation()
     }
 
     override func tearDown() {
         sut = nil
+
         super.tearDown()
     }
 
     // MARK: - shouldInstrument Tests
 
-    func testShouldInstrument_WithExcludedEndpoint_ReturnsFalse() {
+    func testShouldInstrument_WithExcludedEndpoint_ReturnsFalse() throws {
+        let sut = try XCTUnwrap(sut)
+
         // Given
-        let excludedURL = URL(string: "https://excluded.com")!
+        let excludedURL = try XCTUnwrap(URL(string: "https://excluded.com"))
+
         sut.excludedEndpoints = [excludedURL]
         let request = URLRequest(url: excludedURL)
 
@@ -156,9 +161,11 @@ final class SplunkNetworkTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
-    func testShouldInstrument_WithLocalhost_ReturnsFalse() {
+    func testShouldInstrument_WithLocalhost_ReturnsFalse() throws {
+        let sut = try XCTUnwrap(sut)
+
         // Given
-        let localhostURL = URL(string: "http://localhost:8080")!
+        let localhostURL = try XCTUnwrap(URL(string: "http://localhost:8080"))
         let request = URLRequest(url: localhostURL)
 
         // When
@@ -168,10 +175,14 @@ final class SplunkNetworkTests: XCTestCase {
         XCTAssertFalse(result)
     }
 
-    func testShouldInstrument_WithValidURL_ReturnsTrue() {
+    func testShouldInstrument_WithValidURL_ReturnsTrue() throws {
+        let sut = try XCTUnwrap(sut)
+
         // Given
-        let validURL = URL(string: "https://example.com")!
-        sut.excludedEndpoints = [URL(string: "https://excluded.com")!]
+        let validURL = try XCTUnwrap(URL(string: "https://example.com"))
+        let excludedURL = try XCTUnwrap(URL(string: "https://excluded.com"))
+
+        sut.excludedEndpoints = [excludedURL]
         let request = URLRequest(url: validURL)
 
         // When
@@ -181,9 +192,11 @@ final class SplunkNetworkTests: XCTestCase {
         XCTAssertTrue(result)
     }
 
-    func testShouldInstrument_WithNoExcludedEndpoints_ReturnsFalse() {
+    func testShouldInstrument_WithNoExcludedEndpoints_ReturnsFalse() throws {
+        let sut = try XCTUnwrap(sut)
+
         // Given
-        let validURL = URL(string: "https://example.com")!
+        let validURL = try XCTUnwrap(URL(string: "https://example.com"))
         sut.excludedEndpoints = nil
         let request = URLRequest(url: validURL)
 
@@ -196,12 +209,14 @@ final class SplunkNetworkTests: XCTestCase {
 
     // MARK: - shouldRecordPayload Tests
 
-    func testShouldRecordPayload_AlwaysReturnsTrue() {
+    func testShouldRecordPayload_AlwaysReturnsTrue() throws {
+        let sut = try XCTUnwrap(sut)
+
         // Given
         let session = URLSession.shared
 
         // When
-        let result = sut.shouldRecordPayload(URLSession: session)
+        let result = sut.shouldRecordPayload(urlSession: session)
 
         // Then
         XCTAssertTrue(result)
@@ -209,10 +224,14 @@ final class SplunkNetworkTests: XCTestCase {
 
     // MARK: - createdRequest Tests
 
-    func testCreatedRequest_SetsContentLengthAttribute() {
+    func testCreatedRequest_SetsContentLengthAttribute() throws {
+        let sut = try XCTUnwrap(sut)
+
         // Given
-        let body = "test body".data(using: .utf8)!
-        var request = URLRequest(url: URL(string: "https://example.com")!)
+        let body = Data("test body".utf8)
+        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
+
+        var request = URLRequest(url: exampleURL)
         request.httpBody = body
 
         let mockSpan = MockSpan()
@@ -233,19 +252,23 @@ final class SplunkNetworkTests: XCTestCase {
 
     // MARK: - receivedResponse Tests
 
-    func testReceivedResponse_SetsContentLengthAttribute() {
+    func testReceivedResponse_SetsContentLengthAttribute() throws {
+        let sut = try XCTUnwrap(sut)
+        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
+
         // Given
         let response = HTTPURLResponse(
-            url: URL(string: "https://example.com")!,
+            url: exampleURL,
             statusCode: 200,
             httpVersion: nil,
             headerFields: nil
-        )!
+        )
 
+        let unwrappedResponse = try XCTUnwrap(response)
         let mockSpan = MockSpan()
 
         // When
-        sut.receivedResponse(urlResponse: response, dataOrFile: nil, span: mockSpan)
+        sut.receivedResponse(urlResponse: unwrappedResponse, dataOrFile: nil, span: mockSpan)
 
         // Then
         let attributeValue = mockSpan.attributes[SemanticAttributes.httpResponseBodySize.rawValue]
@@ -258,21 +281,25 @@ final class SplunkNetworkTests: XCTestCase {
         }
     }
 
-    func testReceivedResponse_WithServerTiming_AddsLinkToSpan() {
+    func testReceivedResponse_WithServerTiming_AddsLinkToSpan() throws {
+        let sut = try XCTUnwrap(sut)
+        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
+
         // Given
         let response = HTTPURLResponse(
-            url: URL(string: "https://example.com")!,
+            url: exampleURL,
             statusCode: 200,
             httpVersion: nil,
             headerFields: [
                 "server-timing": "traceparent;desc='00-1234567890abcdef1234567890abcdef-1234567890abcdef-01'"
             ]
-        )!
+        )
 
+        let unwrappedResponse = try XCTUnwrap(response)
         let mockSpan = MockSpan()
 
         // When
-        sut.receivedResponse(urlResponse: response, dataOrFile: nil, span: mockSpan)
+        sut.receivedResponse(urlResponse: unwrappedResponse, dataOrFile: nil, span: mockSpan)
 
         // Then
         let traceIdValue = mockSpan.attributes["link.traceId"]

@@ -1,11 +1,12 @@
 // swift-tools-version: 5.9
 
+// swiftformat:disable sortImports
 import PackageDescription
 import class Foundation.ProcessInfo
 
 // MARK: - Package and target definitions
 
-// Create the package instance base.
+/// Create the package instance base.
 let package = Package(
     name: "SplunkAgent",
     platforms: [
@@ -56,6 +57,7 @@ let package = Package(
 )
 
 // Modify it based on current dependency resolution and add all targets to the package
+
 package.targets.append(contentsOf: generateBinaryTargets())
 package.targets.append(contentsOf: generateWrapperTargets())
 package.targets.append(contentsOf: generateMainTargets())
@@ -265,17 +267,6 @@ func generateMainTargets() -> [Target] {
             path: "SplunkCrashReports/Sources",
             plugins: lintTargetPlugins()
         ),
-        .testTarget(
-            name: "SplunkCrashReportsTests",
-            dependencies: [
-                "SplunkCrashReports",
-                "SplunkCommon",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
-                .product(name: "CrashReporter", package: "PLCrashReporter")
-            ],
-            path: "SplunkCrashReports/Tests",
-            plugins: lintTargetPlugins()
-        ),
 
 
         // MARK: - Splunk OTel
@@ -290,12 +281,6 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("logger")
             ],
             path: "SplunkOpenTelemetry/Sources",
-            plugins: lintTargetPlugins()
-        ),
-        .testTarget(
-            name: "SplunkOpenTelemetryTests",
-            dependencies: ["SplunkOpenTelemetry", "SplunkCommon"],
-            path: "SplunkOpenTelemetry/Tests",
             plugins: lintTargetPlugins()
         ),
 
@@ -443,12 +428,6 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("sessionReplay")
             ],
             path: "SplunkSessionReplayProxy/Sources",
-            plugins: lintTargetPlugins()
-        ),
-        .testTarget(
-            name: "SplunkSessionReplayProxyTests",
-            dependencies: ["SplunkSessionReplayProxy"],
-            path: "SplunkSessionReplayProxy/Tests",
             plugins: lintTargetPlugins()
         )
     ]

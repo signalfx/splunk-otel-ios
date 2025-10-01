@@ -21,18 +21,19 @@ import XCTest
 @testable import SplunkCustomTracking
 
 final class CustomEventTrackingTests: XCTestCase {
-    private var module: CustomTrackingInternal!
+    private var module: CustomTrackingInternal?
     private var capturedData: CustomTrackingData?
-    private var expectation: XCTestExpectation!
+    private var expectation: XCTestExpectation?
 
     override func setUp() {
         super.setUp()
+
         module = CustomTrackingInternal()
         expectation = XCTestExpectation(description: "onPublishBlock for event was called")
 
-        module.onPublishBlock = { [weak self] _, data in
+        module?.onPublishBlock = { [weak self] _, data in
             self?.capturedData = data
-            self?.expectation.fulfill()
+            self?.expectation?.fulfill()
         }
     }
 
@@ -40,6 +41,7 @@ final class CustomEventTrackingTests: XCTestCase {
         module = nil
         capturedData = nil
         expectation = nil
+
         super.tearDown()
     }
 
@@ -52,6 +54,8 @@ final class CustomEventTrackingTests: XCTestCase {
         ]
         let event = SplunkTrackableEvent(eventName: eventName, attributes: attributes)
 
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
         module.track(event)
 
         wait(for: [expectation], timeout: 1.0)
@@ -68,6 +72,8 @@ final class CustomEventTrackingTests: XCTestCase {
         let eventName = "testCustomEventWithoutAttributes"
         let event = SplunkTrackableEvent(eventName: eventName, attributes: [:])
 
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
         module.track(event)
 
         wait(for: [expectation], timeout: 1.0)

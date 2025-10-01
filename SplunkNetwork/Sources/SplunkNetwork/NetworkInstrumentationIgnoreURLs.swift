@@ -72,6 +72,7 @@ public class IgnoreURLs: Codable {
     /// Encode the instance to an encoder.
     ///
     /// - Parameter encoder: The encoder to write data to.
+    ///
     /// - Throws: If the encoder fails to encode the data.
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -92,9 +93,9 @@ public class IgnoreURLs: Codable {
     ///
     /// - Parameter patterns: Set of regular expression pattern strings for URLs to add.
     ///
-    /// - Throws: If any of the new patterns are invalid regular expressions.
-    ///
     /// - Returns: The number of patterns added.
+    ///
+    /// - Throws: If any of the new patterns are invalid regular expressions.
     @discardableResult
     public func addPatterns(_ patterns: Set<String>) throws -> Int {
         let newPatterns = try patterns.map { pattern in

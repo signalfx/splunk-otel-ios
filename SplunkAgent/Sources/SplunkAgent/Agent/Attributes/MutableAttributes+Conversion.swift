@@ -117,9 +117,11 @@ extension MutableAttributes {
     ///
     /// - Returns: [String: T] with converted values, omitting non-convertible ones.
     func converted<T>(
-        to _: T.Type,
+        to targetType: T.Type,
         using transform: (AttributeValue) -> T?
     ) -> [String: T] {
+        // Intentionally unused
+        _ = targetType
 
         let sourceAttributes = getAll()
 

@@ -47,6 +47,11 @@ protocol KeyValueStorage {
     /// - Parameters:
     ///   - value: General encodable data for storing.
     ///   - key: An access key in the storage.
+    ///
+    /// - Throws: `KeyValueStorageError.insertIntoExistingKey` if an insert operation
+    ///             is performed on an existing key.
+    /// - Throws: `KeyValueStorageError.dataSerializationFailure` if the attempt to serialize
+    ///              a value for storage purposes fails.
     func insert(_ value: Codable, forKey key: String) throws
 
     /// Reads data for given key.
@@ -54,6 +59,9 @@ protocol KeyValueStorage {
     /// - Parameter key: An access key in the storage.
     ///
     /// - Returns: Previously stored data or `nil`.
+    ///
+    /// - Throws: `KeyValueStorageError.storedTypeMismatch` if the type of stored data
+    ///             does not match the expected type.
     func read<T: Codable>(forKey key: String) throws -> T?
 
     /// Updates data for given key.
@@ -63,10 +71,15 @@ protocol KeyValueStorage {
     /// - Parameters:
     ///   - value: New version of stored data.
     ///   - key: An access key in the storage.
+    ///
+    /// - Throws: `KeyValueStorageError.dataSerializationFailure` if the attempt to serialize
+    ///             a value for storage purposes fails.
     func update(_ value: Codable, forKey key: String) throws
 
     /// Read data for given key.
     ///
     /// - Parameter key: An access key in the storage.
+    ///
+    /// - Throws: `KeyValueStorageError.noValueForKey` if there was no value for the requested key.
     func delete(forKey key: String) throws
 }

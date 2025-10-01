@@ -1,4 +1,4 @@
-strict: false
+strict: true
 
 analyzer_rules:
   - capture_variable
@@ -120,6 +120,7 @@ opt_in_rules:
   - weak_delegate
 
 disabled_rules:
+  - todo
   - opening_brace
   - statement_position
 

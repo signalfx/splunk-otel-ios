@@ -45,7 +45,7 @@
 --enable redundantProperty
 --enable singlePropertyPerLine
 --enable sortSwitchCases
---enable throwingTests
+--enable noForceTryInTests
 --enable unusedPrivateDeclarations
 --enable wrapConditionalBodies
 --enable wrapEnumCases

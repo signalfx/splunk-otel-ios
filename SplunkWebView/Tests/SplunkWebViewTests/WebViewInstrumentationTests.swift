@@ -23,9 +23,14 @@ import XCTest
 
 final class WebViewInstrumentationTests: XCTestCase {
 
-    var webViewInstrumentation: WebViewInstrumentation!
-    var mockWebView: MockWebView!
-    var mockAgentSharedState: MockAgentSharedState!
+    // MARK: - Private
+
+    private var webViewInstrumentation: WebViewInstrumentation?
+    private var mockWebView: MockWebView?
+    private var mockAgentSharedState: MockAgentSharedState?
+
+
+    // MARK: - Tests lifecycle
 
     override func setUp() {
         super.setUp()
@@ -33,7 +38,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         mockWebView = MockWebView()
         // strong instance for testing
         mockAgentSharedState = MockAgentSharedState()
-        webViewInstrumentation.sharedState = mockAgentSharedState
+        webViewInstrumentation?.sharedState = mockAgentSharedState
     }
 
     override func tearDown() {
@@ -43,7 +48,11 @@ final class WebViewInstrumentationTests: XCTestCase {
         super.tearDown()
     }
 
-    func testInjectSessionId() {
+
+    // MARK: - Business logic
+
+    func testInjectSessionId() throws {
+        let mockWebView = try XCTUnwrap(mockWebView)
         let expectation = XCTestExpectation(description: "JavaScript injected")
 
         mockWebView.evaluateJavaScriptHandler = { script, completionHandler in
@@ -53,7 +62,7 @@ final class WebViewInstrumentationTests: XCTestCase {
             completionHandler(nil, nil) // Simulate success
         }
 
-        webViewInstrumentation.injectSessionId(into: mockWebView)
+        webViewInstrumentation?.injectSessionId(into: mockWebView)
 
         // TODO: [DEMRUM-2125] Fix test
         //        wait(for: [expectation], timeout: 5.0)

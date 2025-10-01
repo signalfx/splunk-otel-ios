@@ -62,7 +62,7 @@ final class SessionReplayEventIndexer: EventIndexer {
     }
 
 
-    // MARK: - Indexer methods
+    // MARK: - Indexer method
 
     func prepareIndex(sessionId: String, eventTimestamp: Date) async throws -> Int {
         var eventIndex: Int

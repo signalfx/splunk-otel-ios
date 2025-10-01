@@ -246,23 +246,29 @@ public class SplunkRumBuilder {
     /// - Returns: The builder instance to allow for continued chaining.
     @available(*, deprecated, message: "This configuration has been discontinued and has no effect. Thresholds are now managed automatically.")
     @discardableResult
-    public func slowFrameDetectionThresholdMs(thresholdMs _: Double) -> SplunkRumBuilder {
+    public func slowFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
+        // Intentionally unused
+        _ = thresholdMs
+
         // This method is intentionally empty as the feature is discontinued
         // We return 'self' to allow for continued builder chaining
-        self
+        return self
     }
 
-    /// Specifies the legacy threshold for frozen frame detection. This setting is now ignored.
+    /// Specifies the legacy threshold for frozen frame detection (setting is now ignored).
     ///
     /// - Parameter thresholdMs: The legacy threshold in milliseconds. This value is not used.
     ///
     /// - Returns: The builder instance to allow for continued chaining.
     @available(*, deprecated, message: "This configuration has been discontinued and has no effect. Thresholds are now managed automatically.")
     @discardableResult
-    public func frozenFrameDetectionThresholdMs(thresholdMs _: Double) -> SplunkRumBuilder {
+    public func frozenFrameDetectionThresholdMs(thresholdMs: Double) -> SplunkRumBuilder {
+        // Intentionally unused
+        _ = thresholdMs
+
         // Intentionally empty
         // We return 'self' to allow for continued builder chaining
-        self
+        return self
     }
 
     /// Specifies whether the Network Instrumentation module should be activated and generate spans.

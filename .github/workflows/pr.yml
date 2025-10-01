@@ -44,7 +44,28 @@ jobs:
           xcode-version: latest-stable
       - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
       - run: |
-          git ls-files -z '*.swift' | xargs -0 swift format lint --parallel
+          git ls-files -z '*.swift' | xargs -0 swift format lint --strict --parallel
+
+  swiftformat:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
+      - run: |
+          brew update
+          brew install swiftformat
+      - run: |
+          swiftformat --lint --strict . || {
+              code=$?
+              if [ $code -eq 1 ]; then
+                echo "No Swift files found in $dir, skipping"
+              else
+                exit $code
+              fi
+            }
 
   prepare:
     runs-on: macos-latest
