@@ -27,10 +27,10 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
 
     // MARK: - Private properties
 
-    // OTel logger provider
+    /// OTel logger provider.
     private let loggerProvider: LoggerProvider
 
-    // Logger background dispatch queue
+    /// Logger background dispatch queue.
     private let backgroundQueue = DispatchQueue(
         label: PackageIdentifier.default(named: "LogToSpanEventProcessor"),
         qos: .utility
@@ -47,13 +47,13 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
     // MARK: - Initialization
 
     public required init(
-        with logsEndpoint: URL,
+        with _: URL,
         resources: AgentResources,
         debugEnabled: Bool
     ) {
         // Store resources object for Unit tests
         #if DEBUG
-        // Build Resources
+            /// Build Resources
             var resource = Resource()
             resource.merge(with: resources)
 
@@ -66,8 +66,8 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         // Initialize LogRecordProcessor
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(
             logRecordExporter: debugEnabled
-            ? SplunkStdoutLogExporter(with: logToSpanExporter)
-            : logToSpanExporter
+                ? SplunkStdoutLogExporter(with: logToSpanExporter)
+                : logToSpanExporter
         )
 
         let processors: [LogRecordProcessor] = [simpleLogRecordProcessor]
@@ -98,7 +98,8 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
 
         if immediateProcessing {
             processEvent(event: event, completion: completion)
-        } else {
+        }
+        else {
             backgroundQueue.async {
                 self.processEvent(event: event, completion: completion)
             }
@@ -112,7 +113,8 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         let logger = loggerProvider.get(instrumentationScopeName: event.instrumentationScope)
 
         // Build LogRecordBuilder from LogEvent
-        let logRecordBuilder = logger
+        let logRecordBuilder =
+            logger
             .logRecordBuilder()
             .build(with: event)
 

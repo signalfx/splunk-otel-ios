@@ -25,37 +25,37 @@ final class SplunkConfigurationHandler: AgentConfigurationHandler {
 
     /// Raw configuration data. This is a temporary source of truth for default modules manager enablement and any configuration defaults.
     private let rawConfiguration = """
-    {
-        "configuration": {
-            "mrum": {
-                "enabled": true,
-                "maxSessionLength": \(ConfigurationDefaults.maxSessionLength),
-                "sessionTimeout": \(ConfigurationDefaults.sessionTimeout),
-                "sessionReplay": {
-                    "enabled": true
-                },
-                "crashReporting": {
-                    "enabled": true
-                },
-                "networkTracing": {
-                    "enabled": true
-                },
-                "slowFrameDetector": {
-                    "enabled": true
-                },
-                "appStart": {
-                    "enabled": true
+        {
+            "configuration": {
+                "mrum": {
+                    "enabled": true,
+                    "maxSessionLength": \(ConfigurationDefaults.maxSessionLength),
+                    "sessionTimeout": \(ConfigurationDefaults.sessionTimeout),
+                    "sessionReplay": {
+                        "enabled": true
+                    },
+                    "crashReporting": {
+                        "enabled": true
+                    },
+                    "networkTracing": {
+                        "enabled": true
+                    },
+                    "slowFrameDetector": {
+                        "enabled": true
+                    },
+                    "appStart": {
+                        "enabled": true
+                    }
                 }
             }
         }
-    }
-    """
+        """
 
 
     // MARK: - Configuration
 
     var configurationData: Data? {
-        return rawConfiguration.data(using: .utf8)
+        rawConfiguration.data(using: .utf8)
     }
 
     let configuration: any AgentConfigurationProtocol

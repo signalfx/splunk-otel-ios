@@ -19,8 +19,9 @@ import CiscoInteractions
 import CiscoRuntimeCache
 import CiscoSwizzling
 import Foundation
-@testable import SplunkInteractions
 import XCTest
+
+@testable import SplunkInteractions
 
 final class SplunkInteractionsTests: XCTestCase {
 

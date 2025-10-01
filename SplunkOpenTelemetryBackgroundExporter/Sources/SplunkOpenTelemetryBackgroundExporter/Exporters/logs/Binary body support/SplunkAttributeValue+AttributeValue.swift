@@ -18,10 +18,10 @@ limitations under the License.
 
 import OpenTelemetryApi
 
-public extension SplunkAttributeValue {
+extension SplunkAttributeValue {
 
     /// Converts `AttributeValue` to `SplunkAttributeValue`.
-    init(otelAttributeValue attributeValue: AttributeValue) {
+    public init(otelAttributeValue attributeValue: AttributeValue) {
         switch attributeValue {
         case let .string(attributeValue):
             self = .string(attributeValue)

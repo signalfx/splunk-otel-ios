@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkOpenTelemetryBackgroundExporter
 import XCTest
+
+@testable import SplunkOpenTelemetryBackgroundExporter
 
 final class SplunkOTelBackgroundExporterTests: XCTestCase {
 

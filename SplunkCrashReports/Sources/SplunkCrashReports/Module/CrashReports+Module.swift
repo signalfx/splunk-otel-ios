@@ -18,9 +18,10 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-// `String` can be used as an event type that the module produces.
-// This is due to the fact the Crash Reports module serializes
-// the whole Crash payload JSON in place to `String`.
+/// `String` can be used as an event type that the module produces.
+///
+/// This is due to the fact the Crash Reports module serializes
+/// the whole Crash payload JSON in place to `String`.
 extension String: ModuleEventData {}
 
 /// Describes the Crash Report event metadata.
@@ -44,7 +45,7 @@ extension CrashReports: Module {
 
     public func install(
         with configuration: (any SplunkCommon.ModuleConfiguration)?,
-        remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?
+        remoteConfiguration _: (any SplunkCommon.RemoteModuleConfiguration)?
     ) {
 
         // Configure PLCrashReporter
@@ -61,10 +62,10 @@ extension CrashReports: Module {
     // MARK: - Module event data publishing
 
     public func onPublish(data block: @escaping (CrashReportsMetadata, String) -> Void) {
-       crashReportDataConsumer = block
+        crashReportDataConsumer = block
     }
 
-    // An empty implementation as the purging of the actual crash report data
-    // is handled by the PL Crash Reporter internally.
-    public func deleteData(for metadata: any ModuleEventMetadata) {}
+    /// An empty implementation as the purging of the actual crash report data
+    /// is handled by the PL Crash Reporter internally.
+    public func deleteData(for _: any ModuleEventMetadata) {}
 }

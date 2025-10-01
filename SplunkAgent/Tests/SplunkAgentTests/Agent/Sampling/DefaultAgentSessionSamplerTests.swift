@@ -15,13 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import XCTest
+
+@testable import SplunkAgent
 
 final class DefaultAgentSessionSamplerTests: XCTestCase {
 
-    var sampler: DefaultAgentSessionSampler!
-    var mockRandomNumberProvider: MockRandomNumberProvider!
+    // MARK: - Private
+
+    private var sampler: DefaultAgentSessionSampler?
+    private var mockRandomNumberProvider: MockRandomNumberProvider?
+
+
+    // MARK: - Tests lifecycle
 
     override func setUp() {
         super.setUp()
@@ -37,13 +43,19 @@ final class DefaultAgentSessionSamplerTests: XCTestCase {
         super.tearDown()
     }
 
-    func testInitialProbability() {
+
+    // MARK: - Basic logic
+
+    func testInitialProbability() throws {
+        let sampler = try XCTUnwrap(sampler)
+
         XCTAssertEqual(sampler.probability, 1.0, "Default probability should be 1.0 (always sample).")
         XCTAssertEqual(sampler.lowerBound, 0.0, "Default lowerBound should be 0.0.")
         XCTAssertEqual(sampler.upperBound, 1.0, "Default upperBound should be 1.0.")
     }
 
     func testConfigureUpdatesProbability() throws {
+        let sampler = try XCTUnwrap(sampler)
         let newSamplingRate = 0.5
 
         var configuration = try ConfigurationTestBuilder.buildDefault()
@@ -55,26 +67,33 @@ final class DefaultAgentSessionSamplerTests: XCTestCase {
     }
 
 
-    func testSample_givenNotSamplesOut() {
+    func testSample_givenNotSamplesOut() throws {
+        let sampler = try XCTUnwrap(sampler)
         sampler.probability = 1.0
 
+        let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
         let decision = sampler.sample(randomNumberProvider: mockRandomNumberProvider)
 
         XCTAssertEqual(decision, .notSampledOut)
         XCTAssertTrue(mockRandomNumberProvider.nextRandomNumbers.isEmpty, "Random number provider should not be used if probability is 1.0")
     }
 
-    func testSample_givenSamplesOut() {
+    func testSample_givenSamplesOut() throws {
+        let sampler = try XCTUnwrap(sampler)
         sampler.probability = 0.0
 
+        let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
         let decision = sampler.sample(randomNumberProvider: mockRandomNumberProvider)
 
         XCTAssertEqual(decision, .sampledOut)
         XCTAssertTrue(mockRandomNumberProvider.nextRandomNumbers.isEmpty, "Random number provider should not be used if probability is 0.0")
     }
 
-    func testSample_givenRandomNumberLessThanOrEqualToProbability_shouldSample() {
+    func testSample_givenRandomNumberLessThanOrEqualToProbability_shouldSample() throws {
+        let sampler = try XCTUnwrap(sampler)
         sampler.probability = 0.75
+
+        let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
         mockRandomNumberProvider.nextRandomNumbers = [0.5]
 
         let decision = sampler.sample(randomNumberProvider: mockRandomNumberProvider)
@@ -84,8 +103,11 @@ final class DefaultAgentSessionSamplerTests: XCTestCase {
         XCTAssertEqual(mockRandomNumberProvider.rangesProvided.first, sampler.lowerBound ... sampler.upperBound)
     }
 
-    func testSample_givenRandomNumberGreaterThanProbability_shouldNotSampleOut() {
+    func testSample_givenRandomNumberGreaterThanProbability_shouldNotSampleOut() throws {
+        let sampler = try XCTUnwrap(sampler)
         sampler.probability = 0.25
+
+        let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
         mockRandomNumberProvider.nextRandomNumbers = [0.5]
 
         let decision = sampler.sample(randomNumberProvider: mockRandomNumberProvider)
@@ -95,8 +117,11 @@ final class DefaultAgentSessionSamplerTests: XCTestCase {
         XCTAssertEqual(mockRandomNumberProvider.rangesProvided.first, sampler.lowerBound ... sampler.upperBound)
     }
 
-    func testSample_givenRandomNumberEqualToProbability_shouldSample() {
+    func testSample_givenRandomNumberEqualToProbability_shouldSample() throws {
+        let sampler = try XCTUnwrap(sampler)
         sampler.probability = 0.5
+
+        let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
         mockRandomNumberProvider.nextRandomNumbers = [0.5]
 
         let decision = sampler.sample(randomNumberProvider: mockRandomNumberProvider)
@@ -104,7 +129,7 @@ final class DefaultAgentSessionSamplerTests: XCTestCase {
         XCTAssertEqual(decision, .notSampledOut)
     }
 
-    func testSample_lowerBoundGreaterThanUpperBound_samplesOut() {
+    func testSample_lowerBoundGreaterThanUpperBound_samplesOut() throws {
         // This sanity tests the guard condition added in StatisticalSampler extension
         class MisconfiguredSampler: StatisticalSampler {
             let probability: Double = 0.5
@@ -113,6 +138,7 @@ final class DefaultAgentSessionSamplerTests: XCTestCase {
         }
 
         let misconfiguredSampler = MisconfiguredSampler()
+        let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
         let decision = misconfiguredSampler.sample(randomNumberProvider: mockRandomNumberProvider)
 
         XCTAssertEqual(decision, .sampledOut)

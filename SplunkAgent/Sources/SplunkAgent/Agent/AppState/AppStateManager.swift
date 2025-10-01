@@ -28,7 +28,7 @@ class AppStateManager: AgentAppStateManager {
 
     private var appStateModel: AppStateModel
 
-    // Serializes external access to stored data
+    /// Serializes external access to stored data.
     private let accessQueue: DispatchQueue
 
     // MARK: - Initialization

@@ -43,7 +43,7 @@ final class SessionReplayNonOperationalSensitivity: SessionReplayModuleSensitivi
     /// When the Session Replay module is disabled, this property ensures the API remains
     /// available but performs no action. Accessing it will log a notice.
     /// The getter always returns `nil`, and the setter is a no-op.
-    subscript(view: UIView) -> Bool? {
+    subscript(_: UIView) -> Bool? {
         get {
             logAccess(toApi: #function)
 
@@ -57,7 +57,8 @@ final class SessionReplayNonOperationalSensitivity: SessionReplayModuleSensitivi
         // swiftlint:enable unused_setter_value
     }
 
-    @discardableResult func set(_ view: UIView, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
+    @discardableResult
+    func set(_: UIView, _: Bool?) -> SessionReplayModuleSensitivity {
         logAccess(toApi: #function)
 
         return self
@@ -66,7 +67,7 @@ final class SessionReplayNonOperationalSensitivity: SessionReplayModuleSensitivi
 
     // MARK: - Class sensitivity
 
-    subscript(viewClass: UIView.Type) -> Bool? {
+    subscript(_: UIView.Type) -> Bool? {
         get {
             logAccess(toApi: #function)
 
@@ -80,7 +81,8 @@ final class SessionReplayNonOperationalSensitivity: SessionReplayModuleSensitivi
         // swiftlint:enable unused_setter_value
     }
 
-    @discardableResult func set(_ viewClass: UIView.Type, _ sensitive: Bool?) -> SessionReplayModuleSensitivity {
+    @discardableResult
+    func set(_: UIView.Type, _: Bool?) -> SessionReplayModuleSensitivity {
         logAccess(toApi: #function)
 
         return self

@@ -19,7 +19,7 @@ import Foundation
 
 extension AgentConfiguration {
     static var emptyConfiguration: AgentConfiguration {
-        return AgentConfiguration(
+        AgentConfiguration(
             endpoint: EndpointConfiguration(realm: "", rumAccessToken: ""),
             appName: "",
             deploymentEnvironment: ""

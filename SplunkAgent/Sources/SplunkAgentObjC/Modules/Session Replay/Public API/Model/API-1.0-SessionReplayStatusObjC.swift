@@ -60,8 +60,8 @@ public final class SessionReplayStatusObjC: NSObject {
 
     // MARK: - Initialization
 
-    // Initialization is hidden from the public API
-    // as we only need to work with the class type.
+    /// Initialization is hidden from the public API
+    /// as we only need to work with the class type.
     override init() {}
 
 

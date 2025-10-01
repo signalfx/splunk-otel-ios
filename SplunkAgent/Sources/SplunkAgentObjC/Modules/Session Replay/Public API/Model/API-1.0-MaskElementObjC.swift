@@ -19,7 +19,8 @@ import Foundation
 import SplunkAgent
 
 /// The mask element class defines one area and its role in the recording mask.
-@objc(SPLKMaskElement) @objcMembers
+@objc(SPLKMaskElement)
+@objcMembers
 public final class MaskElementObjC: NSObject {
 
     // MARK: - Public

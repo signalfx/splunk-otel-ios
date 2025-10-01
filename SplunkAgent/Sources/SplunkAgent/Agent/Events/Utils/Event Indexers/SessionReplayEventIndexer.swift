@@ -22,7 +22,7 @@ internal import SplunkCommon
 final class SessionReplayEventIndexer: EventIndexer {
 
     /// Maximum number of managed items.
-    static let maximumCapacity: Int = 1000
+    static let maximumCapacity: Int = 1_000
 
     /// Maximum lifetime of managed items. The value corresponds to 31 days.
     static let maximumLifetime: TimeInterval = 2_678_400
@@ -74,8 +74,8 @@ final class SessionReplayEventIndexer: EventIndexer {
         // If it has not been prepared yet, we will create a new one
         if let preparedEventIndex {
             eventIndex = preparedEventIndex
-
-        } else {
+        }
+        else {
             let processedIndex = try await indexCache.value(forKey: processedKey) ?? 0
             eventIndex = processedIndex + 1
 

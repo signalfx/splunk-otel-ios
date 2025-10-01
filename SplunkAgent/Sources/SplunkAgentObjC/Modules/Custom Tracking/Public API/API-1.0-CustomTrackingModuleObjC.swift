@@ -37,7 +37,8 @@ public final class CustomTrackingModuleObjC: NSObject {
     ///
     /// - Returns: The updated `CustomTrackingModuleObjC` instance.
     @discardableResult
-    @objc public func trackCustomEvent(name: String, attributes: [String: AttributeValueObjC]) -> CustomTrackingModuleObjC {
+    @objc
+    public func trackCustomEvent(name: String, attributes: [String: AttributeValueObjC]) -> CustomTrackingModuleObjC {
         owner.agent.customTracking.trackCustomEvent(name, MutableAttributes(with: attributes))
 
         return self
@@ -96,7 +97,8 @@ public final class CustomTrackingModuleObjC: NSObject {
     // MARK: - Single argument helpers (signatures)
 
     @discardableResult
-    @objc public func trackCustomEvent(name: String) -> CustomTrackingModuleObjC {
+    @objc
+    public func trackCustomEvent(name: String) -> CustomTrackingModuleObjC {
         owner.agent.customTracking.trackCustomEvent(name)
 
         return self

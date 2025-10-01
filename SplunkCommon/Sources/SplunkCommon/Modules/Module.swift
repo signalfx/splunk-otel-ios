@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - Internal Module API
 
 /// Data of events emitted by a Module.

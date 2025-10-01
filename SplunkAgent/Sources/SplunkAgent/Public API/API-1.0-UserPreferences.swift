@@ -31,12 +31,12 @@ public final class UserPreferences {
 }
 
 
-public extension UserPreferences {
+extension UserPreferences {
 
     // MARK: - User identification
 
     /// The required ``UserTrackingMode`` for user identification.
-    var trackingMode: UserTrackingMode {
+    public var trackingMode: UserTrackingMode {
         get {
             owner.currentUser.trackingMode
         }
@@ -50,7 +50,8 @@ public extension UserPreferences {
     /// - Parameter trackingMode: The required ``UserTrackingMode``.
     ///
     /// - Returns: The updated ``UserPreferences`` object.
-    @discardableResult func trackingMode(_ trackingMode: UserTrackingMode) -> UserPreferences {
+    @discardableResult
+    public func trackingMode(_ trackingMode: UserTrackingMode) -> UserPreferences {
         owner.currentUser.trackingMode = trackingMode
 
         return self

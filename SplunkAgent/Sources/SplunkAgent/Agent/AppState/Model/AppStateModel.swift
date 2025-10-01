@@ -68,7 +68,8 @@ class AppStateModel {
         // Save events to storage
         do {
             try storage.update(events, forKey: Self.storageKey)
-        } catch {
+        }
+        catch {
             logger.log(level: .error) {
                 "Error when updating AppStateEvents in storage with error message \(error.localizedDescription)."
             }
@@ -83,7 +84,8 @@ class AppStateModel {
             let foundEvent = events?.reversed().first(where: { $0.timestamp < timestamp })
 
             return foundEvent?.state
-        } catch {
+        }
+        catch {
             logger.log(level: .error) {
                 "Error when fetching AppStateEvents from storage with error message \(error.localizedDescription)."
             }

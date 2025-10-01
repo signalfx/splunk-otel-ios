@@ -35,12 +35,12 @@ public final class WebViewModuleObjC: NSObject {
 
     #if canImport(WebKit)
 
-    /// Injects the necessary JavaScript bridge into a given `WKWebView` to enable
-    /// communication between the web content and the native RUM agent.
-    @objc(integrateWithBrowserRumView:)
-    public func integrateWithBrowserRum(view: WKWebView) {
-        owner.agent.webViewNativeBridge.integrateWithBrowserRum(view)
-    }
+        /// Injects the necessary JavaScript bridge into a given `WKWebView` to enable
+        /// communication between the web content and the native RUM agent.
+        @objc(integrateWithBrowserRumView:)
+        public func integrateWithBrowserRum(view: WKWebView) {
+            owner.agent.webViewNativeBridge.integrateWithBrowserRum(view)
+        }
 
     #endif
 

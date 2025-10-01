@@ -19,8 +19,8 @@ internal import CiscoLogger
 internal import CiscoSessionReplay
 import Foundation
 internal import SplunkCommon
-internal import SplunkCustomTracking
 internal import SplunkCrashReports
+internal import SplunkCustomTracking
 internal import SplunkOpenTelemetry
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
@@ -36,27 +36,23 @@ class DefaultEventManager: AgentEventManager {
 
     // MARK: - Private properties
 
-    // Event processor
+    /// Event processor.
     var logEventProcessor: LogEventProcessor
 
     // Session Replay processor
     var sessionReplayProcessor: LogEventProcessor?
     var sessionReplayIndexer: EventIndexer
 
-    // Trace processor
+    /// Trace processor.
     var traceProcessor: TraceProcessor
 
-    // Agent reference
+    /// Agent reference.
     private unowned let agent: SplunkRum
 
-    // Logger
+    /// Logger.
     private var logger: LogAgent {
         agent.logger
     }
-
-    // Automatically repeated events
-    private var pulseEventJob: AgentRepeatingJob?
-
 
     // MARK: - Initialization
 
@@ -166,10 +162,7 @@ class DefaultEventManager: AgentEventManager {
         Task {
             guard
                 await sessionReplayIndexer.isReady,
-                let eventIndex = await prepareSessionReplayIndex(
-                    sessionId: sessionId,
-                    timestamp: metadata.timestamp
-                )
+                let eventIndex = await prepareSessionReplayIndex(sessionId: sessionId, timestamp: metadata.timestamp)
             else {
                 completion(false)
 
@@ -192,10 +185,11 @@ class DefaultEventManager: AgentEventManager {
                 immediateProcessing: false,
                 completion: { [weak self] processed in
                     if processed {
-                        self?.removeSessionReplayIndex(
-                            sessionId: sessionId,
-                            timestamp: metadata.timestamp
-                        )
+                        self?
+                            .removeSessionReplayIndex(
+                                sessionId: sessionId,
+                                timestamp: metadata.timestamp
+                            )
                     }
 
                     completion(processed)
@@ -235,7 +229,8 @@ class DefaultEventManager: AgentEventManager {
                 sessionId: sessionId,
                 eventTimestamp: timestamp
             )
-        } catch {
+        }
+        catch {
             logger.log(level: .debug, isPrivate: false) {
                 "Preparing the index for the Session Replay event ended with an error: \n\t\(error)"
             }
@@ -251,7 +246,8 @@ class DefaultEventManager: AgentEventManager {
                     sessionId: sessionId,
                     eventTimestamp: timestamp
                 )
-            } catch {
+            }
+            catch {
                 logger.log(level: .debug, isPrivate: false) {
                     "Removing the index for the Session Replay event ended with an error: \n\t\(error)"
                 }

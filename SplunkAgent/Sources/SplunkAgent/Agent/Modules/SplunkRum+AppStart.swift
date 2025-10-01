@@ -25,10 +25,11 @@ extension SplunkRum {
         var initializeEvents = initializeEvents
 
         // Fetch modules initialization times from the Modules manager
-        modulesManager?.modulesInitializationTimes.forEach { moduleName, time in
-            let moduleName = "\(moduleName)_initialized"
-            initializeEvents[moduleName] = time
-        }
+        modulesManager?.modulesInitializationTimes
+            .forEach { moduleName, time in
+                let moduleName = "\(moduleName)_initialized"
+                initializeEvents[moduleName] = time
+            }
 
         // Report initialize events to App Start module
         if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {

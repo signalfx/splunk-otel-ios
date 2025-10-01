@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkCommon
 import XCTest
+
+@testable import SplunkCommon
 
 // MARK: - Configuration, Metadata and Data
 
@@ -25,7 +26,7 @@ struct TestModuleConfiguration: ModuleConfiguration {}
 public struct TestModuleRemoteConfiguration: RemoteModuleConfiguration {
     public var enabled = true
 
-    public init?(from data: Data) {
+    public init?(from _: Data) {
         nil
     }
 }
@@ -59,8 +60,10 @@ class TestModule: Module {
         // Nothing to do...
     }
 
-    func install(with configuration: (any ModuleConfiguration)?,
-                 remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    func install(
+        with _: (any ModuleConfiguration)?,
+        remoteConfiguration _: (any RemoteModuleConfiguration)?
+    ) {
         // Nothing to do...
     }
 

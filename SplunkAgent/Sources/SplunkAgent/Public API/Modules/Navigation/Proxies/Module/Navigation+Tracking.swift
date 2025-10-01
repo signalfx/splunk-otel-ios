@@ -19,7 +19,8 @@ extension Navigation {
 
     // MARK: - Manual detection
 
-    @discardableResult func track(screen name: String) -> any NavigationModule {
+    @discardableResult
+    func track(screen name: String) -> any NavigationModule {
         module.track(screen: name)
 
         return self

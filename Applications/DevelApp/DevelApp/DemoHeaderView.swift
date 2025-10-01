@@ -20,9 +20,11 @@ import SwiftUI
 
 struct DemoHeaderView: View {
 
-    @ObservedObject var agentDataSource = AgentDataSource()
+    @ObservedObject
+    var agentDataSource = AgentDataSource()
 
-    @State private var currentTime = Date()
+    @State
+    private var currentTime = Date()
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {

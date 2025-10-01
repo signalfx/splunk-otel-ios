@@ -31,12 +31,12 @@ public final class UserState {
 }
 
 
-public extension UserState {
+extension UserState {
 
     // MARK: - User identification
 
     /// The currently used ``UserTrackingMode``.
-    var trackingMode: UserTrackingMode {
+    public var trackingMode: UserTrackingMode {
         owner.currentUser.trackingMode
     }
 }

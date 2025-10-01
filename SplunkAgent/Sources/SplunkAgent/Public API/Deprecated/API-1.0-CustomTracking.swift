@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-public extension SplunkRum {
+extension SplunkRum {
 
     // MARK: - Custom Tracking
 
@@ -30,7 +30,7 @@ public extension SplunkRum {
         renamed: "SplunkRum.shared.customTracking.trackError(_:)",
         message: "This method will be removed in a later version."
     )
-    static func reportError(string: String) {
+    public static func reportError(string: String) {
         _ = shared.customTracking.trackError(string)
     }
 
@@ -43,7 +43,7 @@ public extension SplunkRum {
         renamed: "SplunkRum.shared.customTracking.trackError(_:)",
         message: "This method will be removed in a later version."
     )
-    static func reportError(error: Error) {
+    public static func reportError(error: Error) {
         _ = shared.customTracking.trackError(error)
     }
 
@@ -56,7 +56,7 @@ public extension SplunkRum {
         renamed: "SplunkRum.shared.customTracking.trackException(_:)",
         message: "This method will be removed in a later version."
     )
-    static func reportError(exception: NSException) {
+    public static func reportError(exception: NSException) {
         _ = shared.customTracking.trackException(exception)
     }
 
@@ -70,7 +70,7 @@ public extension SplunkRum {
         renamed: "SplunkRum.shared.customTracking.trackCustomEvent(_:_:)",
         message: "This method will be removed in a later version."
     )
-    static func reportEvent(name: String, attributes: NSDictionary) {
+    public static func reportEvent(name: String, attributes: NSDictionary) {
         let mutableAttributes = MutableAttributes(from: attributes)
         _ = shared.customTracking.trackCustomEvent(name, mutableAttributes)
     }
