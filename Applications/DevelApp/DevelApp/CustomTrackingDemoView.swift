@@ -102,7 +102,7 @@ struct CustomTrackingDemoView: View {
         attributes["UIElementType"] = .string("Button")
         attributes["ActionType"] = .string("Primary Action")
         attributes["Timestamp"] = .string(Date().description)
-        attributes["EventID"] = .int(12345)
+        attributes["EventID"] = .int(12_345)
         SplunkRum.shared.customTracking.trackCustomEvent("Demo Button Clicked", attributes)
     }
 
@@ -122,7 +122,7 @@ struct CustomTrackingDemoView: View {
     // MARK: - Legacy API calls demonstrating available but deprecated methods
 
 
-    /// Note: Deprecation warnings in the next section are an intentional feature of the demo.
+    // Note: Deprecation warnings in the next section are an intentional feature of the demo.
 
     func trackLegacyErrorString() {
         let message = "Legacy error string"
@@ -151,12 +151,12 @@ struct CustomTrackingDemoView: View {
 }
 
 struct DemoErrors {
-    // String error (no stack trace needed)
+    /// String error (no stack trace needed)
     static func stringError() -> String {
         "This is a string representing an error message"
     }
 
-    // Swift Error with stack trace
+    /// Swift Error with stack trace
     static func swiftError() -> Error {
         struct SampleError: Error, LocalizedError {
             var errorDescription: String? { "This is a Swift Error" }
@@ -164,19 +164,21 @@ struct DemoErrors {
         return SampleError()
     }
 
-    // NSError with stack trace
+    /// NSError with stack trace
     static func nsError() -> NSError {
         NSError(domain: "com.example.error", code: 42, userInfo: [NSLocalizedDescriptionKey: "This is an NSError"])
     }
 
     class MyCustomError: NSError, @unchecked Sendable {}
     static func nsErrorSubclass() -> NSError {
-        return MyCustomError(domain: "com.example.mycustomerrordomain",
-                             code: 43,
-                             userInfo: [NSLocalizedDescriptionKey: "This is an instance of MyCustomError."])
+        MyCustomError(
+            domain: "com.example.mycustomerrordomain",
+            code: 43,
+            userInfo: [NSLocalizedDescriptionKey: "This is an instance of MyCustomError."]
+        )
     }
 
-    // NSException with stack trace (from callStackSymbols)
+    /// NSException with stack trace (from callStackSymbols)
     static func nsException() -> NSException {
         // Use the Objective-C helper to trigger and catch an NSException
         let exception = ObjCExceptionHelper.performBlockAndCatchException {
@@ -185,7 +187,7 @@ struct DemoErrors {
         }
 
         // Ensure the exception was captured
-        guard let exception = exception else {
+        guard let exception else {
             fatalError("Failed to trigger NSException")
         }
 

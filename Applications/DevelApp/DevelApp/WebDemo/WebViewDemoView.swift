@@ -50,7 +50,9 @@ struct WebViewDemoView: View {
 
                 DemoHeaderView()
 
-                Text("These webviews use timers present in the pre-injection web content to poll and show that the updated native sessionId is available. The callback demo is an exception, using no polling or timer. And for all webviews, the JavaScript injected by the native agent does not contain polling or timers.")
+                Text(
+                    "These webviews use timers present in the pre-injection web content to poll and show that the updated native sessionId is available. The callback demo is an exception, using no polling or timer. And for all webviews, the JavaScript injected by the native agent does not contain polling or timers."
+                )
                     .padding()
 
                 if WebViewDemoView.isBrumDemoEnabled {
@@ -65,7 +67,8 @@ struct WebViewDemoView: View {
                             }
                         ]
                     )
-                } else {
+                }
+                else {
                     PlaceholderSectionView(
                         caption: "Full BRUM Integration Demo",
                         explanation: """
@@ -151,10 +154,10 @@ struct WebViewDemoView: View {
 
 // MARK: - View Helpers
 
-private extension WebViewDemoView {
+extension WebViewDemoView {
     // MARK: - PlaceholderSectionView
 
-    struct PlaceholderSectionView: View {
+    fileprivate struct PlaceholderSectionView: View {
         let caption: String
         let explanation: String
 
@@ -179,7 +182,7 @@ private extension WebViewDemoView {
 
     // MARK: - WebView Section Data Model
 
-    struct WebViewSectionView: View {
+    fileprivate struct WebViewSectionView: View {
         let caption: String
         let webView: WKWebView
         let backgroundColor: Color
@@ -217,7 +220,7 @@ private extension WebViewDemoView {
 
     // MARK: - WebDemoButton Model
 
-    struct WebDemoButton: View, Identifiable {
+    fileprivate struct WebDemoButton: View, Identifiable {
         let id = UUID()
         let label: String
         let action: () -> Void
@@ -232,7 +235,7 @@ private extension WebViewDemoView {
 
     // MARK: - Helper Function for Button Creation
 
-    func createWebDemoButton(
+    private func createWebDemoButton(
         isAsync: Bool,
         isLegacy: Bool,
         webView: WKWebView
@@ -261,7 +264,7 @@ private extension WebViewDemoView {
 
     // MARK: - UIKit SwiftUI Wrapper
 
-    struct WebViewRepresentable: UIViewRepresentable {
+    fileprivate struct WebViewRepresentable: UIViewRepresentable {
         let webView: WKWebView
 
         func makeUIView(context _: Context) -> WKWebView {

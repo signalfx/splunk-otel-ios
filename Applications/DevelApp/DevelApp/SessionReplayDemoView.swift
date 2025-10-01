@@ -41,7 +41,7 @@ struct SessionReplayDemoView: View {
 
     // MARK: - View
 
-    @State var now = Date()
+    @State private var now = Date()
 
     let timer = Timer.publish(every: 0.2, on: .current, in: .common).autoconnect()
 
@@ -78,7 +78,7 @@ struct SessionReplayDemoView: View {
 
             Text("\(now)")
                 .onReceive(timer) { _ in
-                    self.now = Date()
+                    now = Date()
                 }
 
             Text("Sensitive text")

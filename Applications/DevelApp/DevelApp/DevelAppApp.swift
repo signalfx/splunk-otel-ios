@@ -36,7 +36,8 @@ struct DevelAppApp: App {
 
         do {
             agent = try SplunkRum.install(with: agentConfig)
-        } catch {
+        }
+        catch {
             agent = nil
             print("Unable to start the Splunk agent, error: \(error)")
         }

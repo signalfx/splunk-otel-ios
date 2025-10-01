@@ -46,7 +46,8 @@ extension SplunkRum {
             self.eventManager?.publish(data: data, metadata: metadata) { success in
                 if success {
                     self.modulesManager?.deleteModuleData(for: metadata)
-                } else {
+                }
+                else {
                     // TODO: MRUM_AC-1061 (post GA): Handle a case where data is not sent.
                 }
             }
@@ -100,7 +101,7 @@ extension SplunkRum {
         sessionReplayProxy = SessionReplay(for: sessionReplayModule)
     }
 
-    // Configure Navigation module.
+    /// Configure Navigation module.
     private func customizeNavigation() {
         let moduleType = SplunkNavigation.Navigation.self
         let navigationModule = modulesManager?.module(ofType: moduleType)
@@ -204,7 +205,8 @@ extension SplunkRum {
     private func customizeWebView() {
         if let webViewInstrumentationModule = modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentation.self) {
             webViewProxy = WebView(module: webViewInstrumentationModule, sharedState: sharedState)
-        } else {
+        }
+        else {
             logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module not installed."
             }

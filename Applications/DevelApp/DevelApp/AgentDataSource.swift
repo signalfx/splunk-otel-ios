@@ -64,6 +64,6 @@ class AgentDataSource: ObservableObject {
     // MARK: - Derived Properties
 
     var agentStatusDescription: String {
-        return rumEnabled ? "Running" : "Not Running"
+        rumEnabled ? "Running" : "Not Running"
     }
 }
