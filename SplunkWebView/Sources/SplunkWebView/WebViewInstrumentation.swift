@@ -133,8 +133,7 @@ public final class WebViewInstrumentation: NSObject {
             // Re-evaluating is safe and idempotent due to the JS guard.
             webView.evaluateJavaScript(javaScript)
         }
-        // swiftlint:enable function_body_length
-    #endif // canImport(WebKit)
+    #endif
 
     // MARK: - Private Methods
 
