@@ -21,7 +21,7 @@ import Foundation
 ///
 /// This enum serves as a namespace for the static `generate` function, ensuring that
 /// the script generation logic is centralized, stateless, and easily testable.
-internal enum WebViewBridgeScript {
+enum WebViewBridgeScript {
 
     /// Generates the complete JavaScript string to be injected into a web view.
     ///
@@ -34,7 +34,7 @@ internal enum WebViewBridgeScript {
     ///   - handlerName: The name of the `WKScriptMessageHandler` used for asynchronous communication.
     /// - Returns: A fully interpolated JavaScript string ready for injection.
     static func generate(sessionId: String, handlerName: String) -> String {
-        return """
+        """
         if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
             console.log("[SplunkRumNative] Already initialized; skipping.");
         } else {

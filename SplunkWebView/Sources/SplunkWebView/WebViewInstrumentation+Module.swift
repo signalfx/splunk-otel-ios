@@ -31,8 +31,8 @@ public struct WebViewRemoteConfiguration: RemoteModuleConfiguration {
     public var enabled: Bool = true
 
     /// Initializes the remote configuration from data. This module does not support remote configuration beyond enabling/disabling.
-    public init?(from data: Data) {
-        return nil
+    public init?(from _: Data) {
+        nil
     }
 }
 
@@ -57,11 +57,11 @@ extension WebViewInstrumentation: Module {
     /// to enable a BRUM (Browser RUM) instance instrumenting web content to access the native RUM
     /// agent Session ID.
     public func install(
-        with configuration: (any ModuleConfiguration)?,
-        remoteConfiguration: (any SplunkCommon.RemoteModuleConfiguration)?
+        with _: (any ModuleConfiguration)?,
+        remoteConfiguration _: (any SplunkCommon.RemoteModuleConfiguration)?
     ) {}
 
-    public func onPublish(data: @escaping (WebViewInstrumentationMetadata, WebViewInstrumentationData) -> Void) {}
+    public func onPublish(data _: @escaping (WebViewInstrumentationMetadata, WebViewInstrumentationData) -> Void) {}
 
-    public func deleteData(for metadata: any SplunkCommon.ModuleEventMetadata) {}
+    public func deleteData(for _: any SplunkCommon.ModuleEventMetadata) {}
 }

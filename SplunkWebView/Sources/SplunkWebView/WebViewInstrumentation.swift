@@ -165,8 +165,8 @@ public final class WebViewInstrumentation: NSObject {
         ///   - message: The script message received from the web content.
         ///   - replyHandler: A block to be called with the reply data or an error string.
         public func userContentController(
-            _ userContentController: WKUserContentController,
-            didReceive message: WKScriptMessage,
+            _: WKUserContentController,
+            didReceive _: WKScriptMessage,
             replyHandler: @escaping @MainActor @Sendable (Any?, String?) -> Void
         ) {
             // hint: parse message.body["action"] here if you need to add features
@@ -188,7 +188,8 @@ public final class WebViewInstrumentation: NSObject {
 
             if let sessionId = sharedState?.sessionId {
                 replyHandler(["sessionId": sessionId], nil)
-            } else {
+            }
+            else {
                 replyHandler(nil, "Native Session ID not available")
             }
         }
