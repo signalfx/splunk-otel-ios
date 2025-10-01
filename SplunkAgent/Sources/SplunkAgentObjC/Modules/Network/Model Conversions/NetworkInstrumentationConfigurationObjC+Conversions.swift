@@ -25,11 +25,11 @@ extension NetworkInstrumentationConfigurationObjC: ModuleConfigurationSwift {
     // MARK: - Swift variant
 
     var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
-        let ignoreUrls = IgnoreURLs(containing: ignoreURLs)
+        let configurationIgnoreUrls = IgnoreURLs(containing: ignoreURLs)
 
         return NetworkInstrumentationConfiguration(
             isEnabled: isEnabled,
-            ignoreURLs: ignoreUrls
+            ignoreURLs: configurationIgnoreUrls
         )
     }
 }
