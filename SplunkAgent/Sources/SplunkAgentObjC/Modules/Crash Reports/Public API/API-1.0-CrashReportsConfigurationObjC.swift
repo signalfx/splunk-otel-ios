@@ -18,7 +18,8 @@ limitations under the License.
 import Foundation
 
 /// The class implements the Crash Reports module configuration.
-@objc(SPLKCrashReportsConfiguration) @objcMembers
+@objc(SPLKCrashReportsConfiguration)
+@objcMembers
 public final class CrashReportsConfigurationObjC: ModuleConfigurationObjC {
 
     // MARK: - Initialization

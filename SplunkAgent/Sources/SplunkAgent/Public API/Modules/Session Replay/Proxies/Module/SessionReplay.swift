@@ -15,10 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-
 internal import CiscoLogger
 internal import CiscoSessionReplay
+import Foundation
 internal import SplunkCommon
 
 /// The class implementing Session Replay public API.
@@ -62,7 +61,8 @@ final class SessionReplay: SessionReplayModule {
         }
     }
 
-    @discardableResult func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule {
+    @discardableResult
+    func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule {
         self.preferences = preferences
 
         return self
@@ -104,9 +104,10 @@ extension SessionReplay {
             // self?.module.openNewSession()
 
             // Log the change for easier debugging
-            self?.logger.log(level: .info) {
-                "The current record from the Session Replay module will be split due to a session change."
-            }
+            self?.logger
+                .log(level: .info) {
+                    "The current record from the Session Replay module will be split due to a session change."
+                }
 
             // Record this operation for unit test purposes
             self?.newSessionsCount += 1

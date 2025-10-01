@@ -49,7 +49,7 @@ extension Interactions: Module {
 
     // MARK: - Module methods
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
         let configuration = configuration as? Configuration
 
         // Start the interactions detection in the module (unless it is explicitly disabled)
@@ -61,6 +61,6 @@ extension Interactions: Module {
 
     // MARK: - Type transparency helpers
 
-    public func onPublish(data: @escaping (CiscoInteractions.InteractionEvent, InteractionEventData) -> Void) {}
-    public func deleteData(for metadata: any ModuleEventMetadata) {}
+    public func onPublish(data _: @escaping (CiscoInteractions.InteractionEvent, InteractionEventData) -> Void) {}
+    public func deleteData(for _: any ModuleEventMetadata) {}
 }

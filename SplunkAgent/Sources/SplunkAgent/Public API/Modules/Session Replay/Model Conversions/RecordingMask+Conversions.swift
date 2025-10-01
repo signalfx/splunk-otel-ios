@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 internal import CiscoSessionReplay
+import Foundation
 
 // MARK: - SplunkSessionReplay RecordingMask-related type conversions
 
@@ -58,7 +58,7 @@ extension SplunkSessionReplayRecordingMask {
 
     init?(from recordingMask: RecordingMask?) {
         guard
-            let recordingMask = recordingMask,
+            let recordingMask,
             !recordingMask.elements.isEmpty
         else {
             return nil
@@ -112,7 +112,7 @@ extension RecordingMask {
 
     init?(from recordingMask: SplunkSessionReplayRecordingMask?) {
         guard
-            let recordingMask = recordingMask,
+            let recordingMask,
             !recordingMask.elements.isEmpty
         else {
             return nil

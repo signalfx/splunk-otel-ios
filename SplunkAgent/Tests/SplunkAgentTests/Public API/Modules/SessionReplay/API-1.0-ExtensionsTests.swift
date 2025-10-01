@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import XCTest
+
+@testable import SplunkAgent
 
 final class SessionReplayAPI10ExtensionsTests: XCTestCase {
 
@@ -46,11 +47,10 @@ final class SessionReplayAPI10ExtensionsTests: XCTestCase {
 
         view.srSensitive = nil
         // TODO: [DEMRUM-2782] Fix tests
-//        XCTAssertFalse(try XCTUnwrap(agent.sessionReplay.sensitivity[view]))
+        //        XCTAssertFalse(try XCTUnwrap(agent.sessionReplay.sensitivity[view]))
 
-        let isSensitive = agent.sessionReplay.sensitivity[view]
-        // TODO: [DEMRUM-2782] Fix tests
-//        XCTAssertNotNil(isSensitive)
+        //        let isSensitive = agent.sessionReplay.sensitivity[view]
+        //        XCTAssertNotNil(isSensitive)
 
         _ = view.srSensitive
 

@@ -18,9 +18,7 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-// MARK: - Module Configuration
-
-/// Configuration for the `WebViewInstrumentation` module. This is a placeholder as the module currently has no user-configurable options.
+/// ModuleConfiguration conformance.
 public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
 
 /// RemoteModuleConfiguration conformance.

@@ -20,6 +20,12 @@
 		527070DC2DC145F900EDD390 /* DemoHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527070DB2DC145F900EDD390 /* DemoHeaderView.swift */; };
 		527070DE2DC1468100EDD390 /* CrashDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527070DD2DC1468100EDD390 /* CrashDemoView.swift */; };
 		527070E02DC147AB00EDD390 /* AgentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527070DF2DC147AB00EDD390 /* AgentDataSource.swift */; };
+		E44D52F52E8AC39B00F5DD9E /* WebDemoHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D52F12E8AC39B00F5DD9E /* WebDemoHTML.swift */; };
+		E44D52F62E8AC39B00F5DD9E /* WebDemoJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D52F22E8AC39B00F5DD9E /* WebDemoJS.swift */; };
+		E44D52F72E8AC39B00F5DD9E /* WebViewDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D52F32E8AC39B00F5DD9E /* WebViewDemoView.swift */; };
+		E44D52F92E8AC3DC00F5DD9E /* DemoErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D52F82E8AC3DC00F5DD9E /* DemoErrors.swift */; };
+		E44D52FB2E8AC41600F5DD9E /* SampleAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D52FA2E8AC41400F5DD9E /* SampleAttributes.swift */; };
+		E46C01D12E8AAEBC0095CF6A /* SwiftFormat in Frameworks */ = {isa = PBXBuildFile; productRef = E46C01D02E8AAEBC0095CF6A /* SwiftFormat */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,15 +46,12 @@
 		527070DB2DC145F900EDD390 /* DemoHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoHeaderView.swift; sourceTree = "<group>"; };
 		527070DD2DC1468100EDD390 /* CrashDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashDemoView.swift; sourceTree = "<group>"; };
 		527070DF2DC147AB00EDD390 /* AgentDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDataSource.swift; sourceTree = "<group>"; };
+		E44D52F12E8AC39B00F5DD9E /* WebDemoHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDemoHTML.swift; sourceTree = "<group>"; };
+		E44D52F22E8AC39B00F5DD9E /* WebDemoJS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDemoJS.swift; sourceTree = "<group>"; };
+		E44D52F32E8AC39B00F5DD9E /* WebViewDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewDemoView.swift; sourceTree = "<group>"; };
+		E44D52F82E8AC3DC00F5DD9E /* DemoErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoErrors.swift; sourceTree = "<group>"; };
+		E44D52FA2E8AC41400F5DD9E /* SampleAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAttributes.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		526D230C2E0CD0CF00325F87 /* WebDemo */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = WebDemo;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		3384F2832AC8795800512D79 /* Frameworks */ = {
@@ -83,17 +86,17 @@
 			isa = PBXGroup;
 			children = (
 				5238CC852DFB6B6100206F6C /* ObjC */,
-				3384F2AE2AC87A3B00512D79 /* Info.plist */,
+				E44D52F02E8AC37B00F5DD9E /* CustomTrackingDemo */,
+				E44D52F42E8AC39B00F5DD9E /* WebDemo */,
 				527070DF2DC147AB00EDD390 /* AgentDataSource.swift */,
 				527070DD2DC1468100EDD390 /* CrashDemoView.swift */,
 				527070DB2DC145F900EDD390 /* DemoHeaderView.swift */,
 				3384F2892AC8795800512D79 /* DevelAppApp.swift */,
 				522DB6C72DC134C70047FBCD /* RoutingView.swift */,
-				524479282DE7EE9C00E93C77 /* CustomTrackingDemoView.swift */,
 				522DB6C92DC135920047FBCD /* SessionReplayDemoView.swift */,
-				526D230C2E0CD0CF00325F87 /* WebDemo */,
 				522DB6CB2DC135BC0047FBCD /* TemplateView.swift */,
 				52400B7A2DFBC33200F88CD8 /* HelperViews.swift */,
+				3384F2AE2AC87A3B00512D79 /* Info.plist */,
 				3384F28D2AC8795800512D79 /* Assets.xcassets */,
 				3384F28F2AC8795800512D79 /* DevelApp.entitlements */,
 				3384F2902AC8795800512D79 /* Preview Content */,
@@ -126,6 +129,26 @@
 			path = ObjC;
 			sourceTree = "<group>";
 		};
+		E44D52F02E8AC37B00F5DD9E /* CustomTrackingDemo */ = {
+			isa = PBXGroup;
+			children = (
+				524479282DE7EE9C00E93C77 /* CustomTrackingDemoView.swift */,
+				E44D52F82E8AC3DC00F5DD9E /* DemoErrors.swift */,
+				E44D52FA2E8AC41400F5DD9E /* SampleAttributes.swift */,
+			);
+			path = CustomTrackingDemo;
+			sourceTree = "<group>";
+		};
+		E44D52F42E8AC39B00F5DD9E /* WebDemo */ = {
+			isa = PBXGroup;
+			children = (
+				E44D52F12E8AC39B00F5DD9E /* WebDemoHTML.swift */,
+				E44D52F22E8AC39B00F5DD9E /* WebDemoJS.swift */,
+				E44D52F32E8AC39B00F5DD9E /* WebViewDemoView.swift */,
+			);
+			path = WebDemo;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -141,9 +164,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				526D230C2E0CD0CF00325F87 /* WebDemo */,
 			);
 			name = DevelApp;
 			productName = DevelApp;
@@ -226,12 +246,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				527070DC2DC145F900EDD390 /* DemoHeaderView.swift in Sources */,
+				E44D52F92E8AC3DC00F5DD9E /* DemoErrors.swift in Sources */,
+				E44D52FB2E8AC41600F5DD9E /* SampleAttributes.swift in Sources */,
 				522DB6C82DC134C70047FBCD /* RoutingView.swift in Sources */,
 				52400B7B2DFBC33200F88CD8 /* HelperViews.swift in Sources */,
 				527070E02DC147AB00EDD390 /* AgentDataSource.swift in Sources */,
 				524479292DE7EEA200E93C77 /* CustomTrackingDemoView.swift in Sources */,
 				5238CC822DFB6AD400206F6C /* ObjCExceptionHelper.m in Sources */,
 				3384F28A2AC8795800512D79 /* DevelAppApp.swift in Sources */,
+				E44D52F52E8AC39B00F5DD9E /* WebDemoHTML.swift in Sources */,
+				E44D52F62E8AC39B00F5DD9E /* WebDemoJS.swift in Sources */,
+				E44D52F72E8AC39B00F5DD9E /* WebViewDemoView.swift in Sources */,
 				522DB6CC2DC135BC0047FBCD /* TemplateView.swift in Sources */,
 				527070DE2DC1468100EDD390 /* CrashDemoView.swift in Sources */,
 				522DB6CA2DC135920047FBCD /* SessionReplayDemoView.swift in Sources */,

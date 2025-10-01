@@ -69,14 +69,14 @@ struct DeviceInfo {
             // Values for cputype and cpusubtype defined in mach/machine.h
             if cpuType == CPU_TYPE_X86_64 {
                 architectureString = "x86_64"
-
-            } else if cpuType == CPU_TYPE_I386 {
+            }
+            else if cpuType == CPU_TYPE_I386 {
                 architectureString = "i386 (Simulator)"
-
-            } else if cpuType == CPU_TYPE_ARM64 {
+            }
+            else if cpuType == CPU_TYPE_ARM64 {
                 architectureString = "ARM64"
-
-            } else if cpuType == CPU_TYPE_ARM {
+            }
+            else if cpuType == CPU_TYPE_ARM {
                 architectureString = "ARM"
             }
 

@@ -60,7 +60,9 @@ public struct WebDemoJS {
         """
     }
 
-    /// This is the default case today. Here "legacy" (not to be confused with "legacy call" which is about how the integration is done in the iOS code) refers to the BRUM agent using `getNativeSessionId()`, a sync function, as it currently does. Non-legacy would be a different hypothetical future rev of the BRUM agent that wants an async call; they would call `await getNativeSessionAsync()` as seen elsewhere in the "modern" examples.
+    /// This is the default case today. Here "legacy" (not to be confused with "legacy call" which is about how the integration is done in the iOS code) refers
+    /// to the BRUM agent using `getNativeSessionId()`, a sync function, as it currently does. Non-legacy would be a different hypothetical future rev of the
+    /// BRUM agent that wants an async call; they would call `await getNativeSessionAsync()` as seen elsewhere in the "modern" examples.
     public static func legacyScriptExample() -> String {
         """
         function updateSessionId() {
@@ -112,4 +114,3 @@ public struct WebDemoJS {
         """
     }
 }
-

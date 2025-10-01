@@ -15,10 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import XCTest
 
-class AppStateManagerTests: XCTestCase {
+@testable import SplunkAgent
+
+final class AppStateManagerTests: XCTestCase {
 
     func testRemoveOldEvents() {
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testRemoveOldEvents")
@@ -62,32 +63,32 @@ class AppStateManagerTests: XCTestCase {
     }
 
     // TODO: [DEMRUM-2782] Fix tests
-//    func testNotificationsHandle() {
-//        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testNotificationsHandle")
-//        try? storage.delete(forKey: "appStateEvents")
-//
-//        let appStateModel = AppStateModel(storage: storage)
-//        let appStateManager = AppStateManager(appStateModel: appStateModel)
-//
-//        let notifications = [
-//            UIApplication.didBecomeActiveNotification,
-//            UIApplication.didEnterBackgroundNotification,
-//            UIApplication.willEnterForegroundNotification,
-//            UIApplication.willResignActiveNotification,
-//            UIApplication.willTerminateNotification
-//        ]
-//
-//        for notification in notifications {
-//            sendSimulatedNotification(notification)
-//            simulateMainThreadWait(duration: 1)
-//        }
-//
-//        simulateMainThreadWait(duration: 2)
-//
-//        let events: [AppStateEvent] = (try? storage.read(forKey: "appStateEvents")) ?? []
-//        XCTAssertEqual(events.count, 5)
-//
-//        let retrievedState = appStateManager.appState(for: Date())
-//        XCTAssertEqual(retrievedState, .terminate)
-//    }
+    //    func testNotificationsHandle() {
+    //        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testNotificationsHandle")
+    //        try? storage.delete(forKey: "appStateEvents")
+    //
+    //        let appStateModel = AppStateModel(storage: storage)
+    //        let appStateManager = AppStateManager(appStateModel: appStateModel)
+    //
+    //        let notifications = [
+    //            UIApplication.didBecomeActiveNotification,
+    //            UIApplication.didEnterBackgroundNotification,
+    //            UIApplication.willEnterForegroundNotification,
+    //            UIApplication.willResignActiveNotification,
+    //            UIApplication.willTerminateNotification
+    //        ]
+    //
+    //        for notification in notifications {
+    //            sendSimulatedNotification(notification)
+    //            simulateMainThreadWait(duration: 1)
+    //        }
+    //
+    //        simulateMainThreadWait(duration: 2)
+    //
+    //        let events: [AppStateEvent] = (try? storage.read(forKey: "appStateEvents")) ?? []
+    //        XCTAssertEqual(events.count, 5)
+    //
+    //        let retrievedState = appStateManager.appState(for: Date())
+    //        XCTAssertEqual(retrievedState, .terminate)
+    //    }
 }

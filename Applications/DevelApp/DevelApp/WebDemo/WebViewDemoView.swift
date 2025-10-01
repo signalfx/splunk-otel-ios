@@ -23,17 +23,30 @@ import WebKit
 
 struct WebViewDemoView: View {
 
+    // MARK: - Private
+
     private static let isBrumDemoEnabled = false
 
 
     // MARK: - State Variables for WebViews
 
-    @State private var modernWebView = WKWebView()
-    @State private var modernWebViewWithLegacyCall = WKWebView()
-    @State private var legacyWebView = WKWebView()
-    @State private var legacyWebViewWithLegacyCall = WKWebView()
-    @State private var callbackTestWebView = WKWebView()
-    @State private var brumWebView = WKWebView()
+    @State
+    private var modernWebView = WKWebView()
+
+    @State
+    private var modernWebViewWithLegacyCall = WKWebView()
+
+    @State
+    private var legacyWebView = WKWebView()
+
+    @State
+    private var legacyWebViewWithLegacyCall = WKWebView()
+
+    @State
+    private var callbackTestWebView = WKWebView()
+
+    @State
+    private var brumWebView = WKWebView()
 
 
     // MARK: - Background Colors
@@ -43,6 +56,7 @@ struct WebViewDemoView: View {
     private let colorForCallback = Color(red: 0.95, green: 0.90, blue: 0.80)
     private let colorForBrum = Color(red: 0.85, green: 0.95, blue: 0.95)
 
+    // swiftlint:disable closure_body_length
     var body: some View {
         ScrollView {
 
@@ -51,11 +65,15 @@ struct WebViewDemoView: View {
                 DemoHeaderView()
 
                 Text(
-                    "These webviews use timers present in the pre-injection web content to poll and show that the updated native sessionId is available. The callback demo is an exception, using no polling or timer. And for all webviews, the JavaScript injected by the native agent does not contain polling or timers."
+                    """
+                    These webviews use timers present in the pre-injection web content to poll and show that the updated native sessionId is available.
+                    The callback demo is an exception, using no polling or timer. And for all webviews, the JavaScript injected by the native agent
+                    does not contain polling or timers.
+                    """
                 )
-                    .padding()
+                .padding()
 
-                if WebViewDemoView.isBrumDemoEnabled {
+                if Self.isBrumDemoEnabled {
                     WebViewSectionView(
                         caption: "Full BRUM Integration Demo",
                         webView: brumWebView,
@@ -72,9 +90,9 @@ struct WebViewDemoView: View {
                     PlaceholderSectionView(
                         caption: "Full BRUM Integration Demo",
                         explanation: """
-                        This section is disabled by default. Use `isBrumDemoEnabled` in WebViewDemoView.swift to enable it.
-                        You'll also need to set the token and realm in the brumScript() function in WebDemoJS.swift.
-                        """
+                            This section is disabled by default. Use `isBrumDemoEnabled` in WebViewDemoView.swift to enable it.
+                            You'll also need to set the token and realm in the brumScript() function in WebDemoJS.swift.
+                            """
                     )
                 }
 
@@ -107,6 +125,8 @@ struct WebViewDemoView: View {
         }
         .navigationTitle("WebViewNativeBridge")
     }
+
+    // swiftlint:enable closure_body_length
 
 
     // MARK: - Load WebView Content
@@ -152,9 +172,10 @@ struct WebViewDemoView: View {
     }
 }
 
-// MARK: - View Helpers
+// View Helpers
 
 extension WebViewDemoView {
+
     // MARK: - PlaceholderSectionView
 
     fileprivate struct PlaceholderSectionView: View {
@@ -179,6 +200,7 @@ extension WebViewDemoView {
             .padding()
         }
     }
+
 
     // MARK: - WebView Section Data Model
 
@@ -218,6 +240,7 @@ extension WebViewDemoView {
         }
     }
 
+
     // MARK: - WebDemoButton Model
 
     fileprivate struct WebDemoButton: View, Identifiable {
@@ -232,6 +255,7 @@ extension WebViewDemoView {
             }
         }
     }
+
 
     // MARK: - Helper Function for Button Creation
 
@@ -261,6 +285,7 @@ extension WebViewDemoView {
 
         return buttons
     }
+
 
     // MARK: - UIKit SwiftUI Wrapper
 

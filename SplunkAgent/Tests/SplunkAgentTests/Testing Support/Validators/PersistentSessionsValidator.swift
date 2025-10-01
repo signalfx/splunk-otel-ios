@@ -29,14 +29,14 @@ public class PersistentSessionsValidator {
         let readSessions: [SessionItem]? = try? storage.read(forKey: storageKey)
 
         // Filter only matching with storage state
-        let matchingSessions = sessions.compactMap { sessionItem in
-            let found = readSessions?.contains(where: { readSessionItem in
-                readSessionItem == sessionItem
-            }) ?? false
+        return sessions.compactMap { sessionItem in
+            let found =
+                readSessions?
+                .contains(where: { readSessionItem in
+                    readSessionItem == sessionItem
+                }) ?? false
 
             return found ? sessionItem : nil
         }
-
-        return matchingSessions
     }
 }

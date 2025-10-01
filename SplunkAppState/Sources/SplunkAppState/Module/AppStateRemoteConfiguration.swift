@@ -25,5 +25,5 @@ public struct AppStateRemoteConfiguration: RemoteModuleConfiguration {
 
     public var enabled: Bool = true
 
-    public init?(from data: Data) {}
+    public init?(from _: Data) {}
 }

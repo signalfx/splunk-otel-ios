@@ -28,7 +28,7 @@ public protocol SessionReplayModuleCustomId: AnyObject {
     /// - Parameter view: A view instance to add or remove custom id.
     ///
     /// - Returns: The view custom id
-    subscript(view: UIView) -> String? { get set }
+    subscript(_: UIView) -> String? { get set }
 
     /// Sets element custom id for the specified `UIView` instance.
     ///
@@ -39,5 +39,6 @@ public protocol SessionReplayModuleCustomId: AnyObject {
     ///   - customId: A new custom id.
     ///
     /// - Returns: The updated ``SessionReplayModuleCustomId`` object.
-    @discardableResult func set(_ view: UIView, _ customId: String?) -> any SessionReplayModuleCustomId
+    @discardableResult
+    func set(_ view: UIView, _ customId: String?) -> any SessionReplayModuleCustomId
 }

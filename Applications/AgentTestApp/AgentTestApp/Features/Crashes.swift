@@ -18,22 +18,27 @@ limitations under the License.
 import Foundation
 
 class Crashes {
-    
+
+    // MARK: - Sample crashes
+
+    // swiftlint:disable:next unavailable_function
     func fatalErrorCrash() {
         fatalError("Default Fatal Error")
     }
 
+    // swiftlint:disable:next unavailable_function
     func preconditionCrash() {
         preconditionFailure("Precondition Failure")
     }
-    
+
     func unwrapException() {
         let number: Int? = nil
+
+        // swiftlint:disable:next force_unwrapping
         _ = number!
     }
-    
+
     func infiniteLoop() {
-        self.infiniteLoop()
+        infiniteLoop()
     }
 }
-

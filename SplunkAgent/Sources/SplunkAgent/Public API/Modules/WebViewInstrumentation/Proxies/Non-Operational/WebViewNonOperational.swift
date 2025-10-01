@@ -46,7 +46,7 @@ final class WebViewNonOperational: WebViewInstrumentationModule {
     // MARK: - Public
 
     #if canImport(WebKit)
-        func integrateWithBrowserRum(_ view: WKWebView) {
+        func integrateWithBrowserRum(_: WKWebView) {
             logAccess(toApi: #function)
         }
     #endif

@@ -15,8 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkNavigation
+import SwiftUI
 import XCTest
+
+@testable import SplunkNavigation
 
 final class NavigationTests: XCTestCase {
 
@@ -81,4 +83,16 @@ final class NavigationTests: XCTestCase {
         _ = await navigationModule.model.screenName
         // XCTAssertEqual(screenName, customName)
     }
+
+    func testPreferredControllerName() throws {
+        // Test UIViewController name
+        XCTAssertEqual(navigationModule.preferredControllerName(for: UIViewController()), "UIViewController")
+
+        // Test UIHostingController
+        XCTAssertEqual(navigationModule.preferredControllerName(for: UIHostingController(rootView: TestView())), "UIHostingController<TestView>")
+    }
+}
+
+struct TestView: View {
+    var body: some View {}
 }

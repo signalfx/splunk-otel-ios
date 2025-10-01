@@ -19,6 +19,8 @@ import SplunkAgent
 import SwiftUI
 
 struct CustomTrackingDemoView: View {
+
+    // swiftlint:disable closure_body_length
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -97,6 +99,11 @@ struct CustomTrackingDemoView: View {
         .navigationTitle("Custom Tracking")
     }
 
+    // swiftlint:enable closure_body_length
+
+
+    // MARK: - Event tracking
+
     func trackCustomEventWithAttributes() {
         let attributes = MutableAttributes()
         attributes["UIElementType"] = .string("Button")
@@ -119,10 +126,11 @@ struct CustomTrackingDemoView: View {
         }
     }
 
+
     // MARK: - Legacy API calls demonstrating available but deprecated methods
 
-
-    // Note: Deprecation warnings in the next section are an intentional feature of the demo.
+    // Note:
+    // Deprecation warnings in the next section are an intentional feature of the demo.
 
     func trackLegacyErrorString() {
         let message = "Legacy error string"
@@ -147,88 +155,5 @@ struct CustomTrackingDemoView: View {
     func trackLegacyEvent() {
         let testDict = NSDictionary(dictionary: ["key1": "1", "key2": "2"])
         SplunkRum.reportEvent(name: "Legacy event", attributes: testDict)
-    }
-}
-
-struct DemoErrors {
-    /// String error (no stack trace needed)
-    static func stringError() -> String {
-        "This is a string representing an error message"
-    }
-
-    /// Swift Error with stack trace
-    static func swiftError() -> Error {
-        struct SampleError: Error, LocalizedError {
-            var errorDescription: String? { "This is a Swift Error" }
-        }
-        return SampleError()
-    }
-
-    /// NSError with stack trace
-    static func nsError() -> NSError {
-        NSError(domain: "com.example.error", code: 42, userInfo: [NSLocalizedDescriptionKey: "This is an NSError"])
-    }
-
-    class MyCustomError: NSError, @unchecked Sendable {}
-    static func nsErrorSubclass() -> NSError {
-        MyCustomError(
-            domain: "com.example.mycustomerrordomain",
-            code: 43,
-            userInfo: [NSLocalizedDescriptionKey: "This is an instance of MyCustomError."]
-        )
-    }
-
-    /// NSException with stack trace (from callStackSymbols)
-    static func nsException() -> NSException {
-        // Use the Objective-C helper to trigger and catch an NSException
-        let exception = ObjCExceptionHelper.performBlockAndCatchException {
-            // Trigger an NSException by calling an unrecognized selector
-            NSObject().perform(Selector(("nonExistentMethod")))
-        }
-
-        // Ensure the exception was captured
-        guard let exception else {
-            fatalError("Failed to trigger NSException")
-        }
-
-        return exception
-    }
-}
-
-struct SampleAttributes {
-    static func forStringError() -> MutableAttributes {
-        let attributes = MutableAttributes()
-        attributes.setString("sampleValue", for: "stringKey")
-        return attributes
-    }
-
-    static func forSwiftError() -> MutableAttributes {
-        let attributes = MutableAttributes()
-        attributes.setBool(true, for: "isSwiftError")
-        attributes.setInt(404, for: "errorCode")
-        return attributes
-    }
-
-    static func forNSError() -> MutableAttributes {
-        let attributes = MutableAttributes()
-        attributes.setString("NSErrorDomain", for: "domain_set_in_attributes")
-        attributes.setInt(44, for: "code_set_in_attributes")
-        return attributes
-    }
-
-    static func forNSErrorSubclass() -> MutableAttributes {
-        let attributes = MutableAttributes()
-        attributes.setString("NSErrorDomain", for: "domain_set_in_attributes")
-        attributes.setInt(45, for: "code_set_in_attributes")
-        attributes.setString("NSError subclass", for: "what")
-        return attributes
-    }
-
-    static func forNSException() -> MutableAttributes {
-        let attributes = MutableAttributes()
-        attributes.setString("NSExceptionName", for: "exceptionName")
-        attributes.setInt(46, for: "code_set_in_attributes")
-        attributes.setString("Sample reason", for: "reason")
-        return attributes
     }
 }

@@ -24,12 +24,10 @@ class AttributeCheckerLogExporter: LogRecordExporter {
 
     // MARK: - Private
 
-    // No required attributes currently
     private let requiredAttributes: [String] = []
-
     private let proxyExporter: LogRecordExporter
 
-    // Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
 

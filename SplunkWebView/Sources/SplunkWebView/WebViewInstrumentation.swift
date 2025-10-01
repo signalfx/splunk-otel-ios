@@ -15,16 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
-
+import SplunkCommon
 #if canImport(WebKit)
     import WebKit
-#else
-    import Foundation
 #endif
 
-internal import CiscoLogger
-import SplunkCommon
 
 /// Provides the ability to inject a JavaScript bridge into `WKWebView` instances for Browser RUM correlation.
 public final class WebViewInstrumentation: NSObject {
@@ -46,6 +43,7 @@ public final class WebViewInstrumentation: NSObject {
 
     /// The shared state provider, used to access the current native session ID.
     public weak var sharedState: AgentSharedState?
+
 
     // MARK: - Initialization
 

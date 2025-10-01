@@ -45,7 +45,8 @@ final class NavigationNonOperational: NavigationModule {
         // swiftlint:enable unused_setter_value
     }
 
-    @discardableResult func preferences(_ preferences: any NavigationModulePreferences) -> any NavigationModule {
+    @discardableResult
+    func preferences(_: any NavigationModulePreferences) -> any NavigationModule {
         logAccess(toApi: #function)
 
         return self

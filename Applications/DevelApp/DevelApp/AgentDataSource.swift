@@ -23,11 +23,21 @@ class AgentDataSource: ObservableObject {
 
     // MARK: - Published Properties
 
-    @Published var agentVersion: String = SplunkRum.version
-    @Published var agentAppVersion: String = SplunkRum.shared.state.appVersion
-    @Published var sessionId: String = SplunkRum.shared.session.state.id
-    @Published private var userTrackingMode = SplunkRum.shared.user.state.trackingMode
-    @Published var rumEnabled: Bool = SplunkRum.shared.state.status == .running
+    @Published
+    var agentVersion: String = SplunkRum.version
+
+    @Published
+    var agentAppVersion: String = SplunkRum.shared.state.appVersion
+
+    @Published
+    var sessionId: String = SplunkRum.shared.session.state.id
+
+    @Published
+    private var userTrackingMode = SplunkRum.shared.user.state.trackingMode
+
+    @Published
+    var rumEnabled: Bool = SplunkRum.shared.state.status == .running
+
 
     // MARK: - Session publisher for handling session resets
 
@@ -36,6 +46,7 @@ class AgentDataSource: ObservableObject {
         .receive(on: DispatchQueue.main)
 
     private var cancellables: Set<AnyCancellable> = []
+
 
     // MARK: - Initialization
 
@@ -60,6 +71,7 @@ class AgentDataSource: ObservableObject {
             }
         }
     }
+
 
     // MARK: - Derived Properties
 

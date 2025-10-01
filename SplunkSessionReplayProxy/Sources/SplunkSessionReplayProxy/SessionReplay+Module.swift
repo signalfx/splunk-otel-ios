@@ -36,22 +36,22 @@ import SplunkCommon
 // we can add module conformance to any desired type.
 
 
-// `Data` can be used as an event type that the module produces.
+/// `Data` can be used as an event type that the module produces.
 extension Data: ModuleEventData {}
 
-// Struct `RecordMetadata` describes event metadata.
-// This type must be unique in the module/agent space.
+/// Struct `RecordMetadata` describes event metadata.
+/// This type must be unique in the module/agent space.
 extension Metadata: ModuleEventMetadata {
     public var timestamp: Date {
-        Date(timeIntervalSince1970: Double(startUnixMs) / 1000.0)
+        Date(timeIntervalSince1970: Double(startUnixMs) / 1_000.0)
     }
 }
 
 
-// Minimal implementation that ensures protocol conformance.
+/// Minimal implementation that ensures protocol conformance.
 public struct SessionReplayConfiguration: ModuleConfiguration {}
 
-// Minimal implementation that ensures protocol conformance.
+/// Minimal implementation that ensures protocol conformance.
 public struct SessionReplayRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Internal decoding
@@ -87,8 +87,8 @@ public struct SessionReplayRemoteConfiguration: RemoteModuleConfiguration {
 }
 
 
-// Defines SessionReplay conformance to `Module` protocol
-// and implements methods that are missing in the original `SessionReplay`.
+/// Defines SessionReplay conformance to `Module` protocol
+/// and implements methods that are missing in the original `SessionReplay`.
 extension SessionReplay: Module {
 
     // MARK: - Module types
@@ -102,7 +102,7 @@ extension SessionReplay: Module {
 
     // MARK: - Module methods
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
         // Initialize SessionReplay module
         _ = SessionReplay.instance
     }

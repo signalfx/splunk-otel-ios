@@ -28,9 +28,14 @@ struct SessionReplayDemoView: View {
 
     // MARK: - Identifiers
 
-    @State private var sessionId = SplunkRum.shared.session.state.id
-    @State private var userTrackingMode = SplunkRum.shared.user.state.trackingMode
-    @State private var agentStatus = SplunkRum.shared.state.status
+    @State
+    private var sessionId = SplunkRum.shared.session.state.id
+
+    @State
+    private var userTrackingMode = SplunkRum.shared.user.state.trackingMode
+
+    @State
+    private var agentStatus = SplunkRum.shared.state.status
 
     let sessionPublisher = NotificationCenter.default
         .publisher(
@@ -41,15 +46,17 @@ struct SessionReplayDemoView: View {
 
     // MARK: - View
 
-    @State private var now = Date()
+    @State
+    private var now = Date()
 
     let timer = Timer.publish(every: 0.2, on: .current, in: .common).autoconnect()
 
+    // swiftlint:disable closure_body_length
     var body: some View {
         VStack(spacing: 24) {
             HStack {
                 Text("Agent Status:")
-                Text("\(agentStatus)")
+                Text(String(describing: agentStatus))
                     .padding(2)
                     .padding(.horizontal, 4)
                     .background(agentStatus == .running ? Color(.systemGreen) : Color(.systemRed))
@@ -65,11 +72,11 @@ struct SessionReplayDemoView: View {
             Text("Agent App Version: \(agentAppVersion)")
 
             VStack {
-                Text("Session ID: \(sessionId)")
+                Text("Session ID: \(String(describing: sessionId))")
                     .transition(.opacity)
                     .id("LabelSessionID" + sessionId)
 
-                Text("User Tracking: \(userTrackingMode)")
+                Text("User Tracking: \(String(describing: userTrackingMode))")
             }
             .foregroundColor(Color(uiColor: .black))
             .padding()
@@ -82,7 +89,7 @@ struct SessionReplayDemoView: View {
                 }
 
             Text("Sensitive text")
-//                .sessionReplaySensitive(true)
+            // .sessionReplaySensitive(true)
 
             Button {
                 fatalError("Test fatal error from DevelApp.")
@@ -99,8 +106,9 @@ struct SessionReplayDemoView: View {
                     sessionId = currentSessionId
                 }
             }
-         }
+        }
     }
+    // swiftlint:enable closure_body_length
 }
 
 #Preview {

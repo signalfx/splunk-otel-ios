@@ -50,15 +50,15 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
 
     // MARK: - SpanProcessor methods
 
-    public func onStart(parentContext: OpenTelemetryApi.SpanContext?, span: any OpenTelemetrySdk.ReadableSpan) {
+    public func onStart(parentContext _: OpenTelemetryApi.SpanContext?, span: any OpenTelemetrySdk.ReadableSpan) {
         inject(attributes: runtimeAttributes.all, to: span)
     }
 
-    public func onEnd(span: any OpenTelemetrySdk.ReadableSpan) {}
+    public func onEnd(span _: any OpenTelemetrySdk.ReadableSpan) {}
 
-    public func shutdown(explicitTimeout: TimeInterval?) {}
+    public func shutdown(explicitTimeout _: TimeInterval?) {}
 
-    public func forceFlush(timeout: TimeInterval?) {}
+    public func forceFlush(timeout _: TimeInterval?) {}
 
 
     // MARK: - Private methods
@@ -79,6 +79,6 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
     }
 
     private func isScreenSpan(_ span: any OpenTelemetrySdk.ReadableSpan) -> Bool {
-        span.name == "screen name change" || span.name == "ShowVC"
+        span.name == "screen name change" || span.name == "ShowVC" || span.name == "PresentationTransition"
     }
 }

@@ -17,5 +17,5 @@ limitations under the License.
 
 import SplunkCommon
 
-// Minimal protocol conformance.
+/// Minimal protocol conformance.
 public struct CustomTrackingConfiguration: ModuleConfiguration {}

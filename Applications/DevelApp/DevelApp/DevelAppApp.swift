@@ -21,7 +21,12 @@ import SwiftUI
 @main
 struct DevelAppApp: App {
 
-    let agent: SplunkRum?
+    // MARK: - Private
+
+    private let agent: SplunkRum?
+
+
+    // MARK: - Initialization
 
     init() {
         let agentConfig = AgentConfiguration(
@@ -29,10 +34,10 @@ struct DevelAppApp: App {
             appName: "App Name",
             deploymentEnvironment: "dev"
         )
-            .enableDebugLogging(true)
+        .enableDebugLogging(true)
         // Sampled-out agent
         // .sessionConfiguration(SessionConfiguration(samplingRate: 0))
-            .sessionConfiguration(SessionConfiguration(samplingRate: 1))
+        .sessionConfiguration(SessionConfiguration(samplingRate: 1))
 
         do {
             agent = try SplunkRum.install(with: agentConfig)

@@ -26,9 +26,7 @@ final class AgentTestBuilder {
         let configuration = try ConfigurationTestBuilder.buildDefault()
 
         // Agent configured for tests
-        let agent = try build(with: configuration)
-
-        return agent
+        return try build(with: configuration)
     }
 
     static func build(
@@ -39,10 +37,11 @@ final class AgentTestBuilder {
     ) throws -> SplunkRum {
         // Custom key-value storage instance with different keys for testing
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "com.splunk.rum.test.")
+        let apiClient = try APIClientTestBuilder.buildError()
 
         let handler = ConfigurationHandler(
             for: configuration,
-            apiClient: APIClientTestBuilder.buildError(),
+            apiClient: apiClient,
             storage: storage
         )
 

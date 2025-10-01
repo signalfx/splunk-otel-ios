@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import SplunkCommon
 import WebKit
 import XCTest
 @testable import SplunkWebView
@@ -28,6 +29,7 @@ final class WebViewInstrumentationTests: XCTestCase {
     private var mockAgentSharedState: MockAgentSharedState!
     private var mockLogAgent: MockLogAgent!
 
+
     // MARK: - Test Lifecycle
 
     override func setUp() {
@@ -37,6 +39,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         webViewInstrumentation = WebViewInstrumentation(logger: mockLogAgent, sharedState: mockAgentSharedState)
         mockWebView = MockWKWebView()
     }
+
 
     // MARK: - Injection Tests
 
@@ -72,6 +75,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         XCTAssertTrue(warningFound, "A warning should be logged when sharedState is not available")
     }
 
+
     // MARK: - Usage Warning Tests
 
     func testInjectSessionId_whenWebViewIsAlreadyLoading_logsWarning() {
@@ -100,6 +104,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         let warningFound = mockLogAgent.logMessages.contains { $0.level == .warn && $0.message.contains("has already started loading content") }
         XCTAssertFalse(warningFound, "A new webview should not trigger a usage warning.")
     }
+
 
     // MARK: - State Integrity Tests
 
@@ -163,6 +168,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         wait(for: [expectation2], timeout: 1.0)
     }
 
+
     // MARK: - JavaScript Content Tests
 
     func testJavascriptContent_containsSessionId() {
@@ -184,6 +190,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         XCTAssertTrue(script.contains("onNativeSessionIdChanged: null"), "JS should contain onNativeSessionIdChanged")
         XCTAssertTrue(script.contains("window.SplunkRumNative"), "JS should define window.SplunkRumNative")
     }
+
 
     // MARK: - Message Handler Tests
 

@@ -40,7 +40,8 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
                     parrentKeyBuilder: getStorageKey()
                 )
             )
-        } catch {
+        }
+        catch {
 
             return .failure
         }
@@ -58,13 +59,14 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
             try httpClient.send(requestDescriptor)
 
             return .success
-        } catch {
+        }
+        catch {
 
             return .failure
         }
     }
 
-    public func flush(explicitTimeout: TimeInterval? = nil) -> SpanExporterResultCode {
+    public func flush(explicitTimeout _: TimeInterval? = nil) -> SpanExporterResultCode {
         let semaphore = DispatchSemaphore(value: 0)
 
         httpClient.flush {
@@ -75,7 +77,7 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
         return .success
     }
 
-    public func shutdown(explicitTimeout: TimeInterval? = nil) {}
+    public func shutdown(explicitTimeout _: TimeInterval? = nil) {}
 
 
     // MARK: - Local override
