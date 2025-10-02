@@ -33,7 +33,10 @@ extension SplunkRum {
     ///
     /// - Warning: This method is not meant for client applications and may produce
     ///            unexpected results, which are not supported by the product.
-    public static func buildTestInstance(with _: AgentConfiguration, testNamed named: String? = nil) -> SplunkRum {
+    public static func buildTestInstance(with configuration: AgentConfiguration, testNamed named: String? = nil) -> SplunkRum {
+        // Intentionally unused
+        _ = configuration
+
         let testName = named ?? "agent"
 
         // Custom key-value storage instance with different keys for testing

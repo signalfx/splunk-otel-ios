@@ -120,6 +120,7 @@ final class UserDefaultsStorageCRUDTests: XCTestCase {
         // differs from the type of stored data.
         var number: Double?
 
+        // swift-format-ignore: NoAssignmentInExpressions
         XCTAssertThrowsError(
             number = try storage.read(forKey: key)
         ) { error in

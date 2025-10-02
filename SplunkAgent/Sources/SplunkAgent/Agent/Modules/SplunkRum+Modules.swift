@@ -179,14 +179,14 @@ extension SplunkRum {
         appStateModule?.sharedState = sharedState
     }
 
-    /// Configure NetworkMonitor module
+    /// Configure NetworkMonitor module.
     private func customizeNetworkMonitor() {
         let networkMonitorModule = modulesManager?.module(ofType: SplunkNetworkMonitor.NetworkMonitor.self)
 
         networkMonitorModule?.sharedState = sharedState
     }
 
-    /// Configure Interactions module
+    /// Configure Interactions module.
     private func customizeInteractions() {
         let interactionsModule = modulesManager?.module(ofType: SplunkInteractions.Interactions.self)
 
@@ -210,7 +210,7 @@ extension SplunkRum {
         }
     }
 
-    /// Configure CustomTracking intrumentation module
+    /// Configure CustomTracking intrumentation module.
     private func customizeCustomTracking() {
         if let customTrackingModule = modulesManager?.module(ofType: CustomTrackingInternal.self) {
             // Initialize proxy API for this module
@@ -218,7 +218,7 @@ extension SplunkRum {
         }
     }
 
-    /// Configure SlowFrameDetector module
+    /// Configure SlowFrameDetector module.
     private func customizeSlowFrameDetector() {
         if let slowFrameDetectorModule = modulesManager?.module(ofType: SplunkSlowFrameDetector.SlowFrameDetector.self) {
             // Initialize proxy API for this module

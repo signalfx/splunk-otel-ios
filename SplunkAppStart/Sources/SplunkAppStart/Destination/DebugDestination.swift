@@ -52,11 +52,11 @@ class DebugDestination: AppStartDestination {
                 """
 
             string += "\n\tEvents:\n"
-            appStart.events?
-                .forEach { event in
-                    let timeIntervalMs = event.timestamp.timeIntervalSince(appStart.start) * 1_000.0
-                    string += String(format: "\t\t%@ +%.3lfms\n", event.name, timeIntervalMs)
-                }
+
+            for event in appStart.events ?? [] {
+                let timeIntervalMs = event.timestamp.timeIntervalSince(appStart.start) * 1_000.0
+                string += String(format: "\t\t%@ +%.3lfms\n", event.name, timeIntervalMs)
+            }
 
             return string
         }
@@ -84,11 +84,11 @@ class DebugDestination: AppStartDestination {
                     """
 
                 string += "\n\tEvents:\n"
-                agentInitialize.events?
-                    .forEach { event in
-                        let timeIntervalMs = event.timestamp.timeIntervalSince(agentInitialize.start) * 1_000.0
-                        string += String(format: "\t\t%@ +%.3lfms\n", event.name, timeIntervalMs)
-                    }
+
+                for initializeEvent in agentInitialize.events ?? [] {
+                    let timeIntervalMs = initializeEvent.timestamp.timeIntervalSince(agentInitialize.start) * 1_000.0
+                    string += String(format: "\t\t%@ +%.3lfms\n", initializeEvent.name, timeIntervalMs)
+                }
 
                 return string
             }

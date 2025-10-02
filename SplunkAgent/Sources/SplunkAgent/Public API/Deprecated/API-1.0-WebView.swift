@@ -22,7 +22,7 @@ limitations under the License.
 
         // MARK: - WebView
 
-        /// Injects JavaScript `getNativeSessionId()` function into `WKWebView`. Legacy mapping.
+        /// Injects JavaScript `getNativeSessionId()` function into `WKWebView` (legacy mapping).
         ///
         /// - Parameter webView: The `WKWebView` instance into which the JavaScript
         /// `getNativeSessionId()` and `getNativeSessionIdAsync()` APIs will be injected.

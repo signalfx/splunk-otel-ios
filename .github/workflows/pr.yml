@@ -2,17 +2,29 @@ name: PR checks
 
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize]
+    types: [opened, reopened, synchronize]
 
 jobs:
-  validate-title:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4.2.2
-      - name: Validate PR Title
-        uses: ./.github/actions/validate-pr-title
-
   lint:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          brew update
+          brew install swiftlint
+      - run: |
+          swiftlint lint \
+            --reporter github-actions-logging \
+            --force-exclude || {
+              code=$?
+              if [ $code -eq 1 ]; then
+                echo "No Swift files found in $dir, skipping"
+              else
+                exit $code
+              fi
+            }
+
+  format:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,21 +33,18 @@ jobs:
           xcode-version: latest-stable
       - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
       - run: |
-          brew update
-          brew install swiftlint
+          git ls-files -z '*.swift' | xargs -0 swift format lint --strict --parallel
+
+  swiftformat:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
       - run: |
-          exit 0
-#          swiftlint lint \
-#            --config Tools/.swiftlint.yml \
-#            --reporter github-actions-logging \
-#            --force-exclude || {
-#              code=$?
-#              if [ $code -eq 1 ]; then
-#                echo "No Swift files found in $dir, skipping"
-#              else
-#                exit $code
-#              fi
-#            }
+          brew update
+          brew install swiftformat
+      - run: |
+          swiftformat --lint --strict . \
+            --reporter github-actions-log
 
   prepare:
     runs-on: macos-latest

@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// Defines a sampling decision, calculated as the result of a `BaseSampler`'s `sample()` function call.
+/// Defines a sampling decision, calculated as the result of a `BaseSampler's `sample()` function call.
 enum SamplingDecision {
 
     /// Indicates that the item/session should be sampled out.

@@ -21,8 +21,9 @@ extension String {
 
     /// Creates a unique hex-encoded identifier.
     ///
-    /// - Parameters:
-    ///   - length: A number of hex characters in the identifier. Default is `16`.
+    /// - Parameter length: A number of hex characters in the identifier. Default is `16`.
+    ///
+    /// - Returns: A new `String` with a generated identifier.
     static func uniqueHexIdentifier(ofLength length: Int = 16) -> String {
         var identifier = ""
 

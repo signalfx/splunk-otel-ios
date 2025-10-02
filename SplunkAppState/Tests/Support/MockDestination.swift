@@ -23,6 +23,8 @@ import Foundation
 final class MockDestination: AppStateDestination {
 
     private let lock = NSLock()
+
+    // swiftlint:disable:next large_tuple
     private(set) var events: [(state: AppStateType, time: Date, shared: AgentSharedState?)] = []
 
     var onSend: (() -> Void)?

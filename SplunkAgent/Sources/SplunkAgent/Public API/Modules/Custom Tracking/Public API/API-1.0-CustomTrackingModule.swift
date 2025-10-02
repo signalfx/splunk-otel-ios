@@ -29,9 +29,9 @@ public protocol CustomTrackingModule {
 
     /// Track a custom event with a name and attributes.
     ///
-    /// - Parameter name: The event name assigned by the user.
-    ///
-    /// - Parameter attributes: ``MutableAttributes`` instance.
+    /// - Parameters:
+    ///   - name: The event name assigned by the user.
+    ///   - attributes: ``MutableAttributes`` instance.
     ///
     /// - Returns: The updated ``CustomTrackingModule`` instance.
     @discardableResult
@@ -41,9 +41,9 @@ public protocol CustomTrackingModule {
 
     /// Track an error (String message) with optional attributes.
     ///
-    /// - Parameter message: A concise summary of the error condition.
-    ///
-    /// - Parameter attributes: Optional ``MutableAttributes`` instance to associate with the error.
+    /// - Parameters:
+    ///   - message: A concise summary of the error condition.
+    ///   - attributes: Optional ``MutableAttributes`` instance to associate with the error.
     ///
     /// - Returns: The updated ``CustomTrackingModule`` instance.
     @discardableResult
@@ -51,9 +51,9 @@ public protocol CustomTrackingModule {
 
     /// Track an Error, including NSError (any Swift Error conforming type) with optional attributes.
     ///
-    /// - Parameter error: An instance of a type conforming to the Swift Error protocol.
-    ///
-    /// - Parameter attributes: Optional ``MutableAttributes`` instance to associate with the error.
+    /// - Parameters:
+    ///  - error: An instance of a type conforming to the Swift Error protocol.
+    ///  - attributes: Optional ``MutableAttributes`` instance to associate with the error.
     ///
     /// - Returns: The updated ``CustomTrackingModule`` instance.
     @discardableResult
@@ -62,9 +62,9 @@ public protocol CustomTrackingModule {
 
     /// Track an NSException object with optional attributes.
     ///
-    /// - Parameter exception: An NSException instance such as one caught after a throw.
-    ///
-    /// - Parameter attributes: Optional ``MutableAttributes`` instance to associate with the error.
+    /// - Parameters:
+    ///  - exception: An NSException instance such as one caught after a throw.
+    ///  - attributes: Optional ``MutableAttributes`` instance to associate with the error.
     ///
     /// - Returns: The updated ``CustomTrackingModule`` instance.
     @discardableResult

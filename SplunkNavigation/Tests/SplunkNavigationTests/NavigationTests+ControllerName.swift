@@ -34,13 +34,11 @@ final class NavigationControllerNameTests: XCTestCase {
     private let navigationModule = Navigation()
 
     #if canImport(SwiftUI)
-        struct TestView: View {
-            var body: some View {}
-        }
-
         func testSwiftUIPreferredControllerName() throws {
             // Test UIHostingController
-            let controllerName = navigationModule.preferredControllerName(for: UIHostingController(rootView: TestView()))
+            let controllerName = navigationModule.preferredControllerName(
+                for: UIHostingController(rootView: TestView())
+            )
             XCTAssertEqual(controllerName, "UIHostingController<TestView>")
         }
     #endif

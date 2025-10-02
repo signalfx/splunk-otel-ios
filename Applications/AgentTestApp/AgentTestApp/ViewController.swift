@@ -90,7 +90,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
     // MARK: - UITableViewDelegate methods
 
-    /// method to run when table view cell is tapped
+    /// Method to run when table view cell is tapped.
     func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("You tapped row \(indexPath.row), for \(displayName[indexPath.row])")
 

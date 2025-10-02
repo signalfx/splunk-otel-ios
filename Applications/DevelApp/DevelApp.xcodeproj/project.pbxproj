@@ -59,6 +59,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BD024D32DE79F9000ADB31D /* SplunkAgent in Frameworks */,
+				E46C01D12E8AAEBC0095CF6A /* SwiftFormat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,7 +157,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3384F2952AC8795800512D79 /* Build configuration list for PBXNativeTarget "DevelApp" */;
 			buildPhases = (
-				4BD024D72DE79FDC00ADB31D /* Swift Lint & Swift Format */,
 				3384F2822AC8795800512D79 /* Sources */,
 				3384F2832AC8795800512D79 /* Frameworks */,
 				3384F2842AC8795800512D79 /* Resources */,
@@ -164,6 +164,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				E4FD11662E8BECA100BB46E6 /* PBXTargetDependency */,
+				E46C01D32E8AAECE0095CF6A /* PBXTargetDependency */,
 			);
 			name = DevelApp;
 			productName = DevelApp;
@@ -196,6 +198,9 @@
 			mainGroup = 3384F27D2AC8795700512D79;
 			packageReferences = (
 				4BD024D12DE79F9000ADB31D /* XCLocalSwiftPackageReference "../../../splunk-otel-ios" */,
+				E46C01CD2E8AAE990095CF6A /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				E46C01CE2E8AAEA90095CF6A /* XCRemoteSwiftPackageReference "SwiftFormatPlugins" */,
+				E46C01CF2E8AAEBC0095CF6A /* XCRemoteSwiftPackageReference "SwiftFormat" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3384F2872AC8795800512D79 /* Products */;
@@ -218,27 +223,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		4BD024D72DE79FDC00ADB31D /* Swift Lint & Swift Format */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Swift Lint & Swift Format";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/../../Tools\"\n\n# Check SplunkAgent directory\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkAgent/\necho \"$(pwd)\"\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCommon module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkCommon/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkAppStart module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkAppStart/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCustomTracking module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkCustomTracking/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork module\n# cd \"${PROJECT_DIR}\"\n# cd ../../SplunkNetwork/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkOpenTelemetry module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkOpenTelemetry/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkOpenTelemetryBackgroundExporter module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkOpenTelemetryBackgroundExporter/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkWebView module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkWebView/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkInteractions module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkInteractions/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3384F2822AC8795800512D79 /* Sources */ = {
@@ -264,6 +248,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E46C01D32E8AAECE0095CF6A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E46C01D22E8AAECE0095CF6A /* SwiftLintBuildToolPlugin */;
+		};
+		E4FD11662E8BECA100BB46E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E4FD11652E8BECA100BB46E6 /* Lint */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3384F2932AC8795800512D79 /* Debug */ = {
@@ -508,10 +503,52 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		E46C01CD2E8AAE990095CF6A /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.61.0;
+			};
+		};
+		E46C01CE2E8AAEA90095CF6A /* XCRemoteSwiftPackageReference "SwiftFormatPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/StarLard/SwiftFormatPlugins.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1;
+			};
+		};
+		E46C01CF2E8AAEBC0095CF6A /* XCRemoteSwiftPackageReference "SwiftFormat" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nicklockwood/SwiftFormat";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.58.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		4BD024D22DE79F9000ADB31D /* SplunkAgent */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SplunkAgent;
+		};
+		E46C01D02E8AAEBC0095CF6A /* SwiftFormat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E46C01CF2E8AAEBC0095CF6A /* XCRemoteSwiftPackageReference "SwiftFormat" */;
+			productName = SwiftFormat;
+		};
+		E46C01D22E8AAECE0095CF6A /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E46C01CD2E8AAE990095CF6A /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		E4FD11652E8BECA100BB46E6 /* Lint */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E46C01CE2E8AAEA90095CF6A /* XCRemoteSwiftPackageReference "SwiftFormatPlugins" */;
+			productName = "plugin:Lint";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

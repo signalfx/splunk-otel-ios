@@ -40,8 +40,8 @@ extension SplunkRum {
 
     /// Sets global attributes to be added to all spans.
     ///
-    /// - Parameters:
-    ///   - attributes: A dictionary of key-value pairs to add as global attributes.
+    /// - Parameters attributes: A dictionary of key-value pairs to add as global attributes.
+    ///
     /// - Note: This function is deprecated and will be removed in a later version.
     @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.globalAttributes` API instead.")
     public static func setGlobalAttributes(_ attributes: [String: Any]) {
@@ -51,8 +51,8 @@ extension SplunkRum {
 
     /// Removes a global attribute by key.
     ///
-    /// - Parameters:
-    ///   - key: The key of the attribute to remove from global attributes.
+    /// - Parameter key: The key of the attribute to remove from global attributes.
+    ///
     /// - Note: This function is deprecated and will be removed in a later version.
     @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.globalAttributes` API instead.")
     public static func removeGlobalAttribute(_ key: String) {
@@ -61,9 +61,12 @@ extension SplunkRum {
 
     /// Logs a debug message.
     ///
-    /// - Parameters:
-    ///   - msg: The debug message to log.
+    /// - Parameter msg: The debug message to log.
+    ///
     /// - Note: This function is deprecated and will be removed in a later version.
     @available(*, deprecated, message: "This function will be removed in a later version.")
-    public static func debugLog(_: String) {}
+    public static func debugLog(_ msg: String) {
+        // Intentionally unused
+        _ = msg
+    }
 }
