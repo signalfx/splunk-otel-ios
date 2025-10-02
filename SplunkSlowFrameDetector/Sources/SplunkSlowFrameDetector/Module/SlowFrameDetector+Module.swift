@@ -21,16 +21,16 @@ import SplunkCommon
 /// A placeholder data structure for `SlowFrameDetector` module events.
 public struct SlowFrameData: ModuleEventData {}
 
-// MARK: - ModuleEventMetadata Conformance
+// ModuleEventMetadata Conformance
 
 extension EventMetadataSlowFrameDetector: ModuleEventMetadata {
     public static func == (lhs: EventMetadataSlowFrameDetector, rhs: EventMetadataSlowFrameDetector) -> Bool {
         lhs.timestamp == rhs.timestamp
-                   && lhs.id == rhs.id
+            && lhs.id == rhs.id
     }
 }
 
-// MARK: - Module Conformance
+// Module Conformance
 
 extension SlowFrameDetector: Module {
 
@@ -41,6 +41,7 @@ extension SlowFrameDetector: Module {
 
     public typealias EventMetadata = EventMetadataSlowFrameDetector
     public typealias EventData = SlowFrameData
+
 
     // MARK: - Module methods
 
