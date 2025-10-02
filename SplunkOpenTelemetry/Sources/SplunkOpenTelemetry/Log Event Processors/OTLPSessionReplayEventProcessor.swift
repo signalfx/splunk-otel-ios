@@ -140,44 +140,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     // MARK: - Private methods
 
     private func processEvent(event: any AgentEvent, completion: @escaping (Bool) -> Void) {
-        // Initialize attribute dictionary
-        //
-        // As we are bypasing a Log event processor and LogRecordBuilder,
-        // we need to add attributes manually.
-        var attributes: [String: SplunkAttributeValue] = [:]
-
-        // Merge runtime attributes
-        for (key, value) in runtimeAttributes.all {
-            if let attributeValue = SplunkAttributeValue(value) {
-                attributes[key] = attributeValue
-            }
-        }
-
-        // Add attributes from the AgentEvent
-        // ‼️ This code mirrors code from `LogRecordBuilder+AgentEvent.swift`, but utilizes `SplunkAttributeValue`
-
-        // Attributes - session ID
-        if let sessionId = event.sessionId {
-            attributes["session.id"] = SplunkAttributeValue(sessionId)
-        }
-
-        // Attributes - event.domain
-        attributes["event.domain"] = SplunkAttributeValue(event.domain)
-
-        // Attributes - event.name
-        attributes["event.name"] = SplunkAttributeValue(event.name)
-
-        // Attributes - component
-        attributes["component"] = SplunkAttributeValue(event.component)
-
-        // Merge with provided attributes
-        if let providedAttributes = event.attributes {
-            for (attributeName, eventAttributeValue) in providedAttributes {
-                let splunkAttributeValue = SplunkAttributeValue(eventAttributeValue: eventAttributeValue)
-                attributes[attributeName] = splunkAttributeValue
-            }
-        }
-
         guard let eventTimestamp = event.timestamp else {
             logger.log(level: .error) {
                 "Missing session replay data timestamp."
@@ -185,6 +147,12 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
             return
         }
+
+        // Initialize attribute dictionary
+        //
+        // As we are bypasing a Log event processor and LogRecordBuilder,
+        // we need to add attributes manually.
+        let attributes: [String: SplunkAttributeValue] = prepareAttributes(for: event)
 
         // Manually create a Log record
         var logRecord = SplunkReadableLogRecord(
@@ -224,6 +192,44 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         DispatchQueue.main.async {
             completion(true)
         }
+    }
+
+    private func prepareAttributes(for event: any AgentEvent) -> [String: SplunkAttributeValue] {
+        var attributes: [String: SplunkAttributeValue] = [:]
+
+        // Merge runtime attributes
+        for (key, value) in runtimeAttributes.all {
+            if let attributeValue = SplunkAttributeValue(value) {
+                attributes[key] = attributeValue
+            }
+        }
+
+        // Add attributes from the AgentEvent
+        // ‼️ This code mirrors code from `LogRecordBuilder+AgentEvent.swift`, but utilizes `SplunkAttributeValue`
+
+        // Attributes - session ID
+        if let sessionId = event.sessionId {
+            attributes["session.id"] = SplunkAttributeValue(sessionId)
+        }
+
+        // Attributes - event.domain
+        attributes["event.domain"] = SplunkAttributeValue(event.domain)
+
+        // Attributes - event.name
+        attributes["event.name"] = SplunkAttributeValue(event.name)
+
+        // Attributes - component
+        attributes["component"] = SplunkAttributeValue(event.component)
+
+        // Merge with provided attributes
+        if let providedAttributes = event.attributes {
+            for (attributeName, eventAttributeValue) in providedAttributes {
+                let splunkAttributeValue = SplunkAttributeValue(eventAttributeValue: eventAttributeValue)
+                attributes[attributeName] = splunkAttributeValue
+            }
+        }
+
+        return attributes
     }
 }
 

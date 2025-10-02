@@ -154,7 +154,7 @@ final class DefaultSessionTests: XCTestCase {
     //        XCTAssertNil(retrievedSessionId)
     //    }
 
-    /// Test whether next application launch creates a new session
+    /// Test whether next application launch creates a new session.
     func testNextLaunchSession() throws {
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "nextLaunchSessionTest")
         let sessionModel = SessionsModel(storage: storage)

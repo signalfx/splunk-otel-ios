@@ -27,7 +27,7 @@ import XCTest
 
         private let defaultInterval: TimeInterval = 1
 
-        /// We need time to deliver and evaluate the expectations
+        /// We need time to deliver and evaluate the expectations.
         private let deliveryTime: TimeInterval = 0.1
 
 

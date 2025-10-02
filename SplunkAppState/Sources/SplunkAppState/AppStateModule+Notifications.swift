@@ -56,7 +56,10 @@ extension AppStateModule {
         #if os(iOS) || os(tvOS) || os(visionOS)
             let tokens = notificationObservers
             notificationObservers.removeAll()
-            tokens.forEach { NotificationCenter.default.removeObserver($0) }
+
+            for token in tokens {
+                NotificationCenter.default.removeObserver(token)
+            }
         #endif
     }
 

@@ -34,12 +34,12 @@ extension CrashReports {
                 }
             )
         }
-        else if let array = value as? [[CrashReportKeys: Any]] {
+
+        if let array = value as? [[CrashReportKeys: Any]] {
             return array.map { normalizeToJSONReady($0, depth: depth + 1) }
         }
-        else {
-            return value
-        }
+
+        return value
     }
 
     func convertToJSONString(_ item: Any) -> String? {

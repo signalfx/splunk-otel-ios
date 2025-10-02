@@ -34,6 +34,7 @@ class Crashes {
     func unwrapException() {
         let number: Int? = nil
 
+        // swift-format-ignore: NeverForceUnwrap
         // swiftlint:disable:next force_unwrapping
         _ = number!
     }

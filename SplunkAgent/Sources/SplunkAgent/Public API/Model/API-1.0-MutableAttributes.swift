@@ -68,6 +68,7 @@ public class MutableAttributes {
     /// Initializes the collection by decoding from a `Decoder`.
     ///
     /// This initializer is used to conform to the `Decodable` protocol.
+    ///
     /// - Throws: An error if decoding fails.
     public required init(from decoder: Decoder) throws {
         attributes = ThreadSafeDictionary<String, AttributeValue>()

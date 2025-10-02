@@ -26,7 +26,9 @@ public class ModuleConfigurationObjC: NSObject {
 
     // MARK: - Module management
 
-    /// Indicates whether the Module is enabled. Default value is `YES`.
+    /// Indicates whether the Module is enabled.
+    ///
+    /// Default value is `YES`.
     public var isEnabled: Bool = true
 
 

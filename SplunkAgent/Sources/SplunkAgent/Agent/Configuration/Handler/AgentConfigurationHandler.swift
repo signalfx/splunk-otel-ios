@@ -17,12 +17,12 @@ limitations under the License.
 
 import Foundation
 
-/// Defines basic agent configurations api
+/// Defines basic agent configurations api.
 protocol AgentConfigurationHandler {
 
-    /// Raw configuration data downloaded from API or loaded cached from UserDefaults
+    /// Raw configuration data downloaded from API or loaded cached from `UserDefaults`.
     var configurationData: Data? { get }
 
-    /// Encoded configuration model from configurationData
+    /// Encoded configuration model from configurationData.
     var configuration: any AgentConfigurationProtocol { get }
 }
