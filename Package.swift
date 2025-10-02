@@ -160,14 +160,17 @@ func generateMainTargets() -> [Target] {
             dependencies: [
                 "SplunkCommon",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
-                resolveDependency("logger")
+                resolveDependency("logger"),
+                resolveDependency("swizzling")
             ],
             path: "SplunkNavigation/Sources",
             plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkNavigationTests",
-            dependencies: ["SplunkNavigation"],
+            dependencies: [
+                "SplunkNavigation"
+            ],
             path: "SplunkNavigation/Tests",
             plugins: lintTargetPlugins()
         ),
@@ -183,14 +186,17 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
                 .product(name: "ResourceExtension", package: "opentelemetry-swift"),
                 .product(name: "URLSessionInstrumentation", package: "opentelemetry-swift"),
-                .product(name: "SignPostIntegration", package: "opentelemetry-swift")
+                .product(name: "SignPostIntegration", package: "opentelemetry-swift"),
+                resolveDependency("logger")
             ],
             path: "SplunkNetwork/Sources",
             plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkNetworkTests",
-            dependencies: ["SplunkNetwork"],
+            dependencies: [
+                "SplunkNetwork"
+            ],
             path: "SplunkNetwork/Tests",
             plugins: lintTargetPlugins()
         ),
@@ -210,7 +216,9 @@ func generateMainTargets() -> [Target] {
         ),
         .testTarget(
             name: "SplunkNetworkMonitorTests",
-            dependencies: ["SplunkNetworkMonitor"],
+            dependencies: [
+                "SplunkNetworkMonitor"
+            ],
             path: "SplunkNetworkMonitor/Tests",
             plugins: lintTargetPlugins()
         ),
@@ -223,6 +231,7 @@ func generateMainTargets() -> [Target] {
             dependencies: [
                 resolveDependency("diskStorage"),
                 resolveDependency("encryptor"),
+                resolveDependency("logger"),
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
             ],
             path: "SplunkCommon/Sources",
@@ -230,7 +239,9 @@ func generateMainTargets() -> [Target] {
         ),
         .testTarget(
             name: "SplunkCommonTests",
-            dependencies: ["SplunkCommon"],
+            dependencies: [
+                "SplunkCommon"
+            ],
             path: "SplunkCommon/Tests",
             plugins: lintTargetPlugins()
         ),
@@ -242,14 +253,18 @@ func generateMainTargets() -> [Target] {
             name: "SplunkSlowFrameDetector",
             dependencies: [
                 .byName(name: "SplunkCommon"),
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                resolveDependency("logger")
             ],
             path: "SplunkSlowFrameDetector/Sources",
             plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkSlowFrameDetectorTests",
-            dependencies: ["SplunkSlowFrameDetector", "SplunkCommon"],
+            dependencies: [
+                "SplunkSlowFrameDetector",
+                "SplunkCommon"
+            ],
             path: "SplunkSlowFrameDetector/Tests",
             plugins: lintTargetPlugins()
         ),
@@ -301,7 +316,10 @@ func generateMainTargets() -> [Target] {
         ),
         .testTarget(
             name: "SplunkOpenTelemetryBackgroundExporterTests",
-            dependencies: ["SplunkOpenTelemetryBackgroundExporter", "SplunkCommon"],
+            dependencies: [
+                "SplunkOpenTelemetryBackgroundExporter",
+                "SplunkCommon"
+            ],
             path: "SplunkOpenTelemetryBackgroundExporter/Tests",
             plugins: lintTargetPlugins()
         ),
@@ -315,14 +333,18 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 resolveDependency("runtimeCache"),
-                resolveDependency("logger")
+                resolveDependency("logger"),
+                resolveDependency("swizzling"),
+                resolveDependency("interactions")
             ],
             path: "SplunkInteractions/Sources",
             plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkInteractionsTests",
-            dependencies: ["SplunkInteractions"],
+            dependencies: [
+                "SplunkInteractions"
+            ],
             path: "SplunkInteractions/Tests",
             plugins: lintTargetPlugins()
         ),
@@ -356,7 +378,8 @@ func generateMainTargets() -> [Target] {
             name: "SplunkAppState",
             dependencies: [
                 "SplunkCommon",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                resolveDependency("logger")
             ],
             path: "SplunkAppState/Sources",
             plugins: lintTargetPlugins()
@@ -410,7 +433,6 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 "SplunkOpenTelemetry",
                 "SplunkCustomTracking",
-                resolveDependency("logger"),
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift")
             ],
