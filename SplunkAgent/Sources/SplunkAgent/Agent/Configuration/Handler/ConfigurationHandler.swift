@@ -30,7 +30,7 @@ final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
     let storage: KeyValueStorage
 
     var reloadSessionTimer: Timer?
-    var cancellables = [AnyCancellable]()
+    var cancellables: [AnyCancellable] = []
 
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
@@ -73,9 +73,10 @@ final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
             .default
             .publisher(for: DefaultSession.sessionWillResetNotification)
             .sink { [weak self] _ in
-                self?.logger.log(level: .info) {
-                    "Session will reset, fetching new configuration."
-                }
+                self?.logger
+                    .log(level: .info) {
+                        "Session will reset, fetching new configuration."
+                    }
 
                 self?.loadRemoteConfiguration()
             }
@@ -94,7 +95,8 @@ final class ConfigurationHandler: AgentConfigurationHandler, ObservableObject {
         do {
             let remoteConfiguration = try RemoteConfiguration.decode(data)
             configuration.mergeRemote(remoteConfiguration)
-        } catch {
+        }
+        catch {
             logger.log(level: .info) {
                 "Failed to decode remote configuration data with an error: \(error)."
             }

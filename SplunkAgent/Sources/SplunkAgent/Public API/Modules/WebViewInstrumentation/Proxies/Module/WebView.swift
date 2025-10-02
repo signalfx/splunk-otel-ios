@@ -24,7 +24,7 @@ internal import SplunkWebView
 /// The public-facing proxy class that forwards calls to the internal WebView module.
 final class WebView: WebViewInstrumentationModule {
 
-    // This holds the *real* module instance from the SplunkWebView module
+    /// Holds the *real* module instance from the SplunkWebView module.
     private let module: SplunkWebView.WebViewInstrumentation
 
     init(module: SplunkWebView.WebViewInstrumentation) {

@@ -26,11 +26,13 @@ extension MutableAttributes: Codable {
         let dictionary = attributes.getAll()
 
         for (key, value) in dictionary {
-            try container.encode(value, forKey: StringCodingKey(stringValue: key)!)
+            if let codingKey = StringCodingKey(stringValue: key) {
+                try container.encode(value, forKey: codingKey)
+            }
         }
     }
 
-    // Helper for coding with string keys
+    /// Helper for coding with string keys.
     struct StringCodingKey: CodingKey {
         var stringValue: String
         var intValue: Int?

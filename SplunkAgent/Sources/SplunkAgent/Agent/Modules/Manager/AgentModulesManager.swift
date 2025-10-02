@@ -50,8 +50,11 @@ protocol AgentModulesManager {
     ///   - modules: List of connected modules.
     ///   - configurations: A set of relevant module configurations.
     ///   - remoteConfigurations: A set of relevant remote configurations.
-    func connect(modules: [any Module], with configurations: [any ModuleConfiguration],
-                 remoteConfigurations: [any RemoteModuleConfiguration])
+    func connect(
+        modules: [any Module],
+        with configurations: [any ModuleConfiguration],
+        remoteConfigurations: [any RemoteModuleConfiguration]
+    )
 
     /// Returns the module instance managed by this manager.
     ///
@@ -97,10 +100,11 @@ extension AgentModulesManager {
 
     // MARK: - Business Logic
 
-    func module<T: Module>(ofType type: T.Type) -> T? {
-        let matches = modules.filter { module in
-            (module as? T) != nil
-        } as? [T]
+    func module<T: Module>(ofType _: T.Type) -> T? {
+        let matches =
+            modules.filter { module in
+                (module as? T) != nil
+            } as? [T]
 
         return matches?.first
     }

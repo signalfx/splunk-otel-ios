@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 internal import CiscoSessionReplay
+import Foundation
 
 /// The preferences object is a representation of the user's preferred settings.
 ///
@@ -73,7 +73,8 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
     /// - Parameter renderingMode: The desired ``RenderingMode``.
     ///
     /// - Returns: The ``SessionReplayModulePreferences`` instance for chaining further configurations.
-    @discardableResult public func renderingMode(_ renderingMode: RenderingMode?) -> SessionReplayModulePreferences {
+    @discardableResult
+    public func renderingMode(_ renderingMode: RenderingMode?) -> SessionReplayModulePreferences {
         self.renderingMode = renderingMode
 
         return self
@@ -81,14 +82,14 @@ public final class SessionReplayPreferences: SessionReplayModulePreferences, Cod
 }
 
 
-public extension SessionReplayPreferences {
+extension SessionReplayPreferences {
 
     // MARK: - Convenience init
 
     /// Initializes the preferences with a specific rendering mode.
     ///
     /// - Parameter renderingMode: The ``RenderingMode`` to use for the session replay.
-    convenience init(renderingMode: RenderingMode) {
+    public convenience init(renderingMode: RenderingMode) {
         self.init(for: nil)
 
         self.renderingMode = renderingMode

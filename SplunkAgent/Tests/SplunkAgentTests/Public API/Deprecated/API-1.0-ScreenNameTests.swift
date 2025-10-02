@@ -15,14 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import XCTest
+
+@testable import SplunkAgent
 
 final class API10ScreenNameTests: XCTestCase {
 
     // MARK: - Private
 
-    var agent: SplunkRum?
+    private var agent: SplunkRum?
 
 
     // MARK: - Tests lifecycle

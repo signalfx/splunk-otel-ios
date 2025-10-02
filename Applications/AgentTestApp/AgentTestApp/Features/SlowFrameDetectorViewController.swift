@@ -20,15 +20,22 @@ import UIKit
 
 class SlowFrameDetectorViewController: UIViewController {
 
-    @IBOutlet var slowFramesButton: UIButton!
-    @IBOutlet var frozenFramesButton: UIButton!
-    @IBOutlet var beatingHeartView: SlowFrameBeatingHeartView!
+    // MARK: - UI Outlets
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
+    @IBOutlet
+    private var slowFramesButton: UIButton!
 
-    @IBAction func slowFramesClick(_ sender: UIButton) {
+    @IBOutlet
+    private var frozenFramesButton: UIButton!
+
+    @IBOutlet
+    private var beatingHeartView: SlowFrameBeatingHeartView!
+
+
+    // MARK: - UI Actions
+
+    @IBAction
+    private func slowFramesClick(_: UIButton) {
         // Sleep for 0.5 seconds on the main thread
         print("Sleeping for 0.5 seconds to force slow frames")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
@@ -36,7 +43,8 @@ class SlowFrameDetectorViewController: UIViewController {
         }
     }
 
-    @IBAction func frozenFramesClick(_ sender: UIButton) {
+    @IBAction
+    private func frozenFramesClick(_: UIButton) {
         // Sleep for 1 second on the main thread
         print("Sleeping for 2 seconds to force frozen frames")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
@@ -44,5 +52,3 @@ class SlowFrameDetectorViewController: UIViewController {
         }
     }
 }
-
-

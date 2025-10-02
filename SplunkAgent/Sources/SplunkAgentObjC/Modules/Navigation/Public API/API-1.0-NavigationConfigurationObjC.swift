@@ -18,7 +18,8 @@ limitations under the License.
 import Foundation
 
 /// The class implements the Navigation module configuration.
-@objc(SPLKNavigationConfiguration) @objcMembers
+@objc(SPLKNavigationConfiguration)
+@objcMembers
 public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
 
     // MARK: - Module management

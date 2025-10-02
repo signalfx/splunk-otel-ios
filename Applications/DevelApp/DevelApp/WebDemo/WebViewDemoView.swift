@@ -23,22 +23,40 @@ import WebKit
 
 struct WebViewDemoView: View {
 
+    // MARK: - Private
+
     private static let isBrumDemoEnabled = false
 
+
     // MARK: - State Variables for WebViews
-    @State private var modernWebView = WKWebView()
-    @State private var modernWebViewWithLegacyCall = WKWebView()
-    @State private var legacyWebView = WKWebView()
-    @State private var legacyWebViewWithLegacyCall = WKWebView()
-    @State private var callbackTestWebView = WKWebView()
-    @State private var brumWebView = WKWebView()
+
+    @State
+    private var modernWebView = WKWebView()
+
+    @State
+    private var modernWebViewWithLegacyCall = WKWebView()
+
+    @State
+    private var legacyWebView = WKWebView()
+
+    @State
+    private var legacyWebViewWithLegacyCall = WKWebView()
+
+    @State
+    private var callbackTestWebView = WKWebView()
+
+    @State
+    private var brumWebView = WKWebView()
+
 
     // MARK: - Background Colors
+
     private let colorForSync = Color(red: 0.80, green: 0.92, blue: 0.85)
     private let colorForAsync = Color(red: 0.85, green: 0.82, blue: 0.95)
     private let colorForCallback = Color(red: 0.95, green: 0.90, blue: 0.80)
     private let colorForBrum = Color(red: 0.85, green: 0.95, blue: 0.95)
 
+    // swiftlint:disable closure_body_length
     var body: some View {
         ScrollView {
 
@@ -46,10 +64,16 @@ struct WebViewDemoView: View {
 
                 DemoHeaderView()
 
-                Text("These webviews use timers present in the pre-injection web content to poll and show that the updated native sessionId is available. The callback demo is an exception, using no polling or timer. And for all webviews, the JavaScript injected by the native agent does not contain polling or timers.")
-                    .padding()
+                Text(
+                    """
+                    These webviews use timers present in the pre-injection web content to poll and show that the updated native sessionId is available.
+                    The callback demo is an exception, using no polling or timer. And for all webviews, the JavaScript injected by the native agent
+                    does not contain polling or timers.
+                    """
+                )
+                .padding()
 
-                if WebViewDemoView.isBrumDemoEnabled {
+                if Self.isBrumDemoEnabled {
                     WebViewSectionView(
                         caption: "Full BRUM Integration Demo",
                         webView: brumWebView,
@@ -61,13 +85,14 @@ struct WebViewDemoView: View {
                             }
                         ]
                     )
-                } else {
+                }
+                else {
                     PlaceholderSectionView(
                         caption: "Full BRUM Integration Demo",
                         explanation: """
-                        This section is disabled by default. Use `isBrumDemoEnabled` in WebViewDemoView.swift to enable it.
-                        You'll also need to set the token and realm in the brumScript() function in WebDemoJS.swift.
-                        """
+                            This section is disabled by default. Use `isBrumDemoEnabled` in WebViewDemoView.swift to enable it.
+                            You'll also need to set the token and realm in the brumScript() function in WebDemoJS.swift.
+                            """
                     )
                 }
 
@@ -86,7 +111,7 @@ struct WebViewDemoView: View {
                             SplunkRum.shared.webViewNativeBridge.integrateWithBrowserRum(callbackTestWebView)
                         },
                         WebDemoButton(label: "Reset Session ID") {
-                            //SplunkRum.poc_forceNewSession()
+                            // SplunkRum.poc_forceNewSession()
                         }
                     ]
                 )
@@ -101,7 +126,11 @@ struct WebViewDemoView: View {
         .navigationTitle("WebViewNativeBridge")
     }
 
+    // swiftlint:enable closure_body_length
+
+
     // MARK: - Load WebView Content
+
     private func loadWebViewContent() {
         WebDemoHTML.loadWebViewContent(for: legacyWebView, scriptContent: WebDemoJS.legacyScriptExample())
         WebDemoHTML.loadWebViewContent(for: modernWebView, scriptContent: WebDemoJS.modernScriptExample())
@@ -110,7 +139,9 @@ struct WebViewDemoView: View {
         WebDemoHTML.loadCallbackTestWebViewContent(for: callbackTestWebView)
     }
 
+
     // MARK: - Standard Sections
+
     private func getSections() -> [WebViewSectionView] {
         [
             WebViewSectionView(
@@ -167,6 +198,7 @@ struct PlaceholderSectionView: View {
     }
 }
 
+
 // MARK: - WebView Section Data Model
 
 struct WebViewSectionView: View {
@@ -189,7 +221,7 @@ struct WebViewSectionView: View {
             VStack(spacing: 8) {
                 ForEach(buttons.indices, id: \.self) { index in
                     buttons[index]
-                    if buttons.count > 1 && index < buttons.count - 1 {
+                    if buttons.count > 1, index < buttons.count - 1 {
                         Text("—")
                             .font(.body)
                             .foregroundColor(.gray)
@@ -205,7 +237,9 @@ struct WebViewSectionView: View {
     }
 }
 
+
 // MARK: - WebDemoButton Model
+
 struct WebDemoButton: View, Identifiable {
     let id = UUID()
     let label: String
@@ -219,7 +253,9 @@ struct WebDemoButton: View, Identifiable {
     }
 }
 
+
 // MARK: - Helper Function for Button Creation
+
 func createWebDemoButton(
     isAsync: Bool,
     isLegacy: Bool,
@@ -229,13 +265,14 @@ func createWebDemoButton(
 
     // Dynamic label based on parameters
     let legacyPart = isLegacy ? " using legacy call" : ""
-    let label = "Inject JavaScript and demo getNativeSessionId\((isAsync ? "Async" : ""))()\(legacyPart)"
+    let label = "Inject JavaScript and demo getNativeSessionId\(isAsync ? "Async" : "")()\(legacyPart)"
 
     // Button action
     let action: () -> Void = {
         if isLegacy {
             SplunkRum.integrateWithBrowserRum(webView)
-        } else {
+        }
+        else {
             SplunkRum.shared.webViewNativeBridge.integrateWithBrowserRum(webView)
         }
     }
@@ -246,15 +283,17 @@ func createWebDemoButton(
     return buttons
 }
 
+
 // MARK: - UIKit SwiftUI Wrapper
+
 struct WebViewRepresentable: UIViewRepresentable {
     let webView: WKWebView
 
-    func makeUIView(context: Context) -> WKWebView {
-        return webView
+    func makeUIView(context _: Context) -> WKWebView {
+        webView
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {
+    func updateUIView(_: WKWebView, context _: Context) {
         // Nothing to do here
     }
 }

@@ -15,15 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import SplunkCommon
 import XCTest
+
+@testable import SplunkAgent
 
 final class ModuleAcceptHelpersTests: XCTestCase {
 
     // MARK: - Private
 
-    private var sessionReplay: (any Module)!
+    private var sessionReplay: (any Module)?
 
 
     // MARK: - Tests lifecycle
@@ -35,10 +36,18 @@ final class ModuleAcceptHelpersTests: XCTestCase {
         sessionReplay = SessionReplayTestModule()
     }
 
+    override func tearDown() {
+        sessionReplay = nil
+
+        super.tearDown()
+    }
+
 
     // MARK: - Module helpers
 
     func testAcceptsConfiguration() throws {
+        let sessionReplay = try XCTUnwrap(sessionReplay)
+
         let configuration = SessionReplayTestConfiguration()
         let configurationType = type(of: configuration)
 
@@ -53,6 +62,8 @@ final class ModuleAcceptHelpersTests: XCTestCase {
     }
 
     func testAcceptsRemoteConfiguration() throws {
+        let sessionReplay = try XCTUnwrap(sessionReplay)
+
         // Load raw configuration mock
         let rawConfiguration = try RawMockDataBuilder.build(mockFile: .remoteConfiguration)
 
@@ -74,6 +85,8 @@ final class ModuleAcceptHelpersTests: XCTestCase {
     }
 
     func testAcceptsMetadata() throws {
+        let sessionReplay = try XCTUnwrap(sessionReplay)
+
         let metadata = SessionReplayTestMetadata(id: String.uniqueIdentifier())
         let metadataType = type(of: metadata)
 

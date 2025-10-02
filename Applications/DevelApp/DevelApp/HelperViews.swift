@@ -42,6 +42,7 @@ struct FeatureSection<Content: View>: View {
     }
 }
 
+
 struct FeatureButton: View {
     let label: String
     let action: () -> Void

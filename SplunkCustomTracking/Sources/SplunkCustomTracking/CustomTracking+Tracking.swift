@@ -18,7 +18,7 @@ limitations under the License.
 import OpenTelemetryApi
 import SplunkCommon
 
-public extension CustomTrackingInternal {
+extension CustomTrackingInternal {
 
 
     // MARK: - Internal Tracking Methods
@@ -26,11 +26,11 @@ public extension CustomTrackingInternal {
 
     // MARK: - Custom Event Tracking
 
-    func track(_ event: SplunkTrackableEvent) {
+    public func track(_ event: SplunkTrackableEvent) {
         // OTelEmitter.emitSpan(data: event, sharedState: sharedState, spanName: "customEvent")
 
         // Ensure the `onPublishBlock` is set
-        guard let onPublishBlock = onPublishBlock else {
+        guard let onPublishBlock else {
             print("onPublish block not set!")
             return
         }
@@ -38,9 +38,11 @@ public extension CustomTrackingInternal {
         // Metadata and data for the event
         let metadata = CustomTrackingMetadata()
 
-        let data = CustomTrackingData(name: event.eventName,
-                                      component: "event",
-                                      attributes: event.toAttributesDictionary())
+        let data = CustomTrackingData(
+            name: event.eventName,
+            component: "event",
+            attributes: event.toAttributesDictionary()
+        )
 
         // Publish the event using the block
         onPublishBlock(metadata, data)
@@ -49,11 +51,11 @@ public extension CustomTrackingInternal {
 
     // MARK: - Custom Error Tracking
 
-    func track(_ issue: SplunkTrackableIssue, _ attributes: [String: EventAttributeValue]) {
+    public func track(_ issue: SplunkTrackableIssue, _ attributes: [String: EventAttributeValue]) {
         // OTelEmitter.emitSpan(data: issue, sharedState: sharedState, spanName: "customError")
 
         // Ensure the `onPublishBlock` is set
-        guard let onPublishBlock = onPublishBlock else {
+        guard let onPublishBlock else {
             print("onPublish block not set!")
             return
         }
@@ -68,29 +70,30 @@ public extension CustomTrackingInternal {
         let combinedAttributes = augmented.merging(issue.toAttributesDictionary()) { $1 }
 
         // Create the tracking data
-        let data = CustomTrackingData(name: "error",
-                                      component: "error",
-                                      attributes: combinedAttributes)
+        let data = CustomTrackingData(
+            name: "error",
+            component: "error",
+            attributes: combinedAttributes
+        )
 
         // Publish the issue using the block
         onPublishBlock(metadata, data)
     }
 
-    func track(_ workflowName: String) -> Span {
+    public func track(_ workflowName: String) -> Span {
         // Ensure the tracer provider is properly configured
-            let tracer = OpenTelemetry.instance
-                .tracerProvider
-                .get(
-                    instrumentationName: "splunk-custom-tracking",
-                    instrumentationVersion: sharedState?.agentVersion ?? "unknown"
-                )
+        let tracer = OpenTelemetry.instance
+            .tracerProvider
+            .get(
+                instrumentationName: "splunk-custom-tracking",
+                instrumentationVersion: sharedState?.agentVersion ?? "unknown"
+            )
 
         // Start a span for the workflow
-        let span = tracer.spanBuilder(spanName: workflowName)
-                .setAttribute(key: "workflow.name", value: workflowName)
-                .startSpan()
+        return tracer.spanBuilder(spanName: workflowName)
+            .setAttribute(key: "workflow.name", value: workflowName)
+            .startSpan()
 
         // Return the span object
-        return span
     }
 }

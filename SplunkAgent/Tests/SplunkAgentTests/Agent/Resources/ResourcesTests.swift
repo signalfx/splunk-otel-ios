@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import XCTest
+
 @testable import OpenTelemetrySdk
 @testable import SplunkAgent
 @testable import SplunkCommon
 @testable import SplunkOpenTelemetry
-import XCTest
-
 
 /// Tests Resource Attributes parameters based on `EUM Mobile Agents OTel Specification` article.
 final class ResourcesTests: XCTestCase {

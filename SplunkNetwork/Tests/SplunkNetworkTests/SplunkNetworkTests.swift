@@ -17,24 +17,28 @@ limitations under the License.
 
 import OpenTelemetryApi
 import OpenTelemetrySdk
-@testable import SplunkNetwork
 import URLSessionInstrumentation
 import XCTest
+
+@testable import SplunkNetwork
 
 final class SplunkNetworkTests: XCTestCase {
     var sut: NetworkInstrumentation!
 
-    // Mock IgnoreURLs
+    /// Mock IgnoreURLs.
     class MockIgnoreURLs: IgnoreURLs {
         var shouldMatch = false
 
-        override func matches(url: URL) -> Bool {
-            return shouldMatch
+        override func matches(url _: URL) -> Bool {
+            shouldMatch
         }
     }
 
-    // Mock Span that conforms to all required protocols
+    /// Mock Span that conforms to all required protocols.
     class MockSpan: Span {
+
+        // MARK: - Public
+
         var attributes: [String: AttributeValue] = [:]
         var events: [SpanData.Event] = []
         var links: [SpanData.Link] = []
@@ -47,12 +51,17 @@ final class SplunkNetworkTests: XCTestCase {
         var parentSpanId: SpanId?
         var instrumentationScopeInfo = InstrumentationScopeInfo()
 
-        // Required SpanBase properties
-        var kind: SpanKind { return .internal }
+
+        // MARK: - SpanBase properties
+
+        var kind: SpanKind { .internal }
         var context: SpanContext
-        var isRecording: Bool { return true }
+        var isRecording: Bool { true }
         var status: Status = .unset
         var name: String = "MockSpan"
+
+
+        // MARK: - Intialization
 
         init() {
             let traceId = TraceId.random()
@@ -67,21 +76,29 @@ final class SplunkNetworkTests: XCTestCase {
             )
         }
 
+
+        // MARK: - Attributes
+
         func setAttribute(key: String, value: Any) {
             if let stringValue = value as? String {
                 attributes[key] = .string(stringValue)
-            } else if let intValue = value as? Int {
+            }
+            else if let intValue = value as? Int {
                 attributes[key] = .int(intValue)
-            } else if let doubleValue = value as? Double {
+            }
+            else if let doubleValue = value as? Double {
                 attributes[key] = .double(doubleValue)
-            } else if let boolValue = value as? Bool {
+            }
+            else if let boolValue = value as? Bool {
                 attributes[key] = .bool(boolValue)
             }
         }
 
-        // Required SpanBase methods
+
+        // MARK: - SpanBase methods
+
         func setAttribute(key: String, value: AttributeValue?) {
-            if let value = value {
+            if let value {
                 attributes[key] = value
             }
         }
@@ -90,23 +107,28 @@ final class SplunkNetworkTests: XCTestCase {
             self.attributes = attributes
         }
 
-        func addEvent(name: String) {}
-        func addEvent(name: String, timestamp: Date) {}
-        func addEvent(name: String, attributes: [String: AttributeValue]) {}
-        func addEvent(name: String, attributes: [String: AttributeValue], timestamp: Date) {}
+        func addEvent(name _: String) {}
+        func addEvent(name _: String, timestamp _: Date) {}
+        func addEvent(name _: String, attributes _: [String: AttributeValue]) {}
+        func addEvent(name _: String, attributes _: [String: AttributeValue], timestamp _: Date) {}
 
-        // Required Span methods
+
+        // MARK: - Span methods
+
         func end() {}
-        func end(time: Date) {}
+        func end(time _: Date) {}
 
-        // Required SpanExceptionRecorder methods
-        func recordException(_ exception: SpanException) {}
-        func recordException(_ exception: SpanException, timestamp: Date) {}
-        func recordException(_ exception: SpanException, attributes: [String: AttributeValue]) {}
-        func recordException(_ exception: SpanException, attributes: [String: AttributeValue], timestamp: Date) {}
 
-        // CustomStringConvertible
-        var description: String { return "MockSpan" }
+        // MARK: - SpanExceptionRecorder methods
+
+        func recordException(_: SpanException) {}
+        func recordException(_: SpanException, timestamp _: Date) {}
+        func recordException(_: SpanException, attributes _: [String: AttributeValue]) {}
+        func recordException(_: SpanException, attributes _: [String: AttributeValue], timestamp _: Date) {}
+
+        // MARK: - CustomStringConvertible
+
+        var description: String { "MockSpan" }
     }
 
     override func setUp() {
@@ -203,7 +225,8 @@ final class SplunkNetworkTests: XCTestCase {
         XCTAssertNotNil(attributeValue)
         if case let .int(value) = attributeValue {
             XCTAssertEqual(value, body.count)
-        } else {
+        }
+        else {
             XCTFail("Expected int attribute value")
         }
     }
@@ -229,7 +252,8 @@ final class SplunkNetworkTests: XCTestCase {
         XCTAssertNotNil(attributeValue)
         if case .int = attributeValue {
             // Success - we just want to verify it's an int value
-        } else {
+        }
+        else {
             XCTFail("Expected int attribute value")
         }
     }
@@ -259,13 +283,15 @@ final class SplunkNetworkTests: XCTestCase {
 
         if case let .string(traceId) = traceIdValue {
             XCTAssertEqual(traceId, "1234567890abcdef1234567890abcdef")
-        } else {
+        }
+        else {
             XCTFail("Expected string attribute value for traceId")
         }
 
         if case let .string(spanId) = spanIdValue {
             XCTAssertEqual(spanId, "1234567890abcdef")
-        } else {
+        }
+        else {
             XCTFail("Expected string attribute value for spanId")
         }
     }

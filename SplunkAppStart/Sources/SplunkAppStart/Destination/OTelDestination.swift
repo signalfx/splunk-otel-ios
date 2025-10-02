@@ -40,9 +40,10 @@ struct OTelDestination: AppStartDestination {
         appStartSpan.clearAndSetAttribute(key: "screen.name", value: "unknown")
         appStartSpan.clearAndSetAttribute(key: "start.type", value: typeIdentifier(for: appStart.type))
 
-        appStart.events?.forEach { event in
-            appStartSpan.addEvent(name: event.name, timestamp: event.timestamp)
-        }
+        appStart.events?
+            .forEach { event in
+                appStartSpan.addEvent(name: event.name, timestamp: event.timestamp)
+            }
 
         appStartSpan.end(time: appStart.end)
 
@@ -62,9 +63,10 @@ struct OTelDestination: AppStartDestination {
             }
 
             // Add events
-            agentInitialize.events?.forEach { event in
-                initializeSpan.addEvent(name: event.name, timestamp: event.timestamp)
-            }
+            agentInitialize.events?
+                .forEach { event in
+                    initializeSpan.addEvent(name: event.name, timestamp: event.timestamp)
+                }
 
             initializeSpan.end(time: agentInitialize.end)
         }

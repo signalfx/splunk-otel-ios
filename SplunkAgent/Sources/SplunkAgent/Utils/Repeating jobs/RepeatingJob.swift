@@ -83,8 +83,8 @@ class RepeatingJob: AgentRepeatingJob {
     // MARK: - Private methods
 
     private func createTimer() -> Timer {
-        let newTimer = Timer(timeInterval: interval, repeats: true) { [unowned self] _ in
-            self.executionBlock()
+        let newTimer = Timer(timeInterval: interval, repeats: true) { [weak self] _ in
+            self?.executionBlock()
         }
         newTimer.tolerance = tolerance
 

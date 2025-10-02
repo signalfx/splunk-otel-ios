@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import SplunkNavigation
+
+@testable import SplunkAgent
 
 final class NavigationTestBuilder {
 
@@ -25,17 +26,13 @@ final class NavigationTestBuilder {
     static func buildDefault() -> SplunkAgent.Navigation {
         // Build Navigation proxy with actual Navigation module
         let module = SplunkNavigation.Navigation()
-        let moduleProxy = SplunkAgent.Navigation(for: module)
-
-        return moduleProxy
+        return SplunkAgent.Navigation(for: module)
     }
 
 
     // MARK: - Non-operational builds
 
     static func buildNonOperational() -> NavigationNonOperational {
-        let moduleProxy = NavigationNonOperational()
-
-        return moduleProxy
+        NavigationNonOperational()
     }
 }

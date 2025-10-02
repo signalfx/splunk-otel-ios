@@ -29,9 +29,6 @@ extension Navigation {
     private static let screenNameKey = "screen.name"
     private static let lastScreenNameKey = "last.screen.name"
 
-    private static let objectTypeKey = "object.type"
-
-
     // MARK: - Private
 
     private var tracer: Tracer {
@@ -51,7 +48,8 @@ extension Navigation {
         let spanName = spanName(for: navigation.type)
 
         // A new navigation span describing the period when the controller was displayed
-        let navigationSpan = tracer
+        let navigationSpan =
+            tracer
             .spanBuilder(spanName: spanName)
             .setStartTime(time: navigation.start)
             .startSpan()
@@ -68,7 +66,8 @@ extension Navigation {
 
     func send(screenName: String, lastScreenName: String, start: Date) {
         // A new zero length span for change screen name event
-        let screenNameSpan = tracer
+        let screenNameSpan =
+            tracer
             .spanBuilder(spanName: "screen name change")
             .setStartTime(time: start)
             .startSpan()

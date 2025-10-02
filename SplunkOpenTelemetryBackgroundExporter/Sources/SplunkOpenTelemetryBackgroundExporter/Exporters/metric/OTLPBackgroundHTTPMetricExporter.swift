@@ -20,7 +20,6 @@ import Foundation
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 
-
 public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, MetricExporter {
 
     // MARK: - Implementation MetricExporter protocol
@@ -41,7 +40,8 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
                     parrentKeyBuilder: getStorageKey()
                 )
             )
-        } catch {
+        }
+        catch {
 
             return .failure
         }
@@ -57,7 +57,8 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
             try httpClient.send(requestDescriptor)
 
             return .success
-        } catch {
+        }
+        catch {
 
             return .failure
         }
@@ -75,11 +76,11 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
     }
 
     public func shutdown() -> ExportResult {
-        return .success
+        .success
     }
 
-    public func getAggregationTemporality(for instrument: OpenTelemetrySdk.InstrumentType) -> OpenTelemetrySdk.AggregationTemporality {
-        return .delta
+    public func getAggregationTemporality(for _: OpenTelemetrySdk.InstrumentType) -> OpenTelemetrySdk.AggregationTemporality {
+        .delta
     }
 
     // MARK: - Local override

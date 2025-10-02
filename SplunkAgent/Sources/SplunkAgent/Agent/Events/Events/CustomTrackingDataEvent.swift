@@ -15,9 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
 internal import SplunkCommon
-internal import CiscoLogger
 internal import SplunkCustomTracking
 
 // MARK: - Custom Tracking data event

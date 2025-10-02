@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import SplunkCustomTracking
+
+@testable import SplunkAgent
 
 final class CustomTrackingTestBuilder {
 
@@ -25,17 +26,13 @@ final class CustomTrackingTestBuilder {
     static func buildDefault() -> SplunkAgent.CustomTracking {
         // Build CustomTracking proxy with actual CustomTracking module
         let module = SplunkCustomTracking.CustomTrackingInternal()
-        let moduleProxy = SplunkAgent.CustomTracking(for: module)
-
-        return moduleProxy
+        return SplunkAgent.CustomTracking(for: module)
     }
 
 
     // MARK: - Non-operational builds
 
     static func buildNonOperational() -> CustomTrackingNonOperational {
-        let moduleProxy = CustomTrackingNonOperational()
-
-        return moduleProxy
+        CustomTrackingNonOperational()
     }
 }
