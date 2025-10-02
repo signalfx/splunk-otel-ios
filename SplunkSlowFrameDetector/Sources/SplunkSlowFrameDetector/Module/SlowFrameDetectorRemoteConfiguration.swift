@@ -31,5 +31,5 @@ public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
     /// Initializes the remote configuration from data.
     ///
     /// - Parameter data: The data to decode the configuration from. This is currently a no-op.
-    public init?(from data: Data) {}
+    public init?(from _: Data) {}
 }

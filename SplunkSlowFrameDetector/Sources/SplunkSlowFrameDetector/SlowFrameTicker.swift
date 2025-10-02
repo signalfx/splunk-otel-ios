@@ -78,41 +78,45 @@ final class DisplayLinkTicker: SlowFrameTicker {
 
     @MainActor
     func start() {
-        guard self.displayLink == nil else {
+        guard displayLink == nil else {
             return
         }
-        self.displayLink = CADisplayLink(target: self, selector: #selector(self.displayLinkCallback(_:)))
-        self.displayLink?.add(to: .main, forMode: .common)
+
+        displayLink = CADisplayLink(target: self, selector: #selector(displayLinkCallback(_:)))
+        displayLink?.add(to: .main, forMode: .common)
     }
 
     func stop() {
         if Thread.isMainThread {
-            self.displayLink?.invalidate()
-            self.displayLink = nil
-        } else {
+            displayLink?.invalidate()
+            displayLink = nil
+        }
+        else {
             DispatchQueue.main.async { [weak self] in
                 guard let self else {
                     return
                 }
-                self.displayLink?.invalidate()
-                self.displayLink = nil
+
+                displayLink?.invalidate()
+                displayLink = nil
             }
         }
     }
 
     @MainActor
     func pause() {
-        self.displayLink?.isPaused = true
+        displayLink?.isPaused = true
     }
 
     @MainActor
     func resume() {
-        self.displayLink?.isPaused = false
+        displayLink?.isPaused = false
     }
 
     // MARK: - Private Methods
 
-    @objc private func displayLinkCallback(_ link: CADisplayLink) {
+    @objc
+    private func displayLinkCallback(_ link: CADisplayLink) {
         Task {
             await onFrame?(link.timestamp, link.duration)
         }

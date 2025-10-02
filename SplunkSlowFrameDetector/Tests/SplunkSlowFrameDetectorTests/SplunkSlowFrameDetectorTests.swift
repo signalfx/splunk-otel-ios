@@ -18,10 +18,11 @@ limitations under the License.
 import SplunkCommon
 import XCTest
 #if os(iOS) || os(tvOS) || os(visionOS)
-@testable import SplunkSlowFrameDetector
 import UIKit
+@testable import SplunkSlowFrameDetector
 
 // MARK: - Mock Ticker
+
 private final class MockTicker: SlowFrameTicker {
     @MainActor var onFrame: (@MainActor (TimeInterval, TimeInterval) async -> Void)?
     @MainActor var started = false
@@ -42,9 +43,12 @@ private final class MockTicker: SlowFrameTicker {
         // This function is non-isolated to match the protocol.
         // To safely modify the @MainActor properties, we dispatch to the main queue.
         DispatchQueue.main.async { [weak self] in
-            guard let self else { return }
-            self.stopped = true
-            self.onStop?()
+            guard let self else {
+                return
+            }
+
+            stopped = true
+            onStop?()
         }
     }
 
@@ -61,12 +65,13 @@ private final class MockTicker: SlowFrameTicker {
 }
 
 // MARK: - Mock Destination
+
 private actor MockDestination: SlowFrameDetectorDestination {
     // This dictionary will store the accumulated counts.
     var reportedCounts: [String: Int] = [:]
     private var onSend: ((String, Int) -> Void)?
 
-    func send(type: String, count: Int, sharedState: AgentSharedState?) async {
+    func send(type: String, count: Int, sharedState _: AgentSharedState?) async {
         // Accumulate the count for the given type.
         reportedCounts[type, default: 0] += count
         // Call the optional closure for tests that still need it.
@@ -74,25 +79,28 @@ private actor MockDestination: SlowFrameDetectorDestination {
     }
 
     func setOnSend(_ handler: ((String, Int) -> Void)?) {
-        self.onSend = handler
+        onSend = handler
     }
 }
 
 // MARK: - SlowFrameDetectorTests
+
 @MainActor
 final class SlowFrameDetectorTests: XCTestCase {
 
     // MARK: - Test Properties
+
     private var mockTicker: MockTicker!
     private var detector: SlowFrameDetector!
     private var mockDestination: MockDestination!
 
     // MARK: - Test Lifecycle
+
     override func setUp() {
         super.setUp()
         mockTicker = MockTicker()
         let currentMock = MockDestination()
-        self.mockDestination = currentMock
+        mockDestination = currentMock
         detector = SlowFrameDetector(ticker: mockTicker, destinationFactory: { currentMock })
     }
 
@@ -118,6 +126,7 @@ final class SlowFrameDetectorTests: XCTestCase {
     }
 
     // MARK: - Helper Methods
+
     private func awaitDetectorStart() async {
         let startExpectation = XCTestExpectation(description: "Detector has started")
         mockTicker.onStart = {
@@ -128,6 +137,7 @@ final class SlowFrameDetectorTests: XCTestCase {
     }
 
     // MARK: - Start/Stop Tests
+
     /// Verifies that calling `start()` multiple times is idempotent.
     func test_start_isIdempotent() async {
         XCTAssertFalse(mockTicker.started)
@@ -161,6 +171,7 @@ final class SlowFrameDetectorTests: XCTestCase {
     }
 
     // MARK: - Lifecycle Notification Tests
+
     /// Verifies that the logic state is reset when the app becomes active.
     func test_stateIsReset_onAppDidBecomeActive() async {
         await awaitDetectorStart()
@@ -192,6 +203,7 @@ final class SlowFrameDetectorTests: XCTestCase {
     }
 
     // MARK: - Frame Detection Tests
+
     /// Verifies that the very first frame processed does not trigger a report.
     func test_firstFrame_doesNotTriggerReport() async {
         await awaitDetectorStart()

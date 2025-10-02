@@ -22,14 +22,16 @@ import SplunkCommon
 public struct SlowFrameData: ModuleEventData {}
 
 // MARK: - ModuleEventMetadata Conformance
+
 extension EventMetadataSlowFrameDetector: ModuleEventMetadata {
     public static func == (lhs: EventMetadataSlowFrameDetector, rhs: EventMetadataSlowFrameDetector) -> Bool {
-        return lhs.timestamp == rhs.timestamp
+        lhs.timestamp == rhs.timestamp
                    && lhs.id == rhs.id
     }
 }
 
 // MARK: - Module Conformance
+
 extension SlowFrameDetector: Module {
 
     // MARK: - Module types
@@ -42,11 +44,11 @@ extension SlowFrameDetector: Module {
 
     // MARK: - Module methods
 
-    public func deleteData(for metadata: any ModuleEventMetadata) {
+    public func deleteData(for _: any ModuleEventMetadata) {
         // In SlowFrameDetector we don't have any data to delete.
     }
 
-    public func onPublish(data: @escaping (EventMetadataSlowFrameDetector, SlowFrameData) -> Void) {
+    public func onPublish(data _: @escaping (EventMetadataSlowFrameDetector, SlowFrameData) -> Void) {
         // We are emitting spans directly instead of using this.
     }
 }

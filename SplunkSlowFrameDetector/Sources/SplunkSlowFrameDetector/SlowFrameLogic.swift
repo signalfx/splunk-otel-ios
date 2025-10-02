@@ -172,7 +172,7 @@ actor SlowFrameLogic {
     /// A test-only method to set the flush completion handler.
     /// - Parameter handler: The closure to call when a flush completes.
     func setOnFlushDidComplete(_ handler: (() -> Void)?) {
-        self.onFlushDidComplete = handler
+        onFlushDidComplete = handler
     }
     #endif
 
@@ -186,7 +186,9 @@ actor SlowFrameLogic {
     private func runWatchdog() async {
         while !Task.isCancelled {
             try? await Task.sleep(nanoseconds: UInt64(SlowFrameDetector.frozenFrameThreshold * 1_000_000_000))
-            if Task.isCancelled { break }
+            if Task.isCancelled {
+                break
+            }
             let now = CACurrentMediaTime()
             if lastHeartbeatTimestamp > 0, (now - lastHeartbeatTimestamp) >= SlowFrameDetector.frozenFrameThreshold {
                 frozenFrameCount += 1
@@ -201,7 +203,9 @@ actor SlowFrameLogic {
     private func runFlushLoop() async {
         while !Task.isCancelled {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
-            if Task.isCancelled { break }
+            if Task.isCancelled {
+                break
+            }
             await flushBuffers()
         }
     }
