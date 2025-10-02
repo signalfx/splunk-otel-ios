@@ -101,7 +101,12 @@ final class SlowFrameDetectorTests: XCTestCase {
         if !mockTicker.stopped {
             let expectation = XCTestExpectation(description: "TearDown Stop Expectation")
             mockTicker.onStop = { expectation.fulfill() }
-            await detector.stop()
+
+            // Run stop in a detached task to avoid blocking the MainActor test method
+            Task.detached {
+                await self.detector.stop()
+            }
+
             await fulfillment(of: [expectation], timeout: 2.0)
         }
 
