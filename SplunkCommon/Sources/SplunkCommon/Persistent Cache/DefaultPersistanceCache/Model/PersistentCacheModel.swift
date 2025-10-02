@@ -29,7 +29,7 @@ actor PersistentCacheModel<Container: PersistedItemContainer> {
 
     // MARK: - Items management
 
-    func items(from start: Date? = nil, to end: Date? = nil) async -> [String: Container.Item] {
+    func items(from start: Date? = nil, to end: Date? = nil) -> [String: Container.Item] {
         var matchingContainers: [String: Container]
 
         // Filter containers by updated timestamp ...

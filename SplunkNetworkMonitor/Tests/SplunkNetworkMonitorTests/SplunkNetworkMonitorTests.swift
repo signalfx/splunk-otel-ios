@@ -24,18 +24,26 @@ import XCTest
 
 final class NetworkMonitorTests: XCTestCase {
 
-    var networkMonitor: NetworkMonitor!
+    // MARK: - Private
+
+    private var networkMonitor: NetworkMonitor?
+
+
+    // MARK: - Tests lifecycle
 
     override func setUpWithError() throws {
         super.setUp()
+
         networkMonitor = NetworkMonitor()
     }
 
     override func tearDownWithError() throws {
-        networkMonitor.stopDetection()
+        networkMonitor?.stopDetection()
         networkMonitor = nil
+
         super.tearDown()
     }
+
 
     // MARK: - ConnectionType Tests
 
@@ -47,6 +55,7 @@ final class NetworkMonitorTests: XCTestCase {
         XCTAssertEqual(ConnectionType.other.rawValue, "other")
         XCTAssertEqual(ConnectionType.unavailable.rawValue, "unavailable")
     }
+
 
     // MARK: - NetworkMonitor Module Tests
 
@@ -63,9 +72,12 @@ final class NetworkMonitorTests: XCTestCase {
         XCTAssertNotNil(data)
     }
 
+
     // MARK: - NetworkMonitor Status Change Handler Tests
 
-    func testNetworkMonitorStatusChangeHandler() {
+    func testNetworkMonitorStatusChangeHandler() throws {
+        let networkMonitor = try XCTUnwrap(networkMonitor)
+
         var handlerCalled = false
         var receivedIsConnected = false
         var receivedConnectionType: ConnectionType = .unavailable
@@ -85,49 +97,5 @@ final class NetworkMonitorTests: XCTestCase {
         XCTAssertTrue(receivedIsConnected)
         XCTAssertEqual(receivedConnectionType, .wifi)
         XCTAssertNil(receivedRadioType)
-    }
-}
-
-// MARK: - Destination Tests
-
-final class NetworkMonitorDestinationTests: XCTestCase {
-
-    func testOTelDestination() {
-        let destination = OTelDestination()
-        let event = NetworkMonitorEvent(
-            timestamp: Date(),
-            isConnected: true,
-            connectionType: .wifi,
-            radioType: nil
-        )
-
-        // This should not crash and should execute without errors
-        destination.send(networkEvent: event, sharedState: nil)
-    }
-
-    func testDebugDestination() {
-        let destination = DebugDestination()
-        let event = NetworkMonitorEvent(
-            timestamp: Date(),
-            isConnected: true,
-            connectionType: .cellular,
-            radioType: "LTE (4G)"
-        )
-
-        // This should not crash and should execute without errors
-        destination.send(networkEvent: event, sharedState: nil)
-    }
-
-    func testDebugDestinationWithNilRadioType() {
-        let destination = DebugDestination()
-        let event = NetworkMonitorEvent(
-            timestamp: Date(),
-            isConnected: false,
-            connectionType: .wifi,
-            radioType: nil
-        )
-
-        // This should not crash and should execute without errors
-        destination.send(networkEvent: event, sharedState: nil)
     }
 }

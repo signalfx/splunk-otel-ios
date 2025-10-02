@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// Defines the basic client for API communication
+/// Defines the basic client for API communication.
 class APIClient: AgentAPIClient {
 
     // MARK: - Variables

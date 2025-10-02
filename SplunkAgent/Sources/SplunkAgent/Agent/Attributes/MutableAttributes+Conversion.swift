@@ -112,13 +112,16 @@ extension MutableAttributes {
     /// - Parameters:
     ///   - targetType: Desired type for the values.
     ///   - transform: Closure to convert `AttributeValue` to an optional target type.
-    ///     note: specific to OpenTelemetryApi.AttributeValue source type.
+    ///
+    /// - Note: specific to OpenTelemetryApi.AttributeValue source type.
     ///
     /// - Returns: [String: T] with converted values, omitting non-convertible ones.
     func converted<T>(
-        to _: T.Type,
+        to targetType: T.Type,
         using transform: (AttributeValue) -> T?
     ) -> [String: T] {
+        // Intentionally unused
+        _ = targetType
 
         let sourceAttributes = getAll()
 
@@ -183,7 +186,7 @@ extension MutableAttributes {
     convenience init(from dictionary: [String: Any], maxDepth: Int = 20) {
         self.init()
 
-        let attributes = Self._convertDictionaryToAttributes(dictionary, maxDepth: maxDepth)
+        let attributes = Self.convertDictionaryToAttributes(dictionary, maxDepth: maxDepth)
 
         for (key, value) in attributes {
             self[key] = value
@@ -198,7 +201,7 @@ extension MutableAttributes {
     }
 
     /// Convert a dictionary to `[String: AttributeValue]`, enforcing depth constraints.
-    private static func _convertDictionaryToAttributes(
+    private static func convertDictionaryToAttributes(
         _ dictionary: [String: Any],
         maxDepth: Int,
         currentDepth: Int = 0
@@ -211,7 +214,7 @@ extension MutableAttributes {
         // Convert each key-value pair into AttributeValue
         var result: [String: AttributeValue] = [:]
         for (key, value) in dictionary {
-            if let attributeValue = Self._convertValueToAttribute(value, maxDepth: maxDepth, currentDepth: currentDepth + 1) {
+            if let attributeValue = Self.convertValueToAttribute(value, maxDepth: maxDepth, currentDepth: currentDepth + 1) {
                 result[key] = attributeValue
             }
         }
@@ -219,7 +222,7 @@ extension MutableAttributes {
     }
 
     /// Convert a value to an `AttributeValue`, enforcing depth constraints.
-    private static func _convertValueToAttribute(
+    private static func convertValueToAttribute(
         _ value: Any,
         maxDepth: Int,
         currentDepth: Int
@@ -245,19 +248,19 @@ extension MutableAttributes {
         case let arrayValue as [Any]:
             // Enforce depth for nested arrays
             let convertedArray = arrayValue.compactMap { element in
-                _convertValueToAttribute(element, maxDepth: maxDepth, currentDepth: currentDepth + 1)
+                convertValueToAttribute(element, maxDepth: maxDepth, currentDepth: currentDepth + 1)
             }
             return .array(AttributeArray(values: convertedArray))
 
         case let dictValue as [String: Any]:
             // Delegate to the dictionary helper for nested dictionaries
-            let convertedDict = _convertDictionaryToAttributes(dictValue, maxDepth: maxDepth, currentDepth: currentDepth + 1)
+            let convertedDict = convertDictionaryToAttributes(dictValue, maxDepth: maxDepth, currentDepth: currentDepth + 1)
             return .set(AttributeSet(labels: convertedDict))
 
         case let nsDictValue as NSDictionary:
             // Convert `NSDictionary` to `[String: Any]` and handle it
             let swiftDictValue = nsDictValue as? [String: Any] ?? [:]
-            let convertedDict = _convertDictionaryToAttributes(swiftDictValue, maxDepth: maxDepth, currentDepth: currentDepth + 1)
+            let convertedDict = convertDictionaryToAttributes(swiftDictValue, maxDepth: maxDepth, currentDepth: currentDepth + 1)
             return .set(AttributeSet(labels: convertedDict))
 
         default:

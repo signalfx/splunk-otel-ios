@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// Creates Endpoint for remote configuration download
+/// Creates Endpoint for remote configuration download.
 struct RemoteConfigurationEndpoint: Endpoint {
 
     // MARK: - Inline types

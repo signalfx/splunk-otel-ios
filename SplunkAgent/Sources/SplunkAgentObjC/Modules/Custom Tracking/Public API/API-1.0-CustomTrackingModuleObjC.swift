@@ -31,9 +31,9 @@ public final class CustomTrackingModuleObjC: NSObject {
 
     /// Track a custom event with a name and attributes.
     ///
-    /// - Parameter name: The event name assigned by the user.
-    ///
-    /// - Parameter attributes: Dictionary with `AttributeValueObjC` value.
+    /// - Parameters:
+    ///   - name: The event name assigned by the user.
+    ///   - attributes: Dictionary with `AttributeValueObjC` value.
     ///
     /// - Returns: The updated `CustomTrackingModuleObjC` instance.
     @discardableResult
@@ -49,9 +49,9 @@ public final class CustomTrackingModuleObjC: NSObject {
 
     /// Track an error (NSString message) with attributes.
     ///
-    /// - Parameter message: A concise summary of the error condition.
-    ///
-    /// - Parameter attributes: Dictionary with `AttributeValueObjC` value.
+    /// - Parameters:
+    ///   - message: A concise summary of the error condition.
+    ///   - attributes: Dictionary with `AttributeValueObjC` value.
     ///
     /// - Returns: The updated `CustomTrackingModuleObjC` instance.
     @discardableResult
@@ -64,9 +64,9 @@ public final class CustomTrackingModuleObjC: NSObject {
 
     /// Track an NSError with attributes.
     ///
-    /// - Parameter error: An instance of a type conforming to `NSError`.
-    ///
-    /// - Parameter attributes: Dictionary with `AttributeValueObjC` value.
+    /// - Parameters:
+    ///   - error: An instance of a type conforming to `NSError`.
+    ///   - attributes: Dictionary with `AttributeValueObjC` value.
     ///
     /// - Returns: The updated `CustomTrackingModuleObjC` instance.
     @discardableResult
@@ -80,9 +80,9 @@ public final class CustomTrackingModuleObjC: NSObject {
 
     /// Track an NSException object with optional attributes.
     ///
-    /// - Parameter exception: An NSException instance such as one caught after a throw.
-    ///
-    /// - Parameter attributes: Dictionary with `AttributeValueObjC` value.
+    /// - Parameters:
+    ///   - exception: An NSException instance such as one caught after a throw.
+    ///   - attributes: Dictionary with `AttributeValueObjC` value.
     ///
     /// - Returns: The updated `CustomTrackingModuleObjC` instance.
     @discardableResult

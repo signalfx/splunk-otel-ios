@@ -53,10 +53,14 @@ class DefaultSession: AgentSession {
     /// The agent instance to which the session belongs.
     unowned var owner: SplunkRum?
 
-    /// Defines the minimum session refresh interval (defined in seconds). Default value is 1 second.
+    /// Defines the minimum session refresh interval (defined in seconds).
+    ///
+    /// Default value is 1 second.
     var sessionRefreshInterval: Double = 1
 
-    /// Session inactivity timeout (defined in seconds). Default value is 15 minutes.
+    /// Session inactivity timeout (defined in seconds).
+    ///
+    /// Default value is 15 minutes.
     var sessionTimeout: Double {
         let unitTest = testSessionTimeout
         let configuration = owner?.agentConfiguration.sessionTimeout
@@ -65,7 +69,9 @@ class DefaultSession: AgentSession {
         return unitTest ?? configuration ?? defaultValue
     }
 
-    /// The maximal length of one session (defined in seconds). Default value is 1 hour.
+    /// The maximal length of one session (defined in seconds).
+    ///
+    /// Default value is 1 hour.
     var maxSessionLength: Double {
         let unitTest = testMaxSessionLength
         let configuration = owner?.agentConfiguration.maxSessionLength

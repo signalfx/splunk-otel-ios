@@ -49,7 +49,6 @@ public final class Interactions: SplunkInteractionsModule {
 
     // MARK: - Initialization
 
-    /// Module conformance
     public required init() {
         destination = OTelDestination()
     }

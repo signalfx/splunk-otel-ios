@@ -229,7 +229,7 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
     /// Deletes all old elements whose number exceeds the specified number.
     ///
-    /// - Parameter number: Position in ordered data from newest to oldest.
+    /// - Parameter position: Position in ordered data from newest to oldest.
     private func delete(exceedingOrder position: Int) async {
         let containers = await model.containers
 

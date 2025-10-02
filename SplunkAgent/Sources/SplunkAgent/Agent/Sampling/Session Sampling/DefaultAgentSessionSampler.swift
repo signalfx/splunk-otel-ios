@@ -30,6 +30,7 @@ final class DefaultAgentSessionSampler: AgentSessionSampler {
     let lowerBound: Double = 0.0
 
     /// The probability of sampling a session, configurable via the `configure` method.
+    ///
     /// Defaults to 1.0 (always sample).
     var probability: Double = 1.0
 

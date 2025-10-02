@@ -18,7 +18,7 @@ limitations under the License.
 internal import CiscoSessionReplay
 import UIKit
 
-/// Implements the public API for assigning custom identifiers to view elements
+/// Implements the public API for assigning custom identifiers to view elements.
 final class SessionReplayCustomId: SessionReplayModuleCustomId {
 
     // MARK: - View sensitivity
