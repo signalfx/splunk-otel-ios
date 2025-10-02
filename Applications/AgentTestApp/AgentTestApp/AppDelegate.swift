@@ -15,34 +15,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import UIKit
-import SplunkAgent
 import OpenTelemetryApi
+import SplunkAgent
+import UIKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    // MARK: - Application lifecycle
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
 
         // Alternative deprecated Builder setup
-//        let builder = SplunkRumBuilder(
-//            realm: "realm",
-//            rumAuth: "token"
-//        )
-//            .setApplicationName("App Name")
-//            .deploymentEnvironment(environment: "dev")
-//            .debug(enabled: true)
-//            .sessionSamplingRatio(samplingRatio: 1)
-//            .showVCInstrumentation(true)
-//            .slowRenderingDetectionEnabled(true)
-//            .slowFrameDetectionThresholdMs(thresholdMs: 400)
-//            .frozenFrameDetectionThresholdMs(thresholdMs: 700)
-//            .globalAttributes(globalAttributes: ["isWorkingHard": true, "secret": "Red bull"])
-//            .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*\\.(jpg|jpeg|png|gif)$"))
-//            .networkInstrumentation(enabled: true)
-//            .build()
+        //        let builder = SplunkRumBuilder(
+        //            realm: "realm",
+        //            rumAuth: "token"
+        //        )
+        //            .setApplicationName("App Name")
+        //            .deploymentEnvironment(environment: "dev")
+        //            .debug(enabled: true)
+        //            .sessionSamplingRatio(samplingRatio: 1)
+        //            .showVCInstrumentation(true)
+        //            .slowRenderingDetectionEnabled(true)
+        //            .slowFrameDetectionThresholdMs(thresholdMs: 400)
+        //            .frozenFrameDetectionThresholdMs(thresholdMs: 700)
+        //            .globalAttributes(globalAttributes: ["isWorkingHard": true, "secret": "Red bull"])
+        //            .ignoreURLs(ignoreURLs: try! NSRegularExpression(pattern: ".*\\.(jpg|jpeg|png|gif)$"))
+        //            .networkInstrumentation(enabled: true)
+        //            .build()
 
         let endpointConfig = EndpointConfiguration(
             realm: "realm",
@@ -54,22 +55,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             appName: "App Name",
             deploymentEnvironment: "dev"
         )
-            .enableDebugLogging(true)
-            .globalAttributes(MutableAttributes(dictionary: [
+        .enableDebugLogging(true)
+        .globalAttributes(
+            MutableAttributes(dictionary: [
                 "teststring": .string("value"),
-                "testint": .int(100)]))
-            .spanInterceptor { spanData in
-                var attributes = spanData.attributes
-                attributes["test_attribute"] = AttributeValue("test_value")
+                "testint": .int(100)
+            ])
+        )
+        .spanInterceptor { spanData in
+            var attributes = spanData.attributes
+            attributes["test_attribute"] = AttributeValue("test_value")
 
-                var modifiedSpan = spanData
-                modifiedSpan.settingAttributes(attributes)
+            var modifiedSpan = spanData
+            modifiedSpan.settingAttributes(attributes)
 
-                return modifiedSpan
-            }
+            return modifiedSpan
+        }
         do {
             _ = try SplunkRum.install(with: agentConfig)
-        } catch {
+        }
+        catch {
             print("Unable to start the Splunk agent, error: \(error)")
         }
 
@@ -86,17 +91,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
-    // MARK: UISceneSession Lifecycle
-
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    func application(
+        _: UIApplication,
+        configurationForConnecting connectingSceneSession: UISceneSession,
+        options _: UIScene.ConnectionOptions
+    ) -> UISceneConfiguration {
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-    }
-
-    func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
-        // Called when the user discards a scene session.
-        // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
-        // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
+        UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
 }

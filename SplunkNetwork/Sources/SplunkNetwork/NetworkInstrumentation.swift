@@ -30,7 +30,7 @@ public class NetworkInstrumentation {
 
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
 
-    /// Holds regex patterns from IgnoreURLs API
+    /// Holds regex patterns from IgnoreURLs API.
     private var ignoreURLs = IgnoreURLs()
 
     private let delegateClassNames = [
@@ -53,15 +53,19 @@ public class NetworkInstrumentation {
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
 
-    // For Module conformance
     public required init() {}
 
-    /// Installs the Network Instrumentation module
+    /// Installs the Network Instrumentation module.
+    ///
     /// - Parameters:
-    ///   - configuration: Module specific local configuration
-    ///   - remoteConfiguration: Module specific remote configuration
-    public func install(with configuration: (any ModuleConfiguration)?,
-                        remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    ///   - configuration: Module specific local configuration.
+    ///   - remoteConfiguration: Module specific remote configuration.
+    public func install(
+        with configuration: (any ModuleConfiguration)?,
+        remoteConfiguration: (any RemoteModuleConfiguration)?
+    ) {
+        // Intentionally unused
+        _ = remoteConfiguration
 
         var delegateClassesToInstrument = nil as [AnyClass]?
         var delegateClasses: [AnyClass] = []
@@ -74,16 +78,17 @@ public class NetworkInstrumentation {
                 ignoreURLs = ignoreURLsParameter
             }
 
-            // find concrete delegate classes
+            // Find concrete delegate classes
             for className in delegateClassNames {
                 if let concreteClass = NSClassFromString(className) {
                     delegateClasses.append(concreteClass)
                 }
             }
-            // empty array defaults to standard exhaustive search
+            // Empty array defaults to standard exhaustive search
             if !delegateClasses.isEmpty {
                 delegateClassesToInstrument = delegateClasses
-            } else {
+            }
+            else {
                 logger.log(level: .debug) {
                     """
                     Standard Delegate classes not found, using exhaustive delegate class search.
@@ -106,68 +111,68 @@ public class NetworkInstrumentation {
         }
     }
 
-    // Callback methods to modify URLSession monitoring
-    func shouldInstrument(URLRequest: URLRequest) -> Bool {
+    /// Callback method to modify URLSession monitoring.
+    func shouldInstrument(urlRequest: URLRequest) -> Bool {
         // Code here could filter based on URLRequest
 
-        /* Save this until we add the feature into the Agent side API
-         guard agentConfiguration?.appDCloudShouldInstrument?(URLRequest) ?? true else {
-         return ((agentConfiguration?.appDCloudShouldInstrument!(URLRequest)) != nil)
-         }
-         */
+        // Save this until we add the feature into the Agent side API
+        //
+        // guard agentConfiguration?.appDCloudShouldInstrument?(URLRequest) ?? true else {
+        //     return ((agentConfiguration?.appDCloudShouldInstrument!(URLRequest)) != nil)
+        // }
 
         // Filter using ignoreURLs API
-        if let urlToTest = URLRequest.url {
+        if let urlToTest = urlRequest.url {
             if ignoreURLs.matches(url: urlToTest) {
                 logger.log(level: .debug) {
-                    "URL excluded via IgnoreURLs API \(URLRequest.description)"
+                    "URL excluded via IgnoreURLs API \(urlRequest.description)"
                 }
                 return false
             }
         }
 
-        let requestEndpoint = URLRequest.description
-        if let excludedEndpoints {
-            for excludedEndpoint in excludedEndpoints where requestEndpoint.contains(excludedEndpoint.absoluteString) {
-                logger.log(level: .debug) {
-                    "Should Not Instrument Backend URL \(URLRequest.description)"
-                }
-                return false
-            }
-        } else {
+        let requestEndpoint = urlRequest.description
+        guard let excludedEndpoints else {
             logger.log(level: .debug) {
                 "Should Not Instrument, Backend URL not yet configured."
             }
             return false
         }
-        // Leave the localhost test in place for the test case where we have two endpoints,
-        // both collector and zipkin on local.
-        if requestEndpoint.hasPrefix("http://localhost") {
+
+        for excludedEndpoint in excludedEndpoints where requestEndpoint.contains(excludedEndpoint.absoluteString) {
             logger.log(level: .debug) {
-                "Should Not Instrument Localhost \(URLRequest.description)"
+                "Should Not Instrument Backend URL \(urlRequest.description)"
             }
             return false
-        } else {
+        }
+        // Leave the localhost test in place for the test case where we have two endpoints,
+        // both collector and zipkin on local.
+        guard requestEndpoint.hasPrefix("http://localhost") else {
             logger.log(level: .debug) {
-                "Should Instrument \(URLRequest.description)"
+                "Should Instrument \(urlRequest.description)"
             }
             return true
         }
+
+        logger.log(level: .debug) {
+            "Should Not Instrument Localhost \(urlRequest.description)"
+        }
+        return false
     }
 
-    func shouldRecordPayload(URLSession: URLSession) -> Bool {
-        return true
+    func shouldRecordPayload(urlSession _: URLSession) -> Bool {
+        true
     }
 
-    func createdRequest(URLRequest: URLRequest, span: Span) {
-        let body = URLRequest.httpBody
+    func createdRequest(urlRequest: URLRequest, span: Span) {
+        let body = urlRequest.httpBody
         let length = body?.count ?? 0
         span.clearAndSetAttribute(key: SemanticAttributes.httpRequestBodySize, value: length)
-        let method = URLRequest.httpMethod ?? "_OTHER"
+        let method = urlRequest.httpMethod ?? "_OTHER"
         span.clearAndSetAttribute(key: SemanticAttributes.httpRequestMethod, value: method)
         span.clearAndSetAttribute(key: "component", value: "http")
 
-        if let url = URLRequest.url {
+        if let url = urlRequest.url {
             span.clearAndSetAttribute(key: SemanticAttributes.urlPath, value: url.path)
             span.clearAndSetAttribute(key: SemanticAttributes.urlQuery, value: url.query ?? "")
             if let scheme = url.scheme {
@@ -182,7 +187,8 @@ public class NetworkInstrumentation {
 
             if let port = url.port {
                 span.clearAndSetAttribute(key: "network.peer.port", value: port)
-            } else {
+            }
+            else {
                 let defaultPort = url.scheme?.lowercased() == "https" ? 443 : 80
                 span.clearAndSetAttribute(key: "network.peer.port", value: defaultPort)
             }
@@ -210,11 +216,13 @@ public class NetworkInstrumentation {
             }
 
             // Intentional hard failure in both Debug and Release builds
-            preconditionFailure("""
-                                Regex failed to compile. Likely programmer error in
-                                edit of serverTimingPattern
-                                regex: #\(serverTimingPattern)#
-                                """)
+            preconditionFailure(
+                """
+                Regex failed to compile. Likely programmer error in
+                edit of serverTimingPattern
+                regex: #\(serverTimingPattern)#
+                """
+            )
         }
 
         // Match the regex against the input string
@@ -222,8 +230,9 @@ public class NetworkInstrumentation {
 
         // Ensure there's exactly one match and the correct number of capture groups
         guard result.count == 1, result[0].numberOfRanges == 3,
-              let traceIdRange = Range(result[0].range(at: 1), in: valStr),
-              let spanIdRange = Range(result[0].range(at: 2), in: valStr) else {
+            let traceIdRange = Range(result[0].range(at: 1), in: valStr),
+            let spanIdRange = Range(result[0].range(at: 2), in: valStr)
+        else {
             // If the match or capture groups are invalid, log and return early
             // Also, prevent over-long log output
             let truncatedValStr = valStr.count > 255 ? String(valStr.prefix(252)) + "..." : valStr
@@ -242,8 +251,8 @@ public class NetworkInstrumentation {
         span.clearAndSetAttribute(key: "link.spanId", value: spanId)
     }
 
-    func receivedResponse(URLResponse: URLResponse, dataOrFile: DataOrFile?, span: Span) {
-        let response = URLResponse as? HTTPURLResponse
+    func receivedResponse(urlResponse: URLResponse, dataOrFile _: DataOrFile?, span: Span) {
+        let response = urlResponse as? HTTPURLResponse
         let length = response?.expectedContentLength ?? 0
         span.clearAndSetAttribute(key: SemanticAttributes.httpResponseBodySize, value: Int(length))
         span.clearAndSetAttribute(key: SemanticAttributes.httpResponseStatusCode, value: Int(response?.statusCode ?? 0))
@@ -262,15 +271,16 @@ public class NetworkInstrumentation {
 
             for (key, val) in httpResponse.allHeaderFields {
                 if let keyStr = key as? String,
-                   let valStr = val as? String,
-                   keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
-                   valStr.contains("traceparent") {
+                    let valStr = val as? String,
+                    keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
+                    valStr.contains("traceparent")
+                {
                     addLinkToSpan(span: span, valStr: valStr)
                 }
             }
         }
 
-        // removes obsolete attributes
+        // Removes obsolete attributes
         removeObsoleteAttributes(from: span)
 
         /* Save this until we add the feature into the Agent side API
@@ -286,15 +296,13 @@ public class NetworkInstrumentation {
     private func determineHTTPProtocolVersion(_ response: HTTPURLResponse) -> String {
         // Check for HTTP/2 server indicators
         if let serverHeader = response.value(forHTTPHeaderField: "Server") {
-            if serverHeader.lowercased().contains("http/2") ||
-               serverHeader.lowercased().contains("h2") {
+            if serverHeader.lowercased().contains("http/2") || serverHeader.lowercased().contains("h2") {
                 return "2.0"
             }
         }
 
         // Check for HTTP/2 specific headers
-        if response.value(forHTTPHeaderField: "X-Firefox-Spdy") != nil ||
-           response.value(forHTTPHeaderField: "X-Google-Spdy") != nil {
+        if response.value(forHTTPHeaderField: "X-Firefox-Spdy") != nil || response.value(forHTTPHeaderField: "X-Google-Spdy") != nil {
             return "2.0"
         }
 
@@ -336,7 +344,7 @@ public class NetworkInstrumentation {
         return false
     }
 
-    // Removes obsolete attributes from the span
+    /// Removes obsolete attributes from the span.
     private func removeObsoleteAttributes(from span: Span) {
         // Attributes to be removed
         let attributesToRemove = [
@@ -354,17 +362,17 @@ public class NetworkInstrumentation {
         }
     }
 
-    func receivedError(error: Error, dataOrFile: DataOrFile?, HTTPStatus: HTTPStatus, span: Span) {
+    func receivedError(error: Error, dataOrFile _: DataOrFile?, httpStatus: HTTPStatus, span: Span) {
         span.clearAndSetAttribute(key: "error", value: true)
         span.clearAndSetAttribute(key: "error.message", value: error.localizedDescription)
         span.clearAndSetAttribute(key: "error.type", value: String(describing: type(of: error)))
-        span.clearAndSetAttribute(key: SemanticAttributes.httpResponseStatusCode, value: HTTPStatus)
+        span.clearAndSetAttribute(key: SemanticAttributes.httpResponseStatusCode, value: httpStatus)
 
-        // removes obsolete attributes
+        // Removes obsolete attributes
         removeObsoleteAttributes(from: span)
 
         logger.log(level: .error) {
-            "Error: \(error.localizedDescription), Status: \(HTTPStatus)"
+            "Error: \(error.localizedDescription), Status: \(httpStatus)"
         }
     }
 }

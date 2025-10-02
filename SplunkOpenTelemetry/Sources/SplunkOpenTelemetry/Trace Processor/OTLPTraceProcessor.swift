@@ -29,7 +29,7 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Private properties
 
-    // OTel tracer provider
+    /// OTel tracer provider.
     private let tracerProvider: TracerProvider
 
 
@@ -45,7 +45,7 @@ public class OTLPTraceProcessor: TraceProcessor {
     ) {
 
         let configuration = OtlpConfiguration()
-        let envVarHeaders = [(String, String)]()
+        let envVarHeaders: [(String, String)] = []
 
         // Initialize background exporter
         let backgroundTraceExporter = OTLPBackgroundHTTPTraceExporter(
@@ -60,7 +60,8 @@ public class OTLPTraceProcessor: TraceProcessor {
         let attributeCheckerExporter = AttributeCheckerSpanExporter(
             proxy: debugEnabled
                 ? SplunkStdoutSpanExporter(with: backgroundTraceExporter)
-                : backgroundTraceExporter)
+                : backgroundTraceExporter
+        )
 
         // Initialize span interceptor proxy exporter
         let spanInterceptorExporter = SpanInterceptorExporter(

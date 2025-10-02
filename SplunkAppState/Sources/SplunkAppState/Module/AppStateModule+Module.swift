@@ -37,13 +37,13 @@ extension AppStateModule: Module {
 
     // MARK: - Module methods
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
         startDetection()
     }
 
 
     // MARK: - Type transparency helpers
 
-    public func deleteData(for metadata: any ModuleEventMetadata) {}
-    public func onPublish(data: @escaping (AppStateMetadata, AppStateData) -> Void) {}
+    public func deleteData(for _: any ModuleEventMetadata) {}
+    public func onPublish(data _: @escaping (AppStateMetadata, AppStateData) -> Void) {}
 }

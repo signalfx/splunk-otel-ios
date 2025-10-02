@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// Defines the basic client for API communication
+/// Defines the basic client for API communication.
 class APIClient: AgentAPIClient {
 
     // MARK: - Variables
@@ -56,7 +56,8 @@ class APIClient: AgentAPIClient {
             let result = try await session.data(for: request)
             data = result.0
             response = result.1
-        } catch {
+        }
+        catch {
             throw APIClientError.sessionDataFailed
         }
 
@@ -64,7 +65,7 @@ class APIClient: AgentAPIClient {
         if let httpResponse = response as? HTTPURLResponse {
             let statusCode = httpResponse.statusCode
 
-            guard statusCode >= 200 && statusCode <= 299 else {
+            guard statusCode >= 200, statusCode <= 299 else {
                 throw APIClientError.statusCode(statusCode)
             }
         }
@@ -74,10 +75,10 @@ class APIClient: AgentAPIClient {
         }
 
         // Check for server error response or return loaded data
-        if let errorModel = try? JSONDecoder().decode(APIClientError.ServerDetail.self, from: data) {
-            throw APIClientError.server(errorModel)
-        } else {
+        guard let errorModel = try? JSONDecoder().decode(APIClientError.ServerDetail.self, from: data) else {
             return data
         }
+
+        throw APIClientError.server(errorModel)
     }
 }

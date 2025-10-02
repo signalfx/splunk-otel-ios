@@ -19,7 +19,9 @@ import Foundation
 internal import SplunkCommon
 internal import SplunkCrashReports
 
-/// Crash Reports data event. Represents stringified Crash Report with metadata.
+/// Crash Reports data event.
+///
+/// Represents stringified Crash Report with metadata.
 class CrashReportsDataEvent: AgentEvent {
 
     // MARK: - Event Identification

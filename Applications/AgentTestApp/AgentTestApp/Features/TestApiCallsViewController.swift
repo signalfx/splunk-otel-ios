@@ -19,51 +19,69 @@ import UIKit
 
 class TestApiCallsViewController: UIViewController {
 
-    @IBOutlet weak var cloudkartNetworkButton1: UIButton!
-    @IBOutlet weak var cloudkartNetworkButton2: UIButton!
-    @IBOutlet weak var cloudkartNetworkButton3: UIButton!
-    @IBOutlet weak var cloudkartNetworkButton4: UIButton!
-    @IBOutlet weak var cloudkartNetworkButton5: UIButton!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
+    // MARK: - UI Outlets
 
-    @IBAction func cloudkartNetworkClick1(_ sender: UIButton) {
+    @IBOutlet
+    private var cloudkartNetworkButton1: UIButton!
+
+    @IBOutlet
+    private var cloudkartNetworkButton2: UIButton!
+
+    @IBOutlet
+    private var cloudkartNetworkButton3: UIButton!
+
+    @IBOutlet
+    private var cloudkartNetworkButton4: UIButton!
+
+    @IBOutlet
+    private var cloudkartNetworkButton5: UIButton!
+
+
+    // MARK: - UI Actions
+
+    @IBAction
+    private func cloudkartNetworkClick1(_: UIButton) {
         let urlToCall = "http://appdynamics-cloudkart-demo.e2e.appd-test.com/orders/v1/cart"
         let body: [String: Any] = ["id": "leeza.sinha@gmail.com"]
         let httpBody = try? JSONSerialization.data(withJSONObject: body)
         let net = TestApiCalls()
-        net.simplePostWith(targetURL: urlToCall, body: httpBody!)
+
+        if let httpBody {
+            net.simplePostWith(targetURL: urlToCall, body: httpBody)
+        }
     }
-    
-    @IBAction func cloudkartNetworkClick2(_ sender: UIButton) {
+
+    @IBAction
+    private func cloudkartNetworkClick2(_: UIButton) {
         let urlToCall = "http://appdynamics-cloudkart-demo.e2e.appd-test.com/orders/v1/cart/count"
-        
+
         let net = TestApiCalls()
         net.simpleGetWith(targetURL: urlToCall)
     }
-    
-    @IBAction func cloudkartNetworkClick3(_ sender: UIButton) {
+
+    @IBAction
+    private func cloudkartNetworkClick3(_: UIButton) {
         let urlToCall = "http://appdynamics-cloudkart-demo.e2e.appd-test.com/orders/v1/cart/count"
         let body: [String: Any] = ["name": "leeza2"]
         let httpBody = try? JSONSerialization.data(withJSONObject: body)
         let net = TestApiCalls()
-        net.simplePutWith(targetURL: urlToCall, body: httpBody!)
+
+        if let httpBody {
+            net.simplePutWith(targetURL: urlToCall, body: httpBody)
+        }
     }
-    
-    @IBAction func cloudkartNetworkClick4(_ sender: UIButton) {
+
+    @IBAction
+    private func cloudkartNetworkClick4(_: UIButton) {
         let urlToCall = "http://appdynamics-cloudkart-demo.e2e.appd-test.com/inventory/v1/items/count"
         let net = TestApiCalls()
         net.simpleGetWith(targetURL: urlToCall)
     }
-    
-    @IBAction func cloudkartNetworkClick5(_ sender: UIButton) {
+
+    @IBAction
+    private func cloudkartNetworkClick5(_: UIButton) {
         let urlToCall = "http://appdynamics-cloudkart-demo.e2e.appd-test.com/inventory/v1/warehouses"
         let net = TestApiCalls()
         net.simpleGetWith(targetURL: urlToCall)
     }
-    
 }
-
-

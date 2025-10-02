@@ -47,8 +47,7 @@ public struct NetworkMonitorRemoteConfiguration: RemoteModuleConfiguration {
 
     /// Initializes a NetworkMonitorRemoteConfiguration from JSON data.
     ///
-    /// - Parameter data: The JSON data containing the remote configuration
-    /// - Returns: A NetworkMonitorRemoteConfiguration if decoding succeeds, nil otherwise
+    /// - Parameter data: The JSON data containing the remote configuration.
     public init?(from data: Data) {
         guard let root = try? JSONDecoder().decode(Root.self, from: data) else {
             return nil

@@ -15,11 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-public extension SplunkRum {
+extension SplunkRum {
 
     // MARK: - Screen name
 
-    /// Sets a manual screen name. This setting is valid until a new name is set.
+    /// Sets a manual screen name.
+    ///
+    /// This setting is valid until a new name is set.
     ///
     /// - Parameter name: The name to be tracked as the screen name until being changed.
     @available(
@@ -28,7 +30,7 @@ public extension SplunkRum {
         renamed: "SplunkRum.shared.navigation.track(screen:)",
         message: "This method will be removed in a later version."
     )
-    static func setScreenName(_ name: String) {
+    public static func setScreenName(_ name: String) {
         shared.navigation.track(screen: name)
     }
 
@@ -36,7 +38,7 @@ public extension SplunkRum {
     ///
     /// - Parameter callback: A closure for taking over screen name change.
     @available(*, deprecated, message: "This method will be removed in a later version.")
-    static func addScreenNameChangeCallback(_ callback: ((String) -> Void)?) {
+    public static func addScreenNameChangeCallback(_ callback: ((String) -> Void)?) {
         shared.screenNameChangeCallback = callback
     }
 }

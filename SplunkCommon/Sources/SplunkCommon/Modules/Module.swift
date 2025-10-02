@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - Internal Module API
 
 /// Data of events emitted by a Module.
@@ -55,7 +54,10 @@ public protocol Module {
     init()
 
     /// Initialize the Module.
-    /// - Parameter configuration: A Module-specific configuration.
+    ///
+    /// - Parameters:
+    ///   - configuration: A Module-specific configuration.
+    ///   - remoteConfiguration: A Module-specific remote configuration.
     func install(with configuration: ModuleConfiguration?, remoteConfiguration: RemoteModuleConfiguration?)
 
 

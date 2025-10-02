@@ -33,13 +33,14 @@ extension ConfigurationHandler {
                 self.logger.log(level: .info) {
                     "Remote configuration was successfully fetched and stored."
                 }
-            } catch let error as APIClientError {
+            }
+            catch let error as APIClientError {
                 handleAPIClientError(error)
-
-            } catch let error as ConfigurationHandlerError {
+            }
+            catch let error as ConfigurationHandlerError {
                 handleConfigurationHandlerError(error)
-
-            } catch {
+            }
+            catch {
                 handleError(error)
             }
         }

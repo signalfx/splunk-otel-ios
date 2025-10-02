@@ -29,13 +29,14 @@ public final class SlowFrameDetector {
     actor ReportableFramesBuffer {
         private var buffer: FrameBuffer = [:]
 
-        func incrementFrames() async {
+        func incrementFrames() {
             buffer["shared", default: 0] += 1
         }
 
-        func framesToReport() async -> FrameBuffer {
+        func framesToReport() -> FrameBuffer {
             let bufferCopy = buffer
             buffer.removeAll()
+
             return bufferCopy
         }
     }
@@ -50,19 +51,19 @@ public final class SlowFrameDetector {
 
     // MARK: - Private Properties
 
-    // Frame Detection Machinery
+    /* Frame Detection Machinery */
     private var displayLink: CADisplayLink?
     private var timer: Timer?
     private var displayLinkTask: Task<Void, Never>?
 
-    // Frame Buffers
+    /* Frame Buffers */
     private var slowFrames = ReportableFramesBuffer()
     private var frozenFrames = ReportableFramesBuffer()
 
-    // Calculation State
+    /// Calculation State.
     private var previousTimestamp: CFTimeInterval = 0.0
 
-    // Tuning Parameters
+    /* Tuning Parameters */
     private var tolerancePercentage: Double = 15.0
     private var frozenDurationMultiplier: Double = 40.0
 
@@ -74,12 +75,11 @@ public final class SlowFrameDetector {
         stop()
     }
 
-    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
 
         // Ignore `remoteConfiguration` because when it eventually comes into
         // play, DefaultModulesManager will be using it if needed to veto the
         // installation before we ever get here.
-
         let localConfiguration = configuration as? SlowFrameDetectorConfiguration
 
         // If localConfiguration is nil, default to true.
@@ -99,15 +99,19 @@ public final class SlowFrameDetector {
 
         // Stay on top of app lifecycle so we can pause things if needed
         let center = NotificationCenter.default
-        center.addObserver(self,
-                           selector: #selector(appWillResignActive(notification:)),
-                           name: UIApplication.willResignActiveNotification,
-                           object: nil)
+        center.addObserver(
+            self,
+            selector: #selector(appWillResignActive(notification:)),
+            name: UIApplication.willResignActiveNotification,
+            object: nil
+        )
 
-        center.addObserver(self,
-                           selector: #selector(appDidBecomeActive(notification:)),
-                           name: UIApplication.didBecomeActiveNotification,
-                           object: nil)
+        center.addObserver(
+            self,
+            selector: #selector(appDidBecomeActive(notification:)),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
 
 
         // Runs every frame to detect if any frame took longer than expected
@@ -139,14 +143,16 @@ public final class SlowFrameDetector {
 
     // MARK: - App lifecycle events we hook into
 
-    @objc func appWillResignActive(notification: Notification) {
+    @objc
+    func appWillResignActive(notification _: Notification) {
         displayLink?.isPaused = true
         Task { [weak self] in
             await self?.dumpFrames()
         }
     }
 
-    @objc func appDidBecomeActive(notification: Notification) {
+    @objc
+    func appDidBecomeActive(notification _: Notification) {
         previousTimestamp = 0.0
         displayLink?.isPaused = false
     }
@@ -154,7 +160,8 @@ public final class SlowFrameDetector {
 
     // MARK: - CADisplayLink callback, check is here
 
-    @objc func displayLinkCallback(_ displayLink: CADisplayLink) {
+    @objc
+    func displayLinkCallback(_ displayLink: CADisplayLink) {
 
         // We are working off of some ambiguous documentation from Apple.
         // https://developer.apple.com/documentation/quartzcore/cadisplaylink
@@ -194,7 +201,9 @@ public final class SlowFrameDetector {
         previousTimestamp = actualTimestamp
 
         // Short circuit if we already have a Task underway, so they don't pile up
-        guard displayLinkTask == nil else { return }
+        guard displayLinkTask == nil else {
+            return
+        }
 
         // Set up the expectation
         let expectedDuration = targetTimestamp - actualTimestamp
@@ -214,13 +223,14 @@ public final class SlowFrameDetector {
                 await self?.frozenFrames.incrementFrames()
                 self?.displayLinkTask = nil
             }
-        } else if isSlow {
+        }
+        else if isSlow {
             displayLinkTask = Task { [weak self] in
                 await self?.slowFrames.incrementFrames()
                 self?.displayLinkTask = nil
             }
         }
-     }
+    }
 
 
     // MARK: - Reporting

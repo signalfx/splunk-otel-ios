@@ -18,12 +18,15 @@ limitations under the License.
 import Foundation
 
 /// The class implements the Navigation module configuration.
-@objc(SPLKNavigationConfiguration) @objcMembers
+@objc(SPLKNavigationConfiguration)
+@objcMembers
 public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
 
     // MARK: - Module management
 
-    /// A `BOOL` value determines whether the module should automatically detect navigation in the application. Default value is `NO`.
+    /// A `BOOL` value determines whether the module should automatically detect navigation in the application.
+    ///
+    /// Default value is `NO`.
     public var enableAutomatedTracking: Bool = false
 
 
@@ -36,8 +39,7 @@ public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
 
     /// Initializes new module configuration with preconfigured values.
     ///
-    /// - Parameters:
-    ///   - isEnabled: A `BOOL` value sets whether the module is enabled.
+    /// - Parameter isEnabled: A `BOOL` value sets whether the module is enabled.
     @objc(initWithEnabled:)
     public convenience init(isEnabled: Bool) {
         self.init(isEnabled: isEnabled, enableAutomatedTracking: false)

@@ -18,7 +18,8 @@ limitations under the License.
 import Foundation
 
 /// The class implements the SlowFrame Detector module configuration.
-@objc(SPLKSlowFrameDetectorConfiguration) @objcMembers
+@objc(SPLKSlowFrameDetectorConfiguration)
+@objcMembers
 public final class SlowFrameDetectorConfigurationObjC: ModuleConfigurationObjC {
 
     // MARK: - Initialization

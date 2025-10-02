@@ -1,0 +1,67 @@
+# Format options
+
+--allman false
+--blank-line-after-switch-case always
+--call-site-paren balanced
+--closing-paren balanced
+--decimal-grouping 3,4
+--else-position next-line
+--extension-acl on-declarations
+--func-attributes prev-line
+--guard-else next-line
+--header ignore
+--import-grouping testable-last
+--indent 4
+--indent-case false
+--indent-strings true
+--line-between-guards true
+--max-width 160
+--pattern-let hoist
+--property-types infer-locals-only
+--semicolons never
+--swift-version 5.9
+--tab-width 4
+--trailing-commas never
+--type-attributes prev-line
+--type-blank-lines preserve
+--wrap-arguments before-first
+--wrap-collections before-first
+--wrap-ternary before-operators
+
+
+# Opt-In rules
+
+--enable blankLineAfterSwitchCase
+--enable blankLinesAfterGuardStatements
+--enable docComments
+--enable emptyExtensions
+--enable environmentEntry
+--enable isEmpty
+--enable noExplicitOwnership
+--enable noGuardInTests
+--enable privateStateVariables
+--enable redundantEquatable
+--enable redundantMemberwiseInit
+--enable redundantProperty
+--enable singlePropertyPerLine
+--enable sortSwitchCases
+--enable noForceTryInTests
+--enable unusedPrivateDeclarations
+--enable wrapConditionalBodies
+--enable wrapEnumCases
+--enable wrapMultilineConditionalAssignment
+--enable wrapMultilineFunctionChains
+--enable wrapSwitchCases
+
+
+# Disabled rules
+
+--disable blankLinesAtStartOfScope
+--disable braces
+--disable conditionalAssignment
+--disable consecutiveBlankLines
+--disable enumNamespaces
+--disable fileHeader
+--disable indent
+--disable preferSwiftTesting
+--disable wrapMultilineStatementBraces

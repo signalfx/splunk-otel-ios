@@ -15,22 +15,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkOpenTelemetryBackgroundExporter
 import XCTest
+
+@testable import SplunkOpenTelemetryBackgroundExporter
 
 final class SplunkOTelBackgroundExporterTests: XCTestCase {
 
     // MARK: - Private
 
-    let fileKeyType: String = "logfile"
+    private let fileKeyType: String = "logfile"
 
 
     // MARK: - Should send tests
 
     func testShouldSend_givenThreePreviousAttempts() throws {
+        let exampleURL = try XCTUnwrap(URL(string: "example.com"))
+
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
-            endpoint: URL(string: "example.com")!,
+            endpoint: exampleURL,
             explicitTimeout: 0,
             fileKeyType: fileKeyType
         )
@@ -41,9 +44,11 @@ final class SplunkOTelBackgroundExporterTests: XCTestCase {
     }
 
     func testShouldSend_givenSixPreviousAttempts() throws {
+        let exampleURL = try XCTUnwrap(URL(string: "example.com"))
+
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
-            endpoint: URL(string: "example.com")!,
+            endpoint: exampleURL,
             explicitTimeout: 0,
             fileKeyType: fileKeyType
         )
@@ -57,9 +62,11 @@ final class SplunkOTelBackgroundExporterTests: XCTestCase {
     // MARK: - Request delay tests
 
     func testRequestDelay() throws {
+        let exampleURL = try XCTUnwrap(URL(string: "example.com"))
+
         var requestDescriotor = RequestDescriptor(
             id: UUID(),
-            endpoint: URL(string: "example.com")!,
+            endpoint: exampleURL,
             explicitTimeout: 0,
             fileKeyType: fileKeyType
         )

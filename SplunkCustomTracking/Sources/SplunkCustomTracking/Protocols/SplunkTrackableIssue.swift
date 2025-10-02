@@ -19,16 +19,15 @@ import Foundation
 import OpenTelemetryApi
 import SplunkCommon
 
-
 // MARK: - SplunkTrackableIssue Protocol
 
-/// Protocol for marshalling CustomTracking issues of any type: `String`, `Error`, `NSError`, `NSExeption`
+/// Protocol for marshalling CustomTracking issues of any type: `String`, `Error`, `NSError`, `NSExeption`.
 public protocol SplunkTrackableIssue: SplunkTrackable {
 
-    /// The string message e. g. localizedDescription for the type
+    /// The string message e. g. localizedDescription for the type.
     var message: String { get }
 
-    /// The type of the error, e.g. `NSError`, to be reported as OTel `exception.type`
+    /// The type of the error, e.g. `NSError`, to be reported as OTel `exception.type`.
     var exceptionType: String { get }
 
     /// An actual or derived stack trace from the error. Empty for String message errors.
@@ -38,8 +37,8 @@ public protocol SplunkTrackableIssue: SplunkTrackable {
 
 // MARK: - Default Implementation for SplunkTrackableIssue
 
-public extension SplunkTrackableIssue {
-    func toAttributesDictionary() -> [String: EventAttributeValue] {
+extension SplunkTrackableIssue {
+    public func toAttributesDictionary() -> [String: EventAttributeValue] {
         var attributes: [String: EventAttributeValue] = [:]
 
         // Set required attributes
@@ -47,7 +46,7 @@ public extension SplunkTrackableIssue {
         attributes[ErrorAttributeKeys.Exception.message.rawValue] = .string(message)
 
         // Optionally set stacktrace if it exists
-        if let stacktrace = stacktrace {
+        if let stacktrace {
             attributes[ErrorAttributeKeys.Exception.stacktrace.rawValue] = .string(stacktrace.formatted)
         }
 
@@ -69,6 +68,9 @@ public extension SplunkTrackableIssue {
 // MARK: - SplunkIssue Struct
 
 public struct SplunkIssue: SplunkTrackableIssue {
+
+    // MARK: - Public
+
     public let message: String
     public let exceptionType: String
     public let timestamp: Date
@@ -76,7 +78,9 @@ public struct SplunkIssue: SplunkTrackableIssue {
     public let exceptionCode: EventAttributeValue?
     public let codeNamespace: String?
 
-    // Initializers for SplunkIssue
+
+    // MARK: - Initialization
+
     public init(from message: String) {
         self.message = message
         exceptionType = String(describing: type(of: message))

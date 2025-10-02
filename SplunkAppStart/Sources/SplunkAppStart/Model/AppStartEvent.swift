@@ -27,10 +27,9 @@ extension AppStartEvent {
 
     /// Sorts events by timestamp.
     static func sortedEvents(from events: [String: Date]) -> [AppStartEvent] {
-        let appStartEvents = events.map { name, timestamp in
+        events.map { name, timestamp in
             AppStartEvent(name: name, timestamp: timestamp)
-        }.sorted { $0.timestamp < $1.timestamp }
-
-        return appStartEvents
+        }
+        .sorted { $0.timestamp < $1.timestamp }
     }
 }

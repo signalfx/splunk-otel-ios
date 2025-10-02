@@ -56,7 +56,10 @@ extension AppStateModule {
         #if os(iOS) || os(tvOS) || os(visionOS)
             let tokens = notificationObservers
             notificationObservers.removeAll()
-            tokens.forEach { NotificationCenter.default.removeObserver($0) }
+
+            for token in tokens {
+                NotificationCenter.default.removeObserver(token)
+            }
         #endif
     }
 
@@ -65,7 +68,10 @@ extension AppStateModule {
 
     private func addObserver(_ name: Notification.Name, handler: @escaping () -> Void) {
         let token = NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { [weak self] _ in
-            guard self != nil else { return }
+            guard self != nil else {
+                return
+            }
+
             handler()
         }
         var tokens = notificationObservers

@@ -15,9 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import SplunkCommon
 import XCTest
+
+@testable import SplunkAgent
 
 final class DefaultSessionTests: XCTestCase {
 
@@ -58,7 +59,8 @@ final class DefaultSessionTests: XCTestCase {
 
         // Ended session should be closed
         let currentSession = defaultSession.currentSession
-        XCTAssertTrue(currentSession.closed!)
+        let currentsessionClosed = try XCTUnwrap(currentSession.closed)
+        XCTAssertTrue(currentsessionClosed)
 
         // State after ending should be saved in storage
         let keysPrefix = "\(PackageIdentifier.default).\(testName)."
@@ -71,88 +73,88 @@ final class DefaultSessionTests: XCTestCase {
     }
 
     // TODO: [DEMRUM-2782] Fix tests
-//    func testSessionForLogic() throws {
-//        let maxSessionLength = 5.0
-//        let sessionTimeout = 1.0
-//
-//        let configuration = try ConfigurationTestBuilder.buildDefault()
-//
-//        // After the object is created, there should be one open session
-//        let testName = "sessionForLogicTest"
-//        let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
-//        defaultSession.testMaxSessionLength = maxSessionLength
-//        defaultSession.testSessionTimeout = sessionTimeout
-//
-//        // We need to create a full agent as our session runner for this test
-//        let agent = try AgentTestBuilder.build(with: configuration, session: defaultSession)
-//
-//        // Re-link session and agent each other
-//        defaultSession.owner = agent
-//        agent.currentSession = defaultSession
-//
-//        let resumedSessionItem = defaultSession.currentSessionItem
-//        let resumedSessionId = resumedSessionItem.id
-//
-//        var lastSessionItem = resumedSessionItem
-//        var lastSessionId = lastSessionItem.id
-//
-//        // Retrieved session ID should be the resumed ID
-//        var retrievedSessionId = defaultSession.sessionId(for: Date())
-//        XCTAssertEqual(retrievedSessionId, resumedSessionId)
-//
-//        simulateMainThreadWait(duration: 7)
-//
-//        // After exceeding the maximum session length, we should get a new ID
-//        lastSessionItem = defaultSession.currentSessionItem
-//        lastSessionId = lastSessionItem.id
-//
-//        retrievedSessionId = defaultSession.sessionId(for: Date())
-//        XCTAssertNotEqual(lastSessionId, resumedSessionId)
-//        XCTAssertEqual(retrievedSessionId, lastSessionId)
-//
-//        // If we have no session in that period we should get `nil`
-//        let oneWeekInterval: TimeInterval = 7 * 24 * 60 * 60
-//        let weekAgo = Date() - oneWeekInterval
-//
-//        retrievedSessionId = defaultSession.sessionId(for: weekAgo)
-//        XCTAssertNil(retrievedSessionId)
-//
-//        let threshold: TimeInterval = 0.001
-//        var timestamp = Date()
-//
-//        // Test session right before the first session's start
-//        timestamp = resumedSessionItem.start - threshold
-//        retrievedSessionId = defaultSession.sessionId(for: timestamp)
-//        XCTAssertNil(retrievedSessionId)
-//
-//        // Test session right after the first session's start
-//        timestamp = resumedSessionItem.start + threshold
-//        retrievedSessionId = defaultSession.sessionId(for: timestamp)
-//        XCTAssertEqual(retrievedSessionId, resumedSessionId)
-//
-//        // Test session right before the second session's start
-//        timestamp = lastSessionItem.start - threshold
-//        retrievedSessionId = defaultSession.sessionId(for: timestamp)
-//        XCTAssertEqual(retrievedSessionId, resumedSessionId)
-//
-//        // Test session right after the second session's start
-//        timestamp = lastSessionItem.start + threshold
-//        retrievedSessionId = defaultSession.sessionId(for: timestamp)
-//        XCTAssertEqual(retrievedSessionId, lastSessionId)
-//
-//        // Test session right before the second session's end
-//        timestamp = lastSessionItem.start + maxSessionLength - threshold
-//        retrievedSessionId = defaultSession.sessionId(for: timestamp)
-//        XCTAssertEqual(retrievedSessionId, lastSessionId)
-//
-//        // Test session right after the second session's end
-//        let tolerance = defaultSession.sessionRefreshInterval + (defaultSession.refreshJob?.tolerance ?? 0.0)
-//        timestamp = lastSessionItem.start + maxSessionLength + tolerance + threshold
-//        retrievedSessionId = defaultSession.sessionId(for: timestamp)
-//        XCTAssertNil(retrievedSessionId)
-//    }
+    //    func testSessionForLogic() throws {
+    //        let maxSessionLength = 5.0
+    //        let sessionTimeout = 1.0
+    //
+    //        let configuration = try ConfigurationTestBuilder.buildDefault()
+    //
+    //        // After the object is created, there should be one open session
+    //        let testName = "sessionForLogicTest"
+    //        let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
+    //        defaultSession.testMaxSessionLength = maxSessionLength
+    //        defaultSession.testSessionTimeout = sessionTimeout
+    //
+    //        // We need to create a full agent as our session runner for this test
+    //        let agent = try AgentTestBuilder.build(with: configuration, session: defaultSession)
+    //
+    //        // Re-link session and agent each other
+    //        defaultSession.owner = agent
+    //        agent.currentSession = defaultSession
+    //
+    //        let resumedSessionItem = defaultSession.currentSessionItem
+    //        let resumedSessionId = resumedSessionItem.id
+    //
+    //        var lastSessionItem = resumedSessionItem
+    //        var lastSessionId = lastSessionItem.id
+    //
+    //        // Retrieved session ID should be the resumed ID
+    //        var retrievedSessionId = defaultSession.sessionId(for: Date())
+    //        XCTAssertEqual(retrievedSessionId, resumedSessionId)
+    //
+    //        simulateMainThreadWait(duration: 7)
+    //
+    //        // After exceeding the maximum session length, we should get a new ID
+    //        lastSessionItem = defaultSession.currentSessionItem
+    //        lastSessionId = lastSessionItem.id
+    //
+    //        retrievedSessionId = defaultSession.sessionId(for: Date())
+    //        XCTAssertNotEqual(lastSessionId, resumedSessionId)
+    //        XCTAssertEqual(retrievedSessionId, lastSessionId)
+    //
+    //        // If we have no session in that period we should get `nil`
+    //        let oneWeekInterval: TimeInterval = 7 * 24 * 60 * 60
+    //        let weekAgo = Date() - oneWeekInterval
+    //
+    //        retrievedSessionId = defaultSession.sessionId(for: weekAgo)
+    //        XCTAssertNil(retrievedSessionId)
+    //
+    //        let threshold: TimeInterval = 0.001
+    //        var timestamp = Date()
+    //
+    //        // Test session right before the first session's start
+    //        timestamp = resumedSessionItem.start - threshold
+    //        retrievedSessionId = defaultSession.sessionId(for: timestamp)
+    //        XCTAssertNil(retrievedSessionId)
+    //
+    //        // Test session right after the first session's start
+    //        timestamp = resumedSessionItem.start + threshold
+    //        retrievedSessionId = defaultSession.sessionId(for: timestamp)
+    //        XCTAssertEqual(retrievedSessionId, resumedSessionId)
+    //
+    //        // Test session right before the second session's start
+    //        timestamp = lastSessionItem.start - threshold
+    //        retrievedSessionId = defaultSession.sessionId(for: timestamp)
+    //        XCTAssertEqual(retrievedSessionId, resumedSessionId)
+    //
+    //        // Test session right after the second session's start
+    //        timestamp = lastSessionItem.start + threshold
+    //        retrievedSessionId = defaultSession.sessionId(for: timestamp)
+    //        XCTAssertEqual(retrievedSessionId, lastSessionId)
+    //
+    //        // Test session right before the second session's end
+    //        timestamp = lastSessionItem.start + maxSessionLength - threshold
+    //        retrievedSessionId = defaultSession.sessionId(for: timestamp)
+    //        XCTAssertEqual(retrievedSessionId, lastSessionId)
+    //
+    //        // Test session right after the second session's end
+    //        let tolerance = defaultSession.sessionRefreshInterval + (defaultSession.refreshJob?.tolerance ?? 0.0)
+    //        timestamp = lastSessionItem.start + maxSessionLength + tolerance + threshold
+    //        retrievedSessionId = defaultSession.sessionId(for: timestamp)
+    //        XCTAssertNil(retrievedSessionId)
+    //    }
 
-    // Test whether next application launch creates a new session
+    /// Test whether next application launch creates a new session.
     func testNextLaunchSession() throws {
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "nextLaunchSessionTest")
         let sessionModel = SessionsModel(storage: storage)
@@ -205,77 +207,76 @@ final class DefaultSessionTests: XCTestCase {
 }
 
 
-// swiftformat:disable indent
 #if os(iOS) || os(tvOS) || os(visionOS)
 
-extension DefaultSessionTests {
+    extension DefaultSessionTests {
 
-    // MARK: - Application lifecycle
+        // MARK: - Application lifecycle
 
-    func testEnterBackground() throws {
-        let configuration = try ConfigurationTestBuilder.buildDefault()
+        func testEnterBackground() throws {
+            let configuration = try ConfigurationTestBuilder.buildDefault()
 
-        // After the object is created, there should be one open session
-        let testName = "enterBackgroundTest"
-        let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
-        defaultSession.testSessionTimeout = 10
+            // After the object is created, there should be one open session
+            let testName = "enterBackgroundTest"
+            let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
+            defaultSession.testSessionTimeout = 10
 
-        // We need to create a full agent as our session runner for this test
-        let agent = try AgentTestBuilder.build(with: configuration, session: defaultSession)
+            // We need to create a full agent as our session runner for this test
+            let agent = try AgentTestBuilder.build(with: configuration, session: defaultSession)
 
-        /* Going into the background for *allowed* time */
-        let resumedSessionId = defaultSession.currentSessionId
-        try simulateBackgroundStay(for: defaultSession, duration: 3)
-        simulateMainThreadWait(duration: 2)
+            /* Going into the background for *allowed* time */
+            let resumedSessionId = defaultSession.currentSessionId
+            try simulateBackgroundStay(for: defaultSession, duration: 3)
+            simulateMainThreadWait(duration: 2)
 
-        // The current session should be the same
-        var lastSessionId = defaultSession.currentSessionId
-        XCTAssertEqual(lastSessionId, resumedSessionId)
+            // The current session should be the same
+            var lastSessionId = defaultSession.currentSessionId
+            XCTAssertEqual(lastSessionId, resumedSessionId)
 
-        // Simulate some inactivity
-        simulateMainThreadWait(duration: 8)
+            // Simulate some inactivity
+            simulateMainThreadWait(duration: 8)
 
-        // After a previous stay in the background and some inactivity time,
-        // there should be the same session ID.
-        lastSessionId = defaultSession.currentSessionId
-        XCTAssertEqual(lastSessionId, resumedSessionId)
+            // After a previous stay in the background and some inactivity time,
+            // there should be the same session ID.
+            lastSessionId = defaultSession.currentSessionId
+            XCTAssertEqual(lastSessionId, resumedSessionId)
 
 
-        /* Going into the background for *too long* time */
-        try simulateBackgroundStay(for: defaultSession, duration: 12)
+            /* Going into the background for *too long* time */
+            try simulateBackgroundStay(for: defaultSession, duration: 12)
 
-        // The current session should *not* be the same immediately
-        XCTAssertNotEqual(lastSessionId, defaultSession.currentSessionId)
-        XCTAssertNotNil(agent)
+            // The current session should *not* be the same immediately
+            XCTAssertNotEqual(lastSessionId, defaultSession.currentSessionId)
+            XCTAssertNotNil(agent)
+        }
+
+        func testTerminateApplication() throws {
+            // After the object is created, there should be one open session
+            let testName = "terminateApplicationTest"
+            let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
+
+
+            // Watch for notification emitted from simulated UIKit
+            _ = expectation(
+                forNotification: UIApplication.willTerminateNotification,
+                object: nil,
+                handler: nil
+            )
+
+            // Send simulated termination
+            NotificationCenter.default.post(
+                name: UIApplication.willTerminateNotification,
+                object: nil
+            )
+
+            // We need to wait for notification delivery
+            waitForExpectations(timeout: 5, handler: nil)
+
+            // Current session should be closed
+            let currentSession = defaultSession.currentSession
+            let currentsessionClosed = try XCTUnwrap(currentSession.closed)
+            XCTAssertTrue(currentsessionClosed)
+        }
     }
-
-    func testTerminateApplication() throws {
-        // After the object is created, there should be one open session
-        let testName = "terminateApplicationTest"
-        let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
-
-
-        // Watch for notification emitted from simulated UIKit
-        _ = expectation(
-            forNotification: UIApplication.willTerminateNotification,
-            object: nil,
-            handler: nil
-        )
-
-        // Send simulated termination
-        NotificationCenter.default.post(
-            name: UIApplication.willTerminateNotification,
-            object: nil
-        )
-
-        // We need to wait for notification delivery
-        waitForExpectations(timeout: 5, handler: nil)
-
-        // Current session should be closed
-        let currentSession = defaultSession.currentSession
-        XCTAssertTrue(currentSession.closed!)
-    }
-}
 
 #endif
-// swiftformat:enable indent

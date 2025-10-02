@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-public extension PackageIdentifier {
+extension PackageIdentifier {
 
     // MARK: - Package identification for instances
 
@@ -25,7 +25,7 @@ public extension PackageIdentifier {
     /// - Parameter named: A `String` with instance extension.
     ///
     /// - Returns: A newly assembled `String` with an extended identifier.
-    static func instance(named: String = "default") -> String {
+    public static func instance(named: String = "default") -> String {
         guard !named.isEmpty else {
             return "\(`default`)-default"
         }
@@ -39,7 +39,7 @@ public extension PackageIdentifier {
     /// - Parameter named: A `String` with instance extension.
     ///
     /// - Returns: A newly assembled `String` with an extended identifier.
-    static func nonOperationalInstance(named: String = "default") -> String {
+    public static func nonOperationalInstance(named: String = "default") -> String {
         guard !named.isEmpty else {
             return "\(`default`)-noop-default"
         }

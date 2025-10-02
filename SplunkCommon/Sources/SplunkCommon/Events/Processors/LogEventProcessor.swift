@@ -28,7 +28,7 @@ public protocol LogEventProcessor {
     /// Implementation should decide whether to send the event synchronously or asynchronously by default.
     ///
     /// - Parameters:
-    ///   - event: Event to be sent to exporter.
+    ///   - _: Event to be sent to exporter.
     ///   - completion: Completion block, returns `true` if the event was sent correctly.
     func sendEvent(_: any AgentEvent, completion: @escaping (Bool) -> Void)
 

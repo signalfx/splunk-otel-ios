@@ -28,16 +28,14 @@ public protocol SessionReplayModulePreferences {
     /// - Parameter renderingMode: The required ``RenderingMode``.
     ///
     /// - Returns: The updated ``SessionReplayModulePreferences`` object.
-    @discardableResult func renderingMode(_ renderingMode: RenderingMode?) -> any SessionReplayModulePreferences
+    @discardableResult
+    func renderingMode(_ renderingMode: RenderingMode?) -> any SessionReplayModulePreferences
 
 
     // MARK: - Convenience init
 
     /// Initializes new preferences object with preconfigured values.
     ///
-    /// - Parameters:
-    ///   - renderingMode: The required ``RenderingMode``.
-    ///
-    /// - Returns: A newly initialized `Preferences` object.
+    /// - Parameter renderingMode: The required ``RenderingMode``.
     init(renderingMode: RenderingMode)
 }

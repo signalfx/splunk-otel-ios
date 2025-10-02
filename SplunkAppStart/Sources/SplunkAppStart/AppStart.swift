@@ -42,7 +42,7 @@ public final class AppStart {
 
     // MARK: - Private
 
-    // Internal Logger
+    /// Internal Logger.
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "AppStart")
 
     // Notifications and process start
@@ -53,35 +53,36 @@ public final class AppStart {
     var didBecomeActiveTimestamp: Date?
     var processStartTimestamp: Date?
 
-    // Destination
+    /// Data destination.
     var destination: AppStartDestination = OTelDestination()
 
-    // Initialize span data
+    /// Initialize span data.
     var agentInitializeSpanData: AgentInitializeSpanData?
 
-    // Application prewarm detection
+    /// Application prewarm detection.
     var prewarmDetected = false
 
-    // Background launch detection, optional because we need to detect
-    // background launch only once during the initial application launch.
+    /// Background launch detection, optional because we need to detect
+    /// ackground launch only once during the initial application launch.
     var backgroundLaunchDetected: Bool?
 
 
     // MARK: - Public
 
-    // Shared state
+    /// Shared state.
     public unowned var sharedState: AgentSharedState?
 
 
     // MARK: - Initialization
 
-    // Module conformance
     public required init() {}
 
 
     // MARK: - Instrumentation
 
-    /// Starts app start detection. Detection should be started before receiving the `UIApplication.didFinishLaunchingNotification` notification
+    /// Starts app start detection.
+    ///
+    /// Detection should be started before receiving the `UIApplication.didFinishLaunchingNotification` notification
     /// in order to correctly detect an application prewarm.
     public func startDetection() {
 
@@ -91,7 +92,8 @@ public final class AppStart {
         // Obtain process start time, which is used as an app start span's start
         do {
             processStartTimestamp = try processStartTime()
-        } catch {
+        }
+        catch {
             logger.log(level: .warn) {
                 "Was not able to obtain process start date, cold start won't be recorded. Error: \(error)"
             }
@@ -155,15 +157,17 @@ public final class AppStart {
                 determinedType = .hot
             }
 
-        // Warm start
-        } else if launchedInBackground || prewarmDetected {
+            // Warm start
+        }
+        else if launchedInBackground || prewarmDetected {
             if let willEnterForegroundTimestamp, didBecomeActiveTimestamp != nil {
                 startTime = willEnterForegroundTimestamp
                 determinedType = .warm
             }
 
-        // Cold start
-        } else if let processStartTimestamp, didFinishLaunchingTimestamp != nil {
+            // Cold start
+        }
+        else if let processStartTimestamp, didFinishLaunchingTimestamp != nil {
             if didBecomeActiveTimestamp != nil {
                 startTime = processStartTimestamp
                 determinedType = .cold
@@ -177,13 +181,13 @@ public final class AppStart {
             logger.log(level: .debug) {
                 "App start log: determined app start type: \(determinedType.rawValue), start time: \(startTime), end time: \(endTime)."
             }
-
-        } else if didFinishLaunchingTimestamp != nil {
+        }
+        else if didFinishLaunchingTimestamp != nil {
             logger.log(level: .debug) {
                 "App start log: could not determine, skipping."
             }
-
-        } else {
+        }
+        else {
             logger.log(level: .warn) {
                 "Could not determine app start type, the agent was likely initialized later than receiving the didFinishLaunching notification."
             }
@@ -219,7 +223,7 @@ public final class AppStart {
     // MARK: - Cold start events
 
     private func coldStartEvents(startTime: Date) -> [AppStartEvent] {
-        var events = [AppStartEvent]()
+        var events: [AppStartEvent] = []
 
         events.append(AppStartEvent(name: "process.start", timestamp: startTime))
 

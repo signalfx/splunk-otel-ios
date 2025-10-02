@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkCommon
 import XCTest
+
+@testable import SplunkCommon
 
 extension XCTestCase {
     func getStringValue(for key: String, in attributes: [String: EventAttributeValue]) -> String? {

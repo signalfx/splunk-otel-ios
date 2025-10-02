@@ -16,12 +16,15 @@ limitations under the License.
 */
 
 import Foundation
+
 @testable import SplunkAppState
 @testable import SplunkCommon
 
 final class MockDestination: AppStateDestination {
 
     private let lock = NSLock()
+
+    // swiftlint:disable:next large_tuple
     private(set) var events: [(state: AppStateType, time: Date, shared: AgentSharedState?)] = []
 
     var onSend: (() -> Void)?

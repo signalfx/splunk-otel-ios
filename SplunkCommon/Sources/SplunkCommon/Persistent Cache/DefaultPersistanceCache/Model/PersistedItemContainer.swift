@@ -24,7 +24,7 @@ protocol PersistedItemContainer: Sendable, Codable {
     // MARK: - Associated types
 
     /// Type of the persisted item.
-    associatedtype Item: Sendable & Codable
+    associatedtype Item: Sendable, Codable
 
 
     // MARK: - Public

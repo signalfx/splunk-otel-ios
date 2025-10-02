@@ -15,9 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import SplunkCommon
 import XCTest
+
+@testable import SplunkAgent
 
 final class SessionsModelTests: XCTestCase {
 
@@ -141,14 +142,14 @@ final class SessionsModelTests: XCTestCase {
 
     // MARK: - Sample data
 
-    func buildSampleData() -> [SessionItem] {
+    private func buildSampleData() -> [SessionItem] {
         // 1.5 Months ago
         let startAgoInterval: TimeInterval = 4_017_600
         // 7 Hours
-        let stepInterval: TimeInterval = 25200
+        let stepInterval: TimeInterval = 25_200
 
 
-        var sessions = [SessionItem]()
+        var sessions: [SessionItem] = []
 
         // Creates sample data (150 entries with 7 hour gap)
         for index in 0 ..< 150 {

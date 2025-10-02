@@ -67,7 +67,7 @@ internal import SplunkCommon
 class DefaultModulesPool: AgentModulesPool {
 
     static var `default`: [any Module.Type] {
-        var knownModules = [any Module.Type]()
+        var knownModules: [any Module.Type] = []
 
         // Crash reports
         #if canImport(SplunkCrashReports)

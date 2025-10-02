@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryProtocolExporterCommon
 
-/// Defines description of request used to upload exported file
+/// Defines description of request used to upload exported file.
 struct RequestDescriptor: Codable {
 
     // MARK: - Public
@@ -34,7 +34,7 @@ struct RequestDescriptor: Codable {
     }
 
     var shouldSend: Bool {
-        return sentCount <= 5
+        sentCount <= 5
     }
 
 
@@ -53,7 +53,7 @@ struct RequestDescriptor: Codable {
 
     var json: String? {
         guard let data = try? JSONEncoder().encode(self),
-              let json = String(data: data, encoding: .utf8)
+            let json = String(data: data, encoding: .utf8)
         else {
             return nil
         }
@@ -62,9 +62,9 @@ struct RequestDescriptor: Codable {
     }
 }
 
-private extension RequestDescriptor {
+extension RequestDescriptor {
 
-    var nextRequestDelay: DateComponents {
+    private var nextRequestDelay: DateComponents {
         var delay = DateComponents()
 
         switch sentCount {

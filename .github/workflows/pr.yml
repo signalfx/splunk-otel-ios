@@ -9,16 +9,11 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
-      - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
       - run: |
           brew update
           brew install swiftlint
       - run: |
           swiftlint lint \
-            --config Tools/.swiftlint.yml \
             --reporter github-actions-logging \
             --force-exclude || {
               code=$?
@@ -28,6 +23,28 @@ jobs:
                 exit $code
               fi
             }
+
+  format:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
+      - run: |
+          git ls-files -z '*.swift' | xargs -0 swift format lint --strict --parallel
+
+  swiftformat:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          brew update
+          brew install swiftformat
+      - run: |
+          swiftformat --lint --strict . \
+            --reporter github-actions-log
 
   prepare:
     runs-on: macos-latest

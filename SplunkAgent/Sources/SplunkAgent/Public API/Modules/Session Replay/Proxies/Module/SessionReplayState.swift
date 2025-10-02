@@ -15,10 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 internal import CiscoSessionReplay
+import Foundation
 
 /// An internal object that bridges the core module's state to the public API.
+///
 /// It translates the internal status into the public `SessionReplayStatus` enum.
 final class SessionReplayState: SessionReplayModuleState {
 

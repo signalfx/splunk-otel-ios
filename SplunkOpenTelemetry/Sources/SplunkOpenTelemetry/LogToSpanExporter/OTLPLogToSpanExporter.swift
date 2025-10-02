@@ -28,7 +28,7 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
 
     private let agentVersion: String
 
-    // Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Log to Span Exporter")
 
 
@@ -41,7 +41,7 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
 
     // MARK: - LogRecordExporter protocol implementation
 
-    public func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
+    public func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout _: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
 
         let tracer = OpenTelemetry.instance
             .tracerProvider
@@ -62,7 +62,8 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
                 continue
             }
 
-            let span = tracer
+            let span =
+                tracer
                 .spanBuilder(spanName: spanName)
                 .setStartTime(time: log.timestamp)
                 .startSpan()
@@ -82,11 +83,11 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
         // Check for `eventName` property first
         // ‼️ uncomment once the `eventName` log record attribute is implemented
         // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.45.0/specification/logs/data-model.md#field-eventname
-        /*
-        if let eventName = log.eventName {
-            return eventName
-        } else
-         */
+        //
+        // if let eventName = log.eventName {
+        //     return eventName
+        // } else
+
         // Then check for `event.name` attribute
         if let eventName = log.attributes[OpenTelemetryApi.SemanticAttributes.eventName.rawValue]?.description {
             return eventName
@@ -96,9 +97,9 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
         return "splunk.log"
     }
 
-    public func shutdown(explicitTimeout: TimeInterval?) {}
+    public func shutdown(explicitTimeout _: TimeInterval?) {}
 
-    public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
-        return .success
+    public func forceFlush(explicitTimeout _: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
+        .success
     }
 }
