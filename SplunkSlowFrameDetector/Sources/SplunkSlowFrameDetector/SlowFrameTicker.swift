@@ -28,8 +28,8 @@ import UIKit
 /// This protocol provides a consistent interface for receiving frame updates, abstracting
 /// the underlying mechanism (like `CADisplayLink`) for easier testing and dependency injection.
 protocol SlowFrameTicker {
-    /// A closure that is called for each frame update.
-    var onFrame: ((_ timestamp: TimeInterval, _ duration: TimeInterval) -> Void)? { get set }
+    /// An async closure that is called for each frame update.
+    var onFrame: (@MainActor (TimeInterval, TimeInterval) async -> Void)? { get set }
 
     /// Starts the ticker on the main thread.
     @MainActor
@@ -37,7 +37,8 @@ protocol SlowFrameTicker {
 
     /// Stops the ticker.
     ///
-    /// This method is intentionally not marked with `@MainActor` so it can be safely called from `deinit`.
+    /// - Note: This method is intentionally not marked with `@MainActor` so it can be safely called from `deinit`.
+    /// It handles dispatching to the main thread internally if needed.
     func stop()
 
     /// Pauses the ticker on the main thread.
@@ -58,8 +59,8 @@ final class DisplayLinkTicker: SlowFrameTicker {
 
     // MARK: - Public Properties
 
-    /// A closure that is called for each frame update.
-    var onFrame: ((_ timestamp: TimeInterval, _ duration: TimeInterval) -> Void)?
+    /// An async closure that is called for each frame update.
+    var onFrame: (@MainActor (TimeInterval, TimeInterval) async -> Void)?
 
     // MARK: - Private Properties
 
@@ -68,8 +69,8 @@ final class DisplayLinkTicker: SlowFrameTicker {
     // MARK: - Initialization
 
     deinit {
-        // As a fail-safe, ensure the display link is invalidated when the ticker is deallocated
-        // The owner is responsible for calling stop() for intentional cleanup
+        // As a fail-safe, ensure the display link is invalidated when the ticker is deallocated.
+        // The owner is responsible for calling stop() for intentional cleanup.
         stop()
     }
 
@@ -112,7 +113,9 @@ final class DisplayLinkTicker: SlowFrameTicker {
     // MARK: - Private Methods
 
     @objc private func displayLinkCallback(_ link: CADisplayLink) {
-        onFrame?(link.timestamp, link.duration)
+        Task {
+            await onFrame?(link.timestamp, link.duration)
+        }
     }
 }
 #endif // os(iOS) || os(tvOS) || os(visionOS)

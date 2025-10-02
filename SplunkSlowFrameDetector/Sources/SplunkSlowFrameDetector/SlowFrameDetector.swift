@@ -45,10 +45,10 @@ public final class SlowFrameDetector: NSObject {
     // MARK: - Internal Constants
 
     /// The percentage by which a frame's duration must exceed the expected duration to trigger a slow frame report.
-    static let slowFrameTolerancePercentage: Double = 15.0
+    internal static let slowFrameTolerancePercentage: Double = 15.0
 
     /// The duration of main thread unresponsiveness that triggers a frozen frame report.
-    static let frozenFrameThreshold: TimeInterval = 0.7
+    internal static let frozenFrameThreshold: TimeInterval = 0.7
 
     // MARK: - Private Properties
 
@@ -64,12 +64,12 @@ public final class SlowFrameDetector: NSObject {
     // MARK: - Test-only Properties
 
     #if DEBUG
-    var logicForTest: SlowFrameLogic { logic }
+    internal var logicForTest: SlowFrameLogic { logic }
     #endif
 
     // MARK: - Initialization
 
-    init(
+    internal init(
         ticker: (any SlowFrameTicker)?,
         destinationFactory: @escaping () -> SlowFrameDetectorDestination
     ) {
@@ -118,6 +118,8 @@ public final class SlowFrameDetector: NSObject {
         }
     }
 
+    // MARK: - Internal Methods
+
     /// Starts the slow and frozen frame detection process.
     ///
     /// This method sets up the frame ticker and registers for application lifecycle notifications to
@@ -127,8 +129,7 @@ public final class SlowFrameDetector: NSObject {
             return
         }
 
-        // This task is the main run loop for the detector. It runs on a background thread
-        // and dispatches UI work to the main actor, preventing deadlocks.
+        // This task is the main run loop for the detector.
         detectorTask = Task { [weak self] in
             guard let self else { return }
             do {
@@ -136,7 +137,7 @@ public final class SlowFrameDetector: NSObject {
 
                 self.ticker?.onFrame = { [weak self] timestamp, duration in
                     guard let self else { return }
-                    Task { await self.logic.handleFrame(timestamp: timestamp, duration: duration) }
+                    await self.logic.handleFrame(timestamp: timestamp, duration: duration)
                 }
 
                 // Dispatch UI-related setup to the main actor.
@@ -174,8 +175,6 @@ public final class SlowFrameDetector: NSObject {
         // Await both to ensure all cleanup is complete before this method returns.
         _ = await (detectorTaskCleanup, logicCleanup)
     }
-
-    // MARK: - Internal Methods
 
     func flushBuffers() async {
         await logic.flushBuffers()
