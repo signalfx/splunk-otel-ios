@@ -178,7 +178,7 @@ public final class WebViewInstrumentation: NSObject {
 #if canImport(WebKit)
     extension WebViewInstrumentation: WKScriptMessageHandlerWithReply {
 
-        /// Handles JavaScript messages with a reply handler for asynchronous communication
+        /// Handles JavaScript messages with a reply handler for asynchronous communication.
         public func userContentController(
             _: WKUserContentController,
             didReceive _: WKScriptMessage,
@@ -195,10 +195,10 @@ public final class WebViewInstrumentation: NSObject {
     }
 #endif
 
-/// Type for conforming to ModuleEventMetadata
+/// Type for conforming to ModuleEventMetadata.
 public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
     public var timestamp = Date()
 }
 
-/// Type for conforming to ModuleEventData
+/// Type for conforming to ModuleEventData.
 public struct WebViewInstrumentationData: ModuleEventData {}

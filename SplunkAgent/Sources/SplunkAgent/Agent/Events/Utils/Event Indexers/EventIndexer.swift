@@ -42,6 +42,8 @@ protocol EventIndexer {
     ///   - eventTimestamp: Event timestamp.
     ///
     /// - Returns: Pre-generated or newly created event index.
+    ///
+    /// - Throws: Re-throws errors from embedded objects, mainly from the persistent store layer.
     func prepareIndex(sessionId: String, eventTimestamp: Date) async throws -> Int
 
     /// Removes pre-generated event index form the index cache.
@@ -51,5 +53,7 @@ protocol EventIndexer {
     /// - Parameters:
     ///   - sessionId: Identification of the session to which the event belongs.
     ///   - eventTimestamp: Event timestamp.
+    ///
+    /// - Throws: Re-throws errors from embedded objects, mainly from the persistent store layer.
     func removeIndex(sessionId: String, eventTimestamp: Date) async throws
 }

@@ -29,13 +29,14 @@ public final class SlowFrameDetector {
     actor ReportableFramesBuffer {
         private var buffer: FrameBuffer = [:]
 
-        func incrementFrames() async {
+        func incrementFrames() {
             buffer["shared", default: 0] += 1
         }
 
-        func framesToReport() async -> FrameBuffer {
+        func framesToReport() -> FrameBuffer {
             let bufferCopy = buffer
             buffer.removeAll()
+
             return bufferCopy
         }
     }

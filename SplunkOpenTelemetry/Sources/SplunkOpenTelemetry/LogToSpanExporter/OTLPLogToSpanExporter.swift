@@ -28,7 +28,7 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
 
     private let agentVersion: String
 
-    /// Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Log to Span Exporter")
 
 
@@ -83,11 +83,11 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
         // Check for `eventName` property first
         // ‼️ uncomment once the `eventName` log record attribute is implemented
         // https://github.com/open-telemetry/opentelemetry-specification/blob/v1.45.0/specification/logs/data-model.md#field-eventname
-        /*
-        if let eventName = log.eventName {
-            return eventName
-        } else
-         */
+        //
+        // if let eventName = log.eventName {
+        //     return eventName
+        // } else
+
         // Then check for `event.name` attribute
         if let eventName = log.attributes[OpenTelemetryApi.SemanticAttributes.eventName.rawValue]?.description {
             return eventName

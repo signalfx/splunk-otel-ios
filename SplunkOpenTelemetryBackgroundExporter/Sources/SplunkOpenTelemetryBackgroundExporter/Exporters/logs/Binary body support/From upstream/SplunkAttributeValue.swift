@@ -1,3 +1,5 @@
+// swiftlint:disable file_header
+
 // Changes made:
 // - prefix filename
 // - prefix enum and struct names
@@ -5,10 +7,10 @@
 // - add Data case
 // - disable linters
 
-/*
- * Copyright The OpenTelemetry Authors
- * SPDX-License-Identifier: Apache-2.0
- */
+//
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+//
 
 import Foundation
 import OpenTelemetryApi
@@ -71,11 +73,9 @@ public enum SplunkAttributeValue: Equatable, CustomStringConvertible, Hashable {
     // swiftlint:disable cyclomatic_complexity
     public init?(_ value: Any) {
         switch value {
-        case is String:
-            // swiftlint:disable force_cast
-            self = .string(value as! String)
+        case let val as String:
+            self = .string(val)
 
-        // swiftlint:enable force_cast
         case let val as Bool:
             self = .bool(val)
 
@@ -254,6 +254,7 @@ struct SplunkAttributeValueExplicitCodable: Codable {
         }
     }
 
+    // swiftlint:disable cyclomatic_complexity
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
@@ -303,6 +304,7 @@ struct SplunkAttributeValueExplicitCodable: Codable {
             try nestedContainer.encode(value, forKey: .associatedValue)
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 }
 
 extension SplunkAttributeValue: Codable {}

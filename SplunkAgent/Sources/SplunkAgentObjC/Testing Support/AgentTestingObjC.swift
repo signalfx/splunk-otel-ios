@@ -58,8 +58,10 @@ public class AgentTestingObjC: NSObject {
     /// - Parameters:
     ///   - configuration: A `SPLKAgentConfiguration` for the initial SDK setup.
     ///   - named: A `NSString` with the name of the test being performed.
-    public static func buildTestAgent(with _: AgentConfigurationObjC, testNamed named: String? = nil) -> SplunkRumObjC {
-        let configuration = buildTestConfiguration()
+    ///
+    /// - Returns: A newly initialized agent instance.
+    public static func buildTestAgent(with configuration: AgentConfigurationObjC?, testNamed named: String? = nil) -> SplunkRumObjC {
+        let configuration = configuration ?? buildTestConfiguration()
         let agent = SplunkRum.buildTestInstance(
             with: configuration.agentConfiguration(),
             testNamed: named

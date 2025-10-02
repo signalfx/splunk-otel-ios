@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A state object reflects the current ``User``'s state.
+/// A state object reflects the current ``User`` state.
 public final class UserState {
 
     // MARK: - Internal

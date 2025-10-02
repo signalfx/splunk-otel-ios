@@ -25,7 +25,7 @@ extension MutableAttributes {
 
     var attributesDictionary: [String: AttributeValueObjC] {
         let attributes: [String: AttributeValue] = getAll()
-        var attributesDictionary = [String: AttributeValueObjC]()
+        var attributesDictionary: [String: AttributeValueObjC] = [:]
 
         // Map OpenTelemetry attributes to Objective-C
         for (key, value) in attributes {

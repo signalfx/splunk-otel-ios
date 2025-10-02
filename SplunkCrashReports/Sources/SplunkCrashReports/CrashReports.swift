@@ -212,7 +212,9 @@ public class CrashReports {
         return debuggerIsAttached
     }
 
-    /// Device stats handler. This added device stats and Session ID to PLCrashReporter
+    /// Device stats handler.
+    ///
+    /// This added device stats and Session ID to PLCrashReporter
     /// so that it will be included in a future crash report.
     private func updateDeviceStats() {
         deviceDataQueue.async {
@@ -267,13 +269,15 @@ public class CrashReports {
             // the backend is able to support all options.
             appState =
                 switch timebasedAppState {
-                case "active": "foreground"
+                case "active":
+                    "foreground"
 
                 case "inactive",
                     "terminate":
                     "background"
 
-                default: timebasedAppState
+                default:
+                    timebasedAppState
                 }
         }
         return appState
@@ -347,25 +351,6 @@ public class CrashReports {
         return reportDict
     }
 
-    private func toAttributeValue(_ value: Any) -> AttributeValue {
-        switch value {
-        case let string as String:
-            return .string(string)
-
-        case let int as Int:
-            return .int(int)
-
-        case let double as Double:
-            return .double(double)
-
-        case let bool as Bool:
-            return .bool(bool)
-
-        default:
-            return .string(String(describing: value))
-        }
-    }
-
     private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?, timestamp: Date) {
         let tracer = OpenTelemetry.instance
             .tracerProvider
@@ -383,5 +368,30 @@ public class CrashReports {
         }
 
         crashSpan.end(time: timestamp)
+    }
+}
+
+
+extension CrashReports {
+
+    // MARK: - Helpers
+
+    private func toAttributeValue(_ value: Any) -> AttributeValue {
+        switch value {
+        case let string as String:
+            return .string(string)
+
+        case let int as Int:
+            return .int(int)
+
+        case let double as Double:
+            return .double(double)
+
+        case let bool as Bool:
+            return .bool(bool)
+
+        default:
+            return .string(String(describing: value))
+        }
     }
 }

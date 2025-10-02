@@ -39,20 +39,6 @@ public enum ConnectionType: String {
 
 public class NetworkMonitor {
 
-    /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
-    public unowned var sharedState: AgentSharedState?
-
-    /// Shared instance of NetworkMonitor for singleton access.
-    public static let shared = NetworkMonitor()
-
-    /// An optional callback for network changes
-    public typealias NetworkStatusChangeHandler = (
-        _ isConnected: Bool,
-        _ connectionType: ConnectionType,
-        _ radioType: String?
-    ) -> Void
-    public var statusChangeHandler: NetworkStatusChangeHandler?
-
     // MARK: - Private
 
     private let monitor = NWPathMonitor()
@@ -78,6 +64,25 @@ public class NetworkMonitor {
 
     private var destination: NetworkMonitorDestination = OTelDestination()
 
+
+    // MARK: - Public
+
+    /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
+    public unowned var sharedState: AgentSharedState?
+
+    /// Shared instance of NetworkMonitor for singleton access.
+    public static let shared = NetworkMonitor()
+
+    /// An optional callback for network changes.
+    public typealias NetworkStatusChangeHandler = (
+        _ isConnected: Bool,
+        _ connectionType: ConnectionType,
+        _ radioType: String?
+    ) -> Void
+
+    public var statusChangeHandler: NetworkStatusChangeHandler?
+
+
     // MARK: - Initialization
 
     public required init() {}
@@ -85,6 +90,9 @@ public class NetworkMonitor {
     deinit {
         stopDetection()
     }
+
+
+    // MARK: - Instrumentation
 
     /// Starts monitoring network connectivity changes.
     ///
@@ -141,23 +149,27 @@ public class NetworkMonitor {
         if path.usesInterfaceType(.wifi) {
             return .wifi
         }
-        else if path.usesInterfaceType(.cellular) {
+
+        if path.usesInterfaceType(.cellular) {
             return .cellular
         }
-        else if path.usesInterfaceType(.wiredEthernet) {
+
+        if path.usesInterfaceType(.wiredEthernet) {
             return .wiredEthernet
         }
-        else if path.status == .unsatisfied {
+
+        if path.status == .unsatisfied {
             return .unavailable
         }
-        else {
-            // Check for VPN
-            let isVPN = path.availableInterfaces.contains(where: { iface in
-                iface.type == .other
-                    && (iface.name.lowercased().contains("utun") || iface.name.lowercased().contains("ppp") || iface.name.lowercased().contains("ipsec"))
-            })
-            return isVPN ? .vpn : .other
-        }
+
+
+        // Check for VPN
+        let isVPN = path.availableInterfaces.contains(where: { iface in
+            iface.type == .other
+                && (iface.name.lowercased().contains("utun") || iface.name.lowercased().contains("ppp") || iface.name.lowercased().contains("ipsec"))
+        })
+
+        return isVPN ? .vpn : .other
     }
 
     private func sendNetworkChangeSpan() {
@@ -187,8 +199,8 @@ public class NetworkMonitor {
     // swiftlint:disable cyclomatic_complexity
     private func getCurrentRadioType() -> String? {
         #if canImport(CoreTelephony)
-            /// Pick the first available radio access technology
-            let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first ?? nil
+            let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first
+
             switch radioTechnology {
             case CTRadioAccessTechnologyGPRS:
                 return "GPRS (2G)"

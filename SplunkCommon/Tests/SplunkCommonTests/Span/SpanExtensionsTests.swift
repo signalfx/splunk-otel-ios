@@ -23,7 +23,12 @@ import XCTest
 
 final class SpanExtensionsTests: XCTestCase {
 
-    private var mockSpan: MockSpan!
+    // MARK: - Private
+
+    private var mockSpan: MockSpan?
+
+
+    // MARK: - Tests lifecycle
 
     override func setUp() {
         super.setUp()
@@ -35,7 +40,12 @@ final class SpanExtensionsTests: XCTestCase {
         super.tearDown()
     }
 
-    func testClearAndSetAttributeWithAttributeValue() {
+
+    // MARK: - Attributes values
+
+    func testClearAndSetAttributeWithAttributeValue() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given: A span with an existing attribute
         let key = "test.attribute"
         let initialValue = AttributeValue.string("initial")
@@ -51,7 +61,8 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], newValue)
     }
 
-    func testClearAndSetAttributeWithDifferentAttributeValueTypes() {
+    func testClearAndSetAttributeWithDifferentAttributeValueTypes() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
         let key = "test.attribute"
 
         // Test with string value
@@ -75,7 +86,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], boolValue)
     }
 
-    func testClearAndSetAttributeWithStringAny() {
+    func testClearAndSetAttributeWithStringAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.string"
         let value = "test string"
@@ -87,7 +100,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.string(value))
     }
 
-    func testClearAndSetAttributeWithIntAny() {
+    func testClearAndSetAttributeWithIntAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.int"
         let value = 42
@@ -99,7 +114,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.int(value))
     }
 
-    func testClearAndSetAttributeWithDoubleAny() {
+    func testClearAndSetAttributeWithDoubleAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.double"
         let value = 3.14159
@@ -111,7 +128,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.double(value))
     }
 
-    func testClearAndSetAttributeWithBoolAny() {
+    func testClearAndSetAttributeWithBoolAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.bool"
         let value = true
@@ -123,7 +142,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.bool(value))
     }
 
-    func testClearAndSetAttributeWithStringArrayAny() {
+    func testClearAndSetAttributeWithStringArrayAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.string.array"
         let value = ["first", "second", "third"]
@@ -136,7 +157,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.array(expectedArray))
     }
 
-    func testClearAndSetAttributeWithIntArrayAny() {
+    func testClearAndSetAttributeWithIntArrayAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.int.array"
         let value = [1, 2, 3, 4, 5]
@@ -149,7 +172,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.array(expectedArray))
     }
 
-    func testClearAndSetAttributeWithDoubleArrayAny() {
+    func testClearAndSetAttributeWithDoubleArrayAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.double.array"
         let value = [1.1, 2.2, 3.3]
@@ -162,7 +187,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.array(expectedArray))
     }
 
-    func testClearAndSetAttributeWithBoolArrayAny() {
+    func testClearAndSetAttributeWithBoolArrayAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.bool.array"
         let value = [true, false, true]
@@ -175,7 +202,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.array(expectedArray))
     }
 
-    func testClearAndSetAttributeWithUnsupportedTypeAny() {
+    func testClearAndSetAttributeWithUnsupportedTypeAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given: An unsupported type (custom struct)
         struct CustomType {
             let value = "test"
@@ -191,7 +220,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.string(expectedStringValue))
     }
 
-    func testClearAndSetAttributeWithEmptyStringArray() {
+    func testClearAndSetAttributeWithEmptyStringArray() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.empty.array"
         let value: [String] = []
@@ -204,7 +235,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.array(expectedArray))
     }
 
-    func testClearAndSetAttributeWithSemanticAttributesAndAttributeValue() {
+    func testClearAndSetAttributeWithSemanticAttributesAndAttributeValue() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let semanticKey = SemanticAttributes.httpMethod
         let value = AttributeValue.string("GET")
@@ -216,7 +249,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[semanticKey.rawValue], value)
     }
 
-    func testClearAndSetAttributeWithSemanticAttributesAndAny() {
+    func testClearAndSetAttributeWithSemanticAttributesAndAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let semanticKey = SemanticAttributes.httpStatusCode
         let value = 200
@@ -228,7 +263,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[semanticKey.rawValue], AttributeValue.int(value))
     }
 
-    func testClearAndSetAttributeWithMultipleSemanticAttributes() {
+    func testClearAndSetAttributeWithMultipleSemanticAttributes() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let httpMethod = SemanticAttributes.httpMethod
         let httpUrl = SemanticAttributes.httpUrl
@@ -245,7 +282,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[httpStatusCode.rawValue], AttributeValue.int(201))
     }
 
-    func testClearAndSetAttributeOverwritesExistingValue() {
+    func testClearAndSetAttributeOverwritesExistingValue() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given: A span with an existing attribute
         let key = "test.overwrite"
         let initialValue = AttributeValue.string("initial")
@@ -261,7 +300,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], newValue)
     }
 
-    func testClearAndSetAttributeWithNilValues() {
+    func testClearAndSetAttributeWithNilValues() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.nil"
         let initialValue = AttributeValue.string("initial")
@@ -277,7 +318,9 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], newValue)
     }
 
-    func testMultipleClearAndSetOperations() {
+    func testMultipleClearAndSetOperations() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
         // Given
         let key = "test.multiple"
 
@@ -298,7 +341,8 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.double(3.14))
     }
 
-    func testClearAndSetAttributeWithSpecialStringValues() {
+    func testClearAndSetAttributeWithSpecialStringValues() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
         let key = "test.special.strings"
 
         // Test with empty string
@@ -314,7 +358,8 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.string("🚀 Test 测试"))
     }
 
-    func testClearAndSetAttributeWithExtremeNumbers() {
+    func testClearAndSetAttributeWithExtremeNumbers() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
         let key = "test.extreme.numbers"
 
         // Test with very large int
@@ -332,68 +377,5 @@ final class SpanExtensionsTests: XCTestCase {
         // Test with very small double
         mockSpan.clearAndSetAttribute(key: key, value: Double.leastNormalMagnitude)
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.double(Double.leastNormalMagnitude))
-    }
-}
-
-// MARK: - MockSpan for Testing
-
-private class MockSpan: Span {
-    var name: String
-    var kind: SpanKind = .internal
-    var context: SpanContext
-    var status: Status = .unset
-    var isRecording: Bool = true
-    var startTime = Date()
-    var endTime: Date?
-
-    var attributes: [String: AttributeValue] = [:]
-
-    init(name: String) {
-        self.name = name
-        context = SpanContext.create(
-            traceId: TraceId.random(),
-            spanId: SpanId.random(),
-            traceFlags: TraceFlags(),
-            traceState: TraceState()
-        )
-    }
-
-    func setAttribute(key: String, value: AttributeValue?) {
-        if let value {
-            attributes[key] = value
-        }
-        else {
-            attributes.removeValue(forKey: key)
-        }
-    }
-
-    /// Required for full protocol conformance
-    func setAttributes(_ attributes: [String: AttributeValue]) {
-        for (key, value) in attributes {
-            self.attributes[key] = value
-        }
-    }
-
-    func recordException(_: any SpanException) {}
-    func recordException(_: any SpanException, attributes _: [String: AttributeValue]) {}
-    func recordException(_: any SpanException, timestamp _: Date) {}
-    func recordException(_: any SpanException, attributes _: [String: AttributeValue], timestamp _: Date) {}
-
-    func addEvent(name _: String, attributes _: [String: AttributeValue]) {}
-    func addEvent(name _: String) {}
-    func addEvent(name _: String, timestamp _: Date) {}
-    func addEvent(name _: String, attributes _: [String: AttributeValue], timestamp _: Date) {}
-
-    func end() {
-        end(time: Date())
-    }
-
-    func end(time: Date) {
-        isRecording = false
-        endTime = time
-    }
-
-    var description: String {
-        "MockSpan"
     }
 }
