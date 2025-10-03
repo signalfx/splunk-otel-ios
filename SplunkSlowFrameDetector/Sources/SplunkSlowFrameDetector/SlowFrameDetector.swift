@@ -227,7 +227,7 @@ public final class SlowFrameDetector: NSObject {
 @MainActor
 extension SlowFrameDetector {
     /// Encapsulates the state and registration of application lifecycle notification observers.
-    fileprivate final class LifecycleObserver {
+    private final class LifecycleObserver {
         private weak var observer: NSObject?
         private var isRegistered = false
 
