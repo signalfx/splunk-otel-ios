@@ -33,7 +33,7 @@ protocol RequestDescriptorProtocol: Codable {
 extension RequestDescriptorProtocol {
     var json: String? {
         guard let data = try? JSONEncoder().encode(self),
-              let json = String(data: data, encoding: .utf8)
+            let json = String(data: data, encoding: .utf8)
         else {
             return nil
         }
@@ -42,7 +42,7 @@ extension RequestDescriptorProtocol {
     }
 }
 
-/// Defines description of request used to upload exported file
+/// Defines description of request used to upload exported file.
 struct RequestDescriptor: RequestDescriptorProtocol {
 
     // MARK: - Public

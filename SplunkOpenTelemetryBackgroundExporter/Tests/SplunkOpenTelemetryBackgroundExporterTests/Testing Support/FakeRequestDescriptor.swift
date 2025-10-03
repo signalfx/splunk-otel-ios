@@ -24,13 +24,36 @@ import Testing
 @testable import SplunkOpenTelemetryBackgroundExporter
 
 struct FakeRequestDescriptor: RequestDescriptorProtocol {
-    var id: UUID = .init()
-    var endpoint: URL = .init(string: "https://example.com")!
-    var explicitTimeout: TimeInterval = 1
-    var sentCount: Int = 0
-    var fileKeyType: String = "base"
-    var scheduled: Date = .now
-    var shouldSend: Bool = true
+
+    var id: UUID
+    var endpoint: URL
+    var explicitTimeout: TimeInterval
+    var sentCount: Int
+    var fileKeyType: String
+    var scheduled: Date
+    var shouldSend: Bool
+
+    init(
+        endpointString: String = "https://example.com",
+        id: UUID = .init(),
+        explicitTimeout: TimeInterval = 1,
+        sentCount: Int = 0,
+        fileKeyType: String = "base",
+        scheduled: Date = .now,
+        shouldSend: Bool = true
+    ) throws {
+        guard let url = URL(string: endpointString) else {
+            throw URLError(.unknown)
+        }
+
+        endpoint = url
+        self.id = id
+        self.explicitTimeout = explicitTimeout
+        self.sentCount = sentCount
+        self.fileKeyType = fileKeyType
+        self.scheduled = scheduled
+        self.shouldSend = shouldSend
+    }
 
     func createRequest() -> URLRequest {
         var request = URLRequest(url: endpoint)
@@ -41,12 +64,5 @@ struct FakeRequestDescriptor: RequestDescriptorProtocol {
         request.timeoutInterval = explicitTimeout
 
         return request
-    }
-}
-
-extension URLSessionTask {
-
-    static func createNewTestTask(with requestDescriptor: RequestDescriptorProtocol = FakeRequestDescriptor()) -> URLSessionDataTask {
-        URLSession(configuration: .default).dataTask(with: requestDescriptor.createRequest())
     }
 }

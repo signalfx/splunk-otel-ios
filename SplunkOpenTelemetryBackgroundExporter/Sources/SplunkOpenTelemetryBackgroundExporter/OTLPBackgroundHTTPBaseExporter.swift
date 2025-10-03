@@ -73,9 +73,10 @@ public class OTLPBackgroundHTTPBaseExporter {
         // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
         checkStalledTask = Task.detached(priority: .utility) { [weak self] in
             try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
-            self?.httpClient.getAllSessionsTasks { [weak self] tasks in
-                self?.checkStalledUploadsOperation(tasks: tasks)
-            }
+            self?.httpClient
+                .getAllSessionsTasks { [weak self] tasks in
+                    self?.checkStalledUploadsOperation(tasks: tasks)
+                }
         }
     }
 
@@ -89,7 +90,8 @@ public class OTLPBackgroundHTTPBaseExporter {
     func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
 
         // Get descriptions from all incomplete requests
-        let allTaskDescriptions = tasks
+        let allTaskDescriptions =
+            tasks
             .compactMap(\.taskDescription)
             .compactMap {
                 try? JSONDecoder().decode(RequestDescriptor.self, from: Data($0.utf8))
@@ -99,17 +101,17 @@ public class OTLPBackgroundHTTPBaseExporter {
         let cancelTime = Date(timeIntervalSinceNow: -1 * config.timeout)
 
         // Cancel all stalled tasks.
-        tasks
-            .filter {
-                guard let expectedExecutionDate = $0.earliestBeginDate else {
-                    return true
-                }
+        let toCancelTasks = tasks.filter {
+            guard let expectedExecutionDate = $0.earliestBeginDate else {
+                return true
+            }
 
-                return expectedExecutionDate < cancelTime
-            }
-            .forEach {
-                $0.cancel()
-            }
+            return expectedExecutionDate < cancelTime
+        }
+
+        for task in toCancelTasks {
+            task.cancel()
+        }
 
         // Get all file's keys that should be uploaded
         guard let uploadList = (try? diskStorage.list(forKey: getStorageKey()))?.map(\.key) else {

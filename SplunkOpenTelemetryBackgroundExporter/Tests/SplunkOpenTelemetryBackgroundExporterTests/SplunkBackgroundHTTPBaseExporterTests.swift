@@ -27,16 +27,17 @@ import XCTest
 @testable import SplunkOpenTelemetryBackgroundExporter
 
 @Suite
-struct SplunkOTLPBackgroundHTTPBaseExporterTests {
+struct SplunkBackgroundHTTPBaseExporterTests {
+
+    // MARK: - Helpers
 
     func makeExporter(
         disk: FakeDiskStorage,
         http: FakeHTTPClient,
-        config: OtlpConfiguration = OtlpConfiguration(),
-        endpoint: URL = URL(string: "https://example.com")!
-    ) -> OTLPBackgroundHTTPBaseExporter {
-        let exporter = OTLPBackgroundHTTPBaseExporter(
-            endpoint: endpoint,
+        config: OtlpConfiguration = OtlpConfiguration()
+    ) throws -> OTLPBackgroundHTTPBaseExporter {
+        let exporter = try OTLPBackgroundHTTPBaseExporter(
+            endpoint: XCTUnwrap(URL(string: "https://example.com")),
             config: config,
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
@@ -46,14 +47,21 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
         return exporter
     }
 
+    func createNewTestTask() throws -> URLSessionDataTask {
+        try URLSession(configuration: .default).dataTask(with: FakeRequestDescriptor().createRequest())
+    }
+
+
+    // MARK: - Tests
+
     @Test
-    func diskStorageThrows() {
+    func diskStorageThrows() throws {
         let disk = FakeDiskStorage()
         disk.shouldThrowOnlist = true
         let http = FakeHTTPClient()
-        let exporter = makeExporter(disk: disk, http: http)
+        let exporter = try makeExporter(disk: disk, http: http)
 
-        let task = URLSessionTask.createNewTestTask()
+        let task = try createNewTestTask()
         task.earliestBeginDate = .now
 
         exporter.checkStalledUploadsOperation(tasks: [task])
@@ -64,7 +72,7 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
 
     @Test
     func diskStorageWorks() throws {
-        let desc = FakeRequestDescriptor()
+        let desc = try FakeRequestDescriptor()
 
         let disk = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: "SplunkOTLPBackgroundHTTPBaseExporterTests.testDiskStorageWorks"),
@@ -91,12 +99,12 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func taskWithNilEarliestBeginDateIsCancelled() {
+    func taskWithNilEarliestBeginDateIsCancelled() throws {
         let disk = FakeDiskStorage()
         let http = FakeHTTPClient()
-        let exporter = makeExporter(disk: disk, http: http)
+        let exporter = try makeExporter(disk: disk, http: http)
 
-        let task = URLSessionTask.createNewTestTask()
+        let task = try createNewTestTask()
         task.earliestBeginDate = nil
 
         exporter.checkStalledUploadsOperation(tasks: [task])
@@ -105,21 +113,21 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func onlyStalledTasksAreCancelled() {
+    func onlyStalledTasksAreCancelled() throws {
         let disk = FakeDiskStorage()
         let http = FakeHTTPClient()
-        let exporter = makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 1))
+        let exporter = try makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 1))
 
         let now = Date()
         let old = now.addingTimeInterval(-1_000)
         let fresh = now
 
-        let tOld = URLSessionTask.createNewTestTask()
-        tOld.taskDescription = FakeRequestDescriptor(scheduled: old).json
+        let tOld = try createNewTestTask()
+        tOld.taskDescription = try FakeRequestDescriptor(scheduled: old).json
         tOld.earliestBeginDate = old
 
-        let tfresh = URLSessionTask.createNewTestTask()
-        tfresh.taskDescription = FakeRequestDescriptor(scheduled: old).json
+        let tfresh = try createNewTestTask()
+        tfresh.taskDescription = try FakeRequestDescriptor(scheduled: old).json
         tfresh.earliestBeginDate = fresh
 
         exporter.checkStalledUploadsOperation(tasks: [tOld, tfresh])
@@ -129,24 +137,24 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func fileWithInvalidUUIDIsSkipped() {
+    func fileWithInvalidUUIDIsSkipped() throws {
         let disk = FakeDiskStorage()
         let http = FakeHTTPClient()
 
-        let exporter = makeExporter(disk: disk, http: http)
+        let exporter = try makeExporter(disk: disk, http: http)
         exporter.checkAndSend(fileKeys: ["non-working-uuid"], existingTasks: [], cancelTime: .now)
 
         #expect(http.sent.isEmpty)
     }
 
     @Test
-    func fileWithNonStalledTaskIsNotResent() {
+    func fileWithNonStalledTaskIsNotResent() throws {
         let uuid = UUID()
         let disk = FakeDiskStorage()
-        let desc = FakeRequestDescriptor(id: uuid, scheduled: .now.addingTimeInterval(1_000))
+        let desc = try FakeRequestDescriptor(id: uuid, scheduled: .now.addingTimeInterval(1_000))
 
         let http = FakeHTTPClient()
-        let exporter = makeExporter(disk: disk, http: http)
+        let exporter = try makeExporter(disk: disk, http: http)
 
         exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: .now)
 
@@ -159,7 +167,6 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
         let disk = FakeDiskStorage()
         let desc = try FakeRequestDescriptor(
             id: uuid,
-            endpoint: XCTUnwrap(URL(string: "https://example.com")),
             explicitTimeout: 1,
             sentCount: 5,
             fileKeyType: "base",
@@ -167,7 +174,7 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
         )
 
         let http = FakeHTTPClient()
-        let exporter = makeExporter(disk: disk, http: http)
+        let exporter = try makeExporter(disk: disk, http: http)
 
         exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: .now)
 
@@ -176,12 +183,12 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func fileWithNoTaskDescriptionIsSentAsNew() {
+    func fileWithNoTaskDescriptionIsSentAsNew() throws {
         let uuid = UUID()
         let disk = FakeDiskStorage()
         let http = FakeHTTPClient()
 
-        let exporter = makeExporter(disk: disk, http: http)
+        let exporter = try makeExporter(disk: disk, http: http)
 
         exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: .now)
 
