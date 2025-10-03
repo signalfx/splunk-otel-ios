@@ -17,7 +17,9 @@ limitations under the License.
 
 import Foundation
 
-/// A dummy configuration handler. It is used for the non-operational instance, or on a target platform the agent is not fully supporting.
+/// A dummy configuration handler.
+///
+/// It is used for the non-operational instance, or on a target platform the agent is not fully supporting.
 final class ConfigurationHandlerNonOperational: AgentConfigurationHandler {
 
     // MARK: - Configuration

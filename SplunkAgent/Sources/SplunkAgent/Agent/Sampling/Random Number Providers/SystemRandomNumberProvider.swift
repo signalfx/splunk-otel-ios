@@ -22,8 +22,8 @@ protocol RandomNumberProvider {
 
     /// Generates a random `Double` within the specified inclusive range.
     ///
-    /// - Parameters:
-    ///   - range: A `ClosedRange<Double>` specifying the lower and upper bounds for the random number.
+    /// - Parameter range: A `ClosedRange<Double>` specifying the lower and upper bounds for the random number.
+    ///
     /// - Returns: A random `Double` within the specified range.
     func randomNumber(in range: ClosedRange<Double>) -> Double
 }
@@ -37,6 +37,7 @@ struct SystemRandomNumberProvider: RandomNumberProvider {
     /// Generates a random `Double` using `Double.random(in: range)`.
     ///
     /// - Parameter range: The inclusive range within which to generate the random number.
+    ///
     /// - Returns: A random `Double` within the specified range.
     func randomNumber(in range: ClosedRange<Double>) -> Double {
         Double.random(in: range)

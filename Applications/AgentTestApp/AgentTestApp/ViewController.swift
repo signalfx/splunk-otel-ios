@@ -19,16 +19,43 @@ import UIKit
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
-    // Data model: These strings will be the data for the table view cells and drive the segue
-    //             Each array must have the same number of elements
-    let displayName: [String] = ["Network Calls", "Crashes", "Test API Sample Calls", "Slow Frame Renders", "Sample Next Task"] // Can be any descriptive text
-    let segueName: [String] = ["NetworkCalls", "Crashes", "TestApiCalls", "SlowFrameRenders", "PlaceHolder"] //  Segues declared in the storyboard
+    // MARK: - Constants
 
-    // cell reuse id (cells that scroll out of view can be reused)
+    // Data model:
+    //
+    //   - Each array must have the same number of elements.
+    //   - These strings will be the data for the table view cells and drive the segue.
+    //   - Segues declared in the storyboard.
+
+    /// Names for the table view cells.
+    let displayName: [String] = [
+        "Network Calls",
+        "Crashes",
+        "Test API Sample Calls",
+        "Slow Frame Renders",
+        "Sample Next Task"
+    ]
+
+    ///  Segues declared in the storyboard.
+    let segueName: [String] = [
+        "NetworkCalls",
+        "Crashes",
+        "TestApiCalls",
+        "SlowFrameRenders",
+        "PlaceHolder"
+    ]
+
+    /// Cell reuse id (cells that scroll out of view can be reused).
     let cellReuseIdentifier = "cell"
 
-    // don't forget to hook this up from the storyboard
-    @IBOutlet var tableView: UITableView!
+
+    // MARK: - UI Outlets
+
+    @IBOutlet
+    private var tableView: UITableView!
+
+
+    // MARK: - View lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,28 +68,32 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         tableView.dataSource = self
     }
 
-    // number of rows in table view
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return displayName.count
+
+    // MARK: - UITableViewDataSource methods
+
+    /// Number of rows in table view.
+    func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
+        displayName.count
     }
 
-    // create a cell for each table view row
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    /// Create a cell for each table view row.
+    func tableView(_: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // Create a new cell if needed or reuse an old one
+        let cell: UITableViewCell = (tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier) as UITableViewCell?) ?? UITableViewCell()
 
-        // create a new cell if needed or reuse an old one
-        let cell: UITableViewCell = (self.tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier) as UITableViewCell?)!
-
-        // set the text from the data model
+        // Set the text from the data model
         cell.textLabel?.text = displayName[indexPath.row]
 
         return cell
     }
 
-    // method to run when table view cell is tapped
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+
+    // MARK: - UITableViewDelegate methods
+
+    /// Method to run when table view cell is tapped.
+    func tableView(_: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("You tapped row \(indexPath.row), for \(displayName[indexPath.row])")
 
         performSegue(withIdentifier: segueName[indexPath.row], sender: self)
     }
 }
-

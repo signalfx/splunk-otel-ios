@@ -28,7 +28,9 @@ class AppStateModel {
     /// Maximum number of stored app state events.
     private static let maxEvents = 100
 
-    /// Maximum lifetime of stored app states. The value corresponds to 30 days.
+    /// Maximum lifetime of stored app states.
+    ///
+    /// The value corresponds to 30 days.
     private static let eventLifetime: TimeInterval = 2_592_000
 
 

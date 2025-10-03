@@ -28,7 +28,7 @@ class MockTracerProvider: TracerProvider {
         mockTracer
     }
 
-    /// Required for full protocol conformance
+    /// Required for full protocol conformance.
     func get(
         instrumentationName _: String,
         instrumentationVersion _: String?,
@@ -69,17 +69,27 @@ class MockSpanBuilder: SpanBuilder {
         return self
     }
 
-    // Required for full protocol conformance
-    func setActive(_: Bool) -> Self { self }
+    /// Required for full protocol conformance.
+    func setActive(_ active: Bool) -> Self {
+        // Intentionally unused
+        _ = active
+
+        return self
+    }
+
+    // swift-format-ignore: AmbiguousTrailingClosureOverload
     func withActiveSpan<T>(_ operation: (any SpanBase) throws -> T) rethrows -> T {
         let span = startSpan()
         return try operation(span)
     }
 
-    func withActiveSpan<T>(_ operation: (any SpanBase) async throws -> T) async rethrows -> T {
-        let span = startSpan()
-        return try await operation(span)
-    }
+    #if canImport(_Concurrency)
+        // swift-format-ignore: AmbiguousTrailingClosureOverload
+        func withActiveSpan<T>(_ operation: (any SpanBase) async throws -> T) async rethrows -> T {
+            let span = startSpan()
+            return try await operation(span)
+        }
+    #endif
 
     func startSpan() -> Span {
         let span = MockSpan(name: spanName)
@@ -119,7 +129,7 @@ class MockSpan: Span {
         attributes[key] = value
     }
 
-    /// Required for full protocol conformance
+    /// Required for full protocol conformance.
     func setAttributes(_ attributes: [String: AttributeValue]) {
         for (key, value) in attributes {
             self.attributes[key] = value

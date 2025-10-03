@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// Define basic qos handling
+/// Define basic qos handling.
 public struct SessionQOSConfiguration {
 
     // MARK: - Public

@@ -21,18 +21,19 @@ import XCTest
 @testable import SplunkCustomTracking
 
 final class CustomErrorTrackingTests: XCTestCase {
-    private var module: CustomTrackingInternal!
+    private var module: CustomTrackingInternal?
     private var capturedData: CustomTrackingData?
-    private var expectation: XCTestExpectation!
+    private var expectation: XCTestExpectation?
 
     override func setUp() {
         super.setUp()
+
         module = CustomTrackingInternal()
         expectation = XCTestExpectation(description: "onPublishBlock for error was called")
 
-        module.onPublishBlock = { [weak self] _, data in
+        module?.onPublishBlock = { [weak self] _, data in
             self?.capturedData = data
-            self?.expectation.fulfill()
+            self?.expectation?.fulfill()
         }
     }
 
@@ -40,10 +41,14 @@ final class CustomErrorTrackingTests: XCTestCase {
         module = nil
         capturedData = nil
         expectation = nil
+
         super.tearDown()
     }
 
     func testTrackError_withString() throws {
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
+
         let errorMessage = "Failed to load resource from network."
         let attributes: [String: EventAttributeValue] = ["resource_url": .string("http://example.com/data.json")]
         let issue = SplunkIssue(from: errorMessage)
@@ -65,10 +70,13 @@ final class CustomErrorTrackingTests: XCTestCase {
             let path: String
             var errorDescription: String? { "File not found at \(path)" }
         }
+
         let error = FileError(path: "/tmp/file.txt")
         let attributes: [String: EventAttributeValue] = ["file_permissions": .string("read-only")]
         let issue = SplunkIssue(from: error)
 
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
         module.track(issue, attributes)
 
         wait(for: [expectation], timeout: 1.0)
@@ -89,6 +97,8 @@ final class CustomErrorTrackingTests: XCTestCase {
         let attributes: [String: EventAttributeValue] = ["request_id": .string("uuid-1234")]
         let issue = SplunkIssue(from: nsError)
 
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
         module.track(issue, attributes)
 
         wait(for: [expectation], timeout: 1.0)
@@ -110,6 +120,8 @@ final class CustomErrorTrackingTests: XCTestCase {
         let attributes: [String: EventAttributeValue] = ["context": .string("testing_exception_handler")]
         let issue = SplunkIssue(from: nsException)
 
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
         module.track(issue, attributes)
 
         wait(for: [expectation], timeout: 1.0)
@@ -131,6 +143,8 @@ final class CustomErrorTrackingTests: XCTestCase {
         ]
         let issue = SplunkIssue(from: errorMessage)
 
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
         module.track(issue, conflictingAttributes)
 
         wait(for: [expectation], timeout: 1.0)

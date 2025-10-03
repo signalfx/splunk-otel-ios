@@ -21,6 +21,8 @@ import SplunkCommon
 /// ModuleConfiguration conformance.
 public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
 
+// swiftlint:disable type_name
+
 /// RemoteModuleConfiguration conformance.
 public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
     public var enabled: Bool
@@ -29,6 +31,9 @@ public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfigurati
         nil
     }
 }
+
+// swiftlint:enable type_name
+
 
 extension WebViewInstrumentation: Module {
 

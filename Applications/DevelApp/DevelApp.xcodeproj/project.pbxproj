@@ -20,6 +20,12 @@
 		527070DC2DC145F900EDD390 /* DemoHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527070DB2DC145F900EDD390 /* DemoHeaderView.swift */; };
 		527070DE2DC1468100EDD390 /* CrashDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527070DD2DC1468100EDD390 /* CrashDemoView.swift */; };
 		527070E02DC147AB00EDD390 /* AgentDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527070DF2DC147AB00EDD390 /* AgentDataSource.swift */; };
+		E44D52F52E8AC39B00F5DD9E /* WebDemoHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D52F12E8AC39B00F5DD9E /* WebDemoHTML.swift */; };
+		E44D52F62E8AC39B00F5DD9E /* WebDemoJS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D52F22E8AC39B00F5DD9E /* WebDemoJS.swift */; };
+		E44D52F72E8AC39B00F5DD9E /* WebViewDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D52F32E8AC39B00F5DD9E /* WebViewDemoView.swift */; };
+		E44D52F92E8AC3DC00F5DD9E /* DemoErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D52F82E8AC3DC00F5DD9E /* DemoErrors.swift */; };
+		E44D52FB2E8AC41600F5DD9E /* SampleAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D52FA2E8AC41400F5DD9E /* SampleAttributes.swift */; };
+		E46C01D12E8AAEBC0095CF6A /* SwiftFormat in Frameworks */ = {isa = PBXBuildFile; productRef = E46C01D02E8AAEBC0095CF6A /* SwiftFormat */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,15 +46,12 @@
 		527070DB2DC145F900EDD390 /* DemoHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoHeaderView.swift; sourceTree = "<group>"; };
 		527070DD2DC1468100EDD390 /* CrashDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashDemoView.swift; sourceTree = "<group>"; };
 		527070DF2DC147AB00EDD390 /* AgentDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDataSource.swift; sourceTree = "<group>"; };
+		E44D52F12E8AC39B00F5DD9E /* WebDemoHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDemoHTML.swift; sourceTree = "<group>"; };
+		E44D52F22E8AC39B00F5DD9E /* WebDemoJS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDemoJS.swift; sourceTree = "<group>"; };
+		E44D52F32E8AC39B00F5DD9E /* WebViewDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewDemoView.swift; sourceTree = "<group>"; };
+		E44D52F82E8AC3DC00F5DD9E /* DemoErrors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoErrors.swift; sourceTree = "<group>"; };
+		E44D52FA2E8AC41400F5DD9E /* SampleAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAttributes.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		526D230C2E0CD0CF00325F87 /* WebDemo */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = WebDemo;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		3384F2832AC8795800512D79 /* Frameworks */ = {
@@ -56,6 +59,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BD024D32DE79F9000ADB31D /* SplunkAgent in Frameworks */,
+				E46C01D12E8AAEBC0095CF6A /* SwiftFormat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,17 +87,17 @@
 			isa = PBXGroup;
 			children = (
 				5238CC852DFB6B6100206F6C /* ObjC */,
-				3384F2AE2AC87A3B00512D79 /* Info.plist */,
+				E44D52F02E8AC37B00F5DD9E /* CustomTrackingDemo */,
+				E44D52F42E8AC39B00F5DD9E /* WebDemo */,
 				527070DF2DC147AB00EDD390 /* AgentDataSource.swift */,
 				527070DD2DC1468100EDD390 /* CrashDemoView.swift */,
 				527070DB2DC145F900EDD390 /* DemoHeaderView.swift */,
 				3384F2892AC8795800512D79 /* DevelAppApp.swift */,
 				522DB6C72DC134C70047FBCD /* RoutingView.swift */,
-				524479282DE7EE9C00E93C77 /* CustomTrackingDemoView.swift */,
 				522DB6C92DC135920047FBCD /* SessionReplayDemoView.swift */,
-				526D230C2E0CD0CF00325F87 /* WebDemo */,
 				522DB6CB2DC135BC0047FBCD /* TemplateView.swift */,
 				52400B7A2DFBC33200F88CD8 /* HelperViews.swift */,
+				3384F2AE2AC87A3B00512D79 /* Info.plist */,
 				3384F28D2AC8795800512D79 /* Assets.xcassets */,
 				3384F28F2AC8795800512D79 /* DevelApp.entitlements */,
 				3384F2902AC8795800512D79 /* Preview Content */,
@@ -126,6 +130,26 @@
 			path = ObjC;
 			sourceTree = "<group>";
 		};
+		E44D52F02E8AC37B00F5DD9E /* CustomTrackingDemo */ = {
+			isa = PBXGroup;
+			children = (
+				524479282DE7EE9C00E93C77 /* CustomTrackingDemoView.swift */,
+				E44D52F82E8AC3DC00F5DD9E /* DemoErrors.swift */,
+				E44D52FA2E8AC41400F5DD9E /* SampleAttributes.swift */,
+			);
+			path = CustomTrackingDemo;
+			sourceTree = "<group>";
+		};
+		E44D52F42E8AC39B00F5DD9E /* WebDemo */ = {
+			isa = PBXGroup;
+			children = (
+				E44D52F12E8AC39B00F5DD9E /* WebDemoHTML.swift */,
+				E44D52F22E8AC39B00F5DD9E /* WebDemoJS.swift */,
+				E44D52F32E8AC39B00F5DD9E /* WebViewDemoView.swift */,
+			);
+			path = WebDemo;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -133,7 +157,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3384F2952AC8795800512D79 /* Build configuration list for PBXNativeTarget "DevelApp" */;
 			buildPhases = (
-				4BD024D72DE79FDC00ADB31D /* Swift Lint & Swift Format */,
 				3384F2822AC8795800512D79 /* Sources */,
 				3384F2832AC8795800512D79 /* Frameworks */,
 				3384F2842AC8795800512D79 /* Resources */,
@@ -141,9 +164,8 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				526D230C2E0CD0CF00325F87 /* WebDemo */,
+				E4FD11662E8BECA100BB46E6 /* PBXTargetDependency */,
+				E46C01D32E8AAECE0095CF6A /* PBXTargetDependency */,
 			);
 			name = DevelApp;
 			productName = DevelApp;
@@ -176,6 +198,9 @@
 			mainGroup = 3384F27D2AC8795700512D79;
 			packageReferences = (
 				4BD024D12DE79F9000ADB31D /* XCLocalSwiftPackageReference "../../../splunk-otel-ios" */,
+				E46C01CD2E8AAE990095CF6A /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				E46C01CE2E8AAEA90095CF6A /* XCRemoteSwiftPackageReference "SwiftFormatPlugins" */,
+				E46C01CF2E8AAEBC0095CF6A /* XCRemoteSwiftPackageReference "SwiftFormat" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3384F2872AC8795800512D79 /* Products */;
@@ -199,39 +224,23 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		4BD024D72DE79FDC00ADB31D /* Swift Lint & Swift Format */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Swift Lint & Swift Format";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "TOOLS_DIR=\"${PROJECT_DIR}/../../Tools\"\n\n# Check SplunkAgent directory\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkAgent/\necho \"$(pwd)\"\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCommon module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkCommon/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSessionReplayProxy module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkSessionReplayProxy/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCrashReports module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkCrashReports/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkAppStart module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkAppStart/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkCustomTracking module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkCustomTracking/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkNetwork module\n# cd \"${PROJECT_DIR}\"\n# cd ../../SplunkNetwork/\n# \"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkOpenTelemetry module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkOpenTelemetry/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkOpenTelemetryBackgroundExporter module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkOpenTelemetryBackgroundExporter/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkSlowFrameDetector module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkSlowFrameDetector/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkWebView module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkWebView/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n\n# Check SplunkInteractions module\ncd \"${PROJECT_DIR}\"\ncd ../../SplunkInteractions/\n\"${TOOLS_DIR}/Linting.sh\" --config \"${TOOLS_DIR}/.swiftlint.yml\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		3384F2822AC8795800512D79 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				527070DC2DC145F900EDD390 /* DemoHeaderView.swift in Sources */,
+				E44D52F92E8AC3DC00F5DD9E /* DemoErrors.swift in Sources */,
+				E44D52FB2E8AC41600F5DD9E /* SampleAttributes.swift in Sources */,
 				522DB6C82DC134C70047FBCD /* RoutingView.swift in Sources */,
 				52400B7B2DFBC33200F88CD8 /* HelperViews.swift in Sources */,
 				527070E02DC147AB00EDD390 /* AgentDataSource.swift in Sources */,
 				524479292DE7EEA200E93C77 /* CustomTrackingDemoView.swift in Sources */,
 				5238CC822DFB6AD400206F6C /* ObjCExceptionHelper.m in Sources */,
 				3384F28A2AC8795800512D79 /* DevelAppApp.swift in Sources */,
+				E44D52F52E8AC39B00F5DD9E /* WebDemoHTML.swift in Sources */,
+				E44D52F62E8AC39B00F5DD9E /* WebDemoJS.swift in Sources */,
+				E44D52F72E8AC39B00F5DD9E /* WebViewDemoView.swift in Sources */,
 				522DB6CC2DC135BC0047FBCD /* TemplateView.swift in Sources */,
 				527070DE2DC1468100EDD390 /* CrashDemoView.swift in Sources */,
 				522DB6CA2DC135920047FBCD /* SessionReplayDemoView.swift in Sources */,
@@ -239,6 +248,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E46C01D32E8AAECE0095CF6A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E46C01D22E8AAECE0095CF6A /* SwiftLintBuildToolPlugin */;
+		};
+		E4FD11662E8BECA100BB46E6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E4FD11652E8BECA100BB46E6 /* Lint */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3384F2932AC8795800512D79 /* Debug */ = {
@@ -483,10 +503,52 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		E46C01CD2E8AAE990095CF6A /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.61.0;
+			};
+		};
+		E46C01CE2E8AAEA90095CF6A /* XCRemoteSwiftPackageReference "SwiftFormatPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/StarLard/SwiftFormatPlugins.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1;
+			};
+		};
+		E46C01CF2E8AAEBC0095CF6A /* XCRemoteSwiftPackageReference "SwiftFormat" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nicklockwood/SwiftFormat";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.58.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		4BD024D22DE79F9000ADB31D /* SplunkAgent */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SplunkAgent;
+		};
+		E46C01D02E8AAEBC0095CF6A /* SwiftFormat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E46C01CF2E8AAEBC0095CF6A /* XCRemoteSwiftPackageReference "SwiftFormat" */;
+			productName = SwiftFormat;
+		};
+		E46C01D22E8AAECE0095CF6A /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E46C01CD2E8AAE990095CF6A /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		E4FD11652E8BECA100BB46E6 /* Lint */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E46C01CE2E8AAEA90095CF6A /* XCRemoteSwiftPackageReference "SwiftFormatPlugins" */;
+			productName = "plugin:Lint";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

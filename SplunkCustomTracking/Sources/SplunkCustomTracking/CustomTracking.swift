@@ -49,6 +49,5 @@ public final class CustomTrackingInternal {
     public var onPublishBlock: ((CustomTrackingMetadata, CustomTrackingData) -> Void)?
 
 
-    /// Module conformance
     public required init() {}
 }

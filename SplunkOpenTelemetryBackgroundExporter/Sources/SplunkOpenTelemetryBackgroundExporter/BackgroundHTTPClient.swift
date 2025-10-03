@@ -120,6 +120,37 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
             completionHandler(tasks)
         }
     }
+
+    func taskCompleted(withResponse response: URLResponse?, requestDescriptor: RequestDescriptor, error: Error?) throws {
+        if let error {
+            logger.log(level: .info) {
+                """
+                Request to: \(requestDescriptor.endpoint.absoluteString) \n
+                with a data task id: \(requestDescriptor.id) \n
+                failed with an error message: \(error.localizedDescription).
+                """
+            }
+
+            try send(requestDescriptor)
+        }
+        else {
+            if let httpResponse = response as? HTTPURLResponse {
+                logger.log(level: .info) {
+                    """
+                    Request to: \(requestDescriptor.endpoint.absoluteString) with id \(requestDescriptor.id.uuidString) \n
+                    has been received with status code \(httpResponse.statusCode).
+                    """
+                }
+            }
+
+            try diskStorage.delete(
+                forKey: KeyBuilder(
+                    requestDescriptor.id.uuidString,
+                    parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
+                )
+            )
+        }
+    }
 }
 
 extension BackgroundHTTPClient: URLSessionDataDelegate {
@@ -160,33 +191,6 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             return
         }
 
-        if let error {
-            logger.log(level: .info) {
-                """
-                Request to: \(requestDescriptor.endpoint.absoluteString) \n
-                with a data task id: \(requestDescriptor.id) \n
-                failed with an error message: \(error.localizedDescription).
-                """
-            }
-
-            try? send(requestDescriptor)
-        }
-        else {
-            if let httpResponse = task.response as? HTTPURLResponse {
-                logger.log(level: .info) {
-                    """
-                    Request to: \(requestDescriptor.endpoint.absoluteString) with id \(requestDescriptor.id.uuidString) \n
-                    has been received with status code \(httpResponse.statusCode).
-                    """
-                }
-            }
-
-            try? diskStorage.delete(
-                forKey: KeyBuilder(
-                    requestDescriptor.id.uuidString,
-                    parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
-                )
-            )
-        }
+        try? taskCompleted(withResponse: task.response, requestDescriptor: requestDescriptor, error: error)
     }
 }

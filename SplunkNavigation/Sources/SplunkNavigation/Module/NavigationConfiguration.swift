@@ -22,7 +22,9 @@ public struct NavigationConfiguration: ModuleConfiguration {
 
     // MARK: - Module management
 
-    /// Indicates whether the Module is enabled. Default value is `true`.
+    /// Indicates whether the Module is enabled.
+    ///
+    /// Default value is `true`.
     public var isEnabled: Bool = true
 
     /// A `Boolean` value determines whether the module should automatically detect navigation in the application.

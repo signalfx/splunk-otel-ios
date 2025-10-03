@@ -80,7 +80,9 @@ public final class AppStart {
 
     // MARK: - Instrumentation
 
-    /// Starts app start detection. Detection should be started before receiving the `UIApplication.didFinishLaunchingNotification` notification
+    /// Starts app start detection.
+    ///
+    /// Detection should be started before receiving the `UIApplication.didFinishLaunchingNotification` notification
     /// in order to correctly detect an application prewarm.
     public func startDetection() {
 

@@ -16,8 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 import CiscoDiskStorage
+import Foundation
 
 /// A simple test implementation of a key builder,
 /// mimicking CiscoDiskStorage.KeyBuilder for use in unit tests.
@@ -65,84 +65,55 @@ final class TestKeyBuilder {
 /// deletions, and error behaviors.
 final class FakeDiskStorage: DiskStorage {
 
-    /// Test statistics, not used in fake implementation.
     var statistics: (any CiscoDiskStorage.Statistics)?
-
-    /// Internal storage for encoded values (simulating disk).
     private var storage: [String: Data] = [:]
-
-    /// Simulated file URLs by key string.
     var files: [String: URL] = [:]
-
-    /// List of deleted key strings, for verifying deletions in tests.
     var deletedKeys: [String] = []
-
-    /// If true, `finalDestination(forKey:)` will throw an error to simulate disk failure.
     var shouldThrowOnFinalDestination = false
-
-    /// If true, `list(forKey:)` will throw an error to simulate disk failure.
     var shouldThrowOnlist = false
-
-    /// Converts any supported key type to a string for lookup.
-    ///
-    /// - Parameter key: The key as TestKeyBuilder, CiscoDiskStorage.KeyBuilder, or String.
-    /// - Returns: The string representation of the key.
+    
     func keyString(for key: Any) -> String {
         if let testKey = key as? TestKeyBuilder {
+
             return testKey.key
-        } else if let prodKey = key as? CiscoDiskStorage.KeyBuilder {
+        }
+        else if let prodKey = key as? CiscoDiskStorage.KeyBuilder {
+
             return prodKey.key
-        } else if let str = key as? String {
+        }
+        else if let str = key as? String {
+
             return str
-        } else {
+        }
+        else {
+
             return String(describing: key)
         }
     }
 
-    /// Inserts a codable value into the fake storage for the given key.
-    ///
-    /// - Parameters:
-    ///   - value: The value to store.
-    ///   - key: The storage key.
-    func insert<T>(_ value: T, forKey key: CiscoDiskStorage.KeyBuilder) throws where T : Decodable, T : Encodable {
+    func insert<T>(_ value: T, forKey key: CiscoDiskStorage.KeyBuilder) throws where T: Decodable, T: Encodable {
         let keyStr = keyString(for: key)
         let data = try JSONEncoder().encode(value)
         storage[keyStr] = data
     }
 
-    /// Reads a codable value from the fake storage for the given key.
-    ///
-    /// - Parameter key: The storage key.
-    /// - Returns: The decoded value if found, otherwise `nil`.
-    func read<T>(forKey key: CiscoDiskStorage.KeyBuilder) throws -> T? where T : Decodable, T : Encodable {
+    func read<T>(forKey key: CiscoDiskStorage.KeyBuilder) throws -> T? where T: Decodable, T: Encodable {
         let keyStr = keyString(for: key)
         guard let data = storage[keyStr] else { return nil }
         return try JSONDecoder().decode(T.self, from: data)
     }
 
-    /// Updates a value by replacing it in storage.
-    ///
-    /// - Parameters:
-    ///   - value: The new value.
-    ///   - key: The storage key.
-    func update<T>(_ value: T, forKey key: CiscoDiskStorage.KeyBuilder) throws where T : Decodable, T : Encodable {
+    func update<T>(_ value: T, forKey key: CiscoDiskStorage.KeyBuilder) throws where T: Decodable, T: Encodable {
         try insert(value, forKey: key)
     }
 
-    /// Returns an empty list; not used in tests.
     func list(forKey key: CiscoDiskStorage.KeyBuilder) throws -> [CiscoDiskStorage.ItemInfo] {
         if shouldThrowOnlist { throw NSError(domain: "FakeDiskStorage", code: 1) }
         return []
     }
 
-    /// No-op; not used in test storage.
     func checkRules() throws {}
 
-    /// Returns a file URL for the given key, or a dummy non-existent URL.
-    /// Optionally throws for error simulation.
-    ///
-    /// - Parameter key: The key for which to retrieve the file URL.
-    /// - Returns: The file URL associated with the key, or "/notfound".
     func finalDestination(forKey key: KeyBuilder) throws -> URL {
         // For test, we accept either TestKeyBuilder or CiscoDiskStorage.KeyBuilder
         let keyString = keyString(for: key)
@@ -150,10 +121,7 @@ final class FakeDiskStorage: DiskStorage {
         return files[keyString] ?? URL(fileURLWithPath: "/notfound")
     }
 
-    /// Deletes the value and file for the given key, records the deleted key for test assertions.
-    ///
-    /// - Parameter key: The key to delete.
-    func delete(forKey key: KeyBuilder) throws {
+    func delete(forKey key: KeyBuilder) {
         let keyString = keyString(for: key)
         deletedKeys.append(keyString)
         // Remove from "disk"
