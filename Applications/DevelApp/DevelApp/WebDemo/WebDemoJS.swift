@@ -17,9 +17,9 @@ limitations under the License.
 
 public struct WebDemoJS {
 
-    // Currently disabled in the demo pending better infrastructure for handling tokens vis-a-vis git commits.
+    /// Currently disabled in the demo pending better infrastructure for handling tokens vis-a-vis git commits.
     public static func brumScript() -> String {
-        return """
+        """
         <script src="https://cdn.signalfx.com/o11y-gdi-rum/latest/splunk-otel-web.js" crossorigin="anonymous">
         </script>
         <script>
@@ -44,9 +44,9 @@ public struct WebDemoJS {
         """
     }
 
-    // This provides an optional async version of the call, `getNativeSessionIdAsync()`, for BRUM when BRUM is ready to use that.
+    /// This provides an optional async version of the call, `getNativeSessionIdAsync()`, for BRUM when BRUM is ready to use that.
     public static func modernScriptExample() -> String {
-        return """
+        """
         async function updateSessionId() {
             try {
                 const response = await window.SplunkRumNative.getNativeSessionIdAsync();
@@ -60,9 +60,15 @@ public struct WebDemoJS {
         """
     }
 
-    // This is the default case today. Here "legacy" (not to be confused with "legacy call" which is about how the integration is done in the iOS code) refers to the BRUM agent using `getNativeSessionId()`, a sync function, as it currently does. Non-legacy would be a different hypothetical future rev of the BRUM agent that wants an async call; they would call `await getNativeSessionAsync()` as seen elsewhere in the "modern" examples.
+    /// This is the default case today.
+    ///
+    /// Here "legacy" (not to be confused with "legacy call" which is about how the integration
+    /// is done in the iOS code) refers to the BRUM agent using `getNativeSessionId()`, a sync function,
+    /// as it currently does. Non-legacy would be a different hypothetical future rev of the BRUM agent
+    /// that wants an async call; they would call `await getNativeSessionAsync()` as seen elsewhere
+    /// in the "modern" examples.
     public static func legacyScriptExample() -> String {
-        return """
+        """
         function updateSessionId() {
             try {
                 const sessionId = window.SplunkRumNative.getNativeSessionId();
@@ -76,10 +82,11 @@ public struct WebDemoJS {
         """
     }
 
-    // This script's only purpose is to set the callback.
-    // It will be injected alongside the existing polling script.
+    /// This script's only purpose is to set the callback.
+    ///
+    /// It will be injected alongside the existing polling script.
     public static func callbackSetupScript() -> String {
-        return """
+        """
         function handleSessionIdChange(change) {
             const statusElement = document.getElementById('callbackStatus');
             const timestamp = new Date(change.timestamp).toLocaleTimeString();
@@ -106,10 +113,9 @@ public struct WebDemoJS {
                 setTimeout(initializeCallback, 100);
             }
         }
-        
+
         // Start the process once the document is loaded.
         document.addEventListener('DOMContentLoaded', initializeCallback);
         """
     }
 }
-

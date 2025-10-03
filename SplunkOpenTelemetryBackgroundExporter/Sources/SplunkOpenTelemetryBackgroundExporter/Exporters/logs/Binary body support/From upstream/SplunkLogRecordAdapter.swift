@@ -1,3 +1,5 @@
+// swiftlint:disable file_header
+
 // Changes made:
 // - prefix filename
 // - prefix class name
@@ -8,10 +10,10 @@
 // - copy TraceProtoUtils and rename to SplunkTraceProtoUtils
 // - disable linters
 
-/*
- * Copyright The OpenTelemetry Authors
- * SPDX-License-Identifier: Apache-2.0
- */
+//
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+//
 
 import Foundation
 import OpenTelemetryApi

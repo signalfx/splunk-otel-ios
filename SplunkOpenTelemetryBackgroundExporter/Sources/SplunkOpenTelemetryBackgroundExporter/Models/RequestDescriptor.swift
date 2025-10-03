@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryProtocolExporterCommon
 
-/// Defines description of request used to upload exported file
+/// Defines description of request used to upload exported file.
 struct RequestDescriptor: Codable {
 
     // MARK: - Public

@@ -24,6 +24,7 @@ public struct InteractionEventData: ModuleEventData {
     var type: String
 }
 
+// swift-format-ignore: AvoidRetroactiveConformances
 extension InteractionEvent: @retroactive Equatable {}
 
 extension CiscoInteractions.InteractionEvent: ModuleEventMetadata {

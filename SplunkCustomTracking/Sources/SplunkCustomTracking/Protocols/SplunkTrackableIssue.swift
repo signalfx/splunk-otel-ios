@@ -21,7 +21,7 @@ import SplunkCommon
 
 // MARK: - SplunkTrackableIssue Protocol
 
-/// Protocol for marshalling CustomTracking issues of any type: `String`, `Error`, `NSError`, `NSExeption`
+/// Protocol for marshalling CustomTracking issues of any type: `String`, `Error`, `NSError`, `NSExeption`.
 public protocol SplunkTrackableIssue: SplunkTrackable {
 
     /// The string message e. g. localizedDescription for the type.

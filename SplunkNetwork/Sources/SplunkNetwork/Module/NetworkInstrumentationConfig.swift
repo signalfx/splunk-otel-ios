@@ -23,7 +23,9 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
 
     // MARK: - Public
 
-    /// Indicates whether the Module is enabled. Default value is `true`.
+    /// Indicates whether the Module is enabled.
+    ///
+    /// Default value is `true`.
     public var isEnabled: Bool = true
 
     /// Describes URLs to be ignored by the module when reporting on network activity.

@@ -77,7 +77,7 @@ public final class SessionReplayModuleSensitivityObjC: NSObject {
     /// The sensitivity is calculated as a combination of the explicitly set sensitivity of the view class
     /// and the sensitivity derived from the view class parents sensitivity.
     ///
-    /// - Parameter view: A `UIView` class or its descendant.
+    /// - Parameter viewClass: A `UIView` class or its descendant.
     ///
     /// - Returns: A `NSNumber` whose BOOL value returns the given view class sensitivity.
     @objc(sensitivityForViewClass:)

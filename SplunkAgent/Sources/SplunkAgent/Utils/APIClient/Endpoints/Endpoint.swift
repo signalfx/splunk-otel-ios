@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// Defines a base Endpoint model which is used by `APIClient` to define service requests with HTTP headers
+/// Defines a base Endpoint model which is used by `APIClient` to define service requests with HTTP headers.
 protocol Endpoint {
     associatedtype RequestHeaders: APIClientHeaders
 
@@ -33,7 +33,7 @@ protocol Endpoint {
 
 extension Endpoint {
 
-    /// Returns URL path constructed from a baseUrl and the `Service` path
+    /// Returns URL path constructed from a baseUrl and the `Service` path.
     func url(with baseUrl: URL) -> URL {
         baseUrl.appendingPathComponent(Self.service.path)
     }

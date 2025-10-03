@@ -53,8 +53,6 @@ public struct MaskElement: Codable, Equatable {
     /// - Parameters:
     ///   - rect: A rectangle that bounds the masked area.
     ///   - type: A type of mask element, a ``MaskType``.
-    ///
-    /// - Returns: A newly created ``MaskElement`` structure.
     public init(rect: CGRect, type: MaskType = .covering) {
         self.rect = rect
         self.type = type
@@ -84,8 +82,6 @@ public struct RecordingMask: Codable, Equatable {
     /// Creates a new recording mask structure with prepared mask elements.
     ///
     /// - Parameter elements: A list of individual ``MaskElement`` areas to cover or erase.
-    ///
-    /// - Returns: A newly created ``RecordingMask`` structure.
     public init(elements: [MaskElement] = []) {
         self.elements = elements
     }

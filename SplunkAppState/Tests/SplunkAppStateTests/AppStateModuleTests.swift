@@ -162,11 +162,12 @@ final class AppStateModuleTests: XCTestCase {
     // MARK: - Private helpers
 
     private func makeModule(with mock: MockDestination) -> AppStateModule {
-        let m = AppStateModule()
-        m.sharedState = nil
-        m.destination = mock
-        m.setupNotifications()
-        return m
+        let module = AppStateModule()
+        module.sharedState = nil
+        module.destination = mock
+        module.setupNotifications()
+
+        return module
     }
 
     private func expectEventCount(_ mock: MockDestination, count: Int, timeout: TimeInterval = 1.0) {

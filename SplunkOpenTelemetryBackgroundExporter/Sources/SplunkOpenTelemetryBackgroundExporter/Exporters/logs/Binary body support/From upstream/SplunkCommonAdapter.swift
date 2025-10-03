@@ -1,3 +1,5 @@
+// swiftlint:disable file_header
+
 // Changes made:
 // - prefix filename
 // - prefix enum name
@@ -7,16 +9,17 @@
 // - enum and methods internal
 // - disable linters
 
-/*
- * Copyright The OpenTelemetry Authors
- * SPDX-License-Identifier: Apache-2.0
- */
+//
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+//
 
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 
+// swiftlint:disable cyclomatic_complexity
 enum SplunkCommonAdapter {
     static func toProtoAttribute(
         key: String,
@@ -144,3 +147,5 @@ enum SplunkCommonAdapter {
         return instrumentationScope
     }
 }
+
+// swiftlint:enable cyclomatic_complexity

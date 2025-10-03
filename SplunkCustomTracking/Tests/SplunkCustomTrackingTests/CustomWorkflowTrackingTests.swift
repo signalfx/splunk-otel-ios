@@ -23,12 +23,13 @@ import XCTest
 @testable import SplunkCustomTracking
 
 final class CustomWorkflowTrackingTests: XCTestCase {
-    private var module: CustomTrackingInternal!
-    private var mockSharedState: AgentSharedStateMock!
-    private var originalTracerProvider: TracerProvider!
+    private var module: CustomTrackingInternal?
+    private var mockSharedState: AgentSharedStateMock?
+    private var originalTracerProvider: TracerProvider?
 
     override func setUp() {
         super.setUp()
+
         // Save the original provider
         originalTracerProvider = OpenTelemetry.instance.tracerProvider
         // Use the official, public API to register our test provider
@@ -38,21 +39,26 @@ final class CustomWorkflowTrackingTests: XCTestCase {
         // Create the mock and hold a strong reference to it
         mockSharedState = AgentSharedStateMock()
         // Assign the mock to the module's unowned property
-        module.sharedState = mockSharedState
+        module?.sharedState = mockSharedState
     }
 
     override func tearDown() {
-        // Restore the original provider to ensure test isolation
-        OpenTelemetry.registerTracerProvider(tracerProvider: originalTracerProvider)
+        if let originalTracerProvider {
+            // Restore the original provider to ensure test isolation
+            OpenTelemetry.registerTracerProvider(tracerProvider: originalTracerProvider)
+        }
+
         module = nil
         mockSharedState = nil
         originalTracerProvider = nil
+
         super.tearDown()
     }
 
     func testTrackWorkflow_createsValidSpan() throws {
         let workflowName = "testValidWorkflow"
 
+        let module = try XCTUnwrap(module)
         let span = module.track(workflowName)
 
         // The span should be our testable mock span
@@ -73,6 +79,8 @@ final class CustomWorkflowTrackingTests: XCTestCase {
     }
 
     func testTrackWorkflow_canAddCustomAttributes() throws {
+        let module = try XCTUnwrap(module)
+
         let workflowName = "testAddCustomWorkflow"
         let span = module.track(workflowName)
 
@@ -91,6 +99,7 @@ final class CustomWorkflowTrackingTests: XCTestCase {
 }
 
 /// A minimal, final mock class to satisfy the AgentSharedState protocol.
+///
 /// Making it final resolves the Sendable warning.
 private final class AgentSharedStateMock: AgentSharedState {
     let agentVersion: String = "1.2.3-test"

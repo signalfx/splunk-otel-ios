@@ -26,13 +26,13 @@ public final class UserTrackingModeObjC: NSObject {
 
     // MARK: - Tracking modes
 
-    /// No tracking. Individual user sessions are not linked in any way.
+    /// No tracking, individual user sessions are not linked in any way.
     ///
     /// This is a default option for user tracking.
     @objc
     public static let noTracking = NSNumber(value: 0)
 
-    /// Anonymous tracking. Allows you to link individual sessions
+    /// Anonymous tracking, allows you to link individual sessions
     /// under an anonymized user ID.
     ///
     /// - Note: An anonymous user ID is used, which cannot be traced
