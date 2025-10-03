@@ -65,14 +65,14 @@ struct BackgroundHTTPClientTests {
     // MARK: - Tests
 
     @Test
-    func testSendShouldNotSendDeletesFile() async throws {
+    func sendShouldNotSendDeletesFile() throws {
         let descriptor = try makeRequestDescriptor(sentCount: 99)
         let disk = FakeDiskStorage()
         let client = makeClient(disk: disk)
 
-        let key = TestKeyBuilder(
+        let key = KeyBuilder(
             descriptor.id.uuidString,
-            parrentKeyBuilder: TestKeyBuilder.uploadsKey.append(descriptor.fileKeyType)
+            parrentKeyBuilder: KeyBuilder.uploadsKey.append(descriptor.fileKeyType)
         )
         .key
         disk.files[key] = URL(fileURLWithPath: "/tmp/fakefile")
@@ -83,7 +83,7 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func testFlushCallsCompletion() async throws {
+    func flushCallsCompletion() async throws {
         let client = makeClient()
 
         var didComplete = false
@@ -97,11 +97,11 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func testGetAllSessionsTasksReturnsTasks() async throws {
+    func getAllSessionsTasksReturnsTasks() async throws {
         var wasCalled = false
 
         let client = makeClient()
-        client.getAllSessionsTasks { tasks in
+        client.getAllSessionsTasks { _ in
             wasCalled = true
         }
 
@@ -111,7 +111,7 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func testTaskDelegateDidCompleteStatusCodeDeletesFile() async throws {
+    func taskDelegateDidCompleteStatusCodeDeletesFile() throws {
         let disk = FakeDiskStorage()
         let client = makeClient(disk: disk)
         let descriptor = try makeRequestDescriptor()
@@ -126,7 +126,7 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func testTaskDelegateDidCompleteErrorNotDeletesFile() async throws {
+    func taskDelegateDidCompleteErrorNotDeletesFile() throws {
         let disk = FakeDiskStorage()
         let client = makeClient(disk: disk)
         let descriptor = try makeRequestDescriptor()
@@ -138,7 +138,7 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func testTaskDelegateDidCompleteLogsOnBadDescriptor() async throws {
+    func taskDelegateDidCompleteLogsOnBadDescriptor() throws {
         let client = makeClient()
         let descriptor = try makeRequestDescriptor()
 
