@@ -67,6 +67,7 @@ public final class SlowFrameDetector: NSObject {
     var logicForTest: SlowFrameLogic { logic }
     #endif
 
+
     // MARK: - Initialization
 
     init(
@@ -98,6 +99,7 @@ public final class SlowFrameDetector: NSObject {
         detectorTask?.cancel()
     }
 
+
     // MARK: - Public Methods
 
     /// Installs and configures the slow frame detector.
@@ -118,6 +120,7 @@ public final class SlowFrameDetector: NSObject {
         }
     }
 
+
     // MARK: - Internal Methods
 
     /// Starts the slow and frozen frame detection process.
@@ -129,7 +132,7 @@ public final class SlowFrameDetector: NSObject {
             return
         }
 
-        // This task is the main run loop for the detector.
+        // This task is the main run loop for the detector
         detectorTask = Task { [weak self] in
             guard let self else {
                 return
@@ -146,7 +149,7 @@ public final class SlowFrameDetector: NSObject {
                     await logic.handleFrame(timestamp: timestamp, duration: duration)
                 }
 
-                // Dispatch UI-related setup to the main actor.
+                // Dispatch UI-related setup to the main actor
                 await MainActor.run {
                     self.lifecycleObserver.add()
                     self.ticker?.start()
@@ -188,6 +191,7 @@ public final class SlowFrameDetector: NSObject {
         await logic.flushBuffers()
     }
 
+
     // MARK: - Private Methods
 
     /// Cancels and waits for the main detector task to finish its cleanup.
@@ -196,6 +200,7 @@ public final class SlowFrameDetector: NSObject {
         _ = await detectorTask?.result
         detectorTask = nil
     }
+
 
     // MARK: - Lifecycle Handlers
 

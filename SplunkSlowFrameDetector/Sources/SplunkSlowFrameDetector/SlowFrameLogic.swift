@@ -32,6 +32,7 @@ actor SlowFrameLogic {
         case alreadyRunning
     }
 
+
     // MARK: - Private Properties
 
     private var isRunning = false
@@ -46,12 +47,14 @@ actor SlowFrameLogic {
     private var lastFrameTimestamp: TimeInterval?
     private var lastHeartbeatTimestamp: TimeInterval = 0
 
+
     // MARK: - Test-only Properties
 
     #if DEBUG
     /// A test-only hook called after a flush completes.
     private var onFlushDidComplete: (() -> Void)?
     #endif
+
 
     // MARK: - Initialization
 
@@ -62,10 +65,11 @@ actor SlowFrameLogic {
     }
 
     deinit {
-        // Ensure background tasks are cancelled when the actor is deallocated.
+        // Ensure background tasks are cancelled when the actor is deallocated
         watchdogTask?.cancel()
         flushTask?.cancel()
     }
+
 
     // MARK: - Public Methods
 
@@ -79,7 +83,7 @@ actor SlowFrameLogic {
 
         isRunning = true
         destination = destinationFactory()
-        // Use a regular Task, as there's no need for it to be detached from the actor's context.
+        // Use a regular Task, as there's no need for it to be detached from the actor's context
         watchdogTask = Task { [weak self] in await self?.runWatchdog() }
         flushTask = Task { [weak self] in await self?.runFlushLoop() }
     }
@@ -121,6 +125,7 @@ actor SlowFrameLogic {
         lastFrameTimestamp = timestamp
     }
 
+
     // MARK: - Lifecycle Handlers
 
     /// Called when the app is about to resign its active state. Flushes any pending data.
@@ -138,6 +143,7 @@ actor SlowFrameLogic {
     func appWillTerminate() async {
         await flushBuffers()
     }
+
 
     // MARK: - Internal Methods
 
@@ -166,6 +172,7 @@ actor SlowFrameLogic {
         #endif
     }
 
+
     // MARK: - Test-only Methods
 
     #if DEBUG
@@ -175,6 +182,7 @@ actor SlowFrameLogic {
         onFlushDidComplete = handler
     }
     #endif
+
 
     // MARK: - Private Methods
 

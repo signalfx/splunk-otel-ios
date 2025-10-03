@@ -42,8 +42,8 @@ private final class MockTicker: SlowFrameTicker {
     }
 
     func stop() {
-        // This function is non-isolated to match the protocol.
-        // To safely modify the @MainActor properties, we dispatch to the main queue.
+        // This function is non-isolated to match the protocol
+        // To safely modify the @MainActor properties, we dispatch to the main queue
         DispatchQueue.main.async { [weak self] in
             guard let self else {
                 return
@@ -74,9 +74,9 @@ private actor MockDestination: SlowFrameDetectorDestination {
     private var onSend: ((String, Int) -> Void)?
 
     func send(type: String, count: Int, sharedState _: AgentSharedState?) async {
-        // Accumulate the count for the given type.
+        // Accumulate the count for the given type
         reportedCounts[type, default: 0] += count
-        // Call the optional closure for tests that still need it.
+        // Call the optional closure for tests that still need it
         onSend?(type, count)
     }
 
@@ -96,6 +96,7 @@ final class SlowFrameDetectorTests: XCTestCase {
     private var detector: SlowFrameDetector?
     private var mockDestination: MockDestination?
 
+
     // MARK: - Test Lifecycle
 
     override func setUp() {
@@ -108,7 +109,7 @@ final class SlowFrameDetectorTests: XCTestCase {
 
     override func tearDown() async throws {
         // Only stop the detector if the test itself hasn't already stopped it.
-        if let mockTicker = mockTicker, !mockTicker.stopped {
+        if let mockTicker, !mockTicker.stopped {
             let expectation = XCTestExpectation(description: "TearDown Stop Expectation")
             mockTicker.onStop = { expectation.fulfill() }
 
@@ -127,9 +128,10 @@ final class SlowFrameDetectorTests: XCTestCase {
         try await super.tearDown()
     }
 
+
     // MARK: - Helper Methods
 
-    private func pauseUntilDetectorStart() async { // Renamed function
+    private func pauseUntilDetectorStart() async {
         let startExpectation = XCTestExpectation(description: "Detector has started")
         mockTicker?.onStart = {
             startExpectation.fulfill()
@@ -138,13 +140,14 @@ final class SlowFrameDetectorTests: XCTestCase {
         await fulfillment(of: [startExpectation], timeout: 1.0)
     }
 
+
     // MARK: - Start/Stop Tests
 
     /// Verifies that calling `start()` multiple times is idempotent.
     func test_start_isIdempotent() async {
         XCTAssertFalse(mockTicker?.started ?? true)
 
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
         XCTAssertEqual(mockTicker?.startCallCount, 1)
 
         detector?.start()
@@ -158,7 +161,7 @@ final class SlowFrameDetectorTests: XCTestCase {
         XCTAssertFalse(mockTicker?.started ?? true)
         XCTAssertFalse(mockTicker?.stopped ?? true)
 
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
         XCTAssertTrue(mockTicker?.started ?? false)
 
         let tickerStopExpectation = XCTestExpectation(description: "Ticker was stopped")
@@ -172,11 +175,12 @@ final class SlowFrameDetectorTests: XCTestCase {
         XCTAssertTrue(mockTicker?.stopped ?? false)
     }
 
+
     // MARK: - Lifecycle Notification Tests
 
     /// Verifies that the logic state is reset when the app becomes active.
     func test_stateIsReset_onAppDidBecomeActive() async {
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
 
         await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
 
@@ -193,7 +197,7 @@ final class SlowFrameDetectorTests: XCTestCase {
 
     /// Verifies that pending buffers are flushed when the app resigns active.
     func test_buffersAreFlushed_onAppWillResignActive() async {
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
 
         await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
         await mockTicker?.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
@@ -204,11 +208,12 @@ final class SlowFrameDetectorTests: XCTestCase {
         XCTAssertEqual(counts?["slowRenders"], 1)
     }
 
+
     // MARK: - Frame Detection Tests
 
     /// Verifies that the very first frame processed does not trigger a report.
     func test_firstFrame_doesNotTriggerReport() async {
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
 
         await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
 
@@ -220,7 +225,7 @@ final class SlowFrameDetectorTests: XCTestCase {
 
     /// Verifies that a clearly slow frame is detected and reported.
     func test_slowFrame_isDetected() async throws {
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
 
         let normalFrameDuration: TimeInterval = 1.0 / 60.0
 
@@ -235,7 +240,7 @@ final class SlowFrameDetectorTests: XCTestCase {
 
     /// Verifies that a frame at the exact slow-frame threshold is correctly detected.
     func test_slowFrame_atBoundary_isDetected() async throws {
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
 
         let expectedDuration: TimeInterval = 1.0 / 60.0
         let toleranceValue = expectedDuration * (SlowFrameDetector.slowFrameTolerancePercentage / 100.0)
@@ -252,7 +257,7 @@ final class SlowFrameDetectorTests: XCTestCase {
 
     /// Verifies that no reports are sent when frame times are normal.
     func test_noReports_whenFramesAreNormal() async throws {
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
 
         let expectedDuration: TimeInterval = 1.0 / 60.0
         await mockTicker?.simulateFrame(timestamp: 0.0, duration: expectedDuration)
@@ -266,7 +271,7 @@ final class SlowFrameDetectorTests: XCTestCase {
 
     /// Verifies that a frozen frame is detected when the ticker stops firing.
     func test_frozenFrame_isDetected_whenFramesStop() async throws {
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
 
         let hangTime = SlowFrameDetector.frozenFrameThreshold
 
@@ -282,7 +287,7 @@ final class SlowFrameDetectorTests: XCTestCase {
 
     /// Verifies that a long freeze correctly reports multiple frozen frame events.
     func test_longFreeze_reportsMultipleEvents() async throws {
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
 
         await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
 
@@ -307,7 +312,7 @@ final class SlowFrameDetectorTests: XCTestCase {
             }
         }
 
-        await pauseUntilDetectorStart() // Updated call site
+        await pauseUntilDetectorStart()
 
         await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
         await mockTicker?.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)

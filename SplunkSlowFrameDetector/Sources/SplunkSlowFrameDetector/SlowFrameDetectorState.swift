@@ -30,6 +30,7 @@ public final class SlowFrameDetectorState: @unchecked Sendable {
     /// The actual storage for the isEnabled property.
     private var _isEnabled: Bool = false
 
+
     // MARK: - Public Properties
 
     /// Indicates whether the slow frame detection feature is currently enabled.
@@ -47,6 +48,7 @@ public final class SlowFrameDetectorState: @unchecked Sendable {
             _isEnabled = newValue
         }
     }
+
 
     // MARK: - Initialization
 
