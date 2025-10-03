@@ -19,46 +19,6 @@ limitations under the License.
 import CiscoDiskStorage
 import Foundation
 
-/// A simple test implementation of a key builder,
-/// mimicking CiscoDiskStorage.KeyBuilder for use in unit tests.
-///
-/// This builder helps compose hierarchical keys for identifying
-/// files or objects in the fake disk storage.
-final class TestKeyBuilder {
-
-    /// The unique string representing this key.
-    let key: String
-    /// Optional parent key builder for building key hierarchies.
-    let parrentKeyBuilder: TestKeyBuilder?
-    /// Content type, not used in tests.
-    let contentType: Any?
-
-    /// Initializes a new test key builder.
-    ///
-    /// - Parameters:
-    ///   - key: The string key.
-    ///   - parrentKeyBuilder: The (optional) parent key.
-    ///   - contentType: The (optional) content type.
-    init(_ key: String, parrentKeyBuilder: TestKeyBuilder? = nil, contentType: Any? = nil) {
-        self.key = key
-        self.parrentKeyBuilder = parrentKeyBuilder
-        self.contentType = contentType
-    }
-
-    /// Returns a new key builder by appending a new key component.
-    ///
-    /// - Parameters:
-    ///   - key: The string to append.
-    ///   - contentType: Optional content type.
-    /// - Returns: A new TestKeyBuilder with the appended key.
-    func append(_ key: String, contentType: Any? = nil) -> TestKeyBuilder {
-        TestKeyBuilder(key, parrentKeyBuilder: self, contentType: contentType)
-    }
-
-    /// A static key builder for "uploadFiles".
-    static let uploadsKey = TestKeyBuilder("uploadFiles")
-}
-
 /// An in-memory fake implementation of `DiskStorage` for use in unit tests.
 ///
 /// Stores key-value pairs in memory, allowing simulation of file operations,
@@ -71,34 +31,20 @@ final class FakeDiskStorage: DiskStorage {
     var deletedKeys: [String] = []
     var shouldThrowOnFinalDestination = false
 
-    func keyString(for key: Any) -> String {
-        if let testKey = key as? TestKeyBuilder {
-
-            return testKey.key
-        }
-        else if let prodKey = key as? CiscoDiskStorage.KeyBuilder {
-
-            return prodKey.key
-        }
-        else if let str = key as? String {
-
-            return str
-        }
-        else {
-
-            return String(describing: key)
-        }
-    }
-
     func insert<T>(_ value: T, forKey key: CiscoDiskStorage.KeyBuilder) throws where T: Decodable, T: Encodable {
-        let keyStr = keyString(for: key)
+        let keyStr = key.key
         let data = try JSONEncoder().encode(value)
         storage[keyStr] = data
     }
 
     func read<T>(forKey key: CiscoDiskStorage.KeyBuilder) throws -> T? where T: Decodable, T: Encodable {
-        let keyStr = keyString(for: key)
-        guard let data = storage[keyStr] else { return nil }
+        let keyStr = key.key
+
+        guard let data = storage[keyStr]
+        else {
+            return nil
+        }
+
         return try JSONDecoder().decode(T.self, from: data)
     }
 
@@ -106,21 +52,24 @@ final class FakeDiskStorage: DiskStorage {
         try insert(value, forKey: key)
     }
 
-    func list(forKey key: CiscoDiskStorage.KeyBuilder) throws -> [CiscoDiskStorage.ItemInfo] {
+    func list(forKey _: CiscoDiskStorage.KeyBuilder) throws -> [CiscoDiskStorage.ItemInfo] {
         []
     }
 
     func checkRules() throws {}
 
     func finalDestination(forKey key: KeyBuilder) throws -> URL {
-        // For test, we accept either TestKeyBuilder or CiscoDiskStorage.KeyBuilder
-        let keyString = keyString(for: key)
-        if shouldThrowOnFinalDestination { throw NSError(domain: "FakeDiskStorage", code: 1) }
+        let keyString = key.key
+
+        if shouldThrowOnFinalDestination {
+            throw NSError(domain: "FakeDiskStorage", code: 1)
+        }
+
         return files[keyString] ?? URL(fileURLWithPath: "/notfound")
     }
 
     func delete(forKey key: KeyBuilder) {
-        let keyString = keyString(for: key)
+        let keyString = key.key
         deletedKeys.append(keyString)
         // Remove from "disk"
         storage[keyString] = nil
