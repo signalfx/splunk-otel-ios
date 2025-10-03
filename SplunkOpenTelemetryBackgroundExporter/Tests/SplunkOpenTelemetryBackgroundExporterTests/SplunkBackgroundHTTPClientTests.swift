@@ -65,7 +65,7 @@ struct BackgroundHTTPClientTests {
     // MARK: - Tests
 
     @Test
-    func testSendShouldNotSendDeletesFile() throws {
+    func sendShouldNotSendDeletesFile() throws {
         let descriptor = try makeRequestDescriptor(sentCount: 99)
         let disk = FakeDiskStorage()
         let client = makeClient(disk: disk)
@@ -83,7 +83,7 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func testFlushCallsCompletion() async throws {
+    func flushCallsCompletion() async throws {
         let client = makeClient()
 
         var didComplete = false
@@ -97,7 +97,7 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func testGetAllSessionsTasksReturnsTasks() async throws {
+    func getAllSessionsTasksReturnsTasks() async throws {
         var wasCalled = false
 
         let client = makeClient()
@@ -111,7 +111,7 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func testTaskDelegateDidCompleteStatusCodeDeletesFile() throws {
+    func taskDelegateDidCompleteStatusCodeDeletesFile() throws {
         let disk = FakeDiskStorage()
         let client = makeClient(disk: disk)
         let descriptor = try makeRequestDescriptor()
@@ -126,7 +126,7 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func testTaskDelegateDidCompleteErrorNotDeletesFile() throws {
+    func taskDelegateDidCompleteErrorNotDeletesFile() throws {
         let disk = FakeDiskStorage()
         let client = makeClient(disk: disk)
         let descriptor = try makeRequestDescriptor()
@@ -138,7 +138,7 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func testTaskDelegateDidCompleteLogsOnBadDescriptor() throws {
+    func taskDelegateDidCompleteLogsOnBadDescriptor() throws {
         let client = makeClient()
         let descriptor = try makeRequestDescriptor()
 
