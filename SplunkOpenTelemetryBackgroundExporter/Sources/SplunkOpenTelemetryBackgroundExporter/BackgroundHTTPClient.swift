@@ -55,7 +55,7 @@ final class BackgroundHTTPClient: NSObject {
     init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage, namespace: String) {
         self.sessionQosConfiguration = sessionQosConfiguration
         self.diskStorage = diskStorage
-        self.nameSpace = namespace
+        nameSpace = namespace
 
         urlSessionDelegateQueue = OperationQueue("URLSessionDelegate-\(namespace)", maxConcurrents: 1, qualityOfService: .utility)
 

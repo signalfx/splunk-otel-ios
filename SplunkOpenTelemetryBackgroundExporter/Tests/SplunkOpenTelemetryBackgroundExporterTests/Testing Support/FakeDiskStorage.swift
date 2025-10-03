@@ -31,7 +31,7 @@ final class FakeDiskStorage: DiskStorage {
     var deletedKeys: [String] = []
     var shouldThrowOnFinalDestination = false
 
-    func insert<T>(_ value: T, forKey key: CiscoDiskStorage.KeyBuilder) throws where T: Decodable, T: Encodable {
+    func insert(_ value: some Decodable & Encodable, forKey key: CiscoDiskStorage.KeyBuilder) throws {
         let keyStr = key.key
         let data = try JSONEncoder().encode(value)
         storage[keyStr] = data
@@ -48,7 +48,7 @@ final class FakeDiskStorage: DiskStorage {
         return try JSONDecoder().decode(T.self, from: data)
     }
 
-    func update<T>(_ value: T, forKey key: CiscoDiskStorage.KeyBuilder) throws where T: Decodable, T: Encodable {
+    func update(_ value: some Decodable & Encodable, forKey key: CiscoDiskStorage.KeyBuilder) throws {
         try insert(value, forKey: key)
     }
 

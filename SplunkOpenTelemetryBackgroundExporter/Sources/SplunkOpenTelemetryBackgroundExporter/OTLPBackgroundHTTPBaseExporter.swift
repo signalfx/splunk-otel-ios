@@ -37,9 +37,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     let config: OtlpConfiguration
     let diskStorage: DiskStorage
 
-    lazy var httpClient: BackgroundHTTPClient = {
-        BackgroundHTTPClient(sessionQosConfiguration: qosConfig, diskStorage: diskStorage, namespace: getFileKeyType())
-    }()
+    lazy var httpClient: BackgroundHTTPClient = .init(sessionQosConfiguration: qosConfig, diskStorage: diskStorage, namespace: getFileKeyType())
 
     // MARK: - Initialization
 
