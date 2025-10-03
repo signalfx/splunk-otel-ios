@@ -21,16 +21,10 @@ import SplunkCommon
 /// The configuration for the `SlowFrameDetector` module.
 public struct SlowFrameDetectorConfiguration: ModuleConfiguration {
 
-<<<<<<< HEAD
     // MARK: - Public
 
     /// A boolean value indicating whether the `SlowFrameDetector` module is enabled.
     /// The default value is `true`.
-=======
-    /// Indicates whether the Module is enabled.
-    ///
-    /// Default value is `true`.
->>>>>>> origin/develop
     public var isEnabled: Bool = true
 
     // MARK: - Initialization
@@ -40,12 +34,8 @@ public struct SlowFrameDetectorConfiguration: ModuleConfiguration {
 
     /// Initializes a new module configuration.
     ///
-<<<<<<< HEAD
     /// - Parameters:
     ///   - isEnabled: A `Boolean` value that sets whether the module is enabled. The default is `true`.
-=======
-    /// - Parameter isEnabled: A `Boolean` value sets whether the module is enabled.
->>>>>>> origin/develop
     public init(isEnabled: Bool = true) {
         self.isEnabled = isEnabled
     }
