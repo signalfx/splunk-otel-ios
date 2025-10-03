@@ -17,11 +17,12 @@ limitations under the License.
 */
 
 import CiscoDiskStorage
+import CiscoEncryption
 import Foundation
+import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
 import Testing
-import OpenTelemetryProtocolExporterCommon
-import CiscoEncryption
+import XCTest
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
@@ -75,7 +76,7 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
         )
 
         let exporter = FakeOTLPBackgroundHTTPBaseExporter(
-            endpoint: URL(string: "https://example.com")!,
+            endpoint: try XCTUnwrap(URL(string: "https://example.com")),
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
@@ -153,10 +154,17 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func testFileWithStalledTaskIsResent() {
+    func testFileWithStalledTaskIsResent() throws {
         let uuid = UUID()
         let disk = FakeDiskStorage()
-        let desc = FakeRequestDescriptor(id: uuid, endpoint: URL(string: "example.com")!, explicitTimeout: 1, sentCount: 5, fileKeyType: "base", scheduled: .now.addingTimeInterval(-1000))
+        let desc = FakeRequestDescriptor(
+            id: uuid,
+            endpoint: try XCTUnwrap(URL(string: "https://example.com")),
+            explicitTimeout: 1,
+            sentCount: 5,
+            fileKeyType: "base",
+            scheduled: .now.addingTimeInterval(-1000)
+        )
 
         let http = FakeHTTPClient()
         let exporter = makeExporter(disk: disk, http: http)
@@ -184,7 +192,7 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     @Test
     func testExporterWasCreatedAndCheckStalledWasCalled() async throws {
         let exporter = FakeOTLPBackgroundHTTPBaseExporter(
-            endpoint: URL(string: "https://example.com")!,
+            endpoint: try XCTUnwrap(URL(string: "https://example.com")),
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,

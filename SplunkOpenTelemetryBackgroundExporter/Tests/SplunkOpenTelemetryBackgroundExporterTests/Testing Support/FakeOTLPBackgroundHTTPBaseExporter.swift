@@ -15,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoEncryption
 import Foundation
+import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
 import Testing
-import OpenTelemetryProtocolExporterCommon
-import CiscoEncryption
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 

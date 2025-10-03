@@ -17,8 +17,8 @@ limitations under the License.
 
 import Foundation
 import SplunkCommon
-import Testing
 import OpenTelemetryProtocolExporterCommon
+import Testing
 import CiscoEncryption
 
 @testable import SplunkOpenTelemetryBackgroundExporter

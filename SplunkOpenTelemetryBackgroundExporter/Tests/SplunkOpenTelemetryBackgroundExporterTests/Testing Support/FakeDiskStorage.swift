@@ -71,7 +71,7 @@ final class FakeDiskStorage: DiskStorage {
     var deletedKeys: [String] = []
     var shouldThrowOnFinalDestination = false
     var shouldThrowOnlist = false
-    
+
     func keyString(for key: Any) -> String {
         if let testKey = key as? TestKeyBuilder {
 
