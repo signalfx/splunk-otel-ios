@@ -24,8 +24,8 @@ import Testing
 @testable import SplunkOpenTelemetryBackgroundExporter
 
 struct FakeRequestDescriptor: RequestDescriptorProtocol {
-    var id: UUID = UUID()
-    var endpoint: URL = URL(string: "https://example.com")!
+    var id: UUID = .init()
+    var endpoint: URL = .init(string: "https://example.com")!
     var explicitTimeout: TimeInterval = 1
     var sentCount: Int = 0
     var fileKeyType: String = "base"

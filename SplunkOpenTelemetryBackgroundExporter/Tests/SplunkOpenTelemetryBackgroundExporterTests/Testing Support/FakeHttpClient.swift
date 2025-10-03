@@ -15,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-import SplunkCommon
-import OpenTelemetryProtocolExporterCommon
-import Testing
 import CiscoEncryption
+import Foundation
+import OpenTelemetryProtocolExporterCommon
+import SplunkCommon
+import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
@@ -27,13 +27,9 @@ final class FakeHTTPClient: NSObject, BackgroundHTTPClientProtocol {
 
     var sent: [RequestDescriptorProtocol] = []
 
-    func flush(completion: @escaping () -> Void) {
+    func flush(completion _: @escaping () -> Void) {}
 
-    }
-
-    func getAllSessionsTasks(_ completionHandler: @escaping ([URLSessionTask]) -> Void) {
-
-    }
+    func getAllSessionsTasks(_: @escaping ([URLSessionTask]) -> Void) {}
 
     func send(_ requestDescriptor: RequestDescriptorProtocol) throws {
         sent.append(requestDescriptor)

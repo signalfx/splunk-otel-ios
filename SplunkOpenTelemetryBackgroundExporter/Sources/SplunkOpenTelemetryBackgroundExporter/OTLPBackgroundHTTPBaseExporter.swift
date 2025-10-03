@@ -38,9 +38,11 @@ public class OTLPBackgroundHTTPBaseExporter {
     let diskStorage: DiskStorage
     var checkStalledTask: Task<Void, Never>?
 
-    lazy var httpClient: BackgroundHTTPClientProtocol = {
-        BackgroundHTTPClient(sessionQosConfiguration: qosConfig, diskStorage: diskStorage, namespace: getFileKeyType())
-    }()
+    lazy var httpClient: BackgroundHTTPClientProtocol = BackgroundHTTPClient(
+        sessionQosConfiguration: qosConfig,
+        diskStorage: diskStorage,
+        namespace: getFileKeyType()
+    )
 
 
     // MARK: - Initialization
@@ -88,7 +90,7 @@ public class OTLPBackgroundHTTPBaseExporter {
 
         // Get descriptions from all incomplete requests
         let allTaskDescriptions = tasks
-            .compactMap { $0.taskDescription }
+            .compactMap(\.taskDescription)
             .compactMap {
                 try? JSONDecoder().decode(RequestDescriptor.self, from: Data($0.utf8))
             }
@@ -135,7 +137,8 @@ public class OTLPBackgroundHTTPBaseExporter {
                 if taskDescription.scheduled < cancelTime {
                     try? httpClient.send(taskDescription)
                 }
-            } else {
+            }
+            else {
                 // This task was forgotten by system, create new one.
                 let taskDescription = RequestDescriptor(
                     id: requestId,

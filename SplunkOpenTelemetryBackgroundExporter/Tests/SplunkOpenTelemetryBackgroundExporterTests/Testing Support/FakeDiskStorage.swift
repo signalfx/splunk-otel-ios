@@ -54,8 +54,10 @@ final class FakeDiskStorage: DiskStorage {
     }
 
     func list(forKey _: CiscoDiskStorage.KeyBuilder) throws -> [CiscoDiskStorage.ItemInfo] {
-        if shouldThrowOnlist { throw NSError(domain: "FakeDiskStorage", code: 1) }
-    
+        if shouldThrowOnlist {
+            throw NSError(domain: "FakeDiskStorage", code: 1)
+        }
+
         return []
     }
 

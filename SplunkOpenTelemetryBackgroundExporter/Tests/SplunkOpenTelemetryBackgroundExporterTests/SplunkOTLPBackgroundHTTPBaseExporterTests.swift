@@ -47,7 +47,7 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func testDiskStorageThrows() {
+    func diskStorageThrows() {
         let disk = FakeDiskStorage()
         disk.shouldThrowOnlist = true
         let http = FakeHTTPClient()
@@ -63,7 +63,7 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func testDiskStorageWorks() throws {
+    func diskStorageWorks() throws {
         let desc = FakeRequestDescriptor()
 
         let disk = FilesystemDiskStorage(
@@ -75,8 +75,8 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
             encryption: NoneEncryption()
         )
 
-        let exporter = FakeOTLPBackgroundHTTPBaseExporter(
-            endpoint: try XCTUnwrap(URL(string: "https://example.com")),
+        let exporter = try FakeOTLPBackgroundHTTPBaseExporter(
+            endpoint: XCTUnwrap(URL(string: "https://example.com")),
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
@@ -91,7 +91,7 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func testTaskWithNilEarliestBeginDateIsCancelled() {
+    func taskWithNilEarliestBeginDateIsCancelled() {
         let disk = FakeDiskStorage()
         let http = FakeHTTPClient()
         let exporter = makeExporter(disk: disk, http: http)
@@ -105,13 +105,13 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func testOnlyStalledTasksAreCancelled() {
+    func onlyStalledTasksAreCancelled() {
         let disk = FakeDiskStorage()
         let http = FakeHTTPClient()
         let exporter = makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 1))
 
         let now = Date()
-        let old = now.addingTimeInterval(-1000)
+        let old = now.addingTimeInterval(-1_000)
         let fresh = now
 
         let tOld = URLSessionTask.createNewTestTask()
@@ -129,7 +129,7 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func testFileWithInvalidUUIDIsSkipped() {
+    func fileWithInvalidUUIDIsSkipped() {
         let disk = FakeDiskStorage()
         let http = FakeHTTPClient()
 
@@ -140,10 +140,10 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func testFileWithNonStalledTaskIsNotResent() {
+    func fileWithNonStalledTaskIsNotResent() {
         let uuid = UUID()
         let disk = FakeDiskStorage()
-        let desc = FakeRequestDescriptor(id: uuid, scheduled: .now.addingTimeInterval(1000))
+        let desc = FakeRequestDescriptor(id: uuid, scheduled: .now.addingTimeInterval(1_000))
 
         let http = FakeHTTPClient()
         let exporter = makeExporter(disk: disk, http: http)
@@ -154,16 +154,16 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func testFileWithStalledTaskIsResent() throws {
+    func fileWithStalledTaskIsResent() throws {
         let uuid = UUID()
         let disk = FakeDiskStorage()
-        let desc = FakeRequestDescriptor(
+        let desc = try FakeRequestDescriptor(
             id: uuid,
-            endpoint: try XCTUnwrap(URL(string: "https://example.com")),
+            endpoint: XCTUnwrap(URL(string: "https://example.com")),
             explicitTimeout: 1,
             sentCount: 5,
             fileKeyType: "base",
-            scheduled: .now.addingTimeInterval(-1000)
+            scheduled: .now.addingTimeInterval(-1_000)
         )
 
         let http = FakeHTTPClient()
@@ -176,7 +176,7 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func testFileWithNoTaskDescriptionIsSentAsNew() {
+    func fileWithNoTaskDescriptionIsSentAsNew() {
         let uuid = UUID()
         let disk = FakeDiskStorage()
         let http = FakeHTTPClient()
@@ -190,9 +190,9 @@ struct SplunkOTLPBackgroundHTTPBaseExporterTests {
     }
 
     @Test
-    func testExporterWasCreatedAndCheckStalledWasCalled() async throws {
-        let exporter = FakeOTLPBackgroundHTTPBaseExporter(
-            endpoint: try XCTUnwrap(URL(string: "https://example.com")),
+    func exporterWasCreatedAndCheckStalledWasCalled() async throws {
+        let exporter = try FakeOTLPBackgroundHTTPBaseExporter(
+            endpoint: XCTUnwrap(URL(string: "https://example.com")),
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
