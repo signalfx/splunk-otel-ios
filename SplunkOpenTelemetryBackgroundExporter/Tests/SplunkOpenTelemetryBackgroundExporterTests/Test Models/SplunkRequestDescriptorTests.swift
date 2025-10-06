@@ -28,7 +28,7 @@ final class SplunkRequestDescriptorTests: XCTestCase {
 
     // MARK: - Should send tests
 
-    func testShouldSend_givenThreePreviousAttempts() throws {
+    func testShouldSendGivenThreePreviousAttempts() throws {
         let exampleURL = try XCTUnwrap(URL(string: "example.com"))
 
         var requestDescriotor = RequestDescriptor(
@@ -43,7 +43,7 @@ final class SplunkRequestDescriptorTests: XCTestCase {
         XCTAssertTrue(requestDescriotor.shouldSend)
     }
 
-    func testShouldSend_givenSixPreviousAttempts() throws {
+    func testShouldSendGivenSixPreviousAttempts() throws {
         let exampleURL = try XCTUnwrap(URL(string: "example.com"))
 
         var requestDescriotor = RequestDescriptor(

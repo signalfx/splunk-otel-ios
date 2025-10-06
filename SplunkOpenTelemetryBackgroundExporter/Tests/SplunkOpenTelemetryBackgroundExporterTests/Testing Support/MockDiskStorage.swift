@@ -23,7 +23,7 @@ import Foundation
 ///
 /// Stores key-value pairs in memory, allowing simulation of file operations,
 /// deletions, and error behaviors.
-final class FakeDiskStorage: DiskStorage {
+final class MockDiskStorage: DiskStorage {
 
     var statistics: (any CiscoDiskStorage.Statistics)?
     private var storage: [String: Data] = [:]
@@ -31,8 +31,13 @@ final class FakeDiskStorage: DiskStorage {
     var deletedKeys: [String] = []
     var shouldThrowOnFinalDestination = false
     var shouldThrowOnlist = false
+    var shouldThrowOnInsert = false
 
     func insert(_ value: some Decodable & Encodable, forKey key: CiscoDiskStorage.KeyBuilder) throws {
+        if shouldThrowOnInsert {
+            throw NSError(domain: "FakeDiskStorage", code: 1)
+        }
+
         let keyStr = key.key
         let data = try JSONEncoder().encode(value)
         storage[keyStr] = data
