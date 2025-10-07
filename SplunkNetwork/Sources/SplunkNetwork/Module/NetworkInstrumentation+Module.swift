@@ -29,7 +29,7 @@ extension NetworkInstrumentation: Module {
     // MARK: - Module types
 
     public typealias Configuration = NetworkInstrumentationConfiguration
-    public typealias RemoteConfiguration = NetworkInstrumentationRemoteConfig
+    public typealias RemoteConfiguration = NetworkRemoteConfiguration
 
     public typealias EventMetadata = NetworkInstrumentationMetadata
     public typealias EventData = NetworkInstrumentationData
