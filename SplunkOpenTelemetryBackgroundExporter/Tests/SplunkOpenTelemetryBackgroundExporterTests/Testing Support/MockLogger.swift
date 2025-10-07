@@ -27,8 +27,8 @@ final class MockLogger: CiscoLogger.LogAgent, @unchecked Sendable {
     var loggedMessages: [String] = []
 
     init() {
-        self.poolName = "test"
-        self.category = nil
+        poolName = "test"
+        category = nil
     }
 
     init(poolName: String, category: String?) {
