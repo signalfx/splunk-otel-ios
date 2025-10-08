@@ -32,7 +32,7 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
     /// Internal value store for custom attributes.
     private var customValue: [String: Any]
 
-    /// The persistent, unique identifier for this application installation.
+    /// Persistent, unique identifier for this application installation.
     private let appInstallationId: String
 
 
