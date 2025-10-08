@@ -49,13 +49,15 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
         let anonymousCustomAttributes = runtimeAttributes.custom
 
 
-        XCTAssertEqual(systemAttributes.count, 2)
+        XCTAssertEqual(systemAttributes.count, 3)
+        XCTAssertNotNil(systemAttributes["app.installation.id"])
         XCTAssertEqual(systemAttributes["session.id"] as? String, defaultSession.currentSessionId)
         XCTAssertEqual(systemAttributes["user.anonymous_id"] as? String, nil)
 
         XCTAssertEqual(customAttributes.count, 1)
 
-        XCTAssertEqual(anonymousSystemAttributes.count, 3)
+        XCTAssertEqual(anonymousSystemAttributes.count, 4)
+        XCTAssertNotNil(anonymousSystemAttributes["app.installation.id"])
         XCTAssertEqual(anonymousSystemAttributes["session.id"] as? String, defaultSession.currentSessionId)
         XCTAssertEqual(anonymousSystemAttributes["user.anonymous_id"] as? String, defaultUser.userIdentifier)
         XCTAssertFalse(anonymousCustomAttributes.isEmpty)
@@ -101,18 +103,18 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
 
 
         let sessionName = "session.id"
-        XCTAssertEqual(allAttributes.count, 3)
+        XCTAssertEqual(allAttributes.count, 4)
         XCTAssertEqual(allAttributes[sessionName] as? String, agent.currentSession.currentSessionId)
         XCTAssertEqual(allAttributes[customName] as? String, customValue)
         XCTAssertEqual(customAttributes.count, 2)
         XCTAssertEqual(customAttributes[customName] as? String, customValue)
 
-        XCTAssertEqual(updatedAllAttributes.count, 3)
+        XCTAssertEqual(updatedAllAttributes.count, 4)
         XCTAssertEqual(updatedAllAttributes[sessionName] as? String, agent.currentSession.currentSessionId)
         XCTAssertEqual(updatedCustomAttributes.count, 2)
         XCTAssertEqual(updatedCustomAttributes[customName] as? String, updatedValue)
 
-        XCTAssertEqual(finalAllAttributes.count, 2)
+        XCTAssertEqual(finalAllAttributes.count, 3)
         XCTAssertEqual(finalAllAttributes[sessionName] as? String, agent.currentSession.currentSessionId)
         XCTAssertEqual(finalCustomAttributes.count, 1)
     }
@@ -144,10 +146,38 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
 
 
         // System attributes always take precedence over custom attributes
-        XCTAssertEqual(allAttributes.count, 2)
+        XCTAssertEqual(allAttributes.count, 3)
         XCTAssertEqual(allAttributes[systemName] as? String, agent.currentSession.currentSessionId)
 
         XCTAssertEqual(customAttributes.count, 2)
         XCTAssertEqual(customAttributes[systemName] as? String, customValue)
+    }
+
+    func testAppInstallationIdPersistence() throws {
+        let storage = UserDefaultsStorage()
+        let storageKey = "app.installation.id"
+
+        // Generation and persistence
+        try? storage.delete(forKey: storageKey)
+        let agent1 = try AgentTestBuilder.buildDefault()
+        let attrs1 = DefaultRuntimeAttributes(for: agent1)
+        let id1 = attrs1.all["app.installation.id"] as? String
+
+        XCTAssertNotNil(id1, "app.installation.id should be generated.")
+        if let id1 {
+            XCTAssertNotNil(UUID(uuidString: id1), "Generated ID should be a valid UUID.")
+        }
+
+        let stored: String? = try? storage.read(forKey: storageKey)
+        XCTAssertEqual(stored, id1, "Generated ID should be persisted.")
+
+        // Retrieval
+        let agent2 = try AgentTestBuilder.buildDefault()
+        let attrs2 = DefaultRuntimeAttributes(for: agent2)
+        let id2 = attrs2.all["app.installation.id"] as? String
+
+        XCTAssertEqual(id1, id2, "Subsequent initializations should retrieve the same ID.")
+
+        try? storage.delete(forKey: storageKey)
     }
 }
