@@ -41,7 +41,7 @@ final class ConfigurationHandlerTests: XCTestCase {
         XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
     }
 
-    func testApiLoadSuccess() throws {
+    func testApiLoadSuccess() async throws {
 
         let expectation = XCTestExpectation(description: "Delayed execution")
 
@@ -58,17 +58,12 @@ final class ConfigurationHandlerTests: XCTestCase {
             storage: storage
         )
 
-        DispatchQueue.global()
-            .asyncAfter(deadline: .now() + 10) {
-                XCTAssertEqual(configurationHandler.configurationData, dataResponse)
-                XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
+        try await Task.sleep(nanoseconds: 10_000_000_000)
 
-                let storedData: Data? = try? storage.read(forKey: ConfigurationHandler.configurationStoreKey)
-                XCTAssertEqual(storedData, dataResponse)
+        XCTAssertEqual(configurationHandler.configurationData, dataResponse)
+        XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
 
-                expectation.fulfill()
-            }
-        // TODO: [DEMRUM-2782] Fix tests
-        wait(for: [expectation], timeout: 30)
+        let storedData: Data? = try? storage.read(forKey: ConfigurationHandler.configurationStoreKey)
+        XCTAssertEqual(storedData, dataResponse)
     }
 }
