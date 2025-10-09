@@ -554,6 +554,7 @@ struct SessionReplayBinaryRegistry {
 }
 
 /// Determines which dependency resolution strategy to use.
+///
 /// Defaults to `.binaryTargets`, present in the `current` property.
 enum DependencyResolutionStrategy {
 
@@ -574,7 +575,7 @@ enum DependencyResolutionStrategy {
     }
 }
 
-/// Resolves a dependency based on the current strategy
+/// Resolves a dependency based on the current strategy.
 /// - Parameter key: The key from SessionReplayBinaryRegistry.targets
 /// - Returns: A dependency reference (either wrapper target name or product reference)
 func resolveDependency(_ key: String) -> Target.Dependency {
@@ -595,6 +596,7 @@ func resolveDependency(_ key: String) -> Target.Dependency {
 // MARK: - Session Replay related helpers
 
 /// Determines whether to use Session Replay as a repository dependency.
+///
 /// This is the main switch between binary targets and repository-based approach.
 func shouldUseSessionReplayAsRepositoryDependency() -> Bool {
 
@@ -610,7 +612,9 @@ func shouldUseSessionReplayAsRepositoryDependency() -> Bool {
 }
 
 /// Enables or disables having Session Replay as a local dependency (needs smartlook-ios-sdk checked out locally)
-/// or a remote dependency. If the value is `true`, overrides `remoteSessionReplayBranch()`.
+/// or a remote dependency.
+///
+/// If the value is `true`, overrides `remoteSessionReplayBranch()`.
 ///
 /// ✅ Feel free to use this flag for local development.
 func shouldUseLocalSessionReplayDependency() -> Bool {
