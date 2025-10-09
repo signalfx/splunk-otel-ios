@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkWebView
 internal import SplunkCommon
+internal import SplunkWebView
 
 #if canImport(WebKit)
     import WebKit

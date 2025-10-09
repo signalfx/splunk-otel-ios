@@ -178,7 +178,7 @@ extension WebViewDemoView {
 
     // MARK: - PlaceholderSectionView
 
-    fileprivate struct PlaceholderSectionView: View {
+    private struct PlaceholderSectionView: View {
         let caption: String
         let explanation: String
 
@@ -204,7 +204,7 @@ extension WebViewDemoView {
 
     // MARK: - WebView Section Data Model
 
-    fileprivate struct WebViewSectionView: View {
+    private struct WebViewSectionView: View {
         let caption: String
         let webView: WKWebView
         let backgroundColor: Color
@@ -243,7 +243,7 @@ extension WebViewDemoView {
 
     // MARK: - WebDemoButton Model
 
-    fileprivate struct WebDemoButton: View, Identifiable {
+    private struct WebDemoButton: View, Identifiable {
         let id = UUID()
         let label: String
         let action: () -> Void
@@ -289,7 +289,7 @@ extension WebViewDemoView {
 
     // MARK: - UIKit SwiftUI Wrapper
 
-    fileprivate struct WebViewRepresentable: UIViewRepresentable {
+    private struct WebViewRepresentable: UIViewRepresentable {
         let webView: WKWebView
 
         func makeUIView(context _: Context) -> WKWebView {

@@ -15,9 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-@testable import SplunkCommon
 internal import CiscoLogger
+import Foundation
+
+@testable import SplunkCommon
 @testable import SplunkWebView
 
 /// A thread-safe mock implementation of `AgentSharedState` for testing purposes.
