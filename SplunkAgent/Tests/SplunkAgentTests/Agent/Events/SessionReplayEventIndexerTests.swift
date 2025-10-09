@@ -43,33 +43,34 @@ final class SessionReplayEventIndexerTests: XCTestCase {
         let firstId = "12345"
         let secondId = "67890"
 
+        let nowDate = Date()
 
         // Initialize a new indexer
         indexer = SessionReplayIndexerTestBuilder.build(named: indexerName)
 
         // We will ask for the creation of a set of indexes
-        let firstOneDate = Date() - 10
+        let firstOneDate = nowDate - 10
         let firstOne = try await indexer?.prepareIndex(sessionId: firstId, eventTimestamp: firstOneDate)
 
-        let firstTwoDate = Date() - 5
+        let firstTwoDate = nowDate - 5
         let firstTwo = try await indexer?.prepareIndex(sessionId: firstId, eventTimestamp: firstTwoDate)
 
-        let secondOneDate = Date() - 7
+        let secondOneDate = nowDate - 7
         let secondOne = try await indexer?.prepareIndex(sessionId: secondId, eventTimestamp: secondOneDate)
 
         // Simulate recovery after restart
         indexer = nil
-        sleep(1)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
 
 
         indexer = SessionReplayIndexerTestBuilder.build(named: indexerName)
-        sleep(1)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
 
         // Ask for another set after recovery
-        let firstThreeDate = Date()
+        let firstThreeDate = nowDate
         let firstThree = try await indexer?.prepareIndex(sessionId: firstId, eventTimestamp: firstThreeDate)
 
-        let secondTwoDate = Date() - 2
+        let secondTwoDate = nowDate - 2
         let secondTwo = try await indexer?.prepareIndex(sessionId: secondId, eventTimestamp: secondTwoDate)
 
 
@@ -92,11 +93,13 @@ final class SessionReplayEventIndexerTests: XCTestCase {
 
         let sessionId = "12321"
 
+        let nowDate = Date()
+
         // We will ask for the creation of a set of indexes
-        let firstDate = Date() - 10
+        let firstDate = nowDate - 10
         let firstIndex = try await indexer.prepareIndex(sessionId: sessionId, eventTimestamp: firstDate)
 
-        let secondDate = Date() - 5
+        let secondDate = nowDate - 5
         let secondIndex = try await indexer.prepareIndex(sessionId: sessionId, eventTimestamp: secondDate)
 
 
@@ -106,7 +109,7 @@ final class SessionReplayEventIndexerTests: XCTestCase {
 
 
         // Get a new index for the same session
-        let thirdDate = Date()
+        let thirdDate = nowDate
         let thirdIndex = try await indexer.prepareIndex(sessionId: sessionId, eventTimestamp: thirdDate)
 
         // Clean corresponding storage
