@@ -49,7 +49,7 @@ resolveSessionReplayRepositoryDependency()
 
 // MARK: - Helpers for target generation
 
-/// Generates the main library targets
+/// Generates the main library targets.
 func generateMainTargets() -> [Target] {
     [
 
