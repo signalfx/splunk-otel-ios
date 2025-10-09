@@ -14,10 +14,4 @@ LOG="$OUT_DIR/xcodebuild-ios.log"
 JUNIT="$OUT_DIR/junit-ios.xml"
 XCRESULT="${XCRESULT_PATH:-TestResults_iOS.xcresult}"
 
-set +e
 xcodebuild -skipPackagePluginValidation -testPlan "SplunkAgent" -workspace "$WS" -scheme "$SCHEME" -destination "$DESTINATION" -resultBundlePath "$XCRESULT" clean test 2>&1 | tee "$LOG" | xcbeautify --report junit --junit-report-filename "$(basename "$JUNIT")" --report-path "$OUT_DIR"
-STATUS=${PIPESTATUS[0]}
-set -e
-
-printf 'xcode_status=%s\n' "$STATUS" >> "$GITHUB_OUTPUT"
-echo "[test] outputs: xcode_status=$STATUS"

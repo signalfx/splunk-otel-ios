@@ -174,10 +174,3 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Fail job if xcodebuild failed
-        if: always()
-        run: |
-          code="${{ steps.test.outputs.xcode_status }}"
-          if [ -z "$code" ]; then exit 0; fi
-          if [ "$code" -ne 0 ]; then exit "$code"; fi
