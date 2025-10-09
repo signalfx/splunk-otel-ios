@@ -24,9 +24,11 @@ enum WebViewBridgeScript {
         guard let url = Bundle.module.url(forResource: "WebViewBridgeScript", withExtension: "js") else {
             preconditionFailure("WebViewBridgeScript.js not found in bundle.")
         }
+
         guard let script = try? String(contentsOf: url) else {
             preconditionFailure("Could not read WebViewBridgeScript.js from bundle.")
         }
+
         return script
     }()
 
