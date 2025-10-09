@@ -141,7 +141,7 @@ jobs:
           echo "Destination=$DEST"
 
       - name: Run tests (${{ matrix.platform }})
-        id: tests
+        id: test
         env:
           SCHEME: ${{ needs.prepare.outputs.scheme }}
           DESTINATION: ${{ env.DEST }}
