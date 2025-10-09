@@ -24,18 +24,18 @@ final class MockWKWebView: WKWebView {
 
     /// Add properties to control the mock's state for testing the warning logic.
     override var isLoading: Bool {
-        get { _isLoading }
-        set { _isLoading = newValue }
+        get { isLoadingValue }
+        set { isLoadingValue = newValue }
     }
 
-    private var _isLoading = false
+    private var isLoadingValue = false
 
     override var url: URL? {
-        get { _url }
-        set { _url = newValue }
+        get { urlValue }
+        set { urlValue = newValue }
     }
 
-    private var _url: URL?
+    private var urlValue: URL?
 
     private let mockConfiguration: WKWebViewConfiguration
 

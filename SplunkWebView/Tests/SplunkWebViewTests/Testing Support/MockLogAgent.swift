@@ -34,7 +34,7 @@ final class MockLogAgent: @unchecked Sendable, LogAgent {
     // MARK: - Private
 
     private let lock = NSLock()
-    private var _logMessages: [LogMessage] = []
+    private var logMessagesStorage: [LogMessage] = []
 
     // MARK: - Public
 
@@ -44,7 +44,7 @@ final class MockLogAgent: @unchecked Sendable, LogAgent {
     var logMessages: [LogMessage] {
         lock.lock()
         defer { lock.unlock() }
-        return _logMessages
+        return logMessagesStorage
     }
 
     // MARK: - Initialization
@@ -64,7 +64,7 @@ final class MockLogAgent: @unchecked Sendable, LogAgent {
 
     func log(level: CiscoLogger.LogLevel, isPrivate _: Bool, message: @escaping @Sendable () -> String) {
         lock.lock()
-        _logMessages.append(LogMessage(level: level, message: message()))
+        logMessagesStorage.append(LogMessage(level: level, message: message()))
         lock.unlock()
     }
 }

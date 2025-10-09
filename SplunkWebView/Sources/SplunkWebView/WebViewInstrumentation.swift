@@ -163,8 +163,8 @@ public final class WebViewInstrumentation: NSObject {
         ///   - message: The script message received from the web content.
         ///   - replyHandler: A block to be called with the reply data or an error string.
         public func userContentController(
-            _: WKUserContentController,
-            didReceive _: WKScriptMessage,
+            _ userContentController: WKUserContentController,
+            didReceive message: WKScriptMessage,
             replyHandler: @escaping @MainActor @Sendable (Any?, String?) -> Void
         ) {
             // hint: parse message.body["action"] here if you need to add features

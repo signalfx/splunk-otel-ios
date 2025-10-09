@@ -28,19 +28,25 @@ public struct WebViewRemoteConfiguration: RemoteModuleConfiguration {
     /// according to the remote configuration.
     public var enabled: Bool = true
 
-    /// Initializes the remote configuration from data. This module does not support remote configuration beyond enabling/disabling.
+    /// Initializes the remote configuration from data.
+    ///
+    /// This module does not support remote configuration beyond enabling/disabling.
     public init?(from _: Data) {
         nil
     }
 }
 
-/// Placeholder metadata for events produced by `WebViewInstrumentation`. This module does not produce events.
+/// Placeholder metadata for events produced by `WebViewInstrumentation`.
+///
+/// This module does not produce events.
 public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
     /// The timestamp of the event.
     public var timestamp = Date()
 }
 
-/// Placeholder data for events produced by `WebViewInstrumentation`. This module does not produce events.
+/// Placeholder data for events produced by `WebViewInstrumentation`.
+///
+/// This module does not produce events.
 public struct WebViewInstrumentationData: ModuleEventData {}
 
 /// Module conformance.
