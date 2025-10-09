@@ -18,6 +18,7 @@ limitations under the License.
 internal import CiscoLogger
 import Foundation
 import SplunkCommon
+
 #if canImport(WebKit)
     import WebKit
 #endif
@@ -91,8 +92,8 @@ public final class WebViewInstrumentation: NSObject {
             // or has already finished loading a URL other than the default empty page.
             if webView.isLoading || (webView.url != nil && webView.url?.absoluteString != "about:blank") {
                 logger.log(level: .warn, isPrivate: false) {
-                    "SplunkWebView: `injectSessionId` was called on a WKWebView that has already started loading content. " +
-                    "To ensure proper correlation with Browser RUM, this method should be called before `loadHTMLString`, `load`, or similar methods."
+                    "SplunkWebView: `injectSessionId` was called on a WKWebView that has already started loading content. "
+                        + "To ensure proper correlation with Browser RUM, this method should be called before `loadHTMLString`, `load`, or similar methods."
                 }
             }
 
