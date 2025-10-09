@@ -15,7 +15,7 @@ JUNIT="$OUT_DIR/junit-ios.xml"
 XCRESULT="${XCRESULT_PATH:-TestResults_iOS.xcresult}"
 
 set +e
-xcodebuild -skipPackagePluginValidation -workspace "$WS" -scheme "$SCHEME" -destination "$DESTINATION" -resultBundlePath "$XCRESULT" clean test 2>&1 | tee "$LOG" | xcbeautify --report junit --junit-report-filename "$(basename "$JUNIT")" --report-path "$OUT_DIR"
+xcodebuild -skipPackagePluginValidation -testPlan "SplunkAgent" -workspace "$WS" -scheme "$SCHEME" -destination "$DESTINATION" -resultBundlePath "$XCRESULT" clean test 2>&1 | tee "$LOG" | xcbeautify --report junit --junit-report-filename "$(basename "$JUNIT")" --report-path "$OUT_DIR"
 STATUS=${PIPESTATUS[0]}
 set -e
 
