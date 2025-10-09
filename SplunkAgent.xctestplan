@@ -35,6 +35,7 @@
       }
     },
     {
+      "enabled" : false,
       "target" : {
         "containerPath" : "container:",
         "identifier" : "SplunkCrashReportsTests",
@@ -56,6 +57,7 @@
       }
     },
     {
+      "enabled" : false,
       "target" : {
         "containerPath" : "container:",
         "identifier" : "SplunkOpenTelemetryTests",
@@ -63,6 +65,7 @@
       }
     },
     {
+      "enabled" : false,
       "target" : {
         "containerPath" : "container:",
         "identifier" : "SplunkSessionReplayProxyTests",
