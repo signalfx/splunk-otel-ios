@@ -160,7 +160,7 @@ public final class WebViewInstrumentation: NSObject {
         ///
         /// - Parameters:
         ///   - userContentController: The controller that received the script message.
-        ///   - message: The script message received from the web content.
+        ///   - didReceive: The script message received from the web content.
         ///   - replyHandler: A block to be called with the reply data or an error string.
         public func userContentController(
             _ userContentController: WKUserContentController,
