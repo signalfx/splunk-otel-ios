@@ -148,8 +148,8 @@ jobs:
         run: |
           export GITHUB_OUTPUT="$(mktemp)"
           .github/actions/build-and-tests/scripts/test.sh
-          code="$(sed -n 's/^xcode_status=//p' "$GITHUB_OUTPUT")"
-          echo "status=${code:-1}" >> "$GITHUB_OUTPUT"
+          code=$?
+          echo "xcode_status=$code" >> "$GITHUB_OUTPUT"
 
       - name: Publish JUnit to Checks
         uses: mikepenz/action-junit-report@v4
