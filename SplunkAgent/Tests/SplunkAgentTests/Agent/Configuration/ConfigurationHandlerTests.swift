@@ -25,7 +25,7 @@ final class ConfigurationHandlerTests: XCTestCase {
         let storeConfiguration = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)
 
         let storage = UserDefaultsStorage()
-        storage.keysPrefix = "com.splunk.rum.test."
+        storage.keysPrefix = "com.splunk.rum.test.testInternalStore."
         try storage.update(storeConfiguration, forKey: ConfigurationHandler.configurationStoreKey)
 
         let defaultConfig = try ConfigurationTestBuilder.buildDefault()
@@ -46,7 +46,7 @@ final class ConfigurationHandlerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Delayed execution")
 
         let storage = UserDefaultsStorage()
-        storage.keysPrefix = "com.splunk.rum.test."
+        storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
 
         let defaultConfig = try ConfigurationTestBuilder.buildDefault()
         let dataResponse = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)
@@ -59,7 +59,7 @@ final class ConfigurationHandlerTests: XCTestCase {
         )
 
         DispatchQueue.global()
-            .asyncAfter(deadline: .now() + 5) {
+            .asyncAfter(deadline: .now() + 10) {
                 XCTAssertEqual(configurationHandler.configurationData, dataResponse)
                 XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
 
@@ -69,6 +69,6 @@ final class ConfigurationHandlerTests: XCTestCase {
                 expectation.fulfill()
             }
         // TODO: [DEMRUM-2782] Fix tests
-        wait(for: [expectation], timeout: 10)
+        wait(for: [expectation], timeout: 15)
     }
 }

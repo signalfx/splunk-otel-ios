@@ -166,7 +166,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: xcresult-${{ matrix.platform }}
+          name: xcresult-${{ matrix.platform }}.xcresult
           path: TestResults_${{ matrix.platform }}.xcresult
           if-no-files-found: warn
 
