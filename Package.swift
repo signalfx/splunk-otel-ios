@@ -6,7 +6,7 @@ import class Foundation.ProcessInfo
 
 // MARK: - Package and target definitions
 
-// Create the package instance base.
+/// Create the package instance base.
 let package = Package(
     name: "SplunkAgent",
     platforms: [
@@ -38,7 +38,7 @@ let package = Package(
     targets: []
 )
 
-//  Modify it based on current dependency resolution and add all targets to the package
+///  Modify it based on current dependency resolution and add all targets to the package
 package.targets.append(contentsOf: generateBinaryTargets())
 package.targets.append(contentsOf: generateWrapperTargets())
 package.targets.append(contentsOf: generateMainTargets())
@@ -569,6 +569,7 @@ enum DependencyResolutionStrategy {
         guard shouldUseSessionReplayAsRepositoryDependency() else {
             return .binaryTargets
         }
+
         return .repositoryDependency
     }
 }
