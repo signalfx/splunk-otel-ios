@@ -1,7 +1,8 @@
 // swift-tools-version: 5.9
 
-import class Foundation.ProcessInfo
 import PackageDescription
+
+import class Foundation.ProcessInfo
 
 // MARK: - Package and target definitions
 
@@ -30,7 +31,7 @@ let package = Package(
             exact: "2.0.0"
         ),
         .package(
-            url:"https://github.com/microsoft/plcrashreporter",
+            url: "https://github.com/microsoft/plcrashreporter",
             from: "1.12.0"
         )
     ],
@@ -50,7 +51,7 @@ resolveSessionReplayRepositoryDependency()
 
 /// Generates the main library targets
 func generateMainTargets() -> [Target] {
-    return [
+    [
 
         // MARK: - Splunk Agent
 
@@ -156,8 +157,8 @@ func generateMainTargets() -> [Target] {
             dependencies: ["SplunkNetwork"],
             path: "SplunkNetwork/Tests"
         ),
-        
-        
+
+
         // MARK: - Splunk Network Monitor
 
         .target(
@@ -277,15 +278,15 @@ func generateMainTargets() -> [Target] {
         // MARK: - Splunk Interactions
 
         .target(
-                name: "SplunkInteractions",
-                dependencies: [
-                    "SplunkCommon",
-                    .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
-                    resolveDependency("runtimeCache"),
-                    resolveDependency("logger")
-                ],
-                path: "SplunkInteractions/Sources"
-            ),
+            name: "SplunkInteractions",
+            dependencies: [
+                "SplunkCommon",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                resolveDependency("runtimeCache"),
+                resolveDependency("logger")
+            ],
+            path: "SplunkInteractions/Sources"
+        ),
         .testTarget(
             name: "SplunkInteractionsTests",
             dependencies: ["SplunkInteractions"],
@@ -353,7 +354,7 @@ func generateMainTargets() -> [Target] {
 
 
         // MARK: - Splunk Custom Tracking
-        
+
         .target(
             name: "SplunkCustomTracking",
             dependencies: [
@@ -397,7 +398,7 @@ func generateMainTargets() -> [Target] {
 
 /// Generates binary targets from the registry, based on the current `DependencyResolutionStrategy`.
 func generateBinaryTargets() -> [Target] {
-    
+
     // First check the deps resolution whether we want to generate.
     guard DependencyResolutionStrategy.current == .binaryTargets else {
         return []
@@ -425,7 +426,7 @@ func generateWrapperTargets() -> [Target] {
 
 /// Generates wrapper targets that depend on binary targets to correctly construct and link their dependency trees.
 func generateBinaryWrapperTargets() -> [Target] {
-    return [
+    [
         .target(
             name: "CiscoLoggerWrapper",
             dependencies: ["CiscoLogger"],
@@ -565,11 +566,10 @@ enum DependencyResolutionStrategy {
     case repositoryDependency
 
     static var current: DependencyResolutionStrategy {
-        if shouldUseSessionReplayAsRepositoryDependency() {
-            return .repositoryDependency
-        } else {
+        guard shouldUseSessionReplayAsRepositoryDependency() else {
             return .binaryTargets
         }
+        return .repositoryDependency
     }
 }
 
@@ -599,7 +599,8 @@ func shouldUseSessionReplayAsRepositoryDependency() -> Bool {
 
     // Check the ENV first
     if let envValue = ProcessInfo.processInfo.environment["USE_SESSION_REPLAY_REPO"],
-       let boolValue = Bool(envValue) {
+        let boolValue = Bool(envValue)
+    {
         return boolValue
     }
 
@@ -615,7 +616,8 @@ func shouldUseLocalSessionReplayDependency() -> Bool {
 
     // Check the ENV first
     if let envValue = ProcessInfo.processInfo.environment["USE_LOCAL_SESSION_REPLAY"],
-       let boolValue = Bool(envValue) {
+        let boolValue = Bool(envValue)
+    {
         return boolValue
     }
 
