@@ -1,0 +1,116 @@
+{
+  "configurations" : [
+    {
+      "id" : "45434C05-75E3-467C-A88E-A988E43CEFCE",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkAgentTests",
+        "name" : "SplunkAgentTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkAppStartTests",
+        "name" : "SplunkAppStartTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkCommonTests",
+        "name" : "SplunkCommonTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkCrashReportsTests",
+        "name" : "SplunkCrashReportsTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkNetworkTests",
+        "name" : "SplunkNetworkTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkOpenTelemetryBackgroundExporterTests",
+        "name" : "SplunkOpenTelemetryBackgroundExporterTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkOpenTelemetryTests",
+        "name" : "SplunkOpenTelemetryTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkSessionReplayProxyTests",
+        "name" : "SplunkSessionReplayProxyTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkSlowFrameDetectorTests",
+        "name" : "SplunkSlowFrameDetectorTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkWebViewTests",
+        "name" : "SplunkWebViewTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkNavigationTests",
+        "name" : "SplunkNavigationTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkCustomTrackingTests",
+        "name" : "SplunkCustomTrackingTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkInteractionsTests",
+        "name" : "SplunkInteractionsTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkNetworkMonitorTests",
+        "name" : "SplunkNetworkMonitorTests"
+      }
+    }
+  ],
+  "version" : 1
+}

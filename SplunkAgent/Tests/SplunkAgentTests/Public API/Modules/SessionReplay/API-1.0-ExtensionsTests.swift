@@ -47,10 +47,10 @@ final class SessionReplayAPI10ExtensionsTests: XCTestCase {
 
         view.srSensitive = nil
         // TODO: [DEMRUM-2782] Fix tests
-        //        XCTAssertFalse(try XCTUnwrap(agent.sessionReplay.sensitivity[view]))
+        XCTAssertFalse(try XCTUnwrap(agent.sessionReplay.sensitivity[view]))
 
-        //        let isSensitive = agent.sessionReplay.sensitivity[view]
-        //        XCTAssertNotNil(isSensitive)
+        let isSensitive = agent.sessionReplay.sensitivity[view]
+        XCTAssertNotNil(isSensitive)
 
         _ = view.srSensitive
 

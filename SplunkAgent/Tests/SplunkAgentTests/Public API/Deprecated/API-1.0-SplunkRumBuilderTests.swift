@@ -151,11 +151,11 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertTrue(builder.build())
 
         // TODO: [DEMRUM-2782] Fix tests
-        //        let config = SplunkRum.shared.agentConfiguration
-        //        XCTAssertEqual(config.appName, "ConfigApp")
-        //        XCTAssertEqual(config.deploymentEnvironment, "TestEnv")
-        //        XCTAssertEqual(config.enableDebugLogging, true)
-        //        XCTAssertEqual(config.session.samplingRate, 0.75)
+        let config = SplunkRum.shared.agentConfiguration
+        XCTAssertEqual(config.appName, "ConfigApp")
+        XCTAssertEqual(config.deploymentEnvironment, "TestEnv")
+        XCTAssertEqual(config.enableDebugLogging, true)
+        XCTAssertEqual(config.session.samplingRate, 0.75)
     }
 
 

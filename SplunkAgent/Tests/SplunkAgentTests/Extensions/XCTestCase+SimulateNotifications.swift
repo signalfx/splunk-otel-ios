@@ -25,7 +25,7 @@ import XCTest
 
         /// We need time to deliver and evaluate the expectations.
         private var deliveryTime: TimeInterval {
-            0.05
+            0.1
         }
 
 

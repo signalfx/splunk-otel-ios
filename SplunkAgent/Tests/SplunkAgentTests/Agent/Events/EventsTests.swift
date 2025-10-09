@@ -51,26 +51,26 @@ final class EventsTests: XCTestCase {
     // MARK: - Testing Event manual events
 
     // TODO: [DEMRUM-2782] Fix tests
-    //    func testSessionReplayDataEvent() throws {
-    //        let event = try SessionReplayTestBuilder.buildDataEvent()
-    //
-    //        let requestExpectation = XCTestExpectation(description: "Send request")
-    //
-    //        let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
-    //        let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
-    //
-    //        sessionReplayProcessor.sendEvent(event, completion: { _ in
-    //            requestExpectation.fulfill()
-    //        })
-    //
-    //        let processedEvent = try XCTUnwrap(sessionReplayProcessor.storedLastProcessedEvent)
-    //        try checkEventAttributes(processedEvent)
-    //        try checkEventProperties(processedEvent)
-    //
-    //        XCTAssertEqual(processedEvent.name, "session_replay_data")
-    //
-    //        wait(for: [requestExpectation], timeout: 5)
-    //    }
+    func testSessionReplayDataEvent() throws {
+        let event = try SessionReplayTestBuilder.buildDataEvent()
+
+        let requestExpectation = XCTestExpectation(description: "Send request")
+
+        let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
+        let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
+
+        sessionReplayProcessor.sendEvent(event, completion: { _ in
+            requestExpectation.fulfill()
+        })
+
+        let processedEvent = try XCTUnwrap(sessionReplayProcessor.storedLastProcessedEvent)
+        try checkEventAttributes(processedEvent)
+        try checkEventProperties(processedEvent)
+
+        XCTAssertEqual(processedEvent.name, "session_replay_data")
+
+        wait(for: [requestExpectation], timeout: 5)
+    }
 
 
     // MARK: - Testing immediate and background processing
@@ -120,41 +120,41 @@ final class EventsTests: XCTestCase {
     // MARK: - Helpers
 
     // TODO: [DEMRUM-2782] Fix tests
-    //    private func checkEventAttributes(_ event: SplunkCommon.AgentEvent) throws {
-    //        let eventAttributes = try XCTUnwrap(event.attributes)
-    //
-    //        // Metadata
-    //        let metadataValue = eventAttributes["segmentMetadata"]
-    //        let metadataData = try XCTUnwrap(metadataValue?.description.data(using: .utf8))
-    //        let metadata = try JSONDecoder().decode(CiscoSessionReplay.Metadata.self, from: metadataData)
-    //        XCTAssertNotNil(metadataValue)
-    //        XCTAssertNotNil(metadata)
-    //
-    //        // Script ID
-    //        let scriptID = eventAttributes["splunk.scriptInstance"]
-    //        XCTAssertNotNil(scriptID)
-    //
-    //        // Experimental attributes for integration PoC
-    //        let totalChunks = eventAttributes["rr-web.total-chunks"]
-    //        XCTAssertEqual(totalChunks, .double(1))
-    //
-    //        let chunk = eventAttributes["rr-web.chunk"]
-    //        XCTAssertEqual(chunk, .double(1))
-    //
-    //        let eventNumber = eventAttributes["rr-web.event"]
-    //        XCTAssertEqual(eventNumber, .int(1))
-    //
-    //        let offset = eventAttributes["rr-web.offset"]
-    //        XCTAssertEqual(offset, .double(1))
-    //    }
-    //
-    //    private func checkEventProperties(_ event: SplunkCommon.AgentEvent) throws {
-    //        XCTAssertNotNil(event.domain)
-    //        XCTAssertNotNil(event.name)
-    //        XCTAssertNotNil(event.instrumentationScope)
-    //        XCTAssertNotNil(event.component)
-    //
-    //        XCTAssertNotNil(event.sessionId)
-    //        XCTAssertNotNil(event.timestamp)
-    //    }
+    private func checkEventAttributes(_ event: SplunkCommon.AgentEvent) throws {
+        let eventAttributes = try XCTUnwrap(event.attributes)
+
+        // Metadata
+        let metadataValue = eventAttributes["segmentMetadata"]
+        let metadataData = try XCTUnwrap(metadataValue?.description.data(using: .utf8))
+        let metadata = try JSONDecoder().decode(CiscoSessionReplay.Metadata.self, from: metadataData)
+        XCTAssertNotNil(metadataValue)
+        XCTAssertNotNil(metadata)
+
+        // Script ID
+        let scriptID = eventAttributes["splunk.scriptInstance"]
+        XCTAssertNotNil(scriptID)
+
+        // Experimental attributes for integration PoC
+        let totalChunks = eventAttributes["rr-web.total-chunks"]
+        XCTAssertEqual(totalChunks, .double(1))
+
+        let chunk = eventAttributes["rr-web.chunk"]
+        XCTAssertEqual(chunk, .double(1))
+
+        let eventNumber = eventAttributes["rr-web.event"]
+        XCTAssertEqual(eventNumber, .int(1))
+
+        let offset = eventAttributes["rr-web.offset"]
+        XCTAssertEqual(offset, .double(1))
+    }
+
+    private func checkEventProperties(_ event: SplunkCommon.AgentEvent) throws {
+        XCTAssertNotNil(event.domain)
+        XCTAssertNotNil(event.name)
+        XCTAssertNotNil(event.instrumentationScope)
+        XCTAssertNotNil(event.component)
+
+        XCTAssertNotNil(event.sessionId)
+        XCTAssertNotNil(event.timestamp)
+    }
 }

@@ -210,7 +210,7 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
 
     func testSessionRotation() throws {
         // TODO: [DEMRUM-2782] Fix tests
-        //        let initialCount = moduleProxy.newSessionsCount
+        let initialCount = moduleProxy.newSessionsCount
 
         sendSimulatedNotification(DefaultSession.sessionDidResetNotification)
         simulateMainThreadWait(duration: 0.5)
