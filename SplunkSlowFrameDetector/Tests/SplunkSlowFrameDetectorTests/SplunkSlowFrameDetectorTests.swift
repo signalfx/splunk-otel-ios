@@ -294,7 +294,7 @@ import XCTest
                 var count = 0
                 while count < 1, !Task.isCancelled {
                     // Access the test-only property on the actor
-                    count = await detector?.logicForTest.test_frozenFrameCount ?? 0
+                    count = await detector?.logicForTest.testFrozenFrameCount ?? 0
                     if count >= 1 {
                         frozenFrameDetectedExpectation.fulfill()
                         break

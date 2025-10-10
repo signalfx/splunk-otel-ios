@@ -55,7 +55,7 @@ actor SlowFrameLogic {
         private var onFlushDidComplete: (() -> Void)?
 
         /// A test-only accessor for the current frozenFrameCount.
-        var test_frozenFrameCount: Int { frozenFrameCount }
+        var testFrozenFrameCount: Int { frozenFrameCount }
     #endif
 
 
