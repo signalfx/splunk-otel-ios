@@ -21,8 +21,9 @@ import XCTest
 
 #if os(iOS) || os(tvOS) || os(visionOS)
 
-    @testable import SplunkSlowFrameDetector
     import UIKit
+
+    @testable import SplunkSlowFrameDetector
 
     // MARK: - Mock Ticker
 
@@ -56,8 +57,8 @@ import XCTest
                     return
                 }
 
-                self.stopped = true
-                self.onStop?()
+                stopped = true
+                onStop?()
             }
         }
 
