@@ -102,7 +102,7 @@ final class DefaultSessionTests: XCTestCase {
         var retrievedSessionId = defaultSession.sessionId(for: Date())
         XCTAssertEqual(retrievedSessionId, resumedSessionId)
 
-        simulateMainThreadWait(duration: 10)
+        simulateMainThreadWait(duration: 6)
 
         // After exceeding the maximum session length, we should get a new ID
         lastSessionItem = defaultSession.currentSessionItem
