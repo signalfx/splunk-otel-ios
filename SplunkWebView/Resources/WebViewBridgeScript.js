@@ -20,7 +20,7 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
     window.SplunkRumNative = (function() {
         const staleAfterDurationMs = 5000;
         const self = {
-            cachedSessionId: '__SESSION_ID__',
+            cachedSessionId: __SESSION_ID__,
             _isInitialized: false,
             _lastCheckTime: Date.now(),
             _updateInProgress: false,

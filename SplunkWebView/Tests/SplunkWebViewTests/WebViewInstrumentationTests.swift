@@ -32,13 +32,15 @@ final class WebViewInstrumentationTests: XCTestCase {
 
 
     // MARK: - Test Lifecycle
-
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockLogAgent = MockLogAgent()
         mockAgentSharedState = MockAgentSharedState(sessionId: "testing-session-id")
-        webViewInstrumentation = WebViewInstrumentation(logger: mockLogAgent, sharedState: mockAgentSharedState)
         mockWebView = MockWKWebView()
+
+        let logAgent = try XCTUnwrap(mockLogAgent)
+        let sharedState = try XCTUnwrap(mockAgentSharedState)
+        webViewInstrumentation = WebViewInstrumentation(logger: logAgent, sharedState: sharedState)
     }
 
     override func tearDownWithError() throws {
