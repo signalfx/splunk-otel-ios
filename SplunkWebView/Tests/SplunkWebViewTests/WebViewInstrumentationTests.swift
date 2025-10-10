@@ -32,6 +32,7 @@ final class WebViewInstrumentationTests: XCTestCase {
 
 
     // MARK: - Test Lifecycle
+
     override func setUpWithError() throws {
         try super.setUpWithError()
         mockLogAgent = MockLogAgent()

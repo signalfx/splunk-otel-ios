@@ -75,7 +75,9 @@ public final class WebViewInstrumentation: NSObject {
         /// - Note: To ensure proper correlation, this method should be called before the `WKWebView`
         ///   starts loading any content (e.g., before `load`, `loadHTMLString`, etc.).
         ///
-        /// - Parameter webView: The `WKWebView` instance to be instrumented.
+        /// - Parameters:
+        ///
+        ///  - webView: The `WKWebView` instance to be instrumented.
         public func injectSessionId(into webView: WKWebView) {
             // Ensure this method is called on the main thread as WKWebView APIs are UI-bound.
             guard Thread.isMainThread else {
@@ -151,6 +153,7 @@ public final class WebViewInstrumentation: NSObject {
 #if canImport(WebKit)
     extension WebViewInstrumentation: WKScriptMessageHandlerWithReply {
 
+
         // MARK: - WKScriptMessageHandlerWithReply
 
         /// Handles JavaScript messages with a reply handler for asynchronous communication.
@@ -159,12 +162,11 @@ public final class WebViewInstrumentation: NSObject {
         /// It retrieves the current native session ID and sends it back to the JavaScript context.
         ///
         /// - Parameters:
-        ///   - userContentController: The controller that received the script message.
-        ///   - message: The script message received from the web content.
-        ///   - replyHandler: A block to be called with the reply data or an error string.
+        ///
+        /// - replyHandler: A block to be called with the reply data or an error string.
         public func userContentController(
-            _ userContentController: WKUserContentController,
-            didReceive message: WKScriptMessage,
+            _ _: WKUserContentController,
+            didReceive _: WKScriptMessage,
             replyHandler: @escaping @MainActor @Sendable (Any?, String?) -> Void
         ) {
             // hint: parse message.body["action"] here if you need to add features
