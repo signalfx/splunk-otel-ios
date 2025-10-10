@@ -112,7 +112,7 @@ final class RepeatingJobTests: XCTestCase {
         XCTAssertTrue(job.suspended)
     }
 
-    func testLifecycle() async throws {
+    func testLifecycle() throws {
         var counter = 0
 
         // Job is suspended after initialization
@@ -123,13 +123,13 @@ final class RepeatingJobTests: XCTestCase {
 
         /* SUSPENDED */
         // The job should stay suspended
-        try await simulateMainThreadWait(duration: 3)
+        simulateMainThreadWait(duration: 3)
         XCTAssertEqual(counter, 0)
 
         job.suspend()
 
         // `suspend()` on the suspended job does nothing
-        try await simulateMainThreadWait(duration: 3)
+        simulateMainThreadWait(duration: 3)
         XCTAssertEqual(counter, 0)
 
 
@@ -137,13 +137,13 @@ final class RepeatingJobTests: XCTestCase {
         job.resume()
 
         // `resume()` on the suspended job starts its execution
-        try await simulateMainThreadWait(duration: 3)
+        simulateMainThreadWait(duration: 3)
         XCTAssertEqual(counter, 1)
 
         job.resume()
 
         // `resume()` on the resumed job does nothing
-        try await simulateMainThreadWait(duration: 4)
+        simulateMainThreadWait(duration: 4)
         XCTAssertEqual(counter, 3)
     }
 }

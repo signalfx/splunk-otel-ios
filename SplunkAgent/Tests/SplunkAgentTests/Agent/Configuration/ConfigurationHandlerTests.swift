@@ -42,9 +42,6 @@ final class ConfigurationHandlerTests: XCTestCase {
     }
 
     func testApiLoadSuccess() async throws {
-
-        let expectation = XCTestExpectation(description: "Delayed execution")
-
         let storage = UserDefaultsStorage()
         storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
 

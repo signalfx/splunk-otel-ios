@@ -79,11 +79,11 @@ final class AppStateManagerTests: XCTestCase {
         ]
 
         for notification in notifications {
-            sendSimulatedNotification(notification)
-            try await simulateMainThreadWait(duration: 1)
+            await sendSimulatedNotification(notification)
+            simulateMainThreadWait(duration: 1)
         }
 
-        try await simulateMainThreadWait(duration: 2)
+        simulateMainThreadWait(duration: 2)
 
         let events: [AppStateEvent] = (try? storage.read(forKey: "appStateEvents")) ?? []
         XCTAssertEqual(events.count, 5)

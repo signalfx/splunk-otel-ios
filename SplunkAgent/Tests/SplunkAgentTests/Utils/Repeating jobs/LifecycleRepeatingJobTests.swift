@@ -59,17 +59,17 @@ import XCTest
 
         func testLifecycle() async throws {
             /* Going into the background for some time */
-            try simulateBackgroundStay(for: DefaultSession(), duration: 5)
+            try await simulateBackgroundStay(for: DefaultSession(), duration: 5)
 
             /* SUSPENDED */
             // The job should stay suspended
-            try await simulateMainThreadWait(duration: 3)
+            simulateMainThreadWait(duration: 3)
             XCTAssertEqual(counter, 0)
 
             defaultJob?.suspend()
 
             // `suspend()` on the suspended job does nothing
-            try await simulateMainThreadWait(duration: 3)
+            simulateMainThreadWait(duration: 3)
             XCTAssertEqual(counter, 0)
 
 
@@ -80,7 +80,7 @@ import XCTest
             let resumeDuration: TimeInterval = 1
             let resumeCount = executionsCount(for: resumeDuration)
 
-            try await simulateMainThreadWait(duration: resumeDuration + deliveryTime)
+            simulateMainThreadWait(duration: resumeDuration + deliveryTime)
             XCTAssertEqual(counter, resumeCount)
 
             // `resume()` on the resumed job does nothing
@@ -88,7 +88,7 @@ import XCTest
             let secondResumeDuration: TimeInterval = 2
             let secondResumeCount = executionsCount(for: secondResumeDuration) + resumeCount
 
-            try await simulateMainThreadWait(duration: secondResumeDuration + deliveryTime)
+            simulateMainThreadWait(duration: secondResumeDuration + deliveryTime)
             XCTAssertEqual(counter, secondResumeCount)
         }
 
@@ -104,16 +104,16 @@ import XCTest
             defaultJob?.resume()
 
             // After the resume, there should be some job executions
-            try await simulateMainThreadWait(duration: initialDuration + deliveryTime)
+            simulateMainThreadWait(duration: initialDuration + deliveryTime)
             XCTAssertEqual(counter, initialCount)
 
 
             /* Going into the background */
-            sendEnterBackgroundNotification()
+            await sendEnterBackgroundNotification()
 
             // After the background entry, another execution should be performed for this transition
             let afterEnterCount = initialCount + 1
-            try await simulateMainThreadWait(duration: initialDuration + deliveryTime)
+            simulateMainThreadWait(duration: initialDuration + deliveryTime)
             XCTAssertEqual(counter, afterEnterCount)
 
             // If the application is in the background, the job should be suspended
@@ -123,13 +123,13 @@ import XCTest
             // Call to `suspend()` does nothing
             defaultJob?.suspend()
 
-            try await simulateMainThreadWait(duration: initialDuration + deliveryTime)
+            simulateMainThreadWait(duration: initialDuration + deliveryTime)
             XCTAssertEqual(counter, afterEnterCount)
 
             // Call to `resume()` does nothing
             defaultJob?.resume()
 
-            try await simulateMainThreadWait(duration: initialDuration + deliveryTime)
+            simulateMainThreadWait(duration: initialDuration + deliveryTime)
             XCTAssertEqual(counter, afterEnterCount)
         }
 
@@ -145,20 +145,20 @@ import XCTest
             defaultJob?.resume()
 
             // After the resume, there should be some job executions
-            try await simulateMainThreadWait(duration: initialDuration + deliveryTime)
+            simulateMainThreadWait(duration: initialDuration + deliveryTime)
             XCTAssertEqual(counter, initialCount)
 
 
             /* Going into the background for some time */
             let backgroundStay: UInt32 = 7
-            try simulateBackgroundStay(for: defaultSession, duration: backgroundStay)
+            try await simulateBackgroundStay(for: defaultSession, duration: backgroundStay)
 
             // After a previous stay in the background, there should be two new ticks:
             // - 1x transition into background
             // - 1x transition to foreground
             let afterLeaveBackgroundCount = initialCount + 2
 
-            try await simulateMainThreadWait(duration: deliveryTime)
+            simulateMainThreadWait(duration: deliveryTime)
             XCTAssertEqual(counter, afterLeaveBackgroundCount)
 
 
@@ -172,7 +172,7 @@ import XCTest
             let foregroundCount = executionsCount(for: foregroundDuration)
             let finalCount = afterLeaveBackgroundCount + foregroundCount
 
-            try await simulateMainThreadWait(duration: foregroundDuration + deliveryTime)
+            simulateMainThreadWait(duration: foregroundDuration + deliveryTime)
             XCTAssertEqual(counter, finalCount)
         }
 

@@ -212,11 +212,11 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
         // TODO: [DEMRUM-2782] Fix tests
         let initialCount = moduleProxy.newSessionsCount
 
-        sendSimulatedNotification(DefaultSession.sessionDidResetNotification)
-        try await simulateMainThreadWait(duration: 0.5)
+        await sendSimulatedNotification(DefaultSession.sessionDidResetNotification)
+        simulateMainThreadWait(duration: 0.5)
 
         // There should be processed one request to rotate session in module
-        //        XCTAssertEqual(initialCount, 0)
-        //        XCTAssertEqual(moduleProxy.newSessionsCount, 1)
+        XCTAssertEqual(initialCount, 0)
+        XCTAssertEqual(moduleProxy.newSessionsCount, 1)
     }
 }

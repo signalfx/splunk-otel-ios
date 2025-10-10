@@ -73,7 +73,7 @@ final class DefaultSessionTests: XCTestCase {
     }
 
     // TODO: [DEMRUM-2782] Fix tests
-    func testSessionForLogic() async throws {
+    func testSessionForLogic() throws {
         let maxSessionLength = 5.0
         let sessionTimeout = 1.0
 
@@ -102,7 +102,7 @@ final class DefaultSessionTests: XCTestCase {
         var retrievedSessionId = defaultSession.sessionId(for: Date())
         XCTAssertEqual(retrievedSessionId, resumedSessionId)
 
-        try await try await simulateMainThreadWait(duration: 7)
+        simulateMainThreadWait(duration: 10)
 
         // After exceeding the maximum session length, we should get a new ID
         lastSessionItem = defaultSession.currentSessionItem
@@ -226,15 +226,15 @@ final class DefaultSessionTests: XCTestCase {
 
             /* Going into the background for *allowed* time */
             let resumedSessionId = defaultSession.currentSessionId
-            try simulateBackgroundStay(for: defaultSession, duration: 3)
-            try await simulateMainThreadWait(duration: 2)
+            try await simulateBackgroundStay(for: defaultSession, duration: 3)
+            simulateMainThreadWait(duration: 2)
 
             // The current session should be the same
             var lastSessionId = defaultSession.currentSessionId
             XCTAssertEqual(lastSessionId, resumedSessionId)
 
             // Simulate some inactivity
-            try await simulateMainThreadWait(duration: 8)
+            simulateMainThreadWait(duration: 8)
 
             // After a previous stay in the background and some inactivity time,
             // there should be the same session ID.
@@ -243,7 +243,7 @@ final class DefaultSessionTests: XCTestCase {
 
 
             /* Going into the background for *too long* time */
-            try simulateBackgroundStay(for: defaultSession, duration: 12)
+            try await simulateBackgroundStay(for: defaultSession, duration: 12)
 
             // The current session should *not* be the same immediately
             XCTAssertNotEqual(lastSessionId, defaultSession.currentSessionId)
