@@ -122,6 +122,15 @@ jobs:
       matrix:
         include:
           - platform: ios
+          - platform: ios
+          - platform: ios
+          - platform: ios
+          - platform: ios
+          - platform: ios
+          - platform: ios
+          - platform: ios
+          - platform: ios
+          - platform: ios
 
     steps:
       - uses: actions/checkout@v4
