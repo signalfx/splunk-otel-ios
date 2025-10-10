@@ -25,9 +25,9 @@ final class API10SplunkRumBuilderTests: XCTestCase {
     // MARK: - Tests lifecycle
 
     override func setUp() {
-        super.setUp()
-
         SplunkRum.resetSharedInstance()
+
+        super.setUp()
     }
 
     override func tearDown() {
