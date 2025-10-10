@@ -9,9 +9,7 @@
     }
   ],
   "defaultOptions" : {
-    "maximumTestRepetitions" : 5,
     "performanceAntipatternCheckerEnabled" : true,
-    "testRepetitionMode" : "untilFailure",
     "testTimeoutsEnabled" : true
   },
   "testTargets" : [
