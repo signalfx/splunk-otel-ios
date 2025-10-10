@@ -30,15 +30,7 @@ extension XCTestCase {
     /// which differs from other options, such as the `sleep()` method.
     ///
     /// - Parameter duration: A waiting time in seconds.
-    func simulateMainThreadWait(duration: TimeInterval) {
-        let id = UUID().uuidString
-        let exp = expectation(description: "Test delayed by \(duration) seconds - \(id)")
-        let result = XCTWaiter.wait(for: [exp], timeout: duration)
-
-        guard result == XCTWaiter.Result.timedOut else {
-            XCTFail("Delay interrupted - \(id)")
-
-            return
-        }
+    func simulateMainThreadWait(duration: TimeInterval) async throws {
+        try await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
     }
 }

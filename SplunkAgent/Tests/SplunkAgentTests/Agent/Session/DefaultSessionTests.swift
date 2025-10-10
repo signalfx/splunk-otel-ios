@@ -73,7 +73,7 @@ final class DefaultSessionTests: XCTestCase {
     }
 
     // TODO: [DEMRUM-2782] Fix tests
-    func testSessionForLogic() throws {
+    func testSessionForLogic() async throws {
         let maxSessionLength = 5.0
         let sessionTimeout = 1.0
 
@@ -102,7 +102,7 @@ final class DefaultSessionTests: XCTestCase {
         var retrievedSessionId = defaultSession.sessionId(for: Date())
         XCTAssertEqual(retrievedSessionId, resumedSessionId)
 
-        simulateMainThreadWait(duration: 7)
+        try await try await simulateMainThreadWait(duration: 7)
 
         // After exceeding the maximum session length, we should get a new ID
         lastSessionItem = defaultSession.currentSessionItem
@@ -213,7 +213,7 @@ final class DefaultSessionTests: XCTestCase {
 
         // MARK: - Application lifecycle
 
-        func testEnterBackground() throws {
+        func testEnterBackground() async throws {
             let configuration = try ConfigurationTestBuilder.buildDefault()
 
             // After the object is created, there should be one open session
@@ -227,14 +227,14 @@ final class DefaultSessionTests: XCTestCase {
             /* Going into the background for *allowed* time */
             let resumedSessionId = defaultSession.currentSessionId
             try simulateBackgroundStay(for: defaultSession, duration: 3)
-            simulateMainThreadWait(duration: 2)
+            try await simulateMainThreadWait(duration: 2)
 
             // The current session should be the same
             var lastSessionId = defaultSession.currentSessionId
             XCTAssertEqual(lastSessionId, resumedSessionId)
 
             // Simulate some inactivity
-            simulateMainThreadWait(duration: 8)
+            try await simulateMainThreadWait(duration: 8)
 
             // After a previous stay in the background and some inactivity time,
             // there should be the same session ID.

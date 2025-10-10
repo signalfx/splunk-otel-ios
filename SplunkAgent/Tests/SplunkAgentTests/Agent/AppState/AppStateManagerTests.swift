@@ -63,7 +63,7 @@ final class AppStateManagerTests: XCTestCase {
     }
 
     // TODO: [DEMRUM-2782] Fix tests
-    func testNotificationsHandle() {
+    func testNotificationsHandle() async throws {
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testNotificationsHandle")
         try? storage.delete(forKey: "appStateEvents")
 
@@ -80,10 +80,10 @@ final class AppStateManagerTests: XCTestCase {
 
         for notification in notifications {
             sendSimulatedNotification(notification)
-            simulateMainThreadWait(duration: 1)
+            try await simulateMainThreadWait(duration: 1)
         }
 
-        simulateMainThreadWait(duration: 2)
+        try await simulateMainThreadWait(duration: 2)
 
         let events: [AppStateEvent] = (try? storage.read(forKey: "appStateEvents")) ?? []
         XCTAssertEqual(events.count, 5)

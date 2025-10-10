@@ -208,12 +208,12 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
 
     // MARK: - Agent session lifecycle
 
-    func testSessionRotation() throws {
+    func testSessionRotation() async throws {
         // TODO: [DEMRUM-2782] Fix tests
         let initialCount = moduleProxy.newSessionsCount
 
         sendSimulatedNotification(DefaultSession.sessionDidResetNotification)
-        simulateMainThreadWait(duration: 0.5)
+        try await simulateMainThreadWait(duration: 0.5)
 
         // There should be processed one request to rotate session in module
         //        XCTAssertEqual(initialCount, 0)
