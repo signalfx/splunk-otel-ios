@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkNavigation
 import XCTest
+
+@testable import SplunkNavigation
 
 final class PreferencesTests: XCTestCase {
 
@@ -76,7 +77,8 @@ final class PreferencesTests: XCTestCase {
     }
 
     func testPropertiesMethods() throws {
-        let returnObject = preferences
+        let returnObject =
+            preferences
             .enableAutomatedTracking(true)
 
 

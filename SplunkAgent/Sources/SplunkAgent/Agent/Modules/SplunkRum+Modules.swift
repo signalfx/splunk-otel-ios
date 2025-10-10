@@ -15,17 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 internal import CiscoSessionReplay
+import Foundation
 internal import SplunkAppStart
 internal import SplunkAppState
 internal import SplunkCustomTracking
+internal import SplunkInteractions
 internal import SplunkNavigation
 internal import SplunkNetwork
-internal import SplunkWebView
 internal import SplunkNetworkMonitor
-internal import SplunkInteractions
 internal import SplunkSlowFrameDetector
+internal import SplunkWebView
 
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
@@ -42,15 +42,15 @@ extension SplunkRum {
 
     func registerModulePublish() {
         // Send events on data publish
-        modulesManager?.onModulePublish(data: { metadata, data in
-            self.eventManager?.publish(data: data, metadata: metadata) { success in
-                if success {
-                    self.modulesManager?.deleteModuleData(for: metadata)
-                } else {
-                    // TODO: MRUM_AC-1061 (post GA): Handle a case where data is not sent.
-                }
-            }
-        })
+        modulesManager?
+            .onModulePublish(data: { metadata, data in
+                self.eventManager?
+                    .publish(data: data, metadata: metadata) { success in
+                        if success {
+                            self.modulesManager?.deleteModuleData(for: metadata)
+                        }
+                    }
+            })
     }
 
 
@@ -100,7 +100,7 @@ extension SplunkRum {
         sessionReplayProxy = SessionReplay(for: sessionReplayModule)
     }
 
-    // Configure Navigation module.
+    /// Configure Navigation module.
     private func customizeNavigation() {
         let moduleType = SplunkNavigation.Navigation.self
         let navigationModule = modulesManager?.module(ofType: moduleType)
@@ -109,9 +109,9 @@ extension SplunkRum {
             return
         }
 
-#if canImport(SplunkCrashReports)
-        let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
-#endif
+        #if canImport(SplunkCrashReports)
+            let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
+        #endif
 
         navigationModule.agentVersion(sharedState.agentVersion)
 
@@ -120,9 +120,9 @@ extension SplunkRum {
             for await newValue in navigationModule.screenNameStream {
                 runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
                 screenNameChangeCallback?(newValue)
-#if canImport(SplunkCrashReports)
-                crashReportsModule?.crashReportUpdateScreenName(newValue)
-#endif
+                #if canImport(SplunkCrashReports)
+                    crashReportsModule?.crashReportUpdateScreenName(newValue)
+                #endif
             }
         }
 
@@ -153,18 +153,16 @@ extension SplunkRum {
 
     /// Configure Crash Reports module with shared state.
     private func customizeCrashReports() {
-    // swiftformat:disable indent
-    #if canImport(SplunkCrashReports)
-        let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
+        #if canImport(SplunkCrashReports)
+            let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
 
-        // Assign an object providing the current state of the agent instance.
-        // We need to do this because we need to read `appState` from the agent in the instance of a crash.
-        crashReportsModule?.sharedState = sharedState
+            // Assign an object providing the current state of the agent instance.
+            // We need to do this because we need to read `appState` from the agent in the instance of a crash.
+            crashReportsModule?.sharedState = sharedState
 
-        // Check if a crash ended the previous run of the app
-        crashReportsModule?.reportCrashIfPresent()
-    #endif
-    // swiftformat:enable indent
+            // Check if a crash ended the previous run of the app
+            crashReportsModule?.reportCrashIfPresent()
+        #endif
     }
 
     /// Configure App start module with shared state.
@@ -181,14 +179,14 @@ extension SplunkRum {
         appStateModule?.sharedState = sharedState
     }
 
-    /// Configure NetworkMonitor module
+    /// Configure NetworkMonitor module.
     private func customizeNetworkMonitor() {
         let networkMonitorModule = modulesManager?.module(ofType: SplunkNetworkMonitor.NetworkMonitor.self)
 
         networkMonitorModule?.sharedState = sharedState
     }
 
-    /// Configure Interactions module
+    /// Configure Interactions module.
     private func customizeInteractions() {
         let interactionsModule = modulesManager?.module(ofType: SplunkInteractions.Interactions.self)
 
@@ -205,14 +203,15 @@ extension SplunkRum {
         if let webViewInstrumentationModule = modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentation.self) {
             webViewInstrumentationModule.sharedState = sharedState
             webViewProxy = WebView(module: webViewInstrumentationModule)
-        } else {
+        }
+        else {
             logger.log(level: .notice, isPrivate: false) {
                 "WebViewInstrumentation module not installed."
             }
         }
     }
 
-    /// Configure CustomTracking intrumentation module
+    /// Configure CustomTracking intrumentation module.
     private func customizeCustomTracking() {
         if let customTrackingModule = modulesManager?.module(ofType: CustomTrackingInternal.self) {
             // Initialize proxy API for this module
@@ -220,7 +219,7 @@ extension SplunkRum {
         }
     }
 
-    /// Configure SlowFrameDetector module
+    /// Configure SlowFrameDetector module.
     private func customizeSlowFrameDetector() {
         if let slowFrameDetectorModule = modulesManager?.module(ofType: SplunkSlowFrameDetector.SlowFrameDetector.self) {
             // Initialize proxy API for this module

@@ -19,43 +19,61 @@ import UIKit
 
 class NetworkCallsViewController: UIViewController {
 
-    @IBOutlet weak var simpleNetworkButton: UIButton!
-    @IBOutlet weak var delegateNetworkButton: UIButton!
-    @IBOutlet weak var sampleUrl: UITextField!
-    
+    // MARK: - UI Outlets
+
+    @IBOutlet
+    private var simpleNetworkButton: UIButton!
+
+    @IBOutlet
+    private var delegateNetworkButton: UIButton!
+
+    @IBOutlet
+    private var sampleUrl: UITextField!
+
+
+    // MARK: - View lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
+
         let savedUrl = UserDefaults.standard.string(forKey: "SampleURL") ?? "https://httpbin.org/get"
         sampleUrl.text = savedUrl
     }
 
-    @IBAction func simpleNetworkClick(_ sender: UIButton) {
-        
-        let urlToCall = sampleUrl.text!
-        UserDefaults.standard.set(urlToCall, forKey:"SampleURL")
+
+    // MARK: - UI Actions
+
+    @IBAction
+    private func simpleNetworkClick(_: UIButton) {
+        guard let urlToCall = sampleUrl.text else {
+            return
+        }
+
+        UserDefaults.standard.set(urlToCall, forKey: "SampleURL")
         print("Simple Network Call to \(urlToCall)")
-        
+
         let net = NetworkCalls()
         net.simpleNetworkCallWith(targetURL: urlToCall)
     }
-    @IBAction func delegateNetworkClick(_ sender: UIButton) {
-        
-        let urlToCall = sampleUrl.text!
-        UserDefaults.standard.set(urlToCall, forKey:"SampleURL")
+
+    @IBAction
+    private func delegateNetworkClick(_: UIButton) {
+        guard let urlToCall = sampleUrl.text else {
+            return
+        }
+
+        UserDefaults.standard.set(urlToCall, forKey: "SampleURL")
         print("Delegate Network Call to \(urlToCall)")
-        
+
         let net = NetworkCalls()
         net.simpleNetworkCallWithDelegate(targetURL: urlToCall)
     }
-    @IBAction func resetUrl(_ sender: UIButton) {
-        
+
+    @IBAction
+    private func resetUrl(_: UIButton) {
         let savedUrl = "https://httpbin.org/get"
-        UserDefaults.standard.set(savedUrl, forKey:"SampleURL")
+        UserDefaults.standard.set(savedUrl, forKey: "SampleURL")
         sampleUrl.text = savedUrl
         print("Sample URL reset to \(savedUrl)")
     }
 }
-
-

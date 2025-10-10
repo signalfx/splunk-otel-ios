@@ -18,7 +18,8 @@ limitations under the License.
 import Foundation
 
 /// The class implements the Network Monitor module configuration.
-@objc(SPLKNetworkMonitorConfiguration) @objcMembers
+@objc(SPLKNetworkMonitorConfiguration)
+@objcMembers
 public final class NetworkMonitorConfigurationObjC: ModuleConfigurationObjC {
 
     // MARK: - Initialization

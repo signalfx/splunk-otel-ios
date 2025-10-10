@@ -19,38 +19,38 @@ import Foundation
 import UIKit
 
 class CrashesViewController: UIViewController {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-    
-    @IBAction func fatalErrorButtonClick(_ sender: UIButton) {
-        
+
+    // MARK: - UI Actions
+
+    @IBAction
+    private func fatalErrorButtonClick(_: UIButton) {
+
         print("Fatal Error Crash Selected")
         let crashes = Crashes()
         crashes.fatalErrorCrash()
     }
-    
-    @IBAction func preconditionButtonClick(_ sender: UIButton) {
-        
+
+    @IBAction
+    private func preconditionButtonClick(_: UIButton) {
+
         print("Precondition Crash Selected")
         let crashes = Crashes()
         crashes.preconditionCrash()
     }
-    
-    @IBAction func unwrapExceptionButtonClick(_ sender: UIButton) {
-        
+
+    @IBAction
+    private func unwrapExceptionButtonClick(_: UIButton) {
+
         print("Unwrap Exception Crash Selected")
         let crashes = Crashes()
         crashes.unwrapException()
     }
-    
-    @IBAction func infiniteLoopButtonClick(_ sender: UIButton) {
-        
+
+    @IBAction
+    private func infiniteLoopButtonClick(_: UIButton) {
+
         print("Infinite Loop Crash Selected")
         let crashes = Crashes()
         crashes.infiniteLoop()
     }
 }
-
-

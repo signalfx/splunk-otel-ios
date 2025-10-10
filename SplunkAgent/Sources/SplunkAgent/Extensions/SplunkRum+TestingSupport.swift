@@ -19,7 +19,7 @@ import Foundation
 internal import SplunkCommon
 
 @_spi(objc)
-public extension SplunkRum {
+extension SplunkRum {
 
     // MARK: - Testing support for the Objective-C API target
 
@@ -33,7 +33,10 @@ public extension SplunkRum {
     ///
     /// - Warning: This method is not meant for client applications and may produce
     ///            unexpected results, which are not supported by the product.
-    static func buildTestInstance(with configuration: AgentConfiguration, testNamed named: String? = nil) -> SplunkRum {
+    public static func buildTestInstance(with configuration: AgentConfiguration, testNamed named: String? = nil) -> SplunkRum {
+        // Intentionally unused
+        _ = configuration
+
         let testName = named ?? "agent"
 
         // Custom key-value storage instance with different keys for testing

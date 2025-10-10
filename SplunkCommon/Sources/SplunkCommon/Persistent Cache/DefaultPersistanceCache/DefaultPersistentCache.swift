@@ -18,7 +18,6 @@ limitations under the License.
 internal import CiscoDiskStorage
 internal import CiscoEncryption
 internal import CiscoLogger
-
 import Foundation
 
 /// A concurrency-safe persistent cache that stores elements as key-value pairs.
@@ -126,8 +125,8 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
                 // Re-Save updated state
                 try await sync()
-
-            } catch {
+            }
+            catch {
                 logger.log(level: .warn, isPrivate: false) {
                     "Failed to initialize the cache: \n\t\(error)"
                 }
@@ -230,7 +229,7 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
     /// Deletes all old elements whose number exceeds the specified number.
     ///
-    /// - Parameter number: Position in ordered data from newest to oldest.
+    /// - Parameter position: Position in ordered data from newest to oldest.
     private func delete(exceedingOrder position: Int) async {
         let containers = await model.containers
 
@@ -243,11 +242,12 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
             (key, value.updated)
         }
 
-        let sortedKeys = keysAndUpdates
+        let sortedKeys =
+            keysAndUpdates
             .sorted { first, second in
                 first.update < second.update
             }
-            .map { $0.key }
+            .map(\.key)
 
         // Creates list of keys with too old elements
         let firstUsedIndex = sortedKeys.count - position

@@ -19,16 +19,15 @@ import Foundation
 import OpenTelemetryApi
 import SplunkCommon
 
-
 // MARK: - SplunkTrackableIssue Protocol
 
-/// Protocol for marshalling CustomTracking issues of any type: `String`, `Error`, `NSError`, `NSExeption`
+/// Protocol for marshalling CustomTracking issues of any type: `String`, `Error`, `NSError`, `NSExeption`.
 public protocol SplunkTrackableIssue: SplunkTrackable {
 
-    /// The string message e. g. localizedDescription for the type
+    /// The string message e. g. localizedDescription for the type.
     var message: String { get }
 
-    /// The type of the error, e.g. `NSError`, to be reported as OTel `exception.type`
+    /// The type of the error, e.g. `NSError`, to be reported as OTel `exception.type`.
     var exceptionType: String { get }
 
     /// An actual or derived stack trace from the error. Empty for String message errors.
@@ -38,8 +37,8 @@ public protocol SplunkTrackableIssue: SplunkTrackable {
 
 // MARK: - Default Implementation for SplunkTrackableIssue
 
-public extension SplunkTrackableIssue {
-    func toAttributesDictionary() -> [String: EventAttributeValue] {
+extension SplunkTrackableIssue {
+    public func toAttributesDictionary() -> [String: EventAttributeValue] {
         var attributes: [String: EventAttributeValue] = [:]
 
         // Set required attributes
@@ -47,8 +46,18 @@ public extension SplunkTrackableIssue {
         attributes[ErrorAttributeKeys.Exception.message.rawValue] = .string(message)
 
         // Optionally set stacktrace if it exists
-        if let stacktrace = stacktrace {
+        if let stacktrace {
             attributes[ErrorAttributeKeys.Exception.stacktrace.rawValue] = .string(stacktrace.formatted)
+        }
+
+        // Add code and domain for NSErrors if they exist
+        if let issue = self as? SplunkIssue {
+            if let code = issue.exceptionCode {
+                attributes["code"] = code
+            }
+            if let domain = issue.codeNamespace {
+                attributes["domain"] = .string(domain)
+            }
         }
 
         return attributes
@@ -59,6 +68,9 @@ public extension SplunkTrackableIssue {
 // MARK: - SplunkIssue Struct
 
 public struct SplunkIssue: SplunkTrackableIssue {
+
+    // MARK: - Public
+
     public let message: String
     public let exceptionType: String
     public let timestamp: Date
@@ -66,7 +78,9 @@ public struct SplunkIssue: SplunkTrackableIssue {
     public let exceptionCode: EventAttributeValue?
     public let codeNamespace: String?
 
-    // Initializers for SplunkIssue
+
+    // MARK: - Initialization
+
     public init(from message: String) {
         self.message = message
         exceptionType = String(describing: type(of: message))
@@ -77,21 +91,21 @@ public struct SplunkIssue: SplunkTrackableIssue {
     }
 
     public init(from error: Error) {
-        message = (error as? LocalizedError)?.errorDescription ?? String(describing: error)
+        let nsError = error as NSError
+        message = nsError.localizedDescription
         exceptionType = String(describing: type(of: error))
         timestamp = Date()
 
         // This is not necessarily the original error's throw site.
         stacktrace = Stacktrace(frames: Thread.callStackSymbols)
 
-        let nsError = error as NSError
         exceptionCode = .int(nsError.code)
         codeNamespace = nsError.domain
     }
 
     public init(from exception: NSException) {
         message = exception.reason ?? "No reason provided"
-        exceptionType = String(describing: type(of: exception))
+        exceptionType = exception.name.rawValue
         timestamp = Date()
         stacktrace = Stacktrace(frames: exception.callStackSymbols)
         exceptionCode = nil

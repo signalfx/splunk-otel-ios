@@ -17,11 +17,11 @@ limitations under the License.
 
 import Foundation
 
-public extension SplunkRum {
+extension SplunkRum {
 
     // MARK: - Custom Tracking
 
-    /// Reports an error using a String. Legacy mapping.
+    /// Reports an error using a String (legacy mapping).
     ///
     /// - Parameter string: A String error message.
     @available(
@@ -30,11 +30,11 @@ public extension SplunkRum {
         renamed: "SplunkRum.shared.customTracking.trackError(_:)",
         message: "This method will be removed in a later version."
     )
-    static func reportError(string: String) {
+    public static func reportError(string: String) {
         _ = shared.customTracking.trackError(string)
     }
 
-    /// Reports an error with a Swift Error or NSError. Legacy mapping.
+    /// Reports an error with a Swift Error or NSError (legacy mapping).
     ///
     /// - Parameter error: An instance of an Error-conforming type.
     @available(
@@ -43,11 +43,11 @@ public extension SplunkRum {
         renamed: "SplunkRum.shared.customTracking.trackError(_:)",
         message: "This method will be removed in a later version."
     )
-    static func reportError(error: Error) {
+    public static func reportError(error: Error) {
         _ = shared.customTracking.trackError(error)
     }
 
-    /// Reports an exception with an NSException. Legacy mapping.
+    /// Reports an exception with an NSException (legacy mapping).
     ///
     /// - Parameter exception: An NSException instance.
     @available(
@@ -56,21 +56,22 @@ public extension SplunkRum {
         renamed: "SplunkRum.shared.customTracking.trackException(_:)",
         message: "This method will be removed in a later version."
     )
-    static func reportError(exception: NSException) {
+    public static func reportError(exception: NSException) {
         _ = shared.customTracking.trackException(exception)
     }
 
-    /// Reports a custom event with name and attributes. Legacy mapping.
+    /// Reports a custom event with name and attributes (legacy mapping).
     ///
-    /// - Parameter name: A user-assigned String name for the event.
-    /// - Parameter attributes: An NSDictionary with user-provided event attributes.
+    /// - Parameters:
+    ///   - name: A user-assigned String name for the event.
+    ///   - attributes: An NSDictionary with user-provided event attributes.
     @available(
         *,
         deprecated,
         renamed: "SplunkRum.shared.customTracking.trackCustomEvent(_:_:)",
         message: "This method will be removed in a later version."
     )
-    static func reportEvent(name: String, attributes: NSDictionary) {
+    public static func reportEvent(name: String, attributes: NSDictionary) {
         let mutableAttributes = MutableAttributes(from: attributes)
         _ = shared.customTracking.trackCustomEvent(name, mutableAttributes)
     }

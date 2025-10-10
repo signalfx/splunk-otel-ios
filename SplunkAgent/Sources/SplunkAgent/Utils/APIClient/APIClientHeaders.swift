@@ -17,9 +17,9 @@ limitations under the License.
 
 import Foundation
 
-/// Provides the implementer with an HTTP request headers property
+/// Provides the implementer with an HTTP request headers property.
 protocol APIClientHeaders {
 
-    /// Headers which can be added into an HTTP request
+    /// Headers which can be added into an HTTP request.
     var headers: [String: String] { get }
 }

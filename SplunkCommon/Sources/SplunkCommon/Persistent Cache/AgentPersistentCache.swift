@@ -23,7 +23,7 @@ public protocol AgentPersistentCache<Element>: Sendable {
     // MARK: - Associated types
 
     /// Type of the persisted element.
-    associatedtype Element: Codable & Sendable
+    associatedtype Element: Codable, Sendable
 
 
     // MARK: - Public
@@ -74,6 +74,8 @@ public protocol AgentPersistentCache<Element>: Sendable {
     /// - Parameter key: An element access key in the persistent cache.
     ///
     /// - Returns: Previously cached data or `nil`.
+    ///
+    /// - Throws: Re-throws errors from embedded objects, mainly from the persistent store layer.
     func value(forKey key: String) async throws -> Element?
 
     /// Updates element value for a given key in the persistent cache.
@@ -83,11 +85,15 @@ public protocol AgentPersistentCache<Element>: Sendable {
     /// - Parameters:
     ///   - element: New version of cached element.
     ///   - key: An element access key in the persistent cache.
+    ///
+    /// - Throws: Re-throws errors from embedded objects, mainly from the persistent store layer.
     func update(_ element: Element, forKey key: String) async throws
 
     /// Removes element for a given key from persistent cache.
     ///
     /// - Parameter key: An element access key in the persistent cache.
+    ///
+    /// - Throws: Re-throws errors from embedded objects, mainly from the persistent store layer.
     func remove(forKey key: String) async throws
 
 

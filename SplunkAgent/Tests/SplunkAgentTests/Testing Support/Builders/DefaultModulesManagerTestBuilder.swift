@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+
 @testable import SplunkAgent
 
 final class DefaultModulesManagerTestBuilder {
@@ -29,24 +30,23 @@ final class DefaultModulesManagerTestBuilder {
         // We tests with dummy modules
         let modulesPool = TestModulesPool.self
 
-        let manager = try build(
+        return try build(
             rawConfiguration: rawConfiguration,
             for: modulesPool
         )
-
-        return manager
     }
 
-    static func build(rawConfiguration: Data? = nil, moduleConfigurations: [Any]? = nil,
-                      for pool: AgentModulesPool.Type) throws -> DefaultModulesManager {
+    static func build(
+        rawConfiguration: Data? = nil,
+        moduleConfigurations: [Any]? = nil,
+        for pool: AgentModulesPool.Type
+    ) throws -> DefaultModulesManager {
 
         // Build modules manager with preconfigured pool and configurations
-        let manager = DefaultModulesManager(
+        DefaultModulesManager(
             rawConfiguration: rawConfiguration,
             moduleConfigurations: moduleConfigurations,
             for: pool
         )
-
-        return manager
     }
 }

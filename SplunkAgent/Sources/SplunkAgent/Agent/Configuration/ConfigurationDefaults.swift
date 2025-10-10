@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 
-/// Defines default values for configuration
+/// Defines default values for configuration.
 struct ConfigurationDefaults {
 
     static var appVersion: String {

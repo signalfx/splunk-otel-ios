@@ -32,23 +32,29 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// A required endpoint configuration defining URLs to the instrumentation collector.
     public let endpoint: EndpointConfiguration
 
-    /// Required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
+    /// Required application name.
+    ///
+    /// Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
     public let appName: String
 
-    /// Required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
+    /// Required deployment environment.
+    ///
+    /// Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
     /// Deployment environment is sent in all signals as a resource.
     public let deploymentEnvironment: String
 
 
     // MARK: - Public optional properties
 
-    /// A `String` containing the current application version. Application version is sent in all signals as a resource.
+    /// A `String` containing the current application version.
     ///
+    /// Application version is sent in all signals as a resource.
     /// The default value corresponds to the value of `CFBundleShortVersionString`.
     public var appVersion: String = ConfigurationDefaults.appVersion
 
-    /// Enables or disables debug logging. Debug logging prints span contents into the console.
+    /// Enables or disables debug logging.
     ///
+    /// Debug logging prints span contents into the console.
     /// Defaults to `false`.
     public var enableDebugLogging: Bool = ConfigurationDefaults.enableDebugLogging
 
@@ -87,8 +93,6 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     ///   - appName: A required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
     ///   - deploymentEnvironment: A required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
     ///   Deployment environment is sent in all signals as a resource.
-    ///
-    /// - Throws: `AgentConfigurationError` if provided configuration is invalid.
     public init(endpoint: EndpointConfiguration, appName: String, deploymentEnvironment: String) {
         self.endpoint = endpoint
         self.appName = appName
@@ -112,7 +116,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     }
 
 
-    /// Enables or disables debug logging. Debug logging prints span contents into the console.
+    /// Enables or disables debug logging.
+    ///
+    /// Debug logging prints span contents into the console.
     ///
     /// - Parameter enableDebugLogging: A `Bool` to enable or disable debug logging.
     ///
@@ -164,7 +170,9 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         return updated
     }
 
-    /// Sets the span interceptor callback. If the callback is provided, all spans will be funneled through the callback,
+    /// Sets the span interceptor callback.
+    ///
+    /// If the callback is provided, all spans will be funneled through the callback,
     /// and can be either approved by returning the span in the callback, or discarded by returning `nil`.
     /// Spans can also be modified by the callback.
     ///
@@ -202,17 +210,13 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Equatable
 
-    public static func == (lhs: AgentConfiguration, rhs: AgentConfiguration) -> Bool {
-        return
-            lhs.endpoint == rhs.endpoint &&
-            lhs.appName == rhs.appName &&
-            lhs.deploymentEnvironment == rhs.deploymentEnvironment &&
+    public static func == (lhs: Self, rhs: Self) -> Bool {
 
-            lhs.appVersion == rhs.appVersion &&
-            lhs.enableDebugLogging == rhs.enableDebugLogging &&
-            lhs.globalAttributes == rhs.globalAttributes &&
-            lhs.user == rhs.user &&
-            lhs.session == rhs.session
+        lhs.endpoint == rhs.endpoint && lhs.appName == rhs.appName && lhs.deploymentEnvironment == rhs.deploymentEnvironment
+            &&
+
+            lhs.appVersion == rhs.appVersion && lhs.enableDebugLogging == rhs.enableDebugLogging && lhs.globalAttributes == rhs.globalAttributes
+            && lhs.user == rhs.user && lhs.session == rhs.session
     }
 }
 

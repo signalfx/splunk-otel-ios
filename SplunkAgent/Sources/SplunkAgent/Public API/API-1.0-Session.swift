@@ -39,7 +39,7 @@ public final class Session {
 }
 
 
-public extension Session {
+extension Session {
 
     // MARK: - Identifier
 
@@ -53,7 +53,7 @@ public extension Session {
     /// - Parameter timestamp: The timestamp for which the session identifier is requested.
     ///
     /// - Returns: The corresponding `sessionId` or `nil` if the session did not exist at that time.
-    func sessionId(for timestamp: Date) -> String? {
+    public func sessionId(for timestamp: Date) -> String? {
         owner.currentSession.sessionId(for: timestamp)
     }
 }

@@ -28,7 +28,7 @@ class DefaultSession: AgentSession {
 
     // MARK: - Private
 
-    // Serializes external access to stored data
+    /// Serializes external access to stored data.
     private let accessQueue: DispatchQueue
 
     var refreshJob: RepeatingJob?
@@ -53,10 +53,14 @@ class DefaultSession: AgentSession {
     /// The agent instance to which the session belongs.
     unowned var owner: SplunkRum?
 
-    /// Defines the minimum session refresh interval (defined in seconds). Default value is 1 second.
+    /// Defines the minimum session refresh interval (defined in seconds).
+    ///
+    /// Default value is 1 second.
     var sessionRefreshInterval: Double = 1
 
-    /// Session inactivity timeout (defined in seconds). Default value is 15 minutes.
+    /// Session inactivity timeout (defined in seconds).
+    ///
+    /// Default value is 15 minutes.
     var sessionTimeout: Double {
         let unitTest = testSessionTimeout
         let configuration = owner?.agentConfiguration.sessionTimeout
@@ -65,7 +69,9 @@ class DefaultSession: AgentSession {
         return unitTest ?? configuration ?? defaultValue
     }
 
-    /// The maximal length of one session (defined in seconds). Default value is 1 hour.
+    /// The maximal length of one session (defined in seconds).
+    ///
+    /// Default value is 1 hour.
     var maxSessionLength: Double {
         let unitTest = testMaxSessionLength
         let configuration = owner?.agentConfiguration.maxSessionLength
@@ -105,11 +111,15 @@ class DefaultSession: AgentSession {
         hookToAppLifecycle()
 
         // Start a perpetual check of the session state
-        refreshJob = RepeatingJob(interval: sessionRefreshInterval, block: { [weak self] in
-            // We constantly check the situation.
-            // If the current state requires it, we create a new session.
-            self?.refreshSession()
-        }).resume()
+        refreshJob = RepeatingJob(
+            interval: sessionRefreshInterval,
+            block: { [weak self] in
+                // We constantly check the situation.
+                // If the current state requires it, we create a new session.
+                self?.refreshSession()
+            }
+        )
+        .resume()
 
         // Set up the session immediately
         refreshSession()
@@ -144,9 +154,9 @@ class DefaultSession: AgentSession {
 
         // Verify that the session falls within the limits
         // defined by the configurations
-        if
-            let session,
-            session.start + maxSessionLength + sessionRefreshInterval + (refreshJob?.tolerance ?? 0.0) > timestamp {
+        if let session,
+            session.start + maxSessionLength + sessionRefreshInterval + (refreshJob?.tolerance ?? 0.0) > timestamp
+        {
             return session
         }
 
@@ -163,9 +173,9 @@ class DefaultSession: AgentSession {
         sessionsModel.purge()
 
         // Close previous session
-        if
-            var previousSession = sessionsModel.sessions.last,
-            !(previousSession.closed ?? false) {
+        if var previousSession = sessionsModel.sessions.last,
+            !(previousSession.closed ?? false)
+        {
             previousSession.closed = true
 
             // Updates corresponding item in `SessionsModel`
@@ -285,9 +295,7 @@ class DefaultSession: AgentSession {
 
     private func isSessionTooLong() -> Bool {
         let sessionLength = -1.0 * currentSession.start.timeIntervalSinceNow
-        let isTooLong = sessionLength > maxSessionLength
-
-        return isTooLong
+        return sessionLength > maxSessionLength
     }
 
     private func isInBackgroundTooLong() -> Bool {
@@ -299,9 +307,7 @@ class DefaultSession: AgentSession {
         }
 
         let timeInBackground = leaveBackground.timeIntervalSince(enterBackground)
-        let isTooLong = timeInBackground > sessionTimeout
-
-        return isTooLong
+        return timeInBackground > sessionTimeout
     }
 }
 

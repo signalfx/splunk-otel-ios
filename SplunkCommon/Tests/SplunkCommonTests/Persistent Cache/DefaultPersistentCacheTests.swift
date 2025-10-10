@@ -15,14 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkCommon
 import XCTest
+
+@testable import SplunkCommon
 
 final class DefaultPersistentCacheTests: XCTestCase {
 
     // MARK: - Private
 
-    private var defaultCache: DefaultPersistentCache<Int>!
+    private var defaultCache: DefaultPersistentCache<Int>?
 
     private let firstKey = PersistentCacheContent.firstKey
     private let secondKey = PersistentCacheContent.secondKey
@@ -39,7 +40,13 @@ final class DefaultPersistentCacheTests: XCTestCase {
         let cacheContent = PersistentCacheContent.integers
 
         defaultCache = DefaultPersistentCacheTestBuilder.build(named: cacheName)
-        await defaultCache.model.restore(to: cacheContent)
+        await defaultCache?.model.restore(to: cacheContent)
+    }
+
+    override func tearDown() async throws {
+        defaultCache = nil
+
+        try await super.tearDown()
     }
 
 
@@ -92,6 +99,7 @@ final class DefaultPersistentCacheTests: XCTestCase {
         let expectedValues: [Int] = [1, 2, 3]
 
 
+        let defaultCache = try XCTUnwrap(defaultCache)
         let cacheKeys = await defaultCache.keys
         let cacheValues = await defaultCache.values
 
@@ -113,6 +121,7 @@ final class DefaultPersistentCacheTests: XCTestCase {
 
 
         // Obtain different subsets of items based on their modification date.
+        let defaultCache = try XCTUnwrap(defaultCache)
         let elementsTo = await defaultCache.elements(to: afterSevenMinutes)
         let elementsFrom = await defaultCache.elements(from: afterSevenMinutes)
         let elementsInRange = await defaultCache.elements(from: afterThreeMinutes, to: afterSevenMinutes)
@@ -133,6 +142,7 @@ final class DefaultPersistentCacheTests: XCTestCase {
     // MARK: - CRUD operations
 
     func testValueForKey() async throws {
+        let defaultCache = try XCTUnwrap(defaultCache)
         let firstValue = try await defaultCache.value(forKey: firstKey)
         let thirdValue = try await defaultCache.value(forKey: thirdKey)
 
@@ -180,7 +190,7 @@ final class DefaultPersistentCacheTests: XCTestCase {
     func testPurge() async throws {
         let testName = "persistentCachePurge"
 
-        var items = [String: Int]()
+        var items: [String: Int] = [:]
         let thirtyMinutes: TimeInterval = 30 * 60
 
         for value in 0 ... 9 {

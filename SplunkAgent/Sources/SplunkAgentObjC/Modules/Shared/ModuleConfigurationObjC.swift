@@ -20,18 +20,21 @@ import Foundation
 /// Base class for implementing module configurations.
 ///
 /// - Warning: Not intended for direct use by SDK users.
-@objc(SPLKModuleConfiguration) @objcMembers
+@objc(SPLKModuleConfiguration)
+@objcMembers
 public class ModuleConfigurationObjC: NSObject {
 
     // MARK: - Module management
 
-    /// Indicates whether the Module is enabled. Default value is `YES`.
+    /// Indicates whether the Module is enabled.
+    ///
+    /// Default value is `YES`.
     public var isEnabled: Bool = true
 
 
     // MARK: - Initialization
 
-    // Initialization is hidden from the public API
-    // as we only need to work with the descendant types.
+    /// Initialization is hidden from the public API
+    /// as we only need to work with the descendant types.
     override init() {}
 }
