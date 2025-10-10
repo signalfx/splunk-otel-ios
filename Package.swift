@@ -395,6 +395,7 @@ func generateMainTargets() -> [Target] {
 
 
         // MARK: - Splunk Web (Instrumentation)
+
         .target(
             name: "SplunkWebView",
             dependencies: [
