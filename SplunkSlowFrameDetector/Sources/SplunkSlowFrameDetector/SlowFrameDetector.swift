@@ -17,8 +17,9 @@ limitations under the License.
 
 import Foundation
 import SplunkCommon
+
 #if os(iOS) || os(tvOS) || os(visionOS)
-import UIKit
+    import UIKit
 #endif
 
 /// Detects and reports slow and frozen frames in the user interface.
@@ -57,14 +58,14 @@ public final class SlowFrameDetector: NSObject {
     private var detectorTask: Task<Void, Never>?
 
     #if os(iOS) || os(tvOS) || os(visionOS)
-    /// A helper encapsulating lifecycle observers.
-    private lazy var lifecycleObserver = LifecycleObserver(observer: self)
+        /// A helper encapsulating lifecycle observers.
+        private lazy var lifecycleObserver = LifecycleObserver(observer: self)
     #endif
 
     // MARK: - Test-only Properties
 
     #if DEBUG
-    var logicForTest: SlowFrameLogic { logic }
+        var logicForTest: SlowFrameLogic { logic }
     #endif
 
 
@@ -79,19 +80,19 @@ public final class SlowFrameDetector: NSObject {
     }
 
     #if os(iOS) || os(tvOS) || os(visionOS)
-    /// Initializes a new instance of the `SlowFrameDetector`.
-    ///
-    /// This convenience initializer sets up the detector with default dependencies, including a
-    /// `DisplayLinkTicker` for frame monitoring and an `OTelDestination` for reporting.
-    override public required convenience init() {
-        self.init(ticker: DisplayLinkTicker(), destinationFactory: { OTelDestination() })
-    }
+        /// Initializes a new instance of the `SlowFrameDetector`.
+        ///
+        /// This convenience initializer sets up the detector with default dependencies, including a
+        /// `DisplayLinkTicker` for frame monitoring and an `OTelDestination` for reporting.
+        override public required convenience init() {
+            self.init(ticker: DisplayLinkTicker(), destinationFactory: { OTelDestination() })
+        }
     #else
-    /// Initializes a new instance of the `SlowFrameDetector` for unsupported platforms.
-    public required convenience init() {
-        // nil ticker for unsupported platforms
-        self.init(ticker: nil, destinationFactory: { OTelDestination() })
-    }
+        /// Initializes a new instance of the `SlowFrameDetector` for unsupported platforms.
+        public required convenience init() {
+            // nil ticker for unsupported platforms
+            self.init(ticker: nil, destinationFactory: { OTelDestination() })
+        }
     #endif
 
     deinit {
@@ -205,71 +206,71 @@ public final class SlowFrameDetector: NSObject {
     // MARK: - Lifecycle Handlers
 
     #if os(iOS) || os(tvOS) || os(visionOS)
-    @MainActor
-    @objc
-    private func appWillResignActive(_: Notification) {
-        ticker?.pause()
-        Task { await logic.appWillResignActive() }
-    }
+        @MainActor
+        @objc
+        private func appWillResignActive(_: Notification) {
+            ticker?.pause()
+            Task { await logic.appWillResignActive() }
+        }
 
-    @MainActor
-    @objc
-    private func appDidBecomeActive(_: Notification) {
-        ticker?.resume()
-        Task { await logic.appDidBecomeActive() }
-    }
+        @MainActor
+        @objc
+        private func appDidBecomeActive(_: Notification) {
+            ticker?.resume()
+            Task { await logic.appDidBecomeActive() }
+        }
 
-    @objc
-    private func appWillTerminate(_: Notification) {
-        Task { await logic.appWillTerminate() }
-    }
+        @objc
+        private func appWillTerminate(_: Notification) {
+            Task { await logic.appWillTerminate() }
+        }
     #endif
 }
 
 // MARK: - Nested Helper Class
 
 #if os(iOS) || os(tvOS) || os(visionOS)
-@MainActor
-extension SlowFrameDetector {
-    /// Encapsulates the state and registration of application lifecycle notification observers.
-    private final class LifecycleObserver {
-        private weak var observer: NSObject?
-        private var isRegistered = false
+    @MainActor
+    extension SlowFrameDetector {
+        /// Encapsulates the state and registration of application lifecycle notification observers.
+        private final class LifecycleObserver {
+            private weak var observer: NSObject?
+            private var isRegistered = false
 
-        /// Declarative notification/selector configuration.
-        private let specs: [(name: Notification.Name, selector: Selector)] = [
-            (UIApplication.willResignActiveNotification, #selector(SlowFrameDetector.appWillResignActive(_:))),
-            (UIApplication.didBecomeActiveNotification, #selector(SlowFrameDetector.appDidBecomeActive(_:))),
-            (UIApplication.willTerminateNotification, #selector(SlowFrameDetector.appWillTerminate(_:)))
-        ]
+            /// Declarative notification/selector configuration.
+            private let specs: [(name: Notification.Name, selector: Selector)] = [
+                (UIApplication.willResignActiveNotification, #selector(SlowFrameDetector.appWillResignActive(_:))),
+                (UIApplication.didBecomeActiveNotification, #selector(SlowFrameDetector.appDidBecomeActive(_:))),
+                (UIApplication.willTerminateNotification, #selector(SlowFrameDetector.appWillTerminate(_:)))
+            ]
 
-        init(observer: NSObject) {
-            self.observer = observer
-        }
-
-        func add() {
-            guard let observer, !isRegistered else {
-                return
+            init(observer: NSObject) {
+                self.observer = observer
             }
 
-            let notificationCenter = NotificationCenter.default
-            for spec in specs {
-                notificationCenter.addObserver(observer, selector: spec.selector, name: spec.name, object: nil)
-            }
-            isRegistered = true
-        }
+            func add() {
+                guard let observer, !isRegistered else {
+                    return
+                }
 
-        func remove() {
-            guard let observer, isRegistered else {
-                return
+                let notificationCenter = NotificationCenter.default
+                for spec in specs {
+                    notificationCenter.addObserver(observer, selector: spec.selector, name: spec.name, object: nil)
+                }
+                isRegistered = true
             }
 
-            let notificationCenter = NotificationCenter.default
-            for spec in specs {
-                notificationCenter.removeObserver(observer, name: spec.name, object: nil)
+            func remove() {
+                guard let observer, isRegistered else {
+                    return
+                }
+
+                let notificationCenter = NotificationCenter.default
+                for spec in specs {
+                    notificationCenter.removeObserver(observer, name: spec.name, object: nil)
+                }
+                isRegistered = false
             }
-            isRegistered = false
         }
     }
-}
 #endif

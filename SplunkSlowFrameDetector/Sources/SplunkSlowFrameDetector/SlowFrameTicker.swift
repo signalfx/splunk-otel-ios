@@ -17,8 +17,9 @@ limitations under the License.
 
 import Foundation
 import QuartzCore
+
 #if os(iOS) || os(tvOS) || os(visionOS)
-import UIKit
+    import UIKit
 #endif
 
 // MARK: - SlowFrameTicker Protocol
@@ -52,74 +53,74 @@ protocol SlowFrameTicker {
 
 #if os(iOS) || os(tvOS) || os(visionOS)
 
-// MARK: - DisplayLinkTicker Implementation
+    // MARK: - DisplayLinkTicker Implementation
 
-/// A concrete implementation of `SlowFrameTicker` that uses `CADisplayLink`.
-final class DisplayLinkTicker: SlowFrameTicker {
+    /// A concrete implementation of `SlowFrameTicker` that uses `CADisplayLink`.
+    final class DisplayLinkTicker: SlowFrameTicker {
 
-    // MARK: - Public Properties
+        // MARK: - Public Properties
 
-    /// An async closure that is called for each frame update.
-    var onFrame: (@MainActor (TimeInterval, TimeInterval) async -> Void)?
+        /// An async closure that is called for each frame update.
+        var onFrame: (@MainActor (TimeInterval, TimeInterval) async -> Void)?
 
-    // MARK: - Private Properties
+        // MARK: - Private Properties
 
-    private var displayLink: CADisplayLink?
+        private var displayLink: CADisplayLink?
 
-    // MARK: - Initialization
+        // MARK: - Initialization
 
-    deinit {
-        // As a fail-safe, ensure the display link is invalidated when the ticker is deallocated.
-        // The owner is responsible for calling stop() for intentional cleanup.
-        stop()
-    }
-
-    // MARK: - SlowFrameTicker methods
-
-    @MainActor
-    func start() {
-        guard displayLink == nil else {
-            return
+        deinit {
+            // As a fail-safe, ensure the display link is invalidated when the ticker is deallocated.
+            // The owner is responsible for calling stop() for intentional cleanup.
+            stop()
         }
 
-        displayLink = CADisplayLink(target: self, selector: #selector(displayLinkCallback(_:)))
-        displayLink?.add(to: .main, forMode: .common)
-    }
+        // MARK: - SlowFrameTicker methods
 
-    func stop() {
-        if Thread.isMainThread {
-            displayLink?.invalidate()
-            displayLink = nil
+        @MainActor
+        func start() {
+            guard displayLink == nil else {
+                return
+            }
+
+            displayLink = CADisplayLink(target: self, selector: #selector(displayLinkCallback(_:)))
+            displayLink?.add(to: .main, forMode: .common)
         }
-        else {
-            DispatchQueue.main.async { [weak self] in
-                guard let self else {
-                    return
-                }
 
+        func stop() {
+            if Thread.isMainThread {
                 displayLink?.invalidate()
                 displayLink = nil
             }
+            else {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else {
+                        return
+                    }
+
+                    displayLink?.invalidate()
+                    displayLink = nil
+                }
+            }
+        }
+
+        @MainActor
+        func pause() {
+            displayLink?.isPaused = true
+        }
+
+        @MainActor
+        func resume() {
+            displayLink?.isPaused = false
+        }
+
+        // MARK: - Private Methods
+
+        @objc
+        private func displayLinkCallback(_ link: CADisplayLink) {
+            Task {
+                await onFrame?(link.timestamp, link.duration)
+            }
         }
     }
-
-    @MainActor
-    func pause() {
-        displayLink?.isPaused = true
-    }
-
-    @MainActor
-    func resume() {
-        displayLink?.isPaused = false
-    }
-
-    // MARK: - Private Methods
-
-    @objc
-    private func displayLinkCallback(_ link: CADisplayLink) {
-        Task {
-            await onFrame?(link.timestamp, link.duration)
-        }
-    }
-}
 #endif // os(iOS) || os(tvOS) || os(visionOS)
