@@ -20,23 +20,19 @@ import XCTest
 
 @testable import SplunkAgent
 
+@MainActor
 final class API10SplunkRumBuilderTests: XCTestCase {
 
     // MARK: - Tests lifecycle
 
     override func setUp() {
         super.setUp()
-        resetAgentSynchronously()
+        SplunkRum.resetSharedInstance()
     }
 
     override func tearDown() {
-        resetAgentSynchronously()
-        super.tearDown()
-    }
-
-    private func resetAgentSynchronously() {
         SplunkRum.resetSharedInstance()
-        RunLoop.main.run(until: Date().addingTimeInterval(0.01))
+        super.tearDown()
     }
 
 
