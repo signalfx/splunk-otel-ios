@@ -281,16 +281,43 @@ import XCTest
         func test_frozenFrame_isDetected_whenFramesStop() async throws {
             await pauseUntilDetectorStart()
 
-            let hangTime = SlowFrameDetector.frozenFrameThreshold
+            let hangTime = SlowFrameDetector.frozenFrameThreshold // 0.7 seconds
 
             await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
 
-            try await Task.sleep(nanoseconds: UInt64((hangTime + 0.1) * 1_000_000_000))
+            // Create an expectation that the frozenFrameCount becomes 1
+            let frozenFrameDetectedExpectation = XCTestExpectation(description: "Frozen frame detected by watchdog")
 
+            // Monitor the frozenFrameCount in a background task
+            // This task will fulfill the expectation once frozenFrameCount is 1.
+            Task {
+                var count = 0
+                while count < 1 && !Task.isCancelled {
+                    // Access the test-only property on the actor
+                    count = await detector?.logicForTest.test_frozenFrameCount ?? 0
+                    if count >= 1 {
+                        frozenFrameDetectedExpectation.fulfill()
+                        break
+                    }
+                    // Poll frequently to catch the change quickly
+                    try? await Task.sleep(nanoseconds: 10_000_000) // Check every 10ms
+                }
+            }
+
+            // Simulate the passage of time required for the watchdog to trigger.
+            // This sleep ensures CACurrentMediaTime() in runWatchdog advances sufficiently.
+            // Using a duration slightly longer than hangTime but less than runFlushLoop's 1s interval.
+            try await Task.sleep(nanoseconds: UInt64((hangTime + 0.05) * 1_000_000_000)) // Sleep for 0.75 seconds
+
+            // Wait for the watchdog to detect the frozen frame and update the count.
+            // This synchronizes the test with the internal state change.
+            await fulfillment(of: [frozenFrameDetectedExpectation], timeout: 1.0) // Timeout should be > hangTime
+
+            // Now that we are sure frozenFrameCount is 1, explicitly flush the buffers.
             await detector?.flushBuffers()
 
             let counts = await mockDestination?.reportedCounts
-            XCTAssertEqual(counts?["frozenRenders"], 1)
+            XCTAssertEqual(counts?["frozenRenders"], 1, "Expected exactly one frozen render to be reported.")
         }
 
         /// Verifies that a long freeze correctly reports multiple frozen frame events.

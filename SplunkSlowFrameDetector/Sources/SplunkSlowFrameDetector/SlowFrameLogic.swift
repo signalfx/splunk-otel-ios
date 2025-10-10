@@ -53,6 +53,9 @@ actor SlowFrameLogic {
     #if DEBUG
         /// A test-only hook called after a flush completes.
         private var onFlushDidComplete: (() -> Void)?
+
+        /// A test-only accessor for the current frozenFrameCount.
+        var test_frozenFrameCount: Int { frozenFrameCount }
     #endif
 
 
