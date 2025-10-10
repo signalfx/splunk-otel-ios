@@ -31,19 +31,13 @@ extension XCTestCase {
     ///
     /// - Parameter duration: A waiting time in seconds.
     func simulateMainThreadWait(duration: TimeInterval) {
-        // We need time to deliver and evaluate the expectation for the whole mechanism to work correctly.
-        // This time window will guarantee that there will always be enough time for the expectation
-        // to be satisfied and the `wait(for:timeout:)` method to always complete correctly.
-        let deliveryTime: TimeInterval = 0.05
+        let exp = expectation(description: "Test delayed by \(duration) seconds")
+        let result = XCTWaiter.wait(for: [exp], timeout: duration)
 
-        // Simulate waiting on the main thread
-        let waitExpectation = XCTestExpectation(description: "Waiting for \(duration) seconds.")
-        let fireDuration: DispatchTime = .now() + duration - deliveryTime
+        guard result == XCTWaiter.Result.timedOut else {
+            XCTFail("Delay interrupted")
 
-        DispatchQueue.main.asyncAfter(deadline: fireDuration) {
-            waitExpectation.fulfill()
+            return
         }
-
-        wait(for: [waitExpectation], timeout: duration)
     }
 }
