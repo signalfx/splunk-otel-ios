@@ -81,7 +81,7 @@ import XCTest
         var reportedCounts: [String: Int] = [:]
         private var onSend: ((String, Int) -> Void)?
 
-        func send(type: String, count: Int, sharedState _: AgentSharedState?) async {
+        func send(type: String, count: Int, sharedState _: AgentSharedState?) {
             // Accumulate the count for the given type
             reportedCounts[type, default: 0] += count
             // Call the optional closure for tests that still need it
