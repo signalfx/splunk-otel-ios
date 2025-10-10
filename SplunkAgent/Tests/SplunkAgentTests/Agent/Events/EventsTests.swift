@@ -59,9 +59,12 @@ final class EventsTests: XCTestCase {
         let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
         let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
 
-        sessionReplayProcessor.sendEvent(event, completion: { _ in
-            requestExpectation.fulfill()
-        })
+        sessionReplayProcessor.sendEvent(
+            event,
+            completion: { _ in
+                requestExpectation.fulfill()
+            }
+        )
 
         let processedEvent = try XCTUnwrap(sessionReplayProcessor.storedLastProcessedEvent)
         try checkEventAttributes(processedEvent)

@@ -9,7 +9,10 @@
     }
   ],
   "defaultOptions" : {
-    "performanceAntipatternCheckerEnabled" : true
+    "maximumTestRepetitions" : 5,
+    "performanceAntipatternCheckerEnabled" : true,
+    "testRepetitionMode" : "untilFailure",
+    "testTimeoutsEnabled" : true
   },
   "testTargets" : [
     {
