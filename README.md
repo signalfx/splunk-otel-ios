@@ -35,25 +35,33 @@ In your `AppDelegate.swift` or main `@main` App file, import `SplunkAgent` and i
 ```swift
 import SplunkAgent
 
+// Define endpoint configuration
+let endpointConfiguration = EndpointConfiguration(
+    realm: "<YOUR_REALM>",
+    rumAccessToken: "<YOUR_RUM_ACCESS_TOKEN>"
+)
+
+// Construct agent configuration
+let agentConfiguration = AgentConfiguration(
+    endpoint: endpointConfiguration,
+    appName: "<YOUR_APP_NAME>",
+    deploymentEnvironment: "<YOUR_DEPLOYMENT_ENVIRONMENT>"
+)
+
 var agent: SplunkRum?
 
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    let agentConfig = AgentConfiguration(
-        endpoint: .init(realm: "<YOUR_REALM>", rumAccessToken: "<YOUR_RUM_ACCESS_TOKEN>"),
-        appName: "<YOUR_APP_NAME>",
-        deploymentEnvironment: "<YOUR_DEPLOYMENT_ENVIRONMENT>"
-    )
-
-    do {
-        agent = try SplunkRum.install(with: agentConfig)
-    } catch let error {
-        print("Unable to start the Splunk agent, error: \(error)")
-    }
-
-    // ... your other existing code in this method ...
-    
-    return true
+do {
+    // Install the agent
+    agent = try SplunkRum.install(with: agentConfiguration)
+} catch {
+    print("Unable to start the Splunk agent, error: \(error)")
 }
+
+// Example: Enable automated navigation tracking
+agent?.navigation.preferences.enableAutomatedTracking = true
+
+// Example: Start session replay
+agent?.sessionReplay.start()
 ```
 
 ## Modules Overview
@@ -107,13 +115,20 @@ Override default module settings by passing an array of configuration objects to
 
 ```swift
 import SplunkAgent
-import SplunkCrashReports // Required for the configuration type
+import SplunkCrashReports
 
-let crashConfig = CrashReportsConfiguration(isEnabled: false)
+// Initialize the configuration of the Agent
+let agentConfiguration = ...
 
-try SplunkRum.install(
-    with: agentConfig,
-    moduleConfigurations: [crashConfig]
+// Disable configuration for crash reporting
+let crashReportsConfiguration = SplunkCrashReports.CrashReportsConfiguration(
+   isEnabled: false
+)
+
+// Specify crash module configuration during agent installation
+_ = try? SplunkRum.install(
+   with: agentConfiguration, 
+   moduleConfigurations: [crashReportsConfiguration]
 )
 ```
 
@@ -121,11 +136,22 @@ try SplunkRum.install(
 Add custom attributes to all telemetry data by setting `globalAttributes` on your `AgentConfiguration`.
 
 ```swift
-var agentConfig = AgentConfiguration(...)
-agentConfig.globalAttributes["customer.tier"] = "premium"
-agentConfig.globalAttributes["build.number"] = 1234
+import SplunkAgent
 
-try SplunkRum.install(with: agentConfig)
+let agentConfiguration = AgentConfiguration(
+    endpoint: endpointConfiguration,
+    appName: "App Name",
+    deploymentEnvironment: "dev"
+)
+    .enableDebugLogging(true)
+    .globalAttributes(MutableAttributes(dictionary: [
+        "enduser.role": .string("premium"),
+        "enduser.id": .int(128762)]))
+
+// Install the agent
+_ = try? SplunkRum.install(
+    with: agentConfiguration
+)
 ```
 
 ## Common Usage Examples
@@ -136,16 +162,29 @@ Interact with agent modules using the `SplunkRum` instance you retained after in
 Manually track screen names, which is especially useful for SwiftUI applications.
 
 ```swift
-agent?.navigation.track(screen: "ProductDetailView")
+import SplunkAgent
+
+let agent: SplunkRum? = ...
+
+agent?.navigation.track(screen: "A screen")
 ```
 
 ### Custom Event Reporting
 Track business-specific events with custom attributes.
 
 ```swift
-var attributes = MutableAttributes()
-attributes["product.id"] = .string("SKU-123")
-agent?.customTracking.trackCustomEvent("item_added_to_cart", attributes)
+import SplunkAgent
+
+let agent: SplunkRum? = ...
+
+agent?.customTracking.trackCustomEvent(
+    "Completed Tax Filing",
+    MutableAttributes(dictionary: [
+        "Account Type": .string("Premium"),
+        "Referral Source": .string("Google Ads"),
+        "Filing year": .int(2025)
+    ])
+)
 ```
 
 ### Error Reporting
@@ -183,28 +222,23 @@ This API is better suited for an Objective-C project with the same functionality
 ```objc
 @import SplunkAgentObjC;
 
-// In your AppDelegate.m
-@property (nonatomic, strong) SPLKAgent *agent;
+// Define endpoint configuration
+SPLKEndpointConfiguration* endpointConfiguration = [[SPLKEndpointConfiguration alloc] initWithRealm:@"<YOUR_REALM>" rumAccessToken:@"<YOUR_RUM_ACCESS_TOKEN>"];
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    SPLKEndpointConfiguration *endpoint = [[SPLKEndpointConfiguration alloc] initWithRealm:@"<YOUR_REALM>" rumAccessToken:@"<YOUR_RUM_ACCESS_TOKEN>"];
-
-    SPLKAgentConfiguration *config = [[SPLKAgentConfiguration alloc] initWithEndpoint:endpoint appName:@"<YOUR_APP_NAME>" deploymentEnvironment:@"<YOUR_DEPLOYMENT_ENVIRONMENT>"];
-
-    NSError *error = nil;
-    self.agent = [SPLKAgent installWith:config error:&error];
-
-    if (error) {
-        NSLog(@"Splunk RUM installation failed: %@", error);
-    } else {
-        // Example of configuring preferences and starting Session Replay
-        self.agent.navigation.preferences.enableAutomatedTracking = YES;
-        [self.agent.sessionReplay start];
-    }
+// Construct agent configuration
+SPLKAgentConfiguration* agentConfiguration = [[SPLKAgentConfiguration alloc] initWithEndpoint:endpointConfiguration appName:@"<YOUR_APP_NAME>" deploymentEnvironment:@"<YOUR_DEPLOYMENT_ENVIRONMENT>"];
     
-    // ... your other existing code in this method ...
-    return YES;
-} 
+NSError* error = nil;
+
+// Install the agent
+SPLKAgent* agent = [SPLKAgent installWith:agentConfiguration error:&error];
+
+if (agent == nil) {
+    NSLog(@"Unable to start the Splunk agent, error: %@", [error description]);
+} else {
+    // Example: Start session replay
+    [[agent sessionReplay] start];
+}
 ```
 
 ## Upgrading from a Previous Version
