@@ -24,6 +24,7 @@ public struct SlowFrameDetectorConfiguration: ModuleConfiguration {
     // MARK: - Public
 
     /// A boolean value indicating whether the `SlowFrameDetector` module is enabled.
+    ///
     /// The default value is `true`.
     public var isEnabled: Bool = true
 
@@ -34,8 +35,7 @@ public struct SlowFrameDetectorConfiguration: ModuleConfiguration {
 
     /// Initializes a new module configuration.
     ///
-    /// - Parameters:
-    ///   - isEnabled: A `Boolean` value that sets whether the module is enabled. The default is `true`.
+    /// - Parameter: isEnabled: A `Boolean` value that sets whether the module is enabled. The default is `true`.
     public init(isEnabled: Bool = true) {
         self.isEnabled = isEnabled
     }

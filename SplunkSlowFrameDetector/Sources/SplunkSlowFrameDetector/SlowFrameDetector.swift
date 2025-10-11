@@ -107,13 +107,17 @@ public final class SlowFrameDetector: NSObject {
     ///
     /// This method should be called as part of the module initialization process. It enables or disables
     /// the detector based on the provided local configuration.
+    ///
     /// - Parameters:
-    ///   - configuration: The local configuration for the module, which determines if the feature is enabled.
-    ///   - remoteConfiguration: The remote configuration for the module.
+    ///   - configuration: Module specific local configuration.
+    ///   - remoteConfiguration: Module specific remote configuration.
     public func install(
         with configuration: (any ModuleConfiguration)?,
-        remoteConfiguration _: (any RemoteModuleConfiguration)?
+        remoteConfiguration: (any RemoteModuleConfiguration)?
     ) {
+        // Intentionally unused
+        _ = remoteConfiguration
+
         let localConfig = configuration as? SlowFrameDetectorConfiguration
         state.isEnabled = localConfig?.isEnabled ?? true
         if state.isEnabled {
