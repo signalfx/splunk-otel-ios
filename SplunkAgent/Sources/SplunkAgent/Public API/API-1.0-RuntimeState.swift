@@ -68,8 +68,8 @@ extension RuntimeState {
         owner.agentConfiguration.appVersion
     }
 
-    /// A ``EndpointConfiguration`` containing either the specified realm, or endpoint urls.
-    public var endpointConfiguration: EndpointConfiguration {
+    /// An optional ``EndpointConfiguration`` containing either the specified realm, or endpoint urls.
+    public var endpointConfiguration: EndpointConfiguration? {
         owner.agentConfiguration.endpoint
     }
 

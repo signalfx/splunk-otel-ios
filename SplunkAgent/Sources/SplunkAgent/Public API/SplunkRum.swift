@@ -104,6 +104,32 @@ public class SplunkRum: ObservableObject {
         OpenTelemetry.instance
     }
 
+    /// Updates the endpoint configuration to start sending spans and events.
+    ///
+    /// Use this method to dynamically configure the endpoint after the agent has been initialized
+    /// without an endpoint. Once the endpoint is updated, all subsequent spans and events will be
+    /// sent to the specified endpoint.
+    ///
+    /// - Parameter endpoint: The ``EndpointConfiguration`` to use for sending data.
+    /// - Throws: ``AgentConfigurationError`` if the provided endpoint is invalid.
+    ///
+    /// - Note: This method can only be called once the agent is running. Spans created before
+    ///         calling this method will not be sent retroactively.
+    public func updateEndpoint(_ endpoint: EndpointConfiguration) throws {
+        guard let eventManager = eventManager as? DefaultEventManager else {
+            logger.log(level: .error, isPrivate: false) {
+                "Cannot update endpoint: Event manager is not available."
+            }
+            return
+        }
+
+        try eventManager.updateEndpoint(endpoint)
+
+        logger.log(level: .info, isPrivate: false) {
+            "Endpoint configuration updated successfully."
+        }
+    }
+
 
     // MARK: - Public API (Modules)
 

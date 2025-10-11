@@ -40,10 +40,10 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertNotNil(minimal)
 
         // Properties (READ)
-        XCTAssertEqual(minimal.endpoint.realm, realm)
-        XCTAssertEqual(minimal.endpoint.rumAccessToken, rumAccessToken)
-        XCTAssertNotNil(minimal.endpoint.traceEndpoint)
-        XCTAssertNotNil(minimal.endpoint.sessionReplayEndpoint)
+        XCTAssertEqual(minimal.endpoint?.realm, realm)
+        XCTAssertEqual(minimal.endpoint?.rumAccessToken, rumAccessToken)
+        XCTAssertNotNil(minimal.endpoint?.traceEndpoint)
+        XCTAssertNotNil(minimal.endpoint?.sessionReplayEndpoint)
         XCTAssertEqual(minimal.deploymentEnvironment, deploymentEnvironment)
         XCTAssertEqual(minimal.appName, appName)
         XCTAssertNotNil(minimal.appVersion)
@@ -56,8 +56,8 @@ final class API10ConfigurationTests: XCTestCase {
         var full = try ConfigurationTestBuilder.buildDefault()
 
         // Properties (READ)
-        XCTAssertEqual(full.endpoint.realm, realm)
-        XCTAssertEqual(full.endpoint.rumAccessToken, rumAccessToken)
+        XCTAssertEqual(full.endpoint?.realm, realm)
+        XCTAssertEqual(full.endpoint?.rumAccessToken, rumAccessToken)
         XCTAssertEqual(full.deploymentEnvironment, deploymentEnvironment)
         XCTAssertEqual(full.appName, appName)
         XCTAssertEqual(full.appVersion, appVersion)
@@ -66,8 +66,8 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertNotNil(full.user.trackingMode)
         XCTAssertNotNil(full.globalAttributes)
         XCTAssertNotNil(full.spanInterceptor)
-        XCTAssertNotNil(full.endpoint.traceEndpoint)
-        XCTAssertNotNil(full.endpoint.sessionReplayEndpoint)
+        XCTAssertNotNil(full.endpoint?.traceEndpoint)
+        XCTAssertNotNil(full.endpoint?.sessionReplayEndpoint)
 
         // Properties (WRITE)
         full.appVersion = "0.1"
@@ -121,7 +121,8 @@ final class API10ConfigurationTests: XCTestCase {
         // Default initialization
         let configuration = try ConfigurationTestBuilder.buildDefault()
 
-        let traceUrl = try XCTUnwrap(configuration.endpoint.traceEndpoint)
+        let endpoint = try XCTUnwrap(configuration.endpoint)
+        let traceUrl = try XCTUnwrap(endpoint.traceEndpoint)
 
         let urlComponents = try XCTUnwrap(URLComponents(url: traceUrl, resolvingAgainstBaseURL: false))
 
@@ -139,8 +140,9 @@ final class API10ConfigurationTests: XCTestCase {
         // Custom urls initialization
         let configuration = try ConfigurationTestBuilder.buildWithCustomUrls()
 
-        let traceUrl = try XCTUnwrap(configuration.endpoint.traceEndpoint)
-        let sessionReplayUrl = try XCTUnwrap(configuration.endpoint.sessionReplayEndpoint)
+        let endpoint = try XCTUnwrap(configuration.endpoint)
+        let traceUrl = try XCTUnwrap(endpoint.traceEndpoint)
+        let sessionReplayUrl = try XCTUnwrap(endpoint.sessionReplayEndpoint)
 
         let customTraceUrl = try ConfigurationTestBuilder.customUrl(for: customTraceAddress)
         let customSessionReplayUrl = try ConfigurationTestBuilder.customUrl(for: customSessionReplayAddress)

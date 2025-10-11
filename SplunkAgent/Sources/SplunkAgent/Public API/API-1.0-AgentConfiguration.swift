@@ -29,8 +29,8 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Public mandatory properties
 
-    /// A required endpoint configuration defining URLs to the instrumentation collector.
-    public let endpoint: EndpointConfiguration
+    /// An optional endpoint configuration defining URLs to the instrumentation collector.
+    public let endpoint: EndpointConfiguration?
 
     /// Required application name.
     ///
@@ -89,11 +89,11 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     /// Initializes a new Agent configuration with which the Agent is initialized.
     ///
     /// - Parameters:
-    ///   - endpoint: A required endpoint configuration defining URLs to the RUM instrumentation collector.
+    ///   - endpoint: An optional endpoint configuration defining URLs to the RUM instrumentation collector.
     ///   - appName: A required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
     ///   - deploymentEnvironment: A required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
     ///   Deployment environment is sent in all signals as a resource.
-    public init(endpoint: EndpointConfiguration, appName: String, deploymentEnvironment: String) {
+    public init(endpoint: EndpointConfiguration? = nil, appName: String, deploymentEnvironment: String) {
         self.endpoint = endpoint
         self.appName = appName
         self.deploymentEnvironment = deploymentEnvironment
@@ -228,7 +228,10 @@ extension AgentConfiguration {
     ///
     /// - Throws: ``AgentConfigurationError`` if provided configuration is invalid.
     func validate() throws {
-        try endpoint.validate()
+        // Validate endpoint if provided
+        if let endpoint {
+            try endpoint.validate()
+        }
 
         // Validate app name
         if appName.isEmpty {
