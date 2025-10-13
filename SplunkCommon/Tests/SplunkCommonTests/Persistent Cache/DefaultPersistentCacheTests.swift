@@ -174,6 +174,8 @@ final class DefaultPersistentCacheTests: XCTestCase {
         let cache = DefaultPersistentCacheTestBuilder.build(named: testName)
         await cache.model.restore(to: PersistentCacheContent.integers)
 
+        try await cache.sync()
+
         try await cache.remove(forKey: firstKey)
         try await cache.remove(forKey: thirdKey)
 
