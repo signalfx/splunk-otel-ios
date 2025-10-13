@@ -89,6 +89,9 @@ final class SessionReplayEventIndexerTests: XCTestCase {
     // TODO: [DEMRUM-2782] Fix tests
     func testRemoveIndex() async throws {
         let indexerName = "testRemoveIndex"
+
+        try SessionReplayIndexerTestBuilder.removeStorage(named: indexerName)
+
         let indexer = SessionReplayIndexerTestBuilder.build(named: indexerName)
 
         let sessionId = "12321"
