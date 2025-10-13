@@ -44,7 +44,6 @@ public class OTLPBackgroundHTTPBaseExporter {
         namespace: getFileKeyType()
     )
 
-    lazy var httpClient: BackgroundHTTPClient = .init(sessionQosConfiguration: qosConfig, diskStorage: diskStorage, namespace: getFileKeyType())
 
     // MARK: - Initialization
 
