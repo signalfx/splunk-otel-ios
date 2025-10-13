@@ -43,6 +43,9 @@ final class ConfigurationHandlerTests: XCTestCase {
 
     func testApiLoadSuccess() async throws {
         let storage = UserDefaultsStorage()
+
+        try? storage.delete(forKey: ConfigurationHandler.configurationStoreKey)
+
         storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
 
         let defaultConfig = try ConfigurationTestBuilder.buildDefault()
