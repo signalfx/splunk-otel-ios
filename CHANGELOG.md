@@ -9,7 +9,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Add the `app.installation.id` attribute to all signals to uniquely identify each application installation.
+* Add the `app.installation.id` attribute to all signals to uniquely identify each application installation.
+
+## [2.0.1]
+
+### Added
+
+* Added missing ObjC APIs
+
+### Fixed
+
+* Fixed a bug in the ViewController transition navigation tracking
+* Fixed SwiftUI UI element names in automatic navigation tracking
 
 ## [2.0.0]
 
