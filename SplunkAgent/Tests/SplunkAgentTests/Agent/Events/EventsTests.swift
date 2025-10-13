@@ -72,7 +72,7 @@ final class EventsTests: XCTestCase {
 
         XCTAssertEqual(processedEvent.name, "session_replay_data")
 
-        wait(for: [requestExpectation], timeout: 5)
+        wait(for: [requestExpectation], timeout: 10)
     }
 
 

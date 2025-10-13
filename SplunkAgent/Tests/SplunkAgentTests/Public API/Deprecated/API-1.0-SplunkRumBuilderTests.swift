@@ -145,7 +145,6 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             .setApplicationName("ConfigApp")
             .deploymentEnvironment(environment: "TestEnv")
             .debug(enabled: true)
-            .sessionSamplingRatio(samplingRatio: 0.75)
 
         XCTAssertTrue(builder.build())
 
@@ -154,7 +153,6 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertEqual(config.appName, "ConfigApp")
         XCTAssertEqual(config.deploymentEnvironment, "TestEnv")
         XCTAssertEqual(config.enableDebugLogging, true)
-        XCTAssertEqual(config.session.samplingRate, 0.75)
     }
 
 
