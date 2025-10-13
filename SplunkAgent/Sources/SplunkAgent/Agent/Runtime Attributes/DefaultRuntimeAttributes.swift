@@ -104,7 +104,7 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
             appInstallationId = existingAppInstallationId
         }
         else {
-            let newId = UUID().uuidString
+            let newId = String.uniqueHexIdentifier(ofLength: 32)
             try? storage.update(newId, forKey: storageKeyForAppInstallationId)
             appInstallationId = newId
         }

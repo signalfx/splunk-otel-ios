@@ -165,7 +165,8 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
 
         XCTAssertNotNil(id1, "app.installation.id should be generated.")
         if let id1 {
-            XCTAssertNotNil(UUID(uuidString: id1), "Generated ID should be a valid UUID.")
+            XCTAssertEqual(id1.count, 32, "Generated ID should be 32 characters long.")
+            XCTAssertNoThrow(try HexIDValidator.checkFormat(id1), "Generated ID should be a valid hex string.")
         }
 
         let stored: String? = try? storage.read(forKey: storageKey)
