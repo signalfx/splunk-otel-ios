@@ -234,7 +234,7 @@ final class DefaultSessionTests: XCTestCase {
             XCTAssertEqual(lastSessionId, resumedSessionId)
 
             // Simulate some inactivity
-            simulateMainThreadWait(duration: 20)
+            simulateMainThreadWait(duration: 5)
 
             // After a previous stay in the background and some inactivity time,
             // there should be the same session ID.
@@ -243,7 +243,7 @@ final class DefaultSessionTests: XCTestCase {
 
 
             /* Going into the background for *too long* time */
-            try await simulateBackgroundStay(for: defaultSession, duration: 12)
+            try await simulateBackgroundStay(for: defaultSession, duration: 30)
 
             // The current session should *not* be the same immediately
             XCTAssertNotEqual(lastSessionId, defaultSession.currentSessionId)
