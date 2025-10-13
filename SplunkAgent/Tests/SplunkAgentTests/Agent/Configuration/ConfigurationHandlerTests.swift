@@ -52,16 +52,20 @@ final class ConfigurationHandlerTests: XCTestCase {
         let dataResponse = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)
         let apiClient = try APIClientTestBuilder.build(with: "config", response: dataResponse)
 
-        let configurationHandler = ConfigurationHandler(
-            for: defaultConfig,
-            apiClient: apiClient,
-            storage: storage
-        )
+        var configurationHandler: ConfigurationHandler?
+
+        Task.detached {
+            configurationHandler = ConfigurationHandler(
+                for: defaultConfig,
+                apiClient: apiClient,
+                storage: storage
+            )
+        }
 
         try await Task.sleep(nanoseconds: 10_000_000_000)
 
-        XCTAssertEqual(configurationHandler.configurationData, dataResponse)
-        XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
+        XCTAssertEqual(configurationHandler?.configurationData, dataResponse)
+        XCTAssertEqual(configurationHandler?.configuration.maxSessionLength, 111)
 
         let storedData: Data? = try? storage.read(forKey: ConfigurationHandler.configurationStoreKey)
         XCTAssertEqual(storedData, dataResponse)
