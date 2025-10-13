@@ -90,7 +90,7 @@ final class SessionReplayEventIndexerTests: XCTestCase {
     func testRemoveIndex() async throws {
         let indexerName = "testRemoveIndex"
 
-        try SessionReplayIndexerTestBuilder.removeStorage(named: indexerName)
+        try? SessionReplayIndexerTestBuilder.removeStorage(named: indexerName)
 
         let indexer = SessionReplayIndexerTestBuilder.build(named: indexerName)
 

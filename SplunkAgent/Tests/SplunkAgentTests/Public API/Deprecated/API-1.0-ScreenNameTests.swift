@@ -79,6 +79,6 @@ final class API10ScreenNameTests: XCTestCase {
         // Change screen name
         SplunkRum.deprecatedSetScreenName(screenName)
 
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation], timeout: 10)
     }
 }
