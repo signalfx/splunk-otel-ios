@@ -313,28 +313,41 @@ public class CrashReports {
             reportDict[.exceptionReason] = report.exceptionInfo.exceptionReason ?? ""
         }
 
-        do {
-            if let customData = report.customData,
-                let unarchivedData = try NSKeyedUnarchiver.unarchivedDictionary(
-                    ofKeyClass: NSString.self,
-                    objectClass: NSString.self,
-                    from: customData
-                ) as? [String: String]
-            {
-
-                if let sessionId = unarchivedData["sessionId"] {
-                    reportDict[.sessionId] = sessionId
+        if let customData = report.customData {
+            do {
+                let unarchivedData: [String: String]?
+                if #available(iOS 14.0, *) {
+                    unarchivedData =
+                        try NSKeyedUnarchiver.unarchivedDictionary(
+                            ofKeyClass: NSString.self,
+                            objectClass: NSString.self,
+                            from: customData
+                        ) as? [String: String]
+                }
+                else {
+                    // Fallback on earlier versions
+                    unarchivedData =
+                        try NSKeyedUnarchiver.unarchivedObject(
+                            ofClasses: [NSDictionary.self, NSString.self],
+                            from: customData
+                        ) as? [String: String]
                 }
 
-                reportDict[.batteryLevel] = unarchivedData["battery"]
-                reportDict[.freeMemory] = unarchivedData["disk"]
-                reportDict[.freeDiskSpace] = unarchivedData["memory"]
-                reportDict[.screenName] = unarchivedData["screenName"]
+                if let data = unarchivedData {
+                    if let sessionId = data["sessionId"] {
+                        reportDict[.sessionId] = sessionId
+                    }
+
+                    reportDict[.batteryLevel] = data["battery"]
+                    reportDict[.freeMemory] = data["disk"]
+                    reportDict[.freeDiskSpace] = data["memory"]
+                    reportDict[.screenName] = data["screenName"]
+                }
             }
-        }
-        catch {
-            logger.log(level: .warn) {
-                "Crash reporter could not report custom data, error: \(error)"
+            catch {
+                logger.log(level: .warn) {
+                    "Crash reporter could not report custom data, error: \(error)"
+                }
             }
         }
 

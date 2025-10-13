@@ -166,30 +166,43 @@ public class SplunkRum: ObservableObject {
             return shared
         }
 
-        // Re-configure and call the Session Sampler
-        shared.sessionSampler.configure(with: configuration)
-        let samplingDecision = shared.sessionSampler.sample()
+        // Check if the current OS version is 15.0 or newer.
+        if #available(iOS 15.0, *) {
+            // If we are on a supported OS version, proceed with the full agent initialization.
 
-        // Continue with a noop instance in case of sampling out
-        if samplingDecision == .sampledOut {
-            shared.currentStatus = .notRunning(.sampledOut)
+            // Re-configure and call the Session Sampler
+            shared.sessionSampler.configure(with: configuration)
+            let samplingDecision = shared.sessionSampler.sample()
 
-            shared.logger.log(level: .notice, isPrivate: false) {
-                "Agent sampled out."
+            // Continue with a noop instance in case of sampling out
+            if samplingDecision == .sampledOut {
+                shared.currentStatus = .notRunning(.sampledOut)
+
+                shared.logger.log(level: .notice, isPrivate: false) {
+                    "Agent sampled out."
+                }
+
+                return shared
             }
 
+            // Initialize the full agent if all checks pass
+            let agent = try SplunkRum(
+                with: configuration,
+                moduleConfigurations: moduleConfigurations
+            )
+
+            shared = agent
+
+            return agent
+        } else {
+            // If we are on an older OS (iOS 13, iOS 14), do not initialize the agent.
+            // The `shared` instance will remain in its default, non-operational state.
+            shared.currentStatus = .notRunning(.unsupportedOSVersion)
+            shared.logger.log(level: .notice, isPrivate: false) {
+                "Splunk RUM Agent is not supported on this OS version. The agent will not be started. Full functionality requires iOS 15.0+."
+            }
             return shared
         }
-
-        // Initialize the full agent if all checks pass
-        let agent = try SplunkRum(
-            with: configuration,
-            moduleConfigurations: moduleConfigurations
-        )
-
-        shared = agent
-
-        return agent
     }
 
 

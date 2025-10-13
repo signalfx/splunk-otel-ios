@@ -49,15 +49,8 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
     /// Date format style for the stdout log.
-    private let dateFormatStyle: Date.FormatStyle = .init()
-        .month()
-        .day()
-        .year()
-        .hour(.twoDigits(amPM: .wide))
-        .minute(.twoDigits)
-        .second(.twoDigits)
-        .secondFraction(.fractional(3))
-        .timeZone(.iso8601(.short))
+    private var dateFormatStyle: Any?
+    private var legacyDateFormatter: DateFormatter?
 
     /// Logger background dispatch queues.
     private let backgroundQueue = DispatchQueue(
@@ -112,6 +105,23 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         resource.merge(other: replayResource)
 
         self.resource = resource
+
+        if #available(iOS 15.0, *) {
+            let style: Date.FormatStyle = .init()
+                .month()
+                .day()
+                .year()
+                .hour(.twoDigits(amPM: .wide))
+                .minute(.twoDigits)
+                .second(.twoDigits)
+                .secondFraction(.fractional(3))
+                .timeZone(.iso8601(.short))
+            self.dateFormatStyle = style
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MM/dd/yyyy, hh:mm:ss.SSS a Z"
+            self.legacyDateFormatter = formatter
+        }
     }
 
 
@@ -258,15 +268,27 @@ extension OTLPSessionReplayEventProcessor {
                 message += "Severity: \(String(describing: logRecord.severity))\n"
                 message += "Body: \(bodyDescription)\n"
                 message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
-                message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(self.dateFormatStyle)))\n"
 
-                if let observedTimestamp = logRecord.observedTimestamp {
-                    let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                    let observedTimestampFormatted = observedTimestamp.formatted(self.dateFormatStyle)
-                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-                }
-                else {
-                    message += "ObservedTimestamp: -\n"
+                if #available(iOS 15.0, *), let style = self.dateFormatStyle as? Date.FormatStyle {
+                    message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(style)))\n"
+
+                    if let observedTimestamp = logRecord.observedTimestamp {
+                        let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
+                        let observedTimestampFormatted = observedTimestamp.formatted(style)
+                        message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
+                    } else {
+                        message += "ObservedTimestamp: -\n"
+                    }
+                } else if let formatter = self.legacyDateFormatter {
+                    message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: logRecord.timestamp)))\n"
+
+                    if let observedTimestamp = logRecord.observedTimestamp {
+                        let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
+                        let observedTimestampFormatted = formatter.string(from: observedTimestamp)
+                        message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
+                    } else {
+                        message += "ObservedTimestamp: -\n"
+                    }
                 }
 
                 message += "SpanContext: \(String(describing: logRecord.spanContext))\n"

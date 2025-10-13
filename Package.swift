@@ -10,7 +10,7 @@ import class Foundation.ProcessInfo
 let package = Package(
     name: "SplunkAgent",
     platforms: [
-        .iOS(.v15),
+        .iOS(.v13),
         .tvOS(.v15),
         .visionOS(.v1),
         .macCatalyst(.v15)

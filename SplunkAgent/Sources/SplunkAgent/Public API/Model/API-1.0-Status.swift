@@ -38,6 +38,9 @@ public enum Status: Equatable {
 
         /// The agent is not running because of being sampled out locally.
         case sampledOut
+
+        /// The agent is not running because the current OS version is not supported.
+        case unsupportedOSVersion
     }
 }
 
@@ -56,6 +59,9 @@ extension Status.Cause: CustomStringConvertible, CustomDebugStringConvertible {
 
         case .sampledOut:
             return "The agent is not running because of being sampled out locally."
+
+        case .unsupportedOSVersion:
+            return "The agent is not running because the OS version is unsupported."
         }
     }
 

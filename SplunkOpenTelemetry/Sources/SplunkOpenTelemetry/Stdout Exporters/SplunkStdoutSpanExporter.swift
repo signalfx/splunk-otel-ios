@@ -31,18 +31,27 @@ class SplunkStdoutSpanExporter: SpanExporter {
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
     /// Date format.
-    private let dateFormatStyle: Date.FormatStyle = .init()
-        .month()
-        .day()
-        .year()
-        .hour(.twoDigits(amPM: .wide))
-        .minute(.twoDigits)
-        .second(.twoDigits)
-        .secondFraction(.fractional(3))
-        .timeZone(.iso8601(.short))
+    private var dateFormatStyle: Any?
+    private var legacyDateFormatter: DateFormatter?
 
     init(with proxy: SpanExporter) {
         proxyExporter = proxy
+        if #available(iOS 15.0, tvOS 15.0, *) {
+            let style: Date.FormatStyle = .init()
+                .month()
+                .day()
+                .year()
+                .hour(.twoDigits(amPM: .wide))
+                .minute(.twoDigits)
+                .second(.twoDigits)
+                .secondFraction(.fractional(3))
+                .timeZone(.iso8601(.short))
+            dateFormatStyle = style
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MM/dd/yyyy, hh:mm:ss.SSS a Z"
+            legacyDateFormatter = formatter
+        }
     }
 
     func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
@@ -59,8 +68,14 @@ class SplunkStdoutSpanExporter: SpanExporter {
                 message += "TraceFlags: \(span.traceFlags)\n"
                 message += "TraceState: \(span.traceState)\n"
                 message += "ParentSpanId: \(span.parentSpanId?.hexString ?? "-")\n"
-                message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.formatted(self.dateFormatStyle)))\n"
-                message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.formatted(self.dateFormatStyle)))\n"
+
+                if #available(iOS 15.0, tvOS 15.0, *), let style = self.dateFormatStyle as? Date.FormatStyle {
+                    message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.formatted(style)))\n"
+                    message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.formatted(style)))\n"
+                } else if let formatter = self.legacyDateFormatter {
+                    message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: span.startTime)))\n"
+                    message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: span.endTime)))\n"
+                }
 
                 let duration = span.endTime.timeIntervalSince(span.startTime)
                 message += "Duration: \(duration.toNanoseconds) nanoseconds (\(duration) seconds)\n"

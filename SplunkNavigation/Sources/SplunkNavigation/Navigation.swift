@@ -155,7 +155,7 @@ public final class Navigation: Sendable {
                 // If we have set manual naming, then we prefer it
                 if await model.isManualScreenName {
                     processedEvent = AutomatedNavigationEvent(
-                        timestamp: Date.now,
+                        timestamp: Date(),
                         type: event.type,
                         controllerTypeName: screenName,
                         controllerIdentifier: event.controllerIdentifier
@@ -186,12 +186,20 @@ public final class Navigation: Sendable {
 
     // MARK: - Instrumentation (Legacy solution)
 
+    private func notificationStream(for name: Notification.Name) -> AsyncStream<Notification> {
+        AsyncStream { continuation in
+            let observer = NotificationCenter.default.addObserver(forName: name, object: nil, queue: nil) { notification in
+                continuation.yield(notification)
+            }
+            continuation.onTermination = { @Sendable _ in
+                NotificationCenter.default.removeObserver(observer)
+            }
+        }
+    }
+
     private func startLegacyDetection() {
         Task(priority: .userInitiated) {
-            let willShowStream = NotificationCenter.default
-                .publisher(for: Notification.Name(rawValue: "UINavigationControllerWillShowViewControllerNotification"))
-                .values
-
+            let willShowStream = notificationStream(for: Notification.Name(rawValue: "UINavigationControllerWillShowViewControllerNotification"))
             for await notification in willShowStream {
                 if let event = await navigationEvent(for: notification.object, type: .viewDidLoad) {
                     await processShowStart(event: event)
@@ -200,10 +208,7 @@ public final class Navigation: Sendable {
         }
 
         Task(priority: .userInitiated) {
-            let didShowStream = NotificationCenter.default
-                .publisher(for: Notification.Name(rawValue: "UINavigationControllerDidShowViewControllerNotification"))
-                .values
-
+            let didShowStream = notificationStream(for: Notification.Name(rawValue: "UINavigationControllerDidShowViewControllerNotification"))
             for await notification in didShowStream {
                 if let event = await navigationEvent(for: notification.object, type: .viewDidAppear) {
                     await processNavigationEnd(event: event)
@@ -212,10 +217,7 @@ public final class Navigation: Sendable {
         }
 
         Task(priority: .userInitiated) {
-            let willTransitionStream = NotificationCenter.default
-                .publisher(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification"))
-                .values
-
+            let willTransitionStream = notificationStream(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification"))
             for await notification in willTransitionStream {
                 if let event = await transitionEvent(for: notification.object, type: .willTransitionToTraitCollection) {
                     await processTransitionStart(event: event)
@@ -224,10 +226,7 @@ public final class Navigation: Sendable {
         }
 
         Task(priority: .userInitiated) {
-            let didTransitionStream = NotificationCenter.default
-                .publisher(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification"))
-                .values
-
+            let didTransitionStream = notificationStream(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification"))
             for await notification in didTransitionStream {
                 if let event = await transitionEvent(for: notification.object, type: .didTransitionToTraitCollection) {
                     await processNavigationEnd(event: event)
@@ -249,7 +248,7 @@ public final class Navigation: Sendable {
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
-            timestamp: Date.now,
+            timestamp: Date(),
             type: eventType,
             controllerTypeName: screenName,
             controllerIdentifier: ObjectIdentifier(visibleController)
@@ -272,7 +271,7 @@ public final class Navigation: Sendable {
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
-            timestamp: Date.now,
+            timestamp: Date(),
             type: eventType,
             controllerTypeName: screenName,
             controllerIdentifier: ObjectIdentifier(visibleController)
