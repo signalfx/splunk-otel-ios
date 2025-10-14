@@ -60,7 +60,7 @@ final class ConfigurationHandlerTests: XCTestCase {
             storage: storage
         )
 
-        simulateMainThreadWait(duration: 30)
+        simulateMainThreadWait(duration: 5)
 
         XCTAssertEqual(configurationHandler.configurationData, dataResponse)
         XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
