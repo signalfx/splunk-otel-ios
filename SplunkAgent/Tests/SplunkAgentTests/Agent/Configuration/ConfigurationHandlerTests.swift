@@ -52,6 +52,8 @@ final class ConfigurationHandlerTests: XCTestCase {
 
         let apiClient = try APIClientTestBuilder.build(with: "config", response: dataResponse)
 
+        simulateMainThreadWait(duration: 1)
+
         let configurationHandler = ConfigurationHandler(
             for: defaultConfig,
             apiClient: apiClient,
