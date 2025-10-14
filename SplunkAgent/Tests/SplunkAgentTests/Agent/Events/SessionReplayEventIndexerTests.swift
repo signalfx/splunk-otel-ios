@@ -46,7 +46,7 @@ final class SessionReplayEventIndexerTests: XCTestCase {
         let nowDate = Date()
 
         // Initialize a new indexer
-        indexer = SessionReplayIndexerTestBuilder.build(named: indexerName)
+        indexer = try await SessionReplayIndexerTestBuilder.build(named: indexerName)
 
         // We will ask for the creation of a set of indexes
         let firstOneDate = nowDate - 10
@@ -63,7 +63,7 @@ final class SessionReplayEventIndexerTests: XCTestCase {
         try await Task.sleep(nanoseconds: 1_000_000_000)
 
 
-        indexer = SessionReplayIndexerTestBuilder.build(named: indexerName)
+        indexer = try await SessionReplayIndexerTestBuilder.build(named: indexerName)
         try await Task.sleep(nanoseconds: 1_000_000_000)
 
         // Ask for another set after recovery
@@ -92,7 +92,7 @@ final class SessionReplayEventIndexerTests: XCTestCase {
 
         try? SessionReplayIndexerTestBuilder.removeStorage(named: indexerName)
 
-        let indexer = SessionReplayIndexerTestBuilder.build(named: indexerName)
+        let indexer = try await SessionReplayIndexerTestBuilder.build(named: indexerName)
 
         let sessionId = "12321"
 
@@ -109,7 +109,6 @@ final class SessionReplayEventIndexerTests: XCTestCase {
         // Remove processed indexes
         try await indexer.removeIndex(sessionId: sessionId, eventTimestamp: firstDate)
         try await indexer.removeIndex(sessionId: sessionId, eventTimestamp: secondDate)
-
 
         // Get a new index for the same session
         let thirdDate = nowDate
