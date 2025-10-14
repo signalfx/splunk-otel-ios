@@ -48,10 +48,9 @@ final class ConfigurationHandlerTests: XCTestCase {
         var configurationHandler: ConfigurationHandler?
 
         Task.detached {
+            storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
 
             try? storage.delete(forKey: ConfigurationHandler.configurationStoreKey)
-
-            storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
 
             let defaultConfig = try ConfigurationTestBuilder.buildDefault()
 
