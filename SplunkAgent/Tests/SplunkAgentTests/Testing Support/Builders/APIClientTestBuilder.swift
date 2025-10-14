@@ -36,9 +36,7 @@ final class APIClientTestBuilder {
 
     static func build(with path: String, response: Data? = nil) throws -> APIClient {
         if let response {
-            URLProtocolMock.testURLs = [
-                path: response
-            ]
+            URLProtocolMock.testURLs[path] = response
         }
 
         let config = URLSessionConfiguration.ephemeral
