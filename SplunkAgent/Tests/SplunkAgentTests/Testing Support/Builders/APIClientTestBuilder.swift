@@ -36,7 +36,7 @@ final class APIClientTestBuilder {
 
     static func build(with path: String, response: Data? = nil) throws -> APIClient {
         if let response {
-            URLProtocolMock.testURLs[path] = response
+            URLProtocolMock.setData(response, forPath: path)
         }
 
         let config = URLSessionConfiguration.ephemeral
@@ -66,51 +66,122 @@ struct MockEndpoint: Endpoint {
     var requestHeaders: MockHeaders?
 }
 
-class URLProtocolMock: URLProtocol {
-    static var testURLs: [String: Data] = [:]
-
+final class URLProtocolMock: URLProtocol {
     static let mainUrl = URL(string: "https://www.SplunkAgent.test")
+
+    static let testErrorCode = 404
+
     static let testErrorPath = "error"
     static let testServerErrorPath = "testServerError"
 
-    override class func canInit(with _: URLRequest) -> Bool {
+    private static var store: [String: Data] = [:]
+    private static let lock = NSLock()
+
+    static func setData(_ data: Data, forPath path: String) {
+        lock.lock()
+        store[path] = data
+        lock.unlock()
+    }
+
+    static func data(forPath path: String) -> Data? {
+        lock.lock()
+        let data = store[path]
+        lock.unlock()
+        return data
+    }
+
+    static func reset() {
+        lock.lock()
+        store.removeAll()
+        lock.unlock()
+    }
+
+    override static func canInit(with _: URLRequest) -> Bool {
         true
     }
 
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+    override static func canonicalRequest(for request: URLRequest) -> URLRequest {
         request
     }
 
     override func startLoading() {
-        guard let path = request.url?.lastPathComponent else {
+        guard let url = request.url else {
+            client?.urlProtocol(self, didFailWithError: URLError(.badURL))
             return
         }
 
-        if path == Self.testErrorPath,
-            let requestUrl = request.url,
-            let response = HTTPURLResponse(url: requestUrl, statusCode: Self.testErrorCode, httpVersion: "HTTP/1.1", headerFields: nil)
-        {
-            client?.urlProtocol(self, didLoad: Data())
-            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        let path = url.lastPathComponent
+
+        if path == Self.testErrorPath {
+            sendTestError(for: url)
         }
+        else if path == Self.testServerErrorPath {
+            sendTestErrorPath(for: url)
+        }
+        else if let data = Self.data(forPath: path) {
+            sendData(for: url, data: data)
+        }
+    }
+
+    override func stopLoading() {}
+
+
+    // MARK: - Internal client handle response
+
+    func sendTestError(for url: URL) {
+        guard
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: Self.testErrorCode,
+                httpVersion: "HTTP/1.1",
+                headerFields: ["Content-Type": "application/json"]
+            )
         else {
-            if let errorData = try? RawMockDataBuilder.build(mockFile: .remoteError),
-                path == Self.testServerErrorPath
-            {
-                client?.urlProtocol(self, didLoad: errorData)
-            }
-            else if let data = Self.testURLs[path] {
-                client?.urlProtocol(self, didLoad: data)
-            }
 
-            client?.urlProtocol(self, didReceive: HTTPURLResponse(), cacheStoragePolicy: .notAllowed)
+            return
         }
 
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Data())
         client?.urlProtocolDidFinishLoading(self)
     }
 
-    /// Method is required but doesn't need to do anything.
-    override func stopLoading() {}
+    func sendTestErrorPath(for url: URL) {
+        let body = try? RawMockDataBuilder.build(mockFile: .remoteError)
+        guard
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: 500,
+                httpVersion: "HTTP/1.1",
+                headerFields: ["Content-Type": "application/json"]
+            )
+        else {
 
-    static let testErrorCode = 404
+            return
+        }
+
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        if let body {
+            client?.urlProtocol(self, didLoad: body)
+        }
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    func sendData(for url: URL, data: Data) {
+        guard
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: 200,
+                httpVersion: "HTTP/1.1",
+                headerFields: ["Content-Type": "application/json"]
+            )
+        else {
+
+            return
+        }
+
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: data)
+        client?.urlProtocolDidFinishLoading(self)
+    }
 }
