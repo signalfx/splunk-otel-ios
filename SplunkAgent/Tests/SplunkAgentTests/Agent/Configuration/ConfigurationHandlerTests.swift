@@ -43,30 +43,26 @@ final class ConfigurationHandlerTests: XCTestCase {
 
     func testApiLoadSuccess() async throws {
         let storage = UserDefaultsStorage()
+        storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
+
         let dataResponse = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)
 
-        var configurationHandler: ConfigurationHandler?
+        try? storage.delete(forKey: ConfigurationHandler.configurationStoreKey)
 
-        Task.detached {
-            storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
+        let defaultConfig = try ConfigurationTestBuilder.buildDefault()
 
-            try? storage.delete(forKey: ConfigurationHandler.configurationStoreKey)
+        let apiClient = try APIClientTestBuilder.build(with: "config", response: dataResponse)
 
-            let defaultConfig = try ConfigurationTestBuilder.buildDefault()
+        let configurationHandler = ConfigurationHandler(
+            for: defaultConfig,
+            apiClient: apiClient,
+            storage: storage
+        )
 
-            let apiClient = try APIClientTestBuilder.build(with: "config", response: dataResponse)
+        simulateMainThreadWait(duration: 10)
 
-            configurationHandler = ConfigurationHandler(
-                for: defaultConfig,
-                apiClient: apiClient,
-                storage: storage
-            )
-        }
-
-        try await Task.sleep(nanoseconds: 10_000_000_000)
-
-        XCTAssertEqual(configurationHandler?.configurationData, dataResponse)
-        XCTAssertEqual(configurationHandler?.configuration.maxSessionLength, 111)
+        XCTAssertEqual(configurationHandler.configurationData, dataResponse)
+        XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
 
         let storedData: Data? = try? storage.read(forKey: ConfigurationHandler.configurationStoreKey)
         XCTAssertEqual(storedData, dataResponse)
