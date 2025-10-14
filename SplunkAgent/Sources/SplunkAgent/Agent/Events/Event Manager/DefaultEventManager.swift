@@ -92,7 +92,8 @@ class DefaultEventManager: AgentEventManager {
             logger.log(level: .info, isPrivate: false) {
                 "Using trace url: \(traceUrl)"
             }
-        } else {
+        }
+        else {
 
             // Initialize with NoOp processors - spans won't be sent
             logEventProcessor = NoOpLogEventProcessor()
