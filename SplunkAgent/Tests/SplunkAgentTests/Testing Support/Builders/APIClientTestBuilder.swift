@@ -146,7 +146,7 @@ final class URLProtocolMock: URLProtocol {
         client?.urlProtocolDidFinishLoading(self)
     }
 
-    func sendTestErrorPath(for url: URL) {
+    func sendTestErrorPath(for _: URL) {
         if let body = try? RawMockDataBuilder.build(mockFile: .remoteError) {
             client?.urlProtocol(self, didLoad: body)
         }
