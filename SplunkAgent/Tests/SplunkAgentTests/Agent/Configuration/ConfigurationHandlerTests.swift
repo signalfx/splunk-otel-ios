@@ -41,7 +41,7 @@ final class ConfigurationHandlerTests: XCTestCase {
         XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
     }
 
-    func testApiLoadSuccess() async throws {
+    func testApiLoadSuccess() throws {
         let storage = UserDefaultsStorage()
         storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
 
