@@ -71,11 +71,12 @@ class DefaultEventManager: AgentEventManager {
     required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum) throws {
         self.agent = agent
         self.configuration = configuration
-        self.sessionReplayIndexer = SessionReplayEventIndexer(named: "replay")
+        sessionReplayIndexer = SessionReplayEventIndexer(named: "replay")
 
         // Initialize processors based on whether endpoint is available
         if let endpoint = configuration.endpoint,
             let traceUrl = endpoint.traceEndpoint {
+
             // Initialize with real processors
             let processors = Self.createProcessors(
                 traceUrl: traceUrl,
@@ -84,18 +85,19 @@ class DefaultEventManager: AgentEventManager {
                 agent: agent
             )
 
-            self.logEventProcessor = processors.logEventProcessor
-            self.sessionReplayProcessor = processors.sessionReplayProcessor
-            self.traceProcessor = processors.traceProcessor
+            logEventProcessor = processors.logEventProcessor
+            sessionReplayProcessor = processors.sessionReplayProcessor
+            traceProcessor = processors.traceProcessor
 
             logger.log(level: .info, isPrivate: false) {
                 "Using trace url: \(traceUrl)"
             }
         } else {
+
             // Initialize with NoOp processors - spans won't be sent
-            self.logEventProcessor = NoOpLogEventProcessor()
-            self.sessionReplayProcessor = nil
-            self.traceProcessor = NoOpTraceProcessor()
+            logEventProcessor = NoOpLogEventProcessor()
+            sessionReplayProcessor = nil
+            traceProcessor = NoOpTraceProcessor()
 
             logger.log(level: .info, isPrivate: false) {
                 "No endpoint configured. Spans will not be sent until endpoint is updated."
@@ -126,9 +128,9 @@ class DefaultEventManager: AgentEventManager {
         )
 
         // Replace processors
-        self.logEventProcessor = processors.logEventProcessor
-        self.sessionReplayProcessor = processors.sessionReplayProcessor
-        self.traceProcessor = processors.traceProcessor
+        logEventProcessor = processors.logEventProcessor
+        sessionReplayProcessor = processors.sessionReplayProcessor
+        traceProcessor = processors.traceProcessor
 
         logger.log(level: .info, isPrivate: false) {
             "Endpoint updated. Using trace url: \(traceUrl)"
