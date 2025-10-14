@@ -154,7 +154,10 @@ final class DefaultPersistentCacheTests: XCTestCase {
         let testName = "persistentCacheUpdate"
 
         let cache = DefaultPersistentCacheTestBuilder.build(named: testName)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+
         await cache.model.restore(to: PersistentCacheContent.integers)
+
 
         try await cache.update(0, forKey: firstKey)
         try await cache.update(5, forKey: secondKey)
@@ -172,6 +175,8 @@ final class DefaultPersistentCacheTests: XCTestCase {
         let testName = "persistentCacheRemove"
 
         let cache = DefaultPersistentCacheTestBuilder.build(named: testName)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
+
         await cache.model.restore(to: PersistentCacheContent.integers)
 
         try await cache.sync()
