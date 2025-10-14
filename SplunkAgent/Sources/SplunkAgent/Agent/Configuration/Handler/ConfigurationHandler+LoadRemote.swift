@@ -24,11 +24,17 @@ extension ConfigurationHandler {
     func loadRemoteConfiguration() {
         invalidateReloadSessionTimer()
 
-        Task {
+        Task.detached { [weak self] in
+
+            guard let self else {
+
+                return
+            }
+
             do {
-                let receivedData = try await fetchRemoteConfiguration()
+                let receivedData = try await self.fetchRemoteConfiguration()
                 self.configurationData = receivedData
-                storeConfiguration(receivedData)
+                self.storeConfiguration(receivedData)
 
                 self.logger.log(level: .info) {
                     "Remote configuration was successfully fetched and stored."
