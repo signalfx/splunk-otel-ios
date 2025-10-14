@@ -146,10 +146,23 @@ final class URLProtocolMock: URLProtocol {
         client?.urlProtocolDidFinishLoading(self)
     }
 
-    func sendTestErrorPath(for _: URL) {
+    func sendTestErrorPath(for url: URL) {
+        guard
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: 200,
+                httpVersion: "HTTP/1.1",
+                headerFields: ["Content-Type": "application/json"]
+            )
+        else {
+
+            return
+        }
+
         if let body = try? RawMockDataBuilder.build(mockFile: .remoteError) {
             client?.urlProtocol(self, didLoad: body)
         }
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocolDidFinishLoading(self)
     }
 
