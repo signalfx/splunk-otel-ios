@@ -52,6 +52,8 @@ final class ConfigurationHandlerTests: XCTestCase {
 
         let apiClient = try APIClientTestBuilder.build(with: "config", response: dataResponse)
 
+        XCTAssertEqual(URLProtocolMock.testURLs["config"], dataResponse)
+
         let configurationHandler = ConfigurationHandler(
             for: defaultConfig,
             apiClient: apiClient,
