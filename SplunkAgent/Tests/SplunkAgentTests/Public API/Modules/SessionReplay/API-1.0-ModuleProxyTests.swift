@@ -209,7 +209,6 @@ final class SessionReplayAPI10ModuleProxyTests: XCTestCase {
     // MARK: - Agent session lifecycle
 
     func testSessionRotation() async throws {
-        // TODO: [DEMRUM-2782] Fix tests
         let initialCount = moduleProxy.newSessionsCount
 
         await sendSimulatedNotification(DefaultSession.sessionDidResetNotification)

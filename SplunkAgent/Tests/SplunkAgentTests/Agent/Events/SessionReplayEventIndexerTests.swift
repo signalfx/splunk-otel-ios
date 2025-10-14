@@ -23,7 +23,6 @@ final class SessionReplayEventIndexerTests: XCTestCase {
 
     // MARK: - Basic logic
 
-    // TODO: [DEMRUM-2782] Fix tests
     func testInitialization() throws {
         let indexerName = "testDefault"
         let indexer = SessionReplayEventIndexer(named: indexerName)
@@ -35,7 +34,6 @@ final class SessionReplayEventIndexerTests: XCTestCase {
 
     // MARK: - Indexer methods
 
-    // TODO: [DEMRUM-2782] Fix tests
     func testIndexer() async throws {
         var indexer: EventIndexer?
         let indexerName = "testReplay"
@@ -86,7 +84,6 @@ final class SessionReplayEventIndexerTests: XCTestCase {
         XCTAssertEqual(secondTwo, 2)
     }
 
-    // TODO: [DEMRUM-2782] Fix tests
     func testRemoveIndex() async throws {
         let indexerName = "testRemoveIndex"
 

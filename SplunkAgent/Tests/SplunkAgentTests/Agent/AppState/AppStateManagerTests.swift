@@ -62,7 +62,6 @@ final class AppStateManagerTests: XCTestCase {
         XCTAssertEqual(retrievedState, .foreground)
     }
 
-    // TODO: [DEMRUM-2782] Fix tests
     func testNotificationsHandle() async throws {
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testNotificationsHandle")
         try? storage.delete(forKey: "appStateEvents")

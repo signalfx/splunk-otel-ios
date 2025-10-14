@@ -72,7 +72,6 @@ final class DefaultSessionTests: XCTestCase {
         XCTAssertEqual(sessionModel.sessions, matchedSessions)
     }
 
-    // TODO: [DEMRUM-2782] Fix tests
     func testSessionForLogic() throws {
         let maxSessionLength = 5.0
         let sessionTimeout = 1.0

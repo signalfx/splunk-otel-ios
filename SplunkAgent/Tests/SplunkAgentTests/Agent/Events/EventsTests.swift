@@ -50,7 +50,6 @@ final class EventsTests: XCTestCase {
 
     // MARK: - Testing Event manual events
 
-    // TODO: [DEMRUM-2782] Fix tests
     func testSessionReplayDataEvent() throws {
         let event = try SessionReplayTestBuilder.buildDataEvent()
 
@@ -122,7 +121,6 @@ final class EventsTests: XCTestCase {
 
     // MARK: - Helpers
 
-    // TODO: [DEMRUM-2782] Fix tests
     private func checkEventAttributes(_ event: SplunkCommon.AgentEvent) throws {
         let eventAttributes = try XCTUnwrap(event.attributes)
 
