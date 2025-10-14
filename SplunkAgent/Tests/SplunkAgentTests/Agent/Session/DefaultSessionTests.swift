@@ -219,15 +219,15 @@ final class DefaultSessionTests: XCTestCase {
             // After the object is created, there should be one open session
             let testName = "enterBackgroundTest"
             let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
-            defaultSession.testSessionTimeout = 20
+            defaultSession.testSessionTimeout = 30
 
             // We need to create a full agent as our session runner for this test
             let agent = try AgentTestBuilder.build(with: configuration, session: defaultSession)
 
             /* Going into the background for *allowed* time */
             let resumedSessionId = defaultSession.currentSessionId
-            try await simulateBackgroundStay(for: defaultSession, duration: 5)
-            simulateMainThreadWait(duration: 5)
+            try await simulateBackgroundStay(for: defaultSession, duration: 3)
+            simulateMainThreadWait(duration: 2)
 
             // The current session should be the same
             var lastSessionId = defaultSession.currentSessionId

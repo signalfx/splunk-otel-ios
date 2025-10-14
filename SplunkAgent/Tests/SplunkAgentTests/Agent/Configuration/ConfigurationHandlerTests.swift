@@ -42,8 +42,7 @@ final class ConfigurationHandlerTests: XCTestCase {
     }
 
     func testApiLoadSuccess() throws {
-        let storage = UserDefaultsStorage()
-        storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
+        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testApiLoadSuccess")
 
         let dataResponse = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)
 
