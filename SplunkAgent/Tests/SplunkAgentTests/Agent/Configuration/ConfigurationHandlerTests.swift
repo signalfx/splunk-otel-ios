@@ -43,18 +43,20 @@ final class ConfigurationHandlerTests: XCTestCase {
 
     func testApiLoadSuccess() async throws {
         let storage = UserDefaultsStorage()
-
-        try? storage.delete(forKey: ConfigurationHandler.configurationStoreKey)
-
-        storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
-
-        let defaultConfig = try ConfigurationTestBuilder.buildDefault()
         let dataResponse = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)
-        let apiClient = try APIClientTestBuilder.build(with: "config", response: dataResponse)
 
         var configurationHandler: ConfigurationHandler?
 
         Task.detached {
+
+            try? storage.delete(forKey: ConfigurationHandler.configurationStoreKey)
+
+            storage.keysPrefix = "com.splunk.rum.test.testApiLoadSuccess."
+
+            let defaultConfig = try ConfigurationTestBuilder.buildDefault()
+
+            let apiClient = try APIClientTestBuilder.build(with: "config", response: dataResponse)
+
             configurationHandler = ConfigurationHandler(
                 for: defaultConfig,
                 apiClient: apiClient,
