@@ -21,6 +21,9 @@ import Foundation
 import SplunkCommon
 import UIKit
 
+// Legacy navigation POC
+import SplunkNavigationLegacy
+
 /// The navigation module detects and tracks navigation in the application.
 public final class Navigation: Sendable {
 
@@ -45,6 +48,8 @@ public final class Navigation: Sendable {
         category: "Navigation"
     )
 
+    // Legacy navigation POC
+    private let navigationLegacy: NavigationLegacy
 
     // MARK: - Public
 
@@ -101,6 +106,11 @@ public final class Navigation: Sendable {
 
     /// Module protocol conformance.
     public required init() {
+
+        // Legacy navigation POC
+        // Initialize NavigationLegacy
+        navigationLegacy = NavigationLegacy()
+
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
         self.screenNameStream = screenNameStream
@@ -118,6 +128,13 @@ public final class Navigation: Sendable {
         preferences.module = self
     }
 
+    /// Legacy navigation POC.
+    ///
+    /// Returns a screen name from the Legacy navigation module.
+    public func legacyScreenName() -> String {
+        navigationLegacy.legacyScreenName()
+    }
+
 
     // MARK: - Instrumentation
 
@@ -131,10 +148,14 @@ public final class Navigation: Sendable {
         // Once the support is implemented, the solution will adopt modern approach,
         // and the legacy solution will be removed.
         if Self.useLegacySolution {
-            startLegacyDetection()
+            // Legacy navigation POC
+            // Commented out
+//            startLegacyDetection()
         }
         else {
-            startModernDetection()
+            // Legacy navigation POC
+            // Commented out
+//            startModernDetection()
         }
     }
 

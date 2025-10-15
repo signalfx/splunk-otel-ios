@@ -70,7 +70,9 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
                 // Regarding screen spans, we do not directly assign the screen name.
                 // Instead, we utilize the entry that is already part of the span
                 if key == "screen.name", isScreenSpan(span) {
-                    continue
+                    // Legacy navigation POC
+                    // Commented out
+//                    continue
                 }
 
                 span.clearAndSetAttribute(key: key, value: attributeValue)

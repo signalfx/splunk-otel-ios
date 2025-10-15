@@ -130,6 +130,19 @@ extension SplunkRum {
         navigationProxy = Navigation(for: navigationModule)
     }
 
+    /// Legacy navigation POC.
+    /// This bridges in SplunkNavigationLegacy's screen name. This could be placed elsewhere.
+    func legacyScreenName() -> String? {
+        let moduleType = SplunkNavigation.Navigation.self
+        let navigationModule = modulesManager?.module(ofType: moduleType)
+
+        guard let navigationModule else {
+            return nil
+        }
+
+        return navigationModule.legacyScreenName()
+    }
+
     /// Configure Network module with shared state.
     private func customizeNetwork() {
         let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)

@@ -62,6 +62,14 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
             }
         }
 
+        // Legacy navigation POC.
+        // Assign a screen name from the legacy navigation.
+        // This should be used only if the legacy navigation is enabled.
+        // Refactor required.
+        if let legacyScreenName = owner.legacyScreenName() {
+            allAttributes["screen.name"] = legacyScreenName
+        }
+
         return allAttributes
     }
 
