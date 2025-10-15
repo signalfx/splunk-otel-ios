@@ -81,6 +81,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",
                 "SplunkNavigation",
+                "SplunkNavigationLegacy",
                 "SplunkNetwork",
                 "SplunkNetworkMonitor",
                 "SplunkSlowFrameDetector",
@@ -133,6 +134,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 "SplunkInteractions",
                 "SplunkNavigation",
+                "SplunkNavigationLegacy",
                 "SplunkNetworkMonitor",
                 "SplunkSlowFrameDetector"
             ],
@@ -159,6 +161,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkNavigation",
             dependencies: [
                 "SplunkCommon",
+                "SplunkNavigationLegacy",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
                 resolveDependency("logger"),
                 resolveDependency("swizzling")
@@ -172,6 +175,28 @@ func generateMainTargets() -> [Target] {
                 "SplunkNavigation"
             ],
             path: "SplunkNavigation/Tests",
+            plugins: lintTargetPlugins()
+        ),
+
+
+        // MARK: - Splunk Navigation Legacy (Instrumentation)
+
+        .target(
+            name: "SplunkNavigationLegacy",
+            dependencies: [
+                "SplunkCommon",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift")
+            ],
+            path: "SplunkNavigationLegacy/Sources",
+            plugins: lintTargetPlugins()
+        ),
+        .testTarget(
+            name: "SplunkNavigationLegacyTests",
+            dependencies: [
+                "SplunkNavigationLegacy"
+            ],
+            path: "SplunkNavigationLegacy/Tests",
             plugins: lintTargetPlugins()
         ),
 
