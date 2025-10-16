@@ -38,7 +38,6 @@ actor SlowFrameLogic {
     private var isRunning = false
     private var flushTask: Task<Void, Never>?
     private var watchdogTask: Task<Void, Never>?
-    private var destinationFactory: () -> SlowFrameDetectorDestination
     private var destination: SlowFrameDetectorDestination?
 
     private var slowFrameCount: Int = 0
@@ -63,14 +62,16 @@ actor SlowFrameLogic {
 
     /// Initializes the logic actor with a factory for creating the destination.
     /// - Parameter destinationFactory: A closure that creates the destination for reporting frame data.
-    init(destinationFactory: @escaping () -> SlowFrameDetectorDestination) {
-        self.destinationFactory = destinationFactory
+    init(destination: SlowFrameDetectorDestination) {
+        self.destination = destination
     }
 
     deinit {
-        // Ensure background tasks are cancelled when the actor is deallocated
-        watchdogTask?.cancel()
         flushTask?.cancel()
+        flushTask = nil
+
+        watchdogTask?.cancel()
+        watchdogTask = nil
     }
 
 
@@ -85,25 +86,26 @@ actor SlowFrameLogic {
         }
 
         isRunning = true
-        destination = destinationFactory()
+
         // Use a regular Task, as there's no need for it to be detached from the actor's context
+        watchdogTask?.cancel()
         watchdogTask = Task { [weak self] in await self?.runWatchdog() }
+
+        flushTask?.cancel()
         flushTask = Task { [weak self] in await self?.runFlushLoop() }
     }
 
     /// Stops the background tasks and flushes any remaining data.
-    func stop() async {
-        guard isRunning else {
-            return
-        }
-
+    func stop() {
         isRunning = false
-        watchdogTask?.cancel()
+
         flushTask?.cancel()
-        watchdogTask = nil
         flushTask = nil
-        await flushBuffers()
-        destination = nil
+
+        watchdogTask?.cancel()
+        watchdogTask = nil
+
+        flushBuffers()
     }
 
     /// Handles an incoming frame update from the ticker.
@@ -131,8 +133,8 @@ actor SlowFrameLogic {
 
     // MARK: - Lifecycle Handlers
 
-    func appWillResignActive() async {
-        await flushBuffers()
+    func appWillResignActive() {
+        flushBuffers()
     }
 
     func appDidBecomeActive() {
@@ -140,8 +142,8 @@ actor SlowFrameLogic {
         lastHeartbeatTimestamp = 0
     }
 
-    func appWillTerminate() async {
-        await flushBuffers()
+    func appWillTerminate() {
+        flushBuffers()
     }
 
 
@@ -150,7 +152,7 @@ actor SlowFrameLogic {
     /// Flushes the collected slow and frozen frame counts to the destination.
     ///
     /// This method sends the aggregated counts of slow and frozen frames to a configured destination and then resets the internal counters to zero.
-    func flushBuffers() async {
+    func flushBuffers() {
         guard let destination else {
             return
         }
@@ -159,14 +161,14 @@ actor SlowFrameLogic {
         if slowFrameCount > 0 {
             let count = slowFrameCount
             slowFrameCount = 0
-            await destination.send(type: "slowRenders", count: count, sharedState: nil)
+            destination.send(type: "slowRenders", count: count, sharedState: nil)
         }
 
         // Drain frozen frames
         if frozenFrameCount > 0 {
             let count = frozenFrameCount
             frozenFrameCount = 0
-            await destination.send(type: "frozenRenders", count: count, sharedState: nil)
+            destination.send(type: "frozenRenders", count: count, sharedState: nil)
         }
 
         #if DEBUG
@@ -216,7 +218,7 @@ actor SlowFrameLogic {
             if Task.isCancelled {
                 break
             }
-            await flushBuffers()
+            flushBuffers()
         }
     }
 }

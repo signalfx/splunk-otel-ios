@@ -29,8 +29,8 @@ import QuartzCore
 /// This protocol provides a consistent interface for receiving frame updates, abstracting
 /// the underlying mechanism (like `CADisplayLink`) for easier testing and dependency injection.
 protocol SlowFrameTicker {
-    /// An async closure that is called for each frame update.
-    var onFrame: (@MainActor (TimeInterval, TimeInterval) async -> Void)? { get set }
+
+    nonisolated var onFrameStream: AsyncStream<(TimeInterval, TimeInterval)> { get }
 
     /// Starts the ticker on the main thread.
     @MainActor
@@ -56,18 +56,24 @@ protocol SlowFrameTicker {
     // MARK: - DisplayLinkTicker Implementation
 
     /// A concrete implementation of `SlowFrameTicker` that uses `CADisplayLink`.
-    final class DisplayLinkTicker: SlowFrameTicker {
+final class DisplayLinkTicker: SlowFrameTicker {
 
         // MARK: - Public Properties
 
-        /// An async closure that is called for each frame update.
-        var onFrame: (@MainActor (TimeInterval, TimeInterval) async -> Void)?
+        let onFrameStream: AsyncStream<(TimeInterval, TimeInterval)>
+        private let continuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation?
 
         // MARK: - Private Properties
 
         private var displayLink: CADisplayLink?
 
         // MARK: - Initialization
+
+        init() {
+            let (stream, cont) = AsyncStream<(TimeInterval, TimeInterval)>.makeStream()
+            onFrameStream = stream
+            continuation = cont
+        }
 
         deinit {
             // As a fail-safe, ensure the display link is invalidated when the ticker is deallocated.
@@ -88,19 +94,9 @@ protocol SlowFrameTicker {
         }
 
         func stop() {
-            if Thread.isMainThread {
+            Task { @MainActor in
                 displayLink?.invalidate()
                 displayLink = nil
-            }
-            else {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else {
-                        return
-                    }
-
-                    displayLink?.invalidate()
-                    displayLink = nil
-                }
             }
         }
 
@@ -118,9 +114,8 @@ protocol SlowFrameTicker {
 
         @objc
         private func displayLinkCallback(_ link: CADisplayLink) {
-            Task {
-                await onFrame?(link.timestamp, link.duration)
-            }
+            continuation?.yield( (link.timestamp, link.duration) )
         }
     }
+
 #endif // os(iOS) || os(tvOS) || os(visionOS)

@@ -29,5 +29,5 @@ protocol SlowFrameDetectorDestination {
     ///   - type: The type of event being sent (e.g., "slowRenders", "frozenRenders").
     ///   - count: The number of events of that type that were detected.
     ///   - sharedState: The shared state of the agent, providing context like the agent version.
-    func send(type: String, count: Int, sharedState: AgentSharedState?) async
+    func send(type: String, count: Int, sharedState: AgentSharedState?)
 }
