@@ -49,7 +49,7 @@ public final class Navigation: Sendable {
     )
 
     // Legacy navigation POC
-    private let navigationLegacy: NavigationLegacy
+    let navigationLegacy: NavigationLegacy
 
     // MARK: - Public
 

@@ -22,6 +22,12 @@ extension Navigation {
     // MARK: - Manual detection
 
     public func track(screen name: String) {
+
+        // Legacy navigation POC
+        // Track manual scren name in the legacy solution
+        navigationLegacy.setManualScreenName(name)
+        return
+
         let start = Date()
 
         Task {
