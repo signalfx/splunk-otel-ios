@@ -131,15 +131,20 @@ actor SlowFrameLogic {
 
     // MARK: - Lifecycle Handlers
 
+    /// Called when the app is about to resign its active state. Flushes any pending data.
     func appWillResignActive() async {
         await flushBuffers()
     }
 
+    /// Called when the app becomes active. Resets the frame timing state.
     func appDidBecomeActive() {
         lastFrameTimestamp = nil
         lastHeartbeatTimestamp = 0
+        slowFrameCount = 0
+        frozenFrameCount = 0
     }
 
+    /// Called when the app is about to terminate. Flushes any pending data.
     func appWillTerminate() async {
         await flushBuffers()
     }
@@ -148,8 +153,6 @@ actor SlowFrameLogic {
     // MARK: - Internal Methods
 
     /// Flushes the collected slow and frozen frame counts to the destination.
-    ///
-    /// This method sends the aggregated counts of slow and frozen frames to a configured destination and then resets the internal counters to zero.
     func flushBuffers() async {
         guard let destination else {
             return
@@ -170,7 +173,7 @@ actor SlowFrameLogic {
         }
 
         #if DEBUG
-            onFlushDidComplete?()
+        onFlushDidComplete?()
         #endif
     }
 
@@ -178,11 +181,11 @@ actor SlowFrameLogic {
     // MARK: - Test-only Methods
 
     #if DEBUG
-        /// A test-only method to set the flush completion handler.
-        /// - Parameter handler: The closure to call when a flush completes.
-        func setOnFlushDidComplete(_ handler: (() -> Void)?) {
-            onFlushDidComplete = handler
-        }
+    /// A test-only method to set the flush completion handler.
+    /// - Parameter handler: The closure to call when a flush completes.
+    func setOnFlushDidComplete(_ handler: (() -> Void)?) {
+        onFlushDidComplete = handler
+    }
     #endif
 
 

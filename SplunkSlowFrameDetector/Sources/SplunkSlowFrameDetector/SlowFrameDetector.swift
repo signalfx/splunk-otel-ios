@@ -67,6 +67,11 @@ public final class SlowFrameDetector: NSObject {
 
     #if DEBUG
         var logicForTest: SlowFrameLogic { logic }
+
+        /// A test-only method to bypass the `AsyncStream` and process a frame directly and deterministically.
+        func handleFrameForTest(timestamp: TimeInterval, duration: TimeInterval) async {
+            await logic.handleFrame(timestamp: timestamp, duration: duration)
+        }
     #endif
 
 
@@ -161,12 +166,11 @@ public final class SlowFrameDetector: NSObject {
                 }
 
                 for await (timestamp, duration) in ticker.onFrameStream {
-                    await logic.handleFrame(timestamp: timestamp, duration: duration)
+                    await self.logic.handleFrame(timestamp: timestamp, duration: duration)
                 }
-            }
-            catch {
+            } catch {
                 // Task was cancelled or an error occurred.
-                await cleanupAfterTaskError()
+                await self.cleanupAfterTaskError()
             }
         }
     }
@@ -210,22 +214,19 @@ public final class SlowFrameDetector: NSObject {
         private func startObservingAppState() {
             appStateObserverTask?.cancel()
             appStateObserverTask = Task { [weak self] in
-                guard let self else {
-                    return
-                }
-
-                for await notification in lifecycleObserver.stream {
+                guard let self else { return }
+                for await notification in self.lifecycleObserver.stream {
                     switch notification {
                     case .appWillResignActive:
-                        await ticker?.pause()
-                        await logic.appWillResignActive()
+                        await self.ticker?.pause()
+                        await self.logic.appWillResignActive()
 
                     case .appDidBecomeActive:
-                        await ticker?.resume()
-                        await logic.appDidBecomeActive()
+                        await self.ticker?.resume()
+                        await self.logic.appDidBecomeActive()
 
                     case .appWillTerminate:
-                        await logic.appWillTerminate()
+                        await self.logic.appWillTerminate()
                     }
                 }
             }
@@ -239,9 +240,7 @@ public final class SlowFrameDetector: NSObject {
     @MainActor
     extension SlowFrameDetector {
         enum LifecycleEvents {
-            case appWillResignActive
-            case appDidBecomeActive
-            case appWillTerminate
+            case appWillResignActive, appDidBecomeActive, appWillTerminate
         }
 
         /// Encapsulates the state and registration of application lifecycle notification observers.

@@ -71,14 +71,9 @@ protocol SlowFrameTicker {
         // MARK: - Initialization
 
         init() {
-            var tempContinuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation?
-            onFrameStream = AsyncStream { tempContinuation = $0 }
-            guard let initializedContinuation = tempContinuation else {
-                // This should never happen, as the AsyncStream initializer calls the closure synchronously.
-                fatalError("AsyncStream initializer failed to set continuation")
-            }
-
-            continuation = initializedContinuation
+            let (stream, continuation) = AsyncStream.makeStream(of: (TimeInterval, TimeInterval).self)
+            onFrameStream = stream
+            self.continuation = continuation
         }
 
         deinit {
@@ -106,13 +101,13 @@ protocol SlowFrameTicker {
                 displayLink = nil
             }
             else {
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else {
-                        return
-                    }
-
-                    displayLink?.invalidate()
-                    displayLink = nil
+                // A strong capture is intentional and correct here.
+                // If stop() is called from deinit on a background thread, we need to
+                // guarantee the cleanup runs by temporarily extending the object's lifetime.
+                // This is not a retain cycle.
+                DispatchQueue.main.async {
+                    self.displayLink?.invalidate()
+                    self.displayLink = nil
                 }
             }
         }

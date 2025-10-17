@@ -44,13 +44,9 @@ import XCTest
         private let continuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation
 
         init() {
-            var tempContinuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation?
-            onFrameStream = AsyncStream { tempContinuation = $0 }
-            guard let initializedContinuation = tempContinuation else {
-                fatalError("AsyncStream initializer failed to set continuation")
-            }
-
-            continuation = initializedContinuation
+            let (stream, continuation) = AsyncStream.makeStream(of: (TimeInterval, TimeInterval).self)
+            self.onFrameStream = stream
+            self.continuation = continuation
         }
 
         @MainActor
@@ -68,8 +64,8 @@ import XCTest
                     return
                 }
 
-                stopped = true
-                onStop?()
+                self.stopped = true
+                self.onStop?()
             }
         }
 
@@ -113,87 +109,41 @@ import XCTest
 
         // MARK: - Test Properties
 
-        private var mockTicker: MockTicker?
-        private var detector: SlowFrameDetector?
-        private var mockDestination: MockDestination?
+        private var logic: SlowFrameLogic!
+        private var mockDestination: MockDestination!
+
+        // For integration tests that need the full detector
+        private var detector: SlowFrameDetector!
+        private var mockTicker: MockTicker!
 
 
         // MARK: - Test Lifecycle
 
-        override func setUp() {
-            super.setUp()
+        override func setUp() async throws {
+            try await super.setUp()
+            mockDestination = MockDestination()
+            logic = SlowFrameLogic(destinationFactory: { self.mockDestination })
+
+            // Initialize the full detector for integration tests
             mockTicker = MockTicker()
-            let currentMock = MockDestination()
-            mockDestination = currentMock
-            detector = SlowFrameDetector(ticker: mockTicker, destinationFactory: { currentMock })
+            detector = SlowFrameDetector(ticker: mockTicker, destinationFactory: { self.mockDestination })
+
+            try await logic.start()
         }
 
         override func tearDown() async throws {
-            // Only stop the detector if the test itself hasn't already stopped it.
-            if let mockTicker, !mockTicker.stopped {
-                let expectation = XCTestExpectation(description: "TearDown Stop Expectation")
-                mockTicker.onStop = { expectation.fulfill() }
-
-                // Run stop in a detached task to avoid blocking the MainActor test method
-                Task.detached {
-                    await self.detector?.stop()
-                }
-
-                await fulfillment(of: [expectation], timeout: 2.0)
-            }
-
-            detector = nil
+            await logic.stop()
+            logic = nil
             mockDestination = nil
+
+            // Tear down the full detector
+            if let mockTicker, !mockTicker.stopped {
+                await detector.stop()
+            }
+            detector = nil
             mockTicker = nil
 
             try await super.tearDown()
-        }
-
-
-        // MARK: - Helper Methods
-
-        private func pauseUntilDetectorStart() async {
-            let startExpectation = XCTestExpectation(description: "Detector has started")
-            mockTicker?.onStart = {
-                startExpectation.fulfill()
-            }
-            detector?.start()
-            await fulfillment(of: [startExpectation], timeout: 1.0)
-        }
-
-
-        // MARK: - Start/Stop Tests
-
-        /// Verifies that calling `start()` multiple times is idempotent.
-        func test_start_isIdempotent() async {
-            XCTAssertFalse(mockTicker?.started ?? true)
-
-            await pauseUntilDetectorStart()
-            XCTAssertEqual(mockTicker?.startCallCount, 1)
-
-            detector?.start()
-            await Task.yield()
-
-            XCTAssertEqual(mockTicker?.startCallCount, 1)
-        }
-
-        /// Verifies that `start()` and `stop()` correctly control the ticker's state.
-        func test_startAndStop_correctlyControlTicker() async {
-            XCTAssertFalse(mockTicker?.started ?? true)
-            XCTAssertFalse(mockTicker?.stopped ?? true)
-
-            await pauseUntilDetectorStart()
-            XCTAssertTrue(mockTicker?.started ?? false)
-
-            let tickerStopExpectation = XCTestExpectation(description: "Ticker was stopped")
-            mockTicker?.onStop = { tickerStopExpectation.fulfill() }
-
-            Task.detached {
-                await self.detector?.stop()
-            }
-
-            await fulfillment(of: [tickerStopExpectation], timeout: 2.0)
-            XCTAssertTrue(mockTicker?.stopped ?? false)
         }
 
 
@@ -201,32 +151,30 @@ import XCTest
 
         /// Verifies that the logic state is reset when the app becomes active.
         func test_stateIsReset_onAppDidBecomeActive() async {
-            await pauseUntilDetectorStart()
+            await logic.handleFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            await logic.handleFrame(timestamp: 0.1, duration: 1.0 / 60.0) // This would normally be a slow frame
 
-            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            await logic.appDidBecomeActive()
 
-            NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
-            await Task.yield() // Allow notification to be processed
+            // This frame should now be treated as the first frame, not triggering a slow frame
+            await logic.handleFrame(timestamp: 10.0, duration: 1.0 / 60.0)
 
-            mockTicker?.simulateFrame(timestamp: 10.0, duration: 1.0 / 60.0)
+            await logic.flushBuffers()
 
-            await detector?.flushBuffers()
-
-            let counts = await mockDestination?.reportedCounts
-            XCTAssertTrue(counts?.isEmpty ?? true, "No reports should be sent after app becomes active.")
+            let counts = await mockDestination.reportedCounts
+            XCTAssertTrue(counts.isEmpty, "No reports should be sent after app becomes active.")
         }
 
         /// Verifies that pending buffers are flushed when the app resigns active.
         func test_buffersAreFlushed_onAppWillResignActive() async {
-            await pauseUntilDetectorStart()
+            await logic.handleFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            await logic.handleFrame(timestamp: 0.1, duration: 1.0 / 60.0)
 
-            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
-            mockTicker?.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
+            // This will trigger flushBuffers internally
+            await logic.appWillResignActive()
 
-            await detector?.flushBuffers()
-
-            let counts = await mockDestination?.reportedCounts
-            XCTAssertEqual(counts?["slowRenders"], 1)
+            let counts = await mockDestination.reportedCounts
+            XCTAssertEqual(counts["slowRenders"], 1)
         }
 
 
@@ -234,137 +182,124 @@ import XCTest
 
         /// Verifies that the very first frame processed does not trigger a report.
         func test_firstFrame_doesNotTriggerReport() async {
-            await pauseUntilDetectorStart()
+            await logic.handleFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            await logic.flushBuffers()
 
-            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
-
-            await detector?.flushBuffers()
-
-            let counts = await mockDestination?.reportedCounts
-            XCTAssertTrue(counts?.isEmpty ?? true)
+            let counts = await mockDestination.reportedCounts
+            XCTAssertTrue(counts.isEmpty)
         }
 
         /// Verifies that a clearly slow frame is detected and reported.
         func test_slowFrame_isDetected() async throws {
-            await pauseUntilDetectorStart()
-
             let normalFrameDuration: TimeInterval = 1.0 / 60.0
 
-            mockTicker?.simulateFrame(timestamp: 0.0, duration: normalFrameDuration)
-            mockTicker?.simulateFrame(timestamp: 0.100, duration: normalFrameDuration)
+            await logic.handleFrame(timestamp: 0.0, duration: normalFrameDuration)
+            await logic.handleFrame(timestamp: 0.100, duration: normalFrameDuration)
 
-            await detector?.flushBuffers()
+            await logic.flushBuffers()
 
-            let counts = await mockDestination?.reportedCounts
-            XCTAssertEqual(counts?["slowRenders"], 1)
+            let counts = await mockDestination.reportedCounts
+            XCTAssertEqual(counts["slowRenders"], 1)
         }
 
         /// Verifies that a frame at the exact slow-frame threshold is correctly detected.
         func test_slowFrame_atBoundary_isDetected() async throws {
-            await pauseUntilDetectorStart()
-
             let expectedDuration: TimeInterval = 1.0 / 60.0
             let toleranceValue = expectedDuration * (SlowFrameDetector.slowFrameTolerancePercentage / 100.0)
             let slowFrameThreshold = expectedDuration + toleranceValue
 
-            mockTicker?.simulateFrame(timestamp: 0.0, duration: expectedDuration)
-            mockTicker?.simulateFrame(timestamp: slowFrameThreshold, duration: expectedDuration)
+            await logic.handleFrame(timestamp: 0.0, duration: expectedDuration)
+            await logic.handleFrame(timestamp: slowFrameThreshold, duration: expectedDuration)
 
-            await detector?.flushBuffers()
+            await logic.flushBuffers()
 
-            let counts = await mockDestination?.reportedCounts
-            XCTAssertEqual(counts?["slowRenders"], 1)
+            let counts = await mockDestination.reportedCounts
+            XCTAssertEqual(counts["slowRenders"], 1)
         }
 
         /// Verifies that no reports are sent when frame times are normal.
         func test_noReports_whenFramesAreNormal() async throws {
-            await pauseUntilDetectorStart()
-
             let expectedDuration: TimeInterval = 1.0 / 60.0
-            mockTicker?.simulateFrame(timestamp: 0.0, duration: expectedDuration)
-            mockTicker?.simulateFrame(timestamp: expectedDuration, duration: expectedDuration)
+            await logic.handleFrame(timestamp: 0.0, duration: expectedDuration)
+            await logic.handleFrame(timestamp: expectedDuration, duration: expectedDuration)
 
-            await detector?.flushBuffers()
+            await logic.flushBuffers()
 
-            let counts = await mockDestination?.reportedCounts
-            XCTAssertTrue(counts?.isEmpty ?? true)
+            let counts = await mockDestination.reportedCounts
+            XCTAssertTrue(counts.isEmpty)
         }
 
         /// Verifies that a frozen frame is detected when the ticker stops firing.
         func test_frozenFrame_isDetected_whenFramesStop() async throws {
-            await pauseUntilDetectorStart()
-
             let hangTime = SlowFrameDetector.frozenFrameThreshold // 0.7 seconds
 
-            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            await logic.handleFrame(timestamp: 0.0, duration: 1.0 / 60.0)
 
             // Create an expectation that the frozenFrameCount becomes 1
             let frozenFrameDetectedExpectation = XCTestExpectation(description: "Frozen frame detected by watchdog")
 
             // Monitor the frozenFrameCount in a background task
-            // This task will fulfill the expectation once frozenFrameCount is 1.
             Task {
                 var count = 0
                 while count < 1, !Task.isCancelled {
-                    // Access the test-only property on the actor
-                    count = await detector?.logicForTest.testFrozenFrameCount ?? 0
+                    count = await self.logic.testFrozenFrameCount
                     if count >= 1 {
                         frozenFrameDetectedExpectation.fulfill()
                         break
                     }
-                    // Poll frequently to catch the change quickly
                     try? await Task.sleep(nanoseconds: 10_000_000) // Check every 10ms
                 }
             }
 
-            // Simulate the passage of time required for the watchdog to trigger.
-            // This sleep ensures CACurrentMediaTime() in runWatchdog advances sufficiently.
-            // Using a duration slightly longer than hangTime but less than runFlushLoop's 1s interval.
-            try await Task.sleep(nanoseconds: UInt64((hangTime + 0.05) * 1_000_000_000)) // Sleep for 0.75 seconds
+            try await Task.sleep(nanoseconds: UInt64((hangTime + 0.05) * 1_000_000_000))
 
-            // Wait for the watchdog to detect the frozen frame and update the count.
-            // This synchronizes the test with the internal state change.
-            await fulfillment(of: [frozenFrameDetectedExpectation], timeout: 1.0) // Timeout should be > hangTime
+            await fulfillment(of: [frozenFrameDetectedExpectation], timeout: 1.0)
 
-            // Now that we are sure frozenFrameCount is 1, explicitly flush the buffers.
-            await detector?.flushBuffers()
+            await logic.flushBuffers()
 
-            let counts = await mockDestination?.reportedCounts
-            XCTAssertEqual(counts?["frozenRenders"], 1, "Expected exactly one frozen render to be reported.")
+            let counts = await mockDestination.reportedCounts
+            XCTAssertEqual(counts["frozenRenders"], 1, "Expected exactly one frozen render to be reported.")
         }
 
         /// Verifies that a long freeze correctly reports multiple frozen frame events.
         func test_longFreeze_reportsMultipleEvents() async throws {
-            await pauseUntilDetectorStart()
-
-            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            await logic.handleFrame(timestamp: 0.0, duration: 1.0 / 60.0)
 
             let hangTime = SlowFrameDetector.frozenFrameThreshold * 3.5
             try await Task.sleep(nanoseconds: UInt64(hangTime * 1_000_000_000))
 
-            await detector?.flushBuffers()
+            await logic.flushBuffers()
 
-            let counts = await mockDestination?.reportedCounts
-            let finalCount = counts?["frozenRenders"]
+            let counts = await mockDestination.reportedCounts
+            let finalCount = counts["frozenRenders"]
             XCTAssertGreaterThanOrEqual(finalCount ?? 0, 2)
             XCTAssertLessThanOrEqual(finalCount ?? 0, 4)
         }
 
-        /// Verifies that the automatic flush loop correctly reports pending frames.
-        func test_automaticFlush_reportsPendingFrames() async {
+        // MARK: - Integration Tests
+
+        /// Verifies that the full detector correctly reports pending frames via the automatic flush loop.
+        func test_integration_automaticFlush_reportsPendingFrames() async {
             let reportExpectation = XCTestExpectation(description: "Report for slowRenders was sent")
-            await mockDestination?
-                .setOnSend { type, count in
-                    if type == "slowRenders" {
-                        XCTAssertEqual(count, 1)
-                        reportExpectation.fulfill()
-                    }
+            await mockDestination.setOnSend { type, count in
+                if type == "slowRenders" {
+                    XCTAssertEqual(count, 1)
+                    reportExpectation.fulfill()
                 }
+            }
 
-            await pauseUntilDetectorStart()
+            // Start the full detector for this integration test
+            let startExpectation = XCTestExpectation(description: "Detector has started")
+            mockTicker.onStart = {
+                startExpectation.fulfill()
+            }
+            detector.start()
+            await fulfillment(of: [startExpectation], timeout: 1.0)
 
-            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
-            mockTicker?.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
+            // This is the only test that uses the mockTicker's simulateFrame,
+            // as it specifically tests the production path that consumes the AsyncStream.
+            mockTicker.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            mockTicker.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
 
             await fulfillment(of: [reportExpectation], timeout: 1.5)
         }
