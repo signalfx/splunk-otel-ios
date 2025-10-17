@@ -29,8 +29,8 @@ import QuartzCore
 /// This protocol provides a consistent interface for receiving frame updates, abstracting
 /// the underlying mechanism (like `CADisplayLink`) for easier testing and dependency injection.
 protocol SlowFrameTicker {
-    /// An async closure that is called for each frame update.
-    var onFrame: (@MainActor (TimeInterval, TimeInterval) async -> Void)? { get set }
+    /// An async stream that yields the timestamp and duration for each frame update.
+    nonisolated var onFrameStream: AsyncStream<(TimeInterval, TimeInterval)> { get }
 
     /// Starts the ticker on the main thread.
     @MainActor
@@ -60,18 +60,31 @@ protocol SlowFrameTicker {
 
         // MARK: - Public Properties
 
-        /// An async closure that is called for each frame update.
-        var onFrame: (@MainActor (TimeInterval, TimeInterval) async -> Void)?
+        /// An async stream that yields the timestamp and duration for each frame update.
+        let onFrameStream: AsyncStream<(TimeInterval, TimeInterval)>
 
         // MARK: - Private Properties
 
         private var displayLink: CADisplayLink?
+        private let continuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation
 
         // MARK: - Initialization
+
+        init() {
+            var tempContinuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation?
+            onFrameStream = AsyncStream { tempContinuation = $0 }
+            guard let initializedContinuation = tempContinuation else {
+                // This should never happen, as the AsyncStream initializer calls the closure synchronously.
+                fatalError("AsyncStream initializer failed to set continuation")
+            }
+
+            continuation = initializedContinuation
+        }
 
         deinit {
             // As a fail-safe, ensure the display link is invalidated when the ticker is deallocated.
             // The owner is responsible for calling stop() for intentional cleanup.
+            continuation.finish()
             stop()
         }
 
@@ -118,9 +131,7 @@ protocol SlowFrameTicker {
 
         @objc
         private func displayLinkCallback(_ link: CADisplayLink) {
-            Task {
-                await onFrame?(link.timestamp, link.duration)
-            }
+            continuation.yield((link.timestamp, link.duration))
         }
     }
 #endif // os(iOS) || os(tvOS) || os(visionOS)

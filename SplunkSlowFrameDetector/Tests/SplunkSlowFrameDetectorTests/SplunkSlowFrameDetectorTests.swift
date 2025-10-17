@@ -29,8 +29,6 @@ import XCTest
 
     private final class MockTicker: SlowFrameTicker {
         @MainActor
-        var onFrame: (@MainActor (TimeInterval, TimeInterval) async -> Void)?
-        @MainActor
         var started = false
         @MainActor
         var stopped = false
@@ -41,6 +39,19 @@ import XCTest
         var onStart: (() -> Void)?
         @MainActor
         var onStop: (() -> Void)?
+
+        let onFrameStream: AsyncStream<(TimeInterval, TimeInterval)>
+        private let continuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation
+
+        init() {
+            var tempContinuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation?
+            onFrameStream = AsyncStream { tempContinuation = $0 }
+            guard let initializedContinuation = tempContinuation else {
+                fatalError("AsyncStream initializer failed to set continuation")
+            }
+
+            continuation = initializedContinuation
+        }
 
         @MainActor
         func start() {
@@ -69,8 +80,8 @@ import XCTest
         func resume() {}
 
         @MainActor
-        func simulateFrame(timestamp: TimeInterval, duration: TimeInterval) async {
-            await onFrame?(timestamp, duration)
+        func simulateFrame(timestamp: TimeInterval, duration: TimeInterval) {
+            continuation.yield((timestamp, duration))
         }
     }
 
@@ -81,7 +92,9 @@ import XCTest
         var reportedCounts: [String: Int] = [:]
         private var onSend: ((String, Int) -> Void)?
 
-        func send(type: String, count: Int, sharedState _: AgentSharedState?) {
+        func send(type: String, count: Int, sharedState _: AgentSharedState?) async {
+            // Yield to satisfy the async requirement of the protocol in this mock implementation.
+            await Task.yield()
             // Accumulate the count for the given type
             reportedCounts[type, default: 0] += count
             // Call the optional closure for tests that still need it
@@ -190,12 +203,12 @@ import XCTest
         func test_stateIsReset_onAppDidBecomeActive() async {
             await pauseUntilDetectorStart()
 
-            await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
 
             NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
             await Task.yield() // Allow notification to be processed
 
-            await mockTicker?.simulateFrame(timestamp: 10.0, duration: 1.0 / 60.0)
+            mockTicker?.simulateFrame(timestamp: 10.0, duration: 1.0 / 60.0)
 
             await detector?.flushBuffers()
 
@@ -207,8 +220,8 @@ import XCTest
         func test_buffersAreFlushed_onAppWillResignActive() async {
             await pauseUntilDetectorStart()
 
-            await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
-            await mockTicker?.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
+            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            mockTicker?.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
 
             await detector?.flushBuffers()
 
@@ -223,7 +236,7 @@ import XCTest
         func test_firstFrame_doesNotTriggerReport() async {
             await pauseUntilDetectorStart()
 
-            await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
 
             await detector?.flushBuffers()
 
@@ -237,8 +250,8 @@ import XCTest
 
             let normalFrameDuration: TimeInterval = 1.0 / 60.0
 
-            await mockTicker?.simulateFrame(timestamp: 0.0, duration: normalFrameDuration)
-            await mockTicker?.simulateFrame(timestamp: 0.100, duration: normalFrameDuration)
+            mockTicker?.simulateFrame(timestamp: 0.0, duration: normalFrameDuration)
+            mockTicker?.simulateFrame(timestamp: 0.100, duration: normalFrameDuration)
 
             await detector?.flushBuffers()
 
@@ -254,8 +267,8 @@ import XCTest
             let toleranceValue = expectedDuration * (SlowFrameDetector.slowFrameTolerancePercentage / 100.0)
             let slowFrameThreshold = expectedDuration + toleranceValue
 
-            await mockTicker?.simulateFrame(timestamp: 0.0, duration: expectedDuration)
-            await mockTicker?.simulateFrame(timestamp: slowFrameThreshold, duration: expectedDuration)
+            mockTicker?.simulateFrame(timestamp: 0.0, duration: expectedDuration)
+            mockTicker?.simulateFrame(timestamp: slowFrameThreshold, duration: expectedDuration)
 
             await detector?.flushBuffers()
 
@@ -268,8 +281,8 @@ import XCTest
             await pauseUntilDetectorStart()
 
             let expectedDuration: TimeInterval = 1.0 / 60.0
-            await mockTicker?.simulateFrame(timestamp: 0.0, duration: expectedDuration)
-            await mockTicker?.simulateFrame(timestamp: expectedDuration, duration: expectedDuration)
+            mockTicker?.simulateFrame(timestamp: 0.0, duration: expectedDuration)
+            mockTicker?.simulateFrame(timestamp: expectedDuration, duration: expectedDuration)
 
             await detector?.flushBuffers()
 
@@ -283,7 +296,7 @@ import XCTest
 
             let hangTime = SlowFrameDetector.frozenFrameThreshold // 0.7 seconds
 
-            await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
 
             // Create an expectation that the frozenFrameCount becomes 1
             let frozenFrameDetectedExpectation = XCTestExpectation(description: "Frozen frame detected by watchdog")
@@ -324,7 +337,7 @@ import XCTest
         func test_longFreeze_reportsMultipleEvents() async throws {
             await pauseUntilDetectorStart()
 
-            await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
 
             let hangTime = SlowFrameDetector.frozenFrameThreshold * 3.5
             try await Task.sleep(nanoseconds: UInt64(hangTime * 1_000_000_000))
@@ -350,8 +363,8 @@ import XCTest
 
             await pauseUntilDetectorStart()
 
-            await mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
-            await mockTicker?.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
+            mockTicker?.simulateFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+            mockTicker?.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
 
             await fulfillment(of: [reportExpectation], timeout: 1.5)
         }

@@ -25,6 +25,10 @@ protocol SlowFrameDetectorDestination {
 
     /// Sends frame count results to a destination.
     ///
+    /// This method is marked `async` to enforce a non-blocking contract. Implementations
+    /// must not block the calling thread, as doing so would stall the `SlowFrameLogic` actor
+    /// and prevent it from processing new frame data.
+    ///
     /// - Parameters:
     ///   - type: The type of event being sent (e.g., "slowRenders", "frozenRenders").
     ///   - count: The number of events of that type that were detected.
