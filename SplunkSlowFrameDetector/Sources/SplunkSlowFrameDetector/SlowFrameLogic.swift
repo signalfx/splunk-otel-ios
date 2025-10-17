@@ -131,12 +131,10 @@ actor SlowFrameLogic {
 
     // MARK: - Lifecycle Handlers
 
-    /// Called when the app is about to resign its active state. Flushes any pending data.
     func appWillResignActive() async {
         await flushBuffers()
     }
 
-    /// Called when the app becomes active. Resets the frame timing state.
     func appDidBecomeActive() {
         lastFrameTimestamp = nil
         lastHeartbeatTimestamp = 0
@@ -144,7 +142,6 @@ actor SlowFrameLogic {
         frozenFrameCount = 0
     }
 
-    /// Called when the app is about to terminate. Flushes any pending data.
     func appWillTerminate() async {
         await flushBuffers()
     }
