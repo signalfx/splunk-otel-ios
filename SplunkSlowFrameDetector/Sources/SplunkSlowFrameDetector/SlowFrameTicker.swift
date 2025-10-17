@@ -101,10 +101,8 @@ protocol SlowFrameTicker {
                 displayLink = nil
             }
             else {
-                // A strong capture is intentional and correct here.
-                // If stop() is called from deinit on a background thread, we need to
-                // guarantee the cleanup runs by temporarily extending the object's lifetime.
-                // This is not a retain cycle.
+                // A strong capture is used here to ensure this cleanup block executes
+                // successfully, especially if stop() is called from deinit on a background thread.
                 DispatchQueue.main.async {
                     self.displayLink?.invalidate()
                     self.displayLink = nil

@@ -173,7 +173,7 @@ actor SlowFrameLogic {
         }
 
         #if DEBUG
-        onFlushDidComplete?()
+            onFlushDidComplete?()
         #endif
     }
 
@@ -181,11 +181,11 @@ actor SlowFrameLogic {
     // MARK: - Test-only Methods
 
     #if DEBUG
-    /// A test-only method to set the flush completion handler.
-    /// - Parameter handler: The closure to call when a flush completes.
-    func setOnFlushDidComplete(_ handler: (() -> Void)?) {
-        onFlushDidComplete = handler
-    }
+        /// A test-only method to set the flush completion handler.
+        /// - Parameter handler: The closure to call when a flush completes.
+        func setOnFlushDidComplete(_ handler: (() -> Void)?) {
+            onFlushDidComplete = handler
+        }
     #endif
 
 
