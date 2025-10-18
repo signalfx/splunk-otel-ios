@@ -331,10 +331,4 @@ import XCTest
             await fulfillment(of: [reportExpectation], timeout: 1.5)
         }
     }
-
-    extension SlowFrameLogic {
-        #if DEBUG
-            func sync() {}
-        #endif
-    }
 #endif // os(iOS) || os(tvOS) || os(visionOS)

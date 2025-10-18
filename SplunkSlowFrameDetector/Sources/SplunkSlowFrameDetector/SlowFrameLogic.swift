@@ -51,9 +51,6 @@ actor SlowFrameLogic {
     // MARK: - Test-only Properties
 
     #if DEBUG
-        /// A test-only hook called after a flush completes.
-        private var onFlushDidComplete: (() -> Void)?
-
         /// A test-only accessor for the current frozenFrameCount.
         var testFrozenFrameCount: Int { frozenFrameCount }
     #endif
@@ -168,22 +165,7 @@ actor SlowFrameLogic {
             frozenFrameCount = 0
             await destination.send(type: "frozenRenders", count: count, sharedState: nil)
         }
-
-        #if DEBUG
-            onFlushDidComplete?()
-        #endif
     }
-
-
-    // MARK: - Test-only Methods
-
-    #if DEBUG
-        /// A test-only method to set the flush completion handler.
-        /// - Parameter handler: The closure to call when a flush completes.
-        func setOnFlushDidComplete(_ handler: (() -> Void)?) {
-            onFlushDidComplete = handler
-        }
-    #endif
 
 
     // MARK: - Private Methods
