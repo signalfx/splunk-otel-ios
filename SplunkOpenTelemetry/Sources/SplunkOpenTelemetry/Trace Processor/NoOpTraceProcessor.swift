@@ -16,22 +16,13 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkCommon
 
-/// NoOpLogEventProcessor is a no-operation implementation that doesn't send events.
+/// NoOpTraceProcessor is a no-operation implementation that doesn't send traces.
 ///
-/// This processor is used when no endpoint is configured, preventing events from being sent
+/// This processor is used when no endpoint is configured, preventing traces from being sent
 /// until a valid endpoint is provided.
-public class NoOpLogEventProcessor: LogEventProcessor {
+public class NoOpTraceProcessor: TraceProcessor {
 
     public init() {}
-
-    public func sendEvent(_: any AgentEvent, completion: @escaping (Bool) -> Void) {
-        // No-op: Don't send the event
-        completion(false)
-    }
-
-    public func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void) {
-        // No-op: Don't send the event
-        completion(false)
-    }
 }
