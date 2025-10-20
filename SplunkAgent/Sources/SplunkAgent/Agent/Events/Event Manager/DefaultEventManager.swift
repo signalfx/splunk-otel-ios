@@ -75,8 +75,8 @@ class DefaultEventManager: AgentEventManager {
 
         // Initialize processors based on whether endpoint is available
         if let endpoint = configuration.endpoint,
-
-            let traceUrl = endpoint.traceEndpoint {
+            let traceUrl = endpoint.traceEndpoint
+        {
 
             // Initialize with real processors
             let processors = Self.createProcessors(

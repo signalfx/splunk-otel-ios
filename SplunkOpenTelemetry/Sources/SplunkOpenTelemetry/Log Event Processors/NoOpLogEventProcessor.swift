@@ -32,6 +32,8 @@ public class NoOpLogEventProcessor: LogEventProcessor {
     }
 
     public func sendEvent(event: any AgentEvent, immediateProcessing: Bool, completion: @escaping (Bool) -> Void) {
+        _ = event
+        _ = immediateProcessing
         // No-op: Don't send the event
         completion(false)
     }
