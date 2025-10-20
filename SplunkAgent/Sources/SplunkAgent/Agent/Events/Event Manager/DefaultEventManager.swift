@@ -235,7 +235,8 @@ class DefaultEventManager: AgentEventManager {
         attributes["splunk.sessionReplay"] = .string("splunk")
 
 
-        let logRecordBuilder = logProvider
+        let logRecordBuilder =
+            logProvider
             .logRecordBuilder()
             .setTimestamp(timestamp)
             .setAttributes(attributes)
