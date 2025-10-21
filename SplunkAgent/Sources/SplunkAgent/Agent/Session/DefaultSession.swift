@@ -35,7 +35,7 @@ class DefaultSession: AgentSession {
     internal var enterBackground: Date?
     internal var leaveBackground: Date?
 
-    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
+    internal let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Test support
@@ -206,7 +206,12 @@ class DefaultSession: AgentSession {
 
             enterBackground = nil
             leaveBackground = nil
+
             rotateSession()
+
+            // Send session start event, however with no "previous session id",
+            // as the old "background" session does not transition to the new session smoothly.
+            sendSessionStart()
 
             return
         }
@@ -217,7 +222,13 @@ class DefaultSession: AgentSession {
                 "Current session length exceeded the length limit."
             }
 
+            let previousSessionId = currentSessionId
+
             rotateSession()
+
+            // Send session start with a previous session id, as the old session
+            // transitions to the new session smoothly.
+            sendSessionStart(previousSessionId: previousSessionId)
 
             return
         }
