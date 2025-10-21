@@ -77,7 +77,7 @@ class PlatformSupport: PlatformSupporting {
         }
 
         guard #available(iOS 15.0, *) else {
-            // On iOS 13 and 14 we only support building, not running
+            // On iOS 13 and 14 this version only supports building, not running
             return .compileOnly
         }
 
