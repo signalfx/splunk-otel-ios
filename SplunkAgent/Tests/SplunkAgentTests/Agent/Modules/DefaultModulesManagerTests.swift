@@ -163,7 +163,6 @@ final class DefaultModulesManagerTests: XCTestCase {
         // Get connected module
         let crashReportsModule = modulesManager.module(ofType: CrashReportsTestModule.self)
 
-
         let dataExpectation = expectation(description: "Data from module not be delivered.")
         dataExpectation.assertForOverFulfill = false
 
