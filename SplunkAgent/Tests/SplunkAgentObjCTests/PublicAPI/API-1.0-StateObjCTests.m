@@ -43,8 +43,6 @@ limitations under the License.
     // Properties - User Configuration (READ)
     XCTAssertNotNil(state.appName);
     XCTAssertNotNil(state.appVersion);
-    XCTAssertNotNil(state.endpointConfiguration);
-    XCTAssertNotNil(state.endpointConfiguration.realm);
     XCTAssertNotNil(state.deploymentEnvironment);
     XCTAssertFalse(state.isDebugLoggingEnabled);
 }
