@@ -19,10 +19,6 @@ internal import CiscoLogger
 import Foundation
 internal import SplunkCommon
 
-#if os(iOS) || os(tvOS) || os(visionOS)
-    import UIKit
-#endif
-
 /// The object implements the management of the current session.
 class DefaultSession: AgentSession {
 
@@ -36,8 +32,8 @@ class DefaultSession: AgentSession {
     private var sessionsModel: SessionsModel
     private(set) lazy var currentSession: SessionItem = startSession()
 
-    private var enterBackground: Date?
-    private var leaveBackground: Date?
+    internal var enterBackground: Date?
+    internal var leaveBackground: Date?
 
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
@@ -308,55 +304,5 @@ class DefaultSession: AgentSession {
 
         let timeInBackground = leaveBackground.timeIntervalSince(enterBackground)
         return timeInBackground > sessionTimeout
-    }
-}
-
-
-extension DefaultSession {
-
-    // MARK: - Application lifecycle
-
-    private func hookToAppLifecycle() {
-        #if os(iOS) || os(tvOS) || os(visionOS)
-
-            // Transitioning an application to the background
-            _ = NotificationCenter.default.addObserver(
-                forName: UIApplication.didEnterBackgroundNotification,
-                object: nil,
-                queue: nil
-            ) { [weak self] _ in
-
-                // We need to mark the time of this transition
-                self?.enterBackground = Date()
-            }
-
-            // Transitioning an application to the foreground
-            _ = NotificationCenter.default.addObserver(
-                forName: UIApplication.willEnterForegroundNotification,
-                object: nil,
-                queue: nil
-            ) { [weak self] _ in
-
-                // We need to mark the time of this transition
-                if self?.enterBackground != nil {
-                    self?.leaveBackground = Date()
-
-                    // Refresh session immediately
-                    self?.refreshSession()
-                }
-            }
-
-            // The application is being terminated
-            _ = NotificationCenter.default.addObserver(
-                forName: UIApplication.willTerminateNotification,
-                object: nil,
-                queue: nil
-            ) { [weak self] _ in
-
-                // We need to end current session
-                self?.endSession()
-            }
-
-        #endif
     }
 }
