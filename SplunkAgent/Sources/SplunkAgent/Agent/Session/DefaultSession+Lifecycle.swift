@@ -23,7 +23,7 @@ extension DefaultSession {
 
     // MARK: - Application lifecycle
 
-    internal func hookToAppLifecycle() {
+    func hookToAppLifecycle() {
         #if os(iOS) || os(tvOS) || os(visionOS)
 
             // Transitioning an application to the background

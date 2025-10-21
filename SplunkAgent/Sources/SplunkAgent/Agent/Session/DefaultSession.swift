@@ -32,10 +32,10 @@ class DefaultSession: AgentSession {
     private var sessionsModel: SessionsModel
     private(set) lazy var currentSession: SessionItem = startSession()
 
-    internal var enterBackground: Date?
-    internal var leaveBackground: Date?
+    var enterBackground: Date?
+    var leaveBackground: Date?
 
-    internal let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
+    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
 
     // MARK: - Test support

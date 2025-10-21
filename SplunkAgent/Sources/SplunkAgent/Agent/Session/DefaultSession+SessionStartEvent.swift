@@ -25,7 +25,7 @@ extension DefaultSession {
     ///
     /// Initial session start event can't be sent by `DefaultSession` implicitly, because
     /// there is no `eventManager` initialized yet at the time of an initial session creation.
-    internal func sendInitialSessionStartEvent() {
+    func sendInitialSessionStartEvent() {
         sendSessionStart()
     }
 
@@ -35,7 +35,7 @@ extension DefaultSession {
     /// parameter `previousSessionId` should be included.
     ///
     /// - Parameter previousSessionId: A session id of the previous session, sent if the old session "transitions smoothly" into a new session.
-    internal func sendSessionStart(previousSessionId: String? = nil) {
+    func sendSessionStart(previousSessionId: String? = nil) {
         let currentId = currentSession.id
         let timestamp = currentSession.start
 
