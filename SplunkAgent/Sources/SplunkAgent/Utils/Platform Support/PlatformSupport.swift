@@ -76,7 +76,12 @@ class PlatformSupport: PlatformSupporting {
             return .compileOnly
         }
 
-        return .full
+        if #available(iOS 15.0, *) {
+            return .full
+        } else {
+            // On iOS 13 and 14 we only support building, not running
+            return .compileOnly
+        }
     }
 
 

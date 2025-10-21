@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,20 +22,20 @@ import SplunkCommon
 /// Prints Log Record contents into the console using an internal logger.
 class SplunkStdoutLogExporter: LogRecordExporter {
 
-    // MARK: - Private
+    // MARK: - Private Properties
 
-    /// The proxy exporter.
     private let proxyExporter: LogRecordExporter
-
-    /// Logger for the module.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    /// Date format.
+    // Date formatters; one for modern iOS 15+ and a fallback for older versions.
     private var dateFormatStyle: Any?
     private var legacyDateFormatter: DateFormatter?
 
+    // MARK: - Initialization
+
     init(with proxy: LogRecordExporter) {
-        proxyExporter = proxy
+        self.proxyExporter = proxy
+
         if #available(iOS 15.0, tvOS 15.0, *) {
             let style: Date.FormatStyle = .init()
                 .month()
@@ -46,18 +46,19 @@ class SplunkStdoutLogExporter: LogRecordExporter {
                 .second(.twoDigits)
                 .secondFraction(.fractional(3))
                 .timeZone(.iso8601(.short))
-            dateFormatStyle = style
-        }
-        else {
+            self.dateFormatStyle = style
+        } else {
+            // Fallback for iOS 13 & 14
             let formatter = DateFormatter()
             formatter.dateFormat = "MM/dd/yyyy, hh:mm:ss.SSS a Z"
-            legacyDateFormatter = formatter
+            self.legacyDateFormatter = formatter
         }
     }
 
+    // MARK: - LogRecordExporter
+
     func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         for logRecord in logRecords {
-            // Log LogRecord data
             logger.log { self.formatLogRecordMessage(logRecord) }
         }
 
@@ -71,6 +72,8 @@ class SplunkStdoutLogExporter: LogRecordExporter {
     func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
     }
+
+    // MARK: - Private Helpers
 
     private func formatLogRecordMessage(_ logRecord: ReadableLogRecord) -> String {
         var message = ""
@@ -87,20 +90,17 @@ class SplunkStdoutLogExporter: LogRecordExporter {
                 let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
                 let observedTimestampFormatted = observedTimestamp.formatted(style)
                 message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-            }
-            else {
+            } else {
                 message += "ObservedTimestamp: -\n"
             }
-        }
-        else if let formatter = legacyDateFormatter {
+        } else if let formatter = legacyDateFormatter {
             message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: logRecord.timestamp)))\n"
 
             if let observedTimestamp = logRecord.observedTimestamp {
                 let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
                 let observedTimestampFormatted = formatter.string(from: observedTimestamp)
                 message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-            }
-            else {
+            } else {
                 message += "ObservedTimestamp: -\n"
             }
         }
