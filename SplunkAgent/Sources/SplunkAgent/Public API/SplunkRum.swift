@@ -167,34 +167,7 @@ public class SplunkRum: ObservableObject {
         }
 
         // Check if the current OS version is 15.0 or newer.
-        if #available(iOS 15.0, *) {
-            // If we are on a supported OS version, proceed with the full agent initialization.
-
-            // Re-configure and call the Session Sampler
-            shared.sessionSampler.configure(with: configuration)
-            let samplingDecision = shared.sessionSampler.sample()
-
-            // Continue with a noop instance in case of sampling out
-            if samplingDecision == .sampledOut {
-                shared.currentStatus = .notRunning(.sampledOut)
-
-                shared.logger.log(level: .notice, isPrivate: false) {
-                    "Agent sampled out."
-                }
-
-                return shared
-            }
-
-            // Initialize the full agent if all checks pass
-            let agent = try SplunkRum(
-                with: configuration,
-                moduleConfigurations: moduleConfigurations
-            )
-
-            shared = agent
-
-            return agent
-        } else {
+        guard #available(iOS 15.0, *) else {
             // If we are on an older OS (iOS 13, iOS 14), do not initialize the agent.
             // The `shared` instance will remain in its default, non-operational state.
             shared.currentStatus = .notRunning(.unsupportedOSVersion)
@@ -203,6 +176,33 @@ public class SplunkRum: ObservableObject {
             }
             return shared
         }
+
+        // If we are on a supported OS version, proceed with the full agent initialization.
+
+        // Re-configure and call the Session Sampler
+        shared.sessionSampler.configure(with: configuration)
+        let samplingDecision = shared.sessionSampler.sample()
+
+        // Continue with a noop instance in case of sampling out
+        if samplingDecision == .sampledOut {
+            shared.currentStatus = .notRunning(.sampledOut)
+
+            shared.logger.log(level: .notice, isPrivate: false) {
+                "Agent sampled out."
+            }
+
+            return shared
+        }
+
+        // Initialize the full agent if all checks pass
+        let agent = try SplunkRum(
+            with: configuration,
+            moduleConfigurations: moduleConfigurations
+        )
+
+        shared = agent
+
+        return agent
     }
 
 

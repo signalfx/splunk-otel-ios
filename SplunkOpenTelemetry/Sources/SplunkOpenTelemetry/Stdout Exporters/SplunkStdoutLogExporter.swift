@@ -47,7 +47,8 @@ class SplunkStdoutLogExporter: LogRecordExporter {
                 .secondFraction(.fractional(3))
                 .timeZone(.iso8601(.short))
             dateFormatStyle = style
-        } else {
+        }
+        else {
             let formatter = DateFormatter()
             formatter.dateFormat = "MM/dd/yyyy, hh:mm:ss.SSS a Z"
             legacyDateFormatter = formatter
@@ -72,17 +73,20 @@ class SplunkStdoutLogExporter: LogRecordExporter {
                         let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
                         let observedTimestampFormatted = observedTimestamp.formatted(style)
                         message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-                    } else {
+                    }
+                    else {
                         message += "ObservedTimestamp: -\n"
                     }
-                } else if let formatter = self.legacyDateFormatter {
+                }
+                else if let formatter = self.legacyDateFormatter {
                     message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: logRecord.timestamp)))\n"
 
                     if let observedTimestamp = logRecord.observedTimestamp {
                         let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
                         let observedTimestampFormatted = formatter.string(from: observedTimestamp)
                         message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-                    } else {
+                    }
+                    else {
                         message += "ObservedTimestamp: -\n"
                     }
                 }

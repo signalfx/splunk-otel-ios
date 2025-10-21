@@ -45,7 +45,8 @@ public final class WebViewInstrumentation: NSObject {
             contentController.removeScriptMessageHandler(forName: name)
             if #available(iOS 14.0, *) {
                 contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
-            } else {
+            }
+            else {
                 // Fallback on earlier versions
                 contentController.add(self, name: name)
             }
@@ -203,7 +204,7 @@ public final class WebViewInstrumentation: NSObject {
 
 #if canImport(WebKit)
     extension WebViewInstrumentation: WKScriptMessageHandler {
-        public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        public func userContentController(_: WKUserContentController, didReceive _: WKScriptMessage) {
             // This is the fallback for iOS 13. It does not support replies.
             // The JavaScript side will not get a response, and its promise will time out.
             // This is acceptable degradation of functionality for an unsupported OS.

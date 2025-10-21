@@ -217,7 +217,9 @@ public final class Navigation: Sendable {
         }
 
         Task(priority: .userInitiated) {
-            let willTransitionStream = notificationStream(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification"))
+            let willTransitionStream = notificationStream(
+                for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification")
+            )
             for await notification in willTransitionStream {
                 if let event = await transitionEvent(for: notification.object, type: .willTransitionToTraitCollection) {
                     await processTransitionStart(event: event)

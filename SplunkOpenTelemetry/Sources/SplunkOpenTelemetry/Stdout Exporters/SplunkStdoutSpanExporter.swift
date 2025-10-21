@@ -47,7 +47,8 @@ class SplunkStdoutSpanExporter: SpanExporter {
                 .secondFraction(.fractional(3))
                 .timeZone(.iso8601(.short))
             dateFormatStyle = style
-        } else {
+        }
+        else {
             let formatter = DateFormatter()
             formatter.dateFormat = "MM/dd/yyyy, hh:mm:ss.SSS a Z"
             legacyDateFormatter = formatter
@@ -72,7 +73,8 @@ class SplunkStdoutSpanExporter: SpanExporter {
                 if #available(iOS 15.0, tvOS 15.0, *), let style = self.dateFormatStyle as? Date.FormatStyle {
                     message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.formatted(style)))\n"
                     message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.formatted(style)))\n"
-                } else if let formatter = self.legacyDateFormatter {
+                }
+                else if let formatter = self.legacyDateFormatter {
                     message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: span.startTime)))\n"
                     message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: span.endTime)))\n"
                 }
