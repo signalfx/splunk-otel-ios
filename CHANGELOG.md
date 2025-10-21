@@ -9,6 +9,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+* Enabled support for iOS 13/14. On these versions, the main agent is inactive (though it will process pending crash reports), with the full suite of instrumentation features available on iOS 15 and newer.
+
 * Add the `app.installation.id` attribute to all signals to uniquely identify each application installation.
 
 ## [2.0.1]
