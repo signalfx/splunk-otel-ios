@@ -34,7 +34,7 @@ class SplunkStdoutLogExporter: LogRecordExporter {
     // MARK: - Initialization
 
     init(with proxy: LogRecordExporter) {
-        self.proxyExporter = proxy
+        proxyExporter = proxy
 
         if #available(iOS 15.0, tvOS 15.0, *) {
             let style: Date.FormatStyle = .init()
@@ -47,11 +47,12 @@ class SplunkStdoutLogExporter: LogRecordExporter {
                 .secondFraction(.fractional(3))
                 .timeZone(.iso8601(.short))
             self.dateFormatStyle = style
-        } else {
+        }
+        else {
             // Fallback for iOS 13 & 14
             let formatter = DateFormatter()
             formatter.dateFormat = "MM/dd/yyyy, hh:mm:ss.SSS a Z"
-            self.legacyDateFormatter = formatter
+            legacyDateFormatter = formatter
         }
     }
 
@@ -90,17 +91,20 @@ class SplunkStdoutLogExporter: LogRecordExporter {
                 let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
                 let observedTimestampFormatted = observedTimestamp.formatted(style)
                 message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-            } else {
+            }
+            else {
                 message += "ObservedTimestamp: -\n"
             }
-        } else if let formatter = legacyDateFormatter {
+        }
+        else if let formatter = legacyDateFormatter {
             message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: logRecord.timestamp)))\n"
 
             if let observedTimestamp = logRecord.observedTimestamp {
                 let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
                 let observedTimestampFormatted = formatter.string(from: observedTimestamp)
                 message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-            } else {
+            }
+            else {
                 message += "ObservedTimestamp: -\n"
             }
         }
