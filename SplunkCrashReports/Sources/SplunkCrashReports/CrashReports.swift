@@ -15,396 +15,182 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoLogger
 import CrashReporter
 import Foundation
 import OpenTelemetryApi
-@_spi(SplunkInternal) import SplunkCommon
+import SplunkCommon
+import SplunkSession
 
+/// The entry point for the crash reporting module.
 public class CrashReports {
-
 
     // MARK: - Public
 
-    /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
-    public unowned var sharedState: AgentSharedState?
-
-    /// An array to hold images used in active crash threads.
-    var allUsedImageNames: [String] = []
-
-    let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "CrashReports")
-
-    /// A reference to the Module's data publishing callback.
-    var crashReportDataConsumer: ((CrashReportsMetadata, String) -> Void)?
-
-
-    // MARK: - Private
-
-    private var crashReporter: PLCrashReporter?
-
-    /// Storage of periodically sampled device data.
-    private var deviceDataDictionary: [String: String] = [:]
-    private var dataUpdateTimer: Timer?
-
-    /// Serial queue for thread-safe access to deviceDataDictionary.
-    private let deviceDataQueue = DispatchQueue(label: "com.splunk.crashreports.devicedata", qos: .utility)
-
-
-    // MARK: - Module methods
-
-    public required init() {}
-
-    deinit {
-        dataUpdateTimer?.invalidate()
-        dataUpdateTimer = nil
+    /// Enables the crash reporting module.
+    public func enable() {
+        startup()
     }
 
+    // MARK: - Internal
 
-    // MARK: - Public methods
+    /// Logger for the module.
+    let logger = DefaultLogAgent(category: "SplunkCrashReports")
 
-    public func configureCrashReporter() {
-        #if os(tvOS)
-            let signalHandlerType = PLCrashReporterSignalHandlerType.BSD
-        #else
-            let signalHandlerType = PLCrashReporterSignalHandlerType.mach
-        #endif
+    /// Shared agent state.
+    let sharedState: AgentSharedState?
 
-        // Setup private path for crash reports to avoid conflict with other
-        // instances of PLCrashReporter present in the client app
-        let fileManager = FileManager.default
-        let crashDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("SplunkCrashReports", isDirectory: true)
-        try? fileManager.createDirectory(at: crashDirectory, withIntermediateDirectories: true)
+    /// Crash reporter.
+    var crashReporter: PLCrashReporter?
 
-        let signalConfig = PLCrashReporterConfig(
-            signalHandlerType: signalHandlerType,
-            symbolicationStrategy: [],
-            basePath: crashDirectory.path
+    /// Designated initializer.
+    init(
+        configuration: SplunkRumConfiguration,
+        session: SessionState,
+        navigation: Navigation
+    ) {
+        sharedState = AgentSharedState(
+            configuration: configuration,
+            session: session,
+            navigation: navigation
         )
-
-        guard let crashReporterInstance = PLCrashReporter(configuration: signalConfig) else {
-            logger.log(level: .error) {
-                "PLCrashReporter failed to initialize."
-            }
-            return
-        }
-
-        crashReporter = crashReporterInstance
     }
 
-    /// Check whether a crash ended the previous run of the app.
-    public func reportCrashIfPresent() {
+    /// Test initializer.
+    init(
+        crashReporter: PLCrashReporter,
+        sharedState: AgentSharedState?
+    ) {
+        self.crashReporter = crashReporter
+        self.sharedState = sharedState
+    }
 
-        guard crashReporter != nil else {
-            logger.log(level: .warn) {
-                "Could not report, crash reporter: Not Installed."
-            }
-            return
-        }
+    // MARK: - Crash Reporter Lifecycle
 
-        let didCrash = crashReporter?.hasPendingCrashReport()
+    /// Callback for the crash reporter.
+    func postCrashCallback(report: PLCrashReport) {
+        // The crash report is formatted and sent in a background thread.
+        // This is to avoid blocking the main thread while the app is terminating.
+        let backgroundTaskID = SplunkRum.createBackgroundTask()
 
-        guard didCrash ?? false else {
-            logger.log(level: .info) {
-                "No Crash Report found."
-            }
-            return
-        }
+        let formatted = formatCrashReport(report: report)
+        send(crashReport: formatted, sharedState: sharedState, timestamp: Date())
 
-        do {
-            allUsedImageNames.removeAll()
-            let data = try crashReporter?.loadPendingCrashReportDataAndReturnError()
-
-            // Retrieving crash reporter data.
-            let report = try PLCrashReport(data: data)
-
-            // Process the report
-            let reportPayload = formatCrashReport(report: report)
-
-            // Fetch the crash timestamp
-            var timestamp = Date() // Default to now, if no sytemInfo, should not ever happen
-            if let systemInfo = report.systemInfo {
-                timestamp = systemInfo.timestamp
-            }
-            else {
-                logger.log(level: .error) {
-                    "CrashReporter failed to report systemInfo timestamp"
-                }
-            }
-
-            // Send the report to the backend
-            send(crashReport: reportPayload, sharedState: sharedState, timestamp: timestamp)
-        }
-        catch {
-            logger.log(level: .error) {
-                "CrashReporter failed to load/parse with error: \(error)"
-            }
-            return
-        }
-
-        // Purge the report.
-        crashReporter?.purgePendingCrashReport()
-
-        // And indicate that crash occured
-        logger.log(level: .warn) {
-            "A crash ended the previous execution of app."
-        }
+        // The background task must be ended after the crash report is sent.
+        SplunkRum.endBackgroundTask(backgroundTaskID)
     }
 
     // MARK: - Private methods
 
     /// Starts up crash reporter if enable is true and no debugger attached.
-    public func initializeCrashReporter() -> Bool {
-
-        guard crashReporter != nil else {
-            logger.log(level: .warn) {
-                "Could not enable crash reporter: Not Installed"
+    private func startup() {
+        if SplunkRum.isDebuggerAttached {
+            logger.log(level: .info) {
+                "Crash reporting is disabled while debugging."
             }
-            return false
+            return
         }
 
-        guard !isDebuggerAttached() else {
-            logger.log(level: .warn) {
-                "Could not enable crash reporter: Debugger Attached."
+        // It's not safe to use PLCrashReporter in app extensions
+        if isAppExtension {
+            logger.log(level: .info) {
+                "Crash reporting is not supported in app extensions."
             }
-            return false
+            return
         }
 
-        do {
-            try crashReporter?.enableAndReturnError()
-        }
-        catch {
-            logger.log(level: .error) {
-                "Could not enable crash reporter: \(error)"
-            }
-            return false
-        }
+        let config = PLCrashReporterConfig(
+            signalHandlerType: .bsd,
+            symbolicationStrategy: .all
+        )
 
-        // async in order to load session.id
-        DispatchQueue.main.async { [weak self] in
-            self?.updateDeviceStats()
-        }
-        startPollingForDeviceStats()
+        // swiftlint:disable:next force_unwrapping
+        let reporter = PLCrashReporter(configuration: config)!
 
-        return true
-    }
+        // swiftlint:disable:next force_try
+        try! reporter.enableAndReturnError()
 
-    /// Returns true if debugger is attached.
-    private func isDebuggerAttached() -> Bool {
-        var debuggerIsAttached = false
+        // swiftlint:disable:next force_try
+        let data = try! reporter.loadPendingCrashReportDataAndReturnError()
 
-        var name: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
-        var info = kinfo_proc()
-        var infoSize = MemoryLayout<kinfo_proc>.size
+        // swiftlint:disable:next force_try
+        let report = try! PLCrashReport(data: data)
 
-        _ = name.withUnsafeMutableBytes { (nameBytePtr: UnsafeMutableRawBufferPointer) -> Bool in
-            guard let nameBytesBlindMemory = nameBytePtr.bindMemory(to: Int32.self).baseAddress else {
-                return false
-            }
+        postCrashCallback(report: report)
 
-            return sysctl(nameBytesBlindMemory, 4, &info, &infoSize, nil, 0) != -1
-        }
+        // swiftlint:disable:next force_try
+        try! reporter.purgePendingCrashReportAndReturnError()
 
-        if !debuggerIsAttached, (info.kp_proc.p_flag & P_TRACED) != 0 {
-            debuggerIsAttached = true
-        }
-
-        return debuggerIsAttached
-    }
-
-    /// Device stats handler.
-    ///
-    /// This added device stats and Session ID to PLCrashReporter
-    /// so that it will be included in a future crash report.
-    private func updateDeviceStats() {
-        deviceDataQueue.async {
-            do {
-                if let sessionId = self.sharedState?.sessionId {
-                    self.deviceDataDictionary["sessionId"] = sessionId
-                }
-                self.deviceDataDictionary["battery"] = CrashReportDeviceStats.batteryLevel
-                self.deviceDataDictionary["disk"] = CrashReportDeviceStats.freeDiskSpace
-                self.deviceDataDictionary["memory"] = CrashReportDeviceStats.freeMemory
-                let customData = try NSKeyedArchiver.archivedData(
-                    withRootObject: self.deviceDataDictionary,
-                    requiringSecureCoding: false
-                )
-
-                // Update crash reporter on main queue since it might touch UI-related properties
-                DispatchQueue.main.async {
-                    self.crashReporter?.customData = customData
-                }
-            }
-            catch {
-                // We have failed to archive the custom data dictionary.
-                self.logger.log(level: .warn) {
-                    "Failed to add the device stats to the crash reports data."
-                }
-            }
-        }
-    }
-
-    public func crashReportUpdateScreenName(_ screenName: String) {
-        deviceDataQueue.async {
-            self.deviceDataDictionary["screenName"] = screenName
-        }
-        updateDeviceStats()
-    }
-
-    /// Device data and Session ID is collected every 5 seconds and sent to `PLCrashReporter`.
-    private func startPollingForDeviceStats() {
-        let repeatSeconds: Double = 5
-        dataUpdateTimer = Timer.scheduledTimer(withTimeInterval: repeatSeconds, repeats: true) { _ in
-            self.updateDeviceStats()
-        }
+        crashReporter = reporter
     }
 
     /// AppState handler.
-    private func appStateHandler(report: PLCrashReport) -> String {
+    func appStateHandler(report: PLCrashReport) -> String {
         var appState = "unknown"
         if let sharedState {
             let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
-
-            // This mapping code below may be able to be removed in the future should
-            // the backend is able to support all options.
-            appState =
-                switch timebasedAppState {
-                case "active":
-                    "foreground"
-
-                case "inactive",
-                    "terminate":
-                    "background"
-
-                default:
-                    timebasedAppState
-                }
+            appState = timebasedAppState
         }
+
         return appState
     }
 
-    /// Report formatting.
-    private func formatCrashReport(report: PLCrashReport) -> [CrashReportKeys: Any] {
-
-        var reportDict: [CrashReportKeys: Any] = [:]
-
-        reportDict[.component] = "crash"
-        reportDict[.error] = true
-
-        if let systemInfo = report.systemInfo {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-            reportDict[.crashTimestamp] = formatter.string(from: systemInfo.timestamp)
-            reportDict[.currentTimestamp] = formatter.string(from: Date())
-        }
-
-        if report.hasProcessInfo {
-            reportDict[.processPath] = report.processInfo.processPath
-            reportDict[.isNative] = report.processInfo.native
-        }
-
-        if let signalInfo = report.signalInfo {
-            reportDict[.signalName] = signalInfo.name
-            reportDict[.faultAddress] = String(signalInfo.address)
-        }
-
-        if report.hasExceptionInfo {
-            reportDict[.exceptionName] = report.exceptionInfo.exceptionName ?? ""
-            reportDict[.exceptionReason] = report.exceptionInfo.exceptionReason ?? ""
-        }
-
-        if let customData = report.customData {
-            do {
-                let unarchivedData: [String: String]?
-                if #available(iOS 14.0, *) {
-                    unarchivedData =
-                        try NSKeyedUnarchiver.unarchivedDictionary(
-                            ofKeyClass: NSString.self,
-                            objectClass: NSString.self,
-                            from: customData
-                        ) as? [String: String]
-                }
-                else {
-                    // Fallback on earlier versions
-                    unarchivedData =
-                        try NSKeyedUnarchiver.unarchivedObject(
-                            ofClasses: [NSDictionary.self, NSString.self],
-                            from: customData
-                        ) as? [String: String]
-                }
-
-                if let data = unarchivedData {
-                    if let sessionId = data["sessionId"] {
-                        reportDict[.sessionId] = sessionId
-                    }
-
-                    reportDict[.batteryLevel] = data["battery"]
-                    reportDict[.freeMemory] = data["disk"]
-                    reportDict[.freeDiskSpace] = data["memory"]
-                    reportDict[.screenName] = data["screenName"]
-                }
-            }
-            catch {
-                logger.log(level: .warn) {
-                    "Crash reporter could not report custom data, error: \(error)"
-                }
-            }
-        }
-
-        // Collect threads with stack frames
-        let reportThreads = allThreadsFromCrashReport(report: report)
-        reportDict[.threads] = threadList(threads: reportThreads)
-
-        // Images referenced in threads
-        reportDict[.images] = imageList(images: report.images)
-
-        // App state
-        reportDict[.previousAppState] = appStateHandler(report: report)
-
-        return reportDict
-    }
-
-    private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?, timestamp: Date) {
+    private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?, timestamp _: Date) {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
-                instrumentationName: "splunk-crash-report",
-                instrumentationVersion: sharedState?.agentVersion
+                instrumentationName: "splunk-ios-crash",
+                instrumentationVersion: SplunkRumVersionString
             )
 
-        let crashSpan = tracer.spanBuilder(spanName: "SplunkCrashReport")
-            .setStartTime(time: timestamp)
-            .startSpan()
+        let now = Date()
+        let span = tracer.spanBuilder(spanName: "crash.report").setStartTime(time: now).startSpan()
 
-        for (key, value) in crashReport {
-            crashSpan.clearAndSetAttribute(key: key.rawValue, value: toAttributeValue(value))
+        for (key, var value) in crashReport {
+            if key == .sessionId {
+                span.setAttribute(key: key.rawValue, value: value as? String ?? "")
+                continue
+            }
+
+            if var dict = value as? [String: Any] {
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
+                    if let jsonString = String(data: jsonData, encoding: .utf8) {
+                        value = jsonString
+                    }
+                }
+                catch {
+                    logger.log(level: .warn) {
+                        "Crash reporter could not serialize dictionary, error: \(error)"
+                    }
+                }
+            }
+
+            if var array = value as? [Any] {
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: array, options: .prettyPrinted)
+                    if let jsonString = String(data: jsonData, encoding: .utf8) {
+                        value = jsonString
+                    }
+                }
+                catch {
+                    logger.log(level: .warn) {
+                        "Crash reporter could not serialize array, error: \(error)"
+                    }
+                }
+            }
+
+            span.setAttribute(key: key.rawValue, value: AttributeValue.string(String(describing: value)))
         }
 
-        crashSpan.end(time: timestamp)
+        if let sharedState {
+            sharedState.addGlobalAttributes(to: span)
+        }
+
+        span.end(time: now)
     }
-}
 
-
-extension CrashReports {
-
-    // MARK: - Helpers
-
-    private func toAttributeValue(_ value: Any) -> AttributeValue {
-        switch value {
-        case let string as String:
-            return .string(string)
-
-        case let int as Int:
-            return .int(int)
-
-        case let double as Double:
-            return .double(double)
-
-        case let bool as Bool:
-            return .bool(bool)
-
-        default:
-            return .string(String(describing: value))
-        }
+    /// Check if running in an app extension
+    private var isAppExtension: Bool {
+        Bundle.main.bundlePath.hasSuffix(".appex")
     }
 }

@@ -30,7 +30,7 @@ import SplunkOpenTelemetryBackgroundExporter
 /// This allows us to use custom types (especially the `AttributeValue` with `Data` field) to send binary body.
 ///
 /// In case the binary body is supported in the future in the upstream, we can revert back to the processors-exporters chain.
-public class OTLPSessionReplayEventProcessor: LogEventProcessor {
+public class OTLPSessionReplayEventProcessor: AgentEventProcessor {
 
     // MARK: - Private properties
 
@@ -49,8 +49,15 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
     /// Date format style for the stdout log.
-    private var dateFormatStyle: Any?
-    private var legacyDateFormatter: DateFormatter?
+    private let dateFormatStyle: Date.FormatStyle = .init()
+        .month()
+        .day()
+        .year()
+        .hour(.twoDigits(amPM: .wide))
+        .minute(.twoDigits)
+        .second(.twoDigits)
+        .secondFraction(.fractional(3))
+        .timeZone(.iso8601(.short))
 
     /// Logger background dispatch queues.
     private let backgroundQueue = DispatchQueue(
@@ -105,24 +112,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         resource.merge(other: replayResource)
 
         self.resource = resource
-
-        if #available(iOS 15.0, *) {
-            let style: Date.FormatStyle = .init()
-                .month()
-                .day()
-                .year()
-                .hour(.twoDigits(amPM: .wide))
-                .minute(.twoDigits)
-                .second(.twoDigits)
-                .secondFraction(.fractional(3))
-                .timeZone(.iso8601(.short))
-            self.dateFormatStyle = style
-        }
-        else {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MM/dd/yyyy, hh:mm:ss.SSS a Z"
-            legacyDateFormatter = formatter
-        }
     }
 
 
@@ -269,30 +258,15 @@ extension OTLPSessionReplayEventProcessor {
                 message += "Severity: \(String(describing: logRecord.severity))\n"
                 message += "Body: \(bodyDescription)\n"
                 message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
+                message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(self.dateFormatStyle)))\n"
 
-                if #available(iOS 15.0, *), let style = self.dateFormatStyle as? Date.FormatStyle {
-                    message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(style)))\n"
-
-                    if let observedTimestamp = logRecord.observedTimestamp {
-                        let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                        let observedTimestampFormatted = observedTimestamp.formatted(style)
-                        message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-                    }
-                    else {
-                        message += "ObservedTimestamp: -\n"
-                    }
+                if let observedTimestamp = logRecord.observedTimestamp {
+                    let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
+                    let observedTimestampFormatted = observedTimestamp.formatted(self.dateFormatStyle)
+                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
                 }
-                else if let formatter = self.legacyDateFormatter {
-                    message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: logRecord.timestamp)))\n"
-
-                    if let observedTimestamp = logRecord.observedTimestamp {
-                        let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                        let observedTimestampFormatted = formatter.string(from: observedTimestamp)
-                        message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-                    }
-                    else {
-                        message += "ObservedTimestamp: -\n"
-                    }
+                else {
+                    message += "ObservedTimestamp: -\n"
                 }
 
                 message += "SpanContext: \(String(describing: logRecord.spanContext))\n"

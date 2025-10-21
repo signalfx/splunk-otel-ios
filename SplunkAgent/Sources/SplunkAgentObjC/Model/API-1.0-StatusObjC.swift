@@ -43,10 +43,6 @@ public final class StatusObjC: NSObject {
     @objc
     public static let notRunningSampledOut = NSNumber(value: -102)
 
-    /// Recording is not in progress because the current OS version is unsupported.
-    @objc
-    public static let notRunningUnsupportedOSVersion = NSNumber(value: -103)
-
 
     // MARK: - Initialization
 
@@ -71,9 +67,6 @@ public final class StatusObjC: NSObject {
         case notRunningSampledOut:
             return .notRunning(.sampledOut)
 
-        case notRunningUnsupportedOSVersion:
-            return .notRunning(.unsupportedOSVersion)
-
         default:
             return nil
         }
@@ -92,9 +85,6 @@ public final class StatusObjC: NSObject {
 
         case .notRunning(.sampledOut):
             return notRunningSampledOut
-
-        case .notRunning(.unsupportedOSVersion):
-            return notRunningUnsupportedOSVersion
         }
     }
 }

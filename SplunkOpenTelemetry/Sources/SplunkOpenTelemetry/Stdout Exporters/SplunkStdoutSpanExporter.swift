@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoLogger
 import Foundation
+import OpenTelemetryApi
 import OpenTelemetrySdk
 import SplunkCommon
 
@@ -25,9 +25,10 @@ class SplunkStdoutSpanExporter: SpanExporter {
 
     // MARK: - Private
 
+    /// The proxy exporter.
     private let proxyExporter: SpanExporter
 
-    /// Internal Logger.
+    /// Logger for the module.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
     /// Date format.
@@ -58,62 +59,64 @@ class SplunkStdoutSpanExporter: SpanExporter {
     func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
         for span in spans {
             // Log Span data
-            logger.log {
-                var message = ""
-
-                message += "------ 🔧 Span: ------\n"
-                message += "Span: \(span.name)\n"
-                message += "TraceId: \(span.traceId.hexString)\n"
-                message += "SpanId: \(span.spanId.hexString)\n"
-                message += "Span kind: \(span.kind.rawValue)\n"
-                message += "TraceFlags: \(span.traceFlags)\n"
-                message += "TraceState: \(span.traceState)\n"
-                message += "ParentSpanId: \(span.parentSpanId?.hexString ?? "-")\n"
-
-                if #available(iOS 15.0, tvOS 15.0, *), let style = self.dateFormatStyle as? Date.FormatStyle {
-                    message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.formatted(style)))\n"
-                    message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.formatted(style)))\n"
-                }
-                else if let formatter = self.legacyDateFormatter {
-                    message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: span.startTime)))\n"
-                    message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: span.endTime)))\n"
-                }
-
-                let duration = span.endTime.timeIntervalSince(span.startTime)
-                message += "Duration: \(duration.toNanoseconds) nanoseconds (\(duration) seconds)\n"
-
-                // Log attributes
-                message += "Attributes:\n"
-                message += "  \(span.attributes)\n"
-
-                // Log resources
-                message += "Resource:\n"
-                message += "  \(span.resource.attributes)\n"
-
-                // Log span events
-                if !span.events.isEmpty {
-                    message += "Span events:\n"
-
-                    for event in span.events {
-                        let ts = event.timestamp.timeIntervalSince(span.startTime).toNanoseconds
-                        message += "  \(event.name) Time: +\(ts) Attributes: \(event.attributes)\n"
-                    }
-                }
-
-                message += "--------------------\n"
-
-                return message
-            }
+            logger.log { self.formatSpanMessage(span) }
         }
 
         return proxyExporter.export(spans: spans)
     }
 
-    func flush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
-        proxyExporter.flush(explicitTimeout: explicitTimeout)
+    func forceFlush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
+        proxyExporter.forceFlush(explicitTimeout: explicitTimeout)
     }
 
     func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
+    }
+
+    private func formatSpanMessage(_ span: SpanData) -> String {
+        var message = ""
+
+        message += "------ 🔧 Span: ------\n"
+        message += "Span: \(span.name)\n"
+        message += "TraceId: \(span.traceId.hexString)\n"
+        message += "SpanId: \(span.spanId.hexString)\n"
+        message += "Span kind: \(span.kind.rawValue)\n"
+        message += "TraceFlags: \(span.traceFlags)\n"
+        message += "TraceState: \(span.traceState)\n"
+        message += "ParentSpanId: \(span.parentSpanId?.hexString ?? "-")\n"
+
+        if #available(iOS 15.0, tvOS 15.0, *), let style = dateFormatStyle as? Date.FormatStyle {
+            message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.formatted(style)))\n"
+            message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.formatted(style)))\n"
+        }
+        else if let formatter = legacyDateFormatter {
+            message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: span.startTime)))\n"
+            message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: span.endTime)))\n"
+        }
+
+        let duration = span.endTime.timeIntervalSince(span.startTime)
+        message += "Duration: \(duration.toNanoseconds) nanoseconds (\(duration) seconds)\n"
+
+        // Log attributes
+        message += "Attributes:\n"
+        message += "  \(span.attributes)\n"
+
+        // Log resources
+        message += "Resource:\n"
+        message += "  \(span.resource.attributes)\n"
+
+        // Log span events
+        if !span.events.isEmpty {
+            message += "Span events:\n"
+
+            for event in span.events {
+                let ts = event.timestamp.timeIntervalSince(span.startTime).toNanoseconds
+                message += "  \(event.name) Time: +\(ts) Attributes: \(event.attributes)\n"
+            }
+        }
+
+        message += "--------------------\n"
+
+        return message
     }
 }

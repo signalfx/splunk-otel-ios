@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2024 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
 import SplunkCommon
@@ -25,9 +24,10 @@ class SplunkStdoutLogExporter: LogRecordExporter {
 
     // MARK: - Private
 
+    /// The proxy exporter.
     private let proxyExporter: LogRecordExporter
 
-    /// Internal Logger.
+    /// Logger for the module.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
     /// Date format.
@@ -58,53 +58,7 @@ class SplunkStdoutLogExporter: LogRecordExporter {
     func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         for logRecord in logRecords {
             // Log LogRecord data
-            logger.log {
-                var message = ""
-
-                message += "------ 🪵 Log: ------\n"
-                message += "Severity: \(String(describing: logRecord.severity))\n"
-                message += "Body: \(String(describing: logRecord.body))\n"
-                message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
-
-                if #available(iOS 15.0, tvOS 15.0, *), let style = self.dateFormatStyle as? Date.FormatStyle {
-                    message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(style)))\n"
-
-                    if let observedTimestamp = logRecord.observedTimestamp {
-                        let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                        let observedTimestampFormatted = observedTimestamp.formatted(style)
-                        message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-                    }
-                    else {
-                        message += "ObservedTimestamp: -\n"
-                    }
-                }
-                else if let formatter = self.legacyDateFormatter {
-                    message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: logRecord.timestamp)))\n"
-
-                    if let observedTimestamp = logRecord.observedTimestamp {
-                        let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                        let observedTimestampFormatted = formatter.string(from: observedTimestamp)
-                        message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-                    }
-                    else {
-                        message += "ObservedTimestamp: -\n"
-                    }
-                }
-
-                message += "SpanContext: \(String(describing: logRecord.spanContext))\n"
-
-                // Log attributes
-                message += "Attributes:\n"
-                message += "  \(logRecord.attributes)\n"
-
-                // Log resources
-                message += "Resource:\n"
-                message += "  \(logRecord.resource.attributes)\n"
-
-                message += "--------------------\n"
-
-                return message
-            }
+            logger.log { self.formatLogRecordMessage(logRecord) }
         }
 
         return proxyExporter.export(logRecords: logRecords, explicitTimeout: explicitTimeout)
@@ -116,5 +70,53 @@ class SplunkStdoutLogExporter: LogRecordExporter {
 
     func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
+    }
+
+    private func formatLogRecordMessage(_ logRecord: ReadableLogRecord) -> String {
+        var message = ""
+
+        message += "------ 🪵 Log: ------\n"
+        message += "Severity: \(String(describing: logRecord.severity))\n"
+        message += "Body: \(String(describing: logRecord.body))\n"
+        message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
+
+        if #available(iOS 15.0, tvOS 15.0, *), let style = dateFormatStyle as? Date.FormatStyle {
+            message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(style)))\n"
+
+            if let observedTimestamp = logRecord.observedTimestamp {
+                let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
+                let observedTimestampFormatted = observedTimestamp.formatted(style)
+                message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
+            }
+            else {
+                message += "ObservedTimestamp: -\n"
+            }
+        }
+        else if let formatter = legacyDateFormatter {
+            message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: logRecord.timestamp)))\n"
+
+            if let observedTimestamp = logRecord.observedTimestamp {
+                let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
+                let observedTimestampFormatted = formatter.string(from: observedTimestamp)
+                message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
+            }
+            else {
+                message += "ObservedTimestamp: -\n"
+            }
+        }
+
+        message += "SpanContext: \(String(describing: logRecord.spanContext))\n"
+
+        // Log attributes
+        message += "Attributes:\n"
+        message += "  \(logRecord.attributes)\n"
+
+        // Log resources
+        message += "Resource:\n"
+        message += "  \(logRecord.resource.attributes)\n"
+
+        message += "--------------------\n"
+
+        return message
     }
 }
