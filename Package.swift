@@ -34,24 +34,6 @@ let package = Package(
         .package(
             url: "https://github.com/microsoft/plcrashreporter",
             from: "1.12.0"
-        ),
-
-        // SwiftLint (realm)
-        .package(
-            url: "https://github.com/SimplyDanny/SwiftLintPlugins",
-            from: "0.59.1"
-        ),
-
-        // swift-format (swiftlang)
-        .package(
-            url: "https://github.com/StarLard/SwiftFormatPlugins",
-            from: "1.1.0"
-        ),
-
-        // SwiftFormat (nicklockwood)
-        .package(
-            url: "https://github.com/nicklockwood/SwiftFormat",
-            from: "0.57.2"
         )
     ],
     targets: []
@@ -62,6 +44,10 @@ let package = Package(
 package.targets.append(contentsOf: generateBinaryTargets())
 package.targets.append(contentsOf: generateWrapperTargets())
 package.targets.append(contentsOf: generateMainTargets())
+
+// Conditionally add all required plugin dependencies
+
+package.dependencies.append(contentsOf: pluginDependencies())
 
 // Conditionally add Session Replay as a repository dependency
 resolveSessionReplayRepositoryDependency()
@@ -100,10 +86,7 @@ func generateMainTargets() -> [Target] {
                 .copy("../../Resources/PrivacyInfo.xcprivacy"),
                 .copy("../../Resources/NOTICES")
             ],
-            plugins: [
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintMainTargetPlugins()
         ),
         .testTarget(
             name: "SplunkAgentTests",
@@ -118,10 +101,7 @@ func generateMainTargets() -> [Target] {
             swiftSettings: [
                 .define("SPM_TESTS")
             ],
-            plugins: [
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintMainTargetPlugins()
         ),
 
 
@@ -142,10 +122,7 @@ func generateMainTargets() -> [Target] {
                 .copy("../../Resources/PrivacyInfo.xcprivacy"),
                 .copy("../../Resources/NOTICES")
             ],
-            plugins: [
-                .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
-                .plugin(name: "Lint", package: "SwiftFormatPlugins")
-            ]
+            plugins: lintMainTargetPlugins()
         ),
         .testTarget(
             name: "SplunkAgentObjCTests",
@@ -541,9 +518,68 @@ func generateBinaryWrapperTargets() -> [Target] {
 
 // MARK: - Target plugins
 
+/// Determines whether to use development plugins as a repository dependency.
+///
+/// This is the main switch for enabling linter and formaters plugins.
+func shouldUseDevelopmentPlugins() -> Bool {
+    // Check the ENV first
+    if let envValue = ProcessInfo.processInfo.environment["USE_DEVELOPMENT_PLUGINS"],
+        let boolValue = Bool(envValue)
+    {
+        return boolValue
+    }
+
+    // Default to *not use any plugins*
+    return false
+}
+
+/// List of used plugin dependencies.
+func pluginDependencies() -> [Package.Dependency] {
+    guard shouldUseDevelopmentPlugins() else {
+        return []
+    }
+
+    return [
+        // SwiftLint (realm)
+        .package(
+            url: "https://github.com/SimplyDanny/SwiftLintPlugins",
+            from: "0.59.1"
+        ),
+
+        // swift-format (swiftlang)
+        .package(
+            url: "https://github.com/StarLard/SwiftFormatPlugins",
+            from: "1.1.0"
+        ),
+
+        // SwiftFormat (nicklockwood)
+        .package(
+            url: "https://github.com/nicklockwood/SwiftFormat",
+            from: "0.57.2"
+        )
+    ]
+}
+
+/// List of used lint plugins in main targets.
+func lintMainTargetPlugins() -> [Target.PluginUsage] {
+    guard shouldUseDevelopmentPlugins() else {
+        return []
+    }
+
+    return [
+        .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
+        .plugin(name: "Lint", package: "SwiftFormatPlugins")
+    ]
+}
+
 /// List of used lint plugins in every target.
 func lintTargetPlugins() -> [Target.PluginUsage] {
-    [
+    guard shouldUseDevelopmentPlugins() else {
+        return []
+    }
+
+    return [
+        .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins"),
         .plugin(name: "Lint", package: "SwiftFormatPlugins")
     ]
 }

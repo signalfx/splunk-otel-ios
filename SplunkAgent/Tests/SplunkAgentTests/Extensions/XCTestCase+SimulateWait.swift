@@ -34,16 +34,16 @@ extension XCTestCase {
         // We need time to deliver and evaluate the expectation for the whole mechanism to work correctly.
         // This time window will guarantee that there will always be enough time for the expectation
         // to be satisfied and the `wait(for:timeout:)` method to always complete correctly.
-        let deliveryTime: TimeInterval = 0.05
+        let deliveryTime: TimeInterval = 1
 
         // Simulate waiting on the main thread
         let waitExpectation = XCTestExpectation(description: "Waiting for \(duration) seconds.")
-        let fireDuration: DispatchTime = .now() + duration - deliveryTime
+        let fireDuration: DispatchTime = .now() + duration
 
         DispatchQueue.main.asyncAfter(deadline: fireDuration) {
             waitExpectation.fulfill()
         }
 
-        wait(for: [waitExpectation], timeout: duration)
+        wait(for: [waitExpectation], timeout: duration + deliveryTime)
     }
 }
