@@ -23,7 +23,7 @@ extension NotificationCenter {
         guard #available(iOS 15.0, *) else {
             // Provide a fallback for iOS 13/14 using the classic observer pattern.
             return AsyncStream { continuation in
-                let observer = self.addObserver(forName: name, object: nil, queue: nil) { notification in
+                let observer = self.addObserver(forName: name, object: nil, queue: .main) { notification in
                     continuation.yield(notification)
                 }
 
