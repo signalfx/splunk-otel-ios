@@ -139,6 +139,21 @@ class DefaultEventManager: AgentEventManager {
         }
     }
 
+    /// Disables the endpoint configuration and reverts to NoOp processors.
+    ///
+    /// This method replaces active processors with NoOp processors, effectively disabling
+    /// data transmission. All subsequent spans and events will be dropped.
+    func disableEndpoint() {
+        // Replace with NoOp processors - spans won't be sent
+        logEventProcessor = NoOpLogEventProcessor()
+        sessionReplayProcessor = nil
+        traceProcessor = NoOpTraceProcessor()
+
+        logger.log(level: .info, isPrivate: false) {
+            "Endpoint disabled. Spans will not be sent until endpoint is configured."
+        }
+    }
+
     // MARK: - Private Helpers
 
     private static func createProcessors(

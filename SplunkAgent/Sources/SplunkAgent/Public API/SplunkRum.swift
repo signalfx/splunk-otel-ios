@@ -93,6 +93,9 @@ public class SplunkRum: ObservableObject {
     /// An object that manages the associated ``Session``.
     public private(set) lazy var session = Session(for: self)
 
+    /// An object that holds preferred settings for the agent, an ``AgentPreferences`` instance.
+    public private(set) lazy var preferences = AgentPreferences(for: self)
+
     /// An object that contains global attributes (a ``MutableAttributes`` instance) added to all signals.
     public private(set) lazy var globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 
@@ -127,6 +130,28 @@ public class SplunkRum: ObservableObject {
 
         logger.log(level: .info, isPrivate: false) {
             "Endpoint configuration updated successfully."
+        }
+    }
+
+    /// Disables the endpoint configuration and stops sending spans and events.
+    ///
+    /// Use this method to dynamically disable the endpoint after the agent has been initialized.
+    /// Once the endpoint is disabled, all subsequent spans and events will be dropped until
+    /// a new endpoint is configured.
+    ///
+    /// - Note: This method can only be called once the agent is running.
+    public func disableEndpoint() {
+        guard let eventManager = eventManager as? DefaultEventManager else {
+            logger.log(level: .error, isPrivate: false) {
+                "Cannot disable endpoint: Event manager is not available."
+            }
+            return
+        }
+
+        eventManager.disableEndpoint()
+
+        logger.log(level: .info, isPrivate: false) {
+            "Endpoint configuration disabled successfully."
         }
     }
 
