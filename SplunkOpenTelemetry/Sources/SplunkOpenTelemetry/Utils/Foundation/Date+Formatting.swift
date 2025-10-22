@@ -17,8 +17,8 @@ limitations under the License.
 
 import Foundation
 
-/// A private enum to hold the lazily-initialized legacy date formatter.
-/// This is a performant pattern that avoids re-creating the formatter on every call.
+// A private enum to hold the lazily-initialized legacy date formatter.
+// This is a performant pattern that avoids re-creating the formatter on every call.
 private enum SplunkLegacyDateFormatter {
     static let iso8601: DateFormatter = {
         let formatter = DateFormatter()
@@ -33,12 +33,12 @@ extension Date {
     /// Returns a string representation of the date formatted for Splunk logs.
     /// This method is backward-compatible with iOS versions prior to 15.
     func splunkFormatted() -> String {
-        guard #available(iOS 15.0, *) else {
+        if #available(iOS 15.0, *) {
+            // Use the modern, efficient API on iOS 15 and newer.
+            return self.formatted(.iso8601)
+        } else {
             // Use the legacy DateFormatter for older OS versions.
             return SplunkLegacyDateFormatter.iso8601.string(from: self)
         }
-
-        // Use the modern, efficient API on iOS 15 and newer.
-        return formatted(.iso8601)
     }
 }
