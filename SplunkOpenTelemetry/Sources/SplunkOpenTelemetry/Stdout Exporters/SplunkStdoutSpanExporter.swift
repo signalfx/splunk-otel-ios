@@ -26,77 +26,67 @@ class SplunkStdoutSpanExporter: SpanExporter {
 
     // MARK: - Private
 
-    /// The proxy exporter.
     private let proxyExporter: SpanExporter
 
-    /// Logger for the module.
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-
-    // MARK: - Initialization
-
-    init(proxyExporter: SpanExporter) {
-        self.proxyExporter = proxyExporter
+    init(with proxy: SpanExporter) {
+        proxyExporter = proxy
     }
 
-
-    // MARK: - SpanExporter
-
-    func export(spans: [SpanData], explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
+    func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
         for span in spans {
-            log(span: span)
+            // Log Span data
+            logger.log {
+                var message = ""
+
+                message += "------ 🔧 Span: ------\n"
+                message += "Span: \(span.name)\n"
+                message += "TraceId: \(span.traceId.hexString)\n"
+                message += "SpanId: \(span.spanId.hexString)\n"
+                message += "Span kind: \(span.kind.rawValue)\n"
+                message += "TraceFlags: \(span.traceFlags)\n"
+                message += "TraceState: \(span.traceState)\n"
+                message += "ParentSpanId: \(span.parentSpanId?.hexString ?? "-")\n"
+                message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.splunkFormatted()))\n"
+                message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.splunkFormatted()))\n"
+
+                let duration = span.endTime.timeIntervalSince(span.startTime)
+                message += "Duration: \(duration.toNanoseconds) nanoseconds (\(duration) seconds)\n"
+
+                // Log attributes
+                message += "Attributes:\n"
+                message += "  \(span.attributes)\n"
+
+                // Log resources
+                message += "Resource:\n"
+                message += "  \(span.resource.attributes)\n"
+
+                // Log span events
+                if !span.events.isEmpty {
+                    message += "Span events:\n"
+
+                    for event in span.events {
+                        let ts = event.timestamp.timeIntervalSince(span.startTime).toNanoseconds
+                        message += "  \(event.name) Time: +\(ts) Attributes: \(event.attributes)\n"
+                    }
+                }
+
+                message += "--------------------\n"
+
+                return message
+            }
         }
 
-        return proxyExporter.export(spans: spans, explicitTimeout: explicitTimeout)
+        return proxyExporter.export(spans: spans)
+    }
+
+    func flush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
+        proxyExporter.flush(explicitTimeout: explicitTimeout)
     }
 
     func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
-    }
-
-    // MARK: - Private methods
-
-    private func log(span: SpanData) {
-        logger.log(level: .debug) {
-            var message = ""
-
-            message += "------ 🔭 Span: ------\n"
-            message += "TraceId: \(span.traceId.hexString)\n"
-            message += "SpanId: \(span.spanId.hexString)\n"
-            message += "ParentSpanId: \(span.parentSpanId?.hexString ?? "nil")\n"
-            message += "Name: \(span.name)\n"
-            message += "Kind: \(span.kind)\n"
-            message += "Status: \(span.status)\n"
-            message += "StartTime: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.splunkFormatted()))\n"
-            message += "EndTime: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.splunkFormatted()))\n"
-            message += "HasRemoteParent: \(span.hasRemoteParent)\n"
-            message += "TotalRecordedEvents: \(span.totalRecordedEvents)\n"
-            message += "TotalRecordedLinks: \(span.totalRecordedLinks)\n"
-            message += "TotalAttributes: \(span.totalAttributeCount)\n"
-
-            // Log attributes
-            message += "Attributes:\n"
-            message += "  \(span.attributes)\n"
-
-            // Log events
-            message += "Events:\n"
-            for event in span.events {
-                message += "  \(event)\n"
-            }
-
-            // Log links
-            message += "Links:\n"
-            for link in span.links {
-                message += "  \(link)\n"
-            }
-
-            // Log resources
-            message += "Resource:\n"
-            message += "  \(span.resource.attributes)\n"
-
-            message += "--------------------\n"
-
-            return message
-        }
     }
 }
