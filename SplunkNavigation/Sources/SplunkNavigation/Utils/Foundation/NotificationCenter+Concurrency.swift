@@ -42,9 +42,9 @@ extension NotificationCenter {
     import Combine
 
     @available(iOS 15.0, *)
-    extension Publisher.Values {
+    extension AsyncSequence {
         /// Helper to erase the specific async sequence type to a generic AsyncStream.
-        func eraseToStream() -> AsyncStream<Output> {
+        func eraseToStream() -> AsyncStream<Element> {
             AsyncStream { continuation in
                 let task = Task {
                     do {
