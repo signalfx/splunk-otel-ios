@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import CiscoLogger
 import Foundation
 import OpenTelemetrySdk
 import SplunkCommon
@@ -22,45 +23,51 @@ import SplunkCommon
 /// Prints Log Record contents into the console using an internal logger.
 class SplunkStdoutLogExporter: LogRecordExporter {
 
-    // MARK: - Private Properties
+    // MARK: - Private
 
     private let proxyExporter: LogRecordExporter
+
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
-
-    // Date formatters; one for modern iOS 15+ and a fallback for older versions.
-    private var dateFormatStyle: Any?
-    private var legacyDateFormatter: DateFormatter?
-
-    // MARK: - Initialization
 
     init(with proxy: LogRecordExporter) {
         proxyExporter = proxy
-
-        if #available(iOS 15.0, tvOS 15.0, *) {
-            let style: Date.FormatStyle = .init()
-                .month()
-                .day()
-                .year()
-                .hour(.twoDigits(amPM: .wide))
-                .minute(.twoDigits)
-                .second(.twoDigits)
-                .secondFraction(.fractional(3))
-                .timeZone(.iso8601(.short))
-            self.dateFormatStyle = style
-        }
-        else {
-            // Fallback for iOS 13 & 14
-            let formatter = DateFormatter()
-            formatter.dateFormat = "MM/dd/yyyy, hh:mm:ss.SSS a Z"
-            legacyDateFormatter = formatter
-        }
     }
-
-    // MARK: - LogRecordExporter
 
     func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         for logRecord in logRecords {
-            logger.log { self.formatLogRecordMessage(logRecord) }
+            // Log LogRecord data
+            logger.log {
+                var message = ""
+
+                message += "------ 🪵 Log: ------\n"
+                message += "Severity: \(String(describing: logRecord.severity))\n"
+                message += "Body: \(String(describing: logRecord.body))\n"
+                message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
+                message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.splunkFormatted()))\n"
+
+                if let observedTimestamp = logRecord.observedTimestamp {
+                    let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
+                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestamp.splunkFormatted()))\n"
+                }
+                else {
+                    message += "ObservedTimestamp: -\n"
+                }
+
+                message += "SpanContext: \(String(describing: logRecord.spanContext))\n"
+
+                // Log attributes
+                message += "Attributes:\n"
+                message += "  \(logRecord.attributes)\n"
+
+                // Log resources
+                message += "Resource:\n"
+                message += "  \(logRecord.resource.attributes)\n"
+
+                message += "--------------------\n"
+
+                return message
+            }
         }
 
         return proxyExporter.export(logRecords: logRecords, explicitTimeout: explicitTimeout)
@@ -72,55 +79,5 @@ class SplunkStdoutLogExporter: LogRecordExporter {
 
     func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
-    }
-
-    // MARK: - Private Helpers
-
-    private func formatLogRecordMessage(_ logRecord: ReadableLogRecord) -> String {
-        var message = ""
-
-        message += "------ 🪵 Log: ------\n"
-        message += "Severity: \(String(describing: logRecord.severity))\n"
-        message += "Body: \(String(describing: logRecord.body))\n"
-        message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
-
-        if #available(iOS 15.0, tvOS 15.0, *), let style = dateFormatStyle as? Date.FormatStyle {
-            message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(style)))\n"
-
-            if let observedTimestamp = logRecord.observedTimestamp {
-                let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                let observedTimestampFormatted = observedTimestamp.formatted(style)
-                message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-            }
-            else {
-                message += "ObservedTimestamp: -\n"
-            }
-        }
-        else if let formatter = legacyDateFormatter {
-            message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(formatter.string(from: logRecord.timestamp)))\n"
-
-            if let observedTimestamp = logRecord.observedTimestamp {
-                let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                let observedTimestampFormatted = formatter.string(from: observedTimestamp)
-                message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-            }
-            else {
-                message += "ObservedTimestamp: -\n"
-            }
-        }
-
-        message += "SpanContext: \(String(describing: logRecord.spanContext))\n"
-
-        // Log attributes
-        message += "Attributes:\n"
-        message += "  \(logRecord.attributes)\n"
-
-        // Log resources
-        message += "Resource:\n"
-        message += "  \(logRecord.resource.attributes)\n"
-
-        message += "--------------------\n"
-
-        return message
     }
 }
