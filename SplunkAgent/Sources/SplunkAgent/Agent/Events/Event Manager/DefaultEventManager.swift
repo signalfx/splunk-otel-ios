@@ -18,7 +18,6 @@ limitations under the License.
 internal import CiscoLogger
 internal import CiscoSessionReplay
 import Foundation
-import OpenTelemetryApi
 internal import SplunkCommon
 internal import SplunkCrashReports
 internal import SplunkCustomTracking

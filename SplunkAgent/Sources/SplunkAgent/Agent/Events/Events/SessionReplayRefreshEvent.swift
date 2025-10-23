@@ -41,11 +41,11 @@ struct SessionReplayRefreshEvent: AgentEvent {
 
     // MARK: - Initialization
 
-    /// Initializes `SessionStartEvent`event.
+    /// Initializes `SessionReplayRefreshEvent`event.
     ///
     /// - Parameters:
     ///   - timestamp: `SessionReplay` start timestamp.
-    ///   - sessionId: A session id of the session where was `SessionReplay` recorded.
+    ///   - sessionId: The session id of the session where the a SessionReplay event was recorded.
     init(timestamp: Date, sessionId: String) {
         self.timestamp = timestamp
         self.sessionId = sessionId
