@@ -101,7 +101,7 @@ public class NetworkInstrumentation {
             delegateClassesToInstrument = nil
             logger.log(level: .debug) {
                 """
-                Standard Delegate classes removed.  This will force the 
+                Standard Delegate classes removed.  This will force the
                 exhaustive search, but should have broader coverage.
                 """
             }
