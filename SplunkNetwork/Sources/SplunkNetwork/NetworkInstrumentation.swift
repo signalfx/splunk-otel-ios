@@ -97,6 +97,15 @@ public class NetworkInstrumentation {
                 }
             }
 
+            // Temporary patch for DEMRUM-3771
+            delegateClassesToInstrument = nil
+            logger.log(level: .debug) {
+                """
+                Standard Delegate classes removed.  This will force the 
+                exhaustive search, but should have broader coverage.
+                """
+            }
+
             // Start up URLSession instrumentation
             _ = URLSessionInstrumentation(
                 configuration: URLSessionInstrumentationConfiguration(
