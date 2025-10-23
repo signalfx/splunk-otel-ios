@@ -43,12 +43,14 @@ public final class AgentPreferencesObjC: NSObject {
             guard let endpoint = owner.agent.preferences.endpointConfiguration else {
                 return nil
             }
+
             return EndpointConfigurationObjC(for: endpoint)
         }
         set {
             if let newValue {
                 owner.agent.preferences.endpointConfiguration = newValue.endpointConfiguration()
-            } else {
+            }
+            else {
                 // Pass nil to disable the endpoint
                 owner.agent.preferences.endpointConfiguration = nil
             }

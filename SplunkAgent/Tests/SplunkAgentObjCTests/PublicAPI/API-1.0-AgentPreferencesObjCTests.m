@@ -77,9 +77,8 @@ limitations under the License.
     // Disable the endpoint by setting to nil
     agentPreferences.endpointConfiguration = nil;
 
-    // Note: The getter still returns the original configuration from agentConfiguration
-    // but the processors have been replaced with NoOp processors
-    // This test verifies that setting nil doesn't crash and executes the disable logic
+    // Verify the endpoint is now nil
+    XCTAssertNil(agentPreferences.endpointConfiguration);
 }
 
 @end

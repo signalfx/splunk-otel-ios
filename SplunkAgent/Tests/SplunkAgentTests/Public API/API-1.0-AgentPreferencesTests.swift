@@ -40,7 +40,7 @@ final class API10AgentPreferencesTests: XCTestCase {
             rumAccessToken: "test-token"
         )
         agentPreferences.endpointConfiguration = newEndpoint
-        
+
         // Verify the endpoint was updated (by reading it back)
         let updatedEndpoint = agentPreferences.endpointConfiguration
         XCTAssertNotNil(updatedEndpoint)
@@ -54,7 +54,7 @@ final class API10AgentPreferencesTests: XCTestCase {
         )
         let returnedPreferences = agentPreferences.endpointConfiguration(anotherEndpoint)
         XCTAssertNotNil(returnedPreferences)
-        
+
         let finalEndpoint = agentPreferences.endpointConfiguration
         XCTAssertEqual(finalEndpoint?.realm, "us1")
     }
@@ -70,9 +70,7 @@ final class API10AgentPreferencesTests: XCTestCase {
         // Disable the endpoint by setting to nil
         agentPreferences.endpointConfiguration = nil
 
-        // Note: The getter still returns the original configuration from agentConfiguration
-        // but the processors have been replaced with NoOp processors
-        // This test verifies that setting nil doesn't crash and executes the disable logic
+        // Verify the endpoint is now nil
+        XCTAssertNil(agentPreferences.endpointConfiguration)
     }
 }
-

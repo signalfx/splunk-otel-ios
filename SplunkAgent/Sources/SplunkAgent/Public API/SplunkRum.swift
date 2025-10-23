@@ -35,6 +35,7 @@ public class SplunkRum: ObservableObject {
     var currentUser: AgentUser
     var currentSession: AgentSession
     var currentStatus: Status
+    var currentEndpoint: EndpointConfiguration?
 
     var modulesManager: AgentModulesManager?
     var eventManager: AgentEventManager?
@@ -263,6 +264,9 @@ public class SplunkRum: ObservableObject {
         // Assign identification
         currentUser = user
         currentSession = session
+
+        // Initialize current endpoint from configuration
+        currentEndpoint = configurationHandler.configuration.endpoint
 
         let poolName = logPoolName ?? PackageIdentifier.instance()
         let verboseLogging = agentConfigurationHandler.configuration.enableDebugLogging

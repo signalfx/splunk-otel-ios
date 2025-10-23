@@ -70,7 +70,7 @@ extension RuntimeState {
 
     /// An optional ``EndpointConfiguration`` containing either the specified realm, or endpoint urls.
     public var endpointConfiguration: EndpointConfiguration? {
-        owner.agentConfiguration.endpoint
+        owner.currentEndpoint
     }
 
     /// A `String` containing the used application deployment environment.
