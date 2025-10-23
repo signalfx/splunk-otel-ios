@@ -78,9 +78,9 @@ struct SessionReplayDemoView: View {
 
                 Text("User Tracking: \(String(describing: userTrackingMode))")
             }
-            .foregroundColor(Color(uiColor: .black))
+            .foregroundColor(.black)
             .padding()
-            .background(Color(.systemCyan).opacity(0.6))
+            .background(Color(UIColor.systemTeal).opacity(0.6))
             .cornerRadius(8)
 
             Text("\(now)")
