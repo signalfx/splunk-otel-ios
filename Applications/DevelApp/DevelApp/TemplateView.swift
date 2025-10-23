@@ -20,16 +20,17 @@ import SwiftUI
 
 struct TemplateView: View {
     var body: some View {
-        VStack {
-            DemoHeaderView()
-            Text("Clone this and add your content")
-            Button("Do something") {
-                doSomething()
+        ScrollView {
+            VStack {
+                DemoHeaderView()
+                Text("Clone this and add your content")
+                Button("Do something") {
+                    doSomething()
+                }
             }
-            Spacer()
+            .padding()
         }
         .navigationBarTitle("Your title")
-        Spacer()
     }
 
     func doSomething() {

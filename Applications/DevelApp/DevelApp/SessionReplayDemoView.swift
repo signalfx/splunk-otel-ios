@@ -53,57 +53,59 @@ struct SessionReplayDemoView: View {
 
     // swiftlint:disable closure_body_length
     var body: some View {
-        VStack(spacing: 24) {
-            HStack {
-                Text("Agent Status:")
-                Text(String(describing: agentStatus))
-                    .padding(2)
-                    .padding(.horizontal, 4)
-                    .background(agentStatus == .running ? Color(.systemGreen) : Color(.systemRed))
-                    .cornerRadius(4)
-            }
-            .padding(.vertical, 32)
+        ScrollView {
+            VStack(spacing: 24) {
+                HStack {
+                    Text("Agent Status:")
+                    Text(String(describing: agentStatus))
+                        .padding(2)
+                        .padding(.horizontal, 4)
+                        .background(agentStatus == .running ? Color(.systemGreen) : Color(.systemRed))
+                        .cornerRadius(4)
+                }
+                .padding(.vertical, 32)
 
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
+                Image(systemName: "globe")
+                    .imageScale(.large)
+                    .foregroundColor(.accentColor)
 
-            Text("Agent Version: \(agentVersion)")
-            Text("Agent App Version: \(agentAppVersion)")
+                Text("Agent Version: \(agentVersion)")
+                Text("Agent App Version: \(agentAppVersion)")
 
-            VStack {
-                Text("Session ID: \(String(describing: sessionId))")
-                    .transition(.opacity)
-                    .id("LabelSessionID" + sessionId)
+                VStack {
+                    Text("Session ID: \(String(describing: sessionId))")
+                        .transition(.opacity)
+                        .id("LabelSessionID" + sessionId)
 
-                Text("User Tracking: \(String(describing: userTrackingMode))")
-            }
-            .foregroundColor(.black)
-            .padding()
-            .background(Color(UIColor.systemTeal).opacity(0.6))
-            .cornerRadius(8)
+                    Text("User Tracking: \(String(describing: userTrackingMode))")
+                }
+                .foregroundColor(.black)
+                .padding()
+                .background(Color(UIColor.systemTeal).opacity(0.6))
+                .cornerRadius(8)
 
-            Text("\(now)")
-                .onReceive(timer) { _ in
-                    now = Date()
+                Text("\(now)")
+                    .onReceive(timer) { _ in
+                        now = Date()
+                    }
+
+                Text("Sensitive text")
+                // .sessionReplaySensitive(true)
+
+                Button {
+                    fatalError("Test fatal error from DevelApp.")
+                } label: {
+                    Text("Crash")
                 }
 
-            Text("Sensitive text")
-            // .sessionReplaySensitive(true)
-
-            Button {
-                fatalError("Test fatal error from DevelApp.")
-            } label: {
-                Text("Crash")
+                Spacer()
             }
-
-            Spacer()
-        }
-        .padding()
-        .onReceive(sessionPublisher) { output in
-            if let currentSessionId = output.object as? String {
-                withAnimation {
-                    sessionId = currentSessionId
+            .padding()
+            .onReceive(sessionPublisher) { output in
+                if let currentSessionId = output.object as? String {
+                    withAnimation {
+                        sessionId = currentSessionId
+                    }
                 }
             }
         }
