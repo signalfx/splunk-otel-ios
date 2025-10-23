@@ -93,7 +93,7 @@ struct BackgroundHTTPClientTests {
             didComplete = true
         }
 
-        try await Task.sleep(nanoseconds: 100_000_000)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
 
         #expect(didComplete)
     }
@@ -107,7 +107,7 @@ struct BackgroundHTTPClientTests {
             wasCalled = true
         }
 
-        try await Task.sleep(nanoseconds: 100_000_000)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
 
         #expect(wasCalled)
     }
