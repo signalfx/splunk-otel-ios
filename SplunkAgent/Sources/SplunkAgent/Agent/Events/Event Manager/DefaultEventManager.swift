@@ -221,6 +221,16 @@ class DefaultEventManager: AgentEventManager {
     }
 
 
+    // MARK: - Internal events
+
+    func sendEvent(_ event: AgentEvent) {
+        logEventProcessor.sendEvent(
+            event: event,
+            immediateProcessing: false
+        ) { _ in }
+    }
+
+
     // MARK: - Module utils
 
     private func prepareSessionReplayIndex(sessionId: String, timestamp: Date) async -> Int? {

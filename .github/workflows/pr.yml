@@ -116,6 +116,7 @@ jobs:
     permissions:
         contents: read
         pull-requests: write
+        checks: write
     strategy:
       fail-fast: false
       matrix:
@@ -141,15 +142,15 @@ jobs:
           echo "Destination=$DEST"
 
       - name: Run tests (${{ matrix.platform }})
-        id: run
+        id: test
         env:
           SCHEME: ${{ needs.prepare.outputs.scheme }}
           DESTINATION: ${{ env.DEST }}
         run: |
           export GITHUB_OUTPUT="$(mktemp)"
           .github/actions/build-and-tests/scripts/test.sh
-          code="$(sed -n 's/^xcode_status=//p' "$GITHUB_OUTPUT")"
-          echo "status=${code:-1}" >> "$GITHUB_OUTPUT"
+          code=$?
+          echo "xcode_status=$code" >> "$GITHUB_OUTPUT"
 
       - name: Publish JUnit to Checks
         uses: mikepenz/action-junit-report@v4
@@ -166,7 +167,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: xcresult-${{ matrix.platform }}
+          name: xcresult-${{ matrix.platform }}.xcresult
           path: TestResults_${{ matrix.platform }}.xcresult
           if-no-files-found: warn
 
@@ -174,10 +175,3 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Fail job if xcodebuild failed
-        if: always()
-        run: |
-          code="${{ steps.test.outputs.xcode_status }}"
-          if [ -z "$code" ]; then exit 0; fi
-          if [ "$code" -ne 0 ]; then exit "$code"; fi

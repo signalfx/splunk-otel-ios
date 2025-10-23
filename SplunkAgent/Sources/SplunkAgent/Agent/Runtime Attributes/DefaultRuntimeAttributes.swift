@@ -32,6 +32,9 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
     /// Internal value store for custom attributes.
     private var customValue: [String: Any]
 
+    /// Persistent, unique identifier for this application installation.
+    private let appInstallationId: String
+
 
     // MARK: - RuntimeAttributes protocol
 
@@ -46,6 +49,7 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
         var systemAttributes: [String: Any] = [:]
         systemAttributes["user.anonymous_id"] = userIdentifier()
         systemAttributes["session.id"] = sessionIdentifier()
+        systemAttributes["app.installation.id"] = installationIdentifier()
         allAttributes = systemAttributes
 
 
@@ -91,6 +95,19 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
 
         let queueName = PackageIdentifier.default(named: "runtimeAttributesAccess")
         accessQueue = DispatchQueue(label: queueName, qos: .userInitiated)
+
+        let storage = UserDefaultsStorage()
+        let storageKeyForAppInstallationId = "app.installation.id"
+
+        // Retrieve or generate a persistent app installation ID
+        if let existingAppInstallationId: String = try? storage.read(forKey: storageKeyForAppInstallationId), !existingAppInstallationId.isEmpty {
+            appInstallationId = existingAppInstallationId
+        }
+        else {
+            let newId = String.uniqueHexIdentifier(ofLength: 32)
+            try? storage.update(newId, forKey: storageKeyForAppInstallationId)
+            appInstallationId = newId
+        }
     }
 
 
@@ -107,5 +124,9 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
 
     private func sessionIdentifier() -> String? {
         owner.currentSession.currentSessionId
+    }
+
+    private func installationIdentifier() -> String {
+        appInstallationId
     }
 }

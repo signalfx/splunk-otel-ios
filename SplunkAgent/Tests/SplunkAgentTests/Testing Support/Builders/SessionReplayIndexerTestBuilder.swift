@@ -31,7 +31,7 @@ final class SessionReplayIndexerTestBuilder {
 
     // MARK: - Basic builds
 
-    static func build(named: String) -> SessionReplayEventIndexer {
+    static func build(named: String) async throws -> SessionReplayEventIndexer {
         // Build cache with preconfigured storage
         let storage = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: moduleName),
@@ -46,6 +46,9 @@ final class SessionReplayIndexerTestBuilder {
             maximumCapacity: nil,
             maximumLifetime: nil
         )
+
+        // Init is async, need to wait
+        try await Task.sleep(nanoseconds: 1_000_000_000)
 
         // Build indexer with preconfigured persistent cache
         let indexer = SessionReplayEventIndexer(named: named)
