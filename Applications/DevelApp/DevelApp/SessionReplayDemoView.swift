@@ -66,7 +66,7 @@ struct SessionReplayDemoView: View {
 
             Image(systemName: "globe")
                 .imageScale(.large)
-                .foregroundStyle(.tint)
+                .foregroundColor(.accentColor)
 
             Text("Agent Version: \(agentVersion)")
             Text("Agent App Version: \(agentAppVersion)")
@@ -111,6 +111,8 @@ struct SessionReplayDemoView: View {
     // swiftlint:enable closure_body_length
 }
 
-#Preview {
-    SessionReplayDemoView()
+struct SessionReplayDemoView_Previews: PreviewProvider {
+    static var previews: some View {
+        SessionReplayDemoView()
+    }
 }

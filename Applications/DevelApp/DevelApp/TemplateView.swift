@@ -28,7 +28,7 @@ struct TemplateView: View {
             }
             Spacer()
         }
-        .navigationTitle("Your title")
+        .navigationBarTitle("Your title")
         Spacer()
     }
 

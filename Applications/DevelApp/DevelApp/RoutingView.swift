@@ -37,7 +37,7 @@ struct RoutingView: View {
                     Text("Template for New Screens")
                 }
             }
-            .navigationTitle("Demo Screens")
+            .navigationBarTitle("Demo Screens")
         }
     }
 }

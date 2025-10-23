@@ -16,34 +16,25 @@ limitations under the License.
 */
 
 import SplunkAgent
-import SwiftUI
+import UIKit
 
-@main
-struct DevelAppApp: App {
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    // MARK: - Private
+    func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
-    private let agent: SplunkRum?
-
-
-    // MARK: - Initialization
-
-    init() {
         let agentConfig = AgentConfiguration(
             endpoint: .init(realm: "realm", rumAccessToken: "token"),
-            appName: "App Name",
+            appName: "DevelApp",
             deploymentEnvironment: "dev"
         )
         .enableDebugLogging(true)
-        // Sampled-out agent
-        // .sessionConfiguration(SessionConfiguration(samplingRate: 0))
         .sessionConfiguration(SessionConfiguration(samplingRate: 1))
 
         do {
-            agent = try SplunkRum.install(with: agentConfig)
+            _ = try SplunkRum.install(with: agentConfig)
         }
         catch {
-            agent = nil
             print("Unable to start the Splunk agent, error: \(error)")
         }
 
@@ -56,11 +47,21 @@ struct DevelAppApp: App {
         // API to update Global Attributes
         SplunkRum.shared.globalAttributes.setBool(true, for: "isWorkingHard")
         SplunkRum.shared.globalAttributes[string: "secret"] = "Red bull"
+
+        return true
     }
 
-    var body: some Scene {
-        WindowGroup {
-            RoutingView()
-        }
+    // MARK: UISceneSession Lifecycle
+
+    func application(
+        _: UIApplication,
+        configurationForConnecting connectingSceneSession: UISceneSession,
+        options _: UIScene.ConnectionOptions
+    ) -> UISceneConfiguration {
+        UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+
+    func application(_: UIApplication, didDiscardSceneSessions _: Set<UISceneSession>) {
+        // Called when the user discards a scene session.
     }
 }
