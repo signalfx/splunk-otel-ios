@@ -159,7 +159,7 @@ class DefaultEventManager: AgentEventManager {
             return
         }
 
-        emitSessionReplayRecordingEvent(at: metadata.timestamp)
+        emitSessionReplayRecordingEvent(at: metadata.timestamp, sessionId: sessionId)
 
         // Prepare and send the event as a separate transaction
         Task {
@@ -223,27 +223,13 @@ class DefaultEventManager: AgentEventManager {
         )
     }
 
-    private func emitSessionReplayRecordingEvent(at timestamp: Date) {
-        let logProvider = OpenTelemetry.instance
-            .loggerProvider
-            .get(
-                instrumentationScopeName: "splunk.sessionReplay.isRecording"
-            )
+    private func emitSessionReplayRecordingEvent(at timestamp: Date, sessionId: String) {
+        let event = SessionReplayRefreshEvent(
+            timestamp: timestamp,
+            sessionId: sessionId
+        )
 
-        var attributes: [String: AttributeValue] = [:]
-        attributes["event.name"] = .string("splunk.sessionReplay.isRecording")
-        attributes["component"] = .string("session.replay")
-        attributes["splunk.sessionReplay"] = .string("splunk")
-
-
-        let logRecordBuilder =
-            logProvider
-            .logRecordBuilder()
-            .setTimestamp(timestamp)
-            .setAttributes(attributes)
-
-        // Send event
-        logRecordBuilder.emit()
+        agent.eventManager?.sendEvent(event)
     }
 
 
