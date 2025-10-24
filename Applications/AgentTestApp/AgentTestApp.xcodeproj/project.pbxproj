@@ -22,6 +22,7 @@
 		BA5E5A502B6859BD0022CEB2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BA5E5A4E2B6859BD0022CEB2 /* LaunchScreen.storyboard */; };
 		BA5E5A5C2B6864A60022CEB2 /* NetworkCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5E5A582B6864A60022CEB2 /* NetworkCalls.swift */; };
 		BA5E5A5E2B6864A60022CEB2 /* NetworkCallsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5E5A5A2B6864A60022CEB2 /* NetworkCallsViewController.swift */; };
+		C71A8FF02EAB7AA300308990 /* ColorWellViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71A8FEF2EAB7AA300308990 /* ColorWellViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		BA5E5A512B6859BD0022CEB2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BA5E5A582B6864A60022CEB2 /* NetworkCalls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkCalls.swift; sourceTree = "<group>"; };
 		BA5E5A5A2B6864A60022CEB2 /* NetworkCallsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkCallsViewController.swift; sourceTree = "<group>"; };
+		C71A8FEF2EAB7AA300308990 /* ColorWellViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorWellViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +107,7 @@
 				52705BDF2D08FDF600445B8E /* SlowFrameBeatingHeartView.swift */,
 				BA338B452B9A610600D2F3B6 /* TestApiCalls.swift */,
 				BA338B472B9A612400D2F3B6 /* TestApiCallsViewController.swift */,
+				C71A8FEF2EAB7AA300308990 /* ColorWellViewController.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -201,6 +204,7 @@
 				52705BE12D08FDF600445B8E /* SlowFrameDetectorViewController.swift in Sources */,
 				BA5E5A462B6859BC0022CEB2 /* SceneDelegate.swift in Sources */,
 				BA188B202BA0C91B00DACB15 /* CrashesViewController.swift in Sources */,
+				C71A8FF02EAB7AA300308990 /* ColorWellViewController.swift in Sources */,
 				BA5E5A5E2B6864A60022CEB2 /* NetworkCallsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

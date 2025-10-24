@@ -33,7 +33,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         "Crashes",
         "Test API Sample Calls",
         "Slow Frame Renders",
-        "Sample Next Task"
+        "Sample Next Task",
+        "UIColorWell"
     ]
 
     ///  Segues declared in the storyboard.
@@ -42,7 +43,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         "Crashes",
         "TestApiCalls",
         "SlowFrameRenders",
-        "PlaceHolder"
+        "PlaceHolder",
+        "ColorWell"
     ]
 
     /// Cell reuse id (cells that scroll out of view can be reused).
