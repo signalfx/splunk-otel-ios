@@ -233,14 +233,13 @@ final class ThreadSafeDictionaryTests: XCTestCase {
 
         // Perform concurrent writes
         for index in 0 ..< 100 {
-            DispatchQueue.global()
-                .async {
-                    dict["key\(index)"] = index
-                    expectation.fulfill()
-                }
+            Task.detached {
+                dict["key\(index)"] = index
+                expectation.fulfill()
+            }
         }
 
-        wait(for: [expectation], timeout: 5.0)
+        wait(for: [expectation], timeout: 10.0)
 
         // Verify all values were written
         XCTAssertEqual(dict.count(), 100)

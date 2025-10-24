@@ -25,7 +25,7 @@ final class ConfigurationHandlerTests: XCTestCase {
         let storeConfiguration = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)
 
         let storage = UserDefaultsStorage()
-        storage.keysPrefix = "com.splunk.rum.test."
+        storage.keysPrefix = "com.splunk.rum.test.testInternalStore."
         try storage.update(storeConfiguration, forKey: ConfigurationHandler.configurationStoreKey)
 
         let defaultConfig = try ConfigurationTestBuilder.buildDefault()
@@ -42,15 +42,17 @@ final class ConfigurationHandlerTests: XCTestCase {
     }
 
     func testApiLoadSuccess() throws {
+        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testApiLoadSuccess")
 
-        let expectation = XCTestExpectation(description: "Delayed execution")
+        let dataResponse = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)
 
-        let storage = UserDefaultsStorage()
-        storage.keysPrefix = "com.splunk.rum.test."
+        try? storage.delete(forKey: ConfigurationHandler.configurationStoreKey)
 
         let defaultConfig = try ConfigurationTestBuilder.buildDefault()
-        let dataResponse = try RawMockDataBuilder.build(mockFile: .alternativeRemoteConfiguration)
+
         let apiClient = try APIClientTestBuilder.build(with: "config", response: dataResponse)
+
+        simulateMainThreadWait(duration: 1)
 
         let configurationHandler = ConfigurationHandler(
             for: defaultConfig,
@@ -58,17 +60,12 @@ final class ConfigurationHandlerTests: XCTestCase {
             storage: storage
         )
 
-        DispatchQueue.global()
-            .asyncAfter(deadline: .now() + 5) {
-                XCTAssertEqual(configurationHandler.configurationData, dataResponse)
-                XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
+        simulateMainThreadWait(duration: 30)
 
-                let storedData: Data? = try? storage.read(forKey: ConfigurationHandler.configurationStoreKey)
-                XCTAssertEqual(storedData, dataResponse)
+        XCTAssertEqual(configurationHandler.configurationData, dataResponse)
+        XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
 
-                expectation.fulfill()
-            }
-        // TODO: [DEMRUM-2782] Fix tests
-        //        wait(for: [expectation], timeout: 10)
+        let storedData: Data? = try? storage.read(forKey: ConfigurationHandler.configurationStoreKey)
+        XCTAssertEqual(storedData, dataResponse)
     }
 }
