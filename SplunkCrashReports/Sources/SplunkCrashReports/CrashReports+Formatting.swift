@@ -74,7 +74,7 @@ extension CrashReports {
 
         do {
             let unarchivedData: [String: String]?
-            if #available(iOS 14.0, tvOS 14.0, *) {
+            if #available(iOS 14.0, tvOS 15.0, *) {
                 unarchivedData =
                     try NSKeyedUnarchiver.unarchivedDictionary(
                         ofKeyClass: NSString.self,
