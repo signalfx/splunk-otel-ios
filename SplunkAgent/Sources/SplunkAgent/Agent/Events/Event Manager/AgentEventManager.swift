@@ -55,4 +55,12 @@ protocol AgentEventManager {
     ///    - metadata: Module event metadata.
     ///    - completion: Completion block, returns `true` if the data was processed and sent correctly.
     func publish(data: any ModuleEventData, metadata: any ModuleEventMetadata, completion: @escaping (Bool) -> Void)
+
+
+    // MARK: - Internal events
+
+    /// Sends a custom `AgentEvent`.
+    ///
+    ///  - Parameter event: A custom `AgentEvent` to be sent.
+    func sendEvent(_ event: AgentEvent)
 }
