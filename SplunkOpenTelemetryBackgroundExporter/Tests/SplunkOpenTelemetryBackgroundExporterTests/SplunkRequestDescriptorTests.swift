@@ -19,7 +19,7 @@ import XCTest
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-final class SplunkOTelBackgroundExporterTests: XCTestCase {
+final class SplunkRequestDescriptorTests: XCTestCase {
 
     // MARK: - Private
 
