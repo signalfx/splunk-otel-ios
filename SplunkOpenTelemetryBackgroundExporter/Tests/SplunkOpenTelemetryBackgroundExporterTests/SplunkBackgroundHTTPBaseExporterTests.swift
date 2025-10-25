@@ -48,7 +48,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     }
 
     func createNewTestTask() throws -> URLSessionDataTask {
-        try URLSession(configuration: .default).dataTask(with: FakeRequestDescriptor().createRequest())
+        try URLSession(configuration: .default).dataTask(with: MockRequestDescriptor().createRequest())
     }
 
 
@@ -72,7 +72,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
     @Test
     func diskStorageWorks() throws {
-        let desc = try FakeRequestDescriptor()
+        let desc = try MockRequestDescriptor()
 
         let disk = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: "SplunkOTLPBackgroundHTTPBaseExporterTests.testDiskStorageWorks"),
@@ -123,11 +123,11 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         let fresh = now
 
         let tOld = try createNewTestTask()
-        tOld.taskDescription = try FakeRequestDescriptor(scheduled: old).json
+        tOld.taskDescription = try MockRequestDescriptor(scheduled: old).json
         tOld.earliestBeginDate = old
 
         let tfresh = try createNewTestTask()
-        tfresh.taskDescription = try FakeRequestDescriptor(scheduled: old).json
+        tfresh.taskDescription = try MockRequestDescriptor(scheduled: old).json
         tfresh.earliestBeginDate = fresh
 
         exporter.checkStalledUploadsOperation(tasks: [tOld, tfresh])
@@ -151,7 +151,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func fileWithNonStalledTaskIsNotResent() throws {
         let uuid = UUID()
         let disk = MockDiskStorage()
-        let desc = try FakeRequestDescriptor(id: uuid, scheduled: .now.addingTimeInterval(1_000))
+        let desc = try MockRequestDescriptor(id: uuid, scheduled: .now.addingTimeInterval(1_000))
 
         let http = MockHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
@@ -165,7 +165,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func fileWithStalledTaskIsResent() throws {
         let uuid = UUID()
         let disk = MockDiskStorage()
-        let desc = try FakeRequestDescriptor(
+        let desc = try MockRequestDescriptor(
             id: uuid,
             explicitTimeout: 1,
             sentCount: 5,
