@@ -46,8 +46,8 @@ public final class StatusObjC: NSObject {
 
     // MARK: - Initialization
 
-    // Initialization is hidden from the public API
-    // as we only need to work with the class type.
+    /// Initialization is hidden from the public API
+    /// as we only need to work with the class type.
     override init() {}
 
 
@@ -55,16 +55,16 @@ public final class StatusObjC: NSObject {
 
     static func status(for value: NSNumber) -> Status? {
         switch value {
-        case StatusObjC.running:
+        case running:
             return .running
 
-        case StatusObjC.notRunningNotInstalled:
+        case notRunningNotInstalled:
             return .notRunning(.notInstalled)
 
-        case StatusObjC.notRunningUnsupportedPlatform:
+        case notRunningUnsupportedPlatform:
             return .notRunning(.unsupportedPlatform)
 
-        case StatusObjC.notRunningSampledOut:
+        case notRunningSampledOut:
             return .notRunning(.sampledOut)
 
         default:
@@ -75,16 +75,16 @@ public final class StatusObjC: NSObject {
     static func value(for status: Status) -> NSNumber {
         switch status {
         case .running:
-            return StatusObjC.running
+            return running
 
         case .notRunning(.notInstalled):
-            return StatusObjC.notRunningNotInstalled
+            return notRunningNotInstalled
 
         case .notRunning(.unsupportedPlatform):
-            return StatusObjC.notRunningUnsupportedPlatform
+            return notRunningUnsupportedPlatform
 
         case .notRunning(.sampledOut):
-            return StatusObjC.notRunningSampledOut
+            return notRunningSampledOut
         }
     }
 }

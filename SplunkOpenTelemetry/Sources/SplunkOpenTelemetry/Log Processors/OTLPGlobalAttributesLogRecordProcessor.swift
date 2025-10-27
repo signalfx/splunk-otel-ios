@@ -57,10 +57,10 @@ public class OTLPGlobalAttributesLogRecordProcessor: LogRecordProcessor {
     }
 
     public func forceFlush(explicitTimeout: TimeInterval?) -> ExportResult {
-        return proxy.forceFlush(explicitTimeout: explicitTimeout)
+        proxy.forceFlush(explicitTimeout: explicitTimeout)
     }
 
     public func shutdown(explicitTimeout: TimeInterval?) -> ExportResult {
-        return proxy.shutdown(explicitTimeout: explicitTimeout)
+        proxy.shutdown(explicitTimeout: explicitTimeout)
     }
 }

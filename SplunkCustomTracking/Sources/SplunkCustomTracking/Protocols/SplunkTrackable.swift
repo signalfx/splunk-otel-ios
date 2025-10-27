@@ -19,7 +19,6 @@ import Foundation
 import OpenTelemetryApi
 import SplunkCommon
 
-
 // MARK: - SplunkTrackable Protocol
 
 /// Protocol defining the base requirements for any CustomTracking item.

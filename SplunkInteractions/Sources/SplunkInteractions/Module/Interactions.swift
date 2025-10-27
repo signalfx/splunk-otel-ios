@@ -38,7 +38,7 @@ public final class Interactions: SplunkInteractionsModule {
     private var customIdentifiers = RuntimeCache<String>(
         name: "SplunkInteractionsCustomIds",
         poolName: PackageIdentifier.instance(),
-        garbageCollectionCount: 1000
+        garbageCollectionCount: 1_000
     )
 
 
@@ -49,7 +49,6 @@ public final class Interactions: SplunkInteractionsModule {
 
     // MARK: - Initialization
 
-    // Module conformance
     public required init() {
         destination = OTelDestination()
     }
@@ -88,7 +87,8 @@ public final class Interactions: SplunkInteractionsModule {
 
                     await handleEvent(event)
                 }
-            } catch {
+            }
+            catch {
 
                 internalLogger.log(level: .error) {
                     "Could not initialize InteractionsDetector: \(error)."

@@ -21,6 +21,10 @@ internal import SplunkCommon
     internal import SplunkAppStart
 #endif
 
+#if canImport(SplunkAppState)
+    internal import SplunkAppState
+#endif
+
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
 #endif
@@ -63,7 +67,7 @@ internal import SplunkCommon
 class DefaultModulesPool: AgentModulesPool {
 
     static var `default`: [any Module.Type] {
-        var knownModules = [any Module.Type]()
+        var knownModules: [any Module.Type] = []
 
         // Crash reports
         #if canImport(SplunkCrashReports)
@@ -73,6 +77,11 @@ class DefaultModulesPool: AgentModulesPool {
         // App Start
         #if canImport(SplunkAppStart)
             knownModules.append(AppStart.self)
+        #endif
+
+        // App Start
+        #if canImport(SplunkAppStart)
+            knownModules.append(AppStateModule.self)
         #endif
 
         // Session Replay
@@ -97,7 +106,7 @@ class DefaultModulesPool: AgentModulesPool {
 
         // Slow Frame Detector
         #if canImport(SplunkSlowFrameDetector)
-        knownModules.append(SplunkSlowFrameDetector.SlowFrameDetector.self)
+            knownModules.append(SplunkSlowFrameDetector.SlowFrameDetector.self)
         #endif
 
         // Web View Instrumentation

@@ -41,8 +41,6 @@ extension NetworkMonitorEvent {
             return false
         }
 
-        return isConnected != other.isConnected ||
-               connectionType != other.connectionType ||
-               radioType != other.radioType
+        return isConnected != other.isConnected || connectionType != other.connectionType || radioType != other.radioType
     }
 }

@@ -16,8 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-@testable import SplunkAgent
 import SplunkCommon
+
+@testable import SplunkAgent
 
 /// The class implements the default pool of modules available for tests.
 class TestModulesPool: AgentModulesPool {

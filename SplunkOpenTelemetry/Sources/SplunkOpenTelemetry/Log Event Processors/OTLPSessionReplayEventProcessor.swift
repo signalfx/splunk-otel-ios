@@ -36,40 +36,36 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
     private let backgroundLogExporter: OTLPBackgroundHTTPLogExporterBinary
 
-    // Runtime attributes added manually to each exported log record
+    /// Runtime attributes added manually to each exported log record.
     private unowned let runtimeAttributes: any RuntimeAttributes
 
-    // Resource object, added to all exported logs manually
+    /// Resource object, added to all exported logs manually.
     private let resource: Resource
 
-    // Print log record contents to standard output if debug is enabled
+    /// Print log record contents to standard output if debug is enabled.
     private let debugEnabled: Bool
 
-    // Internal Logger
+    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    // Date format style for the stdout log
-    private let dateFormatStyle: Date.FormatStyle = {
-        let dateFormat = Date.FormatStyle()
-            .month()
-            .day()
-            .year()
-            .hour(.twoDigits(amPM: .wide))
-            .minute(.twoDigits)
-            .second(.twoDigits)
-            .secondFraction(.fractional(3))
-            .timeZone(.iso8601(.short))
+    /// Date format style for the stdout log.
+    private let dateFormatStyle: Date.FormatStyle = .init()
+        .month()
+        .day()
+        .year()
+        .hour(.twoDigits(amPM: .wide))
+        .minute(.twoDigits)
+        .second(.twoDigits)
+        .secondFraction(.fractional(3))
+        .timeZone(.iso8601(.short))
 
-        return dateFormat
-    }()
-
-    // Logger background dispatch queues
+    /// Logger background dispatch queues.
     private let backgroundQueue = DispatchQueue(
         label: PackageIdentifier.default(named: "SessionReplayEventProcessor"),
         qos: .utility
     )
 
-    // Stored properties for Unit tests
+    // Stored properties for Unit tests.
     #if DEBUG
         public var storedLastProcessedEvent: (any AgentEvent)?
         public var storedLastSentEvent: (any AgentEvent)?
@@ -82,7 +78,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         with sessionReplayEndpoint: URL?,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
-        globalAttributes: @escaping () -> [String: AttributeValue],
+        globalAttributes _: @escaping () -> [String: AttributeValue],
         debugEnabled: Bool
     ) {
         guard let sessionReplayEndpoint else {
@@ -90,7 +86,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         }
 
         let configuration = OtlpConfiguration()
-        let envVarHeaders = [(String, String)]()
+        let envVarHeaders: [(String, String)] = []
 
         // Initialize background exporter
         backgroundLogExporter = OTLPBackgroundHTTPLogExporterBinary(
@@ -132,7 +128,8 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
         if immediateProcessing {
             processEvent(event: event, completion: completion)
-        } else {
+        }
+        else {
             backgroundQueue.async {
                 self.processEvent(event: event, completion: completion)
             }
@@ -143,10 +140,61 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     // MARK: - Private methods
 
     private func processEvent(event: any AgentEvent, completion: @escaping (Bool) -> Void) {
+        guard let eventTimestamp = event.timestamp else {
+            logger.log(level: .error) {
+                "Missing session replay data timestamp."
+            }
+
+            return
+        }
+
         // Initialize attribute dictionary
         //
         // As we are bypasing a Log event processor and LogRecordBuilder,
         // we need to add attributes manually.
+        let attributes: [String: SplunkAttributeValue] = prepareAttributes(for: event)
+
+        // Manually create a Log record
+        var logRecord = SplunkReadableLogRecord(
+            resource: resource,
+            instrumentationScopeInfo: InstrumentationScopeInfo(name: event.instrumentationScope),
+            timestamp: eventTimestamp,
+            observedTimestamp: Date(),
+            attributes: attributes
+        )
+
+        // Add body
+        if let body = event.body {
+            let attributeBody = SplunkAttributeValue(eventAttributeValue: body)
+            logRecord.body = attributeBody
+        }
+        else {
+            logger.log(level: .error) {
+                "Missing session replay data in the session replay event."
+            }
+        }
+
+        let logRecords = [logRecord]
+
+        // Export log record
+        _ = backgroundLogExporter.export(logRecords: logRecords)
+
+        // Print contents to stdout
+        if debugEnabled {
+            log(logRecords)
+        }
+
+        #if DEBUG
+            storedLastSentEvent = event
+        #endif
+
+        // TODO: MRUM_AC-1062 (Post GA) - Propagate OTel exporter API errors into the Agent
+        DispatchQueue.main.async {
+            completion(true)
+        }
+    }
+
+    private func prepareAttributes(for event: any AgentEvent) -> [String: SplunkAttributeValue] {
         var attributes: [String: SplunkAttributeValue] = [:]
 
         // Merge runtime attributes
@@ -181,51 +229,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
             }
         }
 
-        guard let eventTimestamp = event.timestamp else {
-            logger.log(level: .error) {
-                "Missing session replay data timestamp."
-            }
-
-            return
-        }
-
-        // Manually create a Log record
-        var logRecord = SplunkReadableLogRecord(
-            resource: resource,
-            instrumentationScopeInfo: InstrumentationScopeInfo(name: event.instrumentationScope),
-            timestamp: eventTimestamp,
-            observedTimestamp: Date(),
-            attributes: attributes
-        )
-
-        // Add body
-        if let body = event.body {
-            let attributeBody = SplunkAttributeValue(eventAttributeValue: body)
-            logRecord.body = attributeBody
-        } else {
-            logger.log(level: .error) {
-                "Missing session replay data in the session replay event."
-            }
-        }
-
-        let logRecords = [logRecord]
-
-        // Export log record
-        _ = backgroundLogExporter.export(logRecords: logRecords)
-
-        // Print contents to stdout
-        if debugEnabled {
-            log(logRecords)
-        }
-
-        #if DEBUG
-            storedLastSentEvent = event
-        #endif
-
-        // TODO: MRUM_AC-1062 (Post GA) - Propagate OTel exporter API errors into the Agent
-        DispatchQueue.main.async {
-            completion(true)
-        }
+        return attributes
     }
 }
 
@@ -241,6 +245,7 @@ extension OTLPSessionReplayEventProcessor {
             switch logRecord.body {
             case let .data(data):
                 bodyDescription = "\(data.count) bytes"
+
             default:
                 bodyDescription = String(describing: logRecord.body)
             }
@@ -259,7 +264,8 @@ extension OTLPSessionReplayEventProcessor {
                     let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
                     let observedTimestampFormatted = observedTimestamp.formatted(self.dateFormatStyle)
                     message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
-                } else {
+                }
+                else {
                     message += "ObservedTimestamp: -\n"
                 }
 

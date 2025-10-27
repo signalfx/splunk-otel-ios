@@ -26,13 +26,13 @@ public final class UserTrackingModeObjC: NSObject {
 
     // MARK: - Tracking modes
 
-    /// No tracking. Individual user sessions are not linked in any way.
+    /// No tracking, individual user sessions are not linked in any way.
     ///
     /// This is a default option for user tracking.
     @objc
     public static let noTracking = NSNumber(value: 0)
 
-    /// Anonymous tracking. Allows you to link individual sessions
+    /// Anonymous tracking, allows you to link individual sessions
     /// under an anonymized user ID.
     ///
     /// - Note: An anonymous user ID is used, which cannot be traced
@@ -43,8 +43,8 @@ public final class UserTrackingModeObjC: NSObject {
 
     // MARK: - Initialization
 
-    // Initialization is hidden from the public API
-    // as we only need to work with the class type.
+    /// Initialization is hidden from the public API
+    /// as we only need to work with the class type.
     override init() {}
 
 
@@ -52,10 +52,10 @@ public final class UserTrackingModeObjC: NSObject {
 
     static func userTrackingMode(for value: NSNumber) -> UserTrackingMode {
         switch value {
-        case UserTrackingModeObjC.noTracking:
+        case noTracking:
             return .noTracking
 
-        case UserTrackingModeObjC.anonymousTracking:
+        case anonymousTracking:
             return .anonymousTracking
 
         default:
@@ -66,21 +66,21 @@ public final class UserTrackingModeObjC: NSObject {
     static func value(for userTrackingMode: UserTrackingMode) -> NSNumber {
         switch userTrackingMode {
         case .noTracking:
-            return UserTrackingModeObjC.noTracking
+            return noTracking
 
         case .anonymousTracking:
-            return UserTrackingModeObjC.anonymousTracking
+            return anonymousTracking
         }
     }
 }
 
 
 @objc
-public extension UserTrackingModeObjC {
+extension UserTrackingModeObjC {
 
     // MARK: - Default preset
 
     /// Default user tracking mode.
     @objc(defaultTracking)
-    static var `default` = value(for: UserTrackingMode.default)
+    public static var `default` = value(for: UserTrackingMode.default)
 }

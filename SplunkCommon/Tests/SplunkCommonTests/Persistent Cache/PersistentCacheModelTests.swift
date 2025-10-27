@@ -15,14 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkCommon
 import XCTest
+
+@testable import SplunkCommon
 
 final class PersistentCacheModelTests: XCTestCase {
 
     // MARK: - Inline types
 
-    typealias ElementContainer = DefaultItemContainer<Int>
+    private typealias ElementContainer = DefaultItemContainer<Int>
 
 
     // MARK: - Constants
@@ -34,7 +35,7 @@ final class PersistentCacheModelTests: XCTestCase {
 
     // MARK: - Private
 
-    private var model: PersistentCacheModel<ElementContainer>!
+    private var model: PersistentCacheModel<ElementContainer>?
 
 
     // MARK: - Tests lifecycle
@@ -44,8 +45,8 @@ final class PersistentCacheModelTests: XCTestCase {
 
         // Fill model with some sample data
         model = PersistentCacheModel()
-        await model.add(1, forKey: firstKey)
-        await model.add(2, forKey: secondKey)
+        await model?.add(1, forKey: firstKey)
+        await model?.add(2, forKey: secondKey)
     }
 
     override func tearDown() {
@@ -103,6 +104,7 @@ final class PersistentCacheModelTests: XCTestCase {
     // MARK: - Model management
 
     func testItems() async throws {
+        let model = try XCTUnwrap(model)
         let items = await model.items()
 
         XCTAssertEqual(items.count, 2)
@@ -111,6 +113,7 @@ final class PersistentCacheModelTests: XCTestCase {
     }
 
     func testItemForKey() async throws {
+        let model = try XCTUnwrap(model)
         let firstValue = await model.item(forKey: firstKey)
         let unmanagedValue = await model.item(forKey: "unknown")
 
@@ -119,6 +122,7 @@ final class PersistentCacheModelTests: XCTestCase {
     }
 
     func testAdd() async throws {
+        let model = try XCTUnwrap(model)
         await model.add(3, forKey: thirdKey)
 
         let items = await model.items()
@@ -129,6 +133,7 @@ final class PersistentCacheModelTests: XCTestCase {
     }
 
     func testRemove() async throws {
+        let model = try XCTUnwrap(model)
         let initialCount = await model.items().count
 
         await model.remove(key: firstKey)
@@ -142,6 +147,7 @@ final class PersistentCacheModelTests: XCTestCase {
     }
 
     func testRemoveAll() async throws {
+        let model = try XCTUnwrap(model)
         let initialCount = await model.items().count
 
         await model.removeAll()

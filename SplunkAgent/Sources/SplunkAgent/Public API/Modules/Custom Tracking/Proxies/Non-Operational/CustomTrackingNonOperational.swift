@@ -15,11 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-internal import SplunkCommon
 internal import CiscoLogger
+import Foundation
 import OpenTelemetryApi
-
+internal import SplunkCommon
 
 /// The class implementing CustomTracking public API in non-operational mode.
 ///

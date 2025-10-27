@@ -20,30 +20,47 @@ import SwiftUI
 
 @main
 struct DevelAppApp: App {
-    @StateObject var agent = initAgent()
 
-    var body: some Scene {
-        WindowGroup {
-            RoutingView()
-                .onAppear(perform: {
-                    agent.sessionReplay.start()
-                })
-        }
-    }
+    // MARK: - Private
 
-    private static func initAgent() -> SplunkRum {
+    private let agent: SplunkRum?
+
+
+    // MARK: - Initialization
+
+    init() {
         let agentConfig = AgentConfiguration(
             endpoint: .init(realm: "realm", rumAccessToken: "token"),
             appName: "App Name",
             deploymentEnvironment: "dev"
         )
-            .enableDebugLogging(true)
-            // Sampled-out agent
-            //.sessionConfiguration(SessionConfiguration(samplingRate: 0))
-            .sessionConfiguration(SessionConfiguration(samplingRate: 1))
+        .enableDebugLogging(true)
+        // Sampled-out agent
+        // .sessionConfiguration(SessionConfiguration(samplingRate: 0))
+        .sessionConfiguration(SessionConfiguration(samplingRate: 1))
 
-        let agent = try! SplunkRum.install(with: agentConfig)
+        do {
+            agent = try SplunkRum.install(with: agentConfig)
+        }
+        catch {
+            agent = nil
+            print("Unable to start the Splunk agent, error: \(error)")
+        }
 
-        return agent
+        // Navigation Instrumentation
+        SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
+
+        // Start session replay
+        SplunkRum.shared.sessionReplay.start()
+
+        // API to update Global Attributes
+        SplunkRum.shared.globalAttributes.setBool(true, for: "isWorkingHard")
+        SplunkRum.shared.globalAttributes[string: "secret"] = "Red bull"
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            RoutingView()
+        }
     }
 }

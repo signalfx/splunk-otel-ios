@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
+@_spi(SplunkInternal) import SplunkCommon
 
 public class OTLPGlobalAttributesSpanProcessor: SpanProcessor {
     private let globalAttributes: () -> [String: AttributeValue]
@@ -31,22 +32,22 @@ public class OTLPGlobalAttributesSpanProcessor: SpanProcessor {
     public var isStartRequired: Bool { true }
     public var isEndRequired: Bool { false }
 
-    public func onStart(parentContext: SpanContext?, span: ReadableSpan) {
+    public func onStart(parentContext _: SpanContext?, span: ReadableSpan) {
         // Add global attributes to the span attributes when it's created
         for (key, value) in globalAttributes() {
-            span.setAttribute(key: key, value: value)
+            span.clearAndSetAttribute(key: key, value: value)
         }
     }
 
-    public func onEnd(span: ReadableSpan) {
+    public func onEnd(span _: ReadableSpan) {
         // No action needed when span ends
     }
 
-    public func shutdown(explicitTimeout: TimeInterval?) {
+    public func shutdown(explicitTimeout _: TimeInterval?) {
         // No cleanup needed
     }
 
-    public func forceFlush(timeout: TimeInterval?) {
+    public func forceFlush(timeout _: TimeInterval?) {
         // No action needed
     }
 }

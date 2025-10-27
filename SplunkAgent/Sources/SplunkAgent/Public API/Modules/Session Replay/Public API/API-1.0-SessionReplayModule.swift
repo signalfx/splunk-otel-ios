@@ -26,7 +26,7 @@ public protocol SessionReplayModule: ObservableObject {
     var sensitivity: SessionReplayModuleSensitivity { get }
 
 
-    // MARK: - Custom id
+    // MARK: - Custom ID
 
     /// An object that holds and manages view elements custom identifiers, a ``SessionReplayModuleCustomId`` instance.
     var customIdentifiers: SessionReplayModuleCustomId { get }
@@ -48,7 +48,8 @@ public protocol SessionReplayModule: ObservableObject {
     /// - Parameter preferences: The preferred ``SessionReplayModulePreferences`` for the recording.
     ///
     /// - Returns: The ``SessionReplayModule`` instance for chaining further configurations.
-    @discardableResult func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule
+    @discardableResult
+    func preferences(_ preferences: SessionReplayModulePreferences) -> any SessionReplayModule
 
 
     // MARK: - Recording management
@@ -58,7 +59,8 @@ public protocol SessionReplayModule: ObservableObject {
     /// If the recording is already running, then it does nothing.
     ///
     /// - Returns: The ``SessionReplayModule`` instance for chaining further configurations.
-    @discardableResult func start() -> any SessionReplayModule
+    @discardableResult
+    func start() -> any SessionReplayModule
 
     /// Stops the currently running recording.
     ///
@@ -69,7 +71,8 @@ public protocol SessionReplayModule: ObservableObject {
     /// the module itself will call it.
     ///
     /// - Returns: The ``SessionReplayModule`` instance for chaining further configurations.
-    @discardableResult func stop() -> any SessionReplayModule
+    @discardableResult
+    func stop() -> any SessionReplayModule
 
 
     // MARK: - Recording masks
@@ -82,5 +85,6 @@ public protocol SessionReplayModule: ObservableObject {
     /// - Parameter recordingMask: The predefined ``RecordingMask`` for recording.
     ///
     /// - Returns: The ``SessionReplayModule`` instance for chaining further configurations.
-    @discardableResult func recordingMask(_ recordingMask: RecordingMask?) -> any SessionReplayModule
+    @discardableResult
+    func recordingMask(_ recordingMask: RecordingMask?) -> any SessionReplayModule
 }

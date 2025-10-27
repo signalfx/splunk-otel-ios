@@ -2,28 +2,182 @@ name: PR checks
 
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize]
+    types: [opened, reopened, synchronize]
 
 jobs:
-  validate-title:
-    runs-on: ubuntu-latest
+  lint:
+    runs-on: macos-latest
     steps:
-      - name: Validate PR title
-        shell: bash
+      - uses: actions/checkout@v4
+      - run: |
+          brew update
+          brew install swiftlint
+      - run: |
+          swiftlint lint \
+            --reporter github-actions-logging \
+            --force-exclude || {
+              code=$?
+              if [ $code -eq 1 ]; then
+                echo "No Swift files found in $dir, skipping"
+              else
+                exit $code
+              fi
+            }
+
+  format:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
+      - run: |
+          git ls-files -z '*.swift' | xargs -0 swift format lint --strict --parallel
+
+  swiftformat:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          brew update
+          brew install swiftformat
+      - run: |
+          swiftformat --lint --strict . \
+            --reporter github-actions-log
+
+  prepare:
+    runs-on: macos-latest
+    outputs:
+      scheme: ${{ steps.scheme.outputs.scheme }}
+      ios_dest: ${{ steps.dest.outputs.ios_dest }}
+      tvos_dest: ${{ steps.dest.outputs.tvos_dest }}
+      visionos_dest: ${{ steps.dest.outputs.visionos_dest }}
+      maccatalyst_dest: ${{ steps.dest.outputs.maccatalyst_dest }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
+      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
+      - id: scheme
+        run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
+      - id: dest
+        env:
+          SCHEME: ${{ steps.scheme.outputs.scheme }}
+        run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
+      - name: Debug destinations
         run: |
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          echo "Validating PR title: \"$PR_TITLE\""
+          echo "::notice::ios=${{ steps.dest.outputs.ios_dest }}"
+          echo "::notice::tvos=${{ steps.dest.outputs.tvos_dest }}"
+          echo "::notice::visionos=${{ steps.dest.outputs.visionos_dest }}"
+          echo "::notice::maccatalyst=${{ steps.dest.outputs.maccatalyst_dest }}"
 
-          REGEX='^\[?(WIP|wip)?\]?\s*(DEMRUM-[0-9]+(,\s?DEMRUM-[0-9]+)*|NO-TICKET):\s.+$'
+  build:
+    runs-on: macos-latest
+    needs: prepare
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ios
+          - platform: tvos
+          - platform: visionos
+          - platform: macCatalyst
+    steps:
+      - uses: actions/checkout@v4
 
-          if [[ "$PR_TITLE" =~ $REGEX ]]; then
-            echo "✅ PR title is valid."
-          else
-            echo "❌ PR title is invalid."
-            echo ""
-            echo "It must match one of the following formats:"
-            echo "- DEMRUM-1234: Description"
-            echo "- DEMRUM-1234, DEMRUM-5678: Description"
-            echo "- NO-TICKET: Description"
-            exit 1
-          fi
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Select destination
+        id: pick
+        run: |
+          case "${{ matrix.platform }}" in
+            ios) echo "DEST=${{ needs.prepare.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
+            tvos) echo "DEST=${{ needs.prepare.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
+            visionos) echo "DEST=${{ needs.prepare.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
+            macCatalyst) echo "DEST=${{ needs.prepare.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
+          esac
+          echo "Platform=${{ matrix.platform }}"
+          echo "Destination=$DEST"
+
+      - name: Build ${{ matrix.platform }}
+        env:
+          SCHEME: ${{ needs.prepare.outputs.scheme }}
+          DESTINATION: ${{ env.DEST }}
+        run: .github/actions/build-and-tests/scripts/build.sh
+
+  tests:
+    runs-on: macos-latest
+    needs: prepare
+    permissions:
+        contents: read
+        pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ios
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Select destination
+        id: pick
+        run: |
+          case "${{ matrix.platform }}" in
+            ios) echo "DEST=${{ needs.prepare.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
+            tvos) echo "DEST=${{ needs.prepare.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
+            visionos) echo "DEST=${{ needs.prepare.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
+            macCatalyst) echo "DEST=${{ needs.prepare.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
+          esac
+          echo "Platform=${{ matrix.platform }}"
+          echo "Destination=$DEST"
+
+      - name: Run tests (${{ matrix.platform }})
+        id: run
+        env:
+          SCHEME: ${{ needs.prepare.outputs.scheme }}
+          DESTINATION: ${{ env.DEST }}
+        run: |
+          export GITHUB_OUTPUT="$(mktemp)"
+          .github/actions/build-and-tests/scripts/test.sh
+          code="$(sed -n 's/^xcode_status=//p' "$GITHUB_OUTPUT")"
+          echo "status=${code:-1}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish JUnit to Checks
+        uses: mikepenz/action-junit-report@v4
+        if: always()
+        with:
+          report_paths: reports/junit-${{ matrix.platform }}.xml
+          check_name: Tests (${{ matrix.platform }})
+          require_tests: true
+          include_passed: true
+          fail_on_failure: false
+          detailed_summary: true
+
+      - name: Upload .xcresult artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: xcresult-${{ matrix.platform }}
+          path: TestResults_${{ matrix.platform }}.xcresult
+          if-no-files-found: warn
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Fail job if xcodebuild failed
+        if: always()
+        run: |
+          code="${{ steps.test.outputs.xcode_status }}"
+          if [ -z "$code" ]; then exit 0; fi
+          if [ "$code" -ne 0 ]; then exit "$code"; fi

@@ -30,6 +30,7 @@ public final class SplunkRumObjC: NSObject {
     // MARK: - Agent singleton
 
     /// A singleton shared instance of the Agent library.
+    ///
     /// This shared instance is used to access all SDK functions.
     @objc
     public private(set) static var shared: SplunkRumObjC = .init()
@@ -106,13 +107,41 @@ public final class SplunkRumObjC: NSObject {
     ///
     /// Emits error from `SplunkRum.AgentConfigurationError` if the provided configuration is invalid.
     ///
-    /// - Parameters:
-    ///   - configuration: A configuration for the initial SDK setup.
+    /// - Parameter configuration: A configuration for the initial SDK setup.
+    ///
+    /// - Returns: A newly initialized agent instance.
+    ///
+    /// - Throws: An error if provided configuration is invalid.
     @objc
     public static func install(with configuration: AgentConfigurationObjC) throws -> SplunkRumObjC {
+        try install(with: configuration, moduleConfigurations: nil)
+    }
+
+    /// Creates and initializes the singleton instance.
+    ///
+    /// Emits error from `SplunkRum.AgentConfigurationError` if the provided configuration is invalid.
+    ///
+    /// - Parameters:
+    ///   - configuration: A configuration for the initial SDK setup.
+    ///   - moduleConfigurations: An array of individual module-specific configurations.
+    ///
+    /// - Returns: A newly initialized agent instance.
+    ///
+    /// - Throws: An error if provided configuration is invalid.
+    @objc
+    public static func install(with configuration: AgentConfigurationObjC, moduleConfigurations: [ModuleConfigurationObjC]?) throws -> SplunkRumObjC {
+        // Converts module configurations to their Swift counterparts
+        let swiftModuleConfigurations = moduleConfigurations?
+            .compactMap { moduleConfiguration in
+                (moduleConfiguration as? ModuleConfigurationSwift)?.moduleConfiguration
+            }
+
         // Create an agent instance or emit errors
         let agentConfiguration = configuration.agentConfiguration()
-        let agent = try SplunkRum.install(with: agentConfiguration)
+        let agent = try SplunkRum.install(
+            with: agentConfiguration,
+            moduleConfigurations: swiftModuleConfigurations
+        )
 
         // Use the installed agent in this Objective-C bridge
         shared = SplunkRumObjC(with: agent)

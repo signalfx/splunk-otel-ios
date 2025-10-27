@@ -17,7 +17,12 @@ limitations under the License.
 
 import CiscoSessionReplay
 import Foundation
+
 @testable import SplunkAgent
+
+enum SessionReplayTestBuilderError: Error {
+    case invalidFileURL
+}
 
 final class SessionReplayTestBuilder {
 
@@ -26,18 +31,14 @@ final class SessionReplayTestBuilder {
     static func buildDefault() -> SplunkAgent.SessionReplay {
         // Build Session Replay proxy with actual Session Replay module
         let module = CiscoSessionReplay.SessionReplay.instance
-        let moduleProxy = SessionReplay(for: module)
-
-        return moduleProxy
+        return SessionReplay(for: module)
     }
 
 
     // MARK: - Non-operational builds
 
     static func buildNonOperational() -> SessionReplayNonOperational {
-        let moduleProxy = SessionReplayNonOperational()
-
-        return moduleProxy
+        SessionReplayNonOperational()
     }
 
 
@@ -47,36 +48,37 @@ final class SessionReplayTestBuilder {
         let sampleVideoData = try Self.sampleVideoData()
 
         let sessionId = UUID().uuidString
+        let scriptInstanceId = String(sessionId.prefix(upTo: sessionId.index(sessionId.startIndex, offsetBy: 16)))
         let timestamp = Date()
         let endTimestamp = Date()
 
         let chunkMetadata = Metadata(
-            startUnixMs: Int(timestamp.timeIntervalSince1970 * 1000.0),
-            endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1000.0)
+            startUnixMs: Int(timestamp.timeIntervalSince1970 * 1_000.0),
+            endUnixMs: Int(endTimestamp.timeIntervalSince1970 * 1_000.0)
         )
 
-        let event = SessionReplayDataEvent(
+        return SessionReplayDataEvent(
             metadata: chunkMetadata,
             data: sampleVideoData,
             index: 1,
             sessionId: sessionId,
-            scriptInstanceId: UUID().uuidString
+            scriptInstanceId: scriptInstanceId
         )
-
-        return event
     }
 
     static func sampleVideoData() throws -> Data {
         #if SPM_TESTS
-        let fileUrl = Bundle.module.url(forResource: "v", withExtension: "mp4")!
+            let fileUrl = Bundle.module.url(forResource: "v", withExtension: "mp4")
 
         #else
-        let bundle = Bundle(for: EventsTests.self)
-        let fileUrl = bundle.url(forResource: "v", withExtension: "mp4")!
+            let bundle = Bundle(for: EventsTests.self)
+            let fileUrl = bundle.url(forResource: "v", withExtension: "mp4")
         #endif
 
-        let data = try Data(contentsOf: fileUrl)
+        guard let fileUrl else {
+            throw SessionReplayTestBuilderError.invalidFileURL
+        }
 
-        return data
+        return try Data(contentsOf: fileUrl)
     }
 }

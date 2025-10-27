@@ -18,7 +18,7 @@ limitations under the License.
 internal import CiscoSessionReplay
 import UIKit
 
-/// Implements the public API for assigning custom identifiers to view elements
+/// Implements the public API for assigning custom identifiers to view elements.
 final class SessionReplayCustomId: SessionReplayModuleCustomId {
 
     // MARK: - View sensitivity
@@ -53,7 +53,8 @@ final class SessionReplayCustomId: SessionReplayModuleCustomId {
     ///   - customId: The unique identifier string to assign. Pass `nil` to remove an existing ID.
     ///
     /// - Returns: The `SessionReplayModuleCustomId` instance for chaining further configurations.
-    @discardableResult func set(_ view: UIView, _ customId: String?) -> SessionReplayModuleCustomId {
+    @discardableResult
+    func set(_ view: UIView, _ customId: String?) -> SessionReplayModuleCustomId {
         self[view] = customId
 
         return self

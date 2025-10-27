@@ -15,17 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import SplunkCustomTracking
 import XCTest
+
+@testable import SplunkAgent
 
 final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
 
 
     // MARK: - Private
 
-    private var module: SplunkCustomTracking.CustomTrackingInternal!
-    private var moduleProxy: SplunkAgent.CustomTracking!
+    private var module: SplunkCustomTracking.CustomTrackingInternal?
+    private var moduleProxy: SplunkAgent.CustomTracking?
 
 
     // MARK: - Tests lifecycle
@@ -34,13 +35,25 @@ final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
         super.setUp()
 
         module = SplunkCustomTracking.CustomTrackingInternal()
-        moduleProxy = SplunkAgent.CustomTracking(for: module)
+
+        if let module {
+            moduleProxy = SplunkAgent.CustomTracking(for: module)
+        }
+    }
+
+    override func tearDown() {
+        module = nil
+        moduleProxy = nil
+
+        super.tearDown()
     }
 
 
     // MARK: - Custom Tracking: Event
 
     func testTrackCustomEvent() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+
         let attributes = MutableAttributes()
         XCTAssertNoThrow(moduleProxy.trackCustomEvent("testEvent", attributes))
     }
@@ -49,29 +62,39 @@ final class CustomTrackingAPI10ModuleProxyTests: XCTestCase {
     // MARK: - Custom Tracking: Errors
 
     func testTrackError_withString() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+
         let attributes = MutableAttributes()
         XCTAssertNoThrow(moduleProxy.trackError("Test error message", attributes))
     }
 
     func testTrackError_withError() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+
         let attributes = MutableAttributes()
         let error = NSError(domain: "com.splunk.test", code: 1, userInfo: nil) as Error
         XCTAssertNoThrow(moduleProxy.trackError(error, attributes))
     }
 
     func testTrackError_withNSError() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+
         let attributes = MutableAttributes()
         let nsError = NSError(domain: "com.splunk.test", code: 1, userInfo: nil)
         XCTAssertNoThrow(moduleProxy.trackError(nsError, attributes))
     }
 
     func testTrackError_withNSException() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+
         let attributes = MutableAttributes()
         let exception = NSException(name: .genericException, reason: "Test exception", userInfo: nil)
         XCTAssertNoThrow(moduleProxy.trackException(exception, attributes))
     }
 
     func testTrackWorkflow() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+
         let span = moduleProxy.trackWorkflow("Test Custom Workflow")
         XCTAssertNoThrow(span)
         span.end()

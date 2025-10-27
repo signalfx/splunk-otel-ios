@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkNetwork
 import XCTest
+
+@testable import SplunkNetwork
 
 final class IgnoreURLsTests: XCTestCase {
 
@@ -146,13 +147,20 @@ final class IgnoreURLsTests: XCTestCase {
 
         let ignoreURLs = try IgnoreURLs(patterns: patterns)
 
+
         // Test matching URLs
-        XCTAssertTrue(ignoreURLs.matches(url: URL(string: "https://example.com/image.jpg")!))
-        XCTAssertTrue(ignoreURLs.matches(url: URL(string: "https://api.example.com/users")!))
+        let imageURL = try XCTUnwrap(URL(string: "https://example.com/image.jpg"))
+        XCTAssertTrue(ignoreURLs.matches(url: imageURL))
+
+        let apiURL = try XCTUnwrap(URL(string: "https://api.example.com/users"))
+        XCTAssertTrue(ignoreURLs.matches(url: apiURL))
 
         // Test non-matching URLs
-        XCTAssertFalse(ignoreURLs.matches(url: URL(string: "https://example.com/page.html")!))
-        XCTAssertFalse(ignoreURLs.matches(url: URL(string: "https://example.com/document.pdf")!))
+        let pageURL = try XCTUnwrap(URL(string: "https://example.com/page.html"))
+        XCTAssertFalse(ignoreURLs.matches(url: pageURL))
+
+        let documentURL = try XCTUnwrap(URL(string: "https://example.com/document.pdf"))
+        XCTAssertFalse(ignoreURLs.matches(url: documentURL))
     }
 
     func testMatchesWithEmptyPatterns() {

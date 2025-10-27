@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/// A state object reflects the current ``User``'s state.
+/// A state object reflects the current ``User`` state.
 public final class UserState {
 
     // MARK: - Internal
@@ -31,12 +31,12 @@ public final class UserState {
 }
 
 
-public extension UserState {
+extension UserState {
 
     // MARK: - User identification
 
     /// The currently used ``UserTrackingMode``.
-    var trackingMode: UserTrackingMode {
+    public var trackingMode: UserTrackingMode {
         owner.currentUser.trackingMode
     }
 }

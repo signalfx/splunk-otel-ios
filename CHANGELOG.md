@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1]
+
+### Added
+
+* Added missing ObjC APIs
+
+### Fixed
+
+* Fixed a bug in the ViewController transition navigation tracking
+* Fixed SwiftUI UI element names in automatic navigation tracking
+
+## [2.0.0]
+
+This is a first major stable release of the new Splunk OpenTelemetry Agent.
+
+### Added
+
+* Added compile support for visionOS, tvOS, macOS Catalyst.
+* Added Objective-C API.
+* Added dSYM upload script.
+* Implemented AppState module monitoring application state.
+
+### Changed
+
+* Updated DocC documentation.
+
+### Fixed
+
+* Various bugs.
+
 ## [2.0.0-alpha.1]
 
 ### Added

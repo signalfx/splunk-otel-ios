@@ -19,7 +19,7 @@ internal import CiscoLogger
 import CrashReporter
 import Foundation
 import OpenTelemetryApi
-import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 
 public class CrashReports {
 
@@ -29,7 +29,7 @@ public class CrashReports {
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
     public unowned var sharedState: AgentSharedState?
 
-    /// An array to hold images used in active crash threads
+    /// An array to hold images used in active crash threads.
     var allUsedImageNames: [String] = []
 
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "CrashReports")
@@ -42,11 +42,11 @@ public class CrashReports {
 
     private var crashReporter: PLCrashReporter?
 
-    /// Storage of periodically sampled device data
+    /// Storage of periodically sampled device data.
     private var deviceDataDictionary: [String: String] = [:]
     private var dataUpdateTimer: Timer?
 
-    /// Serial queue for thread-safe access to deviceDataDictionary
+    /// Serial queue for thread-safe access to deviceDataDictionary.
     private let deviceDataQueue = DispatchQueue(label: "com.splunk.crashreports.devicedata", qos: .utility)
 
 
@@ -63,11 +63,12 @@ public class CrashReports {
     // MARK: - Public methods
 
     public func configureCrashReporter() {
-#if os(tvOS)
-        let signalHandlerType = PLCrashReporterSignalHandlerType.BSD
-#else
-        let signalHandlerType = PLCrashReporterSignalHandlerType.mach
-#endif
+        #if os(tvOS)
+            let signalHandlerType = PLCrashReporterSignalHandlerType.BSD
+        #else
+            let signalHandlerType = PLCrashReporterSignalHandlerType.mach
+        #endif
+
         // Setup private path for crash reports to avoid conflict with other
         // instances of PLCrashReporter present in the client app
         let fileManager = FileManager.default
@@ -87,10 +88,11 @@ public class CrashReports {
             }
             return
         }
+
         crashReporter = crashReporterInstance
     }
 
-    /// Check whether a crash ended the previous run of the app
+    /// Check whether a crash ended the previous run of the app.
     public func reportCrashIfPresent() {
 
         guard crashReporter != nil else {
@@ -119,9 +121,21 @@ public class CrashReports {
             // Process the report
             let reportPayload = formatCrashReport(report: report)
 
+            // Fetch the crash timestamp
+            var timestamp = Date() // Default to now, if no sytemInfo, should not ever happen
+            if let systemInfo = report.systemInfo {
+                timestamp = systemInfo.timestamp
+            }
+            else {
+                logger.log(level: .error) {
+                    "CrashReporter failed to report systemInfo timestamp"
+                }
+            }
+
             // Send the report to the backend
-            send(crashReport: reportPayload, sharedState: sharedState)
-        } catch {
+            send(crashReport: reportPayload, sharedState: sharedState, timestamp: timestamp)
+        }
+        catch {
             logger.log(level: .error) {
                 "CrashReporter failed to load/parse with error: \(error)"
             }
@@ -139,7 +153,7 @@ public class CrashReports {
 
     // MARK: - Private methods
 
-    // Starts up crash reporter if enable is true and no debugger attached
+    /// Starts up crash reporter if enable is true and no debugger attached.
     public func initializeCrashReporter() -> Bool {
 
         guard crashReporter != nil else {
@@ -158,7 +172,8 @@ public class CrashReports {
 
         do {
             try crashReporter?.enableAndReturnError()
-        } catch {
+        }
+        catch {
             logger.log(level: .error) {
                 "Could not enable crash reporter: \(error)"
             }
@@ -174,7 +189,7 @@ public class CrashReports {
         return true
     }
 
-    // Returns true if debugger is attached
+    /// Returns true if debugger is attached.
     private func isDebuggerAttached() -> Bool {
         var debuggerIsAttached = false
 
@@ -190,15 +205,17 @@ public class CrashReports {
             return sysctl(nameBytesBlindMemory, 4, &info, &infoSize, nil, 0) != -1
         }
 
-        if !debuggerIsAttached && (info.kp_proc.p_flag & P_TRACED) != 0 {
+        if !debuggerIsAttached, (info.kp_proc.p_flag & P_TRACED) != 0 {
             debuggerIsAttached = true
         }
 
         return debuggerIsAttached
     }
 
-    // Device stats handler.  This added device stats and Session ID to PLCrashReporter
-    // so that it will be included in a future crash report
+    /// Device stats handler.
+    ///
+    /// This added device stats and Session ID to PLCrashReporter
+    /// so that it will be included in a future crash report.
     private func updateDeviceStats() {
         deviceDataQueue.async {
             do {
@@ -217,7 +234,8 @@ public class CrashReports {
                 DispatchQueue.main.async {
                     self.crashReporter?.customData = customData
                 }
-            } catch {
+            }
+            catch {
                 // We have failed to archive the custom data dictionary.
                 self.logger.log(level: .warn) {
                     "Failed to add the device stats to the crash reports data."
@@ -233,7 +251,7 @@ public class CrashReports {
         updateDeviceStats()
     }
 
-    // Device data and Session ID is collected every 5 seconds and sent to PLCrashReporter
+    /// Device data and Session ID is collected every 5 seconds and sent to `PLCrashReporter`.
     private func startPollingForDeviceStats() {
         let repeatSeconds: Double = 5
         dataUpdateTimer = Timer.scheduledTimer(withTimeInterval: repeatSeconds, repeats: true) { _ in
@@ -241,25 +259,31 @@ public class CrashReports {
         }
     }
 
-    // AppState handler
+    /// AppState handler.
     private func appStateHandler(report: PLCrashReport) -> String {
         var appState = "unknown"
         if let sharedState {
             let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
 
-            // TODO: This mapping code should be removed in favor of returning the line above
-            // once the backend is able to support it.
+            // This mapping code below may be able to be removed in the future should
+            // the backend is able to support all options.
+            appState =
+                switch timebasedAppState {
+                case "active":
+                    "foreground"
 
-            appState = switch timebasedAppState {
-            case "active": "foreground"
-            case "inactive", "terminate": "background"
-            default: timebasedAppState
-            }
+                case "inactive",
+                    "terminate":
+                    "background"
+
+                default:
+                    timebasedAppState
+                }
         }
         return appState
     }
 
-    // Report formatting
+    /// Report formatting.
     private func formatCrashReport(report: PLCrashReport) -> [CrashReportKeys: Any] {
 
         var reportDict: [CrashReportKeys: Any] = [:]
@@ -291,11 +315,12 @@ public class CrashReports {
 
         do {
             if let customData = report.customData,
-               let unarchivedData = try NSKeyedUnarchiver.unarchivedDictionary(
-                   ofKeyClass: NSString.self,
-                   objectClass: NSString.self,
-                   from: customData
-               ) as? [String: String] {
+                let unarchivedData = try NSKeyedUnarchiver.unarchivedDictionary(
+                    ofKeyClass: NSString.self,
+                    objectClass: NSString.self,
+                    from: customData
+                ) as? [String: String]
+            {
 
                 if let sessionId = unarchivedData["sessionId"] {
                     reportDict[.sessionId] = sessionId
@@ -306,7 +331,8 @@ public class CrashReports {
                 reportDict[.freeDiskSpace] = unarchivedData["memory"]
                 reportDict[.screenName] = unarchivedData["screenName"]
             }
-        } catch {
+        }
+        catch {
             logger.log(level: .warn) {
                 "Crash reporter could not report custom data, error: \(error)"
             }
@@ -325,22 +351,7 @@ public class CrashReports {
         return reportDict
     }
 
-    private func toAttributeValue(_ value: Any) -> AttributeValue {
-        switch value {
-        case let string as String:
-            return .string(string)
-        case let int as Int:
-            return .int(int)
-        case let double as Double:
-            return .double(double)
-        case let bool as Bool:
-            return .bool(bool)
-        default:
-            return .string(String(describing: value))
-        }
-    }
-
-    private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?) {
+    private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?, timestamp: Date) {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
@@ -348,16 +359,39 @@ public class CrashReports {
                 instrumentationVersion: sharedState?.agentVersion
             )
 
-        let timestamp = Date()
-
         let crashSpan = tracer.spanBuilder(spanName: "SplunkCrashReport")
             .setStartTime(time: timestamp)
             .startSpan()
 
         for (key, value) in crashReport {
-            crashSpan.setAttribute(key: key.rawValue, value: toAttributeValue(value))
+            crashSpan.clearAndSetAttribute(key: key.rawValue, value: toAttributeValue(value))
         }
 
         crashSpan.end(time: timestamp)
+    }
+}
+
+
+extension CrashReports {
+
+    // MARK: - Helpers
+
+    private func toAttributeValue(_ value: Any) -> AttributeValue {
+        switch value {
+        case let string as String:
+            return .string(string)
+
+        case let int as Int:
+            return .int(int)
+
+        case let double as Double:
+            return .double(double)
+
+        case let bool as Bool:
+            return .bool(bool)
+
+        default:
+            return .string(String(describing: value))
+        }
     }
 }

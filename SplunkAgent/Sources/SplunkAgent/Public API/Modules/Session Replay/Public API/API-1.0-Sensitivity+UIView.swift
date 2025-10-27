@@ -19,12 +19,12 @@ internal import CiscoSessionReplay
 import QuartzCore
 import UIKit
 
-public extension UIView {
+extension UIView {
 
     /// Element sensitivity for the specified `UIView` instance.
     ///
     /// Assigning `nil` removes previously assigned explicit sensitivity.
-    var srSensitive: Bool? {
+    public var srSensitive: Bool? {
         get {
             SplunkRum.shared.sessionReplay.sensitivity[self]
         }

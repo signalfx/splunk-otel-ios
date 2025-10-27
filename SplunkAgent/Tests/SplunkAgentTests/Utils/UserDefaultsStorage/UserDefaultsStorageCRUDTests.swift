@@ -15,16 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAgent
 import SplunkCommon
 import XCTest
+
+@testable import SplunkAgent
 
 final class UserDefaultsStorageCRUDTests: XCTestCase {
 
     // MARK: - Inline types
 
-    /// Sample data for the purposes of this test
-    struct SampleData: Codable, Equatable {
+    /// Sample data for the purposes of this test.
+    private struct SampleData: Codable, Equatable {
         var text: String
         var number: Int
     }
@@ -43,7 +44,7 @@ final class UserDefaultsStorageCRUDTests: XCTestCase {
 
     // MARK: - Private
 
-    private var storage: UserDefaultsStorage!
+    private var storage: UserDefaultsStorage?
 
 
     // MARK: - Tests lifecycle
@@ -56,7 +57,18 @@ final class UserDefaultsStorageCRUDTests: XCTestCase {
 
         // Separated storage for this test
         storage = UserDefaultsStorage()
-        storage.keysPrefix = keysPrefix
+
+        if let storage {
+            storage.keysPrefix = keysPrefix
+        }
+    }
+
+    override func tearDown() {
+        // Clean storage after test run
+        UserDefaultsUtils.cleanItem(prefix: keysPrefix, key: key)
+        storage = nil
+
+        super.tearDown()
     }
 
 
@@ -65,7 +77,7 @@ final class UserDefaultsStorageCRUDTests: XCTestCase {
     func testCreate() throws {
         // Sample data
         let value = sampleData
-
+        let storage = try XCTUnwrap(storage)
 
         // CREATE operation
         XCTAssertNoThrow(
@@ -84,6 +96,8 @@ final class UserDefaultsStorageCRUDTests: XCTestCase {
     }
 
     func testRead() throws {
+        let storage = try XCTUnwrap(storage)
+
         // Insert some sample data
         let value = sampleData
         try? storage.insert(value, forKey: key)
@@ -106,6 +120,7 @@ final class UserDefaultsStorageCRUDTests: XCTestCase {
         // differs from the type of stored data.
         var number: Double?
 
+        // swift-format-ignore: NoAssignmentInExpressions
         XCTAssertThrowsError(
             number = try storage.read(forKey: key)
         ) { error in
@@ -115,6 +130,8 @@ final class UserDefaultsStorageCRUDTests: XCTestCase {
     }
 
     func testUpdate() throws {
+        let storage = try XCTUnwrap(storage)
+
         // Insert some sample data
         let value = SampleData(text: "Test data", number: 17)
         try? storage.insert(value, forKey: key)
@@ -138,6 +155,8 @@ final class UserDefaultsStorageCRUDTests: XCTestCase {
     }
 
     func testDelete() throws {
+        let storage = try XCTUnwrap(storage)
+
         // Insert some sample data
         let value = SampleData(text: "Test data", number: 17)
         try? storage.insert(value, forKey: key)
@@ -168,6 +187,8 @@ final class UserDefaultsStorageCRUDTests: XCTestCase {
     // MARK: - Non-encodable error handling
 
     func testNonEncodableCreate() throws {
+        let storage = try XCTUnwrap(storage)
+
         // Sample data
         let value: Double = .nan
 
@@ -180,6 +201,8 @@ final class UserDefaultsStorageCRUDTests: XCTestCase {
     }
 
     func testNonEncodableUpdate() throws {
+        let storage = try XCTUnwrap(storage)
+
         // Sample data
         let value: Double = .nan
 

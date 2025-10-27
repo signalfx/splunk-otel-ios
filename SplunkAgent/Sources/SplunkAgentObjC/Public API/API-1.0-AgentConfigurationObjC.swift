@@ -33,12 +33,16 @@ public final class AgentConfigurationObjC: NSObject {
     @objc
     public let endpoint: EndpointConfigurationObjC
 
-    /// Required application name. Identifies the application in the RUM dashboard.
+    /// Required application name.
+    ///
+    /// Identifies the application in the RUM dashboard.
     /// App name is sent in all signals as a resource.
     @objc
     public let appName: String
 
-    /// Required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
+    /// Required deployment environment.
+    ///
+    /// Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
     /// Deployment environment is sent in all signals as a resource.
     @objc
     public let deploymentEnvironment: String
@@ -47,14 +51,15 @@ public final class AgentConfigurationObjC: NSObject {
     // MARK: - Public optional properties
 
     /// A `NSString` containing the current application version.
-    /// Application version is sent in all signals as a resource.
     ///
+    /// Application version is sent in all signals as a resource.
     /// The default value corresponds to the value of `CFBundleShortVersionString`.
     @objc
     public var appVersion: String
 
-    /// Enables or disables debug logging. Debug logging prints span contents into the console.
+    /// Enables or disables debug logging.
     ///
+    /// Debug logging prints span contents into the console.
     /// Defaults to `NO`.
     @objc
     public var enableDebugLogging: Bool

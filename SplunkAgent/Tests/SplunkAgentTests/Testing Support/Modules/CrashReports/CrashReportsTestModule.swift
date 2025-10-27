@@ -16,8 +16,9 @@ limitations under the License.
 */
 
 import Foundation
-@testable import SplunkAgent
 import SplunkCommon
+
+@testable import SplunkAgent
 
 /// A dummy module skeleton for testing logic around modules.
 class CrashReportsTestModule {
@@ -51,7 +52,8 @@ class CrashReportsTestModule {
 
                 let sleepInterval = UInt64(dataGenerationInterval * 1_000_000_000)
                 try? await Task.sleep(nanoseconds: sleepInterval)
-            } while !Task.isCancelled
+            }
+            while !Task.isCancelled
         }
     }
 
@@ -93,8 +95,10 @@ extension CrashReportsTestModule: Module {
 
     // MARK: - Protocol compliance
 
-    func install(with configuration: (any ModuleConfiguration)?,
-                 remoteConfiguration: (any RemoteModuleConfiguration)?) {
+    func install(
+        with configuration: (any ModuleConfiguration)?,
+        remoteConfiguration: (any RemoteModuleConfiguration)?
+    ) {
 
         // The configurations obtained are stored for later evaluation
         self.configuration = configuration as? CrashReportsTestConfiguration

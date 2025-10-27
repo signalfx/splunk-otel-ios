@@ -27,7 +27,7 @@ extension AppStart {
             return
         }
 
-        var tokens = [NSObjectProtocol]()
+        var tokens: [NSObjectProtocol] = []
 
         // didFinishLaunching notification - store the notification timestamp
         listen(to: UIApplication.didFinishLaunchingNotification, in: &tokens) {

@@ -25,7 +25,9 @@ class SessionsModel {
     /// Maximum number of managed sessions.
     static let maxDataCapacity: Int = 100
 
-    /// Maximum lifetime of managed records. The value corresponds to 31 days.
+    /// Maximum lifetime of managed records.
+    ///
+    /// The value corresponds to 31 days.
     static let maxDataLifetime: TimeInterval = 2_678_400
 
 
@@ -38,7 +40,7 @@ class SessionsModel {
     // MARK: - Public
 
     /// An array of all available sessions in this instance.
-    var sessions = [SessionItem]()
+    var sessions: [SessionItem] = []
 
 
     // MARK: - Initialization
@@ -106,7 +108,7 @@ extension SessionsModel {
 
     /// Deletes all old records whose number exceeds the specified number.
     ///
-    /// - Parameter number: Position in ordered data from newest to oldest.
+    /// - Parameter position: Position in ordered data from newest to oldest.
     func delete(exceedingOrder position: Int) {
         guard sessions.count > position else {
             return

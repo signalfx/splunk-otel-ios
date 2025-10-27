@@ -30,19 +30,19 @@ public final class SessionState {
     }
 }
 
-public extension SessionState {
+extension SessionState {
 
     // MARK: - Public properties
 
     /// Identification of recorded session.
     ///
     /// When the agent is initialized, there is always some session ID.
-    var id: String {
+    public var id: String {
         owner.currentSession.currentSessionId
     }
 
     /// Value of the currently used session sampling rate.
-    var samplingRate: Double {
+    public var samplingRate: Double {
         owner.agentConfiguration.session.samplingRate
     }
 }

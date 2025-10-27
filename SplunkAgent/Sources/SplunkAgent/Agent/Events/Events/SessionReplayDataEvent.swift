@@ -15,11 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 internal import CiscoSessionReplay
+import Foundation
 internal import SplunkCommon
 
-/// Session Replay data event. Sends session replay blob with metadata.
+/// Session Replay data event.
+///
+/// Sends session replay blob with metadata.
 class SessionReplayDataEvent: AgentEvent {
 
     // MARK: - Event Identification
@@ -48,6 +50,7 @@ class SessionReplayDataEvent: AgentEvent {
     ///   - index: Event sequence number within the session.
     ///   - sessionId: The `session Id` of a session in which the event occurred.
     ///               Optional so that we can see sessions with no session id in the backend.
+    ///   - scriptInstanceId: Internal identifier used for backend purposes.
     init(metadata: Metadata, data: Data, index: Int, sessionId: String?, scriptInstanceId: String) {
         // Event properties
         timestamp = metadata.timestamp

@@ -33,13 +33,11 @@ final class DefaultPersistentCacheTestBuilder {
             encryption: NoneEncryption()
         )
 
-        let cache = DefaultPersistentCache<Int>(
+        return DefaultPersistentCache<Int>(
             cacheName: named,
             diskStorage: storage,
             maximumCapacity: maximumCapacity,
             maximumLifetime: maximumLifetime
         )
-
-        return cache
     }
 }

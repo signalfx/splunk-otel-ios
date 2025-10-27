@@ -18,12 +18,12 @@ internal import CiscoSessionReplay
 import QuartzCore
 import UIKit
 
-public extension UIView {
+extension UIView {
 
     /// Element custom id for the specified `UIView` instance.
     ///
     /// Assigning `nil` removes previously assigned custom id.
-    var splunkRumId: String? {
+    public var splunkRumId: String? {
         get {
             SplunkRum.shared.sessionReplay.customIdentifiers[self]
         }

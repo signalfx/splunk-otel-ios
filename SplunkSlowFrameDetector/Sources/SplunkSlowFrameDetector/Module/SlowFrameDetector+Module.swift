@@ -22,13 +22,13 @@ public struct SlowFrameData: ModuleEventData {}
 
 extension EventMetadataSlowFrameDetector: ModuleEventMetadata {
     public static func == (lhs: EventMetadataSlowFrameDetector, rhs: EventMetadataSlowFrameDetector) -> Bool {
-        return lhs.timestamp == rhs.timestamp
-                   && lhs.id == rhs.id
+        lhs.timestamp == rhs.timestamp
+            && lhs.id == rhs.id
     }
 }
 
-// Defines SlowFrameDetector conformance to `Module` protocol
-// and implements methods that are missing in the original `SlowFrameDetector`.
+/// Defines SlowFrameDetector conformance to `Module` protocol
+/// and implements methods that are missing in the original `SlowFrameDetector`.
 extension SlowFrameDetector: Module {
 
     // MARK: - Module types
@@ -45,11 +45,11 @@ extension SlowFrameDetector: Module {
 
     // MARK: - Type transparency helpers
 
-    public func deleteData(for metadata: any ModuleEventMetadata) {
+    public func deleteData(for _: any ModuleEventMetadata) {
         // In SlowFrameDetector we don't have any data to delete.
     }
 
-    public func onPublish(data: @escaping (EventMetadataSlowFrameDetector, SlowFrameData) -> Void) {
+    public func onPublish(data _: @escaping (EventMetadataSlowFrameDetector, SlowFrameData) -> Void) {
         // We are emitting spans directly instead of using this.
     }
 }

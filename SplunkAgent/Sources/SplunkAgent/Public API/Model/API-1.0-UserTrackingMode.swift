@@ -34,8 +34,8 @@ public enum UserTrackingMode: Codable, Equatable {
 }
 
 
-public extension UserTrackingMode {
+extension UserTrackingMode {
 
     /// Default user tracking mode.
-    static let `default`: UserTrackingMode = .noTracking
+    public static let `default`: UserTrackingMode = .noTracking
 }

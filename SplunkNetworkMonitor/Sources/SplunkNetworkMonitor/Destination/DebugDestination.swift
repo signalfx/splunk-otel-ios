@@ -32,20 +32,20 @@ class DebugDestination: NetworkMonitorDestination {
     /// Logs a network event for debugging purposes.
     ///
     /// - Parameters:
-    ///   - networkEvent: The network change event to log
-    ///   - sharedState: The agent's shared state (not used in debug logging)
+    ///   - networkEvent: The network change event to log.
+    ///   - sharedState: The agent's shared state (not used in debug logging).
     func send(networkEvent: NetworkMonitorEvent, sharedState: (any AgentSharedState)?) {
+        // Intentionally unused
+        _ = sharedState
 
         logger.log(level: .info) {
-            let string = """
+            """
             Network Change span:
                 timestamp: \(networkEvent.timestamp),
                 status: \(networkEvent.isConnected ? "available" : "lost"),
                 type: \(networkEvent.connectionType.rawValue),
                 subType: \(networkEvent.radioType ?? "na"),
             """
-
-            return string
         }
     }
 }

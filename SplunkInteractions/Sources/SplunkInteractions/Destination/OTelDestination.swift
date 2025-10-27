@@ -42,7 +42,8 @@ struct OTelDestination: SplunkInteractionsDestination {
             attributes["target.type"] = .string(elementId)
         }
 
-        let logRecordBuilder = logProvider
+        let logRecordBuilder =
+            logProvider
             .logRecordBuilder()
             .setTimestamp(time)
             .setAttributes(attributes)

@@ -17,7 +17,7 @@ limitations under the License.
 
 import Foundation
 internal import OpenTelemetryApi
-import SplunkCommon
+@_spi(SplunkInternal) import SplunkCommon
 
 /// Creates and sends an OpenTelemetry span from supplied app start data.
 struct OTelDestination: AppStartDestination {
@@ -36,11 +36,11 @@ struct OTelDestination: AppStartDestination {
             .setStartTime(time: appStart.start)
             .startSpan()
 
-        appStartSpan.setAttribute(key: "component", value: "appstart")
-        appStartSpan.setAttribute(key: "screen.name", value: "unknown")
-        appStartSpan.setAttribute(key: "start.type", value: typeIdentifier(for: appStart.type))
+        appStartSpan.clearAndSetAttribute(key: "component", value: "appstart")
+        appStartSpan.clearAndSetAttribute(key: "screen.name", value: "unknown")
+        appStartSpan.clearAndSetAttribute(key: "start.type", value: typeIdentifier(for: appStart.type))
 
-        appStart.events?.forEach { event in
+        for event in appStart.events ?? [] {
             appStartSpan.addEvent(name: event.name, timestamp: event.timestamp)
         }
 
@@ -53,17 +53,17 @@ struct OTelDestination: AppStartDestination {
                 .setParent(appStartSpan)
                 .startSpan()
 
-            initializeSpan.setAttribute(key: "component", value: "appstart")
-            initializeSpan.setAttribute(key: "screen.name", value: "unknown")
+            initializeSpan.clearAndSetAttribute(key: "component", value: "appstart")
+            initializeSpan.clearAndSetAttribute(key: "screen.name", value: "unknown")
 
             // Add config settings
             if let configSettings = agentInitialize.formattedConfigurationSettings {
-                initializeSpan.setAttribute(key: "config_settings", value: configSettings)
+                initializeSpan.clearAndSetAttribute(key: "config_settings", value: configSettings)
             }
 
             // Add events
-            agentInitialize.events?.forEach { event in
-                initializeSpan.addEvent(name: event.name, timestamp: event.timestamp)
+            for initializeEvent in agentInitialize.events ?? [] {
+                initializeSpan.addEvent(name: initializeEvent.name, timestamp: initializeEvent.timestamp)
             }
 
             initializeSpan.end(time: agentInitialize.end)

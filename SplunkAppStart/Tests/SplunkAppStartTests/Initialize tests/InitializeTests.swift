@@ -15,8 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@testable import SplunkAppStart
 import XCTest
+
+@testable import SplunkAppStart
 
 final class InitializeTests: XCTestCase {
     func testInitialize() throws {
@@ -48,7 +49,7 @@ final class InitializeTests: XCTestCase {
 
         // Check events
         let events = try XCTUnwrap(storedInitialize.events)
-        XCTAssertTrue(events.count > 0)
+        XCTAssertTrue(!events.isEmpty)
 
         // Check test event
         let testEvent = try XCTUnwrap(events.first)

@@ -24,19 +24,19 @@ class DebugDestination: AppStartDestination {
 
     // MARK: - Private
 
-    // Stored app start
+    /// Stored app start.
     var storedAppStart: AppStartSpanData?
 
-    // Stored initialize
+    /// Stored initialize.
     var storedInitialize: AgentInitializeSpanData?
 
-    // Internal Logger
+    /// Internal Logger.
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "AppStart")
 
 
     // MARK: - Sending
 
-    func send(appStart: AppStartSpanData, agentInitialize: AgentInitializeSpanData?, sharedState: (any AgentSharedState)?) {
+    func send(appStart: AppStartSpanData, agentInitialize: AgentInitializeSpanData?, sharedState _: (any AgentSharedState)?) {
         storedAppStart = appStart
         storedInitialize = agentInitialize
 
@@ -44,16 +44,17 @@ class DebugDestination: AppStartDestination {
 
         logger.log(level: .info) {
             var string = """
-            App start span:
-                type: \(appStart.type),
-                start: \(appStart.start),
-                end: \(appStart.end),
-                duration: \(String(format: "%.3lfms", appStartDuration * 1000.0)),
-            """
+                App start span:
+                    type: \(appStart.type),
+                    start: \(appStart.start),
+                    end: \(appStart.end),
+                    duration: \(String(format: "%.3lfms", appStartDuration * 1_000.0)),
+                """
 
             string += "\n\tEvents:\n"
-            appStart.events?.forEach { event in
-                let timeIntervalMs = event.timestamp.timeIntervalSince(appStart.start) * 1000.0
+
+            for event in appStart.events ?? [] {
+                let timeIntervalMs = event.timestamp.timeIntervalSince(appStart.start) * 1_000.0
                 string += String(format: "\t\t%@ +%.3lfms\n", event.name, timeIntervalMs)
             }
 
@@ -65,7 +66,7 @@ class DebugDestination: AppStartDestination {
             var configSettings = ""
 
             for configurationSetting in agentInitialize.configurationSettings {
-                if configSettings.count > 0 {
+                if !configSettings.isEmpty {
                     configSettings.append(", ")
                 }
                 configSettings.append("\(configurationSetting.key): \(configurationSetting.value)")
@@ -75,17 +76,18 @@ class DebugDestination: AppStartDestination {
 
             logger.log(level: .info) {
                 var string = """
-                Initialize span:
-                    start: \(agentInitialize.start),
-                    end: \(agentInitialize.end),
-                    duration: \(String(format: "%.3lfms", initializeDuration * 1000.0)),
-                    config settings: \(configSettingsText)
-                """
+                    Initialize span:
+                        start: \(agentInitialize.start),
+                        end: \(agentInitialize.end),
+                        duration: \(String(format: "%.3lfms", initializeDuration * 1_000.0)),
+                        config settings: \(configSettingsText)
+                    """
 
                 string += "\n\tEvents:\n"
-                agentInitialize.events?.forEach { event in
-                    let timeIntervalMs = event.timestamp.timeIntervalSince(agentInitialize.start) * 1000.0
-                    string += String(format: "\t\t%@ +%.3lfms\n", event.name, timeIntervalMs)
+
+                for initializeEvent in agentInitialize.events ?? [] {
+                    let timeIntervalMs = initializeEvent.timestamp.timeIntervalSince(agentInitialize.start) * 1_000.0
+                    string += String(format: "\t\t%@ +%.3lfms\n", initializeEvent.name, timeIntervalMs)
                 }
 
                 return string

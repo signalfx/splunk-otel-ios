@@ -17,10 +17,8 @@ limitations under the License.
 
 internal import CiscoLogger
 internal import CiscoSwizzling
-
 import Foundation
 import SplunkCommon
-
 import UIKit
 
 /// The navigation module detects and tracks navigation in the application.
@@ -28,8 +26,10 @@ public final class Navigation: Sendable {
 
     // MARK: - Static constants
 
-    // It is used to switch the implementation for testing
-    // and during further development of the module
+    /// Detection solution switch.
+    ///
+    /// It is used to switch the implementation for testing
+    /// and during further development of the module
     private static let useLegacySolution = true
 
 
@@ -61,7 +61,9 @@ public final class Navigation: Sendable {
         }
     }
 
-    /// Sets used version of the agent. It should correspond to the `SplunkRum.version`.
+    /// Sets used version of the agent.
+    ///
+    /// It should correspond to the `SplunkRum.version`.
     ///
     /// - Parameter agentVersion: A configured version of the agent.
     ///
@@ -97,7 +99,7 @@ public final class Navigation: Sendable {
 
     // MARK: - Initialization
 
-    // Module protocol conformance
+    /// Module protocol conformance.
     public required init() {
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
@@ -130,8 +132,8 @@ public final class Navigation: Sendable {
         // and the legacy solution will be removed.
         if Self.useLegacySolution {
             startLegacyDetection()
-
-        } else {
+        }
+        else {
             startModernDetection()
         }
     }
@@ -140,14 +142,12 @@ public final class Navigation: Sendable {
     // MARK: - Instrumentation (Modern solution)
 
     private func startModernDetection() {
+        // swiftlint:disable:next unhandled_throwing_task
         Task(priority: .userInitiated) {
             let navigationStream = try await DefaultSwizzling.navigation
 
             // Process navigation events
-            for await event in navigationStream {
-                guard await shouldProcessEvent() else {
-                    continue
-                }
+            for await event in navigationStream where await shouldProcessEvent() {
 
                 var processedEvent = event
                 let screenName = await preferredScreenName(for: event.controllerTypeName)
@@ -155,6 +155,7 @@ public final class Navigation: Sendable {
                 // If we have set manual naming, then we prefer it
                 if await model.isManualScreenName {
                     processedEvent = AutomatedNavigationEvent(
+                        timestamp: Date.now,
                         type: event.type,
                         controllerTypeName: screenName,
                         controllerIdentifier: event.controllerIdentifier
@@ -244,10 +245,11 @@ public final class Navigation: Sendable {
             return nil
         }
 
-        let controllerTypeName = NSStringFromClass(type(of: visibleController))
+        let controllerTypeName = preferredControllerName(for: visibleController)
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
+            timestamp: Date.now,
             type: eventType,
             controllerTypeName: screenName,
             controllerIdentifier: ObjectIdentifier(visibleController)
@@ -255,18 +257,22 @@ public final class Navigation: Sendable {
     }
 
     private func transitionEvent(for presentationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
+        let presentationController = presentationObject as? UIPresentationController
+        let uiViewController = presentationObject as? UIViewController
+        let presentedController = await presentationController?.presentedViewController
+
         guard
             await shouldProcessEvent(),
-            let presentationController = presentationObject as? UIPresentationController
+            let visibleController = presentedController ?? uiViewController
         else {
             return nil
         }
 
-        let visibleController = await presentationController.presentedViewController
-        let controllerTypeName = NSStringFromClass(type(of: visibleController))
+        let controllerTypeName = preferredControllerName(for: visibleController)
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
+            timestamp: Date.now,
             type: eventType,
             controllerTypeName: screenName,
             controllerIdentifier: ObjectIdentifier(visibleController)
@@ -377,23 +383,7 @@ public final class Navigation: Sendable {
         return controllerTypeName
     }
 
-
-    // MARK: - Class name sanitization
-
-    /// Returns the bundle name for the guest application.
-    private static func applicationBundleName() -> String? {
-        Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as? String
-    }
-
-    /// Drops module prefix for types from the application naming space.
-    private func sanitize(typeName: String) -> String {
-        guard
-            let bundleName = appBundleName,
-            typeName.hasPrefix(bundleName)
-        else {
-            return typeName
-        }
-
-        return String(typeName.dropFirst("\(bundleName).".count))
+    func preferredControllerName(for controller: UIViewController) -> String {
+        String(describing: type(of: controller))
     }
 }

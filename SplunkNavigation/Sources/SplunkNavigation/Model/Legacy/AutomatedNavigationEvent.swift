@@ -15,14 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
 internal import CiscoSwizzling
+import Foundation
 
-/// Represents automatic navigation event. Used for legacy solution compatibility.
+/// Represents automatic navigation event.
+///
+/// Used for legacy solution compatibility.
 struct AutomatedNavigationEvent: NavigationActionEvent {
 
     // MARK: - Public
 
+    var timestamp: Date
     var type: NavigationActionEventType
     var controllerTypeName: String
     var controllerIdentifier: ObjectIdentifier

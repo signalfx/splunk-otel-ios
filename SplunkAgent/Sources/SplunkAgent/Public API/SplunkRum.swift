@@ -16,12 +16,10 @@ limitations under the License.
 */
 
 internal import CiscoLogger
-internal import SplunkCommon
-
 import Combine
 import Foundation
 import OpenTelemetryApi
-
+internal import SplunkCommon
 
 /// The class implementing Splunk Agent public API.
 public class SplunkRum: ObservableObject {
@@ -103,7 +101,7 @@ public class SplunkRum: ObservableObject {
 
     /// OpenTelemetry instance.
     public var openTelemetry: OpenTelemetry {
-        return OpenTelemetry.instance
+        OpenTelemetry.instance
     }
 
 
@@ -311,15 +309,15 @@ public class SplunkRum: ObservableObject {
         return SplunkConfigurationHandler(for: configuration)
 
         // Temporarily commented-out code until O11y implements a proper backend config endpoint
-//        return ConfigurationHandler(
-//            for: configuration,
-//            apiClient: APIClient(baseUrl: configuration.configUrl)
-//        )
+        //        return ConfigurationHandler(
+        //            for: configuration,
+        //            apiClient: APIClient(baseUrl: configuration.configUrl)
+        //        )
     }
 
 
     // MARK: - Version
 
     /// A version of this agent.
-    public static let version = "2.0.0-alpha.1"
+    public static let version = "2.0.1"
 }
