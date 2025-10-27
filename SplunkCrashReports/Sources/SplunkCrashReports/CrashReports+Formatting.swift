@@ -81,7 +81,8 @@ extension CrashReports {
                         objectClass: NSString.self,
                         from: customData
                     ) as? [String: String]
-            } else {
+            }
+            else {
                 // Fallback for iOS 13 using the secure unarchiver available since iOS 11
                 unarchivedData =
                     try NSKeyedUnarchiver.unarchivedObject(
