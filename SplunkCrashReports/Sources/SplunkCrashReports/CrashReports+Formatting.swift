@@ -74,20 +74,20 @@ extension CrashReports {
 
         do {
             let unarchivedData: [String: String]?
-            if #available(iOS 14.0, tvOS 15.0, *) {
+            if #available(iOS 14.0, *) {
                 unarchivedData =
                     try NSKeyedUnarchiver.unarchivedDictionary(
                         ofKeyClass: NSString.self,
                         objectClass: NSString.self,
                         from: customData
                     ) as? [String: String]
-            }
-            else {
-                // Fallback for iOS 13.
-                // Note: unarchiveTopLevelObjectWithData is deprecated, but it is the
-                // correct API to use for compatibility with iOS versions prior to 14.
+            } else {
+                // Fallback for iOS 13 using the secure unarchiver available since iOS 11
                 unarchivedData =
-                    try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(customData) as? [String: String]
+                    try NSKeyedUnarchiver.unarchivedObject(
+                        ofClasses: [NSDictionary.self, NSString.self],
+                        from: customData
+                    ) as? [String: String]
             }
 
             if let data = unarchivedData {
