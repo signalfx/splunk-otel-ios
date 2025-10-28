@@ -20,8 +20,14 @@ internal import CiscoLogger
 import Foundation
 import SplunkCommon
 
+protocol BackgroundHTTPClientProtocol: NSObjectProtocol {
+    func send(_ requestDescriptor: RequestDescriptorProtocol) throws
+    func flush(completion: @escaping () -> Void)
+    func getAllSessionsTasks(_ completionHandler: @escaping ([URLSessionTask]) -> Void)
+}
+
 /// Client for sending requests over HTTP.
-final class BackgroundHTTPClient: NSObject {
+final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
 
     // MARK: - Private properties
 
@@ -65,7 +71,7 @@ final class BackgroundHTTPClient: NSObject {
 
     // MARK: - Client logic
 
-    func send(_ requestDescriptor: RequestDescriptor) throws {
+    func send(_ requestDescriptor: RequestDescriptorProtocol) throws {
         let fileKey = KeyBuilder(
             requestDescriptor.id.uuidString,
             parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
@@ -116,18 +122,7 @@ final class BackgroundHTTPClient: NSObject {
     }
 
     func taskCompleted(withResponse response: URLResponse?, requestDescriptor: RequestDescriptor, error: Error?) throws {
-        if let error {
-            logger.log(level: .info) {
-                """
-                Request to: \(requestDescriptor.endpoint.absoluteString) \n
-                with a data task id: \(requestDescriptor.id) \n
-                failed with an error message: \(error.localizedDescription).
-                """
-            }
-
-            try send(requestDescriptor)
-        }
-        else {
+        guard let error else {
             if let httpResponse = response as? HTTPURLResponse {
                 logger.log(level: .info) {
                     """
@@ -143,6 +138,20 @@ final class BackgroundHTTPClient: NSObject {
                     parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
                 )
             )
+
+            return
+        }
+
+        logger.log(level: .info) {
+            """
+            Request to: \(requestDescriptor.endpoint.absoluteString) \n
+            with a data task id: \(requestDescriptor.id) \n
+            failed with an error message: \(error.localizedDescription).
+            """
+        }
+
+        if let urlError = error as? URLError, urlError.code != .cancelled {
+            try send(requestDescriptor)
         }
     }
 }
