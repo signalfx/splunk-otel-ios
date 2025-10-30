@@ -41,7 +41,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             config: config,
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
-            diskStorage: disk
+            diskStorage: disk,
+            performStalledUploadCheck: false
         )
         exporter.httpClient = http
         return exporter
@@ -88,7 +89,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
-            diskStorage: disk
+            diskStorage: disk,
+            performStalledUploadCheck: false
         )
 
         try disk.insert(desc, forKey: exporter.getStorageKey().append(desc.id.uuidString))

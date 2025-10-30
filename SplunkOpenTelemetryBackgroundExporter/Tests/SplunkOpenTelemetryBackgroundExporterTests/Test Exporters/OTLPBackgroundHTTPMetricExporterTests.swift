@@ -62,7 +62,8 @@ struct OTLPBackgroundHTTPMetricExporterTests {
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
             diskStorage: disk,
-            fileType: fileType
+            fileType: fileType,
+            performStalledUploadCheck: false
         )
         exporter.httpClient = http
         return exporter
