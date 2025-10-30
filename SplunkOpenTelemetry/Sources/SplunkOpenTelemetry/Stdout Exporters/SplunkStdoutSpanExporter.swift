@@ -17,7 +17,6 @@ limitations under the License.
 
 internal import CiscoLogger
 import Foundation
-import OpenTelemetryApi
 import OpenTelemetrySdk
 import SplunkCommon
 
