@@ -151,7 +151,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func fileWithNonStalledTaskIsNotResent() throws {
         let uuid = UUID()
         let disk = FakeDiskStorage()
-        let desc = try FakeRequestDescriptor(id: uuid, scheduled: .now.addingTimeInterval(1_000))
+        let desc = try FakeRequestDescriptor(id: uuid, scheduled: Date(timeIntervalSinceNow: 1_000))
 
         let http = FakeHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
@@ -170,7 +170,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             explicitTimeout: 1,
             sentCount: 5,
             fileKeyType: "base",
-            scheduled: .now.addingTimeInterval(-1_000)
+            scheduled: Date(timeIntervalSinceNow: -1_000)
         )
 
         let http = FakeHTTPClient()
