@@ -175,3 +175,80 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  prepare-macos-13:
+    runs-on: macos-13
+    outputs:
+      scheme: ${{ steps.scheme.outputs.scheme }}
+      ios13_dest: ${{ steps.dest.outputs.ios13_dest }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 14.3.1
+      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
+      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
+      - id: scheme
+        run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
+      - name: Download and install iOS 13.7 runtime
+        run: |
+          # Download iOS 13.7 simulator runtime
+          echo "Downloading iOS 13.7 simulator runtime..."
+          xcodebuild -downloadPlatform iOS -buildVersion 13.7" || {
+            echo "Failed to install iOS 13.7 runtime via xcodebuild, trying alternative method..."
+            # Alternative method using xcrun simctl
+            xcrun simctl list runtimes
+            echo "iOS 13.7 runtime installation failed"
+          }
+      - id: dest
+        env:
+          SCHEME: ${{ steps.scheme.outputs.scheme }}
+        run: |
+          # Find iOS 13.7 simulator
+          IOS13_DEVICE_ID=$(xcrun simctl list devices available | grep "iOS 13.7" | grep "iPhone" | head -n1 | sed -E 's/.*\(([A-Z0-9-]+)\).*/\1/' || true)
+          if [ -n "$IOS13_DEVICE_ID" ]; then
+            IOS13_DEST="platform=iOS Simulator,id=$IOS13_DEVICE_ID"
+          else
+            # Create iPhone 8 with iOS 13.7 if not available
+            IOS13_RUNTIME=$(xcrun simctl list runtimes | grep "iOS 13.7" | awk '{print $NF}' | head -n1 || true)
+            if [ -n "$IOS13_RUNTIME" ]; then
+              echo "Creating iPhone 8 device with iOS 13.7 runtime..."
+              DEVICE_ID=$(xcrun simctl create "iPhone 8 iOS 13.7" "iPhone 8" "$IOS13_RUNTIME")
+              IOS13_DEST="platform=iOS Simulator,id=$DEVICE_ID"
+            else
+              echo "Warning: iOS 13.7 runtime not found, using fallback"
+              IOS13_DEST="platform=iOS Simulator,OS=13.7,name=iPhone 8"
+            fi
+          fi
+          echo "ios13_dest=$IOS13_DEST" >> "$GITHUB_OUTPUT"
+          echo "iOS 13.7 destination: $IOS13_DEST"
+      - name: Debug iOS 13.7 destination
+        run: |
+          echo "::notice::ios13=${{ steps.dest.outputs.ios13_dest }}"
+
+  build-macos-13:
+    runs-on: macos-13
+    needs: prepare-macos-13
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: ios13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 14.3.1
+
+      - name: Select iOS 13.7 destination
+        id: pick
+        run: |
+          echo "DEST=${{ needs.prepare-macos-13.outputs.ios13_dest }}" >> "$GITHUB_ENV"
+          echo "Platform=${{ matrix.platform }}"
+          echo "Destination=$DEST"
+
+      - name: Build ${{ matrix.platform }}
+        env:
+          SCHEME: ${{ needs.prepare-macos-13.outputs.scheme }}
+          DESTINATION: ${{ env.DEST }}
+        run: .github/actions/build-and-tests/scripts/build.sh
