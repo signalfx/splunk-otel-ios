@@ -30,6 +30,7 @@ final class FakeDiskStorage: DiskStorage {
     var files: [String: URL] = [:]
     var deletedKeys: [String] = []
     var shouldThrowOnFinalDestination = false
+    var shouldThrowOnlist = false
 
     func insert(_ value: some Decodable & Encodable, forKey key: CiscoDiskStorage.KeyBuilder) throws {
         let keyStr = key.key
@@ -53,7 +54,11 @@ final class FakeDiskStorage: DiskStorage {
     }
 
     func list(forKey _: CiscoDiskStorage.KeyBuilder) throws -> [CiscoDiskStorage.ItemInfo] {
-        []
+        if shouldThrowOnlist {
+            throw NSError(domain: "FakeDiskStorage", code: 1)
+        }
+
+        return []
     }
 
     func checkRules() throws {}
