@@ -35,13 +35,13 @@ struct BackgroundHTTPClientTests {
     func makeClient(
         qos: SessionQOSConfiguration = SessionQOSConfiguration(),
         disk: MockDiskStorage = MockDiskStorage(),
-        nameSpace: String = "test",
+        namespace: String = "test",
         logger: MockLogger = MockLogger()
     ) -> BackgroundHTTPClient {
         BackgroundHTTPClient(
             sessionQosConfiguration: qos,
             diskStorage: disk,
-            nameSpace: nameSpace,
+            namespace: namespace,
             logger: logger
         )
     }

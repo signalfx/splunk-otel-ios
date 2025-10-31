@@ -35,7 +35,7 @@ final class MockDiskStorage: DiskStorage {
 
     func insert(_ value: some Decodable & Encodable, forKey key: CiscoDiskStorage.KeyBuilder) throws {
         if shouldThrowOnInsert {
-            throw NSError(domain: "FakeDiskStorage", code: 1)
+            throw NSError(domain: "MockDiskStorage", code: 1)
         }
 
         let keyStr = key.key
@@ -60,7 +60,7 @@ final class MockDiskStorage: DiskStorage {
 
     func list(forKey _: CiscoDiskStorage.KeyBuilder) throws -> [CiscoDiskStorage.ItemInfo] {
         if shouldThrowOnlist {
-            throw NSError(domain: "FakeDiskStorage", code: 1)
+            throw NSError(domain: "MockDiskStorage", code: 1)
         }
 
         return []
@@ -72,7 +72,7 @@ final class MockDiskStorage: DiskStorage {
         let keyString = key.key
 
         if shouldThrowOnFinalDestination {
-            throw NSError(domain: "FakeDiskStorage", code: 1)
+            throw NSError(domain: "MockDiskStorage", code: 1)
         }
 
         return files[keyString] ?? URL(fileURLWithPath: "/notfound")

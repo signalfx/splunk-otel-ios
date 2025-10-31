@@ -33,7 +33,7 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
 
     private let urlSessionDelegateQueue: OperationQueue
     private let sessionQosConfiguration: SessionQOSConfiguration
-    private let nameSpace: String
+    private let namespace: String
 
     private let logger: CiscoLogger.LogAgent
 
@@ -43,7 +43,7 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
     // MARK: - Computed properties
 
     private lazy var session: URLSession = {
-        let identifier = "com.otel.config.session.\(nameSpace)"
+        let identifier = "com.otel.config.session.\(namespace)"
         let configuration = URLSessionConfiguration.background(withIdentifier: identifier)
 
         configuration.networkServiceType = .background
@@ -58,22 +58,22 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
 
     // MARK: - Initialization
 
-    init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage, nameSpace: String, logger: CiscoLogger.LogAgent) {
+    init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage, namespace: String, logger: CiscoLogger.LogAgent) {
         self.sessionQosConfiguration = sessionQosConfiguration
         self.diskStorage = diskStorage
         self.logger = logger
-        self.nameSpace = nameSpace
+        self.namespace = namespace
 
-        urlSessionDelegateQueue = OperationQueue("URLSessionDelegate-\(nameSpace)", maxConcurrents: 1, qualityOfService: .utility)
+        urlSessionDelegateQueue = OperationQueue("URLSessionDelegate-\(namespace)", maxConcurrents: 1, qualityOfService: .utility)
 
         super.init()
     }
 
-    convenience init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage, nameSpace: String) {
+    convenience init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage, namespace: String) {
         self.init(
             sessionQosConfiguration: sessionQosConfiguration,
             diskStorage: diskStorage,
-            nameSpace: nameSpace,
+            namespace: namespace,
             logger: DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "BackgroundExporter")
         )
     }

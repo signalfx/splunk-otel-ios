@@ -41,7 +41,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     lazy var httpClient: BackgroundHTTPClientProtocol = BackgroundHTTPClient(
         sessionQosConfiguration: qosConfig,
         diskStorage: diskStorage,
-        nameSpace: getFileKeyType()
+        namespace: getFileKeyType()
     )
 
 
