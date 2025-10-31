@@ -243,24 +243,21 @@ extension OTLPSessionReplayEventProcessor {
             logger.log {
                 var message = ""
 
-        if let body = logRecord.body {
-            var bodyDescription = String(describing: body)
-            if bodyDescription.count > 1000 {
-                bodyDescription = bodyDescription.prefix(1000) + "..."
-            }
+                message += "------ 🪵 Log: ------\n"
+                message += "Severity: \(String(describing: logRecord.severity))\n"
+                message += "Body: \(bodyDescription)\n"
+                message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
+                message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.iso8601Formatted()))\n"
 
-            message += "Severity: \(String(describing: logRecord.severity))\n"
-            message += "Body: \(bodyDescription)\n"
-            message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
-            message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.iso8601Formatted()) / \(logRecord.timestamp))\n"
+                if let observedTimestamp = logRecord.observedTimestamp {
+                    let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
+                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestamp.iso8601Formatted()))\n"
+                }
+                else {
+                    message += "ObservedTimestamp: -\n"
+                }
 
-            if let observedTimestamp = logRecord.observedTimestamp {
-                let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestamp.iso8601Formatted()) / \(observedTimestamp))\n"
-            }
-            else {
-                message += "ObservedTimestamp: -\n"
-            }
+                message += "SpanContext: \(String(describing: logRecord.spanContext))\n"
 
                 // Log attributes
                 message += "Attributes:\n"
