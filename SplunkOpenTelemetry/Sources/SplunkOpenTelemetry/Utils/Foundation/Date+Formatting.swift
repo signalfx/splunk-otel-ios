@@ -17,28 +17,21 @@ limitations under the License.
 
 import Foundation
 
-/// A private enum to hold the lazily-initialized legacy date formatter.
 private enum SplunkLegacyDateFormatter {
-    static let iso8601: DateFormatter = {
-        let formatter = DateFormatter()
-        // Using a standard, locale-independent format is crucial for logs.
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
+    static let iso8601: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return formatter
     }()
 }
 
 extension Date {
-    /// Returns a string representation of the date formatted for Splunk logs.
-    ///
-    /// This method is backward-compatible with iOS versions prior to 15.
-    func splunkFormatted() -> String {
-        guard #available(iOS 15.0, *) else {
-            // Use the legacy DateFormatter for older OS versions.
+    /// Returns a string representation of the date in ISO 8601 format.
+    func iso8601Formatted() -> String {
+        if #available(iOS 15.0, *) {
+            return formatted(.iso8601)
+        } else {
             return SplunkLegacyDateFormatter.iso8601.string(from: self)
         }
-
-        // Use the modern, efficient API on iOS 15 and newer.
-        return formatted(.iso8601)
     }
 }
