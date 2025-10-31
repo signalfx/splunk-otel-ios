@@ -28,10 +28,10 @@ private enum SplunkLegacyDateFormatter {
 extension Date {
     /// Returns a string representation of the date in ISO 8601 format.
     func iso8601Formatted() -> String {
-        if #available(iOS 15.0, *) {
-            return formatted(.iso8601)
-        } else {
+        guard #available(iOS 15.0, *) else {
             return SplunkLegacyDateFormatter.iso8601.string(from: self)
         }
+
+        return formatted(.iso8601)
     }
 }

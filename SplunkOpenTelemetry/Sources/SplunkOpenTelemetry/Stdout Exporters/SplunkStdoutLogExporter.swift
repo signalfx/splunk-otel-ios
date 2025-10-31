@@ -39,12 +39,14 @@ class SplunkStdoutLogExporter: LogRecordExporter {
             // Log LogRecord data
             logger.log {
                 var message = ""
+                let logRecordTimestampNanoseconds = logRecordTimestamp.timeIntervalSince1970.toNanoseconds
 
                 message += "------ 🪵 Log: ------\n"
                 message += "Severity: \(String(describing: logRecord.severity))\n"
                 message += "Body: \(String(describing: logRecord.body))\n"
                 message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
-                message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.iso8601Formatted()) / \(logRecord.timestamp))\n"
+                message +=
+                    "Timestamp: \(logRecordTimestampNanoseconds) (\(logRecord.timestamp.iso8601Formatted()) / \(logRecord.timestamp))\n"
 
                 if let observedTimestamp = logRecord.observedTimestamp {
                     let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
