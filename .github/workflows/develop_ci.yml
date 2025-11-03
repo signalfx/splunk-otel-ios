@@ -68,7 +68,7 @@ jobs:
           echo "status=${code:-1}" >> "$GITHUB_OUTPUT"
 
       - name: Publish JUnit to Checks
-        uses: mikepenz/action-junit-report@v4
+        uses: mikepenz/action-junit-report@v6
         if: always()
         with:
           report_paths: reports/junit-${{ matrix.platform }}.xml
