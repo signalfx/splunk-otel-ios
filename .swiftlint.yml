@@ -15,6 +15,9 @@ identifier_name:
 
 vertical_whitespace:
   max_empty_lines: 2
+  
+modifier_order:
+  preferred_modifier_order: [override, acl, setterACL, isolation, dynamic, mutators, lazy, final, required, convenience, typeMethods, owned]
 
 opt_in_rules:
   - array_init
