@@ -5,13 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.2]
 
 ### Added
 
 * Enabled support for iOS 13/14. On these versions, the main agent is inactive (though it will process pending crash reports), with the full suite of instrumentation features available on iOS 15 and newer.
-
 * Add the `app.installation.id` attribute to all signals to uniquely identify each application installation.
+* Added the session start event
+* Added the session replay refresh event
+
+### Fixed
+
+* Fixed SwiftLint and SwiftFormat plugins appearing when importing the agent (#454)
+* Fixed ocasional stalled url requests
 
 ## [2.0.1]
 
