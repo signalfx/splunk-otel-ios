@@ -9,15 +9,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-* Enabled compilation support for iOS 13/14. On these versions, the main agent is inactive (though it will process pending crash reports), with the full suite of instrumentation features available on iOS 15 and newer.
-* Add the app.installation.id attribute to all signals to uniquely identify each application installation.
-* Added the session start event
-* Added the session replay refresh event
+* Added compilation support for iOS 13 and 14. On these versions, the main agent remains inactive but will continue to handle pending crash reports. Full instrumentation features are available on iOS 15 and above. #466
+* Add the app.installation.id attribute to all signals to uniquely identify each application installation. #452
+* Added the session start event. #465 #475
+* Added the session replay refresh event. #463
 
 ### Fixed
 
-* Fixed SwiftLint and SwiftFormat plugins appearing when importing the agent - Please remove SwiftLint from Package file #454
-* Fixed ocasional stalled url requests
+* Fixed SwiftLint and SwiftFormat plugins appearing when importing the agent #454
+* Fixed occasional stalled url requests #448
 
 ## [2.0.1]
 
