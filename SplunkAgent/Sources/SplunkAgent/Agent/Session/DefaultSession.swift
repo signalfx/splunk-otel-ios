@@ -305,7 +305,7 @@ class DefaultSession: AgentSession {
     // MARK: - Length checks
 
     private func isSessionTooLong() -> Bool {
-        let sessionLength = -1.0 * currentSession.start.timeIntervalSinceNow
+        let sessionLength = Date().timeIntervalSince(currentSession.start)
         return sessionLength > maxSessionLength
     }
 
@@ -316,7 +316,7 @@ class DefaultSession: AgentSession {
             return false
         }
 
-        let timeInBackground = -1.0 * enterBackground.timeIntervalSinceNow
+        let timeInBackground = Date().timeIntervalSince(enterBackground)
         return timeInBackground > sessionTimeout
     }
 }
