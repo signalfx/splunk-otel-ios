@@ -199,7 +199,18 @@ public class NetworkMonitor {
     // swiftlint:disable cyclomatic_complexity
     private func getCurrentRadioType() -> String? {
         #if canImport(CoreTelephony)
-            let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first
+            guard let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first else {
+                return nil
+            }
+
+            if #available(iOS 14.1, *) {
+                if radioTechnology == CTRadioAccessTechnologyNRNSA {
+                    return "NRNSA (5G Non-Standalone)"
+                }
+                if radioTechnology == CTRadioAccessTechnologyNR {
+                    return "NR (5G Standalone)"
+                }
+            }
 
             switch radioTechnology {
             case CTRadioAccessTechnologyGPRS:
@@ -234,12 +245,6 @@ public class NetworkMonitor {
 
             case CTRadioAccessTechnologyLTE:
                 return "LTE (4G)"
-
-            case CTRadioAccessTechnologyNRNSA:
-                return "NRNSA (5G Non-Standalone)"
-
-            case CTRadioAccessTechnologyNR:
-                return "NR (5G Standalone)"
 
             default:
                 return nil

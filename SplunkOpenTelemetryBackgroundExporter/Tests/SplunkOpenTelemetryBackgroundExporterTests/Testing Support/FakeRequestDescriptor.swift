@@ -39,7 +39,7 @@ struct FakeRequestDescriptor: RequestDescriptorProtocol {
         explicitTimeout: TimeInterval = 1,
         sentCount: Int = 0,
         fileKeyType: String = "base",
-        scheduled: Date = .now,
+        scheduled: Date = Date(),
         shouldSend: Bool = true
     ) throws {
         guard let url = URL(string: endpointString) else {

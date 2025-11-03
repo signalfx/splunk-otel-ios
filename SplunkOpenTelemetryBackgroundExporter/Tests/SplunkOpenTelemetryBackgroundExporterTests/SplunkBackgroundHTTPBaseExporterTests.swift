@@ -62,7 +62,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         let exporter = try makeExporter(disk: disk, http: http)
 
         let task = try createNewTestTask()
-        task.earliestBeginDate = .now
+        task.earliestBeginDate = Date()
 
         exporter.checkStalledUploadsOperation(tasks: [task])
 
@@ -142,7 +142,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         let http = FakeHTTPClient()
 
         let exporter = try makeExporter(disk: disk, http: http)
-        exporter.checkAndSend(fileKeys: ["non-working-uuid"], existingTasks: [], cancelTime: .now)
+        exporter.checkAndSend(fileKeys: ["non-working-uuid"], existingTasks: [], cancelTime: Date())
 
         #expect(http.sent.isEmpty)
     }
@@ -151,12 +151,12 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func fileWithNonStalledTaskIsNotResent() throws {
         let uuid = UUID()
         let disk = FakeDiskStorage()
-        let desc = try FakeRequestDescriptor(id: uuid, scheduled: .now.addingTimeInterval(1_000))
+        let desc = try FakeRequestDescriptor(id: uuid, scheduled: Date(timeIntervalSinceNow: 1_000))
 
         let http = FakeHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: .now)
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: Date())
 
         #expect(http.sent.isEmpty)
     }
@@ -170,13 +170,13 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             explicitTimeout: 1,
             sentCount: 5,
             fileKeyType: "base",
-            scheduled: .now.addingTimeInterval(-1_000)
+            scheduled: Date(timeIntervalSinceNow: -1_000)
         )
 
         let http = FakeHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: .now)
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: Date())
 
         #expect(http.sent.count == 1)
         #expect(http.sent.first?.id == uuid)
@@ -190,7 +190,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
         let exporter = try makeExporter(disk: disk, http: http)
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: .now)
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: Date())
 
         #expect(http.sent.count == 1)
         #expect(http.sent.first?.id == uuid)
