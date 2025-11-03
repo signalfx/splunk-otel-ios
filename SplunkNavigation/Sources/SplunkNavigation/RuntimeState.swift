@@ -25,5 +25,5 @@ public final class RuntimeState: Sendable {
     /// Indicates whether automatic navigation detection is enabled.
     ///
     /// The default value is `false`.
-    nonisolated(unsafe) public internal(set) var isAutomatedTrackingEnabled: Bool = false
+    public internal(set) nonisolated(unsafe) var isAutomatedTrackingEnabled: Bool = false
 }

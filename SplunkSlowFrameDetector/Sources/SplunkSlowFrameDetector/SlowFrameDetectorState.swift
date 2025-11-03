@@ -21,5 +21,5 @@ public final class SlowFrameDetectorState: Sendable {
     /// Indicates whether the SlowFrameDetector feature is enabled.
     ///
     /// The default value is `false`.
-    nonisolated(unsafe) public internal(set) var isEnabled: Bool = false
+    public internal(set) nonisolated(unsafe) var isEnabled: Bool = false
 }
