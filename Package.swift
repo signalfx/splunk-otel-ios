@@ -543,7 +543,7 @@ func pluginDependencies() -> [Package.Dependency] {
         // SwiftLint (realm)
         .package(
             url: "https://github.com/SimplyDanny/SwiftLintPlugins",
-            from: "0.59.1"
+            from: "0.62.2"
         ),
 
         // swift-format (swiftlang)
