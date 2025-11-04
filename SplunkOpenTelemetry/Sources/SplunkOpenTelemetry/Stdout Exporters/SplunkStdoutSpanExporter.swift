@@ -17,7 +17,6 @@ limitations under the License.
 
 internal import CiscoLogger
 import Foundation
-import OpenTelemetryApi
 import OpenTelemetrySdk
 import SplunkCommon
 
@@ -49,8 +48,8 @@ class SplunkStdoutSpanExporter: SpanExporter {
                 message += "TraceFlags: \(span.traceFlags)\n"
                 message += "TraceState: \(span.traceState)\n"
                 message += "ParentSpanId: \(span.parentSpanId?.hexString ?? "-")\n"
-                message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.splunkFormatted()))\n"
-                message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.splunkFormatted()))\n"
+                message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.iso8601Formatted()) / \(span.startTime))\n"
+                message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.iso8601Formatted()) / \(span.endTime))\n"
 
                 let duration = span.endTime.timeIntervalSince(span.startTime)
                 message += "Duration: \(duration.toNanoseconds) nanoseconds (\(duration) seconds)\n"
