@@ -26,16 +26,23 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     // MARK: - Private
 
+    private let qosConfig: SessionQOSConfiguration
+
+
+    // MARK: - Internal
+
     let fileType: String?
-
-
-    // MARK: - Public
-
     let endpoint: URL
-    let httpClient: BackgroundHTTPClient
     let envVarHeaders: [(String, String)]?
     let config: OtlpConfiguration
     let diskStorage: DiskStorage
+    var checkStalledTask: Task<Void, Never>?
+
+    lazy var httpClient: BackgroundHTTPClientProtocol = BackgroundHTTPClient(
+        sessionQosConfiguration: qosConfig,
+        diskStorage: diskStorage,
+        namespace: getFileKeyType()
+    )
 
 
     // MARK: - Initialization
@@ -60,68 +67,89 @@ public class OTLPBackgroundHTTPBaseExporter {
         self.config = config
         self.diskStorage = diskStorage
         self.fileType = fileType
-
-        httpClient = BackgroundHTTPClient(sessionQosConfiguration: qosConfig, diskStorage: diskStorage)
+        self.qosConfig = qosConfig
 
         // Get incomplete requests and check for stalled files
         // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
-        let cleanTime = DispatchTime.now() + .seconds(Int.random(in: 5 ... 8))
-
-        DispatchQueue.global(qos: .utility)
-            .asyncAfter(deadline: cleanTime) { [weak self] in
-                self?.httpClient
-                    .getAllSessionsTasks { [weak self] tasks in
-                        self?.checkStalledUploadsOperation(tasks: tasks)
-                    }
-            }
+        checkStalledTask = Task.detached(priority: .utility) { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
+            self?.httpClient
+                .getAllSessionsTasks { [weak self] tasks in
+                    self?.checkStalledUploadsOperation(tasks: tasks)
+                }
+        }
     }
 
-
-    // MARK: - Request method
-
-    public func createRequest(endpoint: URL) -> URLRequest {
-        var request = URLRequest(url: endpoint)
-
-        request.httpMethod = "POST"
-        request.setValue(Headers.getUserAgentHeader(), forHTTPHeaderField: Constants.HTTP.userAgent)
-        request.setValue("application/x-protobuf", forHTTPHeaderField: "Content-Type")
-
-        return request
+    deinit {
+        checkStalledTask?.cancel()
     }
 
 
     // MARK: - Stalled request operations
 
-    private func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
-        // Get ids from all incomplete requests
-        let taskDescriptions =
+    func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
+
+        // Get descriptions from all incomplete requests
+        let allTaskDescriptions =
             tasks
             .compactMap(\.taskDescription)
             .compactMap {
                 try? JSONDecoder().decode(RequestDescriptor.self, from: Data($0.utf8))
             }
 
-        guard let uploadList = try? diskStorage.list(forKey: getStorageKey()) else {
+        // Get time when all newly created tasks should be already sent.
+        let cancelTime = Date(timeIntervalSinceNow: -1 * config.timeout)
+
+        // Cancel all stalled tasks.
+        let toCancelTasks = tasks.filter {
+            guard let expectedExecutionDate = $0.earliestBeginDate else {
+                return true
+            }
+
+            return expectedExecutionDate < cancelTime
+        }
+
+        for task in toCancelTasks {
+            task.cancel()
+        }
+
+        // Get all file's keys that should be uploaded
+        guard let uploadList = (try? diskStorage.list(forKey: getStorageKey()))?.map(\.key) else {
 
             return
         }
 
-        for file in uploadList {
+        checkAndSend(fileKeys: uploadList, existingTasks: allTaskDescriptions, cancelTime: cancelTime)
+    }
+
+    func checkAndSend(fileKeys files: [String], existingTasks allTaskDescriptions: [RequestDescriptorProtocol], cancelTime: Date) {
+
+        // Go throught file list and try to send all files again.
+        for fileKey in files {
+            guard let requestId = UUID(uuidString: fileKey) else {
+
+                continue
+            }
 
             // If there is no upload task for file in cache folder, create RequestDescriptor and plan its upload to server
             // Note:
             //      File names are UUIDs of tasks
-            if let requestId = UUID(uuidString: file.key),
-                let taskDescription = taskDescriptions.first(where: { $0.id == requestId })
-            {
-                let requestDescriptor = RequestDescriptor(
+            if let taskDescription = allTaskDescriptions.first(where: { $0.id == requestId }) {
+                // Perform send only for tasks which was scheduled in past and was cancelled in previous step.
+                if taskDescription.scheduled < cancelTime {
+                    try? httpClient.send(taskDescription)
+                }
+            }
+            else {
+                // This task was forgotten by system, create new one.
+                let taskDescription = RequestDescriptor(
                     id: requestId,
                     endpoint: endpoint,
                     explicitTimeout: config.timeout,
-                    fileKeyType: taskDescription.fileKeyType
+                    fileKeyType: getFileKeyType()
                 )
 
-                try? httpClient.send(requestDescriptor)
+                try? httpClient.send(taskDescription)
             }
         }
     }

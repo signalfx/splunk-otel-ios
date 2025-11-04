@@ -20,13 +20,20 @@ internal import CiscoLogger
 import Foundation
 import SplunkCommon
 
+protocol BackgroundHTTPClientProtocol: NSObjectProtocol {
+    func send(_ requestDescriptor: RequestDescriptorProtocol) throws
+    func flush(completion: @escaping () -> Void)
+    func getAllSessionsTasks(_ completionHandler: @escaping ([URLSessionTask]) -> Void)
+}
+
 /// Client for sending requests over HTTP.
-final class BackgroundHTTPClient: NSObject {
+final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
 
     // MARK: - Private properties
 
-    private let urlSessionDelegateQueue = OperationQueue("URLSessionDelegate", maxConcurrents: 1, qualityOfService: .utility)
+    private let urlSessionDelegateQueue: OperationQueue
     private let sessionQosConfiguration: SessionQOSConfiguration
+    private let nameSpace: String
 
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "BackgroundExporter")
 
@@ -36,7 +43,7 @@ final class BackgroundHTTPClient: NSObject {
     // MARK: - Computed properties
 
     private lazy var session: URLSession = {
-        let identifier = "com.otel.config.session"
+        let identifier = "com.otel.config.session.\(nameSpace)"
         let configuration = URLSessionConfiguration.background(withIdentifier: identifier)
 
         configuration.networkServiceType = .background
@@ -51,9 +58,12 @@ final class BackgroundHTTPClient: NSObject {
 
     // MARK: - Initialization
 
-    init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage) {
+    init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage, namespace: String) {
         self.sessionQosConfiguration = sessionQosConfiguration
         self.diskStorage = diskStorage
+        nameSpace = namespace
+
+        urlSessionDelegateQueue = OperationQueue("URLSessionDelegate-\(namespace)", maxConcurrents: 1, qualityOfService: .utility)
 
         super.init()
     }
@@ -61,7 +71,7 @@ final class BackgroundHTTPClient: NSObject {
 
     // MARK: - Client logic
 
-    func send(_ requestDescriptor: RequestDescriptor) throws {
+    func send(_ requestDescriptor: RequestDescriptorProtocol) throws {
         let fileKey = KeyBuilder(
             requestDescriptor.id.uuidString,
             parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
@@ -110,6 +120,40 @@ final class BackgroundHTTPClient: NSObject {
             completionHandler(tasks)
         }
     }
+
+    func taskCompleted(withResponse response: URLResponse?, requestDescriptor: RequestDescriptor, error: Error?) throws {
+        guard let error else {
+            if let httpResponse = response as? HTTPURLResponse {
+                logger.log(level: .info) {
+                    """
+                    Request to: \(requestDescriptor.endpoint.absoluteString) with id \(requestDescriptor.id.uuidString) \n
+                    has been received with status code \(httpResponse.statusCode).
+                    """
+                }
+            }
+
+            try diskStorage.delete(
+                forKey: KeyBuilder(
+                    requestDescriptor.id.uuidString,
+                    parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
+                )
+            )
+
+            return
+        }
+
+        logger.log(level: .info) {
+            """
+            Request to: \(requestDescriptor.endpoint.absoluteString) \n
+            with a data task id: \(requestDescriptor.id) \n
+            failed with an error message: \(error.localizedDescription).
+            """
+        }
+
+        if let urlError = error as? URLError, urlError.code != .cancelled {
+            try send(requestDescriptor)
+        }
+    }
 }
 
 extension BackgroundHTTPClient: URLSessionDataDelegate {
@@ -150,47 +194,6 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             return
         }
 
-        if let httpResponse = task.response as? HTTPURLResponse,
-            !(200 ... 299).contains(httpResponse.statusCode)
-        {
-
-            logger.log(level: .info) {
-                """
-                Request to: \(requestDescriptor.endpoint.absoluteString) \n
-                with a data task id: \(requestDescriptor.id) \n
-                failed with an error status code: \(httpResponse.statusCode).
-                """
-            }
-
-            try? send(requestDescriptor)
-        }
-        else if let error {
-            logger.log(level: .info) {
-                """
-                Request to: \(requestDescriptor.endpoint.absoluteString) \n
-                with a data task id: \(requestDescriptor.id) \n
-                failed with an error message: \(error.localizedDescription).
-                """
-            }
-
-            try? send(requestDescriptor)
-        }
-        else {
-            if let httpResponse = task.response as? HTTPURLResponse {
-                logger.log(level: .info) {
-                    """
-                    Request to: \(requestDescriptor.endpoint.absoluteString) \n
-                    has been successfully received with status code \(httpResponse.statusCode).
-                    """
-                }
-            }
-
-            try? diskStorage.delete(
-                forKey: KeyBuilder(
-                    requestDescriptor.id.uuidString,
-                    parrentKeyBuilder: KeyBuilder.uploadsKey.append(requestDescriptor.fileKeyType)
-                )
-            )
-        }
+        try? taskCompleted(withResponse: task.response, requestDescriptor: requestDescriptor, error: error)
     }
 }

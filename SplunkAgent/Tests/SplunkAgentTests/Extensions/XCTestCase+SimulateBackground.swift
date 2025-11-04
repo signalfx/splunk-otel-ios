@@ -25,7 +25,7 @@ import XCTest
 
         // MARK: - Simulated background
 
-        func simulateBackgroundStay(for defaultSession: DefaultSession, duration: UInt32) throws {
+        func simulateBackgroundStay(for defaultSession: DefaultSession, duration: UInt32) async throws {
             let previousInterval = defaultSession.sessionRefreshInterval
 
             // The current interval also needs to be rolled back
@@ -62,7 +62,9 @@ import XCTest
             sleep(duration)
 
             // We need to wait for notification delivery
-            waitForExpectations(timeout: TimeInterval(duration), handler: nil)
+            await MainActor.run {
+                waitForExpectations(timeout: TimeInterval(duration), handler: nil)
+            }
 
             // Send simulated leave from background
             NotificationCenter.default.post(

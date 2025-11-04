@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-
 internal import SplunkCommon
 internal import SplunkNetwork
 

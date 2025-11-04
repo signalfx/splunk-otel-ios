@@ -57,9 +57,9 @@ import XCTest
 
         // MARK: - Job management
 
-        func testLifecycle() throws {
+        func testLifecycle() async throws {
             /* Going into the background for some time */
-            try simulateBackgroundStay(for: DefaultSession(), duration: 5)
+            try await simulateBackgroundStay(for: DefaultSession(), duration: 5)
 
             /* SUSPENDED */
             // The job should stay suspended
@@ -95,7 +95,7 @@ import XCTest
 
         // MARK: - Application lifecycle
 
-        func testEnterBackground() throws {
+        func testEnterBackground() async throws {
             let initialDuration: TimeInterval = 2
             let initialCount = executionsCount(for: initialDuration)
 
@@ -109,7 +109,7 @@ import XCTest
 
 
             /* Going into the background */
-            sendEnterBackgroundNotification()
+            await sendEnterBackgroundNotification()
 
             // After the background entry, another execution should be performed for this transition
             let afterEnterCount = initialCount + 1
@@ -133,7 +133,7 @@ import XCTest
             XCTAssertEqual(counter, afterEnterCount)
         }
 
-        func testEnterForeground() throws {
+        func testEnterForeground() async throws {
             let testName = "jobEntersForegroundTest"
             let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
 
@@ -151,7 +151,7 @@ import XCTest
 
             /* Going into the background for some time */
             let backgroundStay: UInt32 = 7
-            try simulateBackgroundStay(for: defaultSession, duration: backgroundStay)
+            try await simulateBackgroundStay(for: defaultSession, duration: backgroundStay)
 
             // After a previous stay in the background, there should be two new ticks:
             // - 1x transition into background
