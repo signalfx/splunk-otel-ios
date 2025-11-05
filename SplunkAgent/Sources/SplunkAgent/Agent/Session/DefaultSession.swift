@@ -249,7 +249,7 @@ class DefaultSession: AgentSession {
         // If we are rotating a session while in the background,
         // refresh the `enterBackground` timestamp as well
         if enterBackground != nil {
-            enterBackground = Date()
+            enterBackground = .now
         }
 
         // We will announce that the session closing is done
