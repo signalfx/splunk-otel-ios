@@ -11,7 +11,7 @@ import class Foundation.ProcessInfo
 let package = Package(
     name: "SplunkAgent",
     platforms: [
-        .iOS(.v15),
+        .iOS(.v13),
         .tvOS(.v15),
         .visionOS(.v1),
         .macCatalyst(.v15)
@@ -548,7 +548,7 @@ func pluginDependencies() -> [Package.Dependency] {
         // SwiftLint (realm)
         .package(
             url: "https://github.com/SimplyDanny/SwiftLintPlugins",
-            from: "0.59.1"
+            from: "0.62.2"
         ),
 
         // swift-format (swiftlang)

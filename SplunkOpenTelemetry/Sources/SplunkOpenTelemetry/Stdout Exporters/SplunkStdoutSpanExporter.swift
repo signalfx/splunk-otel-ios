@@ -30,17 +30,6 @@ class SplunkStdoutSpanExporter: SpanExporter {
     /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    /// Date format.
-    private let dateFormatStyle: Date.FormatStyle = .init()
-        .month()
-        .day()
-        .year()
-        .hour(.twoDigits(amPM: .wide))
-        .minute(.twoDigits)
-        .second(.twoDigits)
-        .secondFraction(.fractional(3))
-        .timeZone(.iso8601(.short))
-
     init(with proxy: SpanExporter) {
         proxyExporter = proxy
     }
@@ -59,8 +48,8 @@ class SplunkStdoutSpanExporter: SpanExporter {
                 message += "TraceFlags: \(span.traceFlags)\n"
                 message += "TraceState: \(span.traceState)\n"
                 message += "ParentSpanId: \(span.parentSpanId?.hexString ?? "-")\n"
-                message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.formatted(self.dateFormatStyle)))\n"
-                message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.formatted(self.dateFormatStyle)))\n"
+                message += "Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) (\(span.startTime.iso8601Formatted()) / \(span.startTime))\n"
+                message += "End: \(span.endTime.timeIntervalSince1970.toNanoseconds) (\(span.endTime.iso8601Formatted()) / \(span.endTime))\n"
 
                 let duration = span.endTime.timeIntervalSince(span.startTime)
                 message += "Duration: \(duration.toNanoseconds) nanoseconds (\(duration) seconds)\n"

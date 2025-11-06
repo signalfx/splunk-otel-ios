@@ -33,7 +33,6 @@ class DefaultSession: AgentSession {
     private(set) lazy var currentSession: SessionItem = startSession()
 
     var enterBackground: Date?
-    var leaveBackground: Date?
 
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "Agent")
 
@@ -205,7 +204,6 @@ class DefaultSession: AgentSession {
             }
 
             enterBackground = nil
-            leaveBackground = nil
 
             rotateSession()
 
@@ -247,6 +245,12 @@ class DefaultSession: AgentSession {
 
         // Save changes into cache
         sessionsModel.sync()
+
+        // If we are rotating a session while in the background,
+        // refresh the `enterBackground` timestamp as well
+        if enterBackground != nil {
+            enterBackground = Date()
+        }
 
         // We will announce that the session closing is done
         NotificationCenter.default.post(
@@ -301,19 +305,18 @@ class DefaultSession: AgentSession {
     // MARK: - Length checks
 
     private func isSessionTooLong() -> Bool {
-        let sessionLength = -1.0 * currentSession.start.timeIntervalSinceNow
+        let sessionLength = Date().timeIntervalSince(currentSession.start)
         return sessionLength > maxSessionLength
     }
 
     private func isInBackgroundTooLong() -> Bool {
         guard
-            let enterBackground,
-            let leaveBackground
+            let enterBackground
         else {
             return false
         }
 
-        let timeInBackground = leaveBackground.timeIntervalSince(enterBackground)
+        let timeInBackground = Date().timeIntervalSince(enterBackground)
         return timeInBackground > sessionTimeout
     }
 }

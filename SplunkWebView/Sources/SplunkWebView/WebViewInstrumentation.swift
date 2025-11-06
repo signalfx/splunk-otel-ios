@@ -144,13 +144,20 @@ public final class WebViewInstrumentation: NSObject {
         private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
             let contentController = webView.configuration.userContentController
             contentController.removeScriptMessageHandler(forName: name)
-            contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
+            if #available(iOS 14.0, *) {
+                contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
+            }
+            else {
+                // Fallback on earlier versions
+                contentController.add(self, name: name)
+            }
             return contentController
         }
     #endif
 }
 
 #if canImport(WebKit)
+    @available(iOS 14.0, *)
     extension WebViewInstrumentation: WKScriptMessageHandlerWithReply {
 
 
@@ -195,3 +202,21 @@ public final class WebViewInstrumentation: NSObject {
         }
     }
 #endif
+
+#if canImport(WebKit)
+    extension WebViewInstrumentation: WKScriptMessageHandler {
+        public func userContentController(_: WKUserContentController, didReceive _: WKScriptMessage) {
+            // This is the fallback for iOS 13. It does not support replies.
+            // The JavaScript side will not get a response, and its promise will time out.
+            // This is acceptable degradation of functionality for an unsupported OS.
+        }
+    }
+#endif
+
+/// Type for conforming to ModuleEventMetadata.
+public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
+    public var timestamp = Date()
+}
+
+/// Type for conforming to ModuleEventData.
+public struct WebViewInstrumentationData: ModuleEventData {}
