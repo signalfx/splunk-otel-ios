@@ -61,7 +61,6 @@ final class ConfigurationTestBuilder {
         configuration.session = sessionConfiguration
         configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
 
-        // swiftlint:disable:next prefer_key_path
         configuration.spanInterceptor = { spanData in
             spanData
         }
@@ -92,7 +91,6 @@ final class ConfigurationTestBuilder {
         configuration.session = sessionConfiguration
         configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
 
-        // swiftlint:disable:next prefer_key_path
         configuration.spanInterceptor = { spanData in
             spanData
         }
