@@ -22,7 +22,7 @@ import OpenTelemetrySdk
 import ResourceExtension
 import SignPostIntegration
 @_spi(SplunkInternal) import SplunkCommon
-import SplunkNetwork
+
 
 /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
 public unowned var sharedState: AgentSharedState?
@@ -60,11 +60,11 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
             }
         }
 
-        let length = hr!.expectedContentLength ?? 0
+        let length = hr!.expectedContentLength
         span.clearAndSetAttribute(key: SemanticAttributes.httpResponseBodySize, value: Int(length))
 
         // Try to capture IP address from the response/connection
-        if let httpResponse = hr {
+        if hr != nil {
             // Update network.peer.address with actual IP if we can get it
             if let ipAddress = getIPAddressFromResponse(hr!) {
                 span.clearAndSetAttribute(key: "network.peer.address", value: ipAddress)
@@ -235,7 +235,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     return span
 }
 
-fileprivate var ASSOC_KEY_SPAN: UInt8 = 0
+fileprivate var AssocKeySpan: UInt8 = 0
 
 extension URLSessionTask {
     @objc open func splunk_swizzled_setState(state: URLSessionTask.State) {
@@ -255,7 +255,7 @@ extension URLSessionTask {
             return
         }
 
-        let maybeSpan: Span? = objc_getAssociatedObject(self, &ASSOC_KEY_SPAN) as? Span
+        let maybeSpan: Span? = objc_getAssociatedObject(self, &AssocKeySpan) as? Span
 
         if maybeSpan == nil {
             return
@@ -278,14 +278,14 @@ extension URLSessionTask {
             return
         }
 
-        let existingSpan: Span? = objc_getAssociatedObject(self, &ASSOC_KEY_SPAN) as? Span
+        let existingSpan: Span? = objc_getAssociatedObject(self, &AssocKeySpan) as? Span
 
         if existingSpan != nil {
             return
         }
 
         startHttpSpan(request: currentRequest).map { span in
-            objc_setAssociatedObject(self, &ASSOC_KEY_SPAN, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, &AssocKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
     }
 }
