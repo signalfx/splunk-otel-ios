@@ -22,15 +22,13 @@ import OpenTelemetrySdk
 import ResourceExtension
 import SignPostIntegration
 @_spi(SplunkInternal) import SplunkCommon
-
+/*
 func isUsefulString(_ s: String?) -> Bool {
     return s != nil && !s!.isEmpty
 }
 
 func computeDeviceModel() -> String {
     // Using DeviceKit for this because the native apis for these things don't return
-    // convenient identifiers like "iPhone6s"
-    // SPM - Device model
     return "" // Device.current.description
 }
 
@@ -53,7 +51,7 @@ class GlobalAttributesProcessor: SpanProcessor {
         } else if let app = app {
             self.appName = app
         } else {
-            self.appName = Constants.Globals.UNKNOWN_APP_NAME
+            self.appName = "unknown-app"
         }
         let bundleVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
         let bundleShortVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
@@ -62,23 +60,17 @@ class GlobalAttributesProcessor: SpanProcessor {
     }
 
     func onStart(parentContext: SpanContext?, span: ReadableSpan) {
-        span.setAttribute(key: Constants.AttributeNames.APP, value: appName)
+        span.setAttribute(key: "app", value: appName)
         if appVersion != nil {
-            span.setAttribute(key: Constants.AttributeNames.APP_VERSION, value: appVersion!)
+            span.setAttribute(key: "app.version", value: appVersion!)
         }
-        // glossing over iPadOS, watchOS, etc. here, knowing that the device model spells out reality
-        span.setAttribute(key: Constants.AttributeNames.OS_NAME, value: "iOS")
-        // SPM span.setAttribute(key: Constants.AttributeNames.SPLUNK_RUM_SESSION_ID, value: getRumSessionId())
-        // SPM span.setAttribute(key: Constants.AttributeNames.SPLUNK_RUM_VERSION, value: SplunkRumVersionString)
-        span.setAttribute(key: Constants.AttributeNames.DEVICE_MODEL_NAME, value: deviceModel)
-        // SPM span.setAttribute(key: Constants.AttributeNames.OS_VERSION, value: UIDevice.current.systemVersion)
-        // It would be nice to drop this field when the span-ending thread isn't the same...
+        span.setAttribute(key: "os.name", value: "iOS")
+        span.setAttribute(key: "device.model.name", value: deviceModel)
         if Thread.current.isMainThread {
-            span.setAttribute(key: Constants.AttributeNames.THREAD_NAME, value: "main")
+            span.setAttribute(key: "thread.name", value: "main")
         } else if isUsefulString(Thread.current.name) {
-            span.setAttribute(key: Constants.AttributeNames.THREAD_NAME, value: Thread.current.name!)
+            span.setAttribute(key: "thread.name", value: Thread.current.name!)
         }
-        // SPM SplunkRum.addGlobalAttributesToSpan(span)
     }
 
     func onEnd(span: ReadableSpan) { }
@@ -86,3 +78,4 @@ class GlobalAttributesProcessor: SpanProcessor {
     func forceFlush() { }
     func forceFlush(timeout: TimeInterval?) { }
 }
+*/
