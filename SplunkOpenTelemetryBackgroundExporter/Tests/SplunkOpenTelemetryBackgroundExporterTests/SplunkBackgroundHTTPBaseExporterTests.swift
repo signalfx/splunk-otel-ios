@@ -153,7 +153,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func fileWithNonStalledTaskIsNotResent() throws {
         let uuid = UUID()
         let disk = MockDiskStorage()
-        let desc = try MockRequestDescriptor(id: uuid, scheduled: .now.addingTimeInterval(1_000))
+        let desc = try MockRequestDescriptor(id: uuid, scheduled: Date().addingTimeInterval(1_000))
 
         let http = MockHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
