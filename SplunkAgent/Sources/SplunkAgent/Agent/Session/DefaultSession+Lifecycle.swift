@@ -44,12 +44,10 @@ extension DefaultSession {
                 queue: nil
             ) { [weak self] _ in
 
-                // We need to mark the time of this transition
+                // Refresh a session and then clear the `enterBackground` timestamp
                 if self?.enterBackground != nil {
-                    self?.leaveBackground = Date()
-
-                    // Refresh session immediately
                     self?.refreshSession()
+                    self?.enterBackground = nil
                 }
             }
 

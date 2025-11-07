@@ -155,7 +155,7 @@ public final class Navigation: Sendable {
                 // If we have set manual naming, then we prefer it
                 if await model.isManualScreenName {
                     processedEvent = AutomatedNavigationEvent(
-                        timestamp: Date.now,
+                        timestamp: Date(),
                         type: event.type,
                         controllerTypeName: screenName,
                         controllerIdentifier: event.controllerIdentifier
@@ -189,8 +189,7 @@ public final class Navigation: Sendable {
     private func startLegacyDetection() {
         Task(priority: .userInitiated) {
             let willShowStream = NotificationCenter.default
-                .publisher(for: Notification.Name(rawValue: "UINavigationControllerWillShowViewControllerNotification"))
-                .values
+                .notifications(for: Notification.Name(rawValue: "UINavigationControllerWillShowViewControllerNotification"))
 
             for await notification in willShowStream {
                 if let event = await navigationEvent(for: notification.object, type: .viewDidLoad) {
@@ -201,8 +200,7 @@ public final class Navigation: Sendable {
 
         Task(priority: .userInitiated) {
             let didShowStream = NotificationCenter.default
-                .publisher(for: Notification.Name(rawValue: "UINavigationControllerDidShowViewControllerNotification"))
-                .values
+                .notifications(for: Notification.Name(rawValue: "UINavigationControllerDidShowViewControllerNotification"))
 
             for await notification in didShowStream {
                 if let event = await navigationEvent(for: notification.object, type: .viewDidAppear) {
@@ -213,8 +211,7 @@ public final class Navigation: Sendable {
 
         Task(priority: .userInitiated) {
             let willTransitionStream = NotificationCenter.default
-                .publisher(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification"))
-                .values
+                .notifications(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification"))
 
             for await notification in willTransitionStream {
                 if let event = await transitionEvent(for: notification.object, type: .willTransitionToTraitCollection) {
@@ -225,8 +222,7 @@ public final class Navigation: Sendable {
 
         Task(priority: .userInitiated) {
             let didTransitionStream = NotificationCenter.default
-                .publisher(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification"))
-                .values
+                .notifications(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification"))
 
             for await notification in didTransitionStream {
                 if let event = await transitionEvent(for: notification.object, type: .didTransitionToTraitCollection) {
@@ -249,7 +245,7 @@ public final class Navigation: Sendable {
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
-            timestamp: Date.now,
+            timestamp: Date(),
             type: eventType,
             controllerTypeName: screenName,
             controllerIdentifier: ObjectIdentifier(visibleController)
@@ -272,7 +268,7 @@ public final class Navigation: Sendable {
         let screenName = await preferredScreenName(for: controllerTypeName)
 
         return AutomatedNavigationEvent(
-            timestamp: Date.now,
+            timestamp: Date(),
             type: eventType,
             controllerTypeName: screenName,
             controllerIdentifier: ObjectIdentifier(visibleController)
