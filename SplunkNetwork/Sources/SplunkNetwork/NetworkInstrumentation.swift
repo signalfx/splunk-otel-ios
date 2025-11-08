@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoLogger
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
@@ -24,10 +23,6 @@ import SignPostIntegration
 @_spi(SplunkInternal) import SplunkCommon
 
 public class NetworkInstrumentation {
-
-    // MARK: - Private
-
-    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
 
     // MARK: - Public
 
