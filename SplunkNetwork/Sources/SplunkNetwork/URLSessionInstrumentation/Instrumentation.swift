@@ -177,17 +177,16 @@ func isSupportedTask(task: URLSessionTask) -> Bool {
 }
 
 func startHttpSpan(request: URLRequest?) -> Span? {
-    if request?.url == nil {
+    guard let request, let url = request.url else {
         return nil
     }
-    let url = request!.url!
     if !(url.scheme?.lowercased().starts(with: "http") ?? false) {
         return nil
     }
-    let method = request!.httpMethod ?? "_OTHER"
+    let method = request.httpMethod ?? "_OTHER"
     let absUrlString = url.absoluteString
 
-    let requestEndpoint = request!.description
+    let requestEndpoint = request.description
     let excludedEndpoints = networkModule?.excludedEndpoints
     guard let excludedEndpoints else {
         logger.log(level: .debug) {
@@ -224,7 +223,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         .setStartTime(time: Date())
         .startSpan()
 
-    let body = request!.httpBody
+    let body = request.httpBody
     let length = body?.count ?? 0
     span.clearAndSetAttribute(key: SemanticAttributes.httpRequestBodySize, value: length)
     span.clearAndSetAttribute(key: SemanticAttributes.httpRequestMethod, value: method)
@@ -285,13 +284,11 @@ extension URLSessionTask {
             return
         }
 
-        let maybeSpan: Span? = objc_getAssociatedObject(self, &AssocKeySpan) as? Span
-
-        if maybeSpan == nil {
+        guard let span = objc_getAssociatedObject(self, &AssocKeySpan) as? Span else {
             return
         }
 
-        endHttpSpan(span: maybeSpan!, task: self)
+        endHttpSpan(span: span, task: self)
     }
 
     @objc
@@ -325,8 +322,8 @@ extension URLSessionTask {
 func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
     let origM = class_getInstanceMethod(clazz, orig)
     let swizM = class_getInstanceMethod(clazz, swizzled)
-    if origM != nil && swizM != nil {
-        method_exchangeImplementations(origM!, swizM!)
+    if let origM, let swizM {
+        method_exchangeImplementations(origM, swizM)
     } else {
         // SPM debug_log("warning: could not swizzle "+NSStringFromSelector(orig))
     }
