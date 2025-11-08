@@ -83,9 +83,9 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
         span.clearAndSetAttribute(key: "http.status_code", value: hr.statusCode)
         for (key, val) in hr.allHeaderFields {
             if let keyStr = key as? String,
-               let valStr = val as? String,
-               keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
-               valStr.contains("traceparent") {
+                let valStr = val as? String,
+                keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
+                valStr.contains("traceparent") {
                 addLinkToSpan(span: span, valStr: valStr)
             }
         }
@@ -336,7 +336,10 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
     let conf = URLSessionConfiguration.ephemeral
     let session = URLSession(configuration: conf)
     // The URL is just something parseable, since empty string can not be provided
-    let localDataTask = session.dataTask(with: URL(string: "https://splunkrum")!)
+    guard let url = URL(string: "https://splunkrum") else {
+        return []
+    }
+    let localDataTask = session.dataTask(with: url)
 
     defer {
         localDataTask.cancel()
@@ -349,8 +352,8 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
     guard var currentClass: AnyClass = object_getClass(localDataTask) else { return classes }
     var method = class_getInstanceMethod(currentClass, setStateSelector)
 
-    while method != nil {
-        let classResumeImp = method_getImplementation(method!)
+    while let currentMethod = method {
+        let classResumeImp = method_getImplementation(currentMethod)
 
         let superClass: AnyClass? = currentClass.superclass()
         let superClassMethod = class_getInstanceMethod(superClass, setStateSelector)
@@ -360,11 +363,11 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
             classes.append(currentClass)
         }
 
-        if superClass == nil {
+        guard let nextClass = superClass else {
             return classes
         }
 
-        currentClass = superClass!
+        currentClass = nextClass
         method = superClassMethod
     }
 
