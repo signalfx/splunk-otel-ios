@@ -324,7 +324,8 @@ func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
     let swizM = class_getInstanceMethod(clazz, swizzled)
     if let origM, let swizM {
         method_exchangeImplementations(origM, swizM)
-    } else {
+    }
+    else {
         logger.log(level: .fault) {
             "could not swizzle \(NSStringFromSelector(orig))"
         }
