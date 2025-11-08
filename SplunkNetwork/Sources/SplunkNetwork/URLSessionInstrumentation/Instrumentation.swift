@@ -220,7 +220,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
             instrumentationVersion: sharedState?.agentVersion
         )
 
-    let span = tracer.spanBuilder(spanName: "HTTP "+method)
+    let span = tracer.spanBuilder(spanName: "HTTP " + method)
         .setStartTime(time: Date())
         .startSpan()
 
@@ -264,7 +264,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     return span
 }
 
-fileprivate var AssocKeySpan: UInt8 = 0
+private var assocKeySpan: UInt8 = 0
 
 extension URLSessionTask {
     @objc
@@ -285,7 +285,7 @@ extension URLSessionTask {
             return
         }
 
-        guard let span = objc_getAssociatedObject(self, &AssocKeySpan) as? Span else {
+        guard let span = objc_getAssociatedObject(self, &assocKeySpan) as? Span else {
             return
         }
 
@@ -302,31 +302,32 @@ extension URLSessionTask {
             return
         }
 
-        if self.state == URLSessionTask.State.completed ||
-            self.state == URLSessionTask.State.canceling {
+        if state == URLSessionTask.State.completed ||
+            state == URLSessionTask.State.canceling {
             return
         }
 
-        let existingSpan: Span? = objc_getAssociatedObject(self, &AssocKeySpan) as? Span
+        let existingSpan: Span? = objc_getAssociatedObject(self, &assocKeySpan) as? Span
 
         if existingSpan != nil {
             return
         }
 
         startHttpSpan(request: currentRequest).map { span in
-            objc_setAssociatedObject(self, &AssocKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, &assocKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
     }
 }
 
-// FIXME use setImplementation and capture, rather than exchangeImpl
 func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
     let origM = class_getInstanceMethod(clazz, orig)
     let swizM = class_getInstanceMethod(clazz, swizzled)
     if let origM, let swizM {
         method_exchangeImplementations(origM, swizM)
     } else {
-        // SPM debug_log("warning: could not swizzle "+NSStringFromSelector(orig))
+        logger.log(level: .fault) {
+            "could not swizzle \(NSStringFromSelector(orig))"
+        }
     }
 }
 
