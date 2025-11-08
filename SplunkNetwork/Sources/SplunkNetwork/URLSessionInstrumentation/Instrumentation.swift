@@ -79,9 +79,9 @@ func addLinkToSpan(span: Span, valStr: String) {
 
 func endHttpSpan(span: Span, task: URLSessionTask) {
     let hr: HTTPURLResponse? = task.response as? HTTPURLResponse
-    if hr != nil {
-        span.clearAndSetAttribute(key: "http.status_code", value: hr!.statusCode)
-        for (key, val) in hr!.allHeaderFields {
+    if let hr {
+        span.clearAndSetAttribute(key: "http.status_code", value: hr.statusCode)
+        for (key, val) in hr.allHeaderFields {
             if let keyStr = key as? String,
                let valStr = val as? String,
                keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
@@ -90,28 +90,26 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
             }
         }
 
-        let length = hr!.expectedContentLength
+        let length = hr.expectedContentLength
         span.clearAndSetAttribute(key: SemanticAttributes.httpResponseBodySize, value: Int(length))
 
         // Try to capture IP address from the response/connection
-        if hr != nil {
-            // Update network.peer.address with actual IP if we can get it
-            if let ipAddress = getIPAddressFromResponse(hr!) {
-                span.clearAndSetAttribute(key: "network.peer.address", value: ipAddress)
-            }
+        // Update network.peer.address with actual IP if we can get it
+        if let ipAddress = getIPAddressFromResponse(hr) {
+            span.clearAndSetAttribute(key: "network.peer.address", value: ipAddress)
         }
 
-        let protocolVersion = determineHTTPProtocolVersion(hr!)
+        let protocolVersion = determineHTTPProtocolVersion(hr)
         span.clearAndSetAttribute(key: "http.protocol.version", value: protocolVersion)
     }
 
-    if task.error != nil {
+    if let error = task.error {
         span.clearAndSetAttribute(key: "error", value: true)
-        span.clearAndSetAttribute(key: "error.message", value: task.error!.localizedDescription)
-        span.clearAndSetAttribute(key: "error.type", value: String(describing: type(of: task.error!)))
+        span.clearAndSetAttribute(key: "error.message", value: error.localizedDescription)
+        span.clearAndSetAttribute(key: "error.type", value: String(describing: type(of: error)))
 
         logger.log(level: .error) {
-            "Error: \(task.error!.localizedDescription)"
+            "Error: \(error.localizedDescription)"
         }
     }
 
@@ -175,7 +173,7 @@ func isValidIPAddress(_ ipString: String) -> Bool {
 }
 
 func isSupportedTask(task: URLSessionTask) -> Bool {
-    return task is URLSessionDataTask || task is URLSessionDownloadTask || task is URLSessionUploadTask
+    task is URLSessionDataTask || task is URLSessionDownloadTask || task is URLSessionUploadTask
 }
 
 func startHttpSpan(request: URLRequest?) -> Span? {
@@ -197,6 +195,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         }
         return nil
     }
+
     for excludedEndpoint in excludedEndpoints where requestEndpoint.contains(excludedEndpoint.absoluteString) {
         logger.log(level: .debug) {
             "Should Not Instrument Backend URL \(requestEndpoint)"
@@ -268,7 +267,8 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 fileprivate var AssocKeySpan: UInt8 = 0
 
 extension URLSessionTask {
-    @objc open func splunk_swizzled_setState(state: URLSessionTask.State) {
+    @objc
+    open func splunk_swizzled_setState(state: URLSessionTask.State) {
         defer {
             splunk_swizzled_setState(state: state)
         }
@@ -294,7 +294,8 @@ extension URLSessionTask {
         endHttpSpan(span: maybeSpan!, task: self)
     }
 
-    @objc open func splunk_swizzled_resume() {
+    @objc
+    open func splunk_swizzled_resume() {
         defer {
             splunk_swizzled_resume()
         }
