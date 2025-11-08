@@ -22,7 +22,6 @@ import OpenTelemetrySdk
 import ResourceExtension
 import SignPostIntegration
 @_spi(SplunkInternal) import SplunkCommon
-import URLSessionInstrumentation
 
 public class NetworkInstrumentation {
 
