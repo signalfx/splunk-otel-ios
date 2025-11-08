@@ -339,6 +339,7 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
     guard let url = URL(string: "https://splunkrum") else {
         return []
     }
+
     let localDataTask = session.dataTask(with: url)
 
     defer {
@@ -350,6 +351,7 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
 
     var classes: [AnyClass] = []
     guard var currentClass: AnyClass = object_getClass(localDataTask) else { return classes }
+
     var method = class_getInstanceMethod(currentClass, setStateSelector)
 
     while let currentMethod = method {
