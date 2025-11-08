@@ -350,7 +350,9 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
     let setStateSelector = NSSelectorFromString("setState:")
 
     var classes: [AnyClass] = []
-    guard var currentClass: AnyClass = object_getClass(localDataTask) else { return classes }
+    guard var currentClass: AnyClass = object_getClass(localDataTask) else {
+        return classes
+    }
 
     var method = class_getInstanceMethod(currentClass, setStateSelector)
 
