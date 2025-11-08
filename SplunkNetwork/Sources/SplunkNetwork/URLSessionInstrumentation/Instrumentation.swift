@@ -56,8 +56,8 @@ func addLinkToSpan(span: Span, valStr: String) {
 
     // Ensure there's exactly one match and the correct number of capture groups
     guard result.count == 1, result[0].numberOfRanges == 3,
-          let traceIdRange = Range(result[0].range(at: 1), in: valStr),
-          let spanIdRange = Range(result[0].range(at: 2), in: valStr)
+        let traceIdRange = Range(result[0].range(at: 1), in: valStr),
+        let spanIdRange = Range(result[0].range(at: 2), in: valStr)
     else {
         // If the match or capture groups are invalid, log and return early
         // Also, prevent over-long log output
@@ -180,6 +180,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     guard let request, let url = request.url else {
         return nil
     }
+
     if !(url.scheme?.lowercased().starts(with: "http") ?? false) {
         return nil
     }
