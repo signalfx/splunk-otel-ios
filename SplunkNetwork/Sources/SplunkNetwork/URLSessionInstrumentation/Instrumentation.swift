@@ -314,9 +314,8 @@ extension URLSessionTask {
         }
 
         startHttpSpan(request: currentRequest)
-            .map {
-                span in objc_setAssociatedObject(self, &assocKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-        }
+            .map { span in objc_setAssociatedObject(self, &assocKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            }
     }
 }
 
