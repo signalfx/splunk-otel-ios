@@ -33,13 +33,14 @@ final class InstrumentationTests: XCTestCase {
         init(statusCode: Int, headers: [String: Any] = [:]) {
             mockStatusCode = statusCode
             mockHeaders = headers
-            // swiftlint:disable:next force_unwrapping
+            // swiftlint:disable force_unwrapping
             super.init(
                 url: URL(string: "https://example.com")!,
                 statusCode: statusCode,
                 httpVersion: "HTTP/1.1",
                 headerFields: headers as? [String: String]
             )!
+            // swiftlint:enable force_unwrapping
         }
 
         @available(*, unavailable)
