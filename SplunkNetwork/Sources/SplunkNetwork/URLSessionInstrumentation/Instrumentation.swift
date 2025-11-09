@@ -186,7 +186,8 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         return nil
     }
     let method = request.httpMethod ?? "_OTHER"
-    let absUrlString = url.absoluteString
+    let body = request.httpBody
+    let length = body?.count ?? 0
 
     let requestEndpoint = request.description
     let excludedEndpoints = networkModule?.excludedEndpoints
@@ -208,7 +209,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     if let ignoreURLs = networkModule?.ignoreURLs {
         if ignoreURLs.matches(url: url) {
             logger.log(level: .debug) {
-                "URL excluded via IgnoreURLs API \(absUrlString)"
+                "URL excluded via IgnoreURLs API \(url.absoluteString)"
             }
             return nil
         }
@@ -225,8 +226,12 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         .setStartTime(time: Date())
         .startSpan()
 
-    let body = request.httpBody
-    let length = body?.count ?? 0
+    addDataToSpan(url: url, method: method, length: length, span: span)
+
+    return span
+}
+
+func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
     span.clearAndSetAttribute(key: SemanticAttributes.httpRequestBodySize, value: length)
     span.clearAndSetAttribute(key: SemanticAttributes.httpRequestMethod, value: method)
     span.clearAndSetAttribute(key: "component", value: "http")
@@ -261,8 +266,6 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         let sessionID = sharedState.sessionId
         span.clearAndSetAttribute(key: "session.id", value: sessionID)
     }
-
-    return span
 }
 
 private var assocKeySpan: UInt8 = 0
