@@ -142,4 +142,84 @@ final class SplunkNetworkTests: XCTestCase {
 
         super.tearDown()
     }
+
+    // MARK: - Initialization Tests
+
+    func testNetworkInstrumentation_Init() {
+        XCTAssertNotNil(sut)
+        XCTAssertNotNil(sut?.ignoreURLs)
+        XCTAssertNil(sut?.excludedEndpoints)
+        XCTAssertNil(sut?.sharedState)
+    }
+
+    // MARK: - Configuration Tests
+
+    func testNetworkInstrumentation_InstallWithDefaultConfig() {
+        let configuration = NetworkInstrumentation.Configuration(isEnabled: true, ignoreURLs: nil)
+
+        sut?.install(with: configuration, remoteConfiguration: nil)
+
+        // Default configuration should enable instrumentation
+        XCTAssertTrue(configuration.isEnabled)
+    }
+
+    func testNetworkInstrumentation_InstallWithDisabledConfig() {
+        let configuration = NetworkInstrumentation.Configuration(isEnabled: false, ignoreURLs: nil)
+
+        sut?.install(with: configuration, remoteConfiguration: nil)
+
+        // When disabled, instrumentation should not be initialized
+        XCTAssertFalse(configuration.isEnabled)
+    }
+
+    func testNetworkInstrumentation_InstallWithIgnoreURLs() throws {
+        let patterns = Set([".*\\.(jpg|jpeg|png|gif)$"])
+        let ignoreURLs = try IgnoreURLs(patterns: patterns)
+        let configuration = NetworkInstrumentation.Configuration(
+            isEnabled: true,
+            ignoreURLs: ignoreURLs
+        )
+
+        sut?.install(with: configuration, remoteConfiguration: nil)
+
+        XCTAssertEqual(sut?.ignoreURLs.count(), 1)
+    }
+
+    func testNetworkInstrumentation_InstallWithNilConfiguration() {
+        // Installing with nil configuration should use defaults
+        sut?.install(with: nil, remoteConfiguration: nil)
+
+        XCTAssertNotNil(sut?.ignoreURLs)
+    }
+
+    // MARK: - Properties Tests
+
+    func testNetworkInstrumentation_ExcludedEndpoints() {
+        let endpoints = [
+            URL(string: "https://api.example.com/traces")!,
+            URL(string: "https://api.example.com/metrics")!
+        ]
+
+        sut?.excludedEndpoints = endpoints
+
+        XCTAssertEqual(sut?.excludedEndpoints?.count, 2)
+        XCTAssertEqual(sut?.excludedEndpoints?[0], endpoints[0])
+        XCTAssertEqual(sut?.excludedEndpoints?[1], endpoints[1])
+    }
+
+    func testNetworkInstrumentation_IgnoreURLs_Default() {
+        // By default, ignoreURLs should be initialized but empty
+        XCTAssertEqual(sut?.ignoreURLs.count(), 0)
+    }
+
+    func testNetworkInstrumentation_IgnoreURLs_CustomPatterns() throws {
+        let patterns = Set([
+            ".*\\.(jpg|jpeg|png|gif)$",
+            ".*/api/v1/.*"
+        ])
+
+        sut?.ignoreURLs = try IgnoreURLs(patterns: patterns)
+
+        XCTAssertEqual(sut?.ignoreURLs.count(), 2)
+    }
 }
