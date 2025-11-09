@@ -27,7 +27,7 @@ import SignPostIntegration
 /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
 public unowned var sharedState: AgentSharedState?
 
-/// Used to access ignoreURLs and excludedEndpoints
+/// Used to access ignoreURLs and excludedEndpoints.
 private var networkModule: NetworkInstrumentation?
 
 let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
@@ -85,7 +85,8 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
             if let keyStr = key as? String,
                 let valStr = val as? String,
                 keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
-                valStr.contains("traceparent") {
+                valStr.contains("traceparent")
+            {
                 addLinkToSpan(span: span, valStr: valStr)
             }
         }
@@ -268,9 +269,9 @@ private var assocKeySpan: UInt8 = 0
 
 extension URLSessionTask {
     @objc
-    open func splunk_swizzled_setState(state: URLSessionTask.State) {
+    open func splunkSwizzledSetState(state: URLSessionTask.State) {
         defer {
-            splunk_swizzled_setState(state: state)
+            splunkSwizzledSetState(state: state)
         }
 
         if !isSupportedTask(task: self) {
@@ -293,17 +294,16 @@ extension URLSessionTask {
     }
 
     @objc
-    open func splunk_swizzled_resume() {
+    open func splunkSwizzledResume() {
         defer {
-            splunk_swizzled_resume()
+            splunkSwizzledResume()
         }
 
         if !isSupportedTask(task: self) {
             return
         }
 
-        if state == URLSessionTask.State.completed ||
-            state == URLSessionTask.State.canceling {
+        if state == URLSessionTask.State.completed || state == URLSessionTask.State.canceling {
             return
         }
 
@@ -313,8 +313,8 @@ extension URLSessionTask {
             return
         }
 
-        startHttpSpan(request: currentRequest).map { span in
-            objc_setAssociatedObject(self, &assocKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        startHttpSpan(request: currentRequest).map {
+            span in objc_setAssociatedObject(self, &assocKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
     }
 }
@@ -385,8 +385,8 @@ func swizzleUrlSession() {
     let resumeSelector = NSSelectorFromString("resume")
 
     for classToSwizzle in classes {
-        swizzle(clazz: classToSwizzle, orig: setStateSelector, swizzled: #selector(URLSessionTask.splunk_swizzled_setState(state:)))
-        swizzle(clazz: classToSwizzle, orig: resumeSelector, swizzled: #selector(URLSessionTask.splunk_swizzled_resume))
+        swizzle(clazz: classToSwizzle, orig: setStateSelector, swizzled: #selector(URLSessionTask.splunkSwizzledSetState(state:)))
+        swizzle(clazz: classToSwizzle, orig: resumeSelector, swizzled: #selector(URLSessionTask.splunkSwizzledResume))
     }
 }
 
