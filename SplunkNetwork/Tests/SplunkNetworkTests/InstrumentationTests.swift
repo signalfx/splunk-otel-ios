@@ -33,6 +33,7 @@ final class InstrumentationTests: XCTestCase {
         init(statusCode: Int, headers: [String: Any] = [:]) {
             mockStatusCode = statusCode
             mockHeaders = headers
+            // swiftlint:disable:next force_unwrapping
             super.init(
                 url: URL(string: "https://example.com")!,
                 statusCode: statusCode,
@@ -41,7 +42,8 @@ final class InstrumentationTests: XCTestCase {
             )!
         }
 
-        required init?(coder: NSCoder) {
+        @available(*, unavailable)
+        required init?(coder _: NSCoder) {
             fatalError("init(coder:) has not been implemented")
         }
 
@@ -86,9 +88,9 @@ final class InstrumentationTests: XCTestCase {
 
     // MARK: - Supported Task Tests
 
-    func testIsSupportedTask_DataTask() {
+    func testIsSupportedTask_DataTask() throws {
         let session = URLSession.shared
-        let url = URL(string: "https://example.com")!
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
         let task = session.dataTask(with: url)
 
         XCTAssertTrue(isSupportedTask(task: task))
@@ -96,9 +98,9 @@ final class InstrumentationTests: XCTestCase {
         task.cancel()
     }
 
-    func testIsSupportedTask_DownloadTask() {
+    func testIsSupportedTask_DownloadTask() throws {
         let session = URLSession.shared
-        let url = URL(string: "https://example.com")!
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
         let task = session.downloadTask(with: url)
 
         XCTAssertTrue(isSupportedTask(task: task))
@@ -106,9 +108,9 @@ final class InstrumentationTests: XCTestCase {
         task.cancel()
     }
 
-    func testIsSupportedTask_UploadTask() {
+    func testIsSupportedTask_UploadTask() throws {
         let session = URLSession.shared
-        let url = URL(string: "https://example.com")!
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
         let data = Data()
         let task = session.uploadTask(with: URLRequest(url: url), from: data)
 

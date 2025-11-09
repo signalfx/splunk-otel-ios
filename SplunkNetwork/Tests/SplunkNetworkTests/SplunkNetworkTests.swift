@@ -194,10 +194,10 @@ final class SplunkNetworkTests: XCTestCase {
 
     // MARK: - Properties Tests
 
-    func testNetworkInstrumentation_ExcludedEndpoints() {
+    func testNetworkInstrumentation_ExcludedEndpoints() throws {
         let endpoints = [
-            URL(string: "https://api.example.com/traces")!,
-            URL(string: "https://api.example.com/metrics")!
+            try XCTUnwrap(URL(string: "https://api.example.com/traces")),
+            try XCTUnwrap(URL(string: "https://api.example.com/metrics"))
         ]
 
         sut?.excludedEndpoints = endpoints
