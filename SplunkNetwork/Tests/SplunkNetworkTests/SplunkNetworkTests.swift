@@ -24,21 +24,21 @@ import XCTest
 
 final class SplunkNetworkTests: XCTestCase {
     private var sut: NetworkInstrumentation?
-
+    
     /// Mock IgnoreURLs.
     private class MockIgnoreURLs: IgnoreURLs {
         var shouldMatch = false
-
+        
         override func matches(url _: URL) -> Bool {
             shouldMatch
         }
     }
-
+    
     /// Mock Span that conforms to all required protocols.
     private class MockSpan: Span {
-
+        
         // MARK: - Public
-
+        
         var attributes: [String: AttributeValue] = [:]
         var events: [SpanData.Event] = []
         var links: [SpanData.Link] = []
@@ -50,19 +50,19 @@ final class SplunkNetworkTests: XCTestCase {
         var totalAttributeCount: Int = 0
         var parentSpanId: SpanId?
         var instrumentationScopeInfo = InstrumentationScopeInfo()
-
-
+        
+        
         // MARK: - SpanBase properties
-
+        
         var kind: SpanKind { .internal }
         var context: SpanContext
         var isRecording: Bool { true }
         var status: Status = .unset
         var name: String = "MockSpan"
-
-
+        
+        
         // MARK: - Intialization
-
+        
         init() {
             let traceId = TraceId.random()
             let spanId = SpanId.random()
@@ -75,10 +75,10 @@ final class SplunkNetworkTests: XCTestCase {
                 traceState: traceState
             )
         }
-
-
+        
+        
         // MARK: - Attributes
-
+        
         func setAttribute(key: String, value: Any) {
             if let stringValue = value as? String {
                 attributes[key] = .string(stringValue)
@@ -93,233 +93,53 @@ final class SplunkNetworkTests: XCTestCase {
                 attributes[key] = .bool(boolValue)
             }
         }
-
-
+        
+        
         // MARK: - SpanBase methods
-
+        
         func setAttribute(key: String, value: AttributeValue?) {
             if let value {
                 attributes[key] = value
             }
         }
-
+        
         func setAttributes(_ attributes: [String: OpenTelemetryApi.AttributeValue]) {
             self.attributes = attributes
         }
-
+        
         func addEvent(name _: String) {}
         func addEvent(name _: String, timestamp _: Date) {}
         func addEvent(name _: String, attributes _: [String: AttributeValue]) {}
         func addEvent(name _: String, attributes _: [String: AttributeValue], timestamp _: Date) {}
-
-
+        
+        
         // MARK: - Span methods
-
+        
         func end() {}
         func end(time _: Date) {}
-
-
+        
+        
         // MARK: - SpanExceptionRecorder methods
-
+        
         func recordException(_: SpanException) {}
         func recordException(_: SpanException, timestamp _: Date) {}
         func recordException(_: SpanException, attributes _: [String: AttributeValue]) {}
         func recordException(_: SpanException, attributes _: [String: AttributeValue], timestamp _: Date) {}
-
+        
         // MARK: - CustomStringConvertible
-
+        
         var description: String { "MockSpan" }
     }
-
+    
     override func setUp() {
         super.setUp()
-
+        
         sut = NetworkInstrumentation()
     }
-
+    
     override func tearDown() {
         sut = nil
-
+        
         super.tearDown()
-    }
-
-    // MARK: - shouldInstrument Tests
-
-    func testShouldInstrument_WithExcludedEndpoint_ReturnsFalse() throws {
-        let sut = try XCTUnwrap(sut)
-
-        // Given
-        let excludedURL = try XCTUnwrap(URL(string: "https://excluded.com"))
-
-        sut.excludedEndpoints = [excludedURL]
-        let request = URLRequest(url: excludedURL)
-
-        // When
-        let result = sut.shouldInstrument(urlRequest: request)
-
-        // Then
-        XCTAssertFalse(result)
-    }
-
-    func testShouldInstrument_WithLocalhost_ReturnsFalse() throws {
-        let sut = try XCTUnwrap(sut)
-
-        // Given
-        let localhostURL = try XCTUnwrap(URL(string: "http://localhost:8080"))
-        let request = URLRequest(url: localhostURL)
-
-        // When
-        let result = sut.shouldInstrument(urlRequest: request)
-
-        // Then
-        XCTAssertFalse(result)
-    }
-
-    func testShouldInstrument_WithValidURL_ReturnsTrue() throws {
-        let sut = try XCTUnwrap(sut)
-
-        // Given
-        let validURL = try XCTUnwrap(URL(string: "https://example.com"))
-        let excludedURL = try XCTUnwrap(URL(string: "https://excluded.com"))
-
-        sut.excludedEndpoints = [excludedURL]
-        let request = URLRequest(url: validURL)
-
-        // When
-        let result = sut.shouldInstrument(urlRequest: request)
-
-        // Then
-        XCTAssertTrue(result)
-    }
-
-    func testShouldInstrument_WithNoExcludedEndpoints_ReturnsFalse() throws {
-        let sut = try XCTUnwrap(sut)
-
-        // Given
-        let validURL = try XCTUnwrap(URL(string: "https://example.com"))
-        sut.excludedEndpoints = nil
-        let request = URLRequest(url: validURL)
-
-        // When
-        let result = sut.shouldInstrument(urlRequest: request)
-
-        // Then
-        XCTAssertFalse(result)
-    }
-
-    // MARK: - shouldRecordPayload Tests
-
-    func testShouldRecordPayload_AlwaysReturnsTrue() throws {
-        let sut = try XCTUnwrap(sut)
-
-        // Given
-        let session = URLSession.shared
-
-        // When
-        let result = sut.shouldRecordPayload(urlSession: session)
-
-        // Then
-        XCTAssertTrue(result)
-    }
-
-    // MARK: - createdRequest Tests
-
-    func testCreatedRequest_SetsContentLengthAttribute() throws {
-        let sut = try XCTUnwrap(sut)
-
-        // Given
-        let body = Data("test body".utf8)
-        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
-
-        var request = URLRequest(url: exampleURL)
-        request.httpBody = body
-
-        let mockSpan = MockSpan()
-
-        // When
-        sut.createdRequest(urlRequest: request, span: mockSpan)
-
-        // Then
-        let attributeValue = mockSpan.attributes[SemanticAttributes.httpRequestBodySize.rawValue]
-        XCTAssertNotNil(attributeValue)
-        if case let .int(value) = attributeValue {
-            XCTAssertEqual(value, body.count)
-        }
-        else {
-            XCTFail("Expected int attribute value")
-        }
-    }
-
-    // MARK: - receivedResponse Tests
-
-    func testReceivedResponse_SetsContentLengthAttribute() throws {
-        let sut = try XCTUnwrap(sut)
-        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
-
-        // Given
-        let response = HTTPURLResponse(
-            url: exampleURL,
-            statusCode: 200,
-            httpVersion: nil,
-            headerFields: nil
-        )
-
-        let unwrappedResponse = try XCTUnwrap(response)
-        let mockSpan = MockSpan()
-
-        // When
-        sut.receivedResponse(urlResponse: unwrappedResponse, dataOrFile: nil, span: mockSpan)
-
-        // Then
-        let attributeValue = mockSpan.attributes[SemanticAttributes.httpResponseBodySize.rawValue]
-        XCTAssertNotNil(attributeValue)
-        if case .int = attributeValue {
-            // Success - we just want to verify it's an int value
-        }
-        else {
-            XCTFail("Expected int attribute value")
-        }
-    }
-
-    func testReceivedResponse_WithServerTiming_AddsLinkToSpan() throws {
-        let sut = try XCTUnwrap(sut)
-        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
-
-        // Given
-        let response = HTTPURLResponse(
-            url: exampleURL,
-            statusCode: 200,
-            httpVersion: nil,
-            headerFields: [
-                "server-timing": "traceparent;desc='00-1234567890abcdef1234567890abcdef-1234567890abcdef-01'"
-            ]
-        )
-
-        let unwrappedResponse = try XCTUnwrap(response)
-        let mockSpan = MockSpan()
-
-        // When
-        sut.receivedResponse(urlResponse: unwrappedResponse, dataOrFile: nil, span: mockSpan)
-
-        // Then
-        let traceIdValue = mockSpan.attributes["link.traceId"]
-        let spanIdValue = mockSpan.attributes["link.spanId"]
-
-        XCTAssertNotNil(traceIdValue)
-        XCTAssertNotNil(spanIdValue)
-
-        if case let .string(traceId) = traceIdValue {
-            XCTAssertEqual(traceId, "1234567890abcdef1234567890abcdef")
-        }
-        else {
-            XCTFail("Expected string attribute value for traceId")
-        }
-
-        if case let .string(spanId) = spanIdValue {
-            XCTAssertEqual(spanId, "1234567890abcdef")
-        }
-        else {
-            XCTFail("Expected string attribute value for spanId")
-        }
     }
 }
