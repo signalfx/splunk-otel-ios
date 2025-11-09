@@ -24,21 +24,21 @@ import XCTest
 
 final class SplunkNetworkTests: XCTestCase {
     private var sut: NetworkInstrumentation?
-    
+
     /// Mock IgnoreURLs.
     private class MockIgnoreURLs: IgnoreURLs {
         var shouldMatch = false
-        
+
         override func matches(url _: URL) -> Bool {
             shouldMatch
         }
     }
-    
+
     /// Mock Span that conforms to all required protocols.
     private class MockSpan: Span {
-        
+
         // MARK: - Public
-        
+
         var attributes: [String: AttributeValue] = [:]
         var events: [SpanData.Event] = []
         var links: [SpanData.Link] = []
