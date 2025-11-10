@@ -34,6 +34,8 @@ public enum AppStartType: String {
     /// Note: Opening the application right after closing the application in a quick succession causes the `willEnterForeground` to not trigger.
     /// We don't handle this case and we do not consider this scenario as an app start in the current implementation.
     case hot
+
+    case unknown
 }
 
 /// AppStart determines and measures an application's start type (cold, warm, hot), by listening to Application's lifecycle notifications,
@@ -65,6 +67,8 @@ public final class AppStart {
     /// Background launch detection, optional because we need to detect
     /// ackground launch only once during the initial application launch.
     var backgroundLaunchDetected: Bool?
+
+    var initializeDataSent = false
 
 
     // MARK: - Public
@@ -172,6 +176,9 @@ public final class AppStart {
                 startTime = processStartTimestamp
                 determinedType = .cold
             }
+        } else if let processStartTimestamp {
+            startTime = processStartTimestamp
+            determinedType = .unknown
         }
 
         // Send app start if the type was determined
@@ -204,9 +211,11 @@ public final class AppStart {
         var initializeData: AgentInitializeSpanData?
 
         // Send app start events and initialize span in a cold start only
-        if type == .cold {
+        if type == .cold || !initializeDataSent {
             events = coldStartEvents(startTime: start)
             initializeData = agentInitializeSpanData
+
+            initializeDataSent = true
         }
 
         let appStartData = AppStartSpanData(

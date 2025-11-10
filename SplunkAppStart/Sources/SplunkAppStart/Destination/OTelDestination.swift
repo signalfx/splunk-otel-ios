@@ -80,6 +80,9 @@ struct OTelDestination: AppStartDestination {
 
         case .hot:
             return "hot"
+
+        case .unknown:
+            return "unknown"
         }
     }
 }
