@@ -66,6 +66,6 @@ public class NetworkInstrumentation {
     }
 
     public func getIgnoreURLs() -> IgnoreURLs {
-        return ignoreURLs
+        ignoreURLs
     }
 }
