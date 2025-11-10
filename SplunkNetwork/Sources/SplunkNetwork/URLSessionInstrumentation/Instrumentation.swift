@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2023 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -203,7 +203,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     }
 
     // Filter using ignoreURLs API
-    if let ignoreURLs = networkModule?.ignoreURLs {
+    if let ignoreURLs = networkModule?.getIgnoreURLs() {
         if ignoreURLs.matches(url: url) {
             logger.log(level: .debug) {
                 "URL excluded via IgnoreURLs API \(url.absoluteString)"
@@ -391,7 +391,7 @@ func swizzleUrlSession() {
     }
 }
 
-func initalizeNetworkInstrumentation(module: NetworkInstrumentation) {
+func initializeNetworkInstrumentation(module: NetworkInstrumentation) {
     networkModule = module
     swizzleUrlSession()
 }

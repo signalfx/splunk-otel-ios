@@ -24,10 +24,13 @@ import SignPostIntegration
 
 public class NetworkInstrumentation {
 
-    // MARK: - Public
+    // MARK: - Private
 
     /// Holds regex patterns from IgnoreURLs API.
-    public var ignoreURLs = IgnoreURLs()
+    private var ignoreURLs = IgnoreURLs()
+
+
+    // MARK: - Public
 
     /// Endpoints excluded from network instrumentation.
     public var excludedEndpoints: [URL]?
@@ -58,7 +61,11 @@ public class NetworkInstrumentation {
                 ignoreURLs = ignoreURLsParameter
             }
 
-            initalizeNetworkInstrumentation(module: self)
+            initializeNetworkInstrumentation(module: self)
         }
+    }
+
+    public func getIgnoreURLs() -> IgnoreURLs {
+        return ignoreURLs
     }
 }
