@@ -1,9 +1,10 @@
 name: PR checks
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [opened, reopened, synchronize]
-  workflow_dispatch:
+
 
 jobs:
   lint:
