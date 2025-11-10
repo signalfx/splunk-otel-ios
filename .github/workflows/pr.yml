@@ -145,7 +145,7 @@ jobs:
           esac
           echo "Platform=${{ matrix.platform }}"
           echo "Destination=$DEST"
-          
+
       - name: Ensure destination is installed
         env:
           DEST: ${{ env.DEST }}
