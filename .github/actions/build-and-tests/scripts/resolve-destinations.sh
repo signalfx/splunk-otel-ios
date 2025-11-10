@@ -10,34 +10,31 @@ if ! command -v jq >/dev/null 2>&1; then
   brew install -q jq >/dev/null
 fi
 
+# Xcode někdy vypíše před JSONem hlášky - sed odřízne vše před prvním '{'
 SHOW="$(xcodebuild -showdestinations -workspace "$WS" -scheme "$SCHEME" -json 2>/dev/null | sed -n '/^{/,$p' || true)"
 
-pick_id() { echo "$SHOW" | jq -r '.destinations[]? | select(.platform=="'"$1"'" and .available=="YES") | .id' | head -n1; }
+pick_name_os() {
+  local platform="$1" name_re="$2" fallback_name="$3" fallback_os="$4"
+  # vezmeme první dostupnou destinaci dané platformy, která sedí na jméno zařízení
+  local sel='.destinations[]? | select(.platform=="'"$platform"'" and .available=="YES")'
+  local name="$(echo "$SHOW" | jq -r "$sel | .name" | grep -E "$name_re" | head -n1 || true)"
+  local os="$(echo "$SHOW" | jq -r "$sel | .OS" | head -n1 || true)"
 
-IOS_DID="$(pick_id 'iOS Simulator' || true)"
-if [ -n "${IOS_DID:-}" ] && [ "$IOS_DID" != "null" ]; then
-  IOS_DEST="id=$IOS_DID"
-else
-  ID="$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("iPhone|iPad"))).udid' | head -n1 || true)"
-  if [ -n "${ID:-}" ]; then IOS_DEST="platform=iOS Simulator,id=$ID"; else IOS_DEST="platform=iOS Simulator,OS=latest,name=iPhone 16"; fi
-fi
+  # fallbacky
+  if [ -z "${name:-}" ] || [ "$name" = "null" ]; then name="$fallback_name"; fi
+  if [ -z "${os:-}" ]   || [ "$os"   = "null" ]; then os="$fallback_os"; fi
 
-TVOS_DID="$(pick_id 'tvOS Simulator' || true)"
-if [ -n "${TVOS_DID:-}" ] && [ "$TVOS_DID" != "null" ]; then
-  TVOS_DEST="id=$TVOS_DID"
-else
-  ID="$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("Apple TV"))).udid' | head -n1 || true)"
-  if [ -n "${ID:-}" ]; then TVOS_DEST="platform=tvOS Simulator,id=$ID"; else TVOS_DEST="platform=tvOS Simulator,OS=latest,name=Apple TV 4K (3rd generation)"; fi
-fi
+  # vrátíme "OS=…,name=…"
+  echo "OS=$os,name=$name"
+}
 
-VOS_DID="$(pick_id 'visionOS Simulator' || true)"
-if [ -n "${VOS_DID:-}" ] && [ "$VOS_DID" != "null" ]; then
-  VISIONOS_DEST="id=$VOS_DID"
-else
-  ID="$(xcrun simctl list -j devices available | jq -r '.devices[]|.[]|select(.isAvailable==true and (.name|test("Apple Vision"))).udid' | head -n1 || true)"
-  if [ -n "${ID:-}" ]; then VISIONOS_DEST="platform=visionOS Simulator,id=$ID"; else VISIONOS_DEST="platform=visionOS Simulator,OS=latest,name=Apple Vision Pro"; fi
-fi
+IOS_PAIR="$(pick_name_os 'iOS Simulator' 'iPhone|iPad' 'iPhone 16' 'latest')"
+TVOS_PAIR="$(pick_name_os 'tvOS Simulator' 'Apple TV' 'Apple TV 4K (3rd generation)' 'latest')"
+VOS_PAIR="$(pick_name_os 'visionOS Simulator' 'Apple Vision' 'Apple Vision Pro' 'latest')"
 
+IOS_DEST="platform=iOS Simulator,${IOS_PAIR}"
+TVOS_DEST="platform=tvOS Simulator,${TVOS_PAIR}"
+VISIONOS_DEST="platform=visionOS Simulator,${VOS_PAIR}"
 MACCAT_DEST="platform=macOS,variant=Mac Catalyst"
 
 if [ -n "${GITHUB_OUTPUT:-}" ]; then
