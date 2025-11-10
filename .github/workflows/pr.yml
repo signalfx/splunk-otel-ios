@@ -104,6 +104,11 @@ jobs:
           esac
           echo "Platform=${{ matrix.platform }}"
           echo "Destination=$DEST"
+        
+      - name: Show runtimes & devices
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
           
       - name: Ensure destination is installed
         env:
@@ -147,6 +152,11 @@ jobs:
           echo "Platform=${{ matrix.platform }}"
           echo "Destination=$DEST"
 
+      - name: Show runtimes & devices
+        run: |
+          xcrun simctl list runtimes
+          xcrun simctl list devices
+    
       - name: Ensure destination is installed
         env:
           DEST: ${{ env.DEST }}
