@@ -91,7 +91,7 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-
+          
       - name: Select destination
         id: pick
         run: |
@@ -103,6 +103,11 @@ jobs:
           esac
           echo "Platform=${{ matrix.platform }}"
           echo "Destination=$DEST"
+          
+      - name: Ensure destination is installed
+        env:
+          DEST: ${{ env.DEST }}
+          run: .github/actions/build-and-tests/scripts/ensure-destination.sh
 
       - name: Build ${{ matrix.platform }}
         env:
@@ -140,6 +145,11 @@ jobs:
           esac
           echo "Platform=${{ matrix.platform }}"
           echo "Destination=$DEST"
+          
+      - name: Ensure destination is installed
+        env:
+          DEST: ${{ env.DEST }}
+          run: .github/actions/build-and-tests/scripts/ensure-destination.sh
 
       - name: Run tests (${{ matrix.platform }})
         id: test
