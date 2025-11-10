@@ -108,7 +108,7 @@ jobs:
       - name: Ensure destination is installed
         env:
           DEST: ${{ env.DEST }}
-          run: .github/actions/build-and-tests/scripts/ensure-destination.sh
+        run: .github/actions/build-and-tests/scripts/ensure-destination.sh
 
       - name: Build ${{ matrix.platform }}
         env:
@@ -150,7 +150,7 @@ jobs:
       - name: Ensure destination is installed
         env:
           DEST: ${{ env.DEST }}
-          run: .github/actions/build-and-tests/scripts/ensure-destination.sh
+        run: .github/actions/build-and-tests/scripts/ensure-destination.sh
 
       - name: Run tests (${{ matrix.platform }})
         id: test
