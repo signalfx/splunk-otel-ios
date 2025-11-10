@@ -24,9 +24,6 @@ import SignPostIntegration
 @_spi(SplunkInternal) import SplunkCommon
 
 
-/// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
-public unowned var sharedState: AgentSharedState?
-
 /// Used to access ignoreURLs and excludedEndpoints.
 private var networkModule: NetworkInstrumentation?
 
@@ -219,7 +216,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         .tracerProvider
         .get(
             instrumentationName: "NetworkInstrumentation",
-            instrumentationVersion: sharedState?.agentVersion
+            instrumentationVersion: networkModule?.sharedState?.agentVersion
         )
 
     let span = tracer.spanBuilder(spanName: "HTTP " + method)
@@ -262,8 +259,8 @@ func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
 
     span.clearAndSetAttribute(key: "url.full", value: url.absoluteString)
 
-    if let sharedState {
-        let sessionID = sharedState.sessionId
+    if let sharedState = networkModule?.sharedState {
+        let sessionID: String = sharedState.sessionId
         span.clearAndSetAttribute(key: "session.id", value: sessionID)
     }
 }
