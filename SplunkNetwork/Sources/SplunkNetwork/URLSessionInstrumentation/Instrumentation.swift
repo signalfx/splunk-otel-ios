@@ -26,6 +26,15 @@ import SignPostIntegration
 
 /// Used to access ignoreURLs and excludedEndpoints.
 private var networkModule: NetworkInstrumentation?
+private let networkModuleQueue = DispatchQueue(label: "com.splunk.networkModuleQueue")
+private func getNetworkModule() -> NetworkInstrumentation? {
+    return networkModuleQueue.sync { networkModule }
+}
+private func setNetworkModule(_ module: NetworkInstrumentation?) {
+    networkModuleQueue.sync {
+        networkModule = module
+    }
+}
 
 let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
 
@@ -187,7 +196,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     let length = body?.count ?? 0
 
     let requestEndpoint = request.description
-    let excludedEndpoints = networkModule?.excludedEndpoints
+    let excludedEndpoints = getNetworkModule()?.excludedEndpoints
     guard let excludedEndpoints else {
         logger.log(level: .debug) {
             "Should Not Instrument, Backend URL not yet configured."
@@ -203,7 +212,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     }
 
     // Filter using ignoreURLs API
-    if let ignoreURLs = networkModule?.getIgnoreURLs() {
+    if let ignoreURLs = getNetworkModule()?.getIgnoreURLs() {
         if ignoreURLs.matches(url: url) {
             logger.log(level: .debug) {
                 "URL excluded via IgnoreURLs API \(url.absoluteString)"
@@ -216,7 +225,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         .tracerProvider
         .get(
             instrumentationName: "NetworkInstrumentation",
-            instrumentationVersion: networkModule?.sharedState?.agentVersion
+            instrumentationVersion: getNetworkModule()?.sharedState?.agentVersion
         )
 
     let span = tracer.spanBuilder(spanName: "HTTP " + method)
@@ -259,7 +268,7 @@ func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
 
     span.clearAndSetAttribute(key: "url.full", value: url.absoluteString)
 
-    if let sharedState = networkModule?.sharedState {
+    if let sharedState = getNetworkModule()?.sharedState {
         let sessionID: String = sharedState.sessionId
         span.clearAndSetAttribute(key: "session.id", value: sessionID)
     }
@@ -392,6 +401,6 @@ func swizzleUrlSession() {
 }
 
 func initializeNetworkInstrumentation(module: NetworkInstrumentation) {
-    networkModule = module
+    setNetworkModule(module)
     swizzleUrlSession()
 }
