@@ -23,13 +23,14 @@ import ResourceExtension
 import SignPostIntegration
 @_spi(SplunkInternal) import SplunkCommon
 
-
 /// Used to access ignoreURLs and excludedEndpoints.
 private var networkModule: NetworkInstrumentation?
 private let networkModuleQueue = DispatchQueue(label: "com.splunk.networkModuleQueue")
+
 private func getNetworkModule() -> NetworkInstrumentation? {
-    return networkModuleQueue.sync { networkModule }
+    networkModuleQueue.sync { networkModule }
 }
+
 private func setNetworkModule(_ module: NetworkInstrumentation?) {
     networkModuleQueue.sync {
         networkModule = module
@@ -41,7 +42,6 @@ let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "
 func addLinkToSpan(span: Span, valStr: String) {
 
     let serverTimingPattern = #"traceparent;desc=['"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['"]"#
-
     guard let regex = try? NSRegularExpression(pattern: serverTimingPattern) else {
         logger.log(level: .fault) {
             "Regex failed to compile"
@@ -124,7 +124,6 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
     if task.countOfBytesSent != 0 {
         span.clearAndSetAttribute(key: "http.request_content_length", value: Int(task.countOfBytesSent))
     }
-
     span.end()
 }
 
@@ -140,7 +139,6 @@ func determineHTTPProtocolVersion(_ response: HTTPURLResponse) -> String {
     if response.value(forHTTPHeaderField: "X-Firefox-Spdy") != nil || response.value(forHTTPHeaderField: "X-Google-Spdy") != nil {
         return "2.0"
     }
-
     return "1.1"
 }
 
@@ -194,7 +192,6 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     let method = request.httpMethod ?? "_OTHER"
     let body = request.httpBody
     let length = body?.count ?? 0
-
     let requestEndpoint = request.description
     let excludedEndpoints = getNetworkModule()?.excludedEndpoints
     guard let excludedEndpoints else {
@@ -317,7 +314,6 @@ extension URLSessionTask {
         }
 
         let existingSpan: Span? = objc_getAssociatedObject(self, &assocKeySpan) as? Span
-
         if existingSpan != nil {
             return
         }
@@ -345,7 +341,6 @@ func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
 func swizzledUrlSessionClasses() -> [AnyClass] {
     let conf = URLSessionConfiguration.ephemeral
     let session = URLSession(configuration: conf)
-    // The URL is just something parseable, since empty string can not be provided
     guard let url = URL(string: "https://splunkrum") else {
         return []
     }
@@ -358,7 +353,6 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
     }
 
     let setStateSelector = NSSelectorFromString("setState:")
-
     var classes: [AnyClass] = []
     guard var currentClass: AnyClass = object_getClass(localDataTask) else {
         return classes
@@ -368,7 +362,6 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
 
     while let currentMethod = method {
         let classResumeImp = method_getImplementation(currentMethod)
-
         let superClass: AnyClass? = currentClass.superclass()
         let superClassMethod = class_getInstanceMethod(superClass, setStateSelector)
         let superClassResumeImp = superClassMethod.map { method_getImplementation($0) }
