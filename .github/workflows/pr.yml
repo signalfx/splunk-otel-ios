@@ -56,8 +56,6 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
-      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
       - id: scheme
         run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
 

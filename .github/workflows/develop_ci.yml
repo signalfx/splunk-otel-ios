@@ -16,8 +16,6 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
-      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
       - id: scheme
         run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
 
@@ -49,7 +47,7 @@ jobs:
           .github/actions/build-and-tests/scripts/resolve-destination-for-platform.sh
 
       - name: Show selected destination
-        run: echo "Selected destination for ${{ matrix.platform }}:${{ env.DEST }}"
+        run: echo "Selected destination for ${{ matrix.platform }}: ${{ env.DEST }}"
 
       - name: Ensure destination is installed
         env:
@@ -95,7 +93,7 @@ jobs:
       - name: Fail job if xcodebuild failed
         if: always()
         run: |
-          code="${{ steps.test.outputs.xcode_status }}"
+          code="${{ steps.run.outputs.status }}"
           if [ -z "$code" ]; then exit 0; fi
           if [ "$code" -ne 0 ]; then exit "$code"; fi
           

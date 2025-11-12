@@ -16,8 +16,6 @@ jobs:
         with:
           xcode-version: latest-stable
       - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
-      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
-      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
       - id: scheme
         run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
 

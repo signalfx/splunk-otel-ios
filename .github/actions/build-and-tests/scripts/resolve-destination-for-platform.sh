@@ -42,8 +42,10 @@ pick_destination() {
   return 0
 }
 
-# Resolve destination based on platform
-case "${PLATFORM,,}" in  # lowercase comparison
+# Resolve destination based on platform (case-insensitive)
+PLATFORM_LOWER="$(echo "$PLATFORM" | tr '[:upper:]' '[:lower:]')"
+
+case "$PLATFORM_LOWER" in
   ios)
     if PAIR="$(pick_destination 'iOS Simulator')"; then
       DEST="platform=iOS Simulator,${PAIR}"
