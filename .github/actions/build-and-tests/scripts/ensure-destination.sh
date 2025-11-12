@@ -10,6 +10,16 @@ fail() { echo "::error::$*"; exit 1; }
 DEST="${DEST:-${1:-}}"
 [ -n "${DEST}" ] || fail "DEST not set. Example: platform=iOS Simulator,OS=latest,name=iPhone 16"
 
+# Parse DEST parts
+PLATFORM="$(echo "$DEST" | sed -n 's/.*platform=\([^,]*\).*/\1/p')"
+[ -n "$PLATFORM" ] || fail "Could not parse platform from DEST=$DEST"
+
+# Mac Catalyst runs on macOS directly, no simulator setup needed
+if [[ "$PLATFORM" == "macOS" ]] || [[ "$DEST" == *"Mac Catalyst"* ]]; then
+  log "Platform is macOS/Mac Catalyst - no simulator setup required."
+  exit 0
+fi
+
 # Require jq (install if missing)
 if ! command -v jq >/dev/null 2>&1; then
   log "Installing jq…"
@@ -17,12 +27,9 @@ if ! command -v jq >/dev/null 2>&1; then
   brew install -q jq >/dev/null
 fi
 
-# Parse DEST parts
-PLATFORM="$(echo "$DEST" | sed -n 's/.*platform=\([^,]*\).*/\1/p')"
 OS_REQ="$(echo "$DEST" | sed -n 's/.*OS=\([^,]*\).*/\1/p')"
 NAME_REQ="$(echo "$DEST" | sed -n 's/.*name=\(.*\)$/\1/p')"
 
-[ -n "$PLATFORM" ] || fail "Could not parse platform from DEST=$DEST"
 [ -n "$NAME_REQ" ] || fail "Could not parse name=… from DEST=$DEST"
 
 # Map "iOS Simulator" -> "iOS" etc. for xcodebuild/xcrun outputs
