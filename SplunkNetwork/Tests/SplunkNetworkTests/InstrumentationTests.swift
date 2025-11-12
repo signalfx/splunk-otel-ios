@@ -78,15 +78,30 @@ final class InstrumentationTests: XCTestCase {
     }
 
     func testIsValidIPAddress_ValidIPv6() {
+        // Full-form IPv6
         XCTAssertTrue(isValidIPAddress("2001:0db8:85a3:0000:0000:8a2e:0370:7334"))
+
+        // Loopback and special addresses
         XCTAssertTrue(isValidIPAddress("::1")) // Loopback
         XCTAssertTrue(isValidIPAddress("::")) // All zeros
+
+        // Compressed IPv6 addresses
+        XCTAssertTrue(isValidIPAddress("2001:db8::1"))
+        XCTAssertTrue(isValidIPAddress("fe80::1:2:3"))
+        XCTAssertTrue(isValidIPAddress("2001:db8::8a2e:370:7334"))
+        XCTAssertTrue(isValidIPAddress("::ffff:192.0.2.1")) // IPv4-mapped IPv6
+
+        // Link-local addresses
+        XCTAssertTrue(isValidIPAddress("fe80::"))
+        XCTAssertTrue(isValidIPAddress("fe80::1"))
     }
 
     func testIsValidIPAddress_InvalidIPv6() {
         XCTAssertFalse(isValidIPAddress("2001:0db8:85a3::8a2e:0370:7334:extra")) // Too many groups
         XCTAssertFalse(isValidIPAddress("gggg:0db8:85a3:0000:0000:8a2e:0370:7334")) // Invalid hex
         XCTAssertFalse(isValidIPAddress("2001:0db8")) // Too few groups
+        XCTAssertFalse(isValidIPAddress("::gggg")) // Invalid hex in compressed form
+        XCTAssertFalse(isValidIPAddress("2001:db8:::1")) // Triple colon (invalid)
     }
 
     // MARK: - Supported Task Tests

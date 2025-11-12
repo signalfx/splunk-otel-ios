@@ -160,17 +160,15 @@ func getIPAddressFromResponse(_ response: HTTPURLResponse) -> String? {
 }
 
 func isValidIPAddress(_ ipString: String) -> Bool {
-    // Check for IPv4
-    let ipv4Pattern = #"""
-        ^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
-        """#
-    if ipString.range(of: ipv4Pattern, options: .regularExpression) != nil {
+    var buffer = [CChar](repeating: 0, count: Int(INET6_ADDRSTRLEN))
+
+    // Try IPv4 validation using inet_pton
+    if inet_pton(AF_INET, ipString, &buffer) == 1 {
         return true
     }
 
-    // Check for IPv6
-    let ipv6Pattern = #"^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^::1$|^::$"#
-    if ipString.range(of: ipv6Pattern, options: .regularExpression) != nil {
+    // Try IPv6 validation using inet_pton
+    if inet_pton(AF_INET6, ipString, &buffer) == 1 {
         return true
     }
 
