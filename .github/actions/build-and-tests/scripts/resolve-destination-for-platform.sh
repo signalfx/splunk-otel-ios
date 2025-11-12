@@ -19,13 +19,19 @@ fi
 SHOW="$(xcodebuild -showdestinations -workspace "$WS" -scheme "$SCHEME" -json 2>/dev/null | sed -n '/^{/,$p' || true)"
 
 # Pick the first available destination for a given platform
-# Prioritizes by: 1) available=YES, 2) newest OS version, 3) first in list
+# Prioritizes by: 1) available=YES, 2) stable OS version (not 26.x), 3) newest, 4) first in list
 pick_destination() {
   local platform="$1"
   local sel='.destinations[]? | select(.platform=="'"$platform"'" and .available=="YES")'
 
-  # Try to get the first available destination, sorted by OS version (newest first)
-  local dest="$(echo "$SHOW" | jq -r "$sel | \"\(.OS // \"latest\")|\(.name)\"" | sort -Vr | head -n1 || true)"
+  # Try to get the first STABLE available destination (filter out beta versions like 26.x)
+  # Prefer 18.x over 26.x as 26.x may require SDK that's not installed
+  local dest="$(echo "$SHOW" | jq -r "$sel | \"\(.OS // \"latest\")|\(.name)\"" | grep -v '^26\.' | sort -Vr | head -n1 || true)"
+
+  # If no stable destination found, try any destination (fallback to beta/RC)
+  if [ -z "$dest" ] || [ "$dest" = "null" ] || [ "$dest" = "|" ]; then
+    dest="$(echo "$SHOW" | jq -r "$sel | \"\(.OS // \"latest\")|\(.name)\"" | sort -Vr | head -n1 || true)"
+  fi
 
   if [ -z "$dest" ] || [ "$dest" = "null" ] || [ "$dest" = "|" ]; then
     echo ""
