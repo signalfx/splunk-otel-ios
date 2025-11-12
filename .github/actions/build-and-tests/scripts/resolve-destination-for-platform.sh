@@ -42,32 +42,32 @@ pick_destination() {
   return 0
 }
 
-# Fallback: find any available simulator using xcrun simctl
-pick_from_simctl() {
+# Fallback: Check if runtime exists, if so find device, else return generic fallback
+# This will be handled by ensure-destination.sh which downloads/creates as needed
+pick_fallback_destination() {
   local platform_family="$1"  # e.g., "iOS", "tvOS", "visionOS"
   local device_pattern="$2"   # e.g., "iPhone", "Apple TV", "Apple Vision"
+  local default_device="$3"   # e.g., "iPhone 16", "Apple TV"
 
-  # Get latest available runtime for this platform
+  # Check if runtime exists
   local runtime_id="$(xcrun simctl list -j runtimes 2>/dev/null \
     | jq -r --arg f "$platform_family" '.runtimes[]|select(.platform==$f and .isAvailable==true)|.identifier' \
     | sort -Vr | head -n1 || true)"
 
-  if [ -z "$runtime_id" ]; then
-    echo ""
-    return 1
+  if [ -n "$runtime_id" ]; then
+    # Runtime exists, try to find existing device
+    local device_name="$(xcrun simctl list -j devices available 2>/dev/null \
+      | jq -r --arg r "$runtime_id" --arg p "$device_pattern" '.devices[$r][]?|select(.name|test($p))|.name' \
+      | head -n1 || true)"
+
+    if [ -n "$device_name" ]; then
+      echo "OS=latest,name=$device_name"
+      return 0
+    fi
   fi
 
-  # Get any available device for this runtime
-  local device_name="$(xcrun simctl list -j devices available 2>/dev/null \
-    | jq -r --arg r "$runtime_id" --arg p "$device_pattern" '.devices[$r][]?|select(.name|test($p))|.name' \
-    | head -n1 || true)"
-
-  if [ -z "$device_name" ]; then
-    echo ""
-    return 1
-  fi
-
-  echo "OS=latest,name=$device_name"
+  # No runtime or no device - return default, ensure-destination will create it
+  echo "OS=latest,name=$default_device"
   return 0
 }
 
@@ -78,34 +78,28 @@ case "$PLATFORM_LOWER" in
   ios)
     if PAIR="$(pick_destination 'iOS Simulator')"; then
       DEST="platform=iOS Simulator,${PAIR}"
-    elif PAIR="$(pick_from_simctl 'iOS' 'iPhone')"; then
-      echo "$LOG_PREFIX Using simctl fallback for iOS"
-      DEST="platform=iOS Simulator,${PAIR}"
     else
-      echo "$LOG_PREFIX Warning: No iOS Simulator found, using hardcoded fallback"
-      DEST="platform=iOS Simulator,OS=latest,name=iPhone 16"
+      echo "$LOG_PREFIX xcodebuild found no iOS Simulator, using fallback"
+      PAIR="$(pick_fallback_destination 'iOS' 'iPhone' 'iPhone 16')"
+      DEST="platform=iOS Simulator,${PAIR}"
     fi
     ;;
   tvos)
     if PAIR="$(pick_destination 'tvOS Simulator')"; then
       DEST="platform=tvOS Simulator,${PAIR}"
-    elif PAIR="$(pick_from_simctl 'tvOS' 'Apple TV')"; then
-      echo "$LOG_PREFIX Using simctl fallback for tvOS"
-      DEST="platform=tvOS Simulator,${PAIR}"
     else
-      echo "$LOG_PREFIX Warning: No tvOS Simulator found, using hardcoded fallback"
-      DEST="platform=tvOS Simulator,OS=latest,name=Apple TV 4K (3rd generation)"
+      echo "$LOG_PREFIX xcodebuild found no tvOS Simulator, using fallback"
+      PAIR="$(pick_fallback_destination 'tvOS' 'Apple TV' 'Apple TV')"
+      DEST="platform=tvOS Simulator,${PAIR}"
     fi
     ;;
   visionos)
     if PAIR="$(pick_destination 'visionOS Simulator')"; then
       DEST="platform=visionOS Simulator,${PAIR}"
-    elif PAIR="$(pick_from_simctl 'visionOS' 'Apple Vision')"; then
-      echo "$LOG_PREFIX Using simctl fallback for visionOS"
-      DEST="platform=visionOS Simulator,${PAIR}"
     else
-      echo "$LOG_PREFIX Warning: No visionOS Simulator found, using hardcoded fallback"
-      DEST="platform=visionOS Simulator,OS=latest,name=Apple Vision Pro"
+      echo "$LOG_PREFIX xcodebuild found no visionOS Simulator, using fallback"
+      PAIR="$(pick_fallback_destination 'visionOS' 'Apple Vision' 'Apple Vision Pro')"
+      DEST="platform=visionOS Simulator,${PAIR}"
     fi
     ;;
   maccatalyst)

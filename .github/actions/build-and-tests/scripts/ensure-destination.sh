@@ -45,15 +45,46 @@ log "Requested: PLATFORM=$PLATFORM ($OS_FAMILY) OS=$OS_REQ NAME=$NAME_REQ"
 # Make sure correct Xcode is selected (setup-xcode should have run)
 sudo xcode-select -s "$(xcode-select -p)" >/dev/null 2>&1 || true
 
+# Show current runtimes for debugging
+log "Current runtimes:"
+xcrun simctl list runtimes | grep -E "($OS_FAMILY|--)" || echo "(none for $OS_FAMILY)"
+
 # Ensure a runtime for this platform exists (download if missing)
 have_runtime_for_family() {
   xcrun simctl list -j runtimes | jq -e --arg f "$OS_FAMILY" '.runtimes[]|select(.platform==$f and .isAvailable==true)' >/dev/null
 }
 
 if ! have_runtime_for_family; then
-  log "No $OS_FAMILY runtime found. Downloading platform via xcodebuild…"
-  sudo xcodebuild -runFirstLaunch || true
-  sudo xcodebuild -downloadPlatform "$OS_FAMILY" || true
+  log "No $OS_FAMILY runtime found. Attempting to install..."
+  log "This may take several minutes..."
+
+  # Try runFirstLaunch first
+  log "Running xcodebuild -runFirstLaunch..."
+  if sudo xcodebuild -runFirstLaunch 2>&1 | tee /tmp/runfirstlaunch.log; then
+    log "runFirstLaunch completed"
+  else
+    log "runFirstLaunch failed or not needed"
+    cat /tmp/runfirstlaunch.log || true
+  fi
+
+  # Check if runtime appeared after runFirstLaunch
+  if ! have_runtime_for_family; then
+    log "Attempting to download $OS_FAMILY platform..."
+    if sudo xcodebuild -downloadPlatform "$OS_FAMILY" 2>&1 | tee /tmp/downloadplatform.log; then
+      log "downloadPlatform completed"
+    else
+      log "downloadPlatform failed"
+      cat /tmp/downloadplatform.log || true
+    fi
+  fi
+
+  # Final check
+  if ! have_runtime_for_family; then
+    log "ERROR: No $OS_FAMILY runtime available after installation attempts!"
+    log "Available runtimes:"
+    xcrun simctl list runtimes
+    fail "Cannot proceed without $OS_FAMILY runtime. This may require manual Xcode configuration or a different GitHub runner."
+  fi
 fi
 
 # Resolve runtime identifier
