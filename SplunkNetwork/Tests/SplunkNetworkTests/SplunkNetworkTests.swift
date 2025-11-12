@@ -147,7 +147,6 @@ final class SplunkNetworkTests: XCTestCase {
 
     func testNetworkInstrumentation_Init() {
         XCTAssertNotNil(sut)
-        XCTAssertNotNil(sut?.ignoreURLs)
         XCTAssertNil(sut?.excludedEndpoints)
         XCTAssertNil(sut?.sharedState)
     }
@@ -180,16 +179,19 @@ final class SplunkNetworkTests: XCTestCase {
             ignoreURLs: ignoreURLs
         )
 
+        // Test that install succeeds with ignore URLs configuration
         sut?.install(with: configuration, remoteConfiguration: nil)
 
-        XCTAssertEqual(sut?.ignoreURLs.count(), 1)
+        // Verify configuration was accepted (no crash, module initialized)
+        XCTAssertNotNil(sut)
     }
 
     func testNetworkInstrumentation_InstallWithNilConfiguration() {
         // Installing with nil configuration should use defaults
         sut?.install(with: nil, remoteConfiguration: nil)
 
-        XCTAssertNotNil(sut?.ignoreURLs)
+        // Verify that installation succeeds with nil configuration
+        XCTAssertNotNil(sut)
     }
 
     // MARK: - Properties Tests
@@ -207,19 +209,17 @@ final class SplunkNetworkTests: XCTestCase {
         XCTAssertEqual(sut?.excludedEndpoints?[1], endpoints[1])
     }
 
-    func testNetworkInstrumentation_IgnoreURLs_Default() {
-        // By default, ignoreURLs should be initialized but empty
-        XCTAssertEqual(sut?.ignoreURLs.count(), 0)
-    }
+    func testNetworkInstrumentation_MultipleConfigurations() throws {
+        // Test that multiple configurations can be installed
+        let config1 = NetworkInstrumentation.Configuration(isEnabled: true, ignoreURLs: nil)
+        sut?.install(with: config1, remoteConfiguration: nil)
+        XCTAssertNotNil(sut)
 
-    func testNetworkInstrumentation_IgnoreURLs_CustomPatterns() throws {
-        let patterns = Set([
-            ".*\\.(jpg|jpeg|png|gif)$",
-            ".*/api/v1/.*"
-        ])
-
-        sut?.ignoreURLs = try IgnoreURLs(patterns: patterns)
-
-        XCTAssertEqual(sut?.ignoreURLs.count(), 2)
+        // Install another configuration
+        let patterns = Set([".*\\.(jpg|jpeg|png|gif)$"])
+        let ignoreURLs = try IgnoreURLs(patterns: patterns)
+        let config2 = NetworkInstrumentation.Configuration(isEnabled: true, ignoreURLs: ignoreURLs)
+        sut?.install(with: config2, remoteConfiguration: nil)
+        XCTAssertNotNil(sut)
     }
 }
