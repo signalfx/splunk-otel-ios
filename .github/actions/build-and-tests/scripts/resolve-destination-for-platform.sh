@@ -42,31 +42,40 @@ pick_destination() {
   return 0
 }
 
-# Fallback: Check if runtime exists, if so find device, else return generic fallback
+# Fallback: Check if runtime exists, if so find device with REAL OS version
 # This will be handled by ensure-destination.sh which downloads/creates as needed
 pick_fallback_destination() {
   local platform_family="$1"  # e.g., "iOS", "tvOS", "visionOS"
   local device_pattern="$2"   # e.g., "iPhone", "Apple TV", "Apple Vision"
   local default_device="$3"   # e.g., "iPhone 16", "Apple TV"
 
-  # Check if runtime exists
-  local runtime_id="$(xcrun simctl list -j runtimes 2>/dev/null \
-    | jq -r --arg f "$platform_family" '.runtimes[]|select(.platform==$f and .isAvailable==true)|.identifier' \
+  # Get the latest runtime with its actual OS version (major.minor from name, not full version)
+  local runtime_info="$(xcrun simctl list -j runtimes 2>/dev/null \
+    | jq -r --arg f "$platform_family" '.runtimes[]|select(.platform==$f and .isAvailable==true)|"\(.name)|\(.identifier)"' \
     | sort -Vr | head -n1 || true)"
 
-  if [ -n "$runtime_id" ]; then
-    # Runtime exists, try to find existing device
+  if [ -n "$runtime_info" ]; then
+    local runtime_name="${runtime_info%%|*}"
+    local runtime_id="${runtime_info##*|}"
+    # Extract version from name like "iOS 26.0" -> "26.0"
+    local os_version="$(echo "$runtime_name" | grep -oE '[0-9]+\.[0-9]+' | head -n1 || echo "latest")"
+
+    # Try to find existing device for this runtime
     local device_name="$(xcrun simctl list -j devices available 2>/dev/null \
       | jq -r --arg r "$runtime_id" --arg p "$device_pattern" '.devices[$r][]?|select(.name|test($p))|.name' \
       | head -n1 || true)"
 
     if [ -n "$device_name" ]; then
-      echo "OS=latest,name=$device_name"
+      echo "OS=$os_version,name=$device_name"
+      return 0
+    else
+      # Runtime exists but no matching device - return with OS version for ensure-destination
+      echo "OS=$os_version,name=$default_device"
       return 0
     fi
   fi
 
-  # No runtime or no device - return default, ensure-destination will create it
+  # No runtime at all - return latest as fallback
   echo "OS=latest,name=$default_device"
   return 0
 }
