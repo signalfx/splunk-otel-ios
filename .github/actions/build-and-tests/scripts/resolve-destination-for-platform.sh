@@ -49,10 +49,18 @@ pick_fallback_destination() {
   local device_pattern="$2"   # e.g., "iPhone", "Apple TV", "Apple Vision"
   local default_device="$3"   # e.g., "iPhone 16", "Apple TV"
 
-  # Get the latest runtime with its actual OS version (major.minor from name, not full version)
+  # Get the latest STABLE runtime (not beta/RC versions like 26.x)
+  # Prefer 18.x over 26.x as 26.x may require SDK that's not installed
   local runtime_info="$(xcrun simctl list -j runtimes 2>/dev/null \
     | jq -r --arg f "$platform_family" '.runtimes[]|select(.platform==$f and .isAvailable==true)|"\(.name)|\(.identifier)"' \
-    | sort -Vr | head -n1 || true)"
+    | grep -v '26\.' | sort -Vr | head -n1 || true)"
+
+  # If no stable runtime found, fall back to any runtime
+  if [ -z "$runtime_info" ]; then
+    runtime_info="$(xcrun simctl list -j runtimes 2>/dev/null \
+      | jq -r --arg f "$platform_family" '.runtimes[]|select(.platform==$f and .isAvailable==true)|"\(.name)|\(.identifier)"' \
+      | sort -Vr | head -n1 || true)"
+  fi
 
   if [ -n "$runtime_info" ]; then
     local runtime_name="${runtime_info%%|*}"
