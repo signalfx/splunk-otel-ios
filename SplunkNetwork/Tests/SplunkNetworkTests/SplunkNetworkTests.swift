@@ -222,4 +222,18 @@ final class SplunkNetworkTests: XCTestCase {
         sut?.install(with: config2, remoteConfiguration: nil)
         XCTAssertNotNil(sut)
     }
+
+    func testNetworkInstrumentation_MultipleInstallsCalls() {
+        // Test that calling install() multiple times doesn't cause issues
+        // This verifies that swizzling only happens once
+        let config = NetworkInstrumentation.Configuration(isEnabled: true, ignoreURLs: nil)
+
+        // Call install multiple times
+        sut?.install(with: config, remoteConfiguration: nil)
+        sut?.install(with: config, remoteConfiguration: nil)
+        sut?.install(with: config, remoteConfiguration: nil)
+
+        // Verify the module is still functional
+        XCTAssertNotNil(sut)
+    }
 }

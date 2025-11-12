@@ -277,19 +277,15 @@ extension URLSessionTask {
         defer {
             splunkSwizzledSetState(state: state)
         }
-
         if !isSupportedTask(task: self) {
             return
         }
-
         if state == URLSessionTask.State.running {
             return
         }
-
         if currentRequest?.url == nil {
             return
         }
-
         guard let span = objc_getAssociatedObject(self, &assocKeySpan) as? Span else {
             return
         }
@@ -302,20 +298,16 @@ extension URLSessionTask {
         defer {
             splunkSwizzledResume()
         }
-
         if !isSupportedTask(task: self) {
             return
         }
-
         if state == URLSessionTask.State.completed || state == URLSessionTask.State.canceling {
             return
         }
-
         let existingSpan: Span? = objc_getAssociatedObject(self, &assocKeySpan) as? Span
         if existingSpan != nil {
             return
         }
-
         startHttpSpan(request: currentRequest)
             .map { span in
                 objc_setAssociatedObject(self, &assocKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
@@ -357,7 +349,6 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
     }
 
     var method = class_getInstanceMethod(currentClass, setStateSelector)
-
     while let currentMethod = method {
         let classResumeImp = method_getImplementation(currentMethod)
         let superClass: AnyClass? = currentClass.superclass()
@@ -375,7 +366,6 @@ func swizzledUrlSessionClasses() -> [AnyClass] {
         currentClass = nextClass
         method = superClassMethod
     }
-
     return classes
 }
 
@@ -391,7 +381,12 @@ func swizzleUrlSession() {
     }
 }
 
-func initializeNetworkInstrumentation(module: NetworkInstrumentation) {
-    setNetworkModule(module)
+/// Ensures swizzling only happens once, even if initializeNetworkInstrumentation is called multiple times
+private let swizzleOnce: Void = {
     swizzleUrlSession()
+}()
+
+func initializeNetworkInstrumentation(module: NetworkInstrumentation) {
+    _ = swizzleOnce
+    setNetworkModule(module)
 }
