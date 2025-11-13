@@ -60,7 +60,8 @@ public class OTLPBackgroundHTTPBaseExporter {
             ),
             encryption: NoneEncryption()
         ),
-        fileType: String? = nil
+        fileType: String? = nil,
+        performStalledUploadCheck: Bool = true
     ) {
         self.envVarHeaders = envVarHeaders
         self.endpoint = endpoint
@@ -69,14 +70,16 @@ public class OTLPBackgroundHTTPBaseExporter {
         self.fileType = fileType
         self.qosConfig = qosConfig
 
-        // Get incomplete requests and check for stalled files
-        // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
-        checkStalledTask = Task.detached(priority: .utility) { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
-            self?.httpClient
-                .getAllSessionsTasks { [weak self] tasks in
-                    self?.checkStalledUploadsOperation(tasks: tasks)
-                }
+        if performStalledUploadCheck {
+            // Get incomplete requests and check for stalled files
+            // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
+            checkStalledTask = Task.detached(priority: .utility) { [weak self] in
+                try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
+                self?.httpClient
+                    .getAllSessionsTasks { [weak self] tasks in
+                        self?.checkStalledUploadsOperation(tasks: tasks)
+                    }
+            }
         }
     }
 

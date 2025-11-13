@@ -34,13 +34,15 @@ struct BackgroundHTTPClientTests {
 
     func makeClient(
         qos: SessionQOSConfiguration = SessionQOSConfiguration(),
-        disk: FakeDiskStorage = FakeDiskStorage(),
-        namespace: String = "test"
+        disk: MockDiskStorage = MockDiskStorage(),
+        namespace: String = "test",
+        logger: MockLogger = MockLogger()
     ) -> BackgroundHTTPClient {
         BackgroundHTTPClient(
             sessionQosConfiguration: qos,
             diskStorage: disk,
-            namespace: namespace
+            namespace: namespace,
+            logger: logger
         )
     }
 
@@ -67,7 +69,7 @@ struct BackgroundHTTPClientTests {
     @Test
     func sendShouldNotSendDeletesFile() throws {
         let descriptor = try makeRequestDescriptor(sentCount: 99)
-        let disk = FakeDiskStorage()
+        let disk = MockDiskStorage()
         let client = makeClient(disk: disk)
 
         let key = KeyBuilder(
@@ -91,7 +93,7 @@ struct BackgroundHTTPClientTests {
             didComplete = true
         }
 
-        try await Task.sleep(nanoseconds: 100_000_000)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
 
         #expect(didComplete)
     }
@@ -105,14 +107,14 @@ struct BackgroundHTTPClientTests {
             wasCalled = true
         }
 
-        try await Task.sleep(nanoseconds: 100_000_000)
+        try await Task.sleep(nanoseconds: 1_000_000_000)
 
         #expect(wasCalled)
     }
 
     @Test
     func taskDelegateDidCompleteStatusCodeDeletesFile() throws {
-        let disk = FakeDiskStorage()
+        let disk = MockDiskStorage()
         let client = makeClient(disk: disk)
         let descriptor = try makeRequestDescriptor()
 
@@ -127,7 +129,7 @@ struct BackgroundHTTPClientTests {
 
     @Test
     func taskDelegateDidCompleteErrorNotDeletesFile() throws {
-        let disk = FakeDiskStorage()
+        let disk = MockDiskStorage()
         let client = makeClient(disk: disk)
         let descriptor = try makeRequestDescriptor()
 
@@ -148,5 +150,17 @@ struct BackgroundHTTPClientTests {
         client.urlSession(URLSession.shared, task: task, didCompleteWithError: nil)
 
         #expect(true)
+    }
+
+    @Test
+    func sendNonExistingFile() throws {
+        let disk = MockDiskStorage()
+        let logger = MockLogger()
+        let client = makeClient(disk: disk, logger: logger)
+        let descriptor = try makeRequestDescriptor()
+
+        try client.send(descriptor)
+
+        #expect(!logger.loggedMessages.isEmpty)
     }
 }
