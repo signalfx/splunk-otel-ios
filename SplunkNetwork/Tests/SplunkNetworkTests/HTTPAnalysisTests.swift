@@ -33,12 +33,13 @@ final class HTTPAnalysisTests: XCTestCase {
             mockHeaders = headers
 
             // swiftlint:disable force_unwrapping
-            super.init(
-                url: URL(string: "https://example.com")!,
-                statusCode: statusCode,
-                httpVersion: "HTTP/1.1",
-                headerFields: headers as? [String: String]
-            )!
+            super
+                .init(
+                    url: URL(string: "https://example.com")!,
+                    statusCode: statusCode,
+                    httpVersion: "HTTP/1.1",
+                    headerFields: headers as? [String: String]
+                )!
             // swiftlint:enable force_unwrapping
         }
 
@@ -166,4 +167,3 @@ final class HTTPAnalysisTests: XCTestCase {
         XCTAssertEqual(getIPAddressFromResponse(response), "203.0.113.195")
     }
 }
-

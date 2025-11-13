@@ -68,4 +68,3 @@ final class IPAddressValidationTests: XCTestCase {
         XCTAssertFalse(isValidIPAddress("2001:db8:::1")) // Triple colon (invalid)
     }
 }
-

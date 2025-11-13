@@ -140,4 +140,3 @@ final class URLExclusionTests: XCTestCase {
         XCTAssertFalse(shouldExcludeURL(url, excludedEndpoints: excludedEndpoints))
     }
 }
-

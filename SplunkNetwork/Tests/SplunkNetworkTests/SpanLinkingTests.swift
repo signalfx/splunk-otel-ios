@@ -133,4 +133,3 @@ final class SpanLinkingTests: XCTestCase {
         XCTAssertNil(mockSpan.attributes["link.spanId"])
     }
 }
-

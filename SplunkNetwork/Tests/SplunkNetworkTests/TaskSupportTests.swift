@@ -63,4 +63,3 @@ final class TaskSupportTests: XCTestCase {
         task.cancel()
     }
 }
-
