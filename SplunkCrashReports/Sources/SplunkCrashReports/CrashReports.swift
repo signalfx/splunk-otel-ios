@@ -180,9 +180,9 @@ public class CrashReports {
             return false
         }
 
-        // Load CFBundleVersion.  Only need to do this at install
+        // Load CFBundleVersion. Only need to do this at install
         // as it cannot change without reloading the app
-        self.deviceDataDictionary["buildId"] = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+        deviceDataDictionary["buildId"] = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
 
         // async in order to load session.id
         DispatchQueue.main.async { [weak self] in
