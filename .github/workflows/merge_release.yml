@@ -1,0 +1,99 @@
+name: Release finalize
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Git setup
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Resolve version and changelog
+        id: meta
+        run: |
+          FILE="SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift"
+          VERSION="$(awk 'match($0,/public[[:space:]]+static[[:space:]]+let[[:space:]]+version[[:space:]]*=[[:space:]]*\"([0-9]+\.[0-9]+\.[0-9]+)\"/,a){print a[1]; exit}' "$FILE")"
+          if [[ -z "$VERSION" || ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid or missing version in $FILE"
+            exit 1
+          fi
+          TAG="$VERSION"
+          BODY="$(
+            awk -v ver="$VERSION" '
+              $0 ~ "^##[[:space:]]+"ver"([[:space:]]|$)" {print; p=1; next}
+              /^##[[:space:]]/ && p {exit}
+              p {print}
+            ' CHANGELOG.md
+          )"
+          if [[ -z "$BODY" ]]; then
+            echo "Changelog section for $VERSION not found"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "body<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$BODY" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push tag
+        run: |
+          if git ls-remote --exit-code --tags origin "${{ steps.meta.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Tag ${{ steps.meta.outputs.tag }} already exists on origin"
+          else
+            git tag -a "${{ steps.meta.outputs.tag }}" -m "Release ${{ steps.meta.outputs.version }}"
+            git push origin "${{ steps.meta.outputs.tag }}"
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "${{ steps.meta.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Release ${{ steps.meta.outputs.tag }} already exists"
+          else
+            gh release create "${{ steps.meta.outputs.tag }}" \
+              --title "${{ steps.meta.outputs.version }}" \
+              --notes "${{ steps.meta.outputs.body }}"
+          fi
+
+      - name: Notify Slack
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          REPO="${GITHUB_REPOSITORY}"
+          TAG="${{ steps.meta.outputs.tag }}"
+          VERSION="${{ steps.meta.outputs.version }}"
+          CHANGELOG="${{ steps.meta.outputs.body }}"
+          RELEASE_URL="https://github.com/${REPO}/releases/tag/${TAG}"
+          PAYLOAD=$(jq -n --arg v "$VERSION" --arg url "$RELEASE_URL" --arg changelog "$CHANGELOG" '{
+            text: (":green-alert: iOS Agent '\''" + $v + "'\'' released :green-alert:\n" + $url + "\nChangelog:\n```\n" + $changelog + "\n```")
+          }')
+          curl -s -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
+
+      - name: Create PR main -> develop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh pr list --base develop --head main --state open --json number --jq 'length' | grep -q '^0$'; then
+            gh pr create \
+              --title "NO-TICKET: Merge back ${{ steps.meta.outputs.version }} to develop" \
+              --base develop \
+              --head main \
+              --body "Auto back-merge after tagging ${{ steps.meta.outputs.tag }}."
+          else
+            echo "An open PR from main to develop already exists"
+          fi
