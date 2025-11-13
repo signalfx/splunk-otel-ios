@@ -33,14 +33,14 @@ final class CrashReportDeviceStatsTests: XCTestCase {
         let batteryLevel = CrashReportDeviceStats.batteryLevel
 
         #if !os(tvOS)
-        // On iOS, should contain a percentage value
-        XCTAssertTrue(
-            batteryLevel.contains("%") || batteryLevel == "Unknown",
-            "Battery level should contain % or be Unknown, got: \(batteryLevel)"
-        )
+            // On iOS, should contain a percentage value
+            XCTAssertTrue(
+                batteryLevel.contains("%") || batteryLevel == "Unknown",
+                "Battery level should contain % or be Unknown, got: \(batteryLevel)"
+            )
         #else
-        // On tvOS, should be "Unknown"
-        XCTAssertEqual(batteryLevel, "Unknown")
+            // On tvOS, should be "Unknown"
+            XCTAssertEqual(batteryLevel, "Unknown")
         #endif
     }
 
@@ -56,13 +56,9 @@ final class CrashReportDeviceStatsTests: XCTestCase {
         let freeDiskSpace = CrashReportDeviceStats.freeDiskSpace
 
         // Should contain bytes unit (KB, MB, GB, TB) or be "Unknown"
-        let containsUnit =
-            freeDiskSpace.contains("KB") ||
-            freeDiskSpace.contains("MB") ||
-            freeDiskSpace.contains("GB") ||
-            freeDiskSpace.contains("TB") ||
-            freeDiskSpace.contains("bytes") ||
-            freeDiskSpace == "Unknown"
+        let containsUnit = freeDiskSpace.contains("KB") || freeDiskSpace.contains("MB") ||
+            freeDiskSpace.contains("GB") || freeDiskSpace.contains("TB") ||
+            freeDiskSpace.contains("bytes") || freeDiskSpace == "Unknown"
 
         XCTAssertTrue(
             containsUnit,
@@ -82,11 +78,8 @@ final class CrashReportDeviceStatsTests: XCTestCase {
         let freeMemory = CrashReportDeviceStats.freeMemory
 
         // Should contain bytes unit (KB, MB, GB) or be "Unknown"
-        let containsUnit =
-            freeMemory.contains("KB") ||
-            freeMemory.contains("MB") ||
-            freeMemory.contains("GB") ||
-            freeMemory.contains("bytes") ||
+        let containsUnit = freeMemory.contains("KB") || freeMemory.contains("MB") ||
+            freeMemory.contains("GB") || freeMemory.contains("bytes") ||
             freeMemory == "Unknown"
 
         XCTAssertTrue(
