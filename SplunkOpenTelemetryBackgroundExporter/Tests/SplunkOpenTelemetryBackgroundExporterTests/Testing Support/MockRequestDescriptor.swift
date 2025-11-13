@@ -23,7 +23,7 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-struct FakeRequestDescriptor: RequestDescriptorProtocol {
+struct MockRequestDescriptor: RequestDescriptorProtocol {
 
     var id: UUID
     var endpoint: URL

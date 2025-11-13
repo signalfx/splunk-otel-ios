@@ -33,9 +33,9 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
 
     private let urlSessionDelegateQueue: OperationQueue
     private let sessionQosConfiguration: SessionQOSConfiguration
-    private let nameSpace: String
+    private let namespace: String
 
-    private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "BackgroundExporter")
+    private let logger: CiscoLogger.LogAgent
 
     private let diskStorage: DiskStorage
 
@@ -43,7 +43,7 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
     // MARK: - Computed properties
 
     private lazy var session: URLSession = {
-        let identifier = "com.otel.config.session.\(nameSpace)"
+        let identifier = "com.otel.config.session.\(namespace)"
         let configuration = URLSessionConfiguration.background(withIdentifier: identifier)
 
         configuration.networkServiceType = .background
@@ -58,14 +58,24 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
 
     // MARK: - Initialization
 
-    init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage, namespace: String) {
+    init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage, namespace: String, logger: CiscoLogger.LogAgent) {
         self.sessionQosConfiguration = sessionQosConfiguration
         self.diskStorage = diskStorage
-        nameSpace = namespace
+        self.logger = logger
+        self.namespace = namespace
 
         urlSessionDelegateQueue = OperationQueue("URLSessionDelegate-\(namespace)", maxConcurrents: 1, qualityOfService: .utility)
 
         super.init()
+    }
+
+    convenience init(sessionQosConfiguration: SessionQOSConfiguration, diskStorage: DiskStorage, namespace: String) {
+        self.init(
+            sessionQosConfiguration: sessionQosConfiguration,
+            diskStorage: diskStorage,
+            namespace: namespace,
+            logger: DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "BackgroundExporter")
+        )
     }
 
 
@@ -78,7 +88,7 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
         )
 
         guard requestDescriptor.shouldSend else {
-            logger.log(level: .info) {
+            logger.log(level: .info, isPrivate: false) {
                 "Maximal retry sent count exceeded for the given taskDescription: \(requestDescriptor)."
             }
 
@@ -90,7 +100,7 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
         let fileUrl = try diskStorage.finalDestination(forKey: fileKey)
 
         guard FileManager.default.fileExists(atPath: fileUrl.path) else {
-            logger.log(level: .error) {
+            logger.log(level: .error, isPrivate: false) {
                 "File does not exist at path: \(fileUrl)."
             }
 
@@ -124,7 +134,7 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
     func taskCompleted(withResponse response: URLResponse?, requestDescriptor: RequestDescriptor, error: Error?) throws {
         guard let error else {
             if let httpResponse = response as? HTTPURLResponse {
-                logger.log(level: .info) {
+                logger.log(level: .info, isPrivate: false) {
                     """
                     Request to: \(requestDescriptor.endpoint.absoluteString) with id \(requestDescriptor.id.uuidString) \n
                     has been received with status code \(httpResponse.statusCode).
@@ -142,7 +152,7 @@ final class BackgroundHTTPClient: NSObject, BackgroundHTTPClientProtocol {
             return
         }
 
-        logger.log(level: .info) {
+        logger.log(level: .info, isPrivate: false) {
             """
             Request to: \(requestDescriptor.endpoint.absoluteString) \n
             with a data task id: \(requestDescriptor.id) \n
@@ -169,7 +179,7 @@ extension BackgroundHTTPClient: URLSessionDataDelegate {
             return
         }
 
-        logger.log(level: .info) {
+        logger.log(level: .info, isPrivate: false) {
             """
             Request to: \(requestDescriptor.endpoint.absoluteString) \n
             with a data task id: \(requestDescriptor.id) \n
@@ -187,7 +197,7 @@ extension BackgroundHTTPClient: URLSessionTaskDelegate {
             let taskDescription = task.taskDescription,
             let requestDescriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
         else {
-            logger.log(level: .info) {
+            logger.log(level: .info, isPrivate: false) {
                 "Failed to reconstruct request descriptor for a request with an empty taskDescription: \(String(describing: task.taskDescription))."
             }
 

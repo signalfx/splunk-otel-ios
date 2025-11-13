@@ -1,4 +1,5 @@
 //
+//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -15,23 +16,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoEncryption
 import Foundation
-import OpenTelemetryProtocolExporterCommon
-import SplunkCommon
 import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-final class FakeHTTPClient: NSObject, BackgroundHTTPClientProtocol {
+@Suite
+struct OperationQueueConvenienceInitTests {
 
-    var sent: [RequestDescriptorProtocol] = []
+    @Test
+    func checkInit() throws {
+        let queue = OperationQueue("testQueue", maxConcurrents: 987, qualityOfService: .utility)
 
-    func flush(completion _: @escaping () -> Void) {}
-
-    func getAllSessionsTasks(_: @escaping ([URLSessionTask]) -> Void) {}
-
-    func send(_ requestDescriptor: RequestDescriptorProtocol) throws {
-        sent.append(requestDescriptor)
+        #expect(queue.name == "com.otel.sdk.testQueue")
+        #expect(queue.maxConcurrentOperationCount == 987)
+        #expect(queue.qualityOfService == .utility)
     }
 }
