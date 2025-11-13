@@ -180,8 +180,10 @@ func isSupportedTask(task: URLSessionTask) -> Bool {
 }
 
 /// Checks if a URL should be excluded based on the excluded endpoints list.
+///
 /// Uses precise URL matching by comparing scheme, host, and path prefix to avoid false positives.
 func shouldExcludeURL(_ url: URL, excludedEndpoints: [URL]) -> Bool {
+
     for excludedEndpoint in excludedEndpoints {
         // Match scheme (both must be http or https, or exact match)
         let requestScheme = url.scheme?.lowercased() ?? ""
