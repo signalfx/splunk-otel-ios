@@ -56,13 +56,8 @@ final class CrashReportDeviceStatsTests: XCTestCase {
         let freeDiskSpace = CrashReportDeviceStats.freeDiskSpace
 
         // Should contain bytes unit (KB, MB, GB, TB) or be "Unknown"
-        let containsUnit =
-            freeDiskSpace.contains("KB") ||
-            freeDiskSpace.contains("MB") ||
-            freeDiskSpace.contains("GB") ||
-            freeDiskSpace.contains("TB") ||
-            freeDiskSpace.contains("bytes") ||
-            freeDiskSpace == "Unknown"
+        let validUnits = ["KB", "MB", "GB", "TB", "bytes", "Unknown"]
+        let containsUnit = validUnits.contains { freeDiskSpace.contains($0) }
 
         XCTAssertTrue(
             containsUnit,
@@ -82,12 +77,8 @@ final class CrashReportDeviceStatsTests: XCTestCase {
         let freeMemory = CrashReportDeviceStats.freeMemory
 
         // Should contain bytes unit (KB, MB, GB) or be "Unknown"
-        let containsUnit =
-            freeMemory.contains("KB") ||
-            freeMemory.contains("MB") ||
-            freeMemory.contains("GB") ||
-            freeMemory.contains("bytes") ||
-            freeMemory == "Unknown"
+        let validUnits = ["KB", "MB", "GB", "bytes", "Unknown"]
+        let containsUnit = validUnits.contains { freeMemory.contains($0) }
 
         XCTAssertTrue(
             containsUnit,
