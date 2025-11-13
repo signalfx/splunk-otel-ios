@@ -182,7 +182,7 @@ public class CrashReports {
 
         // async in order to load session.id
         DispatchQueue.main.async { [weak self] in
-            self?.deviceDataDictionary["buildId"] =  Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+            self?.deviceDataDictionary["buildId"] = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
             self?.updateDeviceStats()
         }
         startPollingForDeviceStats()
