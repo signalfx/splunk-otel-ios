@@ -23,7 +23,7 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-final class FakeOTLPBackgroundHTTPBaseExporter: OTLPBackgroundHTTPBaseExporter {
+final class MockOTLPBackgroundHTTPBaseExporter: OTLPBackgroundHTTPBaseExporter {
 
     var checkStalledUploadsOperationCalled = false
 
