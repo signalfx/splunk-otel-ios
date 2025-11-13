@@ -112,4 +112,3 @@ func addLinkToSpan(span: Span, valStr: String) {
     span.clearAndSetAttribute(key: "link.traceId", value: traceId)
     span.clearAndSetAttribute(key: "link.spanId", value: spanId)
 }
-

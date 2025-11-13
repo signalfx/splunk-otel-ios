@@ -142,4 +142,3 @@ func swizzleUrlSession() {
         swizzle(clazz: classToSwizzle, orig: resumeSelector, swizzled: #selector(URLSessionTask.splunkSwizzledResume))
     }
 }
-

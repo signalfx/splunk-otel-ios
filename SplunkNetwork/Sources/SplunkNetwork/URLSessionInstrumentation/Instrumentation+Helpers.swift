@@ -91,4 +91,3 @@ func shouldExcludeURL(_ url: URL, excludedEndpoints: [URL]) -> Bool {
     }
     return false
 }
-

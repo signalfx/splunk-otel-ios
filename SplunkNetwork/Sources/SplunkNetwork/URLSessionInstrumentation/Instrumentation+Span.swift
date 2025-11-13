@@ -170,4 +170,3 @@ func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
         span.clearAndSetAttribute(key: "session.id", value: sessionID)
     }
 }
-
