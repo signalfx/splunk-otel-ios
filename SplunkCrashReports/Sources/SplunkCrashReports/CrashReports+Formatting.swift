@@ -100,6 +100,8 @@ extension CrashReports {
                 reportDict[.freeMemory] = data["disk"]
                 reportDict[.freeDiskSpace] = data["memory"]
                 reportDict[.screenName] = data["screenName"]
+
+                reportDict[.buildId] = data["buildId"]
             }
         }
         catch {
