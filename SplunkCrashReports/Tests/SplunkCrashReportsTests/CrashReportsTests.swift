@@ -21,7 +21,12 @@ import XCTest
 
 final class CrashReportsTests: XCTestCase {
 
-    var crashReports: CrashReports!
+    // MARK: - Private
+
+    private var crashReports: CrashReports?
+
+
+    // MARK: - Tests lifecycle
 
     override func setUp() {
         super.setUp()
@@ -43,17 +48,26 @@ final class CrashReportsTests: XCTestCase {
         XCTAssertTrue(instance.allUsedImageNames.isEmpty)
     }
 
+    func testCrashReports_SharedStateCanBeSet() {
+        // Create a mock shared state
+        let mockSharedState = MockAgentSharedState()
+
+        crashReports?.sharedState = mockSharedState
+
+        XCTAssertNotNil(crashReports?.sharedState)
+    }
+
     // MARK: - Configuration Tests
 
     func testCrashReports_ConfigureCrashReporter_DoesNotThrow() {
         // This should not throw or crash
-        XCTAssertNoThrow(crashReports.configureCrashReporter())
+        XCTAssertNoThrow(crashReports?.configureCrashReporter())
     }
 
     func testCrashReports_ConfigureCrashReporter_CanBeCalledMultipleTimes() {
         // Calling multiple times should be safe
-        crashReports.configureCrashReporter()
-        crashReports.configureCrashReporter()
+        crashReports?.configureCrashReporter()
+        crashReports?.configureCrashReporter()
 
         // If we reach here, multiple calls are safe
         XCTAssertTrue(true)
@@ -63,14 +77,14 @@ final class CrashReportsTests: XCTestCase {
 
     func testCrashReports_ReportCrashIfPresent_WithoutConfiguration() {
         // Calling without configuration should handle gracefully
-        XCTAssertNoThrow(crashReports.reportCrashIfPresent())
+        XCTAssertNoThrow(crashReports?.reportCrashIfPresent())
     }
 
     func testCrashReports_ReportCrashIfPresent_WithConfiguration() {
-        crashReports.configureCrashReporter()
+        crashReports?.configureCrashReporter()
 
         // Should not throw
-        XCTAssertNoThrow(crashReports.reportCrashIfPresent())
+        XCTAssertNoThrow(crashReports?.reportCrashIfPresent())
     }
 
     // MARK: - Data Consumer Tests
@@ -78,39 +92,39 @@ final class CrashReportsTests: XCTestCase {
     func testCrashReports_CrashReportDataConsumer_CanBeSet() {
         var consumerCalled = false
 
-        crashReports.crashReportDataConsumer = { _, _ in
+        crashReports?.crashReportDataConsumer = { _, _ in
             consumerCalled = true
         }
 
-        XCTAssertNotNil(crashReports.crashReportDataConsumer)
+        XCTAssertNotNil(crashReports?.crashReportDataConsumer)
 
         // Verify it can be called
-        crashReports.crashReportDataConsumer?(CrashReportsMetadata(), "test")
+        crashReports?.crashReportDataConsumer?(CrashReportsMetadata(), "test")
         XCTAssertTrue(consumerCalled)
     }
 
     func testCrashReports_CrashReportDataConsumer_CanBeCleared() {
-        crashReports.crashReportDataConsumer = { _, _ in }
+        crashReports?.crashReportDataConsumer = { _, _ in }
 
-        XCTAssertNotNil(crashReports.crashReportDataConsumer)
+        XCTAssertNotNil(crashReports?.crashReportDataConsumer)
 
-        crashReports.crashReportDataConsumer = nil
+        crashReports?.crashReportDataConsumer = nil
 
-        XCTAssertNil(crashReports.crashReportDataConsumer)
+        XCTAssertNil(crashReports?.crashReportDataConsumer)
     }
 
     // MARK: - Image Names Tests
 
     func testCrashReports_AllUsedImageNames_InitiallyEmpty() {
-        XCTAssertTrue(crashReports.allUsedImageNames.isEmpty)
+        XCTAssertTrue(crashReports?.allUsedImageNames.isEmpty ?? false)
     }
 
     func testCrashReports_AllUsedImageNames_CanBePopulated() {
-        crashReports.allUsedImageNames = ["image1.dylib", "image2.framework"]
+        crashReports?.allUsedImageNames = ["image1.dylib", "image2.framework"]
 
-        XCTAssertEqual(crashReports.allUsedImageNames.count, 2)
-        XCTAssertTrue(crashReports.allUsedImageNames.contains("image1.dylib"))
-        XCTAssertTrue(crashReports.allUsedImageNames.contains("image2.framework"))
+        XCTAssertEqual(crashReports?.allUsedImageNames.count, 2)
+        XCTAssertTrue(crashReports?.allUsedImageNames.contains("image1.dylib") ?? false)
+        XCTAssertTrue(crashReports?.allUsedImageNames.contains("image2.framework") ?? false)
     }
 
     // MARK: - Lifecycle Tests
