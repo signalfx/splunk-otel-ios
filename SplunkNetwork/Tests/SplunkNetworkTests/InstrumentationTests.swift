@@ -108,8 +108,8 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_ExactHostMatch() throws {
         let url = try XCTUnwrap(URL(string: "https://api.example.com/v1/data"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://api.example.com"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://api.example.com"))
         ]
 
         XCTAssertTrue(shouldExcludeURL(url, excludedEndpoints: excludedEndpoints))
@@ -117,8 +117,8 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_DifferentHost_NoFalsePositive() throws {
         let url = try XCTUnwrap(URL(string: "https://api.company.com/v1/data"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://api.com"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://api.com"))
         ]
 
         // Should NOT match - api.company.com is different from api.com
@@ -127,8 +127,8 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_PathPrefixMatch() throws {
         let url = try XCTUnwrap(URL(string: "https://api.example.com/v1/users/123"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://api.example.com/v1"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://api.example.com/v1"))
         ]
 
         XCTAssertTrue(shouldExcludeURL(url, excludedEndpoints: excludedEndpoints))
@@ -136,8 +136,8 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_PathNoMatch() throws {
         let url = try XCTUnwrap(URL(string: "https://api.example.com/v2/users"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://api.example.com/v1"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://api.example.com/v1"))
         ]
 
         // Should NOT match - /v2/users doesn't start with /v1
@@ -146,8 +146,8 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_SchemeMatch() throws {
         let url = try XCTUnwrap(URL(string: "https://api.example.com/data"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "http://api.example.com"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "http://api.example.com"))
         ]
 
         // Should NOT match - https vs http
@@ -156,8 +156,8 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_PortMatch() throws {
         let url = try XCTUnwrap(URL(string: "https://api.example.com:8080/data"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://api.example.com:8080"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://api.example.com:8080"))
         ]
 
         XCTAssertTrue(shouldExcludeURL(url, excludedEndpoints: excludedEndpoints))
@@ -165,8 +165,8 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_PortMismatch() throws {
         let url = try XCTUnwrap(URL(string: "https://api.example.com:8080/data"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://api.example.com:9090"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://api.example.com:9090"))
         ]
 
         // Should NOT match - different ports
@@ -175,8 +175,8 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_EmptyPath() throws {
         let url = try XCTUnwrap(URL(string: "https://api.example.com/any/path"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://api.example.com"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://api.example.com"))
         ]
 
         // Should match - empty path matches any path on same host
@@ -185,8 +185,8 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_RootPath() throws {
         let url = try XCTUnwrap(URL(string: "https://api.example.com/any/path"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://api.example.com/"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://api.example.com/"))
         ]
 
         // Should match - root path "/" matches any path on same host
@@ -195,8 +195,8 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_CaseInsensitive() throws {
         let url = try XCTUnwrap(URL(string: "https://API.EXAMPLE.COM/data"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://api.example.com"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://api.example.com"))
         ]
 
         // Should match - host comparison is case-insensitive
@@ -205,10 +205,10 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_MultipleEndpoints() throws {
         let url = try XCTUnwrap(URL(string: "https://api.example.com/data"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://other.com")),
-            try XCTUnwrap(URL(string: "https://api.example.com")),
-            try XCTUnwrap(URL(string: "https://another.com"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://other.com")),
+            XCTUnwrap(URL(string: "https://api.example.com")),
+            XCTUnwrap(URL(string: "https://another.com"))
         ]
 
         XCTAssertTrue(shouldExcludeURL(url, excludedEndpoints: excludedEndpoints))
@@ -216,9 +216,9 @@ final class InstrumentationTests: XCTestCase {
 
     func testShouldExcludeURL_NoMatch() throws {
         let url = try XCTUnwrap(URL(string: "https://example.com/data"))
-        let excludedEndpoints = [
-            try XCTUnwrap(URL(string: "https://api.com")),
-            try XCTUnwrap(URL(string: "https://other.com"))
+        let excludedEndpoints = try [
+            XCTUnwrap(URL(string: "https://api.com")),
+            XCTUnwrap(URL(string: "https://other.com"))
         ]
 
         XCTAssertFalse(shouldExcludeURL(url, excludedEndpoints: excludedEndpoints))
