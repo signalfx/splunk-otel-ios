@@ -145,33 +145,20 @@ public final class AppStart {
             agentInitializeSpanData = nil
         }
 
-        var launchedInBackground = false
-        if let backgroundLaunchDetected {
-            launchedInBackground = backgroundLaunchDetected
+        let launchedInBackground: Bool = backgroundLaunchDetected ?? false
+        
+        // Determine app start type
+        if willResignActiveTimestamp != nil, let willEnterForegroundTimestamp, didBecomeActiveTimestamp != nil {
+            startTime = willEnterForegroundTimestamp
+            determinedType = .hot
         }
-
-        // Hot start
-        if willResignActiveTimestamp != nil {
-            if let willEnterForegroundTimestamp, didBecomeActiveTimestamp != nil {
-                startTime = willEnterForegroundTimestamp
-                determinedType = .hot
-            }
-
-            // Warm start
+        else if launchedInBackground || prewarmDetected, let willEnterForegroundTimestamp, didBecomeActiveTimestamp != nil {
+            startTime = willEnterForegroundTimestamp
+            determinedType = .warm
         }
-        else if launchedInBackground || prewarmDetected {
-            if let willEnterForegroundTimestamp, didBecomeActiveTimestamp != nil {
-                startTime = willEnterForegroundTimestamp
-                determinedType = .warm
-            }
-
-            // Cold start
-        }
-        else if let processStartTimestamp, didFinishLaunchingTimestamp != nil {
-            if didBecomeActiveTimestamp != nil {
-                startTime = processStartTimestamp
-                determinedType = .cold
-            }
+        else if let processStartTimestamp, didBecomeActiveTimestamp != nil {
+            startTime = processStartTimestamp
+            determinedType = .cold
         }
 
         // Send app start if the type was determined
@@ -182,14 +169,9 @@ public final class AppStart {
                 "App start log: determined app start type: \(determinedType.rawValue), start time: \(startTime), end time: \(endTime)."
             }
         }
-        else if didFinishLaunchingTimestamp != nil {
-            logger.log(level: .debug) {
-                "App start log: could not determine, skipping."
-            }
-        }
         else {
             logger.log(level: .warn) {
-                "Could not determine app start type, the agent was likely initialized later than receiving the didFinishLaunching notification."
+                "Could not determine app start type."
             }
         }
     }
