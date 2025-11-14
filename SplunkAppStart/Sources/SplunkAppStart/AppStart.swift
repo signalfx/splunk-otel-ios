@@ -146,7 +146,7 @@ public final class AppStart {
         }
 
         let launchedInBackground: Bool = backgroundLaunchDetected ?? false
-        
+
         // Determine app start type
         if willResignActiveTimestamp != nil, let willEnterForegroundTimestamp, didBecomeActiveTimestamp != nil {
             startTime = willEnterForegroundTimestamp
