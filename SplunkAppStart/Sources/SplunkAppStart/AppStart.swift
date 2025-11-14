@@ -66,6 +66,9 @@ public final class AppStart {
     /// ackground launch only once during the initial application launch.
     var backgroundLaunchDetected: Bool?
 
+    /// A flag to prevent duplicate cold starts.
+    var coldStartSent = false
+
 
     // MARK: - Public
 
@@ -156,7 +159,7 @@ public final class AppStart {
             startTime = willEnterForegroundTimestamp
             determinedType = .warm
         }
-        else if let processStartTimestamp, didBecomeActiveTimestamp != nil {
+        else if let processStartTimestamp, didBecomeActiveTimestamp != nil, !coldStartSent {
             startTime = processStartTimestamp
             determinedType = .cold
         }
@@ -189,6 +192,8 @@ public final class AppStart {
         if type == .cold {
             events = coldStartEvents(startTime: start)
             initializeData = agentInitializeSpanData
+
+            coldStartSent = true
         }
 
         let appStartData = AppStartSpanData(
