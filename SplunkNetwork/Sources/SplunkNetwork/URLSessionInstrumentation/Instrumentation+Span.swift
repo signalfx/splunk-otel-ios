@@ -86,7 +86,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 func endHttpSpan(span: Span, task: URLSessionTask) {
     let hr: HTTPURLResponse? = task.response as? HTTPURLResponse
     if let hr {
-        span.clearAndSetAttribute(key: SemanticAttributes.httpStatusCode, value: hr.statusCode)
+        span.clearAndSetAttribute(key: SemanticAttributes.httpResponseStatusCode, value: hr.statusCode)
         for (key, val) in hr.allHeaderFields {
             if let keyStr = key as? String,
                 let valStr = val as? String,
@@ -120,7 +120,6 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
         }
     }
 
-    span.clearAndSetAttribute(key: "http.response_content_length_uncompressed", value: Int(task.countOfBytesReceived))
     if task.countOfBytesSent != 0 {
         span.clearAndSetAttribute(key: SemanticAttributes.httpRequestContentLength, value: Int(task.countOfBytesSent))
     }
