@@ -16,10 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryApi
-import OpenTelemetrySdk
-import ResourceExtension
-import SignPostIntegration
 @_spi(SplunkInternal) import SplunkCommon
 
 public class NetworkInstrumentation {

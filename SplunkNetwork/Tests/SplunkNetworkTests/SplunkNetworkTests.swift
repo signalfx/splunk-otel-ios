@@ -17,7 +17,6 @@ limitations under the License.
 
 import OpenTelemetryApi
 import OpenTelemetrySdk
-import URLSessionInstrumentation
 import XCTest
 
 @testable import SplunkNetwork

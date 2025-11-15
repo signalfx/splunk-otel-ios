@@ -18,8 +18,6 @@ limitations under the License.
 import CiscoLogger
 import Foundation
 import OpenTelemetryApi
-import OpenTelemetrySdk
-import ResourceExtension
 @_spi(SplunkInternal) import SplunkCommon
 
 /// Starts an HTTP span for a URL request.
