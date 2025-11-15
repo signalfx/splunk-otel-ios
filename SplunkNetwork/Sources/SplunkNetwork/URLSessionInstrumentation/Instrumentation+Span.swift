@@ -35,19 +35,15 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     let method = request.httpMethod ?? "_OTHER"
     let body = request.httpBody
     let length = body?.count ?? 0
-    let excludedEndpoints = getNetworkModule()?.excludedEndpoints
-    guard let excludedEndpoints else {
-        logger.log(level: .debug) {
-            "Should Not Instrument, Backend URL not yet configured."
-        }
-        return nil
-    }
 
-    if shouldExcludeURL(url, excludedEndpoints: excludedEndpoints) {
-        logger.log(level: .debug) {
-            "Should Not Instrument Backend URL \(url.absoluteString)"
+    // Filter using excludedEndpoints, backend URLs
+    if let excludedEndpoints = getNetworkModule()?.excludedEndpoints {
+        if shouldExcludeURL(url, excludedEndpoints: excludedEndpoints) {
+            logger.log(level: .debug) {
+                "Should Not Instrument Backend URL \(url.absoluteString)"
+            }
+            return nil
         }
-        return nil
     }
 
     // Filter using ignoreURLs API
