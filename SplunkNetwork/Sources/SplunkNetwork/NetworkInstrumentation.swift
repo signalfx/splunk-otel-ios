@@ -32,6 +32,7 @@ public class NetworkInstrumentation {
     public var excludedEndpoints: [URL]?
 
     /// An instance of the Agent shared state object, which is used to obtain agent's state, e.g. a session id.
+    ///
     /// Uses weak reference to prevent crashes when AgentSharedState is deallocated while instrumentation is still active.
     public weak var sharedState: AgentSharedState?
 

@@ -41,6 +41,7 @@ func setNetworkModule(_ module: NetworkInstrumentation?) {
 }
 
 /// Clears the network module pointer asynchronously.
+///
 /// Safe to call from deinit without risking deadlock.
 func clearNetworkModule() {
     networkModuleQueue.async {
