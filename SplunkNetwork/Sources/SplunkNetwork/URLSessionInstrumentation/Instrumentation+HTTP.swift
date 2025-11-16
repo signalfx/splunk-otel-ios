@@ -73,7 +73,7 @@ func addLinkToSpan(span: Span, valStr: String) {
 
     let serverTimingPattern = #"traceparent;desc=['"]00-([0-9a-f]{32})-([0-9a-f]{16})-01['"]"#
     guard let regex = try? NSRegularExpression(pattern: serverTimingPattern) else {
-        logger.log(level: .fault) {
+        NetworkInstrumentationManager.shared.logger.log(level: .fault) {
             "Regex failed to compile"
         }
 
@@ -99,7 +99,7 @@ func addLinkToSpan(span: Span, valStr: String) {
         // Also, prevent over-long log output
         let truncatedValStr = valStr.count > 255 ? String(valStr.prefix(252)) + "..." : valStr
 
-        logger.log(level: .debug) {
+        NetworkInstrumentationManager.shared.logger.log(level: .debug) {
             "Failed to match traceparent string: \(truncatedValStr)"
         }
 

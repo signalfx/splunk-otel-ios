@@ -36,10 +36,12 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     let body = request.httpBody
     let length = body?.count ?? 0
 
+    let manager = NetworkInstrumentationManager.shared
+
     // Filter using excludedEndpoints, backend URLs
-    if let excludedEndpoints = getNetworkModule()?.excludedEndpoints {
+    if let excludedEndpoints = manager.getModule()?.excludedEndpoints {
         if shouldExcludeURL(url, excludedEndpoints: excludedEndpoints) {
-            logger.log(level: .debug) {
+            manager.logger.log(level: .debug) {
                 "Should Not Instrument Backend URL \(url.absoluteString)"
             }
             return nil
@@ -47,9 +49,9 @@ func startHttpSpan(request: URLRequest?) -> Span? {
     }
 
     // Filter using ignoreURLs API
-    if let ignoreURLs = getNetworkModule()?.getIgnoreURLs() {
+    if let ignoreURLs = manager.getModule()?.getIgnoreURLs() {
         if ignoreURLs.matches(url: url) {
-            logger.log(level: .debug) {
+            manager.logger.log(level: .debug) {
                 "URL excluded via IgnoreURLs API \(url.absoluteString)"
             }
             return nil
@@ -60,7 +62,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         .tracerProvider
         .get(
             instrumentationName: "NetworkInstrumentation",
-            instrumentationVersion: getNetworkModule()?.sharedState?.agentVersion
+            instrumentationVersion: manager.getModule()?.sharedState?.agentVersion
         )
 
     let span = tracer.spanBuilder(spanName: "HTTP " + method)
@@ -109,7 +111,7 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
         span.clearAndSetAttribute(key: "error.message", value: error.localizedDescription)
         span.clearAndSetAttribute(key: "error.type", value: String(describing: type(of: error)))
 
-        logger.log(level: .error) {
+        NetworkInstrumentationManager.shared.logger.log(level: .error) {
             "Error: \(error.localizedDescription)"
         }
     }
@@ -158,7 +160,7 @@ func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
 
     span.clearAndSetAttribute(key: "url.full", value: url.absoluteString)
 
-    if let sharedState = getNetworkModule()?.sharedState {
+    if let sharedState = NetworkInstrumentationManager.shared.getModule()?.sharedState {
         let sessionID: String = sharedState.sessionId
         span.clearAndSetAttribute(key: "session.id", value: sessionID)
     }

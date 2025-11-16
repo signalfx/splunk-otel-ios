@@ -80,7 +80,7 @@ func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
         method_exchangeImplementations(origM, swizM)
     }
     else {
-        logger.log(level: .fault) {
+        NetworkInstrumentationManager.shared.logger.log(level: .fault) {
             "could not swizzle \(NSStringFromSelector(orig))"
         }
     }

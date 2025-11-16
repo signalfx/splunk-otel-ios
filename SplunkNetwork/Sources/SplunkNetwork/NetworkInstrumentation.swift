@@ -39,9 +39,9 @@ public class NetworkInstrumentation {
     public required init() {}
 
     deinit {
-        // Clear the global module pointer on teardown to prevent accessing deallocated memory
-        // Use async to avoid deadlock if deinit happens on the networkModuleQueue
-        clearNetworkModule()
+        // Clear the module pointer on teardown to prevent accessing deallocated memory
+        // Use async to avoid deadlock if deinit happens on the module queue
+        NetworkInstrumentationManager.shared.clearModule()
     }
 
     /// Installs the Network Instrumentation module.
@@ -65,7 +65,7 @@ public class NetworkInstrumentation {
                 ignoreURLs = ignoreURLsParameter
             }
 
-            initializeNetworkInstrumentation(module: self)
+            NetworkInstrumentationManager.shared.initialize(with: self)
         }
     }
 
