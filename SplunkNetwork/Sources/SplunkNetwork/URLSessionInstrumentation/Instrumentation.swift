@@ -20,35 +20,36 @@ import Foundation
 import SplunkCommon
 
 /// Manages network instrumentation state and coordination.
+///
 /// Encapsulates module registration, swizzling, and provides thread-safe access.
 final class NetworkInstrumentationManager {
-    
+
     // MARK: - Singleton
-    
+
     static let shared = NetworkInstrumentationManager()
-    
+
     // MARK: - Private Properties
-    
+
     private var module: NetworkInstrumentation?
     private let queue = DispatchQueue(label: "com.splunk.networkModuleQueue")
     private var hasSwizzled = false
-    
+
     /// Logger instance for network instrumentation.
     let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "NetworkInstrumentation")
-    
+
     // MARK: - Initialization
-    
+
     private init() {}
-    
+
     // MARK: - Public Methods
-    
+
     /// Thread-safe getter for the network module.
     ///
     /// - Returns: The current network module instance, or `nil` if not initialized.
     func getModule() -> NetworkInstrumentation? {
         queue.sync { module }
     }
-    
+
     /// Thread-safe setter for the network module.
     ///
     /// - Parameter newModule: The network module instance to set.
@@ -57,7 +58,7 @@ final class NetworkInstrumentationManager {
             module = newModule
         }
     }
-    
+
     /// Clears the network module pointer asynchronously.
     ///
     /// Safe to call from deinit without risking deadlock.
@@ -66,7 +67,7 @@ final class NetworkInstrumentationManager {
             self?.module = nil
         }
     }
-    
+
     /// Initializes network instrumentation with the given module.
     ///
     /// This function sets up URLSession method swizzling to enable automatic
