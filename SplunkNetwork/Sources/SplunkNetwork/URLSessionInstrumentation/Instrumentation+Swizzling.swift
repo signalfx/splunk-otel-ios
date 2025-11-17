@@ -70,8 +70,8 @@ extension URLSessionTask {
 /// Swizzles two methods on a given class.
 ///
 /// - Parameters:
-///   - clazz: The class containing the methods to swizzle.
-///   - orig: The original method selector.
+///   - oneClass: The class containing the methods to swizzle.
+///   - original: The original method selector.
 ///   - swizzled: The swizzled method selector.
 func swizzle(oneClass: AnyClass, original: Selector, swizzled: Selector) {
     let originalMethod = class_getInstanceMethod(oneClass, original)
