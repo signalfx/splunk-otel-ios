@@ -19,7 +19,7 @@ import CiscoLogger
 import Foundation
 import OpenTelemetryApi
 
-private var assocKeySpan: UInt8 = 0
+private var associatedKeySpan: UInt8 = 0
 
 extension URLSessionTask {
     @objc
@@ -36,7 +36,7 @@ extension URLSessionTask {
         if currentRequest?.url == nil {
             return
         }
-        guard let span = objc_getAssociatedObject(self, &assocKeySpan) as? Span else {
+        guard let span = objc_getAssociatedObject(self, &associatedKeySpan) as? Span else {
             return
         }
 
@@ -55,14 +55,14 @@ extension URLSessionTask {
             return
         }
 
-        let existingSpan: Span? = objc_getAssociatedObject(self, &assocKeySpan) as? Span
+        let existingSpan: Span? = objc_getAssociatedObject(self, &associatedKeySpan) as? Span
         if existingSpan != nil {
             return
         }
 
         startHttpSpan(request: currentRequest)
             .map { span in
-                objc_setAssociatedObject(self, &assocKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+                objc_setAssociatedObject(self, &associatedKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
             }
     }
 }
@@ -73,15 +73,15 @@ extension URLSessionTask {
 ///   - clazz: The class containing the methods to swizzle.
 ///   - orig: The original method selector.
 ///   - swizzled: The swizzled method selector.
-func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
-    let origM = class_getInstanceMethod(clazz, orig)
-    let swizM = class_getInstanceMethod(clazz, swizzled)
-    if let origM, let swizM {
-        method_exchangeImplementations(origM, swizM)
+func swizzle(oneClass: AnyClass, original: Selector, swizzled: Selector) {
+    let originalMethod = class_getInstanceMethod(oneClass, original)
+    let swizzledMethod = class_getInstanceMethod(oneClass, swizzled)
+    if let originalMethod, let swizzledMethod {
+        method_exchangeImplementations(originalMethod, swizzledMethod)
     }
     else {
         NetworkInstrumentationManager.shared.logger.log(level: .fault) {
-            "could not swizzle \(NSStringFromSelector(orig))"
+            "could not swizzle \(NSStringFromSelector(original))"
         }
     }
 }
@@ -90,8 +90,8 @@ func swizzle(clazz: AnyClass, orig: Selector, swizzled: Selector) {
 ///
 /// - Returns: Array of classes that override the setState: method.
 func swizzledUrlSessionClasses() -> [AnyClass] {
-    let conf = URLSessionConfiguration.ephemeral
-    let session = URLSession(configuration: conf)
+    let configuration = URLSessionConfiguration.ephemeral
+    let session = URLSession(configuration: configuration)
     guard let url = URL(string: "https://splunkrum") else {
         return []
     }
@@ -138,7 +138,7 @@ func swizzleUrlSession() {
     let resumeSelector = NSSelectorFromString("resume")
 
     for classToSwizzle in classes {
-        swizzle(clazz: classToSwizzle, orig: setStateSelector, swizzled: #selector(URLSessionTask.splunkSwizzledSetState(state:)))
-        swizzle(clazz: classToSwizzle, orig: resumeSelector, swizzled: #selector(URLSessionTask.splunkSwizzledResume))
+        swizzle(oneClass: classToSwizzle, original: setStateSelector, swizzled: #selector(URLSessionTask.splunkSwizzledSetState(state:)))
+        swizzle(oneClass: classToSwizzle, original: resumeSelector, swizzled: #selector(URLSessionTask.splunkSwizzledResume))
     }
 }

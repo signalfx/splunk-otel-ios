@@ -80,10 +80,10 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 ///   - span: The span to end.
 ///   - task: The completed URL session task.
 func endHttpSpan(span: Span, task: URLSessionTask) {
-    let hr: HTTPURLResponse? = task.response as? HTTPURLResponse
-    if let hr {
-        span.clearAndSetAttribute(key: SemanticAttributes.httpResponseStatusCode, value: hr.statusCode)
-        for (key, val) in hr.allHeaderFields {
+    let httpResponse: HTTPURLResponse? = task.response as? HTTPURLResponse
+    if let httpResponse {
+        span.clearAndSetAttribute(key: SemanticAttributes.httpResponseStatusCode, value: httpResponse.statusCode)
+        for (key, val) in httpResponse.allHeaderFields {
             if let keyStr = key as? String,
                 let valStr = val as? String,
                 keyStr.caseInsensitiveCompare("server-timing") == .orderedSame,
@@ -93,16 +93,16 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
             }
         }
 
-        let length = hr.expectedContentLength
+        let length = httpResponse.expectedContentLength
         span.clearAndSetAttribute(key: SemanticAttributes.httpResponseBodySize, value: Int(length))
 
         // Try to capture IP address from the response/connection
         // Update network.peer.address with actual IP if we can get it
-        if let ipAddress = getIPAddressFromResponse(hr) {
+        if let ipAddress = getIPAddressFromResponse(httpResponse) {
             span.clearAndSetAttribute(key: "network.peer.address", value: ipAddress)
         }
 
-        let protocolVersion = determineHTTPProtocolVersion(hr)
+        let protocolVersion = determineHTTPProtocolVersion(httpResponse)
         span.clearAndSetAttribute(key: "http.protocol.version", value: protocolVersion)
     }
 
