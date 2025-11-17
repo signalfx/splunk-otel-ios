@@ -33,6 +33,7 @@ extension Resource {
             ResourceAttributes.deploymentEnvironment.rawValue: .string(agentResources.appDeploymentEnvironment),
             "app": .string(agentResources.appName),
             "app.version": .string(agentResources.appVersion),
+            "app.build_id": .string(agentResources.appBuild),
 
             // SDK info
             "rum.sdk.version": .string(agentResources.agentVersion),
