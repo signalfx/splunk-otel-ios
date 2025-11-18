@@ -123,7 +123,7 @@ struct WebViewDemoView: View {
                 loadWebViewContent()
             }
         }
-        .navigationTitle("WebViewNativeBridge")
+        .navigationBarTitle("WebViewNativeBridge")
     }
 
     // swiftlint:enable closure_body_length

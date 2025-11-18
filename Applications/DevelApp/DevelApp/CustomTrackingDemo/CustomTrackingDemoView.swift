@@ -96,7 +96,7 @@ struct CustomTrackingDemoView: View {
                 Spacer()
             }
         }
-        .navigationTitle("Custom Tracking")
+        .navigationBarTitle("Custom Tracking")
     }
 
     // swiftlint:enable closure_body_length
