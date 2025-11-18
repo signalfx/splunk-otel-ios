@@ -89,7 +89,10 @@ public final class WebViewInstrumentation: NSObject {
                             _fetchSessionId: function() {
                                 const handler = window.webkit?.messageHandlers?.SplunkRumNativeUpdate;
                                 if (!handler || typeof handler.postMessage !== "function") {
-                                    const error = new Error("[SplunkRumNative] postMessage handler is unavailable; native replies may be unsupported on this platform.");
+                                    const error = new Error(
+                                        "[SplunkRumNative] postMessage handler is unavailable; " +
+                                        "native replies may be unsupported on this platform."
+                                    );
                                     console.warn(error.message);
                                     return Promise.reject(error);
                                 }
@@ -103,7 +106,10 @@ public final class WebViewInstrumentation: NSObject {
                                 }
 
                                 if (!result || typeof result.then !== "function") {
-                                    const error = new Error("[SplunkRumNative] postMessage did not return a Promise; native replies may be unsupported on this platform.");
+                                    const error = new Error(
+                                        "[SplunkRumNative] postMessage did not return a Promise; " +
+                                        "native replies may be unsupported on this platform."
+                                    );
                                     console.warn(error.message);
                                     return Promise.reject(error);
                                 }
