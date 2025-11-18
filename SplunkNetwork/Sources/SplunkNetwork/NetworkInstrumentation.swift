@@ -69,6 +69,14 @@ public class NetworkInstrumentation {
         }
     }
 
+    /// Uninstalls the Network Instrumentation module.
+    ///
+    /// Clears the module reference from the instrumentation manager, allowing proper teardown
+    /// between agent lifecycles and preventing shared state issues in tests.
+    public func uninstall() {
+        NetworkInstrumentationManager.shared.setModule(nil)
+    }
+
     public func getIgnoreURLs() -> IgnoreURLs {
         ignoreURLs
     }

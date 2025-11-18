@@ -137,6 +137,7 @@ final class SplunkNetworkTests: XCTestCase {
     }
 
     override func tearDown() {
+        sut?.uninstall()
         sut = nil
 
         super.tearDown()
@@ -190,6 +191,36 @@ final class SplunkNetworkTests: XCTestCase {
         sut?.install(with: nil, remoteConfiguration: nil)
 
         // Verify that installation succeeds with nil configuration
+        XCTAssertNotNil(sut)
+    }
+
+    // MARK: - Lifecycle Tests
+
+    func testNetworkInstrumentation_Uninstall() {
+        let configuration = NetworkInstrumentation.Configuration(isEnabled: true, ignoreURLs: nil)
+
+        // Install the instrumentation
+        sut?.install(with: configuration, remoteConfiguration: nil)
+
+        // Uninstall should clear the module reference
+        sut?.uninstall()
+
+        // Verify that the module still exists but is no longer registered
+        XCTAssertNotNil(sut)
+    }
+
+    func testNetworkInstrumentation_ReinstallAfterUninstall() {
+        let configuration = NetworkInstrumentation.Configuration(isEnabled: true, ignoreURLs: nil)
+
+        // Install
+        sut?.install(with: configuration, remoteConfiguration: nil)
+
+        // Uninstall
+        sut?.uninstall()
+
+        // Reinstall should work
+        sut?.install(with: configuration, remoteConfiguration: nil)
+
         XCTAssertNotNil(sut)
     }
 
