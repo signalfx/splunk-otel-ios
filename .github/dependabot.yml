@@ -5,11 +5,11 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
 
   # Maintain dependencies for swift package manager
   - package-ecosystem: "swift"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
 
