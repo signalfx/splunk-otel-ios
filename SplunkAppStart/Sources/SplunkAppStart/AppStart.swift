@@ -130,12 +130,8 @@ public final class AppStart {
 
     // MARK: - Type determination
 
-    /// Determines an app start type from available notifications timestamps, sends valid results.
+    /// Determines an app start type and sends valid results.
     func determineAndSend() {
-
-        var determinedType: AppStartType?
-        var startTime: Date?
-        let endTime = Date()
 
         // Reset state for further app start detection
         defer {
@@ -148,24 +144,10 @@ public final class AppStart {
             agentInitializeSpanData = nil
         }
 
-        let launchedInBackground: Bool = backgroundLaunchDetected ?? false
-
-        // Determine app start type
-        if willResignActiveTimestamp != nil, let willEnterForegroundTimestamp, didBecomeActiveTimestamp != nil {
-            startTime = willEnterForegroundTimestamp
-            determinedType = .hot
-        }
-        else if launchedInBackground || prewarmDetected, let willEnterForegroundTimestamp, didBecomeActiveTimestamp != nil {
-            startTime = willEnterForegroundTimestamp
-            determinedType = .warm
-        }
-        else if let processStartTimestamp, didBecomeActiveTimestamp != nil, !coldStartSent {
-            startTime = processStartTimestamp
-            determinedType = .cold
-        }
+        let endTime = Date()
 
         // Send app start if the type was determined
-        if let determinedType, let startTime {
+        if let (determinedType, startTime) = determinedAppStartType() {
             send(start: startTime, end: endTime, type: determinedType)
 
             logger.log(level: .debug) {
@@ -177,6 +159,29 @@ public final class AppStart {
                 "Could not determine app start type."
             }
         }
+    }
+
+    /// Determines app start type from available notifications timestamps.
+    private func determinedAppStartType() -> (AppStartType, Date)? {
+        guard didBecomeActiveTimestamp != nil else {
+            return nil
+        }
+
+        let launchedInBackground: Bool = backgroundLaunchDetected ?? false
+
+        if willResignActiveTimestamp != nil, let startTime = willEnterForegroundTimestamp {
+            return (.hot, startTime)
+        }
+
+        if launchedInBackground || prewarmDetected, let startTime = willEnterForegroundTimestamp {
+            return (.warm, startTime)
+        }
+
+        if !coldStartSent, let startTime = processStartTimestamp {
+            return (.cold, startTime)
+        }
+
+        return nil
     }
 
 
