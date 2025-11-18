@@ -30,8 +30,8 @@ public final class DefaultPersistentCache<Element: Codable & Sendable & Equatabl
 
     // MARK: - Private
 
-    private nonisolated(unsafe) let storage: DiskStorage
-    private nonisolated(unsafe) let cacheKey: KeyBuilder
+    nonisolated(unsafe) private let storage: DiskStorage
+    nonisolated(unsafe) private let cacheKey: KeyBuilder
 
     let model = PersistentCacheModel<ElementContainer>()
 

@@ -25,7 +25,7 @@ final class DefaultSharedState: AgentSharedState {
 
     // MARK: - Internal
 
-    private nonisolated unowned let owner: SplunkRum
+    nonisolated private unowned let owner: SplunkRum
 
 
     // MARK: - General state

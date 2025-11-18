@@ -83,7 +83,7 @@ public final class Navigation: Sendable {
     // MARK: - Preferences
 
     /// An object that holds preferred settings for the module.
-    public nonisolated(unsafe) var preferences = Preferences() {
+    nonisolated(unsafe) public var preferences = Preferences() {
         didSet {
             preferences.module = self
             update()
