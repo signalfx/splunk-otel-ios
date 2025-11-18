@@ -33,7 +33,7 @@ jobs:
           TAG="$VERSION"
           BODY="$(
             awk -v ver="$VERSION" '
-              $0 ~ "^##[[:space:]]+"ver"([[:space:]]|$)" {print; p=1; next}
+              $0 ~ "^##[[:space:]]+\\["ver"\\]" {print; p=1; next}
               /^##[[:space:]]/ && p {exit}
               p {print}
             ' CHANGELOG.md
@@ -70,7 +70,7 @@ jobs:
           fi
 
       - name: Notify Slack
-        if: env.SLACK_WEBHOOK_URL != ''
+        if: secrets.SLACK_WEBHOOK_URL != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |

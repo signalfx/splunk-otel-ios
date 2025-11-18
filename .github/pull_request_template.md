@@ -16,6 +16,7 @@
 - [ ] I have performed a self-review of my code.
 - [ ] All new and existing tests pass locally.
 - [ ] I have added license headers to all files.
+- [ ] I have added an entry to CHANGELOG" for any user facing changes.
 - [ ] \(Optional) I have added unit tests for my changes.
 - [ ] \(Optional) I have updated the sample app for integration testing.
 - [ ] \(Optional) I have updated any relevant documentation.
