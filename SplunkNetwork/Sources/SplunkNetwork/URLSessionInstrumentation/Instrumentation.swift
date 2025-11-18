@@ -31,6 +31,7 @@ final class NetworkInstrumentationManager {
     // MARK: - Private Properties
 
     /// Weak reference to the network module to allow proper deallocation.
+    ///
     /// Using weak (not unowned) ensures safe optional access if module is deallocated
     /// while swizzled URLSession callbacks are still executing.
     private weak var module: NetworkInstrumentation?
