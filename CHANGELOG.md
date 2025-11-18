@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+* Extended native session ID bridging for BRUM-instrumented WKWebViews in instrumented apps to iOS 13 and iOS 14. On iOS 13, behavior matches legacy 1.x: session ID is obtained at start only, with no subsequent updates. On iOS 14+, behavior matches 2.x: session ID updates are delivered when requested by the BRUM agent, previously available only on iOS 15+.
+
 ## [2.0.2]
 
 ### Added
