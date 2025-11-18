@@ -70,6 +70,9 @@ public final class WebViewInstrumentation: NSObject {
                 return
             }
 
+            // iOS 14+ exposes WKScriptMessageHandlerWithReply and returns a Promise from postMessage.
+            // On iOS 13 postMessage returns void, so the injected script must defensively verify the
+            // result before chaining .then() to avoid TypeError in the legacy BRUM bridge.
             let javaScript = """
                 if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                     console.log("[SplunkRumNative] Already initialized; skipping.");
@@ -84,8 +87,28 @@ public final class WebViewInstrumentation: NSObject {
                             onNativeSessionIdChanged: null,
 
                             _fetchSessionId: function() {
-                                return window.webkit.messageHandlers.SplunkRumNativeUpdate
-                                    .postMessage({})
+                                const handler = window.webkit?.messageHandlers?.SplunkRumNativeUpdate;
+                                if (!handler || typeof handler.postMessage !== "function") {
+                                    const error = new Error("[SplunkRumNative] postMessage handler is unavailable; native replies may be unsupported on this platform.");
+                                    console.warn(error.message);
+                                    return Promise.reject(error);
+                                }
+
+                                let result;
+                                try {
+                                    result = handler.postMessage({});
+                                } catch (error) {
+                                    console.error("[SplunkRumNative] postMessage threw an error:", error);
+                                    return Promise.reject(error);
+                                }
+
+                                if (!result || typeof result.then !== "function") {
+                                    const error = new Error("[SplunkRumNative] postMessage did not return a Promise; native replies may be unsupported on this platform.");
+                                    console.warn(error.message);
+                                    return Promise.reject(error);
+                                }
+
+                                return result
                                     .then((r) => r.sessionId)
                                     .catch( function(error) {
                                         console.error("[SplunkRumNative] Failed to fetch native session ID:", error);
@@ -203,11 +226,17 @@ public final class WebViewInstrumentation: NSObject {
 #endif
 
 #if canImport(WebKit)
+    /// Fallback for platforms limited to `WKScriptMessageHandler` (iOS 13 and other runtimes without reply support).
+    /// - iOS 13 behavior:
+    ///   - `postMessage` returns void; the injected JS detects the missing Promise, causing `_fetchSessionId` to reject and leaving the cached ID untouched.
+    ///   - `getNativeSessionId()` still returns the cached value immediately; `getNativeSessionIdAsync()` resolves to `undefined`.
+    /// - iOS 14+ behavior:
+    ///   - `postMessage` returns a Promise backed by the native `replyHandler`; async calls resolve with `sessionId` when native responds.
+    /// - Callers should wrap `getNativeSessionIdAsync()` with their own timeout if they require bounded waits, and fall back to the synchronous API.
+    /// - Injection occurs only when a native session ID is available (`sharedState?.sessionId` non-nil); otherwise `SplunkRumNative` is not injected.
     extension WebViewInstrumentation: WKScriptMessageHandler {
         public func userContentController(_: WKUserContentController, didReceive _: WKScriptMessage) {
-            // This is the fallback for iOS 13. It does not support replies.
-            // The JavaScript side will not get a response, and its promise will time out.
-            // This is acceptable degradation of functionality for an unsupported OS.
+            // No-op: iOS 13 cannot reply, so JS sees the rejected Promise described above.
         }
     }
 #endif
