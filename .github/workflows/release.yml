@@ -110,7 +110,7 @@ jobs:
             ' CHANGELOG.md
           )"
           gh pr create \
-            --title "${{ inputs.ticket }}: Release-${{ inputs.version }}" \
+            --title "${{ inputs.ticket }}: Release ${{ inputs.version }}" \
             --base main \
             --head "$BRANCH" \
             --body "$BODY"
