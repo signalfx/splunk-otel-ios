@@ -39,8 +39,10 @@ jobs:
 
       - name: Git setup
         run: |
+          git config gpg.format ssh
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config commit.gpgsign true
 
       - name: Create release branch
         run: |
@@ -95,7 +97,7 @@ jobs:
 
       - name: Commit changes
         run: |
-          git commit -m "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
+          git commit -S -m "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
           git push -u origin "$BRANCH"
 
       - name: Create PR to main
