@@ -34,15 +34,11 @@ jobs:
             echo "Invalid ticket format: ${{ inputs.ticket }}. Must be DEMRUM-xxxx"
             exit 1
           fi
-          
+
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create release branch
-        run: |
-          BRANCH="release/${{ inputs.version }}"
-          git switch -c "$BRANCH"
-          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+      # No need for SSH/GPG setup; create-pull-request will sign commits itself.
 
       - name: Update CHANGELOG.md header
         run: |
@@ -50,13 +46,11 @@ jobs:
           sed -i "/^## \[Unreleased\]/a\\
           \\
           ## [${{ inputs.version }}] - $DATE" CHANGELOG.md
-          git add CHANGELOG.md
 
       - name: Bump version in SplunkRum.swift
         run: |
           FILE="SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift"
           sed -i -E "s/(public[[:space:]]+static[[:space:]]+let[[:space:]]+version[[:space:]]*=[[:space:]]*\")([0-9]+\.[0-9]+\.[0-9]+)(\")/\1${{ inputs.version }}\3/" "$FILE"
-          git add "$FILE"
 
       - name: Add version to bug template
         run: |
@@ -81,22 +75,14 @@ jobs:
           ' "$TARGET_FILE" > "$TMP" || true
           if [ -s "$TMP" ]; then
             mv "$TMP" "$TARGET_FILE"
-            git add "$TARGET_FILE"
             echo "Inserted ${{ inputs.version }} into $TARGET_FILE"
           else
             echo "Error: Could not locate dropdown options to insert version in $TARGET_FILE"
             exit 1
           fi
 
-
-      - name: Commit changes
-        run: |
-          git commit -m "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
-          git push -u origin "$BRANCH"
-
-      - name: Create PR to main
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract PR body from CHANGELOG
+        id: prbody
         run: |
           BODY="$(
             awk -v ver="${{ inputs.version }}" '
@@ -105,8 +91,27 @@ jobs:
               p {print}
             ' CHANGELOG.md
           )"
-          gh pr create \
-            --title "${{ inputs.ticket }}: Release ${{ inputs.version }}" \
-            --base main \
-            --head "$BRANCH" \
-            --body "$BODY"
+          printf "%s\n" "$BODY" > pr_body.md
+
+      - name: Create Pull Request (signed commit)
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          # Signs commits as github-actions[bot] (with GITHUB_TOKEN) or as your app if you use a GitHub App token.
+          sign-commits: true
+          commit-message: "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
+          title: "${{ inputs.ticket }}: Release ${{ inputs.version }}"
+          body-path: pr_body.md
+          branch: "release/${{ inputs.version }}"
+          base: main
+          # Optional: limit committed paths if you want to be strict
+          # add-paths: |
+          #   CHANGELOG.md
+          #   SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift
+          #   .github/ISSUE_TEMPLATE/bug.yml
+
+      - name: Show PR URL and verification status
+        if: ${{ steps.cpr.outputs.pull-request-url }}
+        run: |
+          echo "PR: ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "Commits verified: ${{ steps.cpr.outputs['pull-request-commits-verified'] }}"
