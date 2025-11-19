@@ -38,9 +38,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare signing key
-        uses: actions/ssh-key-to-signing-key@v1
-
       - name: Git setup
         run: |
           git config gpg.format ssh
