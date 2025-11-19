@@ -91,7 +91,7 @@ jobs:
 
       - name: Commit changes
         run: |
-          git commit -S -m "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
+          git commit -m "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
           git push -u origin "$BRANCH"
 
       - name: Create PR to main
