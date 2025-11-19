@@ -70,7 +70,7 @@ jobs:
           fi
 
       - name: Notify Slack
-        if: secrets.SLACK_WEBHOOK_URL != ''
+        if: ${{ secrets.GITHUB_TOKEN }} != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
