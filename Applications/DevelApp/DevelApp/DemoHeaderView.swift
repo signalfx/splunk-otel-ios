@@ -54,17 +54,6 @@ struct DemoHeaderView: View {
         .frame(maxWidth: .infinity)
         .cornerRadius(8)
     }
-
-            }
-            .onReceive(timer) { input in
-                currentTime = input
-            }
-        }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-        .frame(maxWidth: .infinity)
-        .cornerRadius(8)
-    }
 }
 
 extension DateFormatter {
