@@ -91,8 +91,6 @@ class AgentDataSource: ObservableObject {
     }
 
     var osVersionDescription: String {
-        "\(operatingSystemVersion.majorVersion)." +
-            "\(operatingSystemVersion.minorVersion)." +
-            "\(operatingSystemVersion.patchVersion)"
+        "\(operatingSystemVersion.majorVersion)." + "\(operatingSystemVersion.minorVersion)." + "\(operatingSystemVersion.patchVersion)"
     }
 }
