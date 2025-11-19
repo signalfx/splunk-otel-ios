@@ -30,6 +30,9 @@ class AgentDataSource: ObservableObject {
     var agentAppVersion: String = SplunkRum.shared.state.appVersion
 
     @Published
+    var agentAppBuild: String = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
+
+    @Published
     var sessionId: String = SplunkRum.shared.session.state.id
 
     @Published
@@ -77,5 +80,19 @@ class AgentDataSource: ObservableObject {
 
     var agentStatusDescription: String {
         rumEnabled ? "Running" : "Not Running"
+    }
+
+    var agentAppVersionDisplay: String {
+        "\(agentAppVersion) (\(agentAppBuild))"
+    }
+
+    private var operatingSystemVersion: OperatingSystemVersion {
+        ProcessInfo.processInfo.operatingSystemVersion
+    }
+
+    var osVersionDescription: String {
+        "\(operatingSystemVersion.majorVersion)." +
+            "\(operatingSystemVersion.minorVersion)." +
+            "\(operatingSystemVersion.patchVersion)"
     }
 }

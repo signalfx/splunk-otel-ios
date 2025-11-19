@@ -17,6 +17,7 @@ limitations under the License.
 
 import SplunkAgent
 import SwiftUI
+import UIKit
 
 struct DemoHeaderView: View {
 
@@ -28,13 +29,32 @@ struct DemoHeaderView: View {
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 4) {
             Text("Agent Status: \(agentDataSource.agentStatusDescription)")
             Text("Agent Version: \(agentDataSource.agentVersion)")
-            Text("Agent App Version: \(agentDataSource.agentAppVersion)")
+            Text("Agent App Version: \(agentDataSource.agentAppVersionDisplay)")
+            Text("OS Version: \(agentDataSource.osVersionDescription)")
             Text("Session ID: \(agentDataSource.sessionId)")
-            HStack {
-                Text("Current Time: \(currentTime, formatter: DateFormatter.shortTime)")
+                .font(.body)
+                .contextMenu {
+                    Button {
+                        UIPasteboard.general.string = agentDataSource.sessionId
+                    } label: {
+                        Label("Copy Session ID", systemImage: "doc.on.doc")
+                    }
+                }
+            Text("Current Time: \(currentTime, formatter: DateFormatter.shortTime)")
+                .onReceive(timer) { input in
+                    currentTime = input
+                }
+        }
+        .font(.subheadline)
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .frame(maxWidth: .infinity)
+        .cornerRadius(8)
+    }
+
             }
             .onReceive(timer) { input in
                 currentTime = input
