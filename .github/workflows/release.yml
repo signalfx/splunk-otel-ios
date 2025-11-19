@@ -1,0 +1,116 @@
+name: New release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version in x.y.z format"
+        required: true
+        type: string
+      ticket:
+        description: "Ticket ID for PR title, e.g. DEMRUM-1234"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate version
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid version format: ${{ inputs.version }}. Must be x.y.z"
+            exit 1
+          fi
+
+      - name: Validate ticket
+        run: |
+          if [[ ! "${{ inputs.ticket }}" =~ ^DEMRUM-[0-9]+$ ]]; then
+            echo "Invalid ticket format: ${{ inputs.ticket }}. Must be DEMRUM-xxxx"
+            exit 1
+          fi
+          
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Git setup
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Create release branch
+        run: |
+          BRANCH="release/${{ inputs.version }}"
+          git switch -c "$BRANCH"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+
+      - name: Update CHANGELOG.md header
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          sed -i "/^## \[Unreleased\]/a\\
+          \\
+          ## [${{ inputs.version }}] - $DATE" CHANGELOG.md
+          git add CHANGELOG.md
+
+      - name: Bump version in SplunkRum.swift
+        run: |
+          FILE="SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift"
+          sed -i -E "s/(public[[:space:]]+static[[:space:]]+let[[:space:]]+version[[:space:]]*=[[:space:]]*\")([0-9]+\.[0-9]+\.[0-9]+)(\")/\1${{ inputs.version }}\3/" "$FILE"
+          git add "$FILE"
+
+      - name: Add version to bug template
+        run: |
+          TARGET_FILE=".github/ISSUE_TEMPLATE/bug.yml"
+          if [ ! -f "$TARGET_FILE" ]; then
+            echo "Error: $TARGET_FILE not found"
+            exit 1
+          fi
+          if grep -qE "^[[:space:]]*-[[:space:]]${{ inputs.version }}$" "$TARGET_FILE"; then
+            echo "Warning: Version ${{ inputs.version }} already present"
+            exit 0
+          fi
+          TMP="$(mktemp)"
+          awk -v ver="${{ inputs.version }}" '
+            BEGIN{in_dd=0; in_cv=0; in_opts=0; inserted=0}
+            /^[[:space:]]*- type: dropdown[[:space:]]*$/ {in_dd=1}
+            in_dd && /^[[:space:]]*id:[[:space:]]*(client-version|agent-version)[[:space:]]*$/ {in_cv=1}
+            in_cv && /^[[:space:]]*options:[[:space:]]*$/ {print; printf "        - %s\n", ver; inserted=1; in_opts=1; next}
+            /^- type:[[:space:]]/ {in_dd=0; in_cv=0; in_opts=0}
+            {print}
+            END{if(!inserted){exit 2}}
+          ' "$TARGET_FILE" > "$TMP" || true
+          if [ -s "$TMP" ]; then
+            mv "$TMP" "$TARGET_FILE"
+            git add "$TARGET_FILE"
+            echo "Inserted ${{ inputs.version }} into $TARGET_FILE"
+          else
+            echo "Error: Could not locate dropdown options to insert version in $TARGET_FILE"
+            exit 1
+          fi
+
+
+      - name: Commit changes
+        run: |
+          git commit -m "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
+          git push -u origin "$BRANCH"
+
+      - name: Create PR to main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BODY="$(
+            awk -v ver="${{ inputs.version }}" '
+              $0 ~ "^##[[:space:]]+\\["ver"\\]" {print; p=1; next}
+              /^##[[:space:]]/ && p {exit}
+              p {print}
+            ' CHANGELOG.md
+          )"
+          gh pr create \
+            --title "${{ inputs.ticket }}: Release ${{ inputs.version }}" \
+            --base main \
+            --head "$BRANCH" \
+            --body "$BODY"
