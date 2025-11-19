@@ -51,7 +51,9 @@ jobs:
       - name: Update CHANGELOG.md header
         run: |
           DATE=$(date +%Y-%m-%d)
-          sed -i "/^## \[Unreleased\]/a\\n\\n## [${{ inputs.version }}] - $DATE" CHANGELOG.md
+          sed -i "/^## \[Unreleased\]/a\\
+          \\
+          ## [${{ inputs.version }}] - $DATE" CHANGELOG.md
           git add CHANGELOG.md
 
       - name: Bump version in SplunkRum.swift
@@ -108,7 +110,7 @@ jobs:
             ' CHANGELOG.md
           )"
           gh pr create \
-            --title "${{ inputs.ticket }}-release-${{ inputs.version }}" \
+            --title "${{ inputs.ticket }}: Release-${{ inputs.version }}" \
             --base main \
             --head "$BRANCH" \
             --body "$BODY"
