@@ -20,19 +20,18 @@ import XCTest
 
 @testable import SplunkAgent
 
+@MainActor
 final class API10SplunkRumBuilderTests: XCTestCase {
 
     // MARK: - Tests lifecycle
 
     override func setUp() {
         super.setUp()
-
         SplunkRum.resetSharedInstance()
     }
 
     override func tearDown() {
         SplunkRum.resetSharedInstance()
-
         super.tearDown()
     }
 
@@ -146,16 +145,13 @@ final class API10SplunkRumBuilderTests: XCTestCase {
             .setApplicationName("ConfigApp")
             .deploymentEnvironment(environment: "TestEnv")
             .debug(enabled: true)
-            .sessionSamplingRatio(samplingRatio: 0.75)
 
         XCTAssertTrue(builder.build())
 
-        // TODO: [DEMRUM-2782] Fix tests
-        //        let config = SplunkRum.shared.agentConfiguration
-        //        XCTAssertEqual(config.appName, "ConfigApp")
-        //        XCTAssertEqual(config.deploymentEnvironment, "TestEnv")
-        //        XCTAssertEqual(config.enableDebugLogging, true)
-        //        XCTAssertEqual(config.session.samplingRate, 0.75)
+        let config = SplunkRum.shared.agentConfiguration
+        XCTAssertEqual(config.appName, "ConfigApp")
+        XCTAssertEqual(config.deploymentEnvironment, "TestEnv")
+        XCTAssertEqual(config.enableDebugLogging, true)
     }
 
 

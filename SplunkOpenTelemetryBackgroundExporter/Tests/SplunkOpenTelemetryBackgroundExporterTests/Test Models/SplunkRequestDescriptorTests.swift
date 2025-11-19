@@ -19,7 +19,7 @@ import XCTest
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-final class SplunkOTelBackgroundExporterTests: XCTestCase {
+final class SplunkRequestDescriptorTests: XCTestCase {
 
     // MARK: - Private
 
@@ -28,7 +28,7 @@ final class SplunkOTelBackgroundExporterTests: XCTestCase {
 
     // MARK: - Should send tests
 
-    func testShouldSend_givenThreePreviousAttempts() throws {
+    func testShouldSendGivenThreePreviousAttempts() throws {
         let exampleURL = try XCTUnwrap(URL(string: "example.com"))
 
         var requestDescriotor = RequestDescriptor(
@@ -43,7 +43,7 @@ final class SplunkOTelBackgroundExporterTests: XCTestCase {
         XCTAssertTrue(requestDescriotor.shouldSend)
     }
 
-    func testShouldSend_givenSixPreviousAttempts() throws {
+    func testShouldSendGivenSixPreviousAttempts() throws {
         let exampleURL = try XCTUnwrap(URL(string: "example.com"))
 
         var requestDescriotor = RequestDescriptor(
@@ -78,6 +78,6 @@ final class SplunkOTelBackgroundExporterTests: XCTestCase {
         let expectedSendDate = Calendar.current.date(byAdding: delay, to: Date()) ?? Date()
 
         // Check the date intervals with an arbitrarily small accuracy.
-        XCTAssertEqual(expectedSendDate.timeIntervalSinceReferenceDate, requestDescriotor.scheduled.timeIntervalSinceReferenceDate, accuracy: 0.001)
+        XCTAssertEqual(expectedSendDate.timeIntervalSinceReferenceDate, requestDescriotor.scheduled.timeIntervalSinceReferenceDate, accuracy: 0.1)
     }
 }

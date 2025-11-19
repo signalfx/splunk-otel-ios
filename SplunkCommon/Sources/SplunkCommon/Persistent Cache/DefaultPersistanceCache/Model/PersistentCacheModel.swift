@@ -58,7 +58,7 @@ actor PersistentCacheModel<Container: PersistedItemContainer> {
     }
 
     func add(_ item: Container.Item, forKey key: String) {
-        containers[key] = Container(value: item, updated: .now)
+        containers[key] = Container(value: item, updated: Date())
     }
 
     func remove(key: String) {

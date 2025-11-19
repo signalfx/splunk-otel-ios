@@ -328,6 +328,9 @@ public class SplunkRum: ObservableObject {
 
         initializeEvents["event_manager_initialized"] = Date()
 
+        // Send a session start event explicitly as soon as a Session and an EventManager are available
+        (currentSession as? DefaultSession)?.sendInitialSessionStartEvent()
+
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
@@ -374,5 +377,5 @@ public class SplunkRum: ObservableObject {
     // MARK: - Version
 
     /// A version of this agent.
-    public static let version = "2.0.1"
+    public static let version = "2.0.2"
 }

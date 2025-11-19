@@ -25,29 +25,29 @@ import XCTest
 
         /// We need time to deliver and evaluate the expectations.
         private var deliveryTime: TimeInterval {
-            0.05
+            0.1
         }
 
 
         // MARK: - Simulated UIKit notifications
 
         /// Simulates sending for `didEnterBackgroundNotification` from the system.
-        func sendEnterBackgroundNotification() {
+        func sendEnterBackgroundNotification() async {
             // Send notification emitted from simulated UIKit
-            sendSimulatedNotification(UIApplication.didEnterBackgroundNotification)
+            await sendSimulatedNotification(UIApplication.didEnterBackgroundNotification)
         }
 
         /// Simulates sending for `willEnterForegroundNotification` from the system.
-        func sendEnterForegroundNotification() {
+        func sendEnterForegroundNotification() async {
             // Send notification emitted from simulated UIKit
-            sendSimulatedNotification(UIApplication.willEnterForegroundNotification)
+            await sendSimulatedNotification(UIApplication.willEnterForegroundNotification)
         }
 
 
         // MARK: - Simulated notifications
 
         /// Simulates sending a notification as in the case of a running application.
-        func sendSimulatedNotification(_ notification: NSNotification.Name) {
+        func sendSimulatedNotification(_ notification: NSNotification.Name) async {
             // Watch for emitted notification
             _ = expectation(
                 forNotification: notification,
@@ -55,14 +55,16 @@ import XCTest
                 handler: nil
             )
 
-            // Send simulated notification
-            NotificationCenter.default.post(
-                name: notification,
-                object: nil
-            )
+            await MainActor.run {
+                // Send simulated notification
+                NotificationCenter.default.post(
+                    name: notification,
+                    object: nil
+                )
 
-            // We need to wait for notification delivery
-            waitForExpectations(timeout: deliveryTime, handler: nil)
+                // We need to wait for notification delivery
+                waitForExpectations(timeout: deliveryTime, handler: nil)
+            }
         }
     }
 

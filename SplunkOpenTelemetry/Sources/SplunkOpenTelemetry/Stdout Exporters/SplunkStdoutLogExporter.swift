@@ -30,17 +30,6 @@ class SplunkStdoutLogExporter: LogRecordExporter {
     /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    /// Date format.
-    private let dateFormatStyle: Date.FormatStyle = .init()
-        .month()
-        .day()
-        .year()
-        .hour(.twoDigits(amPM: .wide))
-        .minute(.twoDigits)
-        .second(.twoDigits)
-        .secondFraction(.fractional(3))
-        .timeZone(.iso8601(.short))
-
     init(with proxy: LogRecordExporter) {
         proxyExporter = proxy
     }
@@ -50,17 +39,18 @@ class SplunkStdoutLogExporter: LogRecordExporter {
             // Log LogRecord data
             logger.log {
                 var message = ""
+                let logRecordTimestampNanoseconds = logRecord.timestamp.timeIntervalSince1970.toNanoseconds
 
                 message += "------ 🪵 Log: ------\n"
                 message += "Severity: \(String(describing: logRecord.severity))\n"
                 message += "Body: \(String(describing: logRecord.body))\n"
                 message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
-                message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(self.dateFormatStyle)))\n"
+                message +=
+                    "Timestamp: \(logRecordTimestampNanoseconds) (\(logRecord.timestamp.iso8601Formatted()) / \(logRecord.timestamp))\n"
 
                 if let observedTimestamp = logRecord.observedTimestamp {
                     let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                    let observedTimestampFormatted = observedTimestamp.formatted(self.dateFormatStyle)
-                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
+                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestamp.iso8601Formatted()) / \(observedTimestamp))\n"
                 }
                 else {
                     message += "ObservedTimestamp: -\n"

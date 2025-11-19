@@ -254,6 +254,8 @@ class DefaultEventManager: AgentEventManager {
             return
         }
 
+        emitSessionReplayRecordingEvent(at: metadata.timestamp, sessionId: sessionId)
+
         // Prepare and send the event as a separate transaction
         Task {
             guard
@@ -314,6 +316,25 @@ class DefaultEventManager: AgentEventManager {
             immediateProcessing: false,
             completion: completion
         )
+    }
+
+    private func emitSessionReplayRecordingEvent(at timestamp: Date, sessionId: String) {
+        let event = SessionReplayRefreshEvent(
+            timestamp: timestamp,
+            sessionId: sessionId
+        )
+
+        agent.eventManager?.sendEvent(event)
+    }
+
+
+    // MARK: - Internal events
+
+    func sendEvent(_ event: AgentEvent) {
+        logEventProcessor.sendEvent(
+            event: event,
+            immediateProcessing: false
+        ) { _ in }
     }
 
 
