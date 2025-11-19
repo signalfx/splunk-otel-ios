@@ -37,8 +37,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-
-      # No need for SSH/GPG setup; create-pull-request will sign commits itself.
+        with:
+          ref: ${{ github.ref }}
 
       - name: Update CHANGELOG.md header
         run: |
@@ -97,18 +97,12 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
-          # Signs commits as github-actions[bot] (with GITHUB_TOKEN) or as your app if you use a GitHub App token.
           sign-commits: true
           commit-message: "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
           title: "${{ inputs.ticket }}: Release ${{ inputs.version }}"
           body-path: pr_body.md
           branch: "release/${{ inputs.version }}"
           base: main
-          # Optional: limit committed paths if you want to be strict
-          # add-paths: |
-          #   CHANGELOG.md
-          #   SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift
-          #   .github/ISSUE_TEMPLATE/bug.yml
 
       - name: Show PR URL and verification status
         if: ${{ steps.cpr.outputs.pull-request-url }}
