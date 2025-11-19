@@ -70,10 +70,14 @@ jobs:
           fi
 
       - name: Notify Slack
-        if: ${{ secrets.GITHUB_TOKEN }} != ''
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+              echo "SLACK_WEBHOOK_URL not set, skipping Slack notification"
+              exit 0
+          fi
+
           REPO="${GITHUB_REPOSITORY}"
           TAG="${{ steps.meta.outputs.tag }}"
           VERSION="${{ steps.meta.outputs.version }}"
