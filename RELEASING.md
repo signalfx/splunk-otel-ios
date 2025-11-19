@@ -2,6 +2,15 @@
 
 This project is distributed as a Swift Package. The release process is driven by creating and pushing versioned Git tags.
 
+## Automated workflow
+
+- An action named “New release” is available in the Actions tab of the repository.
+- Fill in the required fields and select the target branch.
+- The action will prepare a release pull request.
+- After the release pull request is merged into main, a new tag and release will be created automatically, and a new pull request into develop will be opened.
+
+## Manual workflow
+
 ### 1. Prepare the Release
 
 1. Ensure the `main` branch is stable and all changes for the release have been merged.

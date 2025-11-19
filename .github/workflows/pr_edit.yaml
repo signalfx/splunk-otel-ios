@@ -12,6 +12,7 @@ jobs:
       - name: Validate PR Title
         uses: ./.github/actions/validate-pr-title
   validate_gai_usage_disclosure:
+    if: github.event.pull_request.base.ref != 'main' && github.event.pull_request.head.ref != 'main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.3.0
