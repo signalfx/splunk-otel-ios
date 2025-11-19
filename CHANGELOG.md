@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0.3] - 2025-11-19
+
 ### Added
 
 * Added CFBundleVersion to Resources for inclusion in all spans via app.build_id. #494
