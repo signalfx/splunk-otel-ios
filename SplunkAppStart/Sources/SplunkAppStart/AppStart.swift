@@ -90,7 +90,12 @@ public final class AppStart {
     public func startDetection() {
 
         // Detect prewarm. ‼️ Prewarm detection must happen before `didFinishLaunching`
-        prewarmDetected = ProcessInfo.processInfo.environment["ActivePrewarm"] == "1"
+        if #available(iOS 15.0, *) {
+            prewarmDetected = ProcessInfo.processInfo.environment["ActivePrewarm"] == "1"
+        }
+        else {
+            prewarmDetected = false
+        }
 
         // Obtain process start time, which is used as an app start span's start
         do {
