@@ -34,6 +34,7 @@ final class AppStartTests: XCTestCase {
         let destination = DebugDestination()
 
         let appStart = AppStart()
+        appStart.processStartTimestamp = Date()
         appStart.destination = destination
 
         appStart.startDetection()
@@ -64,6 +65,7 @@ final class AppStartTests: XCTestCase {
         let destination = DebugDestination()
 
         let appStart = AppStart()
+        appStart.processStartTimestamp = Date()
         appStart.destination = destination
         appStart.install(with: nil, remoteConfiguration: nil)
 
@@ -138,6 +140,6 @@ final class AppStartTests: XCTestCase {
 
         simulateStartNotificationsWithNoDidFinishLaunching()
 
-        try checkNotDeterminedType(in: destination)
+        try checkDeterminedType(.cold, in: destination)
     }
 }
