@@ -11,6 +11,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Fixed App Start event in case of a delayed agent install.
 
+## [2.0.3]
+
+### Added
+
+* Added CFBundleVersion to Resources for inclusion in all spans via app.build_id. #494
+
+### Changed
+
+* Updated the Network instrumentation to to use the network instrumentation style of 0.13. #490
+
 ## [2.0.2]
 
 ### Added
