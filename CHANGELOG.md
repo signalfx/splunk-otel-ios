@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+* Fixed App Start event in case of a delayed agent install.
+
 ## [2.0.3]
 
 ### Added
