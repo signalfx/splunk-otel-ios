@@ -164,7 +164,7 @@ jobs:
           detailed_summary: true
 
       - name: Upload .xcresult artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: xcresult-${{ matrix.platform }}.xcresult
