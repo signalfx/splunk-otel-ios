@@ -9,7 +9,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-* Add the `app.installation.id` attribute to all signals to uniquely identify each application installation.
+* Added CFBundleVersion to Resources for inclusion in all spans via app.build_id. #494
+
+### Changed
+
+* Updated the Network instrumentation to to use the network instrumentation style of 0.13. #490
+
+## [2.0.2]
+
+### Added
+
+* Added compilation support for iOS 13 and 14. On these versions, the main agent remains inactive but will continue to handle pending crash reports. Full instrumentation features are available on iOS 15 and above. #466
+* Add the app.installation.id attribute to all signals to uniquely identify each application installation. #452
+* Added the session start event. #465 #475
+* Added the session replay refresh event. #463
+
+### Fixed
+
+* Fixed SwiftLint and SwiftFormat plugins appearing when importing the agent #454
+* Fixed occasional stalled url requests #448
 
 ## [2.0.1]
 

@@ -23,7 +23,7 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-struct FakeRequestDescriptor: RequestDescriptorProtocol {
+struct MockRequestDescriptor: RequestDescriptorProtocol {
 
     var id: UUID
     var endpoint: URL
@@ -39,7 +39,7 @@ struct FakeRequestDescriptor: RequestDescriptorProtocol {
         explicitTimeout: TimeInterval = 1,
         sentCount: Int = 0,
         fileKeyType: String = "base",
-        scheduled: Date = .now,
+        scheduled: Date = Date(),
         shouldSend: Bool = true
     ) throws {
         guard let url = URL(string: endpointString) else {

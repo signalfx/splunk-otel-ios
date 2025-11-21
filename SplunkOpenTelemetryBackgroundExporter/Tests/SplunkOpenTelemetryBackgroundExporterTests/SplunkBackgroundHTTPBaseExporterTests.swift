@@ -32,8 +32,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     // MARK: - Helpers
 
     func makeExporter(
-        disk: FakeDiskStorage,
-        http: FakeHTTPClient,
+        disk: MockDiskStorage,
+        http: MockHTTPClient,
         config: OtlpConfiguration = OtlpConfiguration()
     ) throws -> OTLPBackgroundHTTPBaseExporter {
         let exporter = try OTLPBackgroundHTTPBaseExporter(
@@ -41,14 +41,15 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             config: config,
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
-            diskStorage: disk
+            diskStorage: disk,
+            performStalledUploadCheck: false
         )
         exporter.httpClient = http
         return exporter
     }
 
     func createNewTestTask() throws -> URLSessionDataTask {
-        try URLSession(configuration: .default).dataTask(with: FakeRequestDescriptor().createRequest())
+        try URLSession(configuration: .default).dataTask(with: MockRequestDescriptor().createRequest())
     }
 
 
@@ -56,13 +57,13 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
     @Test
     func diskStorageThrows() throws {
-        let disk = FakeDiskStorage()
+        let disk = MockDiskStorage()
         disk.shouldThrowOnlist = true
-        let http = FakeHTTPClient()
+        let http = MockHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
 
         let task = try createNewTestTask()
-        task.earliestBeginDate = .now
+        task.earliestBeginDate = Date()
 
         exporter.checkStalledUploadsOperation(tasks: [task])
 
@@ -72,7 +73,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
     @Test
     func diskStorageWorks() throws {
-        let desc = try FakeRequestDescriptor()
+        let desc = try MockRequestDescriptor()
 
         let disk = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: "SplunkOTLPBackgroundHTTPBaseExporterTests.testDiskStorageWorks"),
@@ -83,12 +84,13 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             encryption: NoneEncryption()
         )
 
-        let exporter = try FakeOTLPBackgroundHTTPBaseExporter(
+        let exporter = try MockOTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
-            diskStorage: disk
+            diskStorage: disk,
+            performStalledUploadCheck: false
         )
 
         try disk.insert(desc, forKey: exporter.getStorageKey().append(desc.id.uuidString))
@@ -100,8 +102,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
     @Test
     func taskWithNilEarliestBeginDateIsCancelled() throws {
-        let disk = FakeDiskStorage()
-        let http = FakeHTTPClient()
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
 
         let task = try createNewTestTask()
@@ -114,8 +116,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
     @Test
     func onlyStalledTasksAreCancelled() throws {
-        let disk = FakeDiskStorage()
-        let http = FakeHTTPClient()
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 1))
 
         let now = Date()
@@ -123,11 +125,11 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         let fresh = now
 
         let tOld = try createNewTestTask()
-        tOld.taskDescription = try FakeRequestDescriptor(scheduled: old).json
+        tOld.taskDescription = try MockRequestDescriptor(scheduled: old).json
         tOld.earliestBeginDate = old
 
         let tfresh = try createNewTestTask()
-        tfresh.taskDescription = try FakeRequestDescriptor(scheduled: old).json
+        tfresh.taskDescription = try MockRequestDescriptor(scheduled: old).json
         tfresh.earliestBeginDate = fresh
 
         exporter.checkStalledUploadsOperation(tasks: [tOld, tfresh])
@@ -138,11 +140,11 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
     @Test
     func fileWithInvalidUUIDIsSkipped() throws {
-        let disk = FakeDiskStorage()
-        let http = FakeHTTPClient()
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
 
         let exporter = try makeExporter(disk: disk, http: http)
-        exporter.checkAndSend(fileKeys: ["non-working-uuid"], existingTasks: [], cancelTime: .now)
+        exporter.checkAndSend(fileKeys: ["non-working-uuid"], existingTasks: [], cancelTime: Date())
 
         #expect(http.sent.isEmpty)
     }
@@ -150,13 +152,13 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     @Test
     func fileWithNonStalledTaskIsNotResent() throws {
         let uuid = UUID()
-        let disk = FakeDiskStorage()
-        let desc = try FakeRequestDescriptor(id: uuid, scheduled: .now.addingTimeInterval(1_000))
+        let disk = MockDiskStorage()
+        let desc = try MockRequestDescriptor(id: uuid, scheduled: Date().addingTimeInterval(1_000))
 
-        let http = FakeHTTPClient()
+        let http = MockHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: .now)
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: Date())
 
         #expect(http.sent.isEmpty)
     }
@@ -164,19 +166,19 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     @Test
     func fileWithStalledTaskIsResent() throws {
         let uuid = UUID()
-        let disk = FakeDiskStorage()
-        let desc = try FakeRequestDescriptor(
+        let disk = MockDiskStorage()
+        let desc = try MockRequestDescriptor(
             id: uuid,
             explicitTimeout: 1,
             sentCount: 5,
             fileKeyType: "base",
-            scheduled: .now.addingTimeInterval(-1_000)
+            scheduled: Date(timeIntervalSinceNow: -1_000)
         )
 
-        let http = FakeHTTPClient()
+        let http = MockHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: .now)
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: Date())
 
         #expect(http.sent.count == 1)
         #expect(http.sent.first?.id == uuid)
@@ -185,12 +187,12 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     @Test
     func fileWithNoTaskDescriptionIsSentAsNew() throws {
         let uuid = UUID()
-        let disk = FakeDiskStorage()
-        let http = FakeHTTPClient()
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
 
         let exporter = try makeExporter(disk: disk, http: http)
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: .now)
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: Date())
 
         #expect(http.sent.count == 1)
         #expect(http.sent.first?.id == uuid)
@@ -198,12 +200,12 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
     @Test
     func exporterWasCreatedAndCheckStalledWasCalled() async throws {
-        let exporter = try FakeOTLPBackgroundHTTPBaseExporter(
+        let exporter = try MockOTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
-            diskStorage: FakeDiskStorage()
+            diskStorage: MockDiskStorage()
         )
 
         try await Task.sleep(nanoseconds: 10_000_000_000) // wait for 10 secs
