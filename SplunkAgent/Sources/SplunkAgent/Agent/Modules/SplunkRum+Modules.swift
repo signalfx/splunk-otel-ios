@@ -165,11 +165,14 @@ extension SplunkRum {
         #endif
     }
 
-    /// Configure App start module with shared state.
+    /// Configure App start module with shared state and a public api proxy.
     private func customizeAppStart() {
-        let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self)
+        if let appStartModule = modulesManager?.module(ofType: SplunkAppStart.AppStart.self) {
+            appStartModule.sharedState = sharedState
 
-        appStartModule?.sharedState = sharedState
+            // Initialize proxy API for this module
+            appStartProxy = AppStart(for: appStartModule)
+        }
     }
 
     /// Configure App state module with shared state.

@@ -132,6 +132,22 @@ public final class AppStart {
         )
     }
 
+    /// This method allows bridges (React, Flutter etc.) to track app lifecycle notifications timestamps to determine and send the app start event manually via an exposed public API.
+    ///
+    /// - Parameters:
+    ///   - didBecomeActive: A timestamp of the `UIApplication.didBecomeActive` notification. Needed for type determination and sending.
+    ///   - didFinishLaunching: An optional timestamp of the `UIApplication.didFinishLaunching` notification.
+    ///   Does not determine AppStart type, but is sent as a metadata.
+    ///   - willEnterForeground: An optional timestamp of the `UIApplication.willEnterForeground` notification.
+    ///   Does not determine AppStart type, but is sent as a metadata.
+    public func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) {
+        didBecomeActiveTimestamp = didBecomeActive
+        didFinishLaunchingTimestamp = didFinishLaunching
+        willEnterForegroundTimestamp = willEnterForeground
+
+        determineAndSend()
+    }
+
 
     // MARK: - Type determination
 
