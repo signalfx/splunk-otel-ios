@@ -24,6 +24,10 @@ extension AppStartNonOperational {
     @discardableResult
     func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) -> any AppStartModule {
         logAccess(toApi: #function)
+        // Intentionally unused
+        _ = didBecomeActive
+        _ = didFinishLaunching
+        _ = willEnterForeground
 
         return self
     }

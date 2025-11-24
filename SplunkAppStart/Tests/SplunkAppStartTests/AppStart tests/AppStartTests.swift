@@ -155,7 +155,7 @@ final class AppStartTests: XCTestCase {
         let didFinishLaunching = Date()
         let willEnterForeground = Date()
         let didBecomeActive = Date()
-        
+
         appStart.track(didBecomeActive: didBecomeActive, didFinishLaunching: didFinishLaunching, willEnterForeground: willEnterForeground)
 
         // Check type and dates
@@ -173,12 +173,11 @@ final class AppStartTests: XCTestCase {
         appStart.startDetection()
 
         let didBecomeActive = Date()
-        
+
         appStart.track(didBecomeActive: didBecomeActive, didFinishLaunching: nil, willEnterForeground: nil)
 
         // Check type and dates
         try checkDeterminedType(.cold, in: destination)
         try checkDates(in: destination)
     }
-
 }

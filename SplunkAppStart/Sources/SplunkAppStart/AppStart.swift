@@ -132,7 +132,8 @@ public final class AppStart {
         )
     }
 
-    /// This method allows bridges (React, Flutter etc.) to track app lifecycle notifications timestamps to determine and send the app start event manually via an exposed public API.
+    /// This method allows bridges (React, Flutter etc.) to track app lifecycle notifications timestamps
+    /// to determine and send the app start event manually via an exposed public API.
     ///
     /// - Parameters:
     ///   - didBecomeActive: A timestamp of the `UIApplication.didBecomeActive` notification. Needed for type determination and sending.
