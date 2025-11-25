@@ -20,7 +20,7 @@ import Foundation
 // Static strings for crash report keys
 
 public enum CrashReportKeys: String {
-    case previousAppState = "ios.state"
+    case previousAppState = "ios.app.state"
 
     case crashTimestamp = "crash.timestamp"
     case currentTimestamp = "crash.observedTimestamp"
