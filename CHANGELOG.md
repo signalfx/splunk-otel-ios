@@ -7,9 +7,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+* Fixed App Start event in case of a delayed agent install.
+* Changed ios.state to ios.app.state in crash spans.
+
+## [2.0.3]
+
 ### Added
 
 * Added CFBundleVersion to Resources for inclusion in all spans via app.build_id. #494
+* Extended the WKWebView BRUM session ID bridging facility down to iOS 13+. BRUM still only uses the initial sync on iOS 13, but iOS 14+ now exposes the async refresh path previously limited to iOS 15+ should BRUM opt in.
 
 ### Changed
 
