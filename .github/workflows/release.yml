@@ -100,16 +100,16 @@ jobs:
           )"
           printf "%s\n" "$BODY" > pr_body.md
 
-      - name: Create Pull Request (signed commit)
-        id: cpr
-        uses: peter-evans/create-pull-request@v7
-        with:
-          sign-commits: true
-          commit-message: "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
-          title: "${{ inputs.ticket }}: Release ${{ inputs.version }}"
-          body-path: pr_body.md
-          branch: ${{ env.BRANCH }}
-          base: main
+#      - name: Create Pull Request (signed commit)
+#        id: cpr
+#        uses: peter-evans/create-pull-request@v7
+#        with:
+#          sign-commits: true
+#          commit-message: "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
+#          title: "${{ inputs.ticket }}: Release ${{ inputs.version }}"
+#          body-path: pr_body.md
+#          branch: ${{ env.BRANCH }}
+#          base: main
 
       - name: Show PR URL and verification status
         if: ${{ steps.cpr.outputs.pull-request-url }}
