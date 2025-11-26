@@ -15,6 +15,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   release:
@@ -33,19 +34,15 @@ jobs:
             echo "Invalid ticket format: ${{ inputs.ticket }}. Must be DEMRUM-xxxx"
             exit 1
           fi
-          
+
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Git setup
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
       - name: Create release branch
         run: |
           BRANCH="release/${{ inputs.version }}"
           git switch -c "$BRANCH"
+          git push -u origin "$BRANCH"
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       - name: Update CHANGELOG.md header
@@ -93,10 +90,83 @@ jobs:
           fi
 
 
-      - name: Commit changes
-        run: |
-          git commit -m "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
-          git push -u origin "$BRANCH"
+      - name: Create signed commit via GitHub API
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+            const path = require('path');
+
+            const branch = process.env.BRANCH;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // Get current branch SHA
+            const { data: refData } = await github.rest.git.getRef({
+              owner,
+              repo,
+              ref: `heads/${branch}`
+            });
+            const currentSha = refData.object.sha;
+
+            // Get current commit to get tree
+            const { data: currentCommit } = await github.rest.git.getCommit({
+              owner,
+              repo,
+              commit_sha: currentSha
+            });
+
+            // Get all changed files
+            const changedFiles = execSync('git diff --name-only HEAD', { encoding: 'utf-8' })
+              .trim()
+              .split('\n')
+              .filter(f => f);
+
+            // Create blobs for all changed files
+            const blobs = [];
+            for (const file of changedFiles) {
+              const content = fs.readFileSync(file, { encoding: 'base64' });
+              const { data: blob } = await github.rest.git.createBlob({
+                owner,
+                repo,
+                content,
+                encoding: 'base64'
+              });
+              blobs.push({
+                path: file,
+                mode: '100644',
+                type: 'blob',
+                sha: blob.sha
+              });
+            }
+
+            // Create new tree
+            const { data: newTree } = await github.rest.git.createTree({
+              owner,
+              repo,
+              base_tree: currentCommit.tree.sha,
+              tree: blobs
+            });
+
+            // Create commit (GitHub will sign it)
+            const { data: newCommit } = await github.rest.git.createCommit({
+              owner,
+              repo,
+              message: `${{ inputs.ticket }}: Prepare ${{ inputs.version }} version`,
+              tree: newTree.sha,
+              parents: [currentSha]
+            });
+
+            // Update branch reference
+            await github.rest.git.updateRef({
+              owner,
+              repo,
+              ref: `heads/${branch}`,
+              sha: newCommit.sha
+            });
+
+            console.log(`✅ Created signed commit: ${newCommit.sha}`);
 
       - name: Create PR to main
         env:
@@ -109,8 +179,19 @@ jobs:
               p {print}
             ' CHANGELOG.md
           )"
-          gh pr create \
+
+          PR_URL=$(gh pr create \
             --title "${{ inputs.ticket }}: Release ${{ inputs.version }}" \
             --base main \
-            --head "$BRANCH" \
-            --body "$BODY"
+            --head "${{ env.BRANCH }}" \
+            --body "$BODY" \
+            --draft)
+
+          echo "PR_URL=$PR_URL" >> "$GITHUB_ENV"
+          echo "Created draft PR $PR_URL"
+
+      - name: Mark PR as ready
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr ready "${{ env.PR_URL }}"
