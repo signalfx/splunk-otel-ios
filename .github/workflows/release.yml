@@ -37,8 +37,12 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }}
+
+      - name: Create release branch
+        run: |
+          BRANCH="release/${{ inputs.version }}"
+          git switch -c "$BRANCH"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       - name: Update CHANGELOG.md header
         run: |
@@ -101,7 +105,7 @@ jobs:
           commit-message: "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
           title: "${{ inputs.ticket }}: Release ${{ inputs.version }}"
           body-path: pr_body.md
-          branch: "release/${{ inputs.version }}"
+          branch: "$BRANCH"
           base: main
 
       - name: Show PR URL and verification status
