@@ -42,6 +42,7 @@ jobs:
         run: |
           BRANCH="release/${{ inputs.version }}"
           git switch -c "$BRANCH"
+          git push -u origin "$BRANCH"
           echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       - name: Update CHANGELOG.md header
