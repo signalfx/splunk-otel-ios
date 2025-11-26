@@ -106,7 +106,7 @@ jobs:
           commit-message: "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
           title: "${{ inputs.ticket }}: Release ${{ inputs.version }}"
           body-path: pr_body.md
-          branch: "$BRANCH"
+          branch: ${{ env.BRANCH }}
           base: main
 
       - name: Show PR URL and verification status
