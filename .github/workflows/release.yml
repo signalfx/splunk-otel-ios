@@ -183,5 +183,4 @@ jobs:
             --title "${{ inputs.ticket }}: Release ${{ inputs.version }}" \
             --base main \
             --head "${{ env.BRANCH }}" \
-            --body "$BODY" \
-            --label "release"
+            --body "$BODY"
