@@ -179,8 +179,20 @@ jobs:
               p {print}
             ' CHANGELOG.md
           )"
-          gh pr create \
+
+          PR_NUMBER=$(gh pr create \
             --title "${{ inputs.ticket }}: Release ${{ inputs.version }}" \
             --base main \
             --head "${{ env.BRANCH }}" \
-            --body "$BODY"
+            --body "$BODY" \
+            --draft \
+            --json number -q .number)
+
+          echo "PR_NUMBER=$PR_NUMBER" >> "$GITHUB_ENV"
+          echo "Created draft PR #$PR_NUMBER"
+
+      - name: Mark PR as ready
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr ready "${{ env.PR_NUMBER }}"
