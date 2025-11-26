@@ -31,7 +31,8 @@ public protocol AppStartModule {
     ///
     /// This method allows bridges (React, Flutter etc.) to track app lifecycle notifications timestamps to determine and send the app start event manually.
     ///
-    /// This method should be called as soon as possible, but not sooner that the agent's `install()` method. Method should be called only once.
+    /// This method should be called as soon as possible, but not sooner that the agent's `install()` method.
+    /// Method call is ignored if an initial app start event has has already been sent, either automatically or by using this method.
     ///
     /// - Parameters:
     ///   - didBecomeActive: A timestamp of the `UIApplication.didBecomeActive` notification. Needed for type determination and sending.

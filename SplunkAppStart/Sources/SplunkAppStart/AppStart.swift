@@ -69,6 +69,9 @@ public final class AppStart {
     /// A flag to prevent duplicate cold starts.
     var coldStartSent = false
 
+    /// A flag to prevent the manual track api to be used when an initial app start event has been already sent.
+    var initialAppStartSent = false
+
 
     // MARK: - Public
 
@@ -135,6 +138,8 @@ public final class AppStart {
     /// This method allows bridges (React, Flutter etc.) to track app lifecycle notifications timestamps
     /// to determine and send the app start event manually via an exposed public API.
     ///
+    /// Function call is ignored if an initial app start event has been already sent.
+    ///
     /// - Parameters:
     ///   - didBecomeActive: A timestamp of the `UIApplication.didBecomeActive` notification. Needed for type determination and sending.
     ///   - didFinishLaunching: An optional timestamp of the `UIApplication.didFinishLaunching` notification.
@@ -142,6 +147,13 @@ public final class AppStart {
     ///   - willEnterForeground: An optional timestamp of the `UIApplication.willEnterForeground` notification.
     ///   Does not determine AppStart type, but is sent as a metadata.
     public func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) {
+        guard !initialAppStartSent else {
+            logger.log(level: .debug) {
+                "Initial app start event has been already sent. Ignoring manual track."
+            }
+            return
+        }
+
         didBecomeActiveTimestamp = didBecomeActive
         didFinishLaunchingTimestamp = didFinishLaunching
         willEnterForegroundTimestamp = willEnterForeground
@@ -171,6 +183,8 @@ public final class AppStart {
         // Send app start if the type was determined
         if let (determinedType, startTime) = determinedAppStartType() {
             send(start: startTime, end: endTime, type: determinedType)
+
+            initialAppStartSent = true
 
             logger.log(level: .debug) {
                 "App start log: determined app start type: \(determinedType.rawValue), start time: \(startTime), end time: \(endTime)."
