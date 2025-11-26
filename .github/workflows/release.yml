@@ -37,8 +37,6 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }}
 
       - name: Create release branch
         run: |
@@ -53,11 +51,13 @@ jobs:
           sed -i "/^## \[Unreleased\]/a\\
           \\
           ## [${{ inputs.version }}] - $DATE" CHANGELOG.md
+          git add CHANGELOG.md
 
       - name: Bump version in SplunkRum.swift
         run: |
           FILE="SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift"
           sed -i -E "s/(public[[:space:]]+static[[:space:]]+let[[:space:]]+version[[:space:]]*=[[:space:]]*\")([0-9]+\.[0-9]+\.[0-9]+)(\")/\1${{ inputs.version }}\3/" "$FILE"
+          git add "$FILE"
 
       - name: Add version to bug template
         run: |
@@ -82,14 +82,95 @@ jobs:
           ' "$TARGET_FILE" > "$TMP" || true
           if [ -s "$TMP" ]; then
             mv "$TMP" "$TARGET_FILE"
+            git add "$TARGET_FILE"
             echo "Inserted ${{ inputs.version }} into $TARGET_FILE"
           else
             echo "Error: Could not locate dropdown options to insert version in $TARGET_FILE"
             exit 1
           fi
 
-      - name: Extract PR body from CHANGELOG
-        id: prbody
+
+      - name: Create signed commit via GitHub API
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const fs = require('fs');
+            const path = require('path');
+
+            const branch = process.env.BRANCH;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // Get current branch SHA
+            const { data: refData } = await github.rest.git.getRef({
+              owner,
+              repo,
+              ref: `heads/${branch}`
+            });
+            const currentSha = refData.object.sha;
+
+            // Get current commit to get tree
+            const { data: currentCommit } = await github.rest.git.getCommit({
+              owner,
+              repo,
+              commit_sha: currentSha
+            });
+
+            // Get all changed files
+            const changedFiles = execSync('git diff --name-only HEAD', { encoding: 'utf-8' })
+              .trim()
+              .split('\n')
+              .filter(f => f);
+
+            // Create blobs for all changed files
+            const blobs = [];
+            for (const file of changedFiles) {
+              const content = fs.readFileSync(file, { encoding: 'base64' });
+              const { data: blob } = await github.rest.git.createBlob({
+                owner,
+                repo,
+                content,
+                encoding: 'base64'
+              });
+              blobs.push({
+                path: file,
+                mode: '100644',
+                type: 'blob',
+                sha: blob.sha
+              });
+            }
+
+            // Create new tree
+            const { data: newTree } = await github.rest.git.createTree({
+              owner,
+              repo,
+              base_tree: currentCommit.tree.sha,
+              tree: blobs
+            });
+
+            // Create commit (GitHub will sign it)
+            const { data: newCommit } = await github.rest.git.createCommit({
+              owner,
+              repo,
+              message: `${{ inputs.ticket }}: Prepare ${{ inputs.version }} version`,
+              tree: newTree.sha,
+              parents: [currentSha]
+            });
+
+            // Update branch reference
+            await github.rest.git.updateRef({
+              owner,
+              repo,
+              ref: `heads/${branch}`,
+              sha: newCommit.sha
+            });
+
+            console.log(`✅ Created signed commit: ${newCommit.sha}`);
+
+      - name: Create PR to main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           BODY="$(
             awk -v ver="${{ inputs.version }}" '
@@ -98,21 +179,9 @@ jobs:
               p {print}
             ' CHANGELOG.md
           )"
-          printf "%s\n" "$BODY" > pr_body.md
-
-#      - name: Create Pull Request (signed commit)
-#        id: cpr
-#        uses: peter-evans/create-pull-request@v7
-#        with:
-#          sign-commits: true
-#          commit-message: "${{ inputs.ticket }}: Prepare ${{ inputs.version }} version"
-#          title: "${{ inputs.ticket }}: Release ${{ inputs.version }}"
-#          body-path: pr_body.md
-#          branch: ${{ env.BRANCH }}
-#          base: main
-
-      - name: Show PR URL and verification status
-        if: ${{ steps.cpr.outputs.pull-request-url }}
-        run: |
-          echo "PR: ${{ steps.cpr.outputs.pull-request-url }}"
-          echo "Commits verified: ${{ steps.cpr.outputs['pull-request-commits-verified'] }}"
+          gh pr create \
+            --title "${{ inputs.ticket }}: Release ${{ inputs.version }}" \
+            --base main \
+            --head "${{ env.BRANCH }}" \
+            --body "$BODY" \
+            --label "release"
