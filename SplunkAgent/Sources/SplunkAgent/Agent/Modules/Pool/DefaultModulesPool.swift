@@ -76,11 +76,11 @@ class DefaultModulesPool: AgentModulesPool {
 
         // App Start
         #if canImport(SplunkAppStart)
-            knownModules.append(AppStart.self)
+            knownModules.append(SplunkAppStart.AppStart.self)
         #endif
 
-        // App Start
-        #if canImport(SplunkAppStart)
+        // App State
+        #if canImport(SplunkAppState)
             knownModules.append(AppStateModule.self)
         #endif
 
