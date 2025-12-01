@@ -66,6 +66,12 @@ public final class AppStart {
     /// ackground launch only once during the initial application launch.
     var backgroundLaunchDetected: Bool?
 
+    /// A flag to prevent duplicate cold starts.
+    var coldStartSent = false
+
+    /// A flag to prevent the manual track api to be used when an initial app start event has been already sent.
+    var initialAppStartSent = false
+
 
     // MARK: - Public
 
@@ -87,7 +93,12 @@ public final class AppStart {
     public func startDetection() {
 
         // Detect prewarm. ‼️ Prewarm detection must happen before `didFinishLaunching`
-        prewarmDetected = ProcessInfo.processInfo.environment["ActivePrewarm"] == "1"
+        if #available(iOS 15.0, *) {
+            prewarmDetected = ProcessInfo.processInfo.environment["ActivePrewarm"] == "1"
+        }
+        else {
+            prewarmDetected = false
+        }
 
         // Obtain process start time, which is used as an app start span's start
         do {
@@ -124,15 +135,37 @@ public final class AppStart {
         )
     }
 
+    /// This method allows bridges (React, Flutter etc.) to track app lifecycle notifications timestamps
+    /// to determine and send the app start event manually via an exposed public API.
+    ///
+    /// Function call is ignored if an initial app start event has been already sent.
+    ///
+    /// - Parameters:
+    ///   - didBecomeActive: A timestamp of the `UIApplication.didBecomeActive` notification. Needed for type determination and sending.
+    ///   - didFinishLaunching: An optional timestamp of the `UIApplication.didFinishLaunching` notification.
+    ///   Does not determine AppStart type, but is sent as a metadata.
+    ///   - willEnterForeground: An optional timestamp of the `UIApplication.willEnterForeground` notification.
+    ///   Does not determine AppStart type, but is sent as a metadata.
+    public func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) {
+        guard !initialAppStartSent else {
+            logger.log(level: .debug) {
+                "Initial app start event has been already sent. Ignoring manual track."
+            }
+            return
+        }
+
+        didBecomeActiveTimestamp = didBecomeActive
+        didFinishLaunchingTimestamp = didFinishLaunching
+        willEnterForegroundTimestamp = willEnterForeground
+
+        determineAndSend()
+    }
+
 
     // MARK: - Type determination
 
-    /// Determines an app start type from available notifications timestamps, sends valid results.
+    /// Determines an app start type and sends valid results.
     func determineAndSend() {
-
-        var determinedType: AppStartType?
-        var startTime: Date?
-        let endTime = Date()
 
         // Reset state for further app start detection
         defer {
@@ -145,53 +178,46 @@ public final class AppStart {
             agentInitializeSpanData = nil
         }
 
-        var launchedInBackground = false
-        if let backgroundLaunchDetected {
-            launchedInBackground = backgroundLaunchDetected
-        }
-
-        // Hot start
-        if willResignActiveTimestamp != nil {
-            if let willEnterForegroundTimestamp, didBecomeActiveTimestamp != nil {
-                startTime = willEnterForegroundTimestamp
-                determinedType = .hot
-            }
-
-            // Warm start
-        }
-        else if launchedInBackground || prewarmDetected {
-            if let willEnterForegroundTimestamp, didBecomeActiveTimestamp != nil {
-                startTime = willEnterForegroundTimestamp
-                determinedType = .warm
-            }
-
-            // Cold start
-        }
-        else if let processStartTimestamp, didFinishLaunchingTimestamp != nil {
-            if didBecomeActiveTimestamp != nil {
-                startTime = processStartTimestamp
-                determinedType = .cold
-            }
-        }
+        let endTime = Date()
 
         // Send app start if the type was determined
-        if let determinedType, let startTime {
+        if let (determinedType, startTime) = determinedAppStartType() {
             send(start: startTime, end: endTime, type: determinedType)
+
+            initialAppStartSent = true
 
             logger.log(level: .debug) {
                 "App start log: determined app start type: \(determinedType.rawValue), start time: \(startTime), end time: \(endTime)."
             }
         }
-        else if didFinishLaunchingTimestamp != nil {
-            logger.log(level: .debug) {
-                "App start log: could not determine, skipping."
-            }
-        }
         else {
             logger.log(level: .warn) {
-                "Could not determine app start type, the agent was likely initialized later than receiving the didFinishLaunching notification."
+                "Could not determine app start type."
             }
         }
+    }
+
+    /// Determines app start type from available notifications timestamps.
+    private func determinedAppStartType() -> (AppStartType, Date)? {
+        guard didBecomeActiveTimestamp != nil else {
+            return nil
+        }
+
+        let launchedInBackground: Bool = backgroundLaunchDetected ?? false
+
+        if willResignActiveTimestamp != nil, let startTime = willEnterForegroundTimestamp {
+            return (.hot, startTime)
+        }
+
+        if launchedInBackground || prewarmDetected, let startTime = willEnterForegroundTimestamp {
+            return (.warm, startTime)
+        }
+
+        if !coldStartSent, let startTime = processStartTimestamp {
+            return (.cold, startTime)
+        }
+
+        return nil
     }
 
 
@@ -207,6 +233,8 @@ public final class AppStart {
         if type == .cold {
             events = coldStartEvents(startTime: start)
             initializeData = agentInitializeSpanData
+
+            coldStartSent = true
         }
 
         let appStartData = AppStartSpanData(

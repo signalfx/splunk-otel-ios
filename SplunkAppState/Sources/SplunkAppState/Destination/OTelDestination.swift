@@ -35,7 +35,7 @@ class OtelDestination: AppStateDestination {
             .setStartTime(time: time)
             .startSpan()
 
-        appStateSpan.setAttribute(key: "component", value: "ui")
+        appStateSpan.setAttribute(key: "component", value: "app-lifecycle")
         appStateSpan.setAttribute(key: "ios.app.state", value: appState.rawValue)
 
         appStateSpan.end(time: time)
