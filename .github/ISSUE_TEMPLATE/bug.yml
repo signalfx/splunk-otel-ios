@@ -19,6 +19,7 @@ body:
       label: 2. Agent Version
       description: Please select the exact version of the `splunk-otel-ios` agent you are using.
       options:
+        - 2.0.4
         - 2.0.3
         - 2.0.2
         - 2.0.1
