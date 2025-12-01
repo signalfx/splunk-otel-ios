@@ -7,7 +7,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [2.0.4] - 2025-11-26
+## [2.0.4] - 2025-12-01
+
+### Added
+
+* Added runtime support for iOS/iPadOS 13 and above.
 
 ### Fixed
 
