@@ -16,18 +16,13 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkCommon
 
-protocol AgentState {
+/// NoOpTraceProcessor is a no-operation implementation that doesn't send traces.
+///
+/// This processor is used when no endpoint is configured, preventing traces from being sent
+/// until a valid endpoint is provided.
+public class NoOpTraceProcessor: TraceProcessor {
 
-    // MARK: - Agent status
-
-    var status: Status { get }
-
-
-    // MARK: - Current Configuration
-
-    var endpointConfiguration: EndpointConfiguration? { get }
-
-    var appName: String { get }
-    var appVersion: String { get }
+    public init() {}
 }

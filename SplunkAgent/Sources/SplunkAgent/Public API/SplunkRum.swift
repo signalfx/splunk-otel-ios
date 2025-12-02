@@ -35,6 +35,7 @@ public class SplunkRum: ObservableObject {
     var currentUser: AgentUser
     var currentSession: AgentSession
     var currentStatus: Status
+    var currentEndpoint: EndpointConfiguration?
 
     var modulesManager: AgentModulesManager?
     var eventManager: AgentEventManager?
@@ -94,6 +95,9 @@ public class SplunkRum: ObservableObject {
     /// An object that manages the associated ``Session``.
     public private(set) lazy var session = Session(for: self)
 
+    /// An object that holds preferred settings for the agent, an ``AgentPreferences`` instance.
+    public private(set) lazy var preferences = AgentPreferences(for: self)
+
     /// An object that contains global attributes (a ``MutableAttributes`` instance) added to all signals.
     public private(set) lazy var globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 
@@ -103,6 +107,54 @@ public class SplunkRum: ObservableObject {
     /// OpenTelemetry instance.
     public var openTelemetry: OpenTelemetry {
         OpenTelemetry.instance
+    }
+
+    /// Updates the endpoint configuration to start sending spans and events.
+    ///
+    /// Use this method to dynamically configure the endpoint after the agent has been initialized
+    /// without an endpoint. Once the endpoint is updated, all subsequent spans and events will be
+    /// sent to the specified endpoint.
+    ///
+    /// - Parameter endpoint: The ``EndpointConfiguration`` to use for sending data.
+    /// - Throws: ``AgentConfigurationError`` if the provided endpoint is invalid.
+    ///
+    /// - Note: This method can only be called once the agent is running. Spans created before
+    ///         calling this method will not be sent retroactively.
+    public func updateEndpoint(_ endpoint: EndpointConfiguration) throws {
+        guard let eventManager = eventManager as? DefaultEventManager else {
+            logger.log(level: .error, isPrivate: false) {
+                "Cannot update endpoint: Event manager is not available."
+            }
+            return
+        }
+
+        try eventManager.updateEndpoint(endpoint)
+
+        logger.log(level: .info, isPrivate: false) {
+            "Endpoint configuration updated successfully."
+        }
+    }
+
+    /// Disables the endpoint configuration and stops sending spans and events.
+    ///
+    /// Use this method to dynamically disable the endpoint after the agent has been initialized.
+    /// Once the endpoint is disabled, all subsequent spans and events will be dropped until
+    /// a new endpoint is configured.
+    ///
+    /// - Note: This method can only be called once the agent is running.
+    public func disableEndpoint() {
+        guard let eventManager = eventManager as? DefaultEventManager else {
+            logger.log(level: .error, isPrivate: false) {
+                "Cannot disable endpoint: Event manager is not available."
+            }
+            return
+        }
+
+        eventManager.disableEndpoint()
+
+        logger.log(level: .info, isPrivate: false) {
+            "Endpoint configuration disabled successfully."
+        }
     }
 
 
@@ -221,6 +273,9 @@ public class SplunkRum: ObservableObject {
         // Assign identification
         currentUser = user
         currentSession = session
+
+        // Initialize current endpoint from configuration
+        currentEndpoint = configurationHandler.configuration.endpoint
 
         let poolName = logPoolName ?? PackageIdentifier.instance()
         let verboseLogging = agentConfigurationHandler.configuration.enableDebugLogging
