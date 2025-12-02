@@ -46,11 +46,12 @@ class SplunkStdoutLogExporter: LogRecordExporter {
                 message += "Body: \(String(describing: logRecord.body))\n"
                 message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
                 message +=
-                    "Timestamp: \(logRecordTimestampNanoseconds) (\(logRecord.timestamp.iso8601Formatted()) / \(logRecord.timestamp))\n"
+                    "Timestamp: \(logRecordTimestampNanoseconds) (\(logRecord.timestamp.iso8601Formatted()) / \(logRecord.timestamp.localizedDebugFormatted()))\n"
 
                 if let observedTimestamp = logRecord.observedTimestamp {
                     let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestamp.iso8601Formatted()) / \(observedTimestamp))\n"
+                    message +=
+                        "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestamp.iso8601Formatted()) / \(observedTimestamp.localizedDebugFormatted()))\n"
                 }
                 else {
                     message += "ObservedTimestamp: -\n"
