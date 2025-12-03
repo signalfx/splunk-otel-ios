@@ -31,6 +31,7 @@ private enum SplunkDebugDateFormatter {
     static func iso8601String(from date: Date) -> String {
         dateFormatter.string(from: date)
     }
+
     static func localizedString(from date: Date) -> String {
         let locale = Locale.autoupdatingCurrent
         let format = formatForLocale(locale)
