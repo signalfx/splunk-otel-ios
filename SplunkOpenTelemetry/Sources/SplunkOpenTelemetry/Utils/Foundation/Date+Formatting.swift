@@ -29,7 +29,7 @@ private enum SplunkDebugDateFormatter {
     private static var localizationCache: (localeID: String, format: String)?
 
     static func iso8601String(from date: Date) -> String {
-        return dateFormatter.string(from: date)
+        dateFormatter.string(from: date)
     }
     static func localizedString(from date: Date) -> String {
         let locale = Locale.autoupdatingCurrent
