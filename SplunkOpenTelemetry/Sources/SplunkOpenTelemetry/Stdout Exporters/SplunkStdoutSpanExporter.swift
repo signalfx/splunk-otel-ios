@@ -36,53 +36,8 @@ class SplunkStdoutSpanExporter: SpanExporter {
 
     func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
         for span in spans {
-            // Log Span data
             logger.log {
-                var message = ""
-
-                message += "------ 🔧 Span: ------\n"
-                message += "Span: \(span.name)\n"
-                message += "TraceId: \(span.traceId.hexString)\n"
-                message += "SpanId: \(span.spanId.hexString)\n"
-                message += "Span kind: \(span.kind.rawValue)\n"
-                message += "TraceFlags: \(span.traceFlags)\n"
-                message += "TraceState: \(span.traceState)\n"
-                message += "ParentSpanId: \(span.parentSpanId?.hexString ?? "-")\n"
-                message += """
-                    Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) \
-                    (\(span.startTime.iso8601Formatted()) \
-                    / \(span.startTime.localizedDebugFormatted()))\n
-                    """
-                message += """
-                    End: \(span.endTime.timeIntervalSince1970.toNanoseconds) \
-                    (\(span.endTime.iso8601Formatted()) \
-                    / \(span.endTime.localizedDebugFormatted()))\n
-                    """
-
-                let duration = span.endTime.timeIntervalSince(span.startTime)
-                message += "Duration: \(duration.toNanoseconds) nanoseconds (\(duration) seconds)\n"
-
-                // Log attributes
-                message += "Attributes:\n"
-                message += "  \(span.attributes)\n"
-
-                // Log resources
-                message += "Resource:\n"
-                message += "  \(span.resource.attributes)\n"
-
-                // Log span events
-                if !span.events.isEmpty {
-                    message += "Span events:\n"
-
-                    for event in span.events {
-                        let ts = event.timestamp.timeIntervalSince(span.startTime).toNanoseconds
-                        message += "  \(event.name) Time: +\(ts) Attributes: \(event.attributes)\n"
-                    }
-                }
-
-                message += "--------------------\n"
-
-                return message
+                spanMessage(for: span)
             }
         }
 
@@ -95,5 +50,45 @@ class SplunkStdoutSpanExporter: SpanExporter {
 
     func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
+    }
+    private func spanMessage(for span: SpanData) -> String {
+        var message = ""
+
+        message += "------ 🔧 Span: ------\n"
+        message += "Span: \(span.name)\n"
+        message += "TraceId: \(span.traceId.hexString)\n"
+        message += "SpanId: \(span.spanId.hexString)\n"
+        message += "Span kind: \(span.kind.rawValue)\n"
+        message += "TraceFlags: \(span.traceFlags)\n"
+        message += "TraceState: \(span.traceState)\n"
+        message += "ParentSpanId: \(span.parentSpanId?.hexString ?? "-")\n"
+        message += """
+            Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) \
+            (\(span.startTime.iso8601Formatted()) / \(span.startTime.localizedDebugFormatted()))\n
+            """
+        message += """
+            End: \(span.endTime.timeIntervalSince1970.toNanoseconds) \
+            (\(span.endTime.iso8601Formatted()) / \(span.endTime.localizedDebugFormatted()))\n
+            """
+
+        let duration = span.endTime.timeIntervalSince(span.startTime)
+        message += "Duration: \(duration.toNanoseconds) nanoseconds (\(duration) seconds)\n"
+        message += "Attributes:\n"
+        message += "  \(span.attributes)\n"
+        message += "Resource:\n"
+        message += "  \(span.resource.attributes)\n"
+
+        if !span.events.isEmpty {
+            message += "Span events:\n"
+
+            for event in span.events {
+                let ts = event.timestamp.timeIntervalSince(span.startTime).toNanoseconds
+                message += "  \(event.name) Time: +\(ts) Attributes: \(event.attributes)\n"
+            }
+        }
+
+        message += "--------------------\n"
+
+        return message
     }
 }
