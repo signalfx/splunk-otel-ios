@@ -59,19 +59,28 @@ private enum SplunkDebugDateFormatter {
         formatter.timeZone = TimeZone.autoupdatingCurrent
         formatter.setLocalizedDateFormatFromTemplate("yMMMdjmszzzz")
 
-        var format = formatter.dateFormat ?? "yyyy-MM-dd HH:mm:ss zzz"
-
-        if !format.contains("ss.SSS") {
-            if let secondsRange = format.range(of: "ss") {
-                format.replaceSubrange(secondsRange, with: "ss.SSS")
-            }
-            else {
-                let separator = format.hasSuffix(" ") ? "" : " "
-                format += "\(separator)ss.SSS"
-            }
-        }
+        var format = formatter.dateFormat ?? "yyyy-MM-dd HH:mm:ss.SSS zzz"
+        format = ensureMilliseconds(in: format)
 
         localizationCache = (locale.identifier, format)
+        return format
+    }
+
+    private static func ensureMilliseconds(in format: String) -> String {
+        var format = format
+
+        guard !format.contains("ss.SSS") else {
+            return format
+        }
+
+        if let secondsRange = format.range(of: "ss") {
+            format.replaceSubrange(secondsRange, with: "ss.SSS")
+        }
+        else {
+            let separator = format.hasSuffix(" ") ? "" : " "
+            format += "\(separator)ss.SSS"
+        }
+
         return format
     }
 }
