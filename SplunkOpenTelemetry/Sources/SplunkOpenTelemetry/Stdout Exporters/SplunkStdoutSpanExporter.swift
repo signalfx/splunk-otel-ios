@@ -50,11 +50,13 @@ class SplunkStdoutSpanExporter: SpanExporter {
                 message += "ParentSpanId: \(span.parentSpanId?.hexString ?? "-")\n"
                 message += """
                     Start: \(span.startTime.timeIntervalSince1970.toNanoseconds) \
-(\(span.startTime.iso8601Formatted()) / \(span.startTime.localizedDebugFormatted()))\n
+                    (\(span.startTime.iso8601Formatted()) \
+                    / \(span.startTime.localizedDebugFormatted()))\n
                     """
                 message += """
                     End: \(span.endTime.timeIntervalSince1970.toNanoseconds) \
-(\(span.endTime.iso8601Formatted()) / \(span.endTime.localizedDebugFormatted()))\n
+                    (\(span.endTime.iso8601Formatted()) \
+                    / \(span.endTime.localizedDebugFormatted()))\n
                     """
 
                 let duration = span.endTime.timeIntervalSince(span.startTime)
