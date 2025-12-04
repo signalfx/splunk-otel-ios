@@ -162,11 +162,8 @@ class DefaultEventManager: AgentEventManager {
 
         // Prepare and send `isRecording` event (if was not yet send)
         Task {
-            if await sessionReplayMemorizer.isReady,
-                await isSessionReplayMemorized(for: sessionId) == false
-            {
-                await markSessionReplayAsMemorized(for: sessionId)
-                emitSessionReplayRecordingEvent(at: metadata.timestamp, sessionId: sessionId)
+            if await sessionReplayMemorizer.isReady {
+                await emitSessionReplayRecordingEvent(at: metadata.timestamp, sessionId: sessionId)
             }
         }
 
@@ -232,13 +229,23 @@ class DefaultEventManager: AgentEventManager {
         )
     }
 
-    private func emitSessionReplayRecordingEvent(at timestamp: Date, sessionId: String) {
-        let event = SessionReplayRefreshEvent(
-            timestamp: timestamp,
-            sessionId: sessionId
-        )
+    private func emitSessionReplayRecordingEvent(at timestamp: Date, sessionId: String) async {
+        do {
+            // Send event if it has not yet been sent for this session
+            if try await sessionReplayMemorizer.checkAndMarkIfNeeded(eventKey: sessionId) {
+                let event = SessionReplayRefreshEvent(
+                    timestamp: timestamp,
+                    sessionId: sessionId
+                )
 
-        agent.eventManager?.sendEvent(event)
+                agent.eventManager?.sendEvent(event)
+            }
+        }
+        catch {
+            logger.log(level: .debug, isPrivate: false) {
+                "Failed to check `isRecording` event status for Session Replay (sessionId: \(sessionId)): \(error)"
+            }
+        }
     }
 
 
@@ -282,30 +289,6 @@ class DefaultEventManager: AgentEventManager {
                 logger.log(level: .debug, isPrivate: false) {
                     "Removing the index for the Session Replay event ended with an error: \(error)"
                 }
-            }
-        }
-    }
-
-    private func isSessionReplayMemorized(for sessionId: String) async -> Bool? {
-        do {
-            return try await sessionReplayMemorizer.isMemorized(eventKey: sessionId)
-        }
-        catch {
-            logger.log(level: .debug, isPrivate: false) {
-                "Failed to check `isRecording` event status for Session Replay (sessionId: \(sessionId)): \(error)"
-            }
-        }
-
-        return nil
-    }
-
-    private func markSessionReplayAsMemorized(for sessionId: String) async {
-        do {
-            try await sessionReplayMemorizer.markAsMemorized(eventKey: sessionId)
-        }
-        catch {
-            logger.log(level: .debug, isPrivate: false) {
-                "Failed to mark Session Replay `isRecording` event as memorized (sessionId: \(sessionId)): \(error)"
             }
         }
     }

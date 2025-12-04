@@ -50,4 +50,15 @@ protocol EventMemorizer {
     ///
     /// - Throws: Re-throws errors from embedded objects, mainly from the persistent store layer.
     func markAsMemorized(eventKey: String) async throws
+
+    /// Checks whether the event with the specified key has already been memorized,
+    /// and if not, marks it as memorized.
+    ///
+    /// - Parameter eventKey: The unique key representing the event.
+    ///
+    /// - Returns: `true` if the event had not been memorized before and is now marked as memorized;
+    ///           `false` if it was already memorized.
+    ///
+    /// - Throws: Propagates errors from internal objects, mainly from the persistence layer.
+    func checkAndMarkIfNeeded(eventKey: String) async throws -> Bool
 }

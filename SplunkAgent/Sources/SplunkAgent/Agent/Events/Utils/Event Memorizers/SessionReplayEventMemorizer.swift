@@ -69,4 +69,16 @@ final class SessionReplayEventMemorizer: EventMemorizer {
     func markAsMemorized(eventKey: String) async throws {
         try await memorizerCache.update(true, forKey: eventKey)
     }
+
+    func checkAndMarkIfNeeded(eventKey: String) async throws -> Bool {
+        let isMarked = try await memorizerCache.value(forKey: eventKey) ?? false
+
+        if isMarked == false {
+            try await memorizerCache.update(true, forKey: eventKey)
+
+            return true
+        }
+
+        return false
+    }
 }

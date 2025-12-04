@@ -84,6 +84,38 @@ final class SessionReplayEventMemorizerTests: XCTestCase {
         XCTAssertFalse(try XCTUnwrap(isStillSecondMemorized))
     }
 
+    func testCheckAndMarkIfNeeded() async throws {
+        let memorizerName = "testCheckAndMark"
+        let memorizer = try await SessionReplayMemorizerTestBuilder.build(named: memorizerName)
+        try await wait(for: memorizer)
+
+        let testKey = "item-123"
+
+
+        let initiallyMemorized = try await memorizer.isMemorized(eventKey: testKey)
+
+        let shouldFirstMark = try await memorizer.checkAndMarkIfNeeded(eventKey: testKey)
+        let isFirstMarked = try await memorizer.isMemorized(eventKey: testKey)
+
+        let shouldSecondMark = try await memorizer.checkAndMarkIfNeeded(eventKey: testKey)
+        let isSecondMark = try await memorizer.isMemorized(eventKey: testKey)
+
+
+        // The key should not be memorized initially
+        XCTAssertFalse(initiallyMemorized)
+
+        // First call: should return true and mark as memorized
+        XCTAssertTrue(shouldFirstMark)
+        XCTAssertTrue(isFirstMarked)
+
+        // Second call: should return false and mark as memorized
+        XCTAssertFalse(shouldSecondMark)
+        XCTAssertTrue(isSecondMark)
+
+        // Clean corresponding storage
+        try SessionReplayMemorizerTestBuilder.removeStorage(named: memorizerName)
+    }
+
 
     // MARK: - Private methods
 
