@@ -30,3 +30,5 @@ webView.loadHTMLString(contentIncludingEmbeddedBRUMLibrary, baseURL: nil)
 This injects a JavaScript object (window.SplunkRumNative) that the Browser RUM agent can use to retrieve the native session ID.
 
 > Important: For best results, it is recommended you load the web content that includes the Browser RUM library only after making the `integrateWithBrowserRum()` call.
+
+> Important: The Splunk RUM integration modifies the `WKWebViewConfiguration`'s `userContentController`. Avoid replacing the `userContentController` object after calling `integrateWithBrowserRum()`, as this will break the native-to-web bridge.

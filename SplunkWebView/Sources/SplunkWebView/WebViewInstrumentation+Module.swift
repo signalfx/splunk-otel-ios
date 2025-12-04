@@ -21,29 +21,45 @@ import SplunkCommon
 /// ModuleConfiguration conformance.
 public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
 
-// swiftlint:disable type_name
-
 /// RemoteModuleConfiguration conformance.
-public struct WebViewInstrumentationRemoteConfiguration: RemoteModuleConfiguration {
-    public var enabled: Bool
+public struct WebViewRemoteConfiguration: RemoteModuleConfiguration {
 
+    /// This property indicates whether the WebViewInstrumentationModule should be enabled
+    /// according to the remote configuration.
+    public var enabled: Bool = true
+
+    /// Initializes the remote configuration from data.
+    ///
+    /// This module does not support remote configuration beyond enabling/disabling.
     public init?(from _: Data) {
         nil
     }
 }
 
-// swiftlint:enable type_name
+/// Placeholder metadata for events produced by `WebViewInstrumentation`.
+///
+/// This module does not produce events.
+public struct WebViewInstrumentationMetadata: ModuleEventMetadata {
+    /// The timestamp of the event.
+    public var timestamp = Date()
+}
 
+/// Placeholder data for events produced by `WebViewInstrumentation`.
+///
+/// This module does not produce events.
+public struct WebViewInstrumentationData: ModuleEventData {}
 
+/// Module conformance.
 extension WebViewInstrumentation: Module {
 
     public typealias Configuration = WebViewInstrumentationConfiguration
-    public typealias RemoteConfiguration = WebViewInstrumentationRemoteConfiguration
-
-    // Module conformance
+    public typealias RemoteConfiguration = WebViewRemoteConfiguration
     public typealias EventMetadata = WebViewInstrumentationMetadata
     public typealias EventData = WebViewInstrumentationData
 
+    /// When enabled, allows the injection of the necessary JavaScript bridge into a given `WKWebView`
+    /// to enable a BRUM (Browser RUM) instance instrumenting web content to access the native RUM
+    /// agent Session ID.
     public func install(
         with _: (any ModuleConfiguration)?,
         remoteConfiguration _: (any SplunkCommon.RemoteModuleConfiguration)?
