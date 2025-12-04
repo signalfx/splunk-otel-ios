@@ -36,39 +36,8 @@ class SplunkStdoutLogExporter: LogRecordExporter {
 
     func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         for logRecord in logRecords {
-            // Log LogRecord data
             logger.log {
-                var message = ""
-                let logRecordTimestampNanoseconds = logRecord.timestamp.timeIntervalSince1970.toNanoseconds
-
-                message += "------ 🪵 Log: ------\n"
-                message += "Severity: \(String(describing: logRecord.severity))\n"
-                message += "Body: \(String(describing: logRecord.body))\n"
-                message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
-                message +=
-                    "Timestamp: \(logRecordTimestampNanoseconds) (\(logRecord.timestamp.iso8601Formatted()) / \(logRecord.timestamp))\n"
-
-                if let observedTimestamp = logRecord.observedTimestamp {
-                    let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestamp.iso8601Formatted()) / \(observedTimestamp))\n"
-                }
-                else {
-                    message += "ObservedTimestamp: -\n"
-                }
-
-                message += "SpanContext: \(String(describing: logRecord.spanContext))\n"
-
-                // Log attributes
-                message += "Attributes:\n"
-                message += "  \(logRecord.attributes)\n"
-
-                // Log resources
-                message += "Resource:\n"
-                message += "  \(logRecord.resource.attributes)\n"
-
-                message += "--------------------\n"
-
-                return message
+                self.logRecordMessage(for: logRecord)
             }
         }
 
@@ -81,5 +50,39 @@ class SplunkStdoutLogExporter: LogRecordExporter {
 
     func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
+    }
+
+    private func logRecordMessage(for logRecord: OpenTelemetrySdk.ReadableLogRecord) -> String {
+        var message = ""
+        let logRecordTimestampNanoseconds = logRecord.timestamp.timeIntervalSince1970.toNanoseconds
+
+        message += "------ 🪵 Log: ------\n"
+        message += "Severity: \(String(describing: logRecord.severity))\n"
+        message += "Body: \(String(describing: logRecord.body))\n"
+        message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
+        message += """
+            Timestamp: \(logRecordTimestampNanoseconds) \
+            (\(logRecord.timestamp.iso8601Formatted()) / \(logRecord.timestamp.localizedDebugFormatted()))\n
+            """
+
+        if let observedTimestamp = logRecord.observedTimestamp {
+            let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
+            message += """
+                ObservedTimestamp: \(observedTimestampNanoseconds) \
+                (\(observedTimestamp.iso8601Formatted()) / \(observedTimestamp.localizedDebugFormatted()))\n
+                """
+        }
+        else {
+            message += "ObservedTimestamp: -\n"
+        }
+
+        message += "SpanContext: \(String(describing: logRecord.spanContext))\n"
+        message += "Attributes:\n"
+        message += "  \(logRecord.attributes)\n"
+        message += "Resource:\n"
+        message += "  \(logRecord.resource.attributes)\n"
+        message += "--------------------\n"
+
+        return message
     }
 }
