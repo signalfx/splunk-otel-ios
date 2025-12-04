@@ -51,6 +51,7 @@ class SplunkStdoutLogExporter: LogRecordExporter {
     func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
     }
+
     private func logRecordMessage(for logRecord: OpenTelemetrySdk.ReadableLogRecord) -> String {
         var message = ""
         let logRecordTimestampNanoseconds = logRecord.timestamp.timeIntervalSince1970.toNanoseconds
