@@ -37,7 +37,7 @@ class SplunkStdoutSpanExporter: SpanExporter {
     func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
         for span in spans {
             logger.log {
-                spanMessage(for: span)
+                self.spanMessage(for: span)
             }
         }
 
@@ -51,6 +51,7 @@ class SplunkStdoutSpanExporter: SpanExporter {
     func shutdown(explicitTimeout: TimeInterval?) {
         proxyExporter.shutdown(explicitTimeout: explicitTimeout)
     }
+
     private func spanMessage(for span: SpanData) -> String {
         var message = ""
 

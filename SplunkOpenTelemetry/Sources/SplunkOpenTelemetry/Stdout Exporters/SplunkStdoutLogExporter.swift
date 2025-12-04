@@ -37,7 +37,7 @@ class SplunkStdoutLogExporter: LogRecordExporter {
     func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
         for logRecord in logRecords {
             logger.log {
-                logRecordMessage(for: logRecord)
+                self.logRecordMessage(for: logRecord)
             }
         }
 
