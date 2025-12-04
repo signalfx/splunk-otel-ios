@@ -24,7 +24,7 @@ final class CrashReportKeysTests: XCTestCase {
     // MARK: - State and Timestamp Keys
 
     func testCrashReportKeys_PreviousAppState() {
-        XCTAssertEqual(CrashReportKeys.previousAppState.rawValue, "ios.state")
+        XCTAssertEqual(CrashReportKeys.previousAppState.rawValue, "ios.app.state")
     }
 
     func testCrashReportKeys_CrashTimestamp() {
