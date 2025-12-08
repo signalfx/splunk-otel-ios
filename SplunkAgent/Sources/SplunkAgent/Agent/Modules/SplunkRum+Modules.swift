@@ -152,7 +152,7 @@ extension SplunkRum {
     func updateNetworkExclusionList(for endpoint: EndpointConfiguration?) {
         let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
 
-        guard let endpoint = endpoint else {
+        guard let endpoint else {
             // Clear excluded endpoints when endpoint is disabled
             networkModule?.excludedEndpoints = nil
             return
