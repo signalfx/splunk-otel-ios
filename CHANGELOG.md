@@ -7,9 +7,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0.4] - 2025-12-01
+
+### Added
+
+* Added runtime support for iOS/iPadOS 13 and above.
+
 ### Fixed
 
 * Fixed App Start event in case of a delayed agent install.
+* Changed ios.state to ios.app.state in crash spans.
 
 ## [2.0.3]
 
