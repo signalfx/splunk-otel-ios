@@ -138,17 +138,38 @@ extension SplunkRum {
         // We need to do this because we need to read `sessionId` from the agent continuously.
         networkModule?.sharedState = sharedState
 
-        // We need the endpoint url to manage trace exclusion logic
+        // Set initial excluded endpoints based on current configuration
+        updateNetworkExclusionList(for: agentConfiguration.endpoint)
+    }
+
+    /// Updates the network module's excluded endpoints list based on the provided endpoint configuration.
+    ///
+    /// This method should be called whenever the endpoint configuration changes to ensure
+    /// that collector URLs are properly excluded from network instrumentation, preventing
+    /// self-instrumentation of export requests.
+    ///
+    /// - Parameter endpoint: The endpoint configuration to extract exclusion URLs from, or `nil` to clear exclusions.
+    func updateNetworkExclusionList(for endpoint: EndpointConfiguration?) {
+        let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
+
+        guard let endpoint = endpoint else {
+            // Clear excluded endpoints when endpoint is disabled
+            networkModule?.excludedEndpoints = nil
+            return
+        }
+
+        // Build excluded endpoints list from the endpoint configuration
         var excludedEndpoints: [URL] = []
-        if let traceUrl = agentConfiguration.endpoint?.traceEndpoint {
+
+        if let traceUrl = endpoint.traceEndpoint {
             excludedEndpoints.append(traceUrl)
         }
 
-        if let sessionReplayUrl = agentConfiguration.endpoint?.sessionReplayEndpoint {
+        if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
             excludedEndpoints.append(sessionReplayUrl)
         }
 
-        networkModule?.excludedEndpoints = excludedEndpoints
+        networkModule?.excludedEndpoints = excludedEndpoints.isEmpty ? nil : excludedEndpoints
     }
 
     /// Configure Crash Reports module with shared state.

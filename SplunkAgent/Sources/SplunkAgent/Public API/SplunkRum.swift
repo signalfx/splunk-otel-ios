@@ -129,6 +129,10 @@ public class SplunkRum: ObservableObject {
         }
 
         try eventManager.updateEndpoint(endpoint)
+        currentEndpoint = endpoint
+
+        // Update network exclusion list to prevent self-instrumentation of export requests
+        updateNetworkExclusionList(for: endpoint)
 
         logger.log(level: .info, isPrivate: false) {
             "Endpoint configuration updated successfully."
@@ -151,6 +155,10 @@ public class SplunkRum: ObservableObject {
         }
 
         eventManager.disableEndpoint()
+        currentEndpoint = nil
+
+        // Clear network exclusion list since no endpoint is configured
+        updateNetworkExclusionList(for: nil)
 
         logger.log(level: .info, isPrivate: false) {
             "Endpoint configuration disabled successfully."
