@@ -62,33 +62,32 @@ final class AppStateManagerTests: XCTestCase {
         XCTAssertEqual(retrievedState, .foreground)
     }
 
-    // TODO: [DEMRUM-2782] Fix tests
-    //    func testNotificationsHandle() {
-    //        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testNotificationsHandle")
-    //        try? storage.delete(forKey: "appStateEvents")
-    //
-    //        let appStateModel = AppStateModel(storage: storage)
-    //        let appStateManager = AppStateManager(appStateModel: appStateModel)
-    //
-    //        let notifications = [
-    //            UIApplication.didBecomeActiveNotification,
-    //            UIApplication.didEnterBackgroundNotification,
-    //            UIApplication.willEnterForegroundNotification,
-    //            UIApplication.willResignActiveNotification,
-    //            UIApplication.willTerminateNotification
-    //        ]
-    //
-    //        for notification in notifications {
-    //            sendSimulatedNotification(notification)
-    //            simulateMainThreadWait(duration: 1)
-    //        }
-    //
-    //        simulateMainThreadWait(duration: 2)
-    //
-    //        let events: [AppStateEvent] = (try? storage.read(forKey: "appStateEvents")) ?? []
-    //        XCTAssertEqual(events.count, 5)
-    //
-    //        let retrievedState = appStateManager.appState(for: Date())
-    //        XCTAssertEqual(retrievedState, .terminate)
-    //    }
+    func testNotificationsHandle() async throws {
+        let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testNotificationsHandle")
+        try? storage.delete(forKey: "appStateEvents")
+
+        let appStateModel = AppStateModel(storage: storage)
+        let appStateManager = AppStateManager(appStateModel: appStateModel)
+
+        let notifications = [
+            UIApplication.didBecomeActiveNotification,
+            UIApplication.didEnterBackgroundNotification,
+            UIApplication.willEnterForegroundNotification,
+            UIApplication.willResignActiveNotification,
+            UIApplication.willTerminateNotification
+        ]
+
+        for notification in notifications {
+            await sendSimulatedNotification(notification)
+            simulateMainThreadWait(duration: 1)
+        }
+
+        simulateMainThreadWait(duration: 2)
+
+        let events: [AppStateEvent] = (try? storage.read(forKey: "appStateEvents")) ?? []
+        XCTAssertEqual(events.count, 5)
+
+        let retrievedState = appStateManager.appState(for: Date())
+        XCTAssertEqual(retrievedState, .terminate)
+    }
 }

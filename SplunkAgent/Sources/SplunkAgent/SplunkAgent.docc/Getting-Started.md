@@ -4,7 +4,7 @@ This guide will walk you through installing and initializing the Splunk RUM agen
 
 ## Requirements
 
-Splunk RUM agent for iOS supports iOS 15 and higher, including iPadOS 15 and higher.
+Splunk RUM Agent for iOS supports iOS 13 and higher (including iPadOS 13 and higher).
 
 ## Installation
 

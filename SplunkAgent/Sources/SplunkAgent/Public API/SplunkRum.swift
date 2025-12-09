@@ -61,6 +61,7 @@ public class SplunkRum: ObservableObject {
     lazy var customTrackingProxy: any CustomTrackingModule = CustomTrackingNonOperational()
     lazy var interactions: any InteractionsModule = InteractionsNonOperational()
     lazy var slowFrameDetectorProxy: any SlowFrameDetectorModule = SlowFrameDetectorNonOperational()
+    lazy var appStartProxy: any AppStartModule = AppStartNonOperational()
 
 
     // MARK: - Platform Support
@@ -125,6 +126,14 @@ public class SplunkRum: ObservableObject {
     /// An object that holds the ``SlowFrameDetectorModule``.
     public var slowFrameDetector: any SlowFrameDetectorModule {
         slowFrameDetectorProxy
+    }
+
+    /// An object that holds the ``AppStartModule``.
+    ///
+    /// - Warning: Internal use only.
+    @_spi(SplunkInternal)
+    public var appStart: any AppStartModule {
+        appStartProxy
     }
 
     /// An object that provides a bridge for WebView instrumentation (a ``WebViewInstrumentationModule`` instance).
@@ -273,6 +282,9 @@ public class SplunkRum: ObservableObject {
 
         initializeEvents["event_manager_initialized"] = Date()
 
+        // Send a session start event explicitly as soon as a Session and an EventManager are available
+        (currentSession as? DefaultSession)?.sendInitialSessionStartEvent()
+
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
@@ -319,5 +331,5 @@ public class SplunkRum: ObservableObject {
     // MARK: - Version
 
     /// A version of this agent.
-    public static let version = "2.0.1"
+    public static let version = "2.0.4"
 }

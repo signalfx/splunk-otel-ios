@@ -43,7 +43,13 @@ public final class WebViewInstrumentation: NSObject {
         private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
             let contentController = webView.configuration.userContentController
             contentController.removeScriptMessageHandler(forName: name)
-            contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
+            if #available(iOS 14.0, *) {
+                contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
+            }
+            else {
+                // Fallback on earlier versions
+                contentController.add(self, name: name)
+            }
             return contentController
         }
 
@@ -64,6 +70,9 @@ public final class WebViewInstrumentation: NSObject {
                 return
             }
 
+            // iOS 14+ exposes WKScriptMessageHandlerWithReply and returns a Promise from postMessage.
+            // On iOS 13 postMessage returns void, so the injected script must defensively verify the
+            // result before chaining .then() to avoid TypeError in the legacy BRUM bridge.
             let javaScript = """
                 if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                     console.log("[SplunkRumNative] Already initialized; skipping.");
@@ -78,8 +87,34 @@ public final class WebViewInstrumentation: NSObject {
                             onNativeSessionIdChanged: null,
 
                             _fetchSessionId: function() {
-                                return window.webkit.messageHandlers.SplunkRumNativeUpdate
-                                    .postMessage({})
+                                const handler = window.webkit?.messageHandlers?.SplunkRumNativeUpdate;
+                                if (!handler || typeof handler.postMessage !== "function") {
+                                    const error = new Error(
+                                        "[SplunkRumNative] postMessage handler is unavailable; " +
+                                        "native replies may be unsupported on this platform."
+                                    );
+                                    console.warn(error.message);
+                                    return Promise.reject(error);
+                                }
+
+                                let result;
+                                try {
+                                    result = handler.postMessage({});
+                                } catch (error) {
+                                    console.error("[SplunkRumNative] postMessage threw an error:", error);
+                                    return Promise.reject(error);
+                                }
+
+                                if (!result || typeof result.then !== "function") {
+                                    const error = new Error(
+                                        "[SplunkRumNative] postMessage did not return a Promise; " +
+                                        "native replies may be unsupported on this platform."
+                                    );
+                                    console.warn(error.message);
+                                    return Promise.reject(error);
+                                }
+
+                                return result
                                     .then((r) => r.sessionId)
                                     .catch( function(error) {
                                         console.error("[SplunkRumNative] Failed to fetch native session ID:", error);
@@ -176,6 +211,7 @@ public final class WebViewInstrumentation: NSObject {
 // MARK: - WKScriptMessageHandlerWithReply
 
 #if canImport(WebKit)
+    @available(iOS 14.0, *)
     extension WebViewInstrumentation: WKScriptMessageHandlerWithReply {
 
         /// Handles JavaScript messages with a reply handler for asynchronous communication.
@@ -191,6 +227,22 @@ public final class WebViewInstrumentation: NSObject {
             else {
                 replyHandler(nil, "Native Session ID not available")
             }
+        }
+    }
+#endif
+
+#if canImport(WebKit)
+    /// Fallback for platforms limited to `WKScriptMessageHandler` (iOS 13 and other runtimes without reply support).
+    /// - iOS 13 behavior:
+    ///   - `postMessage` returns void; the injected JS detects the missing Promise, causing `_fetchSessionId` to reject and leaving the cached ID untouched.
+    ///   - `getNativeSessionId()` still returns the cached value immediately; `getNativeSessionIdAsync()` resolves to `undefined`.
+    /// - iOS 14+ behavior:
+    ///   - `postMessage` returns a Promise backed by the native `replyHandler`; async calls resolve with `sessionId` when native responds.
+    /// - Callers should wrap `getNativeSessionIdAsync()` with their own timeout if they require bounded waits, and fall back to the synchronous API.
+    /// - Injection occurs only when a native session ID is available (`sharedState?.sessionId` non-nil); otherwise `SplunkRumNative` is not injected.
+    extension WebViewInstrumentation: WKScriptMessageHandler {
+        public func userContentController(_: WKUserContentController, didReceive _: WKScriptMessage) {
+            // No-op: iOS 13 cannot reply, so JS sees the rejected Promise described above.
         }
     }
 #endif

@@ -180,6 +180,10 @@ public class CrashReports {
             return false
         }
 
+        // Load CFBundleVersion. Only need to do this at install
+        // as it cannot change without reloading the app
+        deviceDataDictionary["buildId"] = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+
         // async in order to load session.id
         DispatchQueue.main.async { [weak self] in
             self?.updateDeviceStats()
@@ -260,7 +264,7 @@ public class CrashReports {
     }
 
     /// AppState handler.
-    private func appStateHandler(report: PLCrashReport) -> String {
+    func appStateHandler(report: PLCrashReport) -> String {
         var appState = "unknown"
         if let sharedState {
             let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
@@ -281,74 +285,6 @@ public class CrashReports {
                 }
         }
         return appState
-    }
-
-    /// Report formatting.
-    private func formatCrashReport(report: PLCrashReport) -> [CrashReportKeys: Any] {
-
-        var reportDict: [CrashReportKeys: Any] = [:]
-
-        reportDict[.component] = "crash"
-        reportDict[.error] = true
-
-        if let systemInfo = report.systemInfo {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZZ"
-            reportDict[.crashTimestamp] = formatter.string(from: systemInfo.timestamp)
-            reportDict[.currentTimestamp] = formatter.string(from: Date())
-        }
-
-        if report.hasProcessInfo {
-            reportDict[.processPath] = report.processInfo.processPath
-            reportDict[.isNative] = report.processInfo.native
-        }
-
-        if let signalInfo = report.signalInfo {
-            reportDict[.signalName] = signalInfo.name
-            reportDict[.faultAddress] = String(signalInfo.address)
-        }
-
-        if report.hasExceptionInfo {
-            reportDict[.exceptionName] = report.exceptionInfo.exceptionName ?? ""
-            reportDict[.exceptionReason] = report.exceptionInfo.exceptionReason ?? ""
-        }
-
-        do {
-            if let customData = report.customData,
-                let unarchivedData = try NSKeyedUnarchiver.unarchivedDictionary(
-                    ofKeyClass: NSString.self,
-                    objectClass: NSString.self,
-                    from: customData
-                ) as? [String: String]
-            {
-
-                if let sessionId = unarchivedData["sessionId"] {
-                    reportDict[.sessionId] = sessionId
-                }
-
-                reportDict[.batteryLevel] = unarchivedData["battery"]
-                reportDict[.freeMemory] = unarchivedData["disk"]
-                reportDict[.freeDiskSpace] = unarchivedData["memory"]
-                reportDict[.screenName] = unarchivedData["screenName"]
-            }
-        }
-        catch {
-            logger.log(level: .warn) {
-                "Crash reporter could not report custom data, error: \(error)"
-            }
-        }
-
-        // Collect threads with stack frames
-        let reportThreads = allThreadsFromCrashReport(report: report)
-        reportDict[.threads] = threadList(threads: reportThreads)
-
-        // Images referenced in threads
-        reportDict[.images] = imageList(images: report.images)
-
-        // App state
-        reportDict[.previousAppState] = appStateHandler(report: report)
-
-        return reportDict
     }
 
     private func send(crashReport: [CrashReportKeys: Any], sharedState: (any AgentSharedState)?, timestamp: Date) {

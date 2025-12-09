@@ -34,6 +34,7 @@ final class AppStartTests: XCTestCase {
         let destination = DebugDestination()
 
         let appStart = AppStart()
+        appStart.processStartTimestamp = Date()
         appStart.destination = destination
 
         appStart.startDetection()
@@ -64,6 +65,7 @@ final class AppStartTests: XCTestCase {
         let destination = DebugDestination()
 
         let appStart = AppStart()
+        appStart.processStartTimestamp = Date()
         appStart.destination = destination
         appStart.install(with: nil, remoteConfiguration: nil)
 
@@ -138,6 +140,44 @@ final class AppStartTests: XCTestCase {
 
         simulateStartNotificationsWithNoDidFinishLaunching()
 
-        try checkNotDeterminedType(in: destination)
+        try checkDeterminedType(.cold, in: destination)
+    }
+
+    func testManualTrackWithFullParameters() throws {
+        let destination = DebugDestination()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = Date()
+        appStart.destination = destination
+
+        appStart.startDetection()
+
+        let didFinishLaunching = Date()
+        let willEnterForeground = Date()
+        let didBecomeActive = Date()
+
+        appStart.track(didBecomeActive: didBecomeActive, didFinishLaunching: didFinishLaunching, willEnterForeground: willEnterForeground)
+
+        // Check type and dates
+        try checkDeterminedType(.cold, in: destination)
+        try checkDates(in: destination)
+    }
+
+    func testManualTrackWithMinimumParameters() throws {
+        let destination = DebugDestination()
+
+        let appStart = AppStart()
+        appStart.processStartTimestamp = Date()
+        appStart.destination = destination
+
+        appStart.startDetection()
+
+        let didBecomeActive = Date()
+
+        appStart.track(didBecomeActive: didBecomeActive, didFinishLaunching: nil, willEnterForeground: nil)
+
+        // Check type and dates
+        try checkDeterminedType(.cold, in: destination)
+        try checkDates(in: destination)
     }
 }

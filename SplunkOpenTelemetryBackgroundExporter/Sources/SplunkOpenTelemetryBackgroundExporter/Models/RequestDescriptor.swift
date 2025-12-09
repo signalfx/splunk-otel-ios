@@ -18,8 +18,32 @@ limitations under the License.
 import Foundation
 import OpenTelemetryProtocolExporterCommon
 
+protocol RequestDescriptorProtocol: Codable {
+    var id: UUID { get }
+    var endpoint: URL { get }
+    var explicitTimeout: TimeInterval { get }
+    var sentCount: Int { get set }
+    var fileKeyType: String { get }
+    var scheduled: Date { get }
+    var shouldSend: Bool { get }
+
+    func createRequest() -> URLRequest
+}
+
+extension RequestDescriptorProtocol {
+    var json: String? {
+        guard let data = try? JSONEncoder().encode(self),
+            let json = String(data: data, encoding: .utf8)
+        else {
+            return nil
+        }
+
+        return json
+    }
+}
+
 /// Defines description of request used to upload exported file.
-struct RequestDescriptor: Codable {
+struct RequestDescriptor: RequestDescriptorProtocol {
 
     // MARK: - Public
 
@@ -49,16 +73,6 @@ struct RequestDescriptor: Codable {
         request.timeoutInterval = explicitTimeout
 
         return request
-    }
-
-    var json: String? {
-        guard let data = try? JSONEncoder().encode(self),
-            let json = String(data: data, encoding: .utf8)
-        else {
-            return nil
-        }
-
-        return json
     }
 }
 

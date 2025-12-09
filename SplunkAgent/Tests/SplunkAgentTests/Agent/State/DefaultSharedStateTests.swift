@@ -45,16 +45,16 @@ final class DefaultSharedStateTests: XCTestCase {
         XCTAssertEqual(agentVersion, SplunkRum.version)
     }
 
-    func testAppStateRetrieval() throws {
+    func testAppStateRetrieval() async throws {
         let agent = try AgentTestBuilder.buildDefault()
 
-        sendSimulatedNotification(UIApplication.didBecomeActiveNotification)
+        await sendSimulatedNotification(UIApplication.didBecomeActiveNotification)
 
         let activeAppStateExpectation = agent.sharedState.applicationState(for: Date())
         XCTAssertNotNil(activeAppStateExpectation)
         XCTAssertEqual(activeAppStateExpectation, "active")
 
-        sendSimulatedNotification(UIApplication.willResignActiveNotification)
+        await sendSimulatedNotification(UIApplication.willResignActiveNotification)
 
         let inactiveAppStateExpectation = agent.sharedState.applicationState(for: Date())
         XCTAssertNotNil(inactiveAppStateExpectation)

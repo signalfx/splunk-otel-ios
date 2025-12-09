@@ -48,17 +48,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    /// Date format style for the stdout log.
-    private let dateFormatStyle: Date.FormatStyle = .init()
-        .month()
-        .day()
-        .year()
-        .hour(.twoDigits(amPM: .wide))
-        .minute(.twoDigits)
-        .second(.twoDigits)
-        .secondFraction(.fractional(3))
-        .timeZone(.iso8601(.short))
-
     /// Logger background dispatch queues.
     private let backgroundQueue = DispatchQueue(
         label: PackageIdentifier.default(named: "SessionReplayEventProcessor"),
@@ -258,12 +247,11 @@ extension OTLPSessionReplayEventProcessor {
                 message += "Severity: \(String(describing: logRecord.severity))\n"
                 message += "Body: \(bodyDescription)\n"
                 message += "InstrumentationScopeInfo: \(logRecord.instrumentationScopeInfo)\n"
-                message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.formatted(self.dateFormatStyle)))\n"
+                message += "Timestamp: \(logRecord.timestamp.timeIntervalSince1970.toNanoseconds) (\(logRecord.timestamp.iso8601Formatted()))\n"
 
                 if let observedTimestamp = logRecord.observedTimestamp {
                     let observedTimestampNanoseconds = observedTimestamp.timeIntervalSince1970.toNanoseconds
-                    let observedTimestampFormatted = observedTimestamp.formatted(self.dateFormatStyle)
-                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestampFormatted))\n"
+                    message += "ObservedTimestamp: \(observedTimestampNanoseconds) (\(observedTimestamp.iso8601Formatted()))\n"
                 }
                 else {
                     message += "ObservedTimestamp: -\n"
