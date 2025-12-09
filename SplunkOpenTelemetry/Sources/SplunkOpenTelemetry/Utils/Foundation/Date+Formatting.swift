@@ -17,7 +17,11 @@ limitations under the License.
 
 import Foundation
 
+// MARK: - Inline types
+
 private enum SplunkDebugDateFormatter {
+
+    // MARK: - Static constants
 
     private static let iso8601: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
@@ -26,7 +30,16 @@ private enum SplunkDebugDateFormatter {
         return formatter
     }()
 
+
+    // MARK: - Private
+
     private static var localizationCache: (localeID: String, format: String)?
+    private static var dateFormatter: ISO8601DateFormatter {
+        iso8601
+    }
+
+
+    // MARK: - Formatting
 
     static func iso8601String(from date: Date) -> String {
         dateFormatter.string(from: date)
@@ -44,9 +57,8 @@ private enum SplunkDebugDateFormatter {
         return formatter.string(from: date)
     }
 
-    private static var dateFormatter: ISO8601DateFormatter {
-        iso8601
-    }
+
+    // MARK: - Private methods
 
     private static func formatForLocale(_ locale: Locale) -> String {
 
@@ -86,6 +98,9 @@ private enum SplunkDebugDateFormatter {
 }
 
 extension Date {
+
+    // MARK: - Formatting
+
     /// Returns a string representation of the date in ISO 8601 format with milliseconds, always in UTC.
     func iso8601Formatted() -> String {
         SplunkDebugDateFormatter.iso8601String(from: self)
