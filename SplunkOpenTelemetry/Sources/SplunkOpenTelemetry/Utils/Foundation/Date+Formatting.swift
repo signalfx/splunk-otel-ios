@@ -17,21 +17,97 @@ limitations under the License.
 
 import Foundation
 
-private enum SplunkLegacyDateFormatter {
-    static let iso8601: ISO8601DateFormatter = {
+// MARK: - Inline types
+
+private enum SplunkDebugDateFormatter {
+
+    // MARK: - Static constants
+
+    private static let iso8601: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return formatter
     }()
+
+
+    // MARK: - Private
+
+    private static var localizationCache: (localeID: String, format: String)?
+    private static var dateFormatter: ISO8601DateFormatter {
+        iso8601
+    }
+
+
+    // MARK: - Formatting
+
+    static func iso8601String(from date: Date) -> String {
+        dateFormatter.string(from: date)
+    }
+
+    static func localizedString(from date: Date) -> String {
+        let locale = Locale.autoupdatingCurrent
+        let format = formatForLocale(locale)
+
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = TimeZone.autoupdatingCurrent
+        formatter.dateFormat = format
+
+        return formatter.string(from: date)
+    }
+
+
+    // MARK: - Private methods
+
+    private static func formatForLocale(_ locale: Locale) -> String {
+
+        if let cached = localizationCache, cached.localeID == locale.identifier {
+            return cached.format
+        }
+
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.timeZone = TimeZone.autoupdatingCurrent
+        formatter.setLocalizedDateFormatFromTemplate("yMMMdjmszzzz")
+
+        var format = formatter.dateFormat ?? "yyyy-MM-dd HH:mm:ss.SSS zzz"
+        format = ensureMilliseconds(in: format)
+
+        localizationCache = (locale.identifier, format)
+        return format
+    }
+
+    private static func ensureMilliseconds(in format: String) -> String {
+        var format = format
+
+        guard !format.contains("ss.SSS") else {
+            return format
+        }
+
+        if let secondsRange = format.range(of: "ss") {
+            format.replaceSubrange(secondsRange, with: "ss.SSS")
+        }
+        else {
+            let separator = format.hasSuffix(" ") ? "" : " "
+            format += "\(separator)ss.SSS"
+        }
+
+        return format
+    }
 }
 
 extension Date {
-    /// Returns a string representation of the date in ISO 8601 format.
-    func iso8601Formatted() -> String {
-        guard #available(iOS 15.0, *) else {
-            return SplunkLegacyDateFormatter.iso8601.string(from: self)
-        }
 
-        return formatted(.iso8601)
+    // MARK: - Formatting
+
+    /// Returns a string representation of the date in ISO 8601 format with milliseconds, always in UTC.
+    func iso8601Formatted() -> String {
+        SplunkDebugDateFormatter.iso8601String(from: self)
+    }
+
+    /// Returns a localized string representation for debug logs, ensuring milliseconds are visible.
+    func localizedDebugFormatted() -> String {
+        SplunkDebugDateFormatter.localizedString(from: self)
     }
 }
