@@ -29,9 +29,9 @@ public final class AgentConfigurationObjC: NSObject {
 
     // MARK: - Public mandatory properties
 
-    /// A required endpoint configuration defining URLs to the instrumentation collector.
+    /// An optional endpoint configuration defining URLs to the instrumentation collector.
     @objc
-    public let endpoint: EndpointConfigurationObjC
+    public let endpoint: EndpointConfigurationObjC?
 
     /// Required application name.
     ///
@@ -84,13 +84,13 @@ public final class AgentConfigurationObjC: NSObject {
     /// Initializes a new Agent configuration with which the Agent is initialized.
     ///
     /// - Parameters:
-    ///   - endpoint: A required endpoint configuration defining URLs to the RUM instrumentation collector.
+    ///   - endpoint: An optional endpoint configuration defining URLs to the RUM instrumentation collector.
     ///   - appName: A required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
     ///   - deploymentEnvironment: A required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
     ///   Deployment environment is sent in all signals as a resource.
     @objc
-    public convenience init(endpoint: EndpointConfigurationObjC, appName: String, deploymentEnvironment: String) {
-        let endpointConfiguration = endpoint.endpointConfiguration()
+    public convenience init(endpoint: EndpointConfigurationObjC?, appName: String, deploymentEnvironment: String) {
+        let endpointConfiguration = endpoint?.endpointConfiguration()
 
         let agentConfiguration = AgentConfiguration(
             endpoint: endpointConfiguration,
@@ -106,7 +106,7 @@ public final class AgentConfigurationObjC: NSObject {
 
     init(for agentConfiguration: AgentConfiguration) {
         // Initialize according to the native Swift variant
-        endpoint = EndpointConfigurationObjC(for: agentConfiguration.endpoint)
+        endpoint = agentConfiguration.endpoint.map { EndpointConfigurationObjC(for: $0) }
         appName = agentConfiguration.appName
         deploymentEnvironment = agentConfiguration.deploymentEnvironment
 
@@ -122,7 +122,7 @@ public final class AgentConfigurationObjC: NSObject {
     func agentConfiguration() -> AgentConfiguration {
         // We return a native variant for Swift language
         var agentConfiguration = AgentConfiguration(
-            endpoint: endpoint.endpointConfiguration(),
+            endpoint: endpoint?.endpointConfiguration(),
             appName: appName,
             deploymentEnvironment: deploymentEnvironment
         )
