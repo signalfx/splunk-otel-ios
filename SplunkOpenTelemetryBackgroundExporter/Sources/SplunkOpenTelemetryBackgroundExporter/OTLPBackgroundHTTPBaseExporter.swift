@@ -34,6 +34,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     let fileType: String?
     let endpoint: URL
     let envVarHeaders: [(String, String)]?
+    let additionalHeaders: [String: String]
     let config: OtlpConfiguration
     let diskStorage: DiskStorage
     var checkStalledTask: Task<Void, Never>?
@@ -52,6 +53,7 @@ public class OTLPBackgroundHTTPBaseExporter {
         config: OtlpConfiguration = OtlpConfiguration(),
         qosConfig: SessionQOSConfiguration,
         envVarHeaders: [(String, String)]? = EnvVarHeaders.attributes,
+        headers: [String: String] = [:],
         diskStorage: DiskStorage = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: "OTLPBackgroundExporter"),
             rules: Rules(
@@ -64,6 +66,7 @@ public class OTLPBackgroundHTTPBaseExporter {
         performStalledUploadCheck: Bool = true
     ) {
         self.envVarHeaders = envVarHeaders
+        additionalHeaders = headers
         self.endpoint = endpoint
         self.config = config
         self.diskStorage = diskStorage
@@ -149,7 +152,8 @@ public class OTLPBackgroundHTTPBaseExporter {
                     id: requestId,
                     endpoint: endpoint,
                     explicitTimeout: config.timeout,
-                    fileKeyType: getFileKeyType()
+                    fileKeyType: getFileKeyType(),
+                    headers: headers
                 )
 
                 try? httpClient.send(taskDescription)
@@ -166,5 +170,16 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     func getFileKeyType() -> String {
         fileType ?? "base"
+    }
+
+    var headers: [String: String] {
+        var combinedHeaders = additionalHeaders
+
+        envVarHeaders?
+            .forEach { key, value in
+                combinedHeaders[key] = value
+            }
+
+        return combinedHeaders
     }
 }

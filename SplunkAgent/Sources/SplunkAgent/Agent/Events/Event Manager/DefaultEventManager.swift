@@ -61,6 +61,8 @@ class DefaultEventManager: AgentEventManager {
             throw AgentConfigurationError.invalidEndpoint(supplied: configuration.endpoint)
         }
 
+        let accessToken = configuration.endpoint.rumAccessToken
+
         // ‼️ Using trace endpoint as a placeholder
         let logUrl = traceUrl
 
@@ -99,7 +101,8 @@ class DefaultEventManager: AgentEventManager {
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
             globalAttributes: { agent.globalAttributes.getAll() },
-            debugEnabled: configuration.enableDebugLogging
+            debugEnabled: configuration.enableDebugLogging,
+            accessToken: accessToken
         )
 
         sessionReplayIndexer = SessionReplayEventIndexer(named: "replay")
@@ -111,7 +114,8 @@ class DefaultEventManager: AgentEventManager {
             runtimeAttributes: agent.runtimeAttributes,
             globalAttributes: { agent.globalAttributes.getAll() },
             debugEnabled: configuration.enableDebugLogging,
-            spanInterceptor: configuration.spanInterceptor
+            spanInterceptor: configuration.spanInterceptor,
+            accessToken: accessToken
         )
 
         logger.log(level: .info, isPrivate: false) {
