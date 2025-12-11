@@ -175,10 +175,11 @@ public class OTLPBackgroundHTTPBaseExporter {
     var headers: [String: String] {
         var combinedHeaders = additionalHeaders
 
-        envVarHeaders?
-            .forEach { key, value in
+        if let envVarHeaders {
+            for (key, value) in envVarHeaders {
                 combinedHeaders[key] = value
             }
+        }
 
         return combinedHeaders
     }
