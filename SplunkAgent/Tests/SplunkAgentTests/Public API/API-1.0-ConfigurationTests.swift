@@ -129,10 +129,7 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertEqual(urlComponents.host, "rum-ingest.\(realm).signalfx.com")
         XCTAssertEqual(urlComponents.path, "/v1/traces")
 
-        let queryItems = try XCTUnwrap(urlComponents.queryItems)
-        let authQuery = try XCTUnwrap(queryItems.first)
-        XCTAssertEqual(authQuery.name, "auth")
-        XCTAssertEqual(authQuery.value, rumAccessToken)
+        XCTAssertTrue(urlComponents.queryItems?.isEmpty ?? true)
     }
 
     func testCustomUrlConfiguration() throws {

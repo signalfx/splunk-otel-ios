@@ -50,7 +50,8 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
             id: requestId,
             endpoint: endpoint,
             explicitTimeout: config.timeout,
-            fileKeyType: getFileKeyType()
+            fileKeyType: getFileKeyType(),
+            headers: headers
         )
 
         do {

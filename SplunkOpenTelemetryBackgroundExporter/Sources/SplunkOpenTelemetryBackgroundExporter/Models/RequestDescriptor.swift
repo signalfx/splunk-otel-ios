@@ -26,6 +26,7 @@ protocol RequestDescriptorProtocol: Codable {
     var fileKeyType: String { get }
     var scheduled: Date { get }
     var shouldSend: Bool { get }
+    var headers: [String: String] { get }
 
     func createRequest() -> URLRequest
 }
@@ -52,6 +53,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
     let explicitTimeout: TimeInterval
     var sentCount: Int = 0
     var fileKeyType: String
+    var headers: [String: String] = [:]
 
     var scheduled: Date {
         Calendar.current.date(byAdding: nextRequestDelay, to: Date()) ?? Date()
@@ -71,6 +73,10 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         request.setValue(Headers.getUserAgentHeader(), forHTTPHeaderField: Constants.HTTP.userAgent)
         request.setValue("application/x-protobuf", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = explicitTimeout
+
+        for (key, value) in headers {
+            request.setValue(value, forHTTPHeaderField: key)
+        }
 
         return request
     }
