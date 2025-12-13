@@ -123,12 +123,12 @@ import XCTest
             try await super.setUp()
             let destination = MockDestination()
             mockDestination = destination
-            logic = SlowFrameLogic(destinationFactory: { destination })
+            logic = SlowFrameLogic(destination: destination)
 
             // Initialize the full detector for integration tests
             let ticker = MockTicker()
             mockTicker = ticker
-            detector = SlowFrameDetector(ticker: ticker, destinationFactory: { destination })
+            detector = SlowFrameDetector(ticker: ticker, destination: destination)
 
             try await logic?.start()
         }
@@ -301,6 +301,36 @@ import XCTest
 
         // MARK: - Integration Tests
 
+        func test_start_isIdempotent() async throws {
+            XCTAssertFalse(mockTicker?.started ?? true)
+
+            try await pauseUntilDetectorStart()
+            XCTAssertEqual(mockTicker?.startCallCount, 1)
+
+            detector?.start()
+            await Task.yield()
+
+            XCTAssertEqual(mockTicker?.startCallCount, 1)
+        }
+
+        func test_startAndStop_correctlyControlTicker() async throws {
+            XCTAssertFalse(mockTicker?.started ?? true)
+            XCTAssertFalse(mockTicker?.stopped ?? true)
+
+            try await pauseUntilDetectorStart()
+            XCTAssertTrue(mockTicker?.started ?? false)
+
+            let stopExpectation = XCTestExpectation(description: "Ticker was stopped")
+            mockTicker?.onStop = { stopExpectation.fulfill() }
+
+            Task {
+                await self.detector?.stop()
+            }
+
+            await fulfillment(of: [stopExpectation], timeout: 2.0)
+            XCTAssertTrue(mockTicker?.stopped ?? false)
+        }
+
         /// Verifies that the full detector correctly reports pending frames via the automatic flush loop.
         func test_integration_automaticFlush_reportsPendingFrames() async throws {
             let mockDestination = try XCTUnwrap(mockDestination)
@@ -329,6 +359,21 @@ import XCTest
             mockTicker.simulateFrame(timestamp: 0.1, duration: 1.0 / 60.0)
 
             await fulfillment(of: [reportExpectation], timeout: 1.5)
+        }
+
+        // MARK: - Helper Methods
+
+        private func pauseUntilDetectorStart() async throws {
+            let mockTicker = try XCTUnwrap(mockTicker)
+            let detector = try XCTUnwrap(detector)
+
+            let startExpectation = XCTestExpectation(description: "Detector has started")
+            mockTicker.onStart = {
+                startExpectation.fulfill()
+            }
+            detector.start()
+
+            await fulfillment(of: [startExpectation], timeout: 1.0)
         }
     }
 #endif // os(iOS) || os(tvOS) || os(visionOS)
