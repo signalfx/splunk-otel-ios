@@ -96,17 +96,9 @@ protocol SlowFrameTicker {
         }
 
         func stop() {
-            if Thread.isMainThread {
+            Task { @MainActor in
                 displayLink?.invalidate()
                 displayLink = nil
-            }
-            else {
-                // A strong capture is used here to ensure this cleanup block executes
-                // successfully, especially if stop() is called from deinit on a background thread.
-                DispatchQueue.main.async {
-                    self.displayLink?.invalidate()
-                    self.displayLink = nil
-                }
             }
         }
 

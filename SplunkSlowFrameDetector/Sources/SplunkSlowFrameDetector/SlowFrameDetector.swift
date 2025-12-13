@@ -180,9 +180,13 @@ public final class SlowFrameDetector: NSObject {
     ///
     /// This method invalidates the frame ticker, removes notification observers, and flushes any buffered data.
     func stop() async {
+        cancelAppStateObserver()
+
         // Run the two independent cleanup operations concurrently.
         async let detectorTaskCleanup: () = cleanupDetectorTask()
         async let logicCleanup: () = logic.stop()
+
+        await stopTickerAndObservers()
 
         // Await both to ensure all cleanup is complete before this method returns.
         _ = await (detectorTaskCleanup, logicCleanup)
@@ -236,6 +240,20 @@ public final class SlowFrameDetector: NSObject {
             }
         }
     #endif
+
+    private func cancelAppStateObserver() {
+        appStateObserverTask?.cancel()
+        appStateObserverTask = nil
+    }
+
+    private func stopTickerAndObservers() async {
+        await MainActor.run {
+            ticker?.stop()
+            #if os(iOS) || os(tvOS) || os(visionOS)
+                lifecycleObserver.remove()
+            #endif
+        }
+    }
 }
 
 // MARK: - Nested Helper Class
