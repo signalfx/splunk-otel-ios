@@ -79,10 +79,10 @@ public final class SlowFrameDetector: NSObject {
 
     init(
         ticker: (any SlowFrameTicker)?,
-        destinationFactory: @escaping () -> SlowFrameDetectorDestination
+        destination: SlowFrameDetectorDestination
     ) {
         self.ticker = ticker
-        logic = SlowFrameLogic(destinationFactory: destinationFactory)
+        logic = SlowFrameLogic(destination: destination)
     }
 
     #if os(iOS) || os(tvOS) || os(visionOS)
@@ -91,13 +91,13 @@ public final class SlowFrameDetector: NSObject {
         /// This convenience initializer sets up the detector with default dependencies, including a
         /// `DisplayLinkTicker` for frame monitoring and an `OTelDestination` for reporting.
         override public required convenience init() {
-            self.init(ticker: DisplayLinkTicker(), destinationFactory: { OTelDestination() })
+            self.init(ticker: DisplayLinkTicker(), destination: OTelDestination())
         }
     #else
         /// Initializes a new instance of the `SlowFrameDetector` for unsupported platforms.
         public required convenience init() {
             // nil ticker for unsupported platforms
-            self.init(ticker: nil, destinationFactory: { OTelDestination() })
+            self.init(ticker: nil, destination: OTelDestination())
         }
     #endif
 

@@ -38,7 +38,6 @@ actor SlowFrameLogic {
     private var isRunning = false
     private var flushTask: Task<Void, Never>?
     private var watchdogTask: Task<Void, Never>?
-    private var destinationFactory: () -> SlowFrameDetectorDestination
     private var destination: SlowFrameDetectorDestination?
 
     private var slowFrameCount: Int = 0
@@ -58,10 +57,10 @@ actor SlowFrameLogic {
 
     // MARK: - Initialization
 
-    /// Initializes the logic actor with a factory for creating the destination.
-    /// - Parameter destinationFactory: A closure that creates the destination for reporting frame data.
-    init(destinationFactory: @escaping () -> SlowFrameDetectorDestination) {
-        self.destinationFactory = destinationFactory
+    /// Initializes the logic actor with a destination for reporting frame data.
+    /// - Parameter destination: The destination for reporting frame data.
+    init(destination: SlowFrameDetectorDestination) {
+        self.destination = destination
     }
 
     deinit {
@@ -82,7 +81,6 @@ actor SlowFrameLogic {
         }
 
         isRunning = true
-        destination = destinationFactory()
         // Use a regular Task, as there's no need for it to be detached from the actor's context
         watchdogTask = Task { [weak self] in await self?.runWatchdog() }
         flushTask = Task { [weak self] in await self?.runFlushLoop() }
