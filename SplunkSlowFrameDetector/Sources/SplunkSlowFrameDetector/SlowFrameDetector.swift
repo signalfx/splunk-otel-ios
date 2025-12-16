@@ -38,11 +38,6 @@ public final class SlowFrameDetector: NSObject {
     /// The default value is `false`.
     public private(set) var isEnabled = false
 
-    /// The remote configuration for the `SlowFrameDetector`.
-    ///
-    /// This property can be used to update the detector's behavior based on settings fetched from a remote source.
-    public var configuration: SlowFrameDetectorRemoteConfiguration?
-
     // MARK: - Internal Constants
 
     /// The percentage by which a frame's duration must exceed the expected duration to trigger a slow frame report.
@@ -120,11 +115,8 @@ public final class SlowFrameDetector: NSObject {
     ///   - remoteConfiguration: Module specific remote configuration.
     public func install(
         with configuration: (any ModuleConfiguration)?,
-        remoteConfiguration: (any RemoteModuleConfiguration)?
+        remoteConfiguration _: (any RemoteModuleConfiguration)?
     ) {
-        // Intentionally unused
-        _ = remoteConfiguration
-
         let localConfig = configuration as? SlowFrameDetectorConfiguration
         isEnabled = localConfig?.isEnabled ?? true
         if isEnabled {
