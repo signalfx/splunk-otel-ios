@@ -115,8 +115,11 @@ public final class SlowFrameDetector: NSObject {
     ///   - remoteConfiguration: Module specific remote configuration.
     public func install(
         with configuration: (any ModuleConfiguration)?,
-        remoteConfiguration _: (any RemoteModuleConfiguration)?
+        remoteConfiguration: (any RemoteModuleConfiguration)?
     ) {
+        // Intentionally unused, kept for future remote configuration support.
+        _ = remoteConfiguration
+
         let localConfig = configuration as? SlowFrameDetectorConfiguration
         isEnabled = localConfig?.isEnabled ?? true
         if isEnabled {
