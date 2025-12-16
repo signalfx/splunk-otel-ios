@@ -96,7 +96,7 @@ import XCTest
             onSend?(type, count)
         }
 
-        func setOnSend(_ handler: ((String, Int) -> Void)?) async {
+        func setOnSend(_ handler: ((String, Int) -> Void)?) {
             onSend = handler
         }
     }
