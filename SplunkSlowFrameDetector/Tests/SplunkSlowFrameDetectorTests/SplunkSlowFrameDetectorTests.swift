@@ -314,7 +314,8 @@ import XCTest
             try await Task.sleep(nanoseconds: UInt64((SlowFrameDetector.frozenFrameThreshold + 0.1) * 1_000_000_000))
 
             // No frozen frames should have been recorded while inactive.
-            XCTAssertEqual(await logic.testFrozenFrameCount, 0)
+            let frozenCount = await logic.testFrozenFrameCount
+            XCTAssertEqual(frozenCount, 0)
 
             await logic.flushBuffers()
             let counts = await mockDestination.reportedCounts
