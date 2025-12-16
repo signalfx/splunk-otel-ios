@@ -299,6 +299,28 @@ import XCTest
             XCTAssertLessThanOrEqual(finalCount ?? 0, 4)
         }
 
+        /// Verifies that frozen frames are not counted while the app is inactive.
+        func test_frozenFrames_notCounted_whenAppResignsActive() async throws {
+            let logic = try XCTUnwrap(logic)
+            let mockDestination = try XCTUnwrap(mockDestination)
+
+            // Establish a heartbeat so the watchdog would normally have something to check.
+            await logic.handleFrame(timestamp: 0.0, duration: 1.0 / 60.0)
+
+            // Simulate app moving to background; this resets the heartbeat.
+            await logic.appWillResignActive()
+
+            // Wait longer than the frozen frame threshold to ensure the watchdog runs.
+            try await Task.sleep(nanoseconds: UInt64((SlowFrameDetector.frozenFrameThreshold + 0.1) * 1_000_000_000))
+
+            // No frozen frames should have been recorded while inactive.
+            XCTAssertEqual(await logic.testFrozenFrameCount, 0)
+
+            await logic.flushBuffers()
+            let counts = await mockDestination.reportedCounts
+            XCTAssertNil(counts["frozenRenders"])
+        }
+
         // MARK: - Integration Tests
 
         func test_start_isIdempotent() async throws {
