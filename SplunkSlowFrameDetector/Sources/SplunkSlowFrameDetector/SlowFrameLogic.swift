@@ -127,6 +127,8 @@ actor SlowFrameLogic {
     // MARK: - Lifecycle Handlers
 
     func appWillResignActive() async {
+        // Prevent watchdog from counting while paused in background.
+        lastHeartbeatTimestamp = 0
         await flushBuffers()
     }
 
