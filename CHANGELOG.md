@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+* DeploymentEnvironment, in configuration, must now contain a string.
+
 ## [2.0.4] - 2025-12-01
 
 ### Added
