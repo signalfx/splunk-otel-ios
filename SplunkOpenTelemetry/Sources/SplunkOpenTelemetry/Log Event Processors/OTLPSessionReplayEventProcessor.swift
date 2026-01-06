@@ -68,7 +68,8 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
         globalAttributes _: @escaping () -> [String: AttributeValue],
-        debugEnabled: Bool
+        debugEnabled: Bool,
+        accessToken: String? = nil
     ) {
         guard let sessionReplayEndpoint else {
             return nil
@@ -76,6 +77,11 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
         let configuration = OtlpConfiguration()
         let envVarHeaders: [(String, String)] = []
+        var headers: [String: String] = [:]
+
+        if let accessToken, !accessToken.isEmpty {
+            headers["X-SF-Token"] = accessToken
+        }
 
         // Initialize background exporter
         backgroundLogExporter = OTLPBackgroundHTTPLogExporterBinary(
@@ -83,6 +89,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
             config: configuration,
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: envVarHeaders,
+            headers: headers,
             fileType: "replay"
         )
 

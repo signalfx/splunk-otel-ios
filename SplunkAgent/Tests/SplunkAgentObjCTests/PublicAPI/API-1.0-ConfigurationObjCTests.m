@@ -50,11 +50,7 @@ limitations under the License.
 
     // Authentication
     NSArray<NSURLQueryItem *> * queryItems = urlComponents.queryItems;
-    NSURLQueryItem *authQuery = queryItems.firstObject;
-    NSString *expectedRumAccessToken = [ConfigurationTestBuilderObjC rumAccessToken];
-
-    XCTAssertTrue([authQuery.name isEqualToString:@"auth"]);
-    XCTAssertTrue([authQuery.value isEqualToString:expectedRumAccessToken]);
+    XCTAssertTrue(queryItems.count == 0 || queryItems == nil);
 }
 
 - (void)testCustomUrlConfiguration {
