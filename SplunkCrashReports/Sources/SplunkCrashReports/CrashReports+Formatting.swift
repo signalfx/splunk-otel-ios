@@ -97,8 +97,8 @@ extension CrashReports {
                 }
 
                 reportDict[.batteryLevel] = data["battery"]
-                reportDict[.freeMemory] = data["disk"]
-                reportDict[.freeDiskSpace] = data["memory"]
+                reportDict[.freeMemory] = data["memory"]
+                reportDict[.freeDiskSpace] = data["disk"]
                 reportDict[.screenName] = data["screenName"]
                 reportDict[.buildId] = data["buildId"]
             }
