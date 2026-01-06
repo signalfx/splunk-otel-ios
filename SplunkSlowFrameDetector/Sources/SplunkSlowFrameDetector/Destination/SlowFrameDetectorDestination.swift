@@ -18,9 +18,20 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// Describes a destination into which the SlowFrameDetector module sends its results.
+/// Describes a destination into which the `SlowFrameDetector` module sends its results.
+///
+/// This protocol defines the contract for sending slow and frozen frame data to a backend.
 protocol SlowFrameDetectorDestination {
 
-    /// Sends results into a destination.
-    func send(type: String, count: Int, sharedState: AgentSharedState?)
+    /// Sends frame count results to a destination.
+    ///
+    /// This method is marked `async` to enforce a non-blocking contract. Implementations
+    /// must not block the calling thread, as doing so would stall the `SlowFrameLogic` actor
+    /// and prevent it from processing new frame data.
+    ///
+    /// - Parameters:
+    ///   - type: The type of event being sent (e.g., "slowRenders", "frozenRenders").
+    ///   - count: The number of events of that type that were detected.
+    ///   - sharedState: The shared state of the agent, providing context like the agent version.
+    func send(type: String, count: Int, sharedState: AgentSharedState?) async
 }

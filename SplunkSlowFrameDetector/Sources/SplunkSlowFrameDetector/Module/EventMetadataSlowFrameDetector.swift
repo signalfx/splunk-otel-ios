@@ -17,13 +17,16 @@ limitations under the License.
 
 import Foundation
 
+/// Metadata associated with events from the `SlowFrameDetector` module.
 public struct EventMetadataSlowFrameDetector {
 
     // MARK: - Public
 
+    /// The timestamp when the event occurred.
     public var timestamp = Date()
 
     // MARK: - Internal
 
+    /// A unique identifier for the event.
     let id: String
 }
