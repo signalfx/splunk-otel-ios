@@ -312,17 +312,17 @@ public class SplunkRumBuilder {
     public func build() -> Bool {
 
         // Check the properties required for new `AgentConfiguration`
-        guard let appName else {
+        guard let appName, !appName.isEmpty else {
             logger.log(level: .error) {
-                "Application name must be set."
+                "Application name must be set and cannot be empty."
             }
 
             return false
         }
 
-        guard let developmentEnvironment = environment else {
+        guard let developmentEnvironment = environment, !developmentEnvironment.isEmpty else {
             logger.log(level: .error) {
-                "Environment must be set."
+                "Deployment environment must be set and cannot be empty."
             }
 
             return false
