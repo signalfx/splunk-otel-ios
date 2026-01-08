@@ -73,6 +73,7 @@ class DefaultEventManager: AgentEventManager {
         self.agent = agent
         self.configuration = configuration
         sessionReplayIndexer = SessionReplayEventIndexer(named: "replay")
+        sessionReplayMemorizer = SessionReplayEventMemorizer(named: "replay")
 
         // Initialize processors based on whether endpoint is available
         if let endpoint = configuration.endpoint,
@@ -198,9 +199,6 @@ class DefaultEventManager: AgentEventManager {
             globalAttributes: { agent.globalAttributes.getAll() },
             debugEnabled: configuration.enableDebugLogging
         )
-
-        sessionReplayIndexer = SessionReplayEventIndexer(named: "replay")
-        sessionReplayMemorizer = SessionReplayEventMemorizer(named: "replay")
 
         // Initialize trace processor
         let traceProc = OTLPTraceProcessor(
