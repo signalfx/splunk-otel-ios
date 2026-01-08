@@ -51,6 +51,7 @@ class DefaultEventManager: AgentEventManager {
     // Session Replay processor
     var sessionReplayProcessor: LogEventProcessor?
     var sessionReplayIndexer: EventIndexer
+    var sessionReplayMemorizer: EventMemorizer
 
     /// Trace processor.
     var traceProcessor: TraceProcessor
@@ -198,6 +199,9 @@ class DefaultEventManager: AgentEventManager {
             debugEnabled: configuration.enableDebugLogging
         )
 
+        sessionReplayIndexer = SessionReplayEventIndexer(named: "replay")
+        sessionReplayMemorizer = SessionReplayEventMemorizer(named: "replay")
+
         // Initialize trace processor
         let traceProc = OTLPTraceProcessor(
             with: traceUrl,
@@ -254,7 +258,12 @@ class DefaultEventManager: AgentEventManager {
             return
         }
 
-        emitSessionReplayRecordingEvent(at: metadata.timestamp, sessionId: sessionId)
+        // Prepare and send `isRecording` event (if was not yet send)
+        Task {
+            if await sessionReplayMemorizer.isReady {
+                await emitSessionReplayRecordingEvent(at: metadata.timestamp, sessionId: sessionId)
+            }
+        }
 
         // Prepare and send the event as a separate transaction
         Task {
@@ -318,13 +327,23 @@ class DefaultEventManager: AgentEventManager {
         )
     }
 
-    private func emitSessionReplayRecordingEvent(at timestamp: Date, sessionId: String) {
-        let event = SessionReplayRefreshEvent(
-            timestamp: timestamp,
-            sessionId: sessionId
-        )
+    private func emitSessionReplayRecordingEvent(at timestamp: Date, sessionId: String) async {
+        do {
+            // Send event if it has not yet been sent for this session
+            if try await sessionReplayMemorizer.checkAndMarkIfNeeded(eventKey: sessionId) {
+                let event = SessionReplayRefreshEvent(
+                    timestamp: timestamp,
+                    sessionId: sessionId
+                )
 
-        agent.eventManager?.sendEvent(event)
+                agent.eventManager?.sendEvent(event)
+            }
+        }
+        catch {
+            logger.log(level: .debug, isPrivate: false) {
+                "Failed to check `isRecording` event status for Session Replay (sessionId: \(sessionId)): \(error)"
+            }
+        }
     }
 
 
@@ -349,7 +368,7 @@ class DefaultEventManager: AgentEventManager {
         }
         catch {
             logger.log(level: .debug, isPrivate: false) {
-                "Preparing the index for the Session Replay event ended with an error: \n\t\(error)"
+                "Preparing the index for the Session Replay event ended with an error: \(error)"
             }
         }
 
@@ -366,7 +385,7 @@ class DefaultEventManager: AgentEventManager {
             }
             catch {
                 logger.log(level: .debug, isPrivate: false) {
-                    "Removing the index for the Session Replay event ended with an error: \n\t\(error)"
+                    "Removing the index for the Session Replay event ended with an error: \(error)"
                 }
             }
         }
