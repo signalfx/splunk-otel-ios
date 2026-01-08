@@ -28,6 +28,15 @@ internal import SplunkOpenTelemetry
 /// Default event manager also takes care of sending Session Pulse events, and makes sure Session Start events are not duplicated.
 class DefaultEventManager: AgentEventManager {
 
+    // MARK: - Types
+
+    /// Container for event processors.
+    private struct Processors {
+        let logEventProcessor: LogEventProcessor
+        let sessionReplayProcessor: LogEventProcessor?
+        let traceProcessor: TraceProcessor
+    }
+
     // MARK: - Constants
 
     /// Interval for sending pulse events (5 minutes).
@@ -50,6 +59,9 @@ class DefaultEventManager: AgentEventManager {
     /// Agent reference.
     private unowned let agent: SplunkRum
 
+    /// Stored configuration for updating endpoint later.
+    private var configuration: any AgentConfigurationProtocol
+
     /// Logger.
     private var logger: LogAgent {
         agent.logger
@@ -58,15 +70,100 @@ class DefaultEventManager: AgentEventManager {
     // MARK: - Initialization
 
     required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum) throws {
-        guard let traceUrl = configuration.endpoint.traceEndpoint else {
-            throw AgentConfigurationError.invalidEndpoint(supplied: configuration.endpoint)
+        self.agent = agent
+        self.configuration = configuration
+        sessionReplayIndexer = SessionReplayEventIndexer(named: "replay")
+        sessionReplayMemorizer = SessionReplayEventMemorizer(named: "replay")
+
+        // Initialize processors based on whether endpoint is available
+        if let endpoint = configuration.endpoint,
+            let traceUrl = endpoint.traceEndpoint
+        {
+
+            // Initialize with real processors
+            let processors = Self.createProcessors(
+                traceUrl: traceUrl,
+                sessionReplayUrl: endpoint.sessionReplayEndpoint,
+                configuration: configuration,
+                agent: agent
+            )
+
+            logEventProcessor = processors.logEventProcessor
+            sessionReplayProcessor = processors.sessionReplayProcessor
+            traceProcessor = processors.traceProcessor
+
+            logger.log(level: .info, isPrivate: false) {
+                "Using trace url: \(traceUrl)"
+            }
+        }
+        else {
+
+            // Initialize with NoOp processors - spans won't be sent
+            logEventProcessor = NoOpLogEventProcessor()
+            sessionReplayProcessor = nil
+            traceProcessor = NoOpTraceProcessor()
+
+            logger.log(level: .info, isPrivate: false) {
+                "No endpoint configured. Spans will not be sent until endpoint is updated."
+            }
+        }
+    }
+
+    // MARK: - Endpoint Update
+
+    /// Updates the endpoint configuration and reinitializes processors to start sending spans.
+    ///
+    /// - Parameter endpoint: The new endpoint configuration to use.
+    /// - Throws: ``AgentConfigurationError`` if the endpoint is invalid.
+    func updateEndpoint(_ endpoint: EndpointConfiguration) throws {
+        // Validate the endpoint
+        try endpoint.validate()
+
+        guard let traceUrl = endpoint.traceEndpoint else {
+            throw AgentConfigurationError.invalidEndpoint(supplied: endpoint)
         }
 
-        // ‼️ Using trace endpoint as a placeholder
-        let logUrl = traceUrl
+        // Create new processors with the updated endpoint
+        let processors = Self.createProcessors(
+            traceUrl: traceUrl,
+            sessionReplayUrl: endpoint.sessionReplayEndpoint,
+            configuration: configuration,
+            agent: agent
+        )
 
-        self.agent = agent
+        // Replace processors
+        logEventProcessor = processors.logEventProcessor
+        sessionReplayProcessor = processors.sessionReplayProcessor
+        traceProcessor = processors.traceProcessor
 
+        logger.log(level: .info, isPrivate: false) {
+            "Endpoint updated. Using trace url: \(traceUrl)"
+        }
+    }
+
+    /// Disables the endpoint configuration and reverts to NoOp processors.
+    ///
+    /// This method replaces active processors with NoOp processors, effectively disabling
+    /// data transmission. All subsequent spans and events will be dropped.
+    func disableEndpoint() {
+        // Replace with NoOp processors - spans won't be sent
+        logEventProcessor = NoOpLogEventProcessor()
+        sessionReplayProcessor = nil
+        traceProcessor = NoOpTraceProcessor()
+
+        logger.log(level: .info, isPrivate: false) {
+            "Endpoint disabled. Spans will not be sent until endpoint is configured."
+        }
+    }
+
+    // MARK: - Private Helpers
+
+    private static func createProcessors(
+        traceUrl: URL,
+        sessionReplayUrl: URL?,
+        configuration: any AgentConfigurationProtocol,
+        agent: SplunkRum
+    ) -> Processors {
         // Will be used later by hybrid agents
         let hybridType: String? = nil
 
@@ -88,26 +185,23 @@ class DefaultEventManager: AgentEventManager {
         )
 
         // Initialize log event processor
-        logEventProcessor = OTLPLogToSpanEventProcessor(
-            with: logUrl,
+        let logProcessor = OTLPLogToSpanEventProcessor(
+            with: traceUrl,
             resources: resources,
             debugEnabled: configuration.enableDebugLogging
         )
 
         // Initialize session replay processor (optional)
-        sessionReplayProcessor = OTLPSessionReplayEventProcessor(
-            with: configuration.endpoint.sessionReplayEndpoint,
+        let replayProcessor = OTLPSessionReplayEventProcessor(
+            with: sessionReplayUrl,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
             globalAttributes: { agent.globalAttributes.getAll() },
             debugEnabled: configuration.enableDebugLogging
         )
 
-        sessionReplayIndexer = SessionReplayEventIndexer(named: "replay")
-        sessionReplayMemorizer = SessionReplayEventMemorizer(named: "replay")
-
         // Initialize trace processor
-        traceProcessor = OTLPTraceProcessor(
+        let traceProc = OTLPTraceProcessor(
             with: traceUrl,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
@@ -116,9 +210,11 @@ class DefaultEventManager: AgentEventManager {
             spanInterceptor: configuration.spanInterceptor
         )
 
-        logger.log(level: .info, isPrivate: false) {
-            "Using trace url: \(traceUrl)"
-        }
+        return Processors(
+            logEventProcessor: logProcessor,
+            sessionReplayProcessor: replayProcessor,
+            traceProcessor: traceProc
+        )
     }
 
 

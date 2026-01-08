@@ -23,7 +23,7 @@ protocol AgentConfigurationProtocol: Codable, Equatable {
 
     // MARK: - Mandatory parameters
 
-    var endpoint: EndpointConfiguration { get }
+    var endpoint: EndpointConfiguration? { get }
     var appName: String { get }
     var deploymentEnvironment: String { get }
 
