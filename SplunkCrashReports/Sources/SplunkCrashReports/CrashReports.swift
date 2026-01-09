@@ -42,6 +42,8 @@ public class CrashReports {
 
     private var crashReporter: PLCrashReporter?
 
+    private var crashSpanName: String = "SplunkCrashReport"
+
     /// Storage of periodically sampled device data.
     private var deviceDataDictionary: [String: String] = [:]
     private var dataUpdateTimer: Timer?
@@ -151,8 +153,6 @@ public class CrashReports {
         }
     }
 
-    // MARK: - Private methods
-
     /// Starts up crash reporter if enable is true and no debugger attached.
     public func initializeCrashReporter() -> Bool {
 
@@ -192,6 +192,14 @@ public class CrashReports {
 
         return true
     }
+
+    /// Updates the span name with report data
+    public func updateSpanName(_ name: String) {
+        crashSpanName = name
+    }
+
+    // MARK: - Private methods
+
 
     /// Returns true if debugger is attached.
     private func isDebuggerAttached() -> Bool {
@@ -282,7 +290,7 @@ public class CrashReports {
                 instrumentationVersion: sharedState?.agentVersion
             )
 
-        let crashSpan = tracer.spanBuilder(spanName: "SplunkCrashReport")
+        let crashSpan = tracer.spanBuilder(spanName: crashSpanName)
             .setStartTime(time: timestamp)
             .startSpan()
 
