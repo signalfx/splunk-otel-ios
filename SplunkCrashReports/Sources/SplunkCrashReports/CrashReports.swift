@@ -193,7 +193,7 @@ public class CrashReports {
         return true
     }
 
-    /// Updates the span name with report data
+    /// Updates the span name with report data.
     public func updateSpanName(_ name: String) {
         crashSpanName = name
     }
