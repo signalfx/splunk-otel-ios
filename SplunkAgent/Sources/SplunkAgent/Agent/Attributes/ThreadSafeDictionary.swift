@@ -78,7 +78,7 @@ class ThreadSafeDictionary<Key: Hashable, Value> {
     @discardableResult
     func removeValue(forKey key: Key) -> Value? {
         var result: Value?
-        queue.async(flags: .barrier) {
+        queue.sync(flags: .barrier) {
             result = self.dictionary.removeValue(forKey: key)
         }
         return result
@@ -133,7 +133,7 @@ class ThreadSafeDictionary<Key: Hashable, Value> {
     @discardableResult
     func update(with other: [Key: Value]) -> Int {
         var count = 0
-        queue.async(flags: .barrier) {
+        queue.sync(flags: .barrier) {
             for (key, value) in other {
                 self.dictionary[key] = value
                 count += 1
