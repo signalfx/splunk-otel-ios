@@ -60,6 +60,6 @@ class EndpointViewController: UIViewController {
     private func clearEndpoint(_: UIButton) {
         let net = EndpointCalls()
         net.clearEndpoint()
-//        print("Sample URL reset to \(savedUrl)")
+        print("Endpoint cleared")
     }
 }
