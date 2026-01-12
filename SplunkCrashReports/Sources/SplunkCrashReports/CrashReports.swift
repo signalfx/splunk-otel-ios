@@ -42,7 +42,7 @@ public class CrashReports {
 
     private var crashReporter: PLCrashReporter?
 
-    private var crashSpanName: String = "SplunkCrashReport"
+    var crashSpanName: String = "SplunkCrashReport"
 
     /// Storage of periodically sampled device data.
     private var deviceDataDictionary: [String: String] = [:]

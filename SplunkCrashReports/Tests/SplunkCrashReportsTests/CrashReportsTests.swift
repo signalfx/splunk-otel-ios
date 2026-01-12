@@ -127,6 +127,40 @@ final class CrashReportsTests: XCTestCase {
         XCTAssertTrue(crashReports?.allUsedImageNames.contains("image2.framework") ?? false)
     }
 
+    // MARK: - Span Name Tests
+
+    func testCrashReports_DefaultSpanName() {
+        XCTAssertEqual(crashReports?.crashSpanName, "SplunkCrashReport")
+    }
+
+    func testCrashReports_UpdateSpanName_WithSignalName() {
+        crashReports?.updateSpanName("SIGABRT")
+
+        XCTAssertEqual(crashReports?.crashSpanName, "SIGABRT")
+    }
+
+    func testCrashReports_UpdateSpanName_WithExceptionName() {
+        crashReports?.updateSpanName("NSInvalidArgumentException")
+
+        XCTAssertEqual(crashReports?.crashSpanName, "NSInvalidArgumentException")
+    }
+
+    func testCrashReports_UpdateSpanName_ExceptionOverridesSignal() {
+        // Simulates the flow in formatCrashReport where signal name is set first,
+        // then exception name overrides it if present
+        crashReports?.updateSpanName("SIGABRT")
+        XCTAssertEqual(crashReports?.crashSpanName, "SIGABRT")
+
+        crashReports?.updateSpanName("NSInvalidArgumentException")
+        XCTAssertEqual(crashReports?.crashSpanName, "NSInvalidArgumentException")
+    }
+
+    func testCrashReports_UpdateSpanName_WithEmptyString() {
+        crashReports?.updateSpanName("")
+
+        XCTAssertEqual(crashReports?.crashSpanName, "")
+    }
+
     // MARK: - Lifecycle Tests
 
     func testCrashReports_Deinit_DoesNotCrash() {
