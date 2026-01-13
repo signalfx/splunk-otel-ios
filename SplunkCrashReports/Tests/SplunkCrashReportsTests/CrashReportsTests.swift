@@ -17,7 +17,21 @@ limitations under the License.
 
 import XCTest
 
+@testable import SplunkCommon
 @testable import SplunkCrashReports
+
+// MARK: - Mock
+
+final class MockAgentSharedState: AgentSharedState, @unchecked Sendable {
+    var sessionId: String = "mock-session-id"
+    var agentVersion: String = "1.0.0"
+
+    func applicationState(for timestamp: Date) -> String? {
+        "foreground"
+    }
+}
+
+// MARK: - Tests
 
 final class CrashReportsTests: XCTestCase {
 
