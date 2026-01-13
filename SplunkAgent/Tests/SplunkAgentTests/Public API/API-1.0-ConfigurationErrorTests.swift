@@ -64,4 +64,42 @@ final class API10ConfigurationErrorTests: XCTestCase {
             XCTAssertEqual(error as? AgentConfigurationError, AgentConfigurationError.invalidRumAccessToken(supplied: authToken))
         }
     }
+
+    func testInvalidAppName_Empty() throws {
+        let endpoint = EndpointConfiguration(
+            realm: "dev",
+            rumAccessToken: "valid-token"
+        )
+
+        let configuration = AgentConfiguration(
+            endpoint: endpoint,
+            appName: "",
+            deploymentEnvironment: "test"
+        )
+
+        XCTAssertThrowsError(
+            try configuration.validate()
+        ) { error in
+            XCTAssertEqual(error as? AgentConfigurationError, AgentConfigurationError.invalidAppName(supplied: ""))
+        }
+    }
+
+    func testInvalidDeploymentEnvironment_Empty() throws {
+        let endpoint = EndpointConfiguration(
+            realm: "dev",
+            rumAccessToken: "valid-token"
+        )
+
+        let configuration = AgentConfiguration(
+            endpoint: endpoint,
+            appName: "App",
+            deploymentEnvironment: ""
+        )
+
+        XCTAssertThrowsError(
+            try configuration.validate()
+        ) { error in
+            XCTAssertEqual(error as? AgentConfigurationError, AgentConfigurationError.invalidDeploymentEnvironment(supplied: ""))
+        }
+    }
 }

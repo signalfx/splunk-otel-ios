@@ -119,6 +119,28 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertFalse(builder.build())
     }
 
+    func testBuildWithEmptyAppNameReturnsFalse() {
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "auth"
+        )
+        .setApplicationName("")
+        .deploymentEnvironment(environment: "Prod")
+
+        XCTAssertFalse(builder.build())
+    }
+
+    func testBuildWithEmptyEnvironmentReturnsFalse() {
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "auth"
+        )
+        .setApplicationName("EmptyEnvApp")
+        .deploymentEnvironment(environment: "")
+
+        XCTAssertFalse(builder.build())
+    }
+
     func testBuildWithInvalidBeaconUrlReturnsFalse() {
         let invalidUrl = "not a url"
         let builder = SplunkRumBuilder(
