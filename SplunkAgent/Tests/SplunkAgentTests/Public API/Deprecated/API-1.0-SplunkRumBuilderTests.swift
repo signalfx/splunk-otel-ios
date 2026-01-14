@@ -213,8 +213,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertEqual(comps.host, "rum-ingest.\(realm).signalfx.com")
         XCTAssertEqual(comps.path, "/v1/traces")
 
-        let authItem = comps.queryItems?.first { $0.name == "auth" }
-        XCTAssertEqual(authItem?.value, token)
+        XCTAssertTrue(comps.queryItems?.isEmpty ?? true)
     }
 
     func testBuildSlowRenderingDisabledWhenFalse() throws {
