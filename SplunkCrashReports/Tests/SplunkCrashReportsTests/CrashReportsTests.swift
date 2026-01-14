@@ -26,7 +26,7 @@ final class MockAgentSharedState: AgentSharedState, @unchecked Sendable {
     var sessionId: String = "mock-session-id"
     var agentVersion: String = "1.0.0"
 
-    func applicationState(for timestamp: Date) -> String? {
+    func applicationState(for _: Date) -> String? {
         "foreground"
     }
 }
