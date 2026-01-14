@@ -72,6 +72,11 @@ public final class AppStart {
     /// A flag to prevent the manual track api to be used when an initial app start event has been already sent.
     var initialAppStartSent = false
 
+    /// Background launch threshold in seconds. If an application launch duration exceeds this threshold, we consider this launch as being launched in background first.
+    ///
+    /// This threshold is a temporary fix to long cold starts until we improve the background launch detection mechanism.
+    let backgroundLaunchThreshold = 10.0
+
 
     // MARK: - Public
 
