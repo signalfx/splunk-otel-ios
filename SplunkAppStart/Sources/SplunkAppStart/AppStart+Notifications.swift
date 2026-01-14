@@ -36,13 +36,34 @@ extension AppStart {
             self.logger.log(level: .debug) { "UIApplication.didFinishLaunchingNotification triggered" }
         }
 
-        // willEnterForeground notification - store the notification timestamp and detect a background launch
+        // willEnterForeground notification - store the notification timestamp and detect background launch
         listen(to: UIApplication.willEnterForegroundNotification, in: &tokens) {
             self.willEnterForegroundTimestamp = Date()
 
-            // detect background launch, but only once
-            if self.backgroundLaunchDetected == nil, UIApplication.shared.applicationState == .background {
-                self.backgroundLaunchDetected = true
+            // Detect background launch.
+            // For a background launch, the app was in .background state before this notification,
+            // OR significant time has passed since didFinishLaunching (indicating the app was
+            // sitting in background).
+            //
+            // For a cold start, willEnterForeground fires immediately after didFinishLaunching
+            // and the app state is typically .inactive (transitioning).
+            //
+            // We use both checks because the applicationState check alone can be unreliable
+            // due to race conditions during state transitions.
+            if self.backgroundLaunchDetected == nil {
+                let currentState = UIApplication.shared.applicationState
+                let isCurrentlyInBackground = currentState == .background
+
+                // If more than 10 seconds have passed since didFinishLaunching,
+                // the app was likely running in background before coming to foreground
+                var significantDelayFromLaunch = false
+                if let launchTime = self.didFinishLaunchingTimestamp {
+                    significantDelayFromLaunch = Date().timeIntervalSince(launchTime) > 10.0
+                }
+
+                if isCurrentlyInBackground || significantDelayFromLaunch {
+                    self.backgroundLaunchDetected = true
+                }
             }
 
             self.logger.log(level: .debug) { "UIApplication.willEnterForegroundNotification triggered" }
