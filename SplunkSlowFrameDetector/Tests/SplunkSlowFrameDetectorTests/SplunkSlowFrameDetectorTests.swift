@@ -75,7 +75,7 @@ import XCTest
         // MARK: - Lifecycle Notification Tests
 
         /// Verifies that the logic state is reset when the app becomes active.
-        func test_stateIsReset_onAppDidBecomeActive() async throws {
+        func testStateIsResetOnAppDidBecomeActive() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
 
@@ -94,7 +94,7 @@ import XCTest
         }
 
         /// Verifies that pending buffers are flushed when the app resigns active.
-        func test_buffersAreFlushed_onAppWillResignActive() async throws {
+        func testBuffersAreFlushedOnAppWillResignActive() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
 
@@ -112,7 +112,7 @@ import XCTest
         // MARK: - Frame Detection Tests
 
         /// Verifies that the very first frame processed does not trigger a report.
-        func test_firstFrame_doesNotTriggerReport() async throws {
+        func testFirstFrameDoesNotTriggerReport() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
 
@@ -124,7 +124,7 @@ import XCTest
         }
 
         /// Verifies that a clearly slow frame is detected and reported.
-        func test_slowFrame_isDetected() async throws {
+        func testSlowFrameIsDetected() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
             let normalFrameDuration: TimeInterval = 1.0 / 60.0
@@ -139,7 +139,7 @@ import XCTest
         }
 
         /// Verifies that a frame at the exact slow-frame threshold is correctly detected.
-        func test_slowFrame_atBoundary_isDetected() async throws {
+        func testSlowFrameAtBoundaryIsDetected() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
             let expectedDuration: TimeInterval = 1.0 / 60.0
@@ -156,7 +156,7 @@ import XCTest
         }
 
         /// Verifies that no reports are sent when frame times are normal.
-        func test_noReports_whenFramesAreNormal() async throws {
+        func testNoReportsWhenFramesAreNormal() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
             let expectedDuration: TimeInterval = 1.0 / 60.0
@@ -171,7 +171,7 @@ import XCTest
         }
 
         /// Verifies that a frozen frame is detected when the ticker stops firing.
-        func test_frozenFrame_isDetected_whenFramesStop() async throws {
+        func testFrozenFrameIsDetectedWhenFramesStop() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
             let hangTime = SlowFrameDetector.frozenFrameThreshold // 0.7 seconds
@@ -205,7 +205,7 @@ import XCTest
         }
 
         /// Verifies that a long freeze correctly reports multiple frozen frame events.
-        func test_longFreeze_reportsMultipleEvents() async throws {
+        func testLongFreezeReportsMultipleEvents() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
             let hangTime = SlowFrameDetector.frozenFrameThreshold * 3.5
@@ -223,7 +223,7 @@ import XCTest
         }
 
         /// Verifies that frozen frames are not counted while the app is inactive.
-        func test_frozenFrames_notCounted_whenAppResignsActive() async throws {
+        func testFrozenFramesNotCountedWhenAppResignsActive() async throws {
             let logic = try XCTUnwrap(logic)
             let mockDestination = try XCTUnwrap(mockDestination)
 
@@ -247,7 +247,7 @@ import XCTest
 
         // MARK: - Integration Tests
 
-        func test_start_isIdempotent() async throws {
+        func testStartIsIdempotent() async throws {
             XCTAssertFalse(mockTicker?.started ?? true)
 
             try await pauseUntilDetectorStart()
@@ -259,7 +259,7 @@ import XCTest
             XCTAssertEqual(mockTicker?.startCallCount, 1)
         }
 
-        func test_startAndStop_correctlyControlTicker() async throws {
+        func testStartAndStopCorrectlyControlTicker() async throws {
             XCTAssertFalse(mockTicker?.started ?? true)
             XCTAssertFalse(mockTicker?.stopped ?? true)
 
@@ -278,7 +278,7 @@ import XCTest
         }
 
         /// Verifies that the full detector correctly reports pending frames via the automatic flush loop.
-        func test_integration_automaticFlush_reportsPendingFrames() async throws {
+        func testIntegrationAutomaticFlushReportsPendingFrames() async throws {
             let mockDestination = try XCTUnwrap(mockDestination)
             let mockTicker = try XCTUnwrap(mockTicker)
             let detector = try XCTUnwrap(detector)

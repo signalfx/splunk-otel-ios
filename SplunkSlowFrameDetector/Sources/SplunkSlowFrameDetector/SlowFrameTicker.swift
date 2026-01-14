@@ -63,10 +63,12 @@ protocol SlowFrameTicker {
         /// An async stream that yields the timestamp and duration for each frame update.
         let onFrameStream: AsyncStream<(TimeInterval, TimeInterval)>
 
+
         // MARK: - Private Properties
 
         private var displayLink: CADisplayLink?
         private let continuation: AsyncStream<(TimeInterval, TimeInterval)>.Continuation
+
 
         // MARK: - Initialization
 
@@ -82,6 +84,7 @@ protocol SlowFrameTicker {
             continuation.finish()
             stop()
         }
+
 
         // MARK: - SlowFrameTicker methods
 
@@ -111,6 +114,7 @@ protocol SlowFrameTicker {
         func resume() {
             displayLink?.isPaused = false
         }
+
 
         // MARK: - Private Methods
 

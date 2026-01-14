@@ -58,7 +58,7 @@ import XCTest
         func stop() {
             // This function is non-isolated to match the protocol
             // To safely modify the @MainActor properties, we dispatch to the main queue
-            DispatchQueue.main.async { [weak self] in
+            Task { @MainActor [weak self] in
                 guard let self else {
                     return
                 }
@@ -79,6 +79,7 @@ import XCTest
             continuation.yield((timestamp, duration))
         }
     }
+
 
     // MARK: - Mock Destination
 
