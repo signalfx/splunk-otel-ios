@@ -200,7 +200,10 @@ public class CrashReports {
     ///
     /// Only updates if the provided name is not empty.
     func updateSpanName(_ name: String) {
-        guard !name.isEmpty else { return }
+        guard !name.isEmpty else {
+            return
+        }
+
         crashSpanName = name
     }
 
