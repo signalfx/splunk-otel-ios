@@ -58,7 +58,8 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
             id: requestId,
             endpoint: endpoint,
             explicitTimeout: timeout,
-            fileKeyType: getFileKeyType()
+            fileKeyType: getFileKeyType(),
+            headers: headers
         )
 
         do {

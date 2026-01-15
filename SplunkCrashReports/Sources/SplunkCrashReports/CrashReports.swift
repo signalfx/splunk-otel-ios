@@ -269,20 +269,7 @@ public class CrashReports {
         if let sharedState {
             let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
 
-            // This mapping code below may be able to be removed in the future should
-            // the backend is able to support all options.
-            appState =
-                switch timebasedAppState {
-                case "active":
-                    "foreground"
-
-                case "inactive",
-                    "terminate":
-                    "background"
-
-                default:
-                    timebasedAppState
-                }
+            appState = timebasedAppState
         }
         return appState
     }
