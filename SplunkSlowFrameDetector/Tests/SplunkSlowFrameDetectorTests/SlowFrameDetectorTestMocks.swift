@@ -83,22 +83,30 @@ import XCTest
 
     // MARK: - Mock Destination
 
-    actor MockDestination: SlowFrameDetectorDestination {
+    final class MockDestination: SlowFrameDetectorDestination {
         // This dictionary will store the accumulated counts.
-        var reportedCounts: [String: Int] = [:]
+        private var reportedCountsStorage: [String: Int] = [:]
         private var onSend: ((String, Int) -> Void)?
+        private let lock = NSLock()
 
-        func send(type: String, count: Int, sharedState _: AgentSharedState?) async {
-            // Yield to satisfy the async requirement of the protocol in this mock implementation.
-            await Task.yield()
-            // Accumulate the count for the given type
-            reportedCounts[type, default: 0] += count
-            // Call the optional closure for tests that still need it
-            onSend?(type, count)
+        var reportedCounts: [String: Int] {
+            lock.lock()
+            defer { lock.unlock() }
+            return reportedCountsStorage
+        }
+
+        func send(type: String, count: Int, sharedState _: AgentSharedState?) {
+            lock.lock()
+            reportedCountsStorage[type, default: 0] += count
+            let handler = onSend
+            lock.unlock()
+            handler?(type, count)
         }
 
         func setOnSend(_ handler: ((String, Int) -> Void)?) {
+            lock.lock()
             onSend = handler
+            lock.unlock()
         }
     }
 #endif

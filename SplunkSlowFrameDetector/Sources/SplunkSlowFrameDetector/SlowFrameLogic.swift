@@ -156,14 +156,14 @@ actor SlowFrameLogic {
         if slowFrameCount > 0 {
             let count = slowFrameCount
             slowFrameCount = 0
-            await destination.send(type: "slowRenders", count: count, sharedState: nil)
+            destination.send(type: "slowRenders", count: count, sharedState: nil)
         }
 
         // Drain frozen frames
         if frozenFrameCount > 0 {
             let count = frozenFrameCount
             frozenFrameCount = 0
-            await destination.send(type: "frozenRenders", count: count, sharedState: nil)
+            destination.send(type: "frozenRenders", count: count, sharedState: nil)
         }
     }
 

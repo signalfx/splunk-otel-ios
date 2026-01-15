@@ -34,10 +34,7 @@ struct OTelDestination: SlowFrameDetectorDestination {
     ///   - type: The type of event (e.g., "slowRenders"). This becomes the span name.
     ///   - count: The number of detected events. This is added as a "count" attribute.
     ///   - sharedState: The shared agent state, used to get the agent version.
-    func send(type: String, count: Int, sharedState: AgentSharedState?) async {
-        // Yield to honor the async contract without blocking the caller.
-        await Task.yield()
-
+    func send(type: String, count: Int, sharedState: AgentSharedState?) {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(

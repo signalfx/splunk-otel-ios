@@ -25,13 +25,12 @@ protocol SlowFrameDetectorDestination {
 
     /// Sends frame count results to a destination.
     ///
-    /// This method is marked `async` to enforce a non-blocking contract. Implementations
-    /// must not block the calling thread, as doing so would stall the `SlowFrameLogic` actor
-    /// and prevent it from processing new frame data.
+    /// Implementations should keep this work lightweight, as slow work will stall the
+    /// `SlowFrameLogic` actor and prevent it from processing new frame data.
     ///
     /// - Parameters:
     ///   - type: The type of event being sent (e.g., "slowRenders", "frozenRenders").
     ///   - count: The number of events of that type that were detected.
     ///   - sharedState: The shared state of the agent, providing context like the agent version.
-    func send(type: String, count: Int, sharedState: AgentSharedState?) async
+    func send(type: String, count: Int, sharedState: AgentSharedState?)
 }

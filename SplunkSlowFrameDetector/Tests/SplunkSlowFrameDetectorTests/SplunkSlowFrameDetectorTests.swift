@@ -89,7 +89,7 @@ import XCTest
 
             await logic.flushBuffers()
 
-            let counts = await mockDestination.reportedCounts
+            let counts = mockDestination.reportedCounts
             XCTAssertTrue(counts.isEmpty, "No reports should be sent after app becomes active.")
         }
 
@@ -104,7 +104,7 @@ import XCTest
             // This will trigger flushBuffers internally
             await logic.appWillResignActive()
 
-            let counts = await mockDestination.reportedCounts
+            let counts = mockDestination.reportedCounts
             XCTAssertEqual(counts["slowRenders"], 1)
         }
 
@@ -119,7 +119,7 @@ import XCTest
             await logic.handleFrame(timestamp: 0.0, duration: 1.0 / 60.0)
             await logic.flushBuffers()
 
-            let counts = await mockDestination.reportedCounts
+            let counts = mockDestination.reportedCounts
             XCTAssertTrue(counts.isEmpty)
         }
 
@@ -134,7 +134,7 @@ import XCTest
 
             await logic.flushBuffers()
 
-            let counts = await mockDestination.reportedCounts
+            let counts = mockDestination.reportedCounts
             XCTAssertEqual(counts["slowRenders"], 1)
         }
 
@@ -151,7 +151,7 @@ import XCTest
 
             await logic.flushBuffers()
 
-            let counts = await mockDestination.reportedCounts
+            let counts = mockDestination.reportedCounts
             XCTAssertEqual(counts["slowRenders"], 1)
         }
 
@@ -166,7 +166,7 @@ import XCTest
 
             await logic.flushBuffers()
 
-            let counts = await mockDestination.reportedCounts
+            let counts = mockDestination.reportedCounts
             XCTAssertTrue(counts.isEmpty)
         }
 
@@ -200,7 +200,7 @@ import XCTest
 
             await logic.flushBuffers()
 
-            let counts = await mockDestination.reportedCounts
+            let counts = mockDestination.reportedCounts
             XCTAssertEqual(counts["frozenRenders"], 1, "Expected exactly one frozen render to be reported.")
         }
 
@@ -216,7 +216,7 @@ import XCTest
 
             await logic.flushBuffers()
 
-            let counts = await mockDestination.reportedCounts
+            let counts = mockDestination.reportedCounts
             let finalCount = counts["frozenRenders"]
             XCTAssertGreaterThanOrEqual(finalCount ?? 0, 2)
             XCTAssertLessThanOrEqual(finalCount ?? 0, 4)
@@ -241,7 +241,7 @@ import XCTest
             XCTAssertEqual(frozenCount, 0)
 
             await logic.flushBuffers()
-            let counts = await mockDestination.reportedCounts
+            let counts = mockDestination.reportedCounts
             XCTAssertNil(counts["frozenRenders"])
         }
 
@@ -284,7 +284,7 @@ import XCTest
             let detector = try XCTUnwrap(detector)
 
             let reportExpectation = XCTestExpectation(description: "Report for slowRenders was sent")
-            await mockDestination.setOnSend { type, count in
+            mockDestination.setOnSend { type, count in
                 if type == "slowRenders" {
                     XCTAssertEqual(count, 1)
                     reportExpectation.fulfill()
