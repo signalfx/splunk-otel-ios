@@ -23,13 +23,13 @@ final class CrashReportDeviceStatsTests: XCTestCase {
 
     // MARK: - Battery Level Tests
 
-    func testDeviceStats_BatteryLevel_ReturnsNonEmptyString() {
+    func testDeviceStatsBatteryLevelReturnsNonEmptyString() {
         let batteryLevel = CrashReportDeviceStats.batteryLevel
 
         XCTAssertFalse(batteryLevel.isEmpty)
     }
 
-    func testDeviceStats_BatteryLevel_HasValidFormat() {
+    func testDeviceStatsBatteryLevelHasValidFormat() {
         let batteryLevel = CrashReportDeviceStats.batteryLevel
 
         #if !os(tvOS)
@@ -46,13 +46,13 @@ final class CrashReportDeviceStatsTests: XCTestCase {
 
     // MARK: - Free Disk Space Tests
 
-    func testDeviceStats_FreeDiskSpace_ReturnsNonEmptyString() {
+    func testDeviceStatsFreeDiskSpaceReturnsNonEmptyString() {
         let freeDiskSpace = CrashReportDeviceStats.freeDiskSpace
 
         XCTAssertFalse(freeDiskSpace.isEmpty)
     }
 
-    func testDeviceStats_FreeDiskSpace_HasValidFormat() {
+    func testDeviceStatsFreeDiskSpaceHasValidFormat() {
         let freeDiskSpace = CrashReportDeviceStats.freeDiskSpace
 
         // Should contain bytes unit (KB, MB, GB, TB) or be "Unknown"
@@ -67,13 +67,13 @@ final class CrashReportDeviceStatsTests: XCTestCase {
 
     // MARK: - Free Memory Tests
 
-    func testDeviceStats_FreeMemory_ReturnsNonEmptyString() {
+    func testDeviceStatsFreeMemoryReturnsNonEmptyString() {
         let freeMemory = CrashReportDeviceStats.freeMemory
 
         XCTAssertFalse(freeMemory.isEmpty)
     }
 
-    func testDeviceStats_FreeMemory_HasValidFormat() {
+    func testDeviceStatsFreeMemoryHasValidFormat() {
         let freeMemory = CrashReportDeviceStats.freeMemory
 
         // Should contain bytes unit (KB, MB, GB) or be "Unknown"
@@ -88,7 +88,7 @@ final class CrashReportDeviceStatsTests: XCTestCase {
 
     // MARK: - Multiple Calls Tests
 
-    func testDeviceStats_MultipleCallsToSameProperty_ReturnConsistentFormat() {
+    func testDeviceStatsMultipleCallsToSamePropertyReturnConsistentFormat() {
         let batteryLevel1 = CrashReportDeviceStats.batteryLevel
         let batteryLevel2 = CrashReportDeviceStats.batteryLevel
 
@@ -99,7 +99,7 @@ final class CrashReportDeviceStatsTests: XCTestCase {
         XCTAssertEqual(format1, format2)
     }
 
-    func testDeviceStats_AllPropertiesAccessible() {
+    func testDeviceStatsAllPropertiesAccessible() {
         // Verify all properties can be accessed without crashing
         _ = CrashReportDeviceStats.batteryLevel
         _ = CrashReportDeviceStats.freeDiskSpace

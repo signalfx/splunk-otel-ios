@@ -54,7 +54,7 @@ final class CrashReportsTests: XCTestCase {
 
     // MARK: - Initialization Tests
 
-    func testCrashReports_Initialization() {
+    func testCrashReportsInitialization() {
         let instance = CrashReports()
 
         XCTAssertNotNil(instance)
@@ -62,7 +62,7 @@ final class CrashReportsTests: XCTestCase {
         XCTAssertTrue(instance.allUsedImageNames.isEmpty)
     }
 
-    func testCrashReports_SharedStateCanBeSet() {
+    func testCrashReportsSharedStateCanBeSet() {
         // Create a mock shared state
         let mockSharedState = MockAgentSharedState()
 
@@ -73,12 +73,12 @@ final class CrashReportsTests: XCTestCase {
 
     // MARK: - Configuration Tests
 
-    func testCrashReports_ConfigureCrashReporter_DoesNotThrow() {
+    func testCrashReportsConfigureCrashReporterDoesNotThrow() {
         // This should not throw or crash
         XCTAssertNoThrow(crashReports?.configureCrashReporter())
     }
 
-    func testCrashReports_ConfigureCrashReporter_CanBeCalledMultipleTimes() {
+    func testCrashReportsConfigureCrashReporterCanBeCalledMultipleTimes() {
         // Calling multiple times should be safe
         crashReports?.configureCrashReporter()
         crashReports?.configureCrashReporter()
@@ -89,12 +89,12 @@ final class CrashReportsTests: XCTestCase {
 
     // MARK: - Crash Report Detection Tests
 
-    func testCrashReports_ReportCrashIfPresent_WithoutConfiguration() {
+    func testCrashReportsReportCrashIfPresentWithoutConfiguration() {
         // Calling without configuration should handle gracefully
         XCTAssertNoThrow(crashReports?.reportCrashIfPresent())
     }
 
-    func testCrashReports_ReportCrashIfPresent_WithConfiguration() {
+    func testCrashReportsReportCrashIfPresentWithConfiguration() {
         crashReports?.configureCrashReporter()
 
         // Should not throw
@@ -103,7 +103,7 @@ final class CrashReportsTests: XCTestCase {
 
     // MARK: - Data Consumer Tests
 
-    func testCrashReports_CrashReportDataConsumer_CanBeSet() {
+    func testCrashReportsCrashReportDataConsumerCanBeSet() {
         var consumerCalled = false
 
         crashReports?.crashReportDataConsumer = { _, _ in
@@ -117,7 +117,7 @@ final class CrashReportsTests: XCTestCase {
         XCTAssertTrue(consumerCalled)
     }
 
-    func testCrashReports_CrashReportDataConsumer_CanBeCleared() {
+    func testCrashReportsCrashReportDataConsumerCanBeCleared() {
         crashReports?.crashReportDataConsumer = { _, _ in }
 
         XCTAssertNotNil(crashReports?.crashReportDataConsumer)
@@ -129,11 +129,11 @@ final class CrashReportsTests: XCTestCase {
 
     // MARK: - Image Names Tests
 
-    func testCrashReports_AllUsedImageNames_InitiallyEmpty() {
+    func testCrashReportsAllUsedImageNamesInitiallyEmpty() {
         XCTAssertTrue(crashReports?.allUsedImageNames.isEmpty ?? false)
     }
 
-    func testCrashReports_AllUsedImageNames_CanBePopulated() {
+    func testCrashReportsAllUsedImageNamesCanBePopulated() {
         crashReports?.allUsedImageNames = ["image1.dylib", "image2.framework"]
 
         XCTAssertEqual(crashReports?.allUsedImageNames.count, 2)
@@ -143,23 +143,23 @@ final class CrashReportsTests: XCTestCase {
 
     // MARK: - Span Name Tests
 
-    func testCrashReports_DefaultSpanName() {
+    func testCrashReportsDefaultSpanName() {
         XCTAssertEqual(crashReports?.crashSpanName, "SplunkCrashReport")
     }
 
-    func testCrashReports_UpdateSpanName_WithSignalName() {
+    func testCrashReportsUpdateSpanNameWithSignalName() {
         crashReports?.updateSpanName("SIGABRT")
 
         XCTAssertEqual(crashReports?.crashSpanName, "SIGABRT")
     }
 
-    func testCrashReports_UpdateSpanName_WithExceptionName() {
+    func testCrashReportsUpdateSpanNameWithExceptionName() {
         crashReports?.updateSpanName("NSInvalidArgumentException")
 
         XCTAssertEqual(crashReports?.crashSpanName, "NSInvalidArgumentException")
     }
 
-    func testCrashReports_UpdateSpanName_ExceptionOverridesSignal() {
+    func testCrashReportsUpdateSpanNameExceptionOverridesSignal() {
         // Simulates the flow in formatCrashReport where signal name is set first,
         // then exception name overrides it if present
         crashReports?.updateSpanName("SIGABRT")
@@ -169,15 +169,19 @@ final class CrashReportsTests: XCTestCase {
         XCTAssertEqual(crashReports?.crashSpanName, "NSInvalidArgumentException")
     }
 
-    func testCrashReports_UpdateSpanName_WithEmptyString() {
-        crashReports?.updateSpanName("")
+    func testCrashReportsUpdateSpanNameWithEmptyStringDoesNotUpdate() {
+        // First set a valid name
+        crashReports?.updateSpanName("SIGABRT")
+        XCTAssertEqual(crashReports?.crashSpanName, "SIGABRT")
 
-        XCTAssertEqual(crashReports?.crashSpanName, "")
+        // Empty string should not change the span name
+        crashReports?.updateSpanName("")
+        XCTAssertEqual(crashReports?.crashSpanName, "SIGABRT")
     }
 
     // MARK: - Lifecycle Tests
 
-    func testCrashReports_Deinit_DoesNotCrash() {
+    func testCrashReportsDeinitDoesNotCrash() {
         var instance: CrashReports? = CrashReports()
         instance?.configureCrashReporter()
 
@@ -187,7 +191,7 @@ final class CrashReportsTests: XCTestCase {
         XCTAssertNil(instance)
     }
 
-    func testCrashReports_Deinit_WithDataConsumer() {
+    func testCrashReportsDeinitWithDataConsumer() {
         var instance: CrashReports? = CrashReports()
         instance?.crashReportDataConsumer = { _, _ in }
 

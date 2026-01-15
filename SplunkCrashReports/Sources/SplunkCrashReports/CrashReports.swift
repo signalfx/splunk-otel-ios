@@ -193,13 +193,16 @@ public class CrashReports {
         return true
     }
 
-    /// Updates the span name with report data.
-    func updateSpanName(_ name: String) {
-        crashSpanName = name
-    }
-
     // MARK: - Private methods
 
+
+    /// Updates the span name with report data.
+    ///
+    /// Only updates if the provided name is not empty.
+    func updateSpanName(_ name: String) {
+        guard !name.isEmpty else { return }
+        crashSpanName = name
+    }
 
     /// Returns true if debugger is attached.
     private func isDebuggerAttached() -> Bool {
