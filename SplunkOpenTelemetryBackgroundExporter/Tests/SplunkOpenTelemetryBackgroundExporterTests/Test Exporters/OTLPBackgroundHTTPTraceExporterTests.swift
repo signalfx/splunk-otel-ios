@@ -54,7 +54,8 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         disk: DiskStorage,
         http: BackgroundHTTPClientProtocol,
         config: OtlpConfiguration = OtlpConfiguration(),
-        fileType: String? = nil
+        fileType: String? = nil,
+        headers: [String: String] = [:]
     ) throws -> OTLPBackgroundHTTPTraceExporter {
         let endpoint = try #require(URL(string: "https://example.com"))
         let exporter = OTLPBackgroundHTTPTraceExporter(
@@ -62,6 +63,7 @@ struct OTLPBackgroundHTTPTraceExporterTests {
             config: config,
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
+            headers: headers,
             diskStorage: disk,
             fileType: fileType,
             performStalledUploadCheck: false
@@ -93,6 +95,24 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         let fileKey = exporter.getStorageKey().append(sent.id.uuidString)
         let finalURL = try disk.finalDestination(forKey: fileKey)
         #expect(FileManager.default.fileExists(atPath: finalURL.path))
+    }
+
+    @Test
+    func exportIncludesProvidedHeaders() throws {
+        let disk = makeDisk(uniqueLabel: "export_headers_\(UUID().uuidString)")
+        let http = MockHTTPClient()
+        let token = "trace-token"
+        let exporter = try makeExporter(
+            disk: disk,
+            http: http,
+            headers: ["X-SF-Token": token]
+        )
+
+        let result = exporter.export(spans: [], explicitTimeout: nil)
+
+        #expect(result == .success)
+        let sent = try #require(http.sent.first)
+        #expect(sent.headers["X-SF-Token"] == token)
     }
 
     @Test

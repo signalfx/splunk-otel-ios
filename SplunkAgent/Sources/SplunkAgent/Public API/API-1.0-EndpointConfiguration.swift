@@ -52,21 +52,9 @@ public struct EndpointConfiguration: Codable, Equatable {
         let traceUrl = Self.realmUrl(for: realm, path: "/v1/traces")
         let sessionReplayUrl = Self.realmUrl(for: realm, path: "/v1/logs")
 
-        // Authenticate trace url
-        if let traceUrl {
-            traceEndpoint = Self.authenticate(url: traceUrl, with: rumAccessToken)
-        }
-        else {
-            traceEndpoint = nil
-        }
+        traceEndpoint = traceUrl
 
-        // Authenticate session replay url
-        if let sessionReplayUrl {
-            sessionReplayEndpoint = Self.authenticate(url: sessionReplayUrl, with: rumAccessToken)
-        }
-        else {
-            sessionReplayEndpoint = nil
-        }
+        sessionReplayEndpoint = sessionReplayUrl
     }
 
     /// Initialize the endpoint configuration with a custom trace url and an optional session replay url.
@@ -111,34 +99,6 @@ extension EndpointConfiguration: CustomStringConvertible, CustomDebugStringConve
     /// A string representation of the `EndpointConfiguration` instance intended for diagnostic output, identical to `description`.
     public var debugDescription: String {
         description
-    }
-}
-
-
-extension EndpointConfiguration {
-
-    // MARK: - Authentication
-
-    /// Authenticates an endpoint URL by appending the auth token to the URL's query.
-    ///
-    /// - Returns: Authenticated url, or `nil` if building the url fails.
-    private static func authenticate(url: URL, with authToken: String) -> URL? {
-
-        guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            return nil
-        }
-
-        urlComponents.queryItems = [URLQueryItem(name: "auth", value: authToken)]
-
-        guard urlComponents.queryItems?.count ?? 0 > 0 else {
-            return nil
-        }
-
-        guard let authenticatedUrl = urlComponents.url else {
-            return nil
-        }
-
-        return authenticatedUrl
     }
 }
 
