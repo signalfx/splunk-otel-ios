@@ -97,7 +97,7 @@ actor SlowFrameLogic {
         flushTask?.cancel()
         watchdogTask = nil
         flushTask = nil
-        await flushBuffers()
+        flushBuffers()
         destination = nil
     }
 
@@ -126,10 +126,10 @@ actor SlowFrameLogic {
 
     // MARK: - Lifecycle Handlers
 
-    func appWillResignActive() async {
+    func appWillResignActive() {
         // Prevent watchdog from counting while paused in background.
         lastHeartbeatTimestamp = 0
-        await flushBuffers()
+        flushBuffers()
     }
 
     func appDidBecomeActive() {
@@ -139,15 +139,15 @@ actor SlowFrameLogic {
         frozenFrameCount = 0
     }
 
-    func appWillTerminate() async {
-        await flushBuffers()
+    func appWillTerminate() {
+        flushBuffers()
     }
 
 
     // MARK: - Internal Methods
 
     /// Flushes the collected slow and frozen frame counts to the destination.
-    func flushBuffers() async {
+    func flushBuffers() {
         guard let destination else {
             return
         }
@@ -198,7 +198,7 @@ actor SlowFrameLogic {
             if Task.isCancelled {
                 break
             }
-            await flushBuffers()
+            flushBuffers()
         }
     }
 }
