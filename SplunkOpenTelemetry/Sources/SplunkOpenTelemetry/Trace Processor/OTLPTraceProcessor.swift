@@ -41,18 +41,25 @@ public class OTLPTraceProcessor: TraceProcessor {
         runtimeAttributes: RuntimeAttributes,
         globalAttributes: @escaping () -> [String: AttributeValue],
         debugEnabled: Bool,
-        spanInterceptor: SplunkSpanInterceptor?
+        spanInterceptor: SplunkSpanInterceptor?,
+        accessToken: String? = nil
     ) {
 
         let configuration = OtlpConfiguration()
         let envVarHeaders: [(String, String)] = []
+        var headers: [String: String] = [:]
+
+        if let accessToken, !accessToken.isEmpty {
+            headers["X-SF-Token"] = accessToken
+        }
 
         // Initialize background exporter
         let backgroundTraceExporter = OTLPBackgroundHTTPTraceExporter(
             endpoint: tracesEndpoint,
             config: configuration,
             qosConfig: SessionQOSConfiguration(),
-            envVarHeaders: envVarHeaders
+            envVarHeaders: envVarHeaders,
+            headers: headers
         )
 
         // Initialize attribute checker proxy exporter

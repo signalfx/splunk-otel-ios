@@ -32,6 +32,7 @@ struct MockRequestDescriptor: RequestDescriptorProtocol {
     var fileKeyType: String
     var scheduled: Date
     var shouldSend: Bool
+    var headers: [String: String]
 
     init(
         endpointString: String = "https://example.com",
@@ -40,7 +41,8 @@ struct MockRequestDescriptor: RequestDescriptorProtocol {
         sentCount: Int = 0,
         fileKeyType: String = "base",
         scheduled: Date = Date(),
-        shouldSend: Bool = true
+        shouldSend: Bool = true,
+        headers: [String: String] = [:]
     ) throws {
         guard let url = URL(string: endpointString) else {
             throw URLError(.unknown)
@@ -53,6 +55,7 @@ struct MockRequestDescriptor: RequestDescriptorProtocol {
         self.fileKeyType = fileKeyType
         self.scheduled = scheduled
         self.shouldSend = shouldSend
+        self.headers = headers
     }
 
     func createRequest() -> URLRequest {
@@ -62,6 +65,10 @@ struct MockRequestDescriptor: RequestDescriptorProtocol {
         request.setValue(Headers.getUserAgentHeader(), forHTTPHeaderField: Constants.HTTP.userAgent)
         request.setValue("application/x-protobuf", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = explicitTimeout
+
+        for (key, value) in headers {
+            request.setValue(value, forHTTPHeaderField: key)
+        }
 
         return request
     }
