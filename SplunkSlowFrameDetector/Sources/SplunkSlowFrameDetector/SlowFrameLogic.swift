@@ -87,7 +87,7 @@ actor SlowFrameLogic {
     }
 
     /// Stops the background tasks and flushes any remaining data.
-    func stop() async {
+    func stop() {
         guard isRunning else {
             return
         }
