@@ -21,19 +21,19 @@ import XCTest
 
 final class CrashReportsConfigurationTests: XCTestCase {
 
-    func testConfiguration_EnabledByDefault() {
+    func testConfigurationEnabledByDefault() {
         let config = CrashReportsConfiguration(isEnabled: true)
 
         XCTAssertTrue(config.isEnabled)
     }
 
-    func testConfiguration_CanBeDisabled() {
+    func testConfigurationCanBeDisabled() {
         let config = CrashReportsConfiguration(isEnabled: false)
 
         XCTAssertFalse(config.isEnabled)
     }
 
-    func testConfiguration_ConformsToModuleConfiguration() {
+    func testConfigurationConformsToModuleConfiguration() {
         let config = CrashReportsConfiguration(isEnabled: true)
 
         // Verify it can be used as ModuleConfiguration
