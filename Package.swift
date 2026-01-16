@@ -257,6 +257,15 @@ func generateMainTargets() -> [Target] {
             path: "SplunkCrashReports/Sources",
             plugins: lintTargetPlugins()
         ),
+        .testTarget(
+            name: "SplunkCrashReportsTests",
+            dependencies: [
+                "SplunkCrashReports",
+                "SplunkCommon"
+            ],
+            path: "SplunkCrashReports/Tests",
+            plugins: lintTargetPlugins()
+        ),
 
 
         // MARK: - Splunk OTel
