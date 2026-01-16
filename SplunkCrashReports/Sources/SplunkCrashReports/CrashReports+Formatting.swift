@@ -44,11 +44,15 @@ extension CrashReports {
 
         if let signalInfo = report.signalInfo {
             reportDict[.signalName] = signalInfo.name
+            updateSpanName(signalInfo.name)
             reportDict[.faultAddress] = String(signalInfo.address)
         }
 
         if report.hasExceptionInfo {
             reportDict[.exceptionName] = report.exceptionInfo.exceptionName ?? ""
+            if let exceptionName = report.exceptionInfo.exceptionName {
+                updateSpanName(exceptionName)
+            }
             reportDict[.exceptionReason] = report.exceptionInfo.exceptionReason ?? ""
         }
 

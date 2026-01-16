@@ -22,7 +22,7 @@ public struct UserConfiguration: Codable, Equatable {
 
     /// Sets the preferred ``UserTrackingMode``.
     ///
-    /// Defaults to `.noTracking`
+    /// Defaults to `.anonymousTracking`
     public var trackingMode: UserTrackingMode = .default
 
 
