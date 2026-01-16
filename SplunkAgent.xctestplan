@@ -36,7 +36,6 @@
       }
     },
     {
-      "enabled" : false,
       "target" : {
         "containerPath" : "container:",
         "identifier" : "SplunkCrashReportsTests",
