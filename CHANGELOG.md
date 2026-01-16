@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+* Updated and unpinned the opentelemetry-swift dependency to latest version, using the new split repos (opentelemetry-swift and opentelemetry-swift-core). 
+
 ### Fixed
 
 * Moved auth query parameter value for trace/log/replay exporters into X-SF-Token header.
