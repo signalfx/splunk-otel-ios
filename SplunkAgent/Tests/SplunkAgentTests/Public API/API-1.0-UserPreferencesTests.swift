@@ -31,11 +31,11 @@ final class API10UserPreferencesTests: XCTestCase {
 
         // Properties (READ)
         let initialTrackingMode = userPreferences.trackingMode
-        XCTAssertEqual(initialTrackingMode, UserTrackingMode.noTracking)
+        XCTAssertEqual(initialTrackingMode, UserTrackingMode.anonymousTracking)
 
 
         // Properties (WRITE)
-        userPreferences.trackingMode = .default
+        userPreferences.trackingMode = .noTracking
         XCTAssertEqual(userPreferences.trackingMode, UserTrackingMode.noTracking)
 
         userPreferences.trackingMode = .anonymousTracking

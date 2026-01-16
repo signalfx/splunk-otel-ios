@@ -21,15 +21,13 @@ limitations under the License.
 public enum UserTrackingMode: Codable, Equatable {
 
     /// No tracking. Individual user sessions are not linked in any way.
-    ///
-    /// This is a default option for user tracking.
     case noTracking
 
     /// Anonymous tracking. Allows you to link individual sessions
     /// under an anonymized user ID.
     ///
     /// - Note: An anonymous user ID is used, which cannot be traced
-    /// to an individual for tracking across applications.
+    /// to an individual for tracking across applications. This is a default option for user tracking.
     case anonymousTracking
 }
 
@@ -37,5 +35,5 @@ public enum UserTrackingMode: Codable, Equatable {
 extension UserTrackingMode {
 
     /// Default user tracking mode.
-    public static let `default`: UserTrackingMode = .noTracking
+    public static let `default`: UserTrackingMode = .anonymousTracking
 }
