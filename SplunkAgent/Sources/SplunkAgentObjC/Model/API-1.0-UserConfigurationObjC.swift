@@ -31,7 +31,7 @@ public final class UserConfigurationObjC: NSObject {
 
     /// Sets the preferred tracking mode for user identification.
     ///
-    /// Defaults to `SPLKUserTrackingMode.noTracking`.
+    /// Defaults to `SPLKUserTrackingMode.anonymousTracking`.
     ///
     /// A `NSNumber` which value can be mapped to the `SPLKUserTrackingMode` constants.
     @objc
