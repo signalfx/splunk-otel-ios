@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0.5] - 2026-01-19
+
 ### Fixed
 
 * Moved auth query parameter value for trace/log/replay exporters into X-SF-Token header.
