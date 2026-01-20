@@ -119,6 +119,28 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertFalse(builder.build())
     }
 
+    func testBuildWithEmptyAppNameReturnsFalse() {
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "auth"
+        )
+        .setApplicationName("")
+        .deploymentEnvironment(environment: "Prod")
+
+        XCTAssertFalse(builder.build())
+    }
+
+    func testBuildWithEmptyEnvironmentReturnsFalse() {
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "auth"
+        )
+        .setApplicationName("EmptyEnvApp")
+        .deploymentEnvironment(environment: "")
+
+        XCTAssertFalse(builder.build())
+    }
+
     func testBuildWithInvalidBeaconUrlReturnsFalse() {
         let invalidUrl = "not a url"
         let builder = SplunkRumBuilder(
@@ -192,8 +214,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertEqual(comps.host, "rum-ingest.\(realm).signalfx.com")
         XCTAssertEqual(comps.path, "/v1/traces")
 
-        let authItem = comps.queryItems?.first { $0.name == "auth" }
-        XCTAssertEqual(authItem?.value, token)
+        XCTAssertTrue(comps.queryItems?.isEmpty ?? true)
     }
 
     func testBuildSlowRenderingDisabledWhenFalse() throws {
@@ -229,13 +250,13 @@ final class API10SplunkRumBuilderTests: XCTestCase {
 
         // Verify real module state is disabled.
         XCTAssertFalse(
-            operationalProxy.module.state.isEnabled,
-            "The isEnabled property on the REAL underlying module's state object should be false."
+            operationalProxy.module.isEnabled,
+            "The isEnabled property on the REAL underlying module should be false."
         )
 
         // Verify proxy reports disabled state.
         XCTAssertFalse(
-            operationalProxy.state.isEnabled,
+            operationalProxy.isEnabled,
             "The isEnabled property exposed by the PROXY should be false."
         )
     }
@@ -273,13 +294,13 @@ final class API10SplunkRumBuilderTests: XCTestCase {
 
         // Verify real module state is enabled.
         XCTAssertTrue(
-            operationalProxy.module.state.isEnabled,
-            "The isEnabled property on the REAL underlying module's state object should be true."
+            operationalProxy.module.isEnabled,
+            "The isEnabled property on the REAL underlying module should be true."
         )
 
         // Verify proxy reports enabled state.
         XCTAssertTrue(
-            operationalProxy.state.isEnabled,
+            operationalProxy.isEnabled,
             "The isEnabled property exposed by the PROXY should be true."
         )
     }
@@ -322,13 +343,13 @@ final class API10SplunkRumBuilderTests: XCTestCase {
 
         // Verify module is enabled by default.
         XCTAssertTrue(
-            operationalProxy.module.state.isEnabled,
+            operationalProxy.module.isEnabled,
             "The real module should be enabled by default when no explicit setting is provided."
         )
 
         // Verify proxy reports default enabled state.
         XCTAssertTrue(
-            operationalProxy.state.isEnabled,
+            operationalProxy.isEnabled,
             "The proxy should report the default enabled state."
         )
     }

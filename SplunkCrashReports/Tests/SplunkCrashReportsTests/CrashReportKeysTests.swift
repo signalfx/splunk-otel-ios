@@ -23,145 +23,145 @@ final class CrashReportKeysTests: XCTestCase {
 
     // MARK: - State and Timestamp Keys
 
-    func testCrashReportKeys_PreviousAppState() {
+    func testCrashReportKeysPreviousAppState() {
         XCTAssertEqual(CrashReportKeys.previousAppState.rawValue, "ios.app.state")
     }
 
-    func testCrashReportKeys_CrashTimestamp() {
+    func testCrashReportKeysCrashTimestamp() {
         XCTAssertEqual(CrashReportKeys.crashTimestamp.rawValue, "crash.timestamp")
     }
 
-    func testCrashReportKeys_CurrentTimestamp() {
+    func testCrashReportKeysCurrentTimestamp() {
         XCTAssertEqual(CrashReportKeys.currentTimestamp.rawValue, "crash.observedTimestamp")
     }
 
     // MARK: - Device Information Keys
 
-    func testCrashReportKeys_FreeDiskSpace() {
+    func testCrashReportKeysFreeDiskSpace() {
         XCTAssertEqual(CrashReportKeys.freeDiskSpace.rawValue, "crash.freeDiskSpace")
     }
 
-    func testCrashReportKeys_BatteryLevel() {
+    func testCrashReportKeysBatteryLevel() {
         XCTAssertEqual(CrashReportKeys.batteryLevel.rawValue, "crash.batteryLevel")
     }
 
-    func testCrashReportKeys_FreeMemory() {
+    func testCrashReportKeysFreeMemory() {
         XCTAssertEqual(CrashReportKeys.freeMemory.rawValue, "crash.freeMemory")
     }
 
-    func testCrashReportKeys_ScreenName() {
+    func testCrashReportKeysScreenName() {
         XCTAssertEqual(CrashReportKeys.screenName.rawValue, "screen.name")
     }
 
-    func testCrashReportKeys_BuildId() {
+    func testCrashReportKeysBuildId() {
         XCTAssertEqual(CrashReportKeys.buildId.rawValue, "crash.app.build_id")
     }
 
     // MARK: - Process Keys
 
-    func testCrashReportKeys_ProcessPath() {
+    func testCrashReportKeysProcessPath() {
         XCTAssertEqual(CrashReportKeys.processPath.rawValue, "crash.processPath")
     }
 
-    func testCrashReportKeys_IsNative() {
+    func testCrashReportKeysIsNative() {
         XCTAssertEqual(CrashReportKeys.isNative.rawValue, "crash.isNative")
     }
 
     // MARK: - Signal and Fault Keys
 
-    func testCrashReportKeys_SignalName() {
+    func testCrashReportKeysSignalName() {
         XCTAssertEqual(CrashReportKeys.signalName.rawValue, "signalName")
     }
 
-    func testCrashReportKeys_FaultAddress() {
+    func testCrashReportKeysFaultAddress() {
         XCTAssertEqual(CrashReportKeys.faultAddress.rawValue, "crash.address")
     }
 
     // MARK: - Exception Keys
 
-    func testCrashReportKeys_ExceptionName() {
+    func testCrashReportKeysExceptionName() {
         XCTAssertEqual(CrashReportKeys.exceptionName.rawValue, "exception.type")
     }
 
-    func testCrashReportKeys_ExceptionReason() {
+    func testCrashReportKeysExceptionReason() {
         XCTAssertEqual(CrashReportKeys.exceptionReason.rawValue, "exception.message")
     }
 
     // MARK: - Thread and Image Keys
 
-    func testCrashReportKeys_Threads() {
+    func testCrashReportKeysThreads() {
         XCTAssertEqual(CrashReportKeys.threads.rawValue, "exception.threads")
     }
 
-    func testCrashReportKeys_Images() {
+    func testCrashReportKeysImages() {
         XCTAssertEqual(CrashReportKeys.images.rawValue, "exception.images")
     }
 
-    func testCrashReportKeys_Details() {
+    func testCrashReportKeysDetails() {
         XCTAssertEqual(CrashReportKeys.details.rawValue, "details")
     }
 
-    func testCrashReportKeys_Component() {
+    func testCrashReportKeysComponent() {
         XCTAssertEqual(CrashReportKeys.component.rawValue, "component")
     }
 
-    func testCrashReportKeys_Error() {
+    func testCrashReportKeysError() {
         XCTAssertEqual(CrashReportKeys.error.rawValue, "error")
     }
 
     // MARK: - Stack Frame Keys
 
-    func testCrashReportKeys_InstructionPointer() {
+    func testCrashReportKeysInstructionPointer() {
         XCTAssertEqual(CrashReportKeys.instructionPointer.rawValue, "instructionPointer")
     }
 
-    func testCrashReportKeys_ImageName() {
+    func testCrashReportKeysImageName() {
         XCTAssertEqual(CrashReportKeys.imageName.rawValue, "imageName")
     }
 
-    func testCrashReportKeys_SymbolName() {
+    func testCrashReportKeysSymbolName() {
         XCTAssertEqual(CrashReportKeys.symbolName.rawValue, "symbolName")
     }
 
     // MARK: - Thread Keys
 
-    func testCrashReportKeys_ThreadNumber() {
+    func testCrashReportKeysThreadNumber() {
         XCTAssertEqual(CrashReportKeys.threadNumber.rawValue, "threadNumber")
     }
 
-    func testCrashReportKeys_StackFrames() {
+    func testCrashReportKeysStackFrames() {
         XCTAssertEqual(CrashReportKeys.stackFrames.rawValue, "stackFrames")
     }
 
-    func testCrashReportKeys_IsCrashedThread() {
+    func testCrashReportKeysIsCrashedThread() {
         XCTAssertEqual(CrashReportKeys.isCrashedThread.rawValue, "crashed")
     }
 
     // MARK: - Binary Image Keys
 
-    func testCrashReportKeys_BaseAddress() {
+    func testCrashReportKeysBaseAddress() {
         XCTAssertEqual(CrashReportKeys.baseAddress.rawValue, "baseAddress")
     }
 
-    func testCrashReportKeys_Offset() {
+    func testCrashReportKeysOffset() {
         XCTAssertEqual(CrashReportKeys.offset.rawValue, "offset")
     }
 
-    func testCrashReportKeys_ImageSize() {
+    func testCrashReportKeysImageSize() {
         XCTAssertEqual(CrashReportKeys.imageSize.rawValue, "imageSize")
     }
 
-    func testCrashReportKeys_ImagePath() {
+    func testCrashReportKeysImagePath() {
         XCTAssertEqual(CrashReportKeys.imagePath.rawValue, "imagePath")
     }
 
-    func testCrashReportKeys_ImageUUID() {
+    func testCrashReportKeysImageUUID() {
         XCTAssertEqual(CrashReportKeys.imageUUID.rawValue, "imageUUID")
     }
 
     // MARK: - Session Key
 
-    func testCrashReportKeys_SessionId() {
+    func testCrashReportKeysSessionId() {
         XCTAssertEqual(CrashReportKeys.sessionId.rawValue, "session.id")
     }
 }

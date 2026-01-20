@@ -235,20 +235,20 @@ extension AgentConfiguration {
 
         // Validate app name
         if appName.isEmpty {
+            let error = AgentConfigurationError.invalidAppName(supplied: appName)
             logger.log(level: .error, isPrivate: false) {
-                AgentConfigurationError
-                    .invalidAppName(supplied: appName)
-                    .description
+                error.description
             }
+            throw error
         }
 
-        // Validate deployment environment
+        // Validate deployment environment - must not be nil or empty
         if deploymentEnvironment.isEmpty {
-            logger.log(level: .error) {
-                AgentConfigurationError
-                    .invalidDeploymentEnvironment(supplied: deploymentEnvironment)
-                    .description
+            let error = AgentConfigurationError.invalidDeploymentEnvironment(supplied: deploymentEnvironment)
+            logger.log(level: .error, isPrivate: false) {
+                error.description
             }
+            throw error
         }
     }
 }

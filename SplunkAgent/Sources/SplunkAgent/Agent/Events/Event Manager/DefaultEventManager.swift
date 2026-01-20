@@ -102,6 +102,10 @@ class DefaultEventManager: AgentEventManager {
             logEventProcessor = NoOpLogEventProcessor()
             sessionReplayProcessor = nil
             traceProcessor = NoOpTraceProcessor()
+        let accessToken = configuration.endpoint.rumAccessToken
+
+        // ‼️ Using trace endpoint as a placeholder
+        let logUrl = traceUrl
 
             logger.log(level: .info, isPrivate: false) {
                 "No endpoint configured. Spans will not be sent until endpoint is updated."
@@ -197,7 +201,8 @@ class DefaultEventManager: AgentEventManager {
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
             globalAttributes: { agent.globalAttributes.getAll() },
-            debugEnabled: configuration.enableDebugLogging
+            debugEnabled: configuration.enableDebugLogging,
+            accessToken: accessToken
         )
 
         // Initialize trace processor
@@ -207,7 +212,8 @@ class DefaultEventManager: AgentEventManager {
             runtimeAttributes: agent.runtimeAttributes,
             globalAttributes: { agent.globalAttributes.getAll() },
             debugEnabled: configuration.enableDebugLogging,
-            spanInterceptor: configuration.spanInterceptor
+            spanInterceptor: configuration.spanInterceptor,
+            accessToken: accessToken
         )
 
         return Processors(
