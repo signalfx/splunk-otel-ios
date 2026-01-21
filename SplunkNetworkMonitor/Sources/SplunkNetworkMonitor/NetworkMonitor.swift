@@ -197,18 +197,16 @@ public class NetworkMonitor {
                 return
             }
 
-            self.isInitialEvent = false
-            self.networkChangeEvent.timestamp = Date()
-            self.networkChangeEvent.radioType = self.getCurrentRadioType()
-            self.sendNetworkChangeSpan()
+            isInitialEvent = false
+            networkChangeEvent.timestamp = Date()
+            networkChangeEvent.radioType = getCurrentRadioType()
+            sendNetworkChangeSpan()
         }
     }
 
     // swiftlint:disable cyclomatic_complexity
     private func getCurrentRadioType() -> String? {
         #if canImport(CoreTelephony)
-            // Access serviceCurrentRadioAccessTechnology safely - it can sometimes
-            // be in an inconsistent state during radio technology changes
             let radioDict: [String: String]?
             do {
                 radioDict = telephonyInfo.serviceCurrentRadioAccessTechnology
