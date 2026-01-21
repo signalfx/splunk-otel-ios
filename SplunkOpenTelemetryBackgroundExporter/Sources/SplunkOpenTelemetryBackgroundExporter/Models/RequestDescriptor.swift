@@ -110,6 +110,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         try container.encode(headers, forKey: .headers)
     }
 
+
     // MARK: - Request creation methods
 
     func createRequest() -> URLRequest {
