@@ -29,7 +29,11 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/open-telemetry/opentelemetry-swift",
-            exact: "2.0.0"
+            from: "2.1.0"
+        ),
+        .package(
+            url: "https://github.com/open-telemetry/opentelemetry-swift-core",
+            from: "2.1.1"
         ),
         .package(
             url: "https://github.com/microsoft/plcrashreporter",
@@ -73,8 +77,8 @@ func generateMainTargets() -> [Target] {
                 "SplunkSlowFrameDetector",
                 "SplunkOpenTelemetry",
                 "SplunkInteractions",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
-                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
                 "SplunkAppStart",
                 "SplunkAppState",
                 "SplunkWebView",
@@ -137,7 +141,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkNavigation",
             dependencies: [
                 "SplunkCommon",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 resolveDependency("logger"),
                 resolveDependency("swizzling")
             ],
@@ -160,8 +164,8 @@ func generateMainTargets() -> [Target] {
             name: "SplunkNetwork",
             dependencies: [
                 "SplunkCommon",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
-                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
                 resolveDependency("logger")
             ],
             path: "SplunkNetwork/Sources",
@@ -183,7 +187,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkNetworkMonitor",
             dependencies: [
                 "SplunkCommon",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 resolveDependency("logger")
             ],
             path: "SplunkNetworkMonitor/Sources",
@@ -207,7 +211,7 @@ func generateMainTargets() -> [Target] {
                 resolveDependency("diskStorage"),
                 resolveDependency("encryptor"),
                 resolveDependency("logger"),
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift")
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core")
             ],
             path: "SplunkCommon/Sources",
             plugins: lintTargetPlugins()
@@ -228,7 +232,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkSlowFrameDetector",
             dependencies: [
                 .byName(name: "SplunkCommon"),
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 resolveDependency("logger")
             ],
             path: "SplunkSlowFrameDetector/Sources",
@@ -251,10 +255,19 @@ func generateMainTargets() -> [Target] {
             name: "SplunkCrashReports",
             dependencies: [
                 "SplunkCommon",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 .product(name: "CrashReporter", package: "PLCrashReporter")
             ],
             path: "SplunkCrashReports/Sources",
+            plugins: lintTargetPlugins()
+        ),
+        .testTarget(
+            name: "SplunkCrashReportsTests",
+            dependencies: [
+                "SplunkCrashReports",
+                "SplunkCommon"
+            ],
+            path: "SplunkCrashReports/Tests",
             plugins: lintTargetPlugins()
         ),
 
@@ -265,8 +278,8 @@ func generateMainTargets() -> [Target] {
             name: "SplunkOpenTelemetry",
             dependencies: [
                 "SplunkOpenTelemetryBackgroundExporter",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
-                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
                 .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
                 resolveDependency("logger")
             ],
@@ -281,7 +294,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkOpenTelemetryBackgroundExporter",
             dependencies: [
                 "SplunkCommon",
-                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
                 .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
                 resolveDependency("logger"),
                 resolveDependency("diskStorage")
@@ -306,7 +319,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkInteractions",
             dependencies: [
                 "SplunkCommon",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 resolveDependency("runtimeCache"),
                 resolveDependency("logger"),
                 resolveDependency("swizzling"),
@@ -331,7 +344,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkAppStart",
             dependencies: [
                 "SplunkCommon",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 resolveDependency("logger")
             ],
             path: "SplunkAppStart/Sources",
@@ -353,7 +366,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkAppState",
             dependencies: [
                 "SplunkCommon",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 resolveDependency("logger")
             ],
             path: "SplunkAppState/Sources",
@@ -413,8 +426,8 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 "SplunkOpenTelemetry",
                 "SplunkCustomTracking",
-                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift"),
-                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift")
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core")
             ],
             path: "SplunkCustomTracking/Tests",
             plugins: lintTargetPlugins()

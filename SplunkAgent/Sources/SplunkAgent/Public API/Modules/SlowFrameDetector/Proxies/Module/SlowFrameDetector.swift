@@ -33,7 +33,7 @@ final class SlowFrameDetector: SlowFrameDetectorModule, SlowFrameDetectorModuleS
 
     /// The enabled status of the underlying module.
     var isEnabled: Bool {
-        module.state.isEnabled
+        module.isEnabled
     }
 
     // MARK: - InitializationSplunkSlowFrameDetector.SlowFrameDetector.configuration
