@@ -26,6 +26,7 @@ protocol RequestDescriptorProtocol: Codable {
     var fileKeyType: String { get }
     var scheduled: Date { get }
     var shouldSend: Bool { get }
+    var headers: [String: String] { get }
 
     func createRequest() -> URLRequest
 }
@@ -52,6 +53,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
     let explicitTimeout: TimeInterval
     var sentCount: Int = 0
     var fileKeyType: String
+    var headers: [String: String] = [:]
 
     var scheduled: Date {
         Calendar.current.date(byAdding: nextRequestDelay, to: Date()) ?? Date()
@@ -59,6 +61,53 @@ struct RequestDescriptor: RequestDescriptorProtocol {
 
     var shouldSend: Bool {
         sentCount <= 5
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case endpoint
+        case explicitTimeout
+        case sentCount
+        case fileKeyType
+        case headers
+    }
+
+    init(
+        id: UUID,
+        endpoint: URL,
+        explicitTimeout: TimeInterval,
+        sentCount: Int = 0,
+        fileKeyType: String,
+        headers: [String: String] = [:]
+    ) {
+        self.id = id
+        self.endpoint = endpoint
+        self.explicitTimeout = explicitTimeout
+        self.sentCount = sentCount
+        self.fileKeyType = fileKeyType
+        self.headers = headers
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = try container.decode(UUID.self, forKey: .id)
+        endpoint = try container.decode(URL.self, forKey: .endpoint)
+        explicitTimeout = try container.decode(TimeInterval.self, forKey: .explicitTimeout)
+        sentCount = try container.decode(Int.self, forKey: .sentCount)
+        fileKeyType = try container.decode(String.self, forKey: .fileKeyType)
+        headers = try container.decodeIfPresent([String: String].self, forKey: .headers) ?? [:]
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(id, forKey: .id)
+        try container.encode(endpoint, forKey: .endpoint)
+        try container.encode(explicitTimeout, forKey: .explicitTimeout)
+        try container.encode(sentCount, forKey: .sentCount)
+        try container.encode(fileKeyType, forKey: .fileKeyType)
+        try container.encode(headers, forKey: .headers)
     }
 
 
@@ -71,6 +120,10 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         request.setValue(Headers.getUserAgentHeader(), forHTTPHeaderField: Constants.HTTP.userAgent)
         request.setValue("application/x-protobuf", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = explicitTimeout
+
+        for (key, value) in headers {
+            request.setValue(value, forHTTPHeaderField: key)
+        }
 
         return request
     }

@@ -119,6 +119,28 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertFalse(builder.build())
     }
 
+    func testBuildWithEmptyAppNameReturnsFalse() {
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "auth"
+        )
+        .setApplicationName("")
+        .deploymentEnvironment(environment: "Prod")
+
+        XCTAssertFalse(builder.build())
+    }
+
+    func testBuildWithEmptyEnvironmentReturnsFalse() {
+        let builder = SplunkRumBuilder(
+            beaconUrl: "https://example.com/v1/rum",
+            rumAuth: "auth"
+        )
+        .setApplicationName("EmptyEnvApp")
+        .deploymentEnvironment(environment: "")
+
+        XCTAssertFalse(builder.build())
+    }
+
     func testBuildWithInvalidBeaconUrlReturnsFalse() {
         let invalidUrl = "not a url"
         let builder = SplunkRumBuilder(
@@ -191,8 +213,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertEqual(comps.host, "rum-ingest.\(realm).signalfx.com")
         XCTAssertEqual(comps.path, "/v1/traces")
 
-        let authItem = comps.queryItems?.first { $0.name == "auth" }
-        XCTAssertEqual(authItem?.value, token)
+        XCTAssertTrue(comps.queryItems?.isEmpty ?? true)
     }
 
     func testBuildSlowRenderingDisabledWhenFalse() throws {

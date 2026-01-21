@@ -42,6 +42,8 @@ public class CrashReports {
 
     private var crashReporter: PLCrashReporter?
 
+    var crashSpanName: String = "SplunkCrashReport"
+
     /// Storage of periodically sampled device data.
     private var deviceDataDictionary: [String: String] = [:]
     private var dataUpdateTimer: Timer?
@@ -151,8 +153,6 @@ public class CrashReports {
         }
     }
 
-    // MARK: - Private methods
-
     /// Starts up crash reporter if enable is true and no debugger attached.
     public func initializeCrashReporter() -> Bool {
 
@@ -191,6 +191,20 @@ public class CrashReports {
         startPollingForDeviceStats()
 
         return true
+    }
+
+    // MARK: - Private methods
+
+
+    /// Updates the span name with report data.
+    ///
+    /// Only updates if the provided name is not empty.
+    func updateSpanName(_ name: String) {
+        guard !name.isEmpty else {
+            return
+        }
+
+        crashSpanName = name
     }
 
     /// Returns true if debugger is attached.
@@ -269,20 +283,7 @@ public class CrashReports {
         if let sharedState {
             let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
 
-            // This mapping code below may be able to be removed in the future should
-            // the backend is able to support all options.
-            appState =
-                switch timebasedAppState {
-                case "active":
-                    "foreground"
-
-                case "inactive",
-                    "terminate":
-                    "background"
-
-                default:
-                    timebasedAppState
-                }
+            appState = timebasedAppState
         }
         return appState
     }
@@ -295,7 +296,7 @@ public class CrashReports {
                 instrumentationVersion: sharedState?.agentVersion
             )
 
-        let crashSpan = tracer.spanBuilder(spanName: "SplunkCrashReport")
+        let crashSpan = tracer.spanBuilder(spanName: crashSpanName)
             .setStartTime(time: timestamp)
             .startSpan()
 

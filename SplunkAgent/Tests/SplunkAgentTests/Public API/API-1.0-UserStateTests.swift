@@ -30,9 +30,9 @@ final class API10UserStateTests: XCTestCase {
 
         // Properties (READ)
         let initialTrackingMode = userState.trackingMode
-        XCTAssertEqual(initialTrackingMode, UserTrackingMode.noTracking)
+        XCTAssertEqual(initialTrackingMode, UserTrackingMode.anonymousTracking)
 
-        agent.user.preferences.trackingMode = .anonymousTracking
-        XCTAssertEqual(userState.trackingMode, .anonymousTracking)
+        agent.user.preferences.trackingMode = .noTracking
+        XCTAssertEqual(userState.trackingMode, .noTracking)
     }
 }

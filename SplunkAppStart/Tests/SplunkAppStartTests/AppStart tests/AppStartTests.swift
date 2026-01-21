@@ -102,6 +102,13 @@ final class AppStartTests: XCTestCase {
         try checkDates(in: destination)
     }
 
+    /// Tests that when the app is launched in background (backgroundLaunchDetected = true),
+    /// a warm start is correctly reported.
+    ///
+    /// Note: We manually set `backgroundLaunchDetected = true` because UIApplication.shared.applicationState
+    /// cannot be mocked in unit tests. In production, this flag is set automatically in the
+    /// `willEnterForegroundNotification` handler when `applicationState == .background` or when
+    /// more than 10 seconds have passed since `didFinishLaunching`.
     func testBackgroundStart() throws {
         let destination = DebugDestination()
 
@@ -113,6 +120,39 @@ final class AppStartTests: XCTestCase {
         simulateWarmStartNotifications()
 
         // Check type and dates
+        try checkDeterminedType(.warm, in: destination)
+        try checkDates(in: destination)
+    }
+
+    /// Tests the timing-based background launch detection.
+    /// This simulates an app that:
+    /// 1. Starts in background (didFinishLaunching fires more than 10 seconds ago)
+    /// 2. Stays in background for a while
+    /// 3. User brings app to foreground (willEnterForeground, didBecomeActive fire)
+    ///
+    /// The backgroundLaunchDetected flag should be automatically set to true
+    /// because more than 10 seconds have passed since didFinishLaunching,
+    /// resulting in a warm start instead of a cold start with hours-long duration.
+    func testBackgroundLaunchDetectedByTiming() throws {
+        let destination = DebugDestination()
+
+        let appStart = AppStart()
+        appStart.destination = destination
+        appStart.install(with: nil, remoteConfiguration: nil)
+
+        // Simulate didFinishLaunching happened more than 10 seconds ago
+        // (app was launched in background and stayed there)
+        appStart.didFinishLaunchingTimestamp = Date().addingTimeInterval(-15.0)
+
+        // Now simulate user bringing app to foreground
+        // The willEnterForeground handler should detect this as a background launch
+        // because more than 10 seconds have passed since didFinishLaunching
+        simulateWarmStartNotifications()
+
+        // Verify backgroundLaunchDetected was set to true by the timing check
+        XCTAssertTrue(appStart.backgroundLaunchDetected == true, "backgroundLaunchDetected should be true due to timing check")
+
+        // Should be warm start, NOT cold start
         try checkDeterminedType(.warm, in: destination)
         try checkDates(in: destination)
     }
