@@ -190,16 +190,31 @@ public class NetworkMonitor {
 
     @objc
     private func radioAccessChanged() {
-        isInitialEvent = false
-        networkChangeEvent.timestamp = Date()
-        networkChangeEvent.radioType = getCurrentRadioType()
-        sendNetworkChangeSpan()
+        // Dispatch to our serial queue to ensure thread-safe access to telephonyInfo
+        // and add a small delay to allow CoreTelephony to stabilize its internal state
+        queue.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            guard let self else {
+                return
+            }
+
+            self.isInitialEvent = false
+            self.networkChangeEvent.timestamp = Date()
+            self.networkChangeEvent.radioType = self.getCurrentRadioType()
+            self.sendNetworkChangeSpan()
+        }
     }
 
     // swiftlint:disable cyclomatic_complexity
     private func getCurrentRadioType() -> String? {
         #if canImport(CoreTelephony)
-            guard let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first else {
+            // Access serviceCurrentRadioAccessTechnology safely - it can sometimes
+            // be in an inconsistent state during radio technology changes
+            let radioDict: [String: String]?
+            do {
+                radioDict = telephonyInfo.serviceCurrentRadioAccessTechnology
+            }
+
+            guard let radioTechnology = radioDict?.values.first else {
                 return nil
             }
 
