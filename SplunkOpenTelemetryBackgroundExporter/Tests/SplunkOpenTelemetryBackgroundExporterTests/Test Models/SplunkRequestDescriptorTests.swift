@@ -80,4 +80,20 @@ final class SplunkRequestDescriptorTests: XCTestCase {
         // Check the date intervals with an arbitrarily small accuracy.
         XCTAssertEqual(expectedSendDate.timeIntervalSinceReferenceDate, requestDescriotor.scheduled.timeIntervalSinceReferenceDate, accuracy: 0.1)
     }
+
+    func testDecodeWithoutHeadersDefaultsToEmpty() throws {
+        let id = UUID()
+        let payload: [String: Any] = [
+            "id": id.uuidString,
+            "endpoint": "https://example.com",
+            "explicitTimeout": 1.0,
+            "sentCount": 2,
+            "fileKeyType": fileKeyType
+        ]
+
+        let data = try JSONSerialization.data(withJSONObject: payload, options: [])
+        let decoded = try JSONDecoder().decode(RequestDescriptor.self, from: data)
+
+        XCTAssertEqual(decoded.headers, [:])
+    }
 }
