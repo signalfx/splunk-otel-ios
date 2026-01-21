@@ -79,11 +79,11 @@ class DefaultEventManager: AgentEventManager {
         if let endpoint = configuration.endpoint,
             let traceUrl = endpoint.traceEndpoint
         {
-
             // Initialize with real processors
             let processors = Self.createProcessors(
                 traceUrl: traceUrl,
                 sessionReplayUrl: endpoint.sessionReplayEndpoint,
+                accessToken: endpoint.rumAccessToken,
                 configuration: configuration,
                 agent: agent
             )
@@ -97,15 +97,10 @@ class DefaultEventManager: AgentEventManager {
             }
         }
         else {
-
             // Initialize with NoOp processors - spans won't be sent
             logEventProcessor = NoOpLogEventProcessor()
             sessionReplayProcessor = nil
             traceProcessor = NoOpTraceProcessor()
-        let accessToken = configuration.endpoint.rumAccessToken
-
-        // ‼️ Using trace endpoint as a placeholder
-        let logUrl = traceUrl
 
             logger.log(level: .info, isPrivate: false) {
                 "No endpoint configured. Spans will not be sent until endpoint is updated."
@@ -131,6 +126,7 @@ class DefaultEventManager: AgentEventManager {
         let processors = Self.createProcessors(
             traceUrl: traceUrl,
             sessionReplayUrl: endpoint.sessionReplayEndpoint,
+            accessToken: endpoint.rumAccessToken,
             configuration: configuration,
             agent: agent
         )
@@ -165,6 +161,7 @@ class DefaultEventManager: AgentEventManager {
     private static func createProcessors(
         traceUrl: URL,
         sessionReplayUrl: URL?,
+        accessToken: String?,
         configuration: any AgentConfigurationProtocol,
         agent: SplunkRum
     ) -> Processors {
