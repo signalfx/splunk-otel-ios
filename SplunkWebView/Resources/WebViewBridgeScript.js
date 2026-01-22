@@ -27,8 +27,34 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
             onNativeSessionIdChanged: null,
 
             _fetchSessionId: function() {
-                return window.webkit.messageHandlers.__HANDLER_NAME__
-                    .postMessage({})
+                const handler = window.webkit?.messageHandlers?.__HANDLER_NAME__;
+                if (!handler || typeof handler.postMessage !== "function") {
+                    const error = new Error(
+                        "[SplunkRumNative] postMessage handler is unavailable; " +
+                        "native replies may be unsupported on this platform."
+                    );
+                    console.warn(error.message);
+                    return Promise.reject(error);
+                }
+
+                let result;
+                try {
+                    result = handler.postMessage({});
+                } catch (error) {
+                    console.error("[SplunkRumNative] postMessage threw an error:", error);
+                    return Promise.reject(error);
+                }
+
+                if (!result || typeof result.then !== "function") {
+                    const error = new Error(
+                        "[SplunkRumNative] postMessage did not return a Promise; " +
+                        "native replies may be unsupported on this platform."
+                    );
+                    console.warn(error.message);
+                    return Promise.reject(error);
+                }
+
+                return result
                     .then((r) => r.sessionId)
                     .catch( function(error) {
                         console.error("[SplunkRumNative] Failed to fetch native session ID:", error);
