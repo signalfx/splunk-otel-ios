@@ -63,7 +63,12 @@ final class WebViewInstrumentationTests: XCTestCase {
 
         XCTAssertNotNil(mockContentController)
         XCTAssertTrue(mockContentController?.addUserScriptCalled ?? false)
-        XCTAssertTrue(mockContentController?.addScriptMessageHandlerCalled ?? false)
+        if #available(iOS 14.0, *) {
+            XCTAssertTrue(mockContentController?.addScriptMessageHandlerCalled ?? false)
+        }
+        else {
+            XCTAssertTrue(mockContentController?.addLegacyScriptMessageHandlerCalled ?? false)
+        }
         XCTAssertEqual(mockContentController?.lastAddedMessageHandlerName, "SplunkRumNativeUpdate")
     }
 
