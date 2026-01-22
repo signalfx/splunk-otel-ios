@@ -207,12 +207,7 @@ public class NetworkMonitor {
     // swiftlint:disable cyclomatic_complexity
     private func getCurrentRadioType() -> String? {
         #if canImport(CoreTelephony)
-            let radioDict: [String: String]?
-            do {
-                radioDict = telephonyInfo.serviceCurrentRadioAccessTechnology
-            }
-
-            guard let radioTechnology = radioDict?.values.first else {
+            guard let radioTechnology = telephonyInfo.serviceCurrentRadioAccessTechnology?.values.first else {
                 return nil
             }
 

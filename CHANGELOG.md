@@ -9,6 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+* Updated Network Monitor to remove crashes during network radio change notifications.
 * Updated and unpinned the opentelemetry-swift dependency to latest version, using the new split repos (opentelemetry-swift and opentelemetry-swift-core). 
 
 ## [2.0.5] - 2026-01-19
