@@ -171,7 +171,9 @@ final class WebViewInstrumentationTests: XCTestCase {
     }
 
     func testMessageHandler_whenSessionIdChanges_repliesWithNewSessionId() throws {
-        if #available(iOS 14.0, *) {} else { throw XCTSkip("WKScriptMessageHandlerWithReply requires iOS 14+") }
+        guard #available(iOS 14.0, *) else {
+            throw XCTSkip("WKScriptMessageHandlerWithReply requires iOS 14+")
+        }
         let mockWebView = try XCTUnwrap(mockWebView)
         let mockAgentSharedState = try XCTUnwrap(mockAgentSharedState)
         let webViewInstrumentation = try XCTUnwrap(webViewInstrumentation)
@@ -251,7 +253,9 @@ final class WebViewInstrumentationTests: XCTestCase {
     // MARK: - Message Handler Tests
 
     func testMessageHandler_whenSessionIdIsValid_repliesWithSessionId() throws {
-        if #available(iOS 14.0, *) {} else { throw XCTSkip("WKScriptMessageHandlerWithReply requires iOS 14+") }
+        guard #available(iOS 14.0, *) else {
+            throw XCTSkip("WKScriptMessageHandlerWithReply requires iOS 14+")
+        }
         let mockWebView = try XCTUnwrap(mockWebView)
         let mockAgentSharedState = try XCTUnwrap(mockAgentSharedState)
         let webViewInstrumentation = try XCTUnwrap(webViewInstrumentation)
@@ -278,7 +282,9 @@ final class WebViewInstrumentationTests: XCTestCase {
     }
 
     func testMessageHandler_whenSharedStateIsNil_repliesWithError() throws {
-        if #available(iOS 14.0, *) {} else { throw XCTSkip("WKScriptMessageHandlerWithReply requires iOS 14+") }
+        guard #available(iOS 14.0, *) else {
+            throw XCTSkip("WKScriptMessageHandlerWithReply requires iOS 14+")
+        }
         let mockWebView = try XCTUnwrap(mockWebView)
         let webViewInstrumentation = try XCTUnwrap(webViewInstrumentation)
         webViewInstrumentation.sharedState = nil
