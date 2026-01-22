@@ -27,7 +27,10 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
             onNativeSessionIdChanged: null,
 
             _fetchSessionId: function() {
-                const handler = window.webkit?.messageHandlers?.__HANDLER_NAME__;
+                const handler =
+                    window.webkit &&
+                    window.webkit.messageHandlers &&
+                    window.webkit.messageHandlers.__HANDLER_NAME__;
                 if (!handler || typeof handler.postMessage !== "function") {
                     const error = new Error(
                         "[SplunkRumNative] postMessage handler is unavailable; " +
@@ -123,7 +126,12 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
             }
         };
         console.log("[SplunkRumNative] Initialized with native session:", self.cachedSessionId)
-        console.log("[SplunkRumNative] Bridge available:", Boolean(window.webkit?.messageHandlers?.__HANDLER_NAME__));
+        const bridgeAvailable = Boolean(
+            window.webkit &&
+            window.webkit.messageHandlers &&
+            window.webkit.messageHandlers.__HANDLER_NAME__
+        );
+        console.log("[SplunkRumNative] Bridge available:", bridgeAvailable);
         self._isInitialized = true;
         return self;
     }());
