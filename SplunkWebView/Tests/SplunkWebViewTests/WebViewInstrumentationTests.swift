@@ -223,6 +223,24 @@ final class WebViewInstrumentationTests: XCTestCase {
         XCTAssertTrue(script.contains("window.SplunkRumNative"), "JS should define window.SplunkRumNative")
     }
 
+    func testJavascriptContent_includesPostMessagePromiseGuards() throws {
+        let mockWebView = try XCTUnwrap(mockWebView)
+        webViewInstrumentation?.injectSessionId(into: mockWebView)
+
+        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        XCTAssertTrue(script.contains("postMessage handler is unavailable"), "JS should guard missing handler")
+        XCTAssertTrue(script.contains("postMessage did not return a Promise"), "JS should guard non-promise return")
+    }
+
+    func testJavascriptContent_avoidsOptionalChainingForLegacyIOS() throws {
+        let mockWebView = try XCTUnwrap(mockWebView)
+        webViewInstrumentation?.injectSessionId(into: mockWebView)
+
+        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        XCTAssertFalse(script.contains("?."), "JS should avoid optional chaining for iOS 13.0")
+        XCTAssertTrue(script.contains("window.webkit &&"), "JS should use explicit guards for WebKit access")
+    }
+
 
     // MARK: - Message Handler Tests
 
