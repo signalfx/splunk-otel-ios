@@ -31,6 +31,7 @@ final class MockWKUserContentController: WKUserContentController {
         addUserScriptCallCount += 1
     }
 
+    @available(iOS 14.0, *)
     override func addScriptMessageHandler(_: WKScriptMessageHandlerWithReply, contentWorld _: WKContentWorld, name: String) {
         addScriptMessageHandlerCalled = true
         lastAddedMessageHandlerName = name
