@@ -356,11 +356,14 @@ class DefaultEventManager: AgentEventManager {
             immediateProcessing: false
         ) { _ in }
     }
+}
 
 
-    // MARK: - Module utils
+// MARK: - Session Replay Utils
 
-    private func prepareSessionReplayIndex(sessionId: String, timestamp: Date) async -> Int? {
+extension DefaultEventManager {
+
+    func prepareSessionReplayIndex(sessionId: String, timestamp: Date) async -> Int? {
         do {
             return try await sessionReplayIndexer.prepareIndex(
                 sessionId: sessionId,
@@ -376,7 +379,7 @@ class DefaultEventManager: AgentEventManager {
         return nil
     }
 
-    private func removeSessionReplayIndex(sessionId: String, timestamp: Date) {
+    func removeSessionReplayIndex(sessionId: String, timestamp: Date) {
         Task {
             do {
                 try await sessionReplayIndexer.removeIndex(
