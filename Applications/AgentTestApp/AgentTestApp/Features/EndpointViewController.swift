@@ -22,13 +22,13 @@ class EndpointViewController: UIViewController {
     // MARK: - UI Outlets
 
     @IBOutlet
-    private var simpleNetworkButton: UIButton!
+    private var resetEndpointButton: UIButton!
 
     @IBOutlet
-    private var delegateNetworkButton: UIButton!
+    private var clearEndpointButton: UIButton!
 
     @IBOutlet
-    private var sampleUrl: UITextField!
+    private var endpointUrl: UITextField!
 
 
     // MARK: - View lifecycle
@@ -37,7 +37,7 @@ class EndpointViewController: UIViewController {
         super.viewDidLoad()
 
         let savedUrl = UserDefaults.standard.string(forKey: "SampleURL") ?? "https://httpbin.org/get"
-        sampleUrl.text = savedUrl
+        endpointUrl.text = savedUrl
     }
 
 
@@ -45,21 +45,21 @@ class EndpointViewController: UIViewController {
 
     @IBAction
     private func setEndpoint(_: UIButton) {
-        guard let urlToCall = sampleUrl.text else {
+        guard let newEndpointUrl = endpointUrl.text else {
             return
         }
 
-        UserDefaults.standard.set(urlToCall, forKey: "SampleURL")
-        print("Simple Network Call to \(urlToCall)")
+        print("Reset Endpoint to \(newEndpointUrl)")
 
-        let net = EndpointCalls()
-        net.resetEndpoint(targetURL: urlToCall)
+        let endpoint = EndpointCalls()
+        endpoint.resetEndpoint(targetURL: newEndpointUrl)
     }
 
     @IBAction
     private func clearEndpoint(_: UIButton) {
-        let net = EndpointCalls()
-        net.clearEndpoint()
+        let endpoint = EndpointCalls()
+        endpoint.clearEndpoint()
+
         print("Endpoint cleared")
     }
 }

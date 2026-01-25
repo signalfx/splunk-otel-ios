@@ -25,8 +25,7 @@ class EndpointCalls {
         guard let url = URL(string: targetURL) else {
             return
         }
-
-        let request = URLRequest(url: url)
+        //
     }
 
     func clearEndpoint() {

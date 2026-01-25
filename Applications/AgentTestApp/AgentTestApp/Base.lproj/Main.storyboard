@@ -525,7 +525,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5da-Hd-x76">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5da-Hd-x76" userLabel="Reset Endpoint Button">
                                 <rect key="frame" x="107" y="289" width="200" height="31"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="200" id="kIL-Qh-3tQ"/>
@@ -537,7 +537,7 @@
                                     <action selector="setEndpoint:" destination="wv7-gC-WmX" eventType="touchUpInside" id="Tav-rJ-Ifi"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eF1-mN-Xnq">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eF1-mN-Xnq" userLabel="Clear Endpoint Button">
                                 <rect key="frame" x="107" y="328" width="200" height="31"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="200" id="0YO-Ow-UK6"/>
@@ -549,7 +549,7 @@
                                     <action selector="clearEndpoint:" destination="wv7-gC-WmX" eventType="touchUpInside" id="vLP-wB-uzR"/>
                                 </connections>
                             </button>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="exf-L1-ePx">
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="exf-L1-ePx" userLabel="Endpoint URL">
                                 <rect key="frame" x="77" y="247" width="317" height="34"/>
                                 <accessibility key="accessibilityConfiguration" label="sampleUrl"/>
                                 <constraints>
@@ -597,9 +597,9 @@
                     </view>
                     <navigationItem key="navigationItem" id="32U-0M-rtM"/>
                     <connections>
-                        <outlet property="delegateNetworkButton" destination="eF1-mN-Xnq" id="Qgo-Q3-Uqn"/>
-                        <outlet property="sampleUrl" destination="exf-L1-ePx" id="nGW-uK-xIW"/>
-                        <outlet property="simpleNetworkButton" destination="5da-Hd-x76" id="Vtu-WH-whT"/>
+                        <outlet property="clearEndpointButton" destination="eF1-mN-Xnq" id="zvu-uY-d5f"/>
+                        <outlet property="endpointUrl" destination="exf-L1-ePx" id="Zyq-fj-WZg"/>
+                        <outlet property="resetEndpointButton" destination="5da-Hd-x76" id="G3E-zX-9Ae"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eSf-gW-l3u" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
