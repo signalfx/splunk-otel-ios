@@ -141,12 +141,47 @@ class DefaultEventManager: AgentEventManager {
         }
     }
 
-    /// Disables the endpoint configuration and reverts to NoOp processors.
+    /// Disables the endpoint configuration.
     ///
-    /// This method replaces active processors with NoOp processors, effectively disabling
-    /// data transmission. All subsequent spans and events will be dropped.
-    func disableEndpoint() {
-        // Replace with NoOp processors - spans won't be sent
+    /// When `cacheData` is `true` (default), spans and events are cached to disk for later sending
+    /// when a new endpoint is configured. When `false`, data is dropped (NoOp mode).
+    ///
+    /// - Parameter cacheData: If `true`, data is cached for later sending. If `false`, data is dropped.
+    func disableEndpoint(cacheData: Bool = true) {
+        if cacheData {
+            // Keep real processors active for caching - they'll write to disk
+            // but HTTP will fail to a non-routable address, triggering retry cache
+            guard let cachingUrl = URL(string: "http://0.0.0.0:0/v1/traces") else {
+                logger.log(level: .error, isPrivate: false) {
+                    "Failed to create caching URL. Falling back to NoOp mode."
+                }
+                disableEndpointWithNoOp()
+                return
+            }
+
+            let processors = Self.createProcessors(
+                traceUrl: cachingUrl,
+                sessionReplayUrl: nil,
+                accessToken: nil,
+                configuration: configuration,
+                agent: agent
+            )
+
+            logEventProcessor = processors.logEventProcessor
+            sessionReplayProcessor = processors.sessionReplayProcessor
+            traceProcessor = processors.traceProcessor
+
+            logger.log(level: .info, isPrivate: false) {
+                "Endpoint disabled with caching enabled. Spans will be cached and sent when endpoint is configured."
+            }
+        }
+        else {
+            disableEndpointWithNoOp()
+        }
+    }
+
+    /// Disables the endpoint with NoOp processors (data is dropped).
+    private func disableEndpointWithNoOp() {
         logEventProcessor = NoOpLogEventProcessor()
         sessionReplayProcessor = nil
         traceProcessor = NoOpTraceProcessor()

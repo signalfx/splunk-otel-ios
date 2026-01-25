@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+* Added support for the endpointConfiguration to be deferred and after agent initialization.  Disabling the endpoint is also supported with caching (optional) of pending spans.
+
 ### Changed
 
 * Updated and unpinned the opentelemetry-swift dependency to latest version, using the new split repos (opentelemetry-swift and opentelemetry-swift-core). 

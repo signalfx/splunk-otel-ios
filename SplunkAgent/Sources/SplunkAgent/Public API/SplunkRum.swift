@@ -142,11 +142,14 @@ public class SplunkRum: ObservableObject {
     /// Disables the endpoint configuration and stops sending spans and events.
     ///
     /// Use this method to dynamically disable the endpoint after the agent has been initialized.
-    /// Once the endpoint is disabled, all subsequent spans and events will be dropped until
-    /// a new endpoint is configured.
+    /// Disables the current endpoint configuration.
+    ///
+    /// - Parameter cacheData: If `true` (default), spans and events are cached to disk and will be sent
+    ///   when a new endpoint is configured via ``updateEndpoint(_:)``. If `false`,
+    ///   all subsequent spans and events will be dropped.
     ///
     /// - Note: This method can only be called once the agent is running.
-    public func disableEndpoint() {
+    public func disableEndpoint(cacheData: Bool = true) {
         guard let eventManager = eventManager as? DefaultEventManager else {
             logger.log(level: .error, isPrivate: false) {
                 "Cannot disable endpoint: Event manager is not available."
@@ -154,14 +157,16 @@ public class SplunkRum: ObservableObject {
             return
         }
 
-        eventManager.disableEndpoint()
+        eventManager.disableEndpoint(cacheData: cacheData)
         currentEndpoint = nil
 
         // Clear network exclusion list since no endpoint is configured
         updateNetworkExclusionList(for: nil)
 
         logger.log(level: .info, isPrivate: false) {
-            "Endpoint configuration disabled successfully."
+            cacheData
+                ? "Endpoint disabled with caching enabled."
+                : "Endpoint configuration disabled successfully."
         }
     }
 
