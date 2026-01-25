@@ -16,19 +16,41 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkAgent
 
 class EndpointCalls {
 
     // MARK: - Endpoint calls
 
-    func resetEndpoint(targetURL: String) {
+    /// Updates the endpoint configuration with a custom trace URL.
+    ///
+    /// - Parameter targetURL: The URL string for the trace endpoint.
+    /// - Returns: `true` if the endpoint was successfully updated, `false` otherwise.
+    @discardableResult
+    func resetEndpoint(targetURL: String) -> Bool {
         guard let url = URL(string: targetURL) else {
-            return
+            print("EndpointCalls: Invalid URL string: \(targetURL)")
+            return false
         }
-        //
+
+        let endpoint = EndpointConfiguration(trace: url)
+
+        do {
+            try SplunkRum.shared.updateEndpoint(endpoint)
+            print("EndpointCalls: Endpoint updated to \(url)")
+            return true
+        }
+        catch {
+            print("EndpointCalls: Failed to update endpoint: \(error)")
+            return false
+        }
     }
 
+    /// Clears/disables the current endpoint configuration.
+    ///
+    /// After calling this method, spans will not be sent until a new endpoint is configured.
     func clearEndpoint() {
-        //
+        SplunkRum.shared.disableEndpoint()
+        print("EndpointCalls: Endpoint disabled")
     }
 }

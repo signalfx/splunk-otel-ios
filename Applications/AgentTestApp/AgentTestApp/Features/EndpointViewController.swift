@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import SplunkAgent
 import UIKit
 
 class EndpointViewController: UIViewController {
@@ -36,8 +37,14 @@ class EndpointViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let savedUrl = UserDefaults.standard.string(forKey: "SampleURL") ?? "https://httpbin.org/get"
-        endpointUrl.text = savedUrl
+        // Display the current endpoint URL if configured
+        if let currentUrl = SplunkRum.shared.state.endpointConfiguration?.traceEndpoint {
+            endpointUrl.text = currentUrl.absoluteString
+        }
+        else {
+            endpointUrl.text = ""
+            endpointUrl.placeholder = "No endpoint configured"
+        }
     }
 
 
