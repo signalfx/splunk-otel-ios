@@ -117,9 +117,6 @@ public class SplunkRum: ObservableObject {
     ///
     /// - Parameter endpoint: The ``EndpointConfiguration`` to use for sending data.
     /// - Throws: ``AgentConfigurationError`` if the provided endpoint is invalid.
-    ///
-    /// - Note: This method can only be called once the agent is running. Spans created before
-    ///         calling this method will not be sent retroactively.
     public func updateEndpoint(_ endpoint: EndpointConfiguration) throws {
         guard let eventManager = eventManager as? DefaultEventManager else {
             logger.log(level: .error, isPrivate: false) {
@@ -147,8 +144,6 @@ public class SplunkRum: ObservableObject {
     /// - Parameter cacheData: If `true` (default), spans and events are cached to disk and will be sent
     ///   when a new endpoint is configured via ``updateEndpoint(_:)``. If `false`,
     ///   all subsequent spans and events will be dropped.
-    ///
-    /// - Note: This method can only be called once the agent is running.
     public func disableEndpoint(cacheData: Bool = true) {
         guard let eventManager = eventManager as? DefaultEventManager else {
             logger.log(level: .error, isPrivate: false) {

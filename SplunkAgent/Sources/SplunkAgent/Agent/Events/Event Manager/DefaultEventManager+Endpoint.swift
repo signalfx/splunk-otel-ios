@@ -170,4 +170,3 @@ extension DefaultEventManager {
         )
     }
 }
-
