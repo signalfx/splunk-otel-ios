@@ -23,6 +23,7 @@ internal import SplunkOpenTelemetry
 extension DefaultEventManager {
 
     /// The URL used when caching is enabled but no endpoint is configured.
+    ///
     /// This non-routable address forces the exporter to cache data to disk.
     static let cachingUrl = URL(string: "https://0.0.0.0:0/v1/traces")
 
