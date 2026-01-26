@@ -22,14 +22,17 @@ class EndpointViewController: UIViewController {
 
     // MARK: - UI Outlets
 
-    @IBOutlet private var resetEndpointButton: UIButton!
+    @IBOutlet
+    private var resetEndpointButton: UIButton!
 
-    @IBOutlet private var clearEndpointButton: UIButton!
+    @IBOutlet
+    private var clearEndpointButton: UIButton!
 
-    @IBOutlet private var endpointRealm: UITextField!
+    @IBOutlet
+    private var endpointRealm: UITextField!
 
-    @IBOutlet private var endpointToken: UITextField!
-
+    @IBOutlet
+    private var endpointToken: UITextField!
 
     // MARK: - Private Properties
 
