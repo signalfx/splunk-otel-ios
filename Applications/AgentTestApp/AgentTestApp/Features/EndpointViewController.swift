@@ -23,9 +23,13 @@ class EndpointViewController: UIViewController {
     // MARK: - UI Outlets
 
     @IBOutlet private var resetEndpointButton: UIButton!
+
     @IBOutlet private var clearEndpointButton: UIButton!
+
     @IBOutlet private var endpointRealm: UITextField!
+
     @IBOutlet private var endpointToken: UITextField!
+
 
     // MARK: - Private Properties
 
@@ -42,8 +46,9 @@ class EndpointViewController: UIViewController {
 
     @IBAction
     private func setEndpoint(_: UIButton) {
-        guard let realm = endpointRealm.text, !realm.isEmpty,
-              let token = endpointToken.text, !token.isEmpty
+        guard
+            let realm = endpointRealm.text, !realm.isEmpty,
+            let token = endpointToken.text, !token.isEmpty
         else {
             return
         }
