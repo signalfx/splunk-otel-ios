@@ -22,6 +22,10 @@ internal import SplunkOpenTelemetry
 
 extension DefaultEventManager {
 
+    /// The URL used when caching is enabled but no endpoint is configured.
+    /// This non-routable address forces the exporter to cache data to disk.
+    static let cachingUrl = URL(string: "https://0.0.0.0:0/v1/traces")!
+
     /// Updates the endpoint configuration and reinitializes processors to start sending spans.
     ///
     /// - Parameter endpoint: The new endpoint configuration to use.
@@ -63,16 +67,8 @@ extension DefaultEventManager {
         if cacheData {
             // Keep real processors active for caching - they'll write to disk
             // but HTTP will fail to a non-routable address, triggering retry cache
-            guard let cachingUrl = URL(string: "http://0.0.0.0:0/v1/traces") else {
-                logger.log(level: .error, isPrivate: false) {
-                    "Failed to create caching URL. Falling back to NoOp mode."
-                }
-                disableEndpointWithNoOp()
-                return
-            }
-
             let processors = Self.createProcessors(
-                traceUrl: cachingUrl,
+                traceUrl: Self.cachingUrl,
                 sessionReplayUrl: nil,
                 accessToken: nil,
                 configuration: configuration,

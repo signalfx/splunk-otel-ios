@@ -155,8 +155,12 @@ public class SplunkRum: ObservableObject {
         eventManager.disableEndpoint(cacheData: cacheData)
         currentEndpoint = nil
 
-        // Clear network exclusion list since no endpoint is configured
-        updateNetworkExclusionList(for: nil)
+        // Update network exclusion list - include caching URL if caching is enabled
+        if cacheData {
+            updateNetworkExclusionList(for: nil, additionalUrls: [DefaultEventManager.cachingUrl])
+        } else {
+            updateNetworkExclusionList(for: nil)
+        }
 
         logger.log(level: .info, isPrivate: false) {
             cacheData

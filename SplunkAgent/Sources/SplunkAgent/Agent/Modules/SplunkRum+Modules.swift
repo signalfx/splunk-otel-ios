@@ -148,25 +148,23 @@ extension SplunkRum {
     /// that collector URLs are properly excluded from network instrumentation, preventing
     /// self-instrumentation of export requests.
     ///
-    /// - Parameter endpoint: The endpoint configuration to extract exclusion URLs from, or `nil` to clear exclusions.
-    func updateNetworkExclusionList(for endpoint: EndpointConfiguration?) {
+    /// - Parameters:
+    ///   - endpoint: The endpoint configuration to extract exclusion URLs from, or `nil` to clear exclusions.
+    ///   - additionalUrls: Additional URLs to exclude (e.g., caching URLs when endpoint is disabled).
+    func updateNetworkExclusionList(for endpoint: EndpointConfiguration?, additionalUrls: [URL] = []) {
         let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
 
-        guard let endpoint else {
-            // Clear excluded endpoints when endpoint is disabled
-            networkModule?.excludedEndpoints = nil
-            return
-        }
+        // Build excluded endpoints list
+        var excludedEndpoints: [URL] = additionalUrls
 
-        // Build excluded endpoints list from the endpoint configuration
-        var excludedEndpoints: [URL] = []
+        if let endpoint {
+            if let traceUrl = endpoint.traceEndpoint {
+                excludedEndpoints.append(traceUrl)
+            }
 
-        if let traceUrl = endpoint.traceEndpoint {
-            excludedEndpoints.append(traceUrl)
-        }
-
-        if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
-            excludedEndpoints.append(sessionReplayUrl)
+            if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
+                excludedEndpoints.append(sessionReplayUrl)
+            }
         }
 
         networkModule?.excludedEndpoints = excludedEndpoints.isEmpty ? nil : excludedEndpoints
