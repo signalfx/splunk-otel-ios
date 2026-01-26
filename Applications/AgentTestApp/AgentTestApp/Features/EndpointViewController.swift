@@ -29,7 +29,10 @@ class EndpointViewController: UIViewController {
     private var clearEndpointButton: UIButton!
 
     @IBOutlet
-    private var endpointUrl: UITextField!
+    private var endpointRealm: UITextField!
+
+    @IBOutlet
+    private var endpointToken: UITextField!
 
 
     // MARK: - View lifecycle
@@ -37,13 +40,20 @@ class EndpointViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Display the current endpoint URL if configured
-        if let currentUrl = SplunkRum.shared.state.endpointConfiguration?.traceEndpoint {
-            endpointUrl.text = currentUrl.absoluteString
+        // Display the current endpoint values if configured
+        if let currentRealm = SplunkRum.shared.state.endpointConfiguration?.realm {
+            endpointRealm.text = currentRealm
         }
         else {
-            endpointUrl.text = ""
-            endpointUrl.placeholder = "No endpoint configured"
+            endpointRealm.text = ""
+            endpointRealm.placeholder = "No realm configured"
+        }
+        if let currentToken = SplunkRum.shared.state.endpointConfiguration?.rumAccessToken {
+            endpointToken.text = currentToken
+        }
+        else {
+            endpointToken.text = ""
+            endpointToken.placeholder = "No token configured"
         }
     }
 
@@ -52,14 +62,17 @@ class EndpointViewController: UIViewController {
 
     @IBAction
     private func setEndpoint(_: UIButton) {
-        guard let newEndpointUrl = endpointUrl.text else {
+        guard let newEndpointRealm = endpointRealm.text else {
+            return
+        }
+        guard let newEndpointToken = endpointToken.text else {
             return
         }
 
-        print("Reset Endpoint to \(newEndpointUrl)")
+        print("Reset Endpoint to \(newEndpointRealm)")
 
         let endpoint = EndpointCalls()
-        endpoint.resetEndpoint(targetURL: newEndpointUrl)
+        endpoint.resetEndpoint(realm: newEndpointRealm, token: newEndpointToken)
     }
 
     @IBAction

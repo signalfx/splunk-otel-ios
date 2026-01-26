@@ -525,22 +525,56 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5da-Hd-x76" userLabel="Reset Endpoint Button">
-                                <rect key="frame" x="107" y="289" width="200" height="31"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Endpoint Calls" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZzI-YF-iGE">
+                                <rect key="frame" x="138.5" y="169" width="137" height="24"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Realm:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9W8-0J-KPE">
+                                <rect key="frame" x="20" y="213" width="50" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="exf-L1-ePx" userLabel="Endpoint Realm">
+                                <rect key="frame" x="77" y="207" width="317" height="34"/>
+                                <accessibility key="accessibilityConfiguration" label="endpointRealm"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="200" id="kIL-Qh-3tQ"/>
+                                    <constraint firstAttribute="height" constant="34" id="Bq8-sM-wdJ"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Token:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="esb-MN-YF7">
+                                <rect key="frame" x="20" y="262" width="50" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="qTO-l7-SGa" userLabel="Endpoint Token">
+                                <rect key="frame" x="77" y="256" width="317" height="34"/>
+                                <accessibility key="accessibilityConfiguration" label="endpointToken"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="34" id="e7m-1l-geA"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5da-Hd-x76" userLabel="Reset Endpoint Button">
+                                <rect key="frame" x="20" y="310" width="374" height="31"/>
+                                <constraints>
                                     <constraint firstAttribute="height" constant="31" id="tIe-JA-BDd"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Reset Endpoint to URL"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Reset Endpoint to New Values"/>
                                 <connections>
                                     <action selector="setEndpoint:" destination="wv7-gC-WmX" eventType="touchUpInside" id="Tav-rJ-Ifi"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eF1-mN-Xnq" userLabel="Clear Endpoint Button">
-                                <rect key="frame" x="107" y="328" width="200" height="31"/>
+                                <rect key="frame" x="20" y="357" width="374" height="31"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="200" id="0YO-Ow-UK6"/>
                                     <constraint firstAttribute="height" constant="31" id="nBt-dZ-2lJ"/>
                                 </constraints>
                                 <state key="normal" title="Button"/>
@@ -549,62 +583,43 @@
                                     <action selector="clearEndpoint:" destination="wv7-gC-WmX" eventType="touchUpInside" id="vLP-wB-uzR"/>
                                 </connections>
                             </button>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="exf-L1-ePx" userLabel="Endpoint URL">
-                                <rect key="frame" x="77" y="247" width="317" height="34"/>
-                                <accessibility key="accessibilityConfiguration" label="sampleUrl"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="34" id="Bq8-sM-wdJ"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="URL:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9W8-0J-KPE">
-                                <rect key="frame" x="20" y="253" width="37" height="21"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="37" id="2UN-t7-q0d"/>
-                                    <constraint firstAttribute="height" constant="21" id="uEi-fA-gS9"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Endpoint Calls" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZzI-YF-iGE">
-                                <rect key="frame" x="138.5" y="169" width="137" height="24"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="24" id="Fkd-iv-Wvj"/>
-                                    <constraint firstAttribute="width" constant="137" id="MxB-tg-D3b"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="B9f-92-C5r"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="B9f-92-C5r" firstAttribute="trailing" secondItem="exf-L1-ePx" secondAttribute="trailing" constant="20" id="51R-oz-4Q2"/>
-                            <constraint firstItem="5da-Hd-x76" firstAttribute="centerX" secondItem="z6t-CO-WOU" secondAttribute="centerX" id="SpC-ba-R5g"/>
-                            <constraint firstItem="eF1-mN-Xnq" firstAttribute="top" secondItem="5da-Hd-x76" secondAttribute="bottom" constant="8" symbolic="YES" id="UKA-Ib-hTR"/>
                             <constraint firstItem="ZzI-YF-iGE" firstAttribute="top" secondItem="B9f-92-C5r" secondAttribute="top" constant="29" id="amm-TS-atd"/>
-                            <constraint firstItem="9W8-0J-KPE" firstAttribute="leading" secondItem="B9f-92-C5r" secondAttribute="leading" constant="20" id="gkJ-fr-Mp8"/>
-                            <constraint firstItem="5da-Hd-x76" firstAttribute="top" secondItem="B9f-92-C5r" secondAttribute="top" constant="149" id="hbW-dE-4uX"/>
-                            <constraint firstItem="exf-L1-ePx" firstAttribute="leading" secondItem="B9f-92-C5r" secondAttribute="leading" constant="77" id="kSC-nf-Nxk"/>
-                            <constraint firstItem="exf-L1-ePx" firstAttribute="top" secondItem="B9f-92-C5r" secondAttribute="top" constant="107" id="las-iQ-HPg"/>
-                            <constraint firstItem="eF1-mN-Xnq" firstAttribute="centerX" secondItem="z6t-CO-WOU" secondAttribute="centerX" id="nSh-Mv-ReP"/>
-                            <constraint firstItem="9W8-0J-KPE" firstAttribute="top" secondItem="B9f-92-C5r" secondAttribute="top" constant="113" id="pkN-bj-jqM"/>
                             <constraint firstItem="ZzI-YF-iGE" firstAttribute="centerX" secondItem="z6t-CO-WOU" secondAttribute="centerX" id="ywn-ED-CCf"/>
+                            <constraint firstItem="9W8-0J-KPE" firstAttribute="top" secondItem="ZzI-YF-iGE" secondAttribute="bottom" constant="20" id="5gq-Si-ZXT"/>
+                            <constraint firstItem="9W8-0J-KPE" firstAttribute="leading" secondItem="B9f-92-C5r" secondAttribute="leading" constant="20" id="gkJ-fr-Mp8"/>
+                            <constraint firstItem="9W8-0J-KPE" firstAttribute="centerY" secondItem="exf-L1-ePx" secondAttribute="centerY" id="realm-lbl-center"/>
+                            <constraint firstItem="exf-L1-ePx" firstAttribute="leading" secondItem="9W8-0J-KPE" secondAttribute="trailing" constant="8" id="realm-field-lead"/>
+                            <constraint firstItem="B9f-92-C5r" firstAttribute="trailing" secondItem="exf-L1-ePx" secondAttribute="trailing" constant="20" id="51R-oz-4Q2"/>
+                            <constraint firstItem="exf-L1-ePx" firstAttribute="top" secondItem="ZzI-YF-iGE" secondAttribute="bottom" constant="14" id="las-iQ-HPg"/>
+                            <constraint firstItem="esb-MN-YF7" firstAttribute="top" secondItem="exf-L1-ePx" secondAttribute="bottom" constant="20" id="3Vx-sv-wl2"/>
+                            <constraint firstItem="esb-MN-YF7" firstAttribute="leading" secondItem="B9f-92-C5r" secondAttribute="leading" constant="20" id="token-lbl-lead"/>
+                            <constraint firstItem="esb-MN-YF7" firstAttribute="centerY" secondItem="qTO-l7-SGa" secondAttribute="centerY" id="token-lbl-center"/>
+                            <constraint firstItem="qTO-l7-SGa" firstAttribute="leading" secondItem="esb-MN-YF7" secondAttribute="trailing" constant="8" id="token-field-lead"/>
+                            <constraint firstItem="B9f-92-C5r" firstAttribute="trailing" secondItem="qTO-l7-SGa" secondAttribute="trailing" constant="20" id="token-field-trail"/>
+                            <constraint firstItem="qTO-l7-SGa" firstAttribute="top" secondItem="exf-L1-ePx" secondAttribute="bottom" constant="15" id="Z13-53-GnG"/>
+                            <constraint firstItem="5da-Hd-x76" firstAttribute="top" secondItem="qTO-l7-SGa" secondAttribute="bottom" constant="20" id="Zd9-J3-gCH"/>
+                            <constraint firstItem="5da-Hd-x76" firstAttribute="leading" secondItem="B9f-92-C5r" secondAttribute="leading" constant="20" id="GZ4-bw-0a1"/>
+                            <constraint firstItem="B9f-92-C5r" firstAttribute="trailing" secondItem="5da-Hd-x76" secondAttribute="trailing" constant="20" id="reset-btn-trail"/>
+                            <constraint firstItem="eF1-mN-Xnq" firstAttribute="top" secondItem="5da-Hd-x76" secondAttribute="bottom" constant="16" id="UKA-Ib-hTR"/>
+                            <constraint firstItem="eF1-mN-Xnq" firstAttribute="leading" secondItem="B9f-92-C5r" secondAttribute="leading" constant="20" id="clear-btn-lead"/>
+                            <constraint firstItem="B9f-92-C5r" firstAttribute="trailing" secondItem="eF1-mN-Xnq" secondAttribute="trailing" constant="20" id="clear-btn-trail"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="32U-0M-rtM"/>
                     <connections>
                         <outlet property="clearEndpointButton" destination="eF1-mN-Xnq" id="zvu-uY-d5f"/>
-                        <outlet property="endpointUrl" destination="exf-L1-ePx" id="Zyq-fj-WZg"/>
+                        <outlet property="endpointRealm" destination="exf-L1-ePx" id="w4V-jk-TgO"/>
+                        <outlet property="endpointToken" destination="qTO-l7-SGa" id="hx4-hM-mFS"/>
                         <outlet property="resetEndpointButton" destination="5da-Hd-x76" id="G3E-zX-9Ae"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eSf-gW-l3u" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1048" y="-457"/>
+            <point key="canvasLocation" x="1047.8260869565217" y="-457.36607142857139"/>
         </scene>
     </scenes>
     <resources>

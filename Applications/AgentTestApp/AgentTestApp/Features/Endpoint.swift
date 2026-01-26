@@ -22,22 +22,29 @@ class EndpointCalls {
 
     // MARK: - Endpoint calls
 
-    /// Updates the endpoint configuration with a custom trace URL.
+    /// Updates the endpoint configuration with a realm and access token.
     ///
-    /// - Parameter targetURL: The URL string for the trace endpoint.
+    /// - Parameters:
+    ///   - realm: The Splunk realm for the endpoint (e.g., "us0", "us1", "eu0").
+    ///   - token: The RUM access token for authentication.
     /// - Returns: `true` if the endpoint was successfully updated, `false` otherwise.
     @discardableResult
-    func resetEndpoint(targetURL: String) -> Bool {
-        guard let url = URL(string: targetURL) else {
-            print("EndpointCalls: Invalid URL string: \(targetURL)")
+    func resetEndpoint(realm: String, token: String) -> Bool {
+        guard !realm.isEmpty else {
+            print("EndpointCalls: Realm string is empty")
             return false
         }
 
-        let endpoint = EndpointConfiguration(trace: url)
+        guard !token.isEmpty else {
+            print("EndpointCalls: Token string is empty")
+            return false
+        }
+
+        let endpoint = EndpointConfiguration(realm: realm, rumAccessToken: token)
 
         do {
             try SplunkRum.shared.updateEndpoint(endpoint)
-            print("EndpointCalls: Endpoint updated to \(url)")
+            print("EndpointCalls: Endpoint updated to \(realm)")
             return true
         }
         catch {
