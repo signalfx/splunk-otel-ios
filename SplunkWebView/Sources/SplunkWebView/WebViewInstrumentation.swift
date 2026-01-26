@@ -68,16 +68,11 @@ public final class WebViewInstrumentation: NSObject {
     // MARK: - Public Methods
 
     #if canImport(WebKit)
-        /// This method sets up a message handler and injects JavaScript that provides
-        /// `window.SplunkRumNative.getNativeSessionId()` and `getNativeSessionIdAsync()` functions
-        /// for the web content to use.
+        /// Internal implementation of WebView bridge injection.
         ///
-        /// - Note: To ensure proper correlation, this method should be called before the `WKWebView`
-        ///   starts loading any content (e.g., before `load`, `loadHTMLString`, etc.).
+        /// Handler registration is idempotent; user scripts are installed once per view.
         ///
-        /// - Parameters:
-        ///
-        ///  - webView: The `WKWebView` instance to be instrumented.
+        /// - Parameter webView: The `WKWebView` instance to instrument.
         public func injectSessionId(into webView: WKWebView) {
             // Ensure this method is called on the main thread as WKWebView APIs are UI-bound.
             guard Thread.isMainThread else {
