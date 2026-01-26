@@ -24,7 +24,7 @@ extension DefaultEventManager {
 
     /// The URL used when caching is enabled but no endpoint is configured.
     /// This non-routable address forces the exporter to cache data to disk.
-    static let cachingUrl = URL(string: "https://0.0.0.0:0/v1/traces")!
+    static let cachingUrl = URL(string: "https://0.0.0.0:0/v1/traces")
 
     /// Updates the endpoint configuration and reinitializes processors to start sending spans.
     ///
@@ -64,11 +64,11 @@ extension DefaultEventManager {
     ///
     /// - Parameter cacheData: If `true`, data is cached for later sending. If `false`, data is dropped.
     func disableEndpoint(cacheData: Bool = true) {
-        if cacheData {
+        if cacheData, let cachingUrl = Self.cachingUrl {
             // Keep real processors active for caching - they'll write to disk
             // but HTTP will fail to a non-routable address, triggering retry cache
             let processors = Self.createProcessors(
-                traceUrl: Self.cachingUrl,
+                traceUrl: cachingUrl,
                 sessionReplayUrl: nil,
                 accessToken: nil,
                 configuration: configuration,

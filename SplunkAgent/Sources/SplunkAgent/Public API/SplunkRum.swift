@@ -39,12 +39,10 @@ public class SplunkRum: ObservableObject {
 
     var modulesManager: AgentModulesManager?
     var eventManager: AgentEventManager?
-
     var appStateManager: AgentAppStateManager
     lazy var sharedState: AgentSharedState = DefaultSharedState(for: self)
 
     lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
-
 
     let logProcessor: LogProcessor
     let logger: LogAgent
@@ -112,8 +110,7 @@ public class SplunkRum: ObservableObject {
     /// Updates the endpoint configuration to start sending spans and events.
     ///
     /// Use this method to dynamically configure the endpoint after the agent has been initialized
-    /// without an endpoint. Once the endpoint is updated, all subsequent spans and events will be
-    /// sent to the specified endpoint.
+    /// without an endpoint.
     ///
     /// - Parameter endpoint: The ``EndpointConfiguration`` to use for sending data.
     /// - Throws: ``AgentConfigurationError`` if the provided endpoint is invalid.
@@ -127,8 +124,6 @@ public class SplunkRum: ObservableObject {
 
         try eventManager.updateEndpoint(endpoint)
         currentEndpoint = endpoint
-
-        // Update network exclusion list to prevent self-instrumentation of export requests
         updateNetworkExclusionList(for: endpoint)
 
         logger.log(level: .info, isPrivate: false) {
@@ -156,9 +151,10 @@ public class SplunkRum: ObservableObject {
         currentEndpoint = nil
 
         // Update network exclusion list - include caching URL if caching is enabled
-        if cacheData {
-            updateNetworkExclusionList(for: nil, additionalUrls: [DefaultEventManager.cachingUrl])
-        } else {
+        if cacheData, let cachingUrl = DefaultEventManager.cachingUrl {
+            updateNetworkExclusionList(for: nil, additionalUrls: [cachingUrl])
+        }
+        else {
             updateNetworkExclusionList(for: nil)
         }
 
