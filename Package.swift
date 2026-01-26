@@ -390,13 +390,18 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 resolveDependency("logger")
             ],
-            path: "SplunkWebView/Sources",
+            path: "SplunkWebView",
+            sources: ["Sources"],
+            resources: [
+                .process("Resources")
+            ],
             plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkWebViewTests",
             dependencies: [
-                "SplunkWebView"
+                "SplunkWebView",
+                resolveDependency("logger")
             ],
             path: "SplunkWebView/Tests",
             plugins: lintTargetPlugins()
