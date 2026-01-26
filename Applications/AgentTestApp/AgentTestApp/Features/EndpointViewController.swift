@@ -22,64 +22,51 @@ class EndpointViewController: UIViewController {
 
     // MARK: - UI Outlets
 
-    @IBOutlet
-    private var resetEndpointButton: UIButton!
+    @IBOutlet private var resetEndpointButton: UIButton!
+    @IBOutlet private var clearEndpointButton: UIButton!
+    @IBOutlet private var endpointRealm: UITextField!
+    @IBOutlet private var endpointToken: UITextField!
 
-    @IBOutlet
-    private var clearEndpointButton: UIButton!
+    // MARK: - Private Properties
 
-    @IBOutlet
-    private var endpointRealm: UITextField!
+    private let endpointCalls = EndpointCalls()
 
-    @IBOutlet
-    private var endpointToken: UITextField!
-
-
-    // MARK: - View lifecycle
+    // MARK: - View Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Display the current endpoint values if configured
-        if let currentRealm = SplunkRum.shared.state.endpointConfiguration?.realm {
-            endpointRealm.text = currentRealm
-        }
-        else {
-            endpointRealm.text = ""
-            endpointRealm.placeholder = "No realm configured"
-        }
-        if let currentToken = SplunkRum.shared.state.endpointConfiguration?.rumAccessToken {
-            endpointToken.text = currentToken
-        }
-        else {
-            endpointToken.text = ""
-            endpointToken.placeholder = "No token configured"
-        }
+        configureEndpointFields()
     }
-
 
     // MARK: - UI Actions
 
     @IBAction
     private func setEndpoint(_: UIButton) {
-        guard let newEndpointRealm = endpointRealm.text else {
-            return
-        }
-        guard let newEndpointToken = endpointToken.text else {
+        guard let realm = endpointRealm.text, !realm.isEmpty,
+              let token = endpointToken.text, !token.isEmpty
+        else {
             return
         }
 
-        print("Reset Endpoint to \(newEndpointRealm)")
-
-        let endpoint = EndpointCalls()
-        endpoint.resetEndpoint(realm: newEndpointRealm, token: newEndpointToken)
+        print("Reset Endpoint to \(realm)")
+        endpointCalls.resetEndpoint(realm: realm, token: token)
     }
 
     @IBAction
     private func clearEndpoint(_: UIButton) {
-        let endpoint = EndpointCalls()
-        endpoint.clearEndpoint()
-
+        endpointCalls.clearEndpoint()
         print("Endpoint cleared")
+    }
+
+    // MARK: - Private Helpers
+
+    private func configureEndpointFields() {
+        let config = SplunkRum.shared.state.endpointConfiguration
+
+        endpointRealm.text = config?.realm
+        endpointRealm.placeholder = config?.realm == nil ? "No realm configured" : nil
+
+        endpointToken.text = config?.rumAccessToken
+        endpointToken.placeholder = config?.rumAccessToken == nil ? "No token configured" : nil
     }
 }
