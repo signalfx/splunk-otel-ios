@@ -39,10 +39,9 @@ extension AgentPreferences {
     ///
     /// Use this property to dynamically configure or disable the endpoint after the agent has been initialized.
     /// - Setting a non-nil value will configure the endpoint and start sending spans and events.
-    /// - Setting nil will disable the endpoint and revert to dropping all spans and events.
+    /// - Setting nil will disable the endpoint and revert to caching all spans and events for transmission when re-enabled.
     ///
-    /// - Note: This property can only be set once the agent is running. Spans created before
-    ///         setting this property will not be sent retroactively.
+    /// - Note: This property can only be set once the agent is running.
     public var endpointConfiguration: EndpointConfiguration? {
         get {
             owner.currentEndpoint

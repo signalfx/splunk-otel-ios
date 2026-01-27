@@ -142,6 +142,44 @@ extension SplunkRum {
         updateNetworkExclusionList(for: agentConfiguration.endpoint)
     }
 
+    /// Enables Session Replay when a valid endpoint becomes available.
+    ///
+    /// This method should be called when an endpoint is configured to ensure Session Replay
+    /// is properly enabled if it wasn't enabled at initialization time.
+    /// Session Replay continues collecting data even when the endpoint is disabled (data is cached).
+    ///
+    /// - Parameter endpoint: The endpoint configuration to check for Session Replay URL.
+    func enableSessionReplayIfNeeded(for endpoint: EndpointConfiguration) {
+        let moduleType = CiscoSessionReplay.SessionReplay.self
+        let sessionReplayModule = modulesManager?.module(ofType: moduleType)
+
+        guard let sessionReplayModule else {
+            return
+        }
+
+        // Check if Session Replay endpoint is available
+        guard endpoint.sessionReplayEndpoint != nil else {
+            return
+        }
+
+        // Enable Session Replay if not already enabled (check if it's currently non-operational)
+        guard sessionReplayProxy is SessionReplayNonOperational else {
+            return
+        }
+
+        // By default, we turn off the default sensitivity for `WKWebView`
+        #if canImport(WebKit)
+            sessionReplayModule.sensitivity.set(WKWebView.self, nil)
+        #endif
+
+        // Initialize proxy API for this module
+        sessionReplayProxy = SessionReplay(for: sessionReplayModule)
+
+        logger.log(level: .info, isPrivate: false) {
+            "Session Replay enabled after endpoint configuration."
+        }
+    }
+
     /// Updates the network module's excluded endpoints list based on the provided endpoint configuration.
     ///
     /// This method should be called whenever the endpoint configuration changes to ensure

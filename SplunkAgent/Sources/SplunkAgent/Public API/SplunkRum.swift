@@ -125,6 +125,7 @@ public class SplunkRum: ObservableObject {
         try eventManager.updateEndpoint(endpoint)
         currentEndpoint = endpoint
         updateNetworkExclusionList(for: endpoint)
+        enableSessionReplayIfNeeded(for: endpoint)
 
         logger.log(level: .info, isPrivate: false) {
             "Endpoint configuration updated successfully."
@@ -157,6 +158,9 @@ public class SplunkRum: ObservableObject {
         else {
             updateNetworkExclusionList(for: nil)
         }
+
+        // Note: Session Replay continues collecting data even when endpoint is disabled.
+        // Data will be cached and sent when the endpoint is re-enabled.
 
         logger.log(level: .info, isPrivate: false) {
             cacheData
