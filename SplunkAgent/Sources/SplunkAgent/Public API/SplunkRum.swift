@@ -36,7 +36,6 @@ public class SplunkRum: ObservableObject {
     var currentSession: AgentSession
     var currentStatus: Status
     var currentEndpoint: EndpointConfiguration?
-
     var modulesManager: AgentModulesManager?
     var eventManager: AgentEventManager?
     var appStateManager: AgentAppStateManager
@@ -335,7 +334,6 @@ public class SplunkRum: ObservableObject {
 
         // Set the configured user tracking mode
         user.preferences.trackingMode = configuration.user.trackingMode
-
         initializeEvents["agent_instance_initialized"] = Date()
 
         // Links the current session with the agent
@@ -346,7 +344,6 @@ public class SplunkRum: ObservableObject {
 
         // Initialize Event manager
         eventManager = try DefaultEventManager(with: configuration, agent: self)
-
         initializeEvents["event_manager_initialized"] = Date()
 
         // Send a session start event explicitly as soon as a Session and an EventManager are available
