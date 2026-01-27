@@ -151,7 +151,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         // Task is scheduled for the future (not stalled) but has a different endpoint
         let taskWithDifferentEndpoint = try createNewTestTask()
         taskWithDifferentEndpoint.taskDescription = try MockRequestDescriptor(
-            endpointString: "https://0.0.0.0:0/v1/traces",  // Different endpoint (caching URL)
+            // Different endpoint (caching URL)
+            endpointString: "https://0.0.0.0:0/v1/traces",
             scheduled: futureDate
         ).json
         taskWithDifferentEndpoint.earliestBeginDate = futureDate
@@ -174,7 +175,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         // Task has the same endpoint as the exporter
         let taskWithMatchingEndpoint = try createNewTestTask()
         taskWithMatchingEndpoint.taskDescription = try MockRequestDescriptor(
-            endpointString: "https://example.com",  // Same endpoint as exporter
+            // Same endpoint as exporter
+            endpointString: "https://example.com",
             scheduled: futureDate
         ).json
         taskWithMatchingEndpoint.earliestBeginDate = futureDate

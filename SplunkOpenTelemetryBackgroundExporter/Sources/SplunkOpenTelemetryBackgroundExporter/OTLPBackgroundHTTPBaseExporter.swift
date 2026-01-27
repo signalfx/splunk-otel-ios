@@ -110,24 +110,25 @@ public class OTLPBackgroundHTTPBaseExporter {
         // Tasks with different endpoints need to be cancelled and recreated with the current endpoint
         // to handle endpoint configuration changes (e.g., caching mode -> real endpoint).
         let toCancelTasks = tasks.filter { task in
-            // Cancel if no task description
-            guard let taskDescription = task.taskDescription,
-                let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
-            else {
-                return true
-            }
-
-            // Cancel if the task is pointing to a different endpoint (endpoint changed)
-            if descriptor.endpoint != endpoint {
-                return true
-            }
-
-            // Cancel if stalled (scheduled in the past)
+            // Cancel if stalled (no earliestBeginDate or scheduled in the past)
             guard let expectedExecutionDate = task.earliestBeginDate else {
                 return true
             }
 
-            return expectedExecutionDate < cancelTime
+            if expectedExecutionDate < cancelTime {
+                return true
+            }
+
+            // Also cancel if the task is pointing to a different endpoint (endpoint changed)
+            // Only check this if we can decode the task description
+            if let taskDescription = task.taskDescription,
+                let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8)),
+                descriptor.endpoint != endpoint
+            {
+                return true
+            }
+
+            return false
         }
 
         // Build set of cancelled task IDs to track which files need to be resent
