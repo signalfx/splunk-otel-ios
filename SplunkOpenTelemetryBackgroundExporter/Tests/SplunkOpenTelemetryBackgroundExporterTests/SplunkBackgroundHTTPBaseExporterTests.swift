@@ -154,7 +154,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             // Different endpoint (caching URL)
             endpointString: "https://0.0.0.0:0/v1/traces",
             scheduled: futureDate
-        ).json
+        )
+        .json
         taskWithDifferentEndpoint.earliestBeginDate = futureDate
 
         exporter.checkStalledUploadsOperation(tasks: [taskWithDifferentEndpoint])
@@ -178,7 +179,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             // Same endpoint as exporter
             endpointString: "https://example.com",
             scheduled: futureDate
-        ).json
+        )
+        .json
         taskWithMatchingEndpoint.earliestBeginDate = futureDate
 
         exporter.checkStalledUploadsOperation(tasks: [taskWithMatchingEndpoint])
