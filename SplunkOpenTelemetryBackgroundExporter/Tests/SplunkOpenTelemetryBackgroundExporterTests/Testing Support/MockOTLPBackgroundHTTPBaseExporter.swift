@@ -34,8 +34,8 @@ final class MockOTLPBackgroundHTTPBaseExporter: OTLPBackgroundHTTPBaseExporter {
         super.checkStalledUploadsOperation(tasks: tasks)
     }
 
-    override func checkAndSend(fileKeys files: [String], existingTasks allTaskDescriptions: [any RequestDescriptorProtocol], cancelTime: Date) {
+    override func checkAndSend(fileKeys files: [String], existingTasks allTaskDescriptions: [any RequestDescriptorProtocol], cancelledTaskIds: Set<UUID>) {
         checkAndSendCalledWithFiles = files
-        super.checkAndSend(fileKeys: files, existingTasks: allTaskDescriptions, cancelTime: cancelTime)
+        super.checkAndSend(fileKeys: files, existingTasks: allTaskDescriptions, cancelledTaskIds: cancelledTaskIds)
     }
 }

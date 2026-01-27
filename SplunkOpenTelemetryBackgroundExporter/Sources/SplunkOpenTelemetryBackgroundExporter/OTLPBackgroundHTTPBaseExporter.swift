@@ -106,14 +106,41 @@ public class OTLPBackgroundHTTPBaseExporter {
         // Get time when all newly created tasks should be already sent.
         let cancelTime = Date(timeIntervalSinceNow: -1 * config.timeout)
 
-        // Cancel all stalled tasks.
-        let toCancelTasks = tasks.filter {
-            guard let expectedExecutionDate = $0.earliestBeginDate else {
+        // Cancel stalled tasks (scheduled in the past or no date) and tasks with mismatched endpoints.
+        // Tasks with different endpoints need to be cancelled and recreated with the current endpoint
+        // to handle endpoint configuration changes (e.g., caching mode -> real endpoint).
+        let toCancelTasks = tasks.filter { task in
+            // Cancel if no task description
+            guard let taskDescription = task.taskDescription,
+                let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
+            else {
+                return true
+            }
+
+            // Cancel if the task is pointing to a different endpoint (endpoint changed)
+            if descriptor.endpoint != endpoint {
+                return true
+            }
+
+            // Cancel if stalled (scheduled in the past)
+            guard let expectedExecutionDate = task.earliestBeginDate else {
                 return true
             }
 
             return expectedExecutionDate < cancelTime
         }
+
+        // Build set of cancelled task IDs to track which files need to be resent
+        let cancelledTaskIds = Set(
+            toCancelTasks.compactMap { task -> UUID? in
+                guard let taskDescription = task.taskDescription,
+                    let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
+                else {
+                    return nil
+                }
+                return descriptor.id
+            }
+        )
 
         for task in toCancelTasks {
             task.cancel()
@@ -125,10 +152,10 @@ public class OTLPBackgroundHTTPBaseExporter {
             return
         }
 
-        checkAndSend(fileKeys: uploadList, existingTasks: allTaskDescriptions, cancelTime: cancelTime)
+        checkAndSend(fileKeys: uploadList, existingTasks: allTaskDescriptions, cancelledTaskIds: cancelledTaskIds)
     }
 
-    func checkAndSend(fileKeys files: [String], existingTasks allTaskDescriptions: [RequestDescriptorProtocol], cancelTime: Date) {
+    func checkAndSend(fileKeys files: [String], existingTasks allTaskDescriptions: [RequestDescriptorProtocol], cancelledTaskIds: Set<UUID>) {
 
         // Go throught file list and try to send all files again.
         for fileKey in files {
@@ -140,11 +167,23 @@ public class OTLPBackgroundHTTPBaseExporter {
             // If there is no upload task for file in cache folder, create RequestDescriptor and plan its upload to server
             // Note:
             //      File names are UUIDs of tasks
-            if let taskDescription = allTaskDescriptions.first(where: { $0.id == requestId }) {
-                // Perform send only for tasks which was scheduled in past and was cancelled in previous step.
-                if taskDescription.scheduled < cancelTime {
+            if let existingTaskDescription = allTaskDescriptions.first(where: { $0.id == requestId }) {
+                // Resend if the task was cancelled (stalled or had mismatched endpoint)
+                if cancelledTaskIds.contains(requestId) {
+                    // Create a new RequestDescriptor with the current endpoint to handle endpoint changes.
+                    // This ensures cached data is sent to the updated endpoint, not the old one.
+                    let taskDescription = RequestDescriptor(
+                        id: requestId,
+                        endpoint: endpoint,
+                        explicitTimeout: config.timeout,
+                        fileKeyType: getFileKeyType(),
+                        headers: headers
+                    )
+
                     try? httpClient.send(taskDescription)
                 }
+                // If not cancelled, the existing task will continue with its current endpoint
+                // (which should match our endpoint since we cancel mismatched ones)
             }
             else {
                 // This task was forgotten by system, create new one.
