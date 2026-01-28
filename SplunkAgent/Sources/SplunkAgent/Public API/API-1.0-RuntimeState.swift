@@ -69,7 +69,8 @@ extension RuntimeState {
     }
 
     /// A ``EndpointConfiguration`` containing either the specified realm, or endpoint urls.
-    public var endpointConfiguration: EndpointConfiguration {
+    /// Returns `nil` if no endpoint has been configured yet.
+    public var endpointConfiguration: EndpointConfiguration? {
         owner.agentConfiguration.endpoint
     }
 
@@ -81,5 +82,34 @@ extension RuntimeState {
     /// A `Bool` value determining whether the debug logging has been enabled.
     public var isDebugLoggingEnabled: Bool {
         owner.agentConfiguration.enableDebugLogging
+    }
+
+
+    // MARK: - Endpoint Management
+
+    /// Sets the endpoint configuration and flushes any cached telemetry data.
+    ///
+    /// Use this method when you have initialized the agent without an endpoint
+    /// (using ``AgentConfiguration/init(appName:deploymentEnvironment:)``) and
+    /// want to configure it later. All telemetry data that was cached while
+    /// waiting for the endpoint will be flushed and sent.
+    ///
+    /// - Parameter endpoint: The endpoint configuration defining URLs to the RUM instrumentation collector.
+    ///
+    /// - Throws: ``AgentConfigurationError`` if provided endpoint is invalid.
+    public func setEndpoint(_ endpoint: EndpointConfiguration) throws {
+        // Validate the endpoint
+        try endpoint.validate()
+
+        // Update the configuration
+        owner.agentConfigurationHandler.configuration.endpoint = endpoint
+
+        // Update the event manager
+        try (owner.eventManager as? DefaultEventManager)?.setEndpoint(endpoint)
+
+        // Update status from pendingEndpoint to running
+        if owner.currentStatus == .pendingEndpoint {
+            owner.currentStatus = .running
+        }
     }
 }

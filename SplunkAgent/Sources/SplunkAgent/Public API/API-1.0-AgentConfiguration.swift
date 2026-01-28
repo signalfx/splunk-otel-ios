@@ -29,8 +29,11 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
 
     // MARK: - Public mandatory properties
 
-    /// A required endpoint configuration defining URLs to the instrumentation collector.
-    public let endpoint: EndpointConfiguration
+    /// An optional endpoint configuration defining URLs to the instrumentation collector.
+    ///
+    /// If not provided at initialization, the agent will cache all telemetry data until
+    /// an endpoint is configured via ``SplunkRum/shared``'s ``RuntimeState/setEndpoint(_:)``.
+    public var endpoint: EndpointConfiguration?
 
     /// Required application name.
     ///
@@ -95,6 +98,21 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     ///   Deployment environment is sent in all signals as a resource.
     public init(endpoint: EndpointConfiguration, appName: String, deploymentEnvironment: String) {
         self.endpoint = endpoint
+        self.appName = appName
+        self.deploymentEnvironment = deploymentEnvironment
+    }
+
+    /// Initializes a new Agent configuration without an endpoint.
+    ///
+    /// When the agent is initialized without an endpoint, all telemetry data will be cached
+    /// until an endpoint is configured via ``SplunkRum/shared``'s ``RuntimeState/setEndpoint(_:)``.
+    ///
+    /// - Parameters:
+    ///   - appName: A required application name. Identifies the application in the RUM dashboard. App name is sent in all signals as a resource.
+    ///   - deploymentEnvironment: A required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
+    ///   Deployment environment is sent in all signals as a resource.
+    public init(appName: String, deploymentEnvironment: String) {
+        self.endpoint = nil
         self.appName = appName
         self.deploymentEnvironment = deploymentEnvironment
     }
@@ -187,6 +205,21 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
         return updated
     }
 
+    /// Sets the endpoint configuration.
+    ///
+    /// Use this method to configure the endpoint after initializing without one.
+    ///
+    /// - Parameter endpoint: The endpoint configuration defining URLs to the RUM instrumentation collector.
+    ///
+    /// - Returns: The updated configuration structure.
+    @discardableResult
+    public func endpoint(_ endpoint: EndpointConfiguration) -> Self {
+        var updated = self
+        updated.endpoint = endpoint
+
+        return updated
+    }
+
 
     // MARK: - Codable
 
@@ -228,7 +261,9 @@ extension AgentConfiguration {
     ///
     /// - Throws: ``AgentConfigurationError`` if provided configuration is invalid.
     func validate() throws {
-        try endpoint.validate()
+        // Validate endpoint only if it's provided
+        // If endpoint is nil, the agent will cache data until endpoint is set
+        try endpoint?.validate()
 
         // Validate app name
         if appName.isEmpty {

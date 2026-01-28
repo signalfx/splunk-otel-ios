@@ -30,6 +30,11 @@ public final class StatusObjC: NSObject {
     @objc
     public static let running = NSNumber(value: 1)
 
+    /// Recording is in progress but data is being cached because no endpoint is configured.
+    /// Use `setEndpoint:` to configure the endpoint and flush cached data.
+    @objc
+    public static let pendingEndpoint = NSNumber(value: 2)
+
     /// Recording is not currently in progress because the agent has not been installed.
     @objc
     public static let notRunningNotInstalled = NSNumber(value: -100)
@@ -58,6 +63,9 @@ public final class StatusObjC: NSObject {
         case running:
             return .running
 
+        case pendingEndpoint:
+            return .pendingEndpoint
+
         case notRunningNotInstalled:
             return .notRunning(.notInstalled)
 
@@ -76,6 +84,9 @@ public final class StatusObjC: NSObject {
         switch status {
         case .running:
             return running
+
+        case .pendingEndpoint:
+            return pendingEndpoint
 
         case .notRunning(.notInstalled):
             return notRunningNotInstalled

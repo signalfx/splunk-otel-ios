@@ -71,10 +71,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         debugEnabled: Bool,
         accessToken: String? = nil
     ) {
-        guard let sessionReplayEndpoint else {
-            return nil
-        }
-
         let configuration = OtlpConfiguration()
         let envVarHeaders: [(String, String)] = []
         var headers: [String: String] = [:]
@@ -83,7 +79,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
             headers["X-SF-Token"] = accessToken
         }
 
-        // Initialize background exporter
+        // Initialize background exporter (may have nil endpoint for caching)
         backgroundLogExporter = OTLPBackgroundHTTPLogExporterBinary(
             endpoint: sessionReplayEndpoint,
             config: configuration,
@@ -108,6 +104,23 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         resource.merge(other: replayResource)
 
         self.resource = resource
+    }
+
+
+    // MARK: - Endpoint Management
+
+    /// Sets the endpoint URL and flushes any pending cached data.
+    ///
+    /// - Parameters:
+    ///   - newEndpoint: The endpoint URL to use for sending session replay data.
+    ///   - accessToken: Optional new access token to use for authentication.
+    public func setEndpoint(_ newEndpoint: URL, accessToken: String? = nil) {
+        var headers: [String: String] = [:]
+        if let accessToken, !accessToken.isEmpty {
+            headers["X-SF-Token"] = accessToken
+        }
+
+        backgroundLogExporter.setEndpoint(newEndpoint, headers: headers.isEmpty ? nil : headers)
     }
 
 

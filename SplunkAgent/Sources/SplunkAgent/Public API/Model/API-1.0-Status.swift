@@ -23,6 +23,10 @@ public enum Status: Equatable {
     /// Recording is in progress.
     case running
 
+    /// Recording is in progress but data is being cached because no endpoint is configured.
+    /// Use ``RuntimeState/setEndpoint(_:)`` to configure the endpoint and flush cached data.
+    case pendingEndpoint
+
     /// Recording is not in progress. A ``Cause`` determines the reason for this status.
     case notRunning(Cause)
 

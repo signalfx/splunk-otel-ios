@@ -40,10 +40,10 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertNotNil(minimal)
 
         // Properties (READ)
-        XCTAssertEqual(minimal.endpoint.realm, realm)
-        XCTAssertEqual(minimal.endpoint.rumAccessToken, rumAccessToken)
-        XCTAssertNotNil(minimal.endpoint.traceEndpoint)
-        XCTAssertNotNil(minimal.endpoint.sessionReplayEndpoint)
+        XCTAssertEqual(minimal.endpoint?.realm, realm)
+        XCTAssertEqual(minimal.endpoint?.rumAccessToken, rumAccessToken)
+        XCTAssertNotNil(minimal.endpoint?.traceEndpoint)
+        XCTAssertNotNil(minimal.endpoint?.sessionReplayEndpoint)
         XCTAssertEqual(minimal.deploymentEnvironment, deploymentEnvironment)
         XCTAssertEqual(minimal.appName, appName)
         XCTAssertNotNil(minimal.appVersion)
@@ -56,8 +56,8 @@ final class API10ConfigurationTests: XCTestCase {
         var full = try ConfigurationTestBuilder.buildDefault()
 
         // Properties (READ)
-        XCTAssertEqual(full.endpoint.realm, realm)
-        XCTAssertEqual(full.endpoint.rumAccessToken, rumAccessToken)
+        XCTAssertEqual(full.endpoint?.realm, realm)
+        XCTAssertEqual(full.endpoint?.rumAccessToken, rumAccessToken)
         XCTAssertEqual(full.deploymentEnvironment, deploymentEnvironment)
         XCTAssertEqual(full.appName, appName)
         XCTAssertEqual(full.appVersion, appVersion)
@@ -66,8 +66,8 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertNotNil(full.user.trackingMode)
         XCTAssertNotNil(full.globalAttributes)
         XCTAssertNotNil(full.spanInterceptor)
-        XCTAssertNotNil(full.endpoint.traceEndpoint)
-        XCTAssertNotNil(full.endpoint.sessionReplayEndpoint)
+        XCTAssertNotNil(full.endpoint?.traceEndpoint)
+        XCTAssertNotNil(full.endpoint?.sessionReplayEndpoint)
 
         // Properties (WRITE)
         full.appVersion = "0.1"
@@ -121,7 +121,7 @@ final class API10ConfigurationTests: XCTestCase {
         // Default initialization
         let configuration = try ConfigurationTestBuilder.buildDefault()
 
-        let traceUrl = try XCTUnwrap(configuration.endpoint.traceEndpoint)
+        let traceUrl = try XCTUnwrap(configuration.endpoint?.traceEndpoint)
 
         let urlComponents = try XCTUnwrap(URLComponents(url: traceUrl, resolvingAgainstBaseURL: false))
 
@@ -136,8 +136,8 @@ final class API10ConfigurationTests: XCTestCase {
         // Custom urls initialization
         let configuration = try ConfigurationTestBuilder.buildWithCustomUrls()
 
-        let traceUrl = try XCTUnwrap(configuration.endpoint.traceEndpoint)
-        let sessionReplayUrl = try XCTUnwrap(configuration.endpoint.sessionReplayEndpoint)
+        let traceUrl = try XCTUnwrap(configuration.endpoint?.traceEndpoint)
+        let sessionReplayUrl = try XCTUnwrap(configuration.endpoint?.sessionReplayEndpoint)
 
         let customTraceUrl = try ConfigurationTestBuilder.customUrl(for: customTraceAddress)
         let customSessionReplayUrl = try ConfigurationTestBuilder.customUrl(for: customSessionReplayAddress)
@@ -185,5 +185,98 @@ final class API10ConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration.user.trackingMode, userTrackingMode)
         XCTAssertEqual(configuration.globalAttributes, globalAttributes)
         XCTAssertNotNil(configuration.spanInterceptor)
+    }
+
+
+    // MARK: - Optional Endpoint Tests
+
+    func testConfigurationWithoutEndpoint() throws {
+        // Initialize configuration without endpoint
+        let configuration = AgentConfiguration(
+            appName: appName,
+            deploymentEnvironment: deploymentEnvironment
+        )
+
+        // Endpoint should be nil
+        XCTAssertNil(configuration.endpoint)
+
+        // Other properties should be set
+        XCTAssertEqual(configuration.appName, appName)
+        XCTAssertEqual(configuration.deploymentEnvironment, deploymentEnvironment)
+        XCTAssertNotNil(configuration.appVersion)
+    }
+
+    func testConfigurationWithoutEndpointValidation() throws {
+        // Initialize configuration without endpoint
+        let configuration = AgentConfiguration(
+            appName: appName,
+            deploymentEnvironment: deploymentEnvironment
+        )
+
+        // Validation should pass (endpoint validation is deferred)
+        XCTAssertNoThrow(try configuration.validate())
+    }
+
+    func testConfigurationWithoutEndpointInvalidAppName() throws {
+        // Initialize configuration without endpoint but with empty app name
+        let configuration = AgentConfiguration(
+            appName: "",
+            deploymentEnvironment: deploymentEnvironment
+        )
+
+        // Validation should fail due to empty app name
+        XCTAssertThrowsError(try configuration.validate()) { error in
+            guard let configError = error as? AgentConfigurationError else {
+                XCTFail("Expected AgentConfigurationError")
+                return
+            }
+            if case .invalidAppName = configError {
+                // Expected
+            } else {
+                XCTFail("Expected invalidAppName error")
+            }
+        }
+    }
+
+    func testConfigurationEndpointBuilderMethod() throws {
+        // Initialize configuration without endpoint
+        var configuration = AgentConfiguration(
+            appName: appName,
+            deploymentEnvironment: deploymentEnvironment
+        )
+
+        XCTAssertNil(configuration.endpoint)
+
+        // Set endpoint using builder method
+        let endpoint = EndpointConfiguration(
+            realm: realm,
+            rumAccessToken: rumAccessToken
+        )
+        configuration = configuration.endpoint(endpoint)
+
+        // Endpoint should now be set
+        XCTAssertNotNil(configuration.endpoint)
+        XCTAssertEqual(configuration.endpoint?.realm, realm)
+        XCTAssertEqual(configuration.endpoint?.rumAccessToken, rumAccessToken)
+    }
+
+    func testEndpointConfigurationValidation() throws {
+        // Create valid endpoint
+        let validEndpoint = EndpointConfiguration(
+            realm: realm,
+            rumAccessToken: rumAccessToken
+        )
+
+        // Validation should pass
+        XCTAssertNoThrow(try validEndpoint.validate())
+
+        // Create endpoint with empty token
+        let invalidEndpoint = EndpointConfiguration(
+            realm: realm,
+            rumAccessToken: ""
+        )
+
+        // Validation should fail
+        XCTAssertThrowsError(try invalidEndpoint.validate())
     }
 }

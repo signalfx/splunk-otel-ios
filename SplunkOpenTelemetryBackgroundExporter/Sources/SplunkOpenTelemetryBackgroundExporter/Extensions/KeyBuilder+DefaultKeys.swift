@@ -19,4 +19,5 @@ import CiscoDiskStorage
 
 extension KeyBuilder {
     static let uploadsKey = KeyBuilder("uploadFiles")
+    static let pendingUploadsKey = KeyBuilder("pendingUploadFiles")
 }

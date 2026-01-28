@@ -80,7 +80,7 @@ extension SplunkRum {
             return
         }
 
-        guard agentConfiguration.endpoint.sessionReplayEndpoint != nil else {
+        guard agentConfiguration.endpoint?.sessionReplayEndpoint != nil else {
             logger.log(level: .warn, isPrivate: false) {
                 """
                 Session Replay module was not installed (the valid URL for Session Replay \
@@ -140,11 +140,11 @@ extension SplunkRum {
 
         // We need the endpoint url to manage trace exclusion logic
         var excludedEndpoints: [URL] = []
-        if let traceUrl = agentConfiguration.endpoint.traceEndpoint {
+        if let traceUrl = agentConfiguration.endpoint?.traceEndpoint {
             excludedEndpoints.append(traceUrl)
         }
 
-        if let sessionReplayUrl = agentConfiguration.endpoint.sessionReplayEndpoint {
+        if let sessionReplayUrl = agentConfiguration.endpoint?.sessionReplayEndpoint {
             excludedEndpoints.append(sessionReplayUrl)
         }
 

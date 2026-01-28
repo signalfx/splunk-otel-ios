@@ -50,6 +50,12 @@ class DefaultEventManager: AgentEventManager {
     /// Agent reference.
     private unowned let agent: SplunkRum
 
+    /// Stored resources for later use when setting endpoint.
+    private let resources: DefaultResources
+
+    /// Stored configuration for later use when setting endpoint.
+    private let storedConfiguration: any AgentConfigurationProtocol
+
     /// Logger.
     private var logger: LogAgent {
         agent.logger
@@ -58,22 +64,21 @@ class DefaultEventManager: AgentEventManager {
     // MARK: - Initialization
 
     required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum) throws {
-        guard let traceUrl = configuration.endpoint.traceEndpoint else {
-            throw AgentConfigurationError.invalidEndpoint(supplied: configuration.endpoint)
-        }
+        // Get trace URL (may be nil if no endpoint configured)
+        let traceUrl = configuration.endpoint?.traceEndpoint
+        let accessToken = configuration.endpoint?.rumAccessToken
 
-        let accessToken = configuration.endpoint.rumAccessToken
-
-        // ‼️ Using trace endpoint as a placeholder
+        // ‼️ Using trace endpoint as a placeholder for log url
         let logUrl = traceUrl
 
         self.agent = agent
+        self.storedConfiguration = configuration
 
         // Will be used later by hybrid agents
         let hybridType: String? = nil
 
         // Build resources
-        let resources = DefaultResources(
+        resources = DefaultResources(
             appName: configuration.appName,
             appVersion: configuration.appVersion,
             appBuild: AppInfo.buildId ?? "-",
@@ -98,7 +103,7 @@ class DefaultEventManager: AgentEventManager {
 
         // Initialize session replay processor (optional)
         sessionReplayProcessor = OTLPSessionReplayEventProcessor(
-            with: configuration.endpoint.sessionReplayEndpoint,
+            with: configuration.endpoint?.sessionReplayEndpoint,
             resources: resources,
             runtimeAttributes: agent.runtimeAttributes,
             globalAttributes: { agent.globalAttributes.getAll() },
@@ -120,8 +125,44 @@ class DefaultEventManager: AgentEventManager {
             accessToken: accessToken
         )
 
+        if let traceUrl {
+            logger.log(level: .info, isPrivate: false) {
+                "Using trace url: \(traceUrl)"
+            }
+        } else {
+            logger.log(level: .info, isPrivate: false) {
+                "No endpoint configured. Telemetry data will be cached until endpoint is set."
+            }
+        }
+    }
+
+
+    // MARK: - Endpoint Management
+
+    /// Sets the endpoint configuration and flushes any cached data.
+    ///
+    /// - Parameter endpoint: The endpoint configuration to use.
+    /// - Throws: ``AgentConfigurationError`` if the provided endpoint is invalid.
+    func setEndpoint(_ endpoint: EndpointConfiguration) throws {
+        // Validate the endpoint
+        try endpoint.validate()
+
+        guard let traceUrl = endpoint.traceEndpoint else {
+            throw AgentConfigurationError.invalidEndpoint(supplied: endpoint)
+        }
+
+        let accessToken = endpoint.rumAccessToken
+
+        // Update trace processor
+        (traceProcessor as? OTLPTraceProcessor)?.setEndpoint(traceUrl, accessToken: accessToken)
+
+        // Update session replay processor
+        if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
+            (sessionReplayProcessor as? OTLPSessionReplayEventProcessor)?.setEndpoint(sessionReplayUrl, accessToken: accessToken)
+        }
+
         logger.log(level: .info, isPrivate: false) {
-            "Using trace url: \(traceUrl)"
+            "Endpoint configured. Using trace url: \(traceUrl)"
         }
     }
 

@@ -274,8 +274,9 @@ public class SplunkRum: ObservableObject {
         // Links the current session with the agent
         (currentSession as? DefaultSession)?.owner = self
 
-        // The agent is running, so we set the corresponding status
-        currentStatus = .running
+        // Set status based on whether endpoint is configured
+        // If no endpoint, use pendingEndpoint status; otherwise running
+        currentStatus = configuration.endpoint == nil ? .pendingEndpoint : .running
 
         // Initialize Event manager
         eventManager = try DefaultEventManager(with: configuration, agent: self)

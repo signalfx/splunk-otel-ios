@@ -32,9 +32,9 @@ public class OTLPBackgroundHTTPBaseExporter {
     // MARK: - Internal
 
     let fileType: String?
-    let endpoint: URL
+    var endpoint: URL?
     let envVarHeaders: [(String, String)]?
-    let additionalHeaders: [String: String]
+    var additionalHeaders: [String: String]
     let config: OtlpConfiguration
     let diskStorage: DiskStorage
     var checkStalledTask: Task<Void, Never>?
@@ -49,7 +49,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     // MARK: - Initialization
 
     public init(
-        endpoint: URL,
+        endpoint: URL?,
         config: OtlpConfiguration = OtlpConfiguration(),
         qosConfig: SessionQOSConfiguration,
         envVarHeaders: [(String, String)]? = EnvVarHeaders.attributes,
@@ -73,7 +73,7 @@ public class OTLPBackgroundHTTPBaseExporter {
         self.fileType = fileType
         self.qosConfig = qosConfig
 
-        if performStalledUploadCheck {
+        if performStalledUploadCheck && endpoint != nil {
             // Get incomplete requests and check for stalled files
             // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
             checkStalledTask = Task.detached(priority: .utility) { [weak self] in
@@ -129,6 +129,10 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     func checkAndSend(fileKeys files: [String], existingTasks allTaskDescriptions: [RequestDescriptorProtocol], cancelTime: Date) {
+        // Skip if no endpoint is configured
+        guard let endpoint else {
+            return
+        }
 
         // Go throught file list and try to send all files again.
         for fileKey in files {
@@ -168,8 +172,17 @@ public class OTLPBackgroundHTTPBaseExporter {
         KeyBuilder.uploadsKey.append(getFileKeyType())
     }
 
+    func getPendingStorageKey() -> KeyBuilder {
+        KeyBuilder.pendingUploadsKey.append(getFileKeyType())
+    }
+
     func getFileKeyType() -> String {
         fileType ?? "base"
+    }
+
+    /// Returns `true` if no endpoint is configured and data should be cached.
+    public var isPendingEndpoint: Bool {
+        endpoint == nil
     }
 
     var headers: [String: String] {
@@ -182,5 +195,98 @@ public class OTLPBackgroundHTTPBaseExporter {
         }
 
         return combinedHeaders
+    }
+
+
+    // MARK: - Endpoint Management
+
+    /// Sets the endpoint URL and flushes any pending cached data.
+    ///
+    /// When an endpoint is set, all previously cached data will be moved to the
+    /// active upload queue and sent to the server.
+    ///
+    /// - Parameters:
+    ///   - newEndpoint: The endpoint URL to use for sending telemetry data.
+    ///   - newHeaders: Optional new headers to use (e.g., for authentication token).
+    public func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]? = nil) {
+        endpoint = newEndpoint
+
+        if let newHeaders {
+            additionalHeaders = newHeaders
+        }
+
+        // Flush pending data
+        flushPendingData()
+
+        // Start stalled upload check now that we have an endpoint
+        checkStalledTask = Task.detached(priority: .utility) { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
+            self?.httpClient
+                .getAllSessionsTasks { [weak self] tasks in
+                    self?.checkStalledUploadsOperation(tasks: tasks)
+                }
+        }
+    }
+
+    /// Flushes all pending cached data to the server.
+    ///
+    /// This method moves all data from the pending storage to the active upload queue.
+    private func flushPendingData() {
+        guard let endpoint else {
+            return
+        }
+
+        // Get all pending files
+        guard let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) else {
+            return
+        }
+
+        // Move each pending file to active storage and schedule for upload
+        for fileInfo in pendingFiles {
+            guard let requestId = UUID(uuidString: fileInfo.key) else {
+                continue
+            }
+
+            let pendingKey = KeyBuilder(
+                requestId.uuidString,
+                parrentKeyBuilder: getPendingStorageKey()
+            )
+
+            let activeKey = KeyBuilder(
+                requestId.uuidString,
+                parrentKeyBuilder: getStorageKey()
+            )
+
+            do {
+                // Read data from pending storage
+                guard let pendingFileUrl = try? diskStorage.finalDestination(forKey: pendingKey),
+                      FileManager.default.fileExists(atPath: pendingFileUrl.path),
+                      let data = try? Data(contentsOf: pendingFileUrl)
+                else {
+                    continue
+                }
+
+                // Write to active storage
+                try diskStorage.insert(data, forKey: activeKey)
+
+                // Delete from pending storage
+                try diskStorage.delete(forKey: pendingKey)
+
+                // Schedule upload
+                let requestDescriptor = RequestDescriptor(
+                    id: requestId,
+                    endpoint: endpoint,
+                    explicitTimeout: config.timeout,
+                    fileKeyType: getFileKeyType(),
+                    headers: headers
+                )
+
+                try httpClient.send(requestDescriptor)
+            }
+            catch {
+                // Log error but continue processing other files
+                continue
+            }
+        }
     }
 }

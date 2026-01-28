@@ -32,11 +32,14 @@ public class OTLPTraceProcessor: TraceProcessor {
     /// OTel tracer provider.
     private let tracerProvider: TracerProvider
 
+    /// Background exporter reference for endpoint updates.
+    private let backgroundTraceExporter: OTLPBackgroundHTTPTraceExporter
+
 
     // MARK: - Initialization
 
     public required init(
-        with tracesEndpoint: URL,
+        with tracesEndpoint: URL?,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
         globalAttributes: @escaping () -> [String: AttributeValue],
@@ -53,8 +56,8 @@ public class OTLPTraceProcessor: TraceProcessor {
             headers["X-SF-Token"] = accessToken
         }
 
-        // Initialize background exporter
-        let backgroundTraceExporter = OTLPBackgroundHTTPTraceExporter(
+        // Initialize background exporter (may have nil endpoint for caching)
+        backgroundTraceExporter = OTLPBackgroundHTTPTraceExporter(
             endpoint: tracesEndpoint,
             config: configuration,
             qosConfig: SessionQOSConfiguration(),
@@ -100,5 +103,22 @@ public class OTLPTraceProcessor: TraceProcessor {
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
         self.tracerProvider = tracerProvider
+    }
+
+
+    // MARK: - Endpoint Management
+
+    /// Sets the endpoint URL and flushes any pending cached data.
+    ///
+    /// - Parameters:
+    ///   - newEndpoint: The endpoint URL to use for sending trace data.
+    ///   - accessToken: Optional new access token to use for authentication.
+    public func setEndpoint(_ newEndpoint: URL, accessToken: String? = nil) {
+        var headers: [String: String] = [:]
+        if let accessToken, !accessToken.isEmpty {
+            headers["X-SF-Token"] = accessToken
+        }
+
+        backgroundTraceExporter.setEndpoint(newEndpoint, headers: headers.isEmpty ? nil : headers)
     }
 }

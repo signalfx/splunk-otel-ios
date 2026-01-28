@@ -63,9 +63,12 @@ public final class RuntimeStateObjC: NSObject {
     }
 
     /// A `SPLKEndpointConfiguration` containing either the specified realm, or endpoint urls.
+    /// Returns `nil` if no endpoint has been configured yet.
     @objc
-    public var endpointConfiguration: EndpointConfigurationObjC {
-        let configuration = owner.agent.state.endpointConfiguration
+    public var endpointConfiguration: EndpointConfigurationObjC? {
+        guard let configuration = owner.agent.state.endpointConfiguration else {
+            return nil
+        }
 
         return EndpointConfigurationObjC(for: configuration)
     }
@@ -80,6 +83,31 @@ public final class RuntimeStateObjC: NSObject {
     @objc
     public var isDebugLoggingEnabled: Bool {
         owner.agent.state.isDebugLoggingEnabled
+    }
+
+
+    // MARK: - Endpoint Management
+
+    /// Sets the endpoint configuration and flushes any cached telemetry data.
+    ///
+    /// Use this method when you have initialized the agent without an endpoint
+    /// and want to configure it later. All telemetry data that was cached while
+    /// waiting for the endpoint will be flushed and sent.
+    ///
+    /// - Parameter endpoint: The endpoint configuration defining URLs to the RUM instrumentation collector.
+    /// - Parameter error: If an error occurs, this pointer is set to an error object that describes the problem.
+    /// - Returns: `YES` if the endpoint was set successfully, `NO` otherwise.
+    @objc
+    public func setEndpoint(_ endpoint: EndpointConfigurationObjC, error: NSErrorPointer) -> Bool {
+        do {
+            try owner.agent.state.setEndpoint(endpoint.endpointConfiguration())
+            return true
+        } catch let caughtError {
+            if error != nil {
+                error?.pointee = caughtError as NSError
+            }
+            return false
+        }
     }
 
 

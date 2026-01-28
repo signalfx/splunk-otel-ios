@@ -33,6 +33,20 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
 
         do {
             let storeData = try body.serializedData()
+
+            // If no endpoint is configured, store in pending folder for later
+            if isPendingEndpoint {
+                try diskStorage.insert(
+                    storeData,
+                    forKey: KeyBuilder(
+                        requestId.uuidString,
+                        parrentKeyBuilder: getPendingStorageKey()
+                    )
+                )
+                return .success
+            }
+
+            // Normal flow - store and send immediately
             try diskStorage.insert(
                 storeData,
                 forKey: KeyBuilder(
@@ -43,6 +57,10 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
         }
         catch {
 
+            return .failure
+        }
+
+        guard let endpoint else {
             return .failure
         }
 

@@ -143,6 +143,23 @@ final class ConfigurationTestBuilder {
         )
     }
 
+    /// Builds a configuration without an endpoint for testing deferred endpoint scenarios.
+    static func buildWithoutEndpoint() -> AgentConfiguration {
+        var configuration = AgentConfiguration(
+            appName: appName,
+            deploymentEnvironment: deploymentEnvironment
+        )
+
+        var sessionConfiguration = SessionConfiguration()
+        sessionConfiguration.samplingRate = 1.0
+
+        configuration.appVersion = appVersion
+        configuration.enableDebugLogging = true
+        configuration.session = sessionConfiguration
+
+        return configuration
+    }
+
 
     // MARK: - URL builders
 
