@@ -18,10 +18,10 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 import XCTest
+@testable import SplunkSlowFrameDetector
 
 #if os(iOS) || os(tvOS) || os(visionOS)
     import UIKit
-@testable import SplunkSlowFrameDetector
 
     // MARK: - Mock Ticker
 

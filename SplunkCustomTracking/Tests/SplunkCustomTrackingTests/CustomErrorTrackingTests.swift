@@ -169,9 +169,11 @@ final class CustomErrorTrackingTests: XCTestCase {
     }
 
     func testSplunkIssue_from_Error() {
-        struct MyTestError: Error, LocalizedError { var errorDescription: String? {
-            "This is a test error."
-        } }
+        struct MyTestError: Error, LocalizedError {
+            var errorDescription: String? {
+                "This is a test error."
+            }
+        }
         let error = MyTestError()
         let issue = SplunkIssue(from: error)
         let attributes = issue.toAttributesDictionary()
