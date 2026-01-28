@@ -18,7 +18,6 @@ limitations under the License.
 import OpenTelemetryApi
 import OpenTelemetrySdk
 import XCTest
-
 @testable import SplunkNetwork
 
 final class SplunkNetworkTests: XCTestCase {
@@ -53,9 +52,15 @@ final class SplunkNetworkTests: XCTestCase {
 
         // MARK: - SpanBase properties
 
-        var kind: SpanKind { .internal }
+        var kind: SpanKind {
+            .internal
+        }
+
         var context: SpanContext
-        var isRecording: Bool { true }
+        var isRecording: Bool {
+            true
+        }
+
         var status: Status = .unset
         var name: String = "MockSpan"
 
@@ -127,7 +132,9 @@ final class SplunkNetworkTests: XCTestCase {
 
         // MARK: - CustomStringConvertible
 
-        var description: String { "MockSpan" }
+        var description: String {
+            "MockSpan"
+        }
     }
 
     override func setUp() {

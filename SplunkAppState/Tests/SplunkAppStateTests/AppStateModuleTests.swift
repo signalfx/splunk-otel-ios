@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkAppState
 
 final class AppStateModuleTests: XCTestCase {

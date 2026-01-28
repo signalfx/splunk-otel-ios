@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkCommon
 @testable import SplunkCustomTracking
 
@@ -68,7 +67,9 @@ final class CustomErrorTrackingTests: XCTestCase {
     func testTrackError_withSwiftError() throws {
         struct FileError: Error, LocalizedError {
             let path: String
-            var errorDescription: String? { "File not found at \(path)" }
+            var errorDescription: String? {
+                "File not found at \(path)"
+            }
         }
 
         let error = FileError(path: "/tmp/file.txt")
@@ -168,7 +169,9 @@ final class CustomErrorTrackingTests: XCTestCase {
     }
 
     func testSplunkIssue_from_Error() {
-        struct MyTestError: Error, LocalizedError { var errorDescription: String? { "This is a test error." } }
+        struct MyTestError: Error, LocalizedError { var errorDescription: String? {
+            "This is a test error."
+        } }
         let error = MyTestError()
         let issue = SplunkIssue(from: error)
         let attributes = issue.toAttributesDictionary()

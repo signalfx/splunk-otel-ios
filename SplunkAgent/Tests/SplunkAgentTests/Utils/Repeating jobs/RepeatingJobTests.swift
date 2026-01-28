@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkAgent
 
 final class RepeatingJobTests: XCTestCase {
@@ -47,7 +46,7 @@ final class RepeatingJobTests: XCTestCase {
 
     // MARK: - Basic logic
 
-    func testInitialization() throws {
+    func testInitialization() {
         let simpleJob = RepeatingJob(interval: 1) {
             // Does nothing
         }
@@ -112,7 +111,7 @@ final class RepeatingJobTests: XCTestCase {
         XCTAssertTrue(job.suspended)
     }
 
-    func testLifecycle() throws {
+    func testLifecycle() {
         var counter = 0
 
         // Job is suspended after initialization

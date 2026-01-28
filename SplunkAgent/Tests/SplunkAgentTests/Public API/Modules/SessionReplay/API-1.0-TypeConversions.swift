@@ -17,14 +17,13 @@ limitations under the License.
 
 import CiscoSessionReplay
 import XCTest
-
 @testable import SplunkAgent
 
 final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
     // MARK: - Rendering mode
 
-    func testRenderingModesToProxyConversion() throws {
+    func testRenderingModesToProxyConversion() {
         /* From module to proxy */
         var moduleRenderingMode: SplunkSessionReplayRenderingMode = .default
         var proxyRenderingMode: SplunkAgent.RenderingMode = .default
@@ -42,7 +41,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
         XCTAssertEqual(proxyRenderingMode, .wireframeOnly)
     }
 
-    func testRenderingModesToModuleConversion() throws {
+    func testRenderingModesToModuleConversion() {
         /* From proxy to module */
         var proxyRenderingMode: SplunkAgent.RenderingMode = .default
         var srRenderingMode = proxyRenderingMode.srRenderingMode
@@ -60,7 +59,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
     // MARK: - Status
 
-    func testStatusToProxyConversion() throws {
+    func testStatusToProxyConversion() {
         /* From module to proxy */
         var moduleStatus: SplunkSessionReplayStatus = .recording
         var proxyStatus: SplunkAgent.SessionReplayStatus = .recording
@@ -105,7 +104,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
         XCTAssertEqual(proxyStatus, .notRecording(.storageLimitReached))
     }
 
-    func testStatusToModuleConversion() throws {
+    func testStatusToModuleConversion() {
         /* From proxy to module */
         var proxyStatus: SplunkAgent.SessionReplayStatus = .recording
         var srStatus = proxyStatus.srStatus
@@ -144,7 +143,7 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
 
     // MARK: - Masks type
 
-    func testMaskTypeToProxyConversion() throws {
+    func testMaskTypeToProxyConversion() {
         /* From module to proxy */
         var moduleMaskType: SplunkSessionReplayMaskType = .covering
         var proxyMaskType: SplunkAgent.MaskElement.MaskType = .covering

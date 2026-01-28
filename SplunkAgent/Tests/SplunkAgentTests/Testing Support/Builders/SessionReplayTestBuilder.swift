@@ -17,7 +17,6 @@ limitations under the License.
 
 import CiscoSessionReplay
 import Foundation
-
 @testable import SplunkAgent
 
 enum SessionReplayTestBuilderError: Error {

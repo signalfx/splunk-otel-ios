@@ -18,7 +18,6 @@ limitations under the License.
 import SplunkCommon
 import WebKit
 import XCTest
-
 @testable import SplunkWebView
 
 final class WebViewInstrumentationTests: XCTestCase {

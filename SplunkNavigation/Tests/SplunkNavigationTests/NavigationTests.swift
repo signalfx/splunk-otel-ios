@@ -17,7 +17,6 @@ limitations under the License.
 
 import SwiftUI
 import XCTest
-
 @testable import SplunkNavigation
 
 final class NavigationTests: XCTestCase {
@@ -29,14 +28,14 @@ final class NavigationTests: XCTestCase {
 
     // MARK: - Basic logic
 
-    func testInitialization() throws {
+    func testInitialization() {
         XCTAssertNotNil(navigationModule)
     }
 
 
     // MARK: - Business logic
 
-    func testProperties() throws {
+    func testProperties() {
         // Properties with default module configuration (READ)
         let preferences = navigationModule.preferences
         let state = navigationModule.state
@@ -57,7 +56,7 @@ final class NavigationTests: XCTestCase {
         XCTAssertEqual(modulePreferences.enableAutomatedTracking, true)
     }
 
-    func testStateUpdates() throws {
+    func testStateUpdates() {
         let state = navigationModule.state
         let defaultTrackingState = state.isAutomatedTrackingEnabled
 
@@ -76,7 +75,7 @@ final class NavigationTests: XCTestCase {
         XCTAssertFalse(finalTrackingState)
     }
 
-    func testTracking() async throws {
+    func testTracking() async {
         let customName = "Test Screen"
         navigationModule.track(screen: customName)
 
@@ -84,7 +83,7 @@ final class NavigationTests: XCTestCase {
         // XCTAssertEqual(screenName, customName)
     }
 
-    func testPreferredControllerName() throws {
+    func testPreferredControllerName() {
         // Test UIViewController name
         XCTAssertEqual(navigationModule.preferredControllerName(for: UIViewController()), "UIViewController")
 

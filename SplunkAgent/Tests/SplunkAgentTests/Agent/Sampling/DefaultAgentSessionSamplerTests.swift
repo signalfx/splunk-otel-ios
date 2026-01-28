@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkAgent
 
 final class DefaultAgentSessionSamplerTests: XCTestCase {

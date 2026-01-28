@@ -20,7 +20,6 @@ import CiscoDiskStorage
 import Foundation
 import SplunkCommon
 import Testing
-
 @testable import SplunkOpenTelemetryBackgroundExporter
 
 @Suite

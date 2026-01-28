@@ -18,7 +18,6 @@ limitations under the License.
 import OpenTelemetryApi
 import OpenTelemetrySdk
 import XCTest
-
 @testable import SplunkCommon
 @testable import SplunkCustomTracking
 

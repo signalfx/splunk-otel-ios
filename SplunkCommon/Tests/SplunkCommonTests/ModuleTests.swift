@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkCommon
 
 final class SplunkCommonTests: XCTestCase {

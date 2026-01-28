@@ -22,8 +22,7 @@ import XCTest
 #if os(iOS) || os(tvOS) || os(visionOS)
 
     import UIKit
-
-    @testable import SplunkSlowFrameDetector
+@testable import SplunkSlowFrameDetector
 
     // MARK: - SlowFrameDetectorTests
 

@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-
 @testable import SplunkCommon
 
 final class PersistentCacheContent {

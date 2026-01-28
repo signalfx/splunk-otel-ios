@@ -17,7 +17,6 @@ limitations under the License.
 
 import SplunkCommon
 import XCTest
-
 @testable import SplunkAgent
 
 final class SessionsModelTests: XCTestCase {
@@ -29,7 +28,7 @@ final class SessionsModelTests: XCTestCase {
 
     // MARK: - Basic logic
 
-    func testInitialization() throws {
+    func testInitialization() {
         // Default instance
         let defaultModel = SessionsModel()
         XCTAssertNotNil(defaultModel)
@@ -46,7 +45,7 @@ final class SessionsModelTests: XCTestCase {
         XCTAssertTrue(assignedStorage === storage)
     }
 
-    func testBasicLogic() throws {
+    func testBasicLogic() {
         // We need to test the class with separate storage
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "sessionModelTest")
         let sessionModel = SessionsModel(storage: storage)
@@ -60,7 +59,7 @@ final class SessionsModelTests: XCTestCase {
 
     // MARK: - Storage management
 
-    func testStorageManagement() throws {
+    func testStorageManagement() {
         let testName = "storageManagementTest"
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: testName)
         let sessionModel = SessionsModel(storage: storage)
@@ -102,7 +101,7 @@ final class SessionsModelTests: XCTestCase {
 
     // MARK: - Storage utils
 
-    func testStorageUtils() throws {
+    func testStorageUtils() {
         let testName = "storageUtilsTest"
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: testName)
         let sessionModel = SessionsModel(storage: storage)

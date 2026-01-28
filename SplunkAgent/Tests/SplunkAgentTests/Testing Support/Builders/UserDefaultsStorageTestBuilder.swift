@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import SplunkCommon
-
 @testable import SplunkAgent
 
 final class UserDefaultsStorageTestBuilder {

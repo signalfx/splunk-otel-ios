@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import SplunkCommon
-
 @testable import SplunkAgent
 
 /// A dummy module skeleton for testing logic around modules.

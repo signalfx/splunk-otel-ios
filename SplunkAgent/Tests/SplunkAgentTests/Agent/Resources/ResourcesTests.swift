@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import OpenTelemetrySdk
 @testable import SplunkAgent
 @testable import SplunkCommon

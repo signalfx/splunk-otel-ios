@@ -17,7 +17,6 @@ limitations under the License.
 
 import SplunkNavigation
 import XCTest
-
 @testable import SplunkAgent
 
 final class NavigationAPI10ModuleProxyTests: XCTestCase {

@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkAgent
 
 #if os(iOS) || os(tvOS) || os(visionOS)

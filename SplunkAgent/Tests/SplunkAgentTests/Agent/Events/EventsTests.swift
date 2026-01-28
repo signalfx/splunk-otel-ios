@@ -17,7 +17,6 @@ limitations under the License.
 
 import CiscoSessionReplay
 import XCTest
-
 @testable import SplunkAgent
 @testable import SplunkCommon
 @testable import SplunkOpenTelemetry

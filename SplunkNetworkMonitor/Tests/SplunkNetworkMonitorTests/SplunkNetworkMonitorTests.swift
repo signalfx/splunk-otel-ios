@@ -19,7 +19,6 @@ import CoreTelephony
 import Foundation
 import Network
 import XCTest
-
 @testable import SplunkNetworkMonitor
 
 final class NetworkMonitorTests: XCTestCase {

@@ -18,7 +18,6 @@ limitations under the License.
 import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
-
 @testable import SplunkAgent
 @testable import SplunkCommon
 

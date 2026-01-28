@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import XCTest
-
 @testable import SplunkNetworkMonitor
 
 final class NetworkMonitorConfigurationTests: XCTestCase {

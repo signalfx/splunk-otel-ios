@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-
 @testable import SplunkAppState
 @testable import SplunkCommon
 

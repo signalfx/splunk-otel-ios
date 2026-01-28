@@ -21,7 +21,6 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 import Testing
-
 @testable import SplunkOpenTelemetryBackgroundExporter
 
 @Suite
