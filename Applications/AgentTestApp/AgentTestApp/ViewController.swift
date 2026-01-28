@@ -31,6 +31,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     let displayName: [String] = [
         "Network Calls",
         "Crashes",
+        "Endpoint Configuration",
         "Test API Sample Calls",
         "Slow Frame Renders",
         "Sample Next Task"
@@ -40,6 +41,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     let segueName: [String] = [
         "NetworkCalls",
         "Crashes",
+        "EndpointCalls",
         "TestApiCalls",
         "SlowFrameRenders",
         "PlaceHolder"

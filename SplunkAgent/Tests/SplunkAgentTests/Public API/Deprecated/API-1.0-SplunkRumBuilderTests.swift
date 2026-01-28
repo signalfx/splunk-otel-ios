@@ -153,7 +153,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertTrue(builder.build())
 
         let expectedEncoded = URL(string: invalidUrl)?.absoluteString
-        let trace = SplunkRum.shared.agentConfiguration.endpoint.traceEndpoint
+        let trace = SplunkRum.shared.agentConfiguration.endpoint?.traceEndpoint
         XCTAssertEqual(trace?.absoluteString, expectedEncoded)
     }
 
@@ -191,7 +191,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
 
         // Beacon initializer should preserve the raw URL
         XCTAssertEqual(
-            config.endpoint.traceEndpoint?.absoluteString,
+            config.endpoint?.traceEndpoint?.absoluteString,
             beaconUrl
         )
     }
@@ -206,7 +206,8 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         XCTAssertTrue(builder.build())
         let config = SplunkRum.shared.agentConfiguration
 
-        let url = try XCTUnwrap(config.endpoint.traceEndpoint)
+        let endpoint = try XCTUnwrap(config.endpoint)
+        let url = try XCTUnwrap(endpoint.traceEndpoint)
         let comps = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
 
         XCTAssertEqual(comps.scheme, "https")
