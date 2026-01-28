@@ -95,8 +95,27 @@ class DefaultEventManager: AgentEventManager {
                 "Using trace url: \(traceUrl)"
             }
         }
+        else if let cachingUrl = Self.cachingUrl {
+            // Initialize with caching processors - spans will be cached to disk
+            // and sent when an endpoint is configured
+            let processors = Self.createProcessors(
+                traceUrl: cachingUrl,
+                sessionReplayUrl: nil,
+                accessToken: nil,
+                configuration: configuration,
+                agent: agent
+            )
+
+            logEventProcessor = processors.logEventProcessor
+            sessionReplayProcessor = processors.sessionReplayProcessor
+            traceProcessor = processors.traceProcessor
+
+            logger.log(level: .info, isPrivate: false) {
+                "No endpoint configured. Spans will be cached and sent when endpoint is configured."
+            }
+        }
         else {
-            // Initialize with NoOp processors - spans won't be sent
+            // Fallback to NoOp if caching URL is somehow invalid
             logEventProcessor = NoOpLogEventProcessor()
             sessionReplayProcessor = nil
             traceProcessor = NoOpTraceProcessor()
