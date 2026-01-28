@@ -135,7 +135,7 @@ public class OTLPBackgroundHTTPBaseExporter {
         let cancelledTaskIds = Set(
             toCancelTasks.compactMap { task -> UUID? in
                 guard let taskDescription = task.taskDescription,
-                      let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
+                    let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
                 else {
                     return nil
                 }

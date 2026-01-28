@@ -19,8 +19,9 @@ import CiscoEncryption
 import Foundation
 import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
-@testable import SplunkOpenTelemetryBackgroundExporter
 import Testing
+
+@testable import SplunkOpenTelemetryBackgroundExporter
 
 final class MockOTLPBackgroundHTTPBaseExporter: OTLPBackgroundHTTPBaseExporter {
 
