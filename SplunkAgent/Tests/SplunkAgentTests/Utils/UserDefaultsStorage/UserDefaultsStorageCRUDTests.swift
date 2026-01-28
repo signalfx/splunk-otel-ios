@@ -17,7 +17,6 @@ limitations under the License.
 
 import SplunkCommon
 import XCTest
-
 @testable import SplunkAgent
 
 final class UserDefaultsStorageCRUDTests: XCTestCase {

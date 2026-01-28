@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import SplunkCustomTracking
-
 @testable import SplunkAgent
 
 final class CustomTrackingTestBuilder {

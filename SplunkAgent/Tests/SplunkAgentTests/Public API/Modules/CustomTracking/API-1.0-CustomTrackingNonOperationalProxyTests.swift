@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkAgent
 @testable import SplunkCommon
 
@@ -29,7 +28,7 @@ final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Custom Tracking: Event
 
-    func testTrackCustomEvent() throws {
+    func testTrackCustomEvent() {
         let attributes = MutableAttributes()
         XCTAssertNotNil(moduleProxy.trackCustomEvent("testEvent", attributes))
     }
@@ -37,29 +36,29 @@ final class CustomTrackingAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Custom Tracking: Errors
 
-    func testTrackErrorString() throws {
+    func testTrackErrorString() {
         let testErrorString = "TestErrorString"
         XCTAssertNotNil(moduleProxy.trackError(testErrorString))
     }
 
-    func testTrackError() throws {
+    func testTrackError() {
         struct TestError: Error {}
         let testError = TestError()
         XCTAssertNotNil(moduleProxy.trackError(testError))
     }
 
-    func testTrackNSError() throws {
+    func testTrackNSError() {
         let testNSError = NSError(domain: "TestDomain", code: 0, userInfo: nil)
         XCTAssertNotNil(moduleProxy.trackError(testNSError))
     }
 
-    func testTrackException() throws {
+    func testTrackException() {
         let exceptionName = NSExceptionName("TestException")
         let testException = NSException(name: exceptionName, reason: nil, userInfo: nil)
         XCTAssertNotNil(moduleProxy.trackException(testException))
     }
 
-    func testTrackWorkflow() throws {
+    func testTrackWorkflow() {
         let testWorkflowString = "TestWorkflow"
         XCTAssertNotNil(moduleProxy.trackWorkflow(testWorkflowString))
     }

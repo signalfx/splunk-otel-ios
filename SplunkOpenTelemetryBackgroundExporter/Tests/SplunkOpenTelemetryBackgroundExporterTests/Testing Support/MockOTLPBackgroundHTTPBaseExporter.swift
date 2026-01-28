@@ -20,7 +20,6 @@ import Foundation
 import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
 import Testing
-
 @testable import SplunkOpenTelemetryBackgroundExporter
 
 final class MockOTLPBackgroundHTTPBaseExporter: OTLPBackgroundHTTPBaseExporter {

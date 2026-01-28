@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkAgent
 
 final class AppStateManagerTests: XCTestCase {
@@ -62,7 +61,7 @@ final class AppStateManagerTests: XCTestCase {
         XCTAssertEqual(retrievedState, .foreground)
     }
 
-    func testNotificationsHandle() async throws {
+    func testNotificationsHandle() async {
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "testNotificationsHandle")
         try? storage.delete(forKey: "appStateEvents")
 

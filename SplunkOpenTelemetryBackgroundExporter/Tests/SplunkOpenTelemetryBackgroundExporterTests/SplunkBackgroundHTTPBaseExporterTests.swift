@@ -23,7 +23,6 @@ import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
 import Testing
 import XCTest
-
 @testable import SplunkOpenTelemetryBackgroundExporter
 
 @Suite

@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkCommon
 
 final class PersistentCacheModelTests: XCTestCase {
@@ -58,7 +57,7 @@ final class PersistentCacheModelTests: XCTestCase {
 
     // MARK: - Basic logic
 
-    func testInitialization() throws {
+    func testInitialization() {
         let stringCacheModel = PersistentCacheModel<DefaultItemContainer<String>>()
         XCTAssertNotNil(stringCacheModel)
 
@@ -69,7 +68,7 @@ final class PersistentCacheModelTests: XCTestCase {
 
     // MARK: - Items filtering
 
-    func testItemsForRange() async throws {
+    func testItemsForRange() async {
         let afterThreeMinutes = Date() + 3 * 60
         let afterSevenMinutes = Date() + 7 * 60
 
@@ -157,7 +156,7 @@ final class PersistentCacheModelTests: XCTestCase {
         XCTAssertEqual(finalCount, 0)
     }
 
-    func testRestore() async throws {
+    func testRestore() async {
         let customCacheModel = PersistentCacheModel<DefaultItemContainer<CustomDataItem>>()
         let content = PersistentCacheContent.customData
 

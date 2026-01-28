@@ -2,7 +2,6 @@
 
 // swiftformat:disable sortImports
 import PackageDescription
-
 import class Foundation.ProcessInfo
 
 // MARK: - Package and target definitions

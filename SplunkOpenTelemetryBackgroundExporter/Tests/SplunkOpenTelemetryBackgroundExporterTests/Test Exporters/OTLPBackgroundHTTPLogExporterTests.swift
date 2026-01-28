@@ -23,7 +23,6 @@ import OpenTelemetryApi
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import Testing
-
 @testable import SplunkOpenTelemetryBackgroundExporter
 
 @Suite

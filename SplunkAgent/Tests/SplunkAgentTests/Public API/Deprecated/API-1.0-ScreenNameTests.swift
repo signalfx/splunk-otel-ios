@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkAgent
 
 final class API10ScreenNameTests: XCTestCase {
@@ -43,7 +42,7 @@ final class API10ScreenNameTests: XCTestCase {
 
     // MARK: - API Tests
 
-    func testScreenNameMethods() throws {
+    func testScreenNameMethods() {
         let screenName = "Test"
         let screenNameChangeCallback: ((String) -> Void)? = { _ in
             // Not used

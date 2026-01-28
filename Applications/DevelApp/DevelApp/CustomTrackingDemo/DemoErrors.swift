@@ -34,7 +34,9 @@ struct DemoErrors {
     /// Swift Error with stack trace.
     static func swiftError() -> Error {
         struct SampleError: Error, LocalizedError {
-            var errorDescription: String? { "This is a Swift Error" }
+            var errorDescription: String? {
+                "This is a Swift Error"
+            }
         }
         return SampleError()
     }

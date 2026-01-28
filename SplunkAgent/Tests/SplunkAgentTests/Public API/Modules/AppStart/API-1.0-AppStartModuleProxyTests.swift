@@ -17,7 +17,6 @@ limitations under the License.
 
 import SplunkAppStart
 import XCTest
-
 @testable import SplunkAgent
 
 final class AppStartAPI10ModuleProxyTests: XCTestCase {

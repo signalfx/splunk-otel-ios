@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import SplunkNavigation
-
 @testable import SplunkAgent
 
 final class NavigationTestBuilder {

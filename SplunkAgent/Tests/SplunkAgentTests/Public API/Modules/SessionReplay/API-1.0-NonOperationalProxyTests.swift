@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import XCTest
-
 @testable import SplunkAgent
 
 final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
@@ -28,11 +27,11 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Recording
 
-    func testStart() throws {
+    func testStart() {
         XCTAssertNotNil(moduleProxy.start())
     }
 
-    func testStop() throws {
+    func testStop() {
         XCTAssertNotNil(moduleProxy.stop())
     }
 
@@ -57,7 +56,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - State
 
-    func testState() throws {
+    func testState() {
         let state = moduleProxy.state
 
         XCTAssertNotNil(state.status)
@@ -67,7 +66,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Status
 
-    func testStatus() throws {
+    func testStatus() {
         switch moduleProxy.state.status {
         case .recording:
             break
@@ -92,7 +91,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
         }
     }
 
-    func testDefaultStatus() throws {
+    func testDefaultStatus() {
         let status = moduleProxy.state.status
 
         XCTAssertNotNil(status)
@@ -102,7 +101,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Sensitivity
 
-    func testSensitivity() throws {
+    func testSensitivity() {
 
         moduleProxy.sensitivity[UIView()] = true
         moduleProxy.sensitivity[UIView.self] = true
@@ -115,7 +114,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
         _ = moduleProxy.sensitivity[UIView.self]
     }
 
-    func testUIViewTypeSensitivityExtension() throws {
+    func testUIViewTypeSensitivityExtension() {
         let viewType = UIView.self
 
         moduleProxy.sensitivity[viewType] = true
@@ -127,7 +126,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Rendering Mode
 
-    func testRenderingModes() throws {
+    func testRenderingModes() {
         let renderingMode = RenderingMode.default
         switch renderingMode {
         case .native:
@@ -138,7 +137,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
         }
     }
 
-    func testDefaultRenderingMode() throws {
+    func testDefaultRenderingMode() {
         let defaultRenderingMode = RenderingMode.default
 
         XCTAssertEqual(defaultRenderingMode, .native)
@@ -147,7 +146,7 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Recording Masks
 
-    func testRecordingMask() throws {
+    func testRecordingMask() {
         var maskElements: [MaskElement] = []
         maskElements.append(
             MaskElement(rect: CGRect(x: 0, y: 0, width: 100, height: 100), type: .covering)
