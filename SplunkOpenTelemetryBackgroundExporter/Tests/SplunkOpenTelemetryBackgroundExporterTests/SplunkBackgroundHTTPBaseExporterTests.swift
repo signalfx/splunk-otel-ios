@@ -21,9 +21,9 @@ import CiscoEncryption
 import Foundation
 import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
+@testable import SplunkOpenTelemetryBackgroundExporter
 import Testing
 import XCTest
-@testable import SplunkOpenTelemetryBackgroundExporter
 
 @Suite
 struct SplunkBackgroundHTTPBaseExporterTests {

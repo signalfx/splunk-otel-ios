@@ -134,13 +134,13 @@ public class OTLPBackgroundHTTPBaseExporter {
         // Build set of cancelled task IDs to track which files need to be resent
         let cancelledTaskIds = Set(
             toCancelTasks.compactMap { task -> UUID? in
-            guard let taskDescription = task.taskDescription,
-                let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
-            else {
-                return nil
-            }
+                guard let taskDescription = task.taskDescription,
+                      let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
+                else {
+                    return nil
+                }
 
-            return descriptor.id
+                return descriptor.id
             }
         )
 
