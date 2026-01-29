@@ -82,7 +82,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
 func endHttpSpan(span: Span, task: URLSessionTask) {
     let httpResponse: HTTPURLResponse? = task.response as? HTTPURLResponse
     if let httpResponse {
-        span.clearAndSetAttribute(key: SemanticAttributes.httpResponseStatusCode, value: httpResponse.statusCode)
+        span.clearAndSetAttribute(key: SemanticConventions.Http.responseStatusCode, value: httpResponse.statusCode)
         for (key, val) in httpResponse.allHeaderFields {
             if let keyStr = key as? String,
                 let valStr = val as? String,
@@ -94,7 +94,7 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
         }
 
         let length = httpResponse.expectedContentLength
-        span.clearAndSetAttribute(key: SemanticAttributes.httpResponseBodySize, value: Int(length))
+        span.clearAndSetAttribute(key: SemanticConventions.Http.responseBodySize, value: Int(length))
 
         // Try to capture IP address from the response/connection
         // Update network.peer.address with actual IP if we can get it
@@ -117,7 +117,7 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
     }
 
     if task.countOfBytesSent != 0 {
-        span.clearAndSetAttribute(key: SemanticAttributes.httpRequestContentLength, value: Int(task.countOfBytesSent))
+        span.clearAndSetAttribute(key: SemanticConventions.Http.requestBodySize, value: Int(task.countOfBytesSent))
     }
     span.end()
 }
@@ -130,14 +130,14 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
 ///   - length: The request body length.
 ///   - span: The span to add attributes to.
 func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
-    span.clearAndSetAttribute(key: SemanticAttributes.httpRequestBodySize, value: length)
-    span.clearAndSetAttribute(key: SemanticAttributes.httpRequestMethod, value: method)
+    span.clearAndSetAttribute(key: SemanticConventions.Http.requestBodySize, value: length)
+    span.clearAndSetAttribute(key: SemanticConventions.Http.requestMethod, value: method)
     span.clearAndSetAttribute(key: "component", value: "http")
 
-    span.clearAndSetAttribute(key: SemanticAttributes.urlPath, value: url.path)
-    span.clearAndSetAttribute(key: SemanticAttributes.urlQuery, value: url.query ?? "")
+    span.clearAndSetAttribute(key: SemanticConventions.Url.path, value: url.path)
+    span.clearAndSetAttribute(key: SemanticConventions.Url.query, value: url.query ?? "")
     if let scheme = url.scheme {
-        span.clearAndSetAttribute(key: SemanticAttributes.urlScheme, value: scheme)
+        span.clearAndSetAttribute(key: SemanticConventions.Url.scheme, value: scheme)
     }
 
     if let host = url.host {
