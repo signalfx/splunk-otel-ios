@@ -4,8 +4,8 @@ set -euo pipefail
 # Xcode 26+ no longer bundles iOS/tvOS/visionOS SDKs.
 # They must be downloaded separately before simulators are available.
 
-PLATFORMS=("${@}")
-if [ ${#PLATFORMS[@]} -eq 0 ]; then
+PLATFORMS=("${@-}")
+if [ ${#PLATFORMS[@]} -eq 0 ] || [ -z "${PLATFORMS[0]}" ]; then
   PLATFORMS=(iOS tvOS visionOS)
 fi
 
