@@ -29,8 +29,13 @@ public class OTLPGlobalAttributesSpanProcessor: SpanProcessor {
 
     // MARK: - SpanProcessor
 
-    public var isStartRequired: Bool { true }
-    public var isEndRequired: Bool { false }
+    public var isStartRequired: Bool {
+        true
+    }
+
+    public var isEndRequired: Bool {
+        false
+    }
 
     public func onStart(parentContext _: SpanContext?, span: ReadableSpan) {
         // Add global attributes to the span attributes when it's created

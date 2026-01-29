@@ -30,7 +30,9 @@ extension Resource {
         let requiredAttributes: [String: AttributeValue] = [
 
             // App info
-            ResourceAttributes.deploymentEnvironment.rawValue: .string(agentResources.appDeploymentEnvironment),
+            // Note: Using string literal to preserve backward compatibility with "deployment.environment"
+            // (SemanticConventions uses "deployment.environment.name" which is a newer convention)
+            "deployment.environment": .string(agentResources.appDeploymentEnvironment),
             "app": .string(agentResources.appName),
             "app.version": .string(agentResources.appVersion),
             "app.build_id": .string(agentResources.appBuild),
@@ -39,17 +41,17 @@ extension Resource {
             "rum.sdk.version": .string(agentResources.agentVersion),
 
             // Device info
-            ResourceAttributes.deviceModelIdentifier.rawValue: .string(agentResources.deviceModelIdentifier),
-            ResourceAttributes.deviceManufacturer.rawValue: .string(agentResources.deviceManufacturer),
-            ResourceAttributes.deviceId.rawValue: .string(agentResources.deviceID),
+            SemanticConventions.Device.modelIdentifier.rawValue: .string(agentResources.deviceModelIdentifier),
+            SemanticConventions.Device.manufacturer.rawValue: .string(agentResources.deviceManufacturer),
+            SemanticConventions.Device.id.rawValue: .string(agentResources.deviceID),
 
-            ResourceAttributes.deviceModelName.rawValue: .string(agentResources.deviceModelIdentifier),
+            SemanticConventions.Device.modelName.rawValue: .string(agentResources.deviceModelIdentifier),
 
             // OS info
-            ResourceAttributes.osName.rawValue: .string(agentResources.osName),
-            ResourceAttributes.osVersion.rawValue: .string(agentResources.osVersion),
-            ResourceAttributes.osDescription.rawValue: .string(agentResources.osDescription),
-            ResourceAttributes.osType.rawValue: .string(agentResources.osType)
+            SemanticConventions.Os.name.rawValue: .string(agentResources.osName),
+            SemanticConventions.Os.version.rawValue: .string(agentResources.osVersion),
+            SemanticConventions.Os.description.rawValue: .string(agentResources.osDescription),
+            SemanticConventions.Os.type.rawValue: .string(agentResources.osType)
         ]
 
         // Add required attributes to the resource

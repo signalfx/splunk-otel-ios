@@ -23,7 +23,7 @@ final class SessionReplayEventMemorizerTests: XCTestCase {
 
     // MARK: - Basic logic
 
-    func testInitialization() throws {
+    func testInitialization() {
         let memorizerName = "testDefault"
         let memorizer = SessionReplayEventMemorizer(named: memorizerName)
 

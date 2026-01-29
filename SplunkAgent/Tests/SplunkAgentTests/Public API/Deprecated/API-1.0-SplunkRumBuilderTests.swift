@@ -160,7 +160,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
 
     // MARK: - Agent configuration tests
 
-    func testBuildConfigurationProperties() throws {
+    func testBuildConfigurationProperties() {
         let beacon = "https://config.example.com/v1/rum"
         let auth = "cfgToken"
         let builder = SplunkRumBuilder(beaconUrl: beacon, rumAuth: auth)
@@ -179,7 +179,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
 
     // MARK: - Initializers configuration tests
 
-    func testBuildForBeaconInitializer() throws {
+    func testBuildForBeaconInitializer() {
         let beaconUrl = "https://endpoint.example.com/v1/rum"
         let auth = "endpointAuth"
         let builder = SplunkRumBuilder(beaconUrl: beaconUrl, rumAuth: auth)
@@ -354,7 +354,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         )
     }
 
-    func testBuildForGlobalAttributesInitializer() throws {
+    func testBuildForGlobalAttributesInitializer() {
         let realm = "us0"
         let token = "auth-token"
         let builder = SplunkRumBuilder(realm: realm, rumAuth: token)
