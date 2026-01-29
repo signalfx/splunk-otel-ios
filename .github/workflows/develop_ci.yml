@@ -22,7 +22,7 @@ jobs:
           xcode-version: latest-stable
       - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
       - name: Download platform SDKs
-        run: .github/actions/build-and-tests/scripts/download-platforms.sh
+        run: .github/actions/build-and-tests/scripts/download-platforms.sh iOS tvOS
       - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
       - id: scheme
         run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
@@ -51,10 +51,8 @@ jobs:
       - name: Download platform SDK
         run: |
           case "${{ matrix.platform }}" in
-            ios)       .github/actions/build-and-tests/scripts/download-platforms.sh iOS ;;
-            tvos)      .github/actions/build-and-tests/scripts/download-platforms.sh tvOS ;;
-            visionos)  .github/actions/build-and-tests/scripts/download-platforms.sh visionOS ;;
-            macCatalyst) echo "macCatalyst does not need a separate SDK download" ;;
+            ios)  .github/actions/build-and-tests/scripts/download-platforms.sh iOS ;;
+            tvos) .github/actions/build-and-tests/scripts/download-platforms.sh tvOS ;;
           esac
 
       - name: Select destination

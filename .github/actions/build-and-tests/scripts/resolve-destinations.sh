@@ -36,12 +36,9 @@ else
   TVOS_DEST="platform=tvOS Simulator,name=Apple TV 4K (3rd generation)"
 fi
 
-VOS_NAME="$(pick_name 'visionOS' 'Apple Vision')"
-if [ -n "${VOS_NAME:-}" ]; then
-  VISIONOS_DEST="platform=visionOS Simulator,name=$VOS_NAME"
-else
-  VISIONOS_DEST="platform=visionOS Simulator,name=Apple Vision Pro"
-fi
+# visionOS is build-only (no tests), so use a generic destination that
+# does not require a downloaded simulator runtime.
+VISIONOS_DEST="generic/platform=visionOS Simulator"
 
 MACCAT_DEST="platform=macOS,variant=Mac Catalyst"
 

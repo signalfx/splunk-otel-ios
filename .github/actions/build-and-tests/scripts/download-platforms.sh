@@ -9,9 +9,17 @@ if [ ${#PLATFORMS[@]} -eq 0 ] || [ -z "${PLATFORMS[0]}" ]; then
   PLATFORMS=(iOS tvOS visionOS)
 fi
 
+FAILED=()
 for p in "${PLATFORMS[@]}"; do
   echo "[download-platforms] Downloading $p platform SDK..."
-  xcodebuild -downloadPlatform "$p"
+  if ! xcodebuild -downloadPlatform "$p"; then
+    echo "::warning::[download-platforms] Failed to download $p (exit $?). Build for this platform may fail."
+    FAILED+=("$p")
+  fi
 done
+
+if [ ${#FAILED[@]} -gt 0 ]; then
+  echo "[download-platforms] Warning: failed to download: ${FAILED[*]}"
+fi
 
 echo "[download-platforms] Done."
