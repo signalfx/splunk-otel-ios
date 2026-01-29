@@ -23,8 +23,13 @@ limitations under the License.
 public protocol WebViewInstrumentationModule {
 
     #if canImport(WebKit)
-        /// Injects the necessary JavaScript bridge into a given WKWebView to enable
+        /// Injects the necessary JavaScript bridge into a given `WKWebView` to enable
         /// communication between the web content and the native RUM agent.
+        ///
+        /// - Note: To ensure proper correlation, call this before the `WKWebView`
+        ///   starts loading any content (for example, before `load`, `loadHTMLString`, etc.).
+        ///
+        /// - Parameter view: The `WKWebView` instance to be instrumented.
         func integrateWithBrowserRum(_ view: WKWebView)
     #endif
 }

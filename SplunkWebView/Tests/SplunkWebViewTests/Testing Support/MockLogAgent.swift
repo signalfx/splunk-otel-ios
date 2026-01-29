@@ -1,0 +1,70 @@
+//
+/*
+Copyright 2025 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+internal import CiscoLogger
+import Foundation
+
+@testable import SplunkCommon
+@testable import SplunkWebView
+
+/// A thread-safe mock implementation of `LogAgent` that captures log messages for verification in tests.
+final class MockLogAgent: @unchecked Sendable, LogAgent {
+
+    // MARK: - Inline types
+
+    struct LogMessage {
+        let level: LogLevel
+        let message: String
+    }
+
+    // MARK: - Private
+
+    private let lock = NSLock()
+    private var logMessagesStorage: [LogMessage] = []
+
+    // MARK: - Public
+
+    nonisolated let poolName: String
+    nonisolated let category: String?
+
+    var logMessages: [LogMessage] {
+        lock.lock()
+        defer { lock.unlock() }
+        return logMessagesStorage
+    }
+
+    // MARK: - Initialization
+
+    init(poolName: String, category: String? = nil) {
+        self.poolName = poolName
+        self.category = category
+    }
+
+    convenience init() {
+        self.init(poolName: "mock-pool", category: "mock-category")
+    }
+
+    // MARK: - LogAgent methods
+
+    nonisolated func process(configuration _: CiscoLogger.ConfigurationMessage) {}
+
+    func log(level: CiscoLogger.LogLevel, isPrivate _: Bool, message: @escaping @Sendable () -> String) {
+        lock.lock()
+        logMessagesStorage.append(LogMessage(level: level, message: message()))
+        lock.unlock()
+    }
+}
