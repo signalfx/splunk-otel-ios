@@ -294,6 +294,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkOpenTelemetryBackgroundExporter",
             dependencies: [
                 "SplunkCommon",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
                 .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
                 resolveDependency("logger"),
@@ -388,6 +389,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkWebView",
             dependencies: [
                 "SplunkCommon",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 resolveDependency("logger")
             ],
             path: "SplunkWebView/Sources",
@@ -409,7 +411,8 @@ func generateMainTargets() -> [Target] {
             name: "SplunkCustomTracking",
             dependencies: [
                 "SplunkCommon",
-                "SplunkOpenTelemetry",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+                        "SplunkOpenTelemetry",
                 resolveDependency("logger")
             ],
             path: "SplunkCustomTracking/Sources",
@@ -435,7 +438,8 @@ func generateMainTargets() -> [Target] {
             name: "SplunkSessionReplayProxy",
             dependencies: [
                 "SplunkCommon",
-                resolveDependency("sessionReplay")
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+                 resolveDependency("sessionReplay")
             ],
             path: "SplunkSessionReplayProxy/Sources",
             plugins: lintTargetPlugins()
