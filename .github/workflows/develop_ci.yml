@@ -7,31 +7,8 @@ on:
 
 jobs:
 
-  prepare:
-    runs-on: macos-latest
-    outputs:
-      scheme: ${{ steps.scheme.outputs.scheme }}
-      ios_dest: ${{ steps.dest.outputs.ios_dest }}
-      tvos_dest: ${{ steps.dest.outputs.tvos_dest }}
-      visionos_dest: ${{ steps.dest.outputs.visionos_dest }}
-      maccatalyst_dest: ${{ steps.dest.outputs.maccatalyst_dest }}
-    steps:
-      - uses: actions/checkout@v6
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '26.0.1'
-      - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
-      - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
-      - id: scheme
-        run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
-      - id: dest
-        env:
-          SCHEME: ${{ steps.scheme.outputs.scheme }}
-        run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
-
   tests:
     runs-on: macos-latest
-    needs: prepare
     strategy:
       fail-fast: false
       matrix:
@@ -44,14 +21,28 @@ jobs:
         with:
           xcode-version: '26.0.1'
 
-      - name: Select destination
+      - name: Prepare workspace
+        run: |
+          .github/actions/build-and-tests/scripts/neutralize-sdk.sh
+          .github/actions/build-and-tests/scripts/prepare-workspace.sh
+
+      - name: Resolve scheme
+        id: scheme
+        run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
+
+      - name: Resolve destinations
+        id: dest
+        run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
+
+      - name: Select destination for ${{ matrix.platform }}
         id: pick
         run: |
+          # Use specific simulator destinations for tests (need actual device)
           case "${{ matrix.platform }}" in
-            ios) echo "DEST=${{ needs.prepare.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
-            tvos) echo "DEST=${{ needs.prepare.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
-            visionos) echo "DEST=${{ needs.prepare.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
-            macCatalyst) echo "DEST=${{ needs.prepare.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
+            ios) echo "DEST=${{ steps.dest.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
+            tvos) echo "DEST=${{ steps.dest.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
+            visionos) echo "DEST=${{ steps.dest.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
+            macCatalyst) echo "DEST=${{ steps.dest.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
           esac
           echo "Platform=${{ matrix.platform }}"
           echo "Destination=$DEST"
@@ -59,7 +50,7 @@ jobs:
       - name: Run tests (${{ matrix.platform }})
         id: run
         env:
-          SCHEME: ${{ needs.prepare.outputs.scheme }}
+          SCHEME: ${{ steps.scheme.outputs.scheme }}
           DESTINATION: ${{ env.DEST }}
         run: |
           export GITHUB_OUTPUT="$(mktemp)"
