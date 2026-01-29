@@ -24,7 +24,7 @@ final class UserDefaultsStoragePrefixTests: XCTestCase {
 
     // MARK: - Tests
 
-    func testDefaultKeysPrefix() throws {
+    func testDefaultKeysPrefix() {
         let defaultKeysPrefix = "com.splunk.rum."
 
         // Default prefix value
@@ -41,7 +41,7 @@ final class UserDefaultsStoragePrefixTests: XCTestCase {
         XCTAssertEqual(updatedKeysPrefix, newKeysPrefix)
     }
 
-    func testClearPrefix() throws {
+    func testClearPrefix() {
         let key = "testClearPrefix"
         let value = "Test data"
 
@@ -80,7 +80,7 @@ final class UserDefaultsStoragePrefixTests: XCTestCase {
         XCTAssertNotEqual(nilPrefixedData, prefixedData)
     }
 
-    func testKeysPrefix() throws {
+    func testKeysPrefix() {
         let key = "captainName"
 
         let firstPrefix = "\(PackageIdentifier.default).firstStorageTest."
