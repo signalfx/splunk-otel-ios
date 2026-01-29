@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+* Updated Network Monitor to remove potential race condition.
+
 ### Changed
 
 * Updated Network Monitor to remove crashes during network radio change notifications.
