@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import OpenTelemetryApi
 import XCTest
 
 @testable import OpenTelemetrySdk
@@ -37,47 +38,47 @@ final class ResourcesTests: XCTestCase {
         let otelResource = try XCTUnwrap(logEventProcessor.resource)
 
         // Test service name
-        let serviceName = try XCTUnwrap(otelResource.attributes[ResourceAttributes.serviceName.rawValue])
+        let serviceName = try XCTUnwrap(otelResource.attributes[SemanticConventions.Service.name.rawValue])
         XCTAssertFalse(serviceName.description.isEmpty)
 
         // Test telemetry sdk name
-        let telemetrySdkName = try XCTUnwrap(otelResource.attributes[ResourceAttributes.telemetrySdkName.rawValue])
+        let telemetrySdkName = try XCTUnwrap(otelResource.attributes[SemanticConventions.Telemetry.sdkName.rawValue])
         XCTAssertFalse(telemetrySdkName.description.isEmpty)
 
         // Test telemetry sdk language
-        let telemetrySdkLanguage = try XCTUnwrap(otelResource.attributes[ResourceAttributes.telemetrySdkLanguage.rawValue])
+        let telemetrySdkLanguage = try XCTUnwrap(otelResource.attributes[SemanticConventions.Telemetry.sdkLanguage.rawValue])
         XCTAssertFalse(telemetrySdkLanguage.description.isEmpty)
 
         // Test telemetry sdk version
-        let telemetrySdkVersion = try XCTUnwrap(otelResource.attributes[ResourceAttributes.telemetrySdkVersion.rawValue])
+        let telemetrySdkVersion = try XCTUnwrap(otelResource.attributes[SemanticConventions.Telemetry.sdkVersion.rawValue])
         XCTAssertFalse(telemetrySdkVersion.description.isEmpty)
 
         // Test device ID
-        let deviceID = try XCTUnwrap(otelResource.attributes[ResourceAttributes.deviceId.rawValue])
+        let deviceID = try XCTUnwrap(otelResource.attributes[SemanticConventions.Device.id.rawValue])
         XCTAssertFalse(deviceID.description.isEmpty)
 
         // Test device model identifier
-        let deviceModelIdentifier = try XCTUnwrap(otelResource.attributes[ResourceAttributes.deviceModelIdentifier.rawValue])
+        let deviceModelIdentifier = try XCTUnwrap(otelResource.attributes[SemanticConventions.Device.modelIdentifier.rawValue])
         XCTAssertFalse(deviceModelIdentifier.description.isEmpty)
 
         // Test device manufacturer
-        let deviceManufacturer = try XCTUnwrap(otelResource.attributes[ResourceAttributes.deviceManufacturer.rawValue])
+        let deviceManufacturer = try XCTUnwrap(otelResource.attributes[SemanticConventions.Device.manufacturer.rawValue])
         XCTAssertFalse(deviceManufacturer.description.isEmpty)
 
         // Test os name
-        let osName = try XCTUnwrap(otelResource.attributes[ResourceAttributes.osName.rawValue])
+        let osName = try XCTUnwrap(otelResource.attributes[SemanticConventions.Os.name.rawValue])
         XCTAssertFalse(osName.description.isEmpty)
 
         // Test os version
-        let osVersion = try XCTUnwrap(otelResource.attributes[ResourceAttributes.osVersion.rawValue])
+        let osVersion = try XCTUnwrap(otelResource.attributes[SemanticConventions.Os.version.rawValue])
         XCTAssertFalse(osVersion.description.isEmpty)
 
         // Test os description
-        let osDescription = try XCTUnwrap(otelResource.attributes[ResourceAttributes.osDescription.rawValue])
+        let osDescription = try XCTUnwrap(otelResource.attributes[SemanticConventions.Os.description.rawValue])
         XCTAssertFalse(osDescription.description.isEmpty)
 
         // Test os type
-        let osType = try XCTUnwrap(otelResource.attributes[ResourceAttributes.osType.rawValue])
+        let osType = try XCTUnwrap(otelResource.attributes[SemanticConventions.Os.type.rawValue])
         XCTAssertFalse(osType.description.isEmpty)
 
         // Test agent version

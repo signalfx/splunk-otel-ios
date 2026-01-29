@@ -43,7 +43,7 @@ final class MockDiskStorage: DiskStorage {
         storage[keyStr] = data
     }
 
-    func read<T>(forKey key: CiscoDiskStorage.KeyBuilder) throws -> T? where T: Decodable, T: Encodable {
+    func read<T: Decodable & Encodable>(forKey key: CiscoDiskStorage.KeyBuilder) throws -> T? {
         let keyStr = key.key
 
         guard let data = storage[keyStr]

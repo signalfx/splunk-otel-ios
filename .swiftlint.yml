@@ -94,7 +94,7 @@ opt_in_rules:
   - quick_discouraged_call
   - reduce_into
   - redundant_nil_coalescing
-  - redundant_self_in_closure
+  - redundant_self
   - redundant_type_annotation
   - required_enum_case
   - return_value_from_void_function

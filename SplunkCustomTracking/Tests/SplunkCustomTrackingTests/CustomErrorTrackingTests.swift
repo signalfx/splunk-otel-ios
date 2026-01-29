@@ -68,7 +68,9 @@ final class CustomErrorTrackingTests: XCTestCase {
     func testTrackError_withSwiftError() throws {
         struct FileError: Error, LocalizedError {
             let path: String
-            var errorDescription: String? { "File not found at \(path)" }
+            var errorDescription: String? {
+                "File not found at \(path)"
+            }
         }
 
         let error = FileError(path: "/tmp/file.txt")
@@ -159,6 +161,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         let message = "A simple string error."
         let issue = SplunkIssue(from: message)
         let attributes = issue.toAttributesDictionary()
+
         XCTAssertEqual(issue.message, message)
         XCTAssertEqual(issue.exceptionType, "String")
         XCTAssertNil(issue.stacktrace)
@@ -168,10 +171,17 @@ final class CustomErrorTrackingTests: XCTestCase {
     }
 
     func testSplunkIssue_from_Error() {
-        struct MyTestError: Error, LocalizedError { var errorDescription: String? { "This is a test error." } }
+
+        struct MyTestError: Error, LocalizedError {
+            var errorDescription: String? {
+                "This is a test error."
+            }
+        }
+
         let error = MyTestError()
         let issue = SplunkIssue(from: error)
         let attributes = issue.toAttributesDictionary()
+
         XCTAssertEqual(issue.message, "This is a test error.")
         XCTAssertEqual(issue.exceptionType, "MyTestError")
         XCTAssertNotNil(issue.stacktrace)
@@ -184,6 +194,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         let nsError = NSError(domain: "test.domain", code: 123, userInfo: [NSLocalizedDescriptionKey: "An NSError occurred."])
         let issue = SplunkIssue(from: nsError)
         let attributes = issue.toAttributesDictionary()
+
         XCTAssertEqual(issue.message, "An NSError occurred.")
         XCTAssertEqual(issue.exceptionType, "NSError")
         XCTAssertNotNil(issue.stacktrace)
@@ -197,6 +208,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         let exception = NSException(name: .internalInconsistencyException, reason: "Inconsistent state.", userInfo: nil)
         let issue = SplunkIssue(from: exception)
         let attributes = issue.toAttributesDictionary()
+
         XCTAssertEqual(issue.message, "Inconsistent state.")
         XCTAssertEqual(issue.exceptionType, "NSInternalInconsistencyException")
         XCTAssertNotNil(issue.stacktrace)

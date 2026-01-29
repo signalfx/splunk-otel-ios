@@ -26,72 +26,81 @@ struct CustomTrackingDemoView: View {
             VStack(spacing: 16) {
                 DemoHeaderView()
 
-                FeatureSection(title: "Custom Event Tracking with attributes argument") {
-                    FeatureButton(label: "Track Event") {
+                FeatureSection(
+                    title: "Custom Event Tracking with attributes argument",
+                    content: FeatureButton(label: "Track Event") {
                         trackCustomEventWithAttributes()
                     }
-                }
+                )
 
-                FeatureSection(title: "Custom Event Tracking without attributes argument") {
-                    FeatureButton(label: "Track Event") {
+                FeatureSection(
+                    title: "Custom Event Tracking without attributes argument",
+                    content: FeatureButton(label: "Track Event") {
                         trackCustomEventWithoutAttributes()
                     }
-                }
+                )
 
-                FeatureSection(title: "Custom Workflow Tracking") {
-                    FeatureButton(label: "Track Workflow (Span)") {
+                FeatureSection(
+                    title: "Custom Workflow Tracking",
+                    content: FeatureButton(label: "Track Workflow (Span)") {
                         trackWorkflow()
                     }
-                }
+                )
 
-                FeatureSection(title: "Custom Error Tracking") {
-                    FeatureButton(label: "Track Error String") {
-                        let attributes = SampleAttributes.forStringError()
-                        SplunkRum.shared.customTracking.trackError(DemoErrors.stringError(), attributes)
-                    }
+                FeatureSection(
+                    title: "Custom Error Tracking",
+                    content: VStack(spacing: 8) {
+                        FeatureButton(label: "Track Error String") {
+                            let attributes = SampleAttributes.forStringError()
+                            SplunkRum.shared.customTracking.trackError(DemoErrors.stringError(), attributes)
+                        }
 
-                    FeatureButton(label: "Track Swift Error type") {
-                        let attributes = SampleAttributes.forSwiftError()
-                        SplunkRum.shared.customTracking.trackError(DemoErrors.swiftError(), attributes)
-                    }
+                        FeatureButton(label: "Track Swift Error type") {
+                            let attributes = SampleAttributes.forSwiftError()
+                            SplunkRum.shared.customTracking.trackError(DemoErrors.swiftError(), attributes)
+                        }
 
-                    FeatureButton(label: "Track NSError") {
-                        let attributes = SampleAttributes.forNSError()
-                        SplunkRum.shared.customTracking.trackError(DemoErrors.nsError(), attributes)
-                    }
+                        FeatureButton(label: "Track NSError") {
+                            let attributes = SampleAttributes.forNSError()
+                            SplunkRum.shared.customTracking.trackError(DemoErrors.nsError(), attributes)
+                        }
 
-                    FeatureButton(label: "Track NSError Subclass") {
-                        let attributes = SampleAttributes.forNSErrorSubclass()
-                        SplunkRum.shared.customTracking.trackError(DemoErrors.nsErrorSubclass(), attributes)
-                    }
+                        FeatureButton(label: "Track NSError Subclass") {
+                            let attributes = SampleAttributes.forNSErrorSubclass()
+                            SplunkRum.shared.customTracking.trackError(DemoErrors.nsErrorSubclass(), attributes)
+                        }
 
-                    FeatureButton(label: "Track NSException") {
-                        let attributes = SampleAttributes.forNSException()
-                        SplunkRum.shared.customTracking.trackException(DemoErrors.nsException(), attributes)
+                        FeatureButton(label: "Track NSException") {
+                            let attributes = SampleAttributes.forNSException()
+                            SplunkRum.shared.customTracking.trackException(DemoErrors.nsException(), attributes)
+                        }
                     }
-                }
+                )
 
-                FeatureSection(title: "Legacy Tracking") {
-                    FeatureButton(label: "Track Legacy Error (String)") {
-                        trackLegacyErrorString()
-                    }
+                FeatureSection(
+                    title: "Legacy Tracking",
+                    content: VStack(spacing: 8) {
+                        FeatureButton(label: "Track Legacy Error (String)") {
+                            trackLegacyErrorString()
+                        }
 
-                    FeatureButton(label: "Track Legacy Error") {
-                        trackLegacyError()
-                    }
+                        FeatureButton(label: "Track Legacy Error") {
+                            trackLegacyError()
+                        }
 
-                    FeatureButton(label: "Track Legacy NSError") {
-                        trackLegacyNSError()
-                    }
+                        FeatureButton(label: "Track Legacy NSError") {
+                            trackLegacyNSError()
+                        }
 
-                    FeatureButton(label: "Track Legacy Exception") {
-                        trackLegacyException()
-                    }
+                        FeatureButton(label: "Track Legacy Exception") {
+                            trackLegacyException()
+                        }
 
-                    FeatureButton(label: "Track Legacy Event") {
-                        trackLegacyEvent()
+                        FeatureButton(label: "Track Legacy Event") {
+                            trackLegacyEvent()
+                        }
                     }
-                }
+                )
 
                 Spacer()
             }
