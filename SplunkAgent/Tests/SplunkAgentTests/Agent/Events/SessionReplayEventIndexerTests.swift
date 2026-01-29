@@ -23,7 +23,7 @@ final class SessionReplayEventIndexerTests: XCTestCase {
 
     // MARK: - Basic logic
 
-    func testInitialization() throws {
+    func testInitialization() {
         let indexerName = "testDefault"
         let indexer = SessionReplayEventIndexer(named: indexerName)
 

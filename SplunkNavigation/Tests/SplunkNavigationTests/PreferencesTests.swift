@@ -45,7 +45,7 @@ final class PreferencesTests: XCTestCase {
         XCTAssertTrue(enableAutomatedTracking)
     }
 
-    func testInitializationForModule() throws {
+    func testInitializationForModule() {
         // Prepare Navigation module instance
         let navigationModule = Navigation()
 

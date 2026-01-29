@@ -39,9 +39,15 @@ final class SpanLinkingTests: XCTestCase {
         var parentSpanId: SpanId?
         var instrumentationScopeInfo = InstrumentationScopeInfo()
 
-        var kind: SpanKind { .internal }
+        var kind: SpanKind {
+            .internal
+        }
+
         var context: SpanContext
-        var isRecording: Bool { true }
+        var isRecording: Bool {
+            true
+        }
+
         var status: Status = .unset
         var name: String = "MockSpan"
 
@@ -87,7 +93,9 @@ final class SpanLinkingTests: XCTestCase {
         func recordException(_: SpanException, attributes _: [String: AttributeValue]) {}
         func recordException(_: SpanException, attributes _: [String: AttributeValue], timestamp _: Date) {}
 
-        var description: String { "MockSpan" }
+        var description: String {
+            "MockSpan"
+        }
     }
 
     // MARK: - Tests

@@ -52,7 +52,7 @@ final class DefaultPersistentCacheTests: XCTestCase {
 
     // MARK: - Basic logic
 
-    func testInitialization() async throws {
+    func testInitialization() async {
         let countersName = UUID().uuidString + ".countersCache"
         let customDataName = UUID().uuidString + ".customDataCache"
 
@@ -194,7 +194,7 @@ final class DefaultPersistentCacheTests: XCTestCase {
 
     // MARK: - Maintenance methods
 
-    func testPurge() async throws {
+    func testPurge() async {
         let testName = "persistentCachePurge"
 
         var items: [String: Int] = [:]
