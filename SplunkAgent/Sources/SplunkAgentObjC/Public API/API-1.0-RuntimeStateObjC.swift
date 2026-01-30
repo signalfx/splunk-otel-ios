@@ -62,10 +62,12 @@ public final class RuntimeStateObjC: NSObject {
         owner.agent.state.appVersion
     }
 
-    /// A `SPLKEndpointConfiguration` containing either the specified realm, or endpoint urls.
+    /// An optional `SPLKEndpointConfiguration` containing either the specified realm, or endpoint urls.
     @objc
-    public var endpointConfiguration: EndpointConfigurationObjC {
-        let configuration = owner.agent.state.endpointConfiguration
+    public var endpointConfiguration: EndpointConfigurationObjC? {
+        guard let configuration = owner.agent.state.endpointConfiguration else {
+            return nil
+        }
 
         return EndpointConfigurationObjC(for: configuration)
     }

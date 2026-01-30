@@ -200,7 +200,7 @@ class DefaultModulesManager: AgentModulesManager {
         configurationDescription
     }
 
-    /// Prepares modules configuration description, in a format of a `[String: String]` dictionary,
+    /// Prepares modules configuration description, in a format of a `[String: String]` dictionary
     /// with `"ModuleName.propertyName"` as a key and the property's value as a value.
     private func prepareModulesConfigurationDescription(with configurations: [any ModuleConfiguration]) {
         do {

@@ -46,6 +46,10 @@ public final class SplunkRumObjC: NSObject {
     @objc
     public private(set) lazy var session = SessionObjC(for: self)
 
+    /// An object that holds preferred settings for the agent.
+    @objc
+    public private(set) lazy var preferences = AgentPreferencesObjC(for: self)
+
     /// A dictionary that contains global attributes added to all signals.
     ///
     /// Defaults to an empty `NSDictionary` object.

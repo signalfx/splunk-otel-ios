@@ -41,7 +41,7 @@ final class RuntimeStateTests: XCTestCase {
         let appVersion = state.appVersion
         XCTAssertNotNil(appVersion)
 
-        let realm = state.endpointConfiguration.realm
+        let realm = state.endpointConfiguration?.realm
         XCTAssertEqual(realm, ConfigurationTestBuilder.realm)
 
         let deploymentEnvironment = state.deploymentEnvironment
