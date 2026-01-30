@@ -11,6 +11,7 @@ import class Foundation.ProcessInfo
 let package = Package(
     name: "SplunkAgent",
     platforms: [
+        .macOS(.v12),
         .iOS(.v13),
         .tvOS(.v15),
         .visionOS(.v1),
@@ -280,7 +281,8 @@ func generateMainTargets() -> [Target] {
                 "SplunkOpenTelemetryBackgroundExporter",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
-                .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
+                .product(name: "OpenTelemetryProtocolExporterHTTP", package: "opentelemetry-swift"),
+                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
                 resolveDependency("logger")
             ],
             path: "SplunkOpenTelemetry/Sources",
@@ -297,6 +299,7 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
                 .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
+                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
                 resolveDependency("logger"),
                 resolveDependency("diskStorage")
             ],
