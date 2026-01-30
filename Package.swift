@@ -39,7 +39,8 @@ let package = Package(
         .package(
             url: "https://github.com/microsoft/plcrashreporter",
             from: "1.12.0"
-        )
+        ),
+        .package(url: "https://github.com/apple/swift-protobuf", from: "1.0.0")
     ],
     targets: []
 )
