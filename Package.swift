@@ -56,6 +56,9 @@ package.dependencies.append(contentsOf: pluginDependencies())
 // Conditionally add Session Replay as a repository dependency
 resolveSessionReplayRepositoryDependency()
 
+// Conditionally add binary dependencies product for framework-based integrations
+package.products.append(contentsOf: generateBinaryDependenciesProduct())
+
 
 // MARK: - Helpers for target generation
 
@@ -521,6 +524,32 @@ func generateBinaryWrapperTargets() -> [Target] {
                 resolveDependency("swizzling")
             ],
             path: "TargetWrappers/CiscoSessionReplayWrapper/Sources"
+        )
+    ]
+}
+
+/// Generates the binary dependencies product when using binary target strategy.
+/// This product exposes all Cisco wrapper targets for customers who need to
+/// explicitly link binary dependencies (e.g., framework-based architectures).
+func generateBinaryDependenciesProduct() -> [Product] {
+    // Only generate when using binary targets strategy
+    guard DependencyResolutionStrategy.current == .binaryTargets else {
+        return []
+    }
+
+    return [
+        .library(
+            name: "SplunkAgentBinaryDependencies",
+            targets: [
+                "CiscoLoggerWrapper",
+                "CiscoEncryptionWrapper",
+                "CiscoSwizzlingWrapper",
+                "CiscoInteractionsWrapper",
+                "CiscoDiskStorageWrapper",
+                "CiscoInstanceManagerWrapper",
+                "CiscoRuntimeCacheWrapper",
+                "CiscoSessionReplayWrapper"
+            ]
         )
     ]
 }
