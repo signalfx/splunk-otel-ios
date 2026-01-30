@@ -28,7 +28,7 @@ You can add Splunk RUM for iOS to your project using Swift Package Manager.
 2. Enter the package URL: `https://github.com/signalfx/splunk-otel-ios`
 3. Select the `SplunkAgent` package product and add it to your application target.
 
-> **Note for Framework-Based Architectures:** If you're integrating SplunkAgent into an intermediate framework (not directly into your app target), you must also add the `SplunkAgentBinaryDependencies` product to ensure binary dependencies are properly embedded. See the [Framework Integration](SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Framework-Integration.md) documentation for details.
+> **Note for Framework-Based Architectures:** If you're integrating SplunkAgent into an intermediate framework, you must also add the `SplunkAgentBinaryDependencies` product to your **app target** to ensure the binary dependencies are properly embedded. See the [Framework Integration](SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Framework-Integration.md) documentation for details.
 
 ### Basic Configuration
 
