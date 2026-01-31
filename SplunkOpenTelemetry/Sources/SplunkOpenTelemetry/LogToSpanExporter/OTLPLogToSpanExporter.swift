@@ -89,7 +89,8 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
         // } else
 
         // Then check for `event.name` attribute
-        if let eventName = log.attributes[OpenTelemetryApi.SemanticAttributes.eventName.rawValue]?.description {
+        // Note: Using string literal as event.name is not yet in SemanticConventions
+        if let eventName = log.attributes["event.name"]?.description {
             return eventName
         }
 

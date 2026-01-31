@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 
 /// The default container for the persisted item.
-struct DefaultItemContainer<T: Codable>: PersistedItemContainer where T: Sendable {
+struct DefaultItemContainer<T: Codable & Sendable>: PersistedItemContainer {
 
     // MARK: - Public
 

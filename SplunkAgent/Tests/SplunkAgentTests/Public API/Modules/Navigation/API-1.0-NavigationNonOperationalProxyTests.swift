@@ -51,7 +51,7 @@ final class NavigationAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - State
 
-    func testState() throws {
+    func testState() {
         let state = moduleProxy.state
 
         // Properties with default module configuration (READ)
@@ -63,7 +63,7 @@ final class NavigationAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Manual detection
 
-    func testTracking() throws {
+    func testTracking() {
         XCTAssertNotNil(moduleProxy.track(screen: "Test"))
     }
 }

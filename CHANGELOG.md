@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.6] - 2026-01-30
+
+### Changed
+
+* Updated Network Monitor to remove crashes during network radio change notifications.
+* Updated and unpinned the opentelemetry-swift dependency to latest version, using the new split repos (opentelemetry-swift and opentelemetry-swift-core).
+* Improved slow‑frame detection accuracy on variable refresh‑rate (ProMotion) displays.
+
+### Fixed
+
+* Updated Network Monitor to remove potential race condition.
 
 ## [2.0.5] - 2026-01-19
 

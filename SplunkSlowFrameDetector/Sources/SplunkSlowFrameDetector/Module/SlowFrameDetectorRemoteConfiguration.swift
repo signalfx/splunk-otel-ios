@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -19,7 +18,7 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// SlowFrameDetector module remote configuration.
+/// The remote configuration for the `SlowFrameDetector` module.
 public struct SlowFrameDetectorRemoteConfiguration: RemoteModuleConfiguration {
 
     // MARK: - Module management
