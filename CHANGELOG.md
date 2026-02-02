@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0.6] - 2026-02-02
+
 ### Changed
 
 * Updated Network Monitor to remove crashes during network radio change notifications.
