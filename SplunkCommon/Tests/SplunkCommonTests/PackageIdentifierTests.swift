@@ -23,7 +23,7 @@ final class PackageIdentifierTests: XCTestCase {
 
     // MARK: - Tests
 
-    func testIdentification() throws {
+    func testIdentification() {
         // Static properties (READ)
         let defaultIdentifier = PackageIdentifier.default
         XCTAssertFalse(defaultIdentifier.isEmpty)
@@ -47,7 +47,7 @@ final class PackageIdentifierTests: XCTestCase {
         XCTAssertEqual(identifier, expectedIdentifier)
     }
 
-    func testInstanceIdentification() throws {
+    func testInstanceIdentification() {
         let defaultExtension = "default"
         let namedExtension = "named"
         let defaultIdentifier = PackageIdentifier.default
@@ -70,7 +70,7 @@ final class PackageIdentifierTests: XCTestCase {
         XCTAssertEqual(namedInstanceIdentifier, expectedNamed)
     }
 
-    func testNonOperationalInstanceIdentification() throws {
+    func testNonOperationalInstanceIdentification() {
         let defaultExtension = "noop-default"
         let namedExtension = "named"
         let defaultIdentifier = PackageIdentifier.default

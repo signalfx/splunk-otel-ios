@@ -89,7 +89,8 @@ final class ThreadSafeDictionaryTests: XCTestCase {
         dict["two"] = 2
         dict["three"] = 3
 
-        dict.removeValue(forKey: "two")
+        let removedValue = dict.removeValue(forKey: "two")
+        XCTAssertEqual(removedValue, 2)
         XCTAssertEqual(dict["one"], 1)
         XCTAssertNil(dict["two"])
         XCTAssertEqual(dict["three"], 3)
@@ -193,7 +194,8 @@ final class ThreadSafeDictionaryTests: XCTestCase {
         dict["two"] = 2
 
         let newValues = ["three": 3, "four": 4, "five": 5]
-        dict.update(with: newValues)
+        let updatedCount = dict.update(with: newValues)
+        XCTAssertEqual(updatedCount, 3)
 
         XCTAssertEqual(dict["one"], 1)
         XCTAssertEqual(dict["two"], 2)

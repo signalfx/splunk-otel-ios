@@ -40,7 +40,7 @@ extension CustomTrackingInternal {
 
         let data = CustomTrackingData(
             name: event.eventName,
-            component: "event",
+            component: "custom-event",
             attributes: event.toAttributesDictionary()
         )
 
@@ -92,6 +92,7 @@ extension CustomTrackingInternal {
         // Start a span for the workflow
         return tracer.spanBuilder(spanName: workflowName)
             .setAttribute(key: "workflow.name", value: workflowName)
+            .setAttribute(key: "component", value: "custom-workflow")
             .startSpan()
 
         // Return the span object

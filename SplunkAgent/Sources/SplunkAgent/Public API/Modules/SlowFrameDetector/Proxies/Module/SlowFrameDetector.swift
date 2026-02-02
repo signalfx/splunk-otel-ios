@@ -27,13 +27,15 @@ final class SlowFrameDetector: SlowFrameDetectorModule, SlowFrameDetectorModuleS
     // MARK: - SlowFrameDetectorModuleState Conformance
 
     /// Returns self as the state provider.
-    var state: any SlowFrameDetectorModuleState { self }
+    var state: any SlowFrameDetectorModuleState {
+        self
+    }
 
     // MARK: - SlowFrameDetectorModule Conformance
 
     /// The enabled status of the underlying module.
     var isEnabled: Bool {
-        module.state.isEnabled
+        module.isEnabled
     }
 
     // MARK: - InitializationSplunkSlowFrameDetector.SlowFrameDetector.configuration

@@ -22,7 +22,7 @@ final class RuntimeStateTests: XCTestCase {
 
     // MARK: - Business logic
 
-    func testProperties() throws {
+    func testProperties() {
         // Prepare Navigation module instance
         let navigationModule = Navigation()
         let state = navigationModule.state

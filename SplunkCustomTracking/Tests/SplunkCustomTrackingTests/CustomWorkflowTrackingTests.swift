@@ -71,6 +71,8 @@ final class CustomWorkflowTrackingTests: XCTestCase {
         // Verify the default workflow attribute is set
         let workflowNameAttribute = mockSpan.attributes["workflow.name"]
         XCTAssertEqual(workflowNameAttribute?.description, workflowName)
+        let componentAttribute = mockSpan.attributes["component"]
+        XCTAssertEqual(componentAttribute?.description, "custom-workflow")
 
         // End the span and verify its state
         span.end()

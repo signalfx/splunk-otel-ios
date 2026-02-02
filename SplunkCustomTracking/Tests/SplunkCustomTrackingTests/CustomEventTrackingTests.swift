@@ -62,7 +62,7 @@ final class CustomEventTrackingTests: XCTestCase {
 
         let data = try XCTUnwrap(capturedData)
         XCTAssertEqual(data.name, eventName)
-        XCTAssertEqual(data.component, "event")
+        XCTAssertEqual(data.component, "custom-event")
         XCTAssertEqual(getStringValue(for: "userId", in: data), "testUser123")
         XCTAssertEqual(getStringValue(for: "loginMethod", in: data), "biometrics")
         XCTAssertEqual(getIntValue(for: "attempt", in: data), 1)
@@ -80,7 +80,7 @@ final class CustomEventTrackingTests: XCTestCase {
 
         let data = try XCTUnwrap(capturedData)
         XCTAssertEqual(data.name, eventName)
-        XCTAssertEqual(data.component, "event")
+        XCTAssertEqual(data.component, "custom-event")
         XCTAssertTrue(data.attributes.isEmpty, "Attributes dictionary should be empty")
     }
 }

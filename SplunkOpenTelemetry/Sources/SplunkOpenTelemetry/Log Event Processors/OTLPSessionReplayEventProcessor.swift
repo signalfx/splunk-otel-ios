@@ -98,7 +98,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
         // Session replay specific resource
         let replayResource = Resource(attributes: [
-            ResourceAttributes.processRuntimeName.rawValue: .string("mobile"),
+            SemanticConventions.Process.runtimeName.rawValue: .string("mobile"),
             "splunk.rumVersion": .string(resources.agentVersion)
         ])
 
