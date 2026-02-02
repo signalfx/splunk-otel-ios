@@ -7,12 +7,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-* Added support for the endpointConfiguration to be deferred and after agent initialization.  Disabling the endpoint is also supported with caching (optional) of pending spans.
+* Added support for the endpointConfiguration to be deferred un after agent initialization.  Disabling the endpoint is also supported with caching (optional) of pending spans.
+
+## [2.0.6] - 2026-02-02
 
 ### Changed
 
 * Updated Network Monitor to remove crashes during network radio change notifications.
-* Updated and unpinned the opentelemetry-swift dependency to latest version, using the new split repos (opentelemetry-swift and opentelemetry-swift-core). 
+* Updated and unpinned the opentelemetry-swift dependency to latest version, using the new split repos (opentelemetry-swift and opentelemetry-swift-core).
+* Improved slow‑frame detection accuracy on variable refresh‑rate (ProMotion) displays.
+
+### Fixed
+
+* Updated Network Monitor to remove potential race condition.
 
 ## [2.0.5] - 2026-01-19
 
