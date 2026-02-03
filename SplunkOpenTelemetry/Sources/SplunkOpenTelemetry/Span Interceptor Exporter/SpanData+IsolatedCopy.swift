@@ -62,7 +62,11 @@ extension SpanData {
         }
         copy = copy.settingLinks(isolatedLinks)
 
-        // Resource contains an attributes dictionary that also needs isolation
+        // Resource contains an attributes dictionary that also needs isolation.
+        //
+        // Note: As of opentelemetry-swift-core 2.3.0, Resource only has `attributes`.
+        // If future versions add properties like `schemaURL`, this should be updated
+        // to preserve them (e.g., using a Resource initializer that accepts schemaURL).
         let isolatedResource = Resource(
             attributes: Dictionary(uniqueKeysWithValues: resource.attributes.map { ($0.key, $0.value) })
         )

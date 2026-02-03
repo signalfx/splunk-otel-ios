@@ -166,16 +166,31 @@ struct SpanDataIsolatedCopyTests {
             (name: "test-event", attributes: ["eventKey": AttributeValue.string("eventValue")])
         ]
         let original = makeSpanData(events: events)
-        let copy = original.isolatedCopy()
+        var copy = original.isolatedCopy()
 
         // Verify both have the same event data initially
         #expect(original.events.first?.attributes["eventKey"]?.description == "eventValue")
         #expect(copy.events.first?.attributes["eventKey"]?.description == "eventValue")
 
-        // The event attributes dictionaries should be independent copies
-        // We verify this by checking the copy has its own storage
-        #expect(copy.events.count == original.events.count)
-        #expect(copy.events.first?.name == original.events.first?.name)
+        // Modify the copy's events to prove independence
+        let modifiedEvents = [
+            SpanData.Event(
+                name: "modified-event",
+                timestamp: Date(),
+                attributes: ["eventKey": .string("modifiedValue"), "newKey": .string("newValue")]
+            )
+        ]
+        copy = copy.settingEvents(modifiedEvents)
+
+        // Original should be unchanged
+        #expect(original.events.first?.name == "test-event")
+        #expect(original.events.first?.attributes["eventKey"]?.description == "eventValue")
+        #expect(original.events.first?.attributes["newKey"] == nil)
+
+        // Copy should have the modifications
+        #expect(copy.events.first?.name == "modified-event")
+        #expect(copy.events.first?.attributes["eventKey"]?.description == "modifiedValue")
+        #expect(copy.events.first?.attributes["newKey"]?.description == "newValue")
     }
 
     @Test
@@ -183,14 +198,27 @@ struct SpanDataIsolatedCopyTests {
         // Create span with links that have attributes
         let linkContext = makeSpanContext()
         let original = makeSpanData(links: [linkContext])
-        let copy = original.isolatedCopy()
+        var copy = original.isolatedCopy()
 
-        // Verify both have the same link data
+        // Verify both have the same link data initially
         #expect(original.links.first?.context.traceId == linkContext.traceId)
         #expect(copy.links.first?.context.traceId == linkContext.traceId)
+        #expect(original.links.count == 1)
 
-        // The link attributes dictionaries should be independent copies
-        #expect(copy.links.count == original.links.count)
+        // Modify the copy's links to prove independence
+        let newLinkContext = makeSpanContext()
+        let modifiedLinks = [
+            SpanData.Link(context: newLinkContext, attributes: ["linkAttr": .string("linkValue")])
+        ]
+        copy = copy.settingLinks(modifiedLinks)
+
+        // Original should be unchanged
+        #expect(original.links.first?.context.traceId == linkContext.traceId)
+        #expect(original.links.first?.attributes.isEmpty == true)
+
+        // Copy should have the modifications
+        #expect(copy.links.first?.context.traceId == newLinkContext.traceId)
+        #expect(copy.links.first?.attributes["linkAttr"]?.description == "linkValue")
     }
 
     @Test
