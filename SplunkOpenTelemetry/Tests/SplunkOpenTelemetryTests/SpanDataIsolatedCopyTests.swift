@@ -325,15 +325,15 @@ struct SpanDataIsolatedCopyTests {
 
         await withTaskGroup(of: Void.self) { group in
             for iteration in 0 ..< 50 {
-                group.addTask {
+                group.addTask { [self] in
                     // Create original span data
-                    let original = self.makeSpanData(attributes: attributes)
+                    let original = makeSpanData(attributes: attributes)
 
                     // Create isolated copy (simulating what exporter does)
                     let isolated = original.isolatedCopy()
 
                     // Simulate processing delay
-                    try? await Task.sleep(nanoseconds: UInt64.random(in: 1000 ... 10000))
+                    try? await Task.sleep(nanoseconds: UInt64.random(in: 1_000 ... 10_000))
 
                     // Access the isolated copy's data (simulating SpanAdapter processing)
                     for (key, value) in isolated.attributes {
@@ -378,15 +378,19 @@ struct SpanDataIsolatedCopyTests {
                     guard copy.attributes["http.method"]?.description == "GET" else {
                         return false
                     }
+
                     guard copy.attributes["http.status_code"]?.description == "200" else {
                         return false
                     }
+
                     guard copy.attributes["http.url"]?.description == "https://example.com/api" else {
                         return false
                     }
+
                     guard copy.events.first?.name == expectedEventName else {
                         return false
                     }
+
                     guard copy.events.first?.attributes[expectedEventAttr]?.description == "2025-01-01" else {
                         return false
                     }
@@ -396,10 +400,8 @@ struct SpanDataIsolatedCopyTests {
             }
 
             var allValid = true
-            for await isValid in group {
-                if !isValid {
-                    allValid = false
-                }
+            for await isValid in group where !isValid {
+                allValid = false
             }
 
             #expect(allValid, "All concurrent copies should maintain data integrity")
@@ -412,13 +414,13 @@ struct SpanDataIsolatedCopyTests {
 
 /// A simple no-op exporter for testing purposes.
 private class NoOpSpanExporter: SpanExporter {
-    func export(spans: [SpanData], explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
+    func export(spans _: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
         .success
     }
 
-    func flush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
+    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
         .success
     }
 
-    func shutdown(explicitTimeout: TimeInterval?) {}
+    func shutdown(explicitTimeout _: TimeInterval?) {}
 }
