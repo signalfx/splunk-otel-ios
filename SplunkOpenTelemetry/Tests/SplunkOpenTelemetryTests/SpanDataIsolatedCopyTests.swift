@@ -425,5 +425,6 @@ private class NoOpSpanExporter: SpanExporter {
 
     func shutdown(explicitTimeout _: TimeInterval?) {}
 }
+
 // swiftlint:enable type_body_length
 // swiftlint:enable file_length
