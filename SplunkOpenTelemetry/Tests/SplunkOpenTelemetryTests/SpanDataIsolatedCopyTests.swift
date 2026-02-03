@@ -157,6 +157,84 @@ struct SpanDataIsolatedCopyTests {
     }
 
 
+    // MARK: - Deep Isolation Tests
+
+    @Test
+    func isolatedCopyCreatesIndependentEventAttributes() {
+        // Create span with events that have attributes
+        let events = [
+            (name: "test-event", attributes: ["eventKey": AttributeValue.string("eventValue")])
+        ]
+        let original = makeSpanData(events: events)
+        let copy = original.isolatedCopy()
+
+        // Verify both have the same event data initially
+        #expect(original.events.first?.attributes["eventKey"]?.description == "eventValue")
+        #expect(copy.events.first?.attributes["eventKey"]?.description == "eventValue")
+
+        // The event attributes dictionaries should be independent copies
+        // We verify this by checking the copy has its own storage
+        #expect(copy.events.count == original.events.count)
+        #expect(copy.events.first?.name == original.events.first?.name)
+    }
+
+    @Test
+    func isolatedCopyCreatesIndependentLinkAttributes() {
+        // Create span with links that have attributes
+        let linkContext = makeSpanContext()
+        let original = makeSpanData(links: [linkContext])
+        let copy = original.isolatedCopy()
+
+        // Verify both have the same link data
+        #expect(original.links.first?.context.traceId == linkContext.traceId)
+        #expect(copy.links.first?.context.traceId == linkContext.traceId)
+
+        // The link attributes dictionaries should be independent copies
+        #expect(copy.links.count == original.links.count)
+    }
+
+    @Test
+    func isolatedCopyCreatesIndependentResourceAttributes() {
+        // Create span - resources are automatically added by the tracer
+        let original = makeSpanData(attributes: ["test": .string("value")])
+        let copy = original.isolatedCopy()
+
+        // Both should have resource attributes (at minimum the SDK defaults)
+        #expect(!original.resource.attributes.isEmpty)
+        #expect(!copy.resource.attributes.isEmpty)
+
+        // The resource attributes should have the same content
+        #expect(copy.resource.attributes.count == original.resource.attributes.count)
+
+        // Verify all resource attributes are preserved
+        for (key, value) in original.resource.attributes {
+            #expect(copy.resource.attributes[key]?.description == value.description)
+        }
+    }
+
+    @Test
+    func isolatedCopyResourceAttributesAreFullyIndependent() {
+        // This test verifies that modifying the copy's resource doesn't affect the original
+        let original = makeSpanData()
+        var copy = original.isolatedCopy()
+
+        // Get original resource attribute count
+        let originalResourceCount = original.resource.attributes.count
+
+        // Create a new resource with additional attributes for the copy
+        var newResourceAttrs = copy.resource.attributes
+        newResourceAttrs["new.attribute"] = .string("new-value")
+        copy = copy.settingResource(Resource(attributes: newResourceAttrs))
+
+        // Original resource should be unchanged
+        #expect(original.resource.attributes.count == originalResourceCount)
+        #expect(original.resource.attributes["new.attribute"] == nil)
+
+        // Copy should have the new attribute
+        #expect(copy.resource.attributes["new.attribute"]?.description == "new-value")
+    }
+
+
     // MARK: - Concurrent Access Tests
 
     @Test

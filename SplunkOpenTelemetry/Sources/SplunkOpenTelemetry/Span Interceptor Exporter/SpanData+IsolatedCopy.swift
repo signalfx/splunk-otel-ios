@@ -31,7 +31,7 @@ extension SpanData {
     /// storage is shared until mutation. If the original goes out of scope while the closure
     /// is executing, reference count operations can race, causing crashes.
     ///
-    /// By creating new dictionary instances for `attributes`, `events`, and `links`,
+    /// By creating new dictionary instances for `attributes`, `events`, `links`, and `resource`,
     /// this method ensures complete isolation from the original storage.
     ///
     /// - Returns: A new `SpanData` instance with isolated dictionary storage.
@@ -61,6 +61,12 @@ extension SpanData {
             )
         }
         copy = copy.settingLinks(isolatedLinks)
+
+        // Resource contains an attributes dictionary that also needs isolation
+        let isolatedResource = Resource(
+            attributes: Dictionary(uniqueKeysWithValues: resource.attributes.map { ($0.key, $0.value) })
+        )
+        copy = copy.settingResource(isolatedResource)
 
         return copy
     }
