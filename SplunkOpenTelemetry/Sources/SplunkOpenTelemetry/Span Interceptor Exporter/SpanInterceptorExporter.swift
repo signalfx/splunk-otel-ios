@@ -50,13 +50,21 @@ class SpanInterceptorExporter: SpanExporter {
 
     func export(spans: [OpenTelemetrySdk.SpanData], explicitTimeout _: TimeInterval?) -> OpenTelemetrySdk.SpanExporterResultCode {
 
+        // Create thread-isolated copies to prevent CoW data races.
+        //
+        // SpanData is a struct containing dictionaries that use copy-on-write.
+        // When captured in async closures (e.g., by SimpleSpanProcessor), the
+        // dictionary storage is shared. If the original goes out of scope while
+        // the closure executes, reference count operations can race, causing crashes.
+        let isolatedSpans = spans.map { $0.isolatedCopy() }
+
         // Simply re-export the spans if no interceptor was set.
         guard let spanInterceptor else {
-            return proxyExporter.export(spans: spans)
+            return proxyExporter.export(spans: isolatedSpans)
         }
 
         // Invoke the interceptor and only pass through non-nil spans.
-        let interceptedSpans = spans.compactMap { span in
+        let interceptedSpans = isolatedSpans.compactMap { span in
             spanInterceptor(span)
         }
 

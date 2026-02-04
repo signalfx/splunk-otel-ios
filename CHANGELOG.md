@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0.7] - 2026-02-04
+
+### Fixed
+
+* Fixed a SpanData race condition deallocation crash. Fixes #550. #562
+
 ## [2.0.6] - 2026-02-02
 
 ### Changed
