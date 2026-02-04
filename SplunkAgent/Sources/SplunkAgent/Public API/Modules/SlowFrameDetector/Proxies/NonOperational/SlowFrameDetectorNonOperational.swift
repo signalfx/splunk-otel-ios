@@ -15,7 +15,9 @@ limitations under the License.
 */
 
 private final class SlowFrameDetectorNonOperationalState: SlowFrameDetectorModuleState {
-    var isEnabled: Bool { false }
+    var isEnabled: Bool {
+        false
+    }
 }
 
 /// The class implementing SlowFrameDetector public API in non-operational mode.

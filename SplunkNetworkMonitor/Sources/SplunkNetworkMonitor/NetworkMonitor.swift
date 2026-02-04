@@ -119,8 +119,6 @@ public class NetworkMonitor {
                 sendNetworkChangeSpan()
             }
         }
-        monitor.start(queue: queue)
-
         #if canImport(CoreTelephony)
             // Radio Access Technologies detection (connection subtype in Otel)
             NotificationCenter.default.addObserver(
@@ -131,8 +129,16 @@ public class NetworkMonitor {
             )
         #endif
 
-        // Initial fetch of radio access technologies
-        networkChangeEvent.radioType = networkChangeEvent.connectionType == .cellular ? getCurrentRadioType() : nil
+        monitor.start(queue: queue)
+
+        // Initial fetch of radio access technologies - dispatch to queue to avoid race with pathUpdateHandler
+        queue.async { [weak self] in
+            guard let self else {
+                return
+            }
+
+            networkChangeEvent.radioType = networkChangeEvent.connectionType == .cellular ? getCurrentRadioType() : nil
+        }
     }
 
     /// Stops monitoring network connectivity changes.
@@ -190,10 +196,18 @@ public class NetworkMonitor {
 
     @objc
     private func radioAccessChanged() {
-        isInitialEvent = false
-        networkChangeEvent.timestamp = Date()
-        networkChangeEvent.radioType = getCurrentRadioType()
-        sendNetworkChangeSpan()
+        // Dispatch to our serial queue to ensure thread-safe access to telephonyInfo
+        // and add a small delay to allow CoreTelephony to stabilize its internal state
+        queue.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            guard let self else {
+                return
+            }
+
+            isInitialEvent = false
+            networkChangeEvent.timestamp = Date()
+            networkChangeEvent.radioType = getCurrentRadioType()
+            sendNetworkChangeSpan()
+        }
     }
 
     // swiftlint:disable cyclomatic_complexity

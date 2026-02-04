@@ -235,11 +235,11 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.array(expectedArray))
     }
 
-    func testClearAndSetAttributeWithSemanticAttributesAndAttributeValue() throws {
+    func testClearAndSetAttributeWithSemanticConventionsAndAttributeValue() throws {
         let mockSpan = try XCTUnwrap(mockSpan)
 
         // Given
-        let semanticKey = SemanticAttributes.httpMethod
+        let semanticKey = SemanticConventions.Http.requestMethod
         let value = AttributeValue.string("GET")
 
         // When
@@ -249,11 +249,11 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[semanticKey.rawValue], value)
     }
 
-    func testClearAndSetAttributeWithSemanticAttributesAndAny() throws {
+    func testClearAndSetAttributeWithSemanticConventionsAndAny() throws {
         let mockSpan = try XCTUnwrap(mockSpan)
 
         // Given
-        let semanticKey = SemanticAttributes.httpStatusCode
+        let semanticKey = SemanticConventions.Http.responseStatusCode
         let value = 200
 
         // When
@@ -263,22 +263,22 @@ final class SpanExtensionsTests: XCTestCase {
         XCTAssertEqual(mockSpan.attributes[semanticKey.rawValue], AttributeValue.int(value))
     }
 
-    func testClearAndSetAttributeWithMultipleSemanticAttributes() throws {
+    func testClearAndSetAttributeWithMultipleSemanticConventions() throws {
         let mockSpan = try XCTUnwrap(mockSpan)
 
         // Given
-        let httpMethod = SemanticAttributes.httpMethod
-        let httpUrl = SemanticAttributes.httpUrl
-        let httpStatusCode = SemanticAttributes.httpStatusCode
+        let httpMethod = SemanticConventions.Http.requestMethod
+        let urlFull = SemanticConventions.Url.full
+        let httpStatusCode = SemanticConventions.Http.responseStatusCode
 
         // When
         mockSpan.clearAndSetAttribute(key: httpMethod, value: "POST")
-        mockSpan.clearAndSetAttribute(key: httpUrl, value: "https://api.example.com")
+        mockSpan.clearAndSetAttribute(key: urlFull, value: "https://api.example.com")
         mockSpan.clearAndSetAttribute(key: httpStatusCode, value: 201)
 
         // Then
         XCTAssertEqual(mockSpan.attributes[httpMethod.rawValue], AttributeValue.string("POST"))
-        XCTAssertEqual(mockSpan.attributes[httpUrl.rawValue], AttributeValue.string("https://api.example.com"))
+        XCTAssertEqual(mockSpan.attributes[urlFull.rawValue], AttributeValue.string("https://api.example.com"))
         XCTAssertEqual(mockSpan.attributes[httpStatusCode.rawValue], AttributeValue.int(201))
     }
 

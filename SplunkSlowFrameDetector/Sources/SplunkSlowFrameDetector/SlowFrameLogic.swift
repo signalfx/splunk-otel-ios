@@ -51,7 +51,9 @@ actor SlowFrameLogic {
 
     #if DEBUG
         /// A test-only accessor for the current frozenFrameCount.
-        var testFrozenFrameCount: Int { frozenFrameCount }
+        var testFrozenFrameCount: Int {
+            frozenFrameCount
+        }
     #endif
 
 
