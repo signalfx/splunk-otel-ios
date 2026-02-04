@@ -1,0 +1,182 @@
+//
+/*
+Copyright 2025 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import Foundation
+import OpenTelemetryApi
+import OpenTelemetrySdk
+
+
+// MARK: - LogRecordAdapter
+
+/// Adapter for converting OpenTelemetry SDK ReadableLogRecord to OTLP JSON models.
+///
+/// This adapter handles:
+/// - Grouping log records by resource and instrumentation scope
+/// - Converting ReadableLogRecord to OTLPLogRecord with proper encoding
+/// - Filtering out empty envelopes per OTLP spec
+///
+/// NOTE: This adapter does NOT include an eventName field because eventName
+/// is not part of the OTLP proto specification.
+///
+/// Based on OTLP specification v1.9.0.
+enum LogRecordAdapter {
+
+    // MARK: - Public Methods
+
+    /// Converts a list of ReadableLogRecord to OTLP ResourceLogs.
+    ///
+    /// Groups log records by resource and instrumentation scope, then converts them to
+    /// OTLP JSON models. Empty envelopes are filtered out.
+    ///
+    /// - Parameter logRecords: The list of ReadableLogRecord to convert.
+    /// - Returns: A list of OTLPResourceLogs (non-empty).
+    static func toResourceLogs(_ logRecords: [ReadableLogRecord]) -> [OTLPResourceLogs] {
+        // Group log records by resource
+        let grouped = groupByResource(logRecords)
+
+        var resourceLogsList: [OTLPResourceLogs] = []
+
+        for (resource, logRecordList) in grouped {
+            // Convert each ReadableLogRecord to OTLPLogRecord
+            let otlpLogRecords = logRecordList.map { convertLogRecord($0) }
+
+            // Skip empty resource logs
+            guard !otlpLogRecords.isEmpty else {
+                continue
+            }
+
+            // Create a single scope logs container
+            let scopeLogs = OTLPScopeLogs(
+                scope: convertInstrumentationScope(logRecordList.first?.instrumentationScopeInfo),
+                logRecords: otlpLogRecords,
+                schemaUrl: logRecordList.first?.instrumentationScopeInfo.schemaUrl
+            )
+
+            let resourceLogs = OTLPResourceLogs(
+                resource: convertResource(resource),
+                scopeLogs: [scopeLogs],
+                schemaUrl: nil  // Resource.schemaUrl not available in current SDK version
+            )
+            resourceLogsList.append(resourceLogs)
+        }
+
+        return resourceLogsList
+    }
+
+
+    // MARK: - Private Grouping Methods
+
+    /// Groups log records by resource.
+    private static func groupByResource(_ logRecords: [ReadableLogRecord]) -> [Resource: [ReadableLogRecord]] {
+        var result: [Resource: [ReadableLogRecord]] = [:]
+
+        for logRecord in logRecords {
+            result[logRecord.resource, default: []].append(logRecord)
+        }
+
+        return result
+    }
+
+
+    // MARK: - Private Conversion Methods
+
+    /// Converts a ReadableLogRecord to an OTLPLogRecord.
+    private static func convertLogRecord(_ logRecord: ReadableLogRecord) -> OTLPLogRecord {
+        // Get observed timestamp (required)
+        let observedTimeNano: UInt64
+        if let observedTimestamp = logRecord.observedTimestamp {
+            observedTimeNano = observedTimestamp.timeIntervalSince1970.toNanoseconds
+        } else {
+            // Use timestamp as fallback if observedTimestamp is not set
+            observedTimeNano = logRecord.timestamp.timeIntervalSince1970.toNanoseconds
+        }
+
+        return OTLPLogRecord(
+            timeUnixNano: OTLPUInt64(logRecord.timestamp.timeIntervalSince1970.toNanoseconds),
+            observedTimeUnixNano: OTLPUInt64(observedTimeNano),
+            severityNumber: logRecord.severity?.rawValue,
+            severityText: logRecord.severity?.description,
+            body: logRecord.body.map { convertAttributeValue($0) },
+            attributes: convertAttributes(logRecord.attributes),
+            droppedAttributesCount: nil,  // SDK doesn't track this
+            flags: logRecord.spanContext.map { UInt32($0.traceFlags.byte) },
+            traceId: logRecord.spanContext.map { OTLPTraceId(from: $0.traceId) },
+            spanId: logRecord.spanContext.map { OTLPSpanId(from: $0.spanId) }
+        )
+    }
+
+    /// Converts Resource to OTLPResource.
+    private static func convertResource(_ resource: Resource) -> OTLPResource {
+        OTLPResource(
+            attributes: convertAttributes(resource.attributes) ?? [],
+            droppedAttributesCount: nil
+        )
+    }
+
+    /// Converts InstrumentationScopeInfo to OTLPInstrumentationScope.
+    private static func convertInstrumentationScope(_ scopeInfo: InstrumentationScopeInfo?) -> OTLPInstrumentationScope? {
+        guard let scopeInfo = scopeInfo else {
+            return nil
+        }
+        let attrs = scopeInfo.attributes ?? [:]
+        return OTLPInstrumentationScope(
+            name: scopeInfo.name,
+            version: scopeInfo.version,
+            attributes: attrs.isEmpty ? nil : convertAttributes(attrs),
+            droppedAttributesCount: nil
+        )
+    }
+
+    /// Converts attributes dictionary to array of OTLPKeyValue.
+    private static func convertAttributes(_ attributes: [String: AttributeValue]) -> [OTLPKeyValue]? {
+        guard !attributes.isEmpty else {
+            return nil
+        }
+        return attributes.map { key, value in
+            OTLPKeyValue(key: key, value: convertAttributeValue(value))
+        }
+    }
+
+    /// Converts an AttributeValue to OTLPAnyValue.
+    private static func convertAttributeValue(_ value: AttributeValue) -> OTLPAnyValue {
+        switch value {
+        case .string(let v):
+            return .stringValue(v)
+        case .bool(let v):
+            return .boolValue(v)
+        case .int(let v):
+            return .intValue(Int64(v))
+        case .double(let v):
+            return .doubleValue(v)
+        case .stringArray(let arr):
+            return .arrayValue(OTLPArrayValue(values: arr.map { .stringValue($0) }))
+        case .boolArray(let arr):
+            return .arrayValue(OTLPArrayValue(values: arr.map { .boolValue($0) }))
+        case .intArray(let arr):
+            return .arrayValue(OTLPArrayValue(values: arr.map { .intValue(Int64($0)) }))
+        case .doubleArray(let arr):
+            return .arrayValue(OTLPArrayValue(values: arr.map { .doubleValue($0) }))
+        case .set(let set):
+            let kvList = set.labels.map { key, attrValue in
+                OTLPKeyValue(key: key, value: convertAttributeValue(attrValue))
+            }
+            return .kvlistValue(OTLPKeyValueList(values: kvList))
+        case .array(let arr):
+            return .arrayValue(OTLPArrayValue(values: arr.values.map { convertAttributeValue($0) }))
+        }
+    }
+}

@@ -20,7 +20,6 @@ import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
 import OpenTelemetryApi
-import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import Testing
 
@@ -53,7 +52,7 @@ struct OTLPBackgroundHTTPLogExporterTests {
     func makeExporter(
         disk: DiskStorage,
         http: BackgroundHTTPClientProtocol,
-        config: OtlpConfiguration = OtlpConfiguration(),
+        config: OTLPExporterConfiguration = OTLPExporterConfiguration(),
         fileType: String? = nil,
         headers: [String: String] = [:]
     ) throws -> OTLPBackgroundHTTPLogExporter {
@@ -94,7 +93,7 @@ struct OTLPBackgroundHTTPLogExporterTests {
     func exportSuccessSendsRequestAndStoresFileWithLogsFileType() throws {
         let disk = makeDisk(uniqueLabel: "export_success_\(UUID().uuidString)")
         let http = MockHTTPClient()
-        let config = OtlpConfiguration(timeout: 3)
+        let config = OTLPExporterConfiguration(timeout: 3)
         let exporter = try makeExporter(disk: disk, http: http, config: config)
 
         let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: nil)
@@ -134,7 +133,7 @@ struct OTLPBackgroundHTTPLogExporterTests {
     func exportRespectsExplicitTimeoutSmallerThanConfig() throws {
         let disk = makeDisk(uniqueLabel: "timeout_smaller_\(UUID().uuidString)")
         let http = MockHTTPClient()
-        let exporter = try makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 10))
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 10))
 
         let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: 1)
 
@@ -147,7 +146,7 @@ struct OTLPBackgroundHTTPLogExporterTests {
     func exportRespectsExplicitTimeoutGreaterThanConfigUsesConfigTimeout() throws {
         let disk = makeDisk(uniqueLabel: "timeout_greater_\(UUID().uuidString)")
         let http = MockHTTPClient()
-        let config = OtlpConfiguration(timeout: 2)
+        let config = OTLPExporterConfiguration(timeout: 2)
         let exporter = try makeExporter(disk: disk, http: http, config: config)
 
         let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: 10)
@@ -161,7 +160,7 @@ struct OTLPBackgroundHTTPLogExporterTests {
     func exportFailingDiskStorageReturnsFailure() throws {
         let disk = makeFailingDisk(uniqueLabel: "failing_disk_\(UUID().uuidString)")
         let http = MockHTTPClient()
-        let exporter = try makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 2))
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 2))
 
         let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: 10)
 
@@ -173,7 +172,7 @@ struct OTLPBackgroundHTTPLogExporterTests {
     func exportFailureWhenHTTPClientThrowsKeepsFileOnDiskAndReturnsFailure() throws {
         let disk = makeDisk(uniqueLabel: "http_throw_\(UUID().uuidString)")
         let http = ThrowingHTTPClient()
-        let exporter = try makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 5))
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 5))
 
         let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: nil)
 
@@ -188,7 +187,7 @@ struct OTLPBackgroundHTTPLogExporterTests {
     func exportUsesCustomFileTypeWhenProvidedOnInit() throws {
         let disk = makeDisk(uniqueLabel: "custom_filetype_\(UUID().uuidString)")
         let http = MockHTTPClient()
-        let exporter = try makeExporter(disk: disk, http: http, config: OtlpConfiguration(), fileType: "custom_logs")
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(), fileType: "custom_logs")
 
         let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: nil)
 

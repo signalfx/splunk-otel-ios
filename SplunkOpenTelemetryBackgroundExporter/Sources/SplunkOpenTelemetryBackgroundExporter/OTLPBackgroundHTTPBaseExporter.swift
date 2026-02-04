@@ -18,8 +18,6 @@ limitations under the License.
 import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
-import OpenTelemetryProtocolExporterCommon
-import SwiftProtobuf
 
 /// Basic implementation of exporters.
 public class OTLPBackgroundHTTPBaseExporter {
@@ -35,7 +33,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     let endpoint: URL
     let envVarHeaders: [(String, String)]?
     let additionalHeaders: [String: String]
-    let config: OtlpConfiguration
+    let config: OTLPExporterConfiguration
     let diskStorage: DiskStorage
     var checkStalledTask: Task<Void, Never>?
 
@@ -50,9 +48,9 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     public init(
         endpoint: URL,
-        config: OtlpConfiguration = OtlpConfiguration(),
+        config: OTLPExporterConfiguration = OTLPExporterConfiguration(),
         qosConfig: SessionQOSConfiguration,
-        envVarHeaders: [(String, String)]? = EnvVarHeaders.attributes,
+        envVarHeaders: [(String, String)]? = OTLPEnvVarHeaders.attributes,
         headers: [String: String] = [:],
         diskStorage: DiskStorage = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: "OTLPBackgroundExporter"),

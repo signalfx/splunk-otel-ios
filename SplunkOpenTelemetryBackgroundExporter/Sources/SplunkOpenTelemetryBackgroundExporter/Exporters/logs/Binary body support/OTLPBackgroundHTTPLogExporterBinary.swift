@@ -17,28 +17,38 @@ limitations under the License.
 
 import CiscoDiskStorage
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 
 /// This class mirrors the `OTLPBackgroundHTTPLogExporter`, allows exporting `SplunkReadableLogRecord`.
 ///
 /// These changes are implemented to add support for `SplunkReadableLogRecord` export:
 /// - removes the `LogRecordExporter` protocol conformance,
-/// - utilizes the `SplunkLogRecordAdapter`
+/// - utilizes the `SplunkLogRecordAdapterJSON` for OTLP JSON encoding with binary body support
+///
+/// Binary data in the log body is encoded as base64 per OTLP JSON specification.
 public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter {
 
     // MARK: - SplunkReadableLogRecord export
 
-    /// Exports `SplunkReadableLogRecord`.
+    /// Exports `SplunkReadableLogRecord` with binary body support.
+    ///
+    /// Binary data in the log body is encoded as base64 per OTLP JSON specification.
     public func export(logRecords: [SplunkReadableLogRecord], explicitTimeout: TimeInterval? = nil) -> OpenTelemetrySdk.ExportResult {
-        let body = Opentelemetry_Proto_Collector_Logs_V1_ExportLogsServiceRequest.with { request in
-            request.resourceLogs = SplunkLogRecordAdapter.toProtoResourceRecordLog(logRecordList: logRecords)
+        // Convert log records to OTLP JSON models using our custom adapter
+        // Binary body data will be base64 encoded
+        let resourceLogs = SplunkLogRecordAdapterJSON.toResourceLogs(logRecords)
+
+        // Skip if no log records to export (filter empty envelopes per OTLP spec)
+        guard !resourceLogs.isEmpty else {
+            return .success
         }
 
+        let request = OTLPExportLogsServiceRequest(resourceLogs: resourceLogs)
         let requestId = UUID()
 
         do {
-            let storeData = try body.serializedData()
+            // Encode to JSON instead of protobuf binary
+            let storeData = try JSONEncoder().encode(request)
             try diskStorage.insert(
                 storeData,
                 forKey: KeyBuilder(

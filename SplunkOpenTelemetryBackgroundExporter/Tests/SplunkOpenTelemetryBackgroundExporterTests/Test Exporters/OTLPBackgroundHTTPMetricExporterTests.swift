@@ -19,7 +19,6 @@ limitations under the License.
 import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import Testing
 
@@ -52,7 +51,7 @@ struct OTLPBackgroundHTTPMetricExporterTests {
     func makeExporter(
         disk: DiskStorage,
         http: BackgroundHTTPClientProtocol,
-        config: OtlpConfiguration = OtlpConfiguration(),
+        config: OTLPExporterConfiguration = OTLPExporterConfiguration(),
         fileType: String? = nil
     ) throws -> OTLPBackgroundHTTPMetricExporter {
         let endpoint = try #require(URL(string: "https://example.com"))
@@ -76,7 +75,7 @@ struct OTLPBackgroundHTTPMetricExporterTests {
     func exportSuccessSendsRequestAndStoresFileWithMetricFileType() throws {
         let disk = makeDisk(uniqueLabel: "export_success_\(UUID().uuidString)")
         let http = MockHTTPClient()
-        let config = OtlpConfiguration(timeout: 3)
+        let config = OTLPExporterConfiguration(timeout: 3)
         let exporter = try makeExporter(disk: disk, http: http, config: config)
 
         let result = exporter.export(metrics: [])
@@ -98,7 +97,7 @@ struct OTLPBackgroundHTTPMetricExporterTests {
     func exportFailingDiskStorageReturnsFailureAndDoesNotSend() throws {
         let disk = makeFailingDisk(uniqueLabel: "failing_disk_\(UUID().uuidString)")
         let http = MockHTTPClient()
-        let exporter = try makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 2))
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 2))
 
         let result = exporter.export(metrics: [])
 
@@ -110,7 +109,7 @@ struct OTLPBackgroundHTTPMetricExporterTests {
     func exportFailureWhenHTTPClientThrowsKeepsFileOnDiskAndReturnsFailure() throws {
         let disk = makeDisk(uniqueLabel: "http_throw_\(UUID().uuidString)")
         let http = ThrowingHTTPClient()
-        let exporter = try makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 5))
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 5))
 
         let result = exporter.export(metrics: [])
 

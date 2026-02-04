@@ -27,10 +27,8 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(
-            url: "https://github.com/open-telemetry/opentelemetry-swift",
-            from: "2.1.0"
-        ),
+        // Note: opentelemetry-swift package (with OpenTelemetryProtocolExporter) was removed
+        // in favor of custom OTLP JSON encoding. We now only use opentelemetry-swift-core.
         .package(
             url: "https://github.com/open-telemetry/opentelemetry-swift-core",
             from: "2.1.1"
@@ -280,7 +278,6 @@ func generateMainTargets() -> [Target] {
                 "SplunkOpenTelemetryBackgroundExporter",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
-                .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
                 resolveDependency("logger")
             ],
             path: "SplunkOpenTelemetry/Sources",
@@ -304,8 +301,8 @@ func generateMainTargets() -> [Target] {
             name: "SplunkOpenTelemetryBackgroundExporter",
             dependencies: [
                 "SplunkCommon",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core"),
-                .product(name: "OpenTelemetryProtocolExporter", package: "opentelemetry-swift"),
                 resolveDependency("logger"),
                 resolveDependency("diskStorage")
             ],

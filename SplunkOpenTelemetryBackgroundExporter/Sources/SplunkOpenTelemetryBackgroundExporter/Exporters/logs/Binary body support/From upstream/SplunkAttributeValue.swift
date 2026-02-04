@@ -6,6 +6,7 @@
 // - import OpenTelemetryApi
 // - add Data case
 // - disable linters
+// - removed OpenTelemetryProtocolExporterCommon import (no longer needed with JSON encoding)
 
 //
 // Copyright The OpenTelemetry Authors
