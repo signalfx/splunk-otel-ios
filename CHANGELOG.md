@@ -9,6 +9,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Added support for the setting of endpointConfiguration to be deferred until after agent initialization.  Disabling the endpoint is also supported with caching (optional) of pending spans.
 
+## [2.0.7] - 2026-02-04
+
+### Fixed
+
+* Fixed a SpanData race condition deallocation crash. Fixes #550. #562
+
 ## [2.0.6] - 2026-02-02
 
 ### Changed
