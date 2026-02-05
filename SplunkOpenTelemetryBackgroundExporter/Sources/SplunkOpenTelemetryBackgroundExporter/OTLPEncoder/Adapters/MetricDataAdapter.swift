@@ -21,6 +21,8 @@ import OpenTelemetrySdk
 
 // MARK: - MetricDataAdapter
 
+// swiftlint:disable type_body_length
+
 /// Adapter for converting OpenTelemetry SDK MetricData to OTLP JSON models.
 ///
 /// This adapter handles:
@@ -137,24 +139,190 @@ enum MetricDataAdapter {
 
     // MARK: - Private Conversion Methods
 
+    // swiftlint:disable:next function_body_length
+
     /// Converts a MetricData to an OTLPMetric.
     ///
-    /// This method creates a basic metric structure. The data points are
-    /// currently empty as the SDK point data types require further investigation.
+    /// Handles all metric types: Gauge, Sum, Histogram, Summary, ExponentialHistogram.
+    /// Returns nil if the metric has no data points (empty metrics are filtered per OTLP spec).
     private static func convertMetric(_ metricData: MetricData) -> OTLPMetric? {
         let name = metricData.name
         let description = metricData.description.isEmpty ? nil : metricData.description
         let unit = metricData.unit.isEmpty ? nil : metricData.unit
 
-        // For now, we create an empty gauge metric.
-        // TODO: Implement proper metric type detection and conversion based on SDK types.
-        // This placeholder ensures compilation while the correct SDK types are investigated.
-        return OTLPMetric(
-            name: name,
-            description: description,
-            unit: unit,
-            gauge: OTLPGauge(dataPoints: [])
-        )
+        // Skip metrics with no data points
+        guard !metricData.data.points.isEmpty else {
+            return nil
+        }
+
+        switch metricData.type {
+        case .LongGauge, .DoubleGauge:
+            let dataPoints = convertNumberDataPoints(metricData.data.points, isLong: metricData.type == .LongGauge)
+            return OTLPMetric(
+                name: name,
+                description: description,
+                unit: unit,
+                gauge: OTLPGauge(dataPoints: dataPoints)
+            )
+
+        case .LongSum, .DoubleSum:
+            let dataPoints = convertNumberDataPoints(metricData.data.points, isLong: metricData.type == .LongSum)
+            let temporality = convertAggregationTemporality(metricData.data.aggregationTemporality)
+            return OTLPMetric(
+                name: name,
+                description: description,
+                unit: unit,
+                sum: OTLPSum(
+                    dataPoints: dataPoints,
+                    aggregationTemporality: temporality,
+                    isMonotonic: metricData.isMonotonic
+                )
+            )
+
+        case .Histogram:
+            let dataPoints = convertHistogramDataPoints(metricData.data.points)
+            let temporality = convertAggregationTemporality(metricData.data.aggregationTemporality)
+            return OTLPMetric(
+                name: name,
+                description: description,
+                unit: unit,
+                histogram: OTLPHistogram(
+                    dataPoints: dataPoints,
+                    aggregationTemporality: temporality
+                )
+            )
+
+        case .Summary:
+            let dataPoints = convertSummaryDataPoints(metricData.data.points)
+            return OTLPMetric(
+                name: name,
+                description: description,
+                unit: unit,
+                summary: OTLPSummary(dataPoints: dataPoints)
+            )
+
+        case .ExponentialHistogram:
+            let dataPoints = convertExponentialHistogramDataPoints(metricData.data.points)
+            let temporality = convertAggregationTemporality(metricData.data.aggregationTemporality)
+            return OTLPMetric(
+                name: name,
+                description: description,
+                unit: unit,
+                exponentialHistogram: OTLPExponentialHistogram(
+                    dataPoints: dataPoints,
+                    aggregationTemporality: temporality
+                )
+            )
+        }
+    }
+
+    /// Converts aggregation temporality to OTLP integer value.
+    private static func convertAggregationTemporality(_ temporality: AggregationTemporality) -> Int {
+        switch temporality {
+        case .delta:
+            return OTLPSum.aggregationTemporalityDelta
+
+        case .cumulative:
+            return OTLPSum.aggregationTemporalityCumulative
+        }
+    }
+
+    /// Converts number data points (Long or Double) to OTLP NumberDataPoints.
+    private static func convertNumberDataPoints(_ points: [PointData], isLong: Bool) -> [OTLPNumberDataPoint] {
+        if isLong {
+            // Cast to LongPointData and convert
+            guard let longPoints = points as? [LongPointData] else {
+                return []
+            }
+            return longPoints.map { point in
+                OTLPNumberDataPoint(
+                    attributes: convertAttributes(point.attributes),
+                    startTimeUnixNano: OTLPUInt64(point.startEpochNanos),
+                    timeUnixNano: OTLPUInt64(point.endEpochNanos),
+                    asInt: OTLPInt64(Int64(point.value))
+                )
+            }
+        }
+
+        // Cast to DoublePointData and convert
+        guard let doublePoints = points as? [DoublePointData] else {
+            return []
+        }
+        return doublePoints.map { point in
+            OTLPNumberDataPoint(
+                attributes: convertAttributes(point.attributes),
+                startTimeUnixNano: OTLPUInt64(point.startEpochNanos),
+                timeUnixNano: OTLPUInt64(point.endEpochNanos),
+                asDouble: point.value
+            )
+        }
+    }
+
+    /// Converts histogram data points to OTLP HistogramDataPoints.
+    private static func convertHistogramDataPoints(_ points: [PointData]) -> [OTLPHistogramDataPoint] {
+        guard let histogramPoints = points as? [HistogramPointData] else {
+            return []
+        }
+        return histogramPoints.map { point in
+            OTLPHistogramDataPoint(
+                attributes: convertAttributes(point.attributes),
+                startTimeUnixNano: OTLPUInt64(point.startEpochNanos),
+                timeUnixNano: OTLPUInt64(point.endEpochNanos),
+                count: OTLPUInt64(point.count),
+                sum: point.sum,
+                bucketCounts: point.counts.map { OTLPUInt64(UInt64($0)) },
+                explicitBounds: point.boundaries,
+                min: point.hasMin ? point.min : nil,
+                max: point.hasMax ? point.max : nil
+            )
+        }
+    }
+
+    /// Converts summary data points to OTLP SummaryDataPoints.
+    private static func convertSummaryDataPoints(_ points: [PointData]) -> [OTLPSummaryDataPoint] {
+        guard let summaryPoints = points as? [SummaryPointData] else {
+            return []
+        }
+        return summaryPoints.map { point in
+            OTLPSummaryDataPoint(
+                attributes: convertAttributes(point.attributes),
+                startTimeUnixNano: OTLPUInt64(point.startEpochNanos),
+                timeUnixNano: OTLPUInt64(point.endEpochNanos),
+                count: OTLPUInt64(point.count),
+                sum: point.sum,
+                quantileValues: point.values.map { quantile in
+                    OTLPQuantileValue(quantile: quantile.quantile, value: quantile.value)
+                }
+            )
+        }
+    }
+
+    /// Converts exponential histogram data points to OTLP ExponentialHistogramDataPoints.
+    private static func convertExponentialHistogramDataPoints(_ points: [PointData]) -> [OTLPExponentialHistogramDataPoint] {
+        guard let expHistPoints = points as? [ExponentialHistogramPointData] else {
+            return []
+        }
+        return expHistPoints.map { point in
+            OTLPExponentialHistogramDataPoint(
+                attributes: convertAttributes(point.attributes),
+                startTimeUnixNano: OTLPUInt64(point.startEpochNanos),
+                timeUnixNano: OTLPUInt64(point.endEpochNanos),
+                count: OTLPUInt64(UInt64(point.count)),
+                sum: point.sum,
+                scale: Int32(point.scale),
+                zeroCount: OTLPUInt64(UInt64(point.zeroCount)),
+                positive: OTLPBuckets(
+                    offset: Int32(point.positiveBuckets.offset),
+                    bucketCounts: point.positiveBuckets.bucketCounts.map { OTLPUInt64(UInt64($0)) }
+                ),
+                negative: OTLPBuckets(
+                    offset: Int32(point.negativeBuckets.offset),
+                    bucketCounts: point.negativeBuckets.bucketCounts.map { OTLPUInt64(UInt64($0)) }
+                ),
+                min: point.hasMin ? point.min : nil,
+                max: point.hasMax ? point.max : nil
+            )
+        }
     }
 
     /// Converts Resource to OTLPResource.
@@ -229,3 +397,5 @@ enum MetricDataAdapter {
         }
     }
 }
+
+// swiftlint:enable type_body_length
