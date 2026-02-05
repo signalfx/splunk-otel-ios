@@ -53,7 +53,7 @@ struct OTLPEncodingConformanceTests {
         let hex = string.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
 
         #expect(hex.count == 32)
-        #expect(hex.allSatisfy(\.isHexDigit))
+        #expect(try hex.allSatisfy(\.isHexDigit))
         #expect(hex == hex.lowercased())
     }
 
@@ -65,7 +65,7 @@ struct OTLPEncodingConformanceTests {
         let hex = string.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
 
         #expect(hex.count == 16)
-        #expect(hex.allSatisfy(\.isHexDigit))
+        #expect(try hex.allSatisfy(\.isHexDigit))
         #expect(hex == hex.lowercased())
     }
 
