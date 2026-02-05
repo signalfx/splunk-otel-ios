@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPStatus
 
 /// OTLP Span Status model.

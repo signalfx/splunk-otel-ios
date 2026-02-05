@@ -71,7 +71,7 @@ struct OTLPEncodingConformanceTests {
 
     @Test
     func uint64EncodesAsDecimalString() throws {
-        let timestamp = OTLPUInt64(1544712660000000000)
+        let timestamp = OTLPUInt64(1_544_712_660_000_000_000)
         let json = try JSONEncoder().encode(timestamp)
         let string = try #require(String(data: json, encoding: .utf8))
 
@@ -80,7 +80,7 @@ struct OTLPEncodingConformanceTests {
 
     @Test
     func int64EncodesAsDecimalString() throws {
-        let value = OTLPInt64(-123456789)
+        let value = OTLPInt64(-123_456_789)
         let json = try JSONEncoder().encode(value)
         let string = try #require(String(data: json, encoding: .utf8))
 

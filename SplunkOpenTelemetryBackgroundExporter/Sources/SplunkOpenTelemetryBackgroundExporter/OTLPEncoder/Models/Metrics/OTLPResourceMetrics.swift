@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPResourceMetrics
 
 /// Container for metrics from a single resource.

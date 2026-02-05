@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPExporterConfiguration
 
 /// Configuration for OTLP exporters.

@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPResourceSpans
 
 /// Container for spans from a single resource.

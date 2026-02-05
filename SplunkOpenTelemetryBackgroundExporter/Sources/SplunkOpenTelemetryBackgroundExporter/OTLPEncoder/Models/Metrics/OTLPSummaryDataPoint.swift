@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPSummaryDataPoint
 
 /// OTLP Summary data point.

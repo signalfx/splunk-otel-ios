@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPAnyValue
 
 /// OTLP AnyValue with custom encoding to produce correct JSON shape.

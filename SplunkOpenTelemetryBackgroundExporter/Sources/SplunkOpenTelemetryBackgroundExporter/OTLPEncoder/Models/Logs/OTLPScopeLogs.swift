@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPScopeLogs
 
 /// Container for log records from a single instrumentation scope.

@@ -19,7 +19,6 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-
 // MARK: - SpanDataAdapter
 
 /// Adapter for converting OpenTelemetry SDK SpanData to OTLP JSON models.
@@ -96,7 +95,7 @@ enum SpanDataAdapter {
             let resourceSpans = OTLPResourceSpans(
                 resource: convertResource(resource),
                 scopeSpans: scopeSpansList,
-                schemaUrl: nil  // Resource.schemaUrl not available in current SDK version
+                schemaUrl: nil // Resource.schemaUrl not available in current SDK version
             )
             resourceSpansList.append(resourceSpans)
         }
@@ -179,7 +178,7 @@ enum SpanDataAdapter {
         case .consumer:
             return 5
         @unknown default:
-            return 0  // UNSPECIFIED
+            return 0 // UNSPECIFIED
         }
     }
 
@@ -187,7 +186,7 @@ enum SpanDataAdapter {
     private static func convertResource(_ resource: Resource) -> OTLPResource {
         OTLPResource(
             attributes: convertAttributes(resource.attributes) ?? [],
-            droppedAttributesCount: nil  // SDK doesn't track this
+            droppedAttributesCount: nil // SDK doesn't track this
         )
     }
 
@@ -254,7 +253,7 @@ enum SpanDataAdapter {
                 timeUnixNano: OTLPUInt64(event.timestamp.timeIntervalSince1970.toNanoseconds),
                 name: event.name,
                 attributes: convertAttributes(event.attributes),
-                droppedAttributesCount: nil  // SDK doesn't track this per event
+                droppedAttributesCount: nil // SDK doesn't track this per event
             )
         }
     }
@@ -270,7 +269,7 @@ enum SpanDataAdapter {
                 spanId: OTLPSpanId(from: link.context.spanId),
                 traceState: link.context.traceState.entries.isEmpty ? nil : traceStateToString(link.context.traceState),
                 attributes: convertAttributes(link.attributes),
-                droppedAttributesCount: nil,  // SDK doesn't track this per link
+                droppedAttributesCount: nil, // SDK doesn't track this per link
                 flags: UInt32(link.context.traceFlags.byte)
             )
         }

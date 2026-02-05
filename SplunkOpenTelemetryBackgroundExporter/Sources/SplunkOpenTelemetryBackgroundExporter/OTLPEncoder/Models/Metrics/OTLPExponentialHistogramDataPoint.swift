@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPExponentialHistogramDataPoint
 
 /// OTLP Exponential Histogram data point.

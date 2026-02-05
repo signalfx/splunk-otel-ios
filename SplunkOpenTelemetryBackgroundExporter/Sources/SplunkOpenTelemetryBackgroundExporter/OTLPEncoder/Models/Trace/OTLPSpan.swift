@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPSpan
 
 /// OTLP Span model with all required fields.

@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPSpanEvent
 
 /// OTLP Span Event model.

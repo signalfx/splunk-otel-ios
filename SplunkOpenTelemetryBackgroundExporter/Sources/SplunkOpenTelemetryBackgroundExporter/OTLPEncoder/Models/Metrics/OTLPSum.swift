@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPSum
 
 /// OTLP Sum metric type (counters).

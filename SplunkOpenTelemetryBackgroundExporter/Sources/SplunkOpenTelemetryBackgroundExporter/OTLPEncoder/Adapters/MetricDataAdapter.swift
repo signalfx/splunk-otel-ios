@@ -19,7 +19,6 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-
 // MARK: - MetricDataAdapter
 
 /// Adapter for converting OpenTelemetry SDK MetricData to OTLP JSON models.
@@ -100,7 +99,7 @@ enum MetricDataAdapter {
             let resourceMetrics = OTLPResourceMetrics(
                 resource: convertResource(resource),
                 scopeMetrics: scopeMetricsList,
-                schemaUrl: nil  // Resource.schemaUrl not available in current SDK version
+                schemaUrl: nil // Resource.schemaUrl not available in current SDK version
             )
             resourceMetricsList.append(resourceMetrics)
         }

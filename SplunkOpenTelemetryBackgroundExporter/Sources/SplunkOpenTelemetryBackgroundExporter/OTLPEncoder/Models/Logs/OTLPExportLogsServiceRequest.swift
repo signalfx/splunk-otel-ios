@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPExportLogsServiceRequest
 
 /// OTLP ExportLogsServiceRequest - the top-level message for log export.

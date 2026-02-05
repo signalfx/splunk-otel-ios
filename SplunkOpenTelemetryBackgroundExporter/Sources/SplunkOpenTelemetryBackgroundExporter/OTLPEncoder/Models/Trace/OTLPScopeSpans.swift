@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPScopeSpans
 
 /// Container for spans from a single instrumentation scope.

@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPGauge
 
 /// OTLP Gauge metric type.

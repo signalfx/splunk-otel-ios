@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPExportTraceServiceRequest
 
 /// OTLP ExportTraceServiceRequest - the top-level message for trace export.

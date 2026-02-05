@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPLogRecord
 
 /// OTLP LogRecord model.

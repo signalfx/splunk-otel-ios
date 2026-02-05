@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPExponentialHistogram
 
 /// OTLP ExponentialHistogram metric type.

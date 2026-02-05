@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPExemplar
 
 /// OTLP Exemplar model.
@@ -118,7 +117,8 @@ struct OTLPExemplar: Encodable {
         // Oneof value - encode only one
         if let asDouble = asDouble {
             try container.encode(asDouble, forKey: .asDouble)
-        } else if let asInt = asInt {
+        }
+        else if let asInt = asInt {
             try container.encode(asInt, forKey: .asInt)
         }
 

@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPExportMetricsServiceRequest
 
 /// OTLP ExportMetricsServiceRequest - the top-level message for metrics export.

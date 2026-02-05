@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPMetric
 
 /// OTLP Metric model.
@@ -127,13 +126,17 @@ struct OTLPMetric: Encodable {
         // Oneof data - only encode the one that is set
         if let gauge = gauge {
             try container.encode(gauge, forKey: .gauge)
-        } else if let sum = sum {
+        }
+        else if let sum = sum {
             try container.encode(sum, forKey: .sum)
-        } else if let histogram = histogram {
+        }
+        else if let histogram = histogram {
             try container.encode(histogram, forKey: .histogram)
-        } else if let exponentialHistogram = exponentialHistogram {
+        }
+        else if let exponentialHistogram = exponentialHistogram {
             try container.encode(exponentialHistogram, forKey: .exponentialHistogram)
-        } else if let summary = summary {
+        }
+        else if let summary = summary {
             try container.encode(summary, forKey: .summary)
         }
     }

@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPUInt64
 
 /// Wrapper for UInt64 values that encodes as a decimal string in JSON.

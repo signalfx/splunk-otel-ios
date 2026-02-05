@@ -18,7 +18,6 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 
-
 // MARK: - OTLPTraceId
 
 /// Wrapper for TraceId that encodes as a lowercase hex string in JSON.

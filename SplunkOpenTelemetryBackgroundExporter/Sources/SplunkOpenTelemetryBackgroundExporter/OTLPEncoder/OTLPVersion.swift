@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLP Version
 
 /// OTLP specification version this implementation is based on.

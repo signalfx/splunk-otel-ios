@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPScopeMetrics
 
 /// Container for metrics from a single instrumentation scope.

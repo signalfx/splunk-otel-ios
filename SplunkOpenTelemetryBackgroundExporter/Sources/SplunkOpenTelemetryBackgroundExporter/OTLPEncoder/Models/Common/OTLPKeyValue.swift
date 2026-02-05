@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPKeyValue
 
 /// OTLP KeyValue for attributes.

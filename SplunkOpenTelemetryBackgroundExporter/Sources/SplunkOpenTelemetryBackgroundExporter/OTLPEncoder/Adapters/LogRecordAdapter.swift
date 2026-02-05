@@ -19,7 +19,6 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-
 // MARK: - LogRecordAdapter
 
 /// Adapter for converting OpenTelemetry SDK ReadableLogRecord to OTLP JSON models.
@@ -99,7 +98,7 @@ enum LogRecordAdapter {
             let resourceLogs = OTLPResourceLogs(
                 resource: convertResource(resource),
                 scopeLogs: scopeLogsList,
-                schemaUrl: nil  // Resource.schemaUrl not available in current SDK version
+                schemaUrl: nil // Resource.schemaUrl not available in current SDK version
             )
             resourceLogsList.append(resourceLogs)
         }
@@ -142,7 +141,8 @@ enum LogRecordAdapter {
         let observedTimeNano: UInt64
         if let observedTimestamp = logRecord.observedTimestamp {
             observedTimeNano = observedTimestamp.timeIntervalSince1970.toNanoseconds
-        } else {
+        }
+        else {
             // Use timestamp as fallback if observedTimestamp is not set
             observedTimeNano = logRecord.timestamp.timeIntervalSince1970.toNanoseconds
         }
@@ -154,7 +154,7 @@ enum LogRecordAdapter {
             severityText: logRecord.severity?.description,
             body: logRecord.body.map { convertAttributeValue($0) },
             attributes: convertAttributes(logRecord.attributes),
-            droppedAttributesCount: nil,  // SDK doesn't track this
+            droppedAttributesCount: nil, // SDK doesn't track this
             flags: logRecord.spanContext.map { UInt32($0.traceFlags.byte) },
             traceId: logRecord.spanContext.map { OTLPTraceId(from: $0.traceId) },
             spanId: logRecord.spanContext.map { OTLPSpanId(from: $0.spanId) }

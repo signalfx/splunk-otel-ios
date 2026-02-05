@@ -19,7 +19,6 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 
-
 // MARK: - SplunkLogRecordAdapterJSON
 
 /// Adapter for converting SplunkReadableLogRecord (with binary body support) to OTLP JSON models.
@@ -99,7 +98,7 @@ enum SplunkLogRecordAdapterJSON {
             let resourceLogs = OTLPResourceLogs(
                 resource: convertResource(resource),
                 scopeLogs: scopeLogsList,
-                schemaUrl: nil  // Resource.schemaUrl not available in current SDK version
+                schemaUrl: nil // Resource.schemaUrl not available in current SDK version
             )
             resourceLogsList.append(resourceLogs)
         }
@@ -142,7 +141,8 @@ enum SplunkLogRecordAdapterJSON {
         let observedTimeNano: UInt64
         if let observedTimestamp = logRecord.observedTimestamp {
             observedTimeNano = observedTimestamp.timeIntervalSince1970.toNanoseconds
-        } else {
+        }
+        else {
             // Use timestamp as fallback if observedTimestamp is not set
             observedTimeNano = logRecord.timestamp.timeIntervalSince1970.toNanoseconds
         }

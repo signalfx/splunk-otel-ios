@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 
-
 // MARK: - OTLPResourceLogs
 
 /// Container for log records from a single resource.
