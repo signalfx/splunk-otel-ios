@@ -158,6 +158,9 @@ enum MetricDataAdapter {
         switch metricData.type {
         case .LongGauge, .DoubleGauge:
             let dataPoints = convertNumberDataPoints(metricData.data.points, isLong: metricData.type == .LongGauge)
+            guard !dataPoints.isEmpty else {
+                return nil
+            }
             return OTLPMetric(
                 name: name,
                 description: description,
@@ -167,6 +170,9 @@ enum MetricDataAdapter {
 
         case .LongSum, .DoubleSum:
             let dataPoints = convertNumberDataPoints(metricData.data.points, isLong: metricData.type == .LongSum)
+            guard !dataPoints.isEmpty else {
+                return nil
+            }
             let temporality = convertAggregationTemporality(metricData.data.aggregationTemporality)
             return OTLPMetric(
                 name: name,
@@ -181,6 +187,9 @@ enum MetricDataAdapter {
 
         case .Histogram:
             let dataPoints = convertHistogramDataPoints(metricData.data.points)
+            guard !dataPoints.isEmpty else {
+                return nil
+            }
             let temporality = convertAggregationTemporality(metricData.data.aggregationTemporality)
             return OTLPMetric(
                 name: name,
@@ -194,6 +203,9 @@ enum MetricDataAdapter {
 
         case .Summary:
             let dataPoints = convertSummaryDataPoints(metricData.data.points)
+            guard !dataPoints.isEmpty else {
+                return nil
+            }
             return OTLPMetric(
                 name: name,
                 description: description,
@@ -203,6 +215,9 @@ enum MetricDataAdapter {
 
         case .ExponentialHistogram:
             let dataPoints = convertExponentialHistogramDataPoints(metricData.data.points)
+            guard !dataPoints.isEmpty else {
+                return nil
+            }
             let temporality = convertAggregationTemporality(metricData.data.aggregationTemporality)
             return OTLPMetric(
                 name: name,
