@@ -58,7 +58,7 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         headers: [String: String] = [:]
     ) throws -> OTLPBackgroundHTTPTraceExporter {
         let endpoint = try #require(URL(string: "https://example.com"))
-        let exporter = OTLPBackgroundHTTPTraceExporter(
+        return OTLPBackgroundHTTPTraceExporter(
             endpoint: endpoint,
             config: config,
             qosConfig: SessionQOSConfiguration(),
@@ -69,7 +69,6 @@ struct OTLPBackgroundHTTPTraceExporterTests {
             performStalledUploadCheck: false,
             httpClient: http
         )
-        return exporter
     }
 
 
@@ -332,8 +331,8 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         let http = MockHTTPClient()
 
         // Create exporter with endpoint and headers
-        let exporter = OTLPBackgroundHTTPTraceExporter(
-            endpoint: try #require(URL(string: "https://example.com/traces")),
+        let exporter = try OTLPBackgroundHTTPTraceExporter(
+            endpoint: #require(URL(string: "https://example.com/traces")),
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,

@@ -112,7 +112,7 @@ public struct AgentConfiguration: AgentConfigurationProtocol, Codable, Equatable
     ///   - deploymentEnvironment: A required deployment environment. Identifies environment in the RUM dashboard, e.g. `dev`, `production` etc.
     ///   Deployment environment is sent in all signals as a resource.
     public init(appName: String, deploymentEnvironment: String) {
-        self.endpoint = nil
+        endpoint = nil
         self.appName = appName
         self.deploymentEnvironment = deploymentEnvironment
     }

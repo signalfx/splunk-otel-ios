@@ -230,9 +230,11 @@ final class API10ConfigurationTests: XCTestCase {
                 XCTFail("Expected AgentConfigurationError")
                 return
             }
+
             if case .invalidAppName = configError {
                 // Expected
-            } else {
+            }
+            else {
                 XCTFail("Expected invalidAppName error")
             }
         }

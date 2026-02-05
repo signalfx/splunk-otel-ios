@@ -58,7 +58,7 @@ struct OTLPBackgroundHTTPLogExporterTests {
         headers: [String: String] = [:]
     ) throws -> OTLPBackgroundHTTPLogExporter {
         let endpoint = try #require(URL(string: "https://example.com"))
-        let exporter = OTLPBackgroundHTTPLogExporter(
+        return OTLPBackgroundHTTPLogExporter(
             endpoint: endpoint,
             config: config,
             qosConfig: SessionQOSConfiguration(),
@@ -69,7 +69,6 @@ struct OTLPBackgroundHTTPLogExporterTests {
             performStalledUploadCheck: false,
             httpClient: http
         )
-        return exporter
     }
 
     func makeLogRecord() -> ReadableLogRecord {

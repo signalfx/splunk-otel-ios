@@ -61,7 +61,7 @@ struct OTLPBackgroundHTTPLogExporterBinaryTests {
         headers: [String: String] = [:]
     ) throws -> OTLPBackgroundHTTPLogExporterBinary {
         let endpoint = try #require(URL(string: "https://example.com"))
-        let exporter = OTLPBackgroundHTTPLogExporterBinary(
+        return OTLPBackgroundHTTPLogExporterBinary(
             endpoint: endpoint,
             config: config,
             qosConfig: SessionQOSConfiguration(),
@@ -72,7 +72,6 @@ struct OTLPBackgroundHTTPLogExporterBinaryTests {
             performStalledUploadCheck: false,
             httpClient: http
         )
-        return exporter
     }
 
     func makeLogRecord() -> SplunkReadableLogRecord {

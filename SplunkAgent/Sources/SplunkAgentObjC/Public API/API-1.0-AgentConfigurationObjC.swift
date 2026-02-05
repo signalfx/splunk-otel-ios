@@ -130,7 +130,8 @@ public final class AgentConfigurationObjC: NSObject {
         // Initialize according to the native Swift variant
         if let endpointConfig = agentConfiguration.endpoint {
             endpoint = EndpointConfigurationObjC(for: endpointConfig)
-        } else {
+        }
+        else {
             endpoint = nil
         }
         appName = agentConfiguration.appName
@@ -149,13 +150,14 @@ public final class AgentConfigurationObjC: NSObject {
         // We return a native variant for Swift language
         var agentConfiguration: AgentConfiguration
 
-        if let endpoint = endpoint {
+        if let endpoint {
             agentConfiguration = AgentConfiguration(
                 endpoint: endpoint.endpointConfiguration(),
                 appName: appName,
                 deploymentEnvironment: deploymentEnvironment
             )
-        } else {
+        }
+        else {
             agentConfiguration = AgentConfiguration(
                 appName: appName,
                 deploymentEnvironment: deploymentEnvironment

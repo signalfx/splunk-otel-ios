@@ -56,7 +56,7 @@ struct OTLPBackgroundHTTPMetricExporterTests {
         fileType: String? = nil
     ) throws -> OTLPBackgroundHTTPMetricExporter {
         let endpoint = try #require(URL(string: "https://example.com"))
-        let exporter = OTLPBackgroundHTTPMetricExporter(
+        return OTLPBackgroundHTTPMetricExporter(
             endpoint: endpoint,
             config: config,
             qosConfig: SessionQOSConfiguration(),
@@ -66,7 +66,6 @@ struct OTLPBackgroundHTTPMetricExporterTests {
             performStalledUploadCheck: false,
             httpClient: http
         )
-        return exporter
     }
 
 

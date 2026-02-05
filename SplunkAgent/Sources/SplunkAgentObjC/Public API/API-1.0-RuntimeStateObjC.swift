@@ -102,9 +102,10 @@ public final class RuntimeStateObjC: NSObject {
         do {
             try owner.agent.state.setEndpoint(endpoint.endpointConfiguration())
             return true
-        } catch let caughtError {
+        }
+        catch let caughtError as NSError {
             if error != nil {
-                error?.pointee = caughtError as NSError
+                error?.pointee = caughtError
             }
             return false
         }

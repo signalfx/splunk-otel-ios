@@ -36,7 +36,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         http: MockHTTPClient,
         config: OtlpConfiguration = OtlpConfiguration()
     ) throws -> OTLPBackgroundHTTPBaseExporter {
-        let exporter = try OTLPBackgroundHTTPBaseExporter(
+        try OTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
             config: config,
             qosConfig: SessionQOSConfiguration(),
@@ -45,7 +45,6 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             performStalledUploadCheck: false,
             httpClient: http
         )
-        return exporter
     }
 
     func createNewTestTask() throws -> URLSessionDataTask {

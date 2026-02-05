@@ -69,17 +69,19 @@ public class OTLPBackgroundHTTPBaseExporter {
         self.diskStorage = diskStorage
         self.fileType = fileType
         self.qosConfig = qosConfig
-        self.httpClient = httpClient ?? BackgroundHTTPClient(
-            sessionQosConfiguration: qosConfig,
-            diskStorage: diskStorage,
-            namespace: getFileKeyType()
-        )
+        self.httpClient =
+            httpClient
+            ?? BackgroundHTTPClient(
+                sessionQosConfiguration: qosConfig,
+                diskStorage: diskStorage,
+                namespace: getFileKeyType()
+            )
 
         if endpoint != nil {
             flushPendingData()
         }
 
-        if performStalledUploadCheck && endpoint != nil {
+        if performStalledUploadCheck, endpoint != nil {
             // Get incomplete requests and check for stalled files
             // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
             checkStalledTask = Task.detached(priority: .utility) { [weak self] in
@@ -235,9 +237,10 @@ public class OTLPBackgroundHTTPBaseExporter {
 
             do {
                 // Read data from pending storage
-                guard let pendingFileUrl = try? diskStorage.finalDestination(forKey: pendingKey),
-                      FileManager.default.fileExists(atPath: pendingFileUrl.path),
-                      let data = try? Data(contentsOf: pendingFileUrl)
+                guard
+                    let pendingFileUrl = try? diskStorage.finalDestination(forKey: pendingKey),
+                    FileManager.default.fileExists(atPath: pendingFileUrl.path),
+                    let data = try? Data(contentsOf: pendingFileUrl)
                 else {
                     continue
                 }

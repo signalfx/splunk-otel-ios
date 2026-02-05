@@ -25,7 +25,7 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
 
     // MARK: - Initialization
 
-    public override init(
+    override public init(
         endpoint: URL?,
         config: OtlpConfiguration = OtlpConfiguration(),
         qosConfig: SessionQOSConfiguration,
@@ -43,17 +43,18 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
         performStalledUploadCheck: Bool = true,
         httpClient: BackgroundHTTPClientProtocol? = nil
     ) {
-        super.init(
-            endpoint: endpoint,
-            config: config,
-            qosConfig: qosConfig,
-            envVarHeaders: envVarHeaders,
-            headers: headers,
-            diskStorage: diskStorage,
-            fileType: fileType ?? "logs",
-            performStalledUploadCheck: performStalledUploadCheck,
-            httpClient: httpClient
-        )
+        super
+            .init(
+                endpoint: endpoint,
+                config: config,
+                qosConfig: qosConfig,
+                envVarHeaders: envVarHeaders,
+                headers: headers,
+                diskStorage: diskStorage,
+                fileType: fileType ?? "logs",
+                performStalledUploadCheck: performStalledUploadCheck,
+                httpClient: httpClient
+            )
     }
 
     // MARK: - Implementation LogRecordExporter protocol

@@ -30,7 +30,7 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
 
     // MARK: - Initialization
 
-    public override init(
+    override public init(
         endpoint: URL?,
         config: OtlpConfiguration = OtlpConfiguration(),
         qosConfig: SessionQOSConfiguration,
@@ -48,17 +48,18 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
         performStalledUploadCheck: Bool = true,
         httpClient: BackgroundHTTPClientProtocol? = nil
     ) {
-        super.init(
-            endpoint: endpoint,
-            config: config,
-            qosConfig: qosConfig,
-            envVarHeaders: envVarHeaders,
-            headers: headers,
-            diskStorage: diskStorage,
-            fileType: fileType ?? "logs_binary",
-            performStalledUploadCheck: performStalledUploadCheck,
-            httpClient: httpClient
-        )
+        super
+            .init(
+                endpoint: endpoint,
+                config: config,
+                qosConfig: qosConfig,
+                envVarHeaders: envVarHeaders,
+                headers: headers,
+                diskStorage: diskStorage,
+                fileType: fileType ?? "logs_binary",
+                performStalledUploadCheck: performStalledUploadCheck,
+                httpClient: httpClient
+            )
     }
 
     // MARK: - SplunkReadableLogRecord export

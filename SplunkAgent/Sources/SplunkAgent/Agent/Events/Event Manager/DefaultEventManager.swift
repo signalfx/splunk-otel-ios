@@ -72,27 +72,12 @@ class DefaultEventManager: AgentEventManager {
         let logUrl = traceUrl
 
         self.agent = agent
-        self.storedConfiguration = configuration
+        storedConfiguration = configuration
 
         // Will be used later by hybrid agents
         let hybridType: String? = nil
 
-        // Build resources
-        resources = DefaultResources(
-            appName: configuration.appName,
-            appVersion: configuration.appVersion,
-            appBuild: AppInfo.buildId ?? "-",
-            appDeploymentEnvironment: configuration.deploymentEnvironment,
-            agentHybridType: hybridType,
-            agentVersion: SplunkRum.version,
-            deviceID: DeviceInfo.deviceID ?? "-",
-            deviceModelIdentifier: DeviceInfo.type ?? "-",
-            deviceManufacturer: "Apple",
-            osName: SystemInfo.name,
-            osVersion: SystemInfo.version ?? "-",
-            osDescription: SystemInfo.description,
-            osType: SystemInfo.type
-        )
+        resources = Self.buildResources(configuration: configuration, hybridType: hybridType)
 
         // Initialize log event processor
         logEventProcessor = OTLPLogToSpanEventProcessor(
@@ -129,11 +114,33 @@ class DefaultEventManager: AgentEventManager {
             logger.log(level: .info, isPrivate: false) {
                 "Using trace url: \(traceUrl)"
             }
-        } else {
+        }
+        else {
             logger.log(level: .info, isPrivate: false) {
                 "No endpoint configured. Telemetry data will be cached until endpoint is set."
             }
         }
+    }
+
+    private static func buildResources(
+        configuration: any AgentConfigurationProtocol,
+        hybridType: String?
+    ) -> DefaultResources {
+        DefaultResources(
+            appName: configuration.appName,
+            appVersion: configuration.appVersion,
+            appBuild: AppInfo.buildId ?? "-",
+            appDeploymentEnvironment: configuration.deploymentEnvironment,
+            agentHybridType: hybridType,
+            agentVersion: SplunkRum.version,
+            deviceID: DeviceInfo.deviceID ?? "-",
+            deviceModelIdentifier: DeviceInfo.type ?? "-",
+            deviceManufacturer: "Apple",
+            osName: SystemInfo.name,
+            osVersion: SystemInfo.version ?? "-",
+            osDescription: SystemInfo.description,
+            osType: SystemInfo.type
+        )
     }
 
 
