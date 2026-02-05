@@ -120,7 +120,8 @@ struct OTLPSummaryDataPoint: Encodable {
 
         try container.encode(quantileValues, forKey: .quantileValues)
 
-        if let flags = flags, flags > 0 {
+        // Encode flags when present regardless of value (including zero)
+        if let flags = flags {
             try container.encode(flags, forKey: .flags)
         }
     }

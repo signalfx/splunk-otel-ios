@@ -115,7 +115,9 @@ struct OTLPSpanLink: Encodable {
             try container.encode(count, forKey: .droppedAttributesCount)
         }
 
-        if let flags = flags, flags > 0 {
+        // Encode flags when present regardless of value (including zero)
+        // Zero flags means "not sampled" in W3C trace context - valid semantic value
+        if let flags = flags {
             try container.encode(flags, forKey: .flags)
         }
     }

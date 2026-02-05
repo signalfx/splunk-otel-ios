@@ -173,7 +173,8 @@ struct OTLPExponentialHistogramDataPoint: Encodable {
         try container.encode(positive, forKey: .positive)
         try container.encode(negative, forKey: .negative)
 
-        if let flags = flags, flags > 0 {
+        // Encode flags when present regardless of value (including zero)
+        if let flags = flags {
             try container.encode(flags, forKey: .flags)
         }
 

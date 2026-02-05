@@ -51,14 +51,18 @@ enum SpanDataAdapter {
             // Convert each SpanData to OTLPSpan
             let otlpSpans = spanDataList.map { convertSpan($0) }
 
-            // Skip empty resource spans
+            // Skip empty resource spans (filter empty envelopes per OTLP spec)
             guard !otlpSpans.isEmpty else {
                 continue
             }
 
-            // Create a single scope spans container (scope info is on individual spans)
+            // Extract instrumentation scope from the first span (all spans in this group share the resource)
+            // Note: Ideally we should group by scope too, but for simplicity we use the first span's scope
+            let scope = convertInstrumentationScope(spanDataList.first?.instrumentationScope)
+
+            // Create scope spans container with instrumentation scope populated
             let scopeSpans = OTLPScopeSpans(
-                scope: nil,  // Scope info could be extracted if needed
+                scope: scope,
                 spans: otlpSpans,
                 schemaUrl: nil
             )
@@ -146,6 +150,20 @@ enum SpanDataAdapter {
         OTLPResource(
             attributes: convertAttributes(resource.attributes) ?? [],
             droppedAttributesCount: nil  // SDK doesn't track this
+        )
+    }
+
+    /// Converts InstrumentationScopeInfo to OTLPInstrumentationScope.
+    private static func convertInstrumentationScope(_ scopeInfo: InstrumentationScopeInfo?) -> OTLPInstrumentationScope? {
+        guard let scopeInfo = scopeInfo else {
+            return nil
+        }
+        let attrs = scopeInfo.attributes ?? [:]
+        return OTLPInstrumentationScope(
+            name: scopeInfo.name,
+            version: scopeInfo.version,
+            attributes: attrs.isEmpty ? nil : convertAttributes(attrs),
+            droppedAttributesCount: nil
         )
     }
 

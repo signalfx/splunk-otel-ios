@@ -51,10 +51,13 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
             return .failure
         }
 
+        // Use config timeout (aligned with trace/log exporter behavior)
+        let timeout = config.timeout
+
         let requestDescriptor = RequestDescriptor(
             id: requestId,
             endpoint: endpoint,
-            explicitTimeout: config.timeout,
+            explicitTimeout: timeout,
             fileKeyType: getFileKeyType(),
             headers: headers
         )
