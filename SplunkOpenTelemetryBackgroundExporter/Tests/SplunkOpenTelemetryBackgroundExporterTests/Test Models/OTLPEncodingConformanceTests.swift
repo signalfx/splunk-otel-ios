@@ -53,8 +53,7 @@ struct OTLPEncodingConformanceTests {
         let hex = string.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
 
         #expect(hex.count == 32)
-        // swiftlint:disable:next prefer_key_path
-        #expect(hex.allSatisfy { $0.isHexDigit })
+        #expect(hex.allSatisfy(\.isHexDigit))
         #expect(hex == hex.lowercased())
     }
 
@@ -66,8 +65,7 @@ struct OTLPEncodingConformanceTests {
         let hex = string.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
 
         #expect(hex.count == 16)
-        // swiftlint:disable:next prefer_key_path
-        #expect(hex.allSatisfy { $0.isHexDigit })
+        #expect(hex.allSatisfy(\.isHexDigit))
         #expect(hex == hex.lowercased())
     }
 

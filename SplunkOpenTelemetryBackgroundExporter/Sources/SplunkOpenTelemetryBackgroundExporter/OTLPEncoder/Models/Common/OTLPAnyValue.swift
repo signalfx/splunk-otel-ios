@@ -89,27 +89,27 @@ enum OTLPAnyValue: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         switch self {
-        case .stringValue(let value):
+        case let .stringValue(value):
             try container.encode(value, forKey: .stringValue)
 
-        case .boolValue(let value):
+        case let .boolValue(value):
             try container.encode(value, forKey: .boolValue)
 
-        case .intValue(let value):
+        case let .intValue(value):
             // CRITICAL: OTLP JSON requires 64-bit integers as decimal strings
             try container.encode(String(value), forKey: .intValue)
 
-        case .doubleValue(let value):
+        case let .doubleValue(value):
             try container.encode(value, forKey: .doubleValue)
 
-        case .bytesValue(let value):
+        case let .bytesValue(value):
             // OTLP JSON requires binary data as base64 encoded strings
             try container.encode(value.base64EncodedString(), forKey: .bytesValue)
 
-        case .arrayValue(let value):
+        case let .arrayValue(value):
             try container.encode(value, forKey: .arrayValue)
 
-        case .kvlistValue(let value):
+        case let .kvlistValue(value):
             try container.encode(value, forKey: .kvlistValue)
         }
     }

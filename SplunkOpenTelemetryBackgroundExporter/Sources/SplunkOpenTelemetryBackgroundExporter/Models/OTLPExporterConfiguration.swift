@@ -99,16 +99,6 @@ public enum OTLPEnvVarHeaders {
     /// Environment variable key for OTLP headers.
     private static let otlpHeadersEnvVar = "OTEL_EXPORTER_OTLP_HEADERS"
 
-    /// Environment variable key for OTLP trace headers.
-    private static let otlpTracesHeadersEnvVar = "OTEL_EXPORTER_OTLP_TRACES_HEADERS"
-
-    /// Environment variable key for OTLP logs headers.
-    private static let otlpLogsHeadersEnvVar = "OTEL_EXPORTER_OTLP_LOGS_HEADERS"
-
-    /// Environment variable key for OTLP metrics headers.
-    private static let otlpMetricsHeadersEnvVar = "OTEL_EXPORTER_OTLP_METRICS_HEADERS"
-
-
     // MARK: - Public Properties
 
     /// Headers parsed from OTLP environment variables.

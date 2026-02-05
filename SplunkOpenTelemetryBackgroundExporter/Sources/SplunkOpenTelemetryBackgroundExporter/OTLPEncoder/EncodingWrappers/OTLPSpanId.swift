@@ -49,7 +49,7 @@ struct OTLPSpanId: Encodable {
     /// - Parameter spanId: The OpenTelemetry SpanId to convert.
     init(from spanId: SpanId) {
         // Convert to lowercase hex per OTLP JSON spec
-        self.hexString = spanId.hexString.lowercased()
+        hexString = spanId.hexString.lowercased()
     }
 
     /// Creates a new OTLPSpanId from a hex string.

@@ -49,7 +49,7 @@ struct OTLPTraceId: Encodable {
     /// - Parameter traceId: The OpenTelemetry TraceId to convert.
     init(from traceId: TraceId) {
         // Convert to lowercase hex per OTLP JSON spec
-        self.hexString = traceId.hexString.lowercased()
+        hexString = traceId.hexString.lowercased()
     }
 
     /// Creates a new OTLPTraceId from a hex string.

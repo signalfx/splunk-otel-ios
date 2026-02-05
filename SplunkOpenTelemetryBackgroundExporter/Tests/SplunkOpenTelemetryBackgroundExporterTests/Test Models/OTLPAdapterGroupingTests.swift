@@ -44,6 +44,7 @@ struct OTLPAdapterGroupingTests {
         guard let readableSpan = span as? ReadableSpan else {
             fatalError("Could not get SpanData from span")
         }
+
         return readableSpan.toSpanData()
     }
 

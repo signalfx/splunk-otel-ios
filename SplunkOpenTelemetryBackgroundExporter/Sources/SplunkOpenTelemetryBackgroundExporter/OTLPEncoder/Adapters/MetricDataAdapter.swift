@@ -45,8 +45,8 @@ enum MetricDataAdapter {
         let version: String?
 
         init(from scope: InstrumentationScopeInfo?) {
-            self.name = scope?.name ?? ""
-            self.version = scope?.version
+            name = scope?.name ?? ""
+            version = scope?.version
         }
     }
 
@@ -170,6 +170,7 @@ enum MetricDataAdapter {
         guard let scopeInfo else {
             return nil
         }
+
         let attrs = scopeInfo.attributes ?? [:]
         return OTLPInstrumentationScope(
             name: scopeInfo.name,
@@ -184,6 +185,7 @@ enum MetricDataAdapter {
         guard !attributes.isEmpty else {
             return nil
         }
+
         return attributes.map { key, value in
             OTLPKeyValue(key: key, value: convertAttributeValue(value))
         }
@@ -192,37 +194,37 @@ enum MetricDataAdapter {
     /// Converts an AttributeValue to OTLPAnyValue.
     private static func convertAttributeValue(_ value: AttributeValue) -> OTLPAnyValue {
         switch value {
-        case .string(let stringValue):
+        case let .string(stringValue):
             return .stringValue(stringValue)
 
-        case .bool(let boolValue):
+        case let .bool(boolValue):
             return .boolValue(boolValue)
 
-        case .int(let intValue):
+        case let .int(intValue):
             return .intValue(Int64(intValue))
 
-        case .double(let doubleValue):
+        case let .double(doubleValue):
             return .doubleValue(doubleValue)
 
-        case .stringArray(let arr):
+        case let .stringArray(arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .stringValue($0) }))
 
-        case .boolArray(let arr):
+        case let .boolArray(arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .boolValue($0) }))
 
-        case .intArray(let arr):
+        case let .intArray(arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .intValue(Int64($0)) }))
 
-        case .doubleArray(let arr):
+        case let .doubleArray(arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .doubleValue($0) }))
 
-        case .set(let set):
+        case let .set(set):
             let kvList = set.labels.map { key, attrValue in
                 OTLPKeyValue(key: key, value: convertAttributeValue(attrValue))
             }
             return .kvlistValue(OTLPKeyValueList(values: kvList))
 
-        case .array(let arr):
+        case let .array(arr):
             return .arrayValue(OTLPArrayValue(values: arr.values.map { convertAttributeValue($0) }))
         }
     }
