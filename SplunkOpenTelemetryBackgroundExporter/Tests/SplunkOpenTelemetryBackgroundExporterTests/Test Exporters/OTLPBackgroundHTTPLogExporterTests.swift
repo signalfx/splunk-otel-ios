@@ -90,6 +90,18 @@ struct OTLPBackgroundHTTPLogExporterTests {
     // MARK: - Tests
 
     @Test
+    func exportEmptyLogRecordsReturnsSuccessWithoutSending() throws {
+        let disk = makeDisk(uniqueLabel: "empty_logs_\(UUID().uuidString)")
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 2))
+
+        let result = exporter.export(logRecords: [], explicitTimeout: nil)
+
+        #expect(result == .success)
+        #expect(http.sent.isEmpty)
+    }
+
+    @Test
     func exportSuccessSendsRequestAndStoresFileWithLogsFileType() throws {
         let disk = makeDisk(uniqueLabel: "export_success_\(UUID().uuidString)")
         let http = MockHTTPClient()
