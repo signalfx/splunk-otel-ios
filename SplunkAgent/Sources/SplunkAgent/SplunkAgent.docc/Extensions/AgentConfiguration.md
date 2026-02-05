@@ -2,19 +2,22 @@
 
 ## Overview
 
-The `AgentConfiguration` struct defines the initial setup parameters for the Splunk RUM agent. It allows you to specify endpoints, application details, and various module settings.
+The `AgentConfiguration` struct defines the initial setup parameters for the Splunk RUM agent. It allows you to specify endpoints, application details, and various module settings. The endpoint is optional; if you omit it, the agent will cache telemetry until you configure an endpoint later via ``RuntimeState/setEndpoint(_:)``.
 
 ## Topics
 
 ### Initializers
 
-- ``init(url:)``
+- ``init(endpoint:appName:deploymentEnvironment:)``
+- ``init(appName:deploymentEnvironment:)``
 - ``init(from:)``
 
 ### Endpoint Settings
 
-- ``url``
-  The primary URL for the agent's data submission.
+- ``endpoint``
+  The endpoint configuration for the agent's data submission. If `nil`, the agent enters a caching state until you set an endpoint.
+- ``endpoint(_:)``
+  A builder method to set the endpoint configuration.
 - ``enableDebugLogging``
   A boolean indicating whether debug logging is enabled for the agent.
 

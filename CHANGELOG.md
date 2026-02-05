@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+* Added support for initializing without an endpoint and setting it later, caching telemetry until configured.
+
 ## [2.0.7] - 2026-02-04
 
 ### Fixed
@@ -193,4 +197,3 @@ This is a first major stable release of the new Splunk OpenTelemetry Agent.
 ### Deprecated
 
 * Deprecates the use of SplunkRum.initialize. Use the SplunkRumBuilder going forward.
-

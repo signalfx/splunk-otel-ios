@@ -21,11 +21,13 @@ The ``AgentConfiguration`` struct is used to provide all initial settings for th
 
 Key properties you must provide:
 
-- `endpoint`: Specifies the Splunk realm and RUM access token.
+- `endpoint`: Specifies the Splunk realm and RUM access token. This value is optional; if you omit it, the agent will start in a caching state until you call ``RuntimeState/setEndpoint(_:)``.
 - `appName`: Your application's name.
 - `deploymentEnvironment`: The environment, such as `production` or `staging`.
 
 You can also provide optional configurations for global attributes and other settings. See <doc:Getting-Started> for a practical example.
+
+When the agent starts without an endpoint, its status is ``Status/pendingEndpoint`` until you configure one.
 
 ## Module Configurations
 

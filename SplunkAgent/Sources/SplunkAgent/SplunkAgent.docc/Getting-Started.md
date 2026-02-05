@@ -29,6 +29,20 @@ let agentConfig = AgentConfiguration(
 ```
 For a detailed overview of all available settings, see the ``AgentConfiguration`` documentation.
 
+If you need to delay endpoint configuration (for example, until after user consent), you can initialize without an endpoint and set it later:
+
+```swift
+import SplunkAgent
+
+let agentConfig = AgentConfiguration(
+    appName: "<YOUR_APP_NAME>",
+    deploymentEnvironment: "<YOUR_DEPLOYMENT_ENVIRONMENT>"
+)
+
+let agent = try SplunkRum.install(with: agentConfig)
+try agent.state.setEndpoint(.init(realm: "<YOUR_REALM>", rumAccessToken: "<YOUR_RUM_ACCESS_TOKEN>"))
+```
+
 ## Initialization
 
 In a central part of your application, like your `AppDelegate` or main `App` struct, call `SplunkRum.install(with:)`. This method returns a ``SplunkRum`` instance that you should retain for the lifetime of your application to interact with the agent.
