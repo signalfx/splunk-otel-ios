@@ -66,9 +66,9 @@ struct OTLPBackgroundHTTPTraceExporterTests {
             headers: headers,
             diskStorage: disk,
             fileType: fileType,
-            performStalledUploadCheck: false
+            performStalledUploadCheck: false,
+            httpClient: http
         )
-        exporter.httpClient = http
         return exporter
     }
 
@@ -225,9 +225,9 @@ struct OTLPBackgroundHTTPTraceExporterTests {
             headers: [:],
             diskStorage: disk,
             fileType: nil,
-            performStalledUploadCheck: false
+            performStalledUploadCheck: false,
+            httpClient: http
         )
-        exporter.httpClient = http
 
         // Export should succeed
         let result = exporter.export(spans: [], explicitTimeout: nil)
@@ -247,12 +247,11 @@ struct OTLPBackgroundHTTPTraceExporterTests {
     }
 
     @Test
-    func setEndpointFlushesPendingData() throws {
+    func initWithEndpointFlushesPendingData() throws {
         let disk = makeDisk(uniqueLabel: "set_endpoint_\(UUID().uuidString)")
-        let http = MockHTTPClient()
 
         // Create exporter with nil endpoint
-        let exporter = OTLPBackgroundHTTPTraceExporter(
+        let pendingExporter = OTLPBackgroundHTTPTraceExporter(
             endpoint: nil,
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
@@ -262,22 +261,32 @@ struct OTLPBackgroundHTTPTraceExporterTests {
             fileType: nil,
             performStalledUploadCheck: false
         )
-        exporter.httpClient = http
 
         // Export some data (will be cached)
-        _ = exporter.export(spans: [], explicitTimeout: nil)
-        _ = exporter.export(spans: [], explicitTimeout: nil)
+        _ = pendingExporter.export(spans: [], explicitTimeout: nil)
+        _ = pendingExporter.export(spans: [], explicitTimeout: nil)
 
         // Verify data is pending
-        let pendingBeforeSet = try disk.list(forKey: exporter.getPendingStorageKey())
+        let pendingBeforeSet = try disk.list(forKey: pendingExporter.getPendingStorageKey())
         #expect(pendingBeforeSet.count == 2)
-        #expect(http.sent.isEmpty)
 
-        // Set endpoint
+        let http = MockHTTPClient()
+
+        // Create exporter with endpoint to flush pending data
         let endpoint = try #require(URL(string: "https://example.com/traces"))
-        exporter.setEndpoint(endpoint)
+        let exporter = OTLPBackgroundHTTPTraceExporter(
+            endpoint: endpoint,
+            config: OtlpConfiguration(),
+            qosConfig: SessionQOSConfiguration(),
+            envVarHeaders: nil,
+            headers: [:],
+            diskStorage: disk,
+            fileType: nil,
+            performStalledUploadCheck: false,
+            httpClient: http
+        )
 
-        // After setting endpoint, isPendingEndpoint should be false
+        // After initializing with endpoint, isPendingEndpoint should be false
         #expect(exporter.isPendingEndpoint == false)
 
         // HTTP client should have received the flushed requests
@@ -289,26 +298,23 @@ struct OTLPBackgroundHTTPTraceExporterTests {
     }
 
     @Test
-    func exportAfterSetEndpointSendsImmediately() throws {
+    func exportWithEndpointSendsImmediately() throws {
         let disk = makeDisk(uniqueLabel: "export_after_set_\(UUID().uuidString)")
         let http = MockHTTPClient()
 
-        // Create exporter with nil endpoint
+        // Create exporter with endpoint
+        let endpoint = try #require(URL(string: "https://example.com/traces"))
         let exporter = OTLPBackgroundHTTPTraceExporter(
-            endpoint: nil,
+            endpoint: endpoint,
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
             headers: [:],
             diskStorage: disk,
             fileType: nil,
-            performStalledUploadCheck: false
+            performStalledUploadCheck: false,
+            httpClient: http
         )
-        exporter.httpClient = http
-
-        // Set endpoint
-        let endpoint = try #require(URL(string: "https://example.com/traces"))
-        exporter.setEndpoint(endpoint)
 
         // Export should now send immediately
         let result = exporter.export(spans: [], explicitTimeout: nil)
@@ -321,32 +327,27 @@ struct OTLPBackgroundHTTPTraceExporterTests {
     }
 
     @Test
-    func setEndpointWithHeadersUpdatesHeaders() throws {
+    func exportWithHeadersUsesConfiguredHeaders() throws {
         let disk = makeDisk(uniqueLabel: "set_endpoint_headers_\(UUID().uuidString)")
         let http = MockHTTPClient()
 
-        // Create exporter with nil endpoint
+        // Create exporter with endpoint and headers
         let exporter = OTLPBackgroundHTTPTraceExporter(
-            endpoint: nil,
+            endpoint: try #require(URL(string: "https://example.com/traces")),
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
-            headers: [:],
+            headers: ["X-SF-Token": "new-token"],
             diskStorage: disk,
             fileType: nil,
-            performStalledUploadCheck: false
+            performStalledUploadCheck: false,
+            httpClient: http
         )
-        exporter.httpClient = http
-
-        // Set endpoint with headers
-        let endpoint = try #require(URL(string: "https://example.com/traces"))
-        let token = "new-token"
-        exporter.setEndpoint(endpoint, headers: ["X-SF-Token": token])
 
         // Export and verify headers
         _ = exporter.export(spans: [], explicitTimeout: nil)
 
         let sent = try #require(http.sent.first)
-        #expect(sent.headers["X-SF-Token"] == token)
+        #expect(sent.headers["X-SF-Token"] == "new-token")
     }
 }

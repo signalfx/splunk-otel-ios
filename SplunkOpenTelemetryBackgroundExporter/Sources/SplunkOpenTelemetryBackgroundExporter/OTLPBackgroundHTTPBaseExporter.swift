@@ -39,11 +39,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     let diskStorage: DiskStorage
     var checkStalledTask: Task<Void, Never>?
 
-    lazy var httpClient: BackgroundHTTPClientProtocol = BackgroundHTTPClient(
-        sessionQosConfiguration: qosConfig,
-        diskStorage: diskStorage,
-        namespace: getFileKeyType()
-    )
+    var httpClient: BackgroundHTTPClientProtocol
 
 
     // MARK: - Initialization
@@ -63,7 +59,8 @@ public class OTLPBackgroundHTTPBaseExporter {
             encryption: NoneEncryption()
         ),
         fileType: String? = nil,
-        performStalledUploadCheck: Bool = true
+        performStalledUploadCheck: Bool = true,
+        httpClient: BackgroundHTTPClientProtocol? = nil
     ) {
         self.envVarHeaders = envVarHeaders
         additionalHeaders = headers
@@ -72,6 +69,15 @@ public class OTLPBackgroundHTTPBaseExporter {
         self.diskStorage = diskStorage
         self.fileType = fileType
         self.qosConfig = qosConfig
+        self.httpClient = httpClient ?? BackgroundHTTPClient(
+            sessionQosConfiguration: qosConfig,
+            diskStorage: diskStorage,
+            namespace: getFileKeyType()
+        )
+
+        if endpoint != nil {
+            flushPendingData()
+        }
 
         if performStalledUploadCheck && endpoint != nil {
             // Get incomplete requests and check for stalled files
@@ -197,36 +203,6 @@ public class OTLPBackgroundHTTPBaseExporter {
         return combinedHeaders
     }
 
-
-    // MARK: - Endpoint Management
-
-    /// Sets the endpoint URL and flushes any pending cached data.
-    ///
-    /// When an endpoint is set, all previously cached data will be moved to the
-    /// active upload queue and sent to the server.
-    ///
-    /// - Parameters:
-    ///   - newEndpoint: The endpoint URL to use for sending telemetry data.
-    ///   - newHeaders: Optional new headers to use (e.g., for authentication token).
-    public func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]? = nil) {
-        endpoint = newEndpoint
-
-        if let newHeaders {
-            additionalHeaders = newHeaders
-        }
-
-        // Flush pending data
-        flushPendingData()
-
-        // Start stalled upload check now that we have an endpoint
-        checkStalledTask = Task.detached(priority: .utility) { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
-            self?.httpClient
-                .getAllSessionsTasks { [weak self] tasks in
-                    self?.checkStalledUploadsOperation(tasks: tasks)
-                }
-        }
-    }
 
     /// Flushes all pending cached data to the server.
     ///

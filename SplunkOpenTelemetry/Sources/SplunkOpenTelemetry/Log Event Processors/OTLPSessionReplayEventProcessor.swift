@@ -107,23 +107,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
     }
 
 
-    // MARK: - Endpoint Management
-
-    /// Sets the endpoint URL and flushes any pending cached data.
-    ///
-    /// - Parameters:
-    ///   - newEndpoint: The endpoint URL to use for sending session replay data.
-    ///   - accessToken: Optional new access token to use for authentication.
-    public func setEndpoint(_ newEndpoint: URL, accessToken: String? = nil) {
-        var headers: [String: String] = [:]
-        if let accessToken, !accessToken.isEmpty {
-            headers["X-SF-Token"] = accessToken
-        }
-
-        backgroundLogExporter.setEndpoint(newEndpoint, headers: headers.isEmpty ? nil : headers)
-    }
-
-
     // MARK: - Events
 
     public func sendEvent(_ event: any AgentEvent, completion: @escaping (Bool) -> Void) {

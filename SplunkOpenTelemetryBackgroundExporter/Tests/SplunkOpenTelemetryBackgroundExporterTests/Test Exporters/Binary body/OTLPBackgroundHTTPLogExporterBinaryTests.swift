@@ -69,9 +69,9 @@ struct OTLPBackgroundHTTPLogExporterBinaryTests {
             headers: headers,
             diskStorage: disk,
             fileType: fileType,
-            performStalledUploadCheck: false
+            performStalledUploadCheck: false,
+            httpClient: http
         )
-        exporter.httpClient = http
         return exporter
     }
 

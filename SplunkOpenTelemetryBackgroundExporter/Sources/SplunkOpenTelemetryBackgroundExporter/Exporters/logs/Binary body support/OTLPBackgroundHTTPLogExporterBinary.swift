@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import CiscoDiskStorage
+import CiscoEncryption
 import Foundation
 import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
@@ -26,6 +27,39 @@ import OpenTelemetrySdk
 /// - removes the `LogRecordExporter` protocol conformance,
 /// - utilizes the `SplunkLogRecordAdapter`
 public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter {
+
+    // MARK: - Initialization
+
+    public override init(
+        endpoint: URL?,
+        config: OtlpConfiguration = OtlpConfiguration(),
+        qosConfig: SessionQOSConfiguration,
+        envVarHeaders: [(String, String)]? = EnvVarHeaders.attributes,
+        headers: [String: String] = [:],
+        diskStorage: DiskStorage = FilesystemDiskStorage(
+            prefix: FilesystemPrefix(module: "OTLPBackgroundExporter"),
+            rules: Rules(
+                relativeUsedSize: 0.2,
+                absoluteUsedSize: .init(value: 200, unit: .megabytes)
+            ),
+            encryption: NoneEncryption()
+        ),
+        fileType: String? = nil,
+        performStalledUploadCheck: Bool = true,
+        httpClient: BackgroundHTTPClientProtocol? = nil
+    ) {
+        super.init(
+            endpoint: endpoint,
+            config: config,
+            qosConfig: qosConfig,
+            envVarHeaders: envVarHeaders,
+            headers: headers,
+            diskStorage: diskStorage,
+            fileType: fileType ?? "logs_binary",
+            performStalledUploadCheck: performStalledUploadCheck,
+            httpClient: httpClient
+        )
+    }
 
     // MARK: - SplunkReadableLogRecord export
 

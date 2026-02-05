@@ -153,13 +153,31 @@ class DefaultEventManager: AgentEventManager {
 
         let accessToken = endpoint.rumAccessToken
 
-        // Update trace processor
-        (traceProcessor as? OTLPTraceProcessor)?.setEndpoint(traceUrl, accessToken: accessToken)
+        // Rebuild processors to avoid in-place endpoint mutation
+        logEventProcessor = OTLPLogToSpanEventProcessor(
+            with: traceUrl,
+            resources: resources,
+            debugEnabled: storedConfiguration.enableDebugLogging
+        )
 
-        // Update session replay processor
-        if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
-            (sessionReplayProcessor as? OTLPSessionReplayEventProcessor)?.setEndpoint(sessionReplayUrl, accessToken: accessToken)
-        }
+        sessionReplayProcessor = OTLPSessionReplayEventProcessor(
+            with: endpoint.sessionReplayEndpoint,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            globalAttributes: { agent.globalAttributes.getAll() },
+            debugEnabled: storedConfiguration.enableDebugLogging,
+            accessToken: accessToken
+        )
+
+        traceProcessor = OTLPTraceProcessor(
+            with: traceUrl,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            globalAttributes: { agent.globalAttributes.getAll() },
+            debugEnabled: storedConfiguration.enableDebugLogging,
+            spanInterceptor: storedConfiguration.spanInterceptor,
+            accessToken: accessToken
+        )
 
         logger.log(level: .info, isPrivate: false) {
             "Endpoint configured. Using trace url: \(traceUrl)"

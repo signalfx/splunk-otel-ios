@@ -63,9 +63,9 @@ struct OTLPBackgroundHTTPMetricExporterTests {
             envVarHeaders: nil,
             diskStorage: disk,
             fileType: fileType,
-            performStalledUploadCheck: false
+            performStalledUploadCheck: false,
+            httpClient: http
         )
-        exporter.httpClient = http
         return exporter
     }
 

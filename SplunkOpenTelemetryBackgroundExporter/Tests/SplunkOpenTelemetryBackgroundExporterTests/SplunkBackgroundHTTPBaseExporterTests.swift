@@ -42,9 +42,9 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
             diskStorage: disk,
-            performStalledUploadCheck: false
+            performStalledUploadCheck: false,
+            httpClient: http
         )
-        exporter.httpClient = http
         return exporter
     }
 
@@ -84,13 +84,15 @@ struct SplunkBackgroundHTTPBaseExporterTests {
             encryption: NoneEncryption()
         )
 
+        let http = MockHTTPClient()
         let exporter = try MockOTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
             diskStorage: disk,
-            performStalledUploadCheck: false
+            performStalledUploadCheck: false,
+            httpClient: http
         )
 
         try disk.insert(desc, forKey: exporter.getStorageKey().append(desc.id.uuidString))
@@ -200,12 +202,14 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
     @Test
     func exporterWasCreatedAndCheckStalledWasCalled() async throws {
+        let http = MockHTTPClient()
         let exporter = try MockOTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
             config: OtlpConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
-            diskStorage: MockDiskStorage()
+            diskStorage: MockDiskStorage(),
+            httpClient: http
         )
 
         try await Task.sleep(nanoseconds: 10_000_000_000) // wait for 10 secs
