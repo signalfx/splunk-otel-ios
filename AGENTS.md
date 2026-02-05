@@ -9,7 +9,7 @@ This document provides context for AI assistants working on this codebase.
 - **Language**: Swift 5.9+
 - **Package Manager**: Swift Package Manager (SPM)
 - **Minimum iOS**: 13.0
-- **Core Dependency**: [OpenTelemetry Swift](https://github.com/open-telemetry/opentelemetry-swift)
+- **Core Dependency**: [OpenTelemetry Swift Core](https://github.com/open-telemetry/opentelemetry-swift-core) (API and SDK only, no exporters)
 
 ## Architecture
 
@@ -36,8 +36,8 @@ The SDK uses a modular architecture where each instrumentation type is a separat
 - `SplunkSessionReplayProxy` - Session replay proxy
 
 **Infrastructure Modules:**
-- `SplunkOpenTelemetry` - OTel integration and exporters
-- `SplunkOpenTelemetryBackgroundExporter` - Background-safe exporters
+- `SplunkOpenTelemetry` - OTel integration, span/log processors, and attribute handling
+- `SplunkOpenTelemetryBackgroundExporter` - Custom OTLP/JSON exporters for traces, logs, and metrics with background task support
 
 ### Module Protocol Pattern
 
@@ -161,6 +161,8 @@ brew install swiftlint
 | `Package.swift` | SPM manifest with all targets and dependencies |
 | `SplunkAgent/Sources/SplunkAgent/Public API/` | Public API surface |
 | `SplunkCommon/Sources/SplunkCommon/Modules/Module.swift` | Core Module protocol |
+| `SplunkOpenTelemetryBackgroundExporter/.../OTLPEncoder/` | Custom OTLP/JSON encoder |
+| `SplunkOpenTelemetryBackgroundExporter/.../OTLPVersion.swift` | OTLP spec version tracking |
 | `.swiftformat` | SwiftFormat configuration |
 | `CODESTYLE.md` | Detailed code style guide |
 | `Development.md` | Build and test instructions |
@@ -185,9 +187,43 @@ brew install swiftlint
 
 ## Dependencies
 
-- **opentelemetry-swift** / **opentelemetry-swift-core**: OpenTelemetry SDK
+- **opentelemetry-swift-core**: OpenTelemetry API and SDK (no protocol exporters - we use custom OTLP/JSON implementation)
 - **PLCrashReporter**: Crash reporting
 - **Cisco Binary Targets**: Session replay (via wrapper targets)
+
+## OTLP/JSON Encoder Architecture
+
+The SDK uses a custom OTLP/JSON encoder instead of the upstream `OpenTelemetryProtocolExporter` to reduce binary size. The implementation is located in `SplunkOpenTelemetryBackgroundExporter/Sources/.../OTLPEncoder/`.
+
+### Structure
+
+```
+OTLPEncoder/
+├── Adapters/                    # Convert OTel SDK types to OTLP models
+│   ├── LogRecordAdapter.swift   # ReadableLogRecord → OTLPLogRecord
+│   ├── MetricDataAdapter.swift  # MetricData → OTLPMetric
+│   ├── SpanDataAdapter.swift    # SpanData → OTLPSpan
+│   └── SplunkLogRecordAdapter.swift  # Binary data support for Session Replay
+├── EncodingWrappers/            # Custom Encodable wrappers for OTLP types
+│   ├── OTLPInt64.swift          # Encodes Int64 as decimal string
+│   ├── OTLPUInt64.swift         # Encodes UInt64 as decimal string
+│   ├── OTLPTraceId.swift        # Encodes as 32-char lowercase hex
+│   └── OTLPSpanId.swift         # Encodes as 16-char lowercase hex
+├── Models/                      # OTLP JSON data structures
+│   ├── Common/                  # Shared types (Resource, KeyValue, AnyValue)
+│   ├── Logs/                    # Log-specific models
+│   ├── Metrics/                 # Metric-specific models (Gauge, Sum, Histogram, etc.)
+│   └── Trace/                   # Span-specific models
+└── OTLPVersion.swift            # OTLP specification version tracking
+```
+
+### Key Design Decisions
+
+1. **JSON Encoding**: Uses Swift's `Encodable` with custom `encode(to:)` for OTLP-compliant JSON
+2. **String-encoded integers**: Large integers (timestamps, IDs) encoded as strings per OTLP spec
+3. **Base64 binary data**: `bytesValue` in `OTLPAnyValue` encodes binary data as base64
+4. **Null omission**: Optional fields with nil values are omitted from JSON output
+5. **Version tracking**: `OTLPVersion.swift` documents the OTLP specification version for maintenance
 
 ## License
 
