@@ -71,7 +71,7 @@ enum LogRecordAdapter {
 
             var scopeLogsList: [OTLPScopeLogs] = []
 
-            for (scopeKey, scopedLogs) in groupedByScope {
+            for (_, scopedLogs) in groupedByScope {
                 // Convert each ReadableLogRecord to OTLPLogRecord
                 let otlpLogRecords = scopedLogs.map { convertLogRecord($0) }
 

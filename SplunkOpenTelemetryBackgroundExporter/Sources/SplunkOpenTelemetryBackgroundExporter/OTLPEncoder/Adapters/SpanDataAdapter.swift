@@ -68,7 +68,7 @@ enum SpanDataAdapter {
 
             var scopeSpansList: [OTLPScopeSpans] = []
 
-            for (scopeKey, scopedSpans) in groupedByScope {
+            for (_, scopedSpans) in groupedByScope {
                 // Convert each SpanData to OTLPSpan
                 let otlpSpans = scopedSpans.map { convertSpan($0) }
 
