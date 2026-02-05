@@ -35,6 +35,21 @@ import OpenTelemetrySdk
 /// Based on OTLP specification v1.9.0.
 enum LogRecordAdapter {
 
+    // MARK: - Private Types
+
+    /// Key for grouping log records by scope within a resource.
+    /// Uses scope name and version as the grouping key.
+    private struct ScopeKey: Hashable {
+        let name: String
+        let version: String?
+
+        init(from scope: InstrumentationScopeInfo?) {
+            self.name = scope?.name ?? ""
+            self.version = scope?.version
+        }
+    }
+
+
     // MARK: - Public Methods
 
     /// Converts a list of ReadableLogRecord to OTLP ResourceLogs.
@@ -45,30 +60,45 @@ enum LogRecordAdapter {
     /// - Parameter logRecords: The list of ReadableLogRecord to convert.
     /// - Returns: A list of OTLPResourceLogs (non-empty).
     static func toResourceLogs(_ logRecords: [ReadableLogRecord]) -> [OTLPResourceLogs] {
-        // Group log records by resource
-        let grouped = groupByResource(logRecords)
+        // Group log records by resource first
+        let groupedByResource = groupByResource(logRecords)
 
         var resourceLogsList: [OTLPResourceLogs] = []
 
-        for (resource, logRecordList) in grouped {
-            // Convert each ReadableLogRecord to OTLPLogRecord
-            let otlpLogRecords = logRecordList.map { convertLogRecord($0) }
+        for (resource, logRecordList) in groupedByResource {
+            // Group log records within this resource by scope
+            let groupedByScope = groupByScope(logRecordList)
 
-            // Skip empty resource logs
-            guard !otlpLogRecords.isEmpty else {
+            var scopeLogsList: [OTLPScopeLogs] = []
+
+            for (scopeKey, scopedLogs) in groupedByScope {
+                // Convert each ReadableLogRecord to OTLPLogRecord
+                let otlpLogRecords = scopedLogs.map { convertLogRecord($0) }
+
+                // Skip empty scope logs (filter empty envelopes per OTLP spec)
+                guard !otlpLogRecords.isEmpty else {
+                    continue
+                }
+
+                // Get the scope info from the first log in this scope group
+                let scopeInfo = scopedLogs.first?.instrumentationScopeInfo
+
+                let scopeLogs = OTLPScopeLogs(
+                    scope: convertInstrumentationScope(scopeInfo),
+                    logRecords: otlpLogRecords,
+                    schemaUrl: scopeInfo?.schemaUrl
+                )
+                scopeLogsList.append(scopeLogs)
+            }
+
+            // Skip empty resource logs (filter empty envelopes per OTLP spec)
+            guard !scopeLogsList.isEmpty else {
                 continue
             }
 
-            // Create a single scope logs container
-            let scopeLogs = OTLPScopeLogs(
-                scope: convertInstrumentationScope(logRecordList.first?.instrumentationScopeInfo),
-                logRecords: otlpLogRecords,
-                schemaUrl: logRecordList.first?.instrumentationScopeInfo.schemaUrl
-            )
-
             let resourceLogs = OTLPResourceLogs(
                 resource: convertResource(resource),
-                scopeLogs: [scopeLogs],
+                scopeLogs: scopeLogsList,
                 schemaUrl: nil  // Resource.schemaUrl not available in current SDK version
             )
             resourceLogsList.append(resourceLogs)
@@ -86,6 +116,18 @@ enum LogRecordAdapter {
 
         for logRecord in logRecords {
             result[logRecord.resource, default: []].append(logRecord)
+        }
+
+        return result
+    }
+
+    /// Groups log records by instrumentation scope within a resource.
+    private static func groupByScope(_ logRecords: [ReadableLogRecord]) -> [ScopeKey: [ReadableLogRecord]] {
+        var result: [ScopeKey: [ReadableLogRecord]] = [:]
+
+        for logRecord in logRecords {
+            let key = ScopeKey(from: logRecord.instrumentationScopeInfo)
+            result[key, default: []].append(logRecord)
         }
 
         return result

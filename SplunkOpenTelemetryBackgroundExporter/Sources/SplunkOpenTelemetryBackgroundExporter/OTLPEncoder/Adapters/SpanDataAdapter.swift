@@ -32,6 +32,21 @@ import OpenTelemetrySdk
 /// Based on OTLP specification v1.9.0.
 enum SpanDataAdapter {
 
+    // MARK: - Private Types
+
+    /// Key for grouping spans by scope within a resource.
+    /// Uses scope name and version as the grouping key.
+    private struct ScopeKey: Hashable {
+        let name: String
+        let version: String?
+
+        init(from scope: InstrumentationScopeInfo?) {
+            self.name = scope?.name ?? ""
+            self.version = scope?.version
+        }
+    }
+
+
     // MARK: - Public Methods
 
     /// Converts a list of SpanData to OTLP ResourceSpans.
@@ -42,34 +57,45 @@ enum SpanDataAdapter {
     /// - Parameter spans: The list of SpanData to convert.
     /// - Returns: A list of OTLPResourceSpans (non-empty).
     static func toResourceSpans(_ spans: [SpanData]) -> [OTLPResourceSpans] {
-        // Group spans by resource
-        let grouped = groupByResource(spans)
+        // Group spans by resource first
+        let groupedByResource = groupByResource(spans)
 
         var resourceSpansList: [OTLPResourceSpans] = []
 
-        for (resource, spanDataList) in grouped {
-            // Convert each SpanData to OTLPSpan
-            let otlpSpans = spanDataList.map { convertSpan($0) }
+        for (resource, spanDataList) in groupedByResource {
+            // Group spans within this resource by scope
+            let groupedByScope = groupByScope(spanDataList)
+
+            var scopeSpansList: [OTLPScopeSpans] = []
+
+            for (scopeKey, scopedSpans) in groupedByScope {
+                // Convert each SpanData to OTLPSpan
+                let otlpSpans = scopedSpans.map { convertSpan($0) }
+
+                // Skip empty scope spans (filter empty envelopes per OTLP spec)
+                guard !otlpSpans.isEmpty else {
+                    continue
+                }
+
+                // Get the scope info from the first span in this scope group
+                let scope = convertInstrumentationScope(scopedSpans.first?.instrumentationScope)
+
+                let scopeSpans = OTLPScopeSpans(
+                    scope: scope,
+                    spans: otlpSpans,
+                    schemaUrl: nil
+                )
+                scopeSpansList.append(scopeSpans)
+            }
 
             // Skip empty resource spans (filter empty envelopes per OTLP spec)
-            guard !otlpSpans.isEmpty else {
+            guard !scopeSpansList.isEmpty else {
                 continue
             }
 
-            // Extract instrumentation scope from the first span (all spans in this group share the resource)
-            // Note: Ideally we should group by scope too, but for simplicity we use the first span's scope
-            let scope = convertInstrumentationScope(spanDataList.first?.instrumentationScope)
-
-            // Create scope spans container with instrumentation scope populated
-            let scopeSpans = OTLPScopeSpans(
-                scope: scope,
-                spans: otlpSpans,
-                schemaUrl: nil
-            )
-
             let resourceSpans = OTLPResourceSpans(
                 resource: convertResource(resource),
-                scopeSpans: [scopeSpans],
+                scopeSpans: scopeSpansList,
                 schemaUrl: nil  // Resource.schemaUrl not available in current SDK version
             )
             resourceSpansList.append(resourceSpans)
@@ -87,6 +113,18 @@ enum SpanDataAdapter {
 
         for span in spans {
             result[span.resource, default: []].append(span)
+        }
+
+        return result
+    }
+
+    /// Groups spans by instrumentation scope within a resource.
+    private static func groupByScope(_ spans: [SpanData]) -> [ScopeKey: [SpanData]] {
+        var result: [ScopeKey: [SpanData]] = [:]
+
+        for span in spans {
+            let key = ScopeKey(from: span.instrumentationScope)
+            result[key, default: []].append(span)
         }
 
         return result

@@ -36,6 +36,21 @@ import OpenTelemetrySdk
 /// Based on OTLP specification v1.9.0.
 enum MetricDataAdapter {
 
+    // MARK: - Private Types
+
+    /// Key for grouping metrics by scope within a resource.
+    /// Uses scope name and version as the grouping key.
+    private struct ScopeKey: Hashable {
+        let name: String
+        let version: String?
+
+        init(from scope: InstrumentationScopeInfo?) {
+            self.name = scope?.name ?? ""
+            self.version = scope?.version
+        }
+    }
+
+
     // MARK: - Public Methods
 
     /// Converts a list of MetricData to OTLP ResourceMetrics.
@@ -46,30 +61,45 @@ enum MetricDataAdapter {
     /// - Parameter metrics: The list of MetricData to convert.
     /// - Returns: A list of OTLPResourceMetrics (non-empty).
     static func toResourceMetrics(_ metrics: [MetricData]) -> [OTLPResourceMetrics] {
-        // Group metrics by resource
-        let grouped = groupByResource(metrics)
+        // Group metrics by resource first
+        let groupedByResource = groupByResource(metrics)
 
         var resourceMetricsList: [OTLPResourceMetrics] = []
 
-        for (resource, metricDataList) in grouped {
-            // Convert each MetricData to OTLPMetric
-            let otlpMetrics = metricDataList.compactMap { convertMetric($0) }
+        for (resource, metricDataList) in groupedByResource {
+            // Group metrics within this resource by scope
+            let groupedByScope = groupByScope(metricDataList)
+
+            var scopeMetricsList: [OTLPScopeMetrics] = []
+
+            for (scopeKey, scopedMetrics) in groupedByScope {
+                // Convert each MetricData to OTLPMetric
+                let otlpMetrics = scopedMetrics.compactMap { convertMetric($0) }
+
+                // Skip empty scope metrics (filter empty envelopes per OTLP spec)
+                guard !otlpMetrics.isEmpty else {
+                    continue
+                }
+
+                // Get the scope info from the first metric in this scope group
+                let scopeInfo = scopedMetrics.first?.instrumentationScopeInfo
+
+                let scopeMetrics = OTLPScopeMetrics(
+                    scope: convertInstrumentationScope(scopeInfo),
+                    metrics: otlpMetrics,
+                    schemaUrl: scopeInfo?.schemaUrl
+                )
+                scopeMetricsList.append(scopeMetrics)
+            }
 
             // Skip empty resource metrics (filter empty envelopes per OTLP spec)
-            guard !otlpMetrics.isEmpty else {
+            guard !scopeMetricsList.isEmpty else {
                 continue
             }
 
-            // Create a single scope metrics container
-            let scopeMetrics = OTLPScopeMetrics(
-                scope: convertInstrumentationScope(metricDataList.first?.instrumentationScopeInfo),
-                metrics: otlpMetrics,
-                schemaUrl: metricDataList.first?.instrumentationScopeInfo.schemaUrl
-            )
-
             let resourceMetrics = OTLPResourceMetrics(
                 resource: convertResource(resource),
-                scopeMetrics: [scopeMetrics],
+                scopeMetrics: scopeMetricsList,
                 schemaUrl: nil  // Resource.schemaUrl not available in current SDK version
             )
             resourceMetricsList.append(resourceMetrics)
@@ -87,6 +117,18 @@ enum MetricDataAdapter {
 
         for metric in metrics {
             result[metric.resource, default: []].append(metric)
+        }
+
+        return result
+    }
+
+    /// Groups metrics by instrumentation scope within a resource.
+    private static func groupByScope(_ metrics: [MetricData]) -> [ScopeKey: [MetricData]] {
+        var result: [ScopeKey: [MetricData]] = [:]
+
+        for metric in metrics {
+            let key = ScopeKey(from: metric.instrumentationScopeInfo)
+            result[key, default: []].append(metric)
         }
 
         return result
