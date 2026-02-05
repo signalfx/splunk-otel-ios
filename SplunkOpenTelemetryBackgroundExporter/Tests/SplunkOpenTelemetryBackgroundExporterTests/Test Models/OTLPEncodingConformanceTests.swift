@@ -79,6 +79,15 @@ struct OTLPEncodingConformanceTests {
     }
 
     @Test
+    func int64EncodesAsDecimalString() throws {
+        let value = OTLPInt64(-123456789)
+        let json = try JSONEncoder().encode(value)
+        let string = try #require(String(data: json, encoding: .utf8))
+
+        #expect(string == "\"-123456789\"")
+    }
+
+    @Test
     func bytesValueEncodesAsBase64() throws {
         let data = try #require("Hello".data(using: .utf8))
         let anyValue = OTLPAnyValue.bytesValue(data)
