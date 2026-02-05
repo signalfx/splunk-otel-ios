@@ -138,13 +138,19 @@ extension SplunkRum {
         // We need to do this because we need to read `sessionId` from the agent continuously.
         networkModule?.sharedState = sharedState
 
-        // We need the endpoint url to manage trace exclusion logic
+        updateNetworkExcludedEndpoints(for: agentConfiguration.endpoint)
+    }
+
+    /// Updates network instrumentation exclusions for the current endpoints.
+    func updateNetworkExcludedEndpoints(for endpoint: EndpointConfiguration?) {
+        let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
+
         var excludedEndpoints: [URL] = []
-        if let traceUrl = agentConfiguration.endpoint?.traceEndpoint {
+        if let traceUrl = endpoint?.traceEndpoint {
             excludedEndpoints.append(traceUrl)
         }
 
-        if let sessionReplayUrl = agentConfiguration.endpoint?.sessionReplayEndpoint {
+        if let sessionReplayUrl = endpoint?.sessionReplayEndpoint {
             excludedEndpoints.append(sessionReplayUrl)
         }
 

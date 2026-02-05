@@ -104,6 +104,9 @@ extension RuntimeState {
         // Update the configuration
         owner.agentConfigurationHandler.configuration.endpoint = endpoint
 
+        // Update network exclusions to avoid self-instrumentation
+        owner.updateNetworkExcludedEndpoints(for: endpoint)
+
         // Update the event manager
         try (owner.eventManager as? DefaultEventManager)?.setEndpoint(endpoint)
 
