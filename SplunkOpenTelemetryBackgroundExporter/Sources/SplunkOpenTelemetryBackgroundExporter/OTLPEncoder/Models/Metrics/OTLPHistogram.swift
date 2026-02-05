@@ -40,15 +40,4 @@ struct OTLPHistogram: Encodable {
     let aggregationTemporality: Int
 
 
-    // MARK: - Initialization
-
-    /// Creates a new histogram metric.
-    ///
-    /// - Parameters:
-    ///   - dataPoints: The data points for this histogram.
-    ///   - aggregationTemporality: 1=DELTA, 2=CUMULATIVE.
-    init(dataPoints: [OTLPHistogramDataPoint], aggregationTemporality: Int) {
-        self.dataPoints = dataPoints
-        self.aggregationTemporality = aggregationTemporality
-    }
 }

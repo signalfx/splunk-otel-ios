@@ -34,6 +34,7 @@ struct OTLPNumberDataPoint: Encodable {
     let attributes: [OTLPKeyValue]?
 
     /// Start timestamp (nanoseconds since Unix epoch as decimal string).
+    ///
     /// Optional for Gauge metrics.
     let startTimeUnixNano: OTLPUInt64?
 

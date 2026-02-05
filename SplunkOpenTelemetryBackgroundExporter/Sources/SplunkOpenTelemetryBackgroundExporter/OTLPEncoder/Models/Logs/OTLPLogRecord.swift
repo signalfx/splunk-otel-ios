@@ -40,21 +40,26 @@ struct OTLPLogRecord: Encodable {
     // MARK: - Properties
 
     /// Time when the event occurred (nanoseconds since Unix epoch as decimal string).
+    ///
     /// May be nil if the timestamp is unknown.
     let timeUnixNano: OTLPUInt64?
 
     /// Time when the event was observed (nanoseconds since Unix epoch as decimal string).
+    ///
     /// This is typically when the log was collected by the SDK.
     let observedTimeUnixNano: OTLPUInt64
 
     /// Severity number as an integer enum (1-24).
+    ///
     /// Maps to TRACE=1-4, DEBUG=5-8, INFO=9-12, WARN=13-16, ERROR=17-20, FATAL=21-24.
     let severityNumber: Int?
 
     /// Human-readable severity text (e.g., "INFO", "ERROR").
     let severityText: String?
 
-    /// The log message body. Can be any type including bytesValue for binary data.
+    /// The log message body.
+    ///
+    /// Can be any type including bytesValue for binary data.
     let body: OTLPAnyValue?
 
     /// Key-value pairs of log record attributes.

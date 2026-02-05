@@ -37,6 +37,7 @@ enum LogRecordAdapter {
     // MARK: - Private Types
 
     /// Key for grouping log records by scope within a resource.
+    ///
     /// Uses scope name and version as the grouping key.
     private struct ScopeKey: Hashable {
         let name: String

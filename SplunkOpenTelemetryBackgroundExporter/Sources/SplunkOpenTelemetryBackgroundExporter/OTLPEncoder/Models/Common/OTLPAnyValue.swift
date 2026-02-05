@@ -129,16 +129,6 @@ struct OTLPArrayValue: Encodable {
 
     /// The array of values.
     let values: [OTLPAnyValue]
-
-
-    // MARK: - Initialization
-
-    /// Creates a new array value.
-    ///
-    /// - Parameter values: The array of AnyValue items.
-    init(values: [OTLPAnyValue]) {
-        self.values = values
-    }
 }
 
 
@@ -155,14 +145,4 @@ struct OTLPKeyValueList: Encodable {
 
     /// The list of key-value pairs.
     let values: [OTLPKeyValue]
-
-
-    // MARK: - Initialization
-
-    /// Creates a new key-value list.
-    ///
-    /// - Parameter values: The list of key-value pairs.
-    init(values: [OTLPKeyValue]) {
-        self.values = values
-    }
 }

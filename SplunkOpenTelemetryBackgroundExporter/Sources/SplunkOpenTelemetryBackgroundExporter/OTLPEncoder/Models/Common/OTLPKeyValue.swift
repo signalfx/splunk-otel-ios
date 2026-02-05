@@ -40,15 +40,4 @@ struct OTLPKeyValue: Encodable {
     let value: OTLPAnyValue
 
 
-    // MARK: - Initialization
-
-    /// Creates a new key-value pair.
-    ///
-    /// - Parameters:
-    ///   - key: The attribute key/name.
-    ///   - value: The attribute value.
-    init(key: String, value: OTLPAnyValue) {
-        self.key = key
-        self.value = value
-    }
 }

@@ -32,16 +32,7 @@ struct OTLPExportLogsServiceRequest: Encodable {
     // MARK: - Properties
 
     /// The list of ResourceLogs to export.
+    ///
     /// Each ResourceLogs contains log records from a single resource.
     let resourceLogs: [OTLPResourceLogs]
-
-
-    // MARK: - Initialization
-
-    /// Creates a new logs export request.
-    ///
-    /// - Parameter resourceLogs: The list of ResourceLogs to export.
-    init(resourceLogs: [OTLPResourceLogs]) {
-        self.resourceLogs = resourceLogs
-    }
 }

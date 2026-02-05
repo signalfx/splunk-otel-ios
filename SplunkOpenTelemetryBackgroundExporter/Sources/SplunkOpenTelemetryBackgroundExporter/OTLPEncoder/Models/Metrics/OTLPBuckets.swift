@@ -37,15 +37,4 @@ struct OTLPBuckets: Encodable {
     let bucketCounts: [OTLPUInt64]
 
 
-    // MARK: - Initialization
-
-    /// Creates new buckets.
-    ///
-    /// - Parameters:
-    ///   - offset: The offset of the first bucket.
-    ///   - bucketCounts: The count in each bucket.
-    init(offset: Int32, bucketCounts: [OTLPUInt64]) {
-        self.offset = offset
-        self.bucketCounts = bucketCounts
-    }
 }

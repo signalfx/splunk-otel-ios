@@ -35,12 +35,4 @@ struct OTLPGauge: Encodable {
     let dataPoints: [OTLPNumberDataPoint]
 
 
-    // MARK: - Initialization
-
-    /// Creates a new gauge metric.
-    ///
-    /// - Parameter dataPoints: The data points for this gauge.
-    init(dataPoints: [OTLPNumberDataPoint]) {
-        self.dataPoints = dataPoints
-    }
 }

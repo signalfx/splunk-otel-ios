@@ -32,16 +32,7 @@ struct OTLPExportTraceServiceRequest: Encodable {
     // MARK: - Properties
 
     /// The list of ResourceSpans to export.
+    ///
     /// Each ResourceSpans contains spans from a single resource.
     let resourceSpans: [OTLPResourceSpans]
-
-
-    // MARK: - Initialization
-
-    /// Creates a new trace export request.
-    ///
-    /// - Parameter resourceSpans: The list of ResourceSpans to export.
-    init(resourceSpans: [OTLPResourceSpans]) {
-        self.resourceSpans = resourceSpans
-    }
 }

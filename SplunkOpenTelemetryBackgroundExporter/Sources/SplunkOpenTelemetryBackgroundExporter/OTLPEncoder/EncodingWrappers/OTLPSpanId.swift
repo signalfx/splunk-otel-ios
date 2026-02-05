@@ -37,6 +37,7 @@ struct OTLPSpanId: Encodable {
     // MARK: - Properties
 
     /// The lowercase hex string representation of the span ID.
+    ///
     /// Always 16 characters long.
     let hexString: String
 

@@ -37,6 +37,7 @@ enum SplunkLogRecordAdapterJSON {
     // MARK: - Private Types
 
     /// Key for grouping log records by scope within a resource.
+    ///
     /// Uses scope name and version as the grouping key.
     private struct ScopeKey: Hashable {
         let name: String
@@ -185,6 +186,7 @@ enum SplunkLogRecordAdapterJSON {
     }
 
     /// Converts attributes dictionary to array of OTLPKeyValue.
+    ///
     /// This version handles standard AttributeValue from Resource.
     private static func convertAttributes(_ attributes: [String: AttributeValue]) -> [OTLPKeyValue]? {
         guard !attributes.isEmpty else {
@@ -196,6 +198,7 @@ enum SplunkLogRecordAdapterJSON {
     }
 
     /// Converts SplunkAttributeValue attributes dictionary to array of OTLPKeyValue.
+    ///
     /// This version handles SplunkAttributeValue which includes binary data support.
     private static func convertSplunkAttributes(_ attributes: [String: SplunkAttributeValue]) -> [OTLPKeyValue]? {
         guard !attributes.isEmpty else {

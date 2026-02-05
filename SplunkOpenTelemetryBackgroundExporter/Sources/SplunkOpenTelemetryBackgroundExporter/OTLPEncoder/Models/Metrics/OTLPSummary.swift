@@ -35,12 +35,4 @@ struct OTLPSummary: Encodable {
     let dataPoints: [OTLPSummaryDataPoint]
 
 
-    // MARK: - Initialization
-
-    /// Creates a new summary metric.
-    ///
-    /// - Parameter dataPoints: The data points for this summary.
-    init(dataPoints: [OTLPSummaryDataPoint]) {
-        self.dataPoints = dataPoints
-    }
 }

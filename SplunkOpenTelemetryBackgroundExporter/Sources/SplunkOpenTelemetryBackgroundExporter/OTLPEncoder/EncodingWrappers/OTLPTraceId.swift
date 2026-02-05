@@ -37,6 +37,7 @@ struct OTLPTraceId: Encodable {
     // MARK: - Properties
 
     /// The lowercase hex string representation of the trace ID.
+    ///
     /// Always 32 characters long.
     let hexString: String
 

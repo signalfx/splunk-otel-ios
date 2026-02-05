@@ -52,21 +52,4 @@ struct OTLPSum: Encodable {
     let isMonotonic: Bool
 
 
-    // MARK: - Initialization
-
-    /// Creates a new sum metric.
-    ///
-    /// - Parameters:
-    ///   - dataPoints: The data points for this sum.
-    ///   - aggregationTemporality: 1=DELTA, 2=CUMULATIVE.
-    ///   - isMonotonic: Whether the sum is monotonic.
-    init(
-        dataPoints: [OTLPNumberDataPoint],
-        aggregationTemporality: Int,
-        isMonotonic: Bool
-    ) {
-        self.dataPoints = dataPoints
-        self.aggregationTemporality = aggregationTemporality
-        self.isMonotonic = isMonotonic
-    }
 }

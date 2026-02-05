@@ -32,16 +32,7 @@ struct OTLPExportMetricsServiceRequest: Encodable {
     // MARK: - Properties
 
     /// The list of ResourceMetrics to export.
+    ///
     /// Each ResourceMetrics contains metrics from a single resource.
     let resourceMetrics: [OTLPResourceMetrics]
-
-
-    // MARK: - Initialization
-
-    /// Creates a new metrics export request.
-    ///
-    /// - Parameter resourceMetrics: The list of ResourceMetrics to export.
-    init(resourceMetrics: [OTLPResourceMetrics]) {
-        self.resourceMetrics = resourceMetrics
-    }
 }

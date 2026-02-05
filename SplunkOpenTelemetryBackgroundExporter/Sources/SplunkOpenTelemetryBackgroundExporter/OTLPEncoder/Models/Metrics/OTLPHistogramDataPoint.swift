@@ -46,6 +46,7 @@ struct OTLPHistogramDataPoint: Encodable {
     let sum: Double?
 
     /// The count of values in each bucket.
+    ///
     /// Length should be explicitBounds.length + 1.
     let bucketCounts: [OTLPUInt64]
 

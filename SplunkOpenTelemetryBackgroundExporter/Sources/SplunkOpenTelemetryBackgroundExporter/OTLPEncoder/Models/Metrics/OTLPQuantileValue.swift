@@ -37,15 +37,4 @@ struct OTLPQuantileValue: Encodable {
     let value: Double
 
 
-    // MARK: - Initialization
-
-    /// Creates a new quantile value.
-    ///
-    /// - Parameters:
-    ///   - quantile: The quantile (0.0 to 1.0).
-    ///   - value: The value at this quantile.
-    init(quantile: Double, value: Double) {
-        self.quantile = quantile
-        self.value = value
-    }
 }

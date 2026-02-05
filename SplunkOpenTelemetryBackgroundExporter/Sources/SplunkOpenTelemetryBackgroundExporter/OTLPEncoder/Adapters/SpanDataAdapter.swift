@@ -34,6 +34,7 @@ enum SpanDataAdapter {
     // MARK: - Private Types
 
     /// Key for grouping spans by scope within a resource.
+    ///
     /// Uses scope name and version as the grouping key.
     private struct ScopeKey: Hashable {
         let name: String

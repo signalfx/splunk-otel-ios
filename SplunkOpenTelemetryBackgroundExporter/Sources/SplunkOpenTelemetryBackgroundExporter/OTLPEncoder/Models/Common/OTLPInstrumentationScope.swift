@@ -44,6 +44,7 @@ struct OTLPInstrumentationScope: Encodable {
     let attributes: [OTLPKeyValue]?
 
     /// The number of attributes that were dropped due to limits.
+    ///
     /// Only encoded if greater than 0.
     let droppedAttributesCount: UInt32?
 
