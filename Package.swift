@@ -539,15 +539,7 @@ func generateBinaryWrapperTargets() -> [Target] {
 ///
 /// This is the main switch for enabling linter and formaters plugins.
 func shouldUseDevelopmentPlugins() -> Bool {
-    // Check the ENV first
-    if let envValue = ProcessInfo.processInfo.environment["USE_DEVELOPMENT_PLUGINS"],
-        let boolValue = Bool(envValue)
-    {
-        return boolValue
-    }
-
-    // Default to *not use any plugins*
-    return false
+    true
 }
 
 /// List of used plugin dependencies.

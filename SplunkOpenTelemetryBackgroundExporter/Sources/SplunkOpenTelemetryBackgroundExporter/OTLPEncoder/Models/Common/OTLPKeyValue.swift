@@ -38,6 +38,4 @@ struct OTLPKeyValue: Encodable {
 
     /// The attribute value.
     let value: OTLPAnyValue
-
-
 }

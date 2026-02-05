@@ -35,6 +35,4 @@ struct OTLPQuantileValue: Encodable {
 
     /// The value at this quantile.
     let value: Double
-
-
 }

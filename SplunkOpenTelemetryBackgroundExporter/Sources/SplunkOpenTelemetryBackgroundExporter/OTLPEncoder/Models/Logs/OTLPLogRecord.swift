@@ -149,23 +149,23 @@ struct OTLPLogRecord: Encodable {
         try container.encode(observedTimeUnixNano, forKey: .observedTimeUnixNano)
 
         // Optional fields
-        if let timeUnixNano = timeUnixNano {
+        if let timeUnixNano {
             try container.encode(timeUnixNano, forKey: .timeUnixNano)
         }
 
-        if let severityNumber = severityNumber {
+        if let severityNumber {
             try container.encode(severityNumber, forKey: .severityNumber)
         }
 
-        if let severityText = severityText, !severityText.isEmpty {
+        if let severityText, !severityText.isEmpty {
             try container.encode(severityText, forKey: .severityText)
         }
 
-        if let body = body {
+        if let body {
             try container.encode(body, forKey: .body)
         }
 
-        if let attributes = attributes, !attributes.isEmpty {
+        if let attributes, !attributes.isEmpty {
             try container.encode(attributes, forKey: .attributes)
         }
 
@@ -175,15 +175,15 @@ struct OTLPLogRecord: Encodable {
 
         // Encode flags when present regardless of value (including zero)
         // Zero flags means "not sampled" in W3C trace context - valid semantic value
-        if let flags = flags {
+        if let flags {
             try container.encode(flags, forKey: .flags)
         }
 
-        if let traceId = traceId {
+        if let traceId {
             try container.encode(traceId, forKey: .traceId)
         }
 
-        if let spanId = spanId {
+        if let spanId {
             try container.encode(spanId, forKey: .spanId)
         }
     }

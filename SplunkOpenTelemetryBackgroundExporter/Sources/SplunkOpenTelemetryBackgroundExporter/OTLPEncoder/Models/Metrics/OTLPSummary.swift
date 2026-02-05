@@ -33,6 +33,4 @@ struct OTLPSummary: Encodable {
 
     /// The data points for this summary metric.
     let dataPoints: [OTLPSummaryDataPoint]
-
-
 }

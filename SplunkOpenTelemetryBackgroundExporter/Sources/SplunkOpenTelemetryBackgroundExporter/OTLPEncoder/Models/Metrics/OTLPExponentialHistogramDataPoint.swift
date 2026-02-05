@@ -155,7 +155,7 @@ struct OTLPExponentialHistogramDataPoint: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        if let attributes = attributes, !attributes.isEmpty {
+        if let attributes, !attributes.isEmpty {
             try container.encode(attributes, forKey: .attributes)
         }
 
@@ -163,7 +163,7 @@ struct OTLPExponentialHistogramDataPoint: Encodable {
         try container.encode(timeUnixNano, forKey: .timeUnixNano)
         try container.encode(count, forKey: .count)
 
-        if let sum = sum {
+        if let sum {
             try container.encode(sum, forKey: .sum)
         }
 
@@ -173,23 +173,23 @@ struct OTLPExponentialHistogramDataPoint: Encodable {
         try container.encode(negative, forKey: .negative)
 
         // Encode flags when present regardless of value (including zero)
-        if let flags = flags {
+        if let flags {
             try container.encode(flags, forKey: .flags)
         }
 
-        if let exemplars = exemplars, !exemplars.isEmpty {
+        if let exemplars, !exemplars.isEmpty {
             try container.encode(exemplars, forKey: .exemplars)
         }
 
-        if let min = min {
+        if let min {
             try container.encode(min, forKey: .min)
         }
 
-        if let max = max {
+        if let max {
             try container.encode(max, forKey: .max)
         }
 
-        if let zeroThreshold = zeroThreshold {
+        if let zeroThreshold {
             try container.encode(zeroThreshold, forKey: .zeroThreshold)
         }
     }

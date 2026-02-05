@@ -50,6 +50,4 @@ struct OTLPSum: Encodable {
 
     /// Whether the sum is monotonic (always increasing, like a counter).
     let isMonotonic: Bool
-
-
 }

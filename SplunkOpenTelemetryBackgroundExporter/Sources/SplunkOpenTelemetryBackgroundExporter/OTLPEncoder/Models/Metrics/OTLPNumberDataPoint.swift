@@ -107,30 +107,30 @@ struct OTLPNumberDataPoint: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        if let attributes = attributes, !attributes.isEmpty {
+        if let attributes, !attributes.isEmpty {
             try container.encode(attributes, forKey: .attributes)
         }
 
-        if let startTimeUnixNano = startTimeUnixNano {
+        if let startTimeUnixNano {
             try container.encode(startTimeUnixNano, forKey: .startTimeUnixNano)
         }
 
         try container.encode(timeUnixNano, forKey: .timeUnixNano)
 
         // Oneof value - encode only one
-        if let asDouble = asDouble {
+        if let asDouble {
             try container.encode(asDouble, forKey: .asDouble)
         }
-        else if let asInt = asInt {
+        else if let asInt {
             try container.encode(asInt, forKey: .asInt)
         }
 
-        if let exemplars = exemplars, !exemplars.isEmpty {
+        if let exemplars, !exemplars.isEmpty {
             try container.encode(exemplars, forKey: .exemplars)
         }
 
         // Encode flags when present regardless of value (including zero)
-        if let flags = flags {
+        if let flags {
             try container.encode(flags, forKey: .flags)
         }
     }

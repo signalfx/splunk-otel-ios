@@ -33,6 +33,4 @@ struct OTLPGauge: Encodable {
 
     /// The data points for this gauge metric.
     let dataPoints: [OTLPNumberDataPoint]
-
-
 }

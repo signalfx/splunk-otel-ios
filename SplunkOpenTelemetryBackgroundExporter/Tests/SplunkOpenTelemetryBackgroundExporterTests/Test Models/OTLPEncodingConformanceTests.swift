@@ -53,6 +53,7 @@ struct OTLPEncodingConformanceTests {
         let hex = string.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
 
         #expect(hex.count == 32)
+        // swiftlint:disable:next prefer_key_path
         #expect(hex.allSatisfy { $0.isHexDigit })
         #expect(hex == hex.lowercased())
     }
@@ -65,6 +66,7 @@ struct OTLPEncodingConformanceTests {
         let hex = string.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
 
         #expect(hex.count == 16)
+        // swiftlint:disable:next prefer_key_path
         #expect(hex.allSatisfy { $0.isHexDigit })
         #expect(hex == hex.lowercased())
     }
@@ -89,7 +91,7 @@ struct OTLPEncodingConformanceTests {
 
     @Test
     func bytesValueEncodesAsBase64() throws {
-        let data = try #require("Hello".data(using: .utf8))
+        let data = Data("Hello".utf8)
         let anyValue = OTLPAnyValue.bytesValue(data)
         let json = try JSONEncoder().encode(anyValue)
         let dict = try decodeJSON(json)

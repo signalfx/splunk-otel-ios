@@ -78,13 +78,13 @@ struct OTLPScopeMetrics: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        if let scope = scope {
+        if let scope {
             try container.encode(scope, forKey: .scope)
         }
 
         try container.encode(metrics, forKey: .metrics)
 
-        if let schemaUrl = schemaUrl, !schemaUrl.isEmpty {
+        if let schemaUrl, !schemaUrl.isEmpty {
             try container.encode(schemaUrl, forKey: .schemaUrl)
         }
     }

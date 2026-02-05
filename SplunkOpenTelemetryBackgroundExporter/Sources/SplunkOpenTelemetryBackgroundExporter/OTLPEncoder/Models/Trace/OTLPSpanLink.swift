@@ -102,11 +102,11 @@ struct OTLPSpanLink: Encodable {
         try container.encode(traceId, forKey: .traceId)
         try container.encode(spanId, forKey: .spanId)
 
-        if let traceState = traceState, !traceState.isEmpty {
+        if let traceState, !traceState.isEmpty {
             try container.encode(traceState, forKey: .traceState)
         }
 
-        if let attributes = attributes, !attributes.isEmpty {
+        if let attributes, !attributes.isEmpty {
             try container.encode(attributes, forKey: .attributes)
         }
 
@@ -116,7 +116,7 @@ struct OTLPSpanLink: Encodable {
 
         // Encode flags when present regardless of value (including zero)
         // Zero flags means "not sampled" in W3C trace context - valid semantic value
-        if let flags = flags {
+        if let flags {
             try container.encode(flags, forKey: .flags)
         }
     }

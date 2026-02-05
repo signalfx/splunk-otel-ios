@@ -136,7 +136,7 @@ struct OTLPHistogramDataPoint: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        if let attributes = attributes, !attributes.isEmpty {
+        if let attributes, !attributes.isEmpty {
             try container.encode(attributes, forKey: .attributes)
         }
 
@@ -144,27 +144,27 @@ struct OTLPHistogramDataPoint: Encodable {
         try container.encode(timeUnixNano, forKey: .timeUnixNano)
         try container.encode(count, forKey: .count)
 
-        if let sum = sum {
+        if let sum {
             try container.encode(sum, forKey: .sum)
         }
 
         try container.encode(bucketCounts, forKey: .bucketCounts)
         try container.encode(explicitBounds, forKey: .explicitBounds)
 
-        if let exemplars = exemplars, !exemplars.isEmpty {
+        if let exemplars, !exemplars.isEmpty {
             try container.encode(exemplars, forKey: .exemplars)
         }
 
         // Encode flags when present regardless of value (including zero)
-        if let flags = flags {
+        if let flags {
             try container.encode(flags, forKey: .flags)
         }
 
-        if let min = min {
+        if let min {
             try container.encode(min, forKey: .min)
         }
 
-        if let max = max {
+        if let max {
             try container.encode(max, forKey: .max)
         }
     }

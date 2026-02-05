@@ -38,6 +38,4 @@ struct OTLPExponentialHistogram: Encodable {
     /// 1 = DELTA (change since last report)
     /// 2 = CUMULATIVE (total since start)
     let aggregationTemporality: Int
-
-
 }

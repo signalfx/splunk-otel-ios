@@ -35,6 +35,4 @@ struct OTLPBuckets: Encodable {
 
     /// The count in each bucket.
     let bucketCounts: [OTLPUInt64]
-
-
 }

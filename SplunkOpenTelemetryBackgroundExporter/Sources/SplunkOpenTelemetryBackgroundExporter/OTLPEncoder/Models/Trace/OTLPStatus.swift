@@ -83,7 +83,7 @@ struct OTLPStatus: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        if let message = message, !message.isEmpty {
+        if let message, !message.isEmpty {
             try container.encode(message, forKey: .message)
         }
 

@@ -184,15 +184,15 @@ struct OTLPSpan: Encodable {
         try container.encode(endTimeUnixNano, forKey: .endTimeUnixNano)
 
         // Optional fields
-        if let traceState = traceState, !traceState.isEmpty {
+        if let traceState, !traceState.isEmpty {
             try container.encode(traceState, forKey: .traceState)
         }
 
-        if let parentSpanId = parentSpanId {
+        if let parentSpanId {
             try container.encode(parentSpanId, forKey: .parentSpanId)
         }
 
-        if let attributes = attributes, !attributes.isEmpty {
+        if let attributes, !attributes.isEmpty {
             try container.encode(attributes, forKey: .attributes)
         }
 
@@ -200,7 +200,7 @@ struct OTLPSpan: Encodable {
             try container.encode(count, forKey: .droppedAttributesCount)
         }
 
-        if let events = events, !events.isEmpty {
+        if let events, !events.isEmpty {
             try container.encode(events, forKey: .events)
         }
 
@@ -208,7 +208,7 @@ struct OTLPSpan: Encodable {
             try container.encode(count, forKey: .droppedEventsCount)
         }
 
-        if let links = links, !links.isEmpty {
+        if let links, !links.isEmpty {
             try container.encode(links, forKey: .links)
         }
 
@@ -216,13 +216,13 @@ struct OTLPSpan: Encodable {
             try container.encode(count, forKey: .droppedLinksCount)
         }
 
-        if let status = status {
+        if let status {
             try container.encode(status, forKey: .status)
         }
 
         // Encode flags when present regardless of value (including zero)
         // Zero flags means "not sampled" in W3C trace context - valid semantic value
-        if let flags = flags {
+        if let flags {
             try container.encode(flags, forKey: .flags)
         }
     }

@@ -173,7 +173,7 @@ enum SplunkLogRecordAdapterJSON {
 
     /// Converts InstrumentationScopeInfo to OTLPInstrumentationScope.
     private static func convertInstrumentationScope(_ scopeInfo: InstrumentationScopeInfo?) -> OTLPInstrumentationScope? {
-        guard let scopeInfo = scopeInfo else {
+        guard let scopeInfo else {
             return nil
         }
         let attrs = scopeInfo.attributes ?? [:]
@@ -212,31 +212,42 @@ enum SplunkLogRecordAdapterJSON {
     /// Converts a standard AttributeValue to OTLPAnyValue.
     private static func convertAttributeValue(_ value: AttributeValue) -> OTLPAnyValue {
         switch value {
-        case .string(let v):
-            return .stringValue(v)
-        case .bool(let v):
-            return .boolValue(v)
-        case .int(let v):
-            return .intValue(Int64(v))
-        case .double(let v):
-            return .doubleValue(v)
+        case .string(let stringValue):
+            return .stringValue(stringValue)
+
+        case .bool(let boolValue):
+            return .boolValue(boolValue)
+
+        case .int(let intValue):
+            return .intValue(Int64(intValue))
+
+        case .double(let doubleValue):
+            return .doubleValue(doubleValue)
+
         case .stringArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .stringValue($0) }))
+
         case .boolArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .boolValue($0) }))
+
         case .intArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .intValue(Int64($0)) }))
+
         case .doubleArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .doubleValue($0) }))
+
         case .set(let set):
             let kvList = set.labels.map { key, attrValue in
                 OTLPKeyValue(key: key, value: convertAttributeValue(attrValue))
             }
             return .kvlistValue(OTLPKeyValueList(values: kvList))
+
         case .array(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.values.map { convertAttributeValue($0) }))
         }
     }
+
+    // swiftlint:disable cyclomatic_complexity
 
     /// Converts a SplunkAttributeValue to OTLPAnyValue.
     ///
@@ -244,30 +255,40 @@ enum SplunkLogRecordAdapterJSON {
     /// encoded as base64 in the JSON output via OTLPAnyValue.bytesValue.
     private static func convertSplunkAttributeValue(_ value: SplunkAttributeValue) -> OTLPAnyValue {
         switch value {
-        case .string(let v):
-            return .stringValue(v)
-        case .bool(let v):
-            return .boolValue(v)
-        case .int(let v):
-            return .intValue(Int64(v))
-        case .double(let v):
-            return .doubleValue(v)
-        case .data(let v):
+        case .string(let stringValue):
+            return .stringValue(stringValue)
+
+        case .bool(let boolValue):
+            return .boolValue(boolValue)
+
+        case .int(let intValue):
+            return .intValue(Int64(intValue))
+
+        case .double(let doubleValue):
+            return .doubleValue(doubleValue)
+
+        case .data(let dataValue):
             // Binary data - will be encoded as base64 in JSON
-            return .bytesValue(v)
+            return .bytesValue(dataValue)
+
         case .stringArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .stringValue($0) }))
+
         case .boolArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .boolValue($0) }))
+
         case .intArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .intValue(Int64($0)) }))
+
         case .doubleArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .doubleValue($0) }))
+
         case .set(let set):
             let kvList = set.labels.map { key, attrValue in
                 OTLPKeyValue(key: key, value: convertSplunkAttributeValue(SplunkAttributeValue(otelAttributeValue: attrValue)))
             }
             return .kvlistValue(OTLPKeyValueList(values: kvList))
+
         case .array(let arr):
             let values = arr.values.map { attrValue in
                 convertSplunkAttributeValue(SplunkAttributeValue(otelAttributeValue: attrValue))
@@ -275,4 +296,5 @@ enum SplunkLogRecordAdapterJSON {
             return .arrayValue(OTLPArrayValue(values: values))
         }
     }
+    // swiftlint:enable cyclomatic_complexity
 }

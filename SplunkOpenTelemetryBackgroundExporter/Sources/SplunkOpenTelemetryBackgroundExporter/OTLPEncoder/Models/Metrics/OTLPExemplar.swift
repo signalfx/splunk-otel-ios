@@ -108,30 +108,30 @@ struct OTLPExemplar: Encodable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
-        if let filteredAttributes = filteredAttributes, !filteredAttributes.isEmpty {
+        if let filteredAttributes, !filteredAttributes.isEmpty {
             try container.encode(filteredAttributes, forKey: .filteredAttributes)
         }
 
         try container.encode(timeUnixNano, forKey: .timeUnixNano)
 
         // Oneof value - encode only one
-        if let asDouble = asDouble {
+        if let asDouble {
             try container.encode(asDouble, forKey: .asDouble)
         }
-        else if let asInt = asInt {
+        else if let asInt {
             try container.encode(asInt, forKey: .asInt)
         }
 
-        if let spanId = spanId {
+        if let spanId {
             try container.encode(spanId, forKey: .spanId)
         }
 
-        if let traceId = traceId {
+        if let traceId {
             try container.encode(traceId, forKey: .traceId)
         }
 
         // Encode flags when present regardless of value (including zero)
-        if let flags = flags {
+        if let flags {
             try container.encode(flags, forKey: .flags)
         }
     }

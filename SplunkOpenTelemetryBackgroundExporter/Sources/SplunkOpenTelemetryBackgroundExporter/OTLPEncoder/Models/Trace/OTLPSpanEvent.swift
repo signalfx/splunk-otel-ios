@@ -88,7 +88,7 @@ struct OTLPSpanEvent: Encodable {
         try container.encode(timeUnixNano, forKey: .timeUnixNano)
         try container.encode(name, forKey: .name)
 
-        if let attributes = attributes, !attributes.isEmpty {
+        if let attributes, !attributes.isEmpty {
             try container.encode(attributes, forKey: .attributes)
         }
 

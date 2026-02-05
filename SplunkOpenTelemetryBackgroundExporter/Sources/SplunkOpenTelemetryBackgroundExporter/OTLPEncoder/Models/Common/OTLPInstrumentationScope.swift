@@ -92,11 +92,11 @@ struct OTLPInstrumentationScope: Encodable {
 
         try container.encode(name, forKey: .name)
 
-        if let version = version {
+        if let version {
             try container.encode(version, forKey: .version)
         }
 
-        if let attributes = attributes, !attributes.isEmpty {
+        if let attributes, !attributes.isEmpty {
             try container.encode(attributes, forKey: .attributes)
         }
 

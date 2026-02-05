@@ -167,7 +167,7 @@ enum MetricDataAdapter {
 
     /// Converts InstrumentationScopeInfo to OTLPInstrumentationScope.
     private static func convertInstrumentationScope(_ scopeInfo: InstrumentationScopeInfo?) -> OTLPInstrumentationScope? {
-        guard let scopeInfo = scopeInfo else {
+        guard let scopeInfo else {
             return nil
         }
         let attrs = scopeInfo.attributes ?? [:]
@@ -192,27 +192,36 @@ enum MetricDataAdapter {
     /// Converts an AttributeValue to OTLPAnyValue.
     private static func convertAttributeValue(_ value: AttributeValue) -> OTLPAnyValue {
         switch value {
-        case .string(let v):
-            return .stringValue(v)
-        case .bool(let v):
-            return .boolValue(v)
-        case .int(let v):
-            return .intValue(Int64(v))
-        case .double(let v):
-            return .doubleValue(v)
+        case .string(let stringValue):
+            return .stringValue(stringValue)
+
+        case .bool(let boolValue):
+            return .boolValue(boolValue)
+
+        case .int(let intValue):
+            return .intValue(Int64(intValue))
+
+        case .double(let doubleValue):
+            return .doubleValue(doubleValue)
+
         case .stringArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .stringValue($0) }))
+
         case .boolArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .boolValue($0) }))
+
         case .intArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .intValue(Int64($0)) }))
+
         case .doubleArray(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.map { .doubleValue($0) }))
+
         case .set(let set):
             let kvList = set.labels.map { key, attrValue in
                 OTLPKeyValue(key: key, value: convertAttributeValue(attrValue))
             }
             return .kvlistValue(OTLPKeyValueList(values: kvList))
+
         case .array(let arr):
             return .arrayValue(OTLPArrayValue(values: arr.values.map { convertAttributeValue($0) }))
         }
