@@ -22,6 +22,10 @@ import UIKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    // MARK: - Properties
+
+    private var sessionIdObserver: NSObjectProtocol?
+
     // MARK: - Application lifecycle
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -78,6 +82,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("Unable to start the Splunk agent, error: \(error)")
         }
 
+        // Listen for session ID changes
+        setupSessionIdChangeObserver()
+
         // Navigation Instrumentation
         SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
 
@@ -99,5 +106,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
         UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+
+
+    // MARK: - Session ID Change Notification Example
+
+    private func setupSessionIdChangeObserver() {
+        sessionIdObserver = NotificationCenter.default.addObserver(
+            forName: SplunkRum.Session.sessionIdDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { notification in
+            guard let userInfo = notification.userInfo else {
+                print("[Session ID Change] Notification received but no userInfo")
+                return
+            }
+
+            let newSessionId = userInfo[SplunkRum.Session.sessionIdUserInfoKey] as? String
+            let previousSessionId = userInfo[SplunkRum.Session.previousSessionIdUserInfoKey] as? String
+
+            print("========================================")
+            print("[Session ID Change] Notification received")
+            print("  New Session ID: \(newSessionId ?? "unknown")")
+            print("  Previous Session ID: \(previousSessionId ?? "none (initial session)")")
+            print("========================================")
+        }
     }
 }

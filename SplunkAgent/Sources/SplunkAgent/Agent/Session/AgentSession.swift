@@ -46,6 +46,19 @@ protocol AgentSession {
     /// The `object` of the notification is a string with the ID of the new session.
     /// There is no `userInfo` dictionary.
     static var sessionDidResetNotification: Notification.Name { get }
+
+    /// A notification that posts whenever a session ID is set or changed.
+    ///
+    /// The `userInfo` dictionary contains:
+    /// - `sessionIdUserInfoKey`: The new session ID (String)
+    /// - `previousSessionIdUserInfoKey`: The previous session ID (String), if any
+    static var sessionIdDidChangeNotification: Notification.Name { get }
+
+    /// Key for the new session ID in the `sessionIdDidChangeNotification` userInfo dictionary.
+    static var sessionIdUserInfoKey: String { get }
+
+    /// Key for the previous session ID in the `sessionIdDidChangeNotification` userInfo dictionary.
+    static var previousSessionIdUserInfoKey: String { get }
 }
 
 
@@ -63,5 +76,19 @@ extension AgentSession {
         Notification.Name(
             PackageIdentifier.default(named: "session-did-reset")
         )
+    }
+
+    static var sessionIdDidChangeNotification: Notification.Name {
+        Notification.Name(
+            PackageIdentifier.default(named: "session-id-did-change")
+        )
+    }
+
+    static var sessionIdUserInfoKey: String {
+        "sessionId"
+    }
+
+    static var previousSessionIdUserInfoKey: String {
+        "previousSessionId"
     }
 }

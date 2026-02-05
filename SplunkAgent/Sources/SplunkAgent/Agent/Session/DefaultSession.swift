@@ -167,11 +167,15 @@ class DefaultSession: AgentSession {
         // we need to delete the outdated data
         sessionsModel.purge()
 
+        // Track previous session ID if one exists
+        var previousSessionId: String?
+
         // Close previous session
         if var previousSession = sessionsModel.sessions.last,
             !(previousSession.closed ?? false)
         {
             previousSession.closed = true
+            previousSessionId = previousSession.id
 
             // Updates corresponding item in `SessionsModel`
             let previousSessionIndex = sessionsModel.sessions.firstIndex { item in
@@ -182,16 +186,17 @@ class DefaultSession: AgentSession {
                 sessionsModel.sessions[previousSessionIndex] = previousSession
             }
 
-            let previousSessionId = previousSession.id
-
             logger.log(level: .info) {
-                "Previous session (id \(previousSessionId)) has been closed."
+                "Previous session (id \(previousSessionId ?? "unknown")) has been closed."
             }
         }
 
         // Create a new session and save changes.
         let newSession = createSession()
         sessionsModel.sync()
+
+        // Post notification for session ID change
+        postSessionIdDidChangeNotification(newSessionId: newSession.id, previousSessionId: previousSessionId)
 
         return newSession
     }
@@ -233,10 +238,13 @@ class DefaultSession: AgentSession {
     }
 
     func rotateSession() {
+        // Capture the previous session ID before rotation
+        let previousSessionId = currentSessionId
+
         // We will announce our intention to close the session
         NotificationCenter.default.post(
             name: Self.sessionWillResetNotification,
-            object: currentSessionId
+            object: previousSessionId
         )
 
         // Performs the closing of the existing session and creates a fresh new one
@@ -257,6 +265,9 @@ class DefaultSession: AgentSession {
             name: Self.sessionDidResetNotification,
             object: currentSessionId
         )
+
+        // Post notification for session ID change
+        postSessionIdDidChangeNotification(newSessionId: currentSessionId, previousSessionId: previousSessionId)
     }
 
     func createSession() -> SessionItem {
@@ -318,5 +329,28 @@ class DefaultSession: AgentSession {
 
         let timeInBackground = Date().timeIntervalSince(enterBackground)
         return timeInBackground > sessionTimeout
+    }
+
+
+    // MARK: - Notifications
+
+    private func postSessionIdDidChangeNotification(newSessionId: String, previousSessionId: String?) {
+        var userInfo: [String: String] = [
+            Self.sessionIdUserInfoKey: newSessionId
+        ]
+
+        if let previousSessionId {
+            userInfo[Self.previousSessionIdUserInfoKey] = previousSessionId
+        }
+
+        NotificationCenter.default.post(
+            name: Self.sessionIdDidChangeNotification,
+            object: nil,
+            userInfo: userInfo
+        )
+
+        logger.log(level: .info) {
+            "Session ID changed: \(newSessionId) (previous: \(previousSessionId ?? "none"))"
+        }
     }
 }
