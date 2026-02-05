@@ -286,6 +286,16 @@ func generateMainTargets() -> [Target] {
             path: "SplunkOpenTelemetry/Sources",
             plugins: lintTargetPlugins()
         ),
+        .testTarget(
+            name: "SplunkOpenTelemetryTests",
+            dependencies: [
+                "SplunkOpenTelemetry",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core")
+            ],
+            path: "SplunkOpenTelemetry/Tests",
+            plugins: lintTargetPlugins()
+        ),
 
 
         // MARK: - Splunk OTel Background Exporter

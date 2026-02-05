@@ -25,7 +25,7 @@ import Testing
 struct OperationQueueConvenienceInitTests {
 
     @Test
-    func checkInit() throws {
+    func checkInit() {
         let queue = OperationQueue("testQueue", maxConcurrents: 987, qualityOfService: .utility)
 
         #expect(queue.name == "com.otel.sdk.testQueue")

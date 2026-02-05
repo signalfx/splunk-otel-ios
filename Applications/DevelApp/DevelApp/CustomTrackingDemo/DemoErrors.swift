@@ -34,14 +34,21 @@ struct DemoErrors {
     /// Swift Error with stack trace.
     static func swiftError() -> Error {
         struct SampleError: Error, LocalizedError {
-            var errorDescription: String? { "This is a Swift Error" }
+            var errorDescription: String? {
+                "This is a Swift Error"
+            }
         }
+
         return SampleError()
     }
 
     /// NSError with stack trace.
     static func nsError() -> NSError {
-        NSError(domain: "com.example.error", code: 42, userInfo: [NSLocalizedDescriptionKey: "This is an NSError"])
+        NSError(
+            domain: "com.example.error",
+            code: 42,
+            userInfo: [NSLocalizedDescriptionKey: "This is an NSError"]
+        )
     }
 
     static func nsErrorSubclass() -> NSError {

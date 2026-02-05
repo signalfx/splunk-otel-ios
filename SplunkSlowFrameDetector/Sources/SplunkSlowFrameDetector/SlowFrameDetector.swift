@@ -61,7 +61,9 @@ public final class SlowFrameDetector: NSObject {
     // MARK: - Test-only Properties
 
     #if DEBUG
-        var logicForTest: SlowFrameLogic { logic }
+        var logicForTest: SlowFrameLogic {
+            logic
+        }
 
         /// A test-only method to bypass the `AsyncStream` and process a frame directly and deterministically.
         func handleFrameForTest(timestamp: TimeInterval, duration: TimeInterval) async {

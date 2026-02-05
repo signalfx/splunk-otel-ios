@@ -53,7 +53,7 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
     ) {
         // Store resources object for Unit tests
         #if DEBUG
-            /// Build Resources
+            // Build Resources
             var resource = Resource()
             resource.merge(with: resources)
 

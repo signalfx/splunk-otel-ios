@@ -28,7 +28,7 @@ final class AppStartAPI10NoOpProxyTests: XCTestCase {
 
     // MARK: - Manual tracking
 
-    func testManualTracking() throws {
+    func testManualTracking() {
         XCTAssertNotNil(moduleProxy.track(didBecomeActive: Date(), didFinishLaunching: Date(), willEnterForeground: Date()))
         XCTAssertNotNil(moduleProxy.track(didBecomeActive: Date(), didFinishLaunching: nil, willEnterForeground: nil))
     }

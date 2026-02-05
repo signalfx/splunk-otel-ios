@@ -57,13 +57,34 @@ class MockSpanBuilder: SpanBuilder {
         self.spanName = spanName
     }
 
-    func setParent(_: Span) -> Self { self }
-    func setParent(_: SpanContext) -> Self { self }
-    func setNoParent() -> Self { self }
-    func addLink(spanContext _: SpanContext) -> Self { self }
-    func addLink(spanContext _: SpanContext, attributes _: [String: AttributeValue]) -> Self { self }
-    func setSpanKind(spanKind _: SpanKind) -> Self { self }
-    func setStartTime(time _: Date) -> Self { self }
+    func setParent(_: Span) -> Self {
+        self
+    }
+
+    func setParent(_: SpanContext) -> Self {
+        self
+    }
+
+    func setNoParent() -> Self {
+        self
+    }
+
+    func addLink(spanContext _: SpanContext) -> Self {
+        self
+    }
+
+    func addLink(spanContext _: SpanContext, attributes _: [String: AttributeValue]) -> Self {
+        self
+    }
+
+    func setSpanKind(spanKind _: SpanKind) -> Self {
+        self
+    }
+
+    func setStartTime(time _: Date) -> Self {
+        self
+    }
+
     func setAttribute(key: String, value: AttributeValue) -> Self {
         attributes[key] = value
         return self

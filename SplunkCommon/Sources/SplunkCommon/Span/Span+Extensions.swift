@@ -81,27 +81,29 @@ extension Span {
         clearAndSetAttribute(key: key, value: attributeValue)
     }
 
-    // MARK: - SemanticAttributes Convenience Methods
+    // MARK: - SemanticConventions Convenience Methods
 
     /// Clears the existing value for a semantic attribute key and sets a new value atomically.
     ///
     /// This is useful for ensuring clean attribute updates without leftover values.
+    /// Works with any `SemanticConventions` nested enum (e.g., `SemanticConventions.Http`, `SemanticConventions.Url`).
     ///
     /// - Parameters:
-    ///   - key: The semantic attribute key to clear and set
+    ///   - key: The semantic attribute key to clear and set (any RawRepresentable with String rawValue)
     ///   - value: The new value to set for the key
-    public func clearAndSetAttribute(key: SemanticAttributes, value: AttributeValue) {
+    public func clearAndSetAttribute<T: RawRepresentable>(key: T, value: AttributeValue) where T.RawValue == String {
         clearAndSetAttribute(key: key.rawValue, value: value)
     }
 
     /// Clears the existing value for a semantic attribute key and sets a new value atomically.
     ///
     /// This is a convenience method that accepts Any and converts it to AttributeValue.
+    /// Works with any `SemanticConventions` nested enum (e.g., `SemanticConventions.Http`, `SemanticConventions.Url`).
     ///
     /// - Parameters:
-    ///   - key: The semantic attribute key to clear and set
+    ///   - key: The semantic attribute key to clear and set (any RawRepresentable with String rawValue)
     ///   - value: The new value to set for the key (will be converted to AttributeValue)
-    public func clearAndSetAttribute(key: SemanticAttributes, value: Any) {
+    public func clearAndSetAttribute<T: RawRepresentable>(key: T, value: Any) where T.RawValue == String {
         clearAndSetAttribute(key: key.rawValue, value: value)
     }
 }
