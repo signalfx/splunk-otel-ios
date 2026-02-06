@@ -50,7 +50,7 @@ enum SplunkLogRecordAdapterJSON {
     }
 
 
-    // MARK: - Public Methods
+    // MARK: - Internal Methods
 
     /// Converts a list of SplunkReadableLogRecord to OTLP ResourceLogs.
     ///

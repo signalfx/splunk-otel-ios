@@ -50,7 +50,7 @@ enum LogRecordAdapter {
     }
 
 
-    // MARK: - Public Methods
+    // MARK: - Internal Methods
 
     /// Converts a list of ReadableLogRecord to OTLP ResourceLogs.
     ///
@@ -180,7 +180,7 @@ enum LogRecordAdapter {
         return OTLPInstrumentationScope(
             name: scopeInfo.name,
             version: scopeInfo.version,
-            attributes: attrs.isEmpty ? nil : convertAttributes(attrs),
+            attributes: convertAttributes(attrs),
             droppedAttributesCount: nil
         )
     }

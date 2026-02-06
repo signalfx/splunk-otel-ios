@@ -32,7 +32,7 @@ The SDK uses a modular architecture where each instrumentation type is a separat
 - `SplunkNetwork` - URLSession instrumentation
 - `SplunkNetworkMonitor` - Network status monitoring
 - `SplunkSlowFrameDetector` - Slow/frozen frame detection
-- `SplunkWebView` - WKWebView instrumentation
+- `SplunkWebView` - WKWebView instrumentation bridge
 - `SplunkSessionReplayProxy` - Session replay proxy
 
 **Infrastructure Modules:**

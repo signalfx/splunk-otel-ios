@@ -51,7 +51,7 @@ enum MetricDataAdapter {
     }
 
 
-    // MARK: - Public Methods
+    // MARK: - Internal Methods
 
     /// Converts a list of MetricData to OTLP ResourceMetrics.
     ///

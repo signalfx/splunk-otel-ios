@@ -99,6 +99,7 @@ public enum OTLPEnvVarHeaders {
     /// Environment variable key for OTLP headers.
     private static let otlpHeadersEnvVar = "OTEL_EXPORTER_OTLP_HEADERS"
 
+
     // MARK: - Public Properties
 
     /// Headers parsed from OTLP environment variables.
@@ -115,6 +116,7 @@ public enum OTLPEnvVarHeaders {
     /// Parses headers from an environment variable.
     ///
     /// - Parameter envVar: The environment variable name.
+    ///
     /// - Returns: An array of key-value tuples, or nil if not set.
     private static func parseHeaders(from envVar: String) -> [(String, String)]? {
         guard let value = ProcessInfo.processInfo.environment[envVar] else {

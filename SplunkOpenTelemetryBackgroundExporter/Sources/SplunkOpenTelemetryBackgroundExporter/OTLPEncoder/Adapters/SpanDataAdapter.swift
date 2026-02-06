@@ -47,7 +47,7 @@ enum SpanDataAdapter {
     }
 
 
-    // MARK: - Public Methods
+    // MARK: - Internal Methods
 
     /// Converts a list of SpanData to OTLP ResourceSpans.
     ///
