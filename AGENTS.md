@@ -232,7 +232,7 @@ Apache License 2.0. All source files must include the Splunk copyright header:
 ```swift
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 ...
