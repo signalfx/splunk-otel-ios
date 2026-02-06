@@ -124,12 +124,13 @@ public enum OTLPEnvVarHeaders {
         var headers: [(String, String)] = []
 
         // Split by comma and parse key=value pairs
+        // Note: Split on first '=' only to preserve '=' characters in values (e.g., Base64 tokens)
         let pairs = value.components(separatedBy: ",")
         for pair in pairs {
-            let keyValue = pair.components(separatedBy: "=")
+            let keyValue = pair.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: false)
             if keyValue.count == 2 {
-                let key = keyValue[0].trimmingCharacters(in: .whitespaces)
-                let val = keyValue[1].trimmingCharacters(in: .whitespaces)
+                let key = String(keyValue[0]).trimmingCharacters(in: .whitespaces)
+                let val = String(keyValue[1]).trimmingCharacters(in: .whitespaces)
                 if !key.isEmpty {
                     headers.append((key, val))
                 }
