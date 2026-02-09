@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 
 protocol RequestDescriptorProtocol: Codable {
     var id: UUID { get }
@@ -117,8 +116,9 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         var request = URLRequest(url: endpoint)
 
         request.httpMethod = "POST"
-        request.setValue(Headers.getUserAgentHeader(), forHTTPHeaderField: Constants.HTTP.userAgent)
-        request.setValue("application/x-protobuf", forHTTPHeaderField: "Content-Type")
+        request.setValue(OTLPHTTPHeaders.userAgent, forHTTPHeaderField: OTLPHTTPHeaders.userAgentKey)
+        // OTLP JSON encoding uses application/json content type
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = explicitTimeout
 
         for (key, value) in headers {
