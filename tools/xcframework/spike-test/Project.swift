@@ -21,13 +21,13 @@ let project = Project(
             sources: ["SmokeTest.swift"],
             dependencies: [
                 .xcframework(path: "\(xcframeworksDir)/OpenTelemetryApi.xcframework"),
-                .xcframework(path: "\(xcframeworksDir)/OpenTelemetrySdk.xcframework"),
+                .xcframework(path: "\(xcframeworksDir)/OpenTelemetrySdk.xcframework")
             ],
             settings: .settings(
                 base: [
-                    "IPHONEOS_DEPLOYMENT_TARGET": "14.0",
+                    "IPHONEOS_DEPLOYMENT_TARGET": "14.0"
                 ]
             )
-        ),
+        )
     ]
 )

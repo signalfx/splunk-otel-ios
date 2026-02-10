@@ -8,33 +8,22 @@
 // This is NOT a unit test -- it's a build-time verification that all
 // modules resolve and link correctly when consumed as xcframeworks.
 
-import SwiftUI
-
-// ---------------------------------------------------------------------------
-// MARK: - Import verification
-// ---------------------------------------------------------------------------
 // Each import below proves the corresponding xcframework is found by the
 // linker and the Swift module interface resolves correctly.
 
-// Agent modules
-import SplunkAgent
-
-// OpenTelemetry
+import CiscoDiskStorage
+import CiscoEncryption
+import CiscoInstanceManager
+import CiscoInteractions
+import CiscoLogger
+import CiscoRuntimeCache
+import CiscoSessionReplay
+import CiscoSwizzling
+import CrashReporter
 import OpenTelemetryApi
 import OpenTelemetrySdk
-
-// Cisco Session Replay
-import CiscoLogger
-import CiscoEncryption
-import CiscoSwizzling
-import CiscoInteractions
-import CiscoDiskStorage
-import CiscoSessionReplay
-import CiscoInstanceManager
-import CiscoRuntimeCache
-
-// CrashReporter (ObjC module -- uses @import-style bridging)
-import CrashReporter
+import SplunkAgent
+import SwiftUI
 
 
 // ---------------------------------------------------------------------------
@@ -52,7 +41,8 @@ enum SmokeTestRunner {
         let version = SplunkRum.version
         if !version.isEmpty {
             results.append("PASS: SplunkRum.version = \(version)")
-        } else {
+        }
+        else {
             results.append("FAIL: SplunkRum.version is empty")
         }
 
@@ -65,7 +55,8 @@ enum SmokeTestRunner {
         )
         if config.appName == "SmokeTest" {
             results.append("PASS: AgentConfiguration constructed")
-        } else {
+        }
+        else {
             results.append("FAIL: AgentConfiguration.appName mismatch")
         }
 
@@ -105,7 +96,8 @@ struct SmokeTestApp: App {
 
         if passed == total {
             print("✓ All smoke tests passed")
-        } else {
+        }
+        else {
             print("✗ Some smoke tests failed")
         }
     }

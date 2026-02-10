@@ -28,6 +28,7 @@ import ProjectDescription
 let repoRoot: String = "../.."
 
 /// Directory containing pre-built xcframeworks (OTel, Cisco, PLCrashReporter).
+///
 /// Populated by the build script before `tuist generate`.
 let deps: String = "dependencies"
 
@@ -38,21 +39,23 @@ let deps: String = "dependencies"
 
 /// All supported platforms for the majority of modules.
 let allPlatforms: Set<Destination> = [
-    .iPhone, .iPad,         // iOS
-    .appleTv,               // tvOS
-    .appleVision,           // visionOS
-    .macCatalyst            // Mac Catalyst
+    .iPhone, .iPad, // iOS
+    .appleTv, // tvOS
+    .appleVision, // visionOS
+    .macCatalyst // Mac Catalyst
 ]
 
 /// Platforms excluding visionOS.
+///
 /// Used by SplunkCrashReports (PLCrashReporter does not support visionOS).
 let platformsNoCrashReporter: Set<Destination> = [
-    .iPhone, .iPad,         // iOS
-    .appleTv,               // tvOS
-    .macCatalyst            // Mac Catalyst
+    .iPhone, .iPad, // iOS
+    .appleTv, // tvOS
+    .macCatalyst // Mac Catalyst
 ]
 
 /// Platform condition: iOS + tvOS + Mac Catalyst (excludes visionOS).
+///
 /// Applied to SplunkCrashReports and CrashReporter dependencies.
 let noCrashReporterCondition = PlatformCondition.when([.ios, .tvos, .catalyst])
 
@@ -79,7 +82,7 @@ let sharedSettings: SettingsDictionary = [
     "MACOSX_DEPLOYMENT_TARGET": "10.15",
 
     // Support Mac Catalyst builds.
-    "SUPPORTS_MACCATALYST": "YES",
+    "SUPPORTS_MACCATALYST": "YES"
 ]
 
 
@@ -110,7 +113,7 @@ let project = Project(
         base: sharedSettings,
         configurations: [
             .debug(name: "Debug", settings: [:]),
-            .release(name: "Release", settings: [:]),
+            .release(name: "Release", settings: [:])
         ]
     ),
     targets: [
@@ -130,7 +133,7 @@ let project = Project(
                 dep("OpenTelemetryApi"),
                 dep("CiscoDiskStorage"),
                 dep("CiscoEncryption"),
-                dep("CiscoLogger"),
+                dep("CiscoLogger")
             ]
         ),
 
@@ -149,7 +152,7 @@ let project = Project(
                 mod("SplunkCommon"),
                 dep("OpenTelemetryApi"),
                 dep("CiscoLogger"),
-                dep("CiscoSwizzling"),
+                dep("CiscoSwizzling")
             ]
         ),
 
@@ -168,7 +171,7 @@ let project = Project(
                 mod("SplunkCommon"),
                 dep("OpenTelemetryApi"),
                 dep("OpenTelemetrySdk"),
-                dep("CiscoLogger"),
+                dep("CiscoLogger")
             ]
         ),
 
@@ -186,7 +189,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkCommon"),
                 dep("OpenTelemetryApi"),
-                dep("CiscoLogger"),
+                dep("CiscoLogger")
             ]
         ),
 
@@ -205,7 +208,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkCommon"),
                 dep("OpenTelemetryApi"),
-                dep("CiscoLogger"),
+                dep("CiscoLogger")
             ]
         ),
 
@@ -227,7 +230,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkCommon"),
                 dep("OpenTelemetryApi"),
-                dep("CrashReporter"),
+                dep("CrashReporter")
             ]
         ),
 
@@ -248,7 +251,7 @@ let project = Project(
                 dep("OpenTelemetryApi"),
                 dep("OpenTelemetrySdk"),
                 dep("CiscoLogger"),
-                dep("CiscoDiskStorage"),
+                dep("CiscoDiskStorage")
             ]
         ),
 
@@ -268,7 +271,7 @@ let project = Project(
                 mod("SplunkOpenTelemetryBackgroundExporter"),
                 dep("OpenTelemetryApi"),
                 dep("OpenTelemetrySdk"),
-                dep("CiscoLogger"),
+                dep("CiscoLogger")
             ]
         ),
 
@@ -290,7 +293,7 @@ let project = Project(
                 dep("CiscoRuntimeCache"),
                 dep("CiscoLogger"),
                 dep("CiscoSwizzling"),
-                dep("CiscoInteractions"),
+                dep("CiscoInteractions")
             ]
         ),
 
@@ -308,7 +311,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkCommon"),
                 dep("OpenTelemetryApi"),
-                dep("CiscoLogger"),
+                dep("CiscoLogger")
             ]
         ),
 
@@ -326,7 +329,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkCommon"),
                 dep("OpenTelemetryApi"),
-                dep("CiscoLogger"),
+                dep("CiscoLogger")
             ]
         ),
 
@@ -344,7 +347,7 @@ let project = Project(
             sources: "\(repoRoot)/SplunkWebView/Sources/**",
             dependencies: [
                 mod("SplunkCommon"),
-                dep("CiscoLogger"),
+                dep("CiscoLogger")
             ]
         ),
 
@@ -362,7 +365,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkCommon"),
                 mod("SplunkOpenTelemetry"),
-                dep("CiscoLogger"),
+                dep("CiscoLogger")
             ]
         ),
 
@@ -388,7 +391,7 @@ let project = Project(
                 dep("CiscoRuntimeCache"),
                 dep("CiscoLogger"),
                 dep("CiscoDiskStorage"),
-                dep("CiscoEncryption"),
+                dep("CiscoEncryption")
             ]
         ),
 
@@ -410,7 +413,7 @@ let project = Project(
             sources: "\(repoRoot)/SplunkAgent/Sources/SplunkAgent/**",
             resources: [
                 .glob(pattern: "\(repoRoot)/SplunkAgent/Resources/PrivacyInfo.xcprivacy"),
-                .glob(pattern: "\(repoRoot)/SplunkAgent/Resources/NOTICES"),
+                .glob(pattern: "\(repoRoot)/SplunkAgent/Resources/NOTICES")
             ],
             dependencies: [
                 mod("SplunkCommon"),
@@ -430,7 +433,7 @@ let project = Project(
                 dep("CiscoLogger"),
 
                 // Conditional: only on platforms where PLCrashReporter is available
-                mod("SplunkCrashReports", condition: noCrashReporterCondition),
+                mod("SplunkCrashReports", condition: noCrashReporterCondition)
             ]
         ),
 
@@ -447,7 +450,7 @@ let project = Project(
             sources: "\(repoRoot)/SplunkAgent/Sources/SplunkAgentObjC/**",
             resources: [
                 .glob(pattern: "\(repoRoot)/SplunkAgent/Resources/PrivacyInfo.xcprivacy"),
-                .glob(pattern: "\(repoRoot)/SplunkAgent/Resources/NOTICES"),
+                .glob(pattern: "\(repoRoot)/SplunkAgent/Resources/NOTICES")
             ],
             dependencies: [
                 mod("SplunkAgent"),
@@ -459,8 +462,8 @@ let project = Project(
 
                 // Conditional: needed for CrashReportsConfigurationObjC+Conversions.swift
                 // which uses #if canImport(SplunkCrashReports) to bridge config types.
-                mod("SplunkCrashReports", condition: noCrashReporterCondition),
+                mod("SplunkCrashReports", condition: noCrashReporterCondition)
             ]
-        ),
+        )
     ]
 )

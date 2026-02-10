@@ -48,13 +48,18 @@ public protocol AppStartModule {
     func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) -> any AppStartModule
 }
 
-// Default implementation required for BUILD_LIBRARY_FOR_DISTRIBUTION
-// compatibility. @_spi protocol requirements must have a default
-// implementation in library evolution mode.
+/// Default implementation required for BUILD_LIBRARY_FOR_DISTRIBUTION
+/// compatibility. @_spi protocol requirements must have a default
+/// implementation in library evolution mode.
 extension AppStartModule {
 
     @_spi(SplunkInternal)
     public func track(didBecomeActive: Date, didFinishLaunching: Date?, willEnterForeground: Date?) -> any AppStartModule {
-        self
+        // Intentionally unused
+        _ = didBecomeActive
+        _ = didFinishLaunching
+        _ = willEnterForeground
+
+        return self
     }
 }

@@ -20,12 +20,12 @@ internal import SplunkCommon
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
 
-extension CrashReportsConfigurationObjC: ModuleConfigurationSwift {
+    extension CrashReportsConfigurationObjC: ModuleConfigurationSwift {
 
-    // MARK: - Swift variant
+        // MARK: - Swift variant
 
-    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
-        CrashReportsConfiguration(isEnabled: isEnabled)
+        var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
+            CrashReportsConfiguration(isEnabled: isEnabled)
+        }
     }
-}
 #endif

@@ -26,10 +26,11 @@ import ProjectDescription
 // ---------------------------------------------------------------------------
 
 /// Directory containing all xcframeworks for distribution.
+///
 /// After `make build`, this contains Agent modules, OTel, PLCrash, and Cisco SR.
 let xcfwDir = "../output/xcframeworks"
 
-/// Agent modules (built by `make build-agent`):
+/// Agent modules (built by `make build-agent`).
 let agentFrameworks = [
     "SplunkAgent",
     "SplunkAgentObjC",
@@ -46,21 +47,21 @@ let agentFrameworks = [
     "SplunkAppState",
     "SplunkWebView",
     "SplunkCustomTracking",
-    "SplunkSessionReplayProxy",
+    "SplunkSessionReplayProxy"
 ]
 
-/// OpenTelemetry (built by `make build-otel`):
+/// OpenTelemetry (built by `make build-otel`).
 let otelFrameworks = [
     "OpenTelemetryApi",
-    "OpenTelemetrySdk",
+    "OpenTelemetrySdk"
 ]
 
-/// PLCrashReporter (built by `make build-plcrash`):
+/// PLCrashReporter (built by `make build-plcrash`).
 let crashFrameworks = [
-    "CrashReporter",
+    "CrashReporter"
 ]
 
-/// Cisco Session Replay (downloaded by `make populate-deps`):
+/// Cisco Session Replay (downloaded by `make populate-deps`).
 let ciscoFrameworks = [
     "CiscoLogger",
     "CiscoEncryption",
@@ -69,7 +70,7 @@ let ciscoFrameworks = [
     "CiscoDiskStorage",
     "CiscoSessionReplay",
     "CiscoInstanceManager",
-    "CiscoRuntimeCache",
+    "CiscoRuntimeCache"
 ]
 
 /// All frameworks combined.
@@ -85,7 +86,7 @@ let project = Project(
     settings: .settings(
         configurations: [
             .debug(name: "Debug", settings: [:]),
-            .release(name: "Release", settings: [:]),
+            .release(name: "Release", settings: [:])
         ]
     ),
     targets: [
@@ -99,6 +100,6 @@ let project = Project(
             dependencies: allFrameworks.map { name in
                 .xcframework(path: "\(xcfwDir)/\(name).xcframework")
             }
-        ),
+        )
     ]
 )

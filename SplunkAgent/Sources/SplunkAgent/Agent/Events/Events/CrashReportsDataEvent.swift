@@ -21,48 +21,48 @@ internal import SplunkCommon
 #if canImport(SplunkCrashReports)
     internal import SplunkCrashReports
 
-/// Crash Reports data event.
-///
-/// Represents stringified Crash Report with metadata.
-class CrashReportsDataEvent: AgentEvent {
-
-    // MARK: - Event Identification
-
-    let domain = "mrum"
-    var name: String
-    var instrumentationScope = PackageIdentifier.default(named: "crashreports")
-    let component = "crash"
-
-
-    // MARK: - Event properties
-
-    var sessionId: String?
-    var timestamp: Date?
-    var attributes: [String: EventAttributeValue]?
-    var body: EventAttributeValue?
-
-
-    // MARK: - Initialization
-
-    /// Initializes a Crash Report data event.
+    /// Crash Reports data event.
     ///
-    /// - Parameters:
-    ///   - metadata: `CrashReportsMetadata` describing the actual Crash Report event metadata.
-    ///   - data: Crash Report data serialized as a `String`.
-    ///   - sessionID: The `session ID` of a session in which the event occured.
-    init(metadata: CrashReportsMetadata, data: String, sessionID: String?) {
+    /// Represents stringified Crash Report with metadata.
+    class CrashReportsDataEvent: AgentEvent {
 
-        // Event identification
-        name = metadata.eventName
+        // MARK: - Event Identification
 
-        instrumentationScope = PackageIdentifier.default(named: "crashreports")
+        let domain = "mrum"
+        var name: String
+        var instrumentationScope = PackageIdentifier.default(named: "crashreports")
+        let component = "crash"
 
-        if let sessionID {
-            sessionId = sessionID
+
+        // MARK: - Event properties
+
+        var sessionId: String?
+        var timestamp: Date?
+        var attributes: [String: EventAttributeValue]?
+        var body: EventAttributeValue?
+
+
+        // MARK: - Initialization
+
+        /// Initializes a Crash Report data event.
+        ///
+        /// - Parameters:
+        ///   - metadata: `CrashReportsMetadata` describing the actual Crash Report event metadata.
+        ///   - data: Crash Report data serialized as a `String`.
+        ///   - sessionID: The `session ID` of a session in which the event occured.
+        init(metadata: CrashReportsMetadata, data: String, sessionID: String?) {
+
+            // Event identification
+            name = metadata.eventName
+
+            instrumentationScope = PackageIdentifier.default(named: "crashreports")
+
+            if let sessionID {
+                sessionId = sessionID
+            }
+
+            timestamp = metadata.timestamp
+            body = EventAttributeValue(data)
         }
-
-        timestamp = metadata.timestamp
-        body = EventAttributeValue(data)
     }
-}
 #endif

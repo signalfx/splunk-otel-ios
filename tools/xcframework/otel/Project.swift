@@ -20,6 +20,7 @@ import ProjectDescription
 // ---------------------------------------------------------------------------
 
 /// Common settings applied to every OTel framework target.
+///
 /// These are required for producing xcframeworks with stable ABI.
 let sharedSettings: SettingsDictionary = [
     // Produce .swiftinterface files so consumers don't need to match compiler version.
@@ -43,7 +44,7 @@ let sharedSettings: SettingsDictionary = [
     "SUPPORTS_MACCATALYST": "YES",
 
     // Enable module stability for library evolution.
-    "SWIFT_EMIT_MODULE_INTERFACE": "YES",
+    "SWIFT_EMIT_MODULE_INTERFACE": "YES"
 ]
 
 
@@ -57,7 +58,7 @@ let project = Project(
         base: sharedSettings,
         configurations: [
             .debug(name: "Debug", settings: [:]),
-            .release(name: "Release", settings: [:]),
+            .release(name: "Release", settings: [:])
         ]
     ),
     targets: [
@@ -80,7 +81,7 @@ let project = Project(
             settings: .settings(
                 base: [
                     "PRODUCT_MODULE_NAME": "OpenTelemetryApi",
-                    "INFOPLIST_KEY_CFBundleDisplayName": "OpenTelemetryApi",
+                    "INFOPLIST_KEY_CFBundleDisplayName": "OpenTelemetryApi"
                 ]
             )
         ),
@@ -104,14 +105,14 @@ let project = Project(
             bundleId: "io.opentelemetry.swift.sdk",
             sources: "vendor/opentelemetry-swift-core/Sources/OpenTelemetrySdk/**",
             dependencies: [
-                .target(name: "OpenTelemetryApi"),
+                .target(name: "OpenTelemetryApi")
             ],
             settings: .settings(
                 base: [
                     "PRODUCT_MODULE_NAME": "OpenTelemetrySdk",
-                    "INFOPLIST_KEY_CFBundleDisplayName": "OpenTelemetrySdk",
+                    "INFOPLIST_KEY_CFBundleDisplayName": "OpenTelemetrySdk"
                 ]
             )
-        ),
+        )
     ]
 )

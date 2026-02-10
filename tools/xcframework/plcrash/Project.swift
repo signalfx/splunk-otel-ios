@@ -46,13 +46,13 @@ let sharedSettings: SettingsDictionary = [
         "PLCR_PRIVATE=1",
         "PLCF_RELEASE_BUILD=1",
         "PLCRASHREPORTER_PREFIX=",
-        "SWIFT_PACKAGE=1",
+        "SWIFT_PACKAGE=1"
     ],
 
     // Header search paths for the bundled protobuf-c dependency.
     "HEADER_SEARCH_PATHS": [
         "$(SRCROOT)/\(plcrashRoot)/Dependencies/protobuf-c",
-        "$(SRCROOT)/\(plcrashRoot)/Source",
+        "$(SRCROOT)/\(plcrashRoot)/Source"
     ],
 
     // Minimum deployment targets.
@@ -71,7 +71,7 @@ let sharedSettings: SettingsDictionary = [
     "CLANG_CXX_LANGUAGE_STANDARD": "c++17",
 
     // Install the public headers into the framework.
-    "PUBLIC_HEADERS_FOLDER_PATH": "$(CONTENTS_FOLDER_PATH)/Headers",
+    "PUBLIC_HEADERS_FOLDER_PATH": "$(CONTENTS_FOLDER_PATH)/Headers"
 ]
 
 
@@ -83,6 +83,7 @@ let sharedSettings: SettingsDictionary = [
 // cause issues if included as sources. The proto file is also excluded.
 
 /// Header files that should be public (exposed in the framework).
+///
 /// Note: PLCrashReport*.h glob matches PLCrashReporter.h, PLCrashReporterConfig.h,
 /// and all PLCrashReportXxx.h headers — no need to list them individually.
 let publicHeaders: FileList = [
@@ -91,7 +92,7 @@ let publicHeaders: FileList = [
     "\(plcrashRoot)/Source/PLCrashMacros.h",
     "\(plcrashRoot)/Source/PLCrashFeatureConfig.h",
     "\(plcrashRoot)/Source/PLCrashNamespace.h",
-    "\(plcrashRoot)/Source/PLCrashCompatConstants.h",
+    "\(plcrashRoot)/Source/PLCrashCompatConstants.h"
 ]
 
 
@@ -105,16 +106,16 @@ let project = Project(
         base: sharedSettings,
         configurations: [
             .debug(name: "Debug", settings: [:]),
-            .release(name: "Release", settings: [:]),
+            .release(name: "Release", settings: [:])
         ]
     ),
     targets: [
         .target(
             name: "CrashReporter",
             destinations: [
-                .iPhone, .iPad,     // iOS
-                .appleTv,           // tvOS
-                .macCatalyst        // Mac Catalyst
+                .iPhone, .iPad, // iOS
+                .appleTv, // tvOS
+                .macCatalyst // Mac Catalyst
                 // No visionOS — PLCrashReporter doesn't support it
             ],
             product: .framework,
@@ -125,13 +126,13 @@ let project = Project(
                 .glob("\(plcrashRoot)/Source/**/*.mm"),
                 .glob("\(plcrashRoot)/Source/**/*.cpp"),
                 .glob("\(plcrashRoot)/Source/**/*.S"),
-                .glob("\(plcrashRoot)/Dependencies/protobuf-c/**/*.c"),
+                .glob("\(plcrashRoot)/Dependencies/protobuf-c/**/*.c")
             ],
             headers: .headers(
                 public: publicHeaders,
                 private: [
                     "\(plcrashRoot)/Source/**/*.h",
-                    "\(plcrashRoot)/Dependencies/protobuf-c/**/*.h",
+                    "\(plcrashRoot)/Dependencies/protobuf-c/**/*.h"
                 ],
                 project: []
             ),
@@ -139,9 +140,9 @@ let project = Project(
                 base: [
                     "PRODUCT_MODULE_NAME": "CrashReporter",
                     "INFOPLIST_KEY_CFBundleDisplayName": "CrashReporter",
-                    "PRODUCT_NAME": "CrashReporter",
+                    "PRODUCT_NAME": "CrashReporter"
                 ]
             )
-        ),
+        )
     ]
 )
