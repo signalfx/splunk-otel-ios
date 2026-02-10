@@ -18,7 +18,6 @@ limitations under the License.
 internal import CiscoLogger
 import Foundation
 import OpenTelemetryApi
-import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import SplunkCommon
 import SplunkOpenTelemetryBackgroundExporter
@@ -75,7 +74,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
             return nil
         }
 
-        let configuration = OtlpConfiguration()
+        let configuration = OTLPExporterConfiguration()
         let envVarHeaders: [(String, String)] = []
         var headers: [String: String] = [:]
 
