@@ -176,7 +176,33 @@ fi
 
 
 # ---------------------------------------------------------------------------
-# Step 5: Verify
+# Step 5: Copy Cisco xcframeworks into the output directory
+# ---------------------------------------------------------------------------
+# The output/ directory is the single distribution artifact. It already
+# contains built-from-source frameworks (OTel, PLCrash, Agent modules).
+# Cisco SR frameworks are pre-built externals that also need to be in
+# the output so customers get everything from one folder.
+
+if [[ "${SKIP_CISCO}" == "false" ]]; then
+    mkdir -p "${OTEL_OUTPUT_DIR}"
+    log "Copying Cisco xcframeworks to output directory"
+
+    for fw in "${CISCO_FRAMEWORKS[@]}"; do
+        src="${DEPS_DIR}/${fw}.xcframework"
+        dst="${OTEL_OUTPUT_DIR}/${fw}.xcframework"
+
+        if [[ -d "${src}" ]]; then
+            # Use ditto to preserve code signatures and extended attributes
+            rm -rf "${dst}"
+            ditto "${src}" "${dst}"
+            echo "  ✓ ${fw}.xcframework → output/"
+        fi
+    done
+fi
+
+
+# ---------------------------------------------------------------------------
+# Step 6: Verify
 # ---------------------------------------------------------------------------
 
 log "Dependencies directory contents:"

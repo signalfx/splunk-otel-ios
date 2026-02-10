@@ -21,8 +21,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TOOLS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SMOKE_TEST_DIR="${TOOLS_ROOT}/smoke-test"
-OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
-DEPS_DIR="${TOOLS_ROOT}/dependencies"
+XCFW_DIR="${TOOLS_ROOT}/output/xcframeworks"
 
 
 # ---------------------------------------------------------------------------
@@ -47,36 +46,22 @@ log_step() {
 
 log_step "Step 1: Verify xcframeworks exist"
 
-# Built frameworks (in output/xcframeworks/)
-BUILT_FRAMEWORKS=(
+REQUIRED_FRAMEWORKS=(
     "SplunkAgent"
     "SplunkCommon"
     "OpenTelemetryApi"
     "OpenTelemetrySdk"
     "CrashReporter"
-)
-
-# External frameworks (in dependencies/)
-EXTERNAL_FRAMEWORKS=(
     "CiscoLogger"
     "CiscoSessionReplay"
 )
 
 ALL_PRESENT=true
-for fw in "${BUILT_FRAMEWORKS[@]}"; do
-    if [[ -d "${OUTPUT_DIR}/${fw}.xcframework" ]]; then
-        echo "  ✓ ${fw}.xcframework (output)"
+for fw in "${REQUIRED_FRAMEWORKS[@]}"; do
+    if [[ -d "${XCFW_DIR}/${fw}.xcframework" ]]; then
+        echo "  ✓ ${fw}.xcframework"
     else
-        echo "  ✗ ${fw}.xcframework MISSING from output/"
-        ALL_PRESENT=false
-    fi
-done
-
-for fw in "${EXTERNAL_FRAMEWORKS[@]}"; do
-    if [[ -d "${DEPS_DIR}/${fw}.xcframework" ]]; then
-        echo "  ✓ ${fw}.xcframework (dependencies)"
-    else
-        echo "  ✗ ${fw}.xcframework MISSING from dependencies/"
+        echo "  ✗ ${fw}.xcframework MISSING"
         ALL_PRESENT=false
     fi
 done
@@ -134,11 +119,7 @@ fi
 log_step "Smoke test passed"
 
 echo "All xcframeworks linked successfully."
-echo "Built frameworks verified:"
-for fw in "${OUTPUT_DIR}"/*.xcframework; do
-    echo "  ✓ $(basename "${fw}")"
-done
-echo "External frameworks verified:"
-for fw in "${DEPS_DIR}"/*.xcframework; do
+echo "Frameworks verified:"
+for fw in "${XCFW_DIR}"/*.xcframework; do
     echo "  ✓ $(basename "${fw}")"
 done

@@ -25,11 +25,9 @@ import ProjectDescription
 // MARK: - XCFramework Paths
 // ---------------------------------------------------------------------------
 
-/// Directory containing built xcframeworks (Agent modules, OTel, PLCrash).
-let outputDir = "../output/xcframeworks"
-
-/// Directory containing pre-built external xcframeworks (Cisco SR).
-let depsDir = "../dependencies"
+/// Directory containing all xcframeworks for distribution.
+/// After `make build`, this contains Agent modules, OTel, PLCrash, and Cisco SR.
+let xcfwDir = "../output/xcframeworks"
 
 /// Agent modules (built by `make build-agent`):
 let agentFrameworks = [
@@ -74,15 +72,8 @@ let ciscoFrameworks = [
     "CiscoRuntimeCache",
 ]
 
-/// Dependencies from output/ (built from source).
-let builtDeps: [TargetDependency] = (agentFrameworks + otelFrameworks + crashFrameworks).map { name in
-    .xcframework(path: "\(outputDir)/\(name).xcframework")
-}
-
-/// Dependencies from dependencies/ (pre-built externals).
-let externalDeps: [TargetDependency] = ciscoFrameworks.map { name in
-    .xcframework(path: "\(depsDir)/\(name).xcframework")
-}
+/// All frameworks combined.
+let allFrameworks = agentFrameworks + otelFrameworks + crashFrameworks + ciscoFrameworks
 
 
 // ---------------------------------------------------------------------------
@@ -105,7 +96,9 @@ let project = Project(
             bundleId: "com.splunk.rum.xcframework-smoke-test",
             deploymentTargets: .iOS("14.0"),
             sources: ["Sources/**"],
-            dependencies: builtDeps + externalDeps
+            dependencies: allFrameworks.map { name in
+                .xcframework(path: "\(xcfwDir)/\(name).xcframework")
+            }
         ),
     ]
 )
