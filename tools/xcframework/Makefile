@@ -20,9 +20,9 @@
 #   - git
 #
 # Environment Variables:
-#   OTEL_VERSION          - OpenTelemetry Swift Core version (default: 2.3.0)
+#   OTEL_VERSION          - OpenTelemetry Swift Core version (read from Package.swift)
 #   CISCO_XCFRAMEWORKS_PATH - Path to Cisco SR xcframeworks directory
-#   PLCRASH_VERSION       - PLCrashReporter version (default: 1.12.0)
+#   PLCRASH_VERSION       - PLCrashReporter version (read from Package.swift)
 #   SIGNING_IDENTITY      - Code signing identity for codesign
 #   VERSION               - Release version number
 
@@ -42,8 +42,14 @@ DEPS_DIR     := $(TOOLS_ROOT)/dependencies
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-OTEL_VERSION       ?= 2.3.0
-PLCRASH_VERSION    ?= 1.12.0
+# Dependency versions are read from Package.swift (single source of truth).
+# The Package.swift uses `exact:` pins so SPM and xcframework builds always match.
+# Override with environment variables if needed (e.g. OTEL_VERSION=2.4.0 make build).
+REPO_ROOT    := $(TOOLS_ROOT)/../..
+PACKAGE_SWIFT := $(REPO_ROOT)/Package.swift
+
+OTEL_VERSION    ?= $(shell awk '/opentelemetry-swift-core/{found=1} found && !/^ *\/\// && /exact:/{gsub(/.*exact: *"/,""); gsub(/".*/,""); print; exit}' $(PACKAGE_SWIFT))
+PLCRASH_VERSION ?= $(shell awk '/plcrashreporter/{found=1} found && !/^ *\/\// && /exact:/{gsub(/.*exact: *"/,""); gsub(/".*/,""); print; exit}' $(PACKAGE_SWIFT))
 SIGNING_IDENTITY   ?=
 VERSION            ?=
 RELEASE            ?= false
