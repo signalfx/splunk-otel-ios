@@ -17,7 +17,9 @@ limitations under the License.
 
 import Foundation
 internal import SplunkCommon
-internal import SplunkCrashReports
+
+#if canImport(SplunkCrashReports)
+    internal import SplunkCrashReports
 
 /// Crash Reports data event.
 ///
@@ -63,3 +65,4 @@ class CrashReportsDataEvent: AgentEvent {
         body = EventAttributeValue(data)
     }
 }
+#endif

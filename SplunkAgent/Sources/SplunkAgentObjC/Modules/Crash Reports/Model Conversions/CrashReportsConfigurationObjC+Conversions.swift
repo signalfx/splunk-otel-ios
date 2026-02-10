@@ -16,7 +16,9 @@ limitations under the License.
 */
 
 internal import SplunkCommon
-internal import SplunkCrashReports
+
+#if canImport(SplunkCrashReports)
+    internal import SplunkCrashReports
 
 extension CrashReportsConfigurationObjC: ModuleConfigurationSwift {
 
@@ -26,3 +28,4 @@ extension CrashReportsConfigurationObjC: ModuleConfigurationSwift {
         CrashReportsConfiguration(isEnabled: isEnabled)
     }
 }
+#endif

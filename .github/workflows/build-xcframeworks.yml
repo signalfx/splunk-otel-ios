@@ -1,0 +1,248 @@
+name: Build XCFrameworks
+
+# Triggers:
+#   1. Automatically after merge_release.yml creates a GitHub Release
+#   2. Manually via workflow_dispatch for testing
+#
+# This workflow builds all SplunkAgent SDK modules as signed xcframeworks,
+# validates them, packages into a zip, and uploads to the GitHub Release.
+#
+# Architecture:
+#   Job 1 (build): Build OTel + PLCrash + Agent modules → upload artifact
+#   Job 2 (sign-and-release): Sign, validate, package, upload to release
+
+on:
+  release:
+    types: [published]
+
+  workflow_dispatch:
+    inputs:
+      otel-version:
+        description: "OpenTelemetry Swift Core version"
+        required: false
+        default: "2.3.0"
+        type: string
+      plcrash-version:
+        description: "PLCrashReporter version"
+        required: false
+        default: "1.12.0"
+        type: string
+      cisco-xcframeworks-run-id:
+        description: "GitHub Actions run ID with Cisco SR xcframeworks artifact (optional, skip Cisco if empty)"
+        required: false
+        type: string
+      skip-signing:
+        description: "Skip code signing (for local testing)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+env:
+  OTEL_VERSION: ${{ inputs.otel-version || '2.3.0' }}
+  PLCRASH_VERSION: ${{ inputs.plcrash-version || '1.12.0' }}
+
+jobs:
+
+  # ===========================================================================
+  # Job 1: Build all xcframeworks
+  # ===========================================================================
+  build:
+    name: Build XCFrameworks
+    runs-on: macos-15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Install Tuist
+        run: |
+          brew install tuist
+          tuist version
+
+      # -----------------------------------------------------------------
+      # Step 1: Build OTel xcframeworks from source
+      # -----------------------------------------------------------------
+      - name: Build OpenTelemetry xcframeworks
+        working-directory: tools/xcframework
+        run: |
+          chmod +x scripts/*.sh
+          OTEL_VERSION="${OTEL_VERSION}" scripts/build-otel-xcframeworks.sh
+
+      # -----------------------------------------------------------------
+      # Step 2: Build PLCrashReporter xcframework from source
+      # -----------------------------------------------------------------
+      - name: Build PLCrashReporter xcframework
+        working-directory: tools/xcframework
+        run: |
+          PLCRASH_VERSION="${PLCRASH_VERSION}" scripts/build-plcrash-xcframeworks.sh
+
+      # -----------------------------------------------------------------
+      # Step 3: Download Cisco Session Replay xcframeworks (if available)
+      # -----------------------------------------------------------------
+      # Cisco xcframeworks are built separately by the Session Replay team.
+      # They can be provided via:
+      #   a) A GitHub Actions artifact from a previous workflow run
+      #   b) Downloaded from the Cisco SR distribution URL
+      #
+      # For now, if not provided, the build continues without Cisco modules.
+      # SplunkSessionReplayProxy and parts of SplunkAgent that depend on
+      # Cisco will fail to build, but all other modules will succeed.
+      - name: Download Cisco SR xcframeworks (if artifact provided)
+        if: inputs.cisco-xcframeworks-run-id != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: cisco-session-replay-dist-${{ inputs.cisco-xcframeworks-run-id }}
+          path: tools/xcframework/cisco-sr-download
+          run-id: ${{ inputs.cisco-xcframeworks-run-id }}
+
+      # -----------------------------------------------------------------
+      # Step 4: Populate dependencies and build Agent modules
+      # -----------------------------------------------------------------
+      - name: Populate dependencies
+        working-directory: tools/xcframework
+        run: |
+          CISCO_ARG=""
+          if [ -d "cisco-sr-download" ]; then
+            # Find the directory containing xcframeworks
+            CISCO_DIR="$(find cisco-sr-download -name "*.xcframework" -maxdepth 2 -exec dirname {} \; | head -1)"
+            if [ -n "$CISCO_DIR" ]; then
+              CISCO_ARG="--cisco-path $(pwd)/$CISCO_DIR"
+              echo "Using Cisco xcframeworks from: $CISCO_DIR"
+            fi
+          fi
+
+          if [ -z "$CISCO_ARG" ]; then
+            echo "No Cisco xcframeworks available, skipping"
+            scripts/populate-dependencies.sh --skip-cisco
+          else
+            scripts/populate-dependencies.sh $CISCO_ARG
+          fi
+
+      - name: Generate Tuist project
+        working-directory: tools/xcframework
+        run: tuist generate --no-open --no-binary-cache
+
+      - name: Build Agent module xcframeworks
+        working-directory: tools/xcframework
+        run: scripts/build-xcframeworks.sh
+
+      # -----------------------------------------------------------------
+      # Step 5: Validate (pre-signing)
+      # -----------------------------------------------------------------
+      - name: Validate xcframeworks (pre-signing)
+        working-directory: tools/xcframework
+        run: RELEASE=false scripts/validate-xcframeworks.sh
+
+      # -----------------------------------------------------------------
+      # Step 6: Upload build artifacts
+      # -----------------------------------------------------------------
+      - name: Upload xcframeworks artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: splunk-agent-xcframeworks-unsigned
+          path: tools/xcframework/output/xcframeworks/
+          retention-days: 7
+
+
+  # ===========================================================================
+  # Job 2: Sign, validate, and release
+  # ===========================================================================
+  sign-and-release:
+    name: Sign & Release
+    needs: build
+    runs-on: macos-15
+    if: ${{ !inputs.skip-signing }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download xcframeworks artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: splunk-agent-xcframeworks-unsigned
+          path: tools/xcframework/output/xcframeworks/
+
+      # -----------------------------------------------------------------
+      # Signing
+      # -----------------------------------------------------------------
+      - name: Set up signing keychain
+        id: signing
+        uses: ./.github/actions/setup-signing
+        with:
+          distribution-certificate: ${{ secrets.DISTRIBUTION_CERTIFICATE }}
+          certificate-password: ${{ secrets.CERTIFICATE_PASSWORD }}
+
+      - name: Sign xcframeworks
+        working-directory: tools/xcframework
+        run: |
+          chmod +x scripts/*.sh
+          scripts/sign-xcframeworks.sh "${{ steps.signing.outputs.signing-identity }}"
+
+      # -----------------------------------------------------------------
+      # Post-signing validation
+      # -----------------------------------------------------------------
+      - name: Validate xcframeworks (post-signing)
+        working-directory: tools/xcframework
+        run: RELEASE=true scripts/validate-xcframeworks.sh
+
+      # -----------------------------------------------------------------
+      # Generate dependency manifest
+      # -----------------------------------------------------------------
+      - name: Generate dependency manifest
+        working-directory: tools/xcframework
+        run: scripts/generate-dependency-manifest.sh
+
+      # -----------------------------------------------------------------
+      # Package
+      # -----------------------------------------------------------------
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "version=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            # For manual dispatch, read version from SplunkRum.swift
+            VERSION="$(awk 'match($0,/public[[:space:]]+static[[:space:]]+let[[:space:]]+version[[:space:]]*=[[:space:]]*"([0-9]+\.[0-9]+\.[0-9]+)"/,a){print a[1]; exit}' \
+              SplunkAgent/Sources/SplunkAgent/Public\ API/SplunkRum.swift)"
+            echo "version=${VERSION:-dev}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Package xcframeworks
+        working-directory: tools/xcframework
+        run: |
+          scripts/release.sh "${{ steps.version.outputs.version }}"
+
+      # -----------------------------------------------------------------
+      # Upload signed artifact
+      # -----------------------------------------------------------------
+      - name: Upload signed xcframeworks artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: splunk-agent-xcframeworks-${{ steps.version.outputs.version }}
+          path: tools/xcframework/output/SplunkAgent-XCFrameworks-*.zip
+          retention-days: 30
+
+      # -----------------------------------------------------------------
+      # Upload to GitHub Release (only on release event)
+      # -----------------------------------------------------------------
+      - name: Upload to GitHub Release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ZIP_FILE="$(ls tools/xcframework/output/SplunkAgent-XCFrameworks-*.zip 2>/dev/null | head -1)"
+          if [ -z "$ZIP_FILE" ]; then
+            echo "ERROR: No zip file found to upload"
+            exit 1
+          fi
+
+          echo "Uploading $ZIP_FILE to release ${{ github.event.release.tag_name }}..."
+          gh release upload "${{ github.event.release.tag_name }}" "$ZIP_FILE" --clobber
+          echo "✓ Uploaded to release"
