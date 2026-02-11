@@ -135,7 +135,9 @@ jobs:
 
       - name: Generate Tuist project
         working-directory: tools/xcframework
-        run: tuist generate --no-open --no-binary-cache
+        run: |
+          tuist generate --no-open --no-binary-cache
+          scripts/fix-tuist-warnings.sh SplunkAgentXCFrameworks.xcodeproj
 
       - name: Build Agent module xcframeworks
         working-directory: tools/xcframework

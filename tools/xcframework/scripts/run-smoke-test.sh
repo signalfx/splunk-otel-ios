@@ -82,6 +82,10 @@ log_step "Step 2: Generate smoke test Xcode project"
 
 cd "${SMOKE_TEST_DIR}"
 tuist generate --no-open
+
+# Fix deprecated build settings injected by Tuist
+"${SCRIPT_DIR}/fix-tuist-warnings.sh" "${SMOKE_TEST_DIR}/XCFrameworkSmokeTest.xcodeproj"
+
 log "Xcode project generated"
 
 

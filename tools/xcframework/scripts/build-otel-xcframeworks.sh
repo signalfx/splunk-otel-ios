@@ -151,6 +151,10 @@ generate_xcode_project() {
 
     # Generate without opening Xcode
     tuist generate --no-open
+
+    # Fix deprecated build settings injected by Tuist
+    "${SCRIPT_DIR}/fix-tuist-warnings.sh" "${OTEL_PROJECT_DIR}/OpenTelemetryXCFrameworks.xcodeproj"
+
     log "Xcode project generated at ${OTEL_PROJECT_DIR}"
 }
 

@@ -155,6 +155,10 @@ generate_project() {
 
     if [[ ! -d "${WORKSPACE}" ]]; then
         tuist generate --no-open
+
+        # Fix deprecated build settings injected by Tuist
+        "${SCRIPT_DIR}/fix-tuist-warnings.sh" "${TOOLS_ROOT}/SplunkAgentXCFrameworks.xcodeproj"
+
         log "Workspace generated"
     else
         log "Workspace already exists, skipping generation"

@@ -140,6 +140,10 @@ generate_xcode_project() {
     cd "${PLCRASH_PROJECT_DIR}"
 
     tuist generate --no-open
+
+    # Fix deprecated build settings injected by Tuist
+    "${SCRIPT_DIR}/fix-tuist-warnings.sh" "${PLCRASH_PROJECT_DIR}/PLCrashReporterXCFrameworks.xcodeproj"
+
     log "Xcode project generated at ${PLCRASH_PROJECT_DIR}"
 }
 
