@@ -31,6 +31,47 @@ TOTAL_CHECKS=0
 PASSED_CHECKS=0
 FAILED_CHECKS=0
 
+# ---------------------------------------------------------------------------
+# Expected platform slice counts per module.
+# Most modules target all 7 destinations; SplunkCrashReports and
+# CrashReporter exclude visionOS (5 destinations).
+# External Cisco modules ship with their own slice matrix — we don't
+# enforce a count for those.
+# ---------------------------------------------------------------------------
+
+EXPECTED_ALL_SLICES=7
+EXPECTED_NO_VISIONOS_SLICES=5
+
+# Modules with restricted platform support (no visionOS)
+NO_VISIONOS_MODULES="SplunkCrashReports CrashReporter"
+
+# Returns the expected slice count for a given module name, or empty
+# string for modules where we don't enforce a count (externals).
+expected_slices_for() {
+    local name="$1"
+
+    # Splunk modules and OTel modules have known slice counts
+    case "${name}" in
+        Splunk*|OpenTelemetry*)
+            case " ${NO_VISIONOS_MODULES} " in
+                *" ${name} "*)
+                    echo "${EXPECTED_NO_VISIONOS_SLICES}"
+                    ;;
+                *)
+                    echo "${EXPECTED_ALL_SLICES}"
+                    ;;
+            esac
+            ;;
+        CrashReporter)
+            echo "${EXPECTED_NO_VISIONOS_SLICES}"
+            ;;
+        *)
+            # External (Cisco) — don't enforce
+            echo ""
+            ;;
+    esac
+}
+
 log() {
     echo "==> $*"
 }
@@ -67,7 +108,30 @@ validate_xcframework() {
         return
     fi
 
-    # Check 2-3: Platform slices and binaries
+    # Check 2: Expected platform slice count
+    local expected_slices
+    expected_slices="$(expected_slices_for "${name}")"
+
+    local actual_slices=0
+    for slice_dir_count in "${xcfw_path}"/*/; do
+        local sn
+        sn="$(basename "${slice_dir_count}")"
+        [[ "${sn}" == "_CodeSignature" ]] && continue
+        [[ -d "${slice_dir_count}" ]] || continue
+        actual_slices=$((actual_slices + 1))
+    done
+
+    if [[ -n "${expected_slices}" ]]; then
+        if [[ "${actual_slices}" -eq "${expected_slices}" ]]; then
+            check_pass "Platform slices: ${actual_slices} (expected ${expected_slices})"
+        else
+            check_fail "Platform slices: ${actual_slices} (expected ${expected_slices})"
+        fi
+    else
+        echo "  ℹ Platform slices: ${actual_slices} (external, not enforced)"
+    fi
+
+    # Check 3-4: Platform slices and binaries
     for slice_dir in "${xcfw_path}"/*/; do
         local slice_name
         slice_name="$(basename "${slice_dir}")"
@@ -138,15 +202,25 @@ if [[ "${RELEASE}" == "true" ]]; then
     log "Release mode: signature verification enabled"
 fi
 
+XCFW_COUNT=0
 for xcfw in "${OUTPUT_DIR}"/*.xcframework; do
     [[ -d "${xcfw}" ]] || continue
+    XCFW_COUNT=$((XCFW_COUNT + 1))
     validate_xcframework "${xcfw}"
 done
+
+if [[ "${XCFW_COUNT}" -eq 0 ]]; then
+    echo ""
+    echo "ERROR: No xcframeworks found in ${OUTPUT_DIR}"
+    echo "  Run 'make build' or the build scripts first."
+    exit 1
+fi
 
 echo ""
 echo "============================================================"
 echo "  Validation Summary"
 echo "============================================================"
+echo "  XCFrameworks: ${XCFW_COUNT}"
 echo "  Total checks: ${TOTAL_CHECKS}"
 echo "  Passed:       ${PASSED_CHECKS}"
 echo "  Failed:       ${FAILED_CHECKS}"

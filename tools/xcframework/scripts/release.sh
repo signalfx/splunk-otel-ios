@@ -17,7 +17,7 @@
 #   - gh CLI installed (only for --upload)
 #
 # Output:
-#   output/SplunkAgent-xcframeworks-VERSION.zip
+#   output/SplunkAgent-XCFrameworks-VERSION.zip
 
 set -euo pipefail
 
@@ -47,7 +47,7 @@ log() {
     echo "==> $*"
 }
 
-ZIP_NAME="SplunkAgent-xcframeworks-${VERSION}.zip"
+ZIP_NAME="SplunkAgent-XCFrameworks-${VERSION}.zip"
 ZIP_PATH="${OUTPUT_DIR}/${ZIP_NAME}"
 
 # ---------------------------------------------------------------------------

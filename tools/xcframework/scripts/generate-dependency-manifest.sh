@@ -38,12 +38,21 @@ log() {
 
 log "Generating dependency manifest (version: ${VERSION})"
 
+# Ensure output directory exists
+mkdir -p "${OUTPUT_DIR}"
+
 # Collect all xcframeworks in output directory
 ALL_XCFRAMEWORKS=()
 for xcfw in "${XCFW_DIR}"/*.xcframework; do
     [[ -d "${xcfw}" ]] || continue
     ALL_XCFRAMEWORKS+=("$(basename "${xcfw}")")
 done
+
+if [[ ${#ALL_XCFRAMEWORKS[@]} -eq 0 ]]; then
+    echo "ERROR: No xcframeworks found in ${XCFW_DIR}"
+    echo "  Build xcframeworks before generating the manifest."
+    exit 1
+fi
 
 # Write JSON manifest
 cat > "${MANIFEST_PATH}" << JSONEOF
