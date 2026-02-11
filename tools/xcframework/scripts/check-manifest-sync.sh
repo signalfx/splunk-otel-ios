@@ -9,7 +9,9 @@
 #      target in tools/xcframework/Project.swift
 #   2. Every OTel product used in Package.swift has a corresponding
 #      target in tools/xcframework/otel/Project.swift
-#   3. Dependencies between modules are consistent
+#
+# Note: This only checks target name presence, not dependency graph
+# consistency. Dependency correctness is validated at build time.
 #
 # Usage:
 #   ./scripts/check-manifest-sync.sh

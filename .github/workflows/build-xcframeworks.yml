@@ -28,9 +28,14 @@ on:
         default: "1.12.0"
         type: string
       cisco-xcframeworks-run-id:
-        description: "GitHub Actions run ID with Cisco SR xcframeworks artifact (optional, skip Cisco if empty)"
+        description: "GitHub Actions run ID with Cisco SR xcframeworks artifact (optional, downloads from S3 if empty)"
         required: false
         type: string
+      skip-cisco:
+        description: "Skip Cisco SR frameworks (for partial builds without Session Replay)"
+        required: false
+        default: false
+        type: boolean
       skip-signing:
         description: "Skip code signing (for local testing)"
         required: false
@@ -84,16 +89,15 @@ jobs:
           PLCRASH_VERSION="${PLCRASH_VERSION}" scripts/build-plcrash-xcframeworks.sh
 
       # -----------------------------------------------------------------
-      # Step 3: Download Cisco Session Replay xcframeworks (if available)
+      # Step 3: Download Cisco Session Replay xcframeworks (if provided)
       # -----------------------------------------------------------------
       # Cisco xcframeworks are built separately by the Session Replay team.
       # They can be provided via:
       #   a) A GitHub Actions artifact from a previous workflow run
-      #   b) Downloaded from the Cisco SR distribution URL
+      #   b) Downloaded from S3 by populate-dependencies.sh (default)
       #
-      # For now, if not provided, the build continues without Cisco modules.
-      # SplunkSessionReplayProxy and parts of SplunkAgent that depend on
-      # Cisco will fail to build, but all other modules will succeed.
+      # Cisco frameworks are required by SplunkCommon and most modules.
+      # Use the skip-cisco input only for partial test builds.
       - name: Download Cisco SR xcframeworks (if artifact provided)
         if: inputs.cisco-xcframeworks-run-id != ''
         uses: actions/download-artifact@v4
@@ -108,26 +112,26 @@ jobs:
       - name: Populate dependencies
         working-directory: tools/xcframework
         run: |
-          CISCO_ARG=""
+          POPULATE_ARGS=""
+
+          # If a Cisco artifact was downloaded, point to it
           if [ -d "cisco-sr-download" ]; then
-            # Find the directory containing xcframeworks
             CISCO_DIR="$(find cisco-sr-download -name "*.xcframework" -maxdepth 2 -exec dirname {} \; | head -1)"
             if [ -n "$CISCO_DIR" ]; then
-              CISCO_ARG="--cisco-path $(pwd)/$CISCO_DIR"
-              echo "Using Cisco xcframeworks from: $CISCO_DIR"
+              POPULATE_ARGS="--cisco-path $(pwd)/$CISCO_DIR"
+              echo "Using Cisco xcframeworks from artifact: $CISCO_DIR"
             fi
           fi
 
-          if [ -z "$CISCO_ARG" ]; then
-            if [ "${{ github.event_name }}" = "release" ]; then
-              echo "::error::Release builds require Cisco xcframeworks. Provide cisco-xcframeworks-run-id or ensure Cisco artifacts are available."
-              exit 1
-            fi
-            echo "::warning::No Cisco xcframeworks available — modules depending on Cisco will fail to build"
-            scripts/populate-dependencies.sh --skip-cisco
-          else
-            scripts/populate-dependencies.sh $CISCO_ARG
+          # Explicit skip-cisco only via the workflow input
+          if [ "${{ inputs.skip-cisco }}" = "true" ]; then
+            echo "::warning::skip-cisco requested — modules depending on Cisco will fail to build"
+            POPULATE_ARGS="--skip-cisco"
           fi
+
+          # Default (no artifact, no skip): populate-dependencies.sh
+          # downloads Cisco from S3 automatically
+          scripts/populate-dependencies.sh $POPULATE_ARGS
 
       - name: Generate Tuist project
         working-directory: tools/xcframework

@@ -59,11 +59,14 @@ runs:
       id: resolve
       shell: bash
       run: |
-        # Extract the signing identity from the keychain
-        IDENTITY="$(security find-identity -v -p codesigning | head -1 | sed 's/.*"\(.*\)".*/\1/')"
+        # Extract the signing identity from the keychain.
+        # The output format is: N) HEX "Identity Name"
+        # We grab the first line containing a quoted identity.
+        RAW="$(security find-identity -v -p codesigning)"
+        IDENTITY="$(echo "$RAW" | grep '"' | head -1 | sed 's/.*"\(.*\)".*/\1/')"
         if [ -z "$IDENTITY" ]; then
           echo "Error: No codesigning identity found in keychain"
-          security find-identity -p codesigning
+          echo "$RAW"
           exit 1
         fi
         echo "Resolved signing identity: $IDENTITY"
