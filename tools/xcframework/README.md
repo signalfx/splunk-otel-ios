@@ -80,6 +80,80 @@ Key variables in the Makefile:
 
 ---
 
+## Release
+
+Releasing xcframeworks is a two-part process: CI builds the unsigned artifacts, then a developer signs them locally and uploads to the GitHub release.
+
+### How it works
+
+1. A developer triggers `release.yml` with a version and ticket ID.
+2. The release PR is reviewed and merged to `main`.
+3. `merge_release.yml` runs automatically — creates a git tag and a GitHub Release.
+4. `build-xcframeworks.yml` triggers on the release event — builds all xcframeworks, validates them, runs a smoke test, and uploads an **unsigned** artifact.
+5. A developer downloads the unsigned artifact, signs locally, and uploads the signed zip to the release.
+
+> **Note:** Automated CI signing (Job 2 in `build-xcframeworks.yml`) is temporarily disabled because distribution certificates cannot be stored in GitHub secrets. The implementation is preserved and can be re-enabled by setting the `SIGNING_ENABLED` repository variable to `"true"`.
+
+### Local signing
+
+After CI finishes the build (step 4 above), run the convenience script:
+
+```bash
+# Signs and uploads to the release in one step
+./scripts/sign-and-upload.sh 1.2.0
+```
+
+The script will:
+- Auto-detect your signing identity from the local keychain
+- Download the unsigned artifact from the latest CI run
+- Sign all xcframeworks
+- Validate signatures
+- Package and upload the zip to the existing GitHub release
+
+#### Options
+
+```bash
+# Use a specific CI run
+./scripts/sign-and-upload.sh 1.2.0 --run-id 12345678
+
+# Use a specific signing identity
+./scripts/sign-and-upload.sh 1.2.0 --identity "Apple Distribution: Splunk Inc. (TEAMID)"
+
+# Sign and package without uploading (dry run)
+./scripts/sign-and-upload.sh 1.2.0 --skip-upload
+```
+
+#### Prerequisites
+
+- Apple distribution certificate installed in your local keychain
+- `gh` CLI installed and authenticated (`brew install gh && gh auth login`)
+
+### Manual step-by-step (alternative)
+
+If you prefer to run each step individually:
+
+```bash
+# 1. Find the CI run ID
+gh run list --workflow=build-xcframeworks.yml --limit 1
+
+# 2. Download the unsigned artifact
+gh run download <RUN_ID> -n splunk-agent-xcframeworks-unsigned -D tools/xcframework/output/xcframeworks/
+
+# 3. Find your signing identity
+security find-identity -v -p codesigning
+
+# 4. Sign
+./scripts/sign-xcframeworks.sh "Apple Distribution: Splunk Inc. (TEAMID)"
+
+# 5. Validate
+RELEASE=true ./scripts/validate-xcframeworks.sh
+
+# 6. Package and upload to the existing release
+./scripts/release.sh 1.2.0 --upload-to 1.2.0
+```
+
+---
+
 ## Customer Integration Guide
 
 ### Adding XCFrameworks to Your Xcode Project

@@ -5,11 +5,13 @@
 # uploads to GitHub releases.
 #
 # Usage:
-#   ./scripts/release.sh VERSION [--upload]
+#   ./scripts/release.sh VERSION [--upload | --upload-to TAG]
 #
 # Options:
-#   --upload    Upload to GitHub releases using `gh` CLI
-#               (requires GITHUB_TOKEN or `gh auth login`)
+#   --upload       Create a new GitHub release and upload the zip
+#                  (requires GITHUB_TOKEN or `gh auth login`)
+#   --upload-to TAG  Upload the zip to an existing GitHub release
+#                    identified by TAG (e.g., "1.2.0")
 #
 # Prerequisites:
 #   - All xcframeworks built in output/xcframeworks/
@@ -28,10 +30,11 @@ XCFW_DIR="${OUTPUT_DIR}/xcframeworks"
 
 VERSION="${1:-}"
 UPLOAD=false
+UPLOAD_TO_TAG=""
 
 if [[ -z "${VERSION}" ]]; then
     echo "ERROR: Version required."
-    echo "  Usage: $0 VERSION [--upload]"
+    echo "  Usage: $0 VERSION [--upload | --upload-to TAG]"
     exit 1
 fi
 
@@ -39,6 +42,7 @@ shift
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --upload) UPLOAD=true; shift ;;
+        --upload-to) UPLOAD_TO_TAG="$2"; shift 2 ;;
         *) echo "Unknown arg: $1"; exit 1 ;;
     esac
 done
@@ -83,9 +87,7 @@ log "Package created: ${ZIP_PATH} (${ZIP_SIZE})"
 # Step 3: Upload to GitHub (optional)
 # ---------------------------------------------------------------------------
 
-if [[ "${UPLOAD}" == "true" ]]; then
-    log "Uploading to GitHub releases..."
-
+if [[ "${UPLOAD}" == "true" || -n "${UPLOAD_TO_TAG}" ]]; then
     if ! command -v gh &> /dev/null; then
         echo "ERROR: gh CLI not installed. Install with: brew install gh"
         exit 1
@@ -94,15 +96,22 @@ if [[ "${UPLOAD}" == "true" ]]; then
     REPO_ROOT="$(cd "${TOOLS_ROOT}/../.." && pwd)"
     cd "${REPO_ROOT}"
 
-    # Create release and upload asset
-    gh release create "v${VERSION}" \
-        --title "v${VERSION}" \
-        --notes "SplunkAgent iOS SDK v${VERSION} - XCFramework distribution" \
-        "${ZIP_PATH}"
-
-    log "Release v${VERSION} created and asset uploaded ✓"
+    if [[ -n "${UPLOAD_TO_TAG}" ]]; then
+        # Upload to an existing release
+        log "Uploading to existing GitHub release: ${UPLOAD_TO_TAG}..."
+        gh release upload "${UPLOAD_TO_TAG}" "${ZIP_PATH}" --clobber
+        log "Asset uploaded to release ${UPLOAD_TO_TAG} ✓"
+    else
+        # Create a new release and upload
+        log "Creating GitHub release and uploading..."
+        gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --notes "SplunkAgent iOS SDK v${VERSION} - XCFramework distribution" \
+            "${ZIP_PATH}"
+        log "Release v${VERSION} created and asset uploaded ✓"
+    fi
 else
-    log "Skipping upload (use --upload to upload to GitHub releases)"
+    log "Skipping upload (use --upload or --upload-to TAG to upload to GitHub releases)"
 fi
 
 

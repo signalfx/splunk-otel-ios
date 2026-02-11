@@ -171,11 +171,20 @@ jobs:
   # ===========================================================================
   # Job 2: Sign, validate, and release
   # ===========================================================================
+  # NOTE: This job is temporarily disabled because distribution certificates
+  # cannot be stored in GitHub secrets per current policy.
+  #
+  # Signing is done locally instead using:
+  #   tools/xcframework/scripts/sign-and-upload.sh <VERSION>
+  #
+  # To re-enable automated signing, set the SIGNING_ENABLED repository
+  # variable to "true" and configure the DISTRIBUTION_CERTIFICATE and
+  # CERTIFICATE_PASSWORD secrets.
   sign-and-release:
     name: Sign & Release
     needs: build
     runs-on: macos-15
-    if: ${{ !inputs.skip-signing }}
+    if: ${{ vars.SIGNING_ENABLED == 'true' && !inputs.skip-signing }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
