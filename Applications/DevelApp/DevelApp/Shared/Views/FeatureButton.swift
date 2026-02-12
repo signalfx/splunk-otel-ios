@@ -17,27 +17,6 @@ limitations under the License.
 
 import SwiftUI
 
-struct FeatureSection<Content: View>: View {
-    let title: String
-    let content: Content
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Text(title)
-                .font(.headline)
-                .multilineTextAlignment(.center)
-
-            content
-        }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(Color(red: 0.87, green: 0.93, blue: 1.0))
-        .cornerRadius(12)
-        .padding(.horizontal, 16)
-    }
-}
-
-
 struct FeatureButton: View {
     let label: String
     let action: () -> Void
