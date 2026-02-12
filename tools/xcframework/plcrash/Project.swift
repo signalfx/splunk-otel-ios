@@ -75,6 +75,15 @@ let sharedSettings: SettingsDictionary = [
     "CLANG_ENABLE_MODULES": "YES",
     "CLANG_CXX_LANGUAGE_STANDARD": "c++17",
 
+    // Prefix header: ensures PLCrashNamespace.h (and its #define renames)
+    // is included before any other header in every compilation unit.
+    // Without this, private headers that don't include PLCrashNamespace.h
+    // declare classes with the original names, while the @implementation
+    // (after PLCrashNamespace.h is eventually included) uses prefixed
+    // names — causing a class name mismatch.
+    "GCC_PREFIX_HEADER": "$(SRCROOT)/\(plcrashRoot)/Source/PLCrashNamespace.h",
+    "GCC_PRECOMPILE_PREFIX_HEADER": "YES",
+
     // Install the public headers into the framework.
     "PUBLIC_HEADERS_FOLDER_PATH": "$(CONTENTS_FOLDER_PATH)/Headers"
 ]
