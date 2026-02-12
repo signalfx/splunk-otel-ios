@@ -76,13 +76,26 @@ Key variables in the Makefile:
 |----------|---------|-------------|
 | `OTEL_VERSION` | `2.3.0` | OpenTelemetry Swift Core tag to build |
 | `PLCRASH_VERSION` | `1.12.0` | PLCrashReporter tag to build |
+| `PLCRASH_SYMBOL_PREFIX` | `Splunk` | Prefix applied to all PLCrashReporter public symbols |
 | `CISCO_XCFRAMEWORKS_PATH` | *(empty)* | Local path to Cisco xcframeworks (downloads from S3 if unset) |
+
+#### PLCrashReporter Symbol Prefixing
+
+The `CrashReporter.xcframework` is built with a symbol prefix (`Splunk` by default) to avoid symbol collisions when customers already embed their own instance of PLCrashReporter. This uses PLCrashReporter's built-in `PLCRASHREPORTER_PREFIX` macro, which renames all public ObjC classes and C symbols at compile time (e.g., `PLCrashReporter` becomes `SplunkPLCrashReporter` in the binary).
+
+The build script patches `PLCrashNamespace.h` in the vendored source so that the prefix is baked into the shipped headers. This ensures consumers of the xcframework see the prefixed names without needing any extra build settings.
+
+To change the prefix, set `PLCRASH_SYMBOL_PREFIX` before building:
+
+```bash
+PLCRASH_SYMBOL_PREFIX=MyPrefix make build-plcrash
+```
 
 ---
 
 ## Release
 
-Releasing xcframeworks is a two-part process: CI builds the unsigned artifacts, then a developer signs them locally and uploads to the GitHub release.
+Releasing xcframeworks is a two-step process: CI builds the unsigned artifacts, then they are signed either automatically via Fastlane Match or manually by a developer.
 
 ### How it works
 
@@ -90,13 +103,16 @@ Releasing xcframeworks is a two-part process: CI builds the unsigned artifacts, 
 2. The release PR is reviewed and merged to `main`.
 3. `merge_release.yml` runs automatically — creates a git tag and a GitHub Release.
 4. `build-xcframeworks.yml` triggers on the release event — builds all xcframeworks, validates them, runs a smoke test, and uploads an **unsigned** artifact.
-5. A developer downloads the unsigned artifact, signs locally, and uploads the signed zip to the release.
+5. **(Automated)** If `SIGNING_ENABLED` is `"true"`, Job 2 installs the certificate via Fastlane Match, signs, validates, packages, and uploads to the release automatically.
+6. **(Fallback)** If automated signing is disabled, a developer signs locally with `sign-and-upload.sh`.
 
-> **Note:** Automated CI signing (Job 2 in `build-xcframeworks.yml`) is temporarily disabled because distribution certificates cannot be stored in GitHub secrets. The implementation is preserved and can be re-enabled by setting the `SIGNING_ENABLED` repository variable to `"true"`.
+### Code signing with Fastlane Match
 
-### Local signing
+Certificate management uses [Fastlane Match](https://docs.fastlane.tools/actions/match/) to store an encrypted distribution certificate in a private git repository. The actual certificate never appears in GitHub Secrets — only the encryption passphrase and a git access token are stored.
 
-After CI finishes the build (step 4 above), run the convenience script:
+### Local signing (fallback)
+
+If automated signing is disabled or you need to sign manually, use the convenience script after CI finishes the build (step 4 above):
 
 ```bash
 # Signs and uploads to the release in one step
@@ -222,6 +238,10 @@ Add these based on which instrumentation you need:
 
 For Objective-C projects, also include `SplunkAgentObjC.xcframework` and use the `SPLKSplunkRum` class.
 
+### PLCrashReporter Compatibility
+
+The included `CrashReporter.xcframework` uses prefixed symbols (e.g., `SplunkPLCrashReporter` instead of `PLCrashReporter`) to avoid conflicts if your app already uses PLCrashReporter. No action is needed on your side -- the two instances coexist without symbol collisions.
+
 ### visionOS Note
 
 `SplunkCrashReports.xcframework` and `CrashReporter.xcframework` do **not** support visionOS. Crash reporting is automatically disabled on that platform. All other modules work on visionOS.
@@ -250,3 +270,4 @@ The build system caches archives. To rebuild a specific module, remove its archi
 rm -rf build/agent/archives/SplunkAgent-*
 make build-agent
 ```
+
