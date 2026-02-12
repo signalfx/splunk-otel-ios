@@ -18,24 +18,6 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
-/// ModuleConfiguration conformance.
-public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
-
-/// RemoteModuleConfiguration conformance.
-public struct WebViewRemoteConfiguration: RemoteModuleConfiguration {
-
-    /// This property indicates whether the WebViewInstrumentationModule should be enabled
-    /// according to the remote configuration.
-    public var enabled: Bool = true
-
-    /// Initializes the remote configuration from data.
-    ///
-    /// This module does not support remote configuration beyond enabling/disabling.
-    public init?(from _: Data) {
-        nil
-    }
-}
-
 /// Placeholder metadata for events produced by `WebViewInstrumentation`.
 ///
 /// This module does not produce events.
