@@ -34,7 +34,11 @@ final class MockAgentSharedState: @unchecked Sendable, AgentSharedState {
 
     var sessionId: String {
         lock.lock()
-        defer { lock.unlock() }
+
+        defer {
+            lock.unlock()
+        }
+
         return sessionIdStorage
     }
 

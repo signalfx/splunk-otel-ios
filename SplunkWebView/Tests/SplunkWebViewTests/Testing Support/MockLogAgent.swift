@@ -45,7 +45,11 @@ final class MockLogAgent: @unchecked Sendable, LogAgent {
 
     var logMessages: [LogMessage] {
         lock.lock()
-        defer { lock.unlock() }
+
+        defer {
+            lock.unlock()
+        }
+
         return logMessagesStorage
     }
 
