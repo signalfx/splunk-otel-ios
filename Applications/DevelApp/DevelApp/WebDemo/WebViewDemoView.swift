@@ -170,93 +170,6 @@ struct WebViewDemoView: View {
             )
         ]
     }
-}
-
-// View Helpers
-
-extension WebViewDemoView {
-
-    // MARK: - PlaceholderSectionView
-
-    private struct PlaceholderSectionView: View {
-        let caption: String
-        let explanation: String
-
-        var body: some View {
-            VStack(spacing: 12) {
-                Text(caption)
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-
-                Text(explanation)
-                    .font(.callout)
-                    .multilineTextAlignment(.center)
-                    .foregroundColor(.secondary)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color(.systemGray5))
-                    .cornerRadius(8)
-            }
-            .padding()
-        }
-    }
-
-
-    // MARK: - WebView Section Data Model
-
-    private struct WebViewSectionView: View {
-        let caption: String
-        let webView: WKWebView
-        let backgroundColor: Color
-        let buttons: [WebDemoButton]
-
-        var body: some View {
-            VStack {
-                Text(caption)
-                    .font(.footnote)
-                    .padding(.top)
-                WebViewRepresentable(webView: webView)
-                    .frame(height: buttons.count == 2 ? 200 : 150)
-                    .background(Color(red: 0.95, green: 0.95, blue: 0.98)) // Light gray with blue tint
-                    .cornerRadius(8)
-                    .border(Color.gray)
-                    .padding(.horizontal)
-                VStack(spacing: 8) {
-                    ForEach(buttons.indices, id: \.self) { index in
-                        buttons[index]
-                        if buttons.count > 1, index < buttons.count - 1 {
-                            Text("—")
-                                .font(.body)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.bottom)
-            }
-            .background(backgroundColor)
-            .cornerRadius(8)
-            .padding()
-        }
-    }
-
-
-    // MARK: - WebDemoButton Model
-
-    private struct WebDemoButton: View, Identifiable {
-        let id = UUID()
-        let label: String
-        let action: () -> Void
-
-        var body: some View {
-            Button(action: action) {
-                Text(label)
-                    .frame(maxWidth: .infinity)
-            }
-        }
-    }
-
-
     // MARK: - Helper Function for Button Creation
 
     private func createWebDemoButton(
@@ -284,20 +197,5 @@ extension WebViewDemoView {
         buttons.append(WebDemoButton(label: label, action: action))
 
         return buttons
-    }
-
-
-    // MARK: - UIKit SwiftUI Wrapper
-
-    private struct WebViewRepresentable: UIViewRepresentable {
-        let webView: WKWebView
-
-        func makeUIView(context _: Context) -> WKWebView {
-            webView
-        }
-
-        func updateUIView(_: WKWebView, context _: Context) {
-            // Nothing to do here
-        }
     }
 }
