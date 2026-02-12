@@ -31,21 +31,24 @@ final class MockLogAgent: @unchecked Sendable, LogAgent {
         let message: String
     }
 
+
     // MARK: - Private
 
     private let lock = NSLock()
     private var logMessagesStorage: [LogMessage] = []
 
+
     // MARK: - Public
 
-    nonisolated let poolName: String
-    nonisolated let category: String?
+    let poolName: String
+    let category: String?
 
     var logMessages: [LogMessage] {
         lock.lock()
         defer { lock.unlock() }
         return logMessagesStorage
     }
+
 
     // MARK: - Initialization
 
@@ -58,9 +61,10 @@ final class MockLogAgent: @unchecked Sendable, LogAgent {
         self.init(poolName: "mock-pool", category: "mock-category")
     }
 
+
     // MARK: - LogAgent methods
 
-    nonisolated func process(configuration _: CiscoLogger.ConfigurationMessage) {}
+    func process(configuration _: CiscoLogger.ConfigurationMessage) {}
 
     func log(level: CiscoLogger.LogLevel, isPrivate _: Bool, message: @escaping @Sendable () -> String) {
         lock.lock()
