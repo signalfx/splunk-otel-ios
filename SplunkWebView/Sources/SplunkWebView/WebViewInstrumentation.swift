@@ -31,6 +31,7 @@ public final class WebViewInstrumentation: NSObject {
 
     private static let handlerName = "SplunkRumNativeUpdate"
 
+
     // MARK: - Private
 
     private let logger: LogAgent
@@ -39,6 +40,7 @@ public final class WebViewInstrumentation: NSObject {
         /// Tracks which web views have had the user script installed to prevent duplication.
         private let instrumentedWebViews = NSHashTable<WKWebView>.weakObjects()
     #endif
+
 
     // MARK: - Public
 
@@ -64,6 +66,7 @@ public final class WebViewInstrumentation: NSObject {
         self.logger = logger
         self.sharedState = sharedState
     }
+
 
     // MARK: - Public Methods
 
@@ -132,6 +135,7 @@ public final class WebViewInstrumentation: NSObject {
             webView.evaluateJavaScript(javaScript)
         }
     #endif
+
 
     // MARK: - Private Methods
 
