@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 // MARK: - PLCrashReporter type aliases for SPM compatibility
+
 //
 // When building as an xcframework, PLCrashReporter is compiled with
 // PLCRASHREPORTER_PREFIX=Splunk so all public ObjC classes are prefixed
@@ -29,12 +30,12 @@ limitations under the License.
 // consistently, regardless of the build path.
 
 #if SWIFT_PACKAGE
-import CrashReporter
+    import CrashReporter
 
-typealias SplunkPLCrashReporter = PLCrashReporter
-typealias SplunkPLCrashReporterConfig = PLCrashReporterConfig
-typealias SplunkPLCrashReport = PLCrashReport
-typealias SplunkPLCrashReportThreadInfo = PLCrashReportThreadInfo
-typealias SplunkPLCrashReportStackFrameInfo = PLCrashReportStackFrameInfo
-typealias SplunkPLCrashReportBinaryImageInfo = PLCrashReportBinaryImageInfo
+    typealias SplunkPLCrashReporter = PLCrashReporter
+    typealias SplunkPLCrashReporterConfig = PLCrashReporterConfig
+    typealias SplunkPLCrashReport = PLCrashReport
+    typealias SplunkPLCrashReportThreadInfo = PLCrashReportThreadInfo
+    typealias SplunkPLCrashReportStackFrameInfo = PLCrashReportStackFrameInfo
+    typealias SplunkPLCrashReportBinaryImageInfo = PLCrashReportBinaryImageInfo
 #endif
