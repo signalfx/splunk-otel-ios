@@ -139,6 +139,7 @@ public final class WebViewInstrumentation: NSObject {
         private func contentController(forName name: String, forWebView webView: WKWebView) -> WKUserContentController {
             let contentController = webView.configuration.userContentController
             contentController.removeScriptMessageHandler(forName: name)
+
             if #available(iOS 14.0, *) {
                 contentController.addScriptMessageHandler(self, contentWorld: .page, name: name)
             }
@@ -149,15 +150,12 @@ public final class WebViewInstrumentation: NSObject {
             return contentController
         }
 
-
     #endif // canImport(WebKit)
 }
 
 #if canImport(WebKit)
     @available(iOS 14.0, *)
     extension WebViewInstrumentation: WKScriptMessageHandlerWithReply {
-
-
         // MARK: - WKScriptMessageHandlerWithReply
 
         /// Handles JavaScript messages with a reply handler for asynchronous communication.

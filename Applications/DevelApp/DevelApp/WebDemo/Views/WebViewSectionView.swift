@@ -29,12 +29,14 @@ struct WebViewSectionView: View {
             Text(caption)
                 .font(.footnote)
                 .padding(.top)
+
             WebViewRepresentable(webView: webView)
                 .frame(height: buttons.count == 2 ? 200 : 150)
                 .background(Color(red: 0.95, green: 0.95, blue: 0.98)) // Light gray with blue tint
                 .cornerRadius(8)
                 .border(Color.gray)
                 .padding(.horizontal)
+
             VStack(spacing: 8) {
                 ForEach(buttons.indices, id: \.self) { index in
                     buttons[index]

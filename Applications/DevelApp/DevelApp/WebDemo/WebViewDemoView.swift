@@ -170,6 +170,7 @@ struct WebViewDemoView: View {
             )
         ]
     }
+
     // MARK: - Helper Function for Button Creation
 
     private func createWebDemoButton(

@@ -40,6 +40,7 @@ enum WebViewBridgeScript {
     /// - Parameters:
     ///   - sessionId: The initial native session ID to be cached in the JavaScript context.
     ///   - handlerName: The name of the `WKScriptMessageHandler` used for asynchronous communication.
+    ///
     /// - Returns: A fully interpolated JavaScript string ready for injection.
     static func generate(sessionId: String, handlerName: String) -> String {
         scriptTemplate
