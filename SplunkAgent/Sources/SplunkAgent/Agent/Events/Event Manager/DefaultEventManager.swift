@@ -33,8 +33,8 @@ class DefaultEventManager: AgentEventManager {
     /// Container for event processors.
     struct Processors {
         let logEventProcessor: LogEventProcessor
-        let sessionReplayProcessor: LogEventProcessor?
-        let traceProcessor: TraceProcessor
+        let sessionReplayProcessor: OTLPSessionReplayEventProcessor?
+        let traceProcessor: OTLPTraceProcessor
     }
 
     // MARK: - Constants
@@ -42,18 +42,39 @@ class DefaultEventManager: AgentEventManager {
     /// Interval for sending pulse events (5 minutes).
     let pulseEventInterval: TimeInterval = 300
 
+    // MARK: - Private properties (concrete types for endpoint updates)
+
+    /// Event processor (internal for endpoint updates).
+    private let _logEventProcessor: LogEventProcessor
+
+    /// Session Replay processor (stored as concrete type for endpoint updates).
+    private var _sessionReplayProcessor: OTLPSessionReplayEventProcessor?
+
+    /// Trace processor (stored as concrete type for endpoint updates).
+    private let _traceProcessor: OTLPTraceProcessor
+
+    // MARK: - Protocol conformance properties
+
+    /// Event processor to process Logs and Events.
+    var logEventProcessor: LogEventProcessor {
+        _logEventProcessor
+    }
+
+    /// Trace processor to process Traces.
+    var traceProcessor: TraceProcessor {
+        _traceProcessor
+    }
+
     // MARK: - Internal properties
 
-    /// Event processor.
-    var logEventProcessor: LogEventProcessor
+    /// Session Replay processor accessor for endpoint updates.
+    var sessionReplayProcessor: OTLPSessionReplayEventProcessor? {
+        get { _sessionReplayProcessor }
+        set { _sessionReplayProcessor = newValue }
+    }
 
-    /// Session Replay processor.
-    var sessionReplayProcessor: LogEventProcessor?
     var sessionReplayIndexer: EventIndexer
     var sessionReplayMemorizer: EventMemorizer
-
-    /// Trace processor.
-    var traceProcessor: TraceProcessor
 
     /// Agent reference.
     unowned let agent: SplunkRum
@@ -66,6 +87,11 @@ class DefaultEventManager: AgentEventManager {
         agent.logger
     }
 
+    /// Internal access to concrete trace processor for endpoint updates.
+    var concreteTraceProcessor: OTLPTraceProcessor {
+        _traceProcessor
+    }
+
     // MARK: - Initialization
 
     required init(with configuration: any AgentConfigurationProtocol, agent: SplunkRum) throws {
@@ -74,54 +100,33 @@ class DefaultEventManager: AgentEventManager {
         sessionReplayIndexer = SessionReplayEventIndexer(named: "replay")
         sessionReplayMemorizer = SessionReplayEventMemorizer(named: "replay")
 
-        // Initialize processors based on whether endpoint is available
-        if let endpoint = configuration.endpoint,
-            let traceUrl = endpoint.traceEndpoint
-        {
-            // Initialize with real processors
-            let processors = Self.createProcessors(
-                traceUrl: traceUrl,
-                sessionReplayUrl: endpoint.sessionReplayEndpoint,
-                accessToken: endpoint.rumAccessToken,
-                configuration: configuration,
-                agent: agent
-            )
+        // Extract endpoint info if available
+        let traceUrl = configuration.endpoint?.traceEndpoint
+        let sessionReplayUrl = configuration.endpoint?.sessionReplayEndpoint
+        let accessToken = configuration.endpoint?.rumAccessToken
 
-            logEventProcessor = processors.logEventProcessor
-            sessionReplayProcessor = processors.sessionReplayProcessor
-            traceProcessor = processors.traceProcessor
+        // Initialize processors (they will cache data if endpoint is nil)
+        let processors = Self.createProcessors(
+            traceUrl: traceUrl,
+            sessionReplayUrl: sessionReplayUrl,
+            accessToken: accessToken,
+            configuration: configuration,
+            agent: agent
+        )
 
+        _logEventProcessor = processors.logEventProcessor
+        _sessionReplayProcessor = processors.sessionReplayProcessor
+        _traceProcessor = processors.traceProcessor
+
+        // Log the endpoint status
+        if let traceUrl {
             logger.log(level: .info, isPrivate: false) {
                 "Using trace url: \(traceUrl)"
             }
         }
-        else if let cachingUrl = Self.cachingUrl {
-            // Initialize with caching processors - spans will be cached to disk
-            // and sent when an endpoint is configured
-            let processors = Self.createProcessors(
-                traceUrl: cachingUrl,
-                sessionReplayUrl: nil,
-                accessToken: nil,
-                configuration: configuration,
-                agent: agent
-            )
-
-            logEventProcessor = processors.logEventProcessor
-            sessionReplayProcessor = processors.sessionReplayProcessor
-            traceProcessor = processors.traceProcessor
-
+        else {
             logger.log(level: .info, isPrivate: false) {
                 "No endpoint configured. Spans will be cached and sent when endpoint is configured."
-            }
-        }
-        else {
-            // Fallback to NoOp if caching URL is somehow invalid
-            logEventProcessor = NoOpLogEventProcessor()
-            sessionReplayProcessor = nil
-            traceProcessor = NoOpTraceProcessor()
-
-            logger.log(level: .info, isPrivate: false) {
-                "No endpoint configured. Spans will not be sent until endpoint is updated."
             }
         }
     }

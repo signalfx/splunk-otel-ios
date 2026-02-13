@@ -150,13 +150,8 @@ public class SplunkRum: ObservableObject {
         eventManager.disableEndpoint(cacheData: cacheData)
         currentEndpoint = nil
 
-        // Update network exclusion list - include caching URL if caching is enabled
-        if cacheData, let cachingUrl = DefaultEventManager.cachingUrl {
-            updateNetworkExclusionList(for: nil, additionalUrls: [cachingUrl])
-        }
-        else {
-            updateNetworkExclusionList(for: nil)
-        }
+        // Update network exclusion list - no endpoint active
+        updateNetworkExclusionList(for: nil)
 
         // Note: Session Replay continues collecting data even when endpoint is disabled.
         // Data will be cached and sent when the endpoint is re-enabled.

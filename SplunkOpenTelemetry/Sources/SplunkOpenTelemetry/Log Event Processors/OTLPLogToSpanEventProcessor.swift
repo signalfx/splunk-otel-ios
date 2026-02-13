@@ -47,7 +47,7 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
     // MARK: - Initialization
 
     public required init(
-        with _: URL,
+        with _: URL?,
         resources: AgentResources,
         debugEnabled: Bool
     ) {

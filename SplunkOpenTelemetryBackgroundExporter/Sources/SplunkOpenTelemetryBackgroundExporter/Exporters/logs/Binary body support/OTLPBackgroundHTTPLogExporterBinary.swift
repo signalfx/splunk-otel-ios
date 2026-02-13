@@ -39,6 +39,20 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
 
         do {
             let storeData = try body.serializedData()
+
+            // If no endpoint is configured, store in pending folder for later
+            if isPendingEndpoint {
+                try diskStorage.insert(
+                    storeData,
+                    forKey: KeyBuilder(
+                        requestId.uuidString,
+                        parrentKeyBuilder: getPendingStorageKey()
+                    )
+                )
+                return .success
+            }
+
+            // Store in active folder
             try diskStorage.insert(
                 storeData,
                 forKey: KeyBuilder(
@@ -50,6 +64,11 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
         catch {
 
             return .failure
+        }
+
+        // Only send if we have an endpoint
+        guard let endpoint else {
+            return .success
         }
 
         let timeout = min(explicitTimeout ?? TimeInterval.greatestFiniteMagnitude, config.timeout)

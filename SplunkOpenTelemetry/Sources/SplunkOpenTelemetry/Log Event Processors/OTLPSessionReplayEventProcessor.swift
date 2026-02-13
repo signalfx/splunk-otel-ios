@@ -71,6 +71,8 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         debugEnabled: Bool,
         accessToken: String? = nil
     ) {
+        // Session replay requires an endpoint - return nil if not provided
+        // (unlike traces, session replay data shouldn't be cached indefinitely)
         guard let sessionReplayEndpoint else {
             return nil
         }
@@ -108,6 +110,29 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         resource.merge(other: replayResource)
 
         self.resource = resource
+    }
+
+
+    // MARK: - Endpoint Management
+
+    /// Updates the endpoint and flushes any pending data.
+    ///
+    /// - Parameters:
+    ///   - newEndpoint: The new endpoint URL.
+    ///   - accessToken: Optional access token to use for authentication.
+    public func setEndpoint(_ newEndpoint: URL, accessToken: String? = nil) {
+        var headers: [String: String] = [:]
+
+        if let accessToken, !accessToken.isEmpty {
+            headers["X-SF-Token"] = accessToken
+        }
+
+        backgroundLogExporter.setEndpoint(newEndpoint, headers: headers)
+    }
+
+    /// Clears the endpoint, causing new data to be cached to pending storage.
+    public func clearEndpoint() {
+        backgroundLogExporter.clearEndpoint()
     }
 
 

@@ -7,7 +7,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-* Added support for the setting of endpointConfiguration to be deferred until after agent initialization.  Disabling the endpoint is also supported with caching (optional) of pending spans.
+* Added support for the setting of endpointConfiguration to be deferred until after agent initialization.  Disabling the endpoint is also supported with caching of pending spans.
 
 ## [2.0.7] - 2026-02-04
 

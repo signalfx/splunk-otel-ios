@@ -27,14 +27,15 @@ public class OTLPBackgroundHTTPBaseExporter {
     // MARK: - Private
 
     private let qosConfig: SessionQOSConfiguration
+    private let performStalledUploadCheck: Bool
 
 
     // MARK: - Internal
 
     let fileType: String?
-    let endpoint: URL
+    var endpoint: URL?
     let envVarHeaders: [(String, String)]?
-    let additionalHeaders: [String: String]
+    var additionalHeaders: [String: String]
     let config: OtlpConfiguration
     let diskStorage: DiskStorage
     var checkStalledTask: Task<Void, Never>?
@@ -46,10 +47,18 @@ public class OTLPBackgroundHTTPBaseExporter {
     )
 
 
+    // MARK: - Public Properties
+
+    /// Returns `true` if no endpoint is configured and data should be cached to pending storage.
+    public var isPendingEndpoint: Bool {
+        endpoint == nil
+    }
+
+
     // MARK: - Initialization
 
     public init(
-        endpoint: URL,
+        endpoint: URL?,
         config: OtlpConfiguration = OtlpConfiguration(),
         qosConfig: SessionQOSConfiguration,
         envVarHeaders: [(String, String)]? = EnvVarHeaders.attributes,
@@ -72,17 +81,11 @@ public class OTLPBackgroundHTTPBaseExporter {
         self.diskStorage = diskStorage
         self.fileType = fileType
         self.qosConfig = qosConfig
+        self.performStalledUploadCheck = performStalledUploadCheck
 
-        if performStalledUploadCheck {
-            // Get incomplete requests and check for stalled files
-            // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
-            checkStalledTask = Task.detached(priority: .utility) { [weak self] in
-                try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
-                self?.httpClient
-                    .getAllSessionsTasks { [weak self] tasks in
-                        self?.checkStalledUploadsOperation(tasks: tasks)
-                    }
-            }
+        // Only start stalled upload check if endpoint is configured
+        if performStalledUploadCheck, endpoint != nil {
+            startStalledUploadCheck()
         }
     }
 
@@ -91,9 +94,124 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
 
+    // MARK: - Endpoint Management
+
+    /// Updates the endpoint and flushes any pending data.
+    ///
+    /// - Parameters:
+    ///   - newEndpoint: The new endpoint URL.
+    ///   - newHeaders: Optional new headers to use (e.g., for access token).
+    public func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]? = nil) {
+        endpoint = newEndpoint
+
+        if let newHeaders {
+            additionalHeaders = newHeaders
+        }
+
+        // Flush any pending data now that we have an endpoint
+        flushPendingData()
+
+        // Start stalled upload check now that we have an endpoint
+        if performStalledUploadCheck {
+            startStalledUploadCheck()
+        }
+    }
+
+    /// Clears the endpoint, causing new data to be cached to pending storage.
+    ///
+    /// This is useful when you want to temporarily disable sending data
+    /// but still cache it for later transmission.
+    public func clearEndpoint() {
+        // Cancel any pending stalled upload checks
+        checkStalledTask?.cancel()
+        checkStalledTask = nil
+
+        // Clear the endpoint - new data will go to pending storage
+        endpoint = nil
+    }
+
+    /// Starts the background task to check for stalled uploads.
+    private func startStalledUploadCheck() {
+        // Cancel any existing check
+        checkStalledTask?.cancel()
+
+        // Get incomplete requests and check for stalled files
+        // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
+        checkStalledTask = Task.detached(priority: .utility) { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
+            self?.httpClient
+                .getAllSessionsTasks { [weak self] tasks in
+                    self?.checkStalledUploadsOperation(tasks: tasks)
+                }
+        }
+    }
+
+    /// Flushes any data stored in pending storage by moving it to active storage and scheduling uploads.
+    private func flushPendingData() {
+        guard let endpoint else {
+            return
+        }
+
+        // Get all pending files
+        guard let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) else {
+            return
+        }
+
+        // Move each pending file to active storage and schedule for upload
+        for fileInfo in pendingFiles {
+            let pendingKey = KeyBuilder(
+                fileInfo.key,
+                parrentKeyBuilder: getPendingStorageKey()
+            )
+
+            let activeKey = KeyBuilder(
+                fileInfo.key,
+                parrentKeyBuilder: getStorageKey()
+            )
+
+            do {
+                // Get pending file URL
+                let pendingFileUrl = try diskStorage.finalDestination(forKey: pendingKey)
+
+                // Read data from pending storage
+                let data = try Data(contentsOf: pendingFileUrl)
+
+                // Write to active storage
+                try diskStorage.insert(data, forKey: activeKey)
+
+                // Delete from pending storage
+                try diskStorage.delete(forKey: pendingKey)
+
+                // Create request descriptor and schedule upload
+                guard let requestId = UUID(uuidString: fileInfo.key) else {
+                    continue
+                }
+
+                let requestDescriptor = RequestDescriptor(
+                    id: requestId,
+                    endpoint: endpoint,
+                    explicitTimeout: config.timeout,
+                    fileKeyType: getFileKeyType(),
+                    headers: headers
+                )
+
+                try httpClient.send(requestDescriptor)
+            }
+            catch {
+                // If we fail to move/send one file, continue with others
+                continue
+            }
+        }
+    }
+
+
     // MARK: - Stalled request operations
 
     func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
+        // Skip if no endpoint configured
+        guard let endpoint else {
+            return
+        }
 
         // Get descriptions from all incomplete requests
         let allTaskDescriptions =
@@ -108,7 +226,7 @@ public class OTLPBackgroundHTTPBaseExporter {
 
         // Cancel stalled tasks (scheduled in the past or no date) and tasks with mismatched endpoints.
         // Tasks with different endpoints need to be cancelled and recreated with the current endpoint
-        // to handle endpoint configuration changes (e.g., caching mode -> real endpoint).
+        // to handle endpoint configuration changes.
         let toCancelTasks = tasks.filter { task in
             // Cancel if stalled (no earliestBeginDate or scheduled in the past)
             guard let expectedExecutionDate = task.earliestBeginDate else {
@@ -158,6 +276,10 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     func checkAndSend(fileKeys files: [String], existingTasks allTaskDescriptions: [RequestDescriptorProtocol], cancelledTaskIds: Set<UUID>) {
+        // Skip if no endpoint configured
+        guard let endpoint else {
+            return
+        }
 
         // Go throught file list and try to send all files again.
         for fileKey in files {
@@ -207,6 +329,10 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     func getStorageKey() -> KeyBuilder {
         KeyBuilder.uploadsKey.append(getFileKeyType())
+    }
+
+    func getPendingStorageKey() -> KeyBuilder {
+        KeyBuilder.pendingUploadsKey.append(getFileKeyType())
     }
 
     func getFileKeyType() -> String {

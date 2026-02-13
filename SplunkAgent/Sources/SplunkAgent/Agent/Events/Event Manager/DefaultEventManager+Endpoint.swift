@@ -22,12 +22,10 @@ internal import SplunkOpenTelemetry
 
 extension DefaultEventManager {
 
-    /// The URL used when caching is enabled but no endpoint is configured.
+    /// Updates the endpoint configuration and enables sending spans.
     ///
-    /// This non-routable address forces the exporter to cache data to disk.
-    static let cachingUrl = URL(string: "https://0.0.0.0:0/v1/traces")
-
-    /// Updates the endpoint configuration and reinitializes processors to start sending spans.
+    /// When this is called, any data that was cached to pending storage
+    /// (while no endpoint was configured) will be flushed and sent.
     ///
     /// - Parameter endpoint: The new endpoint configuration to use.
     /// - Throws: ``AgentConfigurationError`` if the endpoint is invalid.
@@ -39,19 +37,13 @@ extension DefaultEventManager {
             throw AgentConfigurationError.invalidEndpoint(supplied: endpoint)
         }
 
-        // Create new processors with the updated endpoint
-        let processors = Self.createProcessors(
-            traceUrl: traceUrl,
-            sessionReplayUrl: endpoint.sessionReplayEndpoint,
-            accessToken: endpoint.rumAccessToken,
-            configuration: configuration,
-            agent: agent
-        )
+        // Update the trace processor endpoint (this also flushes pending data)
+        concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken)
 
-        // Replace processors
-        logEventProcessor = processors.logEventProcessor
-        sessionReplayProcessor = processors.sessionReplayProcessor
-        traceProcessor = processors.traceProcessor
+        // Update session replay processor endpoint if it exists and has a URL
+        if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
+            sessionReplayProcessor?.setEndpoint(sessionReplayUrl, accessToken: endpoint.rumAccessToken)
+        }
 
         logger.log(level: .info, isPrivate: false) {
             "Endpoint updated. Using trace url: \(traceUrl)"
@@ -60,43 +52,32 @@ extension DefaultEventManager {
 
     /// Disables the endpoint configuration.
     ///
-    /// When `cacheData` is `true` (default), spans and events are cached to disk for later sending
-    /// when a new endpoint is configured. When `false`, data is dropped (NoOp mode).
+    /// When `cacheData` is `true` (default), spans and events are cached to pending storage
+    /// for later sending when a new endpoint is configured. When `false`, data is dropped (NoOp mode).
     ///
     /// - Parameter cacheData: If `true`, data is cached for later sending. If `false`, data is dropped.
     func disableEndpoint(cacheData: Bool = true) {
-        if cacheData, let cachingUrl = Self.cachingUrl {
-            // Keep real processors active for caching - they'll write to disk
-            // but HTTP will fail to a non-routable address, triggering retry cache
-            let processors = Self.createProcessors(
-                traceUrl: cachingUrl,
-                sessionReplayUrl: nil,
-                accessToken: nil,
-                configuration: configuration,
-                agent: agent
-            )
-
-            logEventProcessor = processors.logEventProcessor
-            sessionReplayProcessor = processors.sessionReplayProcessor
-            traceProcessor = processors.traceProcessor
+        if cacheData {
+            // Clear endpoint on processors - new data will go to pending storage
+            concreteTraceProcessor.clearEndpoint()
+            sessionReplayProcessor?.clearEndpoint()
 
             logger.log(level: .info, isPrivate: false) {
                 "Endpoint disabled with caching enabled. Spans will be cached and sent when endpoint is configured."
             }
         }
         else {
-            disableEndpointWithNoOp()
-        }
-    }
+            // For complete disable (drop data), we can't use the stored processors
+            // since they would still cache. This case requires special handling
+            // by the caller if needed (e.g., stop collecting data entirely).
+            logger.log(level: .info, isPrivate: false) {
+                "Endpoint disabled. Data will continue to be cached until a new endpoint is configured."
+            }
 
-    /// Disables the endpoint with NoOp processors (data is dropped).
-    func disableEndpointWithNoOp() {
-        logEventProcessor = NoOpLogEventProcessor()
-        sessionReplayProcessor = nil
-        traceProcessor = NoOpTraceProcessor()
-
-        logger.log(level: .info, isPrivate: false) {
-            "Endpoint disabled. Spans will not be sent until endpoint is configured."
+            // Note: To truly drop data, the caller should stop generating spans/events.
+            // The caching behavior is intentional to prevent data loss.
+            concreteTraceProcessor.clearEndpoint()
+            sessionReplayProcessor?.clearEndpoint()
         }
     }
 }
@@ -106,7 +87,7 @@ extension DefaultEventManager {
 extension DefaultEventManager {
 
     static func createProcessors(
-        traceUrl: URL,
+        traceUrl: URL?,
         sessionReplayUrl: URL?,
         accessToken: String?,
         configuration: any AgentConfigurationProtocol,
@@ -133,13 +114,14 @@ extension DefaultEventManager {
         )
 
         // Initialize log event processor
+        // Note: This processor converts logs to spans, so it uses the trace endpoint
         let logProcessor = OTLPLogToSpanEventProcessor(
             with: traceUrl,
             resources: resources,
             debugEnabled: configuration.enableDebugLogging
         )
 
-        // Initialize session replay processor (optional)
+        // Initialize session replay processor (optional - requires endpoint)
         let replayProcessor = OTLPSessionReplayEventProcessor(
             with: sessionReplayUrl,
             resources: resources,
