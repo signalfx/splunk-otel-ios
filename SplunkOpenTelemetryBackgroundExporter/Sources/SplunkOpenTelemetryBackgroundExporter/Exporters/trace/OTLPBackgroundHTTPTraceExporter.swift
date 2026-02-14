@@ -17,7 +17,6 @@ limitations under the License.
 
 import CiscoDiskStorage
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 
 public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, SpanExporter {
@@ -25,14 +24,20 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
     // MARK: - Implementation SpanExporter protocol
 
     public func export(spans: [SpanData], explicitTimeout: TimeInterval? = nil) -> SpanExporterResultCode {
-        let body = Opentelemetry_Proto_Collector_Trace_V1_ExportTraceServiceRequest.with {
-            $0.resourceSpans = SpanAdapter.toProtoResourceSpans(spanDataList: spans)
+        // Convert spans to OTLP JSON models using our custom adapter
+        let resourceSpans = SpanDataAdapter.toResourceSpans(spans)
+
+        // Skip if no spans to export (filter empty envelopes per OTLP spec)
+        guard !resourceSpans.isEmpty else {
+            return .success
         }
 
+        let request = OTLPExportTraceServiceRequest(resourceSpans: resourceSpans)
         let requestId = UUID()
 
         do {
-            let storeData = try body.serializedData()
+            // Encode to JSON instead of protobuf binary
+            let storeData = try JSONEncoder().encode(request)
 
             // If no endpoint is configured, store in pending folder for later
             if isPendingEndpoint {

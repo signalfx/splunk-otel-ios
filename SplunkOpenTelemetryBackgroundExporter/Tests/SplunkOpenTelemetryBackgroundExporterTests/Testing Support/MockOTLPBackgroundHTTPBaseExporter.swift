@@ -17,7 +17,6 @@ limitations under the License.
 
 import CiscoEncryption
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
 import Testing
 

@@ -17,7 +17,6 @@ limitations under the License.
 
 import CiscoEncryption
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
 import Testing
 
@@ -62,8 +61,8 @@ struct MockRequestDescriptor: RequestDescriptorProtocol {
         var request = URLRequest(url: endpoint)
 
         request.httpMethod = "POST"
-        request.setValue(Headers.getUserAgentHeader(), forHTTPHeaderField: Constants.HTTP.userAgent)
-        request.setValue("application/x-protobuf", forHTTPHeaderField: "Content-Type")
+        request.setValue(OTLPHTTPHeaders.userAgent, forHTTPHeaderField: OTLPHTTPHeaders.userAgentKey)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = explicitTimeout
 
         for (key, value) in headers {
