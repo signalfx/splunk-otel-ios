@@ -27,16 +27,51 @@ public class OTLPBackgroundHTTPBaseExporter {
     private let qosConfig: SessionQOSConfiguration
     private let performStalledUploadCheck: Bool
 
+    /// Lock for thread-safe access to mutable endpoint state.
+    private let stateLock = NSLock()
+
+    /// Backing storage for endpoint (access via thread-safe computed property).
+    private var _endpoint: URL?
+
+    /// Backing storage for additional headers (access via thread-safe computed property).
+    private var _additionalHeaders: [String: String]
+
 
     // MARK: - Internal
 
     let fileType: String?
-    var endpoint: URL?
     let envVarHeaders: [(String, String)]?
-    var additionalHeaders: [String: String]
     let config: OTLPExporterConfiguration
     let diskStorage: DiskStorage
     var checkStalledTask: Task<Void, Never>?
+
+    /// Thread-safe accessor for the endpoint URL.
+    var endpoint: URL? {
+        get {
+            stateLock.lock()
+            defer { stateLock.unlock() }
+            return _endpoint
+        }
+        set {
+            stateLock.lock()
+            defer { stateLock.unlock() }
+            _endpoint = newValue
+        }
+    }
+
+    /// Thread-safe accessor for additional headers.
+    var additionalHeaders: [String: String] {
+        get {
+            stateLock.lock()
+            defer { stateLock.unlock() }
+            return _additionalHeaders
+        }
+        set {
+            stateLock.lock()
+            defer { stateLock.unlock() }
+            _additionalHeaders = newValue
+        }
+    }
 
     lazy var httpClient: BackgroundHTTPClientProtocol = BackgroundHTTPClient(
         sessionQosConfiguration: qosConfig,
@@ -73,8 +108,8 @@ public class OTLPBackgroundHTTPBaseExporter {
         performStalledUploadCheck: Bool = true
     ) {
         self.envVarHeaders = envVarHeaders
-        additionalHeaders = headers
-        self.endpoint = endpoint
+        _additionalHeaders = headers
+        _endpoint = endpoint
         self.config = config
         self.diskStorage = diskStorage
         self.fileType = fileType
@@ -100,11 +135,13 @@ public class OTLPBackgroundHTTPBaseExporter {
     ///   - newEndpoint: The new endpoint URL.
     ///   - newHeaders: Optional new headers to use (e.g., for access token).
     public func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]? = nil) {
-        endpoint = newEndpoint
-
+        // Update state atomically
+        stateLock.lock()
+        _endpoint = newEndpoint
         if let newHeaders {
-            additionalHeaders = newHeaders
+            _additionalHeaders = newHeaders
         }
+        stateLock.unlock()
 
         // Flush any pending data now that we have an endpoint
         flushPendingData()
@@ -146,7 +183,10 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     /// Flushes any data stored in pending storage by moving it to active storage and scheduling uploads.
     private func flushPendingData() {
-        guard let endpoint else {
+        // Capture current state atomically
+        let (currentEndpoint, currentHeaders) = getEndpointState()
+
+        guard let currentEndpoint else {
             return
         }
 
@@ -187,10 +227,10 @@ public class OTLPBackgroundHTTPBaseExporter {
 
                 let requestDescriptor = RequestDescriptor(
                     id: requestId,
-                    endpoint: endpoint,
+                    endpoint: currentEndpoint,
                     explicitTimeout: config.timeout,
                     fileKeyType: getFileKeyType(),
-                    headers: headers
+                    headers: buildHeaders(from: currentHeaders)
                 )
 
                 try httpClient.send(requestDescriptor)
@@ -206,8 +246,8 @@ public class OTLPBackgroundHTTPBaseExporter {
     // MARK: - Stalled request operations
 
     func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
-        // Skip if no endpoint configured
-        guard let endpoint else {
+        // Capture current endpoint atomically
+        guard let currentEndpoint = endpoint else {
             return
         }
 
@@ -239,7 +279,7 @@ public class OTLPBackgroundHTTPBaseExporter {
             // Only check this if we can decode the task description
             if let taskDescription = task.taskDescription,
                 let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8)),
-                descriptor.endpoint != endpoint
+                descriptor.endpoint != currentEndpoint
             {
                 return true
             }
@@ -274,8 +314,10 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     func checkAndSend(fileKeys files: [String], existingTasks allTaskDescriptions: [RequestDescriptorProtocol], cancelledTaskIds: Set<UUID>) {
-        // Skip if no endpoint configured
-        guard let endpoint else {
+        // Capture current state atomically
+        let (currentEndpoint, currentHeaders) = getEndpointState()
+
+        guard let currentEndpoint else {
             return
         }
 
@@ -296,10 +338,10 @@ public class OTLPBackgroundHTTPBaseExporter {
                     // This ensures cached data is sent to the updated endpoint, not the old one.
                     let taskDescription = RequestDescriptor(
                         id: requestId,
-                        endpoint: endpoint,
+                        endpoint: currentEndpoint,
                         explicitTimeout: config.timeout,
                         fileKeyType: getFileKeyType(),
-                        headers: headers
+                        headers: buildHeaders(from: currentHeaders)
                     )
 
                     try? httpClient.send(taskDescription)
@@ -311,10 +353,10 @@ public class OTLPBackgroundHTTPBaseExporter {
                 // This task was forgotten by system, create new one.
                 let taskDescription = RequestDescriptor(
                     id: requestId,
-                    endpoint: endpoint,
+                    endpoint: currentEndpoint,
                     explicitTimeout: config.timeout,
                     fileKeyType: getFileKeyType(),
-                    headers: headers
+                    headers: buildHeaders(from: currentHeaders)
                 )
 
                 try? httpClient.send(taskDescription)
@@ -337,7 +379,15 @@ public class OTLPBackgroundHTTPBaseExporter {
         fileType ?? "base"
     }
 
-    var headers: [String: String] {
+    /// Returns the current endpoint and headers atomically.
+    private func getEndpointState() -> (endpoint: URL?, headers: [String: String]) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return (_endpoint, _additionalHeaders)
+    }
+
+    /// Builds combined headers from additional headers and environment variable headers.
+    private func buildHeaders(from additionalHeaders: [String: String]) -> [String: String] {
         var combinedHeaders = additionalHeaders
 
         if let envVarHeaders {
@@ -347,5 +397,9 @@ public class OTLPBackgroundHTTPBaseExporter {
         }
 
         return combinedHeaders
+    }
+
+    var headers: [String: String] {
+        buildHeaders(from: additionalHeaders)
     }
 }

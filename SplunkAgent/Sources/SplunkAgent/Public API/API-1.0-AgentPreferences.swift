@@ -50,15 +50,11 @@ extension AgentPreferences {
             guard let newValue else {
                 // Disable the endpoint when nil is passed
                 owner.disableEndpoint()
-                // Update the current endpoint to nil
-                owner.currentEndpoint = nil
                 return
             }
 
             do {
                 try owner.updateEndpoint(newValue)
-                // Update the current endpoint after successful update
-                owner.currentEndpoint = newValue
             }
             catch {
                 owner.logger.log(level: .error, isPrivate: false) {

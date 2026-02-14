@@ -149,8 +149,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         // Task is scheduled for the future (not stalled) but has a different endpoint
         let taskWithDifferentEndpoint = try createNewTestTask()
         taskWithDifferentEndpoint.taskDescription = try MockRequestDescriptor(
-            // Different endpoint (caching URL)
-            endpointString: "https://0.0.0.0:0/v1/traces",
+            // Different endpoint than the exporter's configured endpoint
+            endpointString: "https://other-endpoint.com/v1/traces",
             scheduled: futureDate
         )
         .json
