@@ -45,32 +45,32 @@ class DefaultEventManager: AgentEventManager {
     // MARK: - Private properties (concrete types for endpoint updates)
 
     /// Event processor (internal for endpoint updates).
-    private let _logEventProcessor: LogEventProcessor
+    private let storedLogEventProcessor: LogEventProcessor
 
     /// Session Replay processor (stored as concrete type for endpoint updates).
-    private var _sessionReplayProcessor: OTLPSessionReplayEventProcessor?
+    private var storedSessionReplayProcessor: OTLPSessionReplayEventProcessor?
 
     /// Trace processor (stored as concrete type for endpoint updates).
-    private let _traceProcessor: OTLPTraceProcessor
+    private let storedTraceProcessor: OTLPTraceProcessor
 
     // MARK: - Protocol conformance properties
 
     /// Event processor to process Logs and Events.
     var logEventProcessor: LogEventProcessor {
-        _logEventProcessor
+        storedLogEventProcessor
     }
 
     /// Trace processor to process Traces.
     var traceProcessor: TraceProcessor {
-        _traceProcessor
+        storedTraceProcessor
     }
 
     // MARK: - Internal properties
 
     /// Session Replay processor accessor for endpoint updates.
     var sessionReplayProcessor: OTLPSessionReplayEventProcessor? {
-        get { _sessionReplayProcessor }
-        set { _sessionReplayProcessor = newValue }
+        get { storedSessionReplayProcessor }
+        set { storedSessionReplayProcessor = newValue }
     }
 
     var sessionReplayIndexer: EventIndexer
@@ -89,7 +89,7 @@ class DefaultEventManager: AgentEventManager {
 
     /// Internal access to concrete trace processor for endpoint updates.
     var concreteTraceProcessor: OTLPTraceProcessor {
-        _traceProcessor
+        storedTraceProcessor
     }
 
     // MARK: - Initialization
@@ -114,9 +114,9 @@ class DefaultEventManager: AgentEventManager {
             agent: agent
         )
 
-        _logEventProcessor = processors.logEventProcessor
-        _sessionReplayProcessor = processors.sessionReplayProcessor
-        _traceProcessor = processors.traceProcessor
+        storedLogEventProcessor = processors.logEventProcessor
+        storedSessionReplayProcessor = processors.sessionReplayProcessor
+        storedTraceProcessor = processors.traceProcessor
 
         // Log the endpoint status
         if let traceUrl {
