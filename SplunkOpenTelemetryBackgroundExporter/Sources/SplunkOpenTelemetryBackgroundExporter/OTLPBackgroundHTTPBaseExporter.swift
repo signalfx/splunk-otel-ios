@@ -149,9 +149,10 @@ public class OTLPBackgroundHTTPBaseExporter {
         // Wait 5-8s to clean caches content from abandoned or stalled files.
         checkStalledTask = Task.detached(priority: .utility) { [weak self] in
             try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
-            self?.httpClient.getAllSessionsTasks { [weak self] tasks in
-                self?.checkStalledUploadsOperation(tasks: tasks)
-            }
+            self?.httpClient
+                .getAllSessionsTasks { [weak self] tasks in
+                    self?.checkStalledUploadsOperation(tasks: tasks)
+                }
         }
     }
 
@@ -202,7 +203,8 @@ public class OTLPBackgroundHTTPBaseExporter {
             return
         }
 
-        let allTaskDescriptions = tasks
+        let allTaskDescriptions =
+            tasks
             .compactMap(\.taskDescription)
             .compactMap { try? JSONDecoder().decode(RequestDescriptor.self, from: Data($0.utf8)) }
 
