@@ -128,7 +128,7 @@ public class SplunkRum: ObservableObject {
         else {
             // Event manager not available, but still store the endpoint for API consistency
             currentEndpoint = endpoint
-            logger.log(level: .warning, isPrivate: false) {
+            logger.log(level: .warn, isPrivate: false) {
                 "Endpoint configuration stored but event manager is not available."
             }
         }
@@ -158,7 +158,7 @@ public class SplunkRum: ObservableObject {
             }
         }
         else {
-            logger.log(level: .warning, isPrivate: false) {
+            logger.log(level: .warn, isPrivate: false) {
                 "Endpoint disabled but event manager is not available."
             }
         }
