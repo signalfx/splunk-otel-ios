@@ -132,6 +132,7 @@ class DefaultModulesManager: AgentModulesManager {
     }
 
     /// Logs a warning for each duplicate module configuration that will be ignored.
+    ///
     /// Only the first occurrence of each configuration type is used; all duplicates are ignored.
     private func logDuplicateConfigurations(_ configurations: [any ModuleConfiguration]) {
         // Track which configuration types we've seen
