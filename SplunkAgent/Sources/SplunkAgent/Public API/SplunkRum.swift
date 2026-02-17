@@ -114,20 +114,23 @@ public class SplunkRum: ObservableObject {
     /// - Parameter endpoint: The ``EndpointConfiguration`` to use for sending data.
     /// - Throws: ``AgentConfigurationError`` if the provided endpoint is invalid.
     public func updateEndpoint(_ endpoint: EndpointConfiguration) throws {
-        guard let eventManager = eventManager as? DefaultEventManager else {
-            logger.log(level: .error, isPrivate: false) {
-                "Cannot update endpoint: Event manager is not available."
+        // Try to update the event manager if available
+        if let eventManager = eventManager as? DefaultEventManager {
+            try eventManager.updateEndpoint(endpoint)
+            currentEndpoint = endpoint
+            updateNetworkExclusionList(for: endpoint)
+            enableSessionReplayIfNeeded(for: endpoint)
+
+            logger.log(level: .info, isPrivate: false) {
+                "Endpoint configuration updated successfully."
             }
-            return
         }
-
-        try eventManager.updateEndpoint(endpoint)
-        currentEndpoint = endpoint
-        updateNetworkExclusionList(for: endpoint)
-        enableSessionReplayIfNeeded(for: endpoint)
-
-        logger.log(level: .info, isPrivate: false) {
-            "Endpoint configuration updated successfully."
+        else {
+            // Event manager not available, but still store the endpoint for API consistency
+            currentEndpoint = endpoint
+            logger.log(level: .warning, isPrivate: false) {
+                "Endpoint configuration stored but event manager is not available."
+            }
         }
     }
 
@@ -140,26 +143,24 @@ public class SplunkRum: ObservableObject {
     ///   when a new endpoint is configured via ``updateEndpoint(_:)``. If `false`,
     ///   all subsequent spans and events will be dropped.
     public func disableEndpoint(cacheData: Bool = true) {
-        guard let eventManager = eventManager as? DefaultEventManager else {
-            logger.log(level: .error, isPrivate: false) {
-                "Cannot disable endpoint: Event manager is not available."
-            }
-            return
-        }
-
-        eventManager.disableEndpoint(cacheData: cacheData)
+        // Always update the stored endpoint to reflect user intent
         currentEndpoint = nil
 
-        // Update network exclusion list - no endpoint active
-        updateNetworkExclusionList(for: nil)
+        // Try to update the event manager if available
+        if let eventManager = eventManager as? DefaultEventManager {
+            eventManager.disableEndpoint(cacheData: cacheData)
+            updateNetworkExclusionList(for: nil)
 
-        // Note: Session Replay continues collecting data even when endpoint is disabled.
-        // Data will be cached and sent when the endpoint is re-enabled.
-
-        logger.log(level: .info, isPrivate: false) {
-            cacheData
-                ? "Endpoint disabled with caching enabled."
-                : "Endpoint configuration disabled successfully."
+            logger.log(level: .info, isPrivate: false) {
+                cacheData
+                    ? "Endpoint disabled with caching enabled."
+                    : "Endpoint configuration disabled successfully."
+            }
+        }
+        else {
+            logger.log(level: .warning, isPrivate: false) {
+                "Endpoint disabled but event manager is not available."
+            }
         }
     }
 
