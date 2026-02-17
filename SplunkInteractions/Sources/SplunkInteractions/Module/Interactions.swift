@@ -102,9 +102,12 @@ public final class Interactions: SplunkInteractionsModule {
 
             let targetElement = await targetElement(from: event)
 
+            let xpath = await getElementXpath(from: event.viewHierarchy)
+
             destination.send(
                 actionName: interactionType,
                 elementId: targetElement,
+                xpath: xpath,
                 time: event.time
             )
         }
@@ -121,6 +124,40 @@ public final class Interactions: SplunkInteractionsModule {
 
 
     // MARK: - Private helper functions
+
+    func getElementXpath(from itemNode: InteractionViewNode?) async -> String? {
+        guard let itemNode else {
+            return nil
+        }
+
+        var xpathItems = [String]()
+        var checkNode: InteractionViewNode? = itemNode
+
+        while let currentNode = checkNode {
+            var nodeItem = currentNode.viewTypeName
+            var predicates = [String]()
+
+            if let indexPath = currentNode.indexPath {
+                predicates.append("@col=\(indexPath.section)")
+                predicates.append("@row=\(indexPath.item)")
+            }
+
+            if let customId = await customIdentifiers.value(for: currentNode.viewId) {
+                predicates.append("@id=\(customId)")
+            } else if xpathItems.isEmpty {
+                predicates.append("@id=\(UInt(bitPattern: currentNode.viewId))")
+            }
+
+            if !predicates.isEmpty {
+                nodeItem += "[\(predicates.joined(separator: ","))]"
+            }
+
+            xpathItems.append(nodeItem)
+            checkNode = currentNode.superViewNode
+        }
+
+        return "//" + xpathItems.reversed().joined(separator: "/")
+    }
 
     func targetElement(from event: InteractionEvent) async -> String? {
         guard let identifier = targetElementIdentifier(from: event) else {
