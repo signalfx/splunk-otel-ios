@@ -343,11 +343,23 @@ class DefaultSession: AgentSession {
             userInfo[Self.previousSessionIdUserInfoKey] = previousSessionId
         }
 
-        NotificationCenter.default.post(
-            name: Self.sessionIdDidChangeNotification,
-            object: nil,
-            userInfo: userInfo
-        )
+        // Post notification on main thread to ensure UI safety for observers
+        let postNotification = {
+            NotificationCenter.default.post(
+                name: Self.sessionIdDidChangeNotification,
+                object: nil,
+                userInfo: userInfo
+            )
+        }
+
+        if Thread.isMainThread {
+            postNotification()
+        }
+        else {
+            DispatchQueue.main.async {
+                postNotification()
+            }
+        }
 
         logger.log(level: .info) {
             "Session ID changed: \(newSessionId) (previous: \(previousSessionId ?? "none"))"

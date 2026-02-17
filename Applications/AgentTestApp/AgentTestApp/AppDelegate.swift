@@ -31,6 +31,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
 
+        // Listen for session ID changes
+        setupSessionIdChangeObserver()
+
         // Alternative deprecated Builder setup
         //        let builder = SplunkRumBuilder(
         //            realm: "realm",
@@ -82,9 +85,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("Unable to start the Splunk agent, error: \(error)")
         }
 
-        // Listen for session ID changes
-        setupSessionIdChangeObserver()
-
         // Navigation Instrumentation
         SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
 
@@ -113,7 +113,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private func setupSessionIdChangeObserver() {
         sessionIdObserver = NotificationCenter.default.addObserver(
-            forName: SplunkRum.Session.sessionIdDidChangeNotification,
+            forName: Session.sessionIdDidChangeNotification,
             object: nil,
             queue: .main
         ) { notification in
@@ -122,8 +122,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 return
             }
 
-            let newSessionId = userInfo[SplunkRum.Session.sessionIdUserInfoKey] as? String
-            let previousSessionId = userInfo[SplunkRum.Session.previousSessionIdUserInfoKey] as? String
+            let newSessionId = userInfo[Session.sessionIdUserInfoKey] as? String
+            let previousSessionId = userInfo[Session.previousSessionIdUserInfoKey] as? String
 
             print("========================================")
             print("[Session ID Change] Notification received")

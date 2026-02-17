@@ -25,6 +25,59 @@ public final class Session {
     private unowned let owner: SplunkRum
 
 
+    // MARK: - Notifications
+
+    /// A notification that posts whenever a session ID is set or changed.
+    ///
+    /// This notification is always posted on the **main thread**, making it safe to update
+    /// UI directly from the observer without additional dispatching.
+    ///
+    /// The `userInfo` dictionary contains:
+    /// - ``sessionIdUserInfoKey``: The new session ID (`String`)
+    /// - ``previousSessionIdUserInfoKey``: The previous session ID (`String`), if any
+    ///
+    /// ## Example
+    ///
+    /// ```swift
+    /// // Set up observer before initializing the agent
+    /// NotificationCenter.default.addObserver(
+    ///     forName: Session.sessionIdDidChangeNotification,
+    ///     object: nil,
+    ///     queue: .main
+    /// ) { notification in
+    ///     let newSessionId = notification.userInfo?[Session.sessionIdUserInfoKey] as? String
+    ///     let previousSessionId = notification.userInfo?[Session.previousSessionIdUserInfoKey] as? String
+    ///     // Safe to update UI here
+    /// }
+    ///
+    /// // Then initialize the agent
+    /// let agent = try SplunkRum.install(with: configuration)
+    /// ```
+    ///
+    /// - Important: To receive the notification for the initial session ID, register your observer
+    ///   **before** calling ``SplunkRum/install(with:)``. The first session ID is set during
+    ///   agent initialization.
+    /// - Note: This notification is guaranteed to be delivered on the main thread.
+    public static var sessionIdDidChangeNotification: Notification.Name {
+        DefaultSession.sessionIdDidChangeNotification
+    }
+
+    /// Key for the new session ID in the ``sessionIdDidChangeNotification`` userInfo dictionary.
+    ///
+    /// The value associated with this key is a `String` containing the new session ID.
+    public static var sessionIdUserInfoKey: String {
+        DefaultSession.sessionIdUserInfoKey
+    }
+
+    /// Key for the previous session ID in the ``sessionIdDidChangeNotification`` userInfo dictionary.
+    ///
+    /// The value associated with this key is a `String` containing the previous session ID,
+    /// or `nil` if this is the first session.
+    public static var previousSessionIdUserInfoKey: String {
+        DefaultSession.previousSessionIdUserInfoKey
+    }
+
+
     // MARK: - State
 
     /// An object that reflects the current session's state, a ``SessionState`` instance.
