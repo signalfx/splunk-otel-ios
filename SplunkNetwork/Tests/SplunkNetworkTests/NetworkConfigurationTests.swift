@@ -25,10 +25,11 @@ final class NetworkConfigurationTests: XCTestCase {
     // MARK: - NetworkInstrumentationConfiguration Tests
 
     func testNetworkInstrumentationConfiguration_DefaultInit() {
-        let config = NetworkInstrumentationConfiguration(isEnabled: true, ignoreURLs: nil)
+        let config = NetworkInstrumentationConfiguration()
 
         XCTAssertTrue(config.isEnabled)
         XCTAssertNil(config.ignoreURLs)
+        XCTAssertTrue(config.injectTraceHeaders)
     }
 
     func testNetworkInstrumentationConfiguration_WithIgnoreURLs() throws {
@@ -40,6 +41,7 @@ final class NetworkConfigurationTests: XCTestCase {
         XCTAssertTrue(config.isEnabled)
         XCTAssertNotNil(config.ignoreURLs)
         XCTAssertEqual(config.ignoreURLs?.count(), 1)
+        XCTAssertTrue(config.injectTraceHeaders)
     }
 
     func testNetworkInstrumentationConfiguration_Disabled() {
@@ -47,5 +49,18 @@ final class NetworkConfigurationTests: XCTestCase {
 
         XCTAssertFalse(config.isEnabled)
         XCTAssertNil(config.ignoreURLs)
+        XCTAssertTrue(config.injectTraceHeaders)
+    }
+
+    func testNetworkInstrumentationConfiguration_WithTraceHeadersDisabled() {
+        let config = NetworkInstrumentationConfiguration(
+            isEnabled: true,
+            ignoreURLs: nil,
+            injectTraceHeaders: false
+        )
+
+        XCTAssertTrue(config.isEnabled)
+        XCTAssertNil(config.ignoreURLs)
+        XCTAssertFalse(config.injectTraceHeaders)
     }
 }

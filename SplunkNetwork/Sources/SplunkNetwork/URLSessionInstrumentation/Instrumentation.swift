@@ -82,7 +82,16 @@ final class NetworkInstrumentationManager {
     func initialize(with module: NetworkInstrumentation) {
         queue.sync {
             if !hasSwizzled {
+                // Swizzle resume/setState for span lifecycle management first.
+                // This must happen before task creation swizzling because
+                // swizzledUrlSessionClasses() creates a URLSession task for class discovery.
+                // If task creation is already swizzled, it would call getModule() which
+                // would deadlock since we're already holding the queue lock.
                 swizzleUrlSession()
+
+                // Swizzle task creation methods for trace context injection
+                swizzleURLSessionTaskCreation()
+
                 hasSwizzled = true
             }
             self.module = module
