@@ -22,11 +22,11 @@ import Foundation
 
 extension CrashReports {
 
-    func allThreadsFromCrashReport(report: SplunkPLCrashReport) -> [[CrashReportKeys: Any]] {
+    func allThreadsFromCrashReport(report: PLCrashReport) -> [[CrashReportKeys: Any]] {
         var threads: [[CrashReportKeys: Any]] = []
 
         for thread in report.threads {
-            if let thread = thread as? SplunkPLCrashReportThreadInfo {
+            if let thread = thread as? PLCrashReportThreadInfo {
                 let thr = oneThreadFromCrashReport(thread: thread, report: report)
 
                 threads.append(thr)
@@ -36,8 +36,8 @@ extension CrashReports {
     }
 
     private func oneThreadFromCrashReport(
-        thread: SplunkPLCrashReportThreadInfo,
-        report: SplunkPLCrashReport
+        thread: PLCrashReportThreadInfo,
+        report: PLCrashReport
     ) -> [CrashReportKeys: Any] {
 
         var oneThread: [CrashReportKeys: Any] = [:]
@@ -46,12 +46,12 @@ extension CrashReports {
         return oneThread
     }
 
-    private func convertStackFrames(frames: [Any], report: SplunkPLCrashReport) -> [Any] {
+    private func convertStackFrames(frames: [Any], report: PLCrashReport) -> [Any] {
 
         var stackFrames: [Any] = []
         var isFirstTime = true
 
-        guard let frames = frames as? [SplunkPLCrashReportStackFrameInfo] else {
+        guard let frames = frames as? [PLCrashReportStackFrameInfo] else {
             logger.log(level: .error) {
                 "CrashReporter received incorrect stackFrame type."
             }
@@ -116,7 +116,7 @@ extension CrashReports {
             var threadDictionary: [CrashReportKeys: Any] = [:]
             threadDictionary[.stackFrames] = thread[CrashReportKeys.stackFrames]
 
-            if let info = thread[CrashReportKeys.details] as? SplunkPLCrashReportThreadInfo {
+            if let info = thread[CrashReportKeys.details] as? PLCrashReportThreadInfo {
                 threadDictionary[.threadNumber] = info.threadNumber
                 threadDictionary[.isCrashedThread] = info.crashed
             }

@@ -68,9 +68,9 @@ enum SmokeTestRunner {
         let _ = SpanLimits()
         results.append("PASS: OpenTelemetrySdk types accessible (SpanLimits)")
 
-        // Check 5: PLCrashReporter type is accessible (prefixed to avoid symbol collision)
-        let _ = SplunkPLCrashReporterConfig.defaultConfiguration()
-        results.append("PASS: CrashReporter types accessible (SplunkPLCrashReporterConfig)")
+        // Check 5: PLCrashReporter type is accessible
+        let _ = PLCrashReporterConfig.defaultConfiguration()
+        results.append("PASS: CrashReporter types accessible (PLCrashReporterConfig)")
 
         return results
     }

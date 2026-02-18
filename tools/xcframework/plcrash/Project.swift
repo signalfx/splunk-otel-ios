@@ -42,15 +42,10 @@ let sharedSettings: SettingsDictionary = [
     "DEFINES_MODULE": "YES",
 
     // PLCrashReporter C preprocessor defines (matching upstream Package.swift).
-    //
-    // PLCRASHREPORTER_PREFIX renames all public ObjC/C symbols to avoid
-    // collisions when customers also embed their own PLCrashReporter.
-    // The same prefix is patched into PLCrashNamespace.h by the build
-    // script so that the shipped headers expose the prefixed names.
     "GCC_PREPROCESSOR_DEFINITIONS": [
         "PLCR_PRIVATE=1",
         "PLCF_RELEASE_BUILD=1",
-        "PLCRASHREPORTER_PREFIX=Splunk",
+        "PLCRASHREPORTER_PREFIX=",
         "SWIFT_PACKAGE=1"
     ],
 

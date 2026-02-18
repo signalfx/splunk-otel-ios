@@ -46,11 +46,6 @@ OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 PLCRASH_VERSION="${PLCRASH_VERSION:-1.12.0}"
 PLCRASH_REPO="${PLCRASH_REPO:-https://github.com/microsoft/plcrashreporter.git}"
 
-# Symbol prefix to avoid collisions when customers also use PLCrashReporter.
-# This prefix is applied to all public ObjC/C symbols via PLCrashNamespace.h.
-# See: https://github.com/microsoft/plcrashreporter#custom-symbol-prefix
-PLCRASH_SYMBOL_PREFIX="${PLCRASH_SYMBOL_PREFIX:-Splunk}"
-
 # Build configuration
 CONFIGURATION="Release"
 
@@ -136,58 +131,11 @@ checkout_plcrash_source() {
 
 
 # ---------------------------------------------------------------------------
-# Step 2: Patch PLCrashNamespace.h with symbol prefix
-# ---------------------------------------------------------------------------
-# PLCrashReporter provides PLCRASHREPORTER_PREFIX to rename all public symbols.
-# We patch the header so that BOTH the compiled binary AND the shipped framework
-# headers carry the prefix. Without the header patch, consumers of the
-# xcframework would see the original (unprefixed) names in the headers but the
-# binary would export the prefixed symbols, causing link failures.
-#
-# We use #ifndef so the header define doesn't conflict with the matching
-# GCC_PREPROCESSOR_DEFINITIONS flag used during compilation.
-
-apply_symbol_prefix() {
-    log_step "Step 2: Apply symbol prefix (${PLCRASH_SYMBOL_PREFIX})"
-
-    local namespace_header="${VENDOR_DIR}/Source/PLCrashNamespace.h"
-
-    if [[ ! -f "${namespace_header}" ]]; then
-        echo "ERROR: PLCrashNamespace.h not found at ${namespace_header}"
-        exit 1
-    fi
-
-    # Check if already patched
-    if grep -q "PLCRASHREPORTER_PREFIX ${PLCRASH_SYMBOL_PREFIX}" "${namespace_header}"; then
-        log "PLCrashNamespace.h already patched with prefix '${PLCRASH_SYMBOL_PREFIX}', skipping"
-        return 0
-    fi
-
-    # Replace the commented-out prefix line with an active #ifndef-guarded define.
-    # Original line: // #define PLCRASHREPORTER_PREFIX AcmeCo
-    sed -i '' \
-        's|// #define PLCRASHREPORTER_PREFIX AcmeCo|// Symbol prefix applied by Splunk RUM build system to avoid collisions.\
-#ifndef PLCRASHREPORTER_PREFIX\
-#define PLCRASHREPORTER_PREFIX '"${PLCRASH_SYMBOL_PREFIX}"'\
-#endif|' \
-        "${namespace_header}"
-
-    # Verify the patch was applied
-    if ! grep -q "PLCRASHREPORTER_PREFIX ${PLCRASH_SYMBOL_PREFIX}" "${namespace_header}"; then
-        echo "ERROR: Failed to patch PLCrashNamespace.h with prefix '${PLCRASH_SYMBOL_PREFIX}'"
-        exit 1
-    fi
-
-    log "PLCrashNamespace.h patched: all public symbols will be prefixed with '${PLCRASH_SYMBOL_PREFIX}'"
-}
-
-
-# ---------------------------------------------------------------------------
-# Step 3: Generate Xcode project with Tuist
+# Step 2: Generate Xcode project with Tuist
 # ---------------------------------------------------------------------------
 
 generate_xcode_project() {
-    log_step "Step 3: Generate Xcode project with Tuist"
+    log_step "Step 2: Generate Xcode project with Tuist"
 
     cd "${PLCRASH_PROJECT_DIR}"
 
@@ -201,11 +149,11 @@ generate_xcode_project() {
 
 
 # ---------------------------------------------------------------------------
-# Step 4: Archive for each platform
+# Step 3: Archive for each platform
 # ---------------------------------------------------------------------------
 
 archive_frameworks() {
-    log_step "Step 4: Archive CrashReporter for all platforms"
+    log_step "Step 3: Archive CrashReporter for all platforms"
 
     rm -rf "${ARCHIVES_DIR}"
     mkdir -p "${ARCHIVES_DIR}"
@@ -239,11 +187,11 @@ archive_frameworks() {
 
 
 # ---------------------------------------------------------------------------
-# Step 5: Create xcframework from archives
+# Step 4: Create xcframework from archives
 # ---------------------------------------------------------------------------
 
 create_xcframework() {
-    log_step "Step 5: Create CrashReporter.xcframework"
+    log_step "Step 4: Create CrashReporter.xcframework"
 
     mkdir -p "${OUTPUT_DIR}"
 
@@ -290,11 +238,11 @@ create_xcframework() {
 
 
 # ---------------------------------------------------------------------------
-# Step 6: Verify xcframework
+# Step 5: Verify xcframework
 # ---------------------------------------------------------------------------
 
 verify_xcframework() {
-    log_step "Step 6: Verify CrashReporter.xcframework"
+    log_step "Step 5: Verify CrashReporter.xcframework"
 
     local xcframework_path="${OUTPUT_DIR}/${SCHEME}.xcframework"
     local all_passed=true
@@ -362,28 +310,6 @@ verify_xcframework() {
         all_passed=false
     fi
 
-    # Check 5: Symbol prefix applied
-    if [[ -n "${PLCRASH_SYMBOL_PREFIX}" && -n "${any_binary}" ]]; then
-        local prefixed_symbols
-        prefixed_symbols="$(nm -gU "${any_binary}" 2>/dev/null | grep "${PLCRASH_SYMBOL_PREFIX}PLCrash" | head -5)"
-        local unprefixed_symbols
-        unprefixed_symbols="$(nm -gU "${any_binary}" 2>/dev/null | grep '_OBJC_CLASS_\$_PLCrash[A-Z]' | grep -v "${PLCRASH_SYMBOL_PREFIX}" || true)"
-
-        if [[ -n "${prefixed_symbols}" ]]; then
-            echo "  ✓ Symbol prefix '${PLCRASH_SYMBOL_PREFIX}' applied (found prefixed symbols)"
-        else
-            echo "  FAIL: No prefixed symbols found (expected prefix '${PLCRASH_SYMBOL_PREFIX}')"
-            all_passed=false
-        fi
-
-        if [[ -z "${unprefixed_symbols}" ]]; then
-            echo "  ✓ No unprefixed PLCrashReporter ObjC class symbols found"
-        else
-            echo "  WARN: Found unprefixed PLCrashReporter symbols:"
-            echo "${unprefixed_symbols}" | head -5 | sed 's/^/    /'
-        fi
-    fi
-
     echo ""
     if [[ "${all_passed}" == "true" ]]; then
         log "All verification checks passed ✓"
@@ -395,7 +321,7 @@ verify_xcframework() {
 
 
 # ---------------------------------------------------------------------------
-# Step 7: Summary
+# Step 6: Summary
 # ---------------------------------------------------------------------------
 
 print_summary() {
@@ -417,7 +343,6 @@ print_summary() {
     done
     echo ""
     echo "PLCrashReporter version: ${PLCRASH_VERSION}"
-    echo "Symbol prefix: ${PLCRASH_SYMBOL_PREFIX}"
     echo "Configuration: ${CONFIGURATION}"
     echo "Linking: Dynamic (MH_DYLIB)"
 }
@@ -432,7 +357,6 @@ main() {
     log "Tools root: ${TOOLS_ROOT}"
 
     checkout_plcrash_source
-    apply_symbol_prefix
     generate_xcode_project
     archive_frameworks
     create_xcframework

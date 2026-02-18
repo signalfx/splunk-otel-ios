@@ -40,7 +40,7 @@ public class CrashReports {
 
     // MARK: - Private
 
-    private var crashReporter: SplunkPLCrashReporter?
+    private var crashReporter: PLCrashReporter?
 
     var crashSpanName: String = "SplunkCrashReport"
 
@@ -78,13 +78,13 @@ public class CrashReports {
             .appendingPathComponent("SplunkCrashReports", isDirectory: true)
         try? fileManager.createDirectory(at: crashDirectory, withIntermediateDirectories: true)
 
-        let signalConfig = SplunkPLCrashReporterConfig(
+        let signalConfig = PLCrashReporterConfig(
             signalHandlerType: signalHandlerType,
             symbolicationStrategy: [],
             basePath: crashDirectory.path
         )
 
-        guard let crashReporterInstance = SplunkPLCrashReporter(configuration: signalConfig) else {
+        guard let crashReporterInstance = PLCrashReporter(configuration: signalConfig) else {
             logger.log(level: .error) {
                 "PLCrashReporter failed to initialize."
             }
@@ -118,7 +118,7 @@ public class CrashReports {
             let data = try crashReporter?.loadPendingCrashReportDataAndReturnError()
 
             // Retrieving crash reporter data.
-            let report = try SplunkPLCrashReport(data: data)
+            let report = try PLCrashReport(data: data)
 
             // Process the report
             let reportPayload = formatCrashReport(report: report)
@@ -278,7 +278,7 @@ public class CrashReports {
     }
 
     /// AppState handler.
-    func appStateHandler(report: SplunkPLCrashReport) -> String {
+    func appStateHandler(report: PLCrashReport) -> String {
         var appState = "unknown"
         if let sharedState {
             let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"

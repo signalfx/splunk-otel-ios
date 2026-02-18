@@ -26,7 +26,7 @@ extension CrashReports {
     func imageList(images: [Any]) -> String {
         var outputImages: [Any] = []
         for image in images {
-            guard let image = image as? SplunkPLCrashReportBinaryImageInfo else {
+            guard let image = image as? PLCrashReportBinaryImageInfo else {
                 continue
             }
 

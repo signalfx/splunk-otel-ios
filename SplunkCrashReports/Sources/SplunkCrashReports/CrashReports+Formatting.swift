@@ -23,7 +23,7 @@ import Foundation
 extension CrashReports {
 
     /// Report formatting.
-    func formatCrashReport(report: SplunkPLCrashReport) -> [CrashReportKeys: Any] {
+    func formatCrashReport(report: PLCrashReport) -> [CrashReportKeys: Any] {
 
         var reportDict: [CrashReportKeys: Any] = [:]
 
@@ -71,7 +71,7 @@ extension CrashReports {
         return reportDict
     }
 
-    func addCustomData(from report: SplunkPLCrashReport, to reportDict: inout [CrashReportKeys: Any]) {
+    func addCustomData(from report: PLCrashReport, to reportDict: inout [CrashReportKeys: Any]) {
         guard let customData = report.customData else {
             return
         }
