@@ -130,12 +130,12 @@ public final class Interactions: SplunkInteractionsModule {
             return nil
         }
 
-        var xpathItems = [String]()
+        var xpathItems: [String] = []
         var checkNode: InteractionViewNode? = itemNode
 
         while let currentNode = checkNode {
             var nodeItem = currentNode.viewTypeName
-            var predicates = [String]()
+            var predicates: [String] = []
 
             if let indexPath = currentNode.indexPath {
                 predicates.append("@col=\(indexPath.section)")
@@ -144,7 +144,8 @@ public final class Interactions: SplunkInteractionsModule {
 
             if let customId = await customIdentifiers.value(for: currentNode.viewId) {
                 predicates.append("@id=\(customId)")
-            } else if xpathItems.isEmpty {
+            }
+            else if xpathItems.isEmpty {
                 predicates.append("@id=\(UInt(bitPattern: currentNode.viewId))")
             }
 
