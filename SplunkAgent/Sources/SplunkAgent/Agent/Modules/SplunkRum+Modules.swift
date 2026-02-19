@@ -18,13 +18,13 @@ limitations under the License.
 internal import CiscoSessionReplay
 import Foundation
 internal import SplunkAppStart
-internal import SplunkSessionReplayProxy
 internal import SplunkAppState
 internal import SplunkCustomTracking
 internal import SplunkInteractions
 internal import SplunkNavigation
 internal import SplunkNetwork
 internal import SplunkNetworkMonitor
+internal import SplunkSessionReplayProxy
 internal import SplunkSlowFrameDetector
 internal import SplunkWebView
 
@@ -93,9 +93,7 @@ extension SplunkRum {
         }
 
         // Extract session replay module configuration
-        let config = moduleConfigurations?
-            .compactMap { $0 as? SessionReplayConfiguration }
-            .first ?? SessionReplayConfiguration()
+        let config = moduleConfigurations?.compactMap { $0 as? SessionReplayConfiguration }.first ?? SessionReplayConfiguration()
 
         let effectiveSamplingRate = config.samplingRate ?? 1.0
 
@@ -119,7 +117,8 @@ extension SplunkRum {
 
             if effectiveSamplingRate <= 0.0 {
                 sampledOut = true
-            } else {
+            }
+            else {
                 let randomValue = Double.random(in: 0.0 ... 1.0)
                 sampledOut = randomValue > effectiveSamplingRate
             }

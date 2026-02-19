@@ -45,7 +45,7 @@ final class SessionReplay: SessionReplayModule {
 
     init(for module: CiscoSessionReplay.SessionReplay, samplingRate: Double = 1.0) {
         self.module = module
-        self.effectiveSamplingRate = samplingRate
+        effectiveSamplingRate = samplingRate
         logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SessionReplay")
 
         // Monitor session changes in the agent
