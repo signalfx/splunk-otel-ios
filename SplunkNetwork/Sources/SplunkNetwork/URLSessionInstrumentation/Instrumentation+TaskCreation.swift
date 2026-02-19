@@ -140,22 +140,28 @@ func shouldInstrumentRequest(_ request: URLRequest) -> Bool {
         return false
     }
 
-    guard let url = request.url,
-          url.scheme?.lowercased().starts(with: "http") == true else {
+    guard
+        let url = request.url,
+        url.scheme?.lowercased().starts(with: "http") == true
+    else {
         return false
     }
 
     let manager = NetworkInstrumentationManager.shared
 
     // Check excluded endpoints
-    if let excludedEndpoints = manager.getModule()?.excludedEndpoints,
-       shouldExcludeURL(url, excludedEndpoints: excludedEndpoints) {
+    if
+        let excludedEndpoints = manager.getModule()?.excludedEndpoints,
+        shouldExcludeURL(url, excludedEndpoints: excludedEndpoints)
+    {
         return false
     }
 
     // Check ignoreURLs
-    if let ignoreURLs = manager.getModule()?.getIgnoreURLs(),
-       ignoreURLs.matches(url: url) {
+    if
+        let ignoreURLs = manager.getModule()?.getIgnoreURLs(),
+        ignoreURLs.matches(url: url)
+    {
         return false
     }
 
@@ -176,7 +182,7 @@ func endHttpSpanFromCompletion(span: Span, response: URLResponse?, error: Error?
         span.setAttribute(key: "http.response.status_code", value: httpResponse.statusCode)
     }
 
-    if let error = error {
+    if let error {
         span.setAttribute(key: "error", value: true)
         span.setAttribute(key: "error.message", value: error.localizedDescription)
     }

@@ -159,8 +159,8 @@ final class TraceContextInjectorTests: XCTestCase {
 
         let injectedRequest = TraceContextInjector.injectActiveTraceContext(into: request)
 
-        XCTAssertNil(injectedRequest.value(forHTTPHeaderField: "traceparent"),
-                     "No traceparent should be added when there's no active span")
+        let traceparent = injectedRequest.value(forHTTPHeaderField: "traceparent")
+        XCTAssertNil(traceparent, "No traceparent should be added when there's no active span")
     }
 
     // MARK: - NetworkInstrumentationConfiguration Tests
