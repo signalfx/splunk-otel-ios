@@ -72,6 +72,7 @@ public enum TraceContextInjector {
         guard let activeSpan = OpenTelemetry.instance.contextProvider.activeSpan else {
             return request
         }
+
         return injectTraceContext(into: request, spanContext: activeSpan.context)
     }
 

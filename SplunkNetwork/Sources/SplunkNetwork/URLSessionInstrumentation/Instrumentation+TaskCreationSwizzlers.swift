@@ -26,6 +26,7 @@ func swizzleDataTaskWithRequest() {
         guard let request = argument as? URLRequest else {
             return originalIMP(session, selector, argument)
         }
+
         return createInstrumentedDataTask(session: session, request: request, selector: selector, originalIMP: originalIMP)
     }
 }
@@ -253,6 +254,7 @@ func swizzleDownloadTaskWithRequest() {
         guard let request = argument as? URLRequest else {
             return originalIMP(session, selector, argument)
         }
+
         return createInstrumentedDownloadTask(session: session, request: request, selector: selector, originalIMP: originalIMP)
     }
 }
