@@ -151,14 +151,14 @@ func shouldInstrumentRequest(_ request: URLRequest) -> Bool {
 
     // Check excluded endpoints
     if let excludedEndpoints = manager.getModule()?.excludedEndpoints,
-       shouldExcludeURL(url, excludedEndpoints: excludedEndpoints)
+        shouldExcludeURL(url, excludedEndpoints: excludedEndpoints)
     {
         return false
     }
 
     // Check ignoreURLs
     if let ignoreURLs = manager.getModule()?.getIgnoreURLs(),
-       ignoreURLs.matches(url: url)
+        ignoreURLs.matches(url: url)
     {
         return false
     }
