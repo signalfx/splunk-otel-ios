@@ -26,9 +26,9 @@ final class TestInteractionDestination: SplunkInteractionsDestination {
 
     func send(
         actionName: String,
-        elementId: String?,
-        xpath: String?,
-        time: Date
+        elementId _: String?,
+        xpath _: String?,
+        time _: Date
     ) {
         self.actionName = actionName
         didReceiveInteractionCallCount += 1
