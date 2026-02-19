@@ -46,7 +46,7 @@ final class SessionReplayNonOperational: SessionReplayModule {
 
     // MARK: - Initialization
 
-    init() {
+    init(statusCause: SessionReplayStatus.Cause = .notStarted, samplingRate: Double = 1.0) {
         logger = DefaultLogAgent(
             poolName: PackageIdentifier.nonOperationalInstance(),
             category: "SessionReplay"
@@ -55,7 +55,7 @@ final class SessionReplayNonOperational: SessionReplayModule {
         // Build "dummy" Session Replay module
         sensitivity = SessionReplayNonOperationalSensitivity(logger: logger)
         customIdentifiers = SessionReplayNonOperationalCustomId(logger: logger)
-        state = SessionReplayNonOperationalState()
+        state = SessionReplayNonOperationalState(statusCause: statusCause, samplingRate: samplingRate)
     }
 
 

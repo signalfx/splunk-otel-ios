@@ -48,8 +48,35 @@ extension Metadata: ModuleEventMetadata {
 }
 
 
-/// Minimal implementation that ensures protocol conformance.
-public struct SessionReplayConfiguration: ModuleConfiguration {}
+/// Configuration for the Session Replay module.
+///
+/// - ``enabled``: Enables or disables the session replay. If disabled, subsequent calls to `start()` do nothing.
+/// - ``samplingRate``: Optional local sampling of session replay recording in the `<0, 1>` range.
+public struct SessionReplayConfiguration: ModuleConfiguration {
+
+    /// Enables or disables the session replay.
+    ///
+    /// If disabled, subsequent calls to `start()` do nothing.
+    /// Defaults to `true`.
+    public var enabled: Bool
+
+    /// Optional local sampling of session replay recording.
+    ///
+    /// The value sets the probability with which session replay is enabled.
+    /// - `0` means session replay recording cannot be effectively enabled.
+    /// - `0.5` means only half of sessions can be recorded.
+    /// - `1` means all sessions can be recorded.
+    /// - `nil` means the sampling rate is ignored (equivalent to `1`).
+    ///
+    /// If ``enabled`` is set to `false`, the sampling rate is ignored.
+    /// Defaults to `nil`.
+    public var samplingRate: Double?
+
+    public init(enabled: Bool = true, samplingRate: Double? = nil) {
+        self.enabled = enabled
+        self.samplingRate = samplingRate
+    }
+}
 
 /// Minimal implementation that ensures protocol conformance.
 public struct SessionReplayRemoteConfiguration: RemoteModuleConfiguration {

@@ -38,6 +38,7 @@ public class SplunkRum: ObservableObject {
 
     var modulesManager: AgentModulesManager?
     var eventManager: AgentEventManager?
+    var moduleConfigurations: [Any]?
 
     var appStateManager: AgentAppStateManager
     lazy var sharedState: AgentSharedState = DefaultSharedState(for: self)
@@ -284,6 +285,9 @@ public class SplunkRum: ObservableObject {
 
         // Send a session start event explicitly as soon as a Session and an EventManager are available
         (currentSession as? DefaultSession)?.sendInitialSessionStartEvent()
+
+        // Store module configurations for later use in module customization
+        self.moduleConfigurations = moduleConfigurations
 
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(

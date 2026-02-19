@@ -48,6 +48,9 @@ extension SessionReplayStatus {
 
         case .notRecording(.unsupportedPlatform):
             return .notRecording(.unsupportedPlatform)
+
+        case .notRecording(.disabledBySampling):
+            return .notRecording(.notStarted)
         }
     }
 }

@@ -43,4 +43,13 @@ public protocol SessionReplayModuleState {
 
     /// Indicates the rendering mode for capturing video.
     var renderingMode: RenderingMode { get }
+
+
+    // MARK: - Sampling
+
+    /// The session replay sampling rate used to determine whether
+    /// the session replay of the current session is recorded.
+    ///
+    /// A value in the `<0, 1>` range. Defaults to `1.0`.
+    var samplingRate: Double { get }
 }

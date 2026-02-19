@@ -18,6 +18,7 @@ limitations under the License.
 internal import CiscoSessionReplay
 import Foundation
 internal import SplunkAppStart
+internal import SplunkSessionReplayProxy
 internal import SplunkAppState
 internal import SplunkCustomTracking
 internal import SplunkInteractions
@@ -91,13 +92,59 @@ extension SplunkRum {
             return
         }
 
+        // Extract session replay module configuration
+        let config = moduleConfigurations?
+            .compactMap { $0 as? SessionReplayConfiguration }
+            .first ?? SessionReplayConfiguration()
+
+        let effectiveSamplingRate = config.samplingRate ?? 1.0
+
+        // Check if session replay is enabled by configuration
+        guard config.enabled else {
+            logger.log(level: .notice, isPrivate: false) {
+                "Session Replay module is disabled by configuration."
+            }
+
+            sessionReplayProxy = SessionReplayNonOperational(
+                statusCause: .notStarted,
+                samplingRate: effectiveSamplingRate
+            )
+
+            return
+        }
+
+        // Perform sampling decision (calculated once per Agent life)
+        if effectiveSamplingRate < 1.0 {
+            let sampledOut: Bool
+
+            if effectiveSamplingRate <= 0.0 {
+                sampledOut = true
+            } else {
+                let randomValue = Double.random(in: 0.0 ... 1.0)
+                sampledOut = randomValue > effectiveSamplingRate
+            }
+
+            if sampledOut {
+                logger.log(level: .notice, isPrivate: false) {
+                    "Session Replay module disabled by sampling (rate: \(effectiveSamplingRate))."
+                }
+
+                sessionReplayProxy = SessionReplayNonOperational(
+                    statusCause: .disabledBySampling,
+                    samplingRate: effectiveSamplingRate
+                )
+
+                return
+            }
+        }
+
         // By default, we turn off the default sensitivity for `WKWebView`
         #if canImport(WebKit)
             sessionReplayModule.sensitivity.set(WKWebView.self, nil)
         #endif
 
         // Initialize proxy API for this module
-        sessionReplayProxy = SessionReplay(for: sessionReplayModule)
+        sessionReplayProxy = SessionReplay(for: sessionReplayModule, samplingRate: effectiveSamplingRate)
     }
 
     /// Configure Navigation module.
