@@ -180,12 +180,14 @@ func swizzleDataTaskWithURLAndCompletion() {
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
 
         // Wrap completion to end span
-        let wrappedCompletion: CompletionHandler = completion.map { originalCompletion in
+        let wrappedCompletion: CompletionHandler = completion.map {
+            originalCompletion in
             { data, response, error in
                 endHttpSpanFromCompletion(span: span, response: response, error: error)
                 originalCompletion(data, response, error)
             }
-        } ?? { _, _, _ in
+        } ?? {
+            _, _, _ in
             endHttpSpanFromCompletion(span: span, response: nil, error: nil)
         }
 

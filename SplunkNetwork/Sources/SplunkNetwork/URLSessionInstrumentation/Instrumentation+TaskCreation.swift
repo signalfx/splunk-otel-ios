@@ -26,19 +26,18 @@ var associatedKeyInstrumented: UInt8 = 1
 // MARK: - Original IMP Storage
 
 /// Stores original (un-swizzled) implementations of request-based methods.
+///
 /// These are captured before swizzling and used by URL-based swizzles to bypass
 /// the swizzled request-based methods, preventing double instrumentation when
 /// trace header injection is disabled.
 enum OriginalIMPs {
-    // Data task IMPs
     static var dataTaskWithRequest: IMP?
     static var dataTaskWithRequestAndCompletion: IMP?
-
-    // Download task IMPs
     static var downloadTaskWithRequest: IMP?
 }
 
 /// Captures original request-based IMPs before any swizzling occurs.
+///
 /// Must be called first in swizzleURLSessionTaskCreation().
 private func captureOriginalIMPs() {
     // Capture dataTask(with: URLRequest)
@@ -124,7 +123,7 @@ func swizzleDownloadTaskCreationMethod(
     }
 
     // Capture original implementation BEFORE installing the swizzled block to avoid race condition
-    let originalIMP = method_getImplementation(original)
+    var originalIMP = method_getImplementation(original)
 
     let block: @convention(block) (URLSession, Any) -> URLSessionDownloadTask = { session, argument in
         let castedIMP = unsafeBitCast(
