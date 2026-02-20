@@ -117,14 +117,7 @@ func swizzleDataTaskWithRequestAndCompletion() {
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
-
-        // Wrap completion to end span
-        let wrappedCompletion: CompletionHandler? = completion.map { originalCompletion in
-            { data, response, error in
-                endHttpSpanFromCompletion(span: span, response: response, error: error)
-                originalCompletion(data, response, error)
-            }
-        }
+        let wrappedCompletion = wrapCompletionHandler(completion, span: span)
 
         let task = castedIMP(session, selector, instrumentedRequest, wrappedCompletion)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
@@ -178,18 +171,7 @@ func swizzleDataTaskWithURLAndCompletion() {
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
-
-        // Wrap completion to end span
-        let wrappedCompletion: CompletionHandler = completion.map {
-            originalCompletion in
-            { data, response, error in
-                endHttpSpanFromCompletion(span: span, response: response, error: error)
-                originalCompletion(data, response, error)
-            }
-        } ?? {
-            _, _, _ in
-            endHttpSpanFromCompletion(span: span, response: nil, error: nil)
-        }
+        let wrappedCompletion = wrapCompletionHandler(completion, span: span)
 
         // Call the ORIGINAL (un-swizzled) request-based method directly.
         // This bypasses the request-based swizzle, preventing double instrumentation
