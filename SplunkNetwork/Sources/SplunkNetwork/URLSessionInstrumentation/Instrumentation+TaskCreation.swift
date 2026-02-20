@@ -23,6 +23,46 @@ import OpenTelemetryApi
 var associatedKeySpan: UInt8 = 0
 var associatedKeyInstrumented: UInt8 = 1
 
+// MARK: - Original IMP Storage
+
+/// Stores original (un-swizzled) implementations of request-based methods.
+/// These are captured before swizzling and used by URL-based swizzles to bypass
+/// the swizzled request-based methods, preventing double instrumentation when
+/// trace header injection is disabled.
+enum OriginalIMPs {
+    // Data task IMPs
+    static var dataTaskWithRequest: IMP?
+    static var dataTaskWithRequestAndCompletion: IMP?
+
+    // Download task IMPs
+    static var downloadTaskWithRequest: IMP?
+}
+
+/// Captures original request-based IMPs before any swizzling occurs.
+/// Must be called first in swizzleURLSessionTaskCreation().
+private func captureOriginalIMPs() {
+    // Capture dataTask(with: URLRequest)
+    let dataTaskRequestSelector = #selector(URLSession.dataTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDataTask)
+    if let method = class_getInstanceMethod(URLSession.self, dataTaskRequestSelector) {
+        OriginalIMPs.dataTaskWithRequest = method_getImplementation(method)
+    }
+
+    // Capture dataTask(with: URLRequest, completionHandler:)
+    typealias DataCompletionHandler = (Data?, URLResponse?, Error?) -> Void
+    let dataTaskRequestCompletionSelector = #selector(
+        URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping DataCompletionHandler) -> URLSessionDataTask
+    )
+    if let method = class_getInstanceMethod(URLSession.self, dataTaskRequestCompletionSelector) {
+        OriginalIMPs.dataTaskWithRequestAndCompletion = method_getImplementation(method)
+    }
+
+    // Capture downloadTask(with: URLRequest)
+    let downloadTaskRequestSelector = #selector(URLSession.downloadTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDownloadTask)
+    if let method = class_getInstanceMethod(URLSession.self, downloadTaskRequestSelector) {
+        OriginalIMPs.downloadTaskWithRequest = method_getImplementation(method)
+    }
+}
+
 // MARK: - Task Creation Swizzling
 
 /// Swizzles URLSession task creation methods to enable trace context injection.
@@ -30,6 +70,10 @@ var associatedKeyInstrumented: UInt8 = 1
 /// This must be called during instrumentation initialization to intercept task creation
 /// and inject W3C trace context headers into outgoing requests.
 func swizzleURLSessionTaskCreation() {
+    // Capture original IMPs BEFORE any swizzling to allow URL-based swizzles
+    // to bypass request-based swizzles (prevents double instrumentation)
+    captureOriginalIMPs()
+
     swizzleDataTaskWithRequest()
     swizzleDataTaskWithURL()
     swizzleDataTaskWithRequestAndCompletion()
@@ -53,7 +97,8 @@ func swizzleTaskCreationMethod(
         return
     }
 
-    var originalIMP: IMP?
+    // Capture original implementation BEFORE installing the swizzled block to avoid race condition
+    let originalIMP = method_getImplementation(original)
 
     let block: @convention(block) (URLSession, Any) -> URLSessionDataTask = { session, argument in
         let castedIMP = unsafeBitCast(
@@ -64,7 +109,7 @@ func swizzleTaskCreationMethod(
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-    originalIMP = method_setImplementation(original, swizzledIMP)
+    method_setImplementation(original, swizzledIMP)
 }
 
 func swizzleDownloadTaskCreationMethod(
@@ -78,7 +123,8 @@ func swizzleDownloadTaskCreationMethod(
         return
     }
 
-    var originalIMP: IMP?
+    // Capture original implementation BEFORE installing the swizzled block to avoid race condition
+    let originalIMP = method_getImplementation(original)
 
     let block: @convention(block) (URLSession, Any) -> URLSessionDownloadTask = { session, argument in
         let castedIMP = unsafeBitCast(

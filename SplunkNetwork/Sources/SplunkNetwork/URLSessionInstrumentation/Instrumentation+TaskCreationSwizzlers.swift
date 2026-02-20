@@ -41,7 +41,17 @@ func swizzleDataTaskWithURL() {
         return
     }
 
-    var originalIMP: IMP?
+    // Capture original implementation BEFORE installing the swizzled block to avoid race condition
+    let originalIMP = method_getImplementation(original)
+
+    // Get the original request-based IMP to bypass the swizzled version
+    let requestSelector = #selector(URLSession.dataTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDataTask)
+    guard let originalRequestIMP = OriginalIMPs.dataTaskWithRequest else {
+        NetworkInstrumentationManager.shared.logger.log(level: .fault) {
+            "Original dataTask(with: URLRequest) IMP not captured"
+        }
+        return
+    }
 
     let block: @convention(block) (URLSession, URL) -> URLSessionDataTask = { session, url in
         let castedIMP = unsafeBitCast(
@@ -60,16 +70,21 @@ func swizzleDataTaskWithURL() {
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
 
-        // Call the request-based method with injected headers.
-        // The request-based swizzle will see trace context is already present and skip re-instrumentation.
-        let task = session.dataTask(with: instrumentedRequest)
+        // Call the ORIGINAL (un-swizzled) request-based method directly.
+        // This bypasses the request-based swizzle, preventing double instrumentation
+        // when trace header injection is disabled.
+        let castedRequestIMP = unsafeBitCast(
+            originalRequestIMP,
+            to: (@convention(c) (URLSession, Selector, URLRequest) -> URLSessionDataTask).self
+        )
+        let task = castedRequestIMP(session, requestSelector, instrumentedRequest)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
         return task
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-    originalIMP = method_setImplementation(original, swizzledIMP)
+    method_setImplementation(original, swizzledIMP)
 }
 
 func swizzleDataTaskWithRequestAndCompletion() {
@@ -83,7 +98,8 @@ func swizzleDataTaskWithRequestAndCompletion() {
         return
     }
 
-    var originalIMP: IMP?
+    // Capture original implementation BEFORE installing the swizzled block to avoid race condition
+    let originalIMP = method_getImplementation(original)
 
     let block: @convention(block) (URLSession, URLRequest, CompletionHandler?) -> URLSessionDataTask = { session, request, completion in
         let castedIMP = unsafeBitCast(
@@ -117,7 +133,7 @@ func swizzleDataTaskWithRequestAndCompletion() {
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-    originalIMP = method_setImplementation(original, swizzledIMP)
+    method_setImplementation(original, swizzledIMP)
 }
 
 func swizzleDataTaskWithURLAndCompletion() {
@@ -131,7 +147,19 @@ func swizzleDataTaskWithURLAndCompletion() {
         return
     }
 
-    var originalIMP: IMP?
+    // Capture original implementation BEFORE installing the swizzled block to avoid race condition
+    let originalIMP = method_getImplementation(original)
+
+    // Get the original request-based IMP to bypass the swizzled version
+    let requestSelector = #selector(
+        URLSession.dataTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping CompletionHandler) -> URLSessionDataTask
+    )
+    guard let originalRequestIMP = OriginalIMPs.dataTaskWithRequestAndCompletion else {
+        NetworkInstrumentationManager.shared.logger.log(level: .fault) {
+            "Original dataTask(with: URLRequest, completionHandler:) IMP not captured"
+        }
+        return
+    }
 
     let block: @convention(block) (URLSession, URL, CompletionHandler?) -> URLSessionDataTask = { session, url, completion in
         let castedIMP = unsafeBitCast(
@@ -144,7 +172,7 @@ func swizzleDataTaskWithURLAndCompletion() {
             return castedIMP(session, selector, url, completion)
         }
 
-        // Create span and inject headers - need to use request-based method for instrumented request
+        // Create span and inject headers
         guard let span = startHttpSpan(request: request) else {
             return castedIMP(session, selector, url, completion)
         }
@@ -152,22 +180,30 @@ func swizzleDataTaskWithURLAndCompletion() {
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
 
         // Wrap completion to end span
-        let wrappedCompletion: CompletionHandler? = completion.map { originalCompletion in
+        let wrappedCompletion: CompletionHandler = completion.map { originalCompletion in
             { data, response, error in
                 endHttpSpanFromCompletion(span: span, response: response, error: error)
                 originalCompletion(data, response, error)
             }
+        } ?? { _, _, _ in
+            endHttpSpanFromCompletion(span: span, response: nil, error: nil)
         }
 
-        // Use request-based method since we have an instrumented request
-        let task = session.dataTask(with: instrumentedRequest, completionHandler: wrappedCompletion ?? { _, _, _ in })
+        // Call the ORIGINAL (un-swizzled) request-based method directly.
+        // This bypasses the request-based swizzle, preventing double instrumentation
+        // when trace header injection is disabled.
+        let castedRequestIMP = unsafeBitCast(
+            originalRequestIMP,
+            to: (@convention(c) (URLSession, Selector, URLRequest, CompletionHandler?) -> URLSessionDataTask).self
+        )
+        let task = castedRequestIMP(session, requestSelector, instrumentedRequest, wrappedCompletion)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
         return task
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-    originalIMP = method_setImplementation(original, swizzledIMP)
+    method_setImplementation(original, swizzledIMP)
 }
 
 // MARK: - Upload Task Swizzling
@@ -182,7 +218,8 @@ func swizzleUploadTaskWithRequestFromData() {
         return
     }
 
-    var originalIMP: IMP?
+    // Capture original implementation BEFORE installing the swizzled block to avoid race condition
+    let originalIMP = method_getImplementation(original)
 
     let block: @convention(block) (URLSession, URLRequest, Data?) -> URLSessionUploadTask = { session, request, data in
         let castedIMP = unsafeBitCast(
@@ -206,7 +243,7 @@ func swizzleUploadTaskWithRequestFromData() {
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-    originalIMP = method_setImplementation(original, swizzledIMP)
+    method_setImplementation(original, swizzledIMP)
 }
 
 func swizzleUploadTaskWithRequestFromFile() {
@@ -219,7 +256,8 @@ func swizzleUploadTaskWithRequestFromFile() {
         return
     }
 
-    var originalIMP: IMP?
+    // Capture original implementation BEFORE installing the swizzled block to avoid race condition
+    let originalIMP = method_getImplementation(original)
 
     let block: @convention(block) (URLSession, URLRequest, URL) -> URLSessionUploadTask = { session, request, fileURL in
         let castedIMP = unsafeBitCast(
@@ -243,7 +281,7 @@ func swizzleUploadTaskWithRequestFromFile() {
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-    originalIMP = method_setImplementation(original, swizzledIMP)
+    method_setImplementation(original, swizzledIMP)
 }
 
 // MARK: - Download Task Swizzling
@@ -269,7 +307,17 @@ func swizzleDownloadTaskWithURL() {
         return
     }
 
-    var originalIMP: IMP?
+    // Capture original implementation BEFORE installing the swizzled block to avoid race condition
+    let originalIMP = method_getImplementation(original)
+
+    // Get the original request-based IMP to bypass the swizzled version
+    let requestSelector = #selector(URLSession.downloadTask(with:) as (URLSession) -> (URLRequest) -> URLSessionDownloadTask)
+    guard let originalRequestIMP = OriginalIMPs.downloadTaskWithRequest else {
+        NetworkInstrumentationManager.shared.logger.log(level: .fault) {
+            "Original downloadTask(with: URLRequest) IMP not captured"
+        }
+        return
+    }
 
     let block: @convention(block) (URLSession, URL) -> URLSessionDownloadTask = { session, url in
         let castedIMP = unsafeBitCast(
@@ -288,14 +336,19 @@ func swizzleDownloadTaskWithURL() {
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
 
-        // Call the request-based method with injected headers.
-        // The request-based swizzle will see trace context is already present and skip re-instrumentation.
-        let task = session.downloadTask(with: instrumentedRequest)
+        // Call the ORIGINAL (un-swizzled) request-based method directly.
+        // This bypasses the request-based swizzle, preventing double instrumentation
+        // when trace header injection is disabled.
+        let castedRequestIMP = unsafeBitCast(
+            originalRequestIMP,
+            to: (@convention(c) (URLSession, Selector, URLRequest) -> URLSessionDownloadTask).self
+        )
+        let task = castedRequestIMP(session, requestSelector, instrumentedRequest)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
         return task
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-    originalIMP = method_setImplementation(original, swizzledIMP)
+    method_setImplementation(original, swizzledIMP)
 }
