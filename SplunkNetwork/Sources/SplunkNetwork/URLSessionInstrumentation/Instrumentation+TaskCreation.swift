@@ -225,15 +225,15 @@ func wrapCompletionHandler(
     _ completion: ((Data?, URLResponse?, Error?) -> Void)?,
     span: Span
 ) -> (Data?, URLResponse?, Error?) -> Void {
-    if let originalCompletion = completion {
-        return { data, response, error in
-            endHttpSpanFromCompletion(span: span, response: response, error: error)
-            originalCompletion(data, response, error)
-        }
-    } else {
+    guard let originalCompletion = completion else {
         return { _, response, error in
             endHttpSpanFromCompletion(span: span, response: response, error: error)
         }
+    }
+
+    return { data, response, error in
+        endHttpSpanFromCompletion(span: span, response: response, error: error)
+        originalCompletion(data, response, error)
     }
 }
 
