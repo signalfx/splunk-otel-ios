@@ -62,7 +62,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
     private static var originalTracerProvider: TracerProvider?
     private static var networkModule: NetworkInstrumentation?
 
-    override class func setUp() {
+    override static func setUp() {
         super.setUp()
 
         originalTracerProvider = OpenTelemetry.instance.tracerProvider
@@ -82,7 +82,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         networkModule?.install(with: config, remoteConfiguration: nil)
     }
 
-    override class func tearDown() {
+    override static func tearDown() {
         networkModule?.uninstall()
         networkModule = nil
 
