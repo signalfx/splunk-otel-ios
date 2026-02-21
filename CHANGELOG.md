@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+* Added Notification for Session Changes
+
 ## [2.0.6] - 2026-02-02
 
 ### Changed

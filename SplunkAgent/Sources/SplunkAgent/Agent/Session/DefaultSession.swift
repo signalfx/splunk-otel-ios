@@ -170,24 +170,25 @@ class DefaultSession: AgentSession {
         // Track previous session ID if one exists
         var previousSessionId: String?
 
-        // Close previous session
-        if var previousSession = sessionsModel.sessions.last,
-            !(previousSession.closed ?? false)
-        {
-            previousSession.closed = true
+        if var previousSession = sessionsModel.sessions.last {
             previousSessionId = previousSession.id
 
-            // Updates corresponding item in `SessionsModel`
-            let previousSessionIndex = sessionsModel.sessions.firstIndex { item in
-                item.id == previousSession.id
-            }
+            // Close previous session
+            if !(previousSession.closed ?? false) {
+                previousSession.closed = true
 
-            if let previousSessionIndex {
-                sessionsModel.sessions[previousSessionIndex] = previousSession
-            }
+                // Updates corresponding item in `SessionsModel`
+                let previousSessionIndex = sessionsModel.sessions.firstIndex { item in
+                    item.id == previousSession.id
+                }
 
-            logger.log(level: .info) {
-                "Previous session (id \(previousSessionId ?? "unknown")) has been closed."
+                if let previousSessionIndex {
+                    sessionsModel.sessions[previousSessionIndex] = previousSession
+                }
+
+                logger.log(level: .info) {
+                    "Previous session (id \(previousSessionId ?? "unknown")) has been closed."
+                }
             }
         }
 
