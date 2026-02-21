@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
-import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 import SplunkCommon
 import SplunkOpenTelemetryBackgroundExporter
@@ -53,7 +52,7 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
     ) {
         // Store resources object for Unit tests
         #if DEBUG
-            /// Build Resources
+            // Build Resources
             var resource = Resource()
             resource.merge(with: resources)
 

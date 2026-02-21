@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -19,7 +18,6 @@ limitations under the License.
 import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
 import Testing
 import XCTest
@@ -34,7 +32,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func makeExporter(
         disk: MockDiskStorage,
         http: MockHTTPClient,
-        config: OtlpConfiguration = OtlpConfiguration()
+        config: OTLPExporterConfiguration = OTLPExporterConfiguration()
     ) throws -> OTLPBackgroundHTTPBaseExporter {
         let exporter = try OTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
@@ -86,7 +84,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
         let exporter = try MockOTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
-            config: OtlpConfiguration(),
+            config: OTLPExporterConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
             diskStorage: disk,
@@ -118,7 +116,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func onlyStalledTasksAreCancelled() throws {
         let disk = MockDiskStorage()
         let http = MockHTTPClient()
-        let exporter = try makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 1))
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 1))
 
         let now = Date()
         let old = now.addingTimeInterval(-1_000)
@@ -202,7 +200,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func exporterWasCreatedAndCheckStalledWasCalled() async throws {
         let exporter = try MockOTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
-            config: OtlpConfiguration(),
+            config: OTLPExporterConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
             diskStorage: MockDiskStorage()
