@@ -78,7 +78,9 @@ func swizzleURLSessionTaskCreation() {
     swizzleDataTaskWithRequestAndCompletion()
     swizzleDataTaskWithURLAndCompletion()
     swizzleUploadTaskWithRequestFromData()
+    swizzleUploadTaskWithRequestFromDataAndCompletion()
     swizzleUploadTaskWithRequestFromFile()
+    swizzleUploadTaskWithRequestFromFileAndCompletion()
     swizzleDownloadTaskWithRequest()
     swizzleDownloadTaskWithURL()
 }
@@ -123,7 +125,7 @@ func swizzleDownloadTaskCreationMethod(
     }
 
     // Capture original implementation BEFORE installing the swizzled block to avoid race condition
-    var originalIMP = method_getImplementation(original)
+    let originalIMP = method_getImplementation(original)
 
     let block: @convention(block) (URLSession, Any) -> URLSessionDownloadTask = { session, argument in
         let castedIMP = unsafeBitCast(
@@ -134,7 +136,7 @@ func swizzleDownloadTaskCreationMethod(
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-    originalIMP = method_setImplementation(original, swizzledIMP)
+    method_setImplementation(original, swizzledIMP)
 }
 
 func createInstrumentedDataTask(
