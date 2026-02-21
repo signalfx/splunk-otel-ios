@@ -20,7 +20,7 @@ import XCTest
 @testable import SplunkAgent
 
 extension DefaultSessionTests {
-    func testSessionIdDidChangeNotification_NextLaunchAfterEndSessionContainsPreviousId() {
+    func testSessionIdDidChangeNotificationNextLaunchAfterEndSessionContainsPreviousId() {
         let storage = UserDefaultsStorageTestBuilder.buildCleanStorage(named: "changeNotifClosedPreviousSessionTest")
         let sessionModel = SessionsModel(storage: storage)
 
