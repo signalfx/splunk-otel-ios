@@ -27,24 +27,24 @@ import XCTest
 /// A span exporter that collects finished spans in memory for test assertions.
 private class CollectingSpanExporter: SpanExporter {
     private let lock = NSLock()
-    private var _spans: [SpanData] = []
+    private var collectedSpans: [SpanData] = []
 
     var spans: [SpanData] {
         lock.lock()
         defer { lock.unlock() }
-        return _spans
+        return collectedSpans
     }
 
     func reset() {
         lock.lock()
         defer { lock.unlock() }
-        _spans.removeAll()
+        collectedSpans.removeAll()
     }
 
     func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
         lock.lock()
         defer { lock.unlock() }
-        _spans.append(contentsOf: spans)
+        collectedSpans.append(contentsOf: spans)
         return .success
     }
 
@@ -62,8 +62,6 @@ final class TaskCreationSwizzlingTests: XCTestCase {
     private static var originalTracerProvider: TracerProvider?
     private static var networkModule: NetworkInstrumentation?
 
-    // One-time setup: register a collecting tracer provider and install instrumentation.
-    // Swizzling is process-global so we do this once for all tests.
     override class func setUp() {
         super.setUp()
 
@@ -118,9 +116,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
     /// Waits for the exporter to collect the expected number of spans.
     private func waitForSpans(
         count: Int,
-        timeout: TimeInterval = 5.0,
-        file: StaticString = #filePath,
-        line: UInt = #line
+        timeout: TimeInterval = 5.0
     ) {
         let deadline = Date().addingTimeInterval(timeout)
         while Self.exporter.spans.count < count, Date() < deadline {
@@ -134,7 +130,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         let url = try XCTUnwrap(URL(string: "https://httpbin.org/post"))
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        let data = "test body".data(using: .utf8)
+        let data = Data("test body".utf8)
 
         let expectation = expectation(description: "Upload completion called")
         let session = URLSession(configuration: .ephemeral)
@@ -181,7 +177,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         let url = try XCTUnwrap(URL(string: "https://httpbin.org/post"))
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        let data = "test body".data(using: .utf8)
+        let data = Data("test body".utf8)
 
         let expectation = expectation(description: "Upload completion called")
         var receivedData: Data?
@@ -209,7 +205,6 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
 
         let expectation = expectation(description: "Task completed")
-        let session = URLSession(configuration: .ephemeral)
         let delegate = TaskCompletionDelegate(expectation: expectation)
         let delegateSession = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: nil)
 
@@ -292,8 +287,8 @@ final class TaskCreationSwizzlingTests: XCTestCase {
             let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
             let headers = json["headers"] as? [String: Any]
         {
-            XCTAssertNotNil(headers["Traceparent"] ?? headers["traceparent"],
-                            "traceparent header should be present when injection is enabled")
+            let traceparent = headers["Traceparent"] ?? headers["traceparent"]
+            XCTAssertNotNil(traceparent, "traceparent should be present when injection is enabled")
         }
     }
 
@@ -319,10 +314,8 @@ final class TaskCreationSwizzlingTests: XCTestCase {
             let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
             let headers = json["headers"] as? [String: Any]
         {
-            XCTAssertNil(headers["Traceparent"],
-                         "traceparent header should not be present when injection is disabled")
-            XCTAssertNil(headers["traceparent"],
-                         "traceparent header should not be present when injection is disabled")
+            XCTAssertNil(headers["Traceparent"], "traceparent should not be present when disabled")
+            XCTAssertNil(headers["traceparent"], "traceparent should not be present when disabled")
         }
 
         reinstallModule(injectTraceHeaders: true)
