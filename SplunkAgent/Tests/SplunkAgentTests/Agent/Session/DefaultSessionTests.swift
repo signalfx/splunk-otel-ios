@@ -203,6 +203,117 @@ final class DefaultSessionTests: XCTestCase {
         // We need to wait for notification delivery
         waitForExpectations(timeout: 3, handler: nil)
     }
+
+
+    // MARK: - Session ID Change Notifications
+
+    func testSessionIdDidChangeNotification_PostedOnCreation() throws {
+        _ = expectation(
+            forNotification: DefaultSession.sessionIdDidChangeNotification,
+            object: nil,
+            handler: nil
+        )
+
+        let defaultSession = try DefaultSessionTestBuilder.build(named: "changeNotifCreationTest")
+
+        waitForExpectations(timeout: 3, handler: nil)
+
+        XCTAssertNotNil(defaultSession.currentSessionId)
+    }
+
+    func testSessionIdDidChangeNotification_ContainsNewSessionId() throws {
+        var capturedNewSessionId: String?
+
+        _ = expectation(
+            forNotification: DefaultSession.sessionIdDidChangeNotification,
+            object: nil
+        ) { notification in
+            capturedNewSessionId = notification.userInfo?[DefaultSession.sessionIdUserInfoKey] as? String
+            return true
+        }
+
+        let defaultSession = try DefaultSessionTestBuilder.build(named: "changeNotifNewIdTest")
+
+        waitForExpectations(timeout: 3, handler: nil)
+
+        XCTAssertNotNil(capturedNewSessionId)
+        XCTAssertEqual(capturedNewSessionId, defaultSession.currentSessionId)
+    }
+
+    func testSessionIdDidChangeNotification_FirstSessionHasNilPreviousId() throws {
+        var capturedPreviousSessionId: String? = "sentinel"
+
+        _ = expectation(
+            forNotification: DefaultSession.sessionIdDidChangeNotification,
+            object: nil
+        ) { notification in
+            capturedPreviousSessionId = notification.userInfo?[DefaultSession.previousSessionIdUserInfoKey] as? String
+            return true
+        }
+
+        _ = try DefaultSessionTestBuilder.build(named: "changeNotifNoPrevTest")
+
+        waitForExpectations(timeout: 3, handler: nil)
+
+        XCTAssertNil(capturedPreviousSessionId, "First session should have no previous session ID")
+    }
+
+    func testSessionIdDidChangeNotification_RotationContainsPreviousId() throws {
+        let defaultSession = try DefaultSessionTestBuilder.build(named: "changeNotifRotateTest")
+        let originalSessionId = defaultSession.currentSessionId
+
+        simulateMainThreadWait(duration: 0.5)
+
+        var capturedNewSessionId: String?
+        var capturedPreviousSessionId: String?
+
+        _ = expectation(
+            forNotification: DefaultSession.sessionIdDidChangeNotification,
+            object: nil
+        ) { notification in
+            capturedNewSessionId = notification.userInfo?[DefaultSession.sessionIdUserInfoKey] as? String
+            capturedPreviousSessionId = notification.userInfo?[DefaultSession.previousSessionIdUserInfoKey] as? String
+            return true
+        }
+
+        defaultSession.rotateSession()
+
+        waitForExpectations(timeout: 3, handler: nil)
+
+        XCTAssertNotNil(capturedNewSessionId)
+        XCTAssertNotEqual(capturedNewSessionId, originalSessionId)
+        XCTAssertEqual(capturedNewSessionId, defaultSession.currentSessionId)
+        XCTAssertEqual(capturedPreviousSessionId, originalSessionId)
+    }
+
+    func testSessionIdDidChangeNotification_PostedOnMainThread() throws {
+        var wasMainThread = false
+
+        _ = expectation(
+            forNotification: DefaultSession.sessionIdDidChangeNotification,
+            object: nil
+        ) { _ in
+            wasMainThread = Thread.isMainThread
+            return true
+        }
+
+        _ = try DefaultSessionTestBuilder.build(named: "changeNotifMainThreadTest")
+
+        waitForExpectations(timeout: 3, handler: nil)
+
+        XCTAssertTrue(wasMainThread, "Notification should be posted on the main thread")
+    }
+
+    func testSessionIdDidChangeNotification_UserInfoKeys() {
+        XCTAssertEqual(DefaultSession.sessionIdUserInfoKey, "sessionId")
+        XCTAssertEqual(DefaultSession.previousSessionIdUserInfoKey, "previousSessionId")
+    }
+
+    func testSessionIdDidChangeNotification_PublicAPIMatchesInternal() {
+        XCTAssertEqual(Session.sessionIdDidChangeNotification, DefaultSession.sessionIdDidChangeNotification)
+        XCTAssertEqual(Session.sessionIdUserInfoKey, DefaultSession.sessionIdUserInfoKey)
+        XCTAssertEqual(Session.previousSessionIdUserInfoKey, DefaultSession.previousSessionIdUserInfoKey)
+    }
 }
 
 

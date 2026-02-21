@@ -49,4 +49,69 @@ limitations under the License.
     XCTAssertEqual(currentSamplingRate, 1.0);
 }
 
+
+// MARK: - Session Change Notification API
+
+- (void)testSessionIdDidChangeNotificationName {
+    NSNotificationName name = SPLKSession.sessionIdDidChangeNotification;
+    XCTAssertNotNil(name);
+    XCTAssertTrue(name.length > 0);
+}
+
+- (void)testSessionIdUserInfoKey {
+    NSString *key = SPLKSession.sessionIdUserInfoKey;
+    XCTAssertNotNil(key);
+    XCTAssertEqualObjects(key, @"sessionId");
+}
+
+- (void)testPreviousSessionIdUserInfoKey {
+    NSString *key = SPLKSession.previousSessionIdUserInfoKey;
+    XCTAssertNotNil(key);
+    XCTAssertEqualObjects(key, @"previousSessionId");
+}
+
+- (void)testSessionIdDidChangeNotificationIsObservable {
+    XCTestExpectation *expectation = [self expectationForNotification:SPLKSession.sessionIdDidChangeNotification
+                                                              object:nil
+                                                             handler:nil];
+
+    NSDictionary *userInfo = @{
+        SPLKSession.sessionIdUserInfoKey: @"test-new-id",
+        SPLKSession.previousSessionIdUserInfoKey: @"test-old-id"
+    };
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:SPLKSession.sessionIdDidChangeNotification
+                                                        object:nil
+                                                      userInfo:userInfo];
+
+    [self waitForExpectations:@[expectation] timeout:3];
+}
+
+- (void)testSessionIdDidChangeNotificationUserInfoKeys {
+    __block NSString *capturedNewId = nil;
+    __block NSString *capturedPreviousId = nil;
+
+    XCTestExpectation *expectation = [self expectationForNotification:SPLKSession.sessionIdDidChangeNotification
+                                                              object:nil
+                                                             handler:^BOOL(NSNotification *notification) {
+        capturedNewId = notification.userInfo[SPLKSession.sessionIdUserInfoKey];
+        capturedPreviousId = notification.userInfo[SPLKSession.previousSessionIdUserInfoKey];
+        return YES;
+    }];
+
+    NSDictionary *userInfo = @{
+        SPLKSession.sessionIdUserInfoKey: @"abc123",
+        SPLKSession.previousSessionIdUserInfoKey: @"xyz789"
+    };
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:SPLKSession.sessionIdDidChangeNotification
+                                                        object:nil
+                                                      userInfo:userInfo];
+
+    [self waitForExpectations:@[expectation] timeout:3];
+
+    XCTAssertEqualObjects(capturedNewId, @"abc123");
+    XCTAssertEqualObjects(capturedPreviousId, @"xyz789");
+}
+
 @end
