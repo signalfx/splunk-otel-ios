@@ -353,4 +353,3 @@ func swizzleUploadTaskWithRequestFromFileAndCompletion() {
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
     method_setImplementation(original, swizzledIMP)
 }
-
