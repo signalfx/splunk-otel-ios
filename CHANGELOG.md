@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-02-23
+
 ### Added
 
 * XCFramework build system for binary distribution of the SDK.
