@@ -37,7 +37,7 @@ runs:
 
         # Decode and save the certificate
         echo "Decoding certificate..."
-        echo -n "${DISTRIBUTION_CERTIFICATE}" | base64 --decode -o "$CERT_FILE"
+        printf %s "${DISTRIBUTION_CERTIFICATE}" | base64 --decode > "$CERT_FILE"
 
         if [ ! -f "$CERT_FILE" ]; then
           echo "Error: Certificate file not found at $CERT_FILE"
