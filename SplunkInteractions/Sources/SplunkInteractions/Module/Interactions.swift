@@ -143,7 +143,8 @@ public final class Interactions: SplunkInteractionsModule {
             }
 
             if let customId = await customIdentifiers.value(for: currentNode.viewId) {
-                predicates.append("@id=\(customId)")
+                let escaped = customId.replacingOccurrences(of: "'", with: "\\'")
+                predicates.append("@id='\(escaped)'")
             }
             else if xpathItems.isEmpty {
                 predicates.append("@id=\(UInt(bitPattern: currentNode.viewId))")
