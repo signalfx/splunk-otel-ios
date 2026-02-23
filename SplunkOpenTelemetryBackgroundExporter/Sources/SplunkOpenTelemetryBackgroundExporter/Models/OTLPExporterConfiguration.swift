@@ -111,6 +111,37 @@ public enum OTLPEnvVarHeaders {
     }
 
 
+    // MARK: - Internal Methods
+
+    /// Parses OTLP headers from a header list value.
+    ///
+    /// - Parameter value: The header list string in `key=value,key2=value2` format.
+    ///
+    /// - Returns: An array of key-value tuples, or nil if parsing yields no valid headers.
+    static func parseHeaderListValue(_ value: String) -> [(String, String)]? {
+        var headers: [(String, String)] = []
+
+        // Split by comma and parse key=value pairs.
+        // Note: Split on first '=' only to preserve '=' characters in values (e.g., Base64 tokens).
+        let pairs = value.components(separatedBy: ",")
+        for pair in pairs {
+            let keyValue = pair.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: false)
+            if keyValue.count == 2 {
+                let rawKey = String(keyValue[0]).trimmingCharacters(in: .whitespaces)
+                let rawValue = String(keyValue[1]).trimmingCharacters(in: .whitespaces)
+                let key = rawKey.removingPercentEncoding ?? rawKey
+                let val = rawValue.removingPercentEncoding ?? rawValue
+
+                if !key.isEmpty {
+                    headers.append((key, val))
+                }
+            }
+        }
+
+        return headers.isEmpty ? nil : headers
+    }
+
+
     // MARK: - Private Methods
 
     /// Parses headers from an environment variable.
@@ -123,22 +154,6 @@ public enum OTLPEnvVarHeaders {
             return nil
         }
 
-        var headers: [(String, String)] = []
-
-        // Split by comma and parse key=value pairs
-        // Note: Split on first '=' only to preserve '=' characters in values (e.g., Base64 tokens)
-        let pairs = value.components(separatedBy: ",")
-        for pair in pairs {
-            let keyValue = pair.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: false)
-            if keyValue.count == 2 {
-                let key = String(keyValue[0]).trimmingCharacters(in: .whitespaces)
-                let val = String(keyValue[1]).trimmingCharacters(in: .whitespaces)
-                if !key.isEmpty {
-                    headers.append((key, val))
-                }
-            }
-        }
-
-        return headers.isEmpty ? nil : headers
+        return parseHeaderListValue(value)
     }
 }

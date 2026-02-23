@@ -31,22 +31,6 @@ import OpenTelemetrySdk
 /// Based on OTLP specification v1.9.0.
 enum SpanDataAdapter {
 
-    // MARK: - Private Types
-
-    /// Key for grouping spans by scope within a resource.
-    ///
-    /// Uses scope name and version as the grouping key.
-    private struct ScopeKey: Hashable {
-        let name: String
-        let version: String?
-
-        init(from scope: InstrumentationScopeInfo?) {
-            name = scope?.name ?? ""
-            version = scope?.version
-        }
-    }
-
-
     // MARK: - Internal Methods
 
     /// Converts a list of SpanData to OTLP ResourceSpans.
@@ -68,7 +52,7 @@ enum SpanDataAdapter {
 
             var scopeSpansList: [OTLPScopeSpans] = []
 
-            for (_, scopedSpans) in groupedByScope {
+            for (scopeInfo, scopedSpans) in groupedByScope {
                 // Convert each SpanData to OTLPSpan
                 let otlpSpans = scopedSpans.map { convertSpan($0) }
 
@@ -77,13 +61,10 @@ enum SpanDataAdapter {
                     continue
                 }
 
-                // Get the scope info from the first span in this scope group
-                let scope = convertInstrumentationScope(scopedSpans.first?.instrumentationScope)
-
                 let scopeSpans = OTLPScopeSpans(
-                    scope: scope,
+                    scope: convertInstrumentationScope(scopeInfo),
                     spans: otlpSpans,
-                    schemaUrl: nil
+                    schemaUrl: scopeInfo.schemaUrl
                 )
                 scopeSpansList.append(scopeSpans)
             }
@@ -118,13 +99,15 @@ enum SpanDataAdapter {
         return result
     }
 
-    /// Groups spans by instrumentation scope within a resource.
-    private static func groupByScope(_ spans: [SpanData]) -> [ScopeKey: [SpanData]] {
-        var result: [ScopeKey: [SpanData]] = [:]
+    /// Groups spans by full instrumentation scope identity within a resource.
+    ///
+    /// This uses all scope metadata as the key (name, version, schema URL, attributes)
+    /// to avoid collapsing distinct scopes that share only name/version.
+    private static func groupByScope(_ spans: [SpanData]) -> [InstrumentationScopeInfo: [SpanData]] {
+        var result: [InstrumentationScopeInfo: [SpanData]] = [:]
 
         for span in spans {
-            let key = ScopeKey(from: span.instrumentationScope)
-            result[key, default: []].append(span)
+            result[span.instrumentationScope, default: []].append(span)
         }
 
         return result
