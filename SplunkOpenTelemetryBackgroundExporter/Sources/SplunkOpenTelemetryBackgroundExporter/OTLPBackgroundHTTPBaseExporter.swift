@@ -238,7 +238,44 @@ public class OTLPBackgroundHTTPBaseExporter {
         }
     }
 
-    // MARK: - Stalled request operations
+    // MARK: - Helper functions
+
+    func getStorageKey() -> KeyBuilder {
+        KeyBuilder.uploadsKey.append(getFileKeyType())
+    }
+
+    func getPendingStorageKey() -> KeyBuilder {
+        KeyBuilder.pendingUploadsKey.append(getFileKeyType())
+    }
+
+    func getFileKeyType() -> String {
+        fileType ?? "base"
+    }
+
+    private func getEndpointState() -> (endpoint: URL?, headers: [String: String]) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return (storedEndpoint, storedAdditionalHeaders)
+    }
+
+    private func buildHeaders(from additionalHeaders: [String: String]) -> [String: String] {
+        var combinedHeaders = additionalHeaders
+        if let envVarHeaders {
+            for (key, value) in envVarHeaders {
+                combinedHeaders[key] = value
+            }
+        }
+        return combinedHeaders
+    }
+
+    var headers: [String: String] {
+        buildHeaders(from: additionalHeaders)
+    }
+}
+
+// MARK: - Stalled request operations
+
+extension OTLPBackgroundHTTPBaseExporter {
 
     func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
         guard let currentEndpoint = endpoint else {
@@ -332,39 +369,5 @@ public class OTLPBackgroundHTTPBaseExporter {
                 try? httpClient.send(taskDescription)
             }
         }
-    }
-
-    // MARK: - Helper functions
-
-    func getStorageKey() -> KeyBuilder {
-        KeyBuilder.uploadsKey.append(getFileKeyType())
-    }
-
-    func getPendingStorageKey() -> KeyBuilder {
-        KeyBuilder.pendingUploadsKey.append(getFileKeyType())
-    }
-
-    func getFileKeyType() -> String {
-        fileType ?? "base"
-    }
-
-    private func getEndpointState() -> (endpoint: URL?, headers: [String: String]) {
-        stateLock.lock()
-        defer { stateLock.unlock() }
-        return (storedEndpoint, storedAdditionalHeaders)
-    }
-
-    private func buildHeaders(from additionalHeaders: [String: String]) -> [String: String] {
-        var combinedHeaders = additionalHeaders
-        if let envVarHeaders {
-            for (key, value) in envVarHeaders {
-                combinedHeaders[key] = value
-            }
-        }
-        return combinedHeaders
-    }
-
-    var headers: [String: String] {
-        buildHeaders(from: additionalHeaders)
     }
 }
