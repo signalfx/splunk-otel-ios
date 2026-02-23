@@ -19,9 +19,12 @@ internal import CiscoLogger
 internal import CiscoSessionReplay
 import Foundation
 internal import SplunkCommon
-internal import SplunkCrashReports
 internal import SplunkCustomTracking
 internal import SplunkOpenTelemetry
+
+#if canImport(SplunkCrashReports)
+    internal import SplunkCrashReports
+#endif
 
 /// Default Event Manager instantiates LogEventProcessor for sending logs, instantiates TraceProcessor for sending traces.
 ///
@@ -137,8 +140,10 @@ class DefaultEventManager: AgentEventManager {
             publishSessionReplay(data: data, metadata: metadata, completion: completion)
 
         // Crash Reports module data
-        case let (metadata as CrashReportsMetadata, data as String):
-            publishCrashReports(data: data, metadata: metadata, completion: completion)
+        #if canImport(SplunkCrashReports)
+            case let (metadata as CrashReportsMetadata, data as String):
+                publishCrashReports(data: data, metadata: metadata, completion: completion)
+        #endif
 
         // Custom Tracking module data
         case let (metadata as CustomTrackingMetadata, data as CustomTrackingData):
@@ -211,16 +216,18 @@ class DefaultEventManager: AgentEventManager {
         }
     }
 
-    private func publishCrashReports(data: String, metadata: CrashReportsMetadata, completion: @escaping (Bool) -> Void) {
-        let sessionId = agent.session.sessionId(for: metadata.timestamp)
-        let event = CrashReportsDataEvent(metadata: metadata, data: data, sessionID: sessionId)
+    #if canImport(SplunkCrashReports)
+        private func publishCrashReports(data: String, metadata: CrashReportsMetadata, completion: @escaping (Bool) -> Void) {
+            let sessionId = agent.session.sessionId(for: metadata.timestamp)
+            let event = CrashReportsDataEvent(metadata: metadata, data: data, sessionID: sessionId)
 
-        logEventProcessor.sendEvent(
-            event: event,
-            immediateProcessing: true,
-            completion: completion
-        )
-    }
+            logEventProcessor.sendEvent(
+                event: event,
+                immediateProcessing: true,
+                completion: completion
+            )
+        }
+    #endif
 
     private func publishCustomTracking(data: CustomTrackingData, metadata: CustomTrackingMetadata, completion: @escaping (Bool) -> Void) {
         let sessionId = agent.session.sessionId(for: metadata.timestamp)
