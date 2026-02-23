@@ -56,7 +56,7 @@ struct OTLPAdapterGroupingTests {
     }
 
     private func makeLogRecord(scope: InstrumentationScopeInfo, resource: Resource) -> ReadableLogRecord {
-        return ReadableLogRecord(
+        ReadableLogRecord(
             resource: resource,
             instrumentationScopeInfo: scope,
             timestamp: Date(),
@@ -168,17 +168,21 @@ struct OTLPAdapterGroupingTests {
 
         #expect(resourceSpans.count == 1)
         #expect(scopeSpans.count == 2)
-        #expect(Set(scopeSpans.compactMap { $0.schemaUrl }) == Set(["https://example.com/schema/a", "https://example.com/schema/b"]))
+        #expect(Set(scopeSpans.compactMap(\.schemaUrl)) == Set(["https://example.com/schema/a", "https://example.com/schema/b"]))
 
-        let scopeAttributeValues: Set<String> = Set(scopeSpans.compactMap { scopeSpans -> String? in
-            guard let scopeAttribute = scopeSpans.scope?.attributes?.first(where: { $0.key == "scope.attr" }) else {
-                return nil
+        let scopeAttributeValues: Set<String> = Set(
+            scopeSpans.compactMap { scopeSpans -> String? in
+                guard let scopeAttribute = scopeSpans.scope?.attributes?.first(where: { $0.key == "scope.attr" }) else {
+                    return nil
+                }
+
+                guard case let .stringValue(value) = scopeAttribute.value else {
+                    return nil
+                }
+
+                return value
             }
-            guard case let .stringValue(value) = scopeAttribute.value else {
-                return nil
-            }
-            return value
-        })
+        )
         let expectedScopeAttributeValues: Set<String> = ["value-a", "value-b"]
         #expect(scopeAttributeValues == expectedScopeAttributeValues)
     }
@@ -218,9 +222,9 @@ struct OTLPAdapterGroupingTests {
 
         let resourceLogs = LogRecordAdapter.toResourceLogs([logA, logB])
         let scopeLogs = resourceLogs.first?.scopeLogs ?? []
-        let schemaUrls = Set(scopeLogs.compactMap { $0.schemaUrl })
+        let schemaUrls = Set(scopeLogs.compactMap(\.schemaUrl))
         let expectedSchemaUrls: Set<String> = [scopeA.schemaUrl, scopeB.schemaUrl]
-            .compactMap { $0 }
+            .compactMap(\.self)
             .reduce(into: Set<String>()) { set, value in
                 set.insert(value)
             }
@@ -229,15 +233,19 @@ struct OTLPAdapterGroupingTests {
         #expect(scopeLogs.count == 2)
         #expect(schemaUrls == expectedSchemaUrls)
 
-        let scopeAttributeValues: Set<String> = Set(scopeLogs.compactMap { scopeLogs -> String? in
-            guard let scopeAttribute = scopeLogs.scope?.attributes?.first(where: { $0.key == "scope.attr" }) else {
-                return nil
+        let scopeAttributeValues: Set<String> = Set(
+            scopeLogs.compactMap { scopeLogs -> String? in
+                guard let scopeAttribute = scopeLogs.scope?.attributes?.first(where: { $0.key == "scope.attr" }) else {
+                    return nil
+                }
+
+                guard case let .stringValue(value) = scopeAttribute.value else {
+                    return nil
+                }
+
+                return value
             }
-            guard case let .stringValue(value) = scopeAttribute.value else {
-                return nil
-            }
-            return value
-        })
+        )
         let expectedScopeAttributeValues: Set<String> = ["value-a", "value-b"]
         #expect(scopeAttributeValues == expectedScopeAttributeValues)
     }
@@ -263,7 +271,7 @@ struct OTLPAdapterGroupingTests {
 
         #expect(resourceMetrics.count == 1)
         #expect(scopeMetrics.count == 2)
-        #expect(Set(scopeMetrics.compactMap { $0.schemaUrl }) == Set(["https://example.com/schema/a", "https://example.com/schema/b"]))
+        #expect(Set(scopeMetrics.compactMap(\.schemaUrl)) == Set(["https://example.com/schema/a", "https://example.com/schema/b"]))
     }
 }
 
