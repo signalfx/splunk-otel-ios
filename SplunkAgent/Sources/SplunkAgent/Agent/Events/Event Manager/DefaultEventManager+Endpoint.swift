@@ -40,9 +40,22 @@ extension DefaultEventManager {
         // Update the trace processor endpoint (this also flushes pending data)
         concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken)
 
-        // Update session replay processor endpoint if it exists and has a URL
+        // Update or create session replay processor if a session replay URL is available
         if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
-            sessionReplayProcessor?.setEndpoint(sessionReplayUrl, accessToken: endpoint.rumAccessToken)
+            if let sessionReplayProcessor {
+                sessionReplayProcessor.setEndpoint(sessionReplayUrl, accessToken: endpoint.rumAccessToken)
+            }
+            else {
+                let processors = Self.createProcessors(
+                    traceUrl: traceUrl,
+                    sessionReplayUrl: sessionReplayUrl,
+                    accessToken: endpoint.rumAccessToken,
+                    configuration: configuration,
+                    agent: agent
+                )
+
+                sessionReplayProcessor = processors.sessionReplayProcessor
+            }
         }
 
         logger.log(level: .info, isPrivate: false) {
