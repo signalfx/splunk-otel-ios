@@ -170,112 +170,7 @@ public class OTLPBackgroundHTTPBaseExporter {
         }
     }
 
-    private func dropBufferedData() {
-        if let activeFiles = try? diskStorage.list(forKey: getStorageKey()) {
-            for fileInfo in activeFiles {
-                let key = KeyBuilder(fileInfo.key, parrentKeyBuilder: getStorageKey())
-                try? diskStorage.delete(forKey: key)
-            }
-        }
-
-        if let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) {
-            for fileInfo in pendingFiles {
-                let key = KeyBuilder(fileInfo.key, parrentKeyBuilder: getPendingStorageKey())
-                try? diskStorage.delete(forKey: key)
-            }
-        }
-    }
-
-    private func startStalledUploadCheck() {
-        checkStalledTask?.cancel()
-        // Wait 5-8s to clean caches content from abandoned or stalled files.
-        checkStalledTask = Task.detached(priority: .utility) { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
-            self?.httpClient
-                .getAllSessionsTasks { [weak self] tasks in
-                    self?.checkStalledUploadsOperation(tasks: tasks)
-                }
-        }
-    }
-
-    /// Flushes any data stored in pending storage by moving it to active storage and scheduling uploads.
-    private func flushPendingData() {
-        let (currentEndpoint, currentHeaders) = getEndpointState()
-        guard let currentEndpoint else {
-            return
-        }
-
-        guard let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) else {
-            return
-        }
-
-        for fileInfo in pendingFiles {
-            let pendingKey = KeyBuilder(fileInfo.key, parrentKeyBuilder: getPendingStorageKey())
-            let activeKey = KeyBuilder(fileInfo.key, parrentKeyBuilder: getStorageKey())
-
-            do {
-                let pendingFileUrl = try diskStorage.finalDestination(forKey: pendingKey)
-                let data = try Data(contentsOf: pendingFileUrl)
-                try diskStorage.insert(data, forKey: activeKey)
-                try diskStorage.delete(forKey: pendingKey)
-
-                guard let requestId = UUID(uuidString: fileInfo.key) else {
-                    continue
-                }
-
-                let requestDescriptor = RequestDescriptor(
-                    id: requestId,
-                    endpoint: currentEndpoint,
-                    explicitTimeout: config.timeout,
-                    fileKeyType: getFileKeyType(),
-                    headers: buildHeaders(from: currentHeaders)
-                )
-                try httpClient.send(requestDescriptor)
-            }
-            catch {
-                continue
-            }
-        }
-    }
-
-    // MARK: - Helper functions
-
-    func getStorageKey() -> KeyBuilder {
-        KeyBuilder.uploadsKey.append(getFileKeyType())
-    }
-
-    func getPendingStorageKey() -> KeyBuilder {
-        KeyBuilder.pendingUploadsKey.append(getFileKeyType())
-    }
-
-    func getFileKeyType() -> String {
-        fileType ?? "base"
-    }
-
-    private func getEndpointState() -> (endpoint: URL?, headers: [String: String]) {
-        stateLock.lock()
-        defer { stateLock.unlock() }
-        return (storedEndpoint, storedAdditionalHeaders)
-    }
-
-    private func buildHeaders(from additionalHeaders: [String: String]) -> [String: String] {
-        var combinedHeaders = additionalHeaders
-        if let envVarHeaders {
-            for (key, value) in envVarHeaders {
-                combinedHeaders[key] = value
-            }
-        }
-        return combinedHeaders
-    }
-
-    var headers: [String: String] {
-        buildHeaders(from: additionalHeaders)
-    }
-}
-
-// MARK: - Stalled request operations
-
-extension OTLPBackgroundHTTPBaseExporter {
+    // MARK: - Stalled request operations
 
     func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
         guard let currentEndpoint = endpoint else {
@@ -369,5 +264,112 @@ extension OTLPBackgroundHTTPBaseExporter {
                 try? httpClient.send(taskDescription)
             }
         }
+    }
+
+    // MARK: - Helper functions
+
+    func getStorageKey() -> KeyBuilder {
+        KeyBuilder.uploadsKey.append(getFileKeyType())
+    }
+
+    func getPendingStorageKey() -> KeyBuilder {
+        KeyBuilder.pendingUploadsKey.append(getFileKeyType())
+    }
+
+    func getFileKeyType() -> String {
+        fileType ?? "base"
+    }
+
+    var headers: [String: String] {
+        buildHeaders(from: additionalHeaders)
+    }
+}
+
+// MARK: - Private helpers
+
+extension OTLPBackgroundHTTPBaseExporter {
+
+    private func dropBufferedData() {
+        if let activeFiles = try? diskStorage.list(forKey: getStorageKey()) {
+            for fileInfo in activeFiles {
+                let key = KeyBuilder(fileInfo.key, parrentKeyBuilder: getStorageKey())
+                try? diskStorage.delete(forKey: key)
+            }
+        }
+
+        if let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) {
+            for fileInfo in pendingFiles {
+                let key = KeyBuilder(fileInfo.key, parrentKeyBuilder: getPendingStorageKey())
+                try? diskStorage.delete(forKey: key)
+            }
+        }
+    }
+
+    private func startStalledUploadCheck() {
+        checkStalledTask?.cancel()
+        // Wait 5-8s to clean caches content from abandoned or stalled files.
+        checkStalledTask = Task.detached(priority: .utility) { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
+            self?.httpClient
+                .getAllSessionsTasks { [weak self] tasks in
+                    self?.checkStalledUploadsOperation(tasks: tasks)
+                }
+        }
+    }
+
+    /// Flushes any data stored in pending storage by moving it to active storage and scheduling uploads.
+    private func flushPendingData() {
+        let (currentEndpoint, currentHeaders) = getEndpointState()
+        guard let currentEndpoint else {
+            return
+        }
+
+        guard let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) else {
+            return
+        }
+
+        for fileInfo in pendingFiles {
+            let pendingKey = KeyBuilder(fileInfo.key, parrentKeyBuilder: getPendingStorageKey())
+            let activeKey = KeyBuilder(fileInfo.key, parrentKeyBuilder: getStorageKey())
+
+            do {
+                let pendingFileUrl = try diskStorage.finalDestination(forKey: pendingKey)
+                let data = try Data(contentsOf: pendingFileUrl)
+                try diskStorage.insert(data, forKey: activeKey)
+                try diskStorage.delete(forKey: pendingKey)
+
+                guard let requestId = UUID(uuidString: fileInfo.key) else {
+                    continue
+                }
+
+                let requestDescriptor = RequestDescriptor(
+                    id: requestId,
+                    endpoint: currentEndpoint,
+                    explicitTimeout: config.timeout,
+                    fileKeyType: getFileKeyType(),
+                    headers: buildHeaders(from: currentHeaders)
+                )
+                try httpClient.send(requestDescriptor)
+            }
+            catch {
+                continue
+            }
+        }
+    }
+
+    private func getEndpointState() -> (endpoint: URL?, headers: [String: String]) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return (storedEndpoint, storedAdditionalHeaders)
+    }
+
+    private func buildHeaders(from additionalHeaders: [String: String]) -> [String: String] {
+        var combinedHeaders = additionalHeaders
+        if let envVarHeaders {
+            for (key, value) in envVarHeaders {
+                combinedHeaders[key] = value
+            }
+        }
+        return combinedHeaders
     }
 }
