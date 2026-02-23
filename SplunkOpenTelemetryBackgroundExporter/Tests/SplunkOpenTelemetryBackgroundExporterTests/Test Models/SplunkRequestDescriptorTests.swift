@@ -96,4 +96,93 @@ final class SplunkRequestDescriptorTests: XCTestCase {
 
         XCTAssertEqual(decoded.headers, [:])
     }
+    
+    
+    // MARK: - Content-Type migration tests
+    
+    func testDecodeWithoutContentTypeDefaultsToProtobuf() throws {
+        // Simulates pre-2.1.0 RequestDescriptor (no contentType field)
+        let id = UUID()
+        let payload: [String: Any] = [
+            "id": id.uuidString,
+            "endpoint": "https://example.com",
+            "explicitTimeout": 60.0,
+            "sentCount": 0,
+            "fileKeyType": fileKeyType,
+            "headers": [:]
+        ]
+        
+        let data = try JSONSerialization.data(withJSONObject: payload, options: [])
+        let decoded = try JSONDecoder().decode(RequestDescriptor.self, from: data)
+        
+        // Pre-2.1.0 data should default to protobuf format
+        XCTAssertEqual(decoded.contentType, "application/x-protobuf")
+        
+        let request = decoded.createRequest()
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/x-protobuf")
+    }
+    
+    func testDecodeWithContentTypeUsesStoredValue() throws {
+        // Simulates post-2.1.0 RequestDescriptor with explicit contentType
+        let id = UUID()
+        let payload: [String: Any] = [
+            "id": id.uuidString,
+            "endpoint": "https://example.com",
+            "explicitTimeout": 60.0,
+            "sentCount": 0,
+            "fileKeyType": fileKeyType,
+            "headers": [:],
+            "contentType": "application/json"
+        ]
+        
+        let data = try JSONSerialization.data(withJSONObject: payload, options: [])
+        let decoded = try JSONDecoder().decode(RequestDescriptor.self, from: data)
+        
+        XCTAssertEqual(decoded.contentType, "application/json")
+        
+        let request = decoded.createRequest()
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+    }
+    
+    func testNewDescriptorDefaultsToJSON() throws {
+        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
+        
+        let descriptor = RequestDescriptor(
+            id: UUID(),
+            endpoint: exampleURL,
+            explicitTimeout: 60.0,
+            fileKeyType: fileKeyType
+        )
+        
+        // New descriptors should default to JSON
+        XCTAssertEqual(descriptor.contentType, "application/json")
+        
+        let request = descriptor.createRequest()
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+    }
+    
+    func testEncodeDecodeRoundTrip() throws {
+        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
+        
+        let original = RequestDescriptor(
+            id: UUID(),
+            endpoint: exampleURL,
+            explicitTimeout: 60.0,
+            sentCount: 2,
+            fileKeyType: fileKeyType,
+            headers: ["X-Custom": "value"],
+            contentType: "application/json"
+        )
+        
+        let encoded = try JSONEncoder().encode(original)
+        let decoded = try JSONDecoder().decode(RequestDescriptor.self, from: encoded)
+        
+        XCTAssertEqual(decoded.id, original.id)
+        XCTAssertEqual(decoded.endpoint, original.endpoint)
+        XCTAssertEqual(decoded.explicitTimeout, original.explicitTimeout)
+        XCTAssertEqual(decoded.sentCount, original.sentCount)
+        XCTAssertEqual(decoded.fileKeyType, original.fileKeyType)
+        XCTAssertEqual(decoded.headers, original.headers)
+        XCTAssertEqual(decoded.contentType, original.contentType)
+    }
 }

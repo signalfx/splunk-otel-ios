@@ -26,6 +26,7 @@ protocol RequestDescriptorProtocol: Codable {
     var scheduled: Date { get }
     var shouldSend: Bool { get }
     var headers: [String: String] { get }
+    var contentType: String { get }
 
     func createRequest() -> URLRequest
 }
@@ -53,6 +54,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
     var sentCount: Int = 0
     var fileKeyType: String
     var headers: [String: String] = [:]
+    var contentType: String
 
     var scheduled: Date {
         Calendar.current.date(byAdding: nextRequestDelay, to: Date()) ?? Date()
@@ -69,6 +71,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         case sentCount
         case fileKeyType
         case headers
+        case contentType
     }
 
     init(
@@ -77,7 +80,8 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         explicitTimeout: TimeInterval,
         sentCount: Int = 0,
         fileKeyType: String,
-        headers: [String: String] = [:]
+        headers: [String: String] = [:],
+        contentType: String = "application/json"
     ) {
         self.id = id
         self.endpoint = endpoint
@@ -85,6 +89,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         self.sentCount = sentCount
         self.fileKeyType = fileKeyType
         self.headers = headers
+        self.contentType = contentType
     }
 
     init(from decoder: Decoder) throws {
@@ -96,6 +101,11 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         sentCount = try container.decode(Int.self, forKey: .sentCount)
         fileKeyType = try container.decode(String.self, forKey: .fileKeyType)
         headers = try container.decodeIfPresent([String: String].self, forKey: .headers) ?? [:]
+        
+        // Migration: Pre-2.1.0 data (no contentType field) was protobuf format
+        // Post-2.1.0 data will have contentType field set to "application/json"
+        contentType = try container.decodeIfPresent(String.self, forKey: .contentType)
+                      ?? "application/x-protobuf"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -107,6 +117,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         try container.encode(sentCount, forKey: .sentCount)
         try container.encode(fileKeyType, forKey: .fileKeyType)
         try container.encode(headers, forKey: .headers)
+        try container.encode(contentType, forKey: .contentType)
     }
 
 
@@ -117,8 +128,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
 
         request.httpMethod = "POST"
         request.setValue(OTLPHTTPHeaders.userAgent, forHTTPHeaderField: OTLPHTTPHeaders.userAgentKey)
-        // OTLP JSON encoding uses application/json content type
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(contentType, forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = explicitTimeout
 
         for (key, value) in headers {

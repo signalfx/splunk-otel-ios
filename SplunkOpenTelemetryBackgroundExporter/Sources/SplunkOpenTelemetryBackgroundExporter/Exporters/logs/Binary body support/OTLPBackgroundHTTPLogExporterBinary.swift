@@ -69,7 +69,8 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
             endpoint: endpoint,
             explicitTimeout: timeout,
             fileKeyType: getFileKeyType(),
-            headers: headers
+            headers: headers,
+            contentType: "application/json"
         )
 
         do {
