@@ -134,6 +134,11 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         backgroundLogExporter.clearEndpoint()
     }
 
+    /// Enables or disables drop mode on the underlying exporter.
+    public func setDropMode(_ enabled: Bool) {
+        backgroundLogExporter.setDropMode(enabled)
+    }
+
 
     // MARK: - Events
 

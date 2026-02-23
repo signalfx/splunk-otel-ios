@@ -72,7 +72,16 @@ public class OTLPBackgroundHTTPBaseExporter {
         namespace: getFileKeyType()
     )
 
+    private var storedDropModeEnabled = false
+
     // MARK: - Public Properties
+
+    /// When `true`, all export calls are no-ops and buffered data is dropped.
+    public var isDropModeEnabled: Bool {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return storedDropModeEnabled
+    }
 
     /// Returns `true` if no endpoint is configured and data should be cached to pending storage.
     public var isPendingEndpoint: Bool {
@@ -124,6 +133,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     ///   - newHeaders: Optional new headers to use (e.g., for access token).
     public func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]? = nil) {
         stateLock.lock()
+        storedDropModeEnabled = false
         storedEndpoint = newEndpoint
         if let newHeaders {
             storedAdditionalHeaders = newHeaders
@@ -142,6 +152,38 @@ public class OTLPBackgroundHTTPBaseExporter {
         checkStalledTask?.cancel()
         checkStalledTask = nil
         endpoint = nil
+    }
+
+    /// Enables or disables drop mode.
+    ///
+    /// When enabled, all export calls become no-ops and any buffered data
+    /// (both active and pending storage) is deleted immediately.
+    public func setDropMode(_ enabled: Bool) {
+        stateLock.lock()
+        storedDropModeEnabled = enabled
+        stateLock.unlock()
+
+        if enabled {
+            checkStalledTask?.cancel()
+            checkStalledTask = nil
+            dropBufferedData()
+        }
+    }
+
+    private func dropBufferedData() {
+        if let activeFiles = try? diskStorage.list(forKey: getStorageKey()) {
+            for fileInfo in activeFiles {
+                let key = KeyBuilder(fileInfo.key, parrentKeyBuilder: getStorageKey())
+                try? diskStorage.delete(forKey: key)
+            }
+        }
+
+        if let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) {
+            for fileInfo in pendingFiles {
+                let key = KeyBuilder(fileInfo.key, parrentKeyBuilder: getPendingStorageKey())
+                try? diskStorage.delete(forKey: key)
+            }
+        }
     }
 
     private func startStalledUploadCheck() {

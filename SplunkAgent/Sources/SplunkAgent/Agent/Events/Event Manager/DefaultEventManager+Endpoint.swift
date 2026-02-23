@@ -37,12 +37,16 @@ extension DefaultEventManager {
             throw AgentConfigurationError.invalidEndpoint(supplied: endpoint)
         }
 
+        isDropMode = false
+
         // Update the trace processor endpoint (this also flushes pending data)
+        concreteTraceProcessor.setDropMode(false)
         concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken)
 
         // Update or create session replay processor if a session replay URL is available
         if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
             if let sessionReplayProcessor {
+                sessionReplayProcessor.setDropMode(false)
                 sessionReplayProcessor.setEndpoint(sessionReplayUrl, accessToken: endpoint.rumAccessToken)
             }
             else {
@@ -71,8 +75,11 @@ extension DefaultEventManager {
     /// - Parameter cacheData: If `true`, data is cached for later sending. If `false`, data is dropped.
     func disableEndpoint(cacheData: Bool = true) {
         if cacheData {
-            // Clear endpoint on processors - new data will go to pending storage
+            isDropMode = false
+
+            concreteTraceProcessor.setDropMode(false)
             concreteTraceProcessor.clearEndpoint()
+            sessionReplayProcessor?.setDropMode(false)
             sessionReplayProcessor?.clearEndpoint()
 
             logger.log(level: .info, isPrivate: false) {
@@ -80,17 +87,17 @@ extension DefaultEventManager {
             }
         }
         else {
-            // For complete disable (drop data), we can't use the stored processors
-            // since they would still cache. This case requires special handling
-            // by the caller if needed (e.g., stop collecting data entirely).
-            logger.log(level: .info, isPrivate: false) {
-                "Endpoint disabled. Data will continue to be cached until a new endpoint is configured."
-            }
+            isDropMode = true
 
-            // Note: To truly drop data, the caller should stop generating spans/events.
-            // The caching behavior is intentional to prevent data loss.
+            concreteTraceProcessor.setDropMode(true)
             concreteTraceProcessor.clearEndpoint()
+            sessionReplayProcessor?.setDropMode(true)
             sessionReplayProcessor?.clearEndpoint()
+            sessionReplayProcessor = nil
+
+            logger.log(level: .info, isPrivate: false) {
+                "Endpoint disabled with data dropping enabled. New events will be discarded."
+            }
         }
     }
 }

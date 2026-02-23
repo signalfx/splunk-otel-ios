@@ -34,6 +34,10 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
     ///
     /// Binary data in the log body is encoded as base64 per OTLP JSON specification.
     public func export(logRecords: [SplunkReadableLogRecord], explicitTimeout: TimeInterval? = nil) -> OpenTelemetrySdk.ExportResult {
+        guard !isDropModeEnabled else {
+            return .success
+        }
+
         // Convert log records to OTLP JSON models using our custom adapter
         // Binary body data will be base64 encoded
         let resourceLogs = SplunkLogRecordAdapterJSON.toResourceLogs(logRecords)

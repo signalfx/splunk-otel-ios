@@ -53,6 +53,8 @@ class DefaultEventManager: AgentEventManager {
     /// Trace processor (stored as concrete type for endpoint updates).
     private let storedTraceProcessor: OTLPTraceProcessor
 
+    var isDropMode = false
+
     // MARK: - Protocol conformance properties
 
     /// Event processor to process Logs and Events.
@@ -134,6 +136,11 @@ class DefaultEventManager: AgentEventManager {
     // MARK: - Module Events
 
     func publish(data: any ModuleEventData, metadata: any ModuleEventMetadata, completion: @escaping (Bool) -> Void) {
+        guard !isDropMode else {
+            completion(true)
+            return
+        }
+
         // Create and send an Event based on modules' metadata and data types
         switch (metadata, data) {
 
@@ -261,6 +268,10 @@ class DefaultEventManager: AgentEventManager {
     // MARK: - Internal events
 
     func sendEvent(_ event: AgentEvent) {
+        guard !isDropMode else {
+            return
+        }
+
         logEventProcessor.sendEvent(
             event: event,
             immediateProcessing: false

@@ -24,6 +24,10 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
     // MARK: - Implementation MetricExporter protocol
 
     public func export(metrics: [MetricData]) -> ExportResult {
+        guard !isDropModeEnabled else {
+            return .success
+        }
+
         // Convert metrics to OTLP JSON models using our custom adapter
         let resourceMetrics = MetricDataAdapter.toResourceMetrics(metrics)
 
