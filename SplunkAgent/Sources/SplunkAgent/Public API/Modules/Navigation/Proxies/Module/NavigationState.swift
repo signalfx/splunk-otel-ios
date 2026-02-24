@@ -37,4 +37,8 @@ public final class NavigationState: NavigationModuleState {
     public var isAutomatedTrackingEnabled: Bool {
         module?.state.isAutomatedTrackingEnabled ?? false
     }
+
+    public var currentScreenName: String? {
+        module?.currentScreenName
+    }
 }

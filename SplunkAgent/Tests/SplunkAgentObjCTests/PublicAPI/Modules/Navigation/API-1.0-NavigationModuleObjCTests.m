@@ -19,6 +19,7 @@ limitations under the License.
 #import "../../Builders/AgentTestBuilderObjC.h"
 
 @import SplunkAgentObjC;
+@import SplunkNavigation;
 
 
 @interface NavigationAPI10ModuleObjCTests : XCTestCase
@@ -41,11 +42,24 @@ limitations under the License.
     SPLKNavigationModuleState *state = agent.navigation.state;
     XCTAssertNotNil(state);
     XCTAssertFalse(state.isAutomatedTrackingEnabled);
+    XCTAssertNil(state.currentScreenName);
 }
 
 - (void)testTracking {
     SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
     XCTAssertNoThrow([agent.navigation trackScreen:@"Test"]);
+    XCTAssertNoThrow([agent.navigation trackScreen:@"Test" attributes:@{
+        @"source": @"manual",
+        @"screen_id": @1
+    }]);
+}
+
+- (void)testNavigationEventProcessor {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    SPLKDefaultNavigationEventProcessor *processor = [[SPLKDefaultNavigationEventProcessor alloc] init];
+    agent.navigation.navigationEventProcessor = processor;
+
+    XCTAssertNotNil(agent.navigation.navigationEventProcessor);
 }
 
 @end

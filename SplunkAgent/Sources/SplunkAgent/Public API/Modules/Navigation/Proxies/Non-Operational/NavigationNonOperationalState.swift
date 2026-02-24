@@ -31,4 +31,8 @@ public final class NavigationNonOperationalState: NavigationModuleState {
     public var isAutomatedTrackingEnabled: Bool {
         false
     }
+
+    public var currentScreenName: String? {
+        nil
+    }
 }

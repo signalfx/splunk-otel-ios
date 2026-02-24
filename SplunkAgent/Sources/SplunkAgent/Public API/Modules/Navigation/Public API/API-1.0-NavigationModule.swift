@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Combine
+public import SplunkNavigation
 
 /// Defines a public API for the Navigation module.
 public protocol NavigationModule: ObservableObject {
@@ -39,6 +40,9 @@ public protocol NavigationModule: ObservableObject {
     /// An object that reflects the current state and settings used for the module, a ``NavigationModuleState`` instance.
     var state: NavigationModuleState { get }
 
+    /// Processor used to transform automated navigation events.
+    var navigationEventProcessor: any NavigationEventProcessor { get set }
+
 
     // MARK: - Manual detection
 
@@ -51,4 +55,14 @@ public protocol NavigationModule: ObservableObject {
     /// - Note: The set value is not linked to any specific UI element.
     @discardableResult
     func track(screen name: String) -> any NavigationModule
+
+    /// Sets a manual screen name with additional attributes.
+    ///
+    /// - Parameters:
+    ///   - name: The name to be tracked as the screen name until being changed.
+    ///   - attributes: Optional attributes associated with the screen tracking event.
+    ///
+    /// - Returns: The actual ``NavigationModule`` instance.
+    @discardableResult
+    func track(screen name: String, attributes: [String: Any]?) -> any NavigationModule
 }

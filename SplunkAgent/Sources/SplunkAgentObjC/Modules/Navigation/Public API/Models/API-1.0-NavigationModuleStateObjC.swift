@@ -46,6 +46,12 @@ public final class NavigationModuleStateObjC: NSObject {
         owner.agent.navigation.state.isAutomatedTrackingEnabled
     }
 
+    /// The most recently tracked screen name.
+    @objc
+    public var currentScreenName: String? {
+        owner.agent.navigation.state.currentScreenName
+    }
+
 
     // MARK: - Initialization
 

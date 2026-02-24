@@ -40,6 +40,20 @@ public final class Preferences: Codable, Sendable {
         }
     }
 
+    /// A `Boolean` value determining whether automated tracking is enabled.
+    ///
+    /// This is a compatibility alias for ``enableAutomatedTracking`` aligned with
+    /// the cross-platform navigation terminology.
+    public var isAutoTrackingEnabled: Bool? {
+        get {
+            enableAutomatedTracking
+        }
+
+        set {
+            enableAutomatedTracking = newValue
+        }
+    }
+
     /// Sets whether or not the module should automatically detect navigation in the application.
     ///
     /// - Parameter enable: If `true`, the module will automatically detect navigation.

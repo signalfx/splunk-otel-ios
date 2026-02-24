@@ -45,11 +45,29 @@ public final class Navigation: Sendable {
         category: "Navigation"
     )
 
+    private let currentScreenNameLock = NSLock()
+    private var currentScreenNameValue: String?
+
 
     // MARK: - Public
 
     /// Asynchronous stream of screen name changes.
     public let screenNameStream: AsyncStream<String>
+
+    /// Processes automated navigation events.
+    ///
+    /// Manual ``track(screen:attributes:)`` calls bypass this processor.
+    public nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
+
+    /// The most recently tracked screen name.
+    ///
+    /// This value is updated by both automatic and manual tracking.
+    public var currentScreenName: String? {
+        currentScreenNameLock.lock()
+        defer { currentScreenNameLock.unlock() }
+
+        return currentScreenNameValue
+    }
 
 
     // MARK: - Module configuration
@@ -161,6 +179,19 @@ public final class Navigation: Sendable {
                         controllerIdentifier: event.controllerIdentifier
                     )
                 }
+                else {
+                    let processedName = processAutomatedScreenName(
+                        eventScreenName: screenName,
+                        controllerIdentifier: event.controllerIdentifier
+                    )
+
+                    processedEvent = AutomatedNavigationEvent(
+                        timestamp: Date(),
+                        type: event.type,
+                        controllerTypeName: processedName,
+                        controllerIdentifier: event.controllerIdentifier
+                    )
+                }
 
                 // Supported events handling
                 switch processedEvent.type {
@@ -243,12 +274,24 @@ public final class Navigation: Sendable {
 
         let controllerTypeName = preferredControllerName(for: visibleController)
         let screenName = await preferredScreenName(for: controllerTypeName)
+        let controllerIdentifier = ObjectIdentifier(visibleController)
+        let processedName: String
+
+        if await model.isManualScreenName {
+            processedName = screenName
+        }
+        else {
+            processedName = processAutomatedScreenName(
+                eventScreenName: screenName,
+                controllerIdentifier: controllerIdentifier
+            )
+        }
 
         return AutomatedNavigationEvent(
             timestamp: Date(),
             type: eventType,
-            controllerTypeName: screenName,
-            controllerIdentifier: ObjectIdentifier(visibleController)
+            controllerTypeName: processedName,
+            controllerIdentifier: controllerIdentifier
         )
     }
 
@@ -266,12 +309,24 @@ public final class Navigation: Sendable {
 
         let controllerTypeName = preferredControllerName(for: visibleController)
         let screenName = await preferredScreenName(for: controllerTypeName)
+        let controllerIdentifier = ObjectIdentifier(visibleController)
+        let processedName: String
+
+        if await model.isManualScreenName {
+            processedName = screenName
+        }
+        else {
+            processedName = processAutomatedScreenName(
+                eventScreenName: screenName,
+                controllerIdentifier: controllerIdentifier
+            )
+        }
 
         return AutomatedNavigationEvent(
             timestamp: Date(),
             type: eventType,
-            controllerTypeName: screenName,
-            controllerIdentifier: ObjectIdentifier(visibleController)
+            controllerTypeName: processedName,
+            controllerIdentifier: controllerIdentifier
         )
     }
 
@@ -296,6 +351,7 @@ public final class Navigation: Sendable {
         // Store this navigation for final processing
         await model.update(navigation: navigation, for: event.controllerIdentifier)
         await model.update(screenName: screenName)
+        setCurrentScreenName(screenName)
 
         // Yield this change to the consumer
         // and send corresponding span
@@ -381,5 +437,21 @@ public final class Navigation: Sendable {
 
     func preferredControllerName(for controller: UIViewController) -> String {
         String(describing: type(of: controller))
+    }
+
+    func setCurrentScreenName(_ name: String?) {
+        currentScreenNameLock.lock()
+        defer { currentScreenNameLock.unlock() }
+
+        currentScreenNameValue = name
+    }
+
+    private func processAutomatedScreenName(eventScreenName: String, controllerIdentifier: ObjectIdentifier) -> String {
+        let event = NavigationEvent(
+            screenName: eventScreenName,
+            controllerIdentifier: controllerIdentifier
+        )
+
+        return navigationEventProcessor.process(event: event).screenName
     }
 }

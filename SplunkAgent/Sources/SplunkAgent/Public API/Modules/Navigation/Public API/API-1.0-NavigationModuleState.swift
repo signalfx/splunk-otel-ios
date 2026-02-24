@@ -33,4 +33,7 @@ public protocol NavigationModuleState {
     ///
     /// The default value is `false`.
     var isAutomatedTrackingEnabled: Bool { get }
+
+    /// The most recently tracked screen name.
+    var currentScreenName: String? { get }
 }

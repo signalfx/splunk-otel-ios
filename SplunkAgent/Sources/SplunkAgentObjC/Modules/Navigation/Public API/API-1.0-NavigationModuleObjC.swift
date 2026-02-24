@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 import SplunkAgent
+import SplunkNavigation
 
 /// The class implements a public API for the Navigation module.
 @objc(SPLKNavigationModule)
@@ -53,6 +54,18 @@ public final class NavigationModuleObjC: NSObject {
         NavigationModuleStateObjC(for: owner)
     }
 
+    /// Processor used to transform automated navigation events.
+    @objc
+    public var navigationEventProcessor: NavigationEventProcessor {
+        get {
+            owner.agent.navigation.navigationEventProcessor
+        }
+
+        set {
+            owner.agent.navigation.navigationEventProcessor = newValue
+        }
+    }
+
 
     // MARK: - Manual detection
 
@@ -66,7 +79,22 @@ public final class NavigationModuleObjC: NSObject {
     @discardableResult
     @objc(trackScreen:)
     public func track(screen name: String) -> NavigationModuleObjC {
-        owner.agent.navigation.track(screen: name)
+        track(screen: name, attributes: nil)
+
+        return self
+    }
+
+    /// Sets a manual screen name with optional attributes.
+    ///
+    /// - Parameters:
+    ///   - name: The name to be tracked as the screen name until being changed.
+    ///   - attributes: Optional attributes associated with screen tracking.
+    ///
+    /// - Returns: The actual ``NavigationModuleObjC`` instance.
+    @discardableResult
+    @objc(trackScreen:attributes:)
+    public func track(screen name: String, attributes: [String: Any]?) -> NavigationModuleObjC {
+        owner.agent.navigation.track(screen: name, attributes: attributes)
 
         return self
     }

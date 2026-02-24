@@ -83,6 +83,15 @@ final class NavigationAPI10ModuleProxyTests: XCTestCase {
         let defaultAutomatedTracking = state.isAutomatedTrackingEnabled
         XCTAssertNotNil(state.isAutomatedTrackingEnabled)
         XCTAssertFalse(defaultAutomatedTracking)
+        XCTAssertNil(state.currentScreenName)
+    }
+
+    func testNavigationEventProcessor() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+        let processor = DefaultNavigationEventProcessor()
+        moduleProxy.navigationEventProcessor = processor
+
+        XCTAssertNotNil(moduleProxy.navigationEventProcessor)
     }
 
 
@@ -91,5 +100,10 @@ final class NavigationAPI10ModuleProxyTests: XCTestCase {
     func testTracking() throws {
         let moduleProxy = try XCTUnwrap(moduleProxy)
         XCTAssertNotNil(moduleProxy.track(screen: "Test"))
+    }
+
+    func testTrackingWithAttributes() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+        XCTAssertNotNil(moduleProxy.track(screen: "Test", attributes: ["source": "manual"]))
     }
 }

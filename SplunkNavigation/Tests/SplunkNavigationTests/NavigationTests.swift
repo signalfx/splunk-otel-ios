@@ -40,6 +40,7 @@ final class NavigationTests: XCTestCase {
         // Properties with default module configuration (READ)
         let preferences = navigationModule.preferences
         let state = navigationModule.state
+        let currentScreenName = navigationModule.currentScreenName
 
         // Properties (WRITE)
         let customPreferences = Preferences(
@@ -51,6 +52,7 @@ final class NavigationTests: XCTestCase {
         // Check existency of basic properties
         XCTAssertNotNil(preferences)
         XCTAssertNotNil(state)
+        XCTAssertNil(currentScreenName)
 
         // Module preferences should be updated
         let modulePreferences = navigationModule.preferences
@@ -81,7 +83,24 @@ final class NavigationTests: XCTestCase {
         navigationModule.track(screen: customName)
 
         _ = await navigationModule.model.screenName
-        // XCTAssertEqual(screenName, customName)
+        XCTAssertEqual(navigationModule.currentScreenName, customName)
+    }
+
+    func testTrackWithAttributes() async {
+        let customName = "Attributes Screen"
+        navigationModule.track(screen: customName, attributes: ["source": "manual"])
+
+        _ = await navigationModule.model.screenName
+        XCTAssertEqual(navigationModule.currentScreenName, customName)
+    }
+
+    func testManualTrackingBypassesNavigationEventProcessor() {
+        let navigationEventProcessor = NavigationEventProcessorMock()
+        navigationModule.navigationEventProcessor = navigationEventProcessor
+
+        navigationModule.track(screen: "Test Screen", attributes: ["source": "manual"])
+
+        XCTAssertEqual(navigationEventProcessor.processCallCount, 0)
     }
 
     func testPreferredControllerName() {
@@ -90,6 +109,22 @@ final class NavigationTests: XCTestCase {
 
         // Test UIHostingController
         XCTAssertEqual(navigationModule.preferredControllerName(for: UIHostingController(rootView: TestView())), "UIHostingController<TestView>")
+    }
+}
+
+final class NavigationEventProcessorMock: NSObject, NavigationEventProcessor {
+
+    // MARK: - Public
+
+    private(set) var processCallCount = 0
+
+
+    // MARK: - Event processing
+
+    func process(event: NavigationEvent) -> NavigationEvent {
+        processCallCount += 1
+
+        return event
     }
 }
 
