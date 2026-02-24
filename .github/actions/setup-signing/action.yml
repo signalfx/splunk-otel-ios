@@ -1,0 +1,73 @@
+name: "Set up Keychain and Import Certificate"
+description: "Sets up a macOS keychain and imports a distribution certificate for codesigning xcframeworks."
+
+inputs:
+  distribution-certificate:
+    description: "The distribution certificate in base64 encoded format"
+    required: true
+  certificate-password:
+    description: "Password for the distribution certificate"
+    required: true
+
+outputs:
+  signing-identity:
+    description: "The resolved codesigning identity name"
+    value: ${{ steps.resolve.outputs.identity }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Keychain and Import Certificate
+      shell: bash
+      env:
+        CERT_FILE: ${{ runner.temp }}/cert.p12
+        DISTRIBUTION_CERTIFICATE: ${{ inputs.distribution-certificate }}
+        CERTIFICATE_PASSWORD: ${{ inputs.certificate-password }}
+      run: |
+        KEYCHAIN_PATH="${RUNNER_TEMP}/xcfw-signing.keychain-db"
+        KEYCHAIN_PASSWORD="xcfwkeychain"
+
+        mkdir -p "$(dirname "$CERT_FILE")"
+
+        # Create and configure keychain
+        echo "Creating keychain at: $KEYCHAIN_PATH"
+        security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+        security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+        # Decode and save the certificate
+        echo "Decoding certificate..."
+        printf %s "${DISTRIBUTION_CERTIFICATE}" | base64 --decode > "$CERT_FILE"
+
+        if [ ! -f "$CERT_FILE" ]; then
+          echo "Error: Certificate file not found at $CERT_FILE"
+          exit 1
+        fi
+
+        # Import into keychain
+        echo "Importing certificate into keychain..."
+        security import "$CERT_FILE" -P "${CERTIFICATE_PASSWORD}" -T /usr/bin/codesign -k "$KEYCHAIN_PATH"
+        security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+        security list-keychain -d user -s "$KEYCHAIN_PATH"
+
+        echo "KEYCHAIN_PATH=${KEYCHAIN_PATH}" >> "$GITHUB_ENV"
+
+        # Clean up the certificate file
+        rm -f "$CERT_FILE"
+
+    - name: Resolve signing identity
+      id: resolve
+      shell: bash
+      run: |
+        # Extract the signing identity from the keychain.
+        # The output format is: N) HEX "Identity Name"
+        # We grab the first line containing a quoted identity.
+        RAW="$(security find-identity -v -p codesigning)"
+        IDENTITY="$(echo "$RAW" | grep '"' | head -1 | sed 's/.*"\(.*\)".*/\1/')"
+        if [ -z "$IDENTITY" ]; then
+          echo "Error: No codesigning identity found in keychain"
+          echo "$RAW"
+          exit 1
+        fi
+        echo "Resolved signing identity: $IDENTITY"
+        echo "identity=$IDENTITY" >> "$GITHUB_OUTPUT"

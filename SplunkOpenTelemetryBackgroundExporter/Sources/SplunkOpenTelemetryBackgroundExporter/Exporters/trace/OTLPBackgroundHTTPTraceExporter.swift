@@ -81,7 +81,8 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
             endpoint: endpoint,
             explicitTimeout: timeout,
             fileKeyType: getFileKeyType(),
-            headers: headers
+            headers: headers,
+            payloadFormat: .json
         )
 
         do {

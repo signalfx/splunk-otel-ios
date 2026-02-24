@@ -254,12 +254,15 @@ public class OTLPBackgroundHTTPBaseExporter {
                 }
             }
             else {
+                // This task was forgotten by system, create new one.
+                let payloadFormat = inferPayloadFormat(forFileKey: fileKey)
                 let taskDescription = RequestDescriptor(
                     id: requestId,
                     endpoint: currentEndpoint,
                     explicitTimeout: config.timeout,
                     fileKeyType: getFileKeyType(),
-                    headers: buildHeaders(from: currentHeaders)
+                    headers: buildHeaders(from: currentHeaders),
+                    payloadFormat: payloadFormat
                 )
                 try? httpClient.send(taskDescription)
             }
@@ -371,5 +374,20 @@ extension OTLPBackgroundHTTPBaseExporter {
             }
         }
         return combinedHeaders
+    }
+
+    private func inferPayloadFormat(forFileKey fileKey: String) -> RequestPayloadFormat {
+        guard
+            let fileURL = try? diskStorage.finalDestination(forKey: getStorageKey().append(fileKey)),
+            let payloadData = try? Data(contentsOf: fileURL)
+        else {
+            return .json
+        }
+
+        if (try? JSONSerialization.jsonObject(with: payloadData)) != nil {
+            return .json
+        }
+
+        return .protobuf
     }
 }
