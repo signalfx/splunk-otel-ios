@@ -24,15 +24,10 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
     // MARK: - Implementation LogRecordExporter protocol
 
     public func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval? = nil) -> OpenTelemetrySdk.ExportResult {
-        guard !isDropModeEnabled else {
-            return .success
-        }
-
         // Convert log records to OTLP JSON models using our custom adapter
         let resourceLogs = LogRecordAdapter.toResourceLogs(logRecords)
 
-        // Skip if no log records to export (filter empty envelopes per OTLP spec)
-        guard !resourceLogs.isEmpty else {
+        guard !isDropModeEnabled, !resourceLogs.isEmpty else {
             return .success
         }
 

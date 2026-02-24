@@ -24,15 +24,10 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
     // MARK: - Implementation SpanExporter protocol
 
     public func export(spans: [SpanData], explicitTimeout: TimeInterval? = nil) -> SpanExporterResultCode {
-        guard !isDropModeEnabled else {
-            return .success
-        }
-
         // Convert spans to OTLP JSON models using our custom adapter
         let resourceSpans = SpanDataAdapter.toResourceSpans(spans)
 
-        // Skip if no spans to export (filter empty envelopes per OTLP spec)
-        guard !resourceSpans.isEmpty else {
+        guard !isDropModeEnabled, !resourceSpans.isEmpty else {
             return .success
         }
 

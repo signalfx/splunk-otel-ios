@@ -266,7 +266,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         try jsonPayload.write(to: fileURL)
         disk.files[fileKey] = fileURL
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: Date())
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelledTaskIds: [])
 
         #expect(http.sent.count == 1)
         #expect(http.sent.first?.payloadFormat == .json)
@@ -286,7 +286,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         try payload.write(to: fileURL)
         disk.files[fileKey] = fileURL
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: Date())
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelledTaskIds: [])
 
         #expect(http.sent.count == 1)
         #expect(http.sent.first?.payloadFormat == .protobuf)
