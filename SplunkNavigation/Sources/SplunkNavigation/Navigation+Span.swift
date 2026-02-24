@@ -75,9 +75,10 @@ extension Navigation {
         screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
         screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
         screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
-        attributes?.forEach { key, value in
-            screenNameSpan.clearAndSetAttribute(key: key, value: value)
-        }
+        attributes?
+            .forEach { key, value in
+                screenNameSpan.clearAndSetAttribute(key: key, value: value)
+            }
 
         screenNameSpan.end(time: start)
     }

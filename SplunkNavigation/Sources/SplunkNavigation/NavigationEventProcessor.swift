@@ -39,7 +39,7 @@ public final class DefaultNavigationEventProcessor: NSObject, NavigationEventPro
     // MARK: - Initialization
 
     @objc
-    public override init() {
+    override public init() {
         super.init()
     }
 
