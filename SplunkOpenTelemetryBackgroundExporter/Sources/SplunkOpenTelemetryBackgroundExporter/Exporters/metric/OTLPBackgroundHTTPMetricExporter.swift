@@ -59,7 +59,8 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
             endpoint: endpoint,
             explicitTimeout: timeout,
             fileKeyType: getFileKeyType(),
-            headers: headers
+            headers: headers,
+            payloadFormat: .json
         )
 
         do {
