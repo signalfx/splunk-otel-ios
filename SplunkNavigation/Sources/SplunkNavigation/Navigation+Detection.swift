@@ -55,7 +55,7 @@ extension Navigation {
         }
     }
 
-    private func processModernDetectionEvent(_ event: AutomatedNavigationEvent) async {
+    private func processModernDetectionEvent(_ event: any NavigationActionEvent) async {
         let processedEvent = await processedModernDetectionEvent(from: event)
 
         // Supported events handling
@@ -77,7 +77,7 @@ extension Navigation {
         }
     }
 
-    private func processedModernDetectionEvent(from event: AutomatedNavigationEvent) async -> AutomatedNavigationEvent {
+    private func processedModernDetectionEvent(from event: any NavigationActionEvent) async -> AutomatedNavigationEvent {
         let screenName = await preferredScreenName(for: event.controllerTypeName)
 
         if await model.isManualScreenName {
