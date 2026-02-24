@@ -207,7 +207,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("otlp-json-\(uuid.uuidString)")
         defer { try? FileManager.default.removeItem(at: fileURL) }
 
-        guard let jsonPayload = "{}".data(using: .utf8) else {
+        guard let jsonPayload = Data("{}".utf8) else {
             throw URLError(.unknown)
         }
 

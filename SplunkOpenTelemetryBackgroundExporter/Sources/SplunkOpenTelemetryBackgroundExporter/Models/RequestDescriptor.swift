@@ -25,6 +25,7 @@ enum RequestPayloadFormat: String, Codable {
         switch self {
         case .json:
             "application/json"
+
         case .protobuf:
             "application/x-protobuf"
         }
