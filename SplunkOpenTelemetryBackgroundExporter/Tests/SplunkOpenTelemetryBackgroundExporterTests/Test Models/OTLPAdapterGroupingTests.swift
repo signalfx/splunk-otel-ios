@@ -27,7 +27,12 @@ struct OTLPAdapterGroupingTests {
 
     // MARK: - Helpers
 
-    private func makeSpanData(scopeName: String, scopeVersion: String) -> SpanData {
+    private func makeSpanData(
+        scopeName: String,
+        scopeVersion: String,
+        schemaUrl: String? = nil,
+        scopeAttributes: [String: AttributeValue]? = nil
+    ) -> SpanData {
         let exporter = NoOpSpanExporter()
         let processor = SimpleSpanProcessor(spanExporter: exporter)
         let tracerProvider = TracerProviderBuilder()
@@ -36,7 +41,9 @@ struct OTLPAdapterGroupingTests {
 
         let tracer = tracerProvider.get(
             instrumentationName: scopeName,
-            instrumentationVersion: scopeVersion
+            instrumentationVersion: scopeVersion,
+            schemaUrl: schemaUrl,
+            attributes: scopeAttributes
         )
         let span = tracer.spanBuilder(spanName: "test-span-\(scopeName)").startSpan()
         span.end()
@@ -48,9 +55,8 @@ struct OTLPAdapterGroupingTests {
         return readableSpan.toSpanData()
     }
 
-    private func makeLogRecord(scopeName: String, scopeVersion: String, resource: Resource) -> ReadableLogRecord {
-        let scope = InstrumentationScopeInfo(name: scopeName, version: scopeVersion)
-        return ReadableLogRecord(
+    private func makeLogRecord(scope: InstrumentationScopeInfo, resource: Resource) -> ReadableLogRecord {
+        ReadableLogRecord(
             resource: resource,
             instrumentationScopeInfo: scope,
             timestamp: Date(),
@@ -59,6 +65,55 @@ struct OTLPAdapterGroupingTests {
             severity: nil,
             body: nil,
             attributes: [:]
+        )
+    }
+
+    private func makeMetricsForScopes(
+        scopeA: InstrumentationScopeInfo,
+        scopeB: InstrumentationScopeInfo
+    ) -> [MetricData] {
+        let exporter = CapturingMetricExporter()
+        let reader = PeriodicMetricReaderBuilder(exporter: exporter)
+            .setInterval(timeInterval: 60)
+            .build()
+        let meterProvider = MeterProviderSdk.builder()
+            .registerMetricReader(reader: reader)
+            .registerView(
+                selector: InstrumentSelectorBuilder().build(),
+                view: View.builder().build()
+            )
+            .build()
+
+        defer {
+            _ = meterProvider.shutdown()
+        }
+
+        let meterA = meterProvider.meterBuilder(name: scopeA.name)
+            .setInstrumentationVersion(instrumentationVersion: scopeA.version ?? "")
+            .setSchemaUrl(schemaUrl: scopeA.schemaUrl ?? "")
+            .build()
+        let meterB = meterProvider.meterBuilder(name: scopeB.name)
+            .setInstrumentationVersion(instrumentationVersion: scopeB.version ?? "")
+            .setSchemaUrl(schemaUrl: scopeB.schemaUrl ?? "")
+            .build()
+
+        let counterA = meterA.counterBuilder(name: "metric-a").build()
+        let counterB = meterB.counterBuilder(name: "metric-b").build()
+        counterA.add(value: 1)
+        counterB.add(value: 1)
+
+        guard meterProvider.forceFlush() == .success else {
+            fatalError("Failed to flush metrics")
+        }
+
+        let metricNames = Set(["metric-a", "metric-b"])
+        return exporter.metrics.filter { metricNames.contains($0.name) }
+    }
+
+    private func makeLogRecord(scopeName: String, scopeVersion: String, resource: Resource) -> ReadableLogRecord {
+        makeLogRecord(
+            scope: InstrumentationScopeInfo(name: scopeName, version: scopeVersion),
+            resource: resource
         )
     }
 
@@ -94,6 +149,45 @@ struct OTLPAdapterGroupingTests {
     }
 
     @Test
+    func spanAdapterGroupsByFullScopeIdentity() {
+        let spanA = makeSpanData(
+            scopeName: "shared-scope",
+            scopeVersion: "1.0.0",
+            schemaUrl: "https://example.com/schema/a",
+            scopeAttributes: ["scope.attr": .string("value-a")]
+        )
+        let spanB = makeSpanData(
+            scopeName: "shared-scope",
+            scopeVersion: "1.0.0",
+            schemaUrl: "https://example.com/schema/b",
+            scopeAttributes: ["scope.attr": .string("value-b")]
+        )
+
+        let resourceSpans = SpanDataAdapter.toResourceSpans([spanA, spanB])
+        let scopeSpans = resourceSpans.first?.scopeSpans ?? []
+
+        #expect(resourceSpans.count == 1)
+        #expect(scopeSpans.count == 2)
+        #expect(Set(scopeSpans.compactMap(\.schemaUrl)) == Set(["https://example.com/schema/a", "https://example.com/schema/b"]))
+
+        let scopeAttributeValues: Set<String> = Set(
+            scopeSpans.compactMap { scopeSpans -> String? in
+                guard let scopeAttribute = scopeSpans.scope?.attributes?.first(where: { $0.key == "scope.attr" }) else {
+                    return nil
+                }
+
+                guard case let .stringValue(value) = scopeAttribute.value else {
+                    return nil
+                }
+
+                return value
+            }
+        )
+        let expectedScopeAttributeValues: Set<String> = ["value-a", "value-b"]
+        #expect(scopeAttributeValues == expectedScopeAttributeValues)
+    }
+
+    @Test
     func logAdapterGroupsByResourceAndScope() {
         let resource = Resource(attributes: ["service.name": .string("test")])
         let logA = makeLogRecord(scopeName: "scope-a", scopeVersion: "1.0.0", resource: resource)
@@ -105,6 +199,79 @@ struct OTLPAdapterGroupingTests {
         #expect(resourceLogs.first?.scopeLogs.count == 2)
         let scopeNames = resourceLogs.first?.scopeLogs.compactMap { $0.scope?.name } ?? []
         #expect(Set(scopeNames) == Set(["scope-a", "scope-b"]))
+    }
+
+    @Test
+    func logAdapterGroupsByFullScopeIdentity() {
+        let resource = Resource(attributes: ["service.name": .string("test")])
+        let scopeA = InstrumentationScopeInfo(
+            name: "shared-scope",
+            version: "1.0.0",
+            schemaUrl: "https://example.com/schema/a",
+            attributes: ["scope.attr": .string("value-a")]
+        )
+        let scopeB = InstrumentationScopeInfo(
+            name: "shared-scope",
+            version: "1.0.0",
+            schemaUrl: "https://example.com/schema/b",
+            attributes: ["scope.attr": .string("value-b")]
+        )
+
+        let logA = makeLogRecord(scope: scopeA, resource: resource)
+        let logB = makeLogRecord(scope: scopeB, resource: resource)
+
+        let resourceLogs = LogRecordAdapter.toResourceLogs([logA, logB])
+        let scopeLogs = resourceLogs.first?.scopeLogs ?? []
+        let schemaUrls = Set(scopeLogs.compactMap(\.schemaUrl))
+        let expectedSchemaUrls: Set<String> = [scopeA.schemaUrl, scopeB.schemaUrl]
+            .compactMap(\.self)
+            .reduce(into: Set<String>()) { set, value in
+                set.insert(value)
+            }
+
+        #expect(resourceLogs.count == 1)
+        #expect(scopeLogs.count == 2)
+        #expect(schemaUrls == expectedSchemaUrls)
+
+        let scopeAttributeValues: Set<String> = Set(
+            scopeLogs.compactMap { scopeLogs -> String? in
+                guard let scopeAttribute = scopeLogs.scope?.attributes?.first(where: { $0.key == "scope.attr" }) else {
+                    return nil
+                }
+
+                guard case let .stringValue(value) = scopeAttribute.value else {
+                    return nil
+                }
+
+                return value
+            }
+        )
+        let expectedScopeAttributeValues: Set<String> = ["value-a", "value-b"]
+        #expect(scopeAttributeValues == expectedScopeAttributeValues)
+    }
+
+    @Test
+    func metricAdapterGroupsByFullScopeIdentity() {
+        let scopeA = InstrumentationScopeInfo(
+            name: "shared-scope",
+            version: "1.0.0",
+            schemaUrl: "https://example.com/schema/a"
+        )
+        let scopeB = InstrumentationScopeInfo(
+            name: "shared-scope",
+            version: "1.0.0",
+            schemaUrl: "https://example.com/schema/b"
+        )
+        let metricData = makeMetricsForScopes(scopeA: scopeA, scopeB: scopeB)
+
+        #expect(metricData.count == 2)
+
+        let resourceMetrics = MetricDataAdapter.toResourceMetrics(metricData)
+        let scopeMetrics = resourceMetrics.first?.scopeMetrics ?? []
+
+        #expect(resourceMetrics.count == 1)
+        #expect(scopeMetrics.count == 2)
+        #expect(Set(scopeMetrics.compactMap(\.schemaUrl)) == Set(["https://example.com/schema/a", "https://example.com/schema/b"]))
     }
 }
 
@@ -121,4 +288,37 @@ private class NoOpSpanExporter: SpanExporter {
     }
 
     func shutdown(explicitTimeout _: TimeInterval?) {}
+}
+
+
+// MARK: - Capturing Metric Exporter
+
+private final class CapturingMetricExporter: MetricExporter {
+    private let lock = NSLock()
+    private var exportedMetrics: [MetricData] = []
+
+    var metrics: [MetricData] {
+        lock.lock()
+        defer { lock.unlock() }
+        return exportedMetrics
+    }
+
+    func export(metrics: [MetricData]) -> ExportResult {
+        lock.lock()
+        defer { lock.unlock() }
+        exportedMetrics = metrics
+        return .success
+    }
+
+    func flush() -> ExportResult {
+        .success
+    }
+
+    func shutdown() -> ExportResult {
+        .success
+    }
+
+    func getAggregationTemporality(for _: InstrumentType) -> AggregationTemporality {
+        .delta
+    }
 }

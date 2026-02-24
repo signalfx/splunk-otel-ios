@@ -147,3 +147,4 @@ file_header:
 excluded:
  - ${PWD}/Package.swift
  - ${PWD}/.build
+ - ${PWD}/tools/xcframework

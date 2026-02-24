@@ -35,22 +35,6 @@ import OpenTelemetrySdk
 /// Based on OTLP specification v1.9.0.
 enum MetricDataAdapter {
 
-    // MARK: - Private Types
-
-    /// Key for grouping metrics by scope within a resource.
-    ///
-    /// Uses scope name and version as the grouping key.
-    struct ScopeKey: Hashable {
-        let name: String
-        let version: String?
-
-        init(from scope: InstrumentationScopeInfo?) {
-            name = scope?.name ?? ""
-            version = scope?.version
-        }
-    }
-
-
     // MARK: - Internal Methods
 
     /// Converts a list of MetricData to OTLP ResourceMetrics.
@@ -72,7 +56,7 @@ enum MetricDataAdapter {
 
             var scopeMetricsList: [OTLPScopeMetrics] = []
 
-            for (_, scopedMetrics) in groupedByScope {
+            for (scopeInfo, scopedMetrics) in groupedByScope {
                 // Convert each MetricData to OTLPMetric
                 let otlpMetrics = scopedMetrics.compactMap { convertMetric($0) }
 
@@ -81,13 +65,10 @@ enum MetricDataAdapter {
                     continue
                 }
 
-                // Get the scope info from the first metric in this scope group
-                let scopeInfo = scopedMetrics.first?.instrumentationScopeInfo
-
                 let scopeMetrics = OTLPScopeMetrics(
                     scope: convertInstrumentationScope(scopeInfo),
                     metrics: otlpMetrics,
-                    schemaUrl: scopeInfo?.schemaUrl
+                    schemaUrl: scopeInfo.schemaUrl
                 )
                 scopeMetricsList.append(scopeMetrics)
             }
