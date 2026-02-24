@@ -104,9 +104,17 @@ public final class Interactions: SplunkInteractionsModule {
 
             let xpath = await getElementXpath(from: event.viewHierarchy)
 
-            destination.send(
+            destination.sendInteraction(
                 actionName: interactionType,
                 elementId: targetElement,
+                xpath: xpath,
+                time: event.time
+            )
+        } else if event.type == .gestureRageTap {
+
+            let xpath = await getElementXpath(from: event.viewHierarchy)
+
+            destination.sendFrustration(
                 xpath: xpath,
                 time: event.time
             )
@@ -214,9 +222,6 @@ public final class Interactions: SplunkInteractionsModule {
 
         case .gestureDoubleTap:
             "double_tap"
-
-        case .gestureRageTap:
-            "rage_tap"
 
         case .gesturePinch:
             "pinch"

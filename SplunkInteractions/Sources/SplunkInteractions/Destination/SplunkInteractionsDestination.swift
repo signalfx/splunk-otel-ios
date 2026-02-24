@@ -23,5 +23,6 @@ import SplunkCommon
 public protocol SplunkInteractionsDestination {
 
     /// Sends results into a destination.
-    func send(actionName: String, elementId: String?, xpath: String?, time: Date)
+    func sendInteraction(actionName: String, elementId: String?, xpath: String?, time: Date)
+    func sendFrustration(xpath: String?, time: Date)
 }
