@@ -24,13 +24,21 @@ final class TestInteractionDestination: SplunkInteractionsDestination {
     var didReceiveInteractionCallCount = 0
     var actionName: String?
 
-    func send(
+    func sendInteraction(
         actionName: String,
         elementId _: String?,
         xpath _: String?,
         time _: Date
     ) {
         self.actionName = actionName
+        didReceiveInteractionCallCount += 1
+    }
+
+    func sendFrustration(
+        xpath _: String?,
+        time _: Date
+    ) {
+        actionName = "frustration"
         didReceiveInteractionCallCount += 1
     }
 }

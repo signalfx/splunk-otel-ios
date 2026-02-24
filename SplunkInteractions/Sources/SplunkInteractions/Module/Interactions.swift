@@ -110,7 +110,8 @@ public final class Interactions: SplunkInteractionsModule {
                 xpath: xpath,
                 time: event.time
             )
-        } else if event.type == .gestureRageTap {
+        }
+        else if event.type == .gestureRageTap {
 
             let xpath = await getElementXpath(from: event.viewHierarchy)
 

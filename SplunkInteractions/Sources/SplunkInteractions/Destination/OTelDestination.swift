@@ -65,7 +65,7 @@ struct OTelDestination: SplunkInteractionsDestination {
             )
 
         var attributes: [String: AttributeValue] = [:]
-        attributes["name"] = .string("frustration")
+        attributes["event.name"] = .string("frustration")
         attributes["component"] = .string("user-interaction")
         attributes["frustration_type"] = .string("rage")
         attributes["interaction_type"] = .string("tap")
