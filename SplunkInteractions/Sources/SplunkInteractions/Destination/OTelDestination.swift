@@ -75,7 +75,7 @@ struct OTelDestination: SplunkInteractionsDestination {
         }
 
         let logRecordBuilder =
-        logProvider
+            logProvider
             .logRecordBuilder()
             .setTimestamp(time)
             .setAttributes(attributes)
