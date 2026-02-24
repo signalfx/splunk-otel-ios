@@ -194,6 +194,48 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
         #expect(http.sent.count == 1)
         #expect(http.sent.first?.id == uuid)
+        #expect(http.sent.first?.payloadFormat == .json)
+    }
+
+    @Test
+    func fileWithNoTaskDescriptionAndJSONPayloadUsesJSONFormat() throws {
+        let uuid = UUID()
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http)
+        let fileKey = exporter.getStorageKey().append(uuid.uuidString).key
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("otlp-json-\(uuid.uuidString)")
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let jsonPayload = Data("{}".utf8)
+
+        try jsonPayload.write(to: fileURL)
+        disk.files[fileKey] = fileURL
+
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: Date())
+
+        #expect(http.sent.count == 1)
+        #expect(http.sent.first?.payloadFormat == .json)
+    }
+
+    @Test
+    func fileWithNoTaskDescriptionAndProtobufPayloadUsesProtobufFormat() throws {
+        let uuid = UUID()
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http)
+        let fileKey = exporter.getStorageKey().append(uuid.uuidString).key
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("otlp-proto-\(uuid.uuidString)")
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let payload = Data([0x0A, 0x02, 0x08, 0x01])
+        try payload.write(to: fileURL)
+        disk.files[fileKey] = fileURL
+
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: Date())
+
+        #expect(http.sent.count == 1)
+        #expect(http.sent.first?.payloadFormat == .protobuf)
     }
 
     @Test
