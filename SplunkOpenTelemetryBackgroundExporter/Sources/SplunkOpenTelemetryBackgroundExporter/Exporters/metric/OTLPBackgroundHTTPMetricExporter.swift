@@ -17,7 +17,6 @@ limitations under the License.
 
 import CiscoDiskStorage
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 
 public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, MetricExporter {
@@ -25,14 +24,20 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
     // MARK: - Implementation MetricExporter protocol
 
     public func export(metrics: [MetricData]) -> ExportResult {
-        let body = Opentelemetry_Proto_Collector_Metrics_V1_ExportMetricsServiceRequest.with {
-            $0.resourceMetrics = MetricsAdapter.toProtoResourceMetrics(metricData: metrics)
+        // Convert metrics to OTLP JSON models using our custom adapter
+        let resourceMetrics = MetricDataAdapter.toResourceMetrics(metrics)
+
+        // Skip if no metrics to export (filter empty envelopes per OTLP spec)
+        guard !resourceMetrics.isEmpty else {
+            return .success
         }
 
+        let request = OTLPExportMetricsServiceRequest(resourceMetrics: resourceMetrics)
         let requestId = UUID()
 
         do {
-            let storeData = try body.serializedData()
+            // Encode to JSON instead of protobuf binary
+            let storeData = try JSONEncoder().encode(request)
             try diskStorage.insert(
                 storeData,
                 forKey: KeyBuilder(
@@ -46,12 +51,16 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
             return .failure
         }
 
+        // Use config timeout (MetricExporter protocol has no explicitTimeout parameter)
+        let timeout = config.timeout
+
         let requestDescriptor = RequestDescriptor(
             id: requestId,
             endpoint: endpoint,
-            explicitTimeout: config.timeout,
+            explicitTimeout: timeout,
             fileKeyType: getFileKeyType(),
-            headers: headers
+            headers: headers,
+            payloadFormat: .json
         )
 
         do {

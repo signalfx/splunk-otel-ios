@@ -17,7 +17,6 @@ limitations under the License.
 
 import CiscoEncryption
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
 import Testing
 
@@ -33,6 +32,7 @@ struct MockRequestDescriptor: RequestDescriptorProtocol {
     var scheduled: Date
     var shouldSend: Bool
     var headers: [String: String]
+    var payloadFormat: RequestPayloadFormat
 
     init(
         endpointString: String = "https://example.com",
@@ -42,7 +42,8 @@ struct MockRequestDescriptor: RequestDescriptorProtocol {
         fileKeyType: String = "base",
         scheduled: Date = Date(),
         shouldSend: Bool = true,
-        headers: [String: String] = [:]
+        headers: [String: String] = [:],
+        payloadFormat: RequestPayloadFormat = .json
     ) throws {
         guard let url = URL(string: endpointString) else {
             throw URLError(.unknown)
@@ -56,14 +57,15 @@ struct MockRequestDescriptor: RequestDescriptorProtocol {
         self.scheduled = scheduled
         self.shouldSend = shouldSend
         self.headers = headers
+        self.payloadFormat = payloadFormat
     }
 
     func createRequest() -> URLRequest {
         var request = URLRequest(url: endpoint)
 
         request.httpMethod = "POST"
-        request.setValue(Headers.getUserAgentHeader(), forHTTPHeaderField: Constants.HTTP.userAgent)
-        request.setValue("application/x-protobuf", forHTTPHeaderField: "Content-Type")
+        request.setValue(OTLPHTTPHeaders.userAgent, forHTTPHeaderField: OTLPHTTPHeaders.userAgentKey)
+        request.setValue(payloadFormat.contentType, forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = explicitTimeout
 
         for (key, value) in headers {

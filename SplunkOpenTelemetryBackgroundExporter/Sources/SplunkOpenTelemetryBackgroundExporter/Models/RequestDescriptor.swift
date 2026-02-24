@@ -16,7 +16,21 @@ limitations under the License.
 */
 
 import Foundation
-import OpenTelemetryProtocolExporterCommon
+
+enum RequestPayloadFormat: String, Codable {
+    case json
+    case protobuf
+
+    var contentType: String {
+        switch self {
+        case .json:
+            "application/json"
+
+        case .protobuf:
+            "application/x-protobuf"
+        }
+    }
+}
 
 protocol RequestDescriptorProtocol: Codable {
     var id: UUID { get }
@@ -27,6 +41,7 @@ protocol RequestDescriptorProtocol: Codable {
     var scheduled: Date { get }
     var shouldSend: Bool { get }
     var headers: [String: String] { get }
+    var payloadFormat: RequestPayloadFormat { get }
 
     func createRequest() -> URLRequest
 }
@@ -54,6 +69,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
     var sentCount: Int = 0
     var fileKeyType: String
     var headers: [String: String] = [:]
+    var payloadFormat: RequestPayloadFormat
 
     var scheduled: Date {
         Calendar.current.date(byAdding: nextRequestDelay, to: Date()) ?? Date()
@@ -70,6 +86,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         case sentCount
         case fileKeyType
         case headers
+        case payloadFormat
     }
 
     init(
@@ -78,7 +95,8 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         explicitTimeout: TimeInterval,
         sentCount: Int = 0,
         fileKeyType: String,
-        headers: [String: String] = [:]
+        headers: [String: String] = [:],
+        payloadFormat: RequestPayloadFormat = .json
     ) {
         self.id = id
         self.endpoint = endpoint
@@ -86,6 +104,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         self.sentCount = sentCount
         self.fileKeyType = fileKeyType
         self.headers = headers
+        self.payloadFormat = payloadFormat
     }
 
     init(from decoder: Decoder) throws {
@@ -97,6 +116,8 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         sentCount = try container.decode(Int.self, forKey: .sentCount)
         fileKeyType = try container.decode(String.self, forKey: .fileKeyType)
         headers = try container.decodeIfPresent([String: String].self, forKey: .headers) ?? [:]
+        // Preserve legacy queued payloads (pre-2.1.0) that were protobuf-encoded.
+        payloadFormat = try container.decodeIfPresent(RequestPayloadFormat.self, forKey: .payloadFormat) ?? .protobuf
     }
 
     func encode(to encoder: Encoder) throws {
@@ -108,6 +129,7 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         try container.encode(sentCount, forKey: .sentCount)
         try container.encode(fileKeyType, forKey: .fileKeyType)
         try container.encode(headers, forKey: .headers)
+        try container.encode(payloadFormat, forKey: .payloadFormat)
     }
 
 
@@ -117,8 +139,8 @@ struct RequestDescriptor: RequestDescriptorProtocol {
         var request = URLRequest(url: endpoint)
 
         request.httpMethod = "POST"
-        request.setValue(Headers.getUserAgentHeader(), forHTTPHeaderField: Constants.HTTP.userAgent)
-        request.setValue("application/x-protobuf", forHTTPHeaderField: "Content-Type")
+        request.setValue(OTLPHTTPHeaders.userAgent, forHTTPHeaderField: OTLPHTTPHeaders.userAgentKey)
+        request.setValue(payloadFormat.contentType, forHTTPHeaderField: "Content-Type")
         request.timeoutInterval = explicitTimeout
 
         for (key, value) in headers {

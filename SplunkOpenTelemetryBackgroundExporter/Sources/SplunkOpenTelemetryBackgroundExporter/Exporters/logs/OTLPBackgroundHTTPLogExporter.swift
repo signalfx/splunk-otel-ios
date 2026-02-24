@@ -17,7 +17,6 @@ limitations under the License.
 
 import CiscoDiskStorage
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 import OpenTelemetrySdk
 
 public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogRecordExporter {
@@ -25,14 +24,20 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
     // MARK: - Implementation LogRecordExporter protocol
 
     public func export(logRecords: [OpenTelemetrySdk.ReadableLogRecord], explicitTimeout: TimeInterval? = nil) -> OpenTelemetrySdk.ExportResult {
-        let body = Opentelemetry_Proto_Collector_Logs_V1_ExportLogsServiceRequest.with { request in
-            request.resourceLogs = LogRecordAdapter.toProtoResourceRecordLog(logRecordList: logRecords)
+        // Convert log records to OTLP JSON models using our custom adapter
+        let resourceLogs = LogRecordAdapter.toResourceLogs(logRecords)
+
+        // Skip if no log records to export (filter empty envelopes per OTLP spec)
+        guard !resourceLogs.isEmpty else {
+            return .success
         }
 
+        let request = OTLPExportLogsServiceRequest(resourceLogs: resourceLogs)
         let requestId = UUID()
 
         do {
-            let storeData = try body.serializedData()
+            // Encode to JSON instead of protobuf binary
+            let storeData = try JSONEncoder().encode(request)
             try diskStorage.insert(
                 storeData,
                 forKey: KeyBuilder(
@@ -53,7 +58,8 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
             endpoint: endpoint,
             explicitTimeout: timeout,
             fileKeyType: getFileKeyType(),
-            headers: headers
+            headers: headers,
+            payloadFormat: .json
         )
 
         do {

@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ limitations under the License.
 import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
-import OpenTelemetryProtocolExporterCommon
-import SwiftProtobuf
 
 /// Basic implementation of exporters.
 public class OTLPBackgroundHTTPBaseExporter {
@@ -35,7 +33,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     let endpoint: URL
     let envVarHeaders: [(String, String)]?
     let additionalHeaders: [String: String]
-    let config: OtlpConfiguration
+    let config: OTLPExporterConfiguration
     let diskStorage: DiskStorage
     var checkStalledTask: Task<Void, Never>?
 
@@ -50,9 +48,9 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     public init(
         endpoint: URL,
-        config: OtlpConfiguration = OtlpConfiguration(),
+        config: OTLPExporterConfiguration = OTLPExporterConfiguration(),
         qosConfig: SessionQOSConfiguration,
-        envVarHeaders: [(String, String)]? = EnvVarHeaders.attributes,
+        envVarHeaders: [(String, String)]? = OTLPEnvVarHeaders.attributes,
         headers: [String: String] = [:],
         diskStorage: DiskStorage = FilesystemDiskStorage(
             prefix: FilesystemPrefix(module: "OTLPBackgroundExporter"),
@@ -148,12 +146,14 @@ public class OTLPBackgroundHTTPBaseExporter {
             }
             else {
                 // This task was forgotten by system, create new one.
+                let payloadFormat = inferPayloadFormat(forFileKey: fileKey)
                 let taskDescription = RequestDescriptor(
                     id: requestId,
                     endpoint: endpoint,
                     explicitTimeout: config.timeout,
                     fileKeyType: getFileKeyType(),
-                    headers: headers
+                    headers: headers,
+                    payloadFormat: payloadFormat
                 )
 
                 try? httpClient.send(taskDescription)
@@ -182,5 +182,20 @@ public class OTLPBackgroundHTTPBaseExporter {
         }
 
         return combinedHeaders
+    }
+
+    private func inferPayloadFormat(forFileKey fileKey: String) -> RequestPayloadFormat {
+        guard
+            let fileURL = try? diskStorage.finalDestination(forKey: getStorageKey().append(fileKey)),
+            let payloadData = try? Data(contentsOf: fileURL)
+        else {
+            return .json
+        }
+
+        if (try? JSONSerialization.jsonObject(with: payloadData)) != nil {
+            return .json
+        }
+
+        return .protobuf
     }
 }

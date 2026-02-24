@@ -16,13 +16,16 @@ limitations under the License.
 */
 
 internal import SplunkCommon
-internal import SplunkCrashReports
 
-extension CrashReportsConfigurationObjC: ModuleConfigurationSwift {
+#if canImport(SplunkCrashReports)
+    internal import SplunkCrashReports
 
-    // MARK: - Swift variant
+    extension CrashReportsConfigurationObjC: ModuleConfigurationSwift {
 
-    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
-        CrashReportsConfiguration(isEnabled: isEnabled)
+        // MARK: - Swift variant
+
+        var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
+            CrashReportsConfiguration(isEnabled: isEnabled)
+        }
     }
-}
+#endif

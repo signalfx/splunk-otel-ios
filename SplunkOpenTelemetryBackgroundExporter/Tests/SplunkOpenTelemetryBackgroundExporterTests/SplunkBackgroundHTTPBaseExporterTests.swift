@@ -1,5 +1,4 @@
 //
-//
 /*
 Copyright 2025 Splunk Inc.
 
@@ -19,7 +18,6 @@ limitations under the License.
 import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
-import OpenTelemetryProtocolExporterCommon
 import SplunkCommon
 import Testing
 import XCTest
@@ -34,7 +32,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func makeExporter(
         disk: MockDiskStorage,
         http: MockHTTPClient,
-        config: OtlpConfiguration = OtlpConfiguration()
+        config: OTLPExporterConfiguration = OTLPExporterConfiguration()
     ) throws -> OTLPBackgroundHTTPBaseExporter {
         let exporter = try OTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
@@ -86,7 +84,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
         let exporter = try MockOTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
-            config: OtlpConfiguration(),
+            config: OTLPExporterConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
             diskStorage: disk,
@@ -118,7 +116,7 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func onlyStalledTasksAreCancelled() throws {
         let disk = MockDiskStorage()
         let http = MockHTTPClient()
-        let exporter = try makeExporter(disk: disk, http: http, config: OtlpConfiguration(timeout: 1))
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 1))
 
         let now = Date()
         let old = now.addingTimeInterval(-1_000)
@@ -196,13 +194,55 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
         #expect(http.sent.count == 1)
         #expect(http.sent.first?.id == uuid)
+        #expect(http.sent.first?.payloadFormat == .json)
+    }
+
+    @Test
+    func fileWithNoTaskDescriptionAndJSONPayloadUsesJSONFormat() throws {
+        let uuid = UUID()
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http)
+        let fileKey = exporter.getStorageKey().append(uuid.uuidString).key
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("otlp-json-\(uuid.uuidString)")
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let jsonPayload = Data("{}".utf8)
+
+        try jsonPayload.write(to: fileURL)
+        disk.files[fileKey] = fileURL
+
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: Date())
+
+        #expect(http.sent.count == 1)
+        #expect(http.sent.first?.payloadFormat == .json)
+    }
+
+    @Test
+    func fileWithNoTaskDescriptionAndProtobufPayloadUsesProtobufFormat() throws {
+        let uuid = UUID()
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http)
+        let fileKey = exporter.getStorageKey().append(uuid.uuidString).key
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("otlp-proto-\(uuid.uuidString)")
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let payload = Data([0x0A, 0x02, 0x08, 0x01])
+        try payload.write(to: fileURL)
+        disk.files[fileKey] = fileURL
+
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: Date())
+
+        #expect(http.sent.count == 1)
+        #expect(http.sent.first?.payloadFormat == .protobuf)
     }
 
     @Test
     func exporterWasCreatedAndCheckStalledWasCalled() async throws {
         let exporter = try MockOTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
-            config: OtlpConfiguration(),
+            config: OTLPExporterConfiguration(),
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: nil,
             diskStorage: MockDiskStorage()
