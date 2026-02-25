@@ -1,0 +1,31 @@
+# Tuist-generated Xcode projects and workspaces
+# (NOT in smoke-tests/ — that project is committed)
+*.xcodeproj
+*.xcworkspace
+Derived/
+otel/*.xcodeproj
+otel/*.xcworkspace
+otel/Derived/
+plcrash/*.xcodeproj
+plcrash/*.xcworkspace
+plcrash/Derived/
+spike-test/*.xcodeproj
+spike-test/*.xcworkspace
+spike-test/Derived/
+smoke-test/*.xcodeproj
+smoke-test/*.xcworkspace
+smoke-test/Derived/
+
+# XCFramework build artifacts
+build/
+output/
+archives/
+
+# Pre-built dependency staging directory
+# (populated by the build script before each build)
+dependencies/
+
+# Vendored source checkouts
+# (cloned by build scripts, not committed)
+otel/vendor/
+plcrash/vendor/
