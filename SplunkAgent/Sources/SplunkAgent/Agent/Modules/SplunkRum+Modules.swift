@@ -204,8 +204,7 @@ extension SplunkRum {
     /// Configure WebView Instrumentation module with shared state.
     private func customizeWebView() {
         if let webViewInstrumentationModule = modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentation.self) {
-            webViewInstrumentationModule.sharedState = sharedState
-            webViewProxy = WebView(module: webViewInstrumentationModule)
+            webViewProxy = WebView(module: webViewInstrumentationModule, sharedState: sharedState)
         }
         else {
             logger.log(level: .notice, isPrivate: false) {
