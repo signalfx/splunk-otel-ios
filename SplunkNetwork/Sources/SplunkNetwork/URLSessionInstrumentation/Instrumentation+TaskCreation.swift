@@ -215,7 +215,7 @@ func shouldInstrumentRequest(_ request: URLRequest) -> Bool {
 
 func injectTraceContextIfEnabled(into request: URLRequest, span: Span) -> URLRequest {
     // Check if trace header injection is enabled
-    guard NetworkInstrumentationManager.shared.getModule()?.isTraceHeaderInjectionEnabled ?? true else {
+    guard NetworkInstrumentationManager.shared.getModule()?.isTraceHeaderInjectionEnabled ?? false else {
         return request
     }
 
