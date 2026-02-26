@@ -193,4 +193,59 @@ final class DefaultModulesManagerTests: XCTestCase {
         // We need to wait for data delivery
         waitForExpectations(timeout: 25, handler: nil)
     }
+
+
+    // MARK: - Duplicate Configuration Tests
+
+    /// Tests that when duplicate module configurations are provided, only the first
+    /// occurrence is used ("first takes all" behavior) and duplicates are ignored.
+    func testDuplicateConfigurationFirstTakesAll() throws {
+        // Create two different configurations of the same type
+        let firstConfiguration = CrashReportsTestConfiguration(disableLocalProcessing: false)
+        let duplicateConfiguration = CrashReportsTestConfiguration(disableLocalProcessing: true)
+
+        // Provide both configurations - only the first should be used
+        let moduleConfigurations = [firstConfiguration, duplicateConfiguration]
+
+        // Perform initialization with duplicate configurations
+        let modulesManager = try DefaultModulesManagerTestBuilder.build(
+            moduleConfigurations: moduleConfigurations,
+            for: modulesPool
+        )
+
+        // Get the CrashReports module and verify it received the first configuration
+        let crashReportsModule = modulesManager.module(ofType: CrashReportsTestModule.self)
+        let moduleConfiguration = crashReportsModule?.configuration
+
+        // The module should have the first configuration (disableLocalProcessing = false)
+        XCTAssertNotNil(moduleConfiguration)
+        XCTAssertEqual(moduleConfiguration, firstConfiguration)
+        XCTAssertNotEqual(moduleConfiguration, duplicateConfiguration)
+
+        // Verify the "first takes all" behavior - the first configuration's value should be used
+        XCTAssertEqual(moduleConfiguration?.disableLocalProcessing, false)
+    }
+
+    /// Tests that only one module instance exists even when duplicate configurations are provided.
+    func testDuplicateConfigurationSingleModuleInstance() throws {
+        // Create multiple configurations of the same type
+        let firstConfiguration = CrashReportsTestConfiguration(disableLocalProcessing: false)
+        let secondConfiguration = CrashReportsTestConfiguration(disableLocalProcessing: true)
+        let thirdConfiguration = CrashReportsTestConfiguration(disableLocalProcessing: false)
+
+        let moduleConfigurations = [firstConfiguration, secondConfiguration, thirdConfiguration]
+
+        // Perform initialization
+        let modulesManager = try DefaultModulesManagerTestBuilder.build(
+            moduleConfigurations: moduleConfigurations,
+            for: modulesPool
+        )
+
+        // There should be exactly one CrashReports module instance
+        let crashReportsModules = modulesManager.modules.filter {
+            type(of: $0) == CrashReportsTestModule.self
+        }
+
+        XCTAssertEqual(crashReportsModules.count, 1, "Only one module instance should exist even with duplicate configurations")
+    }
 }
