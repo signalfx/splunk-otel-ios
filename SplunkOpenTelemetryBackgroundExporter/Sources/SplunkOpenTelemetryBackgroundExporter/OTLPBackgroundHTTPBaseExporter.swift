@@ -126,10 +126,10 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     // MARK: - Endpoint Management
+
     /// Updates the endpoint and flushes any pending data.
     ///
-    /// In-flight uploads targeting the previous endpoint are rescheduled by the stalled
-    /// upload check (within 5–8s); a small number may still reach the old endpoint.
+    /// In-flight uploads targeting the previous endpoint are rescheduled by the stalled upload check (within 5–8s).
     public func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]? = nil) {
         stateLock.lock()
         storedDropModeEnabled = false
@@ -292,10 +292,11 @@ public class OTLPBackgroundHTTPBaseExporter {
 // MARK: - Private helpers
 
 extension OTLPBackgroundHTTPBaseExporter {
-
     private func cancelInFlightUploads() {
         httpClient.getAllSessionsTasks { tasks in
-            for task in tasks { task.cancel() }
+            for task in tasks {
+                task.cancel()
+            }
         }
     }
 
@@ -306,7 +307,6 @@ extension OTLPBackgroundHTTPBaseExporter {
                 try? diskStorage.delete(forKey: key)
             }
         }
-
         if let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) {
             for fileInfo in pendingFiles {
                 let key = KeyBuilder(fileInfo.key, parrentKeyBuilder: getPendingStorageKey())
