@@ -26,6 +26,7 @@ TOOLS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 
 RELEASE="${RELEASE:-false}"
+VALIDATE_EXTERNAL_SIGNATURES="${VALIDATE_EXTERNAL_SIGNATURES:-false}"
 
 TOTAL_CHECKS=0
 PASSED_CHECKS=0
@@ -184,10 +185,17 @@ validate_xcframework() {
 
     # Check 8: Signature (release mode only)
     if [[ "${RELEASE}" == "true" ]]; then
-        if codesign --verify --deep --strict "${xcfw_path}" 2>/dev/null; then
-            check_pass "Code signature valid"
+        # Cisco Session Replay xcframeworks are external pre-built artifacts.
+        # Signature validity can differ based on how they are distributed
+        # upstream, so we don't enforce them by default in release validation.
+        if [[ "${VALIDATE_EXTERNAL_SIGNATURES}" != "true" && "${name}" == Cisco* ]]; then
+            echo "  ℹ Code signature check skipped (external Cisco framework)"
         else
-            check_fail "Code signature invalid or missing (required for release)"
+            if codesign --verify --deep --strict "${xcfw_path}" 2>/dev/null; then
+                check_pass "Code signature valid"
+            else
+                check_fail "Code signature invalid or missing (required for release)"
+            fi
         fi
     fi
 }

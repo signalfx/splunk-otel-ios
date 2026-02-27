@@ -22,12 +22,15 @@
 #                      (default: latest successful build-xcframeworks run)
 #   --identity NAME    Signing identity (default: auto-detected)
 #   --skip-upload      Sign and package only, don't upload to GitHub
+#   --skip-cisco-refresh  Keep Cisco xcframeworks from CI artifact as-is
+#                         (default: refresh from source to preserve vendor signatures)
 #
 # Examples:
 #   ./scripts/sign-and-upload.sh 1.2.0
 #   ./scripts/sign-and-upload.sh 1.2.0 --run-id 12345678
 #   ./scripts/sign-and-upload.sh 1.2.0 --identity "Apple Distribution: Splunk Inc. (TEAMID)"
 #   ./scripts/sign-and-upload.sh 1.2.0 --skip-upload
+#   ./scripts/sign-and-upload.sh 1.2.0 --skip-cisco-refresh
 
 set -euo pipefail
 
@@ -40,10 +43,11 @@ VERSION="${1:-}"
 RUN_ID=""
 SIGNING_IDENTITY=""
 SKIP_UPLOAD=false
+REFRESH_CISCO=true
 
 if [[ -z "${VERSION}" ]]; then
     echo "ERROR: Version required."
-    echo "  Usage: $0 VERSION [--run-id ID] [--identity NAME] [--skip-upload]"
+    echo "  Usage: $0 VERSION [--run-id ID] [--identity NAME] [--skip-upload] [--skip-cisco-refresh]"
     exit 1
 fi
 
@@ -53,6 +57,7 @@ while [[ $# -gt 0 ]]; do
         --run-id) RUN_ID="$2"; shift 2 ;;
         --identity) SIGNING_IDENTITY="$2"; shift 2 ;;
         --skip-upload) SKIP_UPLOAD=true; shift ;;
+        --skip-cisco-refresh) REFRESH_CISCO=false; shift ;;
         *) echo "Unknown arg: $1"; exit 1 ;;
     esac
 done
@@ -120,7 +125,7 @@ if [[ -n "${RUN_ID}" ]]; then
     gh run download "${RUN_ID}" \
         -n "${ARTIFACT_NAME}" \
         -D "${OUTPUT_DIR}" \
-        -R "$(gh repo view --json nameWithOwner -q .nameWithOwner "${REPO_ROOT}")" 2>&1
+        -R "$(cd "${REPO_ROOT}" && gh repo view --json nameWithOwner -q .nameWithOwner)" 2>&1
 else
     echo "  Finding latest successful build-xcframeworks run..."
     RUN_ID="$(cd "${REPO_ROOT}" && gh run list \
@@ -152,6 +157,24 @@ if [[ "${XCFW_COUNT}" -eq 0 ]]; then
 fi
 
 echo "  ✓ Downloaded ${XCFW_COUNT} xcframeworks"
+
+# ---------------------------------------------------------------------------
+# Step 2b: Refresh Cisco xcframeworks from source (default)
+# ---------------------------------------------------------------------------
+# Cisco frameworks are pre-built external artifacts. Refreshing them from
+# source ensures we package untouched vendor binaries/signatures.
+
+if [[ "${REFRESH_CISCO}" == "true" ]]; then
+    log "Refreshing Cisco xcframeworks from source"
+
+    # Remove Cisco frameworks from downloaded artifact first.
+    rm -rf "${OUTPUT_DIR}"/Cisco*.xcframework
+
+    # Download fresh Cisco frameworks directly from URLs/checksums in Package.swift.
+    "${SCRIPT_DIR}/download-cisco-xcframeworks.sh" --output-dir "${OUTPUT_DIR}"
+else
+    log "Skipping Cisco refresh (--skip-cisco-refresh)"
+fi
 
 # ---------------------------------------------------------------------------
 # Step 3: Sign
