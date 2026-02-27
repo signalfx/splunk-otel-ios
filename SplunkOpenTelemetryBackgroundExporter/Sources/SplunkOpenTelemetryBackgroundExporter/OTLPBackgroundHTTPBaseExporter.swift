@@ -295,7 +295,7 @@ extension OTLPBackgroundHTTPBaseExporter {
 
     private func cancelInFlightUploads() {
         httpClient.getAllSessionsTasks { tasks in
-            tasks.forEach { $0.cancel() }
+            for task in tasks { task.cancel() }
         }
     }
 
