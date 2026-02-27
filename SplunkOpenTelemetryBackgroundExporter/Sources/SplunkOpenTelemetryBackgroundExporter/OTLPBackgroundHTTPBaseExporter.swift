@@ -128,6 +128,12 @@ public class OTLPBackgroundHTTPBaseExporter {
     // MARK: - Endpoint Management
 
     /// Updates the endpoint and flushes any pending data.
+    ///
+    /// - Note: Already-scheduled upload tasks targeting the previous endpoint are not
+    ///   cancelled immediately. They will be cancelled and rescheduled to the new endpoint
+    ///   by the stalled upload check (within 5–8 seconds). During this window, a small
+    ///   number of in-flight uploads may still reach the old endpoint.
+    ///
     /// - Parameters:
     ///   - newEndpoint: The new endpoint URL.
     ///   - newHeaders: Optional new headers to use (e.g., for access token).
@@ -148,6 +154,9 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     /// Clears the endpoint, causing new data to be cached to pending storage.
+    ///
+    /// - Note: Already-scheduled upload tasks are not cancelled immediately. Use
+    ///   ``setDropMode(_:)`` if in-flight uploads must be stopped urgently (e.g., for privacy).
     public func clearEndpoint() {
         checkStalledTask?.cancel()
         checkStalledTask = nil
@@ -156,8 +165,9 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     /// Enables or disables drop mode.
     ///
-    /// When enabled, all export calls become no-ops and any buffered data
-    /// (both active and pending storage) is deleted immediately.
+    /// When enabled, all export calls become no-ops, any buffered data
+    /// (both active and pending storage) is deleted immediately, and
+    /// in-flight upload tasks are cancelled.
     public func setDropMode(_ enabled: Bool) {
         stateLock.lock()
         storedDropModeEnabled = enabled
@@ -167,6 +177,7 @@ public class OTLPBackgroundHTTPBaseExporter {
             checkStalledTask?.cancel()
             checkStalledTask = nil
             dropBufferedData()
+            cancelInFlightUploads()
         }
     }
 
@@ -291,6 +302,14 @@ public class OTLPBackgroundHTTPBaseExporter {
 // MARK: - Private helpers
 
 extension OTLPBackgroundHTTPBaseExporter {
+
+    private func cancelInFlightUploads() {
+        httpClient.getAllSessionsTasks { tasks in
+            for task in tasks {
+                task.cancel()
+            }
+        }
+    }
 
     private func dropBufferedData() {
         if let activeFiles = try? diskStorage.list(forKey: getStorageKey()) {
