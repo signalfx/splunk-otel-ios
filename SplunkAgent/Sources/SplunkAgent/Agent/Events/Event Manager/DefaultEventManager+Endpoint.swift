@@ -50,15 +50,12 @@ extension DefaultEventManager {
                 sessionReplayProcessor.setEndpoint(sessionReplayUrl, accessToken: endpoint.rumAccessToken)
             }
             else {
-                let processors = Self.createProcessors(
-                    traceUrl: traceUrl,
+                sessionReplayProcessor = Self.createSessionReplayProcessor(
                     sessionReplayUrl: sessionReplayUrl,
                     accessToken: endpoint.rumAccessToken,
                     configuration: configuration,
                     agent: agent
                 )
-
-                sessionReplayProcessor = processors.sessionReplayProcessor
             }
         }
 
@@ -106,6 +103,24 @@ extension DefaultEventManager {
 
 extension DefaultEventManager {
 
+    static func createSessionReplayProcessor(
+        sessionReplayUrl: URL,
+        accessToken: String?,
+        configuration: any AgentConfigurationProtocol,
+        agent: SplunkRum
+    ) -> OTLPSessionReplayEventProcessor? {
+        let resources = buildResources(configuration: configuration)
+
+        return OTLPSessionReplayEventProcessor(
+            with: sessionReplayUrl,
+            resources: resources,
+            runtimeAttributes: agent.runtimeAttributes,
+            globalAttributes: { agent.globalAttributes.getAll() },
+            debugEnabled: configuration.enableDebugLogging,
+            accessToken: accessToken
+        )
+    }
+
     static func createProcessors(
         traceUrl: URL?,
         sessionReplayUrl: URL?,
@@ -113,25 +128,7 @@ extension DefaultEventManager {
         configuration: any AgentConfigurationProtocol,
         agent: SplunkRum
     ) -> Processors {
-        // Will be used later by hybrid agents
-        let hybridType: String? = nil
-
-        // Build resources
-        let resources = DefaultResources(
-            appName: configuration.appName,
-            appVersion: configuration.appVersion,
-            appBuild: AppInfo.buildId ?? "-",
-            appDeploymentEnvironment: configuration.deploymentEnvironment,
-            agentHybridType: hybridType,
-            agentVersion: SplunkRum.version,
-            deviceID: DeviceInfo.deviceID ?? "-",
-            deviceModelIdentifier: DeviceInfo.type ?? "-",
-            deviceManufacturer: "Apple",
-            osName: SystemInfo.name,
-            osVersion: SystemInfo.version ?? "-",
-            osDescription: SystemInfo.description,
-            osType: SystemInfo.type
-        )
+        let resources = buildResources(configuration: configuration)
 
         // Initialize log event processor
         // Note: This processor converts logs to spans, so it uses the trace endpoint
@@ -166,6 +163,27 @@ extension DefaultEventManager {
             logEventProcessor: logProcessor,
             sessionReplayProcessor: replayProcessor,
             traceProcessor: traceProc
+        )
+    }
+
+    private static func buildResources(configuration: any AgentConfigurationProtocol) -> DefaultResources {
+        // Will be used later by hybrid agents
+        let hybridType: String? = nil
+
+        return DefaultResources(
+            appName: configuration.appName,
+            appVersion: configuration.appVersion,
+            appBuild: AppInfo.buildId ?? "-",
+            appDeploymentEnvironment: configuration.deploymentEnvironment,
+            agentHybridType: hybridType,
+            agentVersion: SplunkRum.version,
+            deviceID: DeviceInfo.deviceID ?? "-",
+            deviceModelIdentifier: DeviceInfo.type ?? "-",
+            deviceManufacturer: "Apple",
+            osName: SystemInfo.name,
+            osVersion: SystemInfo.version ?? "-",
+            osDescription: SystemInfo.description,
+            osType: SystemInfo.type
         )
     }
 }
