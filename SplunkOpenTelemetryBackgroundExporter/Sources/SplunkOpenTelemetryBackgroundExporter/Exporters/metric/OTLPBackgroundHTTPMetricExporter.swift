@@ -27,7 +27,8 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
         // Convert metrics to OTLP JSON models using our custom adapter
         let resourceMetrics = MetricDataAdapter.toResourceMetrics(metrics)
 
-        guard !isDropModeEnabled, !resourceMetrics.isEmpty else {
+        // Skip if no metrics to export (filter empty envelopes per OTLP spec)
+        guard !resourceMetrics.isEmpty else {
             return .success
         }
 

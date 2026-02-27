@@ -126,9 +126,4 @@ public class OTLPTraceProcessor: TraceProcessor {
     public func clearEndpoint() {
         backgroundTraceExporter.clearEndpoint()
     }
-
-    /// Enables or disables drop mode on the underlying exporter.
-    public func setDropMode(_ enabled: Bool) {
-        backgroundTraceExporter.setDropMode(enabled)
-    }
 }

@@ -27,7 +27,8 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
         // Convert spans to OTLP JSON models using our custom adapter
         let resourceSpans = SpanDataAdapter.toResourceSpans(spans)
 
-        guard !isDropModeEnabled, !resourceSpans.isEmpty else {
+        // Skip if no spans to export (filter empty envelopes per OTLP spec)
+        guard !resourceSpans.isEmpty else {
             return .success
         }
 

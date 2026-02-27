@@ -27,7 +27,8 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
         // Convert log records to OTLP JSON models using our custom adapter
         let resourceLogs = LogRecordAdapter.toResourceLogs(logRecords)
 
-        guard !isDropModeEnabled, !resourceLogs.isEmpty else {
+        // Skip if no log records to export (filter empty envelopes per OTLP spec)
+        guard !resourceLogs.isEmpty else {
             return .success
         }
 

@@ -37,10 +37,7 @@ extension DefaultEventManager {
             throw AgentConfigurationError.invalidEndpoint(supplied: endpoint)
         }
 
-        isDropMode = false
-
         // Update the trace processor endpoint (this also flushes pending data)
-        concreteTraceProcessor.setDropMode(false)
         concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken)
 
         // Replace semantics: the new config fully replaces the old one.
@@ -48,7 +45,6 @@ extension DefaultEventManager {
         // If omitted, clear the existing processor so it stops sending to the old endpoint.
         if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
             if let sessionReplayProcessor {
-                sessionReplayProcessor.setDropMode(false)
                 sessionReplayProcessor.setEndpoint(sessionReplayUrl, accessToken: endpoint.rumAccessToken)
             }
             else {
@@ -72,35 +68,13 @@ extension DefaultEventManager {
 
     /// Disables the endpoint configuration.
     ///
-    /// When `cacheData` is `true` (default), spans and events are cached to pending storage
-    /// for later sending when a new endpoint is configured. When `false`, data is dropped (NoOp mode).
-    ///
-    /// - Parameter cacheData: If `true`, data is cached for later sending. If `false`, data is dropped.
-    func disableEndpoint(cacheData: Bool = true) {
-        if cacheData {
-            isDropMode = false
+    /// Data is cached to pending storage for later sending when a new endpoint is configured.
+    func disableEndpoint() {
+        concreteTraceProcessor.clearEndpoint()
+        sessionReplayProcessor?.clearEndpoint()
 
-            concreteTraceProcessor.setDropMode(false)
-            concreteTraceProcessor.clearEndpoint()
-            sessionReplayProcessor?.setDropMode(false)
-            sessionReplayProcessor?.clearEndpoint()
-
-            logger.log(level: .info, isPrivate: false) {
-                "Endpoint disabled with caching enabled. Spans will be cached and sent when endpoint is configured."
-            }
-        }
-        else {
-            isDropMode = true
-
-            concreteTraceProcessor.setDropMode(true)
-            concreteTraceProcessor.clearEndpoint()
-            sessionReplayProcessor?.setDropMode(true)
-            sessionReplayProcessor?.clearEndpoint()
-            sessionReplayProcessor = nil
-
-            logger.log(level: .info, isPrivate: false) {
-                "Endpoint disabled with data dropping enabled. New events will be discarded."
-            }
+        logger.log(level: .info, isPrivate: false) {
+            "Endpoint disabled. Spans will be cached and sent when endpoint is configured."
         }
     }
 }

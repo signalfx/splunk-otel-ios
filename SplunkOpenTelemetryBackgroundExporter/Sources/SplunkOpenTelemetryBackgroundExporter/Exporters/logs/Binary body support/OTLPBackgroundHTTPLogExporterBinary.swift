@@ -37,7 +37,8 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
         // Convert log records to OTLP JSON models; binary body data will be base64 encoded
         let resourceLogs = SplunkLogRecordAdapterJSON.toResourceLogs(logRecords)
 
-        guard !isDropModeEnabled, !resourceLogs.isEmpty else {
+        // Skip if no log records to export (filter empty envelopes per OTLP spec)
+        guard !resourceLogs.isEmpty else {
             return .success
         }
 
