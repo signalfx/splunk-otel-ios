@@ -43,7 +43,9 @@ extension DefaultEventManager {
         concreteTraceProcessor.setDropMode(false)
         concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken)
 
-        // Update or create session replay processor if a session replay URL is available
+        // Replace semantics: the new config fully replaces the old one.
+        // If a session replay URL is provided, update or create the processor.
+        // If omitted, clear the existing processor so it stops sending to the old endpoint.
         if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
             if let sessionReplayProcessor {
                 sessionReplayProcessor.setDropMode(false)
@@ -57,6 +59,10 @@ extension DefaultEventManager {
                     agent: agent
                 )
             }
+        }
+        else if sessionReplayProcessor != nil {
+            sessionReplayProcessor?.clearEndpoint()
+            sessionReplayProcessor = nil
         }
 
         logger.log(level: .info, isPrivate: false) {
