@@ -147,6 +147,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     /// Clears the endpoint, causing new data to be cached to pending storage.
+    ///
     /// Use ``setDropMode(_:)`` if in-flight uploads must also be cancelled.
     public func clearEndpoint() {
         checkStalledTask?.cancel()
@@ -154,8 +155,9 @@ public class OTLPBackgroundHTTPBaseExporter {
         endpoint = nil
     }
 
-    /// Enables or disables drop mode. When enabled, exports become no-ops,
-    /// buffered data is deleted, and in-flight uploads are cancelled.
+    /// Enables or disables drop mode.
+    ///
+    /// When enabled, exports become no-ops, buffered data is deleted, and in-flight uploads are cancelled.
     public func setDropMode(_ enabled: Bool) {
         stateLock.lock()
         storedDropModeEnabled = enabled
@@ -293,9 +295,7 @@ extension OTLPBackgroundHTTPBaseExporter {
 
     private func cancelInFlightUploads() {
         httpClient.getAllSessionsTasks { tasks in
-            for task in tasks {
-                task.cancel()
-            }
+            tasks.forEach { $0.cancel() }
         }
     }
 
