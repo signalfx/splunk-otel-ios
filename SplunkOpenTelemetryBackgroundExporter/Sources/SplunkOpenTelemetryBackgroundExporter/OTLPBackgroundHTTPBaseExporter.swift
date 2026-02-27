@@ -126,17 +126,10 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     // MARK: - Endpoint Management
-
     /// Updates the endpoint and flushes any pending data.
     ///
-    /// - Note: Already-scheduled upload tasks targeting the previous endpoint are not
-    ///   cancelled immediately. They will be cancelled and rescheduled to the new endpoint
-    ///   by the stalled upload check (within 5–8 seconds). During this window, a small
-    ///   number of in-flight uploads may still reach the old endpoint.
-    ///
-    /// - Parameters:
-    ///   - newEndpoint: The new endpoint URL.
-    ///   - newHeaders: Optional new headers to use (e.g., for access token).
+    /// In-flight uploads targeting the previous endpoint are rescheduled by the stalled
+    /// upload check (within 5–8s); a small number may still reach the old endpoint.
     public func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]? = nil) {
         stateLock.lock()
         storedDropModeEnabled = false
@@ -154,20 +147,15 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 
     /// Clears the endpoint, causing new data to be cached to pending storage.
-    ///
-    /// - Note: Already-scheduled upload tasks are not cancelled immediately. Use
-    ///   ``setDropMode(_:)`` if in-flight uploads must be stopped urgently (e.g., for privacy).
+    /// Use ``setDropMode(_:)`` if in-flight uploads must also be cancelled.
     public func clearEndpoint() {
         checkStalledTask?.cancel()
         checkStalledTask = nil
         endpoint = nil
     }
 
-    /// Enables or disables drop mode.
-    ///
-    /// When enabled, all export calls become no-ops, any buffered data
-    /// (both active and pending storage) is deleted immediately, and
-    /// in-flight upload tasks are cancelled.
+    /// Enables or disables drop mode. When enabled, exports become no-ops,
+    /// buffered data is deleted, and in-flight uploads are cancelled.
     public func setDropMode(_ enabled: Bool) {
         stateLock.lock()
         storedDropModeEnabled = enabled
