@@ -101,7 +101,6 @@ public final class Interactions: SplunkInteractionsModule {
         if let interactionType = interactionType(from: event.type) {
 
             let targetElement = await targetElement(from: event)
-
             let xpath = await getElementXpath(from: event.viewHierarchy)
 
             destination.send(
@@ -125,13 +124,13 @@ public final class Interactions: SplunkInteractionsModule {
 
     // MARK: - Private helper functions
 
-    func getElementXpath(from itemNode: InteractionViewNode?) async -> String? {
+    func getElementXpath(from itemNode: (any ViewNodeRepresentable)?) async -> String? {
         guard let itemNode else {
             return nil
         }
 
         var xpathItems: [String] = []
-        var checkNode: InteractionViewNode? = itemNode
+        var checkNode: (any ViewNodeRepresentable)? = itemNode
 
         while let currentNode = checkNode {
             var nodeItem = currentNode.viewTypeName
@@ -155,7 +154,7 @@ public final class Interactions: SplunkInteractionsModule {
             }
 
             xpathItems.append(nodeItem)
-            checkNode = currentNode.superViewNode
+            checkNode = currentNode.superNode
         }
 
         return "//" + xpathItems.reversed().joined(separator: "/")
