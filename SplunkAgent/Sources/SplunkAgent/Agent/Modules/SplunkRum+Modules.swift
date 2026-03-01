@@ -95,7 +95,18 @@ extension SplunkRum {
         // Extract session replay module configuration
         let config = moduleConfigurations?.compactMap { $0 as? SessionReplayConfiguration }.first ?? SessionReplayConfiguration()
 
-        let effectiveSamplingRate = config.samplingRate ?? 1.0
+        let configuredSamplingRate = config.samplingRate ?? 1.0
+
+        // Clamp sampling rate to valid range and warn if out of bounds
+        let effectiveSamplingRate = min(max(configuredSamplingRate, 0.0), 1.0)
+        if configuredSamplingRate < 0.0 || configuredSamplingRate > 1.0 {
+            logger.log(level: .warn, isPrivate: false) {
+                """
+                Session Replay sampling rate \(configuredSamplingRate) is outside the valid \
+                range <0, 1>. The value has been clamped to \(effectiveSamplingRate).
+                """
+            }
+        }
 
         // Check if session replay is enabled by configuration
         guard config.enabled else {
@@ -111,30 +122,19 @@ extension SplunkRum {
             return
         }
 
-        // Perform sampling decision (calculated once per Agent life)
-        if effectiveSamplingRate < 1.0 {
-            let sampledOut: Bool
-
-            if effectiveSamplingRate <= 0.0 {
-                sampledOut = true
-            }
-            else {
-                let randomValue = Double.random(in: 0.0 ... 1.0)
-                sampledOut = randomValue > effectiveSamplingRate
+        // Perform sampling decision (calculated once per Agent lifecycle, not re-evaluated on session rotation)
+        let sampler = SessionReplaySampler(probability: effectiveSamplingRate)
+        if sampler.sample() == .sampledOut {
+            logger.log(level: .notice, isPrivate: false) {
+                "Session Replay module disabled by sampling (rate: \(effectiveSamplingRate))."
             }
 
-            if sampledOut {
-                logger.log(level: .notice, isPrivate: false) {
-                    "Session Replay module disabled by sampling (rate: \(effectiveSamplingRate))."
-                }
+            sessionReplayProxy = SessionReplayNonOperational(
+                statusCause: .disabledBySampling,
+                samplingRate: effectiveSamplingRate
+            )
 
-                sessionReplayProxy = SessionReplayNonOperational(
-                    statusCause: .disabledBySampling,
-                    samplingRate: effectiveSamplingRate
-                )
-
-                return
-            }
+            return
         }
 
         // By default, we turn off the default sensitivity for `WKWebView`

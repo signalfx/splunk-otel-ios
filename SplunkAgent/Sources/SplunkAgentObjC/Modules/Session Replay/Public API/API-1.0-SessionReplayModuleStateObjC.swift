@@ -72,7 +72,10 @@ public final class SessionReplayModuleStateObjC: NSObject {
     // MARK: - Sampling
 
     /// The session replay sampling rate used to determine whether
-    /// the session replay of the current session is recorded.
+    /// the session replay recording is enabled for the current app launch.
+    ///
+    /// The sampling decision is made once per Agent lifecycle and is not
+    /// re-evaluated on session rotation.
     ///
     /// A value in the `<0, 1>` range. Defaults to `1.0`.
     @objc

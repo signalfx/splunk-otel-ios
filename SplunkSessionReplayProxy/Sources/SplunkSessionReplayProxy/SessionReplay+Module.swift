@@ -62,16 +62,30 @@ public struct SessionReplayConfiguration: ModuleConfiguration {
 
     /// Optional local sampling of session replay recording.
     ///
-    /// The value sets the probability with which session replay is enabled.
+    /// The value sets the probability with which session replay recording
+    /// is enabled for the current app launch. The sampling decision is made
+    /// once per Agent lifecycle and is not re-evaluated on session rotation.
+    ///
     /// - `0` means session replay recording cannot be effectively enabled.
-    /// - `0.5` means only half of sessions can be recorded.
-    /// - `1` means all sessions can be recorded.
+    /// - `0.5` means only half of app launches will have recording enabled.
+    /// - `1` means all app launches will have recording enabled.
     /// - `nil` means the sampling rate is ignored (equivalent to `1`).
+    ///
+    /// Values outside the `<0, 1>` range are clamped.
     ///
     /// If ``enabled`` is set to `false`, the sampling rate is ignored.
     /// Defaults to `nil`.
     public var samplingRate: Double?
 
+    /// Creates a new Session Replay configuration.
+    ///
+    /// - Parameters:
+    ///   - enabled: A Boolean value that determines whether the session replay
+    ///     is enabled. Defaults to `true`.
+    ///   - samplingRate: An optional probability value in the `<0, 1>` range
+    ///     that controls whether session replay recording is enabled for the
+    ///     current app launch. Defaults to `nil` (equivalent to `1`, meaning
+    ///     all app launches will have recording enabled).
     public init(enabled: Bool = true, samplingRate: Double? = nil) {
         self.enabled = enabled
         self.samplingRate = samplingRate
