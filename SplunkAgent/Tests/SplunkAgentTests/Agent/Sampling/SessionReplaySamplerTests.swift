@@ -51,10 +51,10 @@ final class SessionReplaySamplerTests: XCTestCase {
         XCTAssertEqual(sampler.upperBound, 1.0, "Upper bound should be 1.0.")
     }
 
-    func testInitializationWithDefaultProbability() {
+    func testInitializationWithProbabilityOne() {
         let sampler = SessionReplaySampler(probability: 1.0)
 
-        XCTAssertEqual(sampler.probability, 1.0, "Default probability should be 1.0 (always enabled).")
+        XCTAssertEqual(sampler.probability, 1.0, "Probability of 1.0 should be stored as-is (always enabled).")
     }
 
 
