@@ -117,8 +117,12 @@ public final class Interactions: SplunkInteractionsModule {
 
     public func register(customId: String?, for viewId: ObjectIdentifier) {
         Task {
-            await customIdentifiers.append(value: customId, for: self, with: viewId)
+            await registerCustomId(customId, for: viewId)
         }
+    }
+
+    func registerCustomId(_ customId: String?, for viewId: ObjectIdentifier) async {
+        await customIdentifiers.append(value: customId, for: self, with: viewId)
     }
 
 

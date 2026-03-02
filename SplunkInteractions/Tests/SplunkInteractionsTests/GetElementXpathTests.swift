@@ -205,8 +205,7 @@ final class GetElementXpathTests: XCTestCase {
             viewId: ObjectIdentifier(obj)
         )
 
-        interactions.register(customId: "submitButton", for: ObjectIdentifier(obj))
-        try? await Task.sleep(nanoseconds: 200_000_000)
+        await interactions.registerCustomId("submitButton", for: ObjectIdentifier(obj))
 
         let result = await interactions.getElementXpath(from: node)
 
@@ -220,8 +219,7 @@ final class GetElementXpathTests: XCTestCase {
             viewId: ObjectIdentifier(obj)
         )
 
-        interactions.register(customId: "it's a button", for: ObjectIdentifier(obj))
-        try? await Task.sleep(nanoseconds: 200_000_000)
+        await interactions.registerCustomId("it's a button", for: ObjectIdentifier(obj))
 
         let result = await interactions.getElementXpath(from: node)
 
