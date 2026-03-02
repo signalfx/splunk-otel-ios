@@ -112,7 +112,6 @@ public final class Interactions: SplunkInteractionsModule {
             )
         }
         else if event.type == .gestureRageTap {
-
             let xpath = await getElementXpath(from: event.viewHierarchy)
 
             destination.sendFrustration(

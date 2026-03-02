@@ -43,6 +43,11 @@ final class SplunkInteractionsTests: XCTestCase {
         }
     }
 
+    func testRageTapIsNotAnInteractionType() {
+        let interactions = Interactions()
+        XCTAssertNil(interactions.interactionType(from: .gestureRageTap))
+    }
+
     func testHandlingStream() {
         let interactions = Interactions()
         interactions.startInteractionsDetection()
