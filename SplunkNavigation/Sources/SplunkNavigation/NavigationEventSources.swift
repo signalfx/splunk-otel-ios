@@ -19,23 +19,34 @@ internal import CiscoSwizzling
 import Foundation
 
 /// Provides navigation action events produced by swizzling.
-protocol NavigationEventStreamProviding {
+protocol NavigationEventStreamProviding: Sendable {
     func navigationStream() async throws -> AsyncStream<any NavigationActionEvent>
 }
 
 /// Default stream provider backed by CiscoSwizzling.
-struct DefaultNavigationEventStreamProvider: NavigationEventStreamProviding {
+struct DefaultNavigationEventStreamProvider: NavigationEventStreamProviding, Sendable {
     func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
         try await DefaultSwizzling.navigation
     }
 }
 
 /// Abstracts notification source used by legacy detection.
-protocol NotificationEventsProviding {
+protocol NotificationEventsProviding: Sendable {
     func notifications(for name: Notification.Name) -> AsyncStream<Notification>
 }
 
-extension NotificationCenter: NotificationEventsProviding {}
+/// Default notification provider backed by NotificationCenter.
+struct DefaultNotificationEventsProvider: NotificationEventsProviding, Sendable {
+    private let notificationCenter: NotificationCenter
+
+    init(notificationCenter: NotificationCenter = .default) {
+        self.notificationCenter = notificationCenter
+    }
+
+    func notifications(for name: Notification.Name) -> AsyncStream<Notification> {
+        notificationCenter.notifications(for: name)
+    }
+}
 
 /// Navigation detection mode used by the module.
 enum NavigationDetectionMode {
