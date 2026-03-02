@@ -26,5 +26,7 @@ protocol ViewNodeRepresentable {
 }
 
 extension InteractionViewNode: ViewNodeRepresentable {
-    var superNode: (any ViewNodeRepresentable)? { superViewNode }
+    var superNode: (any ViewNodeRepresentable)? {
+        superViewNode
+    }
 }
