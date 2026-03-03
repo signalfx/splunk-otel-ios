@@ -165,16 +165,6 @@ public final class Navigation: Sendable {
                 var processedEvent = event
                 let screenName = await preferredScreenName(for: event.controllerTypeName)
 
-                // If we have set manual naming, then we prefer it
-                if await model.isManualScreenName {
-                    processedEvent = AutomatedNavigationEvent(
-                        timestamp: Date(),
-                        type: event.type,
-                        controllerTypeName: screenName,
-                        controllerIdentifier: event.controllerIdentifier
-                    )
-                }
-
                 // Supported events handling
                 switch processedEvent.type {
                 case .viewDidLoad:
