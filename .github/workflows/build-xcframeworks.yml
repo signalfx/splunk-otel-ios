@@ -161,7 +161,7 @@ jobs:
       # Step 6: Upload build artifacts
       # -----------------------------------------------------------------
       - name: Upload xcframeworks artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: splunk-agent-xcframeworks-unsigned
           path: tools/xcframework/output/xcframeworks/
@@ -249,7 +249,7 @@ jobs:
       # Upload signed artifact
       # -----------------------------------------------------------------
       - name: Upload signed xcframeworks artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: splunk-agent-xcframeworks-${{ steps.version.outputs.version }}
           path: tools/xcframework/output/SplunkAgent-XCFrameworks-*.zip
