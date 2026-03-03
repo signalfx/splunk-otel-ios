@@ -39,12 +39,13 @@ public final class Navigation: Sendable {
 
     let appBundleName: String?
     let continuation: AsyncStream<String>.Continuation
+    let navigationEventStreamProvider: any NavigationEventStreamProviding
+    let notificationEventsProvider: any NotificationEventsProviding
 
     private let logger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),
         category: "Navigation"
     )
-
 
     // MARK: - Public
 
@@ -100,7 +101,19 @@ public final class Navigation: Sendable {
     // MARK: - Initialization
 
     /// Module protocol conformance.
-    public required init() {
+    public required convenience init() {
+        self.init(
+            navigationEventStreamProvider: DefaultNavigationEventStreamProvider(),
+            notificationEventsProvider: DefaultNotificationEventsProvider()
+        )
+    }
+
+    init(
+        navigationEventStreamProvider: any NavigationEventStreamProviding,
+        notificationEventsProvider: any NotificationEventsProviding
+    ) {
+        self.navigationEventStreamProvider = navigationEventStreamProvider
+        self.notificationEventsProvider = notificationEventsProvider
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
         self.screenNameStream = screenNameStream
@@ -144,7 +157,7 @@ public final class Navigation: Sendable {
     private func startModernDetection() {
         // swiftlint:disable:next unhandled_throwing_task
         Task(priority: .userInitiated) {
-            let navigationStream = try await DefaultSwizzling.navigation
+            let navigationStream = try await modernNavigationStream()
 
             // Process navigation events
             for await event in navigationStream where await shouldProcessEvent() {
@@ -188,8 +201,7 @@ public final class Navigation: Sendable {
 
     private func startLegacyDetection() {
         Task(priority: .userInitiated) {
-            let willShowStream = NotificationCenter.default
-                .notifications(for: Notification.Name(rawValue: "UINavigationControllerWillShowViewControllerNotification"))
+            let willShowStream = legacyNotificationStream(for: Notification.Name(rawValue: "UINavigationControllerWillShowViewControllerNotification"))
 
             for await notification in willShowStream {
                 if let event = await navigationEvent(for: notification.object, type: .viewDidLoad) {
@@ -199,8 +211,9 @@ public final class Navigation: Sendable {
         }
 
         Task(priority: .userInitiated) {
-            let didShowStream = NotificationCenter.default
-                .notifications(for: Notification.Name(rawValue: "UINavigationControllerDidShowViewControllerNotification"))
+            let didShowStream = legacyNotificationStream(
+                for: Notification.Name(rawValue: "UINavigationControllerDidShowViewControllerNotification")
+            )
 
             for await notification in didShowStream {
                 if let event = await navigationEvent(for: notification.object, type: .viewDidAppear) {
@@ -210,8 +223,9 @@ public final class Navigation: Sendable {
         }
 
         Task(priority: .userInitiated) {
-            let willTransitionStream = NotificationCenter.default
-                .notifications(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification"))
+            let willTransitionStream = legacyNotificationStream(
+                for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification")
+            )
 
             for await notification in willTransitionStream {
                 if let event = await transitionEvent(for: notification.object, type: .willTransitionToTraitCollection) {
@@ -221,8 +235,9 @@ public final class Navigation: Sendable {
         }
 
         Task(priority: .userInitiated) {
-            let didTransitionStream = NotificationCenter.default
-                .notifications(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification"))
+            let didTransitionStream = legacyNotificationStream(
+                for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification")
+            )
 
             for await notification in didTransitionStream {
                 if let event = await transitionEvent(for: notification.object, type: .didTransitionToTraitCollection) {
