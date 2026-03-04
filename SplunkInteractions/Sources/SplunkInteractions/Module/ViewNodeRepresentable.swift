@@ -18,6 +18,10 @@ limitations under the License.
 import CiscoInteractions
 import Foundation
 
+/// Abstracts a node in the view hierarchy for the purpose of XPath construction.
+///
+/// This protocol exists to decouple the XPath generation logic from `InteractionViewNode`,
+/// enabling testability via mock implementations without importing the full interaction framework.
 protocol ViewNodeRepresentable {
     var viewTypeName: String { get }
     var viewId: ObjectIdentifier { get }

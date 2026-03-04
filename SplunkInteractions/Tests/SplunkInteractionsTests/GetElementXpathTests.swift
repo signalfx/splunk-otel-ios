@@ -22,8 +22,7 @@ import XCTest
 
 final class GetElementXpathTests: XCTestCase {
 
-    // swiftlint:disable:next implicitly_unwrapped_optional
-    private var interactions: Interactions!
+    private var interactions: Interactions?
 
     override func setUp() {
         super.setUp()
@@ -35,31 +34,35 @@ final class GetElementXpathTests: XCTestCase {
         super.tearDown()
     }
 
+    private func unwrappedInteractions() throws -> Interactions {
+        try XCTUnwrap(interactions)
+    }
+
 
     // MARK: - Nil input
 
-    func testReturnsNilForNilNode() async {
-        let result = await interactions.getElementXpath(from: nil)
+    func testReturnsNilForNilNode() async throws {
+        let result = try await unwrappedInteractions().getElementXpath(from: nil)
         XCTAssertNil(result)
     }
 
 
     // MARK: - Single node
 
-    func testSingleNodeWithoutIndexPath() async {
+    func testSingleNodeWithoutIndexPath() async throws {
         let obj = NSObject()
         let node = MockViewNode(
             viewTypeName: "UIButton",
             viewId: ObjectIdentifier(obj)
         )
 
-        let result = await interactions.getElementXpath(from: node)
+        let result = try await unwrappedInteractions().getElementXpath(from: node)
 
         let expectedId = UInt(bitPattern: ObjectIdentifier(obj))
         XCTAssertEqual(result, "//UIButton[@id=\(expectedId)]")
     }
 
-    func testSingleNodeWithIndexPath() async {
+    func testSingleNodeWithIndexPath() async throws {
         let obj = NSObject()
         let node = MockViewNode(
             viewTypeName: "UITableViewCell",
@@ -67,7 +70,7 @@ final class GetElementXpathTests: XCTestCase {
             indexPath: IndexPath(item: 3, section: 1)
         )
 
-        let result = await interactions.getElementXpath(from: node)
+        let result = try await unwrappedInteractions().getElementXpath(from: node)
 
         let expectedId = UInt(bitPattern: ObjectIdentifier(obj))
         XCTAssertEqual(result, "//UITableViewCell[@col=1,@row=3,@id=\(expectedId)]")
@@ -76,7 +79,7 @@ final class GetElementXpathTests: XCTestCase {
 
     // MARK: - Node hierarchy
 
-    func testTwoNodeHierarchy() async {
+    func testTwoNodeHierarchy() async throws {
         let parentObj = NSObject()
         let childObj = NSObject()
 
@@ -90,13 +93,13 @@ final class GetElementXpathTests: XCTestCase {
             superNode: parent
         )
 
-        let result = await interactions.getElementXpath(from: child)
+        let result = try await unwrappedInteractions().getElementXpath(from:child)
 
         let expectedId = UInt(bitPattern: ObjectIdentifier(childObj))
         XCTAssertEqual(result, "//UIView/UIButton[@id=\(expectedId)]")
     }
 
-    func testThreeNodeHierarchy() async {
+    func testThreeNodeHierarchy() async throws {
         let obj1 = NSObject()
         let obj2 = NSObject()
         let obj3 = NSObject()
@@ -116,7 +119,7 @@ final class GetElementXpathTests: XCTestCase {
             superNode: middle
         )
 
-        let result = await interactions.getElementXpath(from: leaf)
+        let result = try await unwrappedInteractions().getElementXpath(from:leaf)
 
         let expectedId = UInt(bitPattern: ObjectIdentifier(obj3))
         XCTAssertEqual(result, "//UIWindow/UIView/UILabel[@id=\(expectedId)]")
@@ -136,7 +139,7 @@ final class GetElementXpathTests: XCTestCase {
             superNode: parent
         )
 
-        let result = await interactions.getElementXpath(from: child)
+        let result = try await unwrappedInteractions().getElementXpath(from:child)
 
         let xpath = try XCTUnwrap(result)
         // Parent should not have @id predicate (no custom id, not the leaf)
@@ -147,7 +150,7 @@ final class GetElementXpathTests: XCTestCase {
 
     // MARK: - IndexPath in hierarchy
 
-    func testIndexPathInHierarchyNode() async {
+    func testIndexPathInHierarchyNode() async throws {
         let parentObj = NSObject()
         let cellObj = NSObject()
 
@@ -162,13 +165,13 @@ final class GetElementXpathTests: XCTestCase {
             superNode: parent
         )
 
-        let result = await interactions.getElementXpath(from: cell)
+        let result = try await unwrappedInteractions().getElementXpath(from:cell)
 
         let expectedId = UInt(bitPattern: ObjectIdentifier(cellObj))
         XCTAssertEqual(result, "//UITableView/UITableViewCell[@col=0,@row=2,@id=\(expectedId)]")
     }
 
-    func testMiddleNodeWithIndexPath() async {
+    func testMiddleNodeWithIndexPath() async throws {
         let rootObj = NSObject()
         let middleObj = NSObject()
         let leafObj = NSObject()
@@ -189,7 +192,7 @@ final class GetElementXpathTests: XCTestCase {
             superNode: middle
         )
 
-        let result = await interactions.getElementXpath(from: leaf)
+        let result = try await unwrappedInteractions().getElementXpath(from:leaf)
 
         let expectedId = UInt(bitPattern: ObjectIdentifier(leafObj))
         XCTAssertEqual(result, "//UITableView/UITableViewCell[@col=2,@row=5]/UILabel[@id=\(expectedId)]")
@@ -198,30 +201,30 @@ final class GetElementXpathTests: XCTestCase {
 
     // MARK: - Custom identifiers
 
-    func testCustomIdOnLeafNode() async {
+    func testCustomIdOnLeafNode() async throws {
         let obj = NSObject()
         let node = MockViewNode(
             viewTypeName: "UIButton",
             viewId: ObjectIdentifier(obj)
         )
 
-        await interactions.registerCustomId("submitButton", for: ObjectIdentifier(obj))
+        try await unwrappedInteractions().registerCustomId("submitButton", for: ObjectIdentifier(obj))
 
-        let result = await interactions.getElementXpath(from: node)
+        let result = try await unwrappedInteractions().getElementXpath(from: node)
 
         XCTAssertEqual(result, "//UIButton[@id='submitButton']")
     }
 
-    func testCustomIdWithSingleQuoteIsEscaped() async {
+    func testCustomIdWithSingleQuoteIsEscaped() async throws {
         let obj = NSObject()
         let node = MockViewNode(
             viewTypeName: "UIButton",
             viewId: ObjectIdentifier(obj)
         )
 
-        await interactions.registerCustomId("it's a button", for: ObjectIdentifier(obj))
+        try await unwrappedInteractions().registerCustomId("it's a button", for: ObjectIdentifier(obj))
 
-        let result = await interactions.getElementXpath(from: node)
+        let result = try await unwrappedInteractions().getElementXpath(from: node)
 
         XCTAssertEqual(result, "//UIButton[@id='it\\'s a button']")
     }
