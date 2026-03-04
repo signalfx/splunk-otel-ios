@@ -235,6 +235,16 @@ public final class Navigation: Sendable {
                 }
             }
         }
+
+        Task(priority: .userInitiated) {
+            let didSelectTabStream = legacyNotificationStream(
+                for: Notification.Name(rawValue: "UITabBarSelectionDidChangeNotification")
+            )
+
+            for await notification in didSelectTabStream {
+                await processTabBarSelectionDidChange(notification: notification)
+            }
+        }
     }
 
     private func navigationEvent(for notificationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
