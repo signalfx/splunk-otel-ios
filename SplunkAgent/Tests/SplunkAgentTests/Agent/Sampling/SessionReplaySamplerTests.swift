@@ -60,7 +60,7 @@ final class SessionReplaySamplerTests: XCTestCase {
 
     // MARK: - Sampling decisions
 
-    func testSample_givenProbabilityOne_alwaysNotSampledOut() throws {
+    func testProbabilityOneAlwaysNotSampledOut() throws {
         let sampler = SessionReplaySampler(probability: 1.0)
 
         let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
@@ -70,7 +70,7 @@ final class SessionReplaySamplerTests: XCTestCase {
         XCTAssertTrue(mockRandomNumberProvider.nextRandomNumbers.isEmpty, "Random number provider should not be used if probability is 1.0.")
     }
 
-    func testSample_givenProbabilityZero_alwaysSampledOut() throws {
+    func testProbabilityZeroAlwaysSampledOut() throws {
         let sampler = SessionReplaySampler(probability: 0.0)
 
         let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
@@ -80,7 +80,7 @@ final class SessionReplaySamplerTests: XCTestCase {
         XCTAssertTrue(mockRandomNumberProvider.nextRandomNumbers.isEmpty, "Random number provider should not be used if probability is 0.0.")
     }
 
-    func testSample_givenRandomNumberLessThanProbability_shouldNotSampleOut() throws {
+    func testRandomNumberLessThanProbabilityShouldNotSampleOut() throws {
         let sampler = SessionReplaySampler(probability: 0.75)
 
         let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
@@ -93,7 +93,7 @@ final class SessionReplaySamplerTests: XCTestCase {
         XCTAssertEqual(mockRandomNumberProvider.rangesProvided.first, sampler.lowerBound ... sampler.upperBound)
     }
 
-    func testSample_givenRandomNumberGreaterThanProbability_shouldSampleOut() throws {
+    func testRandomNumberGreaterThanProbabilityShouldSampleOut() throws {
         let sampler = SessionReplaySampler(probability: 0.25)
 
         let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
@@ -106,7 +106,7 @@ final class SessionReplaySamplerTests: XCTestCase {
         XCTAssertEqual(mockRandomNumberProvider.rangesProvided.first, sampler.lowerBound ... sampler.upperBound)
     }
 
-    func testSample_givenRandomNumberEqualToProbability_shouldNotSampleOut() throws {
+    func testRandomNumberEqualToProbabilityShouldNotSampleOut() throws {
         let sampler = SessionReplaySampler(probability: 0.5)
 
         let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
@@ -120,7 +120,7 @@ final class SessionReplaySamplerTests: XCTestCase {
 
     // MARK: - Edge cases
 
-    func testSample_givenHalfProbability_usesRandomProvider() throws {
+    func testHalfProbabilityUsesRandomProvider() throws {
         let sampler = SessionReplaySampler(probability: 0.5)
 
         let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
@@ -138,7 +138,7 @@ final class SessionReplaySamplerTests: XCTestCase {
         XCTAssertEqual(decision2, .sampledOut)
     }
 
-    func testSample_givenVeryLowProbability_samplesOutMostOfTheTime() throws {
+    func testVeryLowProbabilitySamplesOut() throws {
         let sampler = SessionReplaySampler(probability: 0.01)
 
         let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)
@@ -149,7 +149,7 @@ final class SessionReplaySamplerTests: XCTestCase {
         XCTAssertEqual(decision, .sampledOut)
     }
 
-    func testSample_givenVeryHighProbability_doesNotSampleOutMostOfTheTime() throws {
+    func testVeryHighProbabilityDoesNotSampleOut() throws {
         let sampler = SessionReplaySampler(probability: 0.99)
 
         let mockRandomNumberProvider = try XCTUnwrap(mockRandomNumberProvider)

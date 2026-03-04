@@ -98,8 +98,9 @@ extension SplunkRum {
         let configuredSamplingRate = config.samplingRate ?? 1.0
 
         // Clamp sampling rate to valid range and warn if out of bounds
-        let effectiveSamplingRate = min(max(configuredSamplingRate, 0.0), 1.0)
-        if configuredSamplingRate < 0.0 || configuredSamplingRate > 1.0 {
+        let sanitizedSamplingRate = configuredSamplingRate.isFinite ? configuredSamplingRate : 1.0
+        let effectiveSamplingRate = min(max(sanitizedSamplingRate, 0.0), 1.0)
+        if !configuredSamplingRate.isFinite || configuredSamplingRate < 0.0 || configuredSamplingRate > 1.0 {
             logger.log(level: .warn, isPrivate: false) {
                 """
                 Session Replay sampling rate \(configuredSamplingRate) is outside the valid \
