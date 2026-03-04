@@ -132,6 +132,8 @@ class DefaultEventManager: AgentEventManager {
     // MARK: - Module Events
 
     func publish(data: any ModuleEventData, metadata: any ModuleEventMetadata, completion: @escaping (Bool) -> Void) {
+        // swiftformat:disable consistentSwitchCaseSpacing, blankLineAfterSwitchCase
+
         // Create and send an Event based on modules' metadata and data types
         switch (metadata, data) {
 
