@@ -99,7 +99,6 @@ public final class Interactions: SplunkInteractionsModule {
 
     func handleEvent(_ event: InteractionEvent) async {
         if let interactionType = interactionType(from: event.type) {
-
             let targetElement = await targetElement(from: event)
 
             let xpath = await getElementXpath(from: event.viewHierarchy)

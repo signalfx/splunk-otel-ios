@@ -63,6 +63,27 @@ final class SplunkInteractionsTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
     }
 
+    func testRageTapSendsFrustration() async {
+        let destination = TestInteractionDestination()
+        let interactions = Interactions(destination: destination)
+
+        let event = InteractionEvent(time: Date(), type: .gestureRageTap)
+        await interactions.handleEvent(event)
+
+        XCTAssertEqual(destination.didReceiveFrustrationCallCount, 1)
+        XCTAssertEqual(destination.didReceiveInteractionCallCount, 0)
+    }
+
+    func testRageTapDoesNotSendInteraction() async {
+        let destination = TestInteractionDestination()
+        let interactions = Interactions(destination: destination)
+
+        let event = InteractionEvent(time: Date(), type: .gestureRageTap)
+        await interactions.handleEvent(event)
+
+        XCTAssertEqual(destination.didReceiveInteractionCallCount, 0)
+    }
+
     func testHandlingEvents() {
         let destination = TestInteractionDestination()
         let interactions = Interactions(destination: destination)

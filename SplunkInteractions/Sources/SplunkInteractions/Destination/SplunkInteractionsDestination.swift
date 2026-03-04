@@ -19,7 +19,7 @@ import CiscoInteractions
 import Foundation
 import SplunkCommon
 
-/// Describes a destination into which the AppStart module sends it's results.
+/// Describes a destination into which the Interactions module sends its results.
 public protocol SplunkInteractionsDestination {
 
     /// Sends interaction into a destination.
