@@ -28,7 +28,7 @@ final class SessionReplayNonOperationalState: SessionReplayModuleState {
 
     // MARK: - Initialization
 
-    init(statusCause: SessionReplayStatus.Cause = .notStarted, samplingRate: Double = 1.0) {
+    init(statusCause: SessionReplayStatus.Cause = .notStarted, samplingRate: Double = 0.2) {
         self.statusCause = statusCause
         self.samplingRate = samplingRate
     }

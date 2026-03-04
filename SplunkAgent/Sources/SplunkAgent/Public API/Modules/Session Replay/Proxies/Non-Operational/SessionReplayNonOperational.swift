@@ -46,7 +46,7 @@ final class SessionReplayNonOperational: SessionReplayModule {
 
     // MARK: - Initialization
 
-    init(statusCause: SessionReplayStatus.Cause = .notStarted, samplingRate: Double = 1.0) {
+    init(statusCause: SessionReplayStatus.Cause = .notStarted, samplingRate: Double = 0.2) {
         logger = DefaultLogAgent(
             poolName: PackageIdentifier.nonOperationalInstance(),
             category: "SessionReplay"

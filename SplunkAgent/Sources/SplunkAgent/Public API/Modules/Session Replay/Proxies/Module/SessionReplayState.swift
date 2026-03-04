@@ -35,7 +35,7 @@ final class SessionReplayState: SessionReplayModuleState {
 
     // MARK: - Initialization
 
-    init(for module: CiscoSessionReplay.SessionReplay, samplingRate: Double = 1.0) {
+    init(for module: CiscoSessionReplay.SessionReplay, samplingRate: Double = 0.2) {
         self.module = module
         self.samplingRate = samplingRate
     }

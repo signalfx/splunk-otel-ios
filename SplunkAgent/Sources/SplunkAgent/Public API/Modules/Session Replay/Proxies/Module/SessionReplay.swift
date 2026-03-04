@@ -43,7 +43,7 @@ final class SessionReplay: SessionReplayModule {
 
     // MARK: - Initialization
 
-    init(for module: CiscoSessionReplay.SessionReplay, samplingRate: Double = 1.0) {
+    init(for module: CiscoSessionReplay.SessionReplay, samplingRate: Double = 0.2) {
         self.module = module
         effectiveSamplingRate = samplingRate
         logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SessionReplay")
