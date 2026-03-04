@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoSwizzling
 import Foundation
 
 extension Navigation {
@@ -24,9 +23,5 @@ extension Navigation {
 
     func modernNavigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
         try await navigationEventStreamProvider.navigationStream()
-    }
-
-    func legacyNotificationStream(for name: Notification.Name) -> AsyncStream<Notification> {
-        notificationEventsProvider.notifications(for: name)
     }
 }

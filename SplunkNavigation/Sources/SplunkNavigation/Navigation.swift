@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 internal import CiscoLogger
-internal import CiscoSwizzling
 import Foundation
 import SplunkCommon
 import UIKit
@@ -26,13 +25,6 @@ public final class Navigation: Sendable {
 
     // MARK: - Static constants
 
-    /// Detection solution switch.
-    ///
-    /// It is used to switch the implementation for testing
-    /// and during further development of the module
-    private static let useLegacySolution = true
-
-
     // MARK: - Private
 
     let model = NavigationModel()
@@ -40,7 +32,6 @@ public final class Navigation: Sendable {
     let appBundleName: String?
     let continuation: AsyncStream<String>.Continuation
     let navigationEventStreamProvider: any NavigationEventStreamProviding
-    let notificationEventsProvider: any NotificationEventsProviding
 
     private let logger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),
@@ -103,17 +94,14 @@ public final class Navigation: Sendable {
     /// Module protocol conformance.
     public required convenience init() {
         self.init(
-            navigationEventStreamProvider: DefaultNavigationEventStreamProvider(),
-            notificationEventsProvider: DefaultNotificationEventsProvider()
+            navigationEventStreamProvider: DefaultNavigationEventStreamProvider()
         )
     }
 
     init(
-        navigationEventStreamProvider: any NavigationEventStreamProviding,
-        notificationEventsProvider: any NotificationEventsProviding
+        navigationEventStreamProvider: any NavigationEventStreamProviding
     ) {
         self.navigationEventStreamProvider = navigationEventStreamProvider
-        self.notificationEventsProvider = notificationEventsProvider
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
         self.screenNameStream = screenNameStream
@@ -136,19 +124,7 @@ public final class Navigation: Sendable {
 
     /// Starts detection and processing of navigation.
     func startDetection() {
-        // NOTE:
-        //
-        // This is a temporary solution that will later be replaced by a more modern approach.
-        //
-        // However, there is currently insufficient support in `CiscoSwizzling`.
-        // Once the support is implemented, the solution will adopt modern approach,
-        // and the legacy solution will be removed.
-        if Self.useLegacySolution {
-            startLegacyDetection()
-        }
-        else {
-            startModernDetection()
-        }
+        startModernDetection()
     }
 
 
@@ -184,100 +160,6 @@ public final class Navigation: Sendable {
                 }
             }
         }
-    }
-
-
-    // MARK: - Instrumentation (Legacy solution)
-
-    private func startLegacyDetection() {
-        Task(priority: .userInitiated) {
-            let willShowStream = legacyNotificationStream(for: Notification.Name(rawValue: "UINavigationControllerWillShowViewControllerNotification"))
-
-            for await notification in willShowStream {
-                if let event = await navigationEvent(for: notification.object, type: .viewDidLoad) {
-                    await processShowStart(event: event)
-                }
-            }
-        }
-
-        Task(priority: .userInitiated) {
-            let didShowStream = legacyNotificationStream(
-                for: Notification.Name(rawValue: "UINavigationControllerDidShowViewControllerNotification")
-            )
-
-            for await notification in didShowStream {
-                if let event = await navigationEvent(for: notification.object, type: .viewDidAppear) {
-                    await processNavigationEnd(event: event)
-                }
-            }
-        }
-
-        Task(priority: .userInitiated) {
-            let willTransitionStream = legacyNotificationStream(
-                for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification")
-            )
-
-            for await notification in willTransitionStream {
-                if let event = await transitionEvent(for: notification.object, type: .willTransitionToTraitCollection) {
-                    await processTransitionStart(event: event)
-                }
-            }
-        }
-
-        Task(priority: .userInitiated) {
-            let didTransitionStream = legacyNotificationStream(
-                for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification")
-            )
-
-            for await notification in didTransitionStream {
-                if let event = await transitionEvent(for: notification.object, type: .didTransitionToTraitCollection) {
-                    await processNavigationEnd(event: event)
-                }
-            }
-        }
-    }
-
-    private func navigationEvent(for notificationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
-        guard
-            await shouldProcessEvent(),
-            let navigationController = notificationObject as? UINavigationController,
-            let visibleController = await navigationController.visibleViewController
-        else {
-            return nil
-        }
-
-        let controllerTypeName = preferredControllerName(for: visibleController)
-        let screenName = await preferredScreenName(for: controllerTypeName)
-
-        return AutomatedNavigationEvent(
-            timestamp: Date(),
-            type: eventType,
-            controllerTypeName: screenName,
-            controllerIdentifier: ObjectIdentifier(visibleController)
-        )
-    }
-
-    private func transitionEvent(for presentationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
-        let presentationController = presentationObject as? UIPresentationController
-        let uiViewController = presentationObject as? UIViewController
-        let presentedController = await presentationController?.presentedViewController
-
-        guard
-            await shouldProcessEvent(),
-            let visibleController = presentedController ?? uiViewController
-        else {
-            return nil
-        }
-
-        let controllerTypeName = preferredControllerName(for: visibleController)
-        let screenName = await preferredScreenName(for: controllerTypeName)
-
-        return AutomatedNavigationEvent(
-            timestamp: Date(),
-            type: eventType,
-            controllerTypeName: screenName,
-            controllerIdentifier: ObjectIdentifier(visibleController)
-        )
     }
 
 

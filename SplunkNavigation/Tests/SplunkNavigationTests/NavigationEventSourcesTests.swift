@@ -37,9 +37,6 @@ final class NavigationEventSourcesTests: XCTestCase {
         let navigation = Navigation(
             navigationEventStreamProvider: MockNavigationEventStreamProvider(
                 stream: makeStream([expectedEvent])
-            ),
-            notificationEventsProvider: MockNotificationEventsProvider(
-                streamFactory: { _ in makeStream([Notification(name: Notification.Name("Unused"))]) }
             )
         )
 
@@ -50,31 +47,10 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertEqual(firstEvent?.controllerTypeName, expectedName)
     }
 
-    func testLegacyNotificationStream_UsesInjectedProvider() async {
-        let expectedName = Notification.Name("TestNotificationName")
-        let navigation = Navigation(
-            navigationEventStreamProvider: MockNavigationEventStreamProvider(
-                stream: makeStream([])
-            ),
-            notificationEventsProvider: MockNotificationEventsProvider(
-                streamFactory: { requestedName in
-                    makeStream([Notification(name: requestedName)])
-                }
-            )
-        )
-
-        let stream = navigation.legacyNotificationStream(for: expectedName)
-        var iterator = stream.makeAsyncIterator()
-        let firstNotification = await iterator.next()
-
-        XCTAssertEqual(firstNotification?.name, expectedName)
-    }
-
     func testDefaultProviders_RemainProductionImplementations() {
         let navigation = Navigation()
 
         XCTAssertTrue(type(of: navigation.navigationEventStreamProvider) == DefaultNavigationEventStreamProvider.self)
-        XCTAssertTrue(type(of: navigation.notificationEventsProvider) == DefaultNotificationEventsProvider.self)
     }
 
     // MARK: - Filtering scaffold
@@ -99,14 +75,6 @@ private struct MockNavigationEventStreamProvider: NavigationEventStreamProviding
     func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
         await Task.yield()
         return stream
-    }
-}
-
-private struct MockNotificationEventsProvider: NotificationEventsProviding {
-    let streamFactory: @Sendable (Notification.Name) -> AsyncStream<Notification>
-
-    func notifications(for name: Notification.Name) -> AsyncStream<Notification> {
-        streamFactory(name)
     }
 }
 
