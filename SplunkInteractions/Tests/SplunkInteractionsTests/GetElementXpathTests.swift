@@ -93,7 +93,7 @@ final class GetElementXpathTests: XCTestCase {
             superNode: parent
         )
 
-        let result = try await unwrappedInteractions().getElementXpath(from:child)
+        let result = try await unwrappedInteractions().getElementXpath(from: child)
 
         let expectedId = UInt(bitPattern: ObjectIdentifier(childObj))
         XCTAssertEqual(result, "//UIView/UIButton[@id=\(expectedId)]")
@@ -119,7 +119,7 @@ final class GetElementXpathTests: XCTestCase {
             superNode: middle
         )
 
-        let result = try await unwrappedInteractions().getElementXpath(from:leaf)
+        let result = try await unwrappedInteractions().getElementXpath(from: leaf)
 
         let expectedId = UInt(bitPattern: ObjectIdentifier(obj3))
         XCTAssertEqual(result, "//UIWindow/UIView/UILabel[@id=\(expectedId)]")
@@ -139,7 +139,7 @@ final class GetElementXpathTests: XCTestCase {
             superNode: parent
         )
 
-        let result = try await unwrappedInteractions().getElementXpath(from:child)
+        let result = try await unwrappedInteractions().getElementXpath(from: child)
 
         let xpath = try XCTUnwrap(result)
         // Parent should not have @id predicate (no custom id, not the leaf)
@@ -165,7 +165,7 @@ final class GetElementXpathTests: XCTestCase {
             superNode: parent
         )
 
-        let result = try await unwrappedInteractions().getElementXpath(from:cell)
+        let result = try await unwrappedInteractions().getElementXpath(from: cell)
 
         let expectedId = UInt(bitPattern: ObjectIdentifier(cellObj))
         XCTAssertEqual(result, "//UITableView/UITableViewCell[@col=0,@row=2,@id=\(expectedId)]")
@@ -192,7 +192,7 @@ final class GetElementXpathTests: XCTestCase {
             superNode: middle
         )
 
-        let result = try await unwrappedInteractions().getElementXpath(from:leaf)
+        let result = try await unwrappedInteractions().getElementXpath(from: leaf)
 
         let expectedId = UInt(bitPattern: ObjectIdentifier(leafObj))
         XCTAssertEqual(result, "//UITableView/UITableViewCell[@col=2,@row=5]/UILabel[@id=\(expectedId)]")
