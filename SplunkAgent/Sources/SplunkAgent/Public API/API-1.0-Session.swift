@@ -58,24 +58,18 @@ public final class Session {
     ///   **before** calling ``SplunkRum/install(with:)``. The first session ID is set during
     ///   agent initialization.
     /// - Note: This notification is guaranteed to be delivered on the main thread.
-    public static var sessionIdDidChangeNotification: Notification.Name {
-        DefaultSession.sessionIdDidChangeNotification
-    }
+    public static let sessionIdDidChangeNotification = DefaultSession.sessionIdDidChangeNotification
 
     /// Key for the new session ID in the ``sessionIdDidChangeNotification`` userInfo dictionary.
     ///
     /// The value associated with this key is a `String` containing the new session ID.
-    public static var sessionIdUserInfoKey: String {
-        DefaultSession.sessionIdUserInfoKey
-    }
+    public static let sessionIdUserInfoKey = DefaultSession.sessionIdUserInfoKey
 
     /// Key for the previous session ID in the ``sessionIdDidChangeNotification`` userInfo dictionary.
     ///
     /// The value associated with this key is a `String` containing the previous session ID,
     /// or `nil` if this is the first session.
-    public static var previousSessionIdUserInfoKey: String {
-        DefaultSession.previousSessionIdUserInfoKey
-    }
+    public static let previousSessionIdUserInfoKey = DefaultSession.previousSessionIdUserInfoKey
 
 
     // MARK: - State

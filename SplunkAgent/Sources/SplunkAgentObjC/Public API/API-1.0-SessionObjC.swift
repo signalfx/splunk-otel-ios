@@ -43,26 +43,20 @@ public final class SessionObjC: NSObject {
     ///   agent initialization.
     /// - Note: This notification is guaranteed to be delivered on the main thread.
     @objc
-    public static var sessionIdDidChangeNotification: NSNotification.Name {
-        Session.sessionIdDidChangeNotification
-    }
+    public static let sessionIdDidChangeNotification: NSNotification.Name = Session.sessionIdDidChangeNotification
 
     /// Key for the new session ID in the ``sessionIdDidChangeNotification`` userInfo dictionary.
     ///
     /// The value associated with this key is an `NSString` containing the new session ID.
     @objc
-    public static var sessionIdUserInfoKey: String {
-        Session.sessionIdUserInfoKey
-    }
+    public static let sessionIdUserInfoKey: String = Session.sessionIdUserInfoKey
 
     /// Key for the previous session ID in the ``sessionIdDidChangeNotification`` userInfo dictionary.
     ///
     /// The value associated with this key is an `NSString` containing the previous session ID,
     /// or `nil` if this is the first session.
     @objc
-    public static var previousSessionIdUserInfoKey: String {
-        Session.previousSessionIdUserInfoKey
-    }
+    public static let previousSessionIdUserInfoKey: String = Session.previousSessionIdUserInfoKey
 
 
     // MARK: - Public API
