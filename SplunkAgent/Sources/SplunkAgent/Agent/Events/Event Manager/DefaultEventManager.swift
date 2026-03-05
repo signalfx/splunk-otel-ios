@@ -145,6 +145,7 @@ class DefaultEventManager: AgentEventManager {
                 publishCrashReports(data: data, metadata: metadata, completion: completion)
 
         #endif
+
         // Custom Tracking module data
         case let (metadata as CustomTrackingMetadata, data as CustomTrackingData):
             publishCustomTracking(data: data, metadata: metadata, completion: completion)
