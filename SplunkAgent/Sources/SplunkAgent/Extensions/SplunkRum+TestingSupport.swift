@@ -34,17 +34,15 @@ extension SplunkRum {
     /// - Warning: This method is not meant for client applications and may produce
     ///            unexpected results, which are not supported by the product.
     public static func buildTestInstance(with configuration: AgentConfiguration, testNamed named: String? = nil) -> SplunkRum {
-        // Intentionally unused
-        _ = configuration
-
         let testName = named ?? "agent"
 
         // Custom key-value storage instance with different keys for testing
         let storageName = "com.splunk.rum.objc.test.\(testName)"
         let storage = buildStorage(named: storageName)
 
+        // Use the provided configuration instead of empty configuration
         let handler = ConfigurationHandlerNonOperational(
-            for: AgentConfiguration.emptyConfiguration
+            for: configuration
         )
 
         // All main objects configured with custom storage

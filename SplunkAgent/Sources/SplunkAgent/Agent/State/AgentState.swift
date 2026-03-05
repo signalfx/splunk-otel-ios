@@ -26,7 +26,7 @@ protocol AgentState {
 
     // MARK: - Current Configuration
 
-    var endpointConfiguration: EndpointConfiguration { get }
+    var endpointConfiguration: EndpointConfiguration? { get }
 
     var appName: String { get }
     var appVersion: String { get }
