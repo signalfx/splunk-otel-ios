@@ -133,6 +133,7 @@ class DefaultEventManager: AgentEventManager {
 
     func publish(data: any ModuleEventData, metadata: any ModuleEventMetadata, completion: @escaping (Bool) -> Void) {
         // Create and send an Event based on modules' metadata and data types
+        // swiftformat:disable:next blankLineAfterSwitchCase
         switch (metadata, data) {
 
         // Session Replay module data
