@@ -24,7 +24,6 @@ import Testing
 
 // swiftlint:disable type_body_length
 // swiftlint:disable file_length
-@Suite
 struct SpanDataIsolatedCopyTests {
 
     // MARK: - Helpers

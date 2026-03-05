@@ -160,6 +160,7 @@ public final class WebViewInstrumentation: NSObject {
 #if canImport(WebKit)
     @available(iOS 14.0, *)
     extension WebViewInstrumentation: WKScriptMessageHandlerWithReply {
+
         // MARK: - WKScriptMessageHandlerWithReply
 
         /// Handles JavaScript messages with a reply handler for asynchronous communication.

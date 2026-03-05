@@ -24,7 +24,6 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-@Suite
 struct OTLPBackgroundHTTPTraceExporterTests {
 
     // MARK: - Helpers

@@ -18,13 +18,13 @@ limitations under the License.
 import Foundation
 
 /// Defines known types of navigation.
-enum NavigationType: Sendable {
+enum NavigationType {
     case show
     case transition
 }
 
 /// The structure encapsulates one navigation in the client application.
-struct NavigationPair: Sendable {
+struct NavigationPair {
 
     // MARK: - Navigation identity
 

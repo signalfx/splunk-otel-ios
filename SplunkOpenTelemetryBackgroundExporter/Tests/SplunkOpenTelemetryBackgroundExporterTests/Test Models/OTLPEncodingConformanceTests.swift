@@ -21,7 +21,6 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-@Suite
 struct OTLPEncodingConformanceTests {
 
     // MARK: - Helpers

@@ -19,7 +19,6 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-@Suite
 struct OTLPEnvVarHeadersTests {
 
     // MARK: - Tests

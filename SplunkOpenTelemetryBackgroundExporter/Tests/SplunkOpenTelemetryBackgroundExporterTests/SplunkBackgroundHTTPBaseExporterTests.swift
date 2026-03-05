@@ -24,7 +24,6 @@ import XCTest
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-@Suite
 struct SplunkBackgroundHTTPBaseExporterTests {
 
     // MARK: - Helpers
