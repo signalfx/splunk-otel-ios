@@ -137,23 +137,28 @@ public final class Navigation: Sendable {
 
             // Process navigation events
             for await event in navigationStream where await shouldProcessEvent() {
-
-                var processedEvent = event
-                let screenName = await preferredScreenName(for: event.controllerTypeName)
-
                 // Supported events handling
-                switch processedEvent.type {
+                switch event.type {
                 case .viewDidLoad:
-                    await processShowStart(event: processedEvent)
+                    await processShowStart(event: event)
 
                 case .viewDidAppear:
-                    await processNavigationEnd(event: processedEvent)
+                    await processNavigationEnd(event: event)
+
+                case .viewDidDisappear:
+                    await processNavigationEnd(event: event)
+
+                case .viewWillTransition:
+                    await processTransitionStart(event: event)
+
+                case .viewDidTransition:
+                    await processNavigationEnd(event: event)
 
                 case .willTransitionToTraitCollection:
-                    await processTransitionStart(event: processedEvent)
+                    await processTransitionStart(event: event)
 
                 case .didTransitionToTraitCollection:
-                    await processNavigationEnd(event: processedEvent)
+                    await processNavigationEnd(event: event)
 
                 default:
                     break
@@ -195,6 +200,15 @@ public final class Navigation: Sendable {
 
     /// Process the beginning of the view controller transition.
     private func processTransitionStart(event: NavigationActionEvent) async {
+        // `viewWillTransition` and `willTransitionToTraitCollection` can both
+        // fire for the same controller transition; keep only the first start.
+        if let existingNavigation = await model.navigation(for: event.controllerIdentifier),
+            existingNavigation.type == .transition,
+            existingNavigation.end == nil
+        {
+            return
+        }
+
         let start = Date()
 
         let typeName = event.controllerTypeName
