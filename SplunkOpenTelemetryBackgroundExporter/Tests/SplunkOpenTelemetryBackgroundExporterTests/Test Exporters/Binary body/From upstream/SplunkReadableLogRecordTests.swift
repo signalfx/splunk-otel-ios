@@ -23,7 +23,6 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-@Suite
 struct SplunkReadableLogRecordTests {
 
     // MARK: - Helpers

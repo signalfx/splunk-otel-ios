@@ -22,7 +22,6 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-@Suite
 struct SplunkEventAttributeValueTests {
 
     // MARK: - String

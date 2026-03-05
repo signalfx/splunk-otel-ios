@@ -22,7 +22,6 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-@Suite
 struct OTLPAdapterGroupingTests {
 
     // MARK: - Helpers
@@ -183,7 +182,7 @@ struct OTLPAdapterGroupingTests {
                 return value
             }
         )
-        let expectedScopeAttributeValues: Set<String> = ["value-a", "value-b"]
+        let expectedScopeAttributeValues: Set = ["value-a", "value-b"]
         #expect(scopeAttributeValues == expectedScopeAttributeValues)
     }
 
@@ -246,7 +245,7 @@ struct OTLPAdapterGroupingTests {
                 return value
             }
         )
-        let expectedScopeAttributeValues: Set<String> = ["value-a", "value-b"]
+        let expectedScopeAttributeValues: Set = ["value-a", "value-b"]
         #expect(scopeAttributeValues == expectedScopeAttributeValues)
     }
 
