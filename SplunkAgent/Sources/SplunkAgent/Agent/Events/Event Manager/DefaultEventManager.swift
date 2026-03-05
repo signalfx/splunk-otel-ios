@@ -139,11 +139,10 @@ class DefaultEventManager: AgentEventManager {
         case let (metadata as Metadata, data as Data):
             publishSessionReplay(data: data, metadata: metadata, completion: completion)
 
-        // Crash Reports module data
         #if canImport(SplunkCrashReports)
+            // Crash Reports module data
             case let (metadata as CrashReportsMetadata, data as String):
                 publishCrashReports(data: data, metadata: metadata, completion: completion)
-
         #endif
 
         // Custom Tracking module data
