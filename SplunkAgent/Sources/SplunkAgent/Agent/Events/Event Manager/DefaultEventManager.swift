@@ -143,6 +143,7 @@ class DefaultEventManager: AgentEventManager {
         #if canImport(SplunkCrashReports)
             case let (metadata as CrashReportsMetadata, data as String):
                 publishCrashReports(data: data, metadata: metadata, completion: completion)
+
         #endif
 
         // Custom Tracking module data
