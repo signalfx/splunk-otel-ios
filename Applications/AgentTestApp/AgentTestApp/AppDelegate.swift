@@ -114,12 +114,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private func startScreenNameObserver() {
         #if DEBUG
-        let stream = SplunkRum.shared.navigation.screenNameStream
-        screenNameObserverTask = Task {
-            for await screenName in stream {
-                print("[Navigation.screenNameStream] \(screenName)")
+            let stream = SplunkRum.shared.navigation.screenNameStream
+            screenNameObserverTask = Task {
+                for await screenName in stream {
+                    print("[Navigation.screenNameStream] \(screenName)")
+                }
             }
-        }
         #endif
     }
 }
