@@ -19,10 +19,9 @@ LATEST_IPHONESIMULATOR_SDK="$(
   xcodebuild -showsdks 2>/dev/null \
     | awk '
         /-sdk iphonesimulator[0-9.]+/ {
-          if (match($0, /iphonesimulator[0-9.]+/)) {
-            sdk = substr($0, RSTART + 14, RLENGTH - 14)
-            if (sdk != "") print sdk
-          }
+          sdk = $0
+          sub(/^.*-sdk iphonesimulator/, "", sdk)
+          if (sdk != "") print sdk
         }
       ' \
     | sort -V \
@@ -47,10 +46,9 @@ LATEST_IOS_RUNTIME_WITH_DEVICE="$(
   xcrun simctl list devices available 2>/dev/null \
     | awk '
         /^-- iOS [0-9.]+ --$/ {
-          if (match($0, /^-- iOS [0-9.]+ --$/)) {
-            header = substr($0, 7, RLENGTH - 11)
-            current_runtime = header
-          }
+          current_runtime = $0
+          sub(/^-- iOS /, "", current_runtime)
+          sub(/ --$/, "", current_runtime)
           next
         }
         /^[[:space:]]+iPhone/ {
