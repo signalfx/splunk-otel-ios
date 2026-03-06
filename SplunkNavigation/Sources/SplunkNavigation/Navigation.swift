@@ -272,14 +272,6 @@ public final class Navigation: Sendable {
         return moduleEnabled && trackingEnabled
     }
 
-    private func preferredScreenName(for controllerTypeName: String) async -> String {
-        if await model.isManualScreenName {
-            return await model.screenName
-        }
-
-        return controllerTypeName
-    }
-
     func preferredControllerName(for controller: UIViewController) -> String {
         String(describing: type(of: controller))
     }

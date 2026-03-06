@@ -33,14 +33,14 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
-        XCTAssertTrue(await waitUntil { continuationBox.continuation != nil })
+        await XCTAssertTrue(waitUntil { continuationBox.continuation != nil })
 
         continuationBox.continuation?
             .yield(
                 event(type: .viewDidLoad, controllerIdentifier: controllerIdentifier)
             )
-        XCTAssertTrue(
-            await waitUntil {
+        await XCTAssertTrue(
+            waitUntil {
                 await navigation.model.navigation(for: controllerIdentifier)?.type == .show
             }
         )
@@ -49,8 +49,8 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
             .yield(
                 event(type: .viewDidDisappear, controllerIdentifier: controllerIdentifier)
             )
-        XCTAssertTrue(
-            await waitUntil {
+        await XCTAssertTrue(
+            waitUntil {
                 await navigation.model.navigation(for: controllerIdentifier) == nil
             }
         )
@@ -66,14 +66,14 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
-        XCTAssertTrue(await waitUntil { continuationBox.continuation != nil })
+        await XCTAssertTrue(waitUntil { continuationBox.continuation != nil })
 
         continuationBox.continuation?
             .yield(
                 event(type: .viewWillTransition, controllerIdentifier: controllerIdentifier)
             )
-        XCTAssertTrue(
-            await waitUntil {
+        await XCTAssertTrue(
+            waitUntil {
                 await navigation.model.navigation(for: controllerIdentifier)?.type == .transition
             }
         )
@@ -82,8 +82,8 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
             .yield(
                 event(type: .viewDidTransition, controllerIdentifier: controllerIdentifier)
             )
-        XCTAssertTrue(
-            await waitUntil {
+        await XCTAssertTrue(
+            waitUntil {
                 await navigation.model.navigation(for: controllerIdentifier) == nil
             }
         )
@@ -99,14 +99,14 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
-        XCTAssertTrue(await waitUntil { continuationBox.continuation != nil })
+        await XCTAssertTrue(waitUntil { continuationBox.continuation != nil })
 
         continuationBox.continuation?
             .yield(
                 event(type: .willTransitionToTraitCollection, controllerIdentifier: controllerIdentifier)
             )
-        XCTAssertTrue(
-            await waitUntil {
+        await XCTAssertTrue(
+            waitUntil {
                 await navigation.model.navigation(for: controllerIdentifier)?.type == .transition
             }
         )
