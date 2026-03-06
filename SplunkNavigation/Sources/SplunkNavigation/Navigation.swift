@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 internal import CiscoLogger
+import CiscoSwizzling
 import Foundation
 import SplunkCommon
 import UIKit

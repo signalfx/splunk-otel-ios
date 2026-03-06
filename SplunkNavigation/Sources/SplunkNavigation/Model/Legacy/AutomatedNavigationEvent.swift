@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoSwizzling
+import CiscoSwizzling
 import Foundation
 
 /// Represents automatic navigation event.
