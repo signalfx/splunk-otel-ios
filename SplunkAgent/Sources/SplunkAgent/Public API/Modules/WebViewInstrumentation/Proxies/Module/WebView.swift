@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+internal import SplunkCommon
 internal import SplunkWebView
 
 #if canImport(WebKit)
@@ -27,8 +28,9 @@ final class WebView: WebViewInstrumentationModule {
     /// Holds the *real* module instance from the SplunkWebView module.
     private let module: SplunkWebView.WebViewInstrumentation
 
-    init(module: SplunkWebView.WebViewInstrumentation) {
+    init(module: SplunkWebView.WebViewInstrumentation, sharedState: AgentSharedState) {
         self.module = module
+        self.module.sharedState = sharedState
     }
 
     #if canImport(WebKit)

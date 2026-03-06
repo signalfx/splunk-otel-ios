@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,20 +34,5 @@ struct FeatureSection<Content: View>: View {
         .background(Color(red: 0.87, green: 0.93, blue: 1.0))
         .cornerRadius(12)
         .padding(.horizontal, 16)
-    }
-}
-
-
-struct FeatureButton: View {
-    let label: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(label)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(.blue)
-        }
-        .padding(.vertical, 8)
     }
 }

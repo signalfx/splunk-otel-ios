@@ -21,6 +21,7 @@ public struct SessionConfiguration: Codable, Equatable {
     // MARK: - Public properties
 
     /// A sampling rate in the `<0.0, 1.0>` interval.
+    ///
     /// `1.0` equals to zero sampling (all instrumentation is sent),
     /// `0.0` equals to all session being sampled, `0.5` equals to 50% sampling.
     ///

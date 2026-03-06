@@ -100,6 +100,9 @@ class DefaultModulesManager: AgentModulesManager {
         with configurations: [any ModuleConfiguration],
         remoteConfigurations: [any RemoteModuleConfiguration]
     ) {
+        // Log any duplicate configurations before processing
+        logDuplicateConfigurations(configurations)
+
         // Connect all modules with corresponding configurations (if exists)
         for module in modules {
             // Get corresponding configuration
@@ -125,6 +128,28 @@ class DefaultModulesManager: AgentModulesManager {
 
             // Report initialization timestamp
             initializationTimes[String(describing: type(of: module))] = Date()
+        }
+    }
+
+    /// Logs a warning for each duplicate module configuration that will be ignored.
+    ///
+    /// Only the first occurrence of each configuration type is used; all duplicates are ignored.
+    private func logDuplicateConfigurations(_ configurations: [any ModuleConfiguration]) {
+        // Track which configuration types we've seen
+        var seenTypes: Set<String> = []
+
+        for configuration in configurations {
+            let typeName = String(describing: type(of: configuration))
+
+            if seenTypes.contains(typeName) {
+                // This is a duplicate - log that it will be ignored
+                logger.log(level: .warn, isPrivate: false) {
+                    "Duplicate module configuration: \(typeName) was ignored."
+                }
+            }
+            else {
+                seenTypes.insert(typeName)
+            }
         }
     }
 
@@ -200,7 +225,7 @@ class DefaultModulesManager: AgentModulesManager {
         configurationDescription
     }
 
-    /// Prepares modules configuration description, in a format of a `[String: String]` dictionary,
+    /// Prepares modules configuration description, in a format of a `[String: String]` dictionary
     /// with `"ModuleName.propertyName"` as a key and the property's value as a value.
     private func prepareModulesConfigurationDescription(with configurations: [any ModuleConfiguration]) {
         do {

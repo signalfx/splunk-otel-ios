@@ -96,4 +96,51 @@ final class SplunkRequestDescriptorTests: XCTestCase {
 
         XCTAssertEqual(decoded.headers, [:])
     }
+
+    func testDecodeWithoutPayloadFormatDefaultsToProtobuf() throws {
+        let id = UUID()
+        let payload: [String: Any] = [
+            "id": id.uuidString,
+            "endpoint": "https://example.com",
+            "explicitTimeout": 1.0,
+            "sentCount": 2,
+            "fileKeyType": fileKeyType,
+            "headers": ["x-header": "value"]
+        ]
+
+        let data = try JSONSerialization.data(withJSONObject: payload, options: [])
+        let decoded = try JSONDecoder().decode(RequestDescriptor.self, from: data)
+
+        XCTAssertEqual(decoded.payloadFormat, .protobuf)
+    }
+
+    func testCreateRequestUsesJSONContentTypeForJSONPayload() throws {
+        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
+        let descriptor = RequestDescriptor(
+            id: UUID(),
+            endpoint: exampleURL,
+            explicitTimeout: 1.0,
+            fileKeyType: fileKeyType,
+            payloadFormat: .json
+        )
+
+        let request = descriptor.createRequest()
+
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/json")
+    }
+
+    func testCreateRequestUsesProtobufContentTypeForProtobufPayload() throws {
+        let exampleURL = try XCTUnwrap(URL(string: "https://example.com"))
+        let descriptor = RequestDescriptor(
+            id: UUID(),
+            endpoint: exampleURL,
+            explicitTimeout: 1.0,
+            fileKeyType: fileKeyType,
+            payloadFormat: .protobuf
+        )
+
+        let request = descriptor.createRequest()
+
+        XCTAssertEqual(request.value(forHTTPHeaderField: "Content-Type"), "application/x-protobuf")
+    }
 }

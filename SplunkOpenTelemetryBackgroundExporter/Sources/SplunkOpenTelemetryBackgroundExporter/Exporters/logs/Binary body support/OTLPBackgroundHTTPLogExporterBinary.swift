@@ -34,8 +34,7 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
     ///
     /// Binary data in the log body is encoded as base64 per OTLP JSON specification.
     public func export(logRecords: [SplunkReadableLogRecord], explicitTimeout: TimeInterval? = nil) -> OpenTelemetrySdk.ExportResult {
-        // Convert log records to OTLP JSON models using our custom adapter
-        // Binary body data will be base64 encoded
+        // Convert log records to OTLP JSON models; binary body data will be base64 encoded
         let resourceLogs = SplunkLogRecordAdapterJSON.toResourceLogs(logRecords)
 
         // Skip if no log records to export (filter empty envelopes per OTLP spec)
@@ -49,6 +48,20 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
         do {
             // Encode to JSON instead of protobuf binary
             let storeData = try JSONEncoder().encode(request)
+
+            // If no endpoint is configured, store in pending folder for later
+            if isPendingEndpoint {
+                try diskStorage.insert(
+                    storeData,
+                    forKey: KeyBuilder(
+                        requestId.uuidString,
+                        parrentKeyBuilder: getPendingStorageKey()
+                    )
+                )
+                return .success
+            }
+
+            // Store in active folder
             try diskStorage.insert(
                 storeData,
                 forKey: KeyBuilder(
@@ -62,6 +75,11 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
             return .failure
         }
 
+        // Only send if we have an endpoint
+        guard let endpoint else {
+            return .success
+        }
+
         let timeout = min(explicitTimeout ?? TimeInterval.greatestFiniteMagnitude, config.timeout)
 
         let requestDescriptor = RequestDescriptor(
@@ -69,7 +87,8 @@ public class OTLPBackgroundHTTPLogExporterBinary: OTLPBackgroundHTTPBaseExporter
             endpoint: endpoint,
             explicitTimeout: timeout,
             fileKeyType: getFileKeyType(),
-            headers: headers
+            headers: headers,
+            payloadFormat: .json
         )
 
         do {
