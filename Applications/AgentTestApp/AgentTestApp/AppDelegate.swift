@@ -22,6 +22,10 @@ import UIKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    // MARK: - Private
+
+    private var screenNameObserverTask: Task<Void, Never>?
+
     // MARK: - Application lifecycle
 
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -80,6 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Navigation Instrumentation
         SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
+        startScreenNameObserver()
 
         // Start session replay
         SplunkRum.shared.sessionReplay.start()
@@ -91,6 +96,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    func applicationWillTerminate(_: UIApplication) {
+        screenNameObserverTask?.cancel()
+    }
+
     func application(
         _: UIApplication,
         configurationForConnecting connectingSceneSession: UISceneSession,
@@ -99,5 +108,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when a new scene session is being created.
         // Use this method to select a configuration to create the new scene with.
         UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
+    }
+
+    // MARK: - Private methods
+
+    private func startScreenNameObserver() {
+        #if DEBUG
+        let stream = SplunkRum.shared.navigation.screenNameStream
+        screenNameObserverTask = Task {
+            for await screenName in stream {
+                print("[Navigation.screenNameStream] \(screenName)")
+            }
+        }
+        #endif
     }
 }
