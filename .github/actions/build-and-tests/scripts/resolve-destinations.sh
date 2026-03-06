@@ -13,7 +13,45 @@ fi
 # UUIDs are runner-specific and break when prepare and build/test run on
 # different runner instances. Name + OS avoids implicit OS:latest matching.
 
-pick_name_and_runtime() {
+WORKSPACE="${WORKSPACE:-.swiftpm/xcode/package.xcworkspace}"
+DESTINATIONS_TEXT="$(
+  xcodebuild -skipPackagePluginValidation -workspace "$WORKSPACE" -scheme "$SCHEME" -showdestinations 2>/dev/null || true
+)"
+
+pick_from_scheme_destinations() {
+  local platform="$1"
+  local name_pattern="$2"
+
+  # Output format: "<name>|<os_version>"
+  printf '%s\n' "$DESTINATIONS_TEXT" \
+    | awk -v plat="$platform" -v pat="$name_pattern" '
+        /\{[[:space:]]*platform:/ {
+          line = $0
+          gsub(/^[[:space:]]+/, "", line)
+          if (line !~ ("platform:" plat) || line ~ /error:/ || line !~ /OS:/ || line !~ /name:/) {
+            next
+          }
+
+          os = line
+          sub(/.*OS:/, "", os)
+          sub(/,.*/, "", os)
+          gsub(/^[[:space:]]+|[[:space:]]+$/, "", os)
+
+          name = line
+          sub(/.*name:/, "", name)
+          sub(/[},].*/, "", name)
+          gsub(/^[[:space:]]+|[[:space:]]+$/, "", name)
+
+          if (name ~ pat && os ~ /^[0-9]+(\.[0-9]+)*$/) {
+            print name "|" os
+          }
+        }
+      ' \
+    | sort -t '|' -k2,2V \
+    | tail -n1
+}
+
+pick_name_and_runtime_from_devices() {
   local runtime_prefix="$1"
   local name_pattern="$2"
   xcrun simctl list -j devices available \
@@ -34,20 +72,32 @@ pick_name_and_runtime() {
       '
 }
 
-IOS_PICK="$(pick_name_and_runtime 'iOS' 'iPhone')"
+IOS_PICK="$(pick_from_scheme_destinations 'iOS Simulator' 'iPhone')"
 if [ -n "${IOS_PICK:-}" ]; then
-  IFS='|' read -r IOS_NAME _IOS_RUNTIME_ID IOS_OS_VERSION <<< "$IOS_PICK"
+  IFS='|' read -r IOS_NAME IOS_OS_VERSION <<< "$IOS_PICK"
   IOS_DEST="platform=iOS Simulator,OS=$IOS_OS_VERSION,name=$IOS_NAME"
 else
-  IOS_DEST="platform=iOS Simulator,name=iPhone 16"
+  IOS_PICK="$(pick_name_and_runtime_from_devices 'iOS' 'iPhone')"
+  if [ -n "${IOS_PICK:-}" ]; then
+    IFS='|' read -r IOS_NAME _IOS_RUNTIME_ID IOS_OS_VERSION <<< "$IOS_PICK"
+    IOS_DEST="platform=iOS Simulator,OS=$IOS_OS_VERSION,name=$IOS_NAME"
+  else
+    IOS_DEST="platform=iOS Simulator,name=iPhone 16"
+  fi
 fi
 
-TVOS_PICK="$(pick_name_and_runtime 'tvOS' 'Apple TV')"
+TVOS_PICK="$(pick_from_scheme_destinations 'tvOS Simulator' 'Apple TV')"
 if [ -n "${TVOS_PICK:-}" ]; then
-  IFS='|' read -r TVOS_NAME _TVOS_RUNTIME_ID TVOS_OS_VERSION <<< "$TVOS_PICK"
+  IFS='|' read -r TVOS_NAME TVOS_OS_VERSION <<< "$TVOS_PICK"
   TVOS_DEST="platform=tvOS Simulator,OS=$TVOS_OS_VERSION,name=$TVOS_NAME"
 else
-  TVOS_DEST="platform=tvOS Simulator,name=Apple TV 4K (3rd generation)"
+  TVOS_PICK="$(pick_name_and_runtime_from_devices 'tvOS' 'Apple TV')"
+  if [ -n "${TVOS_PICK:-}" ]; then
+    IFS='|' read -r TVOS_NAME _TVOS_RUNTIME_ID TVOS_OS_VERSION <<< "$TVOS_PICK"
+    TVOS_DEST="platform=tvOS Simulator,OS=$TVOS_OS_VERSION,name=$TVOS_NAME"
+  else
+    TVOS_DEST="platform=tvOS Simulator,name=Apple TV 4K (3rd generation)"
+  fi
 fi
 
 # visionOS is build-only (no tests), so use a generic destination that
