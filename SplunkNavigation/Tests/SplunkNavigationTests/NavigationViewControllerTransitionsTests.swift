@@ -33,27 +33,26 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
-        await XCTAssertTrue(waitUntil { continuationBox.continuation != nil })
+        let streamReady = await waitUntil { continuationBox.continuation != nil }
+        XCTAssertTrue(streamReady)
 
         continuationBox.continuation?
             .yield(
                 event(type: .viewDidLoad, controllerIdentifier: controllerIdentifier)
             )
-        await XCTAssertTrue(
-            waitUntil {
-                await navigation.model.navigation(for: controllerIdentifier)?.type == .show
-            }
-        )
+        let showStarted = await waitUntil {
+            await navigation.model.navigation(for: controllerIdentifier)?.type == .show
+        }
+        XCTAssertTrue(showStarted)
 
         continuationBox.continuation?
             .yield(
                 event(type: .viewDidDisappear, controllerIdentifier: controllerIdentifier)
             )
-        await XCTAssertTrue(
-            waitUntil {
-                await navigation.model.navigation(for: controllerIdentifier) == nil
-            }
-        )
+        let showFinalized = await waitUntil {
+            await navigation.model.navigation(for: controllerIdentifier) == nil
+        }
+        XCTAssertTrue(showFinalized)
 
         continuationBox.continuation?.finish()
     }
@@ -66,27 +65,26 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
-        await XCTAssertTrue(waitUntil { continuationBox.continuation != nil })
+        let streamReady = await waitUntil { continuationBox.continuation != nil }
+        XCTAssertTrue(streamReady)
 
         continuationBox.continuation?
             .yield(
                 event(type: .viewWillTransition, controllerIdentifier: controllerIdentifier)
             )
-        await XCTAssertTrue(
-            waitUntil {
-                await navigation.model.navigation(for: controllerIdentifier)?.type == .transition
-            }
-        )
+        let transitionStarted = await waitUntil {
+            await navigation.model.navigation(for: controllerIdentifier)?.type == .transition
+        }
+        XCTAssertTrue(transitionStarted)
 
         continuationBox.continuation?
             .yield(
                 event(type: .viewDidTransition, controllerIdentifier: controllerIdentifier)
             )
-        await XCTAssertTrue(
-            waitUntil {
-                await navigation.model.navigation(for: controllerIdentifier) == nil
-            }
-        )
+        let transitionFinalized = await waitUntil {
+            await navigation.model.navigation(for: controllerIdentifier) == nil
+        }
+        XCTAssertTrue(transitionFinalized)
 
         continuationBox.continuation?.finish()
     }
@@ -99,17 +97,17 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
-        await XCTAssertTrue(waitUntil { continuationBox.continuation != nil })
+        let streamReady = await waitUntil { continuationBox.continuation != nil }
+        XCTAssertTrue(streamReady)
 
         continuationBox.continuation?
             .yield(
                 event(type: .willTransitionToTraitCollection, controllerIdentifier: controllerIdentifier)
             )
-        await XCTAssertTrue(
-            waitUntil {
-                await navigation.model.navigation(for: controllerIdentifier)?.type == .transition
-            }
-        )
+        let initialTransitionStarted = await waitUntil {
+            await navigation.model.navigation(for: controllerIdentifier)?.type == .transition
+        }
+        XCTAssertTrue(initialTransitionStarted)
         guard let firstStart = await navigation.model.navigation(for: controllerIdentifier)?.start else {
             XCTFail("Expected first transition start to be stored.")
             return
