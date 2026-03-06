@@ -106,6 +106,7 @@ run_diagnostic() {
 
 run_diagnostic "xcodebuild -version"
 run_diagnostic "xcode-select -p"
+run_diagnostic "find /Applications -maxdepth 1 -type d -name \"Xcode*.app\" -print"
 run_diagnostic "xcodebuild -showsdks"
 run_diagnostic "xcrun simctl list runtimes"
 run_diagnostic "xcrun simctl list devices available"
