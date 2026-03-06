@@ -9,29 +9,43 @@ if ! command -v jq >/dev/null 2>&1; then
   brew install -q jq >/dev/null
 fi
 
-# Use name-based destinations instead of UUIDs.
+# Use name + OS destinations instead of UUIDs.
 # UUIDs are runner-specific and break when prepare and build/test run on
-# different runner instances.  Name-based specifiers are portable.
+# different runner instances. Name + OS avoids implicit OS:latest matching.
 
-pick_name() {
-  local platform="$1"
+pick_name_and_runtime() {
+  local runtime_prefix="$1"
   local name_pattern="$2"
   xcrun simctl list -j devices available \
-    | jq -r --arg pat "$name_pattern" \
-        '.devices[][] | select(.isAvailable==true and (.name | test($pat))) | .name' \
-    | head -n1
+    | jq -r --arg prefix "$runtime_prefix" --arg pat "$name_pattern" '
+        .devices
+        | to_entries
+        | map(select(.key | startswith("com.apple.CoreSimulator.SimRuntime." + $prefix + "-")))
+        | map({
+            runtime: .key,
+            version: (.key | sub("^com.apple.CoreSimulator.SimRuntime\\." + $prefix + "-"; "") | gsub("-"; ".")),
+            name: ([.value[] | select(.isAvailable==true and (.name | test($pat))) | .name] | first)
+          })
+        | map(select(.name != null))
+        | sort_by(.version | split(".") | map((tonumber? // 0)))
+        | last
+        | select(. != null)
+        | "\(.name)|\(.runtime)|\(.version)"
+      '
 }
 
-IOS_NAME="$(pick_name 'iOS' 'iPhone|iPad')"
-if [ -n "${IOS_NAME:-}" ]; then
-  IOS_DEST="platform=iOS Simulator,name=$IOS_NAME"
+IOS_PICK="$(pick_name_and_runtime 'iOS' 'iPhone')"
+if [ -n "${IOS_PICK:-}" ]; then
+  IFS='|' read -r IOS_NAME _IOS_RUNTIME_ID IOS_OS_VERSION <<< "$IOS_PICK"
+  IOS_DEST="platform=iOS Simulator,OS=$IOS_OS_VERSION,name=$IOS_NAME"
 else
   IOS_DEST="platform=iOS Simulator,name=iPhone 16"
 fi
 
-TVOS_NAME="$(pick_name 'tvOS' 'Apple TV')"
-if [ -n "${TVOS_NAME:-}" ]; then
-  TVOS_DEST="platform=tvOS Simulator,name=$TVOS_NAME"
+TVOS_PICK="$(pick_name_and_runtime 'tvOS' 'Apple TV')"
+if [ -n "${TVOS_PICK:-}" ]; then
+  IFS='|' read -r TVOS_NAME _TVOS_RUNTIME_ID TVOS_OS_VERSION <<< "$TVOS_PICK"
+  TVOS_DEST="platform=tvOS Simulator,OS=$TVOS_OS_VERSION,name=$TVOS_NAME"
 else
   TVOS_DEST="platform=tvOS Simulator,name=Apple TV 4K (3rd generation)"
 fi
