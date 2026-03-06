@@ -80,7 +80,9 @@ private struct MockNavigationEventStreamProvider: NavigationEventStreamProviding
 
 private func makeStream<T>(_ values: [T]) -> AsyncStream<T> {
     AsyncStream { continuation in
-        values.forEach { continuation.yield($0) }
+        for value in values {
+            continuation.yield(value)
+        }
         continuation.finish()
     }
 }
