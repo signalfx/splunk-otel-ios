@@ -104,14 +104,20 @@ jobs:
             tvos) .github/actions/build-and-tests/scripts/download-platforms.sh tvOS ;;
           esac
 
+      - name: Resolve destinations on this runner
+        id: local_dest
+        env:
+          SCHEME: ${{ needs.prepare.outputs.scheme }}
+        run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
+
       - name: Select destination
         id: pick
         run: |
           case "${{ matrix.platform }}" in
-            ios) echo "DEST=${{ needs.prepare.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
-            tvos) echo "DEST=${{ needs.prepare.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
-            visionos) echo "DEST=${{ needs.prepare.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
-            macCatalyst) echo "DEST=${{ needs.prepare.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
+            ios) echo "DEST=${{ steps.local_dest.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
+            tvos) echo "DEST=${{ steps.local_dest.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
+            visionos) echo "DEST=${{ steps.local_dest.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
+            macCatalyst) echo "DEST=${{ steps.local_dest.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
           esac
           echo "Platform=${{ matrix.platform }}"
           echo "Destination=$DEST"
@@ -150,14 +156,20 @@ jobs:
             tvos) .github/actions/build-and-tests/scripts/download-platforms.sh tvOS ;;
           esac
 
+      - name: Resolve destinations on this runner
+        id: local_dest
+        env:
+          SCHEME: ${{ needs.prepare.outputs.scheme }}
+        run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
+
       - name: Select destination
         id: pick
         run: |
           case "${{ matrix.platform }}" in
-            ios) echo "DEST=${{ needs.prepare.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
-            tvos) echo "DEST=${{ needs.prepare.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
-            visionos) echo "DEST=${{ needs.prepare.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
-            macCatalyst) echo "DEST=${{ needs.prepare.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
+            ios) echo "DEST=${{ steps.local_dest.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
+            tvos) echo "DEST=${{ steps.local_dest.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
+            visionos) echo "DEST=${{ steps.local_dest.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
+            macCatalyst) echo "DEST=${{ steps.local_dest.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
           esac
           echo "Platform=${{ matrix.platform }}"
           echo "Destination=$DEST"
