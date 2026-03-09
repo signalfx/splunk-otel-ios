@@ -246,12 +246,8 @@ struct OTLPAdapterGroupingTests {
                 return value
             }
         )
-<<<<<<< HEAD
-        let expectedScopeAttributeValues: Set = ["value-a", "value-b"]
-=======
         let expectedScopeAttributeValues = Set(["value-a", "value-b"])
 
->>>>>>> origin/develop
         #expect(scopeAttributeValues == expectedScopeAttributeValues)
     }
 
