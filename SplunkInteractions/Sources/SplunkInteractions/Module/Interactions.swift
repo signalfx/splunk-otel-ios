@@ -102,8 +102,6 @@ public final class Interactions: SplunkInteractionsModule {
             let targetElement = await targetElement(from: event)
             let xpath = await getElementXpath(from: event.viewHierarchy)
 
-            let xpath = await getElementXpath(from: event.viewHierarchy)
-
             destination.sendInteraction(
                 actionName: interactionType,
                 elementId: targetElement,
