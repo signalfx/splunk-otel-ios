@@ -95,19 +95,7 @@ extension SplunkRum {
         // Extract session replay module configuration
         let config = moduleConfigurations?.compactMap { $0 as? SessionReplayConfiguration }.first ?? SessionReplayConfiguration()
 
-        let configuredSamplingRate = config.samplingRate ?? 1.0
-
-        // Clamp sampling rate to valid range and warn if out of bounds
-        let sanitizedSamplingRate = configuredSamplingRate.isFinite ? configuredSamplingRate : 1.0
-        let effectiveSamplingRate = min(max(sanitizedSamplingRate, 0.0), 1.0)
-        if !configuredSamplingRate.isFinite || configuredSamplingRate < 0.0 || configuredSamplingRate > 1.0 {
-            logger.log(level: .warn, isPrivate: false) {
-                """
-                Session Replay sampling rate \(configuredSamplingRate) is outside the valid \
-                range <0, 1>. The value has been clamped to \(effectiveSamplingRate).
-                """
-            }
-        }
+        let effectiveSamplingRate = resolvedSamplingRate(from: config)
 
         // Check if session replay is enabled by configuration
         guard config.enabled else {
@@ -145,6 +133,21 @@ extension SplunkRum {
 
         // Initialize proxy API for this module
         sessionReplayProxy = SessionReplay(for: sessionReplayModule, samplingRate: effectiveSamplingRate)
+    }
+
+    private func resolvedSamplingRate(from config: SessionReplayConfiguration) -> Double {
+        let configured = config.samplingRate ?? 1.0
+        let sanitized = configured.isFinite ? configured : 1.0
+        let effective = min(max(sanitized, 0.0), 1.0)
+        if !configured.isFinite || configured < 0.0 || configured > 1.0 {
+            logger.log(level: .warn, isPrivate: false) {
+                """
+                Session Replay sampling rate \(configured) is outside the valid \
+                range <0, 1>. The value has been clamped to \(effective).
+                """
+            }
+        }
+        return effective
     }
 
     /// Configure Navigation module.
