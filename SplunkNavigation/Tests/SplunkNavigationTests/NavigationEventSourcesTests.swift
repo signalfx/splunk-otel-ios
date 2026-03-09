@@ -67,6 +67,42 @@ final class NavigationEventSourcesTests: XCTestCase {
 
         XCTAssertFalse(navigation.shouldIgnore(controllerTypeName: "ProductDetailsViewController"))
     }
+
+    func testAutomatedEventOverridesManualScreenName() async {
+        let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
+        defer { continuation.finish() }
+
+        let navigation = Navigation(
+            navigationEventStreamProvider: MockNavigationEventStreamProvider(stream: stream)
+        )
+        navigation.preferences.enableAutomatedTracking = true
+
+        navigation.track(screen: "ManualScreen")
+
+        let didApplyManualScreen = await waitUntil {
+            await navigation.model.screenName == "ManualScreen"
+        }
+        XCTAssertTrue(didApplyManualScreen)
+
+        let isManualScreenName = await navigation.model.isManualScreenName
+        XCTAssertTrue(isManualScreenName)
+
+        navigation.startDetection()
+
+        continuation.yield(
+            AutomatedNavigationEvent(
+                timestamp: Date(),
+                type: .viewDidLoad,
+                controllerTypeName: "AutoViewController",
+                controllerIdentifier: ObjectIdentifier(NSString())
+            )
+        )
+
+        let didApplyAutomatedScreen = await waitUntil {
+            await navigation.model.screenName == "AutoViewController"
+        }
+        XCTAssertTrue(didApplyAutomatedScreen)
+    }
 }
 
 private struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
@@ -85,4 +121,22 @@ private func makeStream<T>(_ values: [T]) -> AsyncStream<T> {
         }
         continuation.finish()
     }
+}
+
+private func waitUntil(
+    timeout: TimeInterval = 1.0,
+    pollIntervalNanoseconds: UInt64 = 10_000_000,
+    _ condition: @escaping @Sendable () async -> Bool
+) async -> Bool {
+    let deadline = Date().addingTimeInterval(timeout)
+
+    while Date() < deadline {
+        if await condition() {
+            return true
+        }
+
+        try? await Task.sleep(nanoseconds: pollIntervalNanoseconds)
+    }
+
+    return await condition()
 }
