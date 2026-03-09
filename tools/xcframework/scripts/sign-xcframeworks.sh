@@ -3,8 +3,9 @@
 #
 # Signs .xcframework bundles in the output directory using codesign.
 # Signing protects all files inside the xcframework including privacy manifests.
-# Cisco Session Replay xcframeworks are pre-built externals and are skipped
-# by default to preserve upstream signatures.
+# Cisco Session Replay xcframeworks are vendor-signed externals and are
+# intentionally skipped to preserve the upstream signature that release
+# validation later verifies.
 #
 # Usage:
 #   ./scripts/sign-xcframeworks.sh "Apple Distribution: Splunk Inc. (TEAMID)"
@@ -33,6 +34,11 @@ log() {
     echo "==> $*"
 }
 
+is_vendor_signed_xcframework() {
+    local name="$1"
+    [[ "${name}" == Cisco*.xcframework ]]
+}
+
 log "Signing xcframeworks with identity: ${SIGNING_IDENTITY}"
 
 SIGN_CISCO_FRAMEWORKS="${SIGN_CISCO_FRAMEWORKS:-false}"
@@ -45,7 +51,7 @@ for xcfw in "${OUTPUT_DIR}"/*.xcframework; do
     [[ -d "${xcfw}" ]] || continue
     name="$(basename "${xcfw}")"
 
-    if [[ "${SIGN_CISCO_FRAMEWORKS}" != "true" && "${name}" == Cisco*.xcframework ]]; then
+    if [[ "${SIGN_CISCO_FRAMEWORKS}" != "true" ]] && is_vendor_signed_xcframework "${name}"; then
         echo "  Skipping ${name} (pre-signed external framework)"
         ((SKIPPED_COUNT++))
         continue

@@ -22,15 +22,12 @@
 #                      (default: latest successful build-xcframeworks run)
 #   --identity NAME    Signing identity (default: auto-detected)
 #   --skip-upload      Sign and package only, don't upload to GitHub
-#   --skip-cisco-refresh  Keep Cisco xcframeworks from CI artifact as-is
-#                         (default: refresh from source to preserve vendor signatures)
 #
 # Examples:
 #   ./scripts/sign-and-upload.sh 1.2.0
 #   ./scripts/sign-and-upload.sh 1.2.0 --run-id 12345678
 #   ./scripts/sign-and-upload.sh 1.2.0 --identity "Apple Distribution: Splunk Inc. (TEAMID)"
 #   ./scripts/sign-and-upload.sh 1.2.0 --skip-upload
-#   ./scripts/sign-and-upload.sh 1.2.0 --skip-cisco-refresh
 
 set -euo pipefail
 
@@ -43,11 +40,10 @@ VERSION="${1:-}"
 RUN_ID=""
 SIGNING_IDENTITY=""
 SKIP_UPLOAD=false
-REFRESH_CISCO=true
 
 if [[ -z "${VERSION}" ]]; then
     echo "ERROR: Version required."
-    echo "  Usage: $0 VERSION [--run-id ID] [--identity NAME] [--skip-upload] [--skip-cisco-refresh]"
+    echo "  Usage: $0 VERSION [--run-id ID] [--identity NAME] [--skip-upload]"
     exit 1
 fi
 
@@ -57,7 +53,6 @@ while [[ $# -gt 0 ]]; do
         --run-id) RUN_ID="$2"; shift 2 ;;
         --identity) SIGNING_IDENTITY="$2"; shift 2 ;;
         --skip-upload) SKIP_UPLOAD=true; shift ;;
-        --skip-cisco-refresh) REFRESH_CISCO=false; shift ;;
         *) echo "Unknown arg: $1"; exit 1 ;;
     esac
 done
@@ -163,18 +158,7 @@ echo "  ✓ Downloaded ${XCFW_COUNT} xcframeworks"
 # ---------------------------------------------------------------------------
 # Cisco frameworks are pre-built external artifacts. Refreshing them from
 # source ensures we package untouched vendor binaries/signatures.
-
-if [[ "${REFRESH_CISCO}" == "true" ]]; then
-    log "Refreshing Cisco xcframeworks from source"
-
-    # Remove Cisco frameworks from downloaded artifact first.
-    rm -rf "${OUTPUT_DIR}"/Cisco*.xcframework
-
-    # Download fresh Cisco frameworks directly from URLs/checksums in Package.swift.
-    "${SCRIPT_DIR}/download-cisco-xcframeworks.sh" --output-dir "${OUTPUT_DIR}"
-else
-    log "Skipping Cisco refresh (--skip-cisco-refresh)"
-fi
+"${SCRIPT_DIR}/refresh-cisco-xcframeworks.sh" --output-dir "${OUTPUT_DIR}"
 
 # ---------------------------------------------------------------------------
 # Step 3: Sign
