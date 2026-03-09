@@ -59,11 +59,17 @@ for xcfw in "${OUTPUT_DIR}"/*.xcframework; do
 
     echo -n "  Signing ${name}..."
 
-    if codesign --force --timestamp -v --sign "${SIGNING_IDENTITY}" "${xcfw}" 2>/dev/null; then
+    error_log="$(mktemp /tmp/sign-xcframeworks.XXXXXX.log)"
+    if codesign --force --timestamp -v --sign "${SIGNING_IDENTITY}" "${xcfw}" 2>"${error_log}"; then
         echo " ✓"
         ((SIGNED_COUNT++))
+        rm -f "${error_log}"
     else
         echo " FAILED"
+        if [[ -s "${error_log}" ]]; then
+            sed 's/^/    /' "${error_log}"
+        fi
+        rm -f "${error_log}"
         ((FAILED_COUNT++))
     fi
 done

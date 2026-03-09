@@ -175,6 +175,7 @@ download_and_extract() {
     echo -n "  Downloading ${name}..."
     mkdir -p "${DOWNLOAD_CACHE}"
 
+    local actual_checksum=""
     if [[ -f "${zip_file}" ]]; then
         echo -n " (cached)..."
     else
@@ -182,15 +183,21 @@ download_and_extract() {
     fi
 
     # Verify checksum
-    local actual_checksum
     actual_checksum="$(shasum -a 256 "${zip_file}" | cut -d' ' -f1)"
 
     if [[ "${actual_checksum}" != "${checksum}" ]]; then
-        echo " FAILED (checksum mismatch)"
-        echo "    Expected: ${checksum}"
-        echo "    Actual:   ${actual_checksum}"
+        echo -n " (checksum mismatch, re-downloading)..."
         rm -f "${zip_file}"
-        return 1
+        curl -sL "${url}" -o "${zip_file}"
+
+        actual_checksum="$(shasum -a 256 "${zip_file}" | cut -d' ' -f1)"
+        if [[ "${actual_checksum}" != "${checksum}" ]]; then
+            echo " FAILED (checksum mismatch)"
+            echo "    Expected: ${checksum}"
+            echo "    Actual:   ${actual_checksum}"
+            rm -f "${zip_file}"
+            return 1
+        fi
     fi
 
     # Extract -- the zip contains <Name>.xcframework/ at root
