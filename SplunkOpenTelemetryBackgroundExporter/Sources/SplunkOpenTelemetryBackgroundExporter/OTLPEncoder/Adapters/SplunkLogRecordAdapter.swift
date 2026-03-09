@@ -34,22 +34,6 @@ import OpenTelemetrySdk
 /// Based on OTLP specification v1.9.0.
 enum SplunkLogRecordAdapterJSON {
 
-    // MARK: - Private Types
-
-    /// Key for grouping log records by scope within a resource.
-    ///
-    /// Uses scope name and version as the grouping key.
-    private struct ScopeKey: Hashable {
-        let name: String
-        let version: String?
-
-        init(from scope: InstrumentationScopeInfo?) {
-            name = scope?.name ?? ""
-            version = scope?.version
-        }
-    }
-
-
     // MARK: - Internal Methods
 
     /// Converts a list of SplunkReadableLogRecord to OTLP ResourceLogs.
@@ -71,7 +55,7 @@ enum SplunkLogRecordAdapterJSON {
 
             var scopeLogsList: [OTLPScopeLogs] = []
 
-            for (_, scopedLogs) in groupedByScope {
+            for (scopeInfo, scopedLogs) in groupedByScope {
                 // Convert each SplunkReadableLogRecord to OTLPLogRecord
                 let otlpLogRecords = scopedLogs.map { convertLogRecord($0) }
 
@@ -80,13 +64,10 @@ enum SplunkLogRecordAdapterJSON {
                     continue
                 }
 
-                // Get the scope info from the first log in this scope group
-                let scopeInfo = scopedLogs.first?.instrumentationScopeInfo
-
                 let scopeLogs = OTLPScopeLogs(
                     scope: convertInstrumentationScope(scopeInfo),
                     logRecords: otlpLogRecords,
-                    schemaUrl: scopeInfo?.schemaUrl
+                    schemaUrl: scopeInfo.schemaUrl
                 )
                 scopeLogsList.append(scopeLogs)
             }
@@ -121,13 +102,15 @@ enum SplunkLogRecordAdapterJSON {
         return result
     }
 
-    /// Groups log records by instrumentation scope within a resource.
-    private static func groupByScope(_ logRecords: [SplunkReadableLogRecord]) -> [ScopeKey: [SplunkReadableLogRecord]] {
-        var result: [ScopeKey: [SplunkReadableLogRecord]] = [:]
+    /// Groups log records by full instrumentation scope identity within a resource.
+    ///
+    /// This uses all scope metadata as the key (name, version, schema URL, attributes)
+    /// to avoid collapsing distinct scopes that share only name/version.
+    private static func groupByScope(_ logRecords: [SplunkReadableLogRecord]) -> [InstrumentationScopeInfo: [SplunkReadableLogRecord]] {
+        var result: [InstrumentationScopeInfo: [SplunkReadableLogRecord]] = [:]
 
         for logRecord in logRecords {
-            let key = ScopeKey(from: logRecord.instrumentationScopeInfo)
-            result[key, default: []].append(logRecord)
+            result[logRecord.instrumentationScopeInfo, default: []].append(logRecord)
         }
 
         return result

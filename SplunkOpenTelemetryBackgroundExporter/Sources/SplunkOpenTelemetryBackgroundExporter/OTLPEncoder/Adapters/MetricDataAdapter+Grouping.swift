@@ -33,13 +33,15 @@ extension MetricDataAdapter {
         return result
     }
 
-    /// Groups metrics by instrumentation scope within a resource.
-    static func groupByScope(_ metrics: [MetricData]) -> [ScopeKey: [MetricData]] {
-        var result: [ScopeKey: [MetricData]] = [:]
+    /// Groups metrics by full instrumentation scope identity within a resource.
+    ///
+    /// This uses all scope metadata as the key (name, version, schema URL, attributes)
+    /// to avoid collapsing distinct scopes that share only name/version.
+    static func groupByScope(_ metrics: [MetricData]) -> [InstrumentationScopeInfo: [MetricData]] {
+        var result: [InstrumentationScopeInfo: [MetricData]] = [:]
 
         for metric in metrics {
-            let key = ScopeKey(from: metric.instrumentationScopeInfo)
-            result[key, default: []].append(metric)
+            result[metric.instrumentationScopeInfo, default: []].append(metric)
         }
 
         return result
