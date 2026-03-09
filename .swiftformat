@@ -1,3 +1,7 @@
+# Excluded directories
+
+--exclude tools/xcframework
+
 # Format options
 
 --allman false
@@ -65,4 +69,6 @@
 --disable fileHeader
 --disable indent
 --disable preferSwiftTesting
+--disable redundantSendable
+--disable redundantSwiftTestingSuite
 --disable wrapMultilineStatementBraces
