@@ -101,10 +101,12 @@ public final class Interactions: SplunkInteractionsModule {
         if let interactionType = interactionType(from: event.type) {
 
             let targetElement = await targetElement(from: event)
+            let xpath = await getElementXpath(from: event.viewHierarchy)
 
             destination.send(
                 actionName: interactionType,
                 elementId: targetElement,
+                xpath: xpath,
                 time: event.time
             )
         }
@@ -115,12 +117,52 @@ public final class Interactions: SplunkInteractionsModule {
 
     public func register(customId: String?, for viewId: ObjectIdentifier) {
         Task {
-            await customIdentifiers.append(value: customId, for: self, with: viewId)
+            await registerCustomId(customId, for: viewId)
         }
+    }
+
+    func registerCustomId(_ customId: String?, for viewId: ObjectIdentifier) async {
+        await customIdentifiers.append(value: customId, for: self, with: viewId)
     }
 
 
     // MARK: - Private helper functions
+
+    func getElementXpath(from itemNode: (any ViewNodeRepresentable)?) async -> String? {
+        guard let itemNode else {
+            return nil
+        }
+
+        var xpathItems: [String] = []
+        var checkNode: (any ViewNodeRepresentable)? = itemNode
+
+        while let currentNode = checkNode {
+            var nodeItem = currentNode.viewTypeName
+            var predicates: [String] = []
+
+            if let indexPath = currentNode.indexPath {
+                predicates.append("@col=\(indexPath.section)")
+                predicates.append("@row=\(indexPath.item)")
+            }
+
+            if let customId = await customIdentifiers.value(for: currentNode.viewId) {
+                let escaped = customId.replacingOccurrences(of: "'", with: "\\'")
+                predicates.append("@id='\(escaped)'")
+            }
+            else if xpathItems.isEmpty {
+                predicates.append("@id=\(UInt(bitPattern: currentNode.viewId))")
+            }
+
+            if !predicates.isEmpty {
+                nodeItem += "[\(predicates.joined(separator: ","))]"
+            }
+
+            xpathItems.append(nodeItem)
+            checkNode = currentNode.superNode
+        }
+
+        return "//" + xpathItems.reversed().joined(separator: "/")
+    }
 
     func targetElement(from event: InteractionEvent) async -> String? {
         guard let identifier = targetElementIdentifier(from: event) else {
