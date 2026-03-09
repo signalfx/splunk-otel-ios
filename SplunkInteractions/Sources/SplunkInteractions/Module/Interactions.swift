@@ -100,6 +100,7 @@ public final class Interactions: SplunkInteractionsModule {
     func handleEvent(_ event: InteractionEvent) async {
         if let interactionType = interactionType(from: event.type) {
             let targetElement = await targetElement(from: event)
+            let xpath = await getElementXpath(from: event.viewHierarchy)
 
             let xpath = await getElementXpath(from: event.viewHierarchy)
 
@@ -125,20 +126,24 @@ public final class Interactions: SplunkInteractionsModule {
 
     public func register(customId: String?, for viewId: ObjectIdentifier) {
         Task {
-            await customIdentifiers.append(value: customId, for: self, with: viewId)
+            await registerCustomId(customId, for: viewId)
         }
+    }
+
+    func registerCustomId(_ customId: String?, for viewId: ObjectIdentifier) async {
+        await customIdentifiers.append(value: customId, for: self, with: viewId)
     }
 
 
     // MARK: - Private helper functions
 
-    func getElementXpath(from itemNode: InteractionViewNode?) async -> String? {
+    func getElementXpath(from itemNode: (any ViewNodeRepresentable)?) async -> String? {
         guard let itemNode else {
             return nil
         }
 
         var xpathItems: [String] = []
-        var checkNode: InteractionViewNode? = itemNode
+        var checkNode: (any ViewNodeRepresentable)? = itemNode
 
         while let currentNode = checkNode {
             var nodeItem = currentNode.viewTypeName
@@ -162,7 +167,7 @@ public final class Interactions: SplunkInteractionsModule {
             }
 
             xpathItems.append(nodeItem)
-            checkNode = currentNode.superViewNode
+            checkNode = currentNode.superNode
         }
 
         return "//" + xpathItems.reversed().joined(separator: "/")
