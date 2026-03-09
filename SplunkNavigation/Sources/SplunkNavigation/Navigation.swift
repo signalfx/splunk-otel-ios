@@ -201,15 +201,6 @@ public final class Navigation: Sendable {
 
     /// Process the beginning of the view controller transition.
     private func processTransitionStart(event: NavigationActionEvent) async {
-        // `viewWillTransition` and `willTransitionToTraitCollection` can both
-        // fire for the same controller transition; keep only the first start.
-        if let existingNavigation = await model.navigation(for: event.controllerIdentifier),
-            existingNavigation.type == .transition,
-            existingNavigation.end == nil
-        {
-            return
-        }
-
         let start = Date()
 
         let typeName = event.controllerTypeName
@@ -223,7 +214,8 @@ public final class Navigation: Sendable {
             screenName: screenName
         )
 
-        // Store this navigation for final processing
+        // Always refresh in-flight transition state for this controller.
+        // If a previous end event was missed, this replaces stale timing data.
         await model.update(navigation: navigation, for: event.controllerIdentifier)
 
         // Send corresponding span
