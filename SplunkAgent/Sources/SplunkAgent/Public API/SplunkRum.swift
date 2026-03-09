@@ -48,6 +48,7 @@ public class SplunkRum: ObservableObject {
 
     let sessionSampler: any AgentSessionSampler
 
+    var moduleConfigurations: [Any]?
     var screenNameChangeCallback: ((String) -> Void)?
 
 
