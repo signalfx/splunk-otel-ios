@@ -25,17 +25,46 @@ public class OTLPBackgroundHTTPBaseExporter {
     // MARK: - Private
 
     private let qosConfig: SessionQOSConfiguration
-
+    private let performStalledUploadCheck: Bool
+    private let stateLock = NSLock()
+    private var storedEndpoint: URL?
+    private var storedAdditionalHeaders: [String: String]
 
     // MARK: - Internal
 
     let fileType: String?
-    let endpoint: URL
     let envVarHeaders: [(String, String)]?
-    let additionalHeaders: [String: String]
     let config: OTLPExporterConfiguration
     let diskStorage: DiskStorage
     var checkStalledTask: Task<Void, Never>?
+
+    /// Thread-safe accessor for the endpoint URL.
+    var endpoint: URL? {
+        get {
+            stateLock.lock()
+            defer { stateLock.unlock() }
+            return storedEndpoint
+        }
+        set {
+            stateLock.lock()
+            defer { stateLock.unlock() }
+            storedEndpoint = newValue
+        }
+    }
+
+    /// Thread-safe accessor for additional headers.
+    var additionalHeaders: [String: String] {
+        get {
+            stateLock.lock()
+            defer { stateLock.unlock() }
+            return storedAdditionalHeaders
+        }
+        set {
+            stateLock.lock()
+            defer { stateLock.unlock() }
+            storedAdditionalHeaders = newValue
+        }
+    }
 
     lazy var httpClient: BackgroundHTTPClientProtocol = BackgroundHTTPClient(
         sessionQosConfiguration: qosConfig,
@@ -43,11 +72,17 @@ public class OTLPBackgroundHTTPBaseExporter {
         namespace: getFileKeyType()
     )
 
+    // MARK: - Public Properties
+
+    /// Returns `true` if no endpoint is configured and data should be cached to pending storage.
+    public var isPendingEndpoint: Bool {
+        endpoint == nil
+    }
 
     // MARK: - Initialization
 
     public init(
-        endpoint: URL,
+        endpoint: URL?,
         config: OTLPExporterConfiguration = OTLPExporterConfiguration(),
         qosConfig: SessionQOSConfiguration,
         envVarHeaders: [(String, String)]? = OTLPEnvVarHeaders.attributes,
@@ -64,23 +99,16 @@ public class OTLPBackgroundHTTPBaseExporter {
         performStalledUploadCheck: Bool = true
     ) {
         self.envVarHeaders = envVarHeaders
-        additionalHeaders = headers
-        self.endpoint = endpoint
+        storedAdditionalHeaders = headers
+        storedEndpoint = endpoint
         self.config = config
         self.diskStorage = diskStorage
         self.fileType = fileType
         self.qosConfig = qosConfig
+        self.performStalledUploadCheck = performStalledUploadCheck
 
-        if performStalledUploadCheck {
-            // Get incomplete requests and check for stalled files
-            // Wait arbitrary 5 - 8s to clean caches content from abandoned or stalled files.
-            checkStalledTask = Task.detached(priority: .utility) { [weak self] in
-                try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
-                self?.httpClient
-                    .getAllSessionsTasks { [weak self] tasks in
-                        self?.checkStalledUploadsOperation(tasks: tasks)
-                    }
-            }
+        if performStalledUploadCheck, endpoint != nil {
+            startStalledUploadCheck()
         }
     }
 
@@ -88,77 +116,131 @@ public class OTLPBackgroundHTTPBaseExporter {
         checkStalledTask?.cancel()
     }
 
+    // MARK: - Endpoint Management
+
+    /// Updates the endpoint and flushes any pending data.
+    ///
+    /// In-flight uploads targeting the previous endpoint are rescheduled by the stalled upload check (within 5–8s).
+    public func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]? = nil) {
+        stateLock.lock()
+        storedEndpoint = newEndpoint
+        if let newHeaders {
+            storedAdditionalHeaders = newHeaders
+        }
+        stateLock.unlock()
+
+        flushPendingData()
+
+        if performStalledUploadCheck {
+            startStalledUploadCheck()
+        }
+    }
+
+    /// Clears the endpoint, causing new data to be cached to pending storage.
+    public func clearEndpoint() {
+        checkStalledTask?.cancel()
+        checkStalledTask = nil
+        endpoint = nil
+    }
 
     // MARK: - Stalled request operations
 
     func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
+        guard let currentEndpoint = endpoint else {
+            return
+        }
 
-        // Get descriptions from all incomplete requests
         let allTaskDescriptions =
             tasks
             .compactMap(\.taskDescription)
-            .compactMap {
-                try? JSONDecoder().decode(RequestDescriptor.self, from: Data($0.utf8))
-            }
+            .compactMap { try? JSONDecoder().decode(RequestDescriptor.self, from: Data($0.utf8)) }
 
-        // Get time when all newly created tasks should be already sent.
         let cancelTime = Date(timeIntervalSinceNow: -1 * config.timeout)
 
-        // Cancel all stalled tasks.
-        let toCancelTasks = tasks.filter {
-            guard let expectedExecutionDate = $0.earliestBeginDate else {
+        // Cancel stalled tasks and tasks with mismatched endpoints
+        let toCancelTasks = tasks.filter { task in
+            guard let expectedExecutionDate = task.earliestBeginDate else {
                 return true
             }
 
-            return expectedExecutionDate < cancelTime
+            if expectedExecutionDate < cancelTime {
+                return true
+            }
+
+            if let taskDescription = task.taskDescription,
+                let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8)),
+                descriptor.endpoint != currentEndpoint
+            {
+                return true
+            }
+            return false
         }
+
+        let cancelledTaskIds = Set(
+            toCancelTasks.compactMap { task -> UUID? in
+                guard let taskDescription = task.taskDescription,
+                    let descriptor = try? JSONDecoder().decode(RequestDescriptor.self, from: Data(taskDescription.utf8))
+                else {
+                    return nil
+                }
+
+                return descriptor.id
+            }
+        )
 
         for task in toCancelTasks {
             task.cancel()
         }
 
-        // Get all file's keys that should be uploaded
         guard let uploadList = (try? diskStorage.list(forKey: getStorageKey()))?.map(\.key) else {
-
             return
         }
 
-        checkAndSend(fileKeys: uploadList, existingTasks: allTaskDescriptions, cancelTime: cancelTime)
+        checkAndSend(fileKeys: uploadList, existingTasks: allTaskDescriptions, cancelledTaskIds: cancelledTaskIds)
     }
 
-    func checkAndSend(fileKeys files: [String], existingTasks allTaskDescriptions: [RequestDescriptorProtocol], cancelTime: Date) {
+    func checkAndSend(
+        fileKeys files: [String],
+        existingTasks allTaskDescriptions: [RequestDescriptorProtocol],
+        cancelledTaskIds: Set<UUID>
+    ) {
+        let (currentEndpoint, currentHeaders) = getEndpointState()
+        guard let currentEndpoint else {
+            return
+        }
 
-        // Go throught file list and try to send all files again.
         for fileKey in files {
             guard let requestId = UUID(uuidString: fileKey) else {
-
                 continue
             }
 
-            // If there is no upload task for file in cache folder, create RequestDescriptor and plan its upload to server
-            // Note:
-            //      File names are UUIDs of tasks
-            if let taskDescription = allTaskDescriptions.first(where: { $0.id == requestId }) {
-                // Perform send only for tasks which was scheduled in past and was cancelled in previous step.
-                if taskDescription.scheduled < cancelTime {
+            if let existingTaskDescription = allTaskDescriptions.first(where: { $0.id == requestId }) {
+                if cancelledTaskIds.contains(requestId) {
+                    let taskDescription = RequestDescriptor(
+                        id: requestId,
+                        endpoint: currentEndpoint,
+                        explicitTimeout: config.timeout,
+                        fileKeyType: getFileKeyType(),
+                        headers: buildHeaders(from: currentHeaders)
+                    )
                     try? httpClient.send(taskDescription)
                 }
             }
             else {
                 // This task was forgotten by system, create new one.
+                let payloadFormat = inferPayloadFormat(forFileKey: fileKey)
                 let taskDescription = RequestDescriptor(
                     id: requestId,
-                    endpoint: endpoint,
+                    endpoint: currentEndpoint,
                     explicitTimeout: config.timeout,
                     fileKeyType: getFileKeyType(),
-                    headers: headers
+                    headers: buildHeaders(from: currentHeaders),
+                    payloadFormat: payloadFormat
                 )
-
                 try? httpClient.send(taskDescription)
             }
         }
     }
-
 
     // MARK: - Helper functions
 
@@ -166,19 +248,102 @@ public class OTLPBackgroundHTTPBaseExporter {
         KeyBuilder.uploadsKey.append(getFileKeyType())
     }
 
+    func getPendingStorageKey() -> KeyBuilder {
+        KeyBuilder.pendingUploadsKey.append(getFileKeyType())
+    }
+
     func getFileKeyType() -> String {
         fileType ?? "base"
     }
 
     var headers: [String: String] {
-        var combinedHeaders = additionalHeaders
+        buildHeaders(from: additionalHeaders)
+    }
+}
 
+// MARK: - Private helpers
+
+extension OTLPBackgroundHTTPBaseExporter {
+    private func startStalledUploadCheck() {
+        checkStalledTask?.cancel()
+        // Wait 5-8s to clean caches content from abandoned or stalled files.
+        checkStalledTask = Task.detached(priority: .utility) { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
+            self?.httpClient
+                .getAllSessionsTasks { [weak self] tasks in
+                    self?.checkStalledUploadsOperation(tasks: tasks)
+                }
+        }
+    }
+
+    /// Flushes any data stored in pending storage by moving it to active storage and scheduling uploads.
+    private func flushPendingData() {
+        let (currentEndpoint, currentHeaders) = getEndpointState()
+        guard let currentEndpoint else {
+            return
+        }
+
+        guard let pendingFiles = try? diskStorage.list(forKey: getPendingStorageKey()) else {
+            return
+        }
+
+        for fileInfo in pendingFiles {
+            let pendingKey = KeyBuilder(fileInfo.key, parrentKeyBuilder: getPendingStorageKey())
+            let activeKey = KeyBuilder(fileInfo.key, parrentKeyBuilder: getStorageKey())
+
+            do {
+                let pendingFileUrl = try diskStorage.finalDestination(forKey: pendingKey)
+                let data = try Data(contentsOf: pendingFileUrl)
+                try diskStorage.insert(data, forKey: activeKey)
+                try diskStorage.delete(forKey: pendingKey)
+
+                guard let requestId = UUID(uuidString: fileInfo.key) else {
+                    continue
+                }
+
+                let requestDescriptor = RequestDescriptor(
+                    id: requestId,
+                    endpoint: currentEndpoint,
+                    explicitTimeout: config.timeout,
+                    fileKeyType: getFileKeyType(),
+                    headers: buildHeaders(from: currentHeaders)
+                )
+                try httpClient.send(requestDescriptor)
+            }
+            catch {
+                continue
+            }
+        }
+    }
+
+    private func getEndpointState() -> (endpoint: URL?, headers: [String: String]) {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return (storedEndpoint, storedAdditionalHeaders)
+    }
+
+    private func buildHeaders(from additionalHeaders: [String: String]) -> [String: String] {
+        var combinedHeaders = additionalHeaders
         if let envVarHeaders {
             for (key, value) in envVarHeaders {
                 combinedHeaders[key] = value
             }
         }
-
         return combinedHeaders
+    }
+
+    private func inferPayloadFormat(forFileKey fileKey: String) -> RequestPayloadFormat {
+        guard
+            let fileURL = try? diskStorage.finalDestination(forKey: getStorageKey().append(fileKey)),
+            let payloadData = try? Data(contentsOf: fileURL)
+        else {
+            return .json
+        }
+
+        if (try? JSONSerialization.jsonObject(with: payloadData)) != nil {
+            return .json
+        }
+
+        return .protobuf
     }
 }

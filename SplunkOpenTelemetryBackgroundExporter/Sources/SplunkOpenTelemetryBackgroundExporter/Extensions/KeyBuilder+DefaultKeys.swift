@@ -18,5 +18,9 @@ limitations under the License.
 import CiscoDiskStorage
 
 extension KeyBuilder {
+    /// Key for active uploads (data ready to send).
     static let uploadsKey = KeyBuilder("uploadFiles")
+
+    /// Key for pending uploads (data cached while endpoint is not configured).
+    static let pendingUploadsKey = KeyBuilder("pendingUploadFiles")
 }

@@ -20,7 +20,7 @@ import Foundation
 extension NotificationCenter {
     /// Creates an `AsyncStream` of notifications for a given name, providing backward compatibility for iOS versions prior to 15.
     func notifications(for name: Notification.Name) -> AsyncStream<Notification> {
-        guard #available(iOS 15.0, *) else {
+        guard #available(iOS 15.0, tvOS 15.0, macCatalyst 15.0, visionOS 1.0, *) else {
             // Provide a fallback for iOS 13/14 using the classic observer pattern.
             return AsyncStream { continuation in
                 let observer = self.addObserver(forName: name, object: nil, queue: .main) { notification in
@@ -41,7 +41,7 @@ extension NotificationCenter {
 #if canImport(Combine)
     import Combine
 
-    @available(iOS 15.0, *)
+    @available(iOS 15.0, tvOS 15.0, macCatalyst 15.0, visionOS 1.0, *)
     extension AsyncSequence {
         /// Helper to erase the specific async sequence type to a generic AsyncStream.
         func eraseToStream() -> AsyncStream<Element> {

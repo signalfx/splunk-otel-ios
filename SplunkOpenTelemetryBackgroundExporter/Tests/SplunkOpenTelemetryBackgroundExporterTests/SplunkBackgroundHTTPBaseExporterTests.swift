@@ -137,18 +137,70 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     }
 
     @Test
+    func taskWithMismatchedEndpointIsCancelled() throws {
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        // Exporter is created with endpoint "https://example.com"
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 1))
+
+        let now = Date()
+        let futureDate = now.addingTimeInterval(1_000)
+
+        // Task is scheduled for the future (not stalled) but has a different endpoint
+        let taskWithDifferentEndpoint = try createNewTestTask()
+        taskWithDifferentEndpoint.taskDescription = try MockRequestDescriptor(
+            // Different endpoint than the exporter's configured endpoint
+            endpointString: "https://other-endpoint.com/v1/traces",
+            scheduled: futureDate
+        )
+        .json
+        taskWithDifferentEndpoint.earliestBeginDate = futureDate
+
+        exporter.checkStalledUploadsOperation(tasks: [taskWithDifferentEndpoint])
+
+        // Task should be cancelled because its endpoint doesn't match the exporter's endpoint
+        // Note: The state can be .canceling or .completed since the transition happens quickly
+        #expect(taskWithDifferentEndpoint.state == .canceling || taskWithDifferentEndpoint.state == .completed)
+    }
+
+    @Test
+    func taskWithMatchingEndpointIsNotCancelled() throws {
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http, config: OTLPExporterConfiguration(timeout: 1))
+
+        let now = Date()
+        let futureDate = now.addingTimeInterval(1_000)
+
+        // Task has the same endpoint as the exporter
+        let taskWithMatchingEndpoint = try createNewTestTask()
+        taskWithMatchingEndpoint.taskDescription = try MockRequestDescriptor(
+            // Same endpoint as exporter
+            endpointString: "https://example.com",
+            scheduled: futureDate
+        )
+        .json
+        taskWithMatchingEndpoint.earliestBeginDate = futureDate
+
+        exporter.checkStalledUploadsOperation(tasks: [taskWithMatchingEndpoint])
+
+        // Task should NOT be cancelled because its endpoint matches and it's not stalled
+        #expect(taskWithMatchingEndpoint.state != .canceling)
+    }
+
+    @Test
     func fileWithInvalidUUIDIsSkipped() throws {
         let disk = MockDiskStorage()
         let http = MockHTTPClient()
 
         let exporter = try makeExporter(disk: disk, http: http)
-        exporter.checkAndSend(fileKeys: ["non-working-uuid"], existingTasks: [], cancelTime: Date())
+        exporter.checkAndSend(fileKeys: ["non-working-uuid"], existingTasks: [], cancelledTaskIds: [])
 
         #expect(http.sent.isEmpty)
     }
 
     @Test
-    func fileWithNonStalledTaskIsNotResent() throws {
+    func fileWithNonCancelledTaskIsNotResent() throws {
         let uuid = UUID()
         let disk = MockDiskStorage()
         let desc = try MockRequestDescriptor(id: uuid, scheduled: Date().addingTimeInterval(1_000))
@@ -156,13 +208,14 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         let http = MockHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: Date())
+        // Task exists but was not cancelled (not in cancelledTaskIds), so it should not be resent
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelledTaskIds: [])
 
         #expect(http.sent.isEmpty)
     }
 
     @Test
-    func fileWithStalledTaskIsResent() throws {
+    func fileWithCancelledTaskIsResent() throws {
         let uuid = UUID()
         let disk = MockDiskStorage()
         let desc = try MockRequestDescriptor(
@@ -176,7 +229,8 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         let http = MockHTTPClient()
         let exporter = try makeExporter(disk: disk, http: http)
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelTime: Date())
+        // Task was cancelled (in cancelledTaskIds), so it should be resent with new endpoint
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [desc], cancelledTaskIds: [uuid])
 
         #expect(http.sent.count == 1)
         #expect(http.sent.first?.id == uuid)
@@ -190,10 +244,52 @@ struct SplunkBackgroundHTTPBaseExporterTests {
 
         let exporter = try makeExporter(disk: disk, http: http)
 
-        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelTime: Date())
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelledTaskIds: [])
 
         #expect(http.sent.count == 1)
         #expect(http.sent.first?.id == uuid)
+        #expect(http.sent.first?.payloadFormat == .json)
+    }
+
+    @Test
+    func fileWithNoTaskDescriptionAndJSONPayloadUsesJSONFormat() throws {
+        let uuid = UUID()
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http)
+        let fileKey = exporter.getStorageKey().append(uuid.uuidString).key
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("otlp-json-\(uuid.uuidString)")
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let jsonPayload = Data("{}".utf8)
+
+        try jsonPayload.write(to: fileURL)
+        disk.files[fileKey] = fileURL
+
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelledTaskIds: [])
+
+        #expect(http.sent.count == 1)
+        #expect(http.sent.first?.payloadFormat == .json)
+    }
+
+    @Test
+    func fileWithNoTaskDescriptionAndProtobufPayloadUsesProtobufFormat() throws {
+        let uuid = UUID()
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http)
+        let fileKey = exporter.getStorageKey().append(uuid.uuidString).key
+        let fileURL = FileManager.default.temporaryDirectory.appendingPathComponent("otlp-proto-\(uuid.uuidString)")
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let payload = Data([0x0A, 0x02, 0x08, 0x01])
+        try payload.write(to: fileURL)
+        disk.files[fileKey] = fileURL
+
+        exporter.checkAndSend(fileKeys: [uuid.uuidString], existingTasks: [], cancelledTaskIds: [])
+
+        #expect(http.sent.count == 1)
+        #expect(http.sent.first?.payloadFormat == .protobuf)
     }
 
     @Test

@@ -29,13 +29,17 @@ let package = Package(
     dependencies: [
         // Note: opentelemetry-swift package (with OpenTelemetryProtocolExporter) was removed
         // in favor of custom OTLP JSON encoding. We now only use opentelemetry-swift-core.
+        //
+        // IMPORTANT: These versions are pinned with `exact:` because the xcframework build
+        // system (tools/xcframework/Makefile) reads them to build matching binaries.
+        // When upgrading, update the version here — the Makefile picks it up automatically.
         .package(
             url: "https://github.com/open-telemetry/opentelemetry-swift-core",
-            from: "2.1.1"
+            exact: "2.3.0"
         ),
         .package(
             url: "https://github.com/microsoft/plcrashreporter",
-            from: "1.12.0"
+            exact: "1.12.0"
         )
     ],
     targets: []
@@ -397,13 +401,18 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 resolveDependency("logger")
             ],
-            path: "SplunkWebView/Sources",
+            path: "SplunkWebView",
+            sources: ["Sources"],
+            resources: [
+                .process("Resources")
+            ],
             plugins: lintTargetPlugins()
         ),
         .testTarget(
             name: "SplunkWebViewTests",
             dependencies: [
-                "SplunkWebView"
+                "SplunkWebView",
+                resolveDependency("logger")
             ],
             path: "SplunkWebView/Tests",
             plugins: lintTargetPlugins()

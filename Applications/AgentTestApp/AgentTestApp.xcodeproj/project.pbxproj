@@ -14,6 +14,8 @@
 		BA188B212BA0C91B00DACB15 /* Crashes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA188B1F2BA0C91B00DACB15 /* Crashes.swift */; };
 		BA338B462B9A610600D2F3B6 /* TestApiCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA338B452B9A610600D2F3B6 /* TestApiCalls.swift */; };
 		BA338B482B9A612400D2F3B6 /* TestApiCallsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA338B472B9A612400D2F3B6 /* TestApiCallsViewController.swift */; };
+		BA5371F62F15889800C88609 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5371F52F15889300C88609 /* Endpoint.swift */; };
+		BA5371F82F1588A400C88609 /* EndpointViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5371F72F15889E00C88609 /* EndpointViewController.swift */; };
 		BA5E5A442B6859BC0022CEB2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5E5A432B6859BC0022CEB2 /* AppDelegate.swift */; };
 		BA5E5A462B6859BC0022CEB2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5E5A452B6859BC0022CEB2 /* SceneDelegate.swift */; };
 		BA5E5A482B6859BC0022CEB2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5E5A472B6859BC0022CEB2 /* ViewController.swift */; };
@@ -31,6 +33,8 @@
 		BA188B1F2BA0C91B00DACB15 /* Crashes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crashes.swift; sourceTree = "<group>"; };
 		BA338B452B9A610600D2F3B6 /* TestApiCalls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestApiCalls.swift; sourceTree = "<group>"; };
 		BA338B472B9A612400D2F3B6 /* TestApiCallsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestApiCallsViewController.swift; sourceTree = "<group>"; };
+		BA5371F52F15889300C88609 /* Endpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
+		BA5371F72F15889E00C88609 /* EndpointViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndpointViewController.swift; sourceTree = "<group>"; };
 		BA5E5A402B6859BC0022CEB2 /* AgentTestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgentTestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA5E5A432B6859BC0022CEB2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BA5E5A452B6859BC0022CEB2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -97,6 +101,8 @@
 		BA5E5A572B6864A60022CEB2 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				BA5371F52F15889300C88609 /* Endpoint.swift */,
+				BA5371F72F15889E00C88609 /* EndpointViewController.swift */,
 				BA188B1F2BA0C91B00DACB15 /* Crashes.swift */,
 				BA188B1E2BA0C91B00DACB15 /* CrashesViewController.swift */,
 				BA5E5A582B6864A60022CEB2 /* NetworkCalls.swift */,
@@ -201,6 +207,8 @@
 				52705BE12D08FDF600445B8E /* SlowFrameDetectorViewController.swift in Sources */,
 				BA5E5A462B6859BC0022CEB2 /* SceneDelegate.swift in Sources */,
 				BA188B202BA0C91B00DACB15 /* CrashesViewController.swift in Sources */,
+				BA5371F82F1588A400C88609 /* EndpointViewController.swift in Sources */,
+				BA5371F62F15889800C88609 /* Endpoint.swift in Sources */,
 				BA5E5A5E2B6864A60022CEB2 /* NetworkCallsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
