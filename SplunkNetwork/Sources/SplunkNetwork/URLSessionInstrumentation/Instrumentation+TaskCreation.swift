@@ -182,35 +182,10 @@ func createInstrumentedDownloadTask(
 }
 
 func shouldInstrumentRequest(_ request: URLRequest) -> Bool {
-    // Don't double-instrument
-    if TraceContextInjector.hasTraceContext(in: request) {
-        return false
-    }
-
-    guard
-        let url = request.url,
-        url.scheme?.lowercased().starts(with: "http") == true
-    else {
-        return false
-    }
-
-    let manager = NetworkInstrumentationManager.shared
-
-    // Check excluded endpoints
-    if let excludedEndpoints = manager.getModule()?.excludedEndpoints,
-        shouldExcludeURL(url, excludedEndpoints: excludedEndpoints)
-    {
-        return false
-    }
-
-    // Check ignoreURLs
-    if let ignoreURLs = manager.getModule()?.getIgnoreURLs(),
-        ignoreURLs.matches(url: url)
-    {
-        return false
-    }
-
-    return true
+    // Prevent double-instrumentation of requests that already carry trace context.
+    // All other filtering (URL scheme, excluded endpoints, ignoreURLs) is handled
+    // by startHttpSpan, which is always called immediately after this check.
+    !TraceContextInjector.hasTraceContext(in: request)
 }
 
 func injectTraceContextIfEnabled(into request: URLRequest, span: Span) -> URLRequest {
