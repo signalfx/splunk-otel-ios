@@ -17,17 +17,24 @@ limitations under the License.
 
 import Foundation
 
-protocol AgentState {
+@testable import SplunkInteractions
 
-    // MARK: - Agent status
+final class MockViewNode: ViewNodeRepresentable {
 
-    var status: Status { get }
+    let viewTypeName: String
+    let viewId: ObjectIdentifier
+    let indexPath: IndexPath?
+    let superNode: (any ViewNodeRepresentable)?
 
-
-    // MARK: - Current Configuration
-
-    var endpointConfiguration: EndpointConfiguration? { get }
-
-    var appName: String { get }
-    var appVersion: String { get }
+    init(
+        viewTypeName: String,
+        viewId: ObjectIdentifier,
+        indexPath: IndexPath? = nil,
+        superNode: (any ViewNodeRepresentable)? = nil
+    ) {
+        self.viewTypeName = viewTypeName
+        self.viewId = viewId
+        self.indexPath = indexPath
+        self.superNode = superNode
+    }
 }

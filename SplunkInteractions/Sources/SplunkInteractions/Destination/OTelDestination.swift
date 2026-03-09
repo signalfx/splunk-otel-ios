@@ -25,7 +25,7 @@ struct OTelDestination: SplunkInteractionsDestination {
 
     // MARK: - Sending
 
-    func send(actionName: String, elementId: String?, time: Date) {
+    func send(actionName: String, elementId: String?, xpath: String?, time: Date) {
 
         let logProvider = OpenTelemetry.instance
             .loggerProvider
@@ -37,6 +37,10 @@ struct OTelDestination: SplunkInteractionsDestination {
         attributes["event.name"] = .string("action")
         attributes["component"] = .string("ui")
         attributes["action.name"] = .string(actionName)
+
+        if let xpath {
+            attributes["target_xpath"] = .string(xpath)
+        }
 
         if let elementId {
             attributes["target.type"] = .string(elementId)

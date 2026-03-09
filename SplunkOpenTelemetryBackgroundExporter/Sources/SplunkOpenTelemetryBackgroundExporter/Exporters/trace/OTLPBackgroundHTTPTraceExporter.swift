@@ -38,6 +38,20 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
         do {
             // Encode to JSON instead of protobuf binary
             let storeData = try JSONEncoder().encode(request)
+
+            // If no endpoint is configured, store in pending folder for later
+            if isPendingEndpoint {
+                try diskStorage.insert(
+                    storeData,
+                    forKey: KeyBuilder(
+                        requestId.uuidString,
+                        parrentKeyBuilder: getPendingStorageKey()
+                    )
+                )
+                return .success
+            }
+
+            // Store in active folder
             try diskStorage.insert(
                 storeData,
                 forKey: KeyBuilder(
@@ -49,6 +63,11 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
         catch {
 
             return .failure
+        }
+
+        // Only send if we have an endpoint
+        guard let endpoint else {
+            return .success
         }
 
         let timeout = min(explicitTimeout ?? TimeInterval.greatestFiniteMagnitude, config.timeout)

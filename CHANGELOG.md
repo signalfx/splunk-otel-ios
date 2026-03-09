@@ -9,9 +9,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Added Notification for Session Changes
 
+### Changed
+
+* The SDK now uses static binary dependencies to enhance integration in complex deployment scenarios.
+
 ## [2.1.0] - 2026-02-23
 
 ### Added
+
+* Added support for the setting of endpointConfiguration to be deferred until after agent initialization. Disabling the endpoint is also supported with caching of pending spans.
+* XCFramework build system for binary distribution of the SDK.
+
+### Changed
+
+* Replaced OTLP binary protobuf with custom JSON encoding to reduce binary size. The SDK now uses `opentelemetry-swift-core` (API/SDK only) instead of the full `opentelemetry-swift` package with protocol exporters.
 
 * XCFramework build system for binary distribution of the SDK. #568
 
