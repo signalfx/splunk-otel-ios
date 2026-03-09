@@ -98,7 +98,7 @@ public final class Interactions: SplunkInteractionsModule {
     }
 
     func handleEvent(_ event: InteractionEvent) async {
-        await handleEventType(event.type, viewHierarchy: event.viewHierarchy, targetElement: await targetElement(from: event), time: event.time)
+        await handleEventType(event.type, viewHierarchy: event.viewHierarchy, targetElement: targetElement(from: event), time: event.time)
     }
 
     func handleEventType(_ type: InteractionType, viewHierarchy: InteractionViewNode?, targetElement: String?, time: Date) async {
