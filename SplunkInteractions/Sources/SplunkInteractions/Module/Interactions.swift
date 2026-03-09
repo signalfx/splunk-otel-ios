@@ -98,23 +98,26 @@ public final class Interactions: SplunkInteractionsModule {
     }
 
     func handleEvent(_ event: InteractionEvent) async {
-        if let interactionType = interactionType(from: event.type) {
-            let targetElement = await targetElement(from: event)
-            let xpath = await getElementXpath(from: event.viewHierarchy)
+        await handleEventType(event.type, viewHierarchy: event.viewHierarchy, targetElement: await targetElement(from: event), time: event.time)
+    }
+
+    func handleEventType(_ type: InteractionType, viewHierarchy: InteractionViewNode?, targetElement: String?, time: Date) async {
+        if let interactionType = interactionType(from: type) {
+            let xpath = await getElementXpath(from: viewHierarchy)
 
             destination.sendInteraction(
                 actionName: interactionType,
                 elementId: targetElement,
                 xpath: xpath,
-                time: event.time
+                time: time
             )
         }
-        else if event.type == .gestureRageTap {
-            let xpath = await getElementXpath(from: event.viewHierarchy)
+        else if type == .gestureRageTap {
+            let xpath = await getElementXpath(from: viewHierarchy)
 
             destination.sendFrustration(
                 xpath: xpath,
-                time: event.time
+                time: time
             )
         }
     }

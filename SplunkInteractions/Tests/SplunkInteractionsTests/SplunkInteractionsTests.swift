@@ -67,8 +67,7 @@ final class SplunkInteractionsTests: XCTestCase {
         let destination = TestInteractionDestination()
         let interactions = Interactions(destination: destination)
 
-        let event = InteractionEvent(time: Date(), type: .gestureRageTap)
-        await interactions.handleEvent(event)
+        await interactions.handleEventType(.gestureRageTap, viewHierarchy: nil, targetElement: nil, time: Date())
 
         XCTAssertEqual(destination.didReceiveFrustrationCallCount, 1)
         XCTAssertEqual(destination.didReceiveInteractionCallCount, 0)
@@ -78,8 +77,7 @@ final class SplunkInteractionsTests: XCTestCase {
         let destination = TestInteractionDestination()
         let interactions = Interactions(destination: destination)
 
-        let event = InteractionEvent(time: Date(), type: .gestureRageTap)
-        await interactions.handleEvent(event)
+        await interactions.handleEventType(.gestureRageTap, viewHierarchy: nil, targetElement: nil, time: Date())
 
         XCTAssertEqual(destination.didReceiveInteractionCallCount, 0)
     }
