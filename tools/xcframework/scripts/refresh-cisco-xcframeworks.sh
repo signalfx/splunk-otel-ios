@@ -45,6 +45,13 @@ log() {
     echo "==> $*"
 }
 
+manifest_metadata_value() {
+    local key="$1"
+    local manifest_path="$2"
+
+    awk -F= -v key="${key}" '$1 == key { print substr($0, index($0, "=") + 1); exit }' "${manifest_path}"
+}
+
 resolve_manifest_path() {
     if [[ -n "${MANIFEST_PATH}" ]]; then
         echo "${MANIFEST_PATH}"
@@ -64,6 +71,10 @@ RESOLVED_MANIFEST="$(resolve_manifest_path)"
 DOWNLOAD_ARGS=(--output-dir "${OUTPUT_DIR}")
 if [[ -n "${RESOLVED_MANIFEST}" ]]; then
     log "Using Cisco manifest ${RESOLVED_MANIFEST}"
+    SOURCE_COMMIT="$(manifest_metadata_value "source_commit" "${RESOLVED_MANIFEST}")"
+    if [[ -n "${SOURCE_COMMIT}" ]]; then
+        echo "  Cisco source commit: ${SOURCE_COMMIT}"
+    fi
     DOWNLOAD_ARGS+=(--manifest "${RESOLVED_MANIFEST}")
 elif [[ -n "${PACKAGE_SWIFT}" ]]; then
     log "Using Package.swift at ${PACKAGE_SWIFT}"
