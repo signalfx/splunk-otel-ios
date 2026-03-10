@@ -7,6 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Added support for adjusting the Session Replay sampling rate.
+
+### Changed
+
+* The SDK now uses static binary dependencies to enhance integration in complex deployment scenarios.
+
 ## [2.1.0] - 2026-02-23
 
 ### Added

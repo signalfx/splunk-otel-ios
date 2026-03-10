@@ -152,6 +152,12 @@ jobs:
         working-directory: tools/xcframework
         run: RELEASE=false scripts/validate-xcframeworks.sh
 
+      - name: Generate Cisco release manifest
+        working-directory: tools/xcframework
+        run: |
+          chmod +x scripts/*.sh
+          scripts/generate-cisco-release-manifest.sh
+
       # -----------------------------------------------------------------
       # Step 5b: Smoke test (consumer linkage)
       # -----------------------------------------------------------------
@@ -196,6 +202,12 @@ jobs:
         with:
           name: splunk-agent-xcframeworks-unsigned
           path: tools/xcframework/output/xcframeworks/
+
+      - name: Refresh Cisco xcframeworks from source
+        working-directory: tools/xcframework
+        run: |
+          chmod +x scripts/*.sh
+          scripts/refresh-cisco-xcframeworks.sh
 
       # -----------------------------------------------------------------
       # Signing

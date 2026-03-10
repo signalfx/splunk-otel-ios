@@ -98,14 +98,36 @@ public final class Interactions: SplunkInteractionsModule {
     }
 
     func handleEvent(_ event: InteractionEvent) async {
-        if let interactionType = interactionType(from: event.type) {
+        await handleEventType(
+            event.type,
+            viewHierarchy: event.viewHierarchy,
+            targetElement: targetElement(from: event),
+            time: event.time
+        )
+    }
 
-            let targetElement = await targetElement(from: event)
+    func handleEventType(
+        _ type: InteractionType,
+        viewHierarchy: InteractionViewNode?,
+        targetElement: String?,
+        time: Date
+    ) async {
+        if let interactionType = interactionType(from: type) {
+            let xpath = await getElementXpath(from: viewHierarchy)
 
-            destination.send(
+            destination.sendInteraction(
                 actionName: interactionType,
                 elementId: targetElement,
-                time: event.time
+                xpath: xpath,
+                time: time
+            )
+        }
+        else if type == .gestureRageTap {
+            let xpath = await getElementXpath(from: viewHierarchy)
+
+            destination.sendFrustration(
+                xpath: xpath,
+                time: time
             )
         }
     }
@@ -115,12 +137,52 @@ public final class Interactions: SplunkInteractionsModule {
 
     public func register(customId: String?, for viewId: ObjectIdentifier) {
         Task {
-            await customIdentifiers.append(value: customId, for: self, with: viewId)
+            await registerCustomId(customId, for: viewId)
         }
+    }
+
+    func registerCustomId(_ customId: String?, for viewId: ObjectIdentifier) async {
+        await customIdentifiers.append(value: customId, for: self, with: viewId)
     }
 
 
     // MARK: - Private helper functions
+
+    func getElementXpath(from itemNode: (any ViewNodeRepresentable)?) async -> String? {
+        guard let itemNode else {
+            return nil
+        }
+
+        var xpathItems: [String] = []
+        var checkNode: (any ViewNodeRepresentable)? = itemNode
+
+        while let currentNode = checkNode {
+            var nodeItem = currentNode.viewTypeName
+            var predicates: [String] = []
+
+            if let indexPath = currentNode.indexPath {
+                predicates.append("@col=\(indexPath.section)")
+                predicates.append("@row=\(indexPath.item)")
+            }
+
+            if let customId = await customIdentifiers.value(for: currentNode.viewId) {
+                let escaped = customId.replacingOccurrences(of: "'", with: "\\'")
+                predicates.append("@id='\(escaped)'")
+            }
+            else if xpathItems.isEmpty {
+                predicates.append("@id=\(UInt(bitPattern: currentNode.viewId))")
+            }
+
+            if !predicates.isEmpty {
+                nodeItem += "[\(predicates.joined(separator: ","))]"
+            }
+
+            xpathItems.append(nodeItem)
+            checkNode = currentNode.superNode
+        }
+
+        return "//" + xpathItems.reversed().joined(separator: "/")
+    }
 
     func targetElement(from event: InteractionEvent) async -> String? {
         guard let identifier = targetElementIdentifier(from: event) else {
@@ -175,9 +237,6 @@ public final class Interactions: SplunkInteractionsModule {
 
         case .gestureDoubleTap:
             "double_tap"
-
-        case .gestureRageTap:
-            "rage_tap"
 
         case .gesturePinch:
             "pinch"
