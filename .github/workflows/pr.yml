@@ -50,10 +50,6 @@ jobs:
     runs-on: macos-latest
     outputs:
       scheme: ${{ steps.scheme.outputs.scheme }}
-      ios_dest: ${{ steps.dest.outputs.ios_dest }}
-      tvos_dest: ${{ steps.dest.outputs.tvos_dest }}
-      visionos_dest: ${{ steps.dest.outputs.visionos_dest }}
-      maccatalyst_dest: ${{ steps.dest.outputs.maccatalyst_dest }}
     steps:
       - uses: actions/checkout@v6
       - uses: maxim-lobanov/setup-xcode@v1
@@ -65,16 +61,6 @@ jobs:
       - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
       - id: scheme
         run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
-      - id: dest
-        env:
-          SCHEME: ${{ steps.scheme.outputs.scheme }}
-        run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
-      - name: Debug destinations
-        run: |
-          echo "::notice::ios=${{ steps.dest.outputs.ios_dest }}"
-          echo "::notice::tvos=${{ steps.dest.outputs.tvos_dest }}"
-          echo "::notice::visionos=${{ steps.dest.outputs.visionos_dest }}"
-          echo "::notice::maccatalyst=${{ steps.dest.outputs.maccatalyst_dest }}"
 
   build:
     runs-on: macos-latest
