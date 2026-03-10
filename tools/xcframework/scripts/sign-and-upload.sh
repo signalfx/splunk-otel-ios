@@ -62,6 +62,13 @@ log() {
     echo "==> $*"
 }
 
+manifest_metadata_value() {
+    local key="$1"
+    local manifest_path="$2"
+
+    awk -F= -v key="${key}" '$1 == key { print substr($0, index($0, "=") + 1); exit }' "${manifest_path}"
+}
+
 # ---------------------------------------------------------------------------
 # Preflight checks
 # ---------------------------------------------------------------------------
@@ -120,7 +127,7 @@ if [[ -n "${RUN_ID}" ]]; then
     gh run download "${RUN_ID}" \
         -n "${ARTIFACT_NAME}" \
         -D "${OUTPUT_DIR}" \
-        -R "$(gh repo view --json nameWithOwner -q .nameWithOwner "${REPO_ROOT}")" 2>&1
+        -R "$(cd "${REPO_ROOT}" && gh repo view --json nameWithOwner -q .nameWithOwner)" 2>&1
 else
     echo "  Finding latest successful build-xcframeworks run..."
     RUN_ID="$(cd "${REPO_ROOT}" && gh run list \
@@ -152,6 +159,19 @@ if [[ "${XCFW_COUNT}" -eq 0 ]]; then
 fi
 
 echo "  ✓ Downloaded ${XCFW_COUNT} xcframeworks"
+
+# ---------------------------------------------------------------------------
+# Step 2b: Refresh Cisco xcframeworks from source (default)
+# ---------------------------------------------------------------------------
+# Cisco frameworks are pre-built external artifacts. Refreshing them from
+# source ensures we package untouched vendor binaries/signatures.
+"${SCRIPT_DIR}/refresh-cisco-xcframeworks.sh" --output-dir "${OUTPUT_DIR}"
+
+CISCO_MANIFEST_PATH="${OUTPUT_DIR}/cisco-release-manifest.txt"
+CISCO_SOURCE_COMMIT=""
+if [[ -f "${CISCO_MANIFEST_PATH}" ]]; then
+    CISCO_SOURCE_COMMIT="$(manifest_metadata_value "source_commit" "${CISCO_MANIFEST_PATH}")"
+fi
 
 # ---------------------------------------------------------------------------
 # Step 3: Sign
@@ -188,6 +208,9 @@ echo "============================================================"
 echo "  Version:   ${VERSION}"
 echo "  Identity:  ${SIGNING_IDENTITY}"
 echo "  CI Run:    ${RUN_ID}"
+if [[ -n "${CISCO_SOURCE_COMMIT}" ]]; then
+    echo "  Cisco:     ${CISCO_SOURCE_COMMIT}"
+fi
 if [[ "${SKIP_UPLOAD}" == "true" ]]; then
     echo "  Upload:    skipped (use without --skip-upload to upload)"
 else
