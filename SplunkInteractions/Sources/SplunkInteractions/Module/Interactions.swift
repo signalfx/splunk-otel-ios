@@ -98,16 +98,36 @@ public final class Interactions: SplunkInteractionsModule {
     }
 
     func handleEvent(_ event: InteractionEvent) async {
-        if let interactionType = interactionType(from: event.type) {
+        await handleEventType(
+            event.type,
+            viewHierarchy: event.viewHierarchy,
+            targetElement: targetElement(from: event),
+            time: event.time
+        )
+    }
 
-            let targetElement = await targetElement(from: event)
-            let xpath = await getElementXpath(from: event.viewHierarchy)
+    func handleEventType(
+        _ type: InteractionType,
+        viewHierarchy: InteractionViewNode?,
+        targetElement: String?,
+        time: Date
+    ) async {
+        if let interactionType = interactionType(from: type) {
+            let xpath = await getElementXpath(from: viewHierarchy)
 
-            destination.send(
+            destination.sendInteraction(
                 actionName: interactionType,
                 elementId: targetElement,
                 xpath: xpath,
-                time: event.time
+                time: time
+            )
+        }
+        else if type == .gestureRageTap {
+            let xpath = await getElementXpath(from: viewHierarchy)
+
+            destination.sendFrustration(
+                xpath: xpath,
+                time: time
             )
         }
     }
@@ -217,9 +237,6 @@ public final class Interactions: SplunkInteractionsModule {
 
         case .gestureDoubleTap:
             "double_tap"
-
-        case .gestureRageTap:
-            "rage_tap"
 
         case .gesturePinch:
             "pinch"

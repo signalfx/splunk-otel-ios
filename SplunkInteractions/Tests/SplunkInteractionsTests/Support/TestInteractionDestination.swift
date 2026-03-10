@@ -22,9 +22,11 @@ import Foundation
 final class TestInteractionDestination: SplunkInteractionsDestination {
 
     var didReceiveInteractionCallCount = 0
+    var didReceiveFrustrationCallCount = 0
     var actionName: String?
+    var lastFrustrationXpath: String?
 
-    func send(
+    func sendInteraction(
         actionName: String,
         elementId _: String?,
         xpath _: String?,
@@ -32,5 +34,13 @@ final class TestInteractionDestination: SplunkInteractionsDestination {
     ) {
         self.actionName = actionName
         didReceiveInteractionCallCount += 1
+    }
+
+    func sendFrustration(
+        xpath: String?,
+        time _: Date
+    ) {
+        lastFrustrationXpath = xpath
+        didReceiveFrustrationCallCount += 1
     }
 }
