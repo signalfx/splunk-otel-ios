@@ -102,7 +102,8 @@ public final class Interactions: SplunkInteractionsModule {
             event.type,
             viewHierarchy: event.viewHierarchy,
             targetElement: targetElement(from: event),
-            time: event.time)
+            time: event.time
+        )
     }
 
     func handleEventType(
