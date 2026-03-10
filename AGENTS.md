@@ -165,6 +165,7 @@ brew install swiftlint
 | `SplunkOpenTelemetryBackgroundExporter/.../OTLPVersion.swift` | OTLP spec version tracking |
 | `.swiftformat` | SwiftFormat configuration |
 | `CODESTYLE.md` | Detailed code style guide |
+| `CHANGELOG.md` | Release notes for client-visible API and behavior changes |
 | `Development.md` | Build and test instructions |
 | `CONTRIBUTING.md` | Contribution guidelines |
 
@@ -184,6 +185,13 @@ brew install swiftlint
 2. Add Objective-C bridge in `SplunkAgentObjC` if needed
 3. Document with DocC
 4. Add unit tests
+5. Update `CHANGELOG.md` when the change is visible to clients
+
+## PR Review Expectations
+
+- During PR review, treat missing `CHANGELOG.md` updates as a finding when a change in the agent is visible to clients
+- Visible changes include public API changes and significant behavior changes that affect client applications
+- If such a change is present without a corresponding changelog entry, call it out explicitly in the review
 
 ## Dependencies
 
