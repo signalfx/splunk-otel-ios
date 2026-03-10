@@ -139,6 +139,12 @@ final class SessionReplayAPI10TypeConversionsTests: XCTestCase {
         proxyStatus = .notRecording(.unsupportedPlatform)
         srStatus = proxyStatus.srStatus
         XCTAssertEqual(srStatus, .notRecording(.unsupportedPlatform))
+
+        // Lossy mapping: `.disabledBySampling` maps to `.notStarted` because
+        // the CiscoSessionReplay SDK has no sampling concept.
+        proxyStatus = .notRecording(.disabledBySampling)
+        srStatus = proxyStatus.srStatus
+        XCTAssertEqual(srStatus, .notRecording(.notStarted))
     }
 
 

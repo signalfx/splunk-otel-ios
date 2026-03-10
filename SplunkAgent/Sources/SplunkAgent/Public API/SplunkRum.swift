@@ -48,6 +48,7 @@ public class SplunkRum: ObservableObject {
 
     let sessionSampler: any AgentSessionSampler
 
+    var moduleConfigurations: [Any]?
     var screenNameChangeCallback: ((String) -> Void)?
 
 
@@ -336,6 +337,9 @@ public class SplunkRum: ObservableObject {
 
         // Send a session start event explicitly as soon as a Session and an EventManager are available
         (currentSession as? DefaultSession)?.sendInitialSessionStartEvent()
+
+        // Store module configurations for later use in module customization
+        self.moduleConfigurations = moduleConfigurations
 
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(
