@@ -21,10 +21,23 @@ limitations under the License.
 /// but we still need to keep the API available to the user.
 final class SessionReplayNonOperationalState: SessionReplayModuleState {
 
+    // MARK: - Private
+
+    private let statusCause: SessionReplayStatus.Cause
+
+
+    // MARK: - Initialization
+
+    init(statusCause: SessionReplayStatus.Cause = .notStarted, samplingRate: Double = 0.2) {
+        self.statusCause = statusCause
+        self.samplingRate = samplingRate
+    }
+
+
     // MARK: - Recording
 
     var status: SessionReplayStatus {
-        .notRecording(.notStarted)
+        .notRecording(statusCause)
     }
 
     var isRecording: Bool {
@@ -37,4 +50,9 @@ final class SessionReplayNonOperationalState: SessionReplayModuleState {
     var renderingMode: RenderingMode {
         .default
     }
+
+
+    // MARK: - Sampling
+
+    let samplingRate: Double
 }

@@ -57,6 +57,10 @@ public final class SessionReplayStatusObjC: NSObject {
     @objc
     public static let notRecordingStorageLimitReached = NSNumber(value: -201)
 
+    /// Recording is not in progress because the session was sampled out.
+    @objc
+    public static let notRecordingDisabledBySampling = NSNumber(value: -300)
+
 
     // MARK: - Initialization
 
@@ -90,6 +94,9 @@ public final class SessionReplayStatusObjC: NSObject {
         case notRecordingStorageLimitReached:
             return .notRecording(.storageLimitReached)
 
+        case notRecordingDisabledBySampling:
+            return .notRecording(.disabledBySampling)
+
         default:
             return nil
         }
@@ -117,6 +124,9 @@ public final class SessionReplayStatusObjC: NSObject {
 
         case .notRecording(.storageLimitReached):
             return notRecordingStorageLimitReached
+
+        case .notRecording(.disabledBySampling):
+            return notRecordingDisabledBySampling
         }
     }
 }
