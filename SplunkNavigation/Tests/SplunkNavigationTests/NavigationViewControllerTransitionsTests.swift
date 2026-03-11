@@ -89,7 +89,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         continuationBox.continuation?.finish()
     }
 
-    func testTransitionStartDedupesOverlappingWillSignals() async {
+    func testTransitionStartReplacesOverlappingWillSignals() async {
         let continuationBox = NavigationEventContinuationBox()
         let navigation = makeNavigation(continuationBox: continuationBox)
         let controllerIdentifier = ObjectIdentifier(NSString())
@@ -124,7 +124,8 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(firstStart, secondStart)
+        XCTAssertNotEqual(firstStart, secondStart)
+        XCTAssertGreaterThanOrEqual(secondStart, firstStart)
 
         continuationBox.continuation?.finish()
     }
