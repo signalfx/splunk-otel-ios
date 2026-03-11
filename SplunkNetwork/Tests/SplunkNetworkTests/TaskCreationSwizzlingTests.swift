@@ -263,6 +263,34 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         reinstallModule(injectTraceHeaders: true)
     }
 
+    // MARK: - Resume Event Timing
+
+    func testDataTaskWithRequest_HasResumeEvent() throws {
+        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
+        let request = URLRequest(url: url)
+
+        let expectation = expectation(description: "Completion called")
+        let session = URLSession(configuration: .ephemeral)
+
+        let task = session.dataTask(with: request) { _, _, _ in
+            expectation.fulfill()
+        }
+        task.resume()
+
+        wait(for: [expectation], timeout: 10.0)
+        waitForSpans(count: 1)
+
+        let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
+        XCTAssertEqual(spans.count, 1)
+
+        let span = try XCTUnwrap(spans.first)
+        let resumeEvent = span.events.first { $0.name == "http.request.started" }
+        XCTAssertNotNil(resumeEvent, "Creation-instrumented span should contain an http.request.started event recorded at resume")
+        if let resumeEvent {
+            XCTAssertTrue(resumeEvent.timestamp >= span.startTime, "Resume event should be at or after span start (creation) time")
+        }
+    }
+
     // MARK: - Verify Header Injection On vs Off
 
     func testDataTaskWithURL_HasTraceparent_WhenHeaderInjectionEnabled() throws {

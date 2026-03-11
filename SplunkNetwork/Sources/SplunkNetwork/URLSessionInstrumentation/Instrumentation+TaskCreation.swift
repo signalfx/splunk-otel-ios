@@ -139,6 +139,13 @@ func swizzleDownloadTaskCreationMethod(
     method_setImplementation(original, swizzledIMP)
 }
 
+/// Creates a data task with instrumentation: starts a span, injects trace headers, and
+/// associates the span with the task.
+///
+/// The span starts at creation time because `traceparent` header injection requires a
+/// valid `SpanContext` before the request is sent. Actual network activity begins when
+/// the task is resumed; `splunkSwizzledResume` records an `http.request.started` event
+/// so downstream systems can compute accurate network duration.
 func createInstrumentedDataTask(
     session: URLSession,
     request: URLRequest,
@@ -160,6 +167,10 @@ func createInstrumentedDataTask(
     return task
 }
 
+/// Creates a download task with instrumentation: starts a span, injects trace headers, and
+/// associates the span with the task.
+///
+/// See ``createInstrumentedDataTask`` for details on the creation-vs-resume timing model.
 func createInstrumentedDownloadTask(
     session: URLSession,
     request: URLRequest,

@@ -58,8 +58,12 @@ extension URLSessionTask {
             return
         }
 
-        // If task was already instrumented at creation time, don't instrument again
+        // For tasks instrumented at creation time, record the actual network start.
+        // The span is started at creation (required for traceparent header injection),
+        // but actual network activity only begins at resume. The event allows downstream
+        // systems to compute accurate network duration.
         if wasInstrumentedAtCreation(self) {
+            getCreationSpan(for: self)?.addEvent(name: "http.request.started")
             return
         }
 
