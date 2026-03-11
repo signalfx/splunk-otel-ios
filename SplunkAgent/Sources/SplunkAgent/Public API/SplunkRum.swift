@@ -117,9 +117,12 @@ public class SplunkRum: ObservableObject {
     public func updateEndpoint(_ endpoint: EndpointConfiguration) throws {
         // Try to update the event manager if available
         if let eventManager = eventManager as? DefaultEventManager {
+            // Exclude collector URLs from network instrumentation BEFORE the endpoint
+            // update, which flushes pending data. Otherwise those flush requests would
+            // be captured as normal HTTP spans (self-instrumentation).
+            updateNetworkExclusionList(for: endpoint)
             try eventManager.updateEndpoint(endpoint)
             currentEndpoint = endpoint
-            updateNetworkExclusionList(for: endpoint)
             enableSessionReplayIfNeeded(for: endpoint)
 
             logger.log(level: .info, isPrivate: false) {
