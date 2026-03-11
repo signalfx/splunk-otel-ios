@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-03-11
+
 ### Added
 
 * Added support for adjusting the Session Replay sampling rate.
