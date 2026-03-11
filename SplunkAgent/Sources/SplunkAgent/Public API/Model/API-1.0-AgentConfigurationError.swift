@@ -20,8 +20,8 @@ import Foundation
 /// Describes an invalid agent configuration.
 public enum AgentConfigurationError: Error, Equatable {
 
-    /// Invalid endpoint. Either one of the supplied endpoint urls (traces, session replay) is invalid, or the supplied realm is empty.
-    case invalidEndpoint(supplied: EndpointConfiguration)
+    /// Invalid endpoint. Either one of the supplied endpoint urls (traces, session replay) is invalid, the supplied realm is empty, or the endpoint is missing.
+    case invalidEndpoint(supplied: EndpointConfiguration?)
 
     /// Invalid app name.
     case invalidAppName(supplied: String?)
@@ -43,7 +43,7 @@ extension AgentConfigurationError: CustomStringConvertible, CustomDebugStringCon
             return """
                 The supplied endpoint configuration is invalid. \
                 Please check the agent configuration.
-                Supplied endpoint configuration: \(endpointConfiguration.description)
+                Supplied endpoint configuration: \(endpointConfiguration?.description ?? "nil")
                 """
 
         case let .invalidAppName(appName):

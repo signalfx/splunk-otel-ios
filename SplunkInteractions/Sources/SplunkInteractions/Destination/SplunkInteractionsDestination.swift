@@ -19,9 +19,12 @@ import CiscoInteractions
 import Foundation
 import SplunkCommon
 
-/// Describes a destination into which the AppStart module sends it's results.
+/// Describes a destination into which the Interactions module sends its results.
 public protocol SplunkInteractionsDestination {
 
-    /// Sends results into a destination.
-    func send(actionName: String, elementId: String?, time: Date)
+    /// Sends interaction into a destination.
+    func sendInteraction(actionName: String, elementId: String?, xpath: String?, time: Date)
+
+    /// Sends frustration (rage tap) into a destination.
+    func sendFrustration(xpath: String?, time: Date)
 }

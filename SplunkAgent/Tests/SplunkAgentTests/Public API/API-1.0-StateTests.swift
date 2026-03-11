@@ -33,7 +33,7 @@ final class API10StateTests: XCTestCase {
         // Properties - User Configuration (READ)
         XCTAssertNotNil(state.appName)
         XCTAssertNotNil(state.appVersion)
-        XCTAssertNotNil(state.endpointConfiguration.realm)
+        XCTAssertNotNil(state.endpointConfiguration?.realm)
         XCTAssertNotNil(state.deploymentEnvironment)
         XCTAssertNotNil(state.isDebugLoggingEnabled)
     }

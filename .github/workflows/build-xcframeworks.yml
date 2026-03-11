@@ -100,7 +100,7 @@ jobs:
       # Use the skip-cisco input only for partial test builds.
       - name: Download Cisco SR xcframeworks (if artifact provided)
         if: inputs.cisco-xcframeworks-run-id != ''
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: cisco-session-replay-dist-${{ inputs.cisco-xcframeworks-run-id }}
           path: tools/xcframework/cisco-sr-download
@@ -150,6 +150,12 @@ jobs:
         working-directory: tools/xcframework
         run: RELEASE=false scripts/validate-xcframeworks.sh
 
+      - name: Generate Cisco release manifest
+        working-directory: tools/xcframework
+        run: |
+          chmod +x scripts/*.sh
+          scripts/generate-cisco-release-manifest.sh
+
       # -----------------------------------------------------------------
       # Step 5b: Smoke test (consumer linkage)
       # -----------------------------------------------------------------
@@ -161,7 +167,7 @@ jobs:
       # Step 6: Upload build artifacts
       # -----------------------------------------------------------------
       - name: Upload xcframeworks artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: splunk-agent-xcframeworks-unsigned
           path: tools/xcframework/output/xcframeworks/
@@ -190,10 +196,16 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download xcframeworks artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: splunk-agent-xcframeworks-unsigned
           path: tools/xcframework/output/xcframeworks/
+
+      - name: Refresh Cisco xcframeworks from source
+        working-directory: tools/xcframework
+        run: |
+          chmod +x scripts/*.sh
+          scripts/refresh-cisco-xcframeworks.sh
 
       # -----------------------------------------------------------------
       # Signing
@@ -249,7 +261,7 @@ jobs:
       # Upload signed artifact
       # -----------------------------------------------------------------
       - name: Upload signed xcframeworks artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: splunk-agent-xcframeworks-${{ steps.version.outputs.version }}
           path: tools/xcframework/output/SplunkAgent-XCFrameworks-*.zip

@@ -24,6 +24,7 @@ internal import SplunkInteractions
 internal import SplunkNavigation
 internal import SplunkNetwork
 internal import SplunkNetworkMonitor
+internal import SplunkSessionReplayProxy
 internal import SplunkSlowFrameDetector
 internal import SplunkWebView
 
@@ -80,7 +81,7 @@ extension SplunkRum {
             return
         }
 
-        guard agentConfiguration.endpoint.sessionReplayEndpoint != nil else {
+        guard agentConfiguration.endpoint?.sessionReplayEndpoint != nil else {
             logger.log(level: .warn, isPrivate: false) {
                 """
                 Session Replay module was not installed (the valid URL for Session Replay \
@@ -91,13 +92,62 @@ extension SplunkRum {
             return
         }
 
+        // Extract session replay module configuration
+        let config = moduleConfigurations?.compactMap { $0 as? SessionReplayConfiguration }.first ?? SessionReplayConfiguration()
+
+        let effectiveSamplingRate = resolvedSamplingRate(from: config)
+
+        // Check if session replay is enabled by configuration
+        guard config.enabled else {
+            logger.log(level: .notice, isPrivate: false) {
+                "Session Replay module is disabled by configuration."
+            }
+
+            sessionReplayProxy = SessionReplayNonOperational(
+                statusCause: .notStarted,
+                samplingRate: effectiveSamplingRate
+            )
+
+            return
+        }
+
+        // Perform sampling decision (calculated once per Agent lifecycle, not re-evaluated on session rotation)
+        let sampler = SessionReplaySampler(probability: effectiveSamplingRate)
+        if sampler.sample() == .sampledOut {
+            logger.log(level: .notice, isPrivate: false) {
+                "Session Replay module disabled by sampling (rate: \(effectiveSamplingRate))."
+            }
+
+            sessionReplayProxy = SessionReplayNonOperational(
+                statusCause: .disabledBySampling,
+                samplingRate: effectiveSamplingRate
+            )
+
+            return
+        }
+
         // By default, we turn off the default sensitivity for `WKWebView`
         #if canImport(WebKit)
             sessionReplayModule.sensitivity.set(WKWebView.self, nil)
         #endif
 
         // Initialize proxy API for this module
-        sessionReplayProxy = SessionReplay(for: sessionReplayModule)
+        sessionReplayProxy = SessionReplay(for: sessionReplayModule, samplingRate: effectiveSamplingRate)
+    }
+
+    private func resolvedSamplingRate(from config: SessionReplayConfiguration) -> Double {
+        let configured = config.samplingRate ?? 1.0
+        let sanitized = configured.isFinite ? configured : 1.0
+        let effective = min(max(sanitized, 0.0), 1.0)
+        if !configured.isFinite || configured < 0.0 || configured > 1.0 {
+            logger.log(level: .warn, isPrivate: false) {
+                """
+                Session Replay sampling rate \(configured) is outside the valid \
+                range <0, 1>. The value has been clamped to \(effective).
+                """
+            }
+        }
+        return effective
     }
 
     /// Configure Navigation module.
@@ -138,17 +188,74 @@ extension SplunkRum {
         // We need to do this because we need to read `sessionId` from the agent continuously.
         networkModule?.sharedState = sharedState
 
-        // We need the endpoint url to manage trace exclusion logic
-        var excludedEndpoints: [URL] = []
-        if let traceUrl = agentConfiguration.endpoint.traceEndpoint {
-            excludedEndpoints.append(traceUrl)
+        // Set initial excluded endpoints based on current configuration
+        updateNetworkExclusionList(for: agentConfiguration.endpoint)
+    }
+
+    /// Enables Session Replay when a valid endpoint becomes available.
+    ///
+    /// This method should be called when an endpoint is configured to ensure Session Replay
+    /// is properly enabled if it wasn't enabled at initialization time.
+    /// Session Replay continues collecting data even when the endpoint is disabled (data is cached).
+    ///
+    /// - Parameter endpoint: The endpoint configuration to check for Session Replay URL.
+    func enableSessionReplayIfNeeded(for endpoint: EndpointConfiguration) {
+        let moduleType = CiscoSessionReplay.SessionReplay.self
+        let sessionReplayModule = modulesManager?.module(ofType: moduleType)
+
+        guard let sessionReplayModule else {
+            return
         }
 
-        if let sessionReplayUrl = agentConfiguration.endpoint.sessionReplayEndpoint {
-            excludedEndpoints.append(sessionReplayUrl)
+        // Check if Session Replay endpoint is available
+        guard endpoint.sessionReplayEndpoint != nil else {
+            return
         }
 
-        networkModule?.excludedEndpoints = excludedEndpoints
+        // Enable Session Replay if not already enabled (check if it's currently non-operational)
+        guard sessionReplayProxy is SessionReplayNonOperational else {
+            return
+        }
+
+        // By default, we turn off the default sensitivity for `WKWebView`
+        #if canImport(WebKit)
+            sessionReplayModule.sensitivity.set(WKWebView.self, nil)
+        #endif
+
+        // Initialize proxy API for this module
+        sessionReplayProxy = SessionReplay(for: sessionReplayModule)
+
+        logger.log(level: .info, isPrivate: false) {
+            "Session Replay enabled after endpoint configuration."
+        }
+    }
+
+    /// Updates the network module's excluded endpoints list based on the provided endpoint configuration.
+    ///
+    /// This method should be called whenever the endpoint configuration changes to ensure
+    /// that collector URLs are properly excluded from network instrumentation, preventing
+    /// self-instrumentation of export requests.
+    ///
+    /// - Parameters:
+    ///   - endpoint: The endpoint configuration to extract exclusion URLs from, or `nil` to clear exclusions.
+    ///   - additionalUrls: Additional URLs to exclude (e.g., caching URLs when endpoint is disabled).
+    func updateNetworkExclusionList(for endpoint: EndpointConfiguration?, additionalUrls: [URL] = []) {
+        let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
+
+        // Build excluded endpoints list
+        var excludedEndpoints: [URL] = additionalUrls
+
+        if let endpoint {
+            if let traceUrl = endpoint.traceEndpoint {
+                excludedEndpoints.append(traceUrl)
+            }
+
+            if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
+                excludedEndpoints.append(sessionReplayUrl)
+            }
+        }
+
+        networkModule?.excludedEndpoints = excludedEndpoints.isEmpty ? nil : excludedEndpoints
     }
 
     /// Configure Crash Reports module with shared state.
@@ -204,8 +311,7 @@ extension SplunkRum {
     /// Configure WebView Instrumentation module with shared state.
     private func customizeWebView() {
         if let webViewInstrumentationModule = modulesManager?.module(ofType: SplunkWebView.WebViewInstrumentation.self) {
-            webViewInstrumentationModule.sharedState = sharedState
-            webViewProxy = WebView(module: webViewInstrumentationModule)
+            webViewProxy = WebView(module: webViewInstrumentationModule, sharedState: sharedState)
         }
         else {
             logger.log(level: .notice, isPrivate: false) {

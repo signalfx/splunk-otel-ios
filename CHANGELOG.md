@@ -7,6 +7,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-03-11
+
+### Added
+
+* Added support for the setting of endpointConfiguration to be deferred until after agent initialization. Disabling the endpoint is also supported with caching of pending spans. #457
+* Added support for adjusting the Session Replay sampling rate. #575
+
+### Changed
+
+* The SDK now uses static binary dependencies to enhance integration in complex deployment scenarios. #593
+
 ## [2.1.0] - 2026-02-23
 
 ### Added

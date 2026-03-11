@@ -35,21 +35,20 @@ public class SplunkRum: ObservableObject {
     var currentUser: AgentUser
     var currentSession: AgentSession
     var currentStatus: Status
-
+    var currentEndpoint: EndpointConfiguration?
     var modulesManager: AgentModulesManager?
     var eventManager: AgentEventManager?
-
     var appStateManager: AgentAppStateManager
     lazy var sharedState: AgentSharedState = DefaultSharedState(for: self)
 
     lazy var runtimeAttributes: AgentRuntimeAttributes = DefaultRuntimeAttributes(for: self)
-
 
     let logProcessor: LogProcessor
     let logger: LogAgent
 
     let sessionSampler: any AgentSessionSampler
 
+    var moduleConfigurations: [Any]?
     var screenNameChangeCallback: ((String) -> Void)?
 
 
@@ -94,6 +93,9 @@ public class SplunkRum: ObservableObject {
     /// An object that manages the associated ``Session``.
     public private(set) lazy var session = Session(for: self)
 
+    /// An object that holds preferred settings for the agent, an ``AgentPreferences`` instance.
+    public private(set) lazy var preferences = AgentPreferences(for: self)
+
     /// An object that contains global attributes (a ``MutableAttributes`` instance) added to all signals.
     public private(set) lazy var globalAttributes: MutableAttributes = agentConfiguration.globalAttributes
 
@@ -103,6 +105,56 @@ public class SplunkRum: ObservableObject {
     /// OpenTelemetry instance.
     public var openTelemetry: OpenTelemetry {
         OpenTelemetry.instance
+    }
+
+    /// Updates the endpoint configuration to start sending spans and events.
+    ///
+    /// Use this method to dynamically configure the endpoint after the agent has been initialized
+    /// without an endpoint.
+    ///
+    /// - Parameter endpoint: The ``EndpointConfiguration`` to use for sending data.
+    /// - Throws: ``AgentConfigurationError`` if the provided endpoint is invalid.
+    public func updateEndpoint(_ endpoint: EndpointConfiguration) throws {
+        // Try to update the event manager if available
+        if let eventManager = eventManager as? DefaultEventManager {
+            try eventManager.updateEndpoint(endpoint)
+            currentEndpoint = endpoint
+            updateNetworkExclusionList(for: endpoint)
+            enableSessionReplayIfNeeded(for: endpoint)
+
+            logger.log(level: .info, isPrivate: false) {
+                "Endpoint configuration updated successfully."
+            }
+        }
+        else {
+            // Event manager not available, but still store the endpoint for API consistency
+            currentEndpoint = endpoint
+            logger.log(level: .warn, isPrivate: false) {
+                "Endpoint configuration stored but event manager is not available."
+            }
+        }
+    }
+
+    /// Disables the endpoint configuration and stops sending spans and events.
+    ///
+    /// Data is cached to pending storage for later sending when a new endpoint is
+    /// configured via ``updateEndpoint(_:)``.
+    public func disableEndpoint() {
+        currentEndpoint = nil
+
+        if let eventManager = eventManager as? DefaultEventManager {
+            eventManager.disableEndpoint()
+            updateNetworkExclusionList(for: nil)
+
+            logger.log(level: .info, isPrivate: false) {
+                "Endpoint disabled. Spans will be cached and sent when endpoint is configured."
+            }
+        }
+        else {
+            logger.log(level: .warn, isPrivate: false) {
+                "Endpoint disabled but event manager is not available."
+            }
+        }
     }
 
 
@@ -222,6 +274,9 @@ public class SplunkRum: ObservableObject {
         currentUser = user
         currentSession = session
 
+        // Initialize current endpoint from configuration
+        currentEndpoint = configurationHandler.configuration.endpoint
+
         let poolName = logPoolName ?? PackageIdentifier.instance()
         let verboseLogging = agentConfigurationHandler.configuration.enableDebugLogging
 
@@ -268,7 +323,6 @@ public class SplunkRum: ObservableObject {
 
         // Set the configured user tracking mode
         user.preferences.trackingMode = configuration.user.trackingMode
-
         initializeEvents["agent_instance_initialized"] = Date()
 
         // Links the current session with the agent
@@ -279,11 +333,13 @@ public class SplunkRum: ObservableObject {
 
         // Initialize Event manager
         eventManager = try DefaultEventManager(with: configuration, agent: self)
-
         initializeEvents["event_manager_initialized"] = Date()
 
         // Send a session start event explicitly as soon as a Session and an EventManager are available
         (currentSession as? DefaultSession)?.sendInitialSessionStartEvent()
+
+        // Store module configurations for later use in module customization
+        self.moduleConfigurations = moduleConfigurations
 
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(
@@ -331,5 +387,5 @@ public class SplunkRum: ObservableObject {
     // MARK: - Version
 
     /// A version of this agent.
-    public static let version = "2.1.0"
+    public static let version = "2.2.0"
 }

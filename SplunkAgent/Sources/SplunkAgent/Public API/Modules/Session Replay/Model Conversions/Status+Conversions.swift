@@ -48,6 +48,12 @@ extension SessionReplayStatus {
 
         case .notRecording(.unsupportedPlatform):
             return .notRecording(.unsupportedPlatform)
+
+        // Intentionally lossy mapping: CiscoSessionReplay SDK does not have
+        // a sampling concept, so `.disabledBySampling` is mapped to `.notStarted`.
+        // A round-trip conversion through the underlying SDK will lose the sampling cause.
+        case .notRecording(.disabledBySampling):
+            return .notRecording(.notStarted)
         }
     }
 }
