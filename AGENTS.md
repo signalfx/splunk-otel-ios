@@ -189,9 +189,9 @@ brew install swiftlint
 
 ## PR Review Expectations
 
-- During PR review, treat missing `CHANGELOG.md` updates as a finding when a change in the agent is visible to clients
-- Visible changes include public API changes and significant behavior changes that affect client applications
-- If such a change is present without a corresponding changelog entry, call it out explicitly in the review
+- During PR review, call out missing CHANGELOG.md updates whenever a change is client-visible
+- Client-visible changes include public API changes and significant behavior changes that affect client applications
+- If such a change is present without a corresponding changelog entry, flag it explicitly in the review and request an update
 
 ## Dependencies
 
