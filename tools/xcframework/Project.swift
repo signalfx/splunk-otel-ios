@@ -345,6 +345,9 @@ let project = Project(
             product: .framework,
             bundleId: "com.splunk.rum.webview",
             sources: "\(repoRoot)/SplunkWebView/Sources/**",
+            resources: [
+                .glob(pattern: "\(repoRoot)/SplunkWebView/Resources/**")
+            ],
             dependencies: [
                 mod("SplunkCommon"),
                 dep("CiscoLogger")
