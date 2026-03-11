@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2024 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,16 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoInteractions
-import Foundation
-import SplunkCommon
+internal import SplunkCommon
+internal import SplunkSessionReplayProxy
 
-/// Describes a destination into which the Interactions module sends its results.
-public protocol SplunkInteractionsDestination {
+extension SessionReplayConfigurationObjC: ModuleConfigurationSwift {
 
-    /// Sends interaction into a destination.
-    func sendInteraction(actionName: String, elementId: String?, xpath: String?, time: Date)
+    // MARK: - Swift variant
 
-    /// Sends frustration (rage tap) into a destination.
-    func sendFrustration(xpath: String?, time: Date)
+    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
+        SessionReplayConfiguration(
+            enabled: isEnabled,
+            samplingRate: samplingRate?.doubleValue
+        )
+    }
 }
