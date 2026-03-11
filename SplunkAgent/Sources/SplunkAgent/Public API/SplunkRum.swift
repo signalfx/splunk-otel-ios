@@ -51,7 +51,6 @@ public class SplunkRum: ObservableObject {
     var moduleConfigurations: [Any]?
     var screenNameChangeCallback: ((String) -> Void)?
 
-
     // MARK: - Internal (Modules Proxy)
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
@@ -62,13 +61,11 @@ public class SplunkRum: ObservableObject {
     lazy var slowFrameDetectorProxy: any SlowFrameDetectorModule = SlowFrameDetectorNonOperational()
     lazy var appStartProxy: any AppStartModule = AppStartNonOperational()
 
-
     // MARK: - Platform Support
 
     private static var isSupportedPlatform: Bool {
         PlatformSupport.current.scope == .full
     }
-
 
     // MARK: - Agent singleton
 
@@ -83,7 +80,6 @@ public class SplunkRum: ObservableObject {
         logPoolName: PackageIdentifier.nonOperationalInstance(),
         sessionSampler: DefaultAgentSessionSampler()
     )
-
 
     // MARK: - Public API
 
@@ -122,7 +118,7 @@ public class SplunkRum: ObservableObject {
             // self-instrumentation of flush requests while keeping the old
             // collector excluded in case the update fails.
             let previousEndpoint = currentEndpoint
-            let previousUrls = [previousEndpoint?.traceEndpoint, previousEndpoint?.sessionReplayEndpoint].compactMap { $0 }
+            let previousUrls = [previousEndpoint?.traceEndpoint, previousEndpoint?.sessionReplayEndpoint].compactMap(\.self)
             updateNetworkExclusionList(for: endpoint, additionalUrls: previousUrls)
 
             do {
@@ -173,7 +169,6 @@ public class SplunkRum: ObservableObject {
         }
     }
 
-
     // MARK: - Public API (Modules)
 
     /// An object that holds the ``SessionReplayModule``.
@@ -208,7 +203,6 @@ public class SplunkRum: ObservableObject {
     public var webViewNativeBridge: any WebViewInstrumentationModule {
         webViewProxy
     }
-
 
     // MARK: - Agent builder
 
@@ -268,7 +262,6 @@ public class SplunkRum: ObservableObject {
 
         return agent
     }
-
 
     // MARK: - Initialization
 
