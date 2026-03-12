@@ -356,6 +356,11 @@ public class SplunkRum: ObservableObject {
             moduleConfigurations: moduleConfigurations
         )
 
+        // Module installation above activates URLSession swizzling. Set the
+        // network exclusion list immediately so any exporter traffic triggered
+        // before customizeModules() completes is correctly filtered out.
+        updateNetworkExclusionList(for: agentConfiguration.endpoint)
+
         initializeEvents["modules_connected"] = Date()
 
         // Register modules' publish callback
@@ -374,7 +379,6 @@ public class SplunkRum: ObservableObject {
         }
     }
 
-
     // MARK: - Configuration handler
 
     private static func createConfigurationHandler(for configuration: any AgentConfigurationProtocol) -> AgentConfigurationHandler {
@@ -384,14 +388,7 @@ public class SplunkRum: ObservableObject {
         }
 
         return SplunkConfigurationHandler(for: configuration)
-
-        // Temporarily commented-out code until O11y implements a proper backend config endpoint
-        //        return ConfigurationHandler(
-        //            for: configuration,
-        //            apiClient: APIClient(baseUrl: configuration.configUrl)
-        //        )
     }
-
 
     // MARK: - Version
 
