@@ -73,8 +73,8 @@ extension URLSessionTask {
             return
         }
 
-        // Fallback: create span at resume time (no header injection possible)
-        // This handles cases where task was created without our swizzling (e.g., before initialization)
+        // Fallback: create span at resume time (no header injection possible).
+        // Covers tasks created before agent initialization or via un-swizzled APIs.
         startHttpSpan(request: currentRequest)
             .map { span in
                 objc_setAssociatedObject(self, &associatedKeySpanResume, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)

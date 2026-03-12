@@ -353,3 +353,42 @@ func swizzleUploadTaskWithRequestFromFileAndCompletion() {
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
     method_setImplementation(original, swizzledIMP)
 }
+
+// MARK: - Streamed Upload Task Swizzling
+
+func swizzleUploadTaskWithStreamedRequest() {
+    let selector = #selector(URLSession.uploadTask(withStreamedRequest:))
+
+    guard let original = class_getInstanceMethod(URLSession.self, selector) else {
+        NetworkInstrumentationManager.shared.logger.log(level: .fault) {
+            "Failed to swizzle \(NSStringFromSelector(selector))"
+        }
+        return
+    }
+
+    let originalIMP = method_getImplementation(original)
+
+    let block: @convention(block) (URLSession, URLRequest) -> URLSessionUploadTask = { session, request in
+        let castedIMP = unsafeBitCast(
+            originalIMP,
+            to: (@convention(c) (URLSession, Selector, URLRequest) -> URLSessionUploadTask).self
+        )
+
+        guard shouldInstrumentRequest(request) else {
+            return castedIMP(session, selector, request)
+        }
+
+        guard let span = startHttpSpan(request: request) else {
+            return castedIMP(session, selector, request)
+        }
+
+        let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
+        let task = castedIMP(session, selector, instrumentedRequest)
+        objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
+        objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        return task
+    }
+
+    let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
+    method_setImplementation(original, swizzledIMP)
+}

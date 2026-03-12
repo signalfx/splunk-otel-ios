@@ -34,6 +34,7 @@ enum OriginalIMPs {
     static var dataTaskWithRequest: IMP?
     static var dataTaskWithRequestAndCompletion: IMP?
     static var downloadTaskWithRequest: IMP?
+    static var downloadTaskWithRequestAndCompletion: IMP?
 }
 
 /// Captures original request-based IMPs before any swizzling occurs.
@@ -60,6 +61,15 @@ private func captureOriginalIMPs() {
     if let method = class_getInstanceMethod(URLSession.self, downloadTaskRequestSelector) {
         OriginalIMPs.downloadTaskWithRequest = method_getImplementation(method)
     }
+
+    // Capture downloadTask(with: URLRequest, completionHandler:)
+    typealias DownloadCompletionHandler = (URL?, URLResponse?, Error?) -> Void
+    let downloadTaskRequestCompletionSelector = #selector(
+        URLSession.downloadTask(with:completionHandler:) as (URLSession) -> (URLRequest, @escaping DownloadCompletionHandler) -> URLSessionDownloadTask
+    )
+    if let method = class_getInstanceMethod(URLSession.self, downloadTaskRequestCompletionSelector) {
+        OriginalIMPs.downloadTaskWithRequestAndCompletion = method_getImplementation(method)
+    }
 }
 
 // MARK: - Task Creation Swizzling
@@ -83,6 +93,11 @@ func swizzleURLSessionTaskCreation() {
     swizzleUploadTaskWithRequestFromFileAndCompletion()
     swizzleDownloadTaskWithRequest()
     swizzleDownloadTaskWithURL()
+    swizzleDownloadTaskWithRequestAndCompletion()
+    swizzleDownloadTaskWithURLAndCompletion()
+    swizzleDownloadTaskWithResumeData()
+    swizzleDownloadTaskWithResumeDataAndCompletion()
+    swizzleUploadTaskWithStreamedRequest()
 }
 
 // MARK: - Helper Functions
@@ -233,6 +248,27 @@ func wrapCompletionHandler(
     return { data, response, error in
         endHttpSpanFromCompletion(span: span, response: response, error: error)
         originalCompletion(data, response, error)
+    }
+}
+
+/// Wraps an optional download completion handler to end the span when the download completes.
+///
+/// Download tasks use a different completion signature `(URL?, URLResponse?, Error?)` where
+/// the first parameter is the temporary file location. The span-ending semantics are identical
+/// to ``wrapCompletionHandler``.
+func wrapDownloadCompletionHandler(
+    _ completion: ((URL?, URLResponse?, Error?) -> Void)?,
+    span: Span
+) -> (URL?, URLResponse?, Error?) -> Void {
+    guard let originalCompletion = completion else {
+        return { _, response, error in
+            endHttpSpanFromCompletion(span: span, response: response, error: error)
+        }
+    }
+
+    return { url, response, error in
+        endHttpSpanFromCompletion(span: span, response: response, error: error)
+        originalCompletion(url, response, error)
     }
 }
 
