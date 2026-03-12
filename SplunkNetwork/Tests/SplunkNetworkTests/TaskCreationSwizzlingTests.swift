@@ -201,6 +201,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
     func testDataTaskWithURL_SingleSpan_WhenHeaderInjectionDisabled() throws {
         reinstallModule(injectTraceHeaders: false)
+        addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
         let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
 
@@ -216,12 +217,11 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
         let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
         XCTAssertEqual(spans.count, 1, "Only one span should exist for dataTask(with: URL) when header injection is off")
-
-        reinstallModule(injectTraceHeaders: true)
     }
 
     func testDataTaskWithURLAndCompletion_SingleSpan_WhenHeaderInjectionDisabled() throws {
         reinstallModule(injectTraceHeaders: false)
+        addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
         let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
 
@@ -238,12 +238,11 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
         let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
         XCTAssertEqual(spans.count, 1, "Only one span should exist for dataTask(with: URL, completionHandler:) when header injection is off")
-
-        reinstallModule(injectTraceHeaders: true)
     }
 
     func testDownloadTaskWithURL_SingleSpan_WhenHeaderInjectionDisabled() throws {
         reinstallModule(injectTraceHeaders: false)
+        addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
         let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
 
@@ -259,8 +258,6 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
         let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
         XCTAssertEqual(spans.count, 1, "Only one span should exist for downloadTask(with: URL) when header injection is off")
-
-        reinstallModule(injectTraceHeaders: true)
     }
 
     // MARK: - Resume Event Timing
@@ -310,18 +307,16 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 10.0)
 
-        // httpbin.org/headers echoes request headers back; verify traceparent was sent
-        if let body = responseBody,
-            let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
-            let headers = json["headers"] as? [String: Any]
-        {
-            let traceparent = headers["Traceparent"] ?? headers["traceparent"]
-            XCTAssertNotNil(traceparent, "traceparent should be present when injection is enabled")
-        }
+        let body = try XCTUnwrap(responseBody, "httpbin should return a response body")
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
+        let headers = try XCTUnwrap(json["headers"] as? [String: Any])
+        let traceparent = headers["Traceparent"] ?? headers["traceparent"]
+        XCTAssertNotNil(traceparent, "traceparent should be present when injection is enabled")
     }
 
     func testDataTaskWithURL_NoTraceparent_WhenHeaderInjectionDisabled() throws {
         reinstallModule(injectTraceHeaders: false)
+        addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
         let url = try XCTUnwrap(URL(string: "https://httpbin.org/headers"))
 
@@ -337,16 +332,11 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 10.0)
 
-        // httpbin.org/headers echoes request headers back; verify traceparent was NOT sent
-        if let body = responseBody,
-            let json = try? JSONSerialization.jsonObject(with: body) as? [String: Any],
-            let headers = json["headers"] as? [String: Any]
-        {
-            XCTAssertNil(headers["Traceparent"], "traceparent should not be present when disabled")
-            XCTAssertNil(headers["traceparent"], "traceparent should not be present when disabled")
-        }
-
-        reinstallModule(injectTraceHeaders: true)
+        let body = try XCTUnwrap(responseBody, "httpbin should return a response body")
+        let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
+        let headers = try XCTUnwrap(json["headers"] as? [String: Any])
+        XCTAssertNil(headers["Traceparent"], "traceparent should not be present when disabled")
+        XCTAssertNil(headers["traceparent"], "traceparent should not be present when disabled")
     }
 }
 
