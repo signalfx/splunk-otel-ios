@@ -35,7 +35,8 @@ func normalizeNetworkSpanStartTime(_ span: SpanData) -> SpanData {
         return span
     }
 
-    return span.settingStartTime(requestStartedTimestamp)
+    var normalizedSpan = span
+    return normalizedSpan.settingStartTime(requestStartedTimestamp)
 }
 
 class SpanInterceptorExporter: SpanExporter {
