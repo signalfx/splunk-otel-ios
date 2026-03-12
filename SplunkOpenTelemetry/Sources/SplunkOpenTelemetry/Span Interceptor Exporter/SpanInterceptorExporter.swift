@@ -21,6 +21,23 @@ import SplunkCommon
 
 public typealias SplunkSpanInterceptor = (SpanData) -> SpanData?
 
+private let requestStartedEventName = "http.request.started"
+
+func normalizeNetworkSpanStartTime(_ span: SpanData) -> SpanData {
+    guard let requestStartedTimestamp = span.events
+        .lazy
+        .filter({ $0.name == requestStartedEventName })
+        .map(\.timestamp)
+        .min(),
+        requestStartedTimestamp >= span.startTime,
+        requestStartedTimestamp <= span.endTime
+    else {
+        return span
+    }
+
+    return span.settingStartTime(requestStartedTimestamp)
+}
+
 class SpanInterceptorExporter: SpanExporter {
 
     // MARK: - Private
@@ -56,15 +73,15 @@ class SpanInterceptorExporter: SpanExporter {
         // When captured in async closures (e.g., by SimpleSpanProcessor), the
         // dictionary storage is shared. If the original goes out of scope while
         // the closure executes, reference count operations can race, causing crashes.
-        let isolatedSpans = spans.map { $0.isolatedCopy() }
+        let normalizedSpans = spans.map { normalizeNetworkSpanStartTime($0.isolatedCopy()) }
 
         // Simply re-export the spans if no interceptor was set.
         guard let spanInterceptor else {
-            return proxyExporter.export(spans: isolatedSpans)
+            return proxyExporter.export(spans: normalizedSpans)
         }
 
         // Invoke the interceptor and only pass through non-nil spans.
-        let interceptedSpans = isolatedSpans.compactMap { span in
+        let interceptedSpans = normalizedSpans.compactMap { span in
             spanInterceptor(span)
         }
 
