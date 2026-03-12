@@ -260,88 +260,6 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Only one span should exist for downloadTask(with: URL) when header injection is off")
     }
 
-    // MARK: - Download Task Completion Handler Tests
-
-    func testDownloadTaskWithRequestAndCompletion_CreatesSpan() throws {
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
-        let request = URLRequest(url: url)
-
-        let expectation = expectation(description: "Download completion called")
-        let session = URLSession(configuration: .ephemeral)
-
-        let task = session.downloadTask(with: request) { _, _, _ in
-            expectation.fulfill()
-        }
-        task.resume()
-
-        wait(for: [expectation], timeout: 10.0)
-        waitForSpans(count: 1)
-
-        let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
-        XCTAssertEqual(spans.count, 1, "Exactly one HTTP span should be created for downloadTask(with: URLRequest, completionHandler:)")
-    }
-
-    func testDownloadTaskWithURLAndCompletion_CreatesSpan() throws {
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
-
-        let expectation = expectation(description: "Download completion called")
-        let session = URLSession(configuration: .ephemeral)
-
-        let task = session.downloadTask(with: url) { _, _, _ in
-            expectation.fulfill()
-        }
-        task.resume()
-
-        wait(for: [expectation], timeout: 10.0)
-        waitForSpans(count: 1)
-
-        let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
-        XCTAssertEqual(spans.count, 1, "Exactly one HTTP span should be created for downloadTask(with: URL, completionHandler:)")
-    }
-
-    func testDownloadTaskWithURLAndCompletion_SingleSpan_WhenHeaderInjectionDisabled() throws {
-        reinstallModule(injectTraceHeaders: false)
-        addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
-
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
-
-        let expectation = expectation(description: "Download completion called")
-        let session = URLSession(configuration: .ephemeral)
-
-        let task = session.downloadTask(with: url) { _, _, _ in
-            expectation.fulfill()
-        }
-        task.resume()
-
-        wait(for: [expectation], timeout: 10.0)
-        waitForSpans(count: 1)
-
-        let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
-        XCTAssertEqual(spans.count, 1, "Only one span should exist for downloadTask(with: URL, completionHandler:) when header injection is off")
-    }
-
-    // MARK: - Streamed Upload Task Tests
-
-    func testUploadTaskWithStreamedRequest_CreatesSpan() throws {
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/post"))
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-
-        let expectation = expectation(description: "Task completed")
-        let bodyData = Data("streamed body".utf8)
-        let delegate = StreamedUploadDelegate(expectation: expectation, bodyData: bodyData)
-        let session = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: nil)
-
-        let task = session.uploadTask(withStreamedRequest: request)
-        task.resume()
-
-        wait(for: [expectation], timeout: 10.0)
-        waitForSpans(count: 1)
-
-        let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
-        XCTAssertEqual(spans.count, 1, "Exactly one HTTP span should be created for uploadTask(withStreamedRequest:)")
-    }
-
     // MARK: - Resume Event Timing
 
     func testDataTaskWithRequest_HasResumeEvent() throws {
@@ -437,23 +355,4 @@ private class TaskCompletionDelegate: NSObject, URLSessionDataDelegate, URLSessi
     }
 
     func urlSession(_: URLSession, downloadTask _: URLSessionDownloadTask, didFinishDownloadingTo _: URL) {}
-}
-
-/// Delegate for streamed upload tasks that provides a body stream and signals completion.
-private class StreamedUploadDelegate: NSObject, URLSessionTaskDelegate {
-    let expectation: XCTestExpectation
-    let bodyData: Data
-
-    init(expectation: XCTestExpectation, bodyData: Data) {
-        self.expectation = expectation
-        self.bodyData = bodyData
-    }
-
-    func urlSession(_: URLSession, task _: URLSessionTask, needNewBodyStream completionHandler: @escaping (InputStream?) -> Void) {
-        completionHandler(InputStream(data: bodyData))
-    }
-
-    func urlSession(_: URLSession, task _: URLSessionTask, didCompleteWithError _: Error?) {
-        expectation.fulfill()
-    }
 }

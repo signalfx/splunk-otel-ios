@@ -231,7 +231,9 @@ func swizzleDownloadTaskWithResumeData() {
 
 func swizzleDownloadTaskWithResumeDataAndCompletion() {
     typealias DownloadHandler = (URL?, URLResponse?, Error?) -> Void
-    let selector = #selector(URLSession.downloadTask(withResumeData:completionHandler:) as (URLSession) -> (Data, @escaping DownloadHandler) -> URLSessionDownloadTask)
+    let selector = #selector(
+        URLSession.downloadTask(withResumeData:completionHandler:) as (URLSession) -> (Data, @escaping DownloadHandler) -> URLSessionDownloadTask
+    )
 
     guard let original = class_getInstanceMethod(URLSession.self, selector) else {
         NetworkInstrumentationManager.shared.logger.log(level: .fault) {
