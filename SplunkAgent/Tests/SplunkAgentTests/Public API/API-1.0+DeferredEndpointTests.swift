@@ -178,9 +178,10 @@ final class API10DeferredEndpointTests: XCTestCase {
         let installedAgent = try SplunkRum.install(with: configuration)
 
         // Before endpoint is set, no collector URLs should be excluded
-        let networkModule = installedAgent.modulesManager?.module(
-            ofType: SplunkNetwork.NetworkInstrumentation.self
-        )
+        let networkModule = installedAgent.modulesManager?
+            .module(
+                ofType: SplunkNetwork.NetworkInstrumentation.self
+            )
         XCTAssertNil(
             networkModule?.excludedEndpoints,
             "No exclusions expected when agent starts without an endpoint"
@@ -210,9 +211,10 @@ final class API10DeferredEndpointTests: XCTestCase {
         let configuration = try ConfigurationTestBuilder.buildDefault()
         let installedAgent = try SplunkRum.install(with: configuration)
 
-        let networkModule = installedAgent.modulesManager?.module(
-            ofType: SplunkNetwork.NetworkInstrumentation.self
-        )
+        let networkModule = installedAgent.modulesManager?
+            .module(
+                ofType: SplunkNetwork.NetworkInstrumentation.self
+            )
 
         // Agent started with an endpoint — its collector URLs should already be excluded
         let initialExclusions = try XCTUnwrap(networkModule?.excludedEndpoints)
