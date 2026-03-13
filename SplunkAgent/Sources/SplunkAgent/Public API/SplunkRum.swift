@@ -51,6 +51,7 @@ public class SplunkRum: ObservableObject {
     var moduleConfigurations: [Any]?
     var screenNameChangeCallback: ((String) -> Void)?
 
+
     // MARK: - Internal (Modules Proxy)
 
     lazy var sessionReplayProxy: any SessionReplayModule = SessionReplayNonOperational()
@@ -61,11 +62,13 @@ public class SplunkRum: ObservableObject {
     lazy var slowFrameDetectorProxy: any SlowFrameDetectorModule = SlowFrameDetectorNonOperational()
     lazy var appStartProxy: any AppStartModule = AppStartNonOperational()
 
+
     // MARK: - Platform Support
 
     private static var isSupportedPlatform: Bool {
         PlatformSupport.current.scope == .full
     }
+
 
     // MARK: - Agent singleton
 
@@ -80,6 +83,7 @@ public class SplunkRum: ObservableObject {
         logPoolName: PackageIdentifier.nonOperationalInstance(),
         sessionSampler: DefaultAgentSessionSampler()
     )
+
 
     // MARK: - Public API
 
@@ -169,6 +173,7 @@ public class SplunkRum: ObservableObject {
         }
     }
 
+
     // MARK: - Public API (Modules)
 
     /// An object that holds the ``SessionReplayModule``.
@@ -203,6 +208,7 @@ public class SplunkRum: ObservableObject {
     public var webViewNativeBridge: any WebViewInstrumentationModule {
         webViewProxy
     }
+
 
     // MARK: - Agent builder
 
@@ -262,6 +268,7 @@ public class SplunkRum: ObservableObject {
 
         return agent
     }
+
 
     // MARK: - Initialization
 
@@ -379,6 +386,7 @@ public class SplunkRum: ObservableObject {
         }
     }
 
+
     // MARK: - Configuration handler
 
     private static func createConfigurationHandler(for configuration: any AgentConfigurationProtocol) -> AgentConfigurationHandler {
@@ -388,7 +396,14 @@ public class SplunkRum: ObservableObject {
         }
 
         return SplunkConfigurationHandler(for: configuration)
+
+        // Temporarily commented-out code until O11y implements a proper backend config endpoint
+        //        return ConfigurationHandler(
+        //            for: configuration,
+        //            apiClient: APIClient(baseUrl: configuration.configUrl)
+        //        )
     }
+
 
     // MARK: - Version
 
