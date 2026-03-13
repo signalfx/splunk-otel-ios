@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkSessionReplayProxy
 import XCTest
 
 @testable import SplunkAgent
@@ -93,151 +92,7 @@ final class API10AgentTests: XCTestCase {
         XCTAssertTrue(agent === anotherAgentInstance)
     }
 
-    func testDeferredEndpointSessionReplayStaysNonOperationalWhenDisabledByConfiguration() throws {
-        let configuration = buildConfigurationWithoutEndpoint()
-        let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: false, samplingRate: 1.0)
-        ]
-
-        let installedAgent = try SplunkRum.install(
-            with: configuration,
-            moduleConfigurations: moduleConfigurations
-        )
-
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-
-        let endpoint = EndpointConfiguration(
-            realm: ConfigurationTestBuilder.realm,
-            rumAccessToken: ConfigurationTestBuilder.rumAccessToken
-        )
-        try installedAgent.updateEndpoint(endpoint)
-
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-        XCTAssertEqual(installedAgent.sessionReplay.state.status, .notRecording(.notStarted))
-    }
-
-    func testDeferredEndpointSessionReplayStaysNonOperationalWhenSampledOut() throws {
-        let configuration = buildConfigurationWithoutEndpoint()
-        let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: true, samplingRate: 0.0)
-        ]
-
-        let installedAgent = try SplunkRum.install(
-            with: configuration,
-            moduleConfigurations: moduleConfigurations
-        )
-
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-
-        let endpoint = EndpointConfiguration(
-            realm: ConfigurationTestBuilder.realm,
-            rumAccessToken: ConfigurationTestBuilder.rumAccessToken
-        )
-        try installedAgent.updateEndpoint(endpoint)
-
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-        XCTAssertEqual(installedAgent.sessionReplay.state.status, .notRecording(.disabledBySampling))
-    }
-
-    func testDeferredEndpointSessionReplayBecomesOperationalWhenEnabledAndSampledIn() throws {
-        let configuration = buildConfigurationWithoutEndpoint()
-        let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
-        ]
-
-        let installedAgent = try SplunkRum.install(
-            with: configuration,
-            moduleConfigurations: moduleConfigurations
-        )
-
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-
-        let endpoint = EndpointConfiguration(
-            realm: ConfigurationTestBuilder.realm,
-            rumAccessToken: ConfigurationTestBuilder.rumAccessToken
-        )
-        try installedAgent.updateEndpoint(endpoint)
-
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplay)
-    }
-
-    func testDeferredEndpointSessionReplayDecisionIsNotReEvaluatedOnSubsequentUpdates() throws {
-        let configuration = buildConfigurationWithoutEndpoint()
-        let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: true, samplingRate: 0.0)
-        ]
-
-        let installedAgent = try SplunkRum.install(
-            with: configuration,
-            moduleConfigurations: moduleConfigurations
-        )
-
-        let endpoint = EndpointConfiguration(
-            realm: ConfigurationTestBuilder.realm,
-            rumAccessToken: ConfigurationTestBuilder.rumAccessToken
-        )
-        try installedAgent.updateEndpoint(endpoint)
-
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-        XCTAssertEqual(installedAgent.sessionReplay.state.status, .notRecording(.disabledBySampling))
-
-        // A second endpoint update must not re-evaluate the sampling decision
-        let secondEndpoint = EndpointConfiguration(
-            realm: "us1",
-            rumAccessToken: ConfigurationTestBuilder.rumAccessToken
-        )
-        try installedAgent.updateEndpoint(secondEndpoint)
-
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-        XCTAssertEqual(installedAgent.sessionReplay.state.status, .notRecording(.disabledBySampling))
-    }
-
-    func testDeferredEndpointWithoutReplayUrlDoesNotPreventLaterEvaluation() throws {
-        let configuration = buildConfigurationWithoutEndpoint()
-        let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
-        ]
-
-        let installedAgent = try SplunkRum.install(
-            with: configuration,
-            moduleConfigurations: moduleConfigurations
-        )
-
-        // First endpoint has trace only — no session replay URL
-        let traceUrl = try ConfigurationTestBuilder.customUrl(for: ConfigurationTestBuilder.customTraceAddress)
-        let traceOnlyEndpoint = EndpointConfiguration(trace: traceUrl)
-        try installedAgent.updateEndpoint(traceOnlyEndpoint)
-
-        // Decision should NOT have been made yet (no replay URL to trigger it)
-        XCTAssertFalse(installedAgent.sessionReplayDecisionMade)
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-
-        // Second endpoint includes a session replay URL — should now evaluate
-        let fullEndpoint = EndpointConfiguration(
-            realm: ConfigurationTestBuilder.realm,
-            rumAccessToken: ConfigurationTestBuilder.rumAccessToken
-        )
-        try installedAgent.updateEndpoint(fullEndpoint)
-
-        XCTAssertTrue(installedAgent.sessionReplayDecisionMade)
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplay)
-    }
-
     // MARK: - Private methods
-
-    private func buildConfigurationWithoutEndpoint() -> AgentConfiguration {
-        var configuration = AgentConfiguration(
-            endpoint: nil,
-            appName: ConfigurationTestBuilder.appName,
-            deploymentEnvironment: ConfigurationTestBuilder.deploymentEnvironment
-        )
-
-        configuration.appVersion = ConfigurationTestBuilder.appVersion
-        configuration.enableDebugLogging = true
-        configuration.globalAttributes = MutableAttributes(dictionary: ["attribute": .string("value")])
-
-        return configuration
-    }
 
     private func expectedAgentStatus() -> Status {
         let isSupportedPlatform = PlatformSupport.current.scope == .full

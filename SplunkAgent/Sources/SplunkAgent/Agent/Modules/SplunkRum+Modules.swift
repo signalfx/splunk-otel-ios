@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -72,6 +72,8 @@ extension SplunkRum {
         customizeSlowFrameDetector()
     }
 
+    // MARK: - Session Replay
+
     /// Perform operations specific to the SessionReplay module.
     private func customizeSessionReplay() {
         guard agentConfiguration.endpoint?.sessionReplayEndpoint != nil else {
@@ -86,63 +88,6 @@ extension SplunkRum {
         }
 
         initializeSessionReplayProxy()
-    }
-
-    private func resolvedSamplingRate(from config: SessionReplayConfiguration) -> Double {
-        let configured = config.samplingRate ?? 1.0
-        let sanitized = configured.isFinite ? configured : 1.0
-        let effective = min(max(sanitized, 0.0), 1.0)
-        if !configured.isFinite || configured < 0.0 || configured > 1.0 {
-            logger.log(level: .warn, isPrivate: false) {
-                """
-                Session Replay sampling rate \(configured) is outside the valid \
-                range <0, 1>. The value has been clamped to \(effective).
-                """
-            }
-        }
-        return effective
-    }
-
-    /// Configure Navigation module.
-    private func customizeNavigation() {
-        let moduleType = SplunkNavigation.Navigation.self
-        let navigationModule = modulesManager?.module(ofType: moduleType)
-
-        guard let navigationModule else {
-            return
-        }
-
-        #if canImport(SplunkCrashReports)
-            let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
-        #endif
-
-        navigationModule.agentVersion(sharedState.agentVersion)
-
-        // Set up forwarding of screen name changes to runtime attributes.
-        Task(priority: .userInitiated) {
-            for await newValue in navigationModule.screenNameStream {
-                runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
-                screenNameChangeCallback?(newValue)
-                #if canImport(SplunkCrashReports)
-                    crashReportsModule?.crashReportUpdateScreenName(newValue)
-                #endif
-            }
-        }
-
-        // Initialize proxy API for this module
-        navigationProxy = Navigation(for: navigationModule)
-    }
-
-    /// Configure Network module with shared state.
-    private func customizeNetwork() {
-        let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
-
-        // Assign an object providing the current state of the agent instance.
-        // We need to do this because we need to read `sessionId` from the agent continuously.
-        networkModule?.sharedState = sharedState
-
-        // Set initial excluded endpoints based on current configuration
-        updateNetworkExclusionList(for: agentConfiguration.endpoint)
     }
 
     /// Enables Session Replay when a valid endpoint becomes available.
@@ -221,6 +166,36 @@ extension SplunkRum {
         sessionReplayProxy = SessionReplay(for: sessionReplayModule, samplingRate: effectiveSamplingRate)
     }
 
+    private func resolvedSamplingRate(from config: SessionReplayConfiguration) -> Double {
+        let configured = config.samplingRate ?? 1.0
+        let sanitized = configured.isFinite ? configured : 1.0
+        let effective = min(max(sanitized, 0.0), 1.0)
+        if !configured.isFinite || configured < 0.0 || configured > 1.0 {
+            logger.log(level: .warn, isPrivate: false) {
+                """
+                Session Replay sampling rate \(configured) is outside the valid \
+                range <0, 1>. The value has been clamped to \(effective).
+                """
+            }
+        }
+        return effective
+    }
+
+
+    // MARK: - Network
+
+    /// Configure Network module with shared state.
+    private func customizeNetwork() {
+        let networkModule = modulesManager?.module(ofType: SplunkNetwork.NetworkInstrumentation.self)
+
+        // Assign an object providing the current state of the agent instance.
+        // We need to do this because we need to read `sessionId` from the agent continuously.
+        networkModule?.sharedState = sharedState
+
+        // Set initial excluded endpoints based on current configuration
+        updateNetworkExclusionList(for: agentConfiguration.endpoint)
+    }
+
     /// Updates the network module's excluded endpoints list based on the provided endpoint configuration.
     ///
     /// This method should be called whenever the endpoint configuration changes to ensure
@@ -247,6 +222,39 @@ extension SplunkRum {
         }
 
         networkModule?.excludedEndpoints = excludedEndpoints.isEmpty ? nil : excludedEndpoints
+    }
+
+
+    // MARK: - Other Modules
+
+    /// Configure Navigation module.
+    private func customizeNavigation() {
+        let moduleType = SplunkNavigation.Navigation.self
+        let navigationModule = modulesManager?.module(ofType: moduleType)
+
+        guard let navigationModule else {
+            return
+        }
+
+        #if canImport(SplunkCrashReports)
+            let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
+        #endif
+
+        navigationModule.agentVersion(sharedState.agentVersion)
+
+        // Set up forwarding of screen name changes to runtime attributes.
+        Task(priority: .userInitiated) {
+            for await newValue in navigationModule.screenNameStream {
+                runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
+                screenNameChangeCallback?(newValue)
+                #if canImport(SplunkCrashReports)
+                    crashReportsModule?.crashReportUpdateScreenName(newValue)
+                #endif
+            }
+        }
+
+        // Initialize proxy API for this module
+        navigationProxy = Navigation(for: navigationModule)
     }
 
     /// Configure Crash Reports module with shared state.
