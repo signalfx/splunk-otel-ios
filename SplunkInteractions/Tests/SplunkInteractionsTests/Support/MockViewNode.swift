@@ -19,28 +19,22 @@ import Foundation
 
 @testable import SplunkInteractions
 
-final class TestInteractionDestination: SplunkInteractionsDestination {
+final class MockViewNode: ViewNodeRepresentable {
 
-    var didReceiveInteractionCallCount = 0
-    var didReceiveFrustrationCallCount = 0
-    var actionName: String?
-    var lastFrustrationXpath: String?
+    let viewTypeName: String
+    let viewId: ObjectIdentifier
+    let indexPath: IndexPath?
+    let superNode: (any ViewNodeRepresentable)?
 
-    func sendInteraction(
-        actionName: String,
-        elementId _: String?,
-        xpath _: String?,
-        time _: Date
+    init(
+        viewTypeName: String,
+        viewId: ObjectIdentifier,
+        indexPath: IndexPath? = nil,
+        superNode: (any ViewNodeRepresentable)? = nil
     ) {
-        self.actionName = actionName
-        didReceiveInteractionCallCount += 1
-    }
-
-    func sendFrustration(
-        xpath: String?,
-        time _: Date
-    ) {
-        lastFrustrationXpath = xpath
-        didReceiveFrustrationCallCount += 1
+        self.viewTypeName = viewTypeName
+        self.viewId = viewId
+        self.indexPath = indexPath
+        self.superNode = superNode
     }
 }

@@ -49,5 +49,8 @@ public enum SessionReplayStatus: Equatable {
 
         /// Disk cache overreached its allowed size.
         case storageLimitReached
+
+        /// The recording cannot be started due to sampling.
+        case disabledBySampling
     }
 }

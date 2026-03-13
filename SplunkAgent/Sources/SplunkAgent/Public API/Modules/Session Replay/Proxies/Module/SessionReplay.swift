@@ -32,6 +32,9 @@ final class SessionReplay: SessionReplayModule {
 
     private let logger: DefaultLogAgent
 
+    /// The effective sampling rate for session replay.
+    let effectiveSamplingRate: Double
+
 
     // MARK: - Test support
 
@@ -40,8 +43,9 @@ final class SessionReplay: SessionReplayModule {
 
     // MARK: - Initialization
 
-    init(for module: CiscoSessionReplay.SessionReplay) {
+    init(for module: CiscoSessionReplay.SessionReplay, samplingRate: Double = 0.2) {
         self.module = module
+        effectiveSamplingRate = samplingRate
         logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "SessionReplay")
 
         // Monitor session changes in the agent
@@ -81,7 +85,7 @@ final class SessionReplay: SessionReplayModule {
 
     // MARK: - State
 
-    private(set) lazy var state: any SessionReplayModuleState = SessionReplayState(for: module)
+    private(set) lazy var state: any SessionReplayModuleState = SessionReplayState(for: module, samplingRate: effectiveSamplingRate)
 }
 
 
