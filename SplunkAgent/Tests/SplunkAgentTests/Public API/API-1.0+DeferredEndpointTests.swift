@@ -181,7 +181,10 @@ final class API10DeferredEndpointTests: XCTestCase {
         let networkModule = installedAgent.modulesManager?.module(
             ofType: SplunkNetwork.NetworkInstrumentation.self
         )
-        XCTAssertNil(networkModule?.excludedEndpoints, "No exclusions expected when agent starts without an endpoint")
+        XCTAssertNil(
+            networkModule?.excludedEndpoints,
+            "No exclusions expected when agent starts without an endpoint"
+        )
 
         // Set the endpoint — exclusions must be in place before the internal flush
         let endpoint = EndpointConfiguration(

@@ -124,6 +124,10 @@ extension SplunkRum {
     private func initializeSessionReplayProxy() {
         let moduleType = CiscoSessionReplay.SessionReplay.self
         guard let sessionReplayModule = modulesManager?.module(ofType: moduleType) else {
+            logger.log(level: .warn, isPrivate: false) {
+                "Session Replay module was not found in the modules manager."
+            }
+
             return
         }
 
