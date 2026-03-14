@@ -24,6 +24,7 @@ internal import SplunkInteractions
 internal import SplunkNavigation
 internal import SplunkNetwork
 internal import SplunkNetworkMonitor
+internal import SplunkSessionReplayProxy
 internal import SplunkSlowFrameDetector
 internal import SplunkWebView
 
@@ -91,13 +92,62 @@ extension SplunkRum {
             return
         }
 
+        // Extract session replay module configuration
+        let config = moduleConfigurations?.compactMap { $0 as? SessionReplayConfiguration }.first ?? SessionReplayConfiguration()
+
+        let effectiveSamplingRate = resolvedSamplingRate(from: config)
+
+        // Check if session replay is enabled by configuration
+        guard config.enabled else {
+            logger.log(level: .notice, isPrivate: false) {
+                "Session Replay module is disabled by configuration."
+            }
+
+            sessionReplayProxy = SessionReplayNonOperational(
+                statusCause: .notStarted,
+                samplingRate: effectiveSamplingRate
+            )
+
+            return
+        }
+
+        // Perform sampling decision (calculated once per Agent lifecycle, not re-evaluated on session rotation)
+        let sampler = SessionReplaySampler(probability: effectiveSamplingRate)
+        if sampler.sample() == .sampledOut {
+            logger.log(level: .notice, isPrivate: false) {
+                "Session Replay module disabled by sampling (rate: \(effectiveSamplingRate))."
+            }
+
+            sessionReplayProxy = SessionReplayNonOperational(
+                statusCause: .disabledBySampling,
+                samplingRate: effectiveSamplingRate
+            )
+
+            return
+        }
+
         // By default, we turn off the default sensitivity for `WKWebView`
         #if canImport(WebKit)
             sessionReplayModule.sensitivity.set(WKWebView.self, nil)
         #endif
 
         // Initialize proxy API for this module
-        sessionReplayProxy = SessionReplay(for: sessionReplayModule)
+        sessionReplayProxy = SessionReplay(for: sessionReplayModule, samplingRate: effectiveSamplingRate)
+    }
+
+    private func resolvedSamplingRate(from config: SessionReplayConfiguration) -> Double {
+        let configured = config.samplingRate ?? 1.0
+        let sanitized = configured.isFinite ? configured : 1.0
+        let effective = min(max(sanitized, 0.0), 1.0)
+        if !configured.isFinite || configured < 0.0 || configured > 1.0 {
+            logger.log(level: .warn, isPrivate: false) {
+                """
+                Session Replay sampling rate \(configured) is outside the valid \
+                range <0, 1>. The value has been clamped to \(effective).
+                """
+            }
+        }
+        return effective
     }
 
     /// Configure Navigation module.
