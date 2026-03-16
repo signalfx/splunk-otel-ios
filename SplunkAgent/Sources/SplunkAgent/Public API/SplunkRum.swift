@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public class SplunkRum: ObservableObject {
 
     var moduleConfigurations: [Any]?
     var screenNameChangeCallback: ((String) -> Void)?
-
+    var sessionReplayDecisionMade = false
 
     // MARK: - Internal (Modules Proxy)
 
@@ -106,57 +106,6 @@ public class SplunkRum: ObservableObject {
     public var openTelemetry: OpenTelemetry {
         OpenTelemetry.instance
     }
-
-    /// Updates the endpoint configuration to start sending spans and events.
-    ///
-    /// Use this method to dynamically configure the endpoint after the agent has been initialized
-    /// without an endpoint.
-    ///
-    /// - Parameter endpoint: The ``EndpointConfiguration`` to use for sending data.
-    /// - Throws: ``AgentConfigurationError`` if the provided endpoint is invalid.
-    public func updateEndpoint(_ endpoint: EndpointConfiguration) throws {
-        // Try to update the event manager if available
-        if let eventManager = eventManager as? DefaultEventManager {
-            try eventManager.updateEndpoint(endpoint)
-            currentEndpoint = endpoint
-            updateNetworkExclusionList(for: endpoint)
-            enableSessionReplayIfNeeded(for: endpoint)
-
-            logger.log(level: .info, isPrivate: false) {
-                "Endpoint configuration updated successfully."
-            }
-        }
-        else {
-            // Event manager not available, but still store the endpoint for API consistency
-            currentEndpoint = endpoint
-            logger.log(level: .warn, isPrivate: false) {
-                "Endpoint configuration stored but event manager is not available."
-            }
-        }
-    }
-
-    /// Disables the endpoint configuration and stops sending spans and events.
-    ///
-    /// Data is cached to pending storage for later sending when a new endpoint is
-    /// configured via ``updateEndpoint(_:)``.
-    public func disableEndpoint() {
-        currentEndpoint = nil
-
-        if let eventManager = eventManager as? DefaultEventManager {
-            eventManager.disableEndpoint()
-            updateNetworkExclusionList(for: nil)
-
-            logger.log(level: .info, isPrivate: false) {
-                "Endpoint disabled. Spans will be cached and sent when endpoint is configured."
-            }
-        }
-        else {
-            logger.log(level: .warn, isPrivate: false) {
-                "Endpoint disabled but event manager is not available."
-            }
-        }
-    }
-
 
     // MARK: - Public API (Modules)
 
@@ -347,6 +296,11 @@ public class SplunkRum: ObservableObject {
             moduleConfigurations: moduleConfigurations
         )
 
+        // Module installation above activates URLSession swizzling. Set the
+        // network exclusion list immediately so any exporter traffic triggered
+        // before customizeModules() completes is correctly filtered out.
+        updateNetworkExclusionList(for: agentConfiguration.endpoint)
+
         initializeEvents["modules_connected"] = Date()
 
         // Register modules' publish callback
@@ -387,5 +341,5 @@ public class SplunkRum: ObservableObject {
     // MARK: - Version
 
     /// A version of this agent.
-    public static let version = "2.1.0"
+    public static let version = "2.2.0"
 }
