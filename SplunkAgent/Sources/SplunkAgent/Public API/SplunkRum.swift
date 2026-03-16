@@ -50,7 +50,7 @@ public class SplunkRum: ObservableObject {
 
     var moduleConfigurations: [Any]?
     var screenNameChangeCallback: ((String) -> Void)?
-
+    var sessionReplayDecisionMade = false
 
     // MARK: - Internal (Modules Proxy)
 
