@@ -68,7 +68,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertFalse(navigation.shouldIgnore(controllerTypeName: "ProductDetailsViewController"))
     }
 
-    func testAutomatedEventOverridesManualScreenName() async {
+    func testManualUpdateOverridesExistingAutomatedScreenName() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
@@ -76,16 +76,6 @@ final class NavigationEventSourcesTests: XCTestCase {
             navigationEventStreamProvider: MockNavigationEventStreamProvider(stream: stream)
         )
         navigation.preferences.enableAutomatedTracking = true
-
-        navigation.track(screen: "ManualScreen")
-
-        let didApplyManualScreen = await waitUntil {
-            await navigation.model.screenName == "ManualScreen"
-        }
-        XCTAssertTrue(didApplyManualScreen)
-
-        let isManualScreenName = await navigation.model.isManualScreenName
-        XCTAssertTrue(isManualScreenName)
 
         navigation.startDetection()
 
@@ -102,6 +92,78 @@ final class NavigationEventSourcesTests: XCTestCase {
             await navigation.model.screenName == "AutoViewController"
         }
         XCTAssertTrue(didApplyAutomatedScreen)
+
+        navigation.track(screen: "ManualScreen")
+
+        let didApplyManualScreen = await waitUntil {
+            await navigation.model.screenName == "ManualScreen"
+        }
+        XCTAssertTrue(didApplyManualScreen)
+    }
+
+    func testAutomaticUpdateOverridesManualScreenNameWhenAutomatedTrackingEnabled() async {
+        let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
+        defer { continuation.finish() }
+
+        let navigation = Navigation(
+            navigationEventStreamProvider: MockNavigationEventStreamProvider(stream: stream)
+        )
+        navigation.preferences.enableAutomatedTracking = true
+
+        navigation.track(screen: "ManualScreen")
+
+        let didApplyManualScreen = await waitUntil {
+            await navigation.model.screenName == "ManualScreen"
+        }
+        XCTAssertTrue(didApplyManualScreen)
+
+        navigation.startDetection()
+
+        continuation.yield(
+            AutomatedNavigationEvent(
+                timestamp: Date(),
+                type: .viewDidLoad,
+                controllerTypeName: "AutoViewController",
+                controllerIdentifier: ObjectIdentifier(NSString())
+            )
+        )
+
+        let didApplyAutomatedScreen = await waitUntil {
+            await navigation.model.screenName == "AutoViewController"
+        }
+        XCTAssertTrue(didApplyAutomatedScreen)
+    }
+
+    func testAutomaticUpdateDoesNotOverrideManualScreenNameWhenAutomatedTrackingDisabled() async {
+        let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
+        defer { continuation.finish() }
+
+        let navigation = Navigation(
+            navigationEventStreamProvider: MockNavigationEventStreamProvider(stream: stream)
+        )
+
+        navigation.track(screen: "ManualScreen")
+
+        let didApplyManualScreen = await waitUntil {
+            await navigation.model.screenName == "ManualScreen"
+        }
+        XCTAssertTrue(didApplyManualScreen)
+
+        navigation.startDetection()
+
+        continuation.yield(
+            AutomatedNavigationEvent(
+                timestamp: Date(),
+                type: .viewDidLoad,
+                controllerTypeName: "AutoViewController",
+                controllerIdentifier: ObjectIdentifier(NSString())
+            )
+        )
+
+        try? await Task.sleep(nanoseconds: 50_000_000)
+
+        let currentScreenName = await navigation.model.screenName
+        XCTAssertEqual(currentScreenName, "ManualScreen")
     }
 }
 

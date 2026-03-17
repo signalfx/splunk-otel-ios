@@ -249,8 +249,7 @@ public final class Navigation: Sendable {
     /// Determine whether processing should occur at call time.
     private func shouldProcessEvent() async -> Bool {
         let moduleEnabled = await model.moduleEnabled
-        let isManualScreenName = await model.isManualScreenName
-        let trackingEnabled = state.isAutomatedTrackingEnabled || isManualScreenName
+        let trackingEnabled = state.isAutomatedTrackingEnabled
 
         return moduleEnabled && trackingEnabled
     }
