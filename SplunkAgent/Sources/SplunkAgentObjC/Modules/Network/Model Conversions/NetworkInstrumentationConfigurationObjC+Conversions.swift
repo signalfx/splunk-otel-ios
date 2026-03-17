@@ -28,7 +28,9 @@ extension NetworkInstrumentationConfigurationObjC: ModuleConfigurationSwift {
 
         return NetworkInstrumentationConfiguration(
             isEnabled: isEnabled,
-            ignoreURLs: configurationIgnoreUrls
+            ignoreURLs: configurationIgnoreUrls,
+            capturedRequestHeaders: capturedRequestHeaders,
+            capturedResponseHeaders: capturedResponseHeaders
         )
     }
 }

@@ -28,16 +28,16 @@ public final class NetworkInstrumentationConfigurationObjC: ModuleConfigurationO
     public var ignoreURLs: NSRegularExpression?
 
     /// HTTP request header names to capture as span attributes.
-     ///
-     /// When set, matching headers from outgoing requests are added to the HTTP span
-     /// as `http.request.header.<lowercased-name>`. Header matching is case-insensitive.
-     public var capturedRequestHeaders: [String]?
+    ///
+    /// When set, matching headers from outgoing requests are added to the HTTP span
+    /// as `http.request.header.<lowercased-name>`. Header matching is case-insensitive.
+    public var capturedRequestHeaders: [String]?
 
-     /// HTTP response header names to capture as span attributes.
-     ///
-     /// When set, matching headers from incoming responses are added to the HTTP span
-     /// as `http.response.header.<lowercased-name>`. Header matching is case-insensitive.
-     public var capturedResponseHeaders: [String]?
+    /// HTTP response header names to capture as span attributes.
+    ///
+    /// When set, matching headers from incoming responses are added to the HTTP span
+    /// as `http.response.header.<lowercased-name>`. Header matching is case-insensitive.
+    public var capturedResponseHeaders: [String]?
 
 
     // MARK: - Initialization

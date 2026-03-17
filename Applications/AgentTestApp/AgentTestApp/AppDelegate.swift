@@ -73,16 +73,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return modifiedSpan
         }
         let networkConfig = NetworkInstrumentationConfiguration(
-                  capturedRequestHeaders: ["Accept", "Content-Type", "X-Request-ID"],
-                  capturedResponseHeaders: ["Content-Type", "X-Request-ID", "Server"]
-              )
+            capturedRequestHeaders: ["Accept", "Content-Type", "X-Request-ID"],
+            capturedResponseHeaders: ["Content-Type", "X-Request-ID", "Server"]
+        )
 
         do {
-              _ = try SplunkRum.install(with: agentConfig)
-              _ = try SplunkRum.install(
-                  with: agentConfig,
-                  moduleConfigurations: [networkConfig]
-              )
+            _ = try SplunkRum.install(
+                with: agentConfig,
+                moduleConfigurations: [networkConfig]
+            )
         }
         catch {
             print("Unable to start the Splunk agent, error: \(error)")
