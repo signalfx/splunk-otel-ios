@@ -136,7 +136,9 @@ public final class Navigation: Sendable {
     }
 
     private func runModernDetectionLoop() async {
-        let retryDelayNs: UInt64 = 50_000_000
+        let initialRetryDelayNs: UInt64 = 50_000_000
+        let maxRetryDelayNs: UInt64 = 2_000_000_000
+        var retryDelayNs = initialRetryDelayNs
 
         while !Task.isCancelled {
             do {
@@ -162,6 +164,7 @@ public final class Navigation: Sendable {
                 }
 
                 try? await Task.sleep(nanoseconds: retryDelayNs)
+                retryDelayNs = min(retryDelayNs * 2, maxRetryDelayNs)
             }
         }
     }
