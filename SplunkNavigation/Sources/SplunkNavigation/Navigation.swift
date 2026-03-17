@@ -26,6 +26,8 @@ public final class Navigation: Sendable {
 
     // MARK: - Private
 
+    private static let streamRetryDelayNs: UInt64 = 50_000_000
+
     let model = NavigationModel()
 
     let appBundleName: String?
@@ -130,30 +132,56 @@ public final class Navigation: Sendable {
     // MARK: - Instrumentation (Modern solution)
 
     private func startModernDetection() {
-        // swiftlint:disable:next unhandled_throwing_task
         Task(priority: .userInitiated) {
-            let navigationStream = try await modernNavigationStream()
+            await runModernDetectionLoop()
+        }
+    }
 
-            // Process navigation events
-            for await event in navigationStream where await shouldProcessEvent() {
-                // Supported events handling
-                switch event.type {
-                case .viewDidLoad:
-                    await processShowStart(event: event)
+    private func runModernDetectionLoop() async {
+        while !Task.isCancelled {
+            do {
+                let navigationStream = try await modernNavigationStream()
 
-                case .viewDidAppear:
-                    await processNavigationEnd(event: event)
+                // Process navigation events
+                for await event in navigationStream {
+                    guard
+                        await shouldProcessEvent(),
+                        !shouldIgnore(controllerTypeName: event.controllerTypeName)
+                    else {
+                        continue
+                    }
 
-                case .willTransitionToTraitCollection:
-                    await processTransitionStart(event: event)
-
-                case .didTransitionToTraitCollection:
-                    await processNavigationEnd(event: event)
-
-                default:
-                    break
+                    await processModernNavigationEvent(event)
                 }
+
+                return
             }
+            catch {
+                logger.log(level: .error) {
+                    "Failed to initialize modern navigation stream: \(String(describing: error))"
+                }
+
+                try? await Task.sleep(nanoseconds: Self.streamRetryDelayNs)
+            }
+        }
+    }
+
+    private func processModernNavigationEvent(_ event: NavigationActionEvent) async {
+        switch event.type {
+        case .viewDidLoad:
+            await processShowStart(event: event)
+
+        case .viewDidAppear:
+            await processNavigationEnd(event: event)
+
+        case .willTransitionToTraitCollection:
+            await processTransitionStart(event: event)
+
+        case .didTransitionToTraitCollection:
+            await processNavigationEnd(event: event)
+
+        default:
+            break
         }
     }
 
