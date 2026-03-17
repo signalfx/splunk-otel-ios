@@ -31,6 +31,21 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
     /// Describes URLs to be ignored by the module when reporting on network activity.
     public var ignoreURLs: IgnoreURLs?
 
+    /// HTTP request header names to capture as span attributes.
+    ///
+    /// When set, matching headers from outgoing requests are added to the HTTP span
+    /// as `http.request.header.<lowercased-name>`. Header matching is case-insensitive.
+    /// Default is `nil` (no request headers captured).
+    public var capturedRequestHeaders: [String]?
+
+    /// HTTP response header names to capture as span attributes.
+    ///
+    /// When set, matching headers from incoming responses are added to the HTTP span
+    /// as `http.response.header.<lowercased-name>`. Header matching is case-insensitive.
+    /// Default is `nil` (no response headers captured).
+    public var capturedResponseHeaders: [String]?
+
+
     // MARK: init()
 
     /// Initializes new module configuration with preconfigured values.
@@ -41,5 +56,24 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
     public init(isEnabled: Bool, ignoreURLs: IgnoreURLs?) {
         self.isEnabled = isEnabled
         self.ignoreURLs = ignoreURLs
+    }
+
+    /// Initializes new module configuration with all options.
+    ///
+    /// - Parameters:
+    ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
+    ///   - ignoreURLs: If present, the module will not report on these URLs.
+    ///   - capturedRequestHeaders: HTTP request header names to capture as span attributes.
+    ///   - capturedResponseHeaders: HTTP response header names to capture as span attributes.
+    public init(
+        isEnabled: Bool = true,
+        ignoreURLs: IgnoreURLs? = nil,
+        capturedRequestHeaders: [String]? = nil,
+        capturedResponseHeaders: [String]? = nil
+    ) {
+        self.isEnabled = isEnabled
+        self.ignoreURLs = ignoreURLs
+        self.capturedRequestHeaders = capturedRequestHeaders
+        self.capturedResponseHeaders = capturedResponseHeaders
     }
 }

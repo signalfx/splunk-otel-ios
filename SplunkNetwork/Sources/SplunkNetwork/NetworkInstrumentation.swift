@@ -25,6 +25,12 @@ public class NetworkInstrumentation {
     /// Holds regex patterns from IgnoreURLs API.
     private var ignoreURLs = IgnoreURLs()
 
+    /// Lowercased request header names to capture as span attributes.
+    private var capturedRequestHeaders: Set<String> = []
+
+    /// Lowercased response header names to capture as span attributes.
+    private var capturedResponseHeaders: Set<String> = []
+
 
     // MARK: - Public
 
@@ -65,6 +71,14 @@ public class NetworkInstrumentation {
                 ignoreURLs = ignoreURLsParameter
             }
 
+            if let requestHeaders = config?.capturedRequestHeaders {
+                capturedRequestHeaders = Set(requestHeaders.map { $0.lowercased() })
+            }
+
+            if let responseHeaders = config?.capturedResponseHeaders {
+                capturedResponseHeaders = Set(responseHeaders.map { $0.lowercased() })
+            }
+
             NetworkInstrumentationManager.shared.initialize(with: self)
         }
     }
@@ -79,5 +93,13 @@ public class NetworkInstrumentation {
 
     public func getIgnoreURLs() -> IgnoreURLs {
         ignoreURLs
+    }
+
+    public func getCapturedRequestHeaders() -> Set<String> {
+        capturedRequestHeaders
+    }
+
+    public func getCapturedResponseHeaders() -> Set<String> {
+        capturedResponseHeaders
     }
 }
