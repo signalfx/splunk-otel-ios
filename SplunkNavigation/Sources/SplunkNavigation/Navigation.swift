@@ -24,8 +24,6 @@ import UIKit
 /// The navigation module detects and tracks navigation in the application.
 public final class Navigation: Sendable {
 
-    // MARK: - Static constants
-
     // MARK: - Private
 
     let model = NavigationModel()
