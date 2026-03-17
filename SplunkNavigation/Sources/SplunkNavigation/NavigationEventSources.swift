@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import CiscoSwizzling
-import Foundation
 
 /// Provides navigation action events produced by swizzling.
 protocol NavigationEventStreamProviding: Sendable {
