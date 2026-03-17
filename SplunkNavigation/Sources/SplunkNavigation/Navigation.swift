@@ -26,8 +26,6 @@ public final class Navigation: Sendable {
 
     // MARK: - Private
 
-    private static let streamRetryDelayNs: UInt64 = 50_000_000
-
     let model = NavigationModel()
 
     let appBundleName: String?
@@ -138,6 +136,8 @@ public final class Navigation: Sendable {
     }
 
     private func runModernDetectionLoop() async {
+        let retryDelayNs: UInt64 = 50_000_000
+
         while !Task.isCancelled {
             do {
                 let navigationStream = try await modernNavigationStream()
@@ -161,7 +161,7 @@ public final class Navigation: Sendable {
                     "Failed to initialize modern navigation stream: \(String(describing: error))"
                 }
 
-                try? await Task.sleep(nanoseconds: Self.streamRetryDelayNs)
+                try? await Task.sleep(nanoseconds: retryDelayNs)
             }
         }
     }
