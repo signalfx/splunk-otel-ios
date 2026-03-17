@@ -51,6 +51,7 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
     // MARK: - SpanProcessor methods
 
     public func onStart(parentContext _: OpenTelemetryApi.SpanContext?, span: any OpenTelemetrySdk.ReadableSpan) {
+        runtimeAttributes.trackActivity()
         inject(attributes: runtimeAttributes.all, to: span)
     }
 

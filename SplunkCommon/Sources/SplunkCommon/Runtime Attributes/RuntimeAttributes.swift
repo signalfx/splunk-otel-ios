@@ -20,4 +20,13 @@ public protocol RuntimeAttributes: AnyObject {
 
     /// A list of attributes to use at signal start.
     var all: [String: Any] { get }
+
+    /// Records a telemetry activity event. Called on span start and log emit.
+    func trackActivity()
+}
+
+
+public extension RuntimeAttributes {
+
+    func trackActivity() {}
 }

@@ -28,4 +28,14 @@ struct NoOpSession: AgentSession {
     func sessionId(for _: Date) -> String? {
         currentSessionItem.id
     }
+
+    var currentSessionStart: Date {
+        currentSessionItem.start
+    }
+
+    var currentSessionLastActivity: Date {
+        currentSessionItem.start
+    }
+
+    func trackActivity(at _: Date) {}
 }

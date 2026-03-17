@@ -45,4 +45,6 @@ extension SessionState {
     public var samplingRate: Double {
         owner.agentConfiguration.session.samplingRate
     }
+
 }
+
