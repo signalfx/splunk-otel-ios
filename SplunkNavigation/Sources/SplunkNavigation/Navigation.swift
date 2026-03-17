@@ -217,9 +217,11 @@ public final class Navigation: Sendable {
         // Always refresh in-flight transition state for this controller.
         // If a previous end event was missed, this replaces stale timing data.
         await model.update(navigation: navigation, for: event.controllerIdentifier)
+        await model.update(screenName: screenName)
 
-        // Send corresponding span
+        // Yield this change to the consumer and send corresponding span
         if screenName != lastScreenName {
+            continuation.yield(screenName)
             send(screenName: screenName, lastScreenName: lastScreenName, start: start)
         }
     }

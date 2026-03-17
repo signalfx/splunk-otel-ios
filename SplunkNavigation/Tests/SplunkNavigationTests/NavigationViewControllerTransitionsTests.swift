@@ -89,6 +89,38 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         continuationBox.continuation?.finish()
     }
 
+    func testViewWillTransition_UpdatesActiveScreenAndStream() async {
+        let continuationBox = NavigationEventContinuationBox()
+        let navigation = makeNavigation(continuationBox: continuationBox)
+        var screenNameIterator = navigation.screenNameStream.makeAsyncIterator()
+        let controllerIdentifier = ObjectIdentifier(NSString())
+
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
+
+        let streamReady = await waitUntil { continuationBox.continuation != nil }
+        XCTAssertTrue(streamReady)
+
+        continuationBox.continuation?
+            .yield(
+                event(
+                    type: .viewWillTransition,
+                    controllerIdentifier: controllerIdentifier,
+                    controllerTypeName: "TransitionViewController"
+                )
+            )
+
+        let didUpdateActiveScreen = await waitUntil {
+            await navigation.model.screenName == "TransitionViewController"
+        }
+        XCTAssertTrue(didUpdateActiveScreen)
+
+        let emittedScreenName = await screenNameIterator.next()
+        XCTAssertEqual(emittedScreenName, "TransitionViewController")
+
+        continuationBox.continuation?.finish()
+    }
+
     func testTransitionStartReplacesOverlappingWillSignals() async {
         let continuationBox = NavigationEventContinuationBox()
         let navigation = makeNavigation(continuationBox: continuationBox)
@@ -129,6 +161,75 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
 
         continuationBox.continuation?.finish()
     }
+
+    func testTransitionUpdateOverridesManualScreenNameWhenAutomatedTrackingEnabled() async {
+        let continuationBox = NavigationEventContinuationBox()
+        let navigation = makeNavigation(continuationBox: continuationBox)
+        let controllerIdentifier = ObjectIdentifier(NSString())
+
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.track(screen: "ManualScreen")
+
+        let didApplyManualScreen = await waitUntil {
+            await navigation.model.screenName == "ManualScreen"
+        }
+        XCTAssertTrue(didApplyManualScreen)
+
+        navigation.startDetection()
+
+        let streamReady = await waitUntil { continuationBox.continuation != nil }
+        XCTAssertTrue(streamReady)
+
+        continuationBox.continuation?
+            .yield(
+                event(
+                    type: .viewWillTransition,
+                    controllerIdentifier: controllerIdentifier,
+                    controllerTypeName: "TransitionViewController"
+                )
+            )
+
+        let didApplyTransitionScreen = await waitUntil {
+            await navigation.model.screenName == "TransitionViewController"
+        }
+        XCTAssertTrue(didApplyTransitionScreen)
+
+        continuationBox.continuation?.finish()
+    }
+
+    func testTransitionUpdateDoesNotOverrideManualScreenNameWhenAutomatedTrackingDisabled() async {
+        let continuationBox = NavigationEventContinuationBox()
+        let navigation = makeNavigation(continuationBox: continuationBox)
+        let controllerIdentifier = ObjectIdentifier(NSString())
+
+        navigation.track(screen: "ManualScreen")
+
+        let didApplyManualScreen = await waitUntil {
+            await navigation.model.screenName == "ManualScreen"
+        }
+        XCTAssertTrue(didApplyManualScreen)
+
+        navigation.startDetection()
+
+        let streamReady = await waitUntil { continuationBox.continuation != nil }
+        XCTAssertTrue(streamReady)
+
+        continuationBox.continuation?
+            .yield(
+                event(
+                    type: .viewWillTransition,
+                    controllerIdentifier: controllerIdentifier,
+                    controllerTypeName: "TransitionViewController"
+                )
+            )
+
+        try? await Task.sleep(nanoseconds: 50_000_000)
+
+        let currentScreenName = await navigation.model.screenName
+        XCTAssertEqual(currentScreenName, "ManualScreen")
+
+        continuationBox.continuation?.finish()
+    }
 }
 
 private struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
@@ -158,12 +259,13 @@ private func makeNavigation(
 
 private func event(
     type: NavigationActionEventType,
-    controllerIdentifier: ObjectIdentifier
+    controllerIdentifier: ObjectIdentifier,
+    controllerTypeName: String = "MockViewController"
 ) -> AutomatedNavigationEvent {
     AutomatedNavigationEvent(
         timestamp: Date(),
         type: type,
-        controllerTypeName: "MockViewController",
+        controllerTypeName: controllerTypeName,
         controllerIdentifier: controllerIdentifier
     )
 }
