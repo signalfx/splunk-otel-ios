@@ -89,6 +89,9 @@ final class SessionReplayAPI10NoOpProxyTests: XCTestCase {
 
         case .notRecording(.storageLimitReached):
             break
+
+        case .notRecording(.disabledBySampling):
+            break
         }
     }
 

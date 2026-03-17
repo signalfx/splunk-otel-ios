@@ -89,7 +89,7 @@ Releasing xcframeworks is a two-part process: CI builds the unsigned artifacts, 
 1. A developer triggers `release.yml` with a version and ticket ID.
 2. The release PR is reviewed and merged to `main`.
 3. `merge_release.yml` runs automatically — creates a git tag and a GitHub Release.
-4. `build-xcframeworks.yml` triggers on the release event — builds all xcframeworks, validates them, runs a smoke test, and uploads an **unsigned** artifact.
+4. `build-xcframeworks.yml` triggers on the release event — builds all xcframeworks, validates them, runs a smoke test, snapshots the Cisco binary target inputs into `cisco-release-manifest.txt`, and uploads an **unsigned** artifact.
 5. A developer downloads the unsigned artifact, signs locally, and uploads the signed zip to the release.
 
 > **Note:** Automated CI signing (Job 2 in `build-xcframeworks.yml`) is temporarily disabled because distribution certificates cannot be stored in GitHub secrets. The implementation is preserved and can be re-enabled by setting the `SIGNING_ENABLED` repository variable to `"true"`.
@@ -106,9 +106,14 @@ After CI finishes the build (step 4 above), run the convenience script:
 The script will:
 - Auto-detect your signing identity from the local keychain
 - Download the unsigned artifact from the latest CI run
-- Sign all xcframeworks
-- Validate signatures
+- Refresh `Cisco*.xcframework` bundles from the artifact's `cisco-release-manifest.txt`
+- Sign all non-Cisco xcframeworks
+- Validate signatures for all shipped xcframeworks
 - Package and upload the zip to the existing GitHub release
+
+The unsigned artifact is expected to contain `cisco-release-manifest.txt`. The refresh step uses that manifest automatically so manual signing remains reproducible even if `Package.swift` has changed since the CI build was produced.
+
+> **Note:** Older unsigned artifacts created before the manifest was added are not compatible with this refreshed signing flow. In that case, rebuild the unsigned artifact from CI instead of signing the old one.
 
 #### Options
 
@@ -142,13 +147,16 @@ gh run download <RUN_ID> -n splunk-agent-xcframeworks-unsigned -D tools/xcframew
 # 3. Find your signing identity
 security find-identity -v -p codesigning
 
-# 4. Sign
+# 4. Refresh Cisco xcframeworks from the artifact manifest
+./scripts/refresh-cisco-xcframeworks.sh --output-dir output/xcframeworks
+
+# 5. Sign non-Cisco xcframeworks
 ./scripts/sign-xcframeworks.sh "Apple Distribution: Splunk Inc. (TEAMID)"
 
-# 5. Validate
+# 6. Validate all signatures
 RELEASE=true ./scripts/validate-xcframeworks.sh
 
-# 6. Package and upload to the existing release
+# 7. Package and upload to the existing release
 ./scripts/release.sh 1.2.0 --upload-to 1.2.0
 ```
 
