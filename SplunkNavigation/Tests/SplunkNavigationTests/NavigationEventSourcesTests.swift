@@ -270,21 +270,3 @@ private func makeStream<T>(_ values: [T]) -> AsyncStream<T> {
         continuation.finish()
     }
 }
-
-private func waitUntil(
-    timeout: TimeInterval = 1.0,
-    pollIntervalNanoseconds: UInt64 = 10_000_000,
-    _ condition: @escaping @Sendable () async -> Bool
-) async -> Bool {
-    let deadline = Date().addingTimeInterval(timeout)
-
-    while Date() < deadline {
-        if await condition() {
-            return true
-        }
-
-        try? await Task.sleep(nanoseconds: pollIntervalNanoseconds)
-    }
-
-    return await condition()
-}

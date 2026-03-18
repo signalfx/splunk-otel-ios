@@ -269,21 +269,3 @@ private func event(
         controllerIdentifier: controllerIdentifier
     )
 }
-
-private func waitUntil(
-    timeout: TimeInterval = 1.0,
-    pollNanoseconds: UInt64 = 10_000_000,
-    condition: @escaping () async -> Bool
-) async -> Bool {
-    let deadline = Date().addingTimeInterval(timeout)
-
-    while Date() < deadline {
-        if await condition() {
-            return true
-        }
-
-        try? await Task.sleep(nanoseconds: pollNanoseconds)
-    }
-
-    return await condition()
-}
