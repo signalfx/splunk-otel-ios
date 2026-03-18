@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import CiscoLogger
 import Foundation
 import OpenTelemetryApi
 
-private var associatedKeySpan: UInt8 = 0
+private var associatedKeySpanResume: UInt8 = 0
 
 extension URLSessionTask {
     @objc
@@ -36,7 +36,10 @@ extension URLSessionTask {
         if currentRequest?.url == nil {
             return
         }
-        guard let span = objc_getAssociatedObject(self, &associatedKeySpan) as? Span else {
+
+        // Check for span from task creation first, then from resume
+        let span = getCreationSpan(for: self) ?? objc_getAssociatedObject(self, &associatedKeySpanResume) as? Span
+        guard let span else {
             return
         }
 
@@ -55,14 +58,26 @@ extension URLSessionTask {
             return
         }
 
-        let existingSpan: Span? = objc_getAssociatedObject(self, &associatedKeySpan) as? Span
+        // For tasks instrumented at creation time, record the actual network start.
+        // The span is started at creation (required for traceparent header injection),
+        // but actual network activity only begins at resume. The event allows downstream
+        // systems to compute accurate network duration.
+        if wasInstrumentedAtCreation(self) {
+            getCreationSpan(for: self)?.addEvent(name: "http.request.started")
+            return
+        }
+
+        // Check if we already have a span from a previous resume call
+        let existingSpan: Span? = objc_getAssociatedObject(self, &associatedKeySpanResume) as? Span
         if existingSpan != nil {
             return
         }
 
+        // Fallback: create span at resume time (no header injection possible).
+        // Covers tasks created before agent initialization or via un-swizzled APIs.
         startHttpSpan(request: currentRequest)
             .map { span in
-                objc_setAssociatedObject(self, &associatedKeySpan, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+                objc_setAssociatedObject(self, &associatedKeySpanResume, span, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
             }
     }
 }
