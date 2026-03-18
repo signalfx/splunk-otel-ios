@@ -143,6 +143,7 @@ public final class Navigation: Sendable {
         while !Task.isCancelled {
             do {
                 let navigationStream = try await modernNavigationStream()
+
                 // Process navigation events
                 for await event in navigationStream {
                     guard
