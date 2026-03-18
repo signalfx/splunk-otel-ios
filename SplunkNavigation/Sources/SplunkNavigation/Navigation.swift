@@ -130,39 +130,69 @@ public final class Navigation: Sendable {
     // MARK: - Instrumentation (Modern solution)
 
     private func startModernDetection() {
-        // swiftlint:disable:next unhandled_throwing_task
         Task(priority: .userInitiated) {
-            let navigationStream = try await modernNavigationStream()
+            await runModernDetectionLoop()
+        }
+    }
 
-            // Process navigation events
-            for await event in navigationStream where await shouldProcessEvent() {
-                // Supported events handling
-                switch event.type {
-                case .viewDidLoad:
-                    await processShowStart(event: event)
+    private func runModernDetectionLoop() async {
+        let initialRetryDelayNs: UInt64 = 50_000_000
+        let maxRetryDelayNs: UInt64 = 2_000_000_000
+        var retryDelayNs = initialRetryDelayNs
 
-                case .viewDidAppear:
-                    await processNavigationEnd(event: event)
+        while !Task.isCancelled {
+            do {
+                let navigationStream = try await modernNavigationStream()
+                // Process navigation events
+                for await event in navigationStream {
+                    guard
+                        await shouldProcessEvent(),
+                        !shouldIgnore(controllerTypeName: event.controllerTypeName)
+                    else {
+                        continue
+                    }
 
-                case .viewDidDisappear:
-                    await processNavigationEnd(event: event)
-
-                case .viewWillTransition:
-                    await processTransitionStart(event: event)
-
-                case .viewDidTransition:
-                    await processNavigationEnd(event: event)
-
-                case .willTransitionToTraitCollection:
-                    await processTransitionStart(event: event)
-
-                case .didTransitionToTraitCollection:
-                    await processNavigationEnd(event: event)
-
-                default:
-                    break
+                    await processModernNavigationEvent(event)
                 }
+
+                return
             }
+            catch {
+                logger.log(level: .error) {
+                    "Failed to initialize modern navigation stream: \(String(describing: error))"
+                }
+
+                try? await Task.sleep(nanoseconds: retryDelayNs)
+                retryDelayNs = min(retryDelayNs * 2, maxRetryDelayNs)
+            }
+        }
+    }
+
+    private func processModernNavigationEvent(_ event: NavigationActionEvent) async {
+        switch event.type {
+        case .viewDidLoad:
+            await processShowStart(event: event)
+
+        case .viewDidAppear:
+            await processNavigationEnd(event: event)
+
+        case .viewDidDisappear:
+            await processNavigationEnd(event: event)
+
+        case .viewWillTransition:
+            await processTransitionStart(event: event)
+
+        case .viewDidTransition:
+            await processNavigationEnd(event: event)
+
+        case .willTransitionToTraitCollection:
+            await processTransitionStart(event: event)
+
+        case .didTransitionToTraitCollection:
+            await processNavigationEnd(event: event)
+
+        default:
+            break
         }
     }
 
