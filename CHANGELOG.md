@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+* Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans.
+
 ## [2.2.0] - 2026-03-11
 
 ### Added
@@ -214,4 +218,3 @@ This is a first major stable release of the new Splunk OpenTelemetry Agent.
 ### Deprecated
 
 * Deprecates the use of SplunkRum.initialize. Use the SplunkRumBuilder going forward.
-
