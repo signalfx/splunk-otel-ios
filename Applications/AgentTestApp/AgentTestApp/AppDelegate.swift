@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Private
 
     #if DEBUG
-    private var screenNameObserverTask: Task<Void, Never>?
+        private var screenNameObserverTask: Task<Void, Never>?
     #endif
 
     // MARK: - Application lifecycle
@@ -100,7 +100,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_: UIApplication) {
         #if DEBUG
-        screenNameObserverTask?.cancel()
+            screenNameObserverTask?.cancel()
         #endif
     }
 
