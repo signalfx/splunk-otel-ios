@@ -39,4 +39,14 @@ struct SessionMetadata: Codable {
     ///
     /// Falls back to ``sessionStart`` if no activity has been tracked yet.
     let sessionLastActivity: Int64
+
+
+    // MARK: - CodingKeys
+
+    enum CodingKeys: String, CodingKey {
+        case sessionId
+        case anonymousUserId
+        case sessionStart
+        case sessionLastActivity
+    }
 }

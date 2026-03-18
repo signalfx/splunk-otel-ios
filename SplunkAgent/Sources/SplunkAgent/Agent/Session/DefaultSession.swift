@@ -106,7 +106,7 @@ class DefaultSession: AgentSession {
     }
 
     func trackActivity(at date: Date) {
-        accessQueue.async(flags: .barrier) { [weak self] in
+        accessQueue.async { [weak self] in
             self?.lastActivity = date
         }
     }
@@ -265,7 +265,9 @@ class DefaultSession: AgentSession {
         currentSession = createSession()
 
         // Reset in-memory last-activity for the new session
-        lastActivity = nil
+        accessQueue.sync {
+            lastActivity = nil
+        }
 
         // Save changes into cache
         sessionsModel.sync()

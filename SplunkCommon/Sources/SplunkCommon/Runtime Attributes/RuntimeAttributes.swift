@@ -26,7 +26,7 @@ public protocol RuntimeAttributes: AnyObject {
 }
 
 
-public extension RuntimeAttributes {
+extension RuntimeAttributes {
 
-    func trackActivity() {}
+    public func trackActivity() {}
 }

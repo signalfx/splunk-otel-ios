@@ -42,7 +42,7 @@ protocol AgentSession {
 
     /// Records a telemetry activity event for the current session.
     ///
-    /// - Parameter date: The timestamp of the activity. Defaults to the current time.
+    /// - Parameter date: The timestamp of the activity.
     func trackActivity(at date: Date)
 
 

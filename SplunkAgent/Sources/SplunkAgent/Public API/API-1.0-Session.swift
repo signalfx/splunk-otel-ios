@@ -64,8 +64,8 @@ extension Session {
         let sessionMetadata = SessionMetadata(
             sessionId: session.currentSessionId,
             anonymousUserId: anonymousUserId,
-            sessionStart: Int64(session.currentSessionStart.timeIntervalSince1970 * 1000),
-            sessionLastActivity: Int64(session.currentSessionLastActivity.timeIntervalSince1970 * 1000)
+            sessionStart: Int64(session.currentSessionStart.timeIntervalSince1970 * 1_000),
+            sessionLastActivity: Int64(session.currentSessionLastActivity.timeIntervalSince1970 * 1_000)
         )
 
         do {
