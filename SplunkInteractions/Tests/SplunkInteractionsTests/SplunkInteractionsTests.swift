@@ -32,7 +32,6 @@ final class SplunkInteractionsTests: XCTestCase {
             (.gestureTap, "tap"),
             (.gestureLongPress, "long_press"),
             (.gestureDoubleTap, "double_tap"),
-            (.gestureRageTap, "rage_tap"),
             (.gesturePinch, "pinch"),
             (.gestureRotation, "rotation"),
             (.focus, "focus"),
@@ -42,6 +41,11 @@ final class SplunkInteractionsTests: XCTestCase {
         for (type, expected) in types {
             XCTAssertEqual(interactions.interactionType(from: type), expected)
         }
+    }
+
+    func testRageTapIsNotAnInteractionType() {
+        let interactions = Interactions()
+        XCTAssertNil(interactions.interactionType(from: .gestureRageTap))
     }
 
     func testHandlingStream() {
@@ -57,6 +61,25 @@ final class SplunkInteractionsTests: XCTestCase {
         }
 
         wait(for: [expectation], timeout: 1.0)
+    }
+
+    func testRageTapSendsFrustration() async {
+        let destination = TestInteractionDestination()
+        let interactions = Interactions(destination: destination)
+
+        await interactions.handleEventType(.gestureRageTap, viewHierarchy: nil, targetElement: nil, time: Date())
+
+        XCTAssertEqual(destination.didReceiveFrustrationCallCount, 1)
+        XCTAssertEqual(destination.didReceiveInteractionCallCount, 0)
+    }
+
+    func testRageTapDoesNotSendInteraction() async {
+        let destination = TestInteractionDestination()
+        let interactions = Interactions(destination: destination)
+
+        await interactions.handleEventType(.gestureRageTap, viewHierarchy: nil, targetElement: nil, time: Date())
+
+        XCTAssertEqual(destination.didReceiveInteractionCallCount, 0)
     }
 
     func testHandlingEvents() {

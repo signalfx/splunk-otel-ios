@@ -28,10 +28,16 @@ final class SessionReplayState: SessionReplayModuleState {
     private(set) unowned var module: CiscoSessionReplay.SessionReplay
 
 
+    // MARK: - Sampling
+
+    let samplingRate: Double
+
+
     // MARK: - Initialization
 
-    init(for module: CiscoSessionReplay.SessionReplay) {
+    init(for module: CiscoSessionReplay.SessionReplay, samplingRate: Double = 0.2) {
         self.module = module
+        self.samplingRate = samplingRate
     }
 
 
