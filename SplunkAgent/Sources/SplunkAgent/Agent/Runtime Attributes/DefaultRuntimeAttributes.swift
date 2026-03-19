@@ -129,8 +129,4 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
     private func installationIdentifier() -> String {
         appInstallationId
     }
-
-    func trackActivity() {
-        owner.currentSession.trackActivity(at: Date())
-    }
 }

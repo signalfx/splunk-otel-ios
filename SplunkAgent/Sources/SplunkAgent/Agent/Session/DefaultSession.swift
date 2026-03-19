@@ -107,7 +107,12 @@ class DefaultSession: AgentSession {
 
     func trackActivity(at date: Date) {
         accessQueue.async { [weak self] in
-            self?.lastActivity = date
+            guard let self = self else { return }
+
+            let baseline = self.lastActivity ?? self.currentSession.start
+
+            self.lastActivity = max(baseline, date)
+            self.lastActivity = date
         }
     }
 

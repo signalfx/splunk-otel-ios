@@ -19,7 +19,7 @@ import Foundation
 internal import SplunkCommon
 
 /// Defines the basic properties and behavior of the session manager.
-protocol AgentSession {
+protocol AgentSession: ActivityTracker {
 
     // MARK: - Identification
 
@@ -34,6 +34,9 @@ protocol AgentSession {
 
     /// The timestamp when the current session was created.
     var currentSessionStart: Date { get }
+
+
+    // MARK: - Session activity
 
     /// The latest tracked activity timestamp for the current session.
     ///

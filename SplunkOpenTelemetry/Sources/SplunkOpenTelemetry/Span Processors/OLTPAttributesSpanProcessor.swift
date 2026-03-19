@@ -26,6 +26,7 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
     // MARK: - Private
 
     private unowned let runtimeAttributes: any RuntimeAttributes
+    private let activityTracker: ActivityTracker
 
 
     // MARK: - SpanProcessor settings
@@ -43,15 +44,16 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
     ///
     /// - Note: The processor itself does not own the object with runtime attributes.
     ///         So, ensuring its existence outside this span processor is always necessary.
-    public init(with runtimeAttributes: RuntimeAttributes) {
+    public init(with runtimeAttributes: RuntimeAttributes, activityTracker: ActivityTracker) {
         self.runtimeAttributes = runtimeAttributes
+        self.activityTracker = activityTracker
     }
 
 
     // MARK: - SpanProcessor methods
 
     public func onStart(parentContext _: OpenTelemetryApi.SpanContext?, span: any OpenTelemetrySdk.ReadableSpan) {
-        runtimeAttributes.trackActivity()
+        activityTracker.trackActivity(at: Date())
         inject(attributes: runtimeAttributes.all, to: span)
     }
 

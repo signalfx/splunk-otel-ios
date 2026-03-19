@@ -54,6 +54,7 @@ extension Session {
         let user = owner.currentUser
 
         let anonymousUserId: String?
+
         if user.trackingMode != .noTracking {
             anonymousUserId = user.userIdentifier
         }

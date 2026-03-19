@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Added session metadata property. #602
+
 ## [2.2.0] - 2026-03-11
 
 ### Added

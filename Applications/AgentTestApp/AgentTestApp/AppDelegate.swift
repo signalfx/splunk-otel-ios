@@ -88,6 +88,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SplunkRum.shared.globalAttributes.setBool(true, for: "isWorkingHard")
         SplunkRum.shared.globalAttributes[string: "secret"] = "Red bull"
 
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            let metadata = SplunkRum.shared.session.metadata
+            print(metadata)
+        }
+
         return true
     }
 
