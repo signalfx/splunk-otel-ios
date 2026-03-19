@@ -111,9 +111,9 @@ class DefaultSession: AgentSession {
                 return
             }
 
-            let baseline = self.lastActivity ?? self.currentSession.start
+            let baseline = lastActivity ?? currentSession.start
 
-            self.lastActivity = max(baseline, date)
+            lastActivity = max(baseline, date)
         }
     }
 
