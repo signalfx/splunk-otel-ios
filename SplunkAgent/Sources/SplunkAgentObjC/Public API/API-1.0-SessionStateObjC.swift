@@ -37,6 +37,13 @@ public final class SessionStateObjC: NSObject {
         owner.agent.session.state.id
     }
 
+    /// Last recorded session activity timestamp in Unix milliseconds.
+    ///
+    /// Falls back to ``start`` if no activity has been tracked yet.
+    public var lastActivity: Int64 {
+        owner.agent.session.state.lastActivity
+    }
+
     /// Value of the currently used session sampling rate.
     @objc
     public var samplingRate: Double {

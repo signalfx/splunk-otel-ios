@@ -40,7 +40,9 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
 
     /// Initializes new span processor with given runtime attributes.
     ///
-    /// - Parameter runtimeAttributes: An object that holds and manages runtime attributes.
+    /// - Parameters:
+    ///   -  runtimeAttributes: An object that holds and manages runtime attributes.
+    ///   -  activityTracker: An object that can track session activity.
     ///
     /// - Note: The processor itself does not own the object with runtime attributes.
     ///         So, ensuring its existence outside this span processor is always necessary.
