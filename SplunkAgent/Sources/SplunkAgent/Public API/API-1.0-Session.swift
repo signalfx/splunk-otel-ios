@@ -45,8 +45,8 @@ extension Session {
 
     /// Session metadata serialized as a Base64-encoded JSON string.
     ///
-    /// The returned value contains a ``SessionMetadata`` payload that can be used to transfer
-    /// a session from one agent to another. The format is opaque to the hosting application.
+    /// The returned value can be used to transfer a session from one agent to another.
+    /// The format is opaque to the hosting application.
     ///
     /// Returns `nil` if the metadata cannot be serialized.
     public var metadata: String? {

@@ -51,7 +51,7 @@ public class OTLPAttributesLogRecordProcessor: LogRecordProcessor {
     // MARK: - LogRecordProcessor methods
 
     public func onEmit(logRecord: OpenTelemetrySdk.ReadableLogRecord) {
-        activityTracker.trackActivity(at: Date())
+        activityTracker.trackActivity(at: logRecord.timestamp)
 
         var updatedAttributes = logRecord.attributes
 
