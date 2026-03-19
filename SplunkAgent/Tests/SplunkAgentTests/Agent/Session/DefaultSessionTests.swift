@@ -174,6 +174,50 @@ final class DefaultSessionTests: XCTestCase {
     }
 
 
+    // MARK: - Last activity
+
+    func testLastActivityFallsBackToSessionStart() throws {
+        let defaultSession = try DefaultSessionTestBuilder.build(named: "lastActivityFallbackTest")
+
+        // Without any tracked activity, lastActivity should equal sessionStart
+        XCTAssertEqual(
+            defaultSession.currentSessionLastActivity,
+            defaultSession.currentSessionStart
+        )
+    }
+
+    func testLastActivityUpdatesAfterTracking() throws {
+        let defaultSession = try DefaultSessionTestBuilder.build(named: "lastActivityUpdateTest")
+
+        let activityDate = Date().addingTimeInterval(10)
+        defaultSession.trackActivity(at: activityDate)
+
+        // Give async barrier write time to complete
+        simulateMainThreadWait(duration: 0.1)
+
+        XCTAssertEqual(
+            defaultSession.currentSessionLastActivity.timeIntervalSinceReferenceDate,
+            activityDate.timeIntervalSinceReferenceDate,
+            accuracy: 0.001
+        )
+    }
+
+    func testLastActivityResetsAfterSessionRotation() throws {
+        let defaultSession = try DefaultSessionTestBuilder.build(named: "lastActivityRotationTest")
+
+        defaultSession.trackActivity(at: Date().addingTimeInterval(10))
+        simulateMainThreadWait(duration: 0.1)
+
+        defaultSession.rotateSession()
+
+        // After rotation lastActivity should fall back to the new session's start
+        XCTAssertEqual(
+            defaultSession.currentSessionLastActivity,
+            defaultSession.currentSessionStart
+        )
+    }
+
+
     // MARK: - Notifications
 
     func testEmittedNotification() throws {
