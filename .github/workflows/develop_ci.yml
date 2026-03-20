@@ -11,10 +11,6 @@ jobs:
     runs-on: macos-latest
     outputs:
       scheme: ${{ steps.scheme.outputs.scheme }}
-      ios_dest: ${{ steps.dest.outputs.ios_dest }}
-      tvos_dest: ${{ steps.dest.outputs.tvos_dest }}
-      visionos_dest: ${{ steps.dest.outputs.visionos_dest }}
-      maccatalyst_dest: ${{ steps.dest.outputs.maccatalyst_dest }}
     steps:
       - uses: actions/checkout@v6
       - uses: maxim-lobanov/setup-xcode@v1
@@ -26,10 +22,6 @@ jobs:
       - run: .github/actions/build-and-tests/scripts/prepare-workspace.sh
       - id: scheme
         run: .github/actions/build-and-tests/scripts/prepare-scheme.sh
-      - id: dest
-        env:
-          SCHEME: ${{ steps.scheme.outputs.scheme }}
-        run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
 
   tests:
     runs-on: macos-latest
@@ -55,14 +47,20 @@ jobs:
             tvos) .github/actions/build-and-tests/scripts/download-platforms.sh tvOS ;;
           esac
 
+      - name: Resolve destinations on this runner
+        id: local_dest
+        env:
+          SCHEME: ${{ needs.prepare.outputs.scheme }}
+        run: .github/actions/build-and-tests/scripts/resolve-destinations.sh
+
       - name: Select destination
         id: pick
         run: |
           case "${{ matrix.platform }}" in
-            ios) echo "DEST=${{ needs.prepare.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
-            tvos) echo "DEST=${{ needs.prepare.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
-            visionos) echo "DEST=${{ needs.prepare.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
-            macCatalyst) echo "DEST=${{ needs.prepare.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
+            ios) echo "DEST=${{ steps.local_dest.outputs.ios_dest }}" >> "$GITHUB_ENV" ;;
+            tvos) echo "DEST=${{ steps.local_dest.outputs.tvos_dest }}" >> "$GITHUB_ENV" ;;
+            visionos) echo "DEST=${{ steps.local_dest.outputs.visionos_dest }}" >> "$GITHUB_ENV" ;;
+            macCatalyst) echo "DEST=${{ steps.local_dest.outputs.maccatalyst_dest }}" >> "$GITHUB_ENV" ;;
           esac
           echo "Platform=${{ matrix.platform }}"
           echo "Destination=$DEST"

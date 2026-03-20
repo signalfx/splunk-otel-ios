@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,6 +31,14 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
     /// Describes URLs to be ignored by the module when reporting on network activity.
     public var ignoreURLs: IgnoreURLs?
 
+    /// Indicates whether W3C trace context headers should be injected into outgoing HTTP requests.
+    ///
+    /// When enabled (default), the `traceparent` and `tracestate` headers are automatically
+    /// added to outgoing requests to enable distributed trace correlation with backend services.
+    ///
+    /// Default value is `true`.
+    public var injectTraceHeaders: Bool = true
+
     // MARK: init()
 
     /// Initializes new module configuration with preconfigured values.
@@ -38,8 +46,10 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
     /// - Parameters:
     ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
     ///   - ignoreURLs: If present, the module will not report on these URLs.
-    public init(isEnabled: Bool, ignoreURLs: IgnoreURLs?) {
+    ///   - injectTraceHeaders: If `true` (default), W3C trace context headers are injected into requests.
+    public init(isEnabled: Bool = true, ignoreURLs: IgnoreURLs? = nil, injectTraceHeaders: Bool = true) {
         self.isEnabled = isEnabled
         self.ignoreURLs = ignoreURLs
+        self.injectTraceHeaders = injectTraceHeaders
     }
 }
