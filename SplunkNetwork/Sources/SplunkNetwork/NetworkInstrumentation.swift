@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -71,13 +71,8 @@ public class NetworkInstrumentation {
                 ignoreURLs = ignoreURLsParameter
             }
 
-            if let requestHeaders = config?.capturedRequestHeaders {
-                capturedRequestHeaders = Set(requestHeaders.map { $0.lowercased() })
-            }
-
-            if let responseHeaders = config?.capturedResponseHeaders {
-                capturedResponseHeaders = Set(responseHeaders.map { $0.lowercased() })
-            }
+            capturedRequestHeaders = Set(config?.capturedRequestHeaders?.map { $0.lowercased() } ?? [])
+            capturedResponseHeaders = Set(config?.capturedResponseHeaders?.map { $0.lowercased() } ?? [])
 
             NetworkInstrumentationManager.shared.initialize(with: self)
         }

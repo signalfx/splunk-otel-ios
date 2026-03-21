@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -182,7 +182,7 @@ func addCapturedRequestHeaders(from request: URLRequest, to span: Span) {
 
     for headerName in headerNames {
         if let value = request.value(forHTTPHeaderField: headerName) {
-            span.setAttribute(key: "http.request.header.\(headerName)", value: value)
+            span.clearAndSetAttribute(key: "http.request.header.\(headerName)", value: value)
         }
     }
 }
@@ -200,7 +200,7 @@ func addCapturedResponseHeaders(from response: HTTPURLResponse, to span: Span) {
 
     for headerName in headerNames {
         if let value = response.value(forHTTPHeaderField: headerName) {
-            span.setAttribute(key: "http.response.header.\(headerName)", value: value)
+            span.clearAndSetAttribute(key: "http.response.header.\(headerName)", value: value)
         }
     }
 }

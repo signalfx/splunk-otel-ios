@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -68,5 +68,27 @@ public final class NetworkInstrumentationConfigurationObjC: ModuleConfigurationO
 
         self.isEnabled = isEnabled
         self.ignoreURLs = ignoreURLs
+    }
+
+    /// Initializes new module configuration with all options including header capture.
+    ///
+    /// - Parameters:
+    ///   - isEnabled: A `BOOL` value sets whether the module is enabled.
+    ///   - ignoreURLs: An `NSRegularExpression` used to exclude matching URLs from Network instrumentation.
+    ///   - capturedRequestHeaders: HTTP request header names to capture as span attributes.
+    ///   - capturedResponseHeaders: HTTP response header names to capture as span attributes.
+    @objc(initWithEnabled:ignoreURLs:capturedRequestHeaders:capturedResponseHeaders:)
+    public init(
+        isEnabled: Bool,
+        ignoreURLs: NSRegularExpression?,
+        capturedRequestHeaders: [String]?,
+        capturedResponseHeaders: [String]?
+    ) {
+        super.init()
+
+        self.isEnabled = isEnabled
+        self.ignoreURLs = ignoreURLs
+        self.capturedRequestHeaders = capturedRequestHeaders
+        self.capturedResponseHeaders = capturedResponseHeaders
     }
 }
