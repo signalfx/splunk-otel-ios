@@ -40,4 +40,61 @@ final class API10SessionTests: XCTestCase {
         let sessionId = session.sessionId(for: Date())
         XCTAssertNotNil(sessionId)
     }
+
+    func testMetadataIsValidBase64JSON() throws {
+        let agent = try AgentTestBuilder.buildDefault()
+        let metadataString = try XCTUnwrap(agent.session.metadata)
+
+        // Must be valid Base64
+        let jsonData = try XCTUnwrap(Data(base64Encoded: metadataString))
+
+        // Must decode into a valid SessionMetadata
+        let metadata = try JSONDecoder().decode(SessionMetadata.self, from: jsonData)
+
+        XCTAssertEqual(metadata.sessionId, agent.session.state.id)
+        XCTAssertGreaterThan(metadata.sessionStart, 0)
+        XCTAssertGreaterThanOrEqual(metadata.sessionLastActivity, metadata.sessionStart)
+    }
+
+    func testMetadataAnonymousUserIdPresentWhenTrackingEnabled() throws {
+        let agent = try AgentTestBuilder.buildDefault()
+        agent.user.preferences.trackingMode = .anonymousTracking
+
+        let metadataString = try XCTUnwrap(agent.session.metadata)
+        let jsonData = try XCTUnwrap(Data(base64Encoded: metadataString))
+        let metadata = try JSONDecoder().decode(SessionMetadata.self, from: jsonData)
+
+        XCTAssertNotNil(metadata.anonymousUserId)
+    }
+
+    func testMetadataAnonymousUserIdAbsentWhenTrackingDisabled() throws {
+        let agent = try AgentTestBuilder.buildDefault()
+        agent.user.preferences.trackingMode = .noTracking
+
+        let metadataString = try XCTUnwrap(agent.session.metadata)
+        let jsonData = try XCTUnwrap(Data(base64Encoded: metadataString))
+        let metadata = try JSONDecoder().decode(SessionMetadata.self, from: jsonData)
+
+        XCTAssertNil(metadata.anonymousUserId)
+    }
+
+    func testMetadataSessionIdUpdatesAfterRotation() throws {
+        let testName = "metadataSessionRotationTest"
+        let defaultSession = try DefaultSessionTestBuilder.build(named: testName)
+        let agent = try AgentTestBuilder.buildDefault()
+        agent.currentSession = defaultSession
+        defaultSession.owner = agent
+
+        let metadataBefore = try XCTUnwrap(agent.session.metadata)
+        let jsonBefore = try XCTUnwrap(Data(base64Encoded: metadataBefore))
+        let before = try JSONDecoder().decode(SessionMetadata.self, from: jsonBefore)
+
+        defaultSession.rotateSession()
+
+        let metadataAfter = try XCTUnwrap(agent.session.metadata)
+        let jsonAfter = try XCTUnwrap(Data(base64Encoded: metadataAfter))
+        let after = try JSONDecoder().decode(SessionMetadata.self, from: jsonAfter)
+
+        XCTAssertNotEqual(before.sessionId, after.sessionId)
+    }
 }

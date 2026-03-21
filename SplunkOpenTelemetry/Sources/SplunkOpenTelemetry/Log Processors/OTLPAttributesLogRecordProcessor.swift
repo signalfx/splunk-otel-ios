@@ -25,6 +25,7 @@ public class OTLPAttributesLogRecordProcessor: LogRecordProcessor {
 
     // MARK: - Private
 
+    private let activityTracker: ActivityTracker
     private let proxy: LogRecordProcessor
     private unowned let runtimeAttributes: any RuntimeAttributes
 
@@ -36,18 +37,22 @@ public class OTLPAttributesLogRecordProcessor: LogRecordProcessor {
     /// - Parameters:
     ///   - proxy: An object that takes over the processor's own logic.
     ///   - runtimeAttributes: An object that holds and manages runtime attributes.
+    ///   - activityTracker: An object that can track session activity.
     ///
     /// - Note: The processor itself does not own the object with runtime attributes.
     ///         So, ensuring its existence outside this processor is always necessary.
-    public init(proxy: LogRecordProcessor, with runtimeAttributes: RuntimeAttributes) {
+    public init(proxy: LogRecordProcessor, with runtimeAttributes: RuntimeAttributes, activityTracker: ActivityTracker) {
         self.proxy = proxy
         self.runtimeAttributes = runtimeAttributes
+        self.activityTracker = activityTracker
     }
 
 
     // MARK: - LogRecordProcessor methods
 
     public func onEmit(logRecord: OpenTelemetrySdk.ReadableLogRecord) {
+        activityTracker.trackActivity(at: logRecord.timestamp)
+
         var updatedAttributes = logRecord.attributes
 
         for (key, value) in runtimeAttributes.all {
