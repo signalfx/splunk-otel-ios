@@ -114,7 +114,7 @@ final class CapturedHeadersTests: XCTestCase {
         )
         sut?.install(with: config, remoteConfiguration: nil)
 
-        var request = URLRequest(url: try XCTUnwrap(URL(string: "https://example.com/api")))
+        var request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/api")))
         request.setValue("abc-123", forHTTPHeaderField: "X-Request-ID")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
@@ -131,7 +131,7 @@ final class CapturedHeadersTests: XCTestCase {
         )
         sut?.install(with: config, remoteConfiguration: nil)
 
-        var request = URLRequest(url: try XCTUnwrap(URL(string: "https://example.com/api")))
+        var request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/api")))
         request.setValue("text/html", forHTTPHeaderField: "content-type")
 
         let span = MockSpan()
@@ -146,7 +146,7 @@ final class CapturedHeadersTests: XCTestCase {
         )
         sut?.install(with: config, remoteConfiguration: nil)
 
-        let request = URLRequest(url: try XCTUnwrap(URL(string: "https://example.com/api")))
+        let request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/api")))
 
         let span = MockSpan()
         addCapturedRequestHeaders(from: request, to: span)
@@ -158,7 +158,7 @@ final class CapturedHeadersTests: XCTestCase {
         let config = NetworkInstrumentationConfiguration(isEnabled: true, ignoreURLs: nil)
         sut?.install(with: config, remoteConfiguration: nil)
 
-        var request = URLRequest(url: try XCTUnwrap(URL(string: "https://example.com/api")))
+        var request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/api")))
         request.setValue("secret-value", forHTTPHeaderField: "Authorization")
 
         let span = MockSpan()
@@ -276,7 +276,7 @@ final class CapturedHeadersTests: XCTestCase {
         )
         sut?.install(with: config, remoteConfiguration: nil)
 
-        var request = URLRequest(url: try XCTUnwrap(URL(string: "https://example.com/api")))
+        var request = try URLRequest(url: XCTUnwrap(URL(string: "https://example.com/api")))
         request.setValue("Bearer secret-token", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
 
@@ -320,12 +320,23 @@ private class MockSpan: Span {
 
     var attributes: [String: AttributeValue] = [:]
     var context: SpanContext
-    var isRecording: Bool { true }
+
+    var isRecording: Bool {
+        true
+    }
+
     var status: Status = .unset
     var name: String = "MockSpan"
-    var kind: SpanKind { .internal }
+
+    var kind: SpanKind {
+        .internal
+    }
+
     var instrumentationScopeInfo = InstrumentationScopeInfo()
-    var description: String { "MockSpan" }
+
+    var description: String {
+        "MockSpan"
+    }
 
     init() {
         context = SpanContext.create(
