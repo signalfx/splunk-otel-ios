@@ -19,7 +19,7 @@ import Foundation
 internal import SplunkCommon
 
 /// Defines the basic properties and behavior of the session manager.
-protocol AgentSession {
+protocol AgentSession: ActivityTracker {
 
     // MARK: - Identification
 
@@ -31,6 +31,22 @@ protocol AgentSession {
 
     /// Session identifier history.
     func sessionId(for timestamp: Date) -> String?
+
+    /// The timestamp when the current session was created.
+    var currentSessionStart: Date { get }
+
+
+    // MARK: - Session activity
+
+    /// The latest tracked activity timestamp for the current session.
+    ///
+    /// Falls back to ``currentSessionStart`` if no activity has been tracked yet.
+    var currentSessionLastActivity: Date { get }
+
+    /// Records a telemetry activity event for the current session.
+    ///
+    /// - Parameter date: The timestamp of the activity.
+    func trackActivity(at date: Date)
 
 
     // MARK: - Session change notifications

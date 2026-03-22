@@ -9,6 +9,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Added optional support to capture network headers.
 
+## [2.2.1] - 2026-03-19
+
+### Added
+
+* Added session metadata property (`Session.metadata`). #602
+* Added session start timestamp (`SessionState.start`) and last activity timestamp (`SessionState.lastActivity`) to the public API. #602
+* Added W3C trace context header injection for instrumented `URLSession` requests. #574
+* Added `NetworkInstrumentationConfiguration.injectTraceHeaders` to allow disabling trace header injection. #574
+
 ## [2.2.0] - 2026-03-11
 
 ### Added

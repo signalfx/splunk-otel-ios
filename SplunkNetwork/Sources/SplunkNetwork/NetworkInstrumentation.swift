@@ -30,6 +30,8 @@ public class NetworkInstrumentation {
 
     /// Lowercased response header names to capture as span attributes.
     private var capturedResponseHeaders: Set<String> = []
+    /// Indicates whether trace header injection is enabled.
+    private var traceHeaderInjectionEnabled = true
 
 
     // MARK: - Public
@@ -41,6 +43,11 @@ public class NetworkInstrumentation {
     ///
     /// Uses weak reference to prevent crashes when AgentSharedState is deallocated while instrumentation is still active.
     public weak var sharedState: AgentSharedState?
+
+    /// Indicates whether W3C trace context header injection is enabled.
+    public var isTraceHeaderInjectionEnabled: Bool {
+        traceHeaderInjectionEnabled
+    }
 
     public required init() {}
 
@@ -73,6 +80,7 @@ public class NetworkInstrumentation {
 
             capturedRequestHeaders = Set(config?.capturedRequestHeaders?.map { $0.lowercased() } ?? [])
             capturedResponseHeaders = Set(config?.capturedResponseHeaders?.map { $0.lowercased() } ?? [])
+            traceHeaderInjectionEnabled = config?.injectTraceHeaders ?? true
 
             NetworkInstrumentationManager.shared.initialize(with: self)
         }
