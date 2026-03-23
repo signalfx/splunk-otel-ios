@@ -41,6 +41,50 @@ public final class Session {
 
 extension Session {
 
+    // MARK: - Metadata
+
+    /// Session metadata serialized as a Base64-encoded JSON string.
+    ///
+    /// The returned value can be used to transfer a session from one agent to another.
+    /// The format is opaque to the hosting application.
+    ///
+    /// Returns `nil` if the metadata cannot be serialized.
+    public var metadata: String? {
+        let session = owner.currentSession
+        let user = owner.currentUser
+
+        let anonymousUserId: String?
+
+        if user.trackingMode != .noTracking {
+            anonymousUserId = user.userIdentifier
+        }
+        else {
+            anonymousUserId = nil
+        }
+
+        let sessionMetadata = SessionMetadata(
+            sessionId: session.currentSessionId,
+            anonymousUserId: anonymousUserId,
+            sessionStart: Int64(session.currentSessionStart.timeIntervalSince1970 * 1_000),
+            sessionLastActivity: Int64(session.currentSessionLastActivity.timeIntervalSince1970 * 1_000)
+        )
+
+        do {
+            let jsonData = try JSONEncoder().encode(sessionMetadata)
+            return jsonData.base64EncodedString()
+        }
+        catch {
+            owner.logger.log(level: .error, isPrivate: false) {
+                "Failed to serialize session metadata: \(error)"
+            }
+            return nil
+        }
+    }
+}
+
+
+extension Session {
+
     // MARK: - Identifier
 
     /// Identification of recorded session in given time.

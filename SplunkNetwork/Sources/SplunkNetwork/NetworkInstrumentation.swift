@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,6 +25,9 @@ public class NetworkInstrumentation {
     /// Holds regex patterns from IgnoreURLs API.
     private var ignoreURLs = IgnoreURLs()
 
+    /// Indicates whether trace header injection is enabled.
+    private var traceHeaderInjectionEnabled = true
+
 
     // MARK: - Public
 
@@ -35,6 +38,11 @@ public class NetworkInstrumentation {
     ///
     /// Uses weak reference to prevent crashes when AgentSharedState is deallocated while instrumentation is still active.
     public weak var sharedState: AgentSharedState?
+
+    /// Indicates whether W3C trace context header injection is enabled.
+    public var isTraceHeaderInjectionEnabled: Bool {
+        traceHeaderInjectionEnabled
+    }
 
     public required init() {}
 
@@ -64,6 +72,8 @@ public class NetworkInstrumentation {
             if let ignoreURLsParameter = config?.ignoreURLs {
                 ignoreURLs = ignoreURLsParameter
             }
+
+            traceHeaderInjectionEnabled = config?.injectTraceHeaders ?? true
 
             NetworkInstrumentationManager.shared.initialize(with: self)
         }
