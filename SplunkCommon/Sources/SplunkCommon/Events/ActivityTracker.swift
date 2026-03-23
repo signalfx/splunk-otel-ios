@@ -1,6 +1,7 @@
 //
+//
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,25 +18,11 @@ limitations under the License.
 
 import Foundation
 
-/// This struct implements a non operational variant of the AgentSession.
-struct NoOpSession: AgentSession {
-    let currentSessionItem = SessionItem(id: "no-op", start: Date())
+/// A protocol for tracking activity within a session.
+public protocol ActivityTracker {
 
-    var currentSessionId: String {
-        currentSessionItem.id
-    }
-
-    func sessionId(for _: Date) -> String? {
-        currentSessionItem.id
-    }
-
-    var currentSessionStart: Date {
-        currentSessionItem.start
-    }
-
-    var currentSessionLastActivity: Date {
-        currentSessionItem.start
-    }
-
-    func trackActivity(at _: Date) {}
+    /// Records a telemetry activity event for the current session.
+    ///
+    /// - Parameter date: The timestamp of the activity.
+    func trackActivity(at date: Date)
 }

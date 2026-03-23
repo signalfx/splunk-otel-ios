@@ -11,6 +11,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans.
 
+## [2.2.1] - 2026-03-19
+
+### Added
+
+* Added session metadata property (`Session.metadata`). #602
+* Added session start timestamp (`SessionState.start`) and last activity timestamp (`SessionState.lastActivity`) to the public API. #602
+* Added W3C trace context header injection for instrumented `URLSession` requests. #574
+* Added `NetworkInstrumentationConfiguration.injectTraceHeaders` to allow disabling trace header injection. #574
+
 ## [2.2.0] - 2026-03-11
 
 ### Added
@@ -31,7 +40,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Replaced OTLP binary protobuf with custom JSON encoding to reduce binary size. The SDK now uses `opentelemetry-swift-core` (API/SDK only) instead of the full `opentelemetry-swift` package with protocol exporters. #566
-  
+
 ## [2.0.7] - 2026-02-04
 
 ### Fixed

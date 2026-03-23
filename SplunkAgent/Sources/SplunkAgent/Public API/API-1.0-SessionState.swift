@@ -41,6 +41,18 @@ extension SessionState {
         owner.currentSession.currentSessionId
     }
 
+    /// Session start timestamp in Unix milliseconds.
+    public var start: Int64 {
+        Int64(owner.currentSession.currentSessionStart.timeIntervalSince1970 * 1_000)
+    }
+
+    /// Last recorded session activity timestamp in Unix milliseconds.
+    ///
+    /// Falls back to ``start`` if no activity has been tracked yet.
+    public var lastActivity: Int64 {
+        Int64(owner.currentSession.currentSessionLastActivity.timeIntervalSince1970 * 1_000)
+    }
+
     /// Value of the currently used session sampling rate.
     public var samplingRate: Double {
         owner.agentConfiguration.session.samplingRate
