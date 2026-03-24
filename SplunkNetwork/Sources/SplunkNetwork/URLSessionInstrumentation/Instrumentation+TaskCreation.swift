@@ -179,6 +179,7 @@ func createInstrumentedDataTask(
     let task = originalIMP(session, selector, instrumentedRequest)
     objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
     objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+    attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
     return task
 }
 
@@ -204,6 +205,7 @@ func createInstrumentedDownloadTask(
     let task = originalIMP(session, selector, instrumentedRequest)
     objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
     objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+    attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
     return task
 }
 
