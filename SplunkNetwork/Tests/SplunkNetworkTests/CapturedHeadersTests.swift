@@ -64,12 +64,14 @@ final class CapturedHeadersTests: XCTestCase {
         let config = NetworkInstrumentationConfiguration(
             isEnabled: false,
             ignoreURLs: ignoreURLs,
+            injectTraceHeaders: false,
             capturedRequestHeaders: ["Accept"],
             capturedResponseHeaders: ["Server"]
         )
 
         XCTAssertFalse(config.isEnabled)
         XCTAssertNotNil(config.ignoreURLs)
+        XCTAssertFalse(config.injectTraceHeaders)
         XCTAssertEqual(config.capturedRequestHeaders, ["Accept"])
         XCTAssertEqual(config.capturedResponseHeaders, ["Server"])
     }
