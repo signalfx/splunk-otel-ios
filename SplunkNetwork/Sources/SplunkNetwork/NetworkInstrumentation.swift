@@ -30,6 +30,7 @@ public class NetworkInstrumentation {
 
     /// Lowercased response header names to capture as span attributes.
     private var capturedResponseHeaders: Set<String> = []
+
     /// Indicates whether trace header injection is enabled.
     private var traceHeaderInjectionEnabled = true
 
