@@ -72,16 +72,19 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
     /// - Parameters:
     ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
     ///   - ignoreURLs: If present, the module will not report on these URLs.
+    ///   - injectTraceHeaders: If `true` (default), W3C trace context headers are injected into requests.
     ///   - capturedRequestHeaders: HTTP request header names to capture as span attributes.
     ///   - capturedResponseHeaders: HTTP response header names to capture as span attributes.
     public init(
         isEnabled: Bool = true,
         ignoreURLs: IgnoreURLs? = nil,
+        injectTraceHeaders: Bool = true,
         capturedRequestHeaders: [String]? = nil,
         capturedResponseHeaders: [String]? = nil
     ) {
         self.isEnabled = isEnabled
         self.ignoreURLs = ignoreURLs
+        self.injectTraceHeaders = injectTraceHeaders
         self.capturedRequestHeaders = capturedRequestHeaders
         self.capturedResponseHeaders = capturedResponseHeaders
     }
