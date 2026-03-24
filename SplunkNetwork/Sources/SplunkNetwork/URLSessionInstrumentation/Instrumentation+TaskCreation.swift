@@ -279,6 +279,7 @@ func wrapDownloadCompletionHandler(
 func endHttpSpanFromCompletion(span: Span, response: URLResponse?, error: Error?) {
     if let httpResponse = response as? HTTPURLResponse {
         span.setAttribute(key: "http.response.status_code", value: httpResponse.statusCode)
+        addCapturedResponseHeaders(from: httpResponse, to: span)
     }
 
     if let error {
