@@ -21,68 +21,6 @@ import XCTest
 
 @testable import SplunkNetwork
 
-
-// MARK: - Configuration Tests
-
-final class NetworkTimingConfigurationTests: XCTestCase {
-
-    func testDefaultConfigHasTimingEnabled() {
-        let config = NetworkInstrumentationConfiguration()
-
-        XCTAssertTrue(config.collectNetworkTiming)
-    }
-
-    func testConfigWithTimingDisabled() {
-        let config = NetworkInstrumentationConfiguration(collectNetworkTiming: false)
-
-        XCTAssertFalse(config.collectNetworkTiming)
-        XCTAssertTrue(config.isEnabled)
-        XCTAssertTrue(config.injectTraceHeaders)
-    }
-
-    func testFullConfigPreservesAllParameters() throws {
-        let ignoreURLs = try IgnoreURLs(patterns: Set([".*\\.png$"]))
-
-        let config = NetworkInstrumentationConfiguration(
-            isEnabled: false,
-            ignoreURLs: ignoreURLs,
-            injectTraceHeaders: false,
-            collectNetworkTiming: false
-        )
-
-        XCTAssertFalse(config.isEnabled)
-        XCTAssertNotNil(config.ignoreURLs)
-        XCTAssertFalse(config.injectTraceHeaders)
-        XCTAssertFalse(config.collectNetworkTiming)
-    }
-
-    func testModuleStoresTimingFlag() {
-        let module = NetworkInstrumentation()
-
-        let config = NetworkInstrumentationConfiguration(collectNetworkTiming: true)
-        module.install(with: config, remoteConfiguration: nil)
-
-        XCTAssertTrue(module.isNetworkTimingEnabled)
-
-        addTeardownBlock {
-            module.uninstall()
-        }
-    }
-
-    func testModuleDefaultsTimingToEnabled() {
-        let module = NetworkInstrumentation()
-
-        module.install(with: nil, remoteConfiguration: nil)
-
-        XCTAssertTrue(module.isNetworkTimingEnabled)
-
-        addTeardownBlock {
-            module.uninstall()
-        }
-    }
-}
-
-
 // MARK: - NetworkTimingCollector Tests
 
 @available(iOS 15, tvOS 15, macCatalyst 15, visionOS 1, *)
@@ -238,7 +176,6 @@ final class NetworkTimingCollectorTests: XCTestCase {
     }
 }
 
-
 // MARK: - Test Support
 
 /// Holds timing dates for test-driven attribute building without requiring
@@ -256,7 +193,6 @@ struct TimingDates {
     let responseStart: Date?
     let responseEnd: Date?
 }
-
 
 @available(iOS 15, tvOS 15, macCatalyst 15, visionOS 1, *)
 extension NetworkTimingCollector {

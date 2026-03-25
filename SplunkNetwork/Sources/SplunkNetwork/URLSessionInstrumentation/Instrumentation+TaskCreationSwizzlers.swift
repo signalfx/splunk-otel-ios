@@ -361,8 +361,6 @@ func swizzleUploadTaskWithRequestFromFileAndCompletion() {
     method_setImplementation(original, swizzledIMP)
 }
 
-// MARK: - Streamed Upload Task Swizzling
-
 func swizzleUploadTaskWithStreamedRequest() {
     let selector = #selector(URLSession.uploadTask(withStreamedRequest:))
 

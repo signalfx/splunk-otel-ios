@@ -41,8 +41,9 @@ final class NetworkTimingCollector: NSObject, URLSessionTaskDelegate {
 
     // MARK: - URLSessionTaskDelegate
 
-    func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-        guard let transaction = metrics.transactionMetrics.last else {
+    func urlSession(_: URLSession, task _: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+        guard let transaction = metrics.transactionMetrics.last
+        else {
             return
         }
 
@@ -76,6 +77,7 @@ final class NetworkTimingCollector: NSObject, URLSessionTaskDelegate {
     ///
     /// Only non-nil dates produce attributes; phases that did not occur (e.g. DNS on a
     /// reused connection, TLS on plain HTTP) are omitted.
+    // swiftlint:disable:next function_parameter_count
     func buildTimingAttributes(
         fetchStart: Date?,
         domainLookupStart: Date?,
@@ -119,8 +121,12 @@ final class NetworkTimingCollector: NSObject, URLSessionTaskDelegate {
     }
 
     private func setIfPresent(_ attrs: inout [String: AttributeValue], key: String, date: Date?) {
-        guard let date else { return }
-        let epochMillis = Int(date.timeIntervalSince1970 * 1000)
+        guard let date
+        else {
+            return
+        }
+
+        let epochMillis = Int(date.timeIntervalSince1970 * 1_000)
         attrs[key] = .int(epochMillis)
     }
 
@@ -158,11 +164,13 @@ final class NetworkTimingCollector: NSObject, URLSessionTaskDelegate {
 /// for the duration of the task's lifetime, and set as the task's per-task delegate to
 /// receive `didFinishCollecting` metrics.
 func attachTimingCollectorIfEnabled(to task: URLSessionTask, spanContext: SpanContext) {
-    guard #available(iOS 15, tvOS 15, macCatalyst 15, visionOS 1, *) else {
+    guard #available(iOS 15, tvOS 15, macCatalyst 15, visionOS 1, *)
+    else {
         return
     }
 
-    guard NetworkInstrumentationManager.shared.getModule()?.isNetworkTimingEnabled == true else {
+    guard NetworkInstrumentationManager.shared.getModule()?.isNetworkTimingEnabled == true
+    else {
         return
     }
 
