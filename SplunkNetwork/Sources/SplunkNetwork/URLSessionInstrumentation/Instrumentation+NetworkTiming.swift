@@ -73,11 +73,11 @@ final class NetworkTimingCollector: NSObject, URLSessionTaskDelegate {
         )
     }
 
+    // swiftlint:disable:next function_parameter_count
     /// Builds timing attributes from individual date values.
     ///
     /// Only non-nil dates produce attributes; phases that did not occur (e.g. DNS on a
     /// reused connection, TLS on plain HTTP) are omitted.
-    // swiftlint:disable:next function_parameter_count
     func buildTimingAttributes(
         fetchStart: Date?,
         domainLookupStart: Date?,
