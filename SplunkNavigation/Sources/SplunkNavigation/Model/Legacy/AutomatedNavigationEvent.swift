@@ -29,6 +29,7 @@ struct AutomatedNavigationEvent: NavigationActionEvent {
     var type: NavigationActionEventType
     var controllerTypeName: String
     var controllerIdentifier: ObjectIdentifier
-    var navigationControllerIdentifier: ObjectIdentifier?
+    // Required for NavigationActionEvent conformance.
+    var navigationControllerIdentifier: ObjectIdentifier? { nil }
     var viewFrame: CGRect?
 }
