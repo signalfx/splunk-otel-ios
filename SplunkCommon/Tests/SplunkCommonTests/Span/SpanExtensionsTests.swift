@@ -18,9 +18,8 @@ limitations under the License.
 // swiftformat:disable sortImports
 import Foundation
 import OpenTelemetryApi
-import XCTest
-
 @_spi(SplunkInternal) @testable import SplunkCommon
+import XCTest
 
 final class SpanExtensionsTests: XCTestCase {
 
