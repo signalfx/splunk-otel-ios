@@ -15,13 +15,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoSwizzling
+import Foundation
+import OpenTelemetrySdk
 
-extension Navigation {
+final class MockSpanExporter: SpanExporter {
+    private(set) var exportedSpans: [SpanData] = []
 
-    // MARK: - Event sources
-
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        try await navigationEventStreamProvider.navigationStream()
+    func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
+        exportedSpans.append(contentsOf: spans)
+        return .success
     }
+
+    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
+        .success
+    }
+
+    func shutdown(explicitTimeout _: TimeInterval?) {}
 }

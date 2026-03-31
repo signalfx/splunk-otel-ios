@@ -17,7 +17,7 @@ limitations under the License.
 
 extension Navigation {
     /// Internal iOS controllers that should not produce navigation events.
-    static let ignoredControllerTypeNames: Set<String> = [
+    private static let ignoredControllerTypeNames: Set<String> = [
         "UIApplicationRotationFollowingController",
         "UICompatibilityInputViewController",
         "UIInputWindowController",
@@ -30,7 +30,7 @@ extension Navigation {
         "UITabBarController"
     ]
 
-    func shouldIgnore(controllerTypeName: String) -> Bool {
-        Self.ignoredControllerTypeNames.contains(controllerTypeName)
+    static func shouldIgnore(controllerTypeName: String) -> Bool {
+        ignoredControllerTypeNames.contains(controllerTypeName)
     }
 }

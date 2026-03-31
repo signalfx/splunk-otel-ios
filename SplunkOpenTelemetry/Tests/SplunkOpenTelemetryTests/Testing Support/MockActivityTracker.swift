@@ -15,16 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoSwizzling
+import Foundation
+import SplunkCommon
 
-/// Provides navigation action events produced by swizzling.
-protocol NavigationEventStreamProviding: Sendable {
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent>
-}
+final class MockActivityTracker: ActivityTracker {
+    private(set) var trackedDates: [Date] = []
 
-/// Default stream provider backed by CiscoSwizzling.
-struct DefaultNavigationEventStreamProvider: NavigationEventStreamProviding, Sendable {
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        try await DefaultSwizzling.navigation
+    func trackActivity(at date: Date) {
+        trackedDates.append(date)
     }
 }

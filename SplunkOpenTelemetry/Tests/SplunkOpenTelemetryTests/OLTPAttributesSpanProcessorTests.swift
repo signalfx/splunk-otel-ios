@@ -28,9 +28,9 @@ struct OLTPAttributesSpanProcessorTests {
 
     @Test
     func screenSpanDoesNotReceiveRuntimeScreenName() {
-        let exporter = CapturingSpanExporter()
-        let activityTracker = TestActivityTracker()
-        let runtimeAttributes = TestRuntimeAttributes(
+        let exporter = MockSpanExporter()
+        let activityTracker = MockActivityTracker()
+        let runtimeAttributes = MockRuntimeAttributes(
             all: [
                 "screen.name": "RuntimeScreen",
                 "custom.attribute": "custom-value"
@@ -58,9 +58,9 @@ struct OLTPAttributesSpanProcessorTests {
 
     @Test
     func nonScreenSpanReceivesRuntimeScreenName() {
-        let exporter = CapturingSpanExporter()
-        let activityTracker = TestActivityTracker()
-        let runtimeAttributes = TestRuntimeAttributes(
+        let exporter = MockSpanExporter()
+        let activityTracker = MockActivityTracker()
+        let runtimeAttributes = MockRuntimeAttributes(
             all: [
                 "screen.name": "RuntimeScreen"
             ]
@@ -99,35 +99,4 @@ struct OLTPAttributesSpanProcessorTests {
             .add(spanProcessor: SimpleSpanProcessor(spanExporter: exporter))
             .build()
     }
-}
-
-private final class TestRuntimeAttributes: RuntimeAttributes {
-    let all: [String: Any]
-
-    init(all: [String: Any]) {
-        self.all = all
-    }
-}
-
-private final class TestActivityTracker: ActivityTracker {
-    private(set) var trackedDates: [Date] = []
-
-    func trackActivity(at date: Date) {
-        trackedDates.append(date)
-    }
-}
-
-private final class CapturingSpanExporter: SpanExporter {
-    private(set) var exportedSpans: [SpanData] = []
-
-    func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
-        exportedSpans.append(contentsOf: spans)
-        return .success
-    }
-
-    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
-        .success
-    }
-
-    func shutdown(explicitTimeout _: TimeInterval?) {}
 }

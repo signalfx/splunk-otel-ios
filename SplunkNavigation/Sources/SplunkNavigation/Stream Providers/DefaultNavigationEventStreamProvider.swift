@@ -17,11 +17,9 @@ limitations under the License.
 
 import CiscoSwizzling
 
-extension Navigation {
-
-    // MARK: - Event sources
-
+/// Default stream provider backed by CiscoSwizzling.
+struct DefaultNavigationEventStreamProvider: NavigationEventStreamProviding, Sendable {
     func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        try await navigationEventStreamProvider.navigationStream()
+        try await DefaultSwizzling.navigation
     }
 }
