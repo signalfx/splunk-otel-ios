@@ -153,6 +153,7 @@ func generateMainTargets() -> [Target] {
         .testTarget(
             name: "SplunkNavigationTests",
             dependencies: [
+                "SplunkCommon",
                 "SplunkNavigation"
             ],
             path: "SplunkNavigation/Tests",

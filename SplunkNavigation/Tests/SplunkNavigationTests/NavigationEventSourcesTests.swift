@@ -17,6 +17,7 @@ limitations under the License.
 
 internal import CiscoSwizzling
 import Foundation
+import SplunkCommon
 import XCTest
 
 @testable import SplunkNavigation
