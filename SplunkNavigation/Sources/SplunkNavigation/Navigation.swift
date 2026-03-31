@@ -97,9 +97,7 @@ public final class Navigation: Sendable {
         )
     }
 
-    init(
-        navigationEventStreamProvider: any NavigationEventStreamProviding
-    ) {
+    init(navigationEventStreamProvider: any NavigationEventStreamProviding) {
         self.navigationEventStreamProvider = navigationEventStreamProvider
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
@@ -123,53 +121,34 @@ public final class Navigation: Sendable {
 
     /// Starts detection and processing of navigation.
     func startDetection() {
-        startModernDetection()
-    }
-
-
-    // MARK: - Instrumentation (Modern solution)
-
-    private func startModernDetection() {
         Task(priority: .userInitiated) {
-            await runModernDetectionLoop()
+            await runDetectionLoop()
         }
     }
 
-    private func runModernDetectionLoop() async {
-        let initialRetryDelayNs: UInt64 = 50_000_000
-        let maxRetryDelayNs: UInt64 = 2_000_000_000
-        var retryDelayNs = initialRetryDelayNs
+    private func runDetectionLoop() async {
+        do {
+            let stream = try await navigationStream()
 
-        while !Task.isCancelled {
-            do {
-                let navigationStream = try await modernNavigationStream()
-
-                // Process navigation events
-                for await event in navigationStream {
-                    guard
-                        await shouldProcessEvent(),
-                        !shouldIgnore(controllerTypeName: event.controllerTypeName)
-                    else {
-                        continue
-                    }
-
-                    await processModernNavigationEvent(event)
+            for await event in stream {
+                guard
+                    await shouldProcessEvent(),
+                    !Self.shouldIgnore(controllerTypeName: event.controllerTypeName)
+                else {
+                    continue
                 }
 
-                return
+                await processNavigationEvent(event)
             }
-            catch {
-                logger.log(level: .error) {
-                    "Failed to initialize modern navigation stream: \(String(describing: error))"
-                }
-
-                try? await Task.sleep(nanoseconds: retryDelayNs)
-                retryDelayNs = min(retryDelayNs * 2, maxRetryDelayNs)
+        }
+        catch {
+            logger.log(level: .error) {
+                "Failed to initialize navigation stream: \(String(describing: error))"
             }
         }
     }
 
-    private func processModernNavigationEvent(_ event: NavigationActionEvent) async {
+    private func processNavigationEvent(_ event: NavigationActionEvent) async {
         switch event.type {
         case .viewDidLoad:
             await processShowStart(event: event)

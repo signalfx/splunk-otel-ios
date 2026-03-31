@@ -15,13 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoSwizzling
+import SplunkCommon
 
-extension Navigation {
+final class MockRuntimeAttributes: RuntimeAttributes {
+    let all: [String: Any]
 
-    // MARK: - Event sources
-
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        try await navigationEventStreamProvider.navigationStream()
+    init(all: [String: Any]) {
+        self.all = all
     }
 }

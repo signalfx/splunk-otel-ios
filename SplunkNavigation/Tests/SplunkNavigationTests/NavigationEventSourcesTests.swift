@@ -25,7 +25,7 @@ final class NavigationEventSourcesTests: XCTestCase {
 
     // MARK: - Seams
 
-    func testModernNavigationStream_UsesInjectedProvider() async throws {
+    func testNavigationStream_UsesInjectedProvider() async throws {
         let expectedName = "MockViewController"
         let expectedEvent = AutomatedNavigationEvent(
             timestamp: Date(),
@@ -40,7 +40,7 @@ final class NavigationEventSourcesTests: XCTestCase {
             )
         )
 
-        let stream = try await navigation.modernNavigationStream()
+        let stream = try await navigation.navigationStream()
         var iterator = stream.makeAsyncIterator()
         let firstEvent = await iterator.next()
 
@@ -53,22 +53,18 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertTrue(type(of: navigation.navigationEventStreamProvider) == DefaultNavigationEventStreamProvider.self)
     }
 
-    // MARK: - Filtering scaffold
+    // MARK: - Filtering
 
-    func testShouldIgnore_ReturnsTrueForKnownInternalControllers() {
-        let navigation = Navigation()
-
-        XCTAssertTrue(navigation.shouldIgnore(controllerTypeName: "UINavigationController"))
-        XCTAssertTrue(navigation.shouldIgnore(controllerTypeName: "UITabBarController"))
+    func testShouldIgnore_InternalControllers() {
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UINavigationController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UITabBarController"))
     }
 
-    func testShouldIgnore_ReturnsFalseForRegularControllerName() {
-        let navigation = Navigation()
-
-        XCTAssertFalse(navigation.shouldIgnore(controllerTypeName: "ProductDetailsViewController"))
+    func testShouldIgnore_RegularController() {
+        XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "ProductDetailsViewController"))
     }
 
-    func testIgnoredControllerEvent_DoesNotUpdateScreenName() async {
+    func testIgnoredController_DoesNotUpdateScreenName() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
@@ -94,7 +90,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertEqual(currentScreenName, "unknown")
     }
 
-    func testManualUpdateOverridesExistingAutomatedScreenName() async {
+    func testManualUpdate_OverridesAutomatedScreenName() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
@@ -127,7 +123,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertTrue(didApplyManualScreen)
     }
 
-    func testAutomaticUpdateOverridesManualScreenNameWhenAutomatedTrackingEnabled() async {
+    func testAutomatedUpdate_OverridesManualWhenEnabled() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
@@ -160,7 +156,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertTrue(didApplyAutomatedScreen)
     }
 
-    func testAutomaticUpdateDoesNotOverrideManualScreenNameWhenAutomatedTrackingDisabled() async {
+    func testAutomatedUpdate_DoesNotOverrideManualWhenDisabled() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
@@ -191,32 +187,6 @@ final class NavigationEventSourcesTests: XCTestCase {
         let currentScreenName = await navigation.model.screenName
         XCTAssertEqual(currentScreenName, "ManualScreen")
     }
-
-    func testStreamInitializationFailure_RetriesAndRecovers() async {
-        let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
-        defer { continuation.finish() }
-
-        let navigation = Navigation(
-            navigationEventStreamProvider: RetryNavigationEventStreamProvider(stream: stream)
-        )
-        navigation.preferences.enableAutomatedTracking = true
-
-        navigation.startDetection()
-
-        continuation.yield(
-            AutomatedNavigationEvent(
-                timestamp: Date(),
-                type: .viewDidLoad,
-                controllerTypeName: "RecoveredViewController",
-                controllerIdentifier: ObjectIdentifier(NSString())
-            )
-        )
-
-        let didRecover = await waitUntil(timeout: 2.0) {
-            await navigation.model.screenName == "RecoveredViewController"
-        }
-        XCTAssertTrue(didRecover)
-    }
 }
 
 private struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
@@ -226,40 +196,6 @@ private struct MockNavigationEventStreamProvider: NavigationEventStreamProviding
         await Task.yield()
         return stream
     }
-}
-
-private struct RetryNavigationEventStreamProvider: NavigationEventStreamProviding {
-    let state: RetryNavigationEventStreamProviderState
-
-    init(stream: AsyncStream<any NavigationActionEvent>) {
-        state = RetryNavigationEventStreamProviderState(stream: stream)
-    }
-
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        try await state.navigationStream()
-    }
-}
-
-private actor RetryNavigationEventStreamProviderState {
-    private var shouldThrow = true
-    private let stream: AsyncStream<any NavigationActionEvent>
-
-    init(stream: AsyncStream<any NavigationActionEvent>) {
-        self.stream = stream
-    }
-
-    func navigationStream() throws -> AsyncStream<any NavigationActionEvent> {
-        if shouldThrow {
-            shouldThrow = false
-            throw MockNavigationStreamError.initializationFailed
-        }
-
-        return stream
-    }
-}
-
-private enum MockNavigationStreamError: Error {
-    case initializationFailed
 }
 
 private func makeStream<T>(_ values: [T]) -> AsyncStream<T> {
