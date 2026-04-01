@@ -37,7 +37,7 @@ struct OLTPAttributesSpanProcessorTests {
             ]
         )
 
-        let tracerProvider = makeTracerProvider(
+        let tracerProvider = TracerProviderTestBuilder.build(
             runtimeAttributes: runtimeAttributes,
             activityTracker: activityTracker,
             exporter: exporter
@@ -66,7 +66,7 @@ struct OLTPAttributesSpanProcessorTests {
             ]
         )
 
-        let tracerProvider = makeTracerProvider(
+        let tracerProvider = TracerProviderTestBuilder.build(
             runtimeAttributes: runtimeAttributes,
             activityTracker: activityTracker,
             exporter: exporter
@@ -82,21 +82,5 @@ struct OLTPAttributesSpanProcessorTests {
         #expect(activityTracker.trackedDates.count == 1)
         #expect(exporter.exportedSpans.count == 1)
         #expect(exporter.exportedSpans[0].attributes["screen.name"]?.description == "RuntimeScreen")
-    }
-
-    private func makeTracerProvider(
-        runtimeAttributes: RuntimeAttributes,
-        activityTracker: ActivityTracker,
-        exporter: SpanExporter
-    ) -> any TracerProvider {
-        TracerProviderBuilder()
-            .add(
-                spanProcessor: OLTPAttributesSpanProcessor(
-                    with: runtimeAttributes,
-                    activityTracker: activityTracker
-                )
-            )
-            .add(spanProcessor: SimpleSpanProcessor(spanExporter: exporter))
-            .build()
     }
 }
