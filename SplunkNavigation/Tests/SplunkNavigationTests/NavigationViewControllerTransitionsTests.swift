@@ -26,7 +26,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
 
     // MARK: - Transition processing
 
-    func testViewDidDisappear_FinalizesPendingShowNavigation() async {
+    func testViewDidDisappearFinalizesPendingShowNavigation() async {
         let continuationBox = NavigationEventContinuationBox()
         let navigation = makeNavigation(continuationBox: continuationBox)
         let controllerIdentifier = ObjectIdentifier(NSString())
@@ -58,7 +58,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         continuationBox.continuation?.finish()
     }
 
-    func testViewWillAndDidTransition_StartAndFinalizeTransition() async {
+    func testViewWillAndDidTransitionStartAndFinalizeTransition() async {
         let continuationBox = NavigationEventContinuationBox()
         let navigation = makeNavigation(continuationBox: continuationBox)
         let controllerIdentifier = ObjectIdentifier(NSString())
@@ -90,7 +90,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         continuationBox.continuation?.finish()
     }
 
-    func testViewWillTransition_UpdatesActiveScreenAndStream() async {
+    func testViewWillTransitionUpdatesActiveScreenAndStream() async {
         let continuationBox = NavigationEventContinuationBox()
         let navigation = makeNavigation(continuationBox: continuationBox)
         var screenNameIterator = navigation.screenNameStream.makeAsyncIterator()
@@ -163,7 +163,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         continuationBox.continuation?.finish()
     }
 
-    func testTransitionUpdate_OverridesManualWhenEnabled() async {
+    func testTransitionUpdateOverridesManualWhenEnabled() async {
         let continuationBox = NavigationEventContinuationBox()
         let navigation = makeNavigation(continuationBox: continuationBox)
         let controllerIdentifier = ObjectIdentifier(NSString())
@@ -198,7 +198,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         continuationBox.continuation?.finish()
     }
 
-    func testTransitionUpdate_DoesNotOverrideManualWhenDisabled() async {
+    func testTransitionUpdateDoesNotOverrideManualWhenDisabled() async {
         let continuationBox = NavigationEventContinuationBox()
         let navigation = makeNavigation(continuationBox: continuationBox)
         let controllerIdentifier = ObjectIdentifier(NSString())
