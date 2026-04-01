@@ -17,6 +17,7 @@ limitations under the License.
 
 internal import CiscoSwizzling
 import Foundation
+import SplunkCommon
 import XCTest
 
 @testable import SplunkNavigation
@@ -162,7 +163,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         continuationBox.continuation?.finish()
     }
 
-    func testTransitionUpdateOverridesManualScreenNameWhenAutomatedTrackingEnabled() async {
+    func testTransitionUpdate_OverridesManualWhenEnabled() async {
         let continuationBox = NavigationEventContinuationBox()
         let navigation = makeNavigation(continuationBox: continuationBox)
         let controllerIdentifier = ObjectIdentifier(NSString())
@@ -197,7 +198,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         continuationBox.continuation?.finish()
     }
 
-    func testTransitionUpdateDoesNotOverrideManualScreenNameWhenAutomatedTrackingDisabled() async {
+    func testTransitionUpdate_DoesNotOverrideManualWhenDisabled() async {
         let continuationBox = NavigationEventContinuationBox()
         let navigation = makeNavigation(continuationBox: continuationBox)
         let controllerIdentifier = ObjectIdentifier(NSString())
