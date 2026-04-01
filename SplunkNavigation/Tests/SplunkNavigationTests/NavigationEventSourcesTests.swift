@@ -26,7 +26,7 @@ final class NavigationEventSourcesTests: XCTestCase {
 
     // MARK: - Seams
 
-    func testNavigationStream_UsesInjectedProvider() async throws {
+    func testNavigationStreamUsesInjectedProvider() async throws {
         let expectedName = "MockViewController"
         let expectedEvent = AutomatedNavigationEvent(
             timestamp: Date(),
@@ -48,7 +48,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertEqual(firstEvent?.controllerTypeName, expectedName)
     }
 
-    func testDefaultProviders_RemainProductionImplementations() {
+    func testDefaultProvidersRemainProductionImplementations() {
         let navigation = Navigation()
 
         XCTAssertTrue(type(of: navigation.navigationEventStreamProvider) == DefaultNavigationEventStreamProvider.self)
@@ -56,16 +56,16 @@ final class NavigationEventSourcesTests: XCTestCase {
 
     // MARK: - Filtering
 
-    func testShouldIgnore_InternalControllers() {
+    func testShouldIgnoreInternalControllers() {
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UINavigationController"))
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UITabBarController"))
     }
 
-    func testShouldIgnore_RegularController() {
+    func testShouldIgnoreRegularController() {
         XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "ProductDetailsViewController"))
     }
 
-    func testIgnoredController_DoesNotUpdateScreenName() async {
+    func testIgnoredControllerDoesNotUpdateScreenName() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
@@ -91,7 +91,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertEqual(currentScreenName, "unknown")
     }
 
-    func testManualUpdate_OverridesAutomatedScreenName() async {
+    func testManualUpdateOverridesAutomatedScreenName() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
@@ -124,7 +124,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertTrue(didApplyManualScreen)
     }
 
-    func testAutomatedUpdate_OverridesManualWhenEnabled() async {
+    func testAutomatedUpdateOverridesManualWhenEnabled() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
@@ -157,7 +157,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertTrue(didApplyAutomatedScreen)
     }
 
-    func testAutomatedUpdate_DoesNotOverrideManualWhenDisabled() async {
+    func testAutomatedUpdateDoesNotOverrideManualWhenDisabled() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
