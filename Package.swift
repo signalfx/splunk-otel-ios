@@ -153,6 +153,7 @@ func generateMainTargets() -> [Target] {
         .testTarget(
             name: "SplunkNavigationTests",
             dependencies: [
+                "SplunkCommon",
                 "SplunkNavigation"
             ],
             path: "SplunkNavigation/Tests",
@@ -291,6 +292,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkOpenTelemetryTests",
             dependencies: [
                 "SplunkOpenTelemetry",
+                "SplunkCommon",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core")
             ],
