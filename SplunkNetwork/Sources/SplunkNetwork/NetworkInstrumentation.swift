@@ -28,6 +28,9 @@ public class NetworkInstrumentation {
     /// Indicates whether trace header injection is enabled.
     private var traceHeaderInjectionEnabled = true
 
+    /// Indicates whether network timing collection is enabled.
+    private var networkTimingEnabled = false
+
 
     // MARK: - Public
 
@@ -42,6 +45,11 @@ public class NetworkInstrumentation {
     /// Indicates whether W3C trace context header injection is enabled.
     public var isTraceHeaderInjectionEnabled: Bool {
         traceHeaderInjectionEnabled
+    }
+
+    /// Indicates whether network timing collection is enabled (iOS 15+ only).
+    public var isNetworkTimingEnabled: Bool {
+        networkTimingEnabled
     }
 
     public required init() {}
@@ -74,6 +82,7 @@ public class NetworkInstrumentation {
             }
 
             traceHeaderInjectionEnabled = config?.injectTraceHeaders ?? true
+            networkTimingEnabled = config?.collectNetworkTiming ?? true
 
             NetworkInstrumentationManager.shared.initialize(with: self)
         }

@@ -80,6 +80,7 @@ func swizzleDownloadTaskWithURL() {
         let task = castedRequestIMP(session, requestSelector, instrumentedRequest)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
@@ -124,6 +125,7 @@ func swizzleDownloadTaskWithRequestAndCompletion() {
         let task = castedIMP(session, selector, instrumentedRequest, wrappedCompletion)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
@@ -181,6 +183,7 @@ func swizzleDownloadTaskWithURLAndCompletion() {
         let task = castedRequestIMP(session, requestSelector, instrumentedRequest, wrappedCompletion)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
@@ -222,6 +225,7 @@ func swizzleDownloadTaskWithResumeData() {
 
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
@@ -263,6 +267,7 @@ func swizzleDownloadTaskWithResumeDataAndCompletion() {
 
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 

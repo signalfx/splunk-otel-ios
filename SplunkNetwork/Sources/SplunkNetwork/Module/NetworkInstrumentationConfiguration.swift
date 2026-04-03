@@ -39,6 +39,17 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
     /// Default value is `true`.
     public var injectTraceHeaders: Bool = true
 
+    /// Indicates whether network timing breakdown data should be collected.
+    ///
+    /// When enabled, `URLSessionTaskTransactionMetrics` are captured for each instrumented
+    /// HTTP request and emitted as a log record with timing attributes (DNS, connect, TLS,
+    /// request, and response phases).
+    ///
+    /// Requires iOS 15+ at runtime. On earlier versions this setting has no effect.
+    ///
+    /// Default value is `true`.
+    public var collectNetworkTiming: Bool = true
+
     // MARK: init()
 
     /// Initializes new module configuration with preconfigured values.
@@ -47,9 +58,16 @@ public struct NetworkInstrumentationConfiguration: ModuleConfiguration {
     ///   - isEnabled: A `Boolean` value sets whether the module is enabled.
     ///   - ignoreURLs: If present, the module will not report on these URLs.
     ///   - injectTraceHeaders: If `true` (default), W3C trace context headers are injected into requests.
-    public init(isEnabled: Bool = true, ignoreURLs: IgnoreURLs? = nil, injectTraceHeaders: Bool = true) {
+    ///   - collectNetworkTiming: If `true` (default), network timing breakdowns are captured for HTTP requests (iOS 15+ only).
+    public init(
+        isEnabled: Bool = true,
+        ignoreURLs: IgnoreURLs? = nil,
+        injectTraceHeaders: Bool = true,
+        collectNetworkTiming: Bool = true
+    ) {
         self.isEnabled = isEnabled
         self.ignoreURLs = ignoreURLs
         self.injectTraceHeaders = injectTraceHeaders
+        self.collectNetworkTiming = collectNetworkTiming
     }
 }

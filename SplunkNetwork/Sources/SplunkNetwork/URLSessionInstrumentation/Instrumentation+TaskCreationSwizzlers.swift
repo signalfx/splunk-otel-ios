@@ -80,6 +80,7 @@ func swizzleDataTaskWithURL() {
         let task = castedRequestIMP(session, requestSelector, instrumentedRequest)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
@@ -122,6 +123,7 @@ func swizzleDataTaskWithRequestAndCompletion() {
         let task = castedIMP(session, selector, instrumentedRequest, wrappedCompletion)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
@@ -183,6 +185,7 @@ func swizzleDataTaskWithURLAndCompletion() {
         let task = castedRequestIMP(session, requestSelector, instrumentedRequest, wrappedCompletion)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
@@ -223,6 +226,7 @@ func swizzleUploadTaskWithRequestFromData() {
         let task = castedIMP(session, selector, instrumentedRequest, data)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
@@ -261,6 +265,7 @@ func swizzleUploadTaskWithRequestFromFile() {
         let task = castedIMP(session, selector, instrumentedRequest, fileURL)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
@@ -304,6 +309,7 @@ func swizzleUploadTaskWithRequestFromDataAndCompletion() {
         let task = castedIMP(session, selector, instrumentedRequest, data, wrappedCompletion)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
@@ -347,14 +353,13 @@ func swizzleUploadTaskWithRequestFromFileAndCompletion() {
         let task = castedIMP(session, selector, instrumentedRequest, fileURL, wrappedCompletion)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
     method_setImplementation(original, swizzledIMP)
 }
-
-// MARK: - Streamed Upload Task Swizzling
 
 func swizzleUploadTaskWithStreamedRequest() {
     let selector = #selector(URLSession.uploadTask(withStreamedRequest:))
@@ -386,6 +391,7 @@ func swizzleUploadTaskWithStreamedRequest() {
         let task = castedIMP(session, selector, instrumentedRequest)
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
         objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+        attachTimingCollectorIfEnabled(to: task, spanContext: span.context)
         return task
     }
 
