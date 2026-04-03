@@ -104,5 +104,4 @@ final class CrashReportsFormattingTests: XCTestCase {
 
         XCTAssertTrue(unarchived.isEmpty)
     }
-
 }

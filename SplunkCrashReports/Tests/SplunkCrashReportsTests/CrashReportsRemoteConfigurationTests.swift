@@ -22,42 +22,22 @@ import XCTest
 
 final class CrashReportsRemoteConfigurationTests: XCTestCase {
 
+    // MARK: - Helpers
+
+    private func jsonData(enabled: Bool) -> Data {
+        Data(#"{"configuration":{"mrum":{"crashReporting":{"enabled":\#(enabled)}}}}"#.utf8)
+    }
+
     // MARK: - Valid JSON
 
     func testValidJSONWithEnabledTrue() throws {
-        let json = """
-        {
-            "configuration": {
-                "mrum": {
-                    "crashReporting": {
-                        "enabled": true
-                    }
-                }
-            }
-        }
-        """
-        let data = try XCTUnwrap(json.data(using: .utf8))
-
-        let config = try XCTUnwrap(CrashReportsRemoteConfiguration(from: data))
+        let config = try XCTUnwrap(CrashReportsRemoteConfiguration(from: jsonData(enabled: true)))
 
         XCTAssertTrue(config.enabled)
     }
 
     func testValidJSONWithEnabledFalse() throws {
-        let json = """
-        {
-            "configuration": {
-                "mrum": {
-                    "crashReporting": {
-                        "enabled": false
-                    }
-                }
-            }
-        }
-        """
-        let data = try XCTUnwrap(json.data(using: .utf8))
-
-        let config = try XCTUnwrap(CrashReportsRemoteConfiguration(from: data))
+        let config = try XCTUnwrap(CrashReportsRemoteConfiguration(from: jsonData(enabled: false)))
 
         XCTAssertFalse(config.enabled)
     }
@@ -78,87 +58,40 @@ final class CrashReportsRemoteConfigurationTests: XCTestCase {
         XCTAssertNil(config)
     }
 
-    func testMissingConfigurationKeyReturnsNil() throws {
-        let json = """
-        {
-            "other": {
-                "mrum": {
-                    "crashReporting": {
-                        "enabled": true
-                    }
-                }
-            }
-        }
-        """
-        let data = try XCTUnwrap(json.data(using: .utf8))
+    func testMissingConfigurationKeyReturnsNil() {
+        let data = Data(#"{"other":{"mrum":{"crashReporting":{"enabled":true}}}}"#.utf8)
 
         let config = CrashReportsRemoteConfiguration(from: data)
 
         XCTAssertNil(config)
     }
 
-    func testMissingMrumKeyReturnsNil() throws {
-        let json = """
-        {
-            "configuration": {
-                "other": {}
-            }
-        }
-        """
-        let data = try XCTUnwrap(json.data(using: .utf8))
+    func testMissingMrumKeyReturnsNil() {
+        let data = Data(#"{"configuration":{"other":{}}}"#.utf8)
 
         let config = CrashReportsRemoteConfiguration(from: data)
 
         XCTAssertNil(config)
     }
 
-    func testMissingCrashReportingKeyReturnsNil() throws {
-        let json = """
-        {
-            "configuration": {
-                "mrum": {
-                    "other": {}
-                }
-            }
-        }
-        """
-        let data = try XCTUnwrap(json.data(using: .utf8))
+    func testMissingCrashReportingKeyReturnsNil() {
+        let data = Data(#"{"configuration":{"mrum":{"other":{}}}}"#.utf8)
 
         let config = CrashReportsRemoteConfiguration(from: data)
 
         XCTAssertNil(config)
     }
 
-    func testMissingEnabledFieldReturnsNil() throws {
-        let json = """
-        {
-            "configuration": {
-                "mrum": {
-                    "crashReporting": {}
-                }
-            }
-        }
-        """
-        let data = try XCTUnwrap(json.data(using: .utf8))
+    func testMissingEnabledFieldReturnsNil() {
+        let data = Data(#"{"configuration":{"mrum":{"crashReporting":{}}}}"#.utf8)
 
         let config = CrashReportsRemoteConfiguration(from: data)
 
         XCTAssertNil(config)
     }
 
-    func testWrongEnabledTypeReturnsNil() throws {
-        let json = """
-        {
-            "configuration": {
-                "mrum": {
-                    "crashReporting": {
-                        "enabled": "yes"
-                    }
-                }
-            }
-        }
-        """
-        let data = try XCTUnwrap(json.data(using: .utf8))
+    func testWrongEnabledTypeReturnsNil() {
+        let data = Data(#"{"configuration":{"mrum":{"crashReporting":{"enabled":"yes"}}}}"#.utf8)
 
         let config = CrashReportsRemoteConfiguration(from: data)
 
@@ -166,21 +99,9 @@ final class CrashReportsRemoteConfigurationTests: XCTestCase {
     }
 
     func testExtraFieldsDoNotPreventParsing() throws {
-        let json = """
-        {
-            "configuration": {
-                "mrum": {
-                    "crashReporting": {
-                        "enabled": true,
-                        "extraField": "ignored"
-                    },
-                    "otherModule": {}
-                },
-                "extraConfig": true
-            }
-        }
-        """
-        let data = try XCTUnwrap(json.data(using: .utf8))
+        let data = Data(
+            #"{"configuration":{"mrum":{"crashReporting":{"enabled":true,"extra":"ignored"},"other":{}},"extra":true}}"#.utf8
+        )
 
         let config = try XCTUnwrap(CrashReportsRemoteConfiguration(from: data))
 
