@@ -75,7 +75,8 @@ If you are unsure whether something qualifies as "known debt" vs a new instance 
 # Review Domains
 
 Your preloaded skills contain the detailed checklists for each domain. Apply all of them:
-- Memory safety, concurrency, API design, UI frameworks, performance, error handling, security, testability, documentation, formatting, platform compatibility.
+- Memory safety, concurrency, API design, UI frameworks, performance, error handling, security, testability, documentation, platform compatibility.
+- **Formatting**: Handled separately by the `mrum-ios-code-review-formatting` forked skill, which runs linting tools and returns a report. Do not manually review for formatting issues — the tools are the source of truth.
 
 For framework-specific API concerns, also check:
 - Public API stability and annotation. Avoid exposing implementation details.
@@ -154,8 +155,15 @@ If the resolution record shows an associated open PR, note this in the report he
 ### No PR reader for pure local reviews
 If there is no associated PR, skip the PR reader entirely. There are no existing review comments to consider.
 
+## Run the formatting checker
+Before conducting the code review, kick off the `mrum-ios-code-review-formatting` skill to lint the changed files. This runs as a forked sub-agent — it executes `swiftformat --lint`, `swiftlint lint`, and `swift-format lint` in read-only mode and returns a violation report. It does NOT modify any files.
+
+Pass it the list of changed files (or the diff base so it can determine them). Its report will be incorporated into the "Formatting" section of your review output.
+
+You can run this in parallel with starting to read the code for the substantive review, since formatting checks are independent of the other review domains.
+
 ## Conduct the review
-Read the code. Apply the checklists from your preloaded skills. Cross-reference against the project context above.
+Read the code. Apply the checklists from your preloaded skills (all domains except formatting, which is handled by the formatting checker above). Cross-reference against the project context above.
 
 For large diffs, prioritize critical issues. Summarize patterns (e.g., "5 instances of missing `[weak self]` in completion handlers") rather than repeating per-occurrence.
 
@@ -201,6 +209,10 @@ For large diffs, prioritize critical issues. Summarize patterns (e.g., "5 instan
 ## Suggestions (consider)
 ### 1. [<file>:<line>] <category>: <title>
 ...
+
+## Formatting
+<Include the formatting checker's report here. If no violations, note "No formatting issues found."
+If violations exist, include the summary and suggest which tools to run to fix them.>
 
 ## Summary
 - Files reviewed: <count>

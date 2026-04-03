@@ -2,6 +2,7 @@
 name: mrum-ios-code-review-input-parser
 description: Parse and resolve user input (PR numbers, ticket IDs, branch names, URLs, natural language) into confirmed review targets with structured metadata. Use as the first step whenever the user provides ambiguous or shorthand input for the code review agent.
 user-invocable: false
+model: opus
 ---
 
 # Input Parser

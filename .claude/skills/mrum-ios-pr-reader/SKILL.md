@@ -3,7 +3,7 @@ name: mrum-ios-pr-reader
 description: Read GitHub PRs, fetch review comments (including line-level and replies), and present an actionable report. Use when the user wants to review PR comments, check PR status, find PRs by branch/ticket/number, or understand what feedback has been given on a PR.
 argument-hint: [PR-number|branch|ticket] [repo-url]
 allowed-tools: Bash(gh *), Bash(git *), Bash(curl *), Read, Grep, Glob, Agent
-model: sonnet
+model: opus
 effort: high
 context: fork
 agent: general-purpose
