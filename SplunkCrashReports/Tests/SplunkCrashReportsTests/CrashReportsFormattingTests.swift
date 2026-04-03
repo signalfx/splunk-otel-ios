@@ -105,23 +105,4 @@ final class CrashReportsFormattingTests: XCTestCase {
         XCTAssertTrue(unarchived.isEmpty)
     }
 
-    func testCustomDataKeysMappedByAddCustomData() {
-        // Verify the key mapping contract: updateDeviceStats stores values
-        // under these string keys, and addCustomData reads them.
-        let expectedMapping: [String: CrashReportKeys] = [
-            "sessionId": .sessionId,
-            "battery": .batteryLevel,
-            "memory": .freeMemory,
-            "disk": .freeDiskSpace,
-            "screenName": .screenName,
-            "buildId": .buildId
-        ]
-
-        XCTAssertEqual(expectedMapping["sessionId"], .sessionId)
-        XCTAssertEqual(expectedMapping["battery"], .batteryLevel)
-        XCTAssertEqual(expectedMapping["memory"], .freeMemory)
-        XCTAssertEqual(expectedMapping["disk"], .freeDiskSpace)
-        XCTAssertEqual(expectedMapping["screenName"], .screenName)
-        XCTAssertEqual(expectedMapping["buildId"], .buildId)
-    }
 }

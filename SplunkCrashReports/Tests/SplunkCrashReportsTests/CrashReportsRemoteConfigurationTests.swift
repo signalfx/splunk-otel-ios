@@ -70,8 +70,8 @@ final class CrashReportsRemoteConfigurationTests: XCTestCase {
         XCTAssertNil(config)
     }
 
-    func testMalformedJSONReturnsNil() throws {
-        let data = try XCTUnwrap("not valid json".data(using: .utf8))
+    func testMalformedJSONReturnsNil() {
+        let data = Data("not valid json".utf8)
 
         let config = CrashReportsRemoteConfiguration(from: data)
 

@@ -27,17 +27,7 @@ import XCTest
 /// instances and cannot be unit-tested without real crash data.
 final class CrashReportsThreadListTests: XCTestCase {
 
-    private var crashReports: CrashReports!
-
-    override func setUp() {
-        super.setUp()
-        crashReports = CrashReports()
-    }
-
-    override func tearDown() {
-        crashReports = nil
-        super.tearDown()
-    }
+    private let crashReports = CrashReports()
 
     // MARK: - threadList
 

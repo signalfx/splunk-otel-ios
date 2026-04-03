@@ -22,17 +22,7 @@ import XCTest
 
 final class CrashReportsJSONTests: XCTestCase {
 
-    private var crashReports: CrashReports!
-
-    override func setUp() {
-        super.setUp()
-        crashReports = CrashReports()
-    }
-
-    override func tearDown() {
-        crashReports = nil
-        super.tearDown()
-    }
+    private let crashReports = CrashReports()
 
     // MARK: - normalizeToJSONReady
 
@@ -98,7 +88,7 @@ final class CrashReportsJSONTests: XCTestCase {
 
     func testNormalizeDepthLimitPreventsRunawayRecursion() {
         var current: Any = "leaf"
-        for _ in 0..<15 {
+        for _ in 0 ..< 15 {
             current = [CrashReportKeys.details: current]
         }
 

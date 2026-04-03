@@ -28,17 +28,7 @@ import XCTest
 /// `allUsedImageNames` filtering contract).
 final class CrashReportsImageListTests: XCTestCase {
 
-    private var crashReports: CrashReports!
-
-    override func setUp() {
-        super.setUp()
-        crashReports = CrashReports()
-    }
-
-    override func tearDown() {
-        crashReports = nil
-        super.tearDown()
-    }
+    private let crashReports = CrashReports()
 
     // MARK: - imageList
 
