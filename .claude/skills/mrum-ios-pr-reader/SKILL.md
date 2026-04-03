@@ -70,18 +70,36 @@ For each thread, track:
 
 For each comment thread, classify it:
 
+### Conventional comment labels
+
+The team uses conventional labels to prefix review comments. Recognize these when parsing:
+- `praise:` — positive feedback, non-actionable
+- `nitpick:` — trivial preference, non-blocking by nature
+- `suggestion:` — proposed improvement, may be blocking or non-blocking
+- `issue:` — specific problem, usually blocking
+- `todo:` — small necessary change
+- `question:` — request for clarification
+- `thought:` — idea, non-blocking
+- `chore:` — task required before merge
+- `note:` — informational, non-blocking
+
+Comments may also have decorators: `(blocking)`, `(non-blocking)`, `(tests)`, etc.
+
+When a comment starts with one of these labels, use the label to inform classification. A `nitpick:` or `thought:` is inherently non-blocking. An `issue (blocking):` or `chore:` requires action. If no label is present, classify based on content as before.
+
 ### Categories:
-- **Actionable - Open**: A requested change, bug report, or suggestion that has NOT been addressed yet. Look for:
+- **Actionable - Open**: A requested change, bug report, or issue that has NOT been addressed yet. Look for:
   - The comment requests a code change, and the current diff does not reflect that change
   - No reply from the PR author acknowledging or resolving it
   - The review is marked CHANGES_REQUESTED and not superseded by a later APPROVED review from the same reviewer
+  - Comments labeled `issue:`, `todo:`, `chore:`, or `suggestion (blocking):` without resolution
 - **Actionable - Resolved**: A requested change that HAS been addressed. Look for:
   - A reply from the PR author saying "done", "fixed", "addressed", or similar
   - The current diff shows the requested change was made
   - A subsequent APPROVED review from the same reviewer
   - The comment was marked as resolved (if GitHub's resolved status is available via `gh api repos/<owner>/<repo>/pulls/<number>/comments` — check the `resolved` or `is_resolved` field if present, or check for `RESOLVED` in review thread data)
-- **Non-actionable - Discussion**: Questions, explanations, praise, acknowledgments, or general discussion that don't require code changes.
-- **Non-actionable - Nitpick/Optional**: Comments explicitly marked as nitpicks, suggestions marked optional, or style preferences that don't affect correctness.
+- **Non-actionable - Discussion**: Questions, explanations, praise, acknowledgments, or general discussion that don't require code changes. Includes comments labeled `question:`, `thought:`, `note:`, `praise:`.
+- **Non-actionable - Nitpick/Optional**: Comments labeled `nitpick:` or explicitly marked `(non-blocking)`, or style preferences that don't affect correctness.
 - **Non-actionable - Outdated**: Comments on lines that no longer exist in the current diff (check `position` is null or `outdated` is true).
 
 ### Heuristics for assessing resolution:

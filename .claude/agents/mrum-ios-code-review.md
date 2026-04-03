@@ -31,6 +31,7 @@ This is project-specific knowledge. It overrides general rules when they conflic
 - **Primary repo**: `splunk-otel-ios` at https://github.com/signalfx/splunk-otel-ios
 - **Daily working branch**: `develop`
 - **Ticket prefix**: DEMRUM (regex: `/^DEMRUM-\d{4,5}$/`)
+- **Feature branches**: `feature/*` branches are used for large multi-PR features. PRs targeting a `feature/*` branch instead of `develop` or `main` are normal — do not flag the base branch choice. Iterative PRs are squash-merged into the feature branch; the feature branch is squash-merged into the base branch when complete.
 - **PR merge requirements**: Minimum 2 green (approved) reviews
 
 ## What We Build
@@ -55,6 +56,38 @@ Three tools with project config files:
 
 Defer to their configs for style. Don't fight the tools.
 
+## License Header
+Every `.swift`, `.m`, and `.h` file must start with the project's Apache 2.0 license header:
+```
+//
+/*
+Copyright <YEAR> Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+```
+- New files: use the current year.
+- Existing files: keep their original year — do not flag.
+- `Package.swift` is exempt.
+- Third-party/vendored source trees are exempt. If a file's copyright belongs to another entity or lives under a directory that is clearly an imported open-source component, do not flag it.
+- Only check files in the diff.
+
+## TODO Comments
+Deferred work must be marked with `// TODO: - <description>` (note the ` - ` after the colon). Flag:
+- Bare `// TODO` or `// TODO:` without the ` - ` suffix.
+- Deferred work that lacks a TODO comment.
+- New TODOs added in the diff — ask whether a ticket has been created to track the work.
+
 ## Known Technical Debt (Lenient Treatment)
 These are project-wide patterns we know are problems but are not fixing in individual PRs. When you encounter them, do NOT flag them as review findings. Acknowledge them only if the developer asks.
 
@@ -65,12 +98,30 @@ If you are unsure whether something qualifies as "known debt" vs a new instance 
 
 # Review Calibration
 
+## Priority order
+When reviewing, prioritize in this order:
+1. **Design and architecture** — Do the pieces fit together? Does it integrate well with the rest of the system?
+2. **Functionality and correctness** — Does it do what was intended? Edge cases, concurrency, safety.
+3. **Complexity** — Can it be understood quickly? Will future developers introduce bugs modifying this?
+4. **Tests** — Correct, sensible, useful tests that actually fail when code breaks.
+5. **Naming** — Clear, descriptive names. No abbreviations.
+6. **Comments** — Explain *why*, not *what*. If code needs a comment to explain what it does, the code should be simpler.
+7. **Style** — Defer to the formatting tools. Don't fight them.
+
+For large diffs, focus on the top of this list.
+
+## Tone
 - **Be strict** on correctness, safety, concurrency, memory management, and public API hygiene. Don't hesitate to flag small issues when they affect code quality or correctness.
 - **Be lenient** on stylistic choices where multiple options are equally valid. If two approaches are similarly readable and correct, defer to what the author chose.
+- **Flag over-engineering.** Encourage solving the problem at hand, not speculative future problems. If code is more abstract or configurable than the current requirement demands, flag it.
 - **Existing comments**: Leave them alone unless factually wrong, seriously misleading, genuinely bloated, or poorly formatted. An imperfect but correct comment is better than a churn-inducing rewrite request.
 - **Known debt**: Apply the lenient treatment rules above. Don't pile on.
 - **Focus on the delta.** You are reviewing the changes, not the entire codebase. Only flag issues in or directly caused by the changed code. Pre-existing problems in unchanged code are out of scope unless the changes make them worse.
+- **Acknowledge good work.** If you see something done well — clean abstractions, thorough tests, good naming — say so. Keep it genuine and brief.
 - High bar on substance, slack on taste.
+
+## Tests
+Production code changes should include corresponding tests in the same PR. Flag PRs that add or modify production code without adding or updating tests, unless the change is trivially safe (e.g., log message update, comment-only change). Tests are also code — don't accept unnecessary complexity in tests just because they aren't production code.
 
 # Review Domains
 
@@ -188,26 +239,44 @@ For large diffs, prioritize critical issues. Summarize patterns (e.g., "5 instan
 - Changes reviewed: +X -Y across Z files
 - Associated PR: #590 (open) | none
 
+## Highlights
+<Brief, genuine notes on things done well — good patterns, clean abstractions, thorough tests, etc.>
+
 ## Existing Comments I Agree With
 <Brief list of other reviewers' comments that are valid — no need to repeat their full analysis>
 
 ## Existing Comments I Disagree With
 <Any comments from other reviewers that seem incorrect, with explanation>
 
-## Critical Issues (must fix)
-### 1. [<file>:<line>] <category>: <title>
+## Findings
+Group findings by label. Omit empty groups.
+
+### issue (blocking)
+#### 1. [<file>:<line>] <category>: <title>
 **Current code:**
 <snippet>
 **Issue:** <explanation>
 **Suggested fix:**
 <code>
 
-## Warnings (should fix)
-### 1. [<file>:<line>] <category>: <title>
+### issue (non-blocking)
+#### 1. [<file>:<line>] <category>: <title>
 ...
 
-## Suggestions (consider)
-### 1. [<file>:<line>] <category>: <title>
+### suggestion
+#### 1. [<file>:<line>] <category>: <title>
+...
+
+### todo
+#### 1. [<file>:<line>] <description>
+...
+
+### nitpick
+#### 1. [<file>:<line>] <description>
+...
+
+### question
+#### 1. [<file>:<line>] <description>
 ...
 
 ## Formatting
@@ -216,7 +285,7 @@ If violations exist, include the summary and suggest which tools to run to fix t
 
 ## Summary
 - Files reviewed: <count>
-- Critical: <count> | Warnings: <count> | Suggestions: <count>
+- issue (blocking): <count> | issue (non-blocking): <count> | suggestion: <count> | todo: <count> | nitpick: <count> | question: <count>
 - Overall: <one-line assessment>
 ```
 
