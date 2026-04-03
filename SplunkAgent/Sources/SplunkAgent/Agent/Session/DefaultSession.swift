@@ -19,6 +19,7 @@ internal import CiscoLogger
 import Foundation
 internal import SplunkCommon
 
+
 /// The object implements the management of the current session.
 class DefaultSession: AgentSession {
 
@@ -31,6 +32,8 @@ class DefaultSession: AgentSession {
 
     private var sessionsModel: SessionsModel
     private(set) lazy var currentSession: SessionItem = startSession()
+
+    private var lastActivity: Date?
 
     var enterBackground: Date?
 
@@ -87,6 +90,30 @@ class DefaultSession: AgentSession {
     var currentSessionItem: SessionItem {
         accessQueue.sync {
             currentSession
+        }
+    }
+
+    var currentSessionStart: Date {
+        accessQueue.sync {
+            currentSession.start
+        }
+    }
+
+    var currentSessionLastActivity: Date {
+        accessQueue.sync {
+            lastActivity ?? currentSession.start
+        }
+    }
+
+    func trackActivity(at date: Date) {
+        accessQueue.async { [weak self] in
+            guard let self else {
+                return
+            }
+
+            let baseline = lastActivity ?? currentSession.start
+
+            lastActivity = max(baseline, date)
         }
     }
 
@@ -242,6 +269,11 @@ class DefaultSession: AgentSession {
         // Performs the closing of the existing session and creates a fresh new one
         closeSession()
         currentSession = createSession()
+
+        // Reset in-memory last-activity for the new session
+        accessQueue.sync {
+            lastActivity = nil
+        }
 
         // Save changes into cache
         sessionsModel.sync()

@@ -136,7 +136,8 @@ extension DefaultEventManager {
             globalAttributes: { agent.globalAttributes.getAll() },
             debugEnabled: configuration.enableDebugLogging,
             spanInterceptor: configuration.spanInterceptor,
-            accessToken: accessToken
+            accessToken: accessToken,
+            activityTracker: agent.currentSession
         )
 
         return Processors(

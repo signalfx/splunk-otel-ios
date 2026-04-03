@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,26 +16,19 @@ limitations under the License.
 */
 
 import Foundation
+import OpenTelemetrySdk
 
-/// This struct implements a non operational variant of the AgentSession.
-struct NoOpSession: AgentSession {
-    let currentSessionItem = SessionItem(id: "no-op", start: Date())
+final class MockSpanExporter: SpanExporter {
+    private(set) var exportedSpans: [SpanData] = []
 
-    var currentSessionId: String {
-        currentSessionItem.id
+    func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
+        exportedSpans.append(contentsOf: spans)
+        return .success
     }
 
-    func sessionId(for _: Date) -> String? {
-        currentSessionItem.id
+    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
+        .success
     }
 
-    var currentSessionStart: Date {
-        currentSessionItem.start
-    }
-
-    var currentSessionLastActivity: Date {
-        currentSessionItem.start
-    }
-
-    func trackActivity(at _: Date) {}
+    func shutdown(explicitTimeout _: TimeInterval?) {}
 }

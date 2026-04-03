@@ -44,7 +44,8 @@ public class OTLPTraceProcessor: TraceProcessor {
         globalAttributes: @escaping () -> [String: AttributeValue],
         debugEnabled: Bool,
         spanInterceptor: SplunkSpanInterceptor?,
-        accessToken: String? = nil
+        accessToken: String? = nil,
+        activityTracker: ActivityTracker
     ) {
 
         let configuration = OTLPExporterConfiguration()
@@ -80,7 +81,10 @@ public class OTLPTraceProcessor: TraceProcessor {
 
         // Initialize processor
         let spanProcessor = SimpleSpanProcessor(spanExporter: spanInterceptorExporter)
-        let attributesProcessor = OLTPAttributesSpanProcessor(with: runtimeAttributes)
+        let attributesProcessor = OLTPAttributesSpanProcessor(
+            with: runtimeAttributes,
+            activityTracker: activityTracker
+        )
 
         // Global Attributes processor
         let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(with: globalAttributes)
