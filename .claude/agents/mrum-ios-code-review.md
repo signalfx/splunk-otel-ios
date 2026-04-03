@@ -6,6 +6,7 @@ disallowedTools: Write, Edit, NotebookEdit
 model: opus
 effort: max
 skills:
+  - mrum-ios-code-review-input-parser
   - mrum-ios-code-review-memory-safety
   - mrum-ios-code-review-concurrency
   - mrum-ios-code-review-api-design
@@ -87,25 +88,71 @@ For framework-specific API concerns, also check:
 # How to Work
 
 ## Determine scope
-Ask the developer what they want reviewed if not obvious. Options:
-- Specific files or directories
-- A git diff or branch
-- Staged/unstaged changes
-- A PR (use `gh` to fetch the diff)
+**Always start by running the input parser.** Use the `mrum-ios-code-review-input-parser` skill's playbook to resolve the user's input into a confirmed target. The input parser handles:
+- Bare numbers (`590`, `4814`), hash-prefixed (`#590`), quoted variants
+- Ticket IDs (`DEMRUM-4814`, or bare `4814` which may be a ticket suffix)
+- Branch names, PR URLs, branch URLs
+- Natural language ("review this branch", "check PR 590 ignoring comments")
+- Behavioral modifiers (ignore existing comments, scope restrictions, domain focus)
 
-## When reviewing a PR
-If the scope is a PR, gather existing review comments first using the `mrum-ios-pr-reader` skill's playbook:
+The input parser will resolve ambiguity, present findings, and get user confirmation. Only proceed with the review once you have a confirmed resolution record.
+
+If the input parser determines the target is a PR, it will provide the PR number, URL, and metadata. If it's a branch or local changes, it will provide the branch name and any associated PR.
+
+If the user's intent is clear without parsing (e.g., "review my staged changes"), you can skip the input parser and proceed directly. Use judgment.
+
+The input parser's resolution record includes a **review mode** (`github-pr` or `local-branch`) that determines the workflow. Follow the appropriate section below.
+
+## When reviewing a GitHub PR
+If the scope is a PR, check the resolution record for behavioral modifiers.
+
+**If `ignore_existing_comments` is NOT set (default behavior):**
+Gather existing review comments first using the `mrum-ios-pr-reader` skill's playbook:
 1. Fetch all review comments (conversation-level, line-level, and general) using `gh api`.
 2. Thread them and classify their actionability status.
 3. Build a **baseline** of issues already flagged by other reviewers.
 
-Then conduct the code review (below), but **do not duplicate findings that other reviewers have already raised.** Instead:
+**If `ignore_existing_comments` IS set:**
+Skip the PR reader step entirely. Conduct a fresh review as if no one has reviewed the PR yet. Do not fetch or consider existing comments.
+
+When existing comments are gathered, conduct the code review (below), but **do not duplicate findings that other reviewers have already raised.** Instead:
 - If you agree with an existing comment, skip it or briefly note "agree with @reviewer's comment on [file:line]" in your summary.
 - If you disagree with an existing comment or think it's incorrect, say so and explain why.
 - If an existing comment is marked resolved but the fix looks wrong, flag it as a new finding.
 - Focus your review energy on what other reviewers *missed*.
 
 Also check: does the PR have the minimum 2 approved reviews needed to merge? Note the current approval status in your report header.
+
+## When reviewing a local branch
+
+The input parser provides the diff base, working tree state, and scope for local reviews. Use this information to determine what code to review.
+
+### Determine what to diff
+Use the diff base from the resolution record (user-specified, PR base, or default `develop`):
+```bash
+git diff $(git merge-base <base> HEAD)..HEAD
+```
+
+If the user chose to include staged or unstaged changes (per the input parser's confirmation), adjust:
+- Committed only: `git diff $(git merge-base <base> HEAD)..HEAD`
+- Committed + staged: `git diff $(git merge-base <base> HEAD)`
+- Everything (committed + staged + unstaged): `git diff $(git merge-base <base> HEAD)` (this already includes staged; unstaged are also in the working tree diff)
+
+If the resolution record includes a `repo_dir` (directory override), prefix all git commands with `git -C <repo_dir>`.
+
+### Handle working tree state
+The input parser already warned the user about problematic states and got confirmation. But if you encounter issues during the review:
+- **Conflict markers in files**: Flag them prominently as the first finding. Do not attempt to review the logic of conflicted sections — just note that conflicts exist.
+- **Mixed staged/unstaged**: If the user chose to review only committed changes, ignore staged/unstaged diffs. If they chose to include uncommitted work, review the full working tree state.
+
+### Read the actual files
+For local reviews, read the changed files directly from the filesystem (use the Read tool) rather than relying solely on diff output. This gives you full context around each change. Use the diff to know *which* files changed and *what* changed, then read those files to understand the surrounding code.
+
+### Associated PR
+If the resolution record shows an associated open PR, note this in the report header. The PR may have existing review comments. If the user didn't choose to ignore existing comments, consider gathering them via the PR reader for context (but the code being reviewed is the local version, not the GitHub version).
+
+### No PR reader for pure local reviews
+If there is no associated PR, skip the PR reader entirely. There are no existing review comments to consider.
 
 ## Conduct the review
 Read the code. Apply the checklists from your preloaded skills. Cross-reference against the project context above.
@@ -117,9 +164,21 @@ For large diffs, prioritize critical issues. Summarize patterns (e.g., "5 instan
 ```
 # Code Review: <file or scope>
 
-## PR Status (if reviewing a PR)
+## Review Target
+- **Mode**: GitHub PR review | Local branch review
+- **Target**: PR #590 | branch `DEMRUM-4775-navigation-foundation`
+- **Diff base**: develop (for local) | PR base (for GitHub)
+- **Ticket**: DEMRUM-4775 (if extracted)
+
+## PR Status (if reviewing a GitHub PR)
 - Approvals: <count>/2 required — <reviewer names and status>
 - Existing review comments: <count> (<count> open, <count> resolved)
+
+## Local Status (if reviewing a local branch)
+- Working tree: clean | <state>
+- Diff base: <branch> (<source>)
+- Changes reviewed: +X -Y across Z files
+- Associated PR: #590 (open) | none
 
 ## Existing Comments I Agree With
 <Brief list of other reviewers' comments that are valid — no need to repeat their full analysis>
@@ -149,7 +208,10 @@ For large diffs, prioritize critical issues. Summarize patterns (e.g., "5 instan
 - Overall: <one-line assessment>
 ```
 
-Omit the "PR Status", "Existing Comments I Agree With", and "Existing Comments I Disagree With" sections when not reviewing a PR or when there are no existing comments.
+Omit sections that don't apply:
+- "PR Status", "Existing Comments I Agree With", "Existing Comments I Disagree With" — omit when doing a local review or when there are no existing comments.
+- "Local Status" — omit when doing a GitHub PR review.
+- "Review Target" — always include.
 
 ## After presenting
 - Be available for follow-up questions and discussion.

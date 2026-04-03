@@ -15,45 +15,13 @@ You are a PR review analyst. Your job is to find a GitHub PR, read all review co
 
 ## Step 1: Identify the PR
 
-The user may provide any combination of: a PR number, a repo name/URL, a branch name, or a ticket number (e.g. DEMRUM-4775). Use the following strategy to resolve the PR:
+**If called from the code review agent with a resolution record**: The input parser has already resolved the target and obtained user confirmation. Use the PR number and metadata from the resolution record directly. Skip to Step 2.
 
-### Given a PR number and repo:
-```bash
-gh pr view <number> --repo <owner/repo> --json number,title,url,headRefName,baseRefName,state,author,body,reviews,comments
-```
+**If called standalone (directly invoked by the user)**: Use the `mrum-ios-code-review-input-parser` skill's playbook to resolve the user's input. The input parser handles all input forms: PR numbers (bare, `#`-prefixed, quoted), ticket IDs (`DEMRUM-NNNN`), branch names, URLs, natural language, and ambiguous bare numbers. It will resolve, disambiguate, and get confirmation.
 
-### Given a branch name and repo:
-```bash
-gh pr list --repo <owner/repo> --head <branch> --json number,title,url,headRefName,state,author
-```
-- If multiple PRs are found, present them all and ask the user which one to focus on.
-- If exactly one is found, do NOT proceed automatically. First fetch its key metadata and present a confirmation prompt to the user showing:
-  - PR title and number
-  - Ticket number (extracted from title or branch name, if present)
-  - PR URL
-  - Overall checks status as a single rolled-up color (green if all checks pass, red if any check failed, yellow if checks are pending/in-progress — mirrors the status indicator next to the PR title on GitHub's PR list view). Derive this from `statusCheckRollup`.
-  - PR state (open/closed/merged)
-  Then ask: "Is this the PR you want to review?" and wait for confirmation before proceeding.
-- **If the PR is closed or merged**: Do NOT proceed with the full review. Inform the user that the PR is closed/merged and that reviewing comments is typically unnecessary for closed/merged PRs. Only continue if the user explicitly insists.
-- If none found, also try searching with `--state all` to include closed/merged PRs.
-
-### Given only a ticket number (e.g. DEMRUM-4775):
-Search for PRs that reference the ticket in their title or branch name:
-```bash
-gh pr list --repo <owner/repo> --search "<ticket>" --json number,title,url,headRefName,state,author
-```
-Also try:
-```bash
-gh pr list --repo <owner/repo> --state all --json number,title,url,headRefName,state,author | jq '[.[] | select(.title | test("<ticket>"; "i")) // select(.headRefName | test("<ticket>"; "i"))]'
-```
-- If the repo is not specified, check the current git remote: `git remote get-url origin`
-- If multiple PRs match, present them and ask for clarification.
-
-### Given only a PR URL:
-Extract the owner/repo and PR number from the URL and use `gh pr view`.
-
-### Fallback: If no repo is determinable:
-Ask the user for the repository.
+Once you have a confirmed PR target, note:
+- **If the PR is closed or merged**: Do NOT proceed with the full review. Inform the user and only continue if they explicitly insist.
+- The input parser's resolution record includes checks rollup, state, and local branch info.
 
 ## Step 2: Gather PR Data
 
