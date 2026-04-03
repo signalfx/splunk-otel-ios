@@ -57,5 +57,6 @@ echo ""
 xcodebuild -version
 
 # Print a prominent notice in the GitHub Actions log
-XCODE_VERSION=$(xcodebuild -version | head -n 1)
+XCODE_VERSION_OUTPUT=$(xcodebuild -version)
+XCODE_VERSION=$(echo "$XCODE_VERSION_OUTPUT" | head -n 1)
 echo "::notice::Selected Xcode version: $XCODE_VERSION ($(basename "$SELECTED_APP"))"
