@@ -13,9 +13,8 @@ jobs:
       scheme: ${{ steps.scheme.outputs.scheme }}
     steps:
       - uses: actions/checkout@v6
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
+      - name: Select latest Xcode
+        run: bash .github/actions/build-and-tests/scripts/select-xcode.sh
       - run: .github/actions/build-and-tests/scripts/neutralize-sdk.sh
       - name: Download platform SDKs
         run: .github/actions/build-and-tests/scripts/download-platforms.sh iOS tvOS
@@ -34,9 +33,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
+      - name: Select latest Xcode
+        run: bash .github/actions/build-and-tests/scripts/select-xcode.sh
 
       - run: echo "MD_APPLE_SDK_ROOT=" >> "$GITHUB_ENV"
 
@@ -77,7 +75,7 @@ jobs:
           echo "status=${code:-1}" >> "$GITHUB_OUTPUT"
 
       - name: Publish JUnit to Checks
-        uses: mikepenz/action-junit-report@v6
+        uses: mikepenz/action-junit-report@bccf2e31636835cf0874589931c4116687171386 # v6.4.0
         if: always()
         with:
           report_paths: reports/junit-${{ matrix.platform }}.xml
