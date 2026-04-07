@@ -630,57 +630,57 @@ struct SessionReplayBinaryRegistry {
     static let targets: [String: BinaryTargetInfo] = [
         "logger": BinaryTargetInfo(
             name: "CiscoLogger",
-            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.9/staticlib/cisco-logger-1.0.9.259.zip",
-            checksum: "1975de981a68d7edfe4113f4a943b3aa92c6e9c42ab804d11a2b20b3778af8b2",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.0/staticlib/cisco-logger-1.1.0.260.zip",
+            checksum: "8c84f845c958694c9e985b99e0ae241527fa2890ba6647585dad2be7d480a495",
             productName: "CiscoLogger",
             wrapperName: "CiscoLoggerWrapper"
         ),
         "encryptor": BinaryTargetInfo(
             name: "CiscoEncryption",
-            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.9/staticlib/cisco-encryption-1.0.9.259.zip",
-            checksum: "850ddd6deda5bc564169b10b2b2538abe6b976d2bad88be997969dc7d29e3996",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.0/staticlib/cisco-encryption-1.1.0.260.zip",
+            checksum: "c6f7c775d0d5a80f00b2a7bb02fbef7520719d34a6866f7704c70e0d5a84eca4",
             productName: "CiscoEncryption",
             wrapperName: "CiscoEncryptionWrapper"
         ),
         "swizzling": BinaryTargetInfo(
             name: "CiscoSwizzling",
-            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.9/staticlib/cisco-swizzling-1.0.9.259.zip",
-            checksum: "c0bf79d188f9635af0608704d148d21e8328e027a7c5c2b6e028d2373faa13ec",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.0/staticlib/cisco-swizzling-1.1.0.260.zip",
+            checksum: "0b39fc03d61d09b8c76a780dab52885ae6296fcde4b9dedc38ddcee17ebb9902",
             productName: "CiscoSwizzling",
             wrapperName: "CiscoSwizzlingWrapper"
         ),
         "interactions": BinaryTargetInfo(
             name: "CiscoInteractions",
-            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.9/staticlib/cisco-interactions-1.0.9.259.zip",
-            checksum: "5c2a5154cba68809c892f20c74e7d849d467ca7269123108cd3343ba7b7a1bf7",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.0/staticlib/cisco-interactions-1.1.0.260.zip",
+            checksum: "d067bf5f8f467b2f7af4c1efc73a51750b8bc40fa79de8eada963a5bb3fdd6b6",
             productName: "CiscoInteractions",
             wrapperName: "CiscoInteractionsWrapper"
         ),
         "diskStorage": BinaryTargetInfo(
             name: "CiscoDiskStorage",
-            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.9/staticlib/cisco-disk-storage-1.0.9.259.zip",
-            checksum: "f93110582a5a4df85ef76d739866d4d0a8cf2b0756223ca758d178564d0888a4",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.0/staticlib/cisco-disk-storage-1.1.0.260.zip",
+            checksum: "a0b085748223eefd936b17387108bff92e7b7ac3d346c504a7479620524351ca",
             productName: "CiscoDiskStorage",
             wrapperName: "CiscoDiskStorageWrapper"
         ),
         "sessionReplay": BinaryTargetInfo(
             name: "CiscoSessionReplay",
-            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.9/staticlib/cisco-session-replay-1.0.9.259.zip",
-            checksum: "d093ee3a3bdb26b3235f7e6e4edf21075b6a95bdbb6d2d51bf689f401fc7f045",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.0/staticlib/cisco-session-replay-1.1.0.260.zip",
+            checksum: "647d2a2cce06b664db6aeca414b47cca0f453c34214946b935456f664ffbe131",
             productName: "CiscoSessionReplay",
             wrapperName: "CiscoSessionReplayWrapper"
         ),
         "instanceManager": BinaryTargetInfo(
             name: "CiscoInstanceManager",
-            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.9/staticlib/cisco-instance-manager-1.0.9.259.zip",
-            checksum: "788a427ea62453cf26efbb89aecf97540b12404499fe4c1ff5625d4b40d666c4",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.0/staticlib/cisco-instance-manager-1.1.0.260.zip",
+            checksum: "67a889022b8b185f377ba0880dc95cfe188fad9ccdba29f69336a970ea615fa5",
             productName: "CiscoInstanceManager",
             wrapperName: "CiscoInstanceManagerWrapper"
         ),
         "runtimeCache": BinaryTargetInfo(
             name: "CiscoRuntimeCache",
-            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.0.9/staticlib/cisco-runtime-cache-1.0.9.259.zip",
-            checksum: "163904d61590e36bd3f01cb8529a4f6b9df38d5fadc08f44fb184efeb23e65b7",
+            url: "https://sdk.smartlook.com/cisco-session-replay/ios/1.1.0/staticlib/cisco-runtime-cache-1.1.0.260.zip",
+            checksum: "71de240bb7ceb6cc036e1f3cad71991d9d5336201e29ab58eac4cab728bc290e",
             productName: "CiscoRuntimeCache",
             wrapperName: "CiscoRuntimeCacheWrapper"
         )
