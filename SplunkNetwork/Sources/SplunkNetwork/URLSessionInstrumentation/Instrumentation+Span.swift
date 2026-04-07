@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -70,6 +70,7 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         .startSpan()
 
     addDataToSpan(url: url, method: method, length: length, span: span)
+    addCapturedRequestHeaders(from: request, to: span)
 
     return span
 }
@@ -104,6 +105,8 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
 
         let protocolVersion = determineHTTPProtocolVersion(httpResponse)
         span.clearAndSetAttribute(key: "http.protocol.version", value: protocolVersion)
+
+        addCapturedResponseHeaders(from: httpResponse, to: span)
     }
 
     if let error = task.error {
@@ -163,5 +166,41 @@ func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
     if let sharedState = NetworkInstrumentationManager.shared.getModule()?.sharedState {
         let sessionID: String = sharedState.sessionId
         span.clearAndSetAttribute(key: "session.id", value: sessionID)
+    }
+}
+
+/// Adds configured request headers as span attributes.
+///
+/// Only headers whose lowercased names appear in the module's `capturedRequestHeaders`
+/// set are captured. Each matching header is stored as `http.request.header.<lowercased-name>`.
+func addCapturedRequestHeaders(from request: URLRequest, to span: Span) {
+    let headerNames = NetworkInstrumentationManager.shared.getModule()?.getCapturedRequestHeaders() ?? []
+
+    guard !headerNames.isEmpty else {
+        return
+    }
+
+    for headerName in headerNames {
+        if let value = request.value(forHTTPHeaderField: headerName) {
+            span.clearAndSetAttribute(key: "http.request.header.\(headerName)", value: value)
+        }
+    }
+}
+
+/// Adds configured response headers as span attributes.
+///
+/// Only headers whose lowercased names appear in the module's `capturedResponseHeaders`
+/// set are captured. Each matching header is stored as `http.response.header.<lowercased-name>`.
+func addCapturedResponseHeaders(from response: HTTPURLResponse, to span: Span) {
+    let headerNames = NetworkInstrumentationManager.shared.getModule()?.getCapturedResponseHeaders() ?? []
+
+    guard !headerNames.isEmpty else {
+        return
+    }
+
+    for headerName in headerNames {
+        if let value = response.value(forHTTPHeaderField: headerName) {
+            span.clearAndSetAttribute(key: "http.response.header.\(headerName)", value: value)
+        }
     }
 }
