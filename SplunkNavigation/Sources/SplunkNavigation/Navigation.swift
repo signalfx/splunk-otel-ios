@@ -153,22 +153,10 @@ public final class Navigation: Sendable {
         case .viewDidLoad:
             await processShowStart(event: event)
 
-        case .viewDidAppear:
-            await processNavigationEnd(event: event)
-
-        case .viewDidDisappear:
-            await processNavigationEnd(event: event)
-
-        case .viewWillTransition:
+        case .viewWillTransition, .willTransitionToTraitCollection:
             await processTransitionStart(event: event)
 
-        case .viewDidTransition:
-            await processNavigationEnd(event: event)
-
-        case .willTransitionToTraitCollection:
-            await processTransitionStart(event: event)
-
-        case .didTransitionToTraitCollection:
+        case .viewDidAppear, .viewDidDisappear, .viewDidTransition, .didTransitionToTraitCollection:
             await processNavigationEnd(event: event)
 
         default:
