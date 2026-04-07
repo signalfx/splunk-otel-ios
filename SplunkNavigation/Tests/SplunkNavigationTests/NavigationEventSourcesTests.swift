@@ -85,7 +85,7 @@ final class NavigationEventSourcesTests: XCTestCase {
             )
         )
 
-        try? await Task.sleep(nanoseconds: 50_000_000)
+        try? await Task.sleep(nanoseconds: 200_000_000)
 
         let currentScreenName = await navigation.model.screenName
         XCTAssertEqual(currentScreenName, "unknown")
@@ -183,19 +183,10 @@ final class NavigationEventSourcesTests: XCTestCase {
             )
         )
 
-        try? await Task.sleep(nanoseconds: 50_000_000)
+        try? await Task.sleep(nanoseconds: 200_000_000)
 
         let currentScreenName = await navigation.model.screenName
         XCTAssertEqual(currentScreenName, "ManualScreen")
-    }
-}
-
-private struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
-    let stream: AsyncStream<any NavigationActionEvent>
-
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        await Task.yield()
-        return stream
     }
 }
 

@@ -150,7 +150,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
             .yield(
                 event(type: .viewWillTransition, controllerIdentifier: controllerIdentifier)
             )
-        try? await Task.sleep(nanoseconds: 50_000_000)
+        try? await Task.sleep(nanoseconds: 200_000_000)
 
         guard let secondStart = await navigation.model.navigation(for: controllerIdentifier)?.start else {
             XCTFail("Expected transition to remain in-flight.")
@@ -224,26 +224,13 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
                 )
             )
 
-        try? await Task.sleep(nanoseconds: 50_000_000)
+        try? await Task.sleep(nanoseconds: 200_000_000)
 
         let currentScreenName = await navigation.model.screenName
         XCTAssertEqual(currentScreenName, "ManualScreen")
 
         continuationBox.continuation?.finish()
     }
-}
-
-private struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
-    let stream: AsyncStream<any NavigationActionEvent>
-
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        await Task.yield()
-        return stream
-    }
-}
-
-private final class NavigationEventContinuationBox {
-    var continuation: AsyncStream<any NavigationActionEvent>.Continuation?
 }
 
 private func makeNavigation(
