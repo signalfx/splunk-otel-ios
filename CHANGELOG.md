@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+* Added optional support to capture network headers.
+
 ## [2.2.1] - 2026-03-19
 
 ### Added

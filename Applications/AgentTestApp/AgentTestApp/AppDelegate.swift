@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ limitations under the License.
 
 import OpenTelemetryApi
 import SplunkAgent
+import SplunkNetwork
 import UIKit
 
 @main
@@ -71,8 +72,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
             return modifiedSpan
         }
+        let networkConfig = NetworkInstrumentationConfiguration(
+            capturedRequestHeaders: ["Accept", "Content-Type", "X-Request-ID"],
+            capturedResponseHeaders: ["Content-Type", "X-Request-ID", "Server"]
+        )
+
         do {
-            _ = try SplunkRum.install(with: agentConfig)
+            _ = try SplunkRum.install(
+                with: agentConfig,
+                moduleConfigurations: [networkConfig]
+            )
         }
         catch {
             print("Unable to start the Splunk agent, error: \(error)")
