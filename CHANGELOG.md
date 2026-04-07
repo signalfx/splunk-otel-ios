@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Session Replay now captures text content in wireframes for UIKit applications.
+
 ## [2.2.1] - 2026-03-19
 
 ### Added
