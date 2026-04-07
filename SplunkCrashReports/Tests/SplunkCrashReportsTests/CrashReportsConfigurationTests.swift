@@ -17,6 +17,7 @@ limitations under the License.
 
 import XCTest
 
+@testable import SplunkCommon
 @testable import SplunkCrashReports
 
 final class CrashReportsConfigurationTests: XCTestCase {
@@ -34,9 +35,27 @@ final class CrashReportsConfigurationTests: XCTestCase {
     }
 
     func testConfigurationConformsToModuleConfiguration() {
-        let config = CrashReportsConfiguration(isEnabled: true)
+        // Compile-time conformance: this assignment fails to build if the protocol is not satisfied.
+        let config: any ModuleConfiguration = CrashReportsConfiguration(isEnabled: true)
 
-        // Verify it can be used as ModuleConfiguration
+        XCTAssertNotNil(config)
+    }
+
+    func testDefaultPropertyValueIsTrue() {
+        var config = CrashReportsConfiguration(isEnabled: false)
+
+        // Reset to the struct's declared default
+        config.isEnabled = true
+
         XCTAssertTrue(config.isEnabled)
+    }
+
+    func testConfigurationIsValueType() {
+        let original = CrashReportsConfiguration(isEnabled: true)
+        var copy = original
+        copy.isEnabled = false
+
+        XCTAssertTrue(original.isEnabled)
+        XCTAssertFalse(copy.isEnabled)
     }
 }
