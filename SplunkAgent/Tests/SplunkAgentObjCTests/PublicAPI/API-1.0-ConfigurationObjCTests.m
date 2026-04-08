@@ -41,7 +41,7 @@ limitations under the License.
     // Trace URL
     NSURLComponents *urlComponents = [[NSURLComponents alloc] initWithURL:traceURL resolvingAgainstBaseURL:NO];
     NSString *realm = [ConfigurationTestBuilderObjC realm];
-    NSString *expectedHost = [NSString stringWithFormat:@"rum-ingest.%@.signalfx.com", realm];
+    NSString *expectedHost = [NSString stringWithFormat:@"rum-ingest.%@.observability.splunkcloud.com", realm];
 
     XCTAssertTrue([urlComponents.scheme isEqualToString:@"https"]);
     XCTAssertTrue([urlComponents.host isEqualToString:expectedHost]);

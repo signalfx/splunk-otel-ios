@@ -211,7 +211,7 @@ final class API10SplunkRumBuilderTests: XCTestCase {
         let comps = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
 
         XCTAssertEqual(comps.scheme, "https")
-        XCTAssertEqual(comps.host, "rum-ingest.\(realm).signalfx.com")
+        XCTAssertEqual(comps.host, "rum-ingest.\(realm).observability.splunkcloud.com")
         XCTAssertEqual(comps.path, "/v1/traces")
 
         XCTAssertTrue(comps.queryItems?.isEmpty ?? true)
