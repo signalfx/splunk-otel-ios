@@ -209,7 +209,7 @@ ERROR: Could not resolve host
 ```
 - Verify your realm is correct (e.g., "us0", "eu0", "au0")
 - Check network connectivity and DNS resolution
-- Verify firewall allows outbound HTTPS connections to api.{realm}.signalfx.com
+- Verify firewall allows outbound HTTPS connections to api.{realm}.observability.splunkcloud.com
 
 #### Build Output Warning 
 ```
@@ -224,7 +224,7 @@ Run script build phase 'Upload dSYMs to Splunk RUM' will be run during every bui
   - Use CI/CD secret management for automated builds
   - Never commit tokens to source control
 
-- **Network Access:** The script requires outbound HTTPS access to `api.{realm}.signalfx.com`
+- **Network Access:** The script requires outbound HTTPS access to `api.{realm}.observability.splunkcloud.com`
 - **Temporary Files:** The script creates temporary ZIP files during upload and cleans them up automatically
 
 ### Performance Impact

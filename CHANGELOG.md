@@ -7,6 +7,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+* Updated endpoint from signalfx.com to observability.splunkcloud.com
 * Added optional support to capture network headers.
 
 ## [2.2.1] - 2026-03-19
