@@ -48,7 +48,7 @@ set -euo pipefail
 readonly SCRIPT_NAME="$(basename "$0")"
 readonly DEFAULT_TIMEOUT=300
 readonly USER_AGENT="splunk-ios-dsym-uploader/1.0"
-readonly API_ENDPOINT_TEMPLATE="https://api.%s.signalfx.com/v2/rum-mfm/dsym"
+readonly API_ENDPOINT_TEMPLATE="https://api.%s.observability.splunkcloud.com/v2/rum-mfm/dsym"
 
 # Global variables
 DSYM_DIRECTORY=""

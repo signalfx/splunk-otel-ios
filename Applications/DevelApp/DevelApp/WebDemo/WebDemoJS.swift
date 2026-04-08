@@ -20,7 +20,7 @@ public struct WebDemoJS {
     /// Currently disabled in the demo pending better infrastructure for handling tokens vis-a-vis git commits.
     public static func brumScript() -> String {
         """
-        <script src="https://cdn.signalfx.com/o11y-gdi-rum/latest/splunk-otel-web.js" crossorigin="anonymous">
+        <script src="https://cdn.observability.splunkcloud.com/o11y-gdi-rum/latest/splunk-otel-web.js" crossorigin="anonymous">
         </script>
         <script>
             SplunkRum.init(
