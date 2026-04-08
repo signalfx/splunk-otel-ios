@@ -7,7 +7,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+<<<<<<< DEMRUM-3468-Expose-Session-Change-Notification
 * Added public references to sessionWillResetNotification and sessionDidResetNotification
+=======
+* Updated endpoint from signalfx.com to observability.splunkcloud.com
+>>>>>>> develop
 * Added optional support to capture network headers.
 
 ## [2.2.1] - 2026-03-19
