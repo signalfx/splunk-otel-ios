@@ -7,6 +7,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+* Added public references to sessionWillResetNotification and sessionDidResetNotification
 * Updated endpoint from signalfx.com to observability.splunkcloud.com
 * Added optional support to capture network headers.
 

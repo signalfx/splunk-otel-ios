@@ -38,9 +38,7 @@ struct SessionReplayDemoView: View {
     private var agentStatus = SplunkRum.shared.state.status
 
     let sessionPublisher = NotificationCenter.default
-        .publisher(
-            for: NSNotification.Name("com.splunk.rum.session-did-reset")
-        )
+        .publisher(for: Session.sessionDidResetNotification)
         .receive(on: DispatchQueue.main)
 
 
