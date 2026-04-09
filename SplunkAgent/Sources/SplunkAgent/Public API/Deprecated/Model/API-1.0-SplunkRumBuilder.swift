@@ -96,7 +96,7 @@ public class SplunkRumBuilder {
             """
     )
     public init(realm: String, rumAuth: String) {
-        beaconUrl = "https://rum-ingest.\(realm).signalfx.com/v1/rum"
+        beaconUrl = "https://rum-ingest.\(realm).observability.splunkcloud.com/v1/rum"
         self.rumAuth = rumAuth
 
         endpointConfiguration = EndpointConfiguration(realm: realm, rumAccessToken: rumAuth)

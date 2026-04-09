@@ -42,7 +42,7 @@ class AgentDataSource: ObservableObject {
     // MARK: - Session publisher for handling session resets
 
     private let sessionPublisher = NotificationCenter.default
-        .publisher(for: NSNotification.Name("com.splunk.rum.session-did-reset"))
+        .publisher(for: Session.sessionDidResetNotification)
         .receive(on: DispatchQueue.main)
 
     private var cancellables: Set<AnyCancellable> = []

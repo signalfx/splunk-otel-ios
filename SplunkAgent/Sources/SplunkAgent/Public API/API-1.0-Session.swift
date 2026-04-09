@@ -85,6 +85,52 @@ extension Session {
 
 extension Session {
 
+    // MARK: - Notifications
+
+    /// Posted before the current session is reset.
+    ///
+    /// The notification `object` is a `String` containing the session ID that is about to be closed.
+    /// There is no `userInfo` dictionary.
+    ///
+    /// This notification is posted when the session is rotated due to inactivity timeout or
+    /// maximum session length being exceeded. It is **not** posted when the initial session is
+    /// created at startup or when the app terminates.
+    ///
+    /// ```swift
+    /// NotificationCenter.default.addObserver(
+    ///     forName: Session.sessionWillResetNotification,
+    ///     object: nil,
+    ///     queue: nil
+    /// ) { notification in
+    ///     let closingSessionId = notification.object as? String
+    /// }
+    /// ```
+    public static let sessionWillResetNotification = DefaultSession.sessionWillResetNotification
+
+    /// Posted after the current session has been reset.
+    ///
+    /// The notification `object` is a `String` containing the session ID of the new session.
+    /// There is no `userInfo` dictionary.
+    ///
+    /// This notification is posted when the session is rotated due to inactivity timeout or
+    /// maximum session length being exceeded. It is **not** posted when the initial session is
+    /// created at startup or when the app terminates.
+    ///
+    /// ```swift
+    /// NotificationCenter.default.addObserver(
+    ///     forName: Session.sessionDidResetNotification,
+    ///     object: nil,
+    ///     queue: nil
+    /// ) { notification in
+    ///     let newSessionId = notification.object as? String
+    /// }
+    /// ```
+    public static let sessionDidResetNotification = DefaultSession.sessionDidResetNotification
+}
+
+
+extension Session {
+
     // MARK: - Identifier
 
     /// Identification of recorded session in given time.
