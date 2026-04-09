@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans.
+* Added public references to sessionWillResetNotification and sessionDidResetNotification
 * Updated endpoint from signalfx.com to observability.splunkcloud.com
 * Added optional support to capture network headers.
 
