@@ -27,7 +27,3 @@ struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
         return stream
     }
 }
-
-final class NavigationEventContinuationBox: @unchecked Sendable {
-    var continuation: AsyncStream<any NavigationActionEvent>.Continuation?
-}

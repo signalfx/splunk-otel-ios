@@ -27,89 +27,72 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
     // MARK: - Transition processing
 
     func testViewDidDisappearFinalizesPendingShowNavigation() async {
-        let continuationBox = NavigationEventContinuationBox()
-        let navigation = makeNavigation(continuationBox: continuationBox)
+        let (navigation, continuation) = makeNavigation()
         let controllerIdentifier = ObjectIdentifier(NSString())
 
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
-        let streamReady = await waitUntil { continuationBox.continuation != nil }
-        XCTAssertTrue(streamReady)
-
-        continuationBox.continuation?
-            .yield(
-                event(type: .viewDidLoad, controllerIdentifier: controllerIdentifier)
-            )
+        continuation.yield(
+            event(type: .viewDidLoad, controllerIdentifier: controllerIdentifier)
+        )
         let showStarted = await waitUntil {
             await navigation.model.navigation(for: controllerIdentifier)?.type == .show
         }
         XCTAssertTrue(showStarted)
 
-        continuationBox.continuation?
-            .yield(
-                event(type: .viewDidDisappear, controllerIdentifier: controllerIdentifier)
-            )
+        continuation.yield(
+            event(type: .viewDidDisappear, controllerIdentifier: controllerIdentifier)
+        )
         let showFinalized = await waitUntil {
             await navigation.model.navigation(for: controllerIdentifier) == nil
         }
         XCTAssertTrue(showFinalized)
 
-        continuationBox.continuation?.finish()
+        continuation.finish()
     }
 
     func testViewWillAndDidTransitionStartAndFinalizeTransition() async {
-        let continuationBox = NavigationEventContinuationBox()
-        let navigation = makeNavigation(continuationBox: continuationBox)
+        let (navigation, continuation) = makeNavigation()
         let controllerIdentifier = ObjectIdentifier(NSString())
 
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
-        let streamReady = await waitUntil { continuationBox.continuation != nil }
-        XCTAssertTrue(streamReady)
-
-        continuationBox.continuation?
-            .yield(
-                event(type: .viewWillTransition, controllerIdentifier: controllerIdentifier)
-            )
+        continuation.yield(
+            event(type: .viewWillTransition, controllerIdentifier: controllerIdentifier)
+        )
         let transitionStarted = await waitUntil {
             await navigation.model.navigation(for: controllerIdentifier)?.type == .transition
         }
         XCTAssertTrue(transitionStarted)
 
-        continuationBox.continuation?
-            .yield(
-                event(type: .viewDidTransition, controllerIdentifier: controllerIdentifier)
-            )
+        continuation.yield(
+            event(type: .viewDidTransition, controllerIdentifier: controllerIdentifier)
+        )
         let transitionFinalized = await waitUntil {
             await navigation.model.navigation(for: controllerIdentifier) == nil
         }
         XCTAssertTrue(transitionFinalized)
 
-        continuationBox.continuation?.finish()
+        continuation.finish()
     }
 
     func testViewWillTransitionUpdatesActiveScreenAndStream() async {
-        let continuationBox = NavigationEventContinuationBox()
-        let navigation = makeNavigation(continuationBox: continuationBox)
+        let (navigation, continuation) = makeNavigation()
         var screenNameIterator = navigation.screenNameStream.makeAsyncIterator()
         let controllerIdentifier = ObjectIdentifier(NSString())
 
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
-        let streamReady = await waitUntil { continuationBox.continuation != nil }
-        XCTAssertTrue(streamReady)
-
-        continuationBox.continuation?
-            .yield(
-                event(
-                    type: .viewWillTransition,
-                    controllerIdentifier: controllerIdentifier,
-                    controllerTypeName: "TransitionViewController"
-                )
+        continuation.yield(
+            event(
+                type: .viewWillTransition,
+                controllerIdentifier: controllerIdentifier,
+                controllerTypeName: "TransitionViewController"
             )
+        )
 
         let didUpdateActiveScreen = await waitUntil {
             await navigation.model.screenName == "TransitionViewController"
@@ -119,24 +102,19 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         let emittedScreenName = await screenNameIterator.next()
         XCTAssertEqual(emittedScreenName, "TransitionViewController")
 
-        continuationBox.continuation?.finish()
+        continuation.finish()
     }
 
     func testTransitionStartReplacesOverlappingWillSignals() async {
-        let continuationBox = NavigationEventContinuationBox()
-        let navigation = makeNavigation(continuationBox: continuationBox)
+        let (navigation, continuation) = makeNavigation()
         let controllerIdentifier = ObjectIdentifier(NSString())
 
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
-        let streamReady = await waitUntil { continuationBox.continuation != nil }
-        XCTAssertTrue(streamReady)
-
-        continuationBox.continuation?
-            .yield(
-                event(type: .willTransitionToTraitCollection, controllerIdentifier: controllerIdentifier)
-            )
+        continuation.yield(
+            event(type: .willTransitionToTraitCollection, controllerIdentifier: controllerIdentifier)
+        )
         let initialTransitionStarted = await waitUntil {
             await navigation.model.navigation(for: controllerIdentifier)?.type == .transition
         }
@@ -146,10 +124,9 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
             return
         }
 
-        continuationBox.continuation?
-            .yield(
-                event(type: .viewWillTransition, controllerIdentifier: controllerIdentifier)
-            )
+        continuation.yield(
+            event(type: .viewWillTransition, controllerIdentifier: controllerIdentifier)
+        )
         try? await Task.sleep(nanoseconds: 200_000_000)
 
         guard let secondStart = await navigation.model.navigation(for: controllerIdentifier)?.start else {
@@ -160,12 +137,11 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         XCTAssertNotEqual(firstStart, secondStart)
         XCTAssertGreaterThanOrEqual(secondStart, firstStart)
 
-        continuationBox.continuation?.finish()
+        continuation.finish()
     }
 
     func testTransitionUpdateOverridesManualWhenEnabled() async {
-        let continuationBox = NavigationEventContinuationBox()
-        let navigation = makeNavigation(continuationBox: continuationBox)
+        let (navigation, continuation) = makeNavigation()
         let controllerIdentifier = ObjectIdentifier(NSString())
 
         navigation.preferences.enableAutomatedTracking = true
@@ -178,29 +154,24 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
 
         navigation.startDetection()
 
-        let streamReady = await waitUntil { continuationBox.continuation != nil }
-        XCTAssertTrue(streamReady)
-
-        continuationBox.continuation?
-            .yield(
-                event(
-                    type: .viewWillTransition,
-                    controllerIdentifier: controllerIdentifier,
-                    controllerTypeName: "TransitionViewController"
-                )
+        continuation.yield(
+            event(
+                type: .viewWillTransition,
+                controllerIdentifier: controllerIdentifier,
+                controllerTypeName: "TransitionViewController"
             )
+        )
 
         let didApplyTransitionScreen = await waitUntil {
             await navigation.model.screenName == "TransitionViewController"
         }
         XCTAssertTrue(didApplyTransitionScreen)
 
-        continuationBox.continuation?.finish()
+        continuation.finish()
     }
 
     func testTransitionUpdateDoesNotOverrideManualWhenDisabled() async {
-        let continuationBox = NavigationEventContinuationBox()
-        let navigation = makeNavigation(continuationBox: continuationBox)
+        let (navigation, continuation) = makeNavigation()
         let controllerIdentifier = ObjectIdentifier(NSString())
 
         navigation.track(screen: "ManualScreen")
@@ -212,37 +183,33 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
 
         navigation.startDetection()
 
-        let streamReady = await waitUntil { continuationBox.continuation != nil }
-        XCTAssertTrue(streamReady)
-
-        continuationBox.continuation?
-            .yield(
-                event(
-                    type: .viewWillTransition,
-                    controllerIdentifier: controllerIdentifier,
-                    controllerTypeName: "TransitionViewController"
-                )
+        continuation.yield(
+            event(
+                type: .viewWillTransition,
+                controllerIdentifier: controllerIdentifier,
+                controllerTypeName: "TransitionViewController"
             )
+        )
 
         try? await Task.sleep(nanoseconds: 200_000_000)
 
         let currentScreenName = await navigation.model.screenName
         XCTAssertEqual(currentScreenName, "ManualScreen")
 
-        continuationBox.continuation?.finish()
+        continuation.finish()
     }
 }
 
-private func makeNavigation(
-    continuationBox: NavigationEventContinuationBox
-) -> Navigation {
-    let stream = AsyncStream<any NavigationActionEvent> { continuation in
-        continuationBox.continuation = continuation
-    }
+private func makeNavigation() -> (Navigation, AsyncStream<any NavigationActionEvent>.Continuation) {
+    let (stream, continuation) = AsyncStream.makeStream(
+        of: (any NavigationActionEvent).self
+    )
 
-    return Navigation(
+    let navigation = Navigation(
         navigationEventStreamProvider: MockNavigationEventStreamProvider(stream: stream)
     )
+
+    return (navigation, continuation)
 }
 
 private func event(
