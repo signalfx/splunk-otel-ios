@@ -62,7 +62,7 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
 
     // MARK: - Initialization
 
-    public required init?(
+    public required init(
         with sessionReplayEndpoint: URL?,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
@@ -70,12 +70,6 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
         debugEnabled: Bool,
         accessToken: String? = nil
     ) {
-        // Session replay requires an endpoint - return nil if not provided
-        // (unlike traces, session replay data shouldn't be cached indefinitely)
-        guard let sessionReplayEndpoint else {
-            return nil
-        }
-
         let configuration = OTLPExporterConfiguration()
         let envVarHeaders: [(String, String)] = []
         var headers: [String: String] = [:]
@@ -84,7 +78,8 @@ public class OTLPSessionReplayEventProcessor: LogEventProcessor {
             headers["X-SF-Token"] = accessToken
         }
 
-        // Initialize background exporter
+        // When sessionReplayEndpoint is nil the exporter operates in pending
+        // mode — data is cached to disk and flushed once setEndpoint() is called.
         backgroundLogExporter = OTLPBackgroundHTTPLogExporterBinary(
             endpoint: sessionReplayEndpoint,
             config: configuration,

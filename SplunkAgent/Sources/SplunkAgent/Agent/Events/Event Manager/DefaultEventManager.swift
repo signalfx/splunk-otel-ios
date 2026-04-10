@@ -36,7 +36,7 @@ class DefaultEventManager: AgentEventManager {
     /// Container for event processors.
     struct Processors {
         let logEventProcessor: LogEventProcessor
-        let sessionReplayProcessor: OTLPSessionReplayEventProcessor?
+        let sessionReplayProcessor: OTLPSessionReplayEventProcessor
         let traceProcessor: OTLPTraceProcessor
     }
 
@@ -51,7 +51,8 @@ class DefaultEventManager: AgentEventManager {
     private let storedLogEventProcessor: LogEventProcessor
 
     /// Session Replay processor (stored as concrete type for endpoint updates).
-    private var storedSessionReplayProcessor: OTLPSessionReplayEventProcessor?
+    /// Always created at init — operates in pending mode when no endpoint is configured.
+    private var storedSessionReplayProcessor: OTLPSessionReplayEventProcessor
 
     /// Trace processor (stored as concrete type for endpoint updates).
     private let storedTraceProcessor: OTLPTraceProcessor
@@ -71,9 +72,8 @@ class DefaultEventManager: AgentEventManager {
     // MARK: - Internal properties
 
     /// Session Replay processor accessor for endpoint updates.
-    var sessionReplayProcessor: OTLPSessionReplayEventProcessor? {
-        get { storedSessionReplayProcessor }
-        set { storedSessionReplayProcessor = newValue }
+    var sessionReplayProcessor: OTLPSessionReplayEventProcessor {
+        storedSessionReplayProcessor
     }
 
     var sessionReplayIndexer: EventIndexer
@@ -167,9 +167,7 @@ class DefaultEventManager: AgentEventManager {
     }
 
     private func publishSessionReplay(data: Data, metadata: Metadata, completion: @escaping (Bool) -> Void) {
-        guard
-            let sessionReplayProcessor,
-            let sessionId = agent.session.sessionId(for: metadata.timestamp)
+        guard let sessionId = agent.session.sessionId(for: metadata.timestamp)
         else {
             completion(false)
 
