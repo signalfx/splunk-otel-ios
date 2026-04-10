@@ -51,6 +51,7 @@ class DefaultEventManager: AgentEventManager {
     private let storedLogEventProcessor: LogEventProcessor
 
     /// Session Replay processor (stored as concrete type for endpoint updates).
+    ///
     /// Always created at init — operates in pending mode when no endpoint is configured.
     private var storedSessionReplayProcessor: OTLPSessionReplayEventProcessor
 
