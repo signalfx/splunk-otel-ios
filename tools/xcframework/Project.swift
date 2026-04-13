@@ -388,6 +388,7 @@ let project = Project(
                 mod("SplunkCommon"),
                 dep("CiscoSessionReplay"),
                 // Transitive: CiscoSessionReplay's swiftinterface imports these
+                dep("CiscoCommon"),
                 dep("CiscoInteractions"),
                 dep("CiscoSwizzling"),
                 dep("CiscoInstanceManager"),
