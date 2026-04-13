@@ -170,7 +170,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         XCTAssertEqual(mockContentController?.addUserScriptCallCount, 1, "User script should be added only once per webview.")
     }
 
-    func testMessageHandler_whenSessionIdChanges_repliesWithNewSessionId() throws {
+    func testMessageHandler_whenSessionIdChanges_repliesWithNewSessionId() async throws {
         guard #available(iOS 14.0, *) else {
             throw XCTSkip("WKScriptMessageHandlerWithReply requires iOS 14+")
         }
@@ -185,25 +185,31 @@ final class WebViewInstrumentationTests: XCTestCase {
         let mockMessage = MockWKScriptMessage(name: "SplunkRumNativeUpdate", body: [:])
 
         // First call
-        let expectation1 = XCTestExpectation(description: "Reply handler should be called with initial session ID")
-        let replyHandler1: @MainActor @Sendable (Any?, String?) -> Void = { reply, _ in
-            let sessionId = (reply as? [String: String])?["sessionId"]
-            XCTAssertEqual(sessionId, initialSessionId)
-            expectation1.fulfill()
+        let reply1: [String: Any] = try await withCheckedThrowingContinuation { continuation in
+            let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+                if let dict = reply as? [String: Any] {
+                    continuation.resume(returning: dict)
+                } else {
+                    continuation.resume(throwing: XCTestError(.failureWhileWaiting, userInfo: ["error": error ?? "nil reply"]))
+                }
+            }
+            webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler)
         }
-        webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler1)
-        wait(for: [expectation1], timeout: 1.0)
+        XCTAssertEqual(reply1["sessionId"] as? String, initialSessionId)
 
         // Session ID changes and handler is called again
         mockAgentSharedState.updateSessionId(updatedSessionId)
-        let expectation2 = XCTestExpectation(description: "Reply handler should be called with updated session ID")
-        let replyHandler2: @MainActor @Sendable (Any?, String?) -> Void = { reply, _ in
-            let sessionId = (reply as? [String: String])?["sessionId"]
-            XCTAssertEqual(sessionId, updatedSessionId)
-            expectation2.fulfill()
+        let reply2: [String: Any] = try await withCheckedThrowingContinuation { continuation in
+            let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+                if let dict = reply as? [String: Any] {
+                    continuation.resume(returning: dict)
+                } else {
+                    continuation.resume(throwing: XCTestError(.failureWhileWaiting, userInfo: ["error": error ?? "nil reply"]))
+                }
+            }
+            webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler)
         }
-        webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler2)
-        wait(for: [expectation2], timeout: 1.0)
+        XCTAssertEqual(reply2["sessionId"] as? String, updatedSessionId)
     }
 
 
@@ -250,10 +256,32 @@ final class WebViewInstrumentationTests: XCTestCase {
         XCTAssertTrue(script.contains("window.webkit &&"), "JS should use explicit guards for WebKit access")
     }
 
+    func testJavascriptContent_containsSessionMetadata_whenAvailable() throws {
+        let mockWebView = try XCTUnwrap(mockWebView)
+        let mockAgentSharedState = try XCTUnwrap(mockAgentSharedState)
+        let expectedMetadata = "eyJzZXNzaW9uSWQiOiJ0ZXN0In0="
+        mockAgentSharedState.updateSessionMetadata(expectedMetadata)
+
+        webViewInstrumentation?.injectSessionId(into: mockWebView)
+
+        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        XCTAssertTrue(script.contains("nativeSessionMetadata: '\(expectedMetadata)'"), "Injected script must contain the session metadata")
+    }
+
+    func testJavascriptContent_containsNullSessionMetadata_whenUnavailable() throws {
+        let mockWebView = try XCTUnwrap(mockWebView)
+        // sessionMetadata is nil by default in MockAgentSharedState
+
+        webViewInstrumentation?.injectSessionId(into: mockWebView)
+
+        let script = mockWebView.lastEvaluatedJavaScript ?? ""
+        XCTAssertTrue(script.contains("nativeSessionMetadata: null"), "Injected script must set nativeSessionMetadata to null when unavailable")
+    }
+
 
     // MARK: - Message Handler Tests
 
-    func testMessageHandler_whenSessionIdIsValid_repliesWithSessionId() throws {
+    func testMessageHandler_whenSessionIdIsValid_repliesWithSessionId() async throws {
         guard #available(iOS 14.0, *) else {
             throw XCTSkip("WKScriptMessageHandlerWithReply requires iOS 14+")
         }
@@ -264,26 +292,48 @@ final class WebViewInstrumentationTests: XCTestCase {
         let expectedSessionId = "valid-session-id-for-reply"
         mockAgentSharedState.updateSessionId(expectedSessionId)
         let mockMessage = MockWKScriptMessage(name: "SplunkRumNativeUpdate", body: [:])
-        let expectation = XCTestExpectation(description: "Reply handler should be called with session ID")
 
-        let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
-            XCTAssertNil(error)
-            XCTAssertNotNil(reply)
-            guard let replyDict = reply as? [String: String] else {
-                XCTFail("Reply should be a dictionary")
-                return
+        let reply: [String: Any] = try await withCheckedThrowingContinuation { continuation in
+            let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+                if let dict = reply as? [String: Any] {
+                    continuation.resume(returning: dict)
+                } else {
+                    continuation.resume(throwing: XCTestError(.failureWhileWaiting, userInfo: ["error": error ?? "nil reply"]))
+                }
             }
-
-            XCTAssertEqual(replyDict["sessionId"], expectedSessionId)
-            expectation.fulfill()
+            webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler)
         }
 
-        webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler)
-
-        wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(reply["sessionId"] as? String, expectedSessionId)
     }
 
-    func testMessageHandler_whenSharedStateIsNil_repliesWithError() throws {
+    func testMessageHandler_whenSessionMetadataIsAvailable_includesItInReply() async throws {
+        guard #available(iOS 14.0, *) else {
+            throw XCTSkip("WKScriptMessageHandlerWithReply requires iOS 14+")
+        }
+
+        let mockWebView = try XCTUnwrap(mockWebView)
+        let mockAgentSharedState = try XCTUnwrap(mockAgentSharedState)
+        let webViewInstrumentation = try XCTUnwrap(webViewInstrumentation)
+        let expectedMetadata = "eyJzZXNzaW9uSWQiOiJ0ZXN0In0="
+        mockAgentSharedState.updateSessionMetadata(expectedMetadata)
+        let mockMessage = MockWKScriptMessage(name: "SplunkRumNativeUpdate", body: [:])
+
+        let reply: [String: Any] = try await withCheckedThrowingContinuation { continuation in
+            let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+                if let dict = reply as? [String: Any] {
+                    continuation.resume(returning: dict)
+                } else {
+                    continuation.resume(throwing: XCTestError(.failureWhileWaiting, userInfo: ["error": error ?? "nil reply"]))
+                }
+            }
+            webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler)
+        }
+
+        XCTAssertEqual(reply["sessionMetadata"] as? String, expectedMetadata)
+    }
+
+    func testMessageHandler_whenSharedStateIsNil_repliesWithError() async throws {
         guard #available(iOS 14.0, *) else {
             throw XCTSkip("WKScriptMessageHandlerWithReply requires iOS 14+")
         }
@@ -292,17 +342,15 @@ final class WebViewInstrumentationTests: XCTestCase {
         let webViewInstrumentation = try XCTUnwrap(webViewInstrumentation)
         webViewInstrumentation.sharedState = nil
         let mockMessage = MockWKScriptMessage(name: "SplunkRumNativeUpdate", body: [:])
-        let expectation = XCTestExpectation(description: "Reply handler should be called with an error")
 
-        let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
-            XCTAssertNil(reply)
-            XCTAssertNotNil(error)
-            XCTAssertEqual(error, "Native Session ID not available")
-            expectation.fulfill()
+        let (reply, error): (Any?, String?) = await withCheckedContinuation { continuation in
+            let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+                continuation.resume(returning: (reply, error))
+            }
+            webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler)
         }
 
-        webViewInstrumentation.userContentController(mockWebView.configuration.userContentController, didReceive: mockMessage, replyHandler: replyHandler)
-
-        wait(for: [expectation], timeout: 1.0)
+        XCTAssertNil(reply)
+        XCTAssertEqual(error, "Native Session ID not available")
     }
 }

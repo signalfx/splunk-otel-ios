@@ -21,6 +21,7 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
         const staleAfterDurationMs = 5000;
         const self = {
             cachedSessionId: __SESSION_ID__,
+            nativeSessionMetadata: __SESSION_METADATA__,
             _isInitialized: false,
             _lastCheckTime: Date.now(),
             _updateInProgress: false,

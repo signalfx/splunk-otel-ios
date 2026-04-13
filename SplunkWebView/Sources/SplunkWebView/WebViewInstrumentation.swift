@@ -110,6 +110,7 @@ public final class WebViewInstrumentation: NSObject {
 
             let javaScript = WebViewBridgeScript.generate(
                 sessionId: sessionId,
+                sessionMetadata: sharedState?.sessionMetadata,
                 handlerName: Self.handlerName
             )
 
@@ -178,7 +179,11 @@ public final class WebViewInstrumentation: NSObject {
         ) {
             // hint: parse message.body["action"] here if you need to add features
             if let sessionId = sharedState?.sessionId {
-                replyHandler(["sessionId": sessionId], nil)
+                var reply: [String: Any] = ["sessionId": sessionId]
+                if let sessionMetadata = sharedState?.sessionMetadata {
+                    reply["sessionMetadata"] = sessionMetadata
+                }
+                replyHandler(reply, nil)
             }
             else {
                 replyHandler(nil, "Native Session ID not available")

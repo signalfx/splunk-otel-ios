@@ -27,6 +27,12 @@ public protocol AgentSharedState: AnyObject, Sendable {
     /// Identification of the current session at the time of the creation of this state.
     var sessionId: String { get }
 
+    /// Session metadata serialized as a Base64-encoded JSON string.
+    ///
+    /// The returned value can be used to transfer a session from one agent to another.
+    /// Returns `nil` if the metadata cannot be serialized.
+    var sessionMetadata: String? { get }
+
     /// Agent version.
     var agentVersion: String { get }
 
