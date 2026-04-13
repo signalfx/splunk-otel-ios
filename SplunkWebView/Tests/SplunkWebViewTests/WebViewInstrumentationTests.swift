@@ -189,7 +189,8 @@ final class WebViewInstrumentationTests: XCTestCase {
             let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
                 if let dict = reply as? [String: Any] {
                     continuation.resume(returning: dict)
-                } else {
+                }
+                else {
                     continuation.resume(throwing: XCTestError(.failureWhileWaiting, userInfo: ["error": error ?? "nil reply"]))
                 }
             }
@@ -203,7 +204,8 @@ final class WebViewInstrumentationTests: XCTestCase {
             let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
                 if let dict = reply as? [String: Any] {
                     continuation.resume(returning: dict)
-                } else {
+                }
+                else {
                     continuation.resume(throwing: XCTestError(.failureWhileWaiting, userInfo: ["error": error ?? "nil reply"]))
                 }
             }
@@ -297,7 +299,8 @@ final class WebViewInstrumentationTests: XCTestCase {
             let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
                 if let dict = reply as? [String: Any] {
                     continuation.resume(returning: dict)
-                } else {
+                }
+                else {
                     continuation.resume(throwing: XCTestError(.failureWhileWaiting, userInfo: ["error": error ?? "nil reply"]))
                 }
             }
@@ -323,7 +326,8 @@ final class WebViewInstrumentationTests: XCTestCase {
             let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
                 if let dict = reply as? [String: Any] {
                     continuation.resume(returning: dict)
-                } else {
+                }
+                else {
                     continuation.resume(throwing: XCTestError(.failureWhileWaiting, userInfo: ["error": error ?? "nil reply"]))
                 }
             }

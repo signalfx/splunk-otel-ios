@@ -45,7 +45,8 @@ enum WebViewBridgeScript {
     /// - Returns: A fully interpolated JavaScript string ready for injection.
     static func generate(sessionId: String, sessionMetadata: String?, handlerName: String) -> String {
         let metadataLiteral = sessionMetadata.map { "'\($0)'" } ?? "null"
-        return scriptTemplate
+        return
+            scriptTemplate
             .replacingOccurrences(of: "__SESSION_ID__", with: "'\(sessionId)'")
             .replacingOccurrences(of: "__SESSION_METADATA__", with: metadataLiteral)
             .replacingOccurrences(of: "__HANDLER_NAME__", with: handlerName)
