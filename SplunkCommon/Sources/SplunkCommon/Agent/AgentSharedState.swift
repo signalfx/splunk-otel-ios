@@ -39,3 +39,11 @@ public protocol AgentSharedState: AnyObject, Sendable {
     /// Returns application state for the given timestamp.
     func applicationState(for timestamp: Date) -> String?
 }
+
+extension AgentSharedState {
+
+    /// Default implementation returns `nil`; conformers may override to provide metadata.
+    public var sessionMetadata: String? {
+        nil
+    }
+}

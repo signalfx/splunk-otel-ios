@@ -187,6 +187,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         // First call
         let reply1: [String: Any] = try await withCheckedThrowingContinuation { continuation in
             let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+                XCTAssertNil(error)
                 if let dict = reply as? [String: Any] {
                     continuation.resume(returning: dict)
                 }
@@ -202,6 +203,7 @@ final class WebViewInstrumentationTests: XCTestCase {
         mockAgentSharedState.updateSessionId(updatedSessionId)
         let reply2: [String: Any] = try await withCheckedThrowingContinuation { continuation in
             let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+                XCTAssertNil(error)
                 if let dict = reply as? [String: Any] {
                     continuation.resume(returning: dict)
                 }
@@ -297,6 +299,7 @@ final class WebViewInstrumentationTests: XCTestCase {
 
         let reply: [String: Any] = try await withCheckedThrowingContinuation { continuation in
             let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+                XCTAssertNil(error)
                 if let dict = reply as? [String: Any] {
                     continuation.resume(returning: dict)
                 }
@@ -324,6 +327,7 @@ final class WebViewInstrumentationTests: XCTestCase {
 
         let reply: [String: Any] = try await withCheckedThrowingContinuation { continuation in
             let replyHandler: @MainActor @Sendable (Any?, String?) -> Void = { reply, error in
+                XCTAssertNil(error)
                 if let dict = reply as? [String: Any] {
                     continuation.resume(returning: dict)
                 }

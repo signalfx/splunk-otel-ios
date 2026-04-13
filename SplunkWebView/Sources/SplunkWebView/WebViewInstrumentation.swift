@@ -179,10 +179,10 @@ public final class WebViewInstrumentation: NSObject {
         ) {
             // hint: parse message.body["action"] here if you need to add features
             if let sessionId = sharedState?.sessionId {
-                var reply: [String: Any] = ["sessionId": sessionId]
-                if let sessionMetadata = sharedState?.sessionMetadata {
-                    reply["sessionMetadata"] = sessionMetadata
-                }
+                let reply: [String: Any] = [
+                    "sessionId": sessionId,
+                    "sessionMetadata": sharedState?.sessionMetadata ?? NSNull()
+                ]
                 replyHandler(reply, nil)
             }
             else {
