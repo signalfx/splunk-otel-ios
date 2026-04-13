@@ -74,21 +74,13 @@ extension SplunkRum {
 
     // MARK: - Session Replay
 
-    /// Perform operations specific to the SessionReplay module.
+    /// Evaluates Session Replay configuration and sampling, then sets the appropriate proxy.
     ///
     /// The proxy is always created based on config/sampling — endpoint availability
     /// does not gate this decision. When the endpoint is deferred, the underlying
     /// exporter caches replay chunks to disk and flushes them once an endpoint is
     /// provided via ``updateEndpoint(_:)``.
     private func customizeSessionReplay() {
-        initializeSessionReplayProxy()
-    }
-
-    /// Evaluates Session Replay configuration and sampling, then sets the appropriate proxy.
-    ///
-    /// Called once per agent lifecycle — either at startup (if an endpoint is available)
-    /// or when the first endpoint update provides a Session Replay URL.
-    private func initializeSessionReplayProxy() {
         let moduleType = CiscoSessionReplay.SessionReplay.self
         guard let sessionReplayModule = modulesManager?.module(ofType: moduleType) else {
             logger.log(level: .warn, isPrivate: false) {
