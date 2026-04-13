@@ -53,7 +53,7 @@ SKIP_PLCRASH=false
 
 # Expected xcframeworks
 OTEL_FRAMEWORKS=("OpenTelemetryApi" "OpenTelemetrySdk")
-CISCO_FRAMEWORKS=("CiscoLogger" "CiscoEncryption" "CiscoSwizzling" "CiscoInteractions" "CiscoDiskStorage" "CiscoSessionReplay" "CiscoInstanceManager" "CiscoRuntimeCache")
+CISCO_FRAMEWORKS=("CiscoCommon" "CiscoLogger" "CiscoEncryption" "CiscoSwizzling" "CiscoInteractions" "CiscoDiskStorage" "CiscoSessionReplay" "CiscoInstanceManager" "CiscoRuntimeCache")
 
 
 # ---------------------------------------------------------------------------

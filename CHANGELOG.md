@@ -7,12 +7,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Added public references to sessionWillResetNotification and sessionDidResetNotification
+* Added optional support to capture network headers.
+* Session Replay now captures text content in wireframes for UIKit applications.
+
 ### Changed
 
-* Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans.
-* Added public references to sessionWillResetNotification and sessionDidResetNotification
 * Updated endpoint from signalfx.com to observability.splunkcloud.com
-* Added optional support to capture network headers.
+* Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans.
 
 ## [2.2.1] - 2026-03-19
 
