@@ -43,9 +43,30 @@ limitations under the License.
     XCTAssertFalse(state.isAutomatedTrackingEnabled);
 }
 
+- (void)testDefaultState {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    XCTAssertFalse(agent.navigation.state.isAutomatedTrackingEnabled);
+}
+
 - (void)testTracking {
     SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
     XCTAssertNoThrow([agent.navigation trackScreen:@"Test"]);
+}
+
+- (void)testTrackingChaining {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    SPLKNavigationModule *result = [agent.navigation trackScreen:@"ScreenA"];
+    XCTAssertNotNil(result);
+}
+
+- (void)testPreferencesRoundTrip {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+
+    SPLKNavigationModulePreferences *preferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:YES];
+    agent.navigation.preferences = preferences;
+
+    XCTAssertNotNil(agent.navigation.preferences);
+    XCTAssertTrue(agent.navigation.preferences.enableAutomatedTracking);
 }
 
 @end
