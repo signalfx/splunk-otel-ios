@@ -127,6 +127,10 @@ public final class Navigation: Sendable {
     }
 
     private func runDetectionLoop() async {
+        Task(priority: .userInitiated) {
+            await runPresentationDetectionLoop()
+        }
+
         do {
             let stream = try await navigationStream()
 
@@ -144,6 +148,21 @@ public final class Navigation: Sendable {
         catch {
             logger.log(level: .error) {
                 "Failed to initialize navigation stream: \(String(describing: error))"
+            }
+        }
+    }
+
+    private func runPresentationDetectionLoop() async {
+        do {
+            let stream = try await presentationStream()
+
+            for await event in stream {
+                await processPresentationEvent(event: event)
+            }
+        }
+        catch {
+            logger.log(level: .error) {
+                "Failed to initialize presentation stream: \(String(describing: error))"
             }
         }
     }
@@ -227,7 +246,7 @@ public final class Navigation: Sendable {
     }
 
     /// Process the finalizing of the navigation.
-    private func processNavigationEnd(event: NavigationActionEvent) async {
+    func processNavigationEnd(event: NavigationActionEvent) async {
         let end = Date()
         let identifier = event.controllerIdentifier
 
