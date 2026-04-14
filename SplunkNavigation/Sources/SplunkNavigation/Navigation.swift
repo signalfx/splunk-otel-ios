@@ -138,6 +138,10 @@ public final class Navigation: Sendable {
                     continue
                 }
 
+                if await isNavigationControllerManaged(event: event) {
+                    continue
+                }
+
                 await processNavigationEvent(event)
             }
         }
@@ -162,6 +166,13 @@ public final class Navigation: Sendable {
             .viewDidDisappear,
             .viewDidTransition:
             await processNavigationEnd(event: event)
+
+        case .navigationControllerWillShow:
+            await processNavigationControllerWillShow(event: event)
+
+        case .navigationControllerDidShow:
+            await processNavigationControllerDidShow(event: event)
+
 
         default:
             break
@@ -227,7 +238,7 @@ public final class Navigation: Sendable {
     }
 
     /// Process the finalizing of the navigation.
-    private func processNavigationEnd(event: NavigationActionEvent) async {
+    func processNavigationEnd(event: NavigationActionEvent) async {
         let end = Date()
         let identifier = event.controllerIdentifier
 
@@ -265,6 +276,18 @@ public final class Navigation: Sendable {
 
         return moduleEnabled && trackingEnabled
     }
+
+    private func isNavigationControllerManaged(event: NavigationActionEvent) async -> Bool {
+        switch event.type {
+        case .viewDidAppear,
+            .viewDidLoad:
+            await model.isManagedNavigationControllerTarget(event.controllerIdentifier)
+
+        default:
+            false
+        }
+    }
+
 
     func preferredControllerName(for controller: UIViewController) -> String {
         String(describing: type(of: controller))
