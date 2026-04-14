@@ -24,7 +24,6 @@ import Foundation
 ///   - pollIntervalNanoseconds: Interval between polls. Defaults to 10 ms.
 ///   - condition: An async closure that returns `true` when the expected state is reached.
 /// - Returns: `true` if the condition was met before the timeout, `false` otherwise.
-@_spi(SplunkTesting)
 @discardableResult
 public func waitUntil(
     timeout: TimeInterval = 1.0,
@@ -33,7 +32,7 @@ public func waitUntil(
 ) async -> Bool {
     let deadline = Date().addingTimeInterval(timeout)
 
-    while Date() < deadline, !Task.isCancelled {
+    while Date() < deadline {
         if await condition() {
             return true
         }

@@ -153,14 +153,13 @@ public final class Navigation: Sendable {
         case .viewDidLoad:
             await processShowStart(event: event)
 
-        case .viewWillTransition,
-            .willTransitionToTraitCollection:
+        case .viewDidAppear:
+            await processNavigationEnd(event: event)
+
+        case .willTransitionToTraitCollection:
             await processTransitionStart(event: event)
 
-        case .didTransitionToTraitCollection,
-            .viewDidAppear,
-            .viewDidDisappear,
-            .viewDidTransition:
+        case .didTransitionToTraitCollection:
             await processNavigationEnd(event: event)
 
         default:
@@ -214,14 +213,11 @@ public final class Navigation: Sendable {
             screenName: screenName
         )
 
-        // Always refresh in-flight transition state for this controller.
-        // If a previous end event was missed, this replaces stale timing data.
+        // Store this navigation for final processing
         await model.update(navigation: navigation, for: event.controllerIdentifier)
-        await model.update(screenName: screenName)
 
-        // Yield this change to the consumer and send corresponding span
+        // Send corresponding span
         if screenName != lastScreenName {
-            continuation.yield(screenName)
             send(screenName: screenName, lastScreenName: lastScreenName, start: start)
         }
     }
