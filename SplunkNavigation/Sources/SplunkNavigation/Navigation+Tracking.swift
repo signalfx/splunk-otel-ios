@@ -36,8 +36,9 @@ extension Navigation {
                 return
             }
 
-            // Manual tracking updates the current screen name immediately
+            // The manual screen name takes priority over the detected name
             await model.update(screenName: name)
+            await model.update(isManualScreenName: true)
 
             // Yield this change to the consumer
             continuation.yield(name)
