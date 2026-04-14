@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,25 +15,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAgent
 import SwiftUI
 
-struct TemplateView: View {
-    var body: some View {
-        VStack {
-            DemoHeaderView()
-            Text("Clone this and add your content")
-            Button("Do something") {
-                doSomething()
-            }
-            Spacer()
-        }
-        .navigationTitle("Your title")
-        .trackScreen("Template")
-        Spacer()
-    }
+struct TrackScreenModifier: ViewModifier {
 
-    func doSomething() {
-        print("did something")
+    // MARK: - Properties
+
+    let screenName: String
+    let attributes: [String: Any]?
+
+
+    // MARK: - ViewModifier methods
+
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                SplunkRum.shared.navigation.track(screen: screenName, attributes: attributes)
+            }
     }
 }

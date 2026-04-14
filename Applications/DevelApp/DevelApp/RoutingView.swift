@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import SplunkAgent
 import SwiftUI
 
 struct RoutingView: View {
@@ -38,6 +39,7 @@ struct RoutingView: View {
                 }
             }
             .navigationTitle("Demo Screens")
+            .trackScreen("DemoScreens")
         }
     }
 }
