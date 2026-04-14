@@ -74,54 +74,13 @@ extension SplunkRum {
 
     // MARK: - Session Replay
 
-    /// Perform operations specific to the SessionReplay module.
-    private func customizeSessionReplay() {
-        guard agentConfiguration.endpoint?.sessionReplayEndpoint != nil else {
-            logger.log(level: .warn, isPrivate: false) {
-                """
-                Session Replay module was not installed (the valid URL for Session Replay \
-                endpoint is missing in the Agent configuration).
-                """
-            }
-
-            return
-        }
-
-        initializeSessionReplayProxy()
-    }
-
-    /// Enables Session Replay when a valid endpoint becomes available.
-    ///
-    /// This is called from ``updateEndpoint(_:)`` to handle the case where the agent
-    /// started without an endpoint. The config/sampling decision is evaluated at most
-    /// once per agent lifecycle to match the startup path behavior.
-    ///
-    /// - Parameter endpoint: The endpoint configuration to check for Session Replay URL.
-    func enableSessionReplayIfNeeded(for endpoint: EndpointConfiguration) {
-        guard endpoint.sessionReplayEndpoint != nil else {
-            return
-        }
-
-        // The config/sampling decision is made once per agent lifecycle.
-        // If it was already evaluated (at startup or a previous endpoint update), skip.
-        guard !sessionReplayDecisionMade else {
-            return
-        }
-
-        initializeSessionReplayProxy()
-
-        if !(sessionReplayProxy is SessionReplayNonOperational) {
-            logger.log(level: .info, isPrivate: false) {
-                "Session Replay enabled after endpoint configuration."
-            }
-        }
-    }
-
     /// Evaluates Session Replay configuration and sampling, then sets the appropriate proxy.
     ///
-    /// Called once per agent lifecycle — either at startup (if an endpoint is available)
-    /// or when the first endpoint update provides a Session Replay URL.
-    private func initializeSessionReplayProxy() {
+    /// The proxy is always created based on config/sampling — endpoint availability
+    /// does not gate this decision. When the endpoint is deferred, the underlying
+    /// exporter caches replay chunks to disk and flushes them once an endpoint is
+    /// provided via ``updateEndpoint(_:)``.
+    private func customizeSessionReplay() {
         let moduleType = CiscoSessionReplay.SessionReplay.self
         guard let sessionReplayModule = modulesManager?.module(ofType: moduleType) else {
             logger.log(level: .warn, isPrivate: false) {

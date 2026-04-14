@@ -38,9 +38,27 @@ final class API10DeferredEndpointTests: XCTestCase {
     }
 
 
-    // MARK: - Deferred Session Replay
+    // MARK: - Session Replay with Deferred Endpoint
 
-    func testSessionReplayStaysNonOperationalWhenDisabledByConfiguration() throws {
+    func testSessionReplayOperationalAtInstallEvenWithoutEndpoint() throws {
+        let configuration = buildConfigurationWithoutEndpoint()
+        let moduleConfigurations: [Any] = [
+            SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
+        ]
+
+        let installedAgent = try SplunkRum.install(
+            with: configuration,
+            moduleConfigurations: moduleConfigurations
+        )
+
+        XCTAssertTrue(
+            installedAgent.sessionReplayProxy is SessionReplay,
+            "Proxy should be operational at install even without an endpoint"
+        )
+        XCTAssertTrue(installedAgent.sessionReplayDecisionMade)
+    }
+
+    func testSessionReplayNonOperationalWhenDisabledByConfiguration() throws {
         let configuration = buildConfigurationWithoutEndpoint()
         let moduleConfigurations: [Any] = [
             SessionReplayConfiguration(enabled: false, samplingRate: 1.0)
@@ -52,6 +70,7 @@ final class API10DeferredEndpointTests: XCTestCase {
         )
 
         XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
+        XCTAssertEqual(installedAgent.sessionReplay.state.status, .notRecording(.notStarted))
 
         let endpoint = EndpointConfiguration(
             realm: ConfigurationTestBuilder.realm,
@@ -59,11 +78,13 @@ final class API10DeferredEndpointTests: XCTestCase {
         )
         try installedAgent.updateEndpoint(endpoint)
 
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-        XCTAssertEqual(installedAgent.sessionReplay.state.status, .notRecording(.notStarted))
+        XCTAssertTrue(
+            installedAgent.sessionReplayProxy is SessionReplayNonOperational,
+            "Endpoint update must not re-evaluate a disabled configuration"
+        )
     }
 
-    func testSessionReplayStaysNonOperationalWhenSampledOut() throws {
+    func testSessionReplayNonOperationalWhenSampledOut() throws {
         let configuration = buildConfigurationWithoutEndpoint()
         let moduleConfigurations: [Any] = [
             SessionReplayConfiguration(enabled: true, samplingRate: 0.0)
@@ -75,6 +96,7 @@ final class API10DeferredEndpointTests: XCTestCase {
         )
 
         XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
+        XCTAssertEqual(installedAgent.sessionReplay.state.status, .notRecording(.disabledBySampling))
 
         let endpoint = EndpointConfiguration(
             realm: ConfigurationTestBuilder.realm,
@@ -82,11 +104,13 @@ final class API10DeferredEndpointTests: XCTestCase {
         )
         try installedAgent.updateEndpoint(endpoint)
 
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-        XCTAssertEqual(installedAgent.sessionReplay.state.status, .notRecording(.disabledBySampling))
+        XCTAssertTrue(
+            installedAgent.sessionReplayProxy is SessionReplayNonOperational,
+            "Endpoint update must not re-evaluate a sampled-out decision"
+        )
     }
 
-    func testSessionReplayBecomesOperationalWhenEnabledAndSampledIn() throws {
+    func testSessionReplayRemainsOperationalAfterEndpointUpdate() throws {
         let configuration = buildConfigurationWithoutEndpoint()
         let moduleConfigurations: [Any] = [
             SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
@@ -96,28 +120,8 @@ final class API10DeferredEndpointTests: XCTestCase {
             with: configuration,
             moduleConfigurations: moduleConfigurations
         )
-
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-
-        let endpoint = EndpointConfiguration(
-            realm: ConfigurationTestBuilder.realm,
-            rumAccessToken: ConfigurationTestBuilder.rumAccessToken
-        )
-        try installedAgent.updateEndpoint(endpoint)
 
         XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplay)
-    }
-
-    func testSessionReplayDecisionIsNotReEvaluatedOnSubsequentUpdates() throws {
-        let configuration = buildConfigurationWithoutEndpoint()
-        let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: true, samplingRate: 0.0)
-        ]
-
-        let installedAgent = try SplunkRum.install(
-            with: configuration,
-            moduleConfigurations: moduleConfigurations
-        )
 
         let endpoint = EndpointConfiguration(
             realm: ConfigurationTestBuilder.realm,
@@ -125,21 +129,13 @@ final class API10DeferredEndpointTests: XCTestCase {
         )
         try installedAgent.updateEndpoint(endpoint)
 
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-        XCTAssertEqual(installedAgent.sessionReplay.state.status, .notRecording(.disabledBySampling))
-
-        // A second endpoint update must not re-evaluate the sampling decision
-        let secondEndpoint = EndpointConfiguration(
-            realm: "us1",
-            rumAccessToken: ConfigurationTestBuilder.rumAccessToken
+        XCTAssertTrue(
+            installedAgent.sessionReplayProxy is SessionReplay,
+            "Proxy must stay operational after endpoint is provided"
         )
-        try installedAgent.updateEndpoint(secondEndpoint)
-
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-        XCTAssertEqual(installedAgent.sessionReplay.state.status, .notRecording(.disabledBySampling))
     }
 
-    func testWithoutReplayUrlDoesNotPreventLaterEvaluation() throws {
+    func testSessionReplayRemainsOperationalWithTraceOnlyEndpoint() throws {
         let configuration = buildConfigurationWithoutEndpoint()
         let moduleConfigurations: [Any] = [
             SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
@@ -150,24 +146,16 @@ final class API10DeferredEndpointTests: XCTestCase {
             moduleConfigurations: moduleConfigurations
         )
 
-        // First endpoint has trace only — no session replay URL
+        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplay)
+
         let traceUrl = try ConfigurationTestBuilder.customUrl(for: ConfigurationTestBuilder.customTraceAddress)
         let traceOnlyEndpoint = EndpointConfiguration(trace: traceUrl)
         try installedAgent.updateEndpoint(traceOnlyEndpoint)
 
-        // Decision should NOT have been made yet (no replay URL to trigger it)
-        XCTAssertFalse(installedAgent.sessionReplayDecisionMade)
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplayNonOperational)
-
-        // Second endpoint includes a session replay URL — should now evaluate
-        let fullEndpoint = EndpointConfiguration(
-            realm: ConfigurationTestBuilder.realm,
-            rumAccessToken: ConfigurationTestBuilder.rumAccessToken
+        XCTAssertTrue(
+            installedAgent.sessionReplayProxy is SessionReplay,
+            "Trace-only endpoint must not affect the already-operational proxy"
         )
-        try installedAgent.updateEndpoint(fullEndpoint)
-
-        XCTAssertTrue(installedAgent.sessionReplayDecisionMade)
-        XCTAssertTrue(installedAgent.sessionReplayProxy is SessionReplay)
     }
 
 
