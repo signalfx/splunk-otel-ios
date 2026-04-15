@@ -57,6 +57,8 @@ public protocol NavigationModule: ObservableObject {
     /// - Parameters:
     ///   - name: The name to be tracked as the screen name until being changed.
     ///   - attributes: Optional custom key-value pairs to attach to the navigation span.
+    ///     Supported value types: `String`, `Int`, `Double`, `Bool`, and arrays of those types.
+    ///     Other types are converted to their string representation.
     ///
     /// - Returns: The actual ``NavigationModule`` instance.
     ///

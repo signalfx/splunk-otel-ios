@@ -60,6 +60,8 @@ extension View {
     /// - Parameters:
     ///   - name: The screen name to track.
     ///   - attributes: Optional attributes associated with the screen tracking event.
+    ///     Supported value types: `String`, `Int`, `Double`, `Bool`, and arrays of those types.
+    ///     Other types are converted to their string representation.
     ///
     /// - Returns: The `View` with screen tracking applied.
     public func trackScreen(_ name: String, attributes: [String: Any]?) -> some View {
