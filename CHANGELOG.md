@@ -17,6 +17,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Updated endpoint from signalfx.com to observability.splunkcloud.com
 * Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans.
+* Added automated screen tracking for `UINavigationController` push and pop transitions, including interactive pop cancellation handling.
 
 ## [2.2.1] - 2026-03-19
 

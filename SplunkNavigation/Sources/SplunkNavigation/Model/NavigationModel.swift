@@ -24,6 +24,8 @@ actor NavigationModel {
     private(set) var screenName: String = "unknown"
     private(set) var isManualScreenName = false
     private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
+    private(set) var pendingNavigationTargets: [ObjectIdentifier: ObjectIdentifier] = [:]
+    private(set) var managedNavigationControllerTargets: Set<ObjectIdentifier> = []
     private(set) var agentVersion: String?
 
 
@@ -57,6 +59,36 @@ actor NavigationModel {
 
     func removeNavigation(for identifier: ObjectIdentifier) {
         navigations[identifier] = nil
+    }
+
+
+    // MARK: - Pending navigation targets
+
+    func pendingNavigationTarget(for identifier: ObjectIdentifier) -> ObjectIdentifier? {
+        pendingNavigationTargets[identifier]
+    }
+
+    func update(pendingNavigationTarget: ObjectIdentifier, for identifier: ObjectIdentifier) {
+        pendingNavigationTargets[identifier] = pendingNavigationTarget
+    }
+
+    func removePendingNavigationTarget(for identifier: ObjectIdentifier) {
+        pendingNavigationTargets[identifier] = nil
+    }
+
+
+    // MARK: - Managed navigation controller targets
+
+    func addManagedNavigationControllerTarget(_ identifier: ObjectIdentifier) {
+        managedNavigationControllerTargets.insert(identifier)
+    }
+
+    func removeManagedNavigationControllerTarget(_ identifier: ObjectIdentifier) {
+        managedNavigationControllerTargets.remove(identifier)
+    }
+
+    func isManagedNavigationControllerTarget(_ identifier: ObjectIdentifier) -> Bool {
+        managedNavigationControllerTargets.contains(identifier)
     }
 
 
