@@ -41,24 +41,13 @@ extension DefaultEventManager {
         concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken)
 
         // Replace semantics: the new config fully replaces the old one.
-        // If a session replay URL is provided, update or create the processor.
-        // If omitted, clear the existing processor so it stops sending to the old endpoint.
+        // If a session replay URL is provided, activate the processor (also flushes pending data).
+        // If omitted, switch the processor to pending mode so cached data can be sent later.
         if let sessionReplayUrl = endpoint.sessionReplayEndpoint {
-            if let sessionReplayProcessor {
-                sessionReplayProcessor.setEndpoint(sessionReplayUrl, accessToken: endpoint.rumAccessToken)
-            }
-            else {
-                sessionReplayProcessor = Self.createSessionReplayProcessor(
-                    sessionReplayUrl: sessionReplayUrl,
-                    accessToken: endpoint.rumAccessToken,
-                    configuration: configuration,
-                    agent: agent
-                )
-            }
+            sessionReplayProcessor.setEndpoint(sessionReplayUrl, accessToken: endpoint.rumAccessToken)
         }
-        else if sessionReplayProcessor != nil {
-            sessionReplayProcessor?.clearEndpoint()
-            sessionReplayProcessor = nil
+        else {
+            sessionReplayProcessor.clearEndpoint()
         }
 
         logger.log(level: .info, isPrivate: false) {
@@ -71,7 +60,7 @@ extension DefaultEventManager {
     /// Data is cached to pending storage for later sending when a new endpoint is configured.
     func disableEndpoint() {
         concreteTraceProcessor.clearEndpoint()
-        sessionReplayProcessor?.clearEndpoint()
+        sessionReplayProcessor.clearEndpoint()
 
         logger.log(level: .info, isPrivate: false) {
             "Endpoint disabled. Spans will be cached and sent when endpoint is configured."
@@ -84,11 +73,11 @@ extension DefaultEventManager {
 extension DefaultEventManager {
 
     static func createSessionReplayProcessor(
-        sessionReplayUrl: URL,
+        sessionReplayUrl: URL?,
         accessToken: String?,
         configuration: any AgentConfigurationProtocol,
         agent: SplunkRum
-    ) -> OTLPSessionReplayEventProcessor? {
+    ) -> OTLPSessionReplayEventProcessor {
         let resources = buildResources(configuration: configuration)
 
         return OTLPSessionReplayEventProcessor(
@@ -118,7 +107,7 @@ extension DefaultEventManager {
             debugEnabled: configuration.enableDebugLogging
         )
 
-        // Initialize session replay processor (optional - requires endpoint)
+        // Initialize session replay processor (operates in pending mode when endpoint is nil)
         let replayProcessor = OTLPSessionReplayEventProcessor(
             with: sessionReplayUrl,
             resources: resources,

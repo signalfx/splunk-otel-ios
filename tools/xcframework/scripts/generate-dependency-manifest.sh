@@ -82,6 +82,7 @@ cat > "${MANIFEST_PATH}" << JSONEOF
         "OpenTelemetryApi.xcframework",
         "OpenTelemetrySdk.xcframework",
         "CrashReporter.xcframework",
+        "CiscoCommon.xcframework",
         "CiscoLogger.xcframework",
         "CiscoEncryption.xcframework",
         "CiscoSwizzling.xcframework",

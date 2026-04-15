@@ -56,7 +56,7 @@ final class EventsTests: XCTestCase {
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
-        let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
+        let sessionReplayProcessor = eventManager.sessionReplayProcessor
 
         sessionReplayProcessor.sendEvent(
             event,
@@ -82,7 +82,7 @@ final class EventsTests: XCTestCase {
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
-        let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
+        let sessionReplayProcessor = eventManager.sessionReplayProcessor
 
         sessionReplayProcessor.sendEvent(
             event: event,
@@ -103,7 +103,7 @@ final class EventsTests: XCTestCase {
         let requestExpectation = XCTestExpectation(description: "Send request")
 
         let eventManager = try XCTUnwrap(agent?.eventManager as? DefaultEventManager)
-        let sessionReplayProcessor = try XCTUnwrap(eventManager.sessionReplayProcessor as? OTLPSessionReplayEventProcessor)
+        let sessionReplayProcessor = eventManager.sessionReplayProcessor
 
         sessionReplayProcessor.sendEvent(
             event,

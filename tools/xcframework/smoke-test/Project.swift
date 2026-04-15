@@ -63,6 +63,7 @@ let crashFrameworks = [
 
 /// Cisco Session Replay (downloaded by `make populate-deps`).
 let ciscoFrameworks = [
+    "CiscoCommon",
     "CiscoLogger",
     "CiscoEncryption",
     "CiscoSwizzling",

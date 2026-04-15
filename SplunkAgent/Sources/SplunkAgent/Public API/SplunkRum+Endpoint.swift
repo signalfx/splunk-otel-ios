@@ -50,7 +50,6 @@ extension SplunkRum {
 
             currentEndpoint = endpoint
             updateNetworkExclusionList(for: endpoint)
-            enableSessionReplayIfNeeded(for: endpoint)
 
             logger.log(level: .info, isPrivate: false) {
                 "Endpoint configuration updated successfully."
