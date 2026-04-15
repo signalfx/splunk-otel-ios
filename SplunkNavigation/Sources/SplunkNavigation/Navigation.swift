@@ -42,6 +42,12 @@ public final class Navigation: Sendable {
     /// Asynchronous stream of screen name changes.
     public let screenNameStream: AsyncStream<String>
 
+    /// Processor used to transform automated navigation events before they produce spans.
+    ///
+    /// Manual ``track(screen:)`` calls bypass the processor.
+    public nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor =
+        DefaultNavigationEventProcessor()
+
 
     // MARK: - Module configuration
 
@@ -187,7 +193,10 @@ public final class Navigation: Sendable {
         let start = Date()
 
         let typeName = event.controllerTypeName
-        let screenName = sanitize(typeName: typeName)
+        let screenName = processAutomatedScreenName(
+            sanitize(typeName: typeName),
+            controllerIdentifier: event.controllerIdentifier
+        )
         let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
@@ -215,7 +224,10 @@ public final class Navigation: Sendable {
         let start = Date()
 
         let typeName = event.controllerTypeName
-        let screenName = sanitize(typeName: typeName)
+        let screenName = processAutomatedScreenName(
+            sanitize(typeName: typeName),
+            controllerIdentifier: event.controllerIdentifier
+        )
         let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
@@ -296,6 +308,20 @@ public final class Navigation: Sendable {
         }
     }
 
+
+    /// Passes the raw automated screen name through the ``navigationEventProcessor``
+    /// and returns the (potentially transformed) screen name.
+    func processAutomatedScreenName(
+        _ screenName: String,
+        controllerIdentifier: ObjectIdentifier
+    ) -> String {
+        let event = NavigationEvent(
+            screenName: screenName,
+            controllerIdentifier: controllerIdentifier
+        )
+        let processed = navigationEventProcessor.process(event: event)
+        return processed.screenName
+    }
 
     func preferredControllerName(for controller: UIViewController) -> String {
         String(describing: type(of: controller))

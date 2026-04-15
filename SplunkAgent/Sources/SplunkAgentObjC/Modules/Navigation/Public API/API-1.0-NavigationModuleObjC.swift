@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 import SplunkAgent
+import SplunkNavigation
 
 /// The class implements a public API for the Navigation module.
 @objc(SPLKNavigationModule)
@@ -51,6 +52,19 @@ public final class NavigationModuleObjC: NSObject {
     @objc
     public var state: NavigationModuleStateObjC {
         NavigationModuleStateObjC(for: owner)
+    }
+
+
+    /// Processor used to transform automated navigation events.
+    @objc
+    public var navigationEventProcessor: NavigationEventProcessor {
+        get {
+            owner.agent.navigation.navigationEventProcessor
+        }
+
+        set {
+            owner.agent.navigation.navigationEventProcessor = newValue
+        }
     }
 
 

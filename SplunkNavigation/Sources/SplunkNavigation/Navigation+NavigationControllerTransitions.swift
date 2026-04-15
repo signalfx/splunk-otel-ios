@@ -28,8 +28,11 @@ extension Navigation {
         }
 
         let typeName = event.controllerTypeName
-        let screenName = sanitize(typeName: typeName)
         let controllerIdentifier = event.controllerIdentifier
+        let screenName = processAutomatedScreenName(
+            sanitize(typeName: typeName),
+            controllerIdentifier: controllerIdentifier
+        )
 
         let navigation = NavigationPair(
             type: .show,
@@ -103,16 +106,29 @@ extension Navigation {
         await model.removePendingNavigationTarget(for: navigationControllerIdentifier)
         await model.removeManagedNavigationControllerTarget(pendingTargetIdentifier)
 
-        await updateCurrentScreen(typeName: visibleControllerTypeName, start: timestamp)
+        let screenName = processAutomatedScreenName(
+            sanitize(typeName: visibleControllerTypeName),
+            controllerIdentifier: visibleControllerIdentifier
+        )
+        let lastScreenName = await model.screenName
+
+        await updateCurrentScreen(
+            screenName: screenName,
+            lastScreenName: lastScreenName,
+            start: timestamp
+        )
 
         return true
     }
 
     private func completeNavigationControllerTransition(event: any NavigationActionEvent) async {
         let typeName = event.controllerTypeName
-        let screenName = sanitize(typeName: typeName)
-        let lastScreenName = await model.screenName
         let visibleControllerIdentifier = event.controllerIdentifier
+        let screenName = processAutomatedScreenName(
+            sanitize(typeName: typeName),
+            controllerIdentifier: visibleControllerIdentifier
+        )
+        let lastScreenName = await model.screenName
 
         let existingNavigation = await model.navigation(for: visibleControllerIdentifier)
 
@@ -142,17 +158,6 @@ extension Navigation {
         )
 
         await processNavigationEnd(event: endEvent)
-    }
-
-    private func updateCurrentScreen(typeName: String, start: Date) async {
-        let screenName = sanitize(typeName: typeName)
-        let lastScreenName = await model.screenName
-
-        await updateCurrentScreen(
-            screenName: screenName,
-            lastScreenName: lastScreenName,
-            start: start
-        )
     }
 
     private func updateCurrentScreen(screenName: String, lastScreenName: String, start: Date) async {

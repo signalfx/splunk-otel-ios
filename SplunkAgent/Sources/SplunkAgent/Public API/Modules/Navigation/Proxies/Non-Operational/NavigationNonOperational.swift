@@ -17,6 +17,7 @@ limitations under the License.
 
 internal import CiscoLogger
 internal import SplunkCommon
+internal import SplunkNavigation
 
 /// The class implementing Navigation public API in non-operational mode.
 ///
@@ -56,6 +57,20 @@ final class NavigationNonOperational: NavigationModule {
     // MARK: - State
 
     let state: any NavigationModuleState
+
+    var navigationEventProcessor: any NavigationEventProcessor {
+        get {
+            logAccess(toApi: #function)
+
+            return DefaultNavigationEventProcessor()
+        }
+
+        // swiftlint:disable unused_setter_value
+        set {
+            logAccess(toApi: #function)
+        }
+        // swiftlint:enable unused_setter_value
+    }
 
 
     // MARK: - Initialization
