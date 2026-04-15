@@ -37,7 +37,7 @@ final class NavigationEventSourcesTests: XCTestCase {
 
         let navigation = Navigation(
             navigationEventStreamProvider: MockNavigationEventStreamProvider(
-                stream: makeStream([expectedEvent])
+                stream: makeEventStream([expectedEvent])
             )
         )
 
@@ -85,6 +85,7 @@ final class NavigationEventSourcesTests: XCTestCase {
             )
         )
 
+        // Short window for negative assertion; 200 ms balances CI reliability.
         try? await Task.sleep(nanoseconds: 200_000_000)
 
         let currentScreenName = await navigation.model.screenName
@@ -183,18 +184,10 @@ final class NavigationEventSourcesTests: XCTestCase {
             )
         )
 
+        // Short window for negative assertion; 200 ms balances CI reliability.
         try? await Task.sleep(nanoseconds: 200_000_000)
 
         let currentScreenName = await navigation.model.screenName
         XCTAssertEqual(currentScreenName, "ManualScreen")
-    }
-}
-
-private func makeStream<T>(_ values: [T]) -> AsyncStream<T> {
-    AsyncStream { continuation in
-        for value in values {
-            continuation.yield(value)
-        }
-        continuation.finish()
     }
 }
