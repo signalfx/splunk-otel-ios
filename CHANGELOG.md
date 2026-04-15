@@ -16,7 +16,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Updated endpoint from signalfx.com to observability.splunkcloud.com
-* Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans.
 
 ## [2.2.1] - 2026-03-19
 
@@ -47,7 +46,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Replaced OTLP binary protobuf with custom JSON encoding to reduce binary size. The SDK now uses `opentelemetry-swift-core` (API/SDK only) instead of the full `opentelemetry-swift` package with protocol exporters. #566
-
+  
 ## [2.0.7] - 2026-02-04
 
 ### Fixed
@@ -234,3 +233,4 @@ This is a first major stable release of the new Splunk OpenTelemetry Agent.
 ### Deprecated
 
 * Deprecates the use of SplunkRum.initialize. Use the SplunkRumBuilder going forward.
+
