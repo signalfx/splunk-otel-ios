@@ -71,6 +71,23 @@ public final class NavigationModuleObjC: NSObject {
         return self
     }
 
+    /// Sets a manual screen name with custom attributes (setting is valid until a new name is set).
+    ///
+    /// - Parameters:
+    ///   - name: The name to be tracked as the screen name until being changed.
+    ///   - attributes: Optional custom key-value pairs to attach to the navigation span.
+    ///
+    /// - Returns: The actual ``NavigationModuleObjC`` instance.
+    ///
+    /// - Note: The set value is not linked to any specific UI element.
+    @discardableResult
+    @objc(trackScreen:attributes:)
+    public func track(screen name: String, attributes: NSDictionary?) -> NavigationModuleObjC {
+        owner.agent.navigation.track(screen: name, attributes: attributes as? [String: Any])
+
+        return self
+    }
+
 
     // MARK: - Initialization
 
