@@ -37,15 +37,6 @@ struct EmptyNavigationEventStreamProvider: NavigationEventStreamProviding {
     }
 }
 
-struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
-    let stream: AsyncStream<any NavigationActionEvent>
-
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        await Task.yield()
-        return stream
-    }
-}
-
 actor ScreenNameCollector {
     private(set) var values: [String] = []
 
