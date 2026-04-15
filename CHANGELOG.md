@@ -12,6 +12,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added public references to sessionWillResetNotification and sessionDidResetNotification
 * Added optional support to capture network headers.
 * Session Replay now captures text content in wireframes for UIKit applications.
+* Added `.trackScreen` SwiftUI view modifier for manual screen name tracking with optional custom attributes.
 
 ### Changed
 
