@@ -30,13 +30,7 @@ extension Navigation {
 
     // MARK: - Presentation controller transitions
 
-    func processPresentationEvent(
-        event: any PresentationActionEvent
-    ) async {
-        guard await shouldProcessAutomatedPresentationEvent() else {
-            return
-        }
-
+    func processPresentationEvent(event: any PresentationActionEvent) async {
         switch event.type {
         case .presentationWillBegin:
             await updateTransitionStart(for: presentedSnapshot(from: event))
@@ -61,32 +55,21 @@ extension Navigation {
 
     // MARK: - Private methods
 
-    private func shouldProcessAutomatedPresentationEvent() async -> Bool {
-        let moduleEnabled = await model.moduleEnabled
-        return moduleEnabled && state.isAutomatedTrackingEnabled
-    }
-
-    private func presentedSnapshot(
-        from event: any PresentationActionEvent
-    ) -> PresentationTransitionSnapshot {
+    private func presentedSnapshot(from event: any PresentationActionEvent) -> PresentationTransitionSnapshot {
         PresentationTransitionSnapshot(
             controllerIdentifier: event.presentedControllerIdentifier,
             controllerTypeName: event.presentedControllerTypeName
         )
     }
 
-    private func presentingSnapshot(
-        from event: any PresentationActionEvent
-    ) -> PresentationTransitionSnapshot {
+    private func presentingSnapshot(from event: any PresentationActionEvent) -> PresentationTransitionSnapshot {
         PresentationTransitionSnapshot(
             controllerIdentifier: event.presentingControllerIdentifier,
             controllerTypeName: event.presentingControllerTypeName
         )
     }
 
-    private func updateTransitionStart(
-        for snapshot: PresentationTransitionSnapshot
-    ) async {
+    private func updateTransitionStart(for snapshot: PresentationTransitionSnapshot) async {
         let typeName = snapshot.controllerTypeName
         let screenName = sanitize(typeName: typeName)
 

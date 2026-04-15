@@ -122,15 +122,15 @@ public final class Navigation: Sendable {
     /// Starts detection and processing of navigation.
     func startDetection() {
         Task(priority: .userInitiated) {
-            await runDetectionLoop()
+            await runNavigationDetectionLoop()
         }
-    }
 
-    private func runDetectionLoop() async {
         Task(priority: .userInitiated) {
             await runPresentationDetectionLoop()
         }
+    }
 
+    private func runNavigationDetectionLoop() async {
         do {
             let stream = try await navigationStream()
 
@@ -157,6 +157,14 @@ public final class Navigation: Sendable {
             let stream = try await presentationStream()
 
             for await event in stream {
+                guard
+                    await shouldProcessEvent(),
+                    !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName),
+                    !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName)
+                else {
+                    continue
+                }
+
                 await processPresentationEvent(event: event)
             }
         }

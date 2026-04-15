@@ -37,6 +37,7 @@ final class MockPresentationEventStreamProvider:
 {
     private let presentationContinuation: AsyncStream<any PresentationActionEvent>.Continuation
     private let internalPresentationStream: AsyncStream<any PresentationActionEvent>
+    private let presentationControllerProxy = NSObject()
 
     init() {
         let (stream, continuation) = AsyncStream.makeStream(
@@ -65,7 +66,7 @@ final class MockPresentationEventStreamProvider:
         let event = MockPresentationActionEvent(
             timestamp: Date(),
             type: eventType,
-            presentationControllerIdentifier: ObjectIdentifier(presented),
+            presentationControllerIdentifier: ObjectIdentifier(presentationControllerProxy),
             presentedControllerTypeName: String(describing: type(of: presented)),
             presentedControllerIdentifier: ObjectIdentifier(presented),
             presentingControllerTypeName: String(describing: type(of: presenting)),

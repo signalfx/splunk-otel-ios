@@ -26,4 +26,9 @@ struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
         await Task.yield()
         return stream
     }
+
+    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
+        await Task.yield()
+        return AsyncStream { _ in }
+    }
 }

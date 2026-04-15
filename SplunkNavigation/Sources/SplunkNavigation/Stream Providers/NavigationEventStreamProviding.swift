@@ -22,11 +22,3 @@ protocol NavigationEventStreamProviding: Sendable {
     func navigationStream() async throws -> AsyncStream<any NavigationActionEvent>
     func presentationStream() async throws -> AsyncStream<any PresentationActionEvent>
 }
-
-extension NavigationEventStreamProviding {
-    // Swiftlint false positive for protocol async requirement default implementation.
-    // swiftlint:disable:next async_without_await
-    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
-        AsyncStream { _ in }
-    }
-}
