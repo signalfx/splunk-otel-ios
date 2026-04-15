@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 import SplunkAgent
+import SplunkNavigation
 
 /// Defines a public API for the user's preferred settings.
 @objc(SPLKNavigationModulePreferences)
@@ -40,6 +41,19 @@ public final class NavigationModulePreferencesObjC: NSObject {
     }
 
 
+    // MARK: - Navigation event processor
+
+    /// Processor used to transform automated navigation events.
+    @objc
+    public var navigationEventProcessor: NavigationEventProcessor? {
+        didSet {
+            if let owner {
+                owner.agent.navigation.preferences.navigationEventProcessor = navigationEventProcessor
+            }
+        }
+    }
+
+
     // MARK: - Convenience init
 
     /// Initializes new preferences object with preconfigured values.
@@ -48,5 +62,19 @@ public final class NavigationModulePreferencesObjC: NSObject {
     @objc
     public init(enableAutomatedTracking: Bool) {
         self.enableAutomatedTracking = enableAutomatedTracking
+    }
+
+    /// Initializes new preferences object with preconfigured values.
+    ///
+    /// - Parameters:
+    ///   - enableAutomatedTracking: If `true`, the module will automatically detect navigation.
+    ///   - navigationEventProcessor: Optional processor to transform automated navigation events.
+    @objc
+    public init(
+        enableAutomatedTracking: Bool,
+        navigationEventProcessor: NavigationEventProcessor?
+    ) {
+        self.enableAutomatedTracking = enableAutomatedTracking
+        self.navigationEventProcessor = navigationEventProcessor
     }
 }

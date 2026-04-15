@@ -34,14 +34,20 @@ public final class NavigationModuleObjC: NSObject {
     @objc
     public var preferences: NavigationModulePreferencesObjC {
         get {
-            let preferences = NavigationModulePreferencesObjC(enableAutomatedTracking: owner.agent.navigation.preferences.enableAutomatedTracking ?? false)
+            let preferences = NavigationModulePreferencesObjC(
+                enableAutomatedTracking: owner.agent.navigation.preferences.enableAutomatedTracking ?? false,
+                navigationEventProcessor: owner.agent.navigation.preferences.navigationEventProcessor
+            )
             preferences.owner = owner
             return preferences
         }
 
         set {
             newValue.owner = owner
-            owner.agent.navigation.preferences = NavigationPreferences(enableAutomatedTracking: newValue.enableAutomatedTracking)
+            owner.agent.navigation.preferences = NavigationPreferences(
+                enableAutomatedTracking: newValue.enableAutomatedTracking,
+                navigationEventProcessor: newValue.navigationEventProcessor
+            )
         }
     }
 
@@ -52,19 +58,6 @@ public final class NavigationModuleObjC: NSObject {
     @objc
     public var state: NavigationModuleStateObjC {
         NavigationModuleStateObjC(for: owner)
-    }
-
-
-    /// Processor used to transform automated navigation events.
-    @objc
-    public var navigationEventProcessor: NavigationEventProcessor {
-        get {
-            owner.agent.navigation.navigationEventProcessor
-        }
-
-        set {
-            owner.agent.navigation.navigationEventProcessor = newValue
-        }
     }
 
 

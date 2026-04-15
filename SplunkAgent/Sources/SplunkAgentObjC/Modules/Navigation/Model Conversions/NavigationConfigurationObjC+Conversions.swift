@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 internal import SplunkCommon
-internal import SplunkNavigation
+import SplunkNavigation
 
 extension NavigationConfigurationObjC: ModuleConfigurationSwift {
 

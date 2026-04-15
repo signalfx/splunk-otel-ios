@@ -51,6 +51,18 @@ public final class Preferences: Codable, Sendable {
 
         return self
     }
+
+
+    // MARK: - Navigation event processor
+
+    /// Processor used to transform automated navigation events before they produce spans.
+    ///
+    /// Manual ``Navigation/track(screen:)`` calls bypass the processor.
+    public nonisolated(unsafe) var navigationEventProcessor: (any NavigationEventProcessor)? {
+        didSet {
+            module?.update()
+        }
+    }
 }
 
 
@@ -60,13 +72,17 @@ extension Preferences {
 
     /// Initializes new preferences object with preconfigured values.
     ///
-    /// - Parameter enableAutomatedTracking: If `true`, the module will automatically detect navigation.
+    /// - Parameters:
+    ///   - enableAutomatedTracking: If `true`, the module will automatically detect navigation.
+    ///   - navigationEventProcessor: Optional processor to transform automated navigation events.
     public convenience init(
-        enableAutomatedTracking: Bool? = nil
+        enableAutomatedTracking: Bool? = nil,
+        navigationEventProcessor: (any NavigationEventProcessor)? = nil
     ) {
         self.init()
 
         self.enableAutomatedTracking = enableAutomatedTracking
+        self.navigationEventProcessor = navigationEventProcessor
     }
 }
 

@@ -45,7 +45,7 @@ public final class Navigation: Sendable {
     /// Processor used to transform automated navigation events before they produce spans.
     ///
     /// Manual ``track(screen:)`` calls bypass the processor.
-    public nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor =
+    nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor =
         DefaultNavigationEventProcessor()
 
 
@@ -276,6 +276,7 @@ public final class Navigation: Sendable {
     func update() {
         // Update state
         state.isAutomatedTrackingEnabled = preferences.enableAutomatedTracking ?? false
+        navigationEventProcessor = preferences.navigationEventProcessor ?? DefaultNavigationEventProcessor()
     }
 
 

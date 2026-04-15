@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import Combine
-public import SplunkNavigation
 
 /// Defines a public API for the Navigation module.
 public protocol NavigationModule: ObservableObject {
@@ -39,9 +38,6 @@ public protocol NavigationModule: ObservableObject {
 
     /// An object that reflects the current state and settings used for the module, a ``NavigationModuleState`` instance.
     var state: NavigationModuleState { get }
-
-    /// Processor used to transform automated navigation events.
-    var navigationEventProcessor: any NavigationEventProcessor { get set }
 
 
     // MARK: - Manual detection

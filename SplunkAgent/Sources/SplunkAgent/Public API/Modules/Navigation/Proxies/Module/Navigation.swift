@@ -41,16 +41,6 @@ final class Navigation: NavigationModule {
 
     let state: any NavigationModuleState
 
-    var navigationEventProcessor: any NavigationEventProcessor {
-        get {
-            module.navigationEventProcessor
-        }
-
-        set {
-            module.navigationEventProcessor = newValue
-        }
-    }
-
 
     // MARK: - Initialization
 
