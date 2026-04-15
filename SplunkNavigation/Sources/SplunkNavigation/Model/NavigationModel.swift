@@ -56,6 +56,9 @@ actor NavigationModel {
         navigations[identifier] = nil
     }
 
+
+    // MARK: - Pending navigation targets
+
     func pendingNavigationTarget(for identifier: ObjectIdentifier) -> ObjectIdentifier? {
         pendingNavigationTargets[identifier]
     }
@@ -67,6 +70,9 @@ actor NavigationModel {
     func removePendingNavigationTarget(for identifier: ObjectIdentifier) {
         pendingNavigationTargets[identifier] = nil
     }
+
+
+    // MARK: - Managed navigation controller targets
 
     func addManagedNavigationControllerTarget(_ identifier: ObjectIdentifier) {
         managedNavigationControllerTargets.insert(identifier)

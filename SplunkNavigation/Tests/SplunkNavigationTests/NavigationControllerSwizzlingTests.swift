@@ -17,12 +17,12 @@ limitations under the License.
 
 internal import CiscoSwizzling
 import Foundation
-import SplunkCommon
+@_spi(SplunkTesting) import SplunkCommon
 import XCTest
 
 @testable import SplunkNavigation
 
-final class NavigationSwizzleNavControllerTests: XCTestCase {
+final class NavigationControllerSwizzlingTests: XCTestCase {
 
     func testPushAndPopUpdatesScreenName() async {
         let rootIdentifier = ObjectIdentifier(NSString())
@@ -74,6 +74,7 @@ final class NavigationSwizzleNavControllerTests: XCTestCase {
         let detailIdentifier = ObjectIdentifier(NSNumber(value: 1))
         let navigationControllerIdentifier = ObjectIdentifier(NSNumber(value: 2))
         let fixture = makeNavigationStreamFixture()
+
         defer {
             fixture.finish()
         }
@@ -83,8 +84,7 @@ final class NavigationSwizzleNavControllerTests: XCTestCase {
 
         navigation.startDetection()
 
-        showController(
-            fixture: fixture,
+        fixture.showController(
             navigationControllerIdentifier: navigationControllerIdentifier,
             controllerIdentifier: detailIdentifier,
             controllerTypeName: "DetailViewController"
@@ -95,9 +95,8 @@ final class NavigationSwizzleNavControllerTests: XCTestCase {
         }
         XCTAssertTrue(didShowDetail)
 
-        sendTransition(
+        fixture.sendTransition(
             type: .navigationControllerWillShow,
-            fixture: fixture,
             navigationControllerIdentifier: navigationControllerIdentifier,
             controllerIdentifier: rootIdentifier,
             controllerTypeName: "RootViewController"
@@ -108,9 +107,8 @@ final class NavigationSwizzleNavControllerTests: XCTestCase {
         }
         XCTAssertTrue(didApplyAttemptedPop)
 
-        sendTransition(
+        fixture.sendTransition(
             type: .navigationControllerDidShow,
-            fixture: fixture,
             navigationControllerIdentifier: navigationControllerIdentifier,
             controllerIdentifier: detailIdentifier,
             controllerTypeName: "DetailViewController"
@@ -204,6 +202,7 @@ final class NavigationSwizzleNavControllerTests: XCTestCase {
         let detailIdentifier = ObjectIdentifier(NSString())
         let navigationControllerIdentifier = ObjectIdentifier(NSNumber(value: 5))
         let fixture = makeNavigationStreamFixture()
+
         defer {
             fixture.finish()
         }
@@ -212,9 +211,9 @@ final class NavigationSwizzleNavControllerTests: XCTestCase {
         navigation.preferences.enableAutomatedTracking = true
 
         navigation.startDetection()
-        sendTransition(
+
+        fixture.sendTransition(
             type: .navigationControllerWillShow,
-            fixture: fixture,
             navigationControllerIdentifier: navigationControllerIdentifier,
             controllerIdentifier: detailIdentifier,
             controllerTypeName: "DetailViewController"
@@ -227,8 +226,7 @@ final class NavigationSwizzleNavControllerTests: XCTestCase {
         }
         XCTAssertTrue(didRegisterPendingTarget)
 
-        sendManagedLifecycleEvents(
-            fixture: fixture,
+        fixture.sendManagedLifecycleEvents(
             controllerIdentifier: detailIdentifier,
             controllerTypeName: "DetailViewController"
         )
@@ -237,9 +235,8 @@ final class NavigationSwizzleNavControllerTests: XCTestCase {
         let screenNameBeforeDidShow = await navigation.model.screenName
         XCTAssertEqual(screenNameBeforeDidShow, "DetailViewController")
 
-        sendTransition(
+        fixture.sendTransition(
             type: .navigationControllerDidShow,
-            fixture: fixture,
             navigationControllerIdentifier: navigationControllerIdentifier,
             controllerIdentifier: detailIdentifier,
             controllerTypeName: "DetailViewController"

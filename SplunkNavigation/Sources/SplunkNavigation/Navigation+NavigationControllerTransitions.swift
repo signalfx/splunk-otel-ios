@@ -22,9 +22,7 @@ extension Navigation {
 
     // MARK: - Navigation-controller transitions
 
-    func processNavigationControllerWillShow(
-        event: any NavigationActionEvent
-    ) async {
+    func processNavigationControllerWillShow(event: any NavigationActionEvent) async {
         guard let navigationControllerIdentifier = event.navigationControllerIdentifier else {
             return
         }
@@ -32,7 +30,6 @@ extension Navigation {
         let typeName = event.controllerTypeName
         let screenName = sanitize(typeName: typeName)
         let controllerIdentifier = event.controllerIdentifier
-        let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
             type: .show,
@@ -42,26 +39,22 @@ extension Navigation {
         )
 
         await model.update(navigation: navigation, for: controllerIdentifier)
+
         await model.update(
             pendingNavigationTarget: controllerIdentifier,
             for: navigationControllerIdentifier
         )
-        await model.addManagedNavigationControllerTarget(controllerIdentifier)
-        await model.update(screenName: screenName)
 
-        if screenName != lastScreenName {
-            continuation.yield(screenName)
-            send(
-                screenName: screenName,
-                lastScreenName: lastScreenName,
-                start: event.timestamp
-            )
-        }
+        await model.addManagedNavigationControllerTarget(controllerIdentifier)
+
+        await updateCurrentScreen(
+            screenName: screenName,
+            lastScreenName: await model.screenName,
+            start: event.timestamp
+        )
     }
 
-    func processNavigationControllerDidShow(
-        event: any NavigationActionEvent
-    ) async {
+    func processNavigationControllerDidShow(event: any NavigationActionEvent) async {
         guard let navigationControllerIdentifier = event.navigationControllerIdentifier else {
             return
         }
@@ -79,9 +72,8 @@ extension Navigation {
         }
 
         await completeNavigationControllerTransition(event: event)
-        await model.removePendingNavigationTarget(
-            for: navigationControllerIdentifier
-        )
+
+        await model.removePendingNavigationTarget(for: navigationControllerIdentifier)
         await model.removeManagedNavigationControllerTarget(visibleControllerIdentifier)
     }
 
@@ -106,41 +98,33 @@ extension Navigation {
         // Interactive pop cancellation keeps the current controller visible.
         // Drop the previously pending navigation transition.
         await model.removeNavigation(for: pendingTargetIdentifier)
-        await model.removePendingNavigationTarget(
-            for: navigationControllerIdentifier
-        )
+        await model.removePendingNavigationTarget(for: navigationControllerIdentifier)
         await model.removeManagedNavigationControllerTarget(pendingTargetIdentifier)
-        await updateCurrentScreen(
-            typeName: visibleControllerTypeName,
-            start: timestamp
-        )
+
+        await updateCurrentScreen(typeName: visibleControllerTypeName, start: timestamp)
+
         return true
     }
 
-    private func completeNavigationControllerTransition(
-        event: any NavigationActionEvent
-    ) async {
+    private func completeNavigationControllerTransition(event: any NavigationActionEvent) async {
         let typeName = event.controllerTypeName
         let screenName = sanitize(typeName: typeName)
         let lastScreenName = await model.screenName
         let visibleControllerIdentifier = event.controllerIdentifier
 
-        if await model.navigation(for: visibleControllerIdentifier) == nil {
+        let existingNavigation = await model.navigation(for: visibleControllerIdentifier)
+
+        if existingNavigation == nil {
             let fallbackNavigation = NavigationPair(
                 type: .show,
                 start: event.timestamp,
                 typeName: typeName,
                 screenName: screenName
             )
-            await model.update(
-                navigation: fallbackNavigation,
-                for: visibleControllerIdentifier
-            )
+            await model.update(navigation: fallbackNavigation, for: visibleControllerIdentifier)
         }
 
-        let start =
-            await model.navigation(for: visibleControllerIdentifier)?.start
-            ?? event.timestamp
+        let start = existingNavigation?.start ?? event.timestamp
 
         await updateCurrentScreen(
             screenName: screenName,
@@ -158,10 +142,7 @@ extension Navigation {
         await processNavigationEnd(event: endEvent)
     }
 
-    private func updateCurrentScreen(
-        typeName: String,
-        start: Date
-    ) async {
+    private func updateCurrentScreen(typeName: String, start: Date) async {
         let screenName = sanitize(typeName: typeName)
         let lastScreenName = await model.screenName
 
@@ -172,11 +153,7 @@ extension Navigation {
         )
     }
 
-    private func updateCurrentScreen(
-        screenName: String,
-        lastScreenName: String,
-        start: Date
-    ) async {
+    private func updateCurrentScreen(screenName: String, lastScreenName: String, start: Date) async {
         await model.update(screenName: screenName)
 
         if screenName != lastScreenName {
