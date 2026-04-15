@@ -38,11 +38,13 @@ final class NavigationSwiftUITests: XCTestCase {
     }
 
     func testTrackScreenModifierAcceptsAttributes() {
+        let attributes: [String: Any] = [
+            "product.id": "A-1234",
+            "product.category": "electronics"
+        ]
+
         let view = Text("Hello")
-            .trackScreen("TestScreen", attributes: [
-                "product.id": "A-1234",
-                "product.category": "electronics"
-            ])
+            .trackScreen("TestScreen", attributes: attributes)
 
         XCTAssertNotNil(view)
     }
