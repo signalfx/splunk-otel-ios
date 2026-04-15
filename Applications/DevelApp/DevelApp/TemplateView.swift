@@ -29,7 +29,7 @@ struct TemplateView: View {
             Spacer()
         }
         .navigationTitle("Your title")
-        .trackScreen("Template", attributes: ["template.id": "demo"])
+        .trackScreen("Template")
         Spacer()
     }
 

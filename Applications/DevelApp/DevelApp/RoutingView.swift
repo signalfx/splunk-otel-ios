@@ -34,6 +34,9 @@ struct RoutingView: View {
                 NavigationLink(destination: WebViewDemoView()) {
                     Text("WebViewNativeBridge Demo")
                 }
+                NavigationLink(destination: NavigationTrackingDemoView()) {
+                    Text("Navigation Tracking Demo")
+                }
                 NavigationLink(destination: TemplateView()) {
                     Text("Template for New Screens")
                 }
