@@ -47,9 +47,11 @@ extension Navigation {
 
         await model.addManagedNavigationControllerTarget(controllerIdentifier)
 
+        let lastScreenName = await model.screenName
+
         await updateCurrentScreen(
             screenName: screenName,
-            lastScreenName: await model.screenName,
+            lastScreenName: lastScreenName,
             start: event.timestamp
         )
     }
