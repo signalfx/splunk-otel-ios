@@ -25,7 +25,6 @@ extension Navigation {
 
     private static let component = "ui"
     private static let componentKey = "component"
-    private static let navigationSpanName = "app.ui.navigation"
 
     private static let screenNameKey = "screen.name"
     private static let lastScreenNameKey = "last.screen.name"
@@ -69,7 +68,7 @@ extension Navigation {
         // A new zero length span for change screen name event
         let screenNameSpan =
             tracer
-            .spanBuilder(spanName: Self.navigationSpanName)
+            .spanBuilder(spanName: "screen name change")
             .setStartTime(time: start)
             .startSpan()
 
