@@ -15,8 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-public import SplunkNavigation
-
 /// Defines a public API for the user's preferred settings.
 public protocol NavigationModulePreferences {
 
@@ -32,12 +30,6 @@ public protocol NavigationModulePreferences {
     /// - Returns: The updated ``NavigationModulePreferences`` object.
     @discardableResult
     func enableAutomatedTracking(_ enable: Bool?) -> any NavigationModulePreferences
-
-
-    // MARK: - Navigation event processor
-
-    /// Processor used to transform automated navigation events.
-    var navigationEventProcessor: (any NavigationEventProcessor)? { get set }
 
 
     // MARK: - Convenience init

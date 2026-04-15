@@ -81,7 +81,7 @@ final class NavigationEventProcessorTests: XCTestCase {
         let navigation = Navigation(
             navigationEventStreamProvider: MockNavigationEventStreamProvider(stream: events)
         )
-        navigation.preferences.navigationEventProcessor = PrefixingProcessor(prefix: "Custom")
+        navigation.navigationEventProcessor = PrefixingProcessor(prefix: "Custom")
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
@@ -101,7 +101,7 @@ final class NavigationEventProcessorTests: XCTestCase {
         }
 
         let navigation = fixture.navigation
-        navigation.preferences.navigationEventProcessor = RejectingProcessor()
+        navigation.navigationEventProcessor = RejectingProcessor()
         navigation.preferences.enableAutomatedTracking = true
 
         navigation.startDetection()
@@ -122,7 +122,7 @@ final class NavigationEventProcessorTests: XCTestCase {
         }
 
         let navigation = fixture.navigation
-        navigation.preferences.navigationEventProcessor = PrefixingProcessor(prefix: "Auto")
+        navigation.navigationEventProcessor = PrefixingProcessor(prefix: "Auto")
         navigation.preferences.enableAutomatedTracking = true
 
         navigation.startDetection()

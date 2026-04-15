@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-public import SplunkNavigation
+internal import SplunkNavigation
 
 /// The preferences object allows the user to set navigation instrumentation's preferred settings.
 ///
@@ -43,7 +43,6 @@ public final class NavigationPreferences: NavigationModulePreferences, Codable {
         self.module = module
 
         enableAutomatedTracking = module?.preferences.enableAutomatedTracking
-        navigationEventProcessor = module?.preferences.navigationEventProcessor
     }
 
 
@@ -67,16 +66,6 @@ public final class NavigationPreferences: NavigationModulePreferences, Codable {
 
         return self
     }
-
-
-    // MARK: - Navigation event processor
-
-    /// Processor used to transform automated navigation events.
-    public var navigationEventProcessor: (any NavigationEventProcessor)? {
-        didSet {
-            module?.preferences.navigationEventProcessor = navigationEventProcessor
-        }
-    }
 }
 
 
@@ -91,21 +80,6 @@ extension NavigationPreferences {
         self.init()
 
         self.enableAutomatedTracking = enableAutomatedTracking
-    }
-
-    /// Initializes new preferences object with preconfigured values.
-    ///
-    /// - Parameters:
-    ///   - enableAutomatedTracking: If `true`, the ``NavigationModule`` will automatically detect navigation.
-    ///   - navigationEventProcessor: Optional processor to transform automated navigation events.
-    public convenience init(
-        enableAutomatedTracking: Bool?,
-        navigationEventProcessor: (any NavigationEventProcessor)?
-    ) {
-        self.init()
-
-        self.enableAutomatedTracking = enableAutomatedTracking
-        self.navigationEventProcessor = navigationEventProcessor
     }
 }
 

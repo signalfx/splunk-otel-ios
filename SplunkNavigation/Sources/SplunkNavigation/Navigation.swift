@@ -276,7 +276,6 @@ public final class Navigation: Sendable {
     func update() {
         // Update state
         state.isAutomatedTrackingEnabled = preferences.enableAutomatedTracking ?? false
-        navigationEventProcessor = preferences.navigationEventProcessor ?? DefaultNavigationEventProcessor()
     }
 
 

@@ -17,7 +17,6 @@ limitations under the License.
 
 import Foundation
 import SplunkAgent
-import SplunkNavigation
 
 /// The class implements a public API for the Navigation module.
 @objc(SPLKNavigationModule)
@@ -34,20 +33,14 @@ public final class NavigationModuleObjC: NSObject {
     @objc
     public var preferences: NavigationModulePreferencesObjC {
         get {
-            let preferences = NavigationModulePreferencesObjC(
-                enableAutomatedTracking: owner.agent.navigation.preferences.enableAutomatedTracking ?? false,
-                navigationEventProcessor: owner.agent.navigation.preferences.navigationEventProcessor
-            )
+            let preferences = NavigationModulePreferencesObjC(enableAutomatedTracking: owner.agent.navigation.preferences.enableAutomatedTracking ?? false)
             preferences.owner = owner
             return preferences
         }
 
         set {
             newValue.owner = owner
-            owner.agent.navigation.preferences = NavigationPreferences(
-                enableAutomatedTracking: newValue.enableAutomatedTracking,
-                navigationEventProcessor: newValue.navigationEventProcessor
-            )
+            owner.agent.navigation.preferences = NavigationPreferences(enableAutomatedTracking: newValue.enableAutomatedTracking)
         }
     }
 
