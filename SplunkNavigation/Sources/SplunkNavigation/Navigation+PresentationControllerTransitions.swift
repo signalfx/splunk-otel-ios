@@ -116,17 +116,11 @@ extension Navigation {
             await model.navigation(for: snapshot.controllerIdentifier)?
             .start ?? Date()
 
-        await model.update(screenName: screenName)
-        await model.update(isManualScreenName: false)
-
-        if screenName != lastScreenName {
-            continuation.yield(screenName)
-            send(
-                screenName: screenName,
-                lastScreenName: lastScreenName,
-                start: start
-            )
-        }
+        await updateCurrentScreen(
+            screenName: screenName,
+            lastScreenName: lastScreenName,
+            start: start
+        )
 
         let event = AutomatedNavigationEvent(
             timestamp: Date(),

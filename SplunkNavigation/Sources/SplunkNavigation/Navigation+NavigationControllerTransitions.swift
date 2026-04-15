@@ -155,8 +155,9 @@ extension Navigation {
         )
     }
 
-    private func updateCurrentScreen(screenName: String, lastScreenName: String, start: Date) async {
+    func updateCurrentScreen(screenName: String, lastScreenName: String, start: Date) async {
         await model.update(screenName: screenName)
+        await model.update(isManualScreenName: false)
 
         if screenName != lastScreenName {
             continuation.yield(screenName)
