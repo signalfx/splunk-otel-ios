@@ -34,6 +34,10 @@ limitations under the License.
     SPLKNavigationModulePreferences *preferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:NO];
     agent.navigation.preferences = preferences;
     XCTAssertFalse(agent.navigation.preferences.enableAutomatedTracking);
+
+    SPLKNavigationModulePreferences *enabledPreferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:YES];
+    agent.navigation.preferences = enabledPreferences;
+    XCTAssertTrue(agent.navigation.preferences.enableAutomatedTracking);
 }
 
 - (void)testState {
@@ -46,6 +50,12 @@ limitations under the License.
 - (void)testTracking {
     SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
     XCTAssertNoThrow([agent.navigation trackScreen:@"Test"]);
+}
+
+- (void)testTrackingChaining {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    SPLKNavigationModule *result = [agent.navigation trackScreen:@"ScreenA"];
+    XCTAssertNotNil(result);
 }
 
 @end

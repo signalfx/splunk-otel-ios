@@ -48,6 +48,22 @@ final class NavigationAPI10NoOpProxyTests: XCTestCase {
         }
     }
 
+    func testPreferencesSetterIsNoOp() {
+        let preferences = NavigationPreferences()
+            .enableAutomatedTracking(true)
+
+        moduleProxy.preferences = preferences
+
+        let readBack = moduleProxy.preferences
+        XCTAssertNil(readBack.enableAutomatedTracking)
+    }
+
+    func testPreferencesChainingReturnsSelf() {
+        let preferences = NavigationPreferences()
+        let result = moduleProxy.preferences(preferences)
+        XCTAssertTrue(result as AnyObject === moduleProxy)
+    }
+
 
     // MARK: - State
 
@@ -65,5 +81,10 @@ final class NavigationAPI10NoOpProxyTests: XCTestCase {
 
     func testTracking() {
         XCTAssertNotNil(moduleProxy.track(screen: "Test"))
+    }
+
+    func testTrackingReturnsSelf() {
+        let result = moduleProxy.track(screen: "Test")
+        XCTAssertTrue(result as AnyObject === moduleProxy)
     }
 }
