@@ -59,9 +59,11 @@ private struct BasicTrackingView: View {
     var body: some View {
         VStack(spacing: 16) {
             DemoHeaderView()
-            CodeSnippetView(code: """
-                .trackScreen("BasicTracking")
-                """)
+            CodeSnippetView(
+                code: """
+                    .trackScreen("BasicTracking")
+                    """
+            )
             Spacer()
         }
         .padding()
@@ -75,15 +77,17 @@ private struct AttributesTrackingView: View {
     var body: some View {
         VStack(spacing: 16) {
             DemoHeaderView()
-            CodeSnippetView(code: """
-                .trackScreen(
-                    "AttributesTracking",
-                    attributes: [
-                        "demo.feature": "trackScreen",
-                        "demo.attributes": true
-                    ]
-                )
-                """)
+            CodeSnippetView(
+                code: """
+                    .trackScreen(
+                        "AttributesTracking",
+                        attributes: [
+                            "demo.feature": "trackScreen",
+                            "demo.attributes": true
+                        ]
+                    )
+                    """
+            )
             Spacer()
         }
         .padding()
