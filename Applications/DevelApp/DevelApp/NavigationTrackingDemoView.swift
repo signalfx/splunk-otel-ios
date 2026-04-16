@@ -35,16 +35,36 @@ struct NavigationTrackingDemoView: View {
 }
 
 
+// MARK: - Code snippet
+
+private struct CodeSnippetView: View {
+
+    let code: String
+
+    var body: some View {
+        Text(code)
+            .font(.system(.caption, design: .monospaced))
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(8)
+    }
+}
+
+
 // MARK: - Demo screens
 
 private struct BasicTrackingView: View {
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             DemoHeaderView()
-            Text("This screen uses .trackScreen without attributes.")
+            CodeSnippetView(code: """
+                .trackScreen("BasicTracking")
+                """)
             Spacer()
         }
+        .padding()
         .navigationTitle("Basic Tracking")
         .trackScreen("BasicTracking")
     }
@@ -53,11 +73,20 @@ private struct BasicTrackingView: View {
 private struct AttributesTrackingView: View {
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             DemoHeaderView()
-            Text("This screen uses .trackScreen with custom attributes.")
+            CodeSnippetView(code: """
+                .trackScreen(
+                    "AttributesTracking",
+                    attributes: [
+                        "demo.feature": "trackScreen",
+                        "demo.attributes": true
+                    ]
+                )
+                """)
             Spacer()
         }
+        .padding()
         .navigationTitle("Attributes Tracking")
         .trackScreen(
             "AttributesTracking",
