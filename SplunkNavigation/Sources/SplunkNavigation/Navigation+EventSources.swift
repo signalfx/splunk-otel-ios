@@ -24,4 +24,8 @@ extension Navigation {
     func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
         try await navigationEventStreamProvider.navigationStream()
     }
+
+    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
+        try await navigationEventStreamProvider.presentationStream()
+    }
 }

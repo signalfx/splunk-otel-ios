@@ -15,20 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoSwizzling
+import UIKit
 
-@testable import SplunkNavigation
-
-struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
-    let stream: AsyncStream<any NavigationActionEvent>
-
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        await Task.yield()
-        return stream
-    }
-
-    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
-        await Task.yield()
-        return AsyncStream { _ in }
-    }
-}
+final class PresentingViewController: UIViewController {}
+final class PresentedViewController: UIViewController {}

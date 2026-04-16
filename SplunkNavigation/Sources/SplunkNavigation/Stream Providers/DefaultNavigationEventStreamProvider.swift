@@ -22,4 +22,8 @@ struct DefaultNavigationEventStreamProvider: NavigationEventStreamProviding, Sen
     func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
         try await DefaultSwizzling.navigation
     }
+
+    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
+        try await DefaultSwizzling.presentation
+    }
 }

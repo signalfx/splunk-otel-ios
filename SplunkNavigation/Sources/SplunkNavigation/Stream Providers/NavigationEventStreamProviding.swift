@@ -20,4 +20,5 @@ import CiscoSwizzling
 /// Provides navigation action events produced by swizzling.
 protocol NavigationEventStreamProviding: Sendable {
     func navigationStream() async throws -> AsyncStream<any NavigationActionEvent>
+    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent>
 }
