@@ -48,7 +48,6 @@ final class NavigationAPI10NoOpProxyTests: XCTestCase {
         }
     }
 
-
     func testPreferencesSetterIsNoOp() {
         let preferences = NavigationPreferences()
             .enableAutomatedTracking(true)

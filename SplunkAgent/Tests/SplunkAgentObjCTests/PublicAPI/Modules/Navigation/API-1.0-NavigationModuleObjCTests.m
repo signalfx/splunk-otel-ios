@@ -34,6 +34,10 @@ limitations under the License.
     SPLKNavigationModulePreferences *preferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:NO];
     agent.navigation.preferences = preferences;
     XCTAssertFalse(agent.navigation.preferences.enableAutomatedTracking);
+
+    SPLKNavigationModulePreferences *enabledPreferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:YES];
+    agent.navigation.preferences = enabledPreferences;
+    XCTAssertTrue(agent.navigation.preferences.enableAutomatedTracking);
 }
 
 - (void)testState {
@@ -41,11 +45,6 @@ limitations under the License.
     SPLKNavigationModuleState *state = agent.navigation.state;
     XCTAssertNotNil(state);
     XCTAssertFalse(state.isAutomatedTrackingEnabled);
-}
-
-- (void)testDefaultState {
-    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
-    XCTAssertFalse(agent.navigation.state.isAutomatedTrackingEnabled);
 }
 
 - (void)testTracking {
@@ -57,16 +56,6 @@ limitations under the License.
     SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
     SPLKNavigationModule *result = [agent.navigation trackScreen:@"ScreenA"];
     XCTAssertNotNil(result);
-}
-
-- (void)testPreferencesRoundTrip {
-    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
-
-    SPLKNavigationModulePreferences *preferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:YES];
-    agent.navigation.preferences = preferences;
-
-    XCTAssertNotNil(agent.navigation.preferences);
-    XCTAssertTrue(agent.navigation.preferences.enableAutomatedTracking);
 }
 
 @end

@@ -80,7 +80,6 @@ final class NavigationAPI10ModuleProxyTests: XCTestCase {
         XCTAssertTrue(result as AnyObject === moduleProxy)
     }
 
-
     // MARK: - State
 
     func testState() throws {
