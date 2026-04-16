@@ -122,11 +122,15 @@ public final class Navigation: Sendable {
     /// Starts detection and processing of navigation.
     func startDetection() {
         Task(priority: .userInitiated) {
-            await runDetectionLoop()
+            await runNavigationDetectionLoop()
+        }
+
+        Task(priority: .userInitiated) {
+            await runPresentationDetectionLoop()
         }
     }
 
-    private func runDetectionLoop() async {
+    private func runNavigationDetectionLoop() async {
         do {
             let stream = try await navigationStream()
 
@@ -138,12 +142,39 @@ public final class Navigation: Sendable {
                     continue
                 }
 
+                if await isNavigationControllerManaged(event: event) {
+                    continue
+                }
+
                 await processNavigationEvent(event)
             }
         }
         catch {
             logger.log(level: .error) {
                 "Failed to initialize navigation stream: \(String(describing: error))"
+            }
+        }
+    }
+
+    private func runPresentationDetectionLoop() async {
+        do {
+            let stream = try await presentationStream()
+
+            for await event in stream {
+                guard
+                    await shouldProcessEvent(),
+                    !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName),
+                    !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName)
+                else {
+                    continue
+                }
+
+                await processPresentationEvent(event: event)
+            }
+        }
+        catch {
+            logger.log(level: .error) {
+                "Failed to initialize presentation stream: \(String(describing: error))"
             }
         }
     }
@@ -162,6 +193,13 @@ public final class Navigation: Sendable {
             .viewDidDisappear,
             .viewDidTransition:
             await processNavigationEnd(event: event)
+
+        case .navigationControllerWillShow:
+            await processNavigationControllerWillShow(event: event)
+
+        case .navigationControllerDidShow:
+            await processNavigationControllerDidShow(event: event)
+
 
         default:
             break
@@ -227,7 +265,7 @@ public final class Navigation: Sendable {
     }
 
     /// Process the finalizing of the navigation.
-    private func processNavigationEnd(event: NavigationActionEvent) async {
+    func processNavigationEnd(event: NavigationActionEvent) async {
         let end = Date()
         let identifier = event.controllerIdentifier
 
@@ -265,6 +303,26 @@ public final class Navigation: Sendable {
 
         return moduleEnabled && trackingEnabled
     }
+
+    /// Checks whether the event belongs to a view controller whose lifecycle is managed
+    /// by a `UINavigationController` transition.
+    ///
+    /// When a navigation controller push or pop is in flight, the child controller also fires
+    /// its own `viewDidLoad` / `viewDidAppear` events. Processing those independently would
+    /// create duplicate screen-name updates and navigation spans. This guard suppresses the
+    /// redundant lifecycle events so that only the navigation-controller transition path
+    /// (`willShow` / `didShow`) drives the screen change.
+    private func isNavigationControllerManaged(event: NavigationActionEvent) async -> Bool {
+        switch event.type {
+        case .viewDidAppear,
+            .viewDidLoad:
+            await model.isManagedNavigationControllerTarget(event.controllerIdentifier)
+
+        default:
+            false
+        }
+    }
+
 
     func preferredControllerName(for controller: UIViewController) -> String {
         String(describing: type(of: controller))

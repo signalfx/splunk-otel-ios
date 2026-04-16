@@ -15,15 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoSwizzling
+import UIKit
 
-/// Default stream provider backed by CiscoSwizzling.
-struct DefaultNavigationEventStreamProvider: NavigationEventStreamProviding, Sendable {
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        try await DefaultSwizzling.navigation
-    }
-
-    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
-        try await DefaultSwizzling.presentation
-    }
-}
+final class PresentingViewController: UIViewController {}
+final class PresentedViewController: UIViewController {}

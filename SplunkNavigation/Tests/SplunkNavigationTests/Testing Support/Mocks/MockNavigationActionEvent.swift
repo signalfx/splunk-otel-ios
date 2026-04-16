@@ -15,15 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoSwizzling
+internal import CiscoSwizzling
+import Foundation
 
-/// Default stream provider backed by CiscoSwizzling.
-struct DefaultNavigationEventStreamProvider: NavigationEventStreamProviding, Sendable {
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        try await DefaultSwizzling.navigation
-    }
+@testable import SplunkNavigation
 
-    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
-        try await DefaultSwizzling.presentation
-    }
+struct MockNavigationActionEvent: NavigationActionEvent {
+    let timestamp: Date
+    let type: NavigationActionEventType
+    let navigationControllerIdentifier: ObjectIdentifier?
+    let controllerTypeName: String
+    let controllerIdentifier: ObjectIdentifier
+    var viewFrame: CGRect?
 }
