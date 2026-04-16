@@ -22,6 +22,7 @@ actor NavigationModel {
 
     private(set) var moduleEnabled: Bool = true
     private(set) var screenName: String = "unknown"
+    private(set) var isManualScreenName = false
     private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
     private(set) var pendingNavigationTargets: [ObjectIdentifier: ObjectIdentifier] = [:]
     private(set) var managedNavigationControllerTargets: Set<ObjectIdentifier> = []
@@ -39,6 +40,10 @@ actor NavigationModel {
 
     func update(screenName: String) {
         self.screenName = screenName
+    }
+
+    func update(isManualScreenName: Bool) {
+        self.isManualScreenName = isManualScreenName
     }
 
 
