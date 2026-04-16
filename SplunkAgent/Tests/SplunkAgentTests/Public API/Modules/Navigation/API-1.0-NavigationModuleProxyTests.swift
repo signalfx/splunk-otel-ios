@@ -73,6 +73,13 @@ final class NavigationAPI10ModuleProxyTests: XCTestCase {
     }
 
 
+    func testPreferencesChainingReturnsSelf() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+        let preferences = NavigationPreferences()
+        let result = moduleProxy.preferences(preferences)
+        XCTAssertTrue(result as AnyObject === moduleProxy)
+    }
+
     // MARK: - State
 
     func testState() throws {
@@ -83,6 +90,13 @@ final class NavigationAPI10ModuleProxyTests: XCTestCase {
         let defaultAutomatedTracking = state.isAutomatedTrackingEnabled
         XCTAssertNotNil(state.isAutomatedTrackingEnabled)
         XCTAssertFalse(defaultAutomatedTracking)
+    }
+
+    func testStateReflectsPreferencesChange() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+        moduleProxy.preferences = NavigationPreferences()
+            .enableAutomatedTracking(true)
+        XCTAssertTrue(moduleProxy.state.isAutomatedTrackingEnabled)
     }
 
 
@@ -101,5 +115,11 @@ final class NavigationAPI10ModuleProxyTests: XCTestCase {
     func testTrackingWithNilAttributes() throws {
         let moduleProxy = try XCTUnwrap(moduleProxy)
         XCTAssertNotNil(moduleProxy.track(screen: "Test", attributes: nil))
+    }
+
+    func testTrackingReturnsSelf() throws {
+        let moduleProxy = try XCTUnwrap(moduleProxy)
+        let result = moduleProxy.track(screen: "Test")
+        XCTAssertTrue(result as AnyObject === moduleProxy)
     }
 }

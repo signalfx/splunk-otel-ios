@@ -41,6 +41,13 @@ limitations under the License.
     XCTAssertNotNil(fullConfiguration);
 }
 
+- (void)testDefaultValues {
+    SPLKNavigationConfiguration *configuration = [[SPLKNavigationConfiguration alloc] init];
+
+    XCTAssertTrue(configuration.isEnabled);
+    XCTAssertFalse(configuration.enableAutomatedTracking);
+}
+
 - (void)testProperties {
     SPLKNavigationConfiguration *configuration = [[SPLKNavigationConfiguration alloc] init];
 
