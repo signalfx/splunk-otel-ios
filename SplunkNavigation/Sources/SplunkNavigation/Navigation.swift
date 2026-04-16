@@ -166,14 +166,7 @@ public final class Navigation: Sendable {
         do {
             let stream = try await presentationStream()
 
-            for await event in stream {
-                guard
-                    await shouldProcessEvent(),
-                    !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName),
-                    !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName)
-                else {
-                    continue
-                }
+            for await event in stream where await shouldProcessEvent() {
 
                 await processPresentationEvent(event: event)
             }
