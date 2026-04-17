@@ -12,13 +12,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added public references to sessionWillResetNotification and sessionDidResetNotification
 * Added optional support to capture network headers.
 * Session Replay now captures text content in wireframes for UIKit applications.
-* Added `.trackScreen` SwiftUI view modifier for manual screen name tracking with optional custom attributes.
+* Added `.trackScreen` SwiftUI view modifier for manual screen name tracking with optional custom attributes. (DEMRUM-4657)
+* Added automated screen tracking for modal presentation and dismissal via `UIPresentationController`. (DEMRUM-4778)
+* Added `NavigationEventProcessor` protocol for custom screen name transforms on navigation events. (DEMRUM-5203)
+* Added `navigation.name` attribute on `app.ui.navigation` screen-change spans. (DEMRUM-5282)
+* Added navigation module integration in `SplunkAgent` proxy with Swift and Objective-C API surfaces. (DEMRUM-4779)
 
 ### Changed
 
 * Updated endpoint from signalfx.com to observability.splunkcloud.com
-* Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans.
-* Added automated screen tracking for `UINavigationController` push and pop transitions, including interactive pop cancellation handling.
+* Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans. (DEMRUM-4814)
+* Added automated screen tracking for `UINavigationController` push and pop transitions, including interactive pop cancellation handling. (DEMRUM-4776)
 
 ## [2.2.1] - 2026-03-19
 
