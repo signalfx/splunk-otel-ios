@@ -59,7 +59,6 @@ extension Navigation {
         navigationSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
 
         let screenName = navigation.screenName
-        navigationSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
         navigationSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: screenName)
         navigationSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
