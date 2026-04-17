@@ -19,6 +19,13 @@ import SplunkAgent
 import SwiftUI
 
 struct RoutingView: View {
+
+    private var uikitNavDestination: some View {
+        UIKitNavigationDemoView()
+            .navigationBarHidden(true)
+            .edgesIgnoringSafeArea(.all)
+    }
+
     var body: some View {
         NavigationView {
             List {
@@ -37,6 +44,11 @@ struct RoutingView: View {
                 NavigationLink(destination: NavigationTrackingDemoView()) {
                     Text("Navigation Tracking Demo")
                 }
+                .accessibilityIdentifier("navTrackingDemo")
+                NavigationLink(destination: uikitNavDestination) {
+                    Text("UIKit Navigation Demo")
+                }
+                .accessibilityIdentifier("uikitNavDemo")
                 NavigationLink(destination: TemplateView()) {
                     Text("Template for New Screens")
                 }
