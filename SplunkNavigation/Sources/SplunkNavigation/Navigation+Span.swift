@@ -27,6 +27,7 @@ extension Navigation {
     private static let componentKey = "component"
     private static let navigationSpanName = "app.ui.navigation"
 
+    private static let navigationNameKey = "navigation.name"
     private static let screenNameKey = "screen.name"
     private static let lastScreenNameKey = "last.screen.name"
 
@@ -74,6 +75,7 @@ extension Navigation {
             .startSpan()
 
         screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
+        screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
         screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
         screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
