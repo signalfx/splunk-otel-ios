@@ -65,7 +65,7 @@ extension Navigation {
         navigationSpan.end(time: navigationEnd)
     }
 
-    func send(screenName: String, lastScreenName: String, start: Date) {
+    func send(screenName: String, lastScreenName: String, start: Date, attributes: [String: Any]? = nil) {
         // A new zero length span for change screen name event
         let screenNameSpan =
             tracer
@@ -76,6 +76,12 @@ extension Navigation {
         screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
         screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
         screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
+
+        if let attributes {
+            for (key, value) in attributes {
+                screenNameSpan.clearAndSetAttribute(key: key, value: value)
+            }
+        }
 
         screenNameSpan.end(time: start)
     }

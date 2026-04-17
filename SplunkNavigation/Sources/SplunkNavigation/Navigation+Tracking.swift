@@ -22,6 +22,10 @@ extension Navigation {
     // MARK: - Manual detection
 
     public func track(screen name: String) {
+        track(screen: name, attributes: nil)
+    }
+
+    public func track(screen name: String, attributes: [String: Any]?) {
         let start = Date()
 
         Task {
@@ -44,7 +48,7 @@ extension Navigation {
             continuation.yield(name)
 
             // Send corresponding span
-            send(screenName: name, lastScreenName: lastScreenName, start: start)
+            send(screenName: name, lastScreenName: lastScreenName, start: start, attributes: attributes)
         }
     }
 }

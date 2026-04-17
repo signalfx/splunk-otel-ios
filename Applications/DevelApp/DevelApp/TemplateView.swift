@@ -29,6 +29,7 @@ struct TemplateView: View {
             Spacer()
         }
         .navigationTitle("Your title")
+        .trackScreen("Template")
         Spacer()
     }
 

@@ -83,6 +83,14 @@ final class NavigationAPI10NoOpProxyTests: XCTestCase {
         XCTAssertNotNil(moduleProxy.track(screen: "Test"))
     }
 
+    func testTrackingWithAttributes() {
+        XCTAssertNotNil(moduleProxy.track(screen: "Test", attributes: ["product.id": "A-1234"]))
+    }
+
+    func testTrackingWithNilAttributes() {
+        XCTAssertNotNil(moduleProxy.track(screen: "Test", attributes: nil))
+    }
+
     func testTrackingReturnsSelf() {
         let result = moduleProxy.track(screen: "Test")
         XCTAssertTrue(result as AnyObject === moduleProxy)
