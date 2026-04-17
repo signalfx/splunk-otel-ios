@@ -13,6 +13,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added optional support to capture network headers.
 * Session Replay now captures text content in wireframes for UIKit applications.
 * Added `.trackScreen` SwiftUI view modifier for manual screen name tracking with optional custom attributes.
+* Added automated screen tracking for `UIViewController` transition events including screen updates and navigation spans.
+* Added automated screen tracking for `UINavigationController` push and pop transitions, including interactive pop cancellation handling.
 * Added automated screen tracking for modal presentation and dismissal via `UIPresentationController`.
 * Added `NavigationEventProcessor` protocol for custom screen name transforms on navigation events.
 * Added `navigation.name` attribute on `app.ui.navigation` screen-change spans.
@@ -21,8 +23,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Updated endpoint from signalfx.com to observability.splunkcloud.com
-* Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans.
-* Added automated screen tracking for `UINavigationController` push and pop transitions, including interactive pop cancellation handling.
 
 ## [2.2.1] - 2026-03-19
 
