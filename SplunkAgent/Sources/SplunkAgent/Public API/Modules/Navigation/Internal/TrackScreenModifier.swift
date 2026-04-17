@@ -30,6 +30,10 @@ struct TrackScreenModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onAppear {
+                // .onAppear can fire multiple times during the SwiftUI view lifecycle
+                // (redraws, tab switches, etc.). Navigation.track(screen:) deduplicates
+                // by comparing against the current screen name, so repeated calls with
+                // the same name are no-ops and do not generate additional spans.
                 SplunkRum.shared.navigation.track(screen: screenName, attributes: attributes)
             }
     }
