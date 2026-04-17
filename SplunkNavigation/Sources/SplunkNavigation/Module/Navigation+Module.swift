@@ -65,6 +65,11 @@ extension Navigation: Module {
         // Update preferences
         preferences.enableAutomatedTracking = configuration.enableAutomatedTracking
 
+        // Update navigation event processor
+        if let processor = configuration.navigationEventProcessor {
+            navigationEventProcessor = processor
+        }
+
         // Update module mode
         let isEnabled = configuration.isEnabled
 

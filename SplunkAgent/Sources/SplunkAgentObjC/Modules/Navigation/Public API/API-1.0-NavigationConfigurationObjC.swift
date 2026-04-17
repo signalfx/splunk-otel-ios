@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkNavigation
 
 /// The class implements the Navigation module configuration.
 @objc(SPLKNavigationConfiguration)
@@ -28,6 +29,9 @@ public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
     ///
     /// Default value is `NO`.
     public var enableAutomatedTracking: Bool = false
+
+    /// Processor used to transform automated navigation events before they produce spans.
+    public var navigationEventProcessor: NavigationEventProcessor?
 
 
     // MARK: - Initialization
@@ -56,5 +60,24 @@ public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
 
         self.isEnabled = isEnabled
         self.enableAutomatedTracking = enableAutomatedTracking
+    }
+
+    /// Initializes new module configuration with preconfigured values.
+    ///
+    /// - Parameters:
+    ///   - isEnabled: A `BOOL` value sets whether the module is enabled.
+    ///   - enableAutomatedTracking: If `YES`, the module will automatically detect navigation.
+    ///   - navigationEventProcessor: Optional processor to transform automated navigation events.
+    @objc(initWithEnabled:automatedTracking:navigationEventProcessor:)
+    public init(
+        isEnabled: Bool,
+        enableAutomatedTracking: Bool,
+        navigationEventProcessor: NavigationEventProcessor?
+    ) {
+        super.init()
+
+        self.isEnabled = isEnabled
+        self.enableAutomatedTracking = enableAutomatedTracking
+        self.navigationEventProcessor = navigationEventProcessor
     }
 }

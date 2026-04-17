@@ -31,20 +31,38 @@ extension Navigation {
     // MARK: - Presentation controller transitions
 
     func processPresentationEvent(event: any PresentationActionEvent) async {
+        // Filter on the controller whose screen name will be set:
+        // presented for presentations, presenting for dismissals.
         switch event.type {
         case .presentationWillBegin:
+            guard !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
+                return
+            }
+
             await updateTransitionStart(for: presentedSnapshot(from: event))
 
         case .presentationDidEnd:
+            guard !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
+                return
+            }
+
             await finalizeTransition(
                 for: presentedSnapshot(from: event),
                 completed: event.completed ?? true
             )
 
         case .dismissalWillBegin:
+            guard !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
+                return
+            }
+
             await updateTransitionStart(for: presentingSnapshot(from: event))
 
         case .dismissalDidEnd:
+            guard !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
+                return
+            }
+
             await finalizeTransition(
                 for: presentingSnapshot(from: event),
                 completed: event.completed ?? true

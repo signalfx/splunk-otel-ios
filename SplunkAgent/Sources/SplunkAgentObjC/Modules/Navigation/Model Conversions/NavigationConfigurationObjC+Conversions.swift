@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 internal import SplunkCommon
-internal import SplunkNavigation
+import SplunkNavigation
 
 extension NavigationConfigurationObjC: ModuleConfigurationSwift {
 
@@ -25,7 +25,8 @@ extension NavigationConfigurationObjC: ModuleConfigurationSwift {
     var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
         NavigationConfiguration(
             isEnabled: isEnabled,
-            enableAutomatedTracking: enableAutomatedTracking
+            enableAutomatedTracking: enableAutomatedTracking,
+            navigationEventProcessor: navigationEventProcessor
         )
     }
 }
