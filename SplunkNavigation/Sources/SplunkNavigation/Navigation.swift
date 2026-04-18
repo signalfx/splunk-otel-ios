@@ -213,10 +213,12 @@ public final class Navigation: Sendable {
         let start = Date()
 
         let typeName = event.controllerTypeName
-        let screenName = processAutomatedScreenName(
+        guard let screenName = processAutomatedScreenName(
             sanitize(typeName: typeName),
             controllerIdentifier: event.controllerIdentifier
-        )
+        ) else {
+            return
+        }
         let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
@@ -244,10 +246,12 @@ public final class Navigation: Sendable {
         let start = Date()
 
         let typeName = event.controllerTypeName
-        let screenName = processAutomatedScreenName(
+        guard let screenName = processAutomatedScreenName(
             sanitize(typeName: typeName),
             controllerIdentifier: event.controllerIdentifier
-        )
+        ) else {
+            return
+        }
         let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
@@ -330,17 +334,19 @@ public final class Navigation: Sendable {
 
 
     /// Passes the raw automated screen name through the ``navigationEventProcessor``
-    /// and returns the (potentially transformed) screen name.
+    /// and returns the (potentially transformed) screen name, or `nil` if the event was suppressed.
     func processAutomatedScreenName(
         _ screenName: String,
         controllerIdentifier: ObjectIdentifier
-    ) -> String {
-        let event = NavigationEvent(
-            screenName: screenName,
-            controllerIdentifier: controllerIdentifier
-        )
-        let processed = navigationEventProcessor.process(event: event)
-        return processed.screenName
+    ) -> String? {
+        let controllerIdentity = String(describing: controllerIdentifier)
+        guard let processed = navigationEventProcessor.onViewController(
+            typeName: screenName,
+            controllerIdentity: controllerIdentity
+        ) else {
+            return nil
+        }
+        return processed.name
     }
 
     func preferredControllerName(for controller: UIViewController) -> String {

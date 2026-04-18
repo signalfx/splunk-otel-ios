@@ -155,6 +155,54 @@ final class NavigationEventProcessorTests: XCTestCase {
         }
         XCTAssertTrue(didSetAuto)
     }
+
+    // MARK: - Event suppression
+
+    func testProcessorReturningNilSuppressesNavigation() async {
+        let fixture = makeNavigationStreamFixture()
+
+        defer {
+            fixture.finish()
+        }
+
+        let navigation = fixture.navigation
+        navigation.navigationEventProcessor = SuppressingProcessor()
+        navigation.preferences.enableAutomatedTracking = true
+
+        navigation.startDetection()
+
+        // Set an initial screen name manually (bypasses processor)
+        navigation.track(screen: "InitialScreen")
+
+        let didSetInitial = await waitUntil {
+            await navigation.model.screenName == "InitialScreen"
+        }
+        XCTAssertTrue(didSetInitial)
+
+        // Send an automated navigation event; the suppressing processor returns nil
+        let detailIdentifier = ObjectIdentifier(NSString())
+        let navigationControllerIdentifier = ObjectIdentifier(NSNumber(value: 10))
+
+        fixture.sendTransition(
+            type: .navigationControllerWillShow,
+            navigationControllerIdentifier: navigationControllerIdentifier,
+            controllerIdentifier: detailIdentifier,
+            controllerTypeName: "SuppressedViewController"
+        )
+        fixture.sendTransition(
+            type: .navigationControllerDidShow,
+            navigationControllerIdentifier: navigationControllerIdentifier,
+            controllerIdentifier: detailIdentifier,
+            controllerTypeName: "SuppressedViewController"
+        )
+
+        // Give the event loop time to process
+        try? await Task.sleep(nanoseconds: 200_000_000)
+
+        // Screen name should remain unchanged because the event was suppressed
+        let currentScreenName = await navigation.model.screenName
+        XCTAssertEqual(currentScreenName, "InitialScreen")
+    }
 }
 
 
@@ -167,20 +215,28 @@ private final class PrefixingProcessor: NSObject, NavigationEventProcessor {
         self.prefix = prefix
     }
 
-    func process(event: NavigationEvent) -> NavigationEvent {
+    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
         NavigationEvent(
-            screenName: "\(prefix)/\(event.screenName)",
-            controllerIdentifier: event.controllerIdentifier,
-            attributes: event.attributes
+            name: "\(prefix)/\(typeName)",
+            controllerIdentity: controllerIdentity
         )
     }
 }
 
 private final class RejectingProcessor: NSObject, NavigationEventProcessor {
-    func process(event: NavigationEvent) -> NavigationEvent {
-        NavigationEvent(
-            screenName: "REJECTED",
-            controllerIdentifier: event.controllerIdentifier
+    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
+        _ = typeName
+        return NavigationEvent(
+            name: "REJECTED",
+            controllerIdentity: controllerIdentity
         )
+    }
+}
+
+private final class SuppressingProcessor: NSObject, NavigationEventProcessor {
+    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
+        _ = typeName
+        _ = controllerIdentity
+        return nil
     }
 }

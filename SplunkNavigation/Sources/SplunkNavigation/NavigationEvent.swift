@@ -25,9 +25,9 @@ public final class NavigationEvent: NSObject {
 
     // MARK: - Public
 
-    /// A normalized screen name.
+    /// The navigation name for this event.
     @objc
-    public var screenName: String
+    public var name: String
 
     /// String representation of the tracked UI identity.
     @objc
@@ -46,17 +46,38 @@ public final class NavigationEvent: NSObject {
     /// Creates a navigation event.
     ///
     /// - Parameters:
-    ///   - screenName: A normalized screen name.
+    ///   - name: The navigation name for this event.
     ///   - controllerIdentifier: Identifier of the tracked UI object.
     ///   - attributes: Additional event attributes.
     public init(
-        screenName: String,
+        name: String,
         controllerIdentifier: ObjectIdentifier,
         attributes: [String: Any]? = nil
     ) {
-        self.screenName = screenName
+        self.name = name
         self.controllerIdentifier = controllerIdentifier
         controllerIdentity = String(describing: controllerIdentifier)
+        self.attributes = attributes
+    }
+
+    /// Creates a navigation event using a string identity.
+    ///
+    /// This initializer is available for Objective-C consumers where `ObjectIdentifier` is not accessible.
+    ///
+    /// - Parameters:
+    ///   - name: The navigation name for this event.
+    ///   - controllerIdentity: String representation of the tracked UI identity.
+    ///   - attributes: Additional event attributes.
+    @objc(initWithName:controllerIdentity:attributes:)
+    public init(
+        name: String,
+        controllerIdentity: String,
+        attributes: [String: Any]? = nil
+    ) {
+        self.name = name
+        self.controllerIdentity = controllerIdentity
+        // Create a stable placeholder; Swift consumers should use the ObjectIdentifier initializer.
+        self.controllerIdentifier = ObjectIdentifier(NSNull())
         self.attributes = attributes
     }
 }

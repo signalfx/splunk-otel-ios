@@ -17,19 +17,24 @@ limitations under the License.
 
 import Foundation
 
-/// Transforms automated navigation events before they are handled by the module.
+/// Defines basic functionality for navigation event processors.
 @objc(SPLKNavigationEventProcessor)
 public protocol NavigationEventProcessor {
 
-    // MARK: - Event processing
+    // MARK: - Processor methods
 
-    /// Processes an automated navigation event.
+    /// Processes and filters detected navigation events on `UIViewController` descendants.
     ///
-    /// - Parameter event: The event produced by navigation detection.
+    /// Return a ``NavigationEvent`` to allow the navigation (potentially with a transformed name
+    /// or additional attributes), or return `nil` to suppress the event entirely.
     ///
-    /// - Returns: The event to be used by the module.
-    @objc(processEvent:)
-    func process(event: NavigationEvent) -> NavigationEvent
+    /// - Parameters:
+    ///   - typeName: The name of the controller type associated with the navigation event.
+    ///   - controllerIdentity: String representation of the controller's object identifier.
+    ///
+    /// - Returns: New navigation event or `nil` if this navigation should be ignored.
+    @objc(onViewControllerWithTypeName:controllerIdentity:)
+    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent?
 }
 
 /// A pass-through processor used by default.
@@ -44,10 +49,14 @@ public final class DefaultNavigationEventProcessor: NSObject, NavigationEventPro
     }
 
 
-    // MARK: - Event processing
+    // MARK: - Processor methods
 
-    @objc(processEvent:)
-    public func process(event: NavigationEvent) -> NavigationEvent {
-        event
+    @objc(onViewControllerWithTypeName:controllerIdentity:)
+    public func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
+        NavigationEvent(
+            name: typeName,
+            controllerIdentity: controllerIdentity,
+            attributes: nil
+        )
     }
 }
