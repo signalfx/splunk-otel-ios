@@ -21,6 +21,7 @@ import XCTest
 
 @testable import SplunkWebView
 
+@MainActor
 final class WebViewInstrumentationTests: XCTestCase {
 
     // MARK: - Private
