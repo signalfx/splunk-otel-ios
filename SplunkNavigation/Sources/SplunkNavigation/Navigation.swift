@@ -351,15 +351,15 @@ public final class Navigation: Sendable {
     }
 
 
-    /// Passes the automated screen name through the ``navigationEventProcessor``
+    /// Passes the sanitized type name through the ``navigationEventProcessor``
     /// and returns the processed event, or `nil` if the event was suppressed.
     func processAutomatedNavigationEvent(
-        _ screenName: String,
+        _ typeName: String,
         controllerIdentifier: ObjectIdentifier
     ) -> NavigationEvent? {
         let controllerIdentity = String(describing: controllerIdentifier)
         return navigationEventProcessor.onViewController(
-            typeName: screenName,
+            typeName: typeName,
             controllerIdentity: controllerIdentity
         )
     }
