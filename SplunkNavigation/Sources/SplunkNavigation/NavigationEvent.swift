@@ -77,7 +77,7 @@ public final class NavigationEvent: NSObject {
         self.name = name
         self.controllerIdentity = controllerIdentity
         // Create a stable placeholder; Swift consumers should use the ObjectIdentifier initializer.
-        self.controllerIdentifier = ObjectIdentifier(NSNull())
+        controllerIdentifier = ObjectIdentifier(NSNull())
         self.attributes = attributes
     }
 }

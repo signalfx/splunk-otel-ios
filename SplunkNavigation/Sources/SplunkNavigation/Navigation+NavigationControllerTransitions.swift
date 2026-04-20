@@ -114,6 +114,7 @@ extension Navigation {
         ) else {
             return true
         }
+
         let lastScreenName = await model.screenName
 
         await updateCurrentScreen(
@@ -134,6 +135,7 @@ extension Navigation {
         ) else {
             return
         }
+
         let lastScreenName = await model.screenName
 
         let existingNavigation = await model.navigation(for: visibleControllerIdentifier)

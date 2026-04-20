@@ -126,6 +126,7 @@ extension Navigation {
             await model.removeNavigation(for: snapshot.controllerIdentifier)
             return
         }
+
         let lastScreenName = await model.screenName
 
         if await model.navigation(for: snapshot.controllerIdentifier) == nil {

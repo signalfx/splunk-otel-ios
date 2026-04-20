@@ -219,6 +219,7 @@ public final class Navigation: Sendable {
         ) else {
             return
         }
+
         let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
@@ -252,6 +253,7 @@ public final class Navigation: Sendable {
         ) else {
             return
         }
+
         let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
@@ -346,6 +348,7 @@ public final class Navigation: Sendable {
         ) else {
             return nil
         }
+
         return processed.name
     }
 
