@@ -27,21 +27,35 @@ public final class NavigationEvent: NSObject {
 
     /// The navigation name for this event.
     @objc
-    public var name: String
+    public let name: String
 
     /// String representation of the tracked UI identity.
     @objc
     public let controllerIdentity: String
 
     /// Identifier of the tracked UI object used by Swift consumers.
-    public let controllerIdentifier: ObjectIdentifier
+    ///
+    /// This is `nil` when the event was created via the Objective-C initializer.
+    public let controllerIdentifier: ObjectIdentifier?
 
     /// Additional attributes associated with navigation.
     @objc
-    public var attributes: [String: Any]?
+    public let attributes: [String: Any]?
 
 
     // MARK: - Initialization
+
+    private init(
+        name: String,
+        controllerIdentity: String,
+        controllerIdentifier: ObjectIdentifier?,
+        attributes: [String: Any]?
+    ) {
+        self.name = name
+        self.controllerIdentity = controllerIdentity
+        self.controllerIdentifier = controllerIdentifier
+        self.attributes = attributes
+    }
 
     /// Creates a navigation event.
     ///
@@ -49,15 +63,17 @@ public final class NavigationEvent: NSObject {
     ///   - name: The navigation name for this event.
     ///   - controllerIdentifier: Identifier of the tracked UI object.
     ///   - attributes: Additional event attributes.
-    public init(
+    public convenience init(
         name: String,
         controllerIdentifier: ObjectIdentifier,
         attributes: [String: Any]? = nil
     ) {
-        self.name = name
-        self.controllerIdentifier = controllerIdentifier
-        controllerIdentity = String(describing: controllerIdentifier)
-        self.attributes = attributes
+        self.init(
+            name: name,
+            controllerIdentity: String(describing: controllerIdentifier),
+            controllerIdentifier: controllerIdentifier,
+            attributes: attributes
+        )
     }
 
     /// Creates a navigation event using a string identity.
@@ -69,15 +85,16 @@ public final class NavigationEvent: NSObject {
     ///   - controllerIdentity: String representation of the tracked UI identity.
     ///   - attributes: Additional event attributes.
     @objc(initWithName:controllerIdentity:attributes:)
-    public init(
+    public convenience init(
         name: String,
         controllerIdentity: String,
         attributes: [String: Any]? = nil
     ) {
-        self.name = name
-        self.controllerIdentity = controllerIdentity
-        // Create a stable placeholder; Swift consumers should use the ObjectIdentifier initializer.
-        controllerIdentifier = ObjectIdentifier(NSNull())
-        self.attributes = attributes
+        self.init(
+            name: name,
+            controllerIdentity: controllerIdentity,
+            controllerIdentifier: nil,
+            attributes: attributes
+        )
     }
 }

@@ -214,7 +214,7 @@ public final class Navigation: Sendable {
 
         let typeName = event.controllerTypeName
         guard
-            let screenName = processAutomatedScreenName(
+            let navigationEvent = processAutomatedNavigationEvent(
                 sanitize(typeName: typeName),
                 controllerIdentifier: event.controllerIdentifier
             )
@@ -222,6 +222,7 @@ public final class Navigation: Sendable {
             return
         }
 
+        let screenName = navigationEvent.name
         let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
@@ -240,7 +241,12 @@ public final class Navigation: Sendable {
         if screenName != lastScreenName {
             continuation.yield(screenName)
 
-            send(screenName: screenName, lastScreenName: lastScreenName, start: start)
+            send(
+                screenName: screenName,
+                lastScreenName: lastScreenName,
+                start: start,
+                attributes: navigationEvent.attributes
+            )
         }
     }
 
@@ -250,7 +256,7 @@ public final class Navigation: Sendable {
 
         let typeName = event.controllerTypeName
         guard
-            let screenName = processAutomatedScreenName(
+            let navigationEvent = processAutomatedNavigationEvent(
                 sanitize(typeName: typeName),
                 controllerIdentifier: event.controllerIdentifier
             )
@@ -258,6 +264,7 @@ public final class Navigation: Sendable {
             return
         }
 
+        let screenName = navigationEvent.name
         let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
@@ -275,7 +282,12 @@ public final class Navigation: Sendable {
         // Yield this change to the consumer and send corresponding span
         if screenName != lastScreenName {
             continuation.yield(screenName)
-            send(screenName: screenName, lastScreenName: lastScreenName, start: start)
+            send(
+                screenName: screenName,
+                lastScreenName: lastScreenName,
+                start: start,
+                attributes: navigationEvent.attributes
+            )
         }
     }
 
@@ -339,23 +351,17 @@ public final class Navigation: Sendable {
     }
 
 
-    /// Passes the raw automated screen name through the ``navigationEventProcessor``
-    /// and returns the (potentially transformed) screen name, or `nil` if the event was suppressed.
-    func processAutomatedScreenName(
+    /// Passes the automated screen name through the ``navigationEventProcessor``
+    /// and returns the processed event, or `nil` if the event was suppressed.
+    func processAutomatedNavigationEvent(
         _ screenName: String,
         controllerIdentifier: ObjectIdentifier
-    ) -> String? {
+    ) -> NavigationEvent? {
         let controllerIdentity = String(describing: controllerIdentifier)
-        guard
-            let processed = navigationEventProcessor.onViewController(
-                typeName: screenName,
-                controllerIdentity: controllerIdentity
-            )
-        else {
-            return nil
-        }
-
-        return processed.name
+        return navigationEventProcessor.onViewController(
+            typeName: screenName,
+            controllerIdentity: controllerIdentity
+        )
     }
 
     func preferredControllerName(for controller: UIViewController) -> String {
