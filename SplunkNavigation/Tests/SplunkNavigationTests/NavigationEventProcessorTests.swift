@@ -18,6 +18,7 @@ limitations under the License.
 internal import CiscoSwizzling
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
+import UIKit
 import XCTest
 
 @testable import SplunkNavigation
@@ -155,6 +156,76 @@ final class NavigationEventProcessorTests: XCTestCase {
         }
         XCTAssertTrue(didSetAuto)
     }
+
+    // MARK: - Presentation controller processor
+
+    @MainActor
+    func testProcessorApplesToPresentationTransitions() async {
+        let provider = MockPresentationEventStreamProvider()
+        let navigation = Navigation(navigationEventStreamProvider: provider)
+        navigation.navigationEventProcessor = PrefixingProcessor(prefix: "Nav")
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
+
+        let presentingController = PresentingViewController()
+        let presentedController = PresentedViewController()
+
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: true
+        )
+
+        let didUpdate = await waitUntil {
+            await navigation.model.screenName == "Nav/PresentedViewController"
+        }
+        XCTAssertTrue(didUpdate)
+    }
+
+    @MainActor
+    func testProcessorSuppressesPresentationTransition() async {
+        let provider = MockPresentationEventStreamProvider()
+        let navigation = Navigation(navigationEventStreamProvider: provider)
+        navigation.navigationEventProcessor = SuppressingProcessor()
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
+
+        navigation.track(screen: "InitialScreen")
+
+        let didSetInitial = await waitUntil {
+            await navigation.model.screenName == "InitialScreen"
+        }
+        XCTAssertTrue(didSetInitial)
+
+        let presentingController = PresentingViewController()
+        let presentedController = PresentedViewController()
+
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: true
+        )
+
+        try? await Task.sleep(nanoseconds: 200_000_000)
+
+        let currentScreenName = await navigation.model.screenName
+        XCTAssertEqual(currentScreenName, "InitialScreen")
+    }
+
 
     // MARK: - Event suppression
 
