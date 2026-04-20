@@ -67,6 +67,9 @@ extension Navigation {
                 for: presentingSnapshot(from: event),
                 completed: event.completed ?? true
             )
+
+        @unknown default:
+            break
         }
     }
 
