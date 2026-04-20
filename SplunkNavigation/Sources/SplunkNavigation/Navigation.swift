@@ -213,10 +213,12 @@ public final class Navigation: Sendable {
         let start = Date()
 
         let typeName = event.controllerTypeName
-        guard let screenName = processAutomatedScreenName(
-            sanitize(typeName: typeName),
-            controllerIdentifier: event.controllerIdentifier
-        ) else {
+        guard
+            let screenName = processAutomatedScreenName(
+                sanitize(typeName: typeName),
+                controllerIdentifier: event.controllerIdentifier
+            )
+        else {
             return
         }
 
@@ -247,10 +249,12 @@ public final class Navigation: Sendable {
         let start = Date()
 
         let typeName = event.controllerTypeName
-        guard let screenName = processAutomatedScreenName(
-            sanitize(typeName: typeName),
-            controllerIdentifier: event.controllerIdentifier
-        ) else {
+        guard
+            let screenName = processAutomatedScreenName(
+                sanitize(typeName: typeName),
+                controllerIdentifier: event.controllerIdentifier
+            )
+        else {
             return
         }
 
@@ -342,10 +346,12 @@ public final class Navigation: Sendable {
         controllerIdentifier: ObjectIdentifier
     ) -> String? {
         let controllerIdentity = String(describing: controllerIdentifier)
-        guard let processed = navigationEventProcessor.onViewController(
-            typeName: screenName,
-            controllerIdentity: controllerIdentity
-        ) else {
+        guard
+            let processed = navigationEventProcessor.onViewController(
+                typeName: screenName,
+                controllerIdentity: controllerIdentity
+            )
+        else {
             return nil
         }
 

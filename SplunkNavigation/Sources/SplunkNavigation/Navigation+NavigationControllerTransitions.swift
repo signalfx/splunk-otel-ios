@@ -29,10 +29,12 @@ extension Navigation {
 
         let typeName = event.controllerTypeName
         let controllerIdentifier = event.controllerIdentifier
-        guard let screenName = processAutomatedScreenName(
-            sanitize(typeName: typeName),
-            controllerIdentifier: controllerIdentifier
-        ) else {
+        guard
+            let screenName = processAutomatedScreenName(
+                sanitize(typeName: typeName),
+                controllerIdentifier: controllerIdentifier
+            )
+        else {
             return
         }
 
@@ -108,10 +110,12 @@ extension Navigation {
         await model.removePendingNavigationTarget(for: navigationControllerIdentifier)
         await model.removeManagedNavigationControllerTarget(pendingTargetIdentifier)
 
-        guard let screenName = processAutomatedScreenName(
-            sanitize(typeName: visibleControllerTypeName),
-            controllerIdentifier: visibleControllerIdentifier
-        ) else {
+        guard
+            let screenName = processAutomatedScreenName(
+                sanitize(typeName: visibleControllerTypeName),
+                controllerIdentifier: visibleControllerIdentifier
+            )
+        else {
             return true
         }
 
@@ -129,10 +133,12 @@ extension Navigation {
     private func completeNavigationControllerTransition(event: any NavigationActionEvent) async {
         let typeName = event.controllerTypeName
         let visibleControllerIdentifier = event.controllerIdentifier
-        guard let screenName = processAutomatedScreenName(
-            sanitize(typeName: typeName),
-            controllerIdentifier: visibleControllerIdentifier
-        ) else {
+        guard
+            let screenName = processAutomatedScreenName(
+                sanitize(typeName: typeName),
+                controllerIdentifier: visibleControllerIdentifier
+            )
+        else {
             return
         }
 
