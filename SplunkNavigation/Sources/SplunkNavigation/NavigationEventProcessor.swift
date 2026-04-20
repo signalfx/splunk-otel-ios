@@ -79,7 +79,10 @@ public protocol NavigationEventProcessor {
     /// transformed name or additional attributes — or return `nil` to suppress it.
     ///
     /// - Parameters:
-    ///   - typeName: The sanitized controller type name (module prefix stripped).
+    ///   - typeName: The view controller's class name. The SDK strips the
+    ///     application module prefix before invoking this method, so your
+    ///     callback will receive `"DetailViewController"` as the value of
+    ///     this parameter rather than `"MyApp.DetailViewController"`.
     ///   - controllerIdentity: String representation of the controller's object identifier.
     ///
     /// - Returns: A navigation event describing the screen, or `nil` to suppress.
