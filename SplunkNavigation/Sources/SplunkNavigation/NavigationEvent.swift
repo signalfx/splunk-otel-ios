@@ -17,28 +17,42 @@ limitations under the License.
 
 import Foundation
 
-/// A navigation event processed by ``NavigationEventProcessor``.
+/// The result of processing an automated navigation event.
 ///
-/// This model is class-based to support Objective-C interoperability.
+/// Returned by ``NavigationEventProcessor/onViewController(typeName:controllerIdentity:)``
+/// to describe how a detected screen transition should be recorded. The ``name`` becomes the
+/// `navigation.name` span attribute, and any ``attributes`` are added to the navigation span.
+///
+/// This type is a class to support Objective-C interoperability.
 @objc(SPLKNavigationEvent)
 public final class NavigationEvent: NSObject {
 
     // MARK: - Public
 
-    /// The navigation name for this event.
+    /// The screen name to use for this navigation event.
+    ///
+    /// This value is set as the `navigation.name` and `screen.name` span attributes.
     @objc
     public let name: String
 
-    /// String representation of the tracked UI identity.
+    /// String representation of the tracked view controller identity.
+    ///
+    /// Objective-C consumers should use this property. Swift consumers can use
+    /// ``controllerIdentifier`` for type-safe identity comparison.
     @objc
     public let controllerIdentity: String
 
-    /// Identifier of the tracked UI object used by Swift consumers.
+    /// Identifier of the tracked view controller.
     ///
+    /// Available when the event was created from Swift using the
+    /// ``init(name:controllerIdentifier:attributes:)`` initializer.
     /// This is `nil` when the event was created via the Objective-C initializer.
     public let controllerIdentifier: ObjectIdentifier?
 
-    /// Additional attributes associated with navigation.
+    /// Custom attributes to include in the navigation span.
+    ///
+    /// Use this to enrich navigation spans with application-specific metadata
+    /// (e.g., content identifiers, feature flags, or section names).
     @objc
     public let attributes: [String: Any]?
 
@@ -57,12 +71,12 @@ public final class NavigationEvent: NSObject {
         self.attributes = attributes
     }
 
-    /// Creates a navigation event.
+    /// Creates a navigation event with a Swift `ObjectIdentifier`.
     ///
     /// - Parameters:
-    ///   - name: The navigation name for this event.
-    ///   - controllerIdentifier: Identifier of the tracked UI object.
-    ///   - attributes: Additional event attributes.
+    ///   - name: The screen name for this navigation event.
+    ///   - controllerIdentifier: The `ObjectIdentifier` of the tracked view controller.
+    ///   - attributes: Optional custom attributes to include in the navigation span.
     public convenience init(
         name: String,
         controllerIdentifier: ObjectIdentifier,
@@ -78,12 +92,12 @@ public final class NavigationEvent: NSObject {
 
     /// Creates a navigation event using a string identity.
     ///
-    /// This initializer is available for Objective-C consumers where `ObjectIdentifier` is not accessible.
+    /// Use this initializer from Objective-C where `ObjectIdentifier` is not available.
     ///
     /// - Parameters:
-    ///   - name: The navigation name for this event.
-    ///   - controllerIdentity: String representation of the tracked UI identity.
-    ///   - attributes: Additional event attributes.
+    ///   - name: The screen name for this navigation event.
+    ///   - controllerIdentity: String representation of the view controller identity.
+    ///   - attributes: Optional custom attributes to include in the navigation span.
     @objc(initWithName:controllerIdentity:attributes:)
     public convenience init(
         name: String,
