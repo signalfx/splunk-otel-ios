@@ -61,7 +61,7 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                 return result
                     .then((r) => ({ sessionId: r.sessionId, sessionMetadata: r.sessionMetadata }))
                     .catch( function(error) {
-                        console.error("[SplunkRumNative] Failed to fetch native session ID:", error);
+                        console.error("[SplunkRumNative] Failed to fetch native session info:", error);
                         throw error;
                     });
             },
@@ -98,7 +98,7 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                             self._setNativeSession(reply.sessionId, reply.sessionMetadata);
                         })
                         .catch( function(error) {
-                            console.error("[SplunkRumNative] Failed to fetch session ID from native:", error);
+                            console.error("[SplunkRumNative] Failed to fetch session info from native:", error);
                         })
                         .finally( function() {
                             self._updateInProgress = false;
@@ -115,7 +115,7 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                     self._setNativeSession(reply.sessionId, reply.sessionMetadata);
                     return reply.sessionId;
                 } catch (error) {
-                    console.error("[SplunkRumNative] Failed to fetch native session ID asynchronously:", error);
+                    console.error("[SplunkRumNative] Failed to fetch native session info asynchronously:", error);
                 }
             }
         };
