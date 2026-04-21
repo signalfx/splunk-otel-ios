@@ -7,17 +7,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.2.2] - 2026-04-15
+
 ### Added
 
-* Added public references to sessionWillResetNotification and sessionDidResetNotification
-* Added optional support to capture network headers.
-* Session Replay now captures text content in wireframes for UIKit applications.
-* Added `.trackScreen` SwiftUI view modifier for manual screen name tracking with optional custom attributes.
-* Added `track(screen:attributes:)` method for manual screen name tracking with optional custom span attributes.
-* Automated and manual screen tracking can be used together; manual `track(screen:)` calls bypass the `NavigationEventProcessor` and always emit spans.
-* Added automated screen tracking for `UIViewController` transition events including screen updates and navigation spans.
-* Added automated screen tracking for `UINavigationController` push and pop transitions, including interactive pop cancellation handling.
-* Added automated screen tracking for modal presentation and dismissal via `UIPresentationController`.
+* Added public references to sessionWillResetNotification and sessionDidResetNotification. #614
+* Added optional support to capture network headers. #604
+* Session Replay now captures text content in wireframes for UIKit applications. #615
+* Added manual screen name tracking via `track(screen:attributes:)` and the `.trackScreen` SwiftUI view modifier, with optional custom attributes. Manual calls bypass the `NavigationEventProcessor` and always emit spans.
+* Added automated screen tracking for `UIViewController` transitions, `UINavigationController` push/pop (including interactive pop cancellation), and modal presentation/dismissal.
 * Added `NavigationEventProcessor` protocol for custom screen name transforms, event filtering, and span attributes on navigation events.
 * Added `navigation.name` attribute on `app.ui.navigation` screen-change spans.
 * Added navigation module integration in `SplunkAgent` proxy with Swift and Objective-C API surfaces.
@@ -56,7 +54,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Replaced OTLP binary protobuf with custom JSON encoding to reduce binary size. The SDK now uses `opentelemetry-swift-core` (API/SDK only) instead of the full `opentelemetry-swift` package with protocol exporters. #566
-
+  
 ## [2.0.7] - 2026-02-04
 
 ### Fixed
@@ -243,3 +241,4 @@ This is a first major stable release of the new Splunk OpenTelemetry Agent.
 ### Deprecated
 
 * Deprecates the use of SplunkRum.initialize. Use the SplunkRumBuilder going forward.
+
