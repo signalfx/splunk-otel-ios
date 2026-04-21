@@ -16,17 +16,22 @@ limitations under the License.
 */
 
 internal import SplunkCommon
-import SplunkNavigation
+internal import SplunkNavigation
 
 extension NavigationConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 
     var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
-        NavigationConfiguration(
+        // Wrap the ObjC processor in an adapter if provided
+        let swiftProcessor: (any NavigationEventProcessor)? =
+            navigationEventProcessor
+            .map { NavigationEventProcessorAdapter(wrapping: $0) }
+
+        return NavigationConfiguration(
             isEnabled: isEnabled,
             enableAutomatedTracking: enableAutomatedTracking,
-            navigationEventProcessor: navigationEventProcessor
+            navigationEventProcessor: swiftProcessor
         )
     }
 }

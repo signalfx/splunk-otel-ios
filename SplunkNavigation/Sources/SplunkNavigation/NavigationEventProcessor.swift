@@ -17,37 +17,101 @@ limitations under the License.
 
 import Foundation
 
-/// Transforms automated navigation events before they are handled by the module.
-@objc(SPLKNavigationEventProcessor)
+/// A processor that intercepts automated navigation events before they produce spans.
+///
+/// Implement this protocol to customize how detected `UIViewController` transitions
+/// are named, enriched, or filtered. The processor is called once per automated
+/// navigation event; manual ``Navigation/track(screen:)`` calls bypass it.
+///
+/// **Rename a screen:**
+///
+/// ```swift
+/// func onViewController(
+///     typeName: String,
+///     controllerIdentity: String
+/// ) -> NavigationEvent? {
+///     NavigationEvent(
+///         name: friendlyName(for: typeName),
+///         controllerIdentity: controllerIdentity
+///     )
+/// }
+/// ```
+///
+/// **Add custom attributes to the navigation span:**
+///
+/// ```swift
+/// func onViewController(
+///     typeName: String,
+///     controllerIdentity: String
+/// ) -> NavigationEvent? {
+///     NavigationEvent(
+///         name: typeName,
+///         controllerIdentity: controllerIdentity,
+///         attributes: ["app.section": section(for: typeName)]
+///     )
+/// }
+/// ```
+///
+/// **Suppress an event entirely** by returning `nil`:
+///
+/// ```swift
+/// func onViewController(
+///     typeName: String,
+///     controllerIdentity: String
+/// ) -> NavigationEvent? {
+///     shouldIgnore(typeName) ? nil : NavigationEvent(
+///         name: typeName,
+///         controllerIdentity: controllerIdentity
+///     )
+/// }
+/// ```
+///
+/// Assign your processor to
+/// ``NavigationConfiguration/navigationEventProcessor`` before starting the agent.
+///
+/// ## Threading
+///
+/// The callback may be invoked from a background task. Implementations must be
+/// thread-safe or stateless.
 public protocol NavigationEventProcessor {
 
-    // MARK: - Event processing
+    // MARK: - Processor methods
 
-    /// Processes an automated navigation event.
+    /// Called for each detected `UIViewController` navigation event.
     ///
-    /// - Parameter event: The event produced by navigation detection.
+    /// Return a ``NavigationEvent`` to allow the navigation — potentially with a
+    /// transformed name or additional attributes — or return `nil` to suppress it.
     ///
-    /// - Returns: The event to be used by the module.
-    @objc(processEvent:)
-    func process(event: NavigationEvent) -> NavigationEvent
+    /// - Parameters:
+    ///   - typeName: The view controller's class name. The SDK strips the
+    ///     application module prefix before invoking this method, so your
+    ///     callback will receive `"DetailViewController"` as the value of
+    ///     this parameter rather than `"MyApp.DetailViewController"`.
+    ///   - controllerIdentity: String representation of the controller's object identifier.
+    ///
+    /// - Returns: A navigation event describing the screen, or `nil` to suppress.
+    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent?
 }
 
-/// A pass-through processor used by default.
-@objc(SPLKDefaultNavigationEventProcessor)
-public final class DefaultNavigationEventProcessor: NSObject, NavigationEventProcessor {
+/// The default processor that passes navigation events through unchanged.
+///
+/// This processor returns the sanitized controller type name as the screen name
+/// with no additional attributes. It is used automatically when no custom
+/// ``NavigationEventProcessor`` is configured.
+public final class DefaultNavigationEventProcessor: NavigationEventProcessor {
 
     // MARK: - Initialization
 
-    @objc
-    override public init() {
-        super.init()
-    }
+    public init() {}
 
 
-    // MARK: - Event processing
+    // MARK: - Processor methods
 
-    @objc(processEvent:)
-    public func process(event: NavigationEvent) -> NavigationEvent {
-        event
+    public func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
+        NavigationEvent(
+            name: typeName,
+            controllerIdentity: controllerIdentity,
+            attributes: nil
+        )
     }
 }

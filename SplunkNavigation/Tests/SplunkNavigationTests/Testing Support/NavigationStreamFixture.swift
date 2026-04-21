@@ -43,7 +43,9 @@ struct NavigationStreamFixture {
 
 // MARK: - Fixture construction
 
-func makeNavigationStreamFixture() -> NavigationStreamFixture {
+func makeNavigationStreamFixture(
+    navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
+) -> NavigationStreamFixture {
     let (stream, continuation) = AsyncStream.makeStream(
         of: (any NavigationActionEvent).self
     )
@@ -51,7 +53,8 @@ func makeNavigationStreamFixture() -> NavigationStreamFixture {
     let navigation = Navigation(
         navigationEventStreamProvider: MockNavigationEventStreamProvider(
             stream: stream
-        )
+        ),
+        navigationEventProcessor: navigationEventProcessor
     )
 
     let collector = ScreenNameCollector()

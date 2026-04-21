@@ -89,13 +89,20 @@ extension Navigation {
 
     private func updateTransitionStart(for snapshot: PresentationTransitionSnapshot) async {
         let typeName = snapshot.controllerTypeName
-        let screenName = sanitize(typeName: typeName)
+        guard
+            let navigationEvent = processAutomatedNavigationEvent(
+                sanitize(typeName: typeName),
+                controllerIdentifier: snapshot.controllerIdentifier
+            )
+        else {
+            return
+        }
 
         let navigation = NavigationPair(
             type: .transition,
             start: Date(),
             typeName: typeName,
-            screenName: screenName
+            screenName: navigationEvent.name
         )
 
         await model.update(
@@ -114,7 +121,17 @@ extension Navigation {
         }
 
         let typeName = snapshot.controllerTypeName
-        let screenName = sanitize(typeName: typeName)
+        guard
+            let navigationEvent = processAutomatedNavigationEvent(
+                sanitize(typeName: typeName),
+                controllerIdentifier: snapshot.controllerIdentifier
+            )
+        else {
+            await model.removeNavigation(for: snapshot.controllerIdentifier)
+            return
+        }
+
+        let screenName = navigationEvent.name
         let lastScreenName = await model.screenName
 
         if await model.navigation(for: snapshot.controllerIdentifier) == nil {
@@ -137,7 +154,8 @@ extension Navigation {
         await updateCurrentScreen(
             screenName: screenName,
             lastScreenName: lastScreenName,
-            start: start
+            start: start,
+            attributes: navigationEvent.attributes
         )
 
         let event = AutomatedNavigationEvent(

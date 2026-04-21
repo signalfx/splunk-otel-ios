@@ -30,9 +30,17 @@ public struct NavigationConfiguration: ModuleConfiguration {
     /// A `Boolean` value determines whether the module should automatically detect navigation in the application.
     public var enableAutomatedTracking: Bool?
 
-    /// Processor used to transform automated navigation events before they produce spans.
+    /// Processor that intercepts automated navigation events before they produce spans.
+    ///
+    /// Set a custom ``NavigationEventProcessor`` to rename screens, add span attributes,
+    /// or suppress specific navigation events. When `nil`, the default processor
+    /// passes the sanitized controller type name through as the screen name.
     ///
     /// Manual ``Navigation/track(screen:)`` calls bypass the processor.
+    ///
+    /// - Important: The processor is retained strongly by the SDK for the lifetime
+    ///   of the agent. Avoid capturing references that transitively own `SplunkRum`;
+    ///   prefer stateless processors or weak captures where needed.
     public var navigationEventProcessor: (any NavigationEventProcessor)?
 
 

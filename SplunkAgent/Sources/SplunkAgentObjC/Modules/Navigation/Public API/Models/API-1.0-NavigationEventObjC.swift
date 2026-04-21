@@ -19,35 +19,31 @@ import Foundation
 
 /// The result of processing an automated navigation event.
 ///
-/// Returned by ``NavigationEventProcessor/onViewController(typeName:controllerIdentity:)``
+/// Returned by ``NavigationEventProcessorObjC/onViewController(typeName:controllerIdentity:)``
 /// to describe how a detected screen transition should be recorded. The ``name`` becomes the
 /// `navigation.name` span attribute, and any ``attributes`` are added to the navigation span.
-public final class NavigationEvent {
+@objc(SPLKNavigationEvent)
+public final class NavigationEventObjC: NSObject {
 
     // MARK: - Public
 
     /// The screen name to use for this navigation event.
     ///
     /// This value is set as the `navigation.name` and `screen.name` span attributes.
+    @objc
     public let name: String
 
-    /// An opaque string that identifies the tracked view controller instance.
-    ///
-    /// The value is:
-    /// - **Opaque** — consumers must not parse it or derive the underlying controller.
-    /// - **Unique** among simultaneously live instances within a single process.
-    /// - **Stable** for the lifetime of the controller instance.
-    /// - **Reusable** — the same value may appear after the instance is deallocated.
-    /// - **Not persistent** across app launches.
-    ///
-    /// Use `==` (or `-isEqualToString:` from Objective-C) for comparison.
+    /// `NSString` representation of the tracked view controller identity.
+    @objc
     public let controllerIdentity: String
 
     /// Custom attributes to include in the navigation span.
     ///
     /// Use this to enrich navigation spans with application-specific metadata
     /// (e.g., content identifiers, feature flags, or section names).
-    public let attributes: [String: Any]?
+    /// Supported value types: `NSString`, `NSNumber` (integer, double, boolean), and arrays of those types.
+    @objc
+    public let attributes: NSDictionary?
 
 
     // MARK: - Initialization
@@ -56,12 +52,13 @@ public final class NavigationEvent {
     ///
     /// - Parameters:
     ///   - name: The screen name for this navigation event.
-    ///   - controllerIdentity: String representation of the view controller identity.
+    ///   - controllerIdentity: `NSString` representation of the view controller identity.
     ///   - attributes: Optional custom attributes to include in the navigation span.
+    @objc(initWithName:controllerIdentity:attributes:)
     public init(
         name: String,
         controllerIdentity: String,
-        attributes: [String: Any]? = nil
+        attributes: NSDictionary?
     ) {
         self.name = name
         self.controllerIdentity = controllerIdentity
