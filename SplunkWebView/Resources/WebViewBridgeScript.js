@@ -21,6 +21,7 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
         const staleAfterDurationMs = 5000;
         const self = {
             cachedSessionId: __SESSION_ID__,
+            nativeSessionMetadata: __SESSION_METADATA__,
             _isInitialized: false,
             _lastCheckTime: Date.now(),
             _updateInProgress: false,
@@ -58,13 +59,14 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                 }
 
                 return result
-                    .then((r) => r.sessionId)
+                    .then((r) => ({ sessionId: r.sessionId, sessionMetadata: r.sessionMetadata }))
                     .catch( function(error) {
-                        console.error("[SplunkRumNative] Failed to fetch native session ID:", error);
+                        console.error("[SplunkRumNative] Failed to fetch native session info:", error);
                         throw error;
                     });
             },
-            _setNativeSessionId: function(newId) {
+            _setNativeSession: function(newId, newMetadata) {
+                self.nativeSessionMetadata = (newMetadata !== undefined) ? newMetadata : null;
                 if (newId !== self.cachedSessionId) {
                     const oldId = self.cachedSessionId;
                     self.cachedSessionId = newId;
@@ -92,15 +94,11 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
                     self._updateInProgress = true;
                     self._lastCheckTime = now;
                     self._fetchSessionId()
-                        .then( function(newId) {
-                            if (newId !== self.cachedSessionId) {
-                                const oldId = self.cachedSessionId;
-                                self.cachedSessionId = newId;
-                                self._notifyChange(oldId, newId);
-                             }
+                        .then( function(reply) {
+                            self._setNativeSession(reply.sessionId, reply.sessionMetadata);
                         })
                         .catch( function(error) {
-                            console.error("[SplunkRumNative] Failed to fetch session ID from native:", error);
+                            console.error("[SplunkRumNative] Failed to fetch session info from native:", error);
                         })
                         .finally( function() {
                             self._updateInProgress = false;
@@ -113,15 +111,11 @@ if (window.SplunkRumNative && window.SplunkRumNative._isInitialized) {
             // Recommended for BRUM use in new agents going forward.
             getNativeSessionIdAsync: async function() {
                 try {
-                    const newId = await self._fetchSessionId();
-                    if (newId !== self.cachedSessionId) {
-                        const oldId = self.cachedSessionId;
-                        self.cachedSessionId = newId;
-                        self._notifyChange(oldId, newId);
-                    }
-                    return newId;
+                    const reply = await self._fetchSessionId();
+                    self._setNativeSession(reply.sessionId, reply.sessionMetadata);
+                    return reply.sessionId;
                 } catch (error) {
-                    console.error("[SplunkRumNative] Failed to fetch native session ID asynchronously:", error);
+                    console.error("[SplunkRumNative] Failed to fetch native session info asynchronously:", error);
                 }
             }
         };
