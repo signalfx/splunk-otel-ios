@@ -24,7 +24,8 @@ extension NavigationConfigurationObjC: ModuleConfigurationSwift {
 
     var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
         // Wrap the ObjC processor in an adapter if provided
-        let swiftProcessor: (any NavigationEventProcessor)? = navigationEventProcessor
+        let swiftProcessor: (any NavigationEventProcessor)? =
+            navigationEventProcessor
             .map { NavigationEventProcessorAdapter(wrapping: $0) }
 
         return NavigationConfiguration(

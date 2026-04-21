@@ -47,7 +47,7 @@ public final class Navigation: Sendable {
     /// Assigned once during ``install(with:remoteConfiguration:)`` and must not be
     /// mutated after detection has started. Manual ``track(screen:)`` calls bypass
     /// the processor.
-    private(set) nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor
+    internal(set) nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor
 
 
     // MARK: - Module configuration
