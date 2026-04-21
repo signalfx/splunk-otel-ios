@@ -44,9 +44,10 @@ public final class Navigation: Sendable {
 
     /// Processor used to transform automated navigation events before they produce spans.
     ///
-    /// Manual ``track(screen:)`` calls bypass the processor.
-    nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor =
-        DefaultNavigationEventProcessor()
+    /// Assigned once during ``install(with:remoteConfiguration:)`` and must not be
+    /// mutated after detection has started. Manual ``track(screen:)`` calls bypass
+    /// the processor.
+    private(set) nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor
 
 
     // MARK: - Module configuration
@@ -103,8 +104,12 @@ public final class Navigation: Sendable {
         )
     }
 
-    init(navigationEventStreamProvider: any NavigationEventStreamProviding) {
+    init(
+        navigationEventStreamProvider: any NavigationEventStreamProviding,
+        navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
+    ) {
         self.navigationEventStreamProvider = navigationEventStreamProvider
+        self.navigationEventProcessor = navigationEventProcessor
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
         self.screenNameStream = screenNameStream
@@ -357,7 +362,7 @@ public final class Navigation: Sendable {
         _ typeName: String,
         controllerIdentifier: ObjectIdentifier
     ) -> NavigationEvent? {
-        let controllerIdentity = String(describing: controllerIdentifier)
+        let controllerIdentity = String(UInt(bitPattern: controllerIdentifier))
         return navigationEventProcessor.onViewController(
             typeName: typeName,
             controllerIdentity: controllerIdentity

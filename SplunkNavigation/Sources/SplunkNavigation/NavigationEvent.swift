@@ -31,15 +31,17 @@ public final class NavigationEvent {
     /// This value is set as the `navigation.name` and `screen.name` span attributes.
     public let name: String
 
-    /// String representation of the tracked view controller identity.
-    public let controllerIdentity: String
-
-    /// Identifier of the tracked view controller.
+    /// An opaque string that identifies the tracked view controller instance.
     ///
-    /// Available when the event was created from Swift using the
-    /// ``init(name:controllerIdentifier:attributes:)`` initializer.
-    /// This is `nil` when the event was created via the string-based initializer.
-    public let controllerIdentifier: ObjectIdentifier?
+    /// The value is:
+    /// - **Opaque** — consumers must not parse it or derive the underlying controller.
+    /// - **Unique** among simultaneously live instances within a single process.
+    /// - **Stable** for the lifetime of the controller instance.
+    /// - **Reusable** — the same value may appear after the instance is deallocated.
+    /// - **Not persistent** across app launches.
+    ///
+    /// Use `==` (or `-isEqualToString:` from Objective-C) for comparison.
+    public let controllerIdentity: String
 
     /// Custom attributes to include in the navigation span.
     ///
@@ -50,53 +52,19 @@ public final class NavigationEvent {
 
     // MARK: - Initialization
 
-    private init(
-        name: String,
-        controllerIdentity: String,
-        controllerIdentifier: ObjectIdentifier?,
-        attributes: [String: Any]?
-    ) {
-        self.name = name
-        self.controllerIdentity = controllerIdentity
-        self.controllerIdentifier = controllerIdentifier
-        self.attributes = attributes
-    }
-
-    /// Creates a navigation event with a Swift `ObjectIdentifier`.
-    ///
-    /// - Parameters:
-    ///   - name: The screen name for this navigation event.
-    ///   - controllerIdentifier: The `ObjectIdentifier` of the tracked view controller.
-    ///   - attributes: Optional custom attributes to include in the navigation span.
-    public convenience init(
-        name: String,
-        controllerIdentifier: ObjectIdentifier,
-        attributes: [String: Any]? = nil
-    ) {
-        self.init(
-            name: name,
-            controllerIdentity: String(describing: controllerIdentifier),
-            controllerIdentifier: controllerIdentifier,
-            attributes: attributes
-        )
-    }
-
-    /// Creates a navigation event using a string identity.
+    /// Creates a navigation event.
     ///
     /// - Parameters:
     ///   - name: The screen name for this navigation event.
     ///   - controllerIdentity: String representation of the view controller identity.
     ///   - attributes: Optional custom attributes to include in the navigation span.
-    public convenience init(
+    public init(
         name: String,
         controllerIdentity: String,
         attributes: [String: Any]? = nil
     ) {
-        self.init(
-            name: name,
-            controllerIdentity: controllerIdentity,
-            controllerIdentifier: nil,
-            attributes: attributes
-        )
+        self.name = name
+        self.controllerIdentity = controllerIdentity
+        self.attributes = attributes
     }
 }

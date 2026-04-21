@@ -68,6 +68,11 @@ import Foundation
 ///
 /// Assign your processor to
 /// ``NavigationConfiguration/navigationEventProcessor`` before starting the agent.
+///
+/// ## Threading
+///
+/// The callback may be invoked from a background task. Implementations must be
+/// thread-safe or stateless.
 public protocol NavigationEventProcessor {
 
     // MARK: - Processor methods

@@ -80,9 +80,9 @@ final class NavigationEventProcessorTests: XCTestCase {
         ])
 
         let navigation = Navigation(
-            navigationEventStreamProvider: MockNavigationEventStreamProvider(stream: events)
+            navigationEventStreamProvider: MockNavigationEventStreamProvider(stream: events),
+            navigationEventProcessor: PrefixingProcessor(prefix: "Custom")
         )
-        navigation.navigationEventProcessor = PrefixingProcessor(prefix: "Custom")
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
@@ -95,14 +95,15 @@ final class NavigationEventProcessorTests: XCTestCase {
     // MARK: - Manual tracking bypass
 
     func testManualTrackBypassesProcessor() async {
-        let fixture = makeNavigationStreamFixture()
+        let fixture = makeNavigationStreamFixture(
+            navigationEventProcessor: RejectingProcessor()
+        )
 
         defer {
             fixture.finish()
         }
 
         let navigation = fixture.navigation
-        navigation.navigationEventProcessor = RejectingProcessor()
         navigation.preferences.enableAutomatedTracking = true
 
         navigation.startDetection()
@@ -116,14 +117,15 @@ final class NavigationEventProcessorTests: XCTestCase {
     }
 
     func testProcessorAppliesToAutomatedButNotManual() async {
-        let fixture = makeNavigationStreamFixture()
+        let fixture = makeNavigationStreamFixture(
+            navigationEventProcessor: PrefixingProcessor(prefix: "Auto")
+        )
 
         defer {
             fixture.finish()
         }
 
         let navigation = fixture.navigation
-        navigation.navigationEventProcessor = PrefixingProcessor(prefix: "Auto")
         navigation.preferences.enableAutomatedTracking = true
 
         navigation.startDetection()
@@ -162,8 +164,10 @@ final class NavigationEventProcessorTests: XCTestCase {
     @MainActor
     func testProcessorApplesToPresentationTransitions() async {
         let provider = MockPresentationEventStreamProvider()
-        let navigation = Navigation(navigationEventStreamProvider: provider)
-        navigation.navigationEventProcessor = PrefixingProcessor(prefix: "Nav")
+        let navigation = Navigation(
+            navigationEventStreamProvider: provider,
+            navigationEventProcessor: PrefixingProcessor(prefix: "Nav")
+        )
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
@@ -192,8 +196,10 @@ final class NavigationEventProcessorTests: XCTestCase {
     @MainActor
     func testProcessorSuppressesPresentationTransition() async {
         let provider = MockPresentationEventStreamProvider()
-        let navigation = Navigation(navigationEventStreamProvider: provider)
-        navigation.navigationEventProcessor = SuppressingProcessor()
+        let navigation = Navigation(
+            navigationEventStreamProvider: provider,
+            navigationEventProcessor: SuppressingProcessor()
+        )
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
@@ -230,14 +236,15 @@ final class NavigationEventProcessorTests: XCTestCase {
     // MARK: - Event suppression
 
     func testProcessorReturningNilSuppressesNavigation() async {
-        let fixture = makeNavigationStreamFixture()
+        let fixture = makeNavigationStreamFixture(
+            navigationEventProcessor: SuppressingProcessor()
+        )
 
         defer {
             fixture.finish()
         }
 
         let navigation = fixture.navigation
-        navigation.navigationEventProcessor = SuppressingProcessor()
         navigation.preferences.enableAutomatedTracking = true
 
         navigation.startDetection()

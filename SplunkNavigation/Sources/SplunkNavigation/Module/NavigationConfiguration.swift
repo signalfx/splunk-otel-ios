@@ -37,6 +37,10 @@ public struct NavigationConfiguration: ModuleConfiguration {
     /// passes the sanitized controller type name through as the screen name.
     ///
     /// Manual ``Navigation/track(screen:)`` calls bypass the processor.
+    ///
+    /// - Important: The processor is retained strongly by the SDK for the lifetime
+    ///   of the agent. Avoid capturing references that transitively own `SplunkRum`;
+    ///   prefer stateless processors or weak captures where needed.
     public var navigationEventProcessor: (any NavigationEventProcessor)?
 
 

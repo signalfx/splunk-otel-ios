@@ -38,6 +38,10 @@ public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
     /// Set a custom ``NavigationEventProcessorObjC`` to rename screens, add span attributes,
     /// or suppress specific events by returning `nil` from the processor method.
     /// When `nil`, the default processor passes the controller type name through unchanged.
+    ///
+    /// - Important: The processor is retained strongly by the SDK for the lifetime
+    ///   of the agent. Avoid capturing references that transitively own `SplunkRum`;
+    ///   prefer stateless processors or weak captures where needed.
     public var navigationEventProcessor: NavigationEventProcessorObjC?
 
 
