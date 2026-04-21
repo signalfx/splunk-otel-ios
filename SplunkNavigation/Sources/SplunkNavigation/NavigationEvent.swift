@@ -22,38 +22,29 @@ import Foundation
 /// Returned by ``NavigationEventProcessor/onViewController(typeName:controllerIdentity:)``
 /// to describe how a detected screen transition should be recorded. The ``name`` becomes the
 /// `navigation.name` span attribute, and any ``attributes`` are added to the navigation span.
-///
-/// This type is a class to support Objective-C interoperability.
-@objc(SPLKNavigationEvent)
-public final class NavigationEvent: NSObject {
+public final class NavigationEvent {
 
     // MARK: - Public
 
     /// The screen name to use for this navigation event.
     ///
     /// This value is set as the `navigation.name` and `screen.name` span attributes.
-    @objc
     public let name: String
 
     /// String representation of the tracked view controller identity.
-    ///
-    /// Objective-C consumers should use this property. Swift consumers can use
-    /// ``controllerIdentifier`` for type-safe identity comparison.
-    @objc
     public let controllerIdentity: String
 
     /// Identifier of the tracked view controller.
     ///
     /// Available when the event was created from Swift using the
     /// ``init(name:controllerIdentifier:attributes:)`` initializer.
-    /// This is `nil` when the event was created via the Objective-C initializer.
+    /// This is `nil` when the event was created via the string-based initializer.
     public let controllerIdentifier: ObjectIdentifier?
 
     /// Custom attributes to include in the navigation span.
     ///
     /// Use this to enrich navigation spans with application-specific metadata
     /// (e.g., content identifiers, feature flags, or section names).
-    @objc
     public let attributes: [String: Any]?
 
 
@@ -92,13 +83,10 @@ public final class NavigationEvent: NSObject {
 
     /// Creates a navigation event using a string identity.
     ///
-    /// Use this initializer from Objective-C where `ObjectIdentifier` is not available.
-    ///
     /// - Parameters:
     ///   - name: The screen name for this navigation event.
     ///   - controllerIdentity: String representation of the view controller identity.
     ///   - attributes: Optional custom attributes to include in the navigation span.
-    @objc(initWithName:controllerIdentity:attributes:)
     public convenience init(
         name: String,
         controllerIdentity: String,

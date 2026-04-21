@@ -58,4 +58,15 @@ limitations under the License.
     XCTAssertNotNil(result);
 }
 
+- (void)testTrackingWithAttributes {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    NSDictionary *attributes = @{@"app.section": @"settings", @"app.level": @42};
+    XCTAssertNoThrow([agent.navigation trackScreen:@"Settings" attributes:attributes]);
+}
+
+- (void)testTrackingWithNilAttributes {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    XCTAssertNoThrow([agent.navigation trackScreen:@"Home" attributes:nil]);
+}
+
 @end

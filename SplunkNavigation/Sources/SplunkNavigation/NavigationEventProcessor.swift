@@ -68,7 +68,6 @@ import Foundation
 ///
 /// Assign your processor to
 /// ``NavigationConfiguration/navigationEventProcessor`` before starting the agent.
-@objc(SPLKNavigationEventProcessor)
 public protocol NavigationEventProcessor {
 
     // MARK: - Processor methods
@@ -86,7 +85,6 @@ public protocol NavigationEventProcessor {
     ///   - controllerIdentity: String representation of the controller's object identifier.
     ///
     /// - Returns: A navigation event describing the screen, or `nil` to suppress.
-    @objc(onViewControllerWithTypeName:controllerIdentity:)
     func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent?
 }
 
@@ -95,20 +93,15 @@ public protocol NavigationEventProcessor {
 /// This processor returns the sanitized controller type name as the screen name
 /// with no additional attributes. It is used automatically when no custom
 /// ``NavigationEventProcessor`` is configured.
-@objc(SPLKDefaultNavigationEventProcessor)
-public final class DefaultNavigationEventProcessor: NSObject, NavigationEventProcessor {
+public final class DefaultNavigationEventProcessor: NavigationEventProcessor {
 
     // MARK: - Initialization
 
-    @objc
-    override public init() {
-        super.init()
-    }
+    public init() {}
 
 
     // MARK: - Processor methods
 
-    @objc(onViewControllerWithTypeName:controllerIdentity:)
     public func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
         NavigationEvent(
             name: typeName,

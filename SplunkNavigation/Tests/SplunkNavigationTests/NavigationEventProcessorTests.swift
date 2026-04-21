@@ -279,7 +279,7 @@ final class NavigationEventProcessorTests: XCTestCase {
 
 // MARK: - Test processors
 
-private final class PrefixingProcessor: NSObject, NavigationEventProcessor {
+private final class PrefixingProcessor: NavigationEventProcessor {
     let prefix: String
 
     init(prefix: String) {
@@ -294,7 +294,7 @@ private final class PrefixingProcessor: NSObject, NavigationEventProcessor {
     }
 }
 
-private final class RejectingProcessor: NSObject, NavigationEventProcessor {
+private final class RejectingProcessor: NavigationEventProcessor {
     func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
         _ = typeName
         return NavigationEvent(
@@ -304,7 +304,7 @@ private final class RejectingProcessor: NSObject, NavigationEventProcessor {
     }
 }
 
-private final class SuppressingProcessor: NSObject, NavigationEventProcessor {
+private final class SuppressingProcessor: NavigationEventProcessor {
     func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
         _ = typeName
         _ = controllerIdentity

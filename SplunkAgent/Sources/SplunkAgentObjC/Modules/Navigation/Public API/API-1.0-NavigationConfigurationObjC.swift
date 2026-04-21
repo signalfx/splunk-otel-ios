@@ -16,12 +16,11 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkNavigation
 
 /// Objective-C configuration for the navigation module.
 ///
 /// Use this class to enable automated navigation tracking and optionally
-/// configure a ``NavigationEventProcessor`` to customize screen names,
+/// configure a ``NavigationEventProcessorObjC`` to customize screen names,
 /// add span attributes, or suppress specific navigation events.
 @objc(SPLKNavigationConfiguration)
 @objcMembers
@@ -36,10 +35,10 @@ public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
 
     /// Processor that intercepts automated navigation events before they produce spans.
     ///
-    /// Set a custom ``NavigationEventProcessor`` to rename screens, add span attributes,
+    /// Set a custom ``NavigationEventProcessorObjC`` to rename screens, add span attributes,
     /// or suppress specific events by returning `nil` from the processor method.
     /// When `nil`, the default processor passes the controller type name through unchanged.
-    public var navigationEventProcessor: NavigationEventProcessor?
+    public var navigationEventProcessor: NavigationEventProcessorObjC?
 
 
     // MARK: - Initialization
@@ -80,7 +79,7 @@ public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
     public init(
         isEnabled: Bool,
         enableAutomatedTracking: Bool,
-        navigationEventProcessor: NavigationEventProcessor?
+        navigationEventProcessor: NavigationEventProcessorObjC?
     ) {
         super.init()
 
