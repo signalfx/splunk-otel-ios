@@ -162,7 +162,7 @@ final class NavigationEventProcessorTests: XCTestCase {
     // MARK: - Presentation controller processor
 
     @MainActor
-    func testProcessorApplesToPresentationTransitions() async {
+    func testProcessorOnPresentationTransitions() async {
         let provider = MockPresentationEventStreamProvider()
         let navigation = Navigation(
             navigationEventStreamProvider: provider,
@@ -194,7 +194,7 @@ final class NavigationEventProcessorTests: XCTestCase {
     }
 
     @MainActor
-    func testProcessorSuppressesPresentationTransition() async {
+    func testProcessorSuppressesPresentations() async {
         let provider = MockPresentationEventStreamProvider()
         let navigation = Navigation(
             navigationEventStreamProvider: provider,
@@ -235,7 +235,7 @@ final class NavigationEventProcessorTests: XCTestCase {
 
     // MARK: - Event suppression
 
-    func testProcessorReturningNilSuppressesNavigation() async {
+    func testProcessorNilSuppressesNavigation() async {
         let fixture = makeNavigationStreamFixture(
             navigationEventProcessor: SuppressingProcessor()
         )
