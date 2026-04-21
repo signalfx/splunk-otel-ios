@@ -28,6 +28,7 @@ final class MockAgentSharedState: @unchecked Sendable, AgentSharedState {
 
     private let lock = NSLock()
     private var sessionIdStorage: String
+    private var sessionMetadataStorage: String?
 
 
     // MARK: - Public
@@ -42,13 +43,24 @@ final class MockAgentSharedState: @unchecked Sendable, AgentSharedState {
         return sessionIdStorage
     }
 
+    var sessionMetadata: String? {
+        lock.lock()
+
+        defer {
+            lock.unlock()
+        }
+
+        return sessionMetadataStorage
+    }
+
     let agentVersion: String = "testing-agent-version"
 
 
     // MARK: - Initialization
 
-    init(sessionId: String) {
+    init(sessionId: String, sessionMetadata: String? = nil) {
         sessionIdStorage = sessionId
+        sessionMetadataStorage = sessionMetadata
     }
 
 
@@ -57,6 +69,12 @@ final class MockAgentSharedState: @unchecked Sendable, AgentSharedState {
     func updateSessionId(_ newId: String) {
         lock.lock()
         sessionIdStorage = newId
+        lock.unlock()
+    }
+
+    func updateSessionMetadata(_ newMetadata: String?) {
+        lock.lock()
+        sessionMetadataStorage = newMetadata
         lock.unlock()
     }
 
