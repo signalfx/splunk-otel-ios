@@ -30,7 +30,20 @@ extension Navigation {
         "UITabBarController"
     ]
 
+    /// SwiftUI internal controllers whose type names include generic
+    /// parameters (e.g. `UIHostingController<ModifiedContent<...>>`).
+    /// Prefix matching is required because the suffix varies at runtime.
+    private static let ignoredControllerTypePrefixes: [String] = [
+        "UIHostingController",
+        "StyleContextSplitViewNavigationController"
+    ]
+
     static func shouldIgnore(controllerTypeName: String) -> Bool {
-        ignoredControllerTypeNames.contains(controllerTypeName)
+        if ignoredControllerTypeNames.contains(controllerTypeName) {
+            return true
+        }
+        return ignoredControllerTypePrefixes.contains { prefix in
+            controllerTypeName.hasPrefix(prefix)
+        }
     }
 }
