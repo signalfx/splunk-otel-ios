@@ -32,6 +32,7 @@ extension Navigation {
 
     /// SwiftUI internal controllers whose type names include generic
     /// parameters (e.g. `UIHostingController<ModifiedContent<...>>`).
+    ///
     /// Prefix matching is required because the suffix varies at runtime.
     private static let ignoredControllerTypePrefixes: [String] = [
         "UIHostingController",
