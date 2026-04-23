@@ -29,11 +29,6 @@ final class NavigationNonOperational: NavigationModule {
     private let logger: DefaultLogAgent
 
 
-    // MARK: - Screen name stream
-
-    let screenNameStream: AsyncStream<String> = AsyncStream { $0.finish() }
-
-
     // MARK: - Preferences
 
     var preferences: any NavigationModulePreferences {
