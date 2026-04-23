@@ -233,6 +233,49 @@ final class NavigationEventProcessorTests: XCTestCase {
     }
 
 
+    // MARK: - Mid-transition suppression cleanup
+
+    func testDidShowSuppressionCleansUpNavigationPair() async {
+        let fixture = makeNavigationStreamFixture(
+            navigationEventProcessor: AllowThenSuppressProcessor()
+        )
+
+        defer {
+            fixture.finish()
+        }
+
+        let navigation = fixture.navigation
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
+
+        let controllerIdentifier = ObjectIdentifier(NSString())
+        let navigationControllerIdentifier = ObjectIdentifier(NSNumber(value: 50))
+
+        fixture.sendTransition(
+            type: .navigationControllerWillShow,
+            navigationControllerIdentifier: navigationControllerIdentifier,
+            controllerIdentifier: controllerIdentifier,
+            controllerTypeName: "TransientViewController"
+        )
+
+        // Wait for willShow to be processed and NavigationPair to be stored
+        try? await Task.sleep(nanoseconds: 200_000_000)
+
+        fixture.sendTransition(
+            type: .navigationControllerDidShow,
+            navigationControllerIdentifier: navigationControllerIdentifier,
+            controllerIdentifier: controllerIdentifier,
+            controllerTypeName: "TransientViewController"
+        )
+
+        // Wait for didShow suppression to clean up
+        try? await Task.sleep(nanoseconds: 200_000_000)
+
+        let pair = await navigation.model.navigation(for: controllerIdentifier)
+        XCTAssertNil(pair, "NavigationPair should be removed when processor suppresses at didShow")
+    }
+
+
     // MARK: - Event suppression
 
     func testProcessorNilSuppressesNavigation() async {
@@ -307,5 +350,23 @@ private final class RejectingProcessor: NavigationEventProcessor {
 private final class SuppressingProcessor: NavigationEventProcessor {
     func onViewController(typeName _: String, controllerIdentity _: String) -> NavigationEvent? {
         nil
+    }
+}
+
+private final class AllowThenSuppressProcessor: NavigationEventProcessor {
+    private let lock = NSLock()
+    private var callCount = 0
+
+    func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEvent? {
+        lock.lock()
+        defer { lock.unlock() }
+
+        callCount += 1
+
+        if callCount == 1 {
+            return NavigationEvent(name: typeName)
+        }
+
+        return nil
     }
 }
