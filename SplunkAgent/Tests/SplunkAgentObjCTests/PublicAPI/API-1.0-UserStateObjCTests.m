@@ -40,7 +40,7 @@ limitations under the License.
     // Properties (READ)
     NSNumber *initialTrackingMode = userState.trackingMode;
     NSInteger initialTrackingModeValue = initialTrackingMode.integerValue;
-    NSInteger expectedTrackingModeValue = SPLKUserTrackingMode.noTracking.integerValue;
+    NSInteger expectedTrackingModeValue = SPLKUserTrackingMode.anonymousTracking.integerValue;
     XCTAssertEqual(initialTrackingModeValue, expectedTrackingModeValue);
 
     agent.user.preferences.trackingMode = SPLKUserTrackingMode.anonymousTracking;
