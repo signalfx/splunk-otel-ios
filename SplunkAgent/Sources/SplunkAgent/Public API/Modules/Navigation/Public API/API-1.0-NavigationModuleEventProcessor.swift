@@ -58,7 +58,7 @@ limitations under the License.
 /// ```
 ///
 /// Assign your processor to
-/// ``NavigationModuleConfiguration/navigationEventProcessor`` before starting the agent.
+/// ``NavigationConfiguration/navigationEventProcessor`` before starting the agent.
 ///
 /// ## Threading
 ///

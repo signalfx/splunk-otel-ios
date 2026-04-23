@@ -349,7 +349,7 @@ public class SplunkRum: ObservableObject {
     private static func resolveModuleConfigurations(_ configurations: [Any]?) -> [Any]? {
         configurations?
             .map { config in
-                if let navConfig = config as? NavigationModuleConfiguration {
+                if let navConfig = config as? NavigationConfiguration {
                     return navConfig.asNavigationConfiguration
                 }
 

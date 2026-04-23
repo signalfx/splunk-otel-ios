@@ -24,13 +24,13 @@ limitations under the License.
 /// Pass an instance in the `moduleConfigurations` array when installing the agent:
 ///
 /// ```swift
-/// let navConfig = NavigationModuleConfiguration(
+/// let navConfig = NavigationConfiguration(
 ///     enableAutomatedTracking: true,
 ///     navigationEventProcessor: MyProcessor()
 /// )
 /// try SplunkRum.install(with: config, moduleConfigurations: [navConfig])
 /// ```
-public final class NavigationModuleConfiguration {
+public final class NavigationConfiguration {
 
     // MARK: - Module management
 

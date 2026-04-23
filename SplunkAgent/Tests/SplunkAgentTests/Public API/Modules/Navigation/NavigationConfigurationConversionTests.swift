@@ -21,12 +21,16 @@ import XCTest
 
 @testable import SplunkAgent
 
+/// Typealias to disambiguate the SplunkAgent `NavigationConfiguration`
+/// from `SplunkNavigation.NavigationConfiguration` in this test file.
+private typealias AgentNavigationConfiguration = SplunkAgent.NavigationConfiguration
+
 final class NavModuleConfigConversionTests: XCTestCase {
 
     // MARK: - Default values
 
     func testDefaultConfigConversion() {
-        let config = NavigationModuleConfiguration()
+        let config = AgentNavigationConfiguration()
 
         let result = config.asNavigationConfiguration
 
@@ -38,7 +42,7 @@ final class NavModuleConfigConversionTests: XCTestCase {
     // MARK: - Property forwarding
 
     func testIsEnabledForwarded() {
-        let config = NavigationModuleConfiguration(isEnabled: false)
+        let config = AgentNavigationConfiguration(isEnabled: false)
 
         let result = config.asNavigationConfiguration
 
@@ -46,7 +50,7 @@ final class NavModuleConfigConversionTests: XCTestCase {
     }
 
     func testEnableAutomatedTrackingForwarded() {
-        let config = NavigationModuleConfiguration(enableAutomatedTracking: true)
+        let config = AgentNavigationConfiguration(enableAutomatedTracking: true)
 
         let result = config.asNavigationConfiguration
 
@@ -56,7 +60,7 @@ final class NavModuleConfigConversionTests: XCTestCase {
     // MARK: - Processor wrapping
 
     func testProcessorWrappedInAdapter() {
-        let config = NavigationModuleConfiguration(
+        let config = AgentNavigationConfiguration(
             navigationEventProcessor: PassthroughModuleProcessor()
         )
 
@@ -66,7 +70,7 @@ final class NavModuleConfigConversionTests: XCTestCase {
     }
 
     func testNilProcessorStaysNil() {
-        let config = NavigationModuleConfiguration(navigationEventProcessor: nil)
+        let config = AgentNavigationConfiguration(navigationEventProcessor: nil)
 
         let result = config.asNavigationConfiguration
 
@@ -74,7 +78,7 @@ final class NavModuleConfigConversionTests: XCTestCase {
     }
 
     func testWrappedProcessorForwardsCorrectly() {
-        let config = NavigationModuleConfiguration(
+        let config = AgentNavigationConfiguration(
             navigationEventProcessor: PassthroughModuleProcessor()
         )
 

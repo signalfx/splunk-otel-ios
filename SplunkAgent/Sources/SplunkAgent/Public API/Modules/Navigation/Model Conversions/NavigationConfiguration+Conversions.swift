@@ -17,19 +17,19 @@ limitations under the License.
 
 internal import SplunkNavigation
 
-/// Internal extensions to convert ``NavigationModuleConfiguration`` to
+/// Internal extensions to convert ``NavigationConfiguration`` to
 /// the underlying `SplunkNavigation.NavigationConfiguration`.
-extension NavigationModuleConfiguration {
+extension NavigationConfiguration {
 
     // MARK: - Conversion
 
-    var asNavigationConfiguration: NavigationConfiguration {
+    var asNavigationConfiguration: SplunkNavigation.NavigationConfiguration {
         // Wrap the agent-level processor in an adapter if provided
         let swiftProcessor: (any NavigationEventProcessor)? =
             navigationEventProcessor
             .map { NavigationModuleEventProcessorAdapter(wrapping: $0) }
 
-        return NavigationConfiguration(
+        return SplunkNavigation.NavigationConfiguration(
             isEnabled: isEnabled,
             enableAutomatedTracking: enableAutomatedTracking,
             navigationEventProcessor: swiftProcessor
