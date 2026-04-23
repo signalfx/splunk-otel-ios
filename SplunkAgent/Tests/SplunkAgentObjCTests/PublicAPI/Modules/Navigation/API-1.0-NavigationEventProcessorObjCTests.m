@@ -43,7 +43,6 @@ limitations under the License.
                                              controllerIdentity:(NSString *)controllerIdentity {
     NSString *name = [NSString stringWithFormat:@"%@/%@", self.prefix, typeName];
     return [[SPLKNavigationEvent alloc] initWithName:name
-                                  controllerIdentity:controllerIdentity
                                           attributes:nil];
 }
 
@@ -80,12 +79,10 @@ limitations under the License.
 
 - (void)testNavigationEventInitialization {
     SPLKNavigationEvent *event = [[SPLKNavigationEvent alloc] initWithName:@"HomeScreen"
-                                                        controllerIdentity:@"0x12345"
                                                                 attributes:nil];
 
     XCTAssertNotNil(event);
     XCTAssertEqualObjects(event.name, @"HomeScreen");
-    XCTAssertEqualObjects(event.controllerIdentity, @"0x12345");
     XCTAssertNil(event.attributes);
 }
 
@@ -93,12 +90,10 @@ limitations under the License.
     NSDictionary *attributes = @{@"app.section": @"settings", @"app.level": @42};
 
     SPLKNavigationEvent *event = [[SPLKNavigationEvent alloc] initWithName:@"SettingsScreen"
-                                                        controllerIdentity:@"0xABCDE"
                                                                 attributes:attributes];
 
     XCTAssertNotNil(event);
     XCTAssertEqualObjects(event.name, @"SettingsScreen");
-    XCTAssertEqualObjects(event.controllerIdentity, @"0xABCDE");
     XCTAssertNotNil(event.attributes);
     XCTAssertEqualObjects(event.attributes[@"app.section"], @"settings");
     XCTAssertEqualObjects(event.attributes[@"app.level"], @42);
@@ -120,7 +115,6 @@ limitations under the License.
 
     XCTAssertNotNil(event);
     XCTAssertEqualObjects(event.name, @"DetailViewController");
-    XCTAssertEqualObjects(event.controllerIdentity, @"0x99999");
     XCTAssertNil(event.attributes);
 }
 
@@ -135,7 +129,6 @@ limitations under the License.
 
     XCTAssertNotNil(event);
     XCTAssertEqualObjects(event.name, @"MyApp/HomeVC");
-    XCTAssertEqualObjects(event.controllerIdentity, @"0x11111");
 }
 
 - (void)testCustomProcessorSuppresses {

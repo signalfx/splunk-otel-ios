@@ -33,10 +33,6 @@ public final class NavigationEventObjC: NSObject {
     @objc
     public let name: String
 
-    /// `NSString` representation of the tracked view controller identity.
-    @objc
-    public let controllerIdentity: String
-
     /// Custom attributes to include in the navigation span.
     ///
     /// Use this to enrich navigation spans with application-specific metadata
@@ -52,16 +48,13 @@ public final class NavigationEventObjC: NSObject {
     ///
     /// - Parameters:
     ///   - name: The screen name for this navigation event.
-    ///   - controllerIdentity: `NSString` representation of the view controller identity.
     ///   - attributes: Optional custom attributes to include in the navigation span.
-    @objc(initWithName:controllerIdentity:attributes:)
+    @objc(initWithName:attributes:)
     public init(
         name: String,
-        controllerIdentity: String,
-        attributes: NSDictionary?
+        attributes: NSDictionary? = nil
     ) {
         self.name = name
-        self.controllerIdentity = controllerIdentity
         self.attributes = attributes
     }
 }

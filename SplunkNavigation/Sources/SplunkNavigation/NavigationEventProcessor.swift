@@ -30,10 +30,7 @@ import Foundation
 ///     typeName: String,
 ///     controllerIdentity: String
 /// ) -> NavigationEvent? {
-///     NavigationEvent(
-///         name: friendlyName(for: typeName),
-///         controllerIdentity: controllerIdentity
-///     )
+///     NavigationEvent(name: friendlyName(for: typeName))
 /// }
 /// ```
 ///
@@ -46,7 +43,6 @@ import Foundation
 /// ) -> NavigationEvent? {
 ///     NavigationEvent(
 ///         name: typeName,
-///         controllerIdentity: controllerIdentity,
 ///         attributes: ["app.section": section(for: typeName)]
 ///     )
 /// }
@@ -59,10 +55,7 @@ import Foundation
 ///     typeName: String,
 ///     controllerIdentity: String
 /// ) -> NavigationEvent? {
-///     shouldIgnore(typeName) ? nil : NavigationEvent(
-///         name: typeName,
-///         controllerIdentity: controllerIdentity
-///     )
+///     shouldIgnore(typeName) ? nil : NavigationEvent(name: typeName)
 /// }
 /// ```
 ///
@@ -87,31 +80,12 @@ public protocol NavigationEventProcessor {
     ///     application module prefix before invoking this method, so your
     ///     callback will receive `"DetailViewController"` as the value of
     ///     this parameter rather than `"MyApp.DetailViewController"`.
-    ///   - controllerIdentity: String representation of the controller's object identifier.
+    ///   - controllerIdentity: An opaque string derived from the view controller's
+    ///     `ObjectIdentifier`. It is unique among simultaneously live instances,
+    ///     stable for the lifetime of the instance, and may be reused after the
+    ///     controller is deallocated. It is not persisted across app launches.
+    ///     Use `==` to compare identities.
     ///
     /// - Returns: A navigation event describing the screen, or `nil` to suppress.
     func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent?
-}
-
-/// The default processor that passes navigation events through unchanged.
-///
-/// This processor returns the sanitized controller type name as the screen name
-/// with no additional attributes. It is used automatically when no custom
-/// ``NavigationEventProcessor`` is configured.
-public final class DefaultNavigationEventProcessor: NavigationEventProcessor {
-
-    // MARK: - Initialization
-
-    public init() {}
-
-
-    // MARK: - Processor methods
-
-    public func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
-        NavigationEvent(
-            name: typeName,
-            controllerIdentity: controllerIdentity,
-            attributes: nil
-        )
-    }
 }

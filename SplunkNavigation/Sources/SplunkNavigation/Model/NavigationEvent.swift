@@ -31,18 +31,6 @@ public final class NavigationEvent {
     /// This value is set as the `navigation.name` and `screen.name` span attributes.
     public let name: String
 
-    /// An opaque string that identifies the tracked view controller instance.
-    ///
-    /// The value is:
-    /// - **Opaque** — consumers must not parse it or derive the underlying controller.
-    /// - **Unique** among simultaneously live instances within a single process.
-    /// - **Stable** for the lifetime of the controller instance.
-    /// - **Reusable** — the same value may appear after the instance is deallocated.
-    /// - **Not persistent** across app launches.
-    ///
-    /// Use `==` (or `-isEqualToString:` from Objective-C) for comparison.
-    public let controllerIdentity: String
-
     /// Custom attributes to include in the navigation span.
     ///
     /// Use this to enrich navigation spans with application-specific metadata
@@ -56,15 +44,12 @@ public final class NavigationEvent {
     ///
     /// - Parameters:
     ///   - name: The screen name for this navigation event.
-    ///   - controllerIdentity: String representation of the view controller identity.
     ///   - attributes: Optional custom attributes to include in the navigation span.
     public init(
         name: String,
-        controllerIdentity: String,
         attributes: [String: Any]? = nil
     ) {
         self.name = name
-        self.controllerIdentity = controllerIdentity
         self.attributes = attributes
     }
 }

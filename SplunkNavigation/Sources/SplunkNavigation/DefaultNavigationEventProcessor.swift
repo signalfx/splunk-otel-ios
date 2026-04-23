@@ -21,22 +21,17 @@ import Foundation
 ///
 /// This processor returns the sanitized controller type name as the screen name
 /// with no additional attributes. It is used automatically when no custom
-/// ``NavigationEventProcessorObjC`` is configured.
-@objc(SPLKDefaultNavigationEventProcessor)
-public final class DefaultNavigationEventProcessorObjC: NSObject, NavigationEventProcessorObjC {
+/// ``NavigationEventProcessor`` is configured.
+public final class DefaultNavigationEventProcessor: NavigationEventProcessor {
 
     // MARK: - Initialization
 
-    @objc
-    override public init() {
-        super.init()
-    }
+    public init() {}
 
 
     // MARK: - Processor methods
 
-    @objc(onViewControllerWithTypeName:controllerIdentity:)
-    public func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEventObjC? {
-        NavigationEventObjC(name: typeName)
+    public func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEvent? {
+        NavigationEvent(name: typeName)
     }
 }

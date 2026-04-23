@@ -293,28 +293,19 @@ private final class PrefixingProcessor: NavigationEventProcessor {
         self.prefix = prefix
     }
 
-    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
-        NavigationEvent(
-            name: "\(prefix)/\(typeName)",
-            controllerIdentity: controllerIdentity
-        )
+    func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEvent? {
+        NavigationEvent(name: "\(prefix)/\(typeName)")
     }
 }
 
 private final class RejectingProcessor: NavigationEventProcessor {
-    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
-        _ = typeName
-        return NavigationEvent(
-            name: "REJECTED",
-            controllerIdentity: controllerIdentity
-        )
+    func onViewController(typeName _: String, controllerIdentity _: String) -> NavigationEvent? {
+        NavigationEvent(name: "REJECTED")
     }
 }
 
 private final class SuppressingProcessor: NavigationEventProcessor {
-    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
-        _ = typeName
-        _ = controllerIdentity
-        return nil
+    func onViewController(typeName _: String, controllerIdentity _: String) -> NavigationEvent? {
+        nil
     }
 }

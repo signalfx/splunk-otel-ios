@@ -40,10 +40,21 @@ final class NavigationEventProcessorAdapter: NavigationEventProcessor {
             return nil
         }
 
+        let attributes: [String: Any]? = objcEvent.attributes.flatMap { dict in
+            let filtered = dict.compactMap { key, value -> (String, Any)? in
+                guard let stringKey = key as? String else {
+                    return nil
+                }
+
+                return (stringKey, value)
+            }
+
+            return filtered.isEmpty ? nil : Dictionary(uniqueKeysWithValues: filtered)
+        }
+
         return NavigationEvent(
             name: objcEvent.name,
-            controllerIdentity: objcEvent.controllerIdentity,
-            attributes: objcEvent.attributes as? [String: Any]
+            attributes: attributes
         )
     }
 }
