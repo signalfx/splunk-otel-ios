@@ -113,6 +113,13 @@
         "identifier" : "SplunkNetworkMonitorTests",
         "name" : "SplunkNetworkMonitorTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkAgentObjCTests",
+        "name" : "SplunkAgentObjCTests"
+      }
     }
   ],
   "version" : 1
