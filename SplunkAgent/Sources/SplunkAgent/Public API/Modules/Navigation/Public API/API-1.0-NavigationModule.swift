@@ -40,6 +40,12 @@ public protocol NavigationModule: ObservableObject {
     var state: NavigationModuleState { get }
 
 
+    // MARK: - Screen name stream
+
+    /// Asynchronous stream of screen name changes.
+    var screenNameStream: AsyncStream<String> { get }
+
+
     // MARK: - Manual detection
 
     /// Sets a manual screen name. This setting is valid until a new name is set.

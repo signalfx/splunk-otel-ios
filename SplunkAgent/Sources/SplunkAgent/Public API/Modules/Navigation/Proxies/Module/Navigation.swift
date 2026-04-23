@@ -25,6 +25,13 @@ final class Navigation: NavigationModule {
     unowned let module: SplunkNavigation.Navigation
 
 
+    // MARK: - Screen name stream
+
+    var screenNameStream: AsyncStream<String> {
+        module.screenNameStream
+    }
+
+
     // MARK: - Preferences
 
     var preferences: any NavigationModulePreferences {
