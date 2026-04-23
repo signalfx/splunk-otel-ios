@@ -19,7 +19,7 @@ internal import SplunkNavigation
 
 /// Adapts an Objective-C ``NavigationEventProcessorObjC`` to the Swift
 /// ``NavigationEventProcessor`` protocol used by the navigation engine.
-final class NavigationEventProcessorAdapter: NavigationEventProcessor {
+final class NavigationEventProcessorAdapter: NavigationEventProcessor, @unchecked Sendable {
 
     // MARK: - Private
 

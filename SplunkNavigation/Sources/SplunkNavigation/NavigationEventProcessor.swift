@@ -64,9 +64,9 @@ import Foundation
 ///
 /// ## Threading
 ///
-/// The callback may be invoked from a background task. Implementations must be
-/// thread-safe or stateless.
-public protocol NavigationEventProcessor {
+/// The callback may be invoked from a background task. The protocol requires
+/// `Sendable` conformance.
+public protocol NavigationEventProcessor: Sendable {
 
     // MARK: - Processor methods
 

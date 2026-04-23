@@ -47,7 +47,21 @@ public final class Navigation: Sendable {
     /// Assigned once during ``install(with:remoteConfiguration:)`` and must not be
     /// mutated after detection has started. Manual ``track(screen:)`` calls bypass
     /// the processor.
-    nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor
+    private let processorLock = NSLock()
+    private nonisolated(unsafe) var storedNavigationEventProcessor: any NavigationEventProcessor
+
+    var navigationEventProcessor: any NavigationEventProcessor {
+        get {
+            processorLock.lock()
+            defer { processorLock.unlock() }
+            return storedNavigationEventProcessor
+        }
+        set {
+            processorLock.lock()
+            defer { processorLock.unlock() }
+            storedNavigationEventProcessor = newValue
+        }
+    }
 
 
     // MARK: - Module configuration
@@ -109,7 +123,7 @@ public final class Navigation: Sendable {
         navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
     ) {
         self.navigationEventStreamProvider = navigationEventStreamProvider
-        self.navigationEventProcessor = navigationEventProcessor
+        storedNavigationEventProcessor = navigationEventProcessor
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
         self.screenNameStream = screenNameStream
