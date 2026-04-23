@@ -93,7 +93,7 @@ extension Navigation {
     private func updateTransitionStart(for snapshot: PresentationTransitionSnapshot) async {
         let typeName = snapshot.controllerTypeName
         guard
-            let navigationEvent = processAutomatedNavigationEvent(
+            let navigationEvent = await processAutomatedNavigationEvent(
                 sanitize(typeName: typeName),
                 controllerIdentifier: snapshot.controllerIdentifier
             )
@@ -126,7 +126,7 @@ extension Navigation {
         let typeName = snapshot.controllerTypeName
 
         guard
-            let navigationEvent = processAutomatedNavigationEvent(
+            let navigationEvent = await processAutomatedNavigationEvent(
                 sanitize(typeName: typeName),
                 controllerIdentifier: snapshot.controllerIdentifier
             )

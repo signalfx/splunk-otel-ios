@@ -31,7 +31,7 @@ extension Navigation {
         let controllerIdentifier = event.controllerIdentifier
 
         guard
-            let navigationEvent = processAutomatedNavigationEvent(
+            let navigationEvent = await processAutomatedNavigationEvent(
                 sanitize(typeName: typeName),
                 controllerIdentifier: controllerIdentifier
             )
@@ -115,7 +115,7 @@ extension Navigation {
         await model.removeManagedNavigationControllerTarget(pendingTargetIdentifier)
 
         guard
-            let navigationEvent = processAutomatedNavigationEvent(
+            let navigationEvent = await processAutomatedNavigationEvent(
                 sanitize(typeName: visibleControllerTypeName),
                 controllerIdentifier: visibleControllerIdentifier
             )
@@ -139,7 +139,7 @@ extension Navigation {
         let typeName = event.controllerTypeName
         let visibleControllerIdentifier = event.controllerIdentifier
         guard
-            let navigationEvent = processAutomatedNavigationEvent(
+            let navigationEvent = await processAutomatedNavigationEvent(
                 sanitize(typeName: typeName),
                 controllerIdentifier: visibleControllerIdentifier
             )

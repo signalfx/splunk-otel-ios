@@ -27,12 +27,24 @@ actor NavigationModel {
     private(set) var pendingNavigationTargets: [ObjectIdentifier: ObjectIdentifier] = [:]
     private(set) var managedNavigationControllerTargets: Set<ObjectIdentifier> = []
     private(set) var agentVersion: String?
+    private(set) var navigationEventProcessor: any NavigationEventProcessor
+
+
+    // MARK: - Initialization
+
+    init(navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()) {
+        self.navigationEventProcessor = navigationEventProcessor
+    }
 
 
     // MARK: - Module management
 
     func update(moduleEnabled: Bool) {
         self.moduleEnabled = moduleEnabled
+    }
+
+    func update(navigationEventProcessor: any NavigationEventProcessor) {
+        self.navigationEventProcessor = navigationEventProcessor
     }
 
 

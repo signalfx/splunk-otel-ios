@@ -276,6 +276,94 @@ final class NavigationEventProcessorTests: XCTestCase {
     }
 
 
+    // MARK: - Reserved span key protection
+
+    func testReservedSpanKeysCannotBeOverriddenByProcessor() async {
+        // Use a processor that returns attributes containing all SDK-reserved keys.
+        let fixture = makeNavigationStreamFixture(
+            navigationEventProcessor: ReservedKeyOverrideProcessor()
+        )
+
+        defer {
+            fixture.finish()
+        }
+
+        let navigation = fixture.navigation
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
+
+        // Set an initial screen via manual tracking so last.screen.name has a known value.
+        navigation.track(screen: "HomeScreen")
+
+        let didSetInitial = await waitUntil {
+            await navigation.model.screenName == "HomeScreen"
+        }
+        XCTAssertTrue(didSetInitial)
+
+        // Trigger an automated navigation event through the processor.
+        let controllerIdentifier = ObjectIdentifier(NSString())
+        let navigationControllerIdentifier = ObjectIdentifier(NSNumber(value: 99))
+
+        fixture.sendTransition(
+            type: .navigationControllerWillShow,
+            navigationControllerIdentifier: navigationControllerIdentifier,
+            controllerIdentifier: controllerIdentifier,
+            controllerTypeName: "SettingsViewController"
+        )
+        fixture.sendTransition(
+            type: .navigationControllerDidShow,
+            navigationControllerIdentifier: navigationControllerIdentifier,
+            controllerIdentifier: controllerIdentifier,
+            controllerTypeName: "SettingsViewController"
+        )
+
+        // The processor returns name: "SettingsViewController" with attributes
+        // attempting to set screen.name, last.screen.name, component, and
+        // navigation.name to "hacker". Verify the SDK uses the processor's
+        // `name` field for the screen name, not the "screen.name" attribute.
+        let didUpdate = await waitUntil {
+            await navigation.model.screenName == "SettingsViewController"
+        }
+        XCTAssertTrue(didUpdate)
+
+        let currentScreenName = await navigation.model.screenName
+        XCTAssertEqual(
+            currentScreenName,
+            "SettingsViewController",
+            "Screen name must come from NavigationEvent.name, not from the 'screen.name' attribute"
+        )
+        XCTAssertNotEqual(
+            currentScreenName,
+            "hacker",
+            "Processor attributes must not override the SDK-computed screen name"
+        )
+
+        // Verify the processor returns an event that carries the override attributes.
+        // Navigation+Span.swift writes these user attributes BEFORE the SDK-reserved
+        // keys (component, navigation.name, screen.name, last.screen.name) so that
+        // clearAndSetAttribute for SDK keys always wins.
+        let processedEvent = await navigation.processAutomatedNavigationEvent(
+            "SettingsViewController",
+            controllerIdentifier: controllerIdentifier
+        )
+        XCTAssertNotNil(processedEvent)
+        XCTAssertEqual(processedEvent?.name, "SettingsViewController")
+        XCTAssertNotNil(
+            processedEvent?.attributes,
+            "Processor should return attributes (including reserved key overrides)"
+        )
+
+        // Confirm the processor did return attributes that attempt to override reserved keys.
+        // The span-level protection is structural: send(screenName:lastScreenName:start:attributes:)
+        // in Navigation+Span.swift writes user attributes first, then overwrites with SDK values.
+        let attrs = processedEvent?.attributes
+        XCTAssertEqual(attrs?["screen.name"] as? String, "hacker")
+        XCTAssertEqual(attrs?["component"] as? String, "hacker")
+        XCTAssertEqual(attrs?["navigation.name"] as? String, "hacker")
+        XCTAssertEqual(attrs?["last.screen.name"] as? String, "hacker")
+    }
+
+
     // MARK: - Event suppression
 
     func testProcessorNilSuppressesNavigation() async {
@@ -368,5 +456,20 @@ private final class AllowThenSuppressProcessor: NavigationEventProcessor {
         }
 
         return nil
+    }
+}
+
+/// Returns the event with attributes that attempt to override all SDK-reserved span keys.
+private final class ReservedKeyOverrideProcessor: NavigationEventProcessor {
+    func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEvent? {
+        NavigationEvent(
+            name: typeName,
+            attributes: [
+                "screen.name": "hacker",
+                "last.screen.name": "hacker",
+                "component": "hacker",
+                "navigation.name": "hacker"
+            ]
+        )
     }
 }

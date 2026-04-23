@@ -26,7 +26,7 @@ public final class Navigation: Sendable {
 
     // MARK: - Private
 
-    let model = NavigationModel()
+    let model: NavigationModel
 
     let appBundleName: String?
     let continuation: AsyncStream<String>.Continuation
@@ -41,27 +41,6 @@ public final class Navigation: Sendable {
 
     /// Asynchronous stream of screen name changes.
     public let screenNameStream: AsyncStream<String>
-
-    /// Processor used to transform automated navigation events before they produce spans.
-    ///
-    /// Assigned once during ``install(with:remoteConfiguration:)`` and must not be
-    /// mutated after detection has started. Manual ``track(screen:)`` calls bypass
-    /// the processor.
-    private let processorLock = NSLock()
-    private nonisolated(unsafe) var storedNavigationEventProcessor: any NavigationEventProcessor
-
-    var navigationEventProcessor: any NavigationEventProcessor {
-        get {
-            processorLock.lock()
-            defer { processorLock.unlock() }
-            return storedNavigationEventProcessor
-        }
-        set {
-            processorLock.lock()
-            defer { processorLock.unlock() }
-            storedNavigationEventProcessor = newValue
-        }
-    }
 
 
     // MARK: - Module configuration
@@ -123,7 +102,8 @@ public final class Navigation: Sendable {
         navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
     ) {
         self.navigationEventStreamProvider = navigationEventStreamProvider
-        storedNavigationEventProcessor = navigationEventProcessor
+        self.model = NavigationModel(navigationEventProcessor: navigationEventProcessor)
+
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
         self.screenNameStream = screenNameStream
@@ -233,7 +213,7 @@ public final class Navigation: Sendable {
 
         let typeName = event.controllerTypeName
         guard
-            let navigationEvent = processAutomatedNavigationEvent(
+            let navigationEvent = await processAutomatedNavigationEvent(
                 sanitize(typeName: typeName),
                 controllerIdentifier: event.controllerIdentifier
             )
@@ -275,7 +255,7 @@ public final class Navigation: Sendable {
 
         let typeName = event.controllerTypeName
         guard
-            let navigationEvent = processAutomatedNavigationEvent(
+            let navigationEvent = await processAutomatedNavigationEvent(
                 sanitize(typeName: typeName),
                 controllerIdentifier: event.controllerIdentifier
             )
@@ -370,15 +350,16 @@ public final class Navigation: Sendable {
     }
 
 
-    /// Passes the sanitized type name through the ``navigationEventProcessor``
-    /// and returns the processed event, or `nil` if the event was suppressed.
+    /// Passes the sanitized type name through the navigation event processor
+    /// (stored on the ``NavigationModel`` actor) and returns the processed event,
+    /// or `nil` if the event was suppressed.
     func processAutomatedNavigationEvent(
         _ typeName: String,
         controllerIdentifier: ObjectIdentifier
-    ) -> NavigationEvent? {
+    ) async -> NavigationEvent? {
         let controllerIdentity = String(UInt(bitPattern: controllerIdentifier))
 
-        return navigationEventProcessor.onViewController(
+        return await model.navigationEventProcessor.onViewController(
             typeName: typeName,
             controllerIdentity: controllerIdentity
         )
