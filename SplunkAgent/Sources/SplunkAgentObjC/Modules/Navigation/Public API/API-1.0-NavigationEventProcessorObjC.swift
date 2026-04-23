@@ -25,6 +25,11 @@ import Foundation
 ///
 /// Assign your processor to
 /// ``NavigationConfigurationObjC/navigationEventProcessor`` before starting the agent.
+///
+/// ## Threading
+///
+/// The callback may be invoked from a background queue. Implementations must be
+/// thread-safe or stateless.
 @objc(SPLKNavigationEventProcessor)
 public protocol NavigationEventProcessorObjC {
 
@@ -40,7 +45,11 @@ public protocol NavigationEventProcessorObjC {
     ///     application module prefix before invoking this method, so your
     ///     callback will receive `"DetailViewController"` as the value of
     ///     this parameter rather than `"MyApp.DetailViewController"`.
-    ///   - controllerIdentity: `NSString` representation of the controller's object identifier.
+    ///   - controllerIdentity: An opaque `NSString` derived from the `ObjectIdentifier`
+    ///     of the `UIViewController` instance. It is unique among simultaneously
+    ///     live instances, stable for the lifetime of the instance, and may be
+    ///     reused after the controller is deallocated. It is not persisted across
+    ///     app launches. Use `isEqual:` to compare identities.
     ///
     /// - Returns: A navigation event describing the screen, or `nil` to suppress.
     @objc(onViewControllerWithTypeName:controllerIdentity:)
