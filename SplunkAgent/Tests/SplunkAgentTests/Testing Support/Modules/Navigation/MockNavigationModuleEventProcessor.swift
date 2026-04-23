@@ -24,7 +24,7 @@ final class PassthroughModuleProcessor: NavigationModuleEventProcessor {
     }
 }
 
-final class AttributeModuleProcessor: NavigationModuleEventProcessor {
+final class AttributeModuleProcessor: NavigationModuleEventProcessor, @unchecked Sendable {
     let attributes: [String: Any]?
 
     init(attributes: [String: Any]?) {
@@ -42,7 +42,7 @@ final class SuppressingModuleProcessor: NavigationModuleEventProcessor {
     }
 }
 
-final class CapturingModuleProcessor: NavigationModuleEventProcessor {
+final class CapturingModuleProcessor: NavigationModuleEventProcessor, @unchecked Sendable {
     private(set) var lastTypeName: String?
     private(set) var lastControllerIdentity: String?
 
