@@ -40,7 +40,7 @@ public final class NavigationModuleObjC: NSObject {
 
         set {
             newValue.owner = owner
-            owner.agent.navigation.preferences = NavigationPreferences(enableAutomatedTracking: newValue.enableAutomatedTracking)
+            owner.agent.navigation.preferences.enableAutomatedTracking = newValue.enableAutomatedTracking
         }
     }
 
