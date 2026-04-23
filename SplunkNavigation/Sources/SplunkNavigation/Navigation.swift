@@ -47,7 +47,7 @@ public final class Navigation: Sendable {
     /// Assigned once during ``install(with:remoteConfiguration:)`` and must not be
     /// mutated after detection has started. Manual ``track(screen:)`` calls bypass
     /// the processor.
-    internal(set) nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor
+    nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor
 
 
     // MARK: - Module configuration
@@ -363,6 +363,7 @@ public final class Navigation: Sendable {
         controllerIdentifier: ObjectIdentifier
     ) -> NavigationEvent? {
         let controllerIdentity = String(UInt(bitPattern: controllerIdentifier))
+
         return navigationEventProcessor.onViewController(
             typeName: typeName,
             controllerIdentity: controllerIdentity

@@ -124,6 +124,7 @@ extension Navigation {
         }
 
         let typeName = snapshot.controllerTypeName
+
         guard
             let navigationEvent = processAutomatedNavigationEvent(
                 sanitize(typeName: typeName),
