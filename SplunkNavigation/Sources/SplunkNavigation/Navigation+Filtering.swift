@@ -40,11 +40,11 @@ extension Navigation {
     ]
 
     static func shouldIgnore(controllerTypeName: String) -> Bool {
-        if ignoredControllerTypeNames.contains(controllerTypeName) {
-            return true
-        }
-        return ignoredControllerTypePrefixes.contains { prefix in
-            controllerTypeName.hasPrefix(prefix)
-        }
+        let isExactMatch = ignoredControllerTypeNames
+            .contains(controllerTypeName)
+        let isPrefixMatch = ignoredControllerTypePrefixes
+            .contains { controllerTypeName.hasPrefix($0) }
+        let shouldIgnore = isExactMatch || isPrefixMatch
+        return shouldIgnore
     }
 }
