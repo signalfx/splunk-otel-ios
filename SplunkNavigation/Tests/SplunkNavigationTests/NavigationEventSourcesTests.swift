@@ -70,17 +70,17 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: name))
     }
 
-    func testShouldIgnoreStyleContextSplitViewNavigationController() {
+    func testShouldIgnoreSplitViewPrefix() {
         let name = "StyleContextSplitViewNavigationController<MergedStyle>"
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: name))
     }
 
-    func testShouldNotIgnoreControllerWithSimilarPrefix() {
+    func testShouldNotIgnoreSimilarPrefix() {
         let name = "UIHostingWrapperViewController"
         XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: name))
     }
 
-    func testIgnoredControllerDoesNotUpdateScreenName() async {
+    func testIgnoredControllerNoScreenName() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
