@@ -44,7 +44,6 @@ extension Navigation {
             .contains(controllerTypeName)
         let isPrefixMatch = ignoredControllerTypePrefixes
             .contains { controllerTypeName.hasPrefix($0) }
-        let shouldIgnore = isExactMatch || isPrefixMatch
-        return shouldIgnore
+        return isExactMatch || isPrefixMatch
     }
 }
