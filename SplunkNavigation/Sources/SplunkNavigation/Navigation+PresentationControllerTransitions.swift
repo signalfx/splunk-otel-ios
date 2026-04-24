@@ -132,6 +132,7 @@ extension Navigation {
             )
         else {
             await model.removeNavigation(for: snapshot.controllerIdentifier)
+
             return
         }
 

@@ -138,6 +138,7 @@ extension Navigation {
     private func completeNavigationControllerTransition(event: any NavigationActionEvent) async {
         let typeName = event.controllerTypeName
         let visibleControllerIdentifier = event.controllerIdentifier
+
         guard
             let navigationEvent = await processAutomatedNavigationEvent(
                 sanitize(typeName: typeName),
@@ -145,6 +146,7 @@ extension Navigation {
             )
         else {
             await model.removeNavigation(for: visibleControllerIdentifier)
+
             return
         }
 
