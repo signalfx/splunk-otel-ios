@@ -54,9 +54,9 @@ if ! sudo -n xcode-select -s "$DEV_DIR"; then
 fi
 
 echo ""
-xcodebuild -version
+XCODE_VERSION_OUTPUT=$(xcodebuild -version)
+echo "$XCODE_VERSION_OUTPUT"
 
 # Print a prominent notice in the GitHub Actions log
-XCODE_VERSION_OUTPUT=$(xcodebuild -version)
 XCODE_VERSION=$(echo "$XCODE_VERSION_OUTPUT" | head -n 1)
 echo "::notice::Selected Xcode version: $XCODE_VERSION ($(basename "$SELECTED_APP"))"
