@@ -24,6 +24,7 @@ import XCTest
 
 final class MockAgentSharedState: AgentSharedState, @unchecked Sendable {
     var sessionId: String = "mock-session-id"
+    var sessionMetadata: String?
     var agentVersion: String = "1.0.0"
 
     func applicationState(for _: Date) -> String? {
@@ -199,5 +200,55 @@ final class CrashReportsTests: XCTestCase {
         instance = nil
 
         XCTAssertNil(instance)
+    }
+
+    // MARK: - Behavioral Verification Tests
+
+    func testConfigureThenReportCrashIfPresentDoesNotThrow() {
+        crashReports?.configureCrashReporter()
+
+        // After configuration, reporting should work (no pending report expected)
+        XCTAssertNoThrow(crashReports?.reportCrashIfPresent())
+    }
+
+    func testSharedStateCanBeReadBackWithCorrectValues() {
+        let mockSharedState = MockAgentSharedState()
+        mockSharedState.sessionId = "session-xyz-789"
+        mockSharedState.agentVersion = "3.0.0"
+
+        crashReports?.sharedState = mockSharedState
+
+        XCTAssertEqual(crashReports?.sharedState?.sessionId, "session-xyz-789")
+        XCTAssertEqual(crashReports?.sharedState?.agentVersion, "3.0.0")
+    }
+
+    func testSharedStateApplicationStateReturnsExpectedValue() {
+        let mockSharedState = MockAgentSharedState()
+
+        crashReports?.sharedState = mockSharedState
+
+        let appState = crashReports?.sharedState?.applicationState(for: Date())
+        XCTAssertEqual(appState, "foreground")
+    }
+
+    func testMultipleConfigureCallsDoNotCorruptState() {
+        crashReports?.configureCrashReporter()
+        crashReports?.configureCrashReporter()
+
+        // After multiple configure calls, a report check should work
+        XCTAssertNoThrow(crashReports?.reportCrashIfPresent())
+
+        // Span name should still be the default
+        XCTAssertEqual(crashReports?.crashSpanName, "SplunkCrashReport")
+    }
+
+    func testAllUsedImageNamesCanBePopulatedAndCleared() {
+        crashReports?.allUsedImageNames = ["libA.dylib", "libB.dylib"]
+
+        XCTAssertEqual(crashReports?.allUsedImageNames.count, 2)
+
+        crashReports?.allUsedImageNames.removeAll()
+
+        XCTAssertTrue(crashReports?.allUsedImageNames.isEmpty ?? false)
     }
 }

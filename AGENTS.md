@@ -177,7 +177,8 @@ brew install swiftlint
 2. Implement the `Module` protocol in `<ModuleName>+Module.swift`
 3. Create configuration types implementing `ModuleConfiguration` and `RemoteModuleConfiguration`
 4. Add target to `Package.swift` in `generateMainTargets()`
-5. Add test target with builders and mocks
+5. Update `tools/xcframework/Project.swift` to keep the xcframework target graph, platform settings, and dependencies in sync with `Package.swift`
+6. Add test target with builders and mocks
 
 ### Adding a Public API Method
 
@@ -192,6 +193,8 @@ brew install swiftlint
 - During PR review, call out missing CHANGELOG.md updates whenever a change is client-visible
 - Client-visible changes include public API changes and significant behavior changes that affect client applications
 - If such a change is present without a corresponding changelog entry, flag it explicitly in the review and request an update
+- During PR review, when `Package.swift` changes targets, products, supported platforms, or module dependencies, verify that `tools/xcframework/Project.swift` is updated to stay in sync, and vice versa
+- If one manifest changes without the corresponding update in the other manifest, flag it explicitly as a likely xcframework build drift issue
 
 ## Dependencies
 

@@ -101,7 +101,7 @@ public final class WebViewInstrumentation: NSObject {
                 "WebViewInstrumentation injecting JavaScript APIs for fetching native Session ID."
             }
 
-            guard let sessionId = sharedState?.sessionId else {
+            guard let currentState = sharedState else {
                 logger.log(level: .warn, isPrivate: false) {
                     "Native Session ID not available for webview injection. Check that sharedState is set before use."
                 }
@@ -109,7 +109,8 @@ public final class WebViewInstrumentation: NSObject {
             }
 
             let javaScript = WebViewBridgeScript.generate(
-                sessionId: sessionId,
+                sessionId: currentState.sessionId,
+                sessionMetadata: currentState.sessionMetadata,
                 handlerName: Self.handlerName
             )
 
@@ -166,23 +167,27 @@ public final class WebViewInstrumentation: NSObject {
         /// Handles JavaScript messages with a reply handler for asynchronous communication.
         ///
         /// This method is called when the web content calls `window.webkit.messageHandlers.SplunkRumNativeUpdate.postMessage()`.
-        /// It retrieves the current native session ID and sends it back to the JavaScript context.
+        /// It retrieves the current native session ID and session metadata, then sends them back to the JavaScript context.
         ///
         /// - Parameters:
         ///
-        /// - replyHandler: A block to be called with the reply data or an error string.
+        /// - replyHandler: A block to be called with the reply data (containing `sessionId` and `sessionMetadata`) or an error string.
         public func userContentController(
             _ _: WKUserContentController,
             didReceive _: WKScriptMessage,
             replyHandler: @escaping @MainActor @Sendable (Any?, String?) -> Void
         ) {
             // hint: parse message.body["action"] here if you need to add features
-            if let sessionId = sharedState?.sessionId {
-                replyHandler(["sessionId": sessionId], nil)
-            }
-            else {
+            guard let currentState = sharedState else {
                 replyHandler(nil, "Native Session ID not available")
+                return
             }
+
+            let reply: [String: Any] = [
+                "sessionId": currentState.sessionId,
+                "sessionMetadata": currentState.sessionMetadata ?? NSNull()
+            ]
+            replyHandler(reply, nil)
         }
     }
 #endif

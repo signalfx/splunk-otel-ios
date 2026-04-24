@@ -230,7 +230,7 @@ func injectTraceContextIfEnabled(into request: URLRequest, span: Span) -> URLReq
 ///    which sets rich attributes (status code, server-timing link, response body size,
 ///    peer address, protocol version, error details, request body size).
 /// 2. This wrapped completion handler calls `endHttpSpanFromCompletion`, which sets
-///    a minimal subset (status code, error, error message).
+///    status code, configured captured response headers, and error attributes.
 ///
 /// On Apple platforms, `setState:` fires before the completion handler, so `endHttpSpan`
 /// runs first and the span receives the full attribute set. The subsequent `end()` call
@@ -272,13 +272,14 @@ func wrapDownloadCompletionHandler(
     }
 }
 
-/// Ends a span with minimal attributes from a completion handler.
+/// Ends a span from a completion handler with fallback attributes.
 ///
 /// This is a safety net for tasks whose span was not already ended by `splunkSwizzledSetState`.
 /// See ``wrapCompletionHandler`` for details on the dual-path span lifecycle.
 func endHttpSpanFromCompletion(span: Span, response: URLResponse?, error: Error?) {
     if let httpResponse = response as? HTTPURLResponse {
         span.setAttribute(key: "http.response.status_code", value: httpResponse.statusCode)
+        addCapturedResponseHeaders(from: httpResponse, to: span)
     }
 
     if let error {

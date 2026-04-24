@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2026 Splunk Inc.
+Copyright 2025 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,13 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoSwizzling
+internal import CiscoSwizzling
+import Foundation
 
-extension Navigation {
+/// Represents automatic navigation event.
+///
+/// Used for legacy solution compatibility.
+struct AutomatedNavigationEvent: NavigationActionEvent {
 
-    // MARK: - Event sources
+    // MARK: - Public
 
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        try await navigationEventStreamProvider.navigationStream()
-    }
+    var timestamp: Date
+    var type: NavigationActionEventType
+    var controllerTypeName: String
+    var controllerIdentifier: ObjectIdentifier
+    var viewFrame: CGRect?
 }

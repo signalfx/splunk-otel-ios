@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,22 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import CiscoSwizzling
+// MARK: Empty stub file. Serves as a compilation unit for the binary wrapper targets.
+
 import Foundation
-
-/// Represents an automatic navigation event.
-struct AutomatedNavigationEvent: NavigationActionEvent {
-
-    // MARK: - Public
-
-    var timestamp: Date
-    var type: NavigationActionEventType
-    var controllerTypeName: String
-    var controllerIdentifier: ObjectIdentifier
-    var navigationControllerIdentifier: ObjectIdentifier? {
-        // Required for NavigationActionEvent conformance.
-        nil
-    }
-
-    var viewFrame: CGRect?
-}

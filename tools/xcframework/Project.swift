@@ -345,6 +345,9 @@ let project = Project(
             product: .framework,
             bundleId: "com.splunk.rum.webview",
             sources: "\(repoRoot)/SplunkWebView/Sources/**",
+            resources: [
+                .glob(pattern: "\(repoRoot)/SplunkWebView/Resources/**")
+            ],
             dependencies: [
                 mod("SplunkCommon"),
                 dep("CiscoLogger")
@@ -385,6 +388,7 @@ let project = Project(
                 mod("SplunkCommon"),
                 dep("CiscoSessionReplay"),
                 // Transitive: CiscoSessionReplay's swiftinterface imports these
+                dep("CiscoCommon"),
                 dep("CiscoInteractions"),
                 dep("CiscoSwizzling"),
                 dep("CiscoInstanceManager"),
