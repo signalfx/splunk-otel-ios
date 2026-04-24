@@ -13,7 +13,7 @@ jobs:
       build_matrix: ${{ steps.dest.outputs.build_matrix }}
       test_matrix: ${{ steps.dest.outputs.test_matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Select latest Xcode
         run: bash .github/actions/build-and-tests/scripts/select-xcode.sh
       - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.prepare.outputs.build_matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Select latest Xcode
         run: bash .github/actions/build-and-tests/scripts/select-xcode.sh
       - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
@@ -52,7 +52,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.prepare.outputs.test_matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Select latest Xcode
         run: bash .github/actions/build-and-tests/scripts/select-xcode.sh
       - run: chmod +x .github/actions/build-and-tests/scripts/*.sh
@@ -76,7 +76,7 @@ jobs:
           include_passed: true
           fail_on_failure: false
           detailed_summary: true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: TestResults_iOS.xcresult

@@ -246,3 +246,11 @@ Licensed under the Apache License, Version 2.0 (the "License");
 ...
 */
 ```
+
+## GitHub Actions Security
+
+All GitHub Actions used in workflows MUST be pinned to a specific commit SHA rather than a tag or branch version. This prevents malicious updates to third-party actions from compromising the CI/CD pipeline.
+
+**Example**:
+Instead of `uses: actions/checkout@v4`, use:
+`uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4`
