@@ -35,8 +35,8 @@ extension Navigation {
     ///
     /// Prefix matching is required because the suffix varies at runtime.
     private static let ignoredControllerTypePrefixes: [String] = [
-        "UIHostingController",
-        "StyleContextSplitViewNavigationController"
+        "UIHostingController<",
+        "StyleContextSplitViewNavigationController<"
     ]
 
     static func shouldIgnore(controllerTypeName: String) -> Bool {
