@@ -102,7 +102,7 @@ public final class Navigation: Sendable {
         navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
     ) {
         self.navigationEventStreamProvider = navigationEventStreamProvider
-        self.model = NavigationModel(navigationEventProcessor: navigationEventProcessor)
+        model = NavigationModel(navigationEventProcessor: navigationEventProcessor)
 
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
