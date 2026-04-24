@@ -18,13 +18,39 @@ for app in "${xcodes[@]}"; do
 done
 echo ""
 
-# Find the latest versioned Xcode, or fallback to Xcode.app
+# Find the latest stable versioned Xcode, or fallback to Xcode.app
 # Python is used to securely and correctly sort version numbers (e.g. 16.10 > 16.2)
 SELECTED_APP=$(python3 -c '
-import sys, os, re
+import sys, os, re, plistlib
 
 apps = sys.argv[1:]
+
+def get_bundle_version_string(path):
+    info_plist = os.path.join(path, "Contents", "Info.plist")
+    try:
+        with open(info_plist, "rb") as f:
+            info = plistlib.load(f)
+        return str(info.get("CFBundleShortVersionString", "")).strip()
+    except Exception:
+        return ""
+
+def parse_version_string(version):
+    match = re.search(r"([0-9]+(?:\.[0-9]+)*)", version)
+    return [int(x) for x in match.group(1).split(".")] if match else None
+
 def get_version(path):
+    if "beta" in path.lower():
+        return [-1]
+    
+    version_str = get_bundle_version_string(path)
+    
+    if "beta" in version_str.lower():
+        return [-1]
+        
+    parts = parse_version_string(version_str)
+    if parts:
+        return parts
+
     match = re.search(r"Xcode_([0-9]+(?:\.[0-9]+)*)\.app", os.path.basename(path))
     return [int(x) for x in match.group(1).split(".")] if match else [-1]
 
@@ -32,8 +58,6 @@ versioned_apps = [app for app in apps if get_version(app) != [-1]]
 
 if versioned_apps:
     print(sorted(versioned_apps, key=get_version)[-1])
-elif "/Applications/Xcode.app" in apps:
-    print("/Applications/Xcode.app")
 ' "${xcodes[@]}")
 
 if [ -z "$SELECTED_APP" ]; then
