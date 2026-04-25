@@ -135,6 +135,11 @@ func generateMainTargets() -> [Target] {
             dependencies: ["SplunkAgentObjC"],
             path: "SplunkAgent/Tests/SplunkAgentObjCTests"
         ),
+        .testTarget(
+            name: "SplunkAgentBridgingTests",
+            dependencies: ["SplunkAgentObjC", "SplunkNavigation"],
+            path: "SplunkAgent/Tests/SplunkAgentBridgingTests"
+        ),
 
 
         // MARK: - Splunk Navigation (Instrumentation)

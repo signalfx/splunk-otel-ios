@@ -120,6 +120,13 @@
         "identifier" : "SplunkAgentObjCTests",
         "name" : "SplunkAgentObjCTests"
       }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkAgentBridgingTests",
+        "name" : "SplunkAgentBridgingTests"
+      }
     }
   ],
   "version" : 1
