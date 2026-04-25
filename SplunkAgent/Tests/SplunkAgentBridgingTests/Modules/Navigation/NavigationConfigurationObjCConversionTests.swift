@@ -21,6 +21,9 @@ import XCTest
 
 @testable import SplunkAgentObjC
 
+/// Verifies that ``NavigationConfigurationObjC`` correctly converts into the
+/// internal ``SplunkNavigation/NavigationConfiguration``, including property
+/// forwarding and processor wrapping through ``NavigationEventProcessorAdapter``.
 final class NavConfigObjCConversionTests: XCTestCase {
 
     // MARK: - Helpers
@@ -28,6 +31,7 @@ final class NavConfigObjCConversionTests: XCTestCase {
     private func convert(_ config: NavigationConfigurationObjC) -> NavigationConfiguration? {
         config.moduleConfiguration as? NavigationConfiguration
     }
+
 
     // MARK: - Default values
 
@@ -38,6 +42,7 @@ final class NavConfigObjCConversionTests: XCTestCase {
 
         XCTAssertNotNil(result)
     }
+
 
     // MARK: - Property forwarding
 
@@ -59,6 +64,7 @@ final class NavConfigObjCConversionTests: XCTestCase {
 
         XCTAssertEqual(result?.enableAutomatedTracking, true)
     }
+
 
     // MARK: - Processor wrapping
 

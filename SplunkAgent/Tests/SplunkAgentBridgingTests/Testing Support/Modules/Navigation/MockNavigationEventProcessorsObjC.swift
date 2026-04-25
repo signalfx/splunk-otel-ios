@@ -18,12 +18,32 @@ limitations under the License.
 import Foundation
 import SplunkAgentObjC
 
+// Mock NavigationEventProcessorObjC implementations used by
+// SplunkAgentBridgingTests to exercise the adapter/conversion layer
+// between SplunkAgentObjC types and internal SplunkNavigation types.
+//
+// Each mock isolates a single behavior of the bridging path:
+//
+//  - PassthroughProcessorObjC:  returns the event unchanged
+//  - AttributeProcessorObjC:   attaches caller-supplied attributes
+//  - SuppressingProcessorObjC:  returns nil to suppress the event
+
+
+// MARK: - Passthrough
+
+/// Returns the event with its original name and no attributes.
 final class PassthroughProcessorObjC: NSObject, NavigationEventProcessorObjC {
     func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEventObjC? {
         NavigationEventObjC(name: typeName, attributes: nil)
     }
 }
 
+
+// MARK: - Attribute injection
+
+/// Returns the event with a fixed set of attributes supplied at init time.
+/// Used to test that NSDictionary attributes are correctly forwarded (or
+/// filtered, in the case of non-String keys) through the adapter.
 final class AttributeProcessorObjC: NSObject, NavigationEventProcessorObjC {
     let attributes: NSDictionary?
 
@@ -36,6 +56,10 @@ final class AttributeProcessorObjC: NSObject, NavigationEventProcessorObjC {
     }
 }
 
+
+// MARK: - Suppression
+
+/// Always returns nil, simulating a processor that suppresses every event.
 final class SuppressingProcessorObjC: NSObject, NavigationEventProcessorObjC {
     func onViewController(typeName _: String, controllerIdentity _: String) -> NavigationEventObjC? {
         nil

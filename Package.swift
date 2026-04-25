@@ -135,6 +135,10 @@ func generateMainTargets() -> [Target] {
             dependencies: ["SplunkAgentObjC"],
             path: "SplunkAgent/Tests/SplunkAgentObjCTests"
         ),
+        // Swift tests for the ObjC-to-internal bridging layer (adapters,
+        // config conversions). Separate from SplunkAgentObjCTests because
+        // SPM does not support mixed-language targets. That target contains
+        // Objective-C (.m) files for ObjC-callability tests.
         .testTarget(
             name: "SplunkAgentBridgingTests",
             dependencies: ["SplunkAgentObjC", "SplunkNavigation"],

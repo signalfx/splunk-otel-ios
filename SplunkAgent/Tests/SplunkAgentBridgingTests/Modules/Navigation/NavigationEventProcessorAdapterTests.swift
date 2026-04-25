@@ -20,6 +20,11 @@ import XCTest
 
 @testable import SplunkAgentObjC
 
+/// Verifies that ``NavigationEventProcessorAdapter`` correctly bridges
+/// an ObjC ``NavigationEventProcessorObjC`` implementation into the internal
+/// ``SplunkNavigation/NavigationEventProcessor`` protocol, including name
+/// passthrough, event suppression, attribute forwarding, and non-string key
+/// filtering.
 final class NavigationEventProcessorAdapterTests: XCTestCase {
 
     // MARK: - Passthrough
@@ -34,6 +39,7 @@ final class NavigationEventProcessorAdapterTests: XCTestCase {
         XCTAssertNil(event?.attributes)
     }
 
+
     // MARK: - Suppression
 
     func testSuppression() {
@@ -43,6 +49,7 @@ final class NavigationEventProcessorAdapterTests: XCTestCase {
 
         XCTAssertNil(event)
     }
+
 
     // MARK: - Attributes passthrough
 
@@ -65,6 +72,7 @@ final class NavigationEventProcessorAdapterTests: XCTestCase {
         XCTAssertNotNil(event)
         XCTAssertNil(event?.attributes)
     }
+
 
     // MARK: - Non-String key filtering
 
@@ -94,6 +102,7 @@ final class NavigationEventProcessorAdapterTests: XCTestCase {
         XCTAssertNotNil(event)
         XCTAssertNil(event?.attributes)
     }
+
 
     // MARK: - Empty dictionary behavior
 
