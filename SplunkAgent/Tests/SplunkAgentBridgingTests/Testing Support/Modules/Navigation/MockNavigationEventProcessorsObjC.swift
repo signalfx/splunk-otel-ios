@@ -42,6 +42,7 @@ final class PassthroughProcessorObjC: NSObject, NavigationEventProcessorObjC {
 // MARK: - Attribute injection
 
 /// Returns the event with a fixed set of attributes supplied at init time.
+///
 /// Used to test that NSDictionary attributes are correctly forwarded (or
 /// filtered, in the case of non-String keys) through the adapter.
 final class AttributeProcessorObjC: NSObject, NavigationEventProcessorObjC {
