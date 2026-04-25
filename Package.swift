@@ -96,7 +96,7 @@ func generateMainTargets() -> [Target] {
         ),
         .testTarget(
             name: "SplunkAgentTests",
-            dependencies: ["SplunkAgent", "SplunkAgentObjC", "SplunkCommon"],
+            dependencies: ["SplunkAgent", "SplunkCommon"],
             path: "SplunkAgent/Tests/SplunkAgentTests",
             resources: [
                 .copy("Testing Support/Assets/v.mp4"),
