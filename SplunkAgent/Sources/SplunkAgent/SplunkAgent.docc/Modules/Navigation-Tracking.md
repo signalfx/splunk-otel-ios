@@ -12,32 +12,7 @@ This module can be configured to automatically track `UIViewController` transiti
 
 > Tip: You can access all related API via SplunkRum instance property: ``SplunkRum/navigation``
 
-## Configuration
-
-You can configure the navigation module during agent installation by providing a `NavigationConfiguration` object. Use it to enable automated tracking and optionally set a custom event processor for renaming screens, adding span attributes, or suppressing specific navigation events.
-
-```swift
-import SplunkAgent
-import SplunkNavigation // Required for the configuration type
-
-let navConfig = NavigationConfiguration(
-    isEnabled: true,
-    enableAutomatedTracking: true,
-    navigationEventProcessor: MyProcessor()
-)
-
-// Pass it during agent installation
-do {
-    agent = try SplunkRum.install(
-        with: agentConfig,
-        moduleConfigurations: [navConfig]
-    )
-    ...
-```
-
-See ``NavigationEventProcessor`` for details on implementing a custom processor.
-
-## Usage
+## Configuration and Usage
 
 Assuming `agent` is the ``SplunkRum`` instance you retained after installation.
 
