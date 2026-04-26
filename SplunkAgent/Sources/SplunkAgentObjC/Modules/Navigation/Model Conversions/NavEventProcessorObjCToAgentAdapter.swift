@@ -15,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkNavigation
+import SplunkAgent
 
-/// Adapts an Objective-C ``NavigationEventProcessorObjC`` to the Swift
-/// ``NavigationEventProcessor`` protocol used by the navigation engine.
-final class NavigationEventProcessorAdapter: NavigationEventProcessor, @unchecked Sendable {
+/// Adapts an Objective-C ``NavigationEventProcessorObjC`` to the
+/// ``NavigationModuleEventProcessor`` protocol used by the agent facade.
+final class NavEventProcessorObjCToAgentAdapter: NavigationModuleEventProcessor, @unchecked Sendable {
 
     // MARK: - Private
 
@@ -33,9 +33,10 @@ final class NavigationEventProcessorAdapter: NavigationEventProcessor, @unchecke
     }
 
 
-    // MARK: - NavigationEventProcessor
+    // MARK: - NavigationModuleEventProcessor
 
-    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
+    func onViewController(typeName: String, controllerIdentity: String) -> NavigationModuleEvent? {
+
         guard let objcEvent = objcProcessor.onViewController(typeName: typeName, controllerIdentity: controllerIdentity) else {
             return nil
         }
@@ -52,7 +53,7 @@ final class NavigationEventProcessorAdapter: NavigationEventProcessor, @unchecke
             return filtered.isEmpty ? nil : Dictionary(uniqueKeysWithValues: filtered)
         }
 
-        return NavigationEvent(
+        return NavigationModuleEvent(
             name: objcEvent.name,
             attributes: attributes
         )

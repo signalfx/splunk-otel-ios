@@ -23,7 +23,8 @@ import XCTest
 
 /// Verifies that ``NavigationConfigurationObjC`` correctly converts into the
 /// internal ``SplunkNavigation/NavigationConfiguration``, including property
-/// forwarding and processor wrapping through ``NavigationEventProcessorAdapter``.
+/// forwarding and processor routing through the agent facade
+/// (``NavEventProcessorObjCToAgentAdapter`` → ``NavProcessorAgentToInternalAdapter``).
 final class NavConfigObjCConversionTests: XCTestCase {
 
     // MARK: - Helpers

@@ -20,7 +20,7 @@ import SplunkAgentObjC
 
 // Mock NavigationEventProcessorObjC implementations used by
 // SplunkAgentBridgingTests to exercise the adapter/conversion layer
-// between SplunkAgentObjC types and internal SplunkNavigation types.
+// between SplunkAgentObjC types and agent-level SplunkAgent types.
 //
 // Each mock isolates a single behavior of the bridging path:
 //

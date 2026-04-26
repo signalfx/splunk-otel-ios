@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import SplunkAgent
 internal import SplunkCommon
 internal import SplunkNavigation
 
@@ -22,16 +23,19 @@ extension NavigationConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 
-    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
-        // Wrap the ObjC processor in an adapter if provided
-        let swiftProcessor: (any NavigationEventProcessor)? =
+    var moduleConfiguration: any ModuleConfiguration {
+        // Route the ObjC processor through the agent facade before
+        // converting to the internal type:
+        //   ObjC → NavigationModuleEventProcessor → NavigationEventProcessor
+        let internalProcessor: (any NavigationEventProcessor)? =
             navigationEventProcessor
-            .map { NavigationEventProcessorAdapter(wrapping: $0) }
+            .map { NavEventProcessorObjCToAgentAdapter(wrapping: $0) }
+            .map { NavProcessorAgentToInternalAdapter(wrapping: $0) }
 
-        return NavigationConfiguration(
+        return SplunkNavigation.NavigationConfiguration(
             isEnabled: isEnabled,
             enableAutomatedTracking: enableAutomatedTracking,
-            navigationEventProcessor: swiftProcessor
+            navigationEventProcessor: internalProcessor
         )
     }
 }

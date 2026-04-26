@@ -16,21 +16,22 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkAgent
 import XCTest
 
 @testable import SplunkAgentObjC
 
-/// Verifies that ``NavigationEventProcessorAdapter`` correctly bridges
-/// an ObjC ``NavigationEventProcessorObjC`` implementation into the internal
-/// ``SplunkNavigation/NavigationEventProcessor`` protocol, including name
+/// Verifies that ``NavEventProcessorObjCToAgentAdapter`` correctly
+/// bridges an ObjC ``NavigationEventProcessorObjC`` implementation into the
+/// agent-level ``NavigationModuleEventProcessor`` protocol, including name
 /// passthrough, event suppression, attribute forwarding, and non-string key
 /// filtering.
-final class NavigationEventProcessorAdapterTests: XCTestCase {
+final class NavEventProcessorObjCToAgentAdapterTests: XCTestCase {
 
     // MARK: - Passthrough
 
     func testPassthroughName() {
-        let adapter = NavigationEventProcessorAdapter(wrapping: PassthroughProcessorObjC())
+        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: PassthroughProcessorObjC())
 
         let event = adapter.onViewController(typeName: "HomeViewController", controllerIdentity: "12345")
 
@@ -43,7 +44,7 @@ final class NavigationEventProcessorAdapterTests: XCTestCase {
     // MARK: - Suppression
 
     func testSuppression() {
-        let adapter = NavigationEventProcessorAdapter(wrapping: SuppressingProcessorObjC())
+        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: SuppressingProcessorObjC())
 
         let event = adapter.onViewController(typeName: "SomeController", controllerIdentity: "99999")
 
@@ -55,7 +56,7 @@ final class NavigationEventProcessorAdapterTests: XCTestCase {
 
     func testStringAttributes() {
         let attributes: NSDictionary = ["app.section": "settings", "app.feature": "profile"]
-        let adapter = NavigationEventProcessorAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
+        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
 
         let event = adapter.onViewController(typeName: "SettingsVC", controllerIdentity: "111")
 
@@ -65,7 +66,7 @@ final class NavigationEventProcessorAdapterTests: XCTestCase {
     }
 
     func testNilAttributes() {
-        let adapter = NavigationEventProcessorAdapter(wrapping: AttributeProcessorObjC(attributes: nil))
+        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: AttributeProcessorObjC(attributes: nil))
 
         let event = adapter.onViewController(typeName: "PlainVC", controllerIdentity: "222")
 
@@ -81,7 +82,7 @@ final class NavigationEventProcessorAdapterTests: XCTestCase {
             "valid.key": "value",
             NSNumber(value: 42): "number-keyed"
         ]
-        let adapter = NavigationEventProcessorAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
+        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
 
         let event = adapter.onViewController(typeName: "MixedVC", controllerIdentity: "333")
 
@@ -95,7 +96,7 @@ final class NavigationEventProcessorAdapterTests: XCTestCase {
             NSNumber(value: 1): "a",
             NSNumber(value: 2): "b"
         ]
-        let adapter = NavigationEventProcessorAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
+        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
 
         let event = adapter.onViewController(typeName: "BadKeysVC", controllerIdentity: "444")
 
@@ -108,7 +109,7 @@ final class NavigationEventProcessorAdapterTests: XCTestCase {
 
     func testEmptyDictionaryProducesNilAttributes() {
         let attributes: NSDictionary = [:]
-        let adapter = NavigationEventProcessorAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
+        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
 
         let event = adapter.onViewController(typeName: "EmptyAttrsVC", controllerIdentity: "555")
 
