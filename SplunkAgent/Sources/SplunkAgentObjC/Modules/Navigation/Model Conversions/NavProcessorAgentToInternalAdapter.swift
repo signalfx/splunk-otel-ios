@@ -21,12 +21,10 @@ internal import SplunkNavigation
 /// Adapts a ``NavigationModuleEventProcessor`` (agent facade) to the
 /// internal ``NavigationEventProcessor`` used by the navigation engine.
 ///
-/// This adapter mirrors ``NavigationModuleEventProcessorAdapter`` in
-/// `SplunkAgent` but lives in `SplunkAgentObjC` so the ObjC bridging
-/// layer can compose it with ``NavEventProcessorObjCToAgentAdapter``,
-/// routing the full chain through the agent facade:
-///
-///     ObjC → agent-level → internal
+/// Duplicates ``NavigationModuleEventProcessorAdapter`` in `SplunkAgent`,
+/// which is `internal` and inaccessible from this target. We intentionally
+/// duplicate rather than widen access (e.g. `package`) to preserve
+/// compile-time target isolation.
 final class NavProcessorAgentToInternalAdapter: NavigationEventProcessor, @unchecked Sendable {
 
     // MARK: - Private

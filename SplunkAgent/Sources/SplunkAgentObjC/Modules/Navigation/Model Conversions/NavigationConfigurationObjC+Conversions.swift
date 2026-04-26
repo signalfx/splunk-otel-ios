@@ -15,6 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Navigation is the only module whose ObjC bridge needs agent-level types
+// (NavigationModuleEventProcessor) for the processor callback chain.
+// Other module conversions import only SplunkCommon + Splunk<Name>.
 import SplunkAgent
 internal import SplunkCommon
 internal import SplunkNavigation
