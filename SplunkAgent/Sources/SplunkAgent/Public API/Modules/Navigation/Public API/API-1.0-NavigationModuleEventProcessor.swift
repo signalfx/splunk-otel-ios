@@ -78,11 +78,13 @@ public protocol NavigationModuleEventProcessor: Sendable {
     ///     application module prefix before invoking this method, so your
     ///     callback will receive `"DetailViewController"` as the value of
     ///     this parameter rather than `"MyApp.DetailViewController"`.
-    ///   - controllerIdentity: An opaque string derived from the view controller's
-    ///     `ObjectIdentifier`. It is unique among simultaneously live instances,
-    ///     stable for the lifetime of the instance, and may be reused after the
-    ///     controller is deallocated. It is not persisted across app launches.
-    ///     Use `==` to compare identities.
+    ///   - controllerIdentity: An opaque string that the SDK generates from the
+    ///     view controller's `ObjectIdentifier` and passes to this callback. Use
+    ///     it to correlate multiple callbacks for the same controller instance
+    ///     (for example, to track which instances have already been seen). It is
+    ///     unique among simultaneously live instances, stable for the lifetime of
+    ///     the instance, and may be reused after the controller is deallocated.
+    ///     It is not persisted across app launches. Use `==` to compare identities.
     ///
     /// - Returns: A navigation event describing the screen, or `nil` to suppress.
     func onViewController(typeName: String, controllerIdentity: String) -> NavigationModuleEvent?
