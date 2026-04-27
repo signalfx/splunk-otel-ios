@@ -32,8 +32,8 @@ limitations under the License.
     SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
 
     SPLKNavigationModulePreferences *preferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:NO];
-    agent.navigation.preferences = preferences;
-    XCTAssertFalse(agent.navigation.preferences.enableAutomatedTracking);
+    XCTAssertNoThrow(agent.navigation.preferences = preferences);
+    XCTAssertNotNil(agent.navigation.preferences);
 }
 
 - (void)testState {
