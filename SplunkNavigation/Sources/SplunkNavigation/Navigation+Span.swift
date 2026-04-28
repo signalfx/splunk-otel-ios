@@ -74,16 +74,17 @@ extension Navigation {
             .setStartTime(time: start)
             .startSpan()
 
-        screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
-        screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
-        screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
-        screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
-
+        // Write user-provided attributes first so that SDK-reserved keys always win.
         if let attributes {
             for (key, value) in attributes {
                 screenNameSpan.clearAndSetAttribute(key: key, value: value)
             }
         }
+
+        screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
+        screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
+        screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
         screenNameSpan.end(time: start)
     }

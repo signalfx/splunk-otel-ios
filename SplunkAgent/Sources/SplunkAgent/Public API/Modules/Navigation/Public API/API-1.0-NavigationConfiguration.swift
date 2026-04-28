@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,39 +15,48 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkCommon
-
-/// Navigation module configuration, minimal configuration for module conformance.
-public struct NavigationConfiguration: ModuleConfiguration {
+/// Configuration for the navigation module.
+///
+/// Use this class to enable automated navigation tracking and optionally
+/// configure a ``NavigationModuleEventProcessor`` to customize screen names,
+/// add span attributes, or suppress specific navigation events.
+///
+/// Pass an instance in the `moduleConfigurations` array when installing the agent:
+///
+/// ```swift
+/// let navConfig = NavigationConfiguration(
+///     enableAutomatedTracking: true,
+///     navigationEventProcessor: MyProcessor()
+/// )
+/// try SplunkRum.install(with: config, moduleConfigurations: [navConfig])
+/// ```
+public final class NavigationConfiguration {
 
     // MARK: - Module management
 
-    /// Indicates whether the Module is enabled.
+    /// Indicates whether the module is enabled.
     ///
     /// Default value is `true`.
-    public var isEnabled: Bool = true
+    public var isEnabled: Bool
 
     /// A `Boolean` value determines whether the module should automatically detect navigation in the application.
     public var enableAutomatedTracking: Bool?
 
     /// Processor that intercepts automated navigation events before they produce spans.
     ///
-    /// Set a custom ``NavigationEventProcessor`` to rename screens, add span attributes,
+    /// Set a custom ``NavigationModuleEventProcessor`` to rename screens, add span attributes,
     /// or suppress specific navigation events. When `nil`, the default processor
     /// passes the sanitized controller type name through as the screen name.
     ///
-    /// Manual ``Navigation/track(screen:)`` calls bypass the processor.
+    /// Manual ``NavigationModule/track(screen:)`` calls bypass the processor.
     ///
     /// - Important: The processor is retained strongly by the SDK for the lifetime
     ///   of the agent. Avoid capturing references that transitively own `SplunkRum`;
     ///   prefer stateless processors or weak captures where needed.
-    public var navigationEventProcessor: (any NavigationEventProcessor)?
+    public var navigationEventProcessor: (any NavigationModuleEventProcessor)?
 
 
     // MARK: - Initialization
-
-    /// Initialize a new configuration.
-    public init() {}
 
     /// Initializes new module configuration with preconfigured values.
     ///
@@ -56,21 +65,12 @@ public struct NavigationConfiguration: ModuleConfiguration {
     ///   - enableAutomatedTracking: If `true`, the module will automatically detect navigation.
     ///   - navigationEventProcessor: Optional processor to transform automated navigation events.
     public init(
-        isEnabled: Bool,
+        isEnabled: Bool = true,
         enableAutomatedTracking: Bool? = nil,
-        navigationEventProcessor: (any NavigationEventProcessor)? = nil
+        navigationEventProcessor: (any NavigationModuleEventProcessor)? = nil
     ) {
         self.isEnabled = isEnabled
         self.enableAutomatedTracking = enableAutomatedTracking
         self.navigationEventProcessor = navigationEventProcessor
-    }
-
-
-    // MARK: - Codable
-
-    /// Non-serializable properties are excluded from serialization.
-    enum CodingKeys: String, CodingKey {
-        case isEnabled
-        case enableAutomatedTracking
     }
 }

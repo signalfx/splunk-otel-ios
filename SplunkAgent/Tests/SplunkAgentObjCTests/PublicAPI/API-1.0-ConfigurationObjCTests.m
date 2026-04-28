@@ -97,7 +97,7 @@ limitations under the License.
 
 
     double expectedSampligRate = 1.0;
-    NSInteger expectedUserTrackingModeValue = SPLKUserTrackingMode.noTracking.integerValue;
+    NSInteger expectedUserTrackingModeValue = SPLKUserTrackingMode.anonymousTracking.integerValue;
 
     XCTAssertEqual(configuration.session.samplingRate, expectedSampligRate);
     XCTAssertNotNil(configuration.user.trackingMode);

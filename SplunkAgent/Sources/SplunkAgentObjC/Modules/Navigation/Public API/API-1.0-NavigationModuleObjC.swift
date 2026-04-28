@@ -40,7 +40,7 @@ public final class NavigationModuleObjC: NSObject {
 
         set {
             newValue.owner = owner
-            owner.agent.navigation.preferences = NavigationPreferences(enableAutomatedTracking: newValue.enableAutomatedTracking)
+            owner.agent.navigation.preferences.enableAutomatedTracking = newValue.enableAutomatedTracking
         }
     }
 
@@ -75,7 +75,7 @@ public final class NavigationModuleObjC: NSObject {
     ///
     /// - Parameters:
     ///   - name: The name to be tracked as the screen name until being changed.
-    ///   - attributes: Optional custom key-value pairs to attach to the navigation span.
+    ///   - attributes: Optional custom key-value pairs to attach to the `app.ui.navigation` span.
     ///     Supported value types: `NSString`, `NSNumber` (integer, double, boolean), and arrays of those types.
     ///     Other types are converted to their string representation.
     ///

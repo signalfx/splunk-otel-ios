@@ -18,6 +18,7 @@ limitations under the License.
 internal import CiscoSwizzling
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
+import UIKit
 import XCTest
 
 @testable import SplunkNavigation
@@ -79,9 +80,9 @@ final class NavigationEventProcessorTests: XCTestCase {
         ])
 
         let navigation = Navigation(
-            navigationEventStreamProvider: MockNavigationEventStreamProvider(stream: events)
+            navigationEventStreamProvider: MockNavigationEventStreamProvider(stream: events),
+            navigationEventProcessor: PrefixingProcessor(prefix: "Custom")
         )
-        navigation.navigationEventProcessor = PrefixingProcessor(prefix: "Custom")
         navigation.preferences.enableAutomatedTracking = true
         navigation.startDetection()
 
@@ -94,14 +95,15 @@ final class NavigationEventProcessorTests: XCTestCase {
     // MARK: - Manual tracking bypass
 
     func testManualTrackBypassesProcessor() async {
-        let fixture = makeNavigationStreamFixture()
+        let fixture = makeNavigationStreamFixture(
+            navigationEventProcessor: RejectingProcessor()
+        )
 
         defer {
             fixture.finish()
         }
 
         let navigation = fixture.navigation
-        navigation.navigationEventProcessor = RejectingProcessor()
         navigation.preferences.enableAutomatedTracking = true
 
         navigation.startDetection()
@@ -115,14 +117,15 @@ final class NavigationEventProcessorTests: XCTestCase {
     }
 
     func testProcessorAppliesToAutomatedButNotManual() async {
-        let fixture = makeNavigationStreamFixture()
+        let fixture = makeNavigationStreamFixture(
+            navigationEventProcessor: PrefixingProcessor(prefix: "Auto")
+        )
 
         defer {
             fixture.finish()
         }
 
         let navigation = fixture.navigation
-        navigation.navigationEventProcessor = PrefixingProcessor(prefix: "Auto")
         navigation.preferences.enableAutomatedTracking = true
 
         navigation.startDetection()
@@ -155,32 +158,127 @@ final class NavigationEventProcessorTests: XCTestCase {
         }
         XCTAssertTrue(didSetAuto)
     }
-}
 
+    // MARK: - Presentation controller processor
 
-// MARK: - Test processors
+    @MainActor
+    func testProcessorOnPresentationTransitions() async {
+        let provider = MockPresentationEventStreamProvider()
+        let navigation = Navigation(
+            navigationEventStreamProvider: provider,
+            navigationEventProcessor: PrefixingProcessor(prefix: "Nav")
+        )
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
 
-private final class PrefixingProcessor: NSObject, NavigationEventProcessor {
-    let prefix: String
+        let presentingController = PresentingViewController()
+        let presentedController = PresentedViewController()
 
-    init(prefix: String) {
-        self.prefix = prefix
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: true
+        )
+
+        let didUpdate = await waitUntil {
+            await navigation.model.screenName == "Nav/PresentedViewController"
+        }
+        XCTAssertTrue(didUpdate)
     }
 
-    func process(event: NavigationEvent) -> NavigationEvent {
-        NavigationEvent(
-            screenName: "\(prefix)/\(event.screenName)",
-            controllerIdentifier: event.controllerIdentifier,
-            attributes: event.attributes
+    @MainActor
+    func testProcessorSuppressesPresentations() async {
+        let provider = MockPresentationEventStreamProvider()
+        let navigation = Navigation(
+            navigationEventStreamProvider: provider,
+            navigationEventProcessor: SuppressingProcessor()
         )
-    }
-}
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
 
-private final class RejectingProcessor: NSObject, NavigationEventProcessor {
-    func process(event: NavigationEvent) -> NavigationEvent {
-        NavigationEvent(
-            screenName: "REJECTED",
-            controllerIdentifier: event.controllerIdentifier
+        navigation.track(screen: "InitialScreen")
+
+        let didSetInitial = await waitUntil {
+            await navigation.model.screenName == "InitialScreen"
+        }
+        XCTAssertTrue(didSetInitial)
+
+        let presentingController = PresentingViewController()
+        let presentedController = PresentedViewController()
+
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: nil
         )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: true
+        )
+
+        try? await Task.sleep(nanoseconds: 200_000_000)
+
+        let currentScreenName = await navigation.model.screenName
+        XCTAssertEqual(currentScreenName, "InitialScreen")
+    }
+
+
+    // MARK: - Event suppression
+
+    func testProcessorNilSuppressesNavigation() async {
+        let fixture = makeNavigationStreamFixture(
+            navigationEventProcessor: SuppressingProcessor()
+        )
+
+        defer {
+            fixture.finish()
+        }
+
+        let navigation = fixture.navigation
+        navigation.preferences.enableAutomatedTracking = true
+
+        navigation.startDetection()
+
+        // Set an initial screen name manually (bypasses processor)
+        navigation.track(screen: "InitialScreen")
+
+        let didSetInitial = await waitUntil {
+            await navigation.model.screenName == "InitialScreen"
+        }
+        XCTAssertTrue(didSetInitial)
+
+        // Send an automated navigation event; the suppressing processor returns nil
+        let detailIdentifier = ObjectIdentifier(NSString())
+        let navigationControllerIdentifier = ObjectIdentifier(NSNumber(value: 10))
+
+        fixture.sendTransition(
+            type: .navigationControllerWillShow,
+            navigationControllerIdentifier: navigationControllerIdentifier,
+            controllerIdentifier: detailIdentifier,
+            controllerTypeName: "SuppressedViewController"
+        )
+        fixture.sendTransition(
+            type: .navigationControllerDidShow,
+            navigationControllerIdentifier: navigationControllerIdentifier,
+            controllerIdentifier: detailIdentifier,
+            controllerTypeName: "SuppressedViewController"
+        )
+
+        // Give the event loop time to process
+        try? await Task.sleep(nanoseconds: 200_000_000)
+
+        // Screen name should remain unchanged because the event was suppressed
+        let currentScreenName = await navigation.model.screenName
+        XCTAssertEqual(currentScreenName, "InitialScreen")
     }
 }

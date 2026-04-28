@@ -15,13 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Foundation
-
 /// A processor that intercepts automated navigation events before they produce spans.
 ///
 /// Implement this protocol to customize how detected `UIViewController` transitions
 /// are named, enriched, or filtered. The processor is called once per automated
-/// navigation event; manual ``Navigation/track(screen:)`` calls bypass it.
+/// navigation event; manual ``NavigationModule/track(screen:)`` calls bypass it.
 ///
 /// **Rename a screen:**
 ///
@@ -29,8 +27,8 @@ import Foundation
 /// func onViewController(
 ///     typeName: String,
 ///     controllerIdentity: String
-/// ) -> NavigationEvent? {
-///     NavigationEvent(name: friendlyName(for: typeName))
+/// ) -> NavigationModuleEvent? {
+///     NavigationModuleEvent(name: friendlyName(for: typeName))
 /// }
 /// ```
 ///
@@ -40,8 +38,8 @@ import Foundation
 /// func onViewController(
 ///     typeName: String,
 ///     controllerIdentity: String
-/// ) -> NavigationEvent? {
-///     NavigationEvent(
+/// ) -> NavigationModuleEvent? {
+///     NavigationModuleEvent(
 ///         name: typeName,
 ///         attributes: ["app.section": section(for: typeName)]
 ///     )
@@ -54,8 +52,8 @@ import Foundation
 /// func onViewController(
 ///     typeName: String,
 ///     controllerIdentity: String
-/// ) -> NavigationEvent? {
-///     shouldIgnore(typeName) ? nil : NavigationEvent(name: typeName)
+/// ) -> NavigationModuleEvent? {
+///     shouldIgnore(typeName) ? nil : NavigationModuleEvent(name: typeName)
 /// }
 /// ```
 ///
@@ -66,13 +64,13 @@ import Foundation
 ///
 /// The callback may be invoked from a background task. The protocol requires
 /// `Sendable` conformance.
-public protocol NavigationEventProcessor: Sendable {
+public protocol NavigationModuleEventProcessor: Sendable {
 
     // MARK: - Processor methods
 
     /// Called for each detected `UIViewController` navigation event.
     ///
-    /// Return a ``NavigationEvent`` to allow the navigation — potentially with a
+    /// Return a ``NavigationModuleEvent`` to allow the navigation — potentially with a
     /// transformed name or additional attributes — or return `nil` to suppress it.
     ///
     /// - Parameters:
@@ -80,11 +78,14 @@ public protocol NavigationEventProcessor: Sendable {
     ///     application module prefix before invoking this method, so your
     ///     callback will receive `"DetailViewController"` as the value of
     ///     this parameter rather than `"MyApp.DetailViewController"`.
-    ///   - controllerIdentity: An opaque, SDK-generated string identifying the
-    ///     view controller instance. Unique among live instances, stable for the
-    ///     lifetime of the instance, not persisted across launches. See the
-    ///     public ``NavigationModuleEventProcessor`` docs for full semantics.
+    ///   - controllerIdentity: An opaque string that the SDK generates from the
+    ///     view controller's `ObjectIdentifier` and passes to this callback. Use
+    ///     it to correlate multiple callbacks for the same controller instance
+    ///     (for example, to track which instances have already been seen). It is
+    ///     unique among simultaneously live instances, stable for the lifetime of
+    ///     the instance, and may be reused after the controller is deallocated.
+    ///     It is not persisted across app launches. Use `==` to compare identities.
     ///
     /// - Returns: A navigation event describing the screen, or `nil` to suppress.
-    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent?
+    func onViewController(typeName: String, controllerIdentity: String) -> NavigationModuleEvent?
 }

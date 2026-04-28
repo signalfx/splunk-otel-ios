@@ -40,7 +40,7 @@ limitations under the License.
 
     // Properties (READ)
     NSInteger initialTrackingModeValue = userPreferences.trackingMode.integerValue;
-    NSInteger expectedTrackingModeValue = SPLKUserTrackingMode.noTracking.integerValue;
+    NSInteger expectedTrackingModeValue = SPLKUserTrackingMode.anonymousTracking.integerValue;
     XCTAssertEqual(initialTrackingModeValue, expectedTrackingModeValue);
 
 

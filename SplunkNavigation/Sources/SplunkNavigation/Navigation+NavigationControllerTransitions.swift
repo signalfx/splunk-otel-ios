@@ -29,10 +29,17 @@ extension Navigation {
 
         let typeName = event.controllerTypeName
         let controllerIdentifier = event.controllerIdentifier
-        let screenName = processAutomatedScreenName(
-            sanitize(typeName: typeName),
-            controllerIdentifier: controllerIdentifier
-        )
+
+        guard
+            let navigationEvent = await processAutomatedNavigationEvent(
+                sanitize(typeName: typeName),
+                controllerIdentifier: controllerIdentifier
+            )
+        else {
+            return
+        }
+
+        let screenName = navigationEvent.name
 
         let navigation = NavigationPair(
             type: .show,
@@ -55,7 +62,8 @@ extension Navigation {
         await updateCurrentScreen(
             screenName: screenName,
             lastScreenName: lastScreenName,
-            start: event.timestamp
+            start: event.timestamp,
+            attributes: navigationEvent.attributes
         )
     }
 
@@ -106,16 +114,22 @@ extension Navigation {
         await model.removePendingNavigationTarget(for: navigationControllerIdentifier)
         await model.removeManagedNavigationControllerTarget(pendingTargetIdentifier)
 
-        let screenName = processAutomatedScreenName(
-            sanitize(typeName: visibleControllerTypeName),
-            controllerIdentifier: visibleControllerIdentifier
-        )
+        guard
+            let navigationEvent = await processAutomatedNavigationEvent(
+                sanitize(typeName: visibleControllerTypeName),
+                controllerIdentifier: visibleControllerIdentifier
+            )
+        else {
+            return true
+        }
+
         let lastScreenName = await model.screenName
 
         await updateCurrentScreen(
-            screenName: screenName,
+            screenName: navigationEvent.name,
             lastScreenName: lastScreenName,
-            start: timestamp
+            start: timestamp,
+            attributes: navigationEvent.attributes
         )
 
         return true
@@ -124,10 +138,19 @@ extension Navigation {
     private func completeNavigationControllerTransition(event: any NavigationActionEvent) async {
         let typeName = event.controllerTypeName
         let visibleControllerIdentifier = event.controllerIdentifier
-        let screenName = processAutomatedScreenName(
-            sanitize(typeName: typeName),
-            controllerIdentifier: visibleControllerIdentifier
-        )
+
+        guard
+            let navigationEvent = await processAutomatedNavigationEvent(
+                sanitize(typeName: typeName),
+                controllerIdentifier: visibleControllerIdentifier
+            )
+        else {
+            await model.removeNavigation(for: visibleControllerIdentifier)
+
+            return
+        }
+
+        let screenName = navigationEvent.name
         let lastScreenName = await model.screenName
 
         let existingNavigation = await model.navigation(for: visibleControllerIdentifier)
@@ -147,7 +170,8 @@ extension Navigation {
         await updateCurrentScreen(
             screenName: screenName,
             lastScreenName: lastScreenName,
-            start: start
+            start: start,
+            attributes: navigationEvent.attributes
         )
 
         let endEvent = AutomatedNavigationEvent(
@@ -171,7 +195,12 @@ extension Navigation {
         )
     }
 
-    func updateCurrentScreen(screenName: String, lastScreenName: String, start: Date) async {
+    func updateCurrentScreen(
+        screenName: String,
+        lastScreenName: String,
+        start: Date,
+        attributes: [String: Any]? = nil
+    ) async {
         await model.update(screenName: screenName)
         await model.update(isManualScreenName: false)
 
@@ -180,7 +209,8 @@ extension Navigation {
             send(
                 screenName: screenName,
                 lastScreenName: lastScreenName,
-                start: start
+                start: start,
+                attributes: attributes
             )
         }
     }
