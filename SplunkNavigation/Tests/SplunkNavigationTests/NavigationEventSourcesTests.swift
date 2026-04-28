@@ -56,9 +56,20 @@ final class NavigationEventSourcesTests: XCTestCase {
 
     // MARK: - Filtering
 
-    func testShouldIgnoreInternalControllers() {
+    func testShouldIgnoreUIKitInternalControllers() {
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UINavigationController"))
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UITabBarController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UIInputWindowController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UISystemKeyboardDockController"))
+    }
+
+    func testShouldIgnoreSwiftUINavigationInfrastructure() {
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.UIKitNavigationController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.UIKitTabBarController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.UIKitSplitViewController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.TabHostingController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.NotifyingMulticolumnSplitViewController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.PlatformAlertController"))
     }
 
     func testShouldIgnoreRegularController() {
@@ -70,6 +81,14 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: name))
     }
 
+    func testShouldIgnoreNavigationStackHostingController() {
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "NavigationStackHostingController<AnyView>"))
+    }
+
+    func testShouldIgnorePresentationHostingController() {
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "PresentationHostingController<AnyView>"))
+    }
+
     func testShouldIgnoreSplitViewPrefix() {
         let name = "StyleContextSplitViewNavigationController<MergedStyle>"
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: name))
@@ -78,6 +97,11 @@ final class NavigationEventSourcesTests: XCTestCase {
     func testShouldNotIgnoreSimilarPrefix() {
         let name = "UIHostingWrapperViewController"
         XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: name))
+    }
+
+    func testShouldNotIgnoreAppControllers() {
+        XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "SettingsViewController"))
+        XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "DetailViewController"))
     }
 
     func testIgnoredControllerNoScreenName() async {
