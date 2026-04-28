@@ -27,9 +27,16 @@ extension NavigationConfigurationObjC: ModuleConfigurationSwift {
     // MARK: - Swift variant
 
     var moduleConfiguration: any ModuleConfiguration {
-        // Route the ObjC processor through the agent facade before
-        // converting to the internal type:
-        //   ObjC → NavigationModuleEventProcessor → NavigationEventProcessor
+        // The processor is routed through the agent facade
+        // (ObjC -> NavigationModuleEventProcessor -> NavigationEventProcessor)
+        // so it matches the Swift path's adapter chain.
+        //
+        // The config itself is built as SplunkNavigation.NavigationConfiguration
+        // directly because SplunkAgent.NavigationConfiguration does not conform
+        // to ModuleConfiguration (it holds non-Encodable processor references).
+        // The two value-type properties (isEnabled, enableAutomatedTracking) are
+        // forwarded verbatim. If the agent-level config gains derived fields or
+        // validation in the future, replicate them here.
         let internalProcessor: (any NavigationEventProcessor)? =
             navigationEventProcessor
             .map { NavEventProcessorObjCToAgentAdapter(wrapping: $0) }
