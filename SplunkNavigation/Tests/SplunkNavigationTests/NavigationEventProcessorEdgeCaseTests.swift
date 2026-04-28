@@ -21,7 +21,6 @@ import XCTest
 
 @testable import SplunkNavigation
 
-
 /// Tests for edge-case processor behaviors: mid-transition suppression cleanup
 /// and SDK-reserved span key protection.
 final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
@@ -71,7 +70,7 @@ final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
 
     // MARK: - Reserved span key protection
 
-    func testReservedSpanKeysCannotBeOverriddenByProcessor() async throws {
+    func testProcessorReservedKeyOverrideDoesNotLeakIntoModel() async throws {
         let fixture = makeNavigationStreamFixture(
             navigationEventProcessor: ReservedKeyOverrideProcessor()
         )
