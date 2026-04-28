@@ -143,7 +143,7 @@ public final class Navigation: Sendable {
             for await event in stream {
                 guard
                     await shouldProcessEvent(),
-                    !Self.shouldIgnore(controllerTypeName: event.controllerTypeName)
+                    !shouldIgnoreAndLog(controllerTypeName: event.controllerTypeName)
                 else {
                     continue
                 }
@@ -307,6 +307,23 @@ public final class Navigation: Sendable {
         let trackingEnabled = state.isAutomatedTrackingEnabled
 
         return moduleEnabled && trackingEnabled
+    }
+
+    /// Returns whether the controller should be filtered from automatic
+    /// navigation tracking, and logs at debug level when filtering occurs.
+    ///
+    /// The static ``shouldIgnore(controllerTypeName:)`` remains pure for
+    /// testability; this instance method adds the side effect of logging
+    /// so that filtered controller names are observable in debug builds.
+    func shouldIgnoreAndLog(controllerTypeName: String) -> Bool {
+        guard Self.shouldIgnore(controllerTypeName: controllerTypeName) else {
+            return false
+        }
+
+        logger.log(level: .debug) {
+            "Filtered internal controller from automatic navigation tracking: \(controllerTypeName)"
+        }
+        return true
     }
 
     /// Checks whether the event belongs to a view controller whose lifecycle is managed

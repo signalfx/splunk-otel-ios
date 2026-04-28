@@ -104,6 +104,21 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "DetailViewController"))
     }
 
+    // MARK: - Filtering (instance path)
+
+    func testShouldIgnoreAndLogFiltersInternalControllers() {
+        let navigation = Navigation()
+        XCTAssertTrue(navigation.shouldIgnoreAndLog(controllerTypeName: "UINavigationController"))
+        XCTAssertTrue(navigation.shouldIgnoreAndLog(controllerTypeName: "SwiftUI.UIKitNavigationController"))
+        XCTAssertTrue(navigation.shouldIgnoreAndLog(controllerTypeName: "NavigationStackHostingController<AnyView>"))
+    }
+
+    func testShouldIgnoreAndLogPassesAppControllers() {
+        let navigation = Navigation()
+        XCTAssertFalse(navigation.shouldIgnoreAndLog(controllerTypeName: "SettingsViewController"))
+        XCTAssertFalse(navigation.shouldIgnoreAndLog(controllerTypeName: "ProductDetailsViewController"))
+    }
+
     func testIgnoredControllerNoScreenName() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
