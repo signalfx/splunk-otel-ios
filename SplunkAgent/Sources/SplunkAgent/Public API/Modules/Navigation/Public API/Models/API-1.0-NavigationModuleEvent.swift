@@ -19,7 +19,7 @@ limitations under the License.
 ///
 /// Returned by ``NavigationModuleEventProcessor/onViewController(typeName:controllerIdentity:)``
 /// to describe how a detected screen transition should be recorded. The ``name`` becomes the
-/// `navigation.name` span attribute, and any ``attributes`` are added to the navigation span.
+/// `navigation.name` span attribute, and any ``attributes`` are added to the `app.ui.navigation` span.
 public final class NavigationModuleEvent {
 
     // MARK: - Public
@@ -29,9 +29,9 @@ public final class NavigationModuleEvent {
     /// This value is set as the `navigation.name` and `screen.name` span attributes.
     public let name: String
 
-    /// Custom attributes to include in the navigation span.
+    /// Custom attributes to include in the `app.ui.navigation` span.
     ///
-    /// Use this to enrich navigation spans with application-specific metadata
+    /// Use this to enrich the `app.ui.navigation` span with application-specific metadata
     /// (e.g., content identifiers, feature flags, or section names).
     public let attributes: [String: Any]?
 
@@ -42,7 +42,7 @@ public final class NavigationModuleEvent {
     ///
     /// - Parameters:
     ///   - name: The screen name for this navigation event.
-    ///   - attributes: Optional custom attributes to include in the navigation span.
+    ///   - attributes: Optional custom attributes to include in the `app.ui.navigation` span.
     public init(
         name: String,
         attributes: [String: Any]? = nil

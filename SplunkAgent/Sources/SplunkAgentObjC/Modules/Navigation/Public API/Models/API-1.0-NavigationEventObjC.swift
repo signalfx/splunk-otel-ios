@@ -21,7 +21,7 @@ import Foundation
 ///
 /// Returned by ``NavigationEventProcessorObjC/onViewController(typeName:controllerIdentity:)``
 /// to describe how a detected screen transition should be recorded. The ``name`` becomes the
-/// `navigation.name` span attribute, and any ``attributes`` are added to the navigation span.
+/// `navigation.name` span attribute, and any ``attributes`` are added to the `app.ui.navigation` span.
 @objc(SPLKNavigationEvent)
 public final class NavigationEventObjC: NSObject {
 
@@ -33,9 +33,9 @@ public final class NavigationEventObjC: NSObject {
     @objc
     public let name: String
 
-    /// Custom attributes to include in the navigation span.
+    /// Custom attributes to include in the `app.ui.navigation` span.
     ///
-    /// Use this to enrich navigation spans with application-specific metadata
+    /// Use this to enrich the `app.ui.navigation` span with application-specific metadata
     /// (e.g., content identifiers, feature flags, or section names).
     /// Supported value types: `NSString`, `NSNumber` (integer, double, boolean), and arrays of those types.
     @objc
@@ -48,7 +48,7 @@ public final class NavigationEventObjC: NSObject {
     ///
     /// - Parameters:
     ///   - name: The screen name for this navigation event.
-    ///   - attributes: Optional custom attributes to include in the navigation span.
+    ///   - attributes: Optional custom attributes to include in the `app.ui.navigation` span.
     @objc(initWithName:attributes:)
     public init(
         name: String,

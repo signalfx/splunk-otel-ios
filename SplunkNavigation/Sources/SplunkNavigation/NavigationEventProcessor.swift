@@ -34,7 +34,7 @@ import Foundation
 /// }
 /// ```
 ///
-/// **Add custom attributes to the navigation span:**
+/// **Add custom attributes to the `app.ui.navigation` span:**
 ///
 /// ```swift
 /// func onViewController(
