@@ -56,16 +56,70 @@ final class NavigationEventSourcesTests: XCTestCase {
 
     // MARK: - Filtering
 
-    func testShouldIgnoreInternalControllers() {
+    func testShouldIgnoreUIKitInternalControllers() {
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UINavigationController"))
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UITabBarController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UIInputWindowController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UISystemKeyboardDockController"))
+    }
+
+    func testShouldIgnoreSwiftUINavigationInfrastructure() {
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.UIKitNavigationController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.UIKitTabBarController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.UIKitSplitViewController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.TabHostingController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.NotifyingMulticolumnSplitViewController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.PlatformAlertController"))
     }
 
     func testShouldIgnoreRegularController() {
         XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "ProductDetailsViewController"))
     }
 
-    func testIgnoredControllerDoesNotUpdateScreenName() async {
+    func testShouldIgnoreSwiftUIHostingController() {
+        let name = "UIHostingController<ModifiedContent<DemoView, _TraitWritingModifier<AutomaticNavigationSource>>>"
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: name))
+    }
+
+    func testShouldIgnoreNavigationStackHostingController() {
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "NavigationStackHostingController<AnyView>"))
+    }
+
+    func testShouldIgnorePresentationHostingController() {
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "PresentationHostingController<AnyView>"))
+    }
+
+    func testShouldIgnoreSplitViewPrefix() {
+        let name = "StyleContextSplitViewNavigationController<MergedStyle>"
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: name))
+    }
+
+    func testShouldNotIgnoreSimilarPrefix() {
+        let name = "UIHostingWrapperViewController"
+        XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: name))
+    }
+
+    func testShouldNotIgnoreAppControllers() {
+        XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "SettingsViewController"))
+        XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "DetailViewController"))
+    }
+
+    // MARK: - Filtering (instance path)
+
+    func testShouldIgnoreAndLogFiltersInternalControllers() {
+        let navigation = Navigation()
+        XCTAssertTrue(navigation.shouldIgnoreAndLog(controllerTypeName: "UINavigationController"))
+        XCTAssertTrue(navigation.shouldIgnoreAndLog(controllerTypeName: "SwiftUI.UIKitNavigationController"))
+        XCTAssertTrue(navigation.shouldIgnoreAndLog(controllerTypeName: "NavigationStackHostingController<AnyView>"))
+    }
+
+    func testShouldIgnoreAndLogPassesAppControllers() {
+        let navigation = Navigation()
+        XCTAssertFalse(navigation.shouldIgnoreAndLog(controllerTypeName: "SettingsViewController"))
+        XCTAssertFalse(navigation.shouldIgnoreAndLog(controllerTypeName: "ProductDetailsViewController"))
+    }
+
+    func testIgnoredControllerNoScreenName() async {
         let (stream, continuation) = AsyncStream.makeStream(of: (any NavigationActionEvent).self)
         defer { continuation.finish() }
 
