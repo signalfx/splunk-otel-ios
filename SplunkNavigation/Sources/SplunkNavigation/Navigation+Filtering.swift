@@ -39,7 +39,8 @@ extension Navigation {
         "UINavigationController",
         "UITabBarController",
 
-        // SwiftUI navigation infrastructure (observed in situ with SwiftUI. prefix)
+        // SwiftUI navigation infrastructure: both prefixed (SwiftUI.X) and bare
+        // (X) forms were observed in test runs; the prefixed form is matched here
         "SwiftUI.UIKitNavigationController",
         "SwiftUI.UIKitTabBarController",
         "SwiftUI.UIKitSplitViewController",
