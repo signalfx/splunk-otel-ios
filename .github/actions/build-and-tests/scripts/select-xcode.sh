@@ -41,12 +41,12 @@ def parse_version_string(version):
 def get_version(path):
     if "beta" in path.lower():
         return [-1]
-    
+
     version_str = get_bundle_version_string(path)
-    
+
     if "beta" in version_str.lower():
         return [-1]
-        
+
     parts = parse_version_string(version_str)
     if parts:
         return parts
