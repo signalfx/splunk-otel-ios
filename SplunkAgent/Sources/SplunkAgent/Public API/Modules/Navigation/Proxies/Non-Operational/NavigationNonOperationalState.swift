@@ -28,7 +28,7 @@ final class NavigationNonOperationalState: NavigationModuleState {
     /// Indicates whether automatic navigation detection is enabled.
     ///
     /// The default value is `false`.
-    public var isAutomatedTrackingEnabled: Bool {
+    var isAutomatedTrackingEnabled: Bool {
         false
     }
 }

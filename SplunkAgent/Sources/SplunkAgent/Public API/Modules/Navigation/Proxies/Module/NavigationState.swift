@@ -34,7 +34,7 @@ final class NavigationState: NavigationModuleState {
 
     // MARK: - Automated tracking
 
-    public var isAutomatedTrackingEnabled: Bool {
+    var isAutomatedTrackingEnabled: Bool {
         module?.state.isAutomatedTrackingEnabled ?? false
     }
 }
