@@ -17,8 +17,8 @@ limitations under the License.
 
 internal import SplunkNavigation
 
-/// The state object implements public API for the current state of the Navigation module.
-public final class NavigationState: NavigationModuleState {
+/// An internal object that bridges the core module's state to the public NavigationModuleState API.
+final class NavigationState: NavigationModuleState {
 
     // MARK: - Internal
 

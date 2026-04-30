@@ -17,11 +17,11 @@ limitations under the License.
 
 internal import SplunkNavigation
 
-/// The class implementing public API for the current state in non-operational mode.
+/// The class implementing the API for the current state in non-operational mode.
 ///
-/// This is especially the case when the module is stopped by remote configuration,
-/// but we still need to keep the API available to the user.
-public final class NavigationNonOperationalState: NavigationModuleState {
+/// Used when remote configuration disables the module but the API surface
+/// must remain available to the user.
+final class NavigationNonOperationalState: NavigationModuleState {
 
     // MARK: - Automated tracking
 
