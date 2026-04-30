@@ -83,7 +83,7 @@ public protocol NavigationEventProcessor: Sendable {
     ///   - controllerIdentity: An opaque, SDK-generated string identifying the
     ///     view controller instance. Unique among live instances, stable for the
     ///     lifetime of the instance, not persisted across launches. See the
-    ///     public ``NavigationModuleEventProcessor`` docs for full semantics.
+    ///     public `NavigationModuleEventProcessor` docs for full semantics.
     ///
     /// - Returns: A navigation event describing the screen, or `nil` to suppress.
     func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent?
