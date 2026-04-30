@@ -120,6 +120,7 @@ extension Navigation {
                 controllerIdentifier: visibleControllerIdentifier
             )
         else {
+            // Cancellation cleanup is complete; processor chose not to emit a screen-name event.
             return true
         }
 
