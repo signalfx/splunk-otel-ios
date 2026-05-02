@@ -25,6 +25,7 @@ extension Navigation {
     private struct PresentationTransitionSnapshot {
         let controllerIdentifier: ObjectIdentifier
         let controllerTypeName: String
+        let timestamp: Date
     }
 
 
@@ -79,14 +80,16 @@ extension Navigation {
     private func presentedSnapshot(from event: any PresentationActionEvent) -> PresentationTransitionSnapshot {
         PresentationTransitionSnapshot(
             controllerIdentifier: event.presentedControllerIdentifier,
-            controllerTypeName: event.presentedControllerTypeName
+            controllerTypeName: event.presentedControllerTypeName,
+            timestamp: event.timestamp
         )
     }
 
     private func presentingSnapshot(from event: any PresentationActionEvent) -> PresentationTransitionSnapshot {
         PresentationTransitionSnapshot(
             controllerIdentifier: event.presentingControllerIdentifier,
-            controllerTypeName: event.presentingControllerTypeName
+            controllerTypeName: event.presentingControllerTypeName,
+            timestamp: event.timestamp
         )
     }
 
@@ -103,7 +106,7 @@ extension Navigation {
 
         let navigation = NavigationPair(
             type: .transition,
-            start: Date(),
+            start: snapshot.timestamp,
             typeName: typeName,
             screenName: navigationEvent.name
         )
@@ -142,7 +145,7 @@ extension Navigation {
         if await model.navigation(for: snapshot.controllerIdentifier) == nil {
             let fallbackNavigation = NavigationPair(
                 type: .transition,
-                start: Date(),
+                start: snapshot.timestamp,
                 typeName: typeName,
                 screenName: screenName
             )
@@ -154,7 +157,7 @@ extension Navigation {
 
         let start =
             await model.navigation(for: snapshot.controllerIdentifier)?
-            .start ?? Date()
+            .start ?? snapshot.timestamp
 
         await updateCurrentScreen(
             screenName: screenName,
@@ -164,7 +167,7 @@ extension Navigation {
         )
 
         let event = AutomatedNavigationEvent(
-            timestamp: Date(),
+            timestamp: snapshot.timestamp,
             type: .didTransitionToTraitCollection,
             controllerTypeName: typeName,
             controllerIdentifier: snapshot.controllerIdentifier

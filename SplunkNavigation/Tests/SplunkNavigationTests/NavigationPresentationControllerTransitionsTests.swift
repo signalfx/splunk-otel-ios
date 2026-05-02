@@ -226,6 +226,37 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
     }
 
 
+    // MARK: - Timestamp preservation
+
+    @MainActor
+    func testPresentationTransitionStartPreservesEventTimestamp() async {
+        let presentingController = PresentingViewController()
+        let presentedController = PresentedViewController()
+
+        let (module, provider) = makeModule(autoTrackingEnabled: true)
+        module.startDetection()
+
+        let eventTimestamp = Date(timeIntervalSinceNow: -1)
+
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: nil,
+            timestamp: eventTimestamp
+        )
+
+        let controllerIdentifier = ObjectIdentifier(presentedController)
+        let stored = await waitUntil {
+            await module.model.navigation(for: controllerIdentifier) != nil
+        }
+        XCTAssertTrue(stored)
+
+        let start = await module.model.navigation(for: controllerIdentifier)?.start
+        XCTAssertEqual(start, eventTimestamp)
+    }
+
+
     // MARK: - Helpers
 
     @MainActor
