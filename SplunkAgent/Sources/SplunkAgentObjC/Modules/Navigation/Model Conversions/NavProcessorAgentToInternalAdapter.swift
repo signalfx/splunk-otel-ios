@@ -25,6 +25,9 @@ internal import SplunkNavigation
 /// which is `internal` and inaccessible from this target. We intentionally
 /// duplicate rather than widen access (e.g. `package`) to preserve
 /// compile-time target isolation.
+///
+/// - Note: We mark this class `@unchecked Sendable` because it is immutable after
+///   init; the single stored property is a private let and is never mutated.
 final class NavProcessorAgentToInternalAdapter: NavigationEventProcessor, @unchecked Sendable {
 
     // MARK: - Private
