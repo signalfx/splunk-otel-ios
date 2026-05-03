@@ -21,7 +21,7 @@ import SplunkCommon
 
 @testable import SplunkOpenTelemetry
 
-final class TracerProviderTestBuilder {
+enum TracerProviderTestBuilder {
 
     static func build(
         runtimeAttributes: RuntimeAttributes,
