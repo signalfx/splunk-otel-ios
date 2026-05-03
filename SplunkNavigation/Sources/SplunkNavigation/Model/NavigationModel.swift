@@ -26,7 +26,6 @@ actor NavigationModel {
     private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
     private(set) var pendingNavigationTargets: [ObjectIdentifier: ObjectIdentifier] = [:]
     private(set) var managedNavigationControllerTargets: Set<ObjectIdentifier> = []
-    private(set) var agentVersion: String?
     private(set) var navigationEventProcessor: any NavigationEventProcessor
 
 
@@ -101,12 +100,5 @@ actor NavigationModel {
 
     func isManagedNavigationControllerTarget(_ identifier: ObjectIdentifier) -> Bool {
         managedNavigationControllerTargets.contains(identifier)
-    }
-
-
-    // MARK: - Agent version management
-
-    func update(agentVersion: String?) {
-        self.agentVersion = agentVersion
     }
 }
