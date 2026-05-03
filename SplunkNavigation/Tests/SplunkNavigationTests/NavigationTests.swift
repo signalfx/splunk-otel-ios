@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+@_spi(SplunkTesting) import SplunkCommon
 import SwiftUI
 import XCTest
 
@@ -80,8 +81,10 @@ final class NavigationTests: XCTestCase {
         let customName = "Test Screen"
         navigationModule.track(screen: customName)
 
-        _ = await navigationModule.model.screenName
-        // XCTAssertEqual(screenName, customName)
+        let didUpdate = await waitUntil {
+            await self.navigationModule.model.screenName == customName
+        }
+        XCTAssertTrue(didUpdate)
     }
 
     func testPreferredControllerName() {
