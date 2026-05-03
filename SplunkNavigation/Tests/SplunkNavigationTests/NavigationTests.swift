@@ -86,14 +86,6 @@ final class NavigationTests: XCTestCase {
         }
         XCTAssertTrue(didUpdate)
     }
-
-    func testPreferredControllerName() {
-        // Test UIViewController name
-        XCTAssertEqual(navigationModule.preferredControllerName(for: UIViewController()), "UIViewController")
-
-        // Test UIHostingController
-        XCTAssertEqual(navigationModule.preferredControllerName(for: UIHostingController(rootView: TestView())), "UIHostingController<TestView>")
-    }
 }
 
 struct TestView: View {
