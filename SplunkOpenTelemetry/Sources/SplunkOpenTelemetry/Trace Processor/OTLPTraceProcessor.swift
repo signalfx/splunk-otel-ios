@@ -81,7 +81,7 @@ public class OTLPTraceProcessor: TraceProcessor {
 
         // Initialize processor
         let spanProcessor = SimpleSpanProcessor(spanExporter: spanInterceptorExporter)
-        let attributesProcessor = OLTPAttributesSpanProcessor(
+        let attributesProcessor = OTLPAttributesSpanProcessor(
             with: runtimeAttributes,
             activityTracker: activityTracker
         )
