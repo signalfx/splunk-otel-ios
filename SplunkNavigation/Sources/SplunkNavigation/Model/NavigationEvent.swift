@@ -22,7 +22,7 @@ import Foundation
 /// Returned by ``NavigationEventProcessor/onViewController(typeName:controllerIdentity:)``
 /// to describe how a detected screen transition should be recorded. The ``name`` becomes the
 /// `navigation.name` span attribute, and any ``attributes`` are added to the `app.ui.navigation` span.
-public final class NavigationEvent {
+public struct NavigationEvent {
 
     // MARK: - Public
 
