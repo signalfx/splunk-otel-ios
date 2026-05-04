@@ -184,13 +184,10 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
             let screenName = await module.model.screenName
             return screenName.contains("PresentedViewController")
         }
-
-        let isManualScreenName = await module.model.isManualScreenName
-        XCTAssertFalse(isManualScreenName)
     }
 
     @MainActor
-    func testPresentationDoesNotOverrideManualWhenDisabled() async {
+    func testPresentationDoesNotUpdateScreenNameWhenAutomatedTrackingDisabled() async {
         let presentingController = PresentingViewController()
         let presentedController = PresentedViewController()
 
@@ -219,10 +216,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         try? await Task.sleep(nanoseconds: 200_000_000)
 
         let screenName = await module.model.screenName
-        let isManualScreenName = await module.model.isManualScreenName
-
         XCTAssertEqual(screenName, "Manual Screen")
-        XCTAssertTrue(isManualScreenName)
     }
 
 

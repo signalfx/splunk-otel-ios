@@ -203,7 +203,6 @@ extension Navigation {
         attributes: [String: Any]? = nil
     ) async {
         await model.update(screenName: screenName)
-        await model.update(isManualScreenName: false)
 
         if screenName != lastScreenName {
             continuation.yield(screenName)
