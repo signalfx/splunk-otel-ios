@@ -41,7 +41,9 @@ private final class CollectingSpanExporter: SpanExporter {
         return .success
     }
 
-    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode { .success }
+    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
+        .success
+    }
 
     func shutdown(explicitTimeout _: TimeInterval?) {}
 }
@@ -64,7 +66,7 @@ final class NavigationTrackScreenAttributesTests: XCTestCase {
 
     override func tearDown() {
         OpenTelemetry.registerTracerProvider(tracerProvider: originalTracerProvider)
-        exporter = nil
+        exporter = CollectingSpanExporter()
         super.tearDown()
     }
 
