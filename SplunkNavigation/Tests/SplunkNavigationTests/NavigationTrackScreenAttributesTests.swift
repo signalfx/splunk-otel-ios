@@ -58,6 +58,7 @@ final class NavigationTrackScreenAttributesTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
+        exporter = CollectingSpanExporter()
         let tracerProvider = TracerProviderBuilder()
             .add(spanProcessor: SimpleSpanProcessor(spanExporter: exporter))
             .build()
@@ -66,7 +67,6 @@ final class NavigationTrackScreenAttributesTests: XCTestCase {
 
     override func tearDown() {
         OpenTelemetry.registerTracerProvider(tracerProvider: originalTracerProvider)
-        exporter = CollectingSpanExporter()
         super.tearDown()
     }
 
