@@ -57,4 +57,12 @@ public final class NavigationEventObjC: NSObject {
         self.name = name
         self.attributes = attributes
     }
+
+    /// Creates a navigation event with no custom attributes.
+    ///
+    /// - Parameter name: The screen name for this navigation event.
+    @objc(initWithName:)
+    public convenience init(name: String) {
+        self.init(name: name, attributes: nil)
+    }
 }
