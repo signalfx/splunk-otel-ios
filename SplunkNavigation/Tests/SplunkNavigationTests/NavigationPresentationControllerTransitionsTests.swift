@@ -187,7 +187,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
     }
 
     @MainActor
-    func testPresentationDoesNotUpdateScreenNameWhenAutomatedTrackingDisabled() async {
+    func testPresentationSkipsWhenTrackingDisabled() async {
         let presentingController = PresentingViewController()
         let presentedController = PresentedViewController()
 
