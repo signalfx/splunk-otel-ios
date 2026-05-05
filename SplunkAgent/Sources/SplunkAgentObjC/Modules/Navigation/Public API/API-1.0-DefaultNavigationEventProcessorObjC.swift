@@ -27,6 +27,7 @@ public final class DefaultNavigationEventProcessorObjC: NSObject, NavigationEven
 
     // MARK: - Initialization
 
+    /// Creates a default navigation event processor.
     @objc
     override public init() {
         super.init()
@@ -35,6 +36,8 @@ public final class DefaultNavigationEventProcessorObjC: NSObject, NavigationEven
 
     // MARK: - Processor methods
 
+    /// Returns a navigation event using the sanitized controller type name as the screen name,
+    /// with no custom attributes.
     @objc(onViewControllerWithTypeName:controllerIdentity:)
     public func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEventObjC? {
         NavigationEventObjC(name: typeName)
