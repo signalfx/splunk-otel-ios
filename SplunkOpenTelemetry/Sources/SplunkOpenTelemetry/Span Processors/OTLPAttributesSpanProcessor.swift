@@ -21,7 +21,7 @@ import OpenTelemetrySdk
 @_spi(SplunkInternal) import SplunkCommon
 
 /// The class implements a generic span processor that adds runtime attributes to all spans.
-public class OLTPAttributesSpanProcessor: SpanProcessor {
+public class OTLPAttributesSpanProcessor: SpanProcessor {
 
     // MARK: - Private
 

@@ -29,7 +29,7 @@ public final class NavigationModuleObjC: NSObject {
 
     // MARK: - Preferences
 
-    /// An object that holds preferred settings for the module, a ``NavigationModulePreferencesObjc`` instance.
+    /// An object that holds preferred settings for the module, a ``NavigationModulePreferencesObjC`` instance.
     @objc
     public var preferences: NavigationModulePreferencesObjC {
         get {
