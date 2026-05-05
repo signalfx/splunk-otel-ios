@@ -19,6 +19,9 @@ internal import SplunkNavigation
 
 /// Adapts a ``NavigationModuleEventProcessor`` from the `SplunkAgent` public API
 /// to the internal ``NavigationEventProcessor`` protocol used by the navigation engine.
+///
+/// - Note: We mark this class `@unchecked Sendable` because it is immutable after
+///   init; the single stored property is a private let and is never mutated.
 final class NavigationModuleEventProcessorAdapter: NavigationEventProcessor, @unchecked Sendable {
 
     // MARK: - Private
