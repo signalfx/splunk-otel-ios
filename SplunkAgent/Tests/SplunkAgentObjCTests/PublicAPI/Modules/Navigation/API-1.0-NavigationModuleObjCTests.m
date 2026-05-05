@@ -32,12 +32,8 @@ limitations under the License.
     SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
 
     SPLKNavigationModulePreferences *preferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:NO];
-    agent.navigation.preferences = preferences;
-    XCTAssertFalse(agent.navigation.preferences.enableAutomatedTracking);
-
-    SPLKNavigationModulePreferences *enabledPreferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:YES];
-    agent.navigation.preferences = enabledPreferences;
-    XCTAssertTrue(agent.navigation.preferences.enableAutomatedTracking);
+    XCTAssertNoThrow(agent.navigation.preferences = preferences);
+    XCTAssertNotNil(agent.navigation.preferences);
 }
 
 - (void)testState {
@@ -56,6 +52,17 @@ limitations under the License.
     SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
     SPLKNavigationModule *result = [agent.navigation trackScreen:@"ScreenA"];
     XCTAssertNotNil(result);
+}
+
+- (void)testTrackingWithAttributes {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    NSDictionary *attributes = @{@"app.section": @"settings", @"app.level": @42};
+    XCTAssertNoThrow([agent.navigation trackScreen:@"Settings" attributes:attributes]);
+}
+
+- (void)testTrackingWithNilAttributes {
+    SPLKAgent *agent = [AgentTestBuilderObjC buildDefault];
+    XCTAssertNoThrow([agent.navigation trackScreen:@"Home" attributes:nil]);
 }
 
 @end

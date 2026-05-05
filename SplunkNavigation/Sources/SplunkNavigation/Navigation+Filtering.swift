@@ -17,7 +17,17 @@ limitations under the License.
 
 extension Navigation {
     /// Internal iOS controllers that should not produce navigation events.
+    ///
+    /// UIKit infrastructure controllers (keyboard, input, rotation) are
+    /// listed without a module prefix because UIKit types are always
+    /// reported as bare names by `String(describing: type(of:))`.
+    ///
+    /// SwiftUI infrastructure controllers are listed *with* the `SwiftUI.`
+    /// module prefix because the SDK's class-name sanitizer only strips the
+    /// host app's bundle prefix, not `SwiftUI.`. These names are verified
+    /// against span data from an instrumented test app on iOS 26.2.
     private static let ignoredControllerTypeNames: Set<String> = [
+        // UIKit infrastructure
         "UIApplicationRotationFollowingController",
         "UICompatibilityInputViewController",
         "UIInputWindowController",
@@ -27,10 +37,48 @@ extension Navigation {
         "UISystemInputViewController",
         "UISystemKeyboardDockController",
         "UINavigationController",
-        "UITabBarController"
+        "UITabBarController",
+
+        // SwiftUI navigation infrastructure: both prefixed (SwiftUI.X) and bare
+        // (X) forms were observed in test runs; the prefixed form is matched here
+        "SwiftUI.UIKitNavigationController",
+        "SwiftUI.UIKitTabBarController",
+        "SwiftUI.UIKitSplitViewController",
+        "SwiftUI.UIKitInspectorSplitViewController",
+        "SwiftUI.NotifyingMulticolumnSplitViewController",
+        "SwiftUI.NotificationSendingSplitViewController",
+        "SwiftUI.SplitViewNavigationController",
+        "SwiftUI.TabHostingController",
+
+        // SwiftUI non-navigation infrastructure
+        "SwiftUI.PlatformAlertController",
+        "SwiftUI.SwiftUISearchController"
+    ]
+
+    /// SwiftUI internal controllers whose type names include generic
+    /// parameters (e.g. `UIHostingController<ModifiedContent<...>>`).
+    ///
+    /// Prefix matching is required because the generic suffix varies at
+    /// runtime depending on the view hierarchy.
+    ///
+    /// `NavigationStackHostingController<` and
+    /// `PresentationHostingController<` were observed to be the two noisiest
+    /// SwiftUI-internal generic types. They fire on every `NavigationStack`
+    /// push/pop and every sheet/modal presentation, respectively.
+    private static let ignoredControllerTypePrefixes: [String] = [
+        "UIHostingController<",
+        "NavigationStackHostingController<",
+        "PresentationHostingController<",
+        "StyleContextSplitViewNavigationController<"
     ]
 
     static func shouldIgnore(controllerTypeName: String) -> Bool {
-        ignoredControllerTypeNames.contains(controllerTypeName)
+        let isExactMatch =
+            ignoredControllerTypeNames
+            .contains(controllerTypeName)
+        let isPrefixMatch =
+            ignoredControllerTypePrefixes
+            .contains { controllerTypeName.hasPrefix($0) }
+        return isExactMatch || isPrefixMatch
     }
 }

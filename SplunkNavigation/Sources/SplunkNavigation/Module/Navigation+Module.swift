@@ -65,16 +65,16 @@ extension Navigation: Module {
         // Update preferences
         preferences.enableAutomatedTracking = configuration.enableAutomatedTracking
 
-        // Update navigation event processor
-        if let processor = configuration.navigationEventProcessor {
-            navigationEventProcessor = processor
-        }
-
-        // Update module mode
+        // Update module mode and navigation event processor
         let isEnabled = configuration.isEnabled
+        let processor = configuration.navigationEventProcessor
 
         Task {
             await model.update(moduleEnabled: isEnabled)
+
+            if let processor {
+                await model.update(navigationEventProcessor: processor)
+            }
         }
     }
 }

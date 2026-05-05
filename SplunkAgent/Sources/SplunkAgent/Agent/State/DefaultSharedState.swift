@@ -34,6 +34,10 @@ final class DefaultSharedState: AgentSharedState {
         owner.currentSession.currentSessionId
     }
 
+    var sessionMetadata: String? {
+        owner.session.metadata
+    }
+
     var agentVersion: String {
         SplunkRum.version
     }

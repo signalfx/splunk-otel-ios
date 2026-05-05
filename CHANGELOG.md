@@ -9,16 +9,29 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-* Added public references to sessionWillResetNotification and sessionDidResetNotification
-* Added optional support to capture network headers.
-* Session Replay now captures text content in wireframes for UIKit applications.
-* Added `.trackScreen` SwiftUI view modifier for manual screen name tracking with optional custom attributes.
+* Added automated screen tracking for `UIViewController` transitions #590
+* Added automated screen tracking for `UINavigationController` push/pop (including interactive pop cancellation) #587
+* Added automated screen tracking for modal presentation/dismissal. #599
+* Added manual screen name tracking via `track(screen:attributes:)` and the `.trackScreen` SwiftUI view modifier, with optional custom attributes. Manual calls bypass the `NavigationModuleEventProcessor` and always emit spans. #621
+* Added `NavigationModuleEventProcessor` protocol for custom screen name transforms, event filtering, and span attributes on navigation events. #624
+* Added `navigation.name` attribute on `app.ui.navigation` screen-change spans. #625
+* Added navigation module integration in `SplunkAgent` proxy with Swift and Objective-C API surfaces. #618
 
 ### Changed
 
-* Updated endpoint from signalfx.com to observability.splunkcloud.com
-* Updated automated navigation tracking to handle additional `UIViewController` transition events for screen updates and navigation spans.
-* Added automated screen tracking for `UINavigationController` push and pop transitions, including interactive pop cancellation handling.
+* Navigation spans now use the span name `app.ui.navigation` (previously `screen name change`). #625
+
+## [2.2.2] - 2026-04-15
+
+### Added
+
+* Added public references to sessionWillResetNotification and sessionDidResetNotification. #614
+* Added optional support to capture network headers. #604
+* Session Replay now captures text content in wireframes for UIKit applications. #615
+
+### Changed
+
+* Updated endpoint from signalfx.com to observability.splunkcloud.com. #612
 
 ## [2.2.1] - 2026-03-19
 
@@ -49,7 +62,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Replaced OTLP binary protobuf with custom JSON encoding to reduce binary size. The SDK now uses `opentelemetry-swift-core` (API/SDK only) instead of the full `opentelemetry-swift` package with protocol exporters. #566
-
+  
 ## [2.0.7] - 2026-02-04
 
 ### Fixed
@@ -236,3 +249,4 @@ This is a first major stable release of the new Splunk OpenTelemetry Agent.
 ### Deprecated
 
 * Deprecates the use of SplunkRum.initialize. Use the SplunkRumBuilder going forward.
+

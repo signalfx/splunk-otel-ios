@@ -26,7 +26,7 @@ public final class Navigation: Sendable {
 
     // MARK: - Private
 
-    let model = NavigationModel()
+    let model: NavigationModel
 
     let appBundleName: String?
     let continuation: AsyncStream<String>.Continuation
@@ -41,12 +41,6 @@ public final class Navigation: Sendable {
 
     /// Asynchronous stream of screen name changes.
     public let screenNameStream: AsyncStream<String>
-
-    /// Processor used to transform automated navigation events before they produce spans.
-    ///
-    /// Manual ``track(screen:)`` calls bypass the processor.
-    nonisolated(unsafe) var navigationEventProcessor: any NavigationEventProcessor =
-        DefaultNavigationEventProcessor()
 
 
     // MARK: - Module configuration
@@ -103,8 +97,13 @@ public final class Navigation: Sendable {
         )
     }
 
-    init(navigationEventStreamProvider: any NavigationEventStreamProviding) {
+    init(
+        navigationEventStreamProvider: any NavigationEventStreamProviding,
+        navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
+    ) {
         self.navigationEventStreamProvider = navigationEventStreamProvider
+        model = NavigationModel(navigationEventProcessor: navigationEventProcessor)
+
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
         self.screenNameStream = screenNameStream
@@ -143,7 +142,7 @@ public final class Navigation: Sendable {
             for await event in stream {
                 guard
                     await shouldProcessEvent(),
-                    !Self.shouldIgnore(controllerTypeName: event.controllerTypeName)
+                    !shouldIgnoreAndLog(controllerTypeName: event.controllerTypeName)
                 else {
                     continue
                 }
@@ -213,10 +212,16 @@ public final class Navigation: Sendable {
         let start = Date()
 
         let typeName = event.controllerTypeName
-        let screenName = processAutomatedScreenName(
-            sanitize(typeName: typeName),
-            controllerIdentifier: event.controllerIdentifier
-        )
+        guard
+            let navigationEvent = await processAutomatedNavigationEvent(
+                sanitize(typeName: typeName),
+                controllerIdentifier: event.controllerIdentifier
+            )
+        else {
+            return
+        }
+
+        let screenName = navigationEvent.name
         let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
@@ -235,7 +240,12 @@ public final class Navigation: Sendable {
         if screenName != lastScreenName {
             continuation.yield(screenName)
 
-            send(screenName: screenName, lastScreenName: lastScreenName, start: start)
+            send(
+                screenName: screenName,
+                lastScreenName: lastScreenName,
+                start: start,
+                attributes: navigationEvent.attributes
+            )
         }
     }
 
@@ -244,10 +254,16 @@ public final class Navigation: Sendable {
         let start = Date()
 
         let typeName = event.controllerTypeName
-        let screenName = processAutomatedScreenName(
-            sanitize(typeName: typeName),
-            controllerIdentifier: event.controllerIdentifier
-        )
+        guard
+            let navigationEvent = await processAutomatedNavigationEvent(
+                sanitize(typeName: typeName),
+                controllerIdentifier: event.controllerIdentifier
+            )
+        else {
+            return
+        }
+
+        let screenName = navigationEvent.name
         let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
@@ -265,7 +281,12 @@ public final class Navigation: Sendable {
         // Yield this change to the consumer and send corresponding span
         if screenName != lastScreenName {
             continuation.yield(screenName)
-            send(screenName: screenName, lastScreenName: lastScreenName, start: start)
+            send(
+                screenName: screenName,
+                lastScreenName: lastScreenName,
+                start: start,
+                attributes: navigationEvent.attributes
+            )
         }
     }
 
@@ -309,6 +330,23 @@ public final class Navigation: Sendable {
         return moduleEnabled && trackingEnabled
     }
 
+    /// Returns whether the controller should be filtered from automatic
+    /// navigation tracking, and logs at debug level when filtering occurs.
+    ///
+    /// The static ``shouldIgnore(controllerTypeName:)`` remains pure for
+    /// testability; this instance method adds the side effect of logging
+    /// so that filtered controller names are observable in debug builds.
+    func shouldIgnoreAndLog(controllerTypeName: String) -> Bool {
+        guard Self.shouldIgnore(controllerTypeName: controllerTypeName) else {
+            return false
+        }
+
+        logger.log(level: .debug) {
+            "Filtered internal controller from automatic navigation tracking: \(controllerTypeName)"
+        }
+        return true
+    }
+
     /// Checks whether the event belongs to a view controller whose lifecycle is managed
     /// by a `UINavigationController` transition.
     ///
@@ -329,18 +367,19 @@ public final class Navigation: Sendable {
     }
 
 
-    /// Passes the raw automated screen name through the ``navigationEventProcessor``
-    /// and returns the (potentially transformed) screen name.
-    func processAutomatedScreenName(
-        _ screenName: String,
+    /// Passes the sanitized type name through the navigation event processor
+    /// (stored on the ``NavigationModel`` actor) and returns the processed event,
+    /// or `nil` if the event was suppressed.
+    func processAutomatedNavigationEvent(
+        _ typeName: String,
         controllerIdentifier: ObjectIdentifier
-    ) -> String {
-        let event = NavigationEvent(
-            screenName: screenName,
-            controllerIdentifier: controllerIdentifier
+    ) async -> NavigationEvent? {
+        let controllerIdentity = String(UInt(bitPattern: controllerIdentifier))
+
+        return await model.navigationEventProcessor.onViewController(
+            typeName: typeName,
+            controllerIdentity: controllerIdentity
         )
-        let processed = navigationEventProcessor.process(event: event)
-        return processed.screenName
     }
 
     func preferredControllerName(for controller: UIViewController) -> String {

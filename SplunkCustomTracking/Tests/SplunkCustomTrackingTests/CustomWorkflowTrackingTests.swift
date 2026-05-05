@@ -106,6 +106,7 @@ final class CustomWorkflowTrackingTests: XCTestCase {
 private final class AgentSharedStateMock: AgentSharedState {
     let agentVersion: String = "1.2.3-test"
     let sessionId: String = "test-session-id"
+    let sessionMetadata: String? = nil
 
     func applicationState(for _: Date) -> String? {
         "active"

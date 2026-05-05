@@ -35,16 +35,20 @@ enum WebViewBridgeScript {
     /// Generates the complete JavaScript string to be injected into a web view.
     ///
     /// The script is loaded from the `WebViewBridgeScript.js` resource file, and placeholders
-    /// for `sessionId` and `handlerName` are replaced with their actual values.
+    /// for `sessionId`, `sessionMetadata`, and `handlerName` are replaced with their actual values.
     ///
     /// - Parameters:
     ///   - sessionId: The initial native session ID to be cached in the JavaScript context.
+    ///   - sessionMetadata: The initial Base64-encoded session metadata string, or `nil` if unavailable.
     ///   - handlerName: The name of the `WKScriptMessageHandler` used for asynchronous communication.
     ///
     /// - Returns: A fully interpolated JavaScript string ready for injection.
-    static func generate(sessionId: String, handlerName: String) -> String {
-        scriptTemplate
+    static func generate(sessionId: String, sessionMetadata: String?, handlerName: String) -> String {
+        let metadataLiteral = sessionMetadata.map { "'\($0)'" } ?? "null"
+        return
+            scriptTemplate
             .replacingOccurrences(of: "__SESSION_ID__", with: "'\(sessionId)'")
+            .replacingOccurrences(of: "__SESSION_METADATA__", with: metadataLiteral)
             .replacingOccurrences(of: "__HANDLER_NAME__", with: handlerName)
     }
 }

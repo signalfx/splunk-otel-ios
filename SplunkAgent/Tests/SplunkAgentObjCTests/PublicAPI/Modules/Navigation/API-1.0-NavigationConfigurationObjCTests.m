@@ -36,9 +36,13 @@ limitations under the License.
 
     SPLKNavigationConfiguration *fullConfiguration = [[SPLKNavigationConfiguration alloc] initWithEnabled:NO automatedTracking:NO];
 
+    SPLKDefaultNavigationEventProcessor *processor = [[SPLKDefaultNavigationEventProcessor alloc] init];
+    SPLKNavigationConfiguration *fullWithProcessor = [[SPLKNavigationConfiguration alloc] initWithEnabled:YES automatedTracking:YES navigationEventProcessor:processor];
+
     XCTAssertNotNil(defaultConfiguration);
     XCTAssertNotNil(minimalConfiguration);
     XCTAssertNotNil(fullConfiguration);
+    XCTAssertNotNil(fullWithProcessor);
 }
 
 - (void)testDefaultValues {
@@ -46,6 +50,7 @@ limitations under the License.
 
     XCTAssertTrue(configuration.isEnabled);
     XCTAssertFalse(configuration.enableAutomatedTracking);
+    XCTAssertNil(configuration.navigationEventProcessor);
 }
 
 - (void)testProperties {
@@ -65,6 +70,22 @@ limitations under the License.
 
     XCTAssertEqual(configuration.isEnabled, NO);
     XCTAssertEqual(configuration.enableAutomatedTracking, YES);
+}
+
+- (void)testNavigationEventProcessorProperty {
+    SPLKNavigationConfiguration *configuration = [[SPLKNavigationConfiguration alloc] init];
+
+    // Default is nil
+    XCTAssertNil(configuration.navigationEventProcessor);
+
+    // Assign a processor
+    SPLKDefaultNavigationEventProcessor *processor = [[SPLKDefaultNavigationEventProcessor alloc] init];
+    configuration.navigationEventProcessor = processor;
+    XCTAssertNotNil(configuration.navigationEventProcessor);
+
+    // Clear the processor
+    configuration.navigationEventProcessor = nil;
+    XCTAssertNil(configuration.navigationEventProcessor);
 }
 
 @end
