@@ -21,7 +21,7 @@ import Foundation
 enum WebViewBridgeScript {
 
     private static let scriptTemplate: String = {
-        guard let url = Bundle.module.url(forResource: "WebViewBridgeScript", withExtension: "js") else {
+        guard let url = scriptURL() else {
             preconditionFailure("WebViewBridgeScript.js not found in bundle.")
         }
 
@@ -31,6 +31,16 @@ enum WebViewBridgeScript {
 
         return script
     }()
+
+    private static func scriptURL() -> URL? {
+        #if SWIFT_PACKAGE
+            if let packageURL = Bundle.module.url(forResource: "WebViewBridgeScript", withExtension: "js") {
+                return packageURL
+            }
+        #endif
+
+        return Bundle(for: WebViewInstrumentation.self).url(forResource: "WebViewBridgeScript", withExtension: "js")
+    }
 
     /// Generates the complete JavaScript string to be injected into a web view.
     ///

@@ -287,13 +287,15 @@ public class SplunkRum: ObservableObject {
         // Send a session start event explicitly as soon as a Session and an EventManager are available
         (currentSession as? DefaultSession)?.sendInitialSessionStartEvent()
 
+        let normalizedModuleConfigurations = Self.normalizeModuleConfigurations(moduleConfigurations)
+
         // Store module configurations for later use in module customization
-        self.moduleConfigurations = moduleConfigurations
+        self.moduleConfigurations = normalizedModuleConfigurations
 
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
-            moduleConfigurations: moduleConfigurations
+            moduleConfigurations: normalizedModuleConfigurations
         )
 
         // Module installation above activates URLSession swizzling. Set the

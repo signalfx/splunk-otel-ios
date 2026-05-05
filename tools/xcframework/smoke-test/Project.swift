@@ -2,11 +2,9 @@
 //
 // Tuist manifest for the XCFramework smoke test app.
 //
-// This project creates a minimal iOS app that links against ALL built
-// xcframeworks to verify:
-//   1. All frameworks can be found and linked
-//   2. Module imports resolve correctly
-//   3. Basic runtime initialization works
+// This project creates a minimal app whose framework search path contains
+// only shipped xcframeworks. It verifies binary customers do not need any
+// internal Splunk or Cisco frameworks.
 //
 // Prerequisites:
 //   - All xcframeworks must be built in ../output/xcframeworks/
@@ -25,57 +23,17 @@ import ProjectDescription
 // MARK: - XCFramework Paths
 // ---------------------------------------------------------------------------
 
-/// Directory containing all xcframeworks for distribution.
-///
-/// After `make build`, this contains Agent modules, OTel, PLCrash, and Cisco SR.
+/// Directory containing shipped xcframeworks for distribution.
 let xcfwDir = "../output/xcframeworks"
 
-/// Agent modules (built by `make build-agent`).
-let agentFrameworks = [
+let shippedFrameworks = [
     "SplunkAgent",
     "SplunkAgentObjC",
-    "SplunkCommon",
-    "SplunkNavigation",
-    "SplunkNetwork",
-    "SplunkNetworkMonitor",
-    "SplunkSlowFrameDetector",
-    "SplunkCrashReports",
-    "SplunkOpenTelemetry",
-    "SplunkOpenTelemetryBackgroundExporter",
-    "SplunkInteractions",
-    "SplunkAppStart",
-    "SplunkAppState",
-    "SplunkWebView",
-    "SplunkCustomTracking",
-    "SplunkSessionReplayProxy"
-]
-
-/// OpenTelemetry (built by `make build-otel`).
-let otelFrameworks = [
     "OpenTelemetryApi",
     "OpenTelemetrySdk"
 ]
 
-/// PLCrashReporter (built by `make build-plcrash`).
-let crashFrameworks = [
-    "CrashReporter"
-]
-
-/// Cisco Session Replay (downloaded by `make populate-deps`).
-let ciscoFrameworks = [
-    "CiscoCommon",
-    "CiscoLogger",
-    "CiscoEncryption",
-    "CiscoSwizzling",
-    "CiscoInteractions",
-    "CiscoDiskStorage",
-    "CiscoSessionReplay",
-    "CiscoInstanceManager",
-    "CiscoRuntimeCache"
-]
-
-/// All frameworks combined.
-let allFrameworks = agentFrameworks + otelFrameworks + crashFrameworks + ciscoFrameworks
+let noCrashReporterCondition = PlatformCondition.when([.ios, .tvos, .catalyst])
 
 
 // ---------------------------------------------------------------------------
@@ -85,6 +43,9 @@ let allFrameworks = agentFrameworks + otelFrameworks + crashFrameworks + ciscoFr
 let project = Project(
     name: "XCFrameworkSmokeTest",
     settings: .settings(
+        base: [
+            "SUPPORTS_MACCATALYST": "YES"
+        ],
         configurations: [
             .debug(name: "Debug", settings: [:]),
             .release(name: "Release", settings: [:])
@@ -93,14 +54,15 @@ let project = Project(
     targets: [
         .target(
             name: "XCFrameworkSmokeTest",
-            destinations: [.iPhone, .iPad],
+            destinations: [.iPhone, .iPad, .appleTv, .appleVision, .macCatalyst],
             product: .app,
             bundleId: "com.splunk.rum.xcframework-smoke-test",
-            deploymentTargets: .iOS("14.0"),
             sources: ["Sources/**"],
-            dependencies: allFrameworks.map { name in
+            dependencies: shippedFrameworks.map { name in
                 .xcframework(path: "\(xcfwDir)/\(name).xcframework")
-            }
+            } + [
+                .xcframework(path: "\(xcfwDir)/CrashReporter.xcframework", condition: noCrashReporterCondition)
+            ]
         )
     ]
 )

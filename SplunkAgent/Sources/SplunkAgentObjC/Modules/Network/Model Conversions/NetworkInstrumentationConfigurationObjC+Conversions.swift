@@ -16,14 +16,13 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkCommon
-internal import SplunkNetwork
+import SplunkAgent
 
 extension NetworkInstrumentationConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 
-    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
+    var moduleConfiguration: Any {
         let configurationIgnoreUrls = IgnoreURLs(containing: ignoreURLs)
 
         return NetworkInstrumentationConfiguration(

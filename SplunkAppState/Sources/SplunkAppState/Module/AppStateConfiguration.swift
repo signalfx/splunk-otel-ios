@@ -19,4 +19,8 @@ import Foundation
 import SplunkCommon
 
 /// AppState module configuration, minimal configuration for module conformance.
-public struct AppStateConfiguration: ModuleConfiguration {}
+public struct AppStateConfiguration: ModuleConfiguration {
+
+    /// Initializes a new configuration.
+    public init() {}
+}

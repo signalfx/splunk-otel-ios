@@ -15,14 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkCommon
-internal import SplunkSessionReplayProxy
+import SplunkAgent
 
 extension SessionReplayConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 
-    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
+    var moduleConfiguration: Any {
         SessionReplayConfiguration(
             enabled: isEnabled,
             samplingRate: samplingRate?.doubleValue

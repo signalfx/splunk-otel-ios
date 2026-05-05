@@ -115,13 +115,12 @@ Override default module settings by passing an array of configuration objects to
 
 ```swift
 import SplunkAgent
-import SplunkCrashReports
 
 // Initialize the configuration of the Agent
 let agentConfiguration = ...
 
 // Disable configuration for crash reporting
-let crashReportsConfiguration = SplunkCrashReports.CrashReportsConfiguration(
+let crashReportsConfiguration = CrashReportsConfiguration(
    isEnabled: false
 )
 

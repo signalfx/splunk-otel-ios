@@ -16,7 +16,6 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkCommon
 
 /// Defines a unified approach for converting module configurations
 /// from their Objective-C variants to native variants in Swift.
@@ -25,5 +24,5 @@ protocol ModuleConfigurationSwift {
     // MARK: - Swift variant
 
     /// Native Swift variant of the module configuration.
-    var moduleConfiguration: any ModuleConfiguration { get }
+    var moduleConfiguration: Any { get }
 }

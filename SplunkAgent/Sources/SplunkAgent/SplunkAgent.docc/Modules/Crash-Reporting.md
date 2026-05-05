@@ -16,7 +16,6 @@ You can disable crash reporting during initialization by providing a `CrashRepor
 
 ```swift
 import SplunkAgent
-import SplunkCrashReports // Required for the configuration type
 
 let crashConfig = CrashReportsConfiguration(isEnabled: false)
 

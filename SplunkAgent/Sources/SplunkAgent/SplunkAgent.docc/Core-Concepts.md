@@ -29,6 +29,8 @@ You can also provide optional configurations for global attributes and other set
 
 ## Module Configurations
 
-While the main ``AgentConfiguration`` handles global settings, some modules have their own specific configuration structs (e.g., `SplunkNetwork.NetworkInstrumentationConfiguration`). These are passed as an optional array to the `SplunkRum.install(with:moduleConfigurations:)` method to override default module behaviors.
+While the main ``AgentConfiguration`` handles global settings, some modules have their own specific configuration structs, such as ``NetworkInstrumentationConfiguration`` and ``CrashReportsConfiguration``. These are passed as an optional array to the `SplunkRum.install(with:moduleConfigurations:)` method to override default module behaviors.
+
+Binary xcframework customers should import only `SplunkAgent` for Swift configuration. Internal module frameworks such as `SplunkNetwork`, `SplunkNavigation`, and Cisco Session Replay frameworks are linked into `SplunkAgent` and are not part of the public binary distribution.
 
 For a complete list of available modules and their capabilities, see the <doc:Modules-Overview>.

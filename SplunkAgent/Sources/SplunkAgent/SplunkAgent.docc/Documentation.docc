@@ -28,6 +28,7 @@ To make the most of the agent, it's helpful to understand its main components an
 ### Essentials
 - <doc:Getting-Started>
 - <doc:Core-Concepts>
+- <doc:Binary-XCFramework-Migration>
 
 ### Configuration
 - ``SplunkRum``

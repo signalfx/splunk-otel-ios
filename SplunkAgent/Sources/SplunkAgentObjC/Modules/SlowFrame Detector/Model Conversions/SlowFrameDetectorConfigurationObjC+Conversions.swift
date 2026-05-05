@@ -15,14 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkCommon
-internal import SplunkSlowFrameDetector
+import SplunkAgent
 
 extension SlowFrameDetectorConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 
-    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
+    var moduleConfiguration: Any {
         SlowFrameDetectorConfiguration(isEnabled: isEnabled)
     }
 }

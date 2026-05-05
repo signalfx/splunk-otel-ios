@@ -15,17 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkCommon
+import SplunkAgent
 
-#if canImport(SplunkCrashReports)
-    internal import SplunkCrashReports
+extension CrashReportsConfigurationObjC: ModuleConfigurationSwift {
 
-    extension CrashReportsConfigurationObjC: ModuleConfigurationSwift {
+    // MARK: - Swift variant
 
-        // MARK: - Swift variant
-
-        var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
-            CrashReportsConfiguration(isEnabled: isEnabled)
-        }
+    var moduleConfiguration: Any {
+        CrashReportsConfiguration(isEnabled: isEnabled)
     }
-#endif
+}

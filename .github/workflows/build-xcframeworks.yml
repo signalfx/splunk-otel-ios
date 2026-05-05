@@ -4,8 +4,8 @@ name: Build XCFrameworks
 #   1. Automatically after merge_release.yml creates a GitHub Release
 #   2. Manually via workflow_dispatch for testing
 #
-# This workflow builds all SplunkAgent SDK modules as signed xcframeworks,
-# validates them, packages into a zip, and uploads to the GitHub Release.
+# This workflow builds the monolithic SplunkAgent binary distribution,
+# validates it, packages it into a zip, and uploads it to the GitHub Release.
 #
 # Architecture:
 #   Job 1 (build): Build OTel + PLCrash + Agent modules → upload artifact
@@ -52,7 +52,7 @@ env:
 jobs:
 
   # ===========================================================================
-  # Job 1: Build all xcframeworks
+  # Job 1: Build shipped xcframeworks
   # ===========================================================================
   build:
     name: Build XCFrameworks
@@ -96,7 +96,7 @@ jobs:
       #   a) A GitHub Actions artifact from a previous workflow run
       #   b) Downloaded from S3 by populate-dependencies.sh (default)
       #
-      # Cisco frameworks are required by SplunkCommon and most modules.
+      # Cisco frameworks are static inputs to SplunkAgent.
       # Use the skip-cisco input only for partial test builds.
       - name: Download Cisco SR xcframeworks (if artifact provided)
         if: inputs.cisco-xcframeworks-run-id != ''
@@ -139,7 +139,7 @@ jobs:
           tuist generate --no-open --no-binary-cache
           scripts/fix-tuist-warnings.sh SplunkAgentXCFrameworks.xcodeproj
 
-      - name: Build Agent module xcframeworks
+      - name: Build SplunkAgent xcframeworks
         working-directory: tools/xcframework
         run: scripts/build-xcframeworks.sh
 
@@ -149,12 +149,6 @@ jobs:
       - name: Validate xcframeworks (pre-signing)
         working-directory: tools/xcframework
         run: RELEASE=false scripts/validate-xcframeworks.sh
-
-      - name: Generate Cisco release manifest
-        working-directory: tools/xcframework
-        run: |
-          chmod +x scripts/*.sh
-          scripts/generate-cisco-release-manifest.sh
 
       # -----------------------------------------------------------------
       # Step 5b: Smoke test (consumer linkage)
@@ -200,12 +194,6 @@ jobs:
         with:
           name: splunk-agent-xcframeworks-unsigned
           path: tools/xcframework/output/xcframeworks/
-
-      - name: Refresh Cisco xcframeworks from source
-        working-directory: tools/xcframework
-        run: |
-          chmod +x scripts/*.sh
-          scripts/refresh-cisco-xcframeworks.sh
 
       # -----------------------------------------------------------------
       # Signing

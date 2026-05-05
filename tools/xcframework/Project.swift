@@ -1,8 +1,9 @@
 // tools/xcframework/Project.swift
 //
-// Tuist manifest for building all SplunkAgent SDK modules as dynamic
-// xcframeworks. Each module is a separate framework target with
-// BUILD_LIBRARY_FOR_DISTRIBUTION=YES for stable ABI.
+// Tuist manifest for building the binary SplunkAgent distribution.
+// SplunkAgent and SplunkAgentObjC are the only distributable dynamic
+// frameworks. Internal Splunk modules and Cisco binary inputs are linked
+// statically into SplunkAgent.
 //
 // External dependencies (OpenTelemetry, Cisco Session Replay,
 // PLCrashReporter) are consumed as pre-built xcframeworks from the
@@ -10,12 +11,12 @@
 // `tuist generate`.
 //
 // Key design decisions:
-//   - Individual xcframework per module (not a single fat framework)
-//   - Per-module platform matrix (SplunkCrashReports excludes visionOS)
-//   - SplunkAgent's dependency on SplunkCrashReports uses a platform
-//     condition so #if canImport(SplunkCrashReports) works correctly
-//   - Cisco wrappers from Package.swift are NOT needed here — we
-//     reference xcframeworks directly
+//   - Single monolithic SplunkAgent xcframework for Swift customers
+//   - SplunkAgentObjC bridges only through SplunkAgent public APIs
+//   - SplunkCrashReports excludes visionOS because PLCrashReporter does
+//     not support it
+//   - Cisco wrappers from Package.swift are NOT needed here; we reference
+//     the static xcframeworks directly
 //   - No linter/formatter plugins (those are dev-only in Package.swift)
 
 import ProjectDescription
@@ -126,7 +127,7 @@ let project = Project(
         .target(
             name: "SplunkCommon",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.common",
             sources: "\(repoRoot)/SplunkCommon/Sources/**",
             dependencies: [
@@ -145,7 +146,7 @@ let project = Project(
         .target(
             name: "SplunkNavigation",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.navigation",
             sources: "\(repoRoot)/SplunkNavigation/Sources/**",
             dependencies: [
@@ -164,7 +165,7 @@ let project = Project(
         .target(
             name: "SplunkNetwork",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.network",
             sources: "\(repoRoot)/SplunkNetwork/Sources/**",
             dependencies: [
@@ -183,7 +184,7 @@ let project = Project(
         .target(
             name: "SplunkNetworkMonitor",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.networkmonitor",
             sources: "\(repoRoot)/SplunkNetworkMonitor/Sources/**",
             dependencies: [
@@ -202,7 +203,7 @@ let project = Project(
         .target(
             name: "SplunkSlowFrameDetector",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.slowframedetector",
             sources: "\(repoRoot)/SplunkSlowFrameDetector/Sources/**",
             dependencies: [
@@ -224,7 +225,7 @@ let project = Project(
         .target(
             name: "SplunkCrashReports",
             destinations: platformsNoCrashReporter,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.crashreports",
             sources: "\(repoRoot)/SplunkCrashReports/Sources/**",
             dependencies: [
@@ -243,7 +244,7 @@ let project = Project(
         .target(
             name: "SplunkOpenTelemetryBackgroundExporter",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.otelbackgroundexporter",
             sources: "\(repoRoot)/SplunkOpenTelemetryBackgroundExporter/Sources/**",
             dependencies: [
@@ -264,7 +265,7 @@ let project = Project(
         .target(
             name: "SplunkOpenTelemetry",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.opentelemetry",
             sources: "\(repoRoot)/SplunkOpenTelemetry/Sources/**",
             dependencies: [
@@ -284,7 +285,7 @@ let project = Project(
         .target(
             name: "SplunkInteractions",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.interactions",
             sources: "\(repoRoot)/SplunkInteractions/Sources/**",
             dependencies: [
@@ -305,7 +306,7 @@ let project = Project(
         .target(
             name: "SplunkAppStart",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.appstart",
             sources: "\(repoRoot)/SplunkAppStart/Sources/**",
             dependencies: [
@@ -323,7 +324,7 @@ let project = Project(
         .target(
             name: "SplunkAppState",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.appstate",
             sources: "\(repoRoot)/SplunkAppState/Sources/**",
             dependencies: [
@@ -342,12 +343,9 @@ let project = Project(
         .target(
             name: "SplunkWebView",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.webview",
             sources: "\(repoRoot)/SplunkWebView/Sources/**",
-            resources: [
-                .glob(pattern: "\(repoRoot)/SplunkWebView/Resources/**")
-            ],
             dependencies: [
                 mod("SplunkCommon"),
                 dep("CiscoLogger")
@@ -362,7 +360,7 @@ let project = Project(
         .target(
             name: "SplunkCustomTracking",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.customtracking",
             sources: "\(repoRoot)/SplunkCustomTracking/Sources/**",
             dependencies: [
@@ -381,7 +379,7 @@ let project = Project(
         .target(
             name: "SplunkSessionReplayProxy",
             destinations: allPlatforms,
-            product: .framework,
+            product: .staticFramework,
             bundleId: "com.splunk.rum.sessionreplayproxy",
             sources: "\(repoRoot)/SplunkSessionReplayProxy/Sources/**",
             dependencies: [
@@ -417,7 +415,8 @@ let project = Project(
             sources: "\(repoRoot)/SplunkAgent/Sources/SplunkAgent/**",
             resources: [
                 .glob(pattern: "\(repoRoot)/SplunkAgent/Resources/PrivacyInfo.xcprivacy"),
-                .glob(pattern: "\(repoRoot)/SplunkAgent/Resources/NOTICES")
+                .glob(pattern: "\(repoRoot)/SplunkAgent/Resources/NOTICES"),
+                .glob(pattern: "\(repoRoot)/SplunkWebView/Resources/WebViewBridgeScript.js")
             ],
             dependencies: [
                 mod("SplunkCommon"),
@@ -434,10 +433,19 @@ let project = Project(
                 mod("SplunkCustomTracking"),
                 dep("OpenTelemetryApi"),
                 dep("OpenTelemetrySdk"),
+                dep("CiscoCommon"),
+                dep("CiscoDiskStorage"),
+                dep("CiscoEncryption"),
+                dep("CiscoSwizzling"),
+                dep("CiscoInteractions"),
+                dep("CiscoSessionReplay"),
+                dep("CiscoInstanceManager"),
+                dep("CiscoRuntimeCache"),
                 dep("CiscoLogger"),
 
                 // Conditional: only on platforms where PLCrashReporter is available
-                mod("SplunkCrashReports", condition: noCrashReporterCondition)
+                mod("SplunkCrashReports", condition: noCrashReporterCondition),
+                dep("CrashReporter", condition: noCrashReporterCondition)
             ]
         ),
 
@@ -458,15 +466,7 @@ let project = Project(
             ],
             dependencies: [
                 mod("SplunkAgent"),
-                mod("SplunkCommon"),
-                mod("SplunkInteractions"),
-                mod("SplunkNavigation"),
-                mod("SplunkNetworkMonitor"),
-                mod("SplunkSlowFrameDetector"),
-
-                // Conditional: needed for CrashReportsConfigurationObjC+Conversions.swift
-                // which uses #if canImport(SplunkCrashReports) to bridge config types.
-                mod("SplunkCrashReports", condition: noCrashReporterCondition)
+                dep("OpenTelemetryApi")
             ]
         )
     ]

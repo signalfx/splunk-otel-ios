@@ -18,4 +18,8 @@ limitations under the License.
 import SplunkCommon
 
 /// WebView instrumentation module configuration, minimal configuration for module conformance.
-public struct WebViewInstrumentationConfiguration: ModuleConfiguration {}
+public struct WebViewInstrumentationConfiguration: ModuleConfiguration {
+
+    /// Initializes a new configuration.
+    public init() {}
+}

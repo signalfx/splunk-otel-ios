@@ -16,14 +16,13 @@ limitations under the License.
 */
 
 import Foundation
-internal import SplunkCommon
-internal import SplunkNetworkMonitor
+import SplunkAgent
 
 extension NetworkMonitorConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 
-    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
+    var moduleConfiguration: Any {
         NetworkMonitorConfiguration(isEnabled: isEnabled)
     }
 }

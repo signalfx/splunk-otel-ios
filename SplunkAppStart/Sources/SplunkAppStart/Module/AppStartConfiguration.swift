@@ -19,4 +19,8 @@ import Foundation
 import SplunkCommon
 
 /// AppStart module configuration, minimal configuration for module conformance.
-public struct AppStartConfiguration: ModuleConfiguration {}
+public struct AppStartConfiguration: ModuleConfiguration {
+
+    /// Initializes a new configuration.
+    public init() {}
+}

@@ -7,6 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Added public `SplunkAgent` module configuration wrappers so binary customers can configure Navigation, Network, Network Monitor, Slow Frame Detector, Crash Reporting, Session Replay, Interactions, WebView, App Start, App State, and Custom Tracking with only `import SplunkAgent`.
+
+### Changed
+
+* Changed the xcframework distribution to ship a monolithic `SplunkAgent.xcframework` plus `SplunkAgentObjC.xcframework`, `OpenTelemetryApi.xcframework`, `OpenTelemetrySdk.xcframework`, and `CrashReporter.xcframework`. Internal `Splunk*` and `Cisco*` modules are now statically linked into `SplunkAgent` and are no longer shipped as importable xcframeworks.
+
 ## [2.2.2] - 2026-04-15
 
 ### Added
@@ -235,4 +243,3 @@ This is a first major stable release of the new Splunk OpenTelemetry Agent.
 ### Deprecated
 
 * Deprecates the use of SplunkRum.initialize. Use the SplunkRumBuilder going forward.
-

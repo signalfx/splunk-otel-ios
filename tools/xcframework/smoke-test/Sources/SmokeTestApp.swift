@@ -8,22 +8,15 @@
 // This is NOT a unit test -- it's a build-time verification that all
 // modules resolve and link correctly when consumed as xcframeworks.
 
-// Each import below proves the corresponding xcframework is found by the
-// linker and the Swift module interface resolves correctly.
-
-import CiscoDiskStorage
-import CiscoEncryption
-import CiscoInstanceManager
-import CiscoInteractions
-import CiscoLogger
-import CiscoRuntimeCache
-import CiscoSessionReplay
-import CiscoSwizzling
-import CrashReporter
 import OpenTelemetryApi
 import OpenTelemetrySdk
 import SplunkAgent
+import SplunkAgentObjC
 import SwiftUI
+
+#if canImport(CrashReporter)
+    import CrashReporter
+#endif
 
 
 // ---------------------------------------------------------------------------
@@ -60,17 +53,51 @@ enum SmokeTestRunner {
             results.append("FAIL: AgentConfiguration.appName mismatch")
         }
 
-        // Check 3: OpenTelemetry API types are accessible
+        // Check 3: Public SplunkAgent module configuration wrappers are accessible
+        let moduleConfigurations: [Any] = [
+            NavigationConfiguration(isEnabled: true, enableAutomatedTracking: false),
+            NetworkInstrumentationConfiguration(isEnabled: true, ignoreURLs: nil),
+            NetworkMonitorConfiguration(isEnabled: true),
+            SlowFrameDetectorConfiguration(isEnabled: true),
+            CrashReportsConfiguration(isEnabled: true),
+            SessionReplayConfiguration(enabled: false, samplingRate: 0.0),
+            InteractionsConfiguration(isEnabled: true),
+            WebViewInstrumentationConfiguration(),
+            AppStartConfiguration(),
+            AppStateConfiguration(),
+            CustomTrackingConfiguration()
+        ]
+        if moduleConfigurations.count == 11 {
+            results.append("PASS: SplunkAgent module configurations accessible")
+        }
+        else {
+            results.append("FAIL: SplunkAgent module configuration count mismatch")
+        }
+
+        // Check 4: SplunkAgentObjC public configuration types are accessible
+        let objcConfiguration = NavigationConfigurationObjC(isEnabled: true, enableAutomatedTracking: false)
+        if objcConfiguration.isEnabled {
+            results.append("PASS: SplunkAgentObjC types accessible")
+        }
+        else {
+            results.append("FAIL: SplunkAgentObjC configuration mismatch")
+        }
+
+        // Check 5: OpenTelemetry API types are accessible
         let _ = SpanKind.client
         results.append("PASS: OpenTelemetryApi types accessible (SpanKind)")
 
-        // Check 4: OpenTelemetry SDK types are accessible
+        // Check 6: OpenTelemetry SDK types are accessible
         let _ = SpanLimits()
         results.append("PASS: OpenTelemetrySdk types accessible (SpanLimits)")
 
-        // Check 5: PLCrashReporter type is accessible
-        let _ = PLCrashReporterConfig.defaultConfiguration()
-        results.append("PASS: CrashReporter types accessible (PLCrashReporterConfig)")
+        // Check 7: PLCrashReporter is accessible only on supported platforms
+        #if canImport(CrashReporter)
+            let _ = PLCrashReporterConfig.defaultConfiguration()
+            results.append("PASS: CrashReporter types accessible (PLCrashReporterConfig)")
+        #else
+            results.append("PASS: CrashReporter unavailable on this platform")
+        #endif
 
         return results
     }

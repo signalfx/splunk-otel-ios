@@ -5,7 +5,7 @@ Build tooling for producing signed, multi-platform xcframeworks from the Splunk 
 ## Quick Start
 
 ```bash
-# Full build: OTel + PLCrash + Cisco download + Agent modules
+# Full build: OTel + PLCrash + Cisco static inputs + SplunkAgent
 make build
 
 # Validate all built xcframeworks
@@ -24,7 +24,7 @@ The `make build` target runs four stages in order:
 | 1 | `make build-otel` | Clones `opentelemetry-swift-core`, generates a Tuist project, and archives `OpenTelemetryApi` + `OpenTelemetrySdk` for all 7 platform slices |
 | 2 | `make build-plcrash` | Clones `PLCrashReporter`, builds it as a **dynamic** framework from source for iOS/tvOS/macCatalyst |
 | 3 | `make populate-deps` | Symlinks OTel + PLCrash outputs into `dependencies/`, downloads Cisco Session Replay xcframeworks from S3 |
-| 4 | `make build-agent` | Generates the main Tuist workspace and builds all 16 Splunk module xcframeworks |
+| 4 | `make build-agent` | Generates the main Tuist workspace and builds `SplunkAgent.xcframework` plus `SplunkAgentObjC.xcframework` |
 
 ### Output
 
@@ -36,31 +36,16 @@ output/xcframeworks/
 ├── OpenTelemetrySdk.xcframework
 ├── CrashReporter.xcframework
 ├── SplunkAgent.xcframework
-├── SplunkAgentObjC.xcframework
-├── SplunkCommon.xcframework
-├── SplunkNavigation.xcframework
-├── SplunkNetwork.xcframework
-├── SplunkNetworkMonitor.xcframework
-├── SplunkSlowFrameDetector.xcframework
-├── SplunkCrashReports.xcframework
-├── SplunkOpenTelemetry.xcframework
-├── SplunkOpenTelemetryBackgroundExporter.xcframework
-├── SplunkInteractions.xcframework
-├── SplunkAppStart.xcframework
-├── SplunkAppState.xcframework
-├── SplunkWebView.xcframework
-├── SplunkCustomTracking.xcframework
-└── SplunkSessionReplayProxy.xcframework
+└── SplunkAgentObjC.xcframework
 ```
 
-Cisco Session Replay xcframeworks are downloaded into `dependencies/` and are **not** rebuilt (they are pre-built by the Session Replay team).
+Cisco Session Replay xcframeworks are downloaded into `dependencies/` and linked statically into `SplunkAgent.xcframework`. They are not shipped as standalone artifacts.
 
 ### Platform Matrix
 
 | Module | iOS | tvOS | visionOS | macCatalyst |
 |--------|-----|------|----------|-------------|
-| Most modules | arm64 | arm64 | arm64 | arm64 |
-| SplunkCrashReports | arm64 | arm64 | -- | arm64 |
+| SplunkAgent / SplunkAgentObjC | arm64 | arm64 | arm64 | arm64 |
 | OpenTelemetryApi/Sdk | arm64 | arm64 | arm64 | arm64+x86_64 |
 | CrashReporter | arm64 | arm64 | -- | arm64+x86_64 |
 
@@ -89,7 +74,7 @@ Releasing xcframeworks is a two-part process: CI builds the unsigned artifacts, 
 1. A developer triggers `release.yml` with a version and ticket ID.
 2. The release PR is reviewed and merged to `main`.
 3. `merge_release.yml` runs automatically — creates a git tag and a GitHub Release.
-4. `build-xcframeworks.yml` triggers on the release event — builds all xcframeworks, validates them, runs a smoke test, snapshots the Cisco binary target inputs into `cisco-release-manifest.txt`, and uploads an **unsigned** artifact.
+4. `build-xcframeworks.yml` triggers on the release event, builds the five shipped xcframeworks, validates them, runs a clean consumer smoke test, and uploads an **unsigned** artifact.
 5. A developer downloads the unsigned artifact, signs locally, and uploads the signed zip to the release.
 
 > **Note:** Automated CI signing (Job 2 in `build-xcframeworks.yml`) is temporarily disabled because distribution certificates cannot be stored in GitHub secrets. The implementation is preserved and can be re-enabled by setting the `SIGNING_ENABLED` repository variable to `"true"`.
@@ -106,14 +91,9 @@ After CI finishes the build (step 4 above), run the convenience script:
 The script will:
 - Auto-detect your signing identity from the local keychain
 - Download the unsigned artifact from the latest CI run
-- Refresh `Cisco*.xcframework` bundles from the artifact's `cisco-release-manifest.txt`
-- Sign all non-Cisco xcframeworks
+- Sign all shipped xcframeworks
 - Validate signatures for all shipped xcframeworks
 - Package and upload the zip to the existing GitHub release
-
-The unsigned artifact is expected to contain `cisco-release-manifest.txt`. The refresh step uses that manifest automatically so manual signing remains reproducible even if `Package.swift` has changed since the CI build was produced.
-
-> **Note:** Older unsigned artifacts created before the manifest was added are not compatible with this refreshed signing flow. In that case, rebuild the unsigned artifact from CI instead of signing the old one.
 
 #### Options
 
@@ -133,6 +113,21 @@ The unsigned artifact is expected to contain `cisco-release-manifest.txt`. The r
 - Apple distribution certificate installed in your local keychain
 - `gh` CLI installed and authenticated (`brew install gh && gh auth login`)
 
+### Fully local build and package
+
+To bypass GitHub Actions, run the same stages locally:
+
+```bash
+make build
+make validate
+make smoke-test
+make sign SIGNING_IDENTITY="Apple Distribution: Splunk Inc. (TEAMID)"
+make validate RELEASE=true
+./scripts/release.sh 1.2.0
+```
+
+The resulting zip is written to `output/SplunkAgent-XCFrameworks-1.2.0.zip` and can be uploaded to a GitHub Release manually.
+
 ### Manual step-by-step (alternative)
 
 If you prefer to run each step individually:
@@ -147,16 +142,13 @@ gh run download <RUN_ID> -n splunk-agent-xcframeworks-unsigned -D tools/xcframew
 # 3. Find your signing identity
 security find-identity -v -p codesigning
 
-# 4. Refresh Cisco xcframeworks from the artifact manifest
-./scripts/refresh-cisco-xcframeworks.sh --output-dir output/xcframeworks
-
-# 5. Sign non-Cisco xcframeworks
+# 4. Sign shipped xcframeworks
 ./scripts/sign-xcframeworks.sh "Apple Distribution: Splunk Inc. (TEAMID)"
 
-# 6. Validate all signatures
+# 5. Validate all signatures
 RELEASE=true ./scripts/validate-xcframeworks.sh
 
-# 7. Package and upload to the existing release
+# 6. Package and upload to the existing release
 ./scripts/release.sh 1.2.0 --upload-to 1.2.0
 ```
 
@@ -194,37 +186,16 @@ try SplunkRum.initialize(with: config)
 
 ### Required Frameworks
 
-At a minimum, you need these frameworks:
+Swift applications need these frameworks:
 
 | Framework | Purpose |
 |-----------|---------|
-| `SplunkAgent.xcframework` | Main SDK and public API |
-| `SplunkCommon.xcframework` | Shared types and protocols |
-| `SplunkOpenTelemetry.xcframework` | OpenTelemetry integration |
-| `SplunkOpenTelemetryBackgroundExporter.xcframework` | OTLP export with background support |
+| `SplunkAgent.xcframework` | Main SDK and public API with Splunk and Cisco modules statically linked |
 | `OpenTelemetryApi.xcframework` | OpenTelemetry API |
 | `OpenTelemetrySdk.xcframework` | OpenTelemetry SDK |
-| `CiscoLogger.xcframework` | Logging infrastructure |
-| `CiscoDiskStorage.xcframework` | Persistent storage |
-| `CiscoEncryption.xcframework` | Data encryption |
+| `CrashReporter.xcframework` | Crash reporter dependency for non-visionOS targets |
 
-### Optional Instrumentation Frameworks
-
-Add these based on which instrumentation you need:
-
-| Framework | What it tracks |
-|-----------|---------------|
-| `SplunkNavigation.xcframework` | Screen view changes |
-| `SplunkNetwork.xcframework` | HTTP requests via URLSession |
-| `SplunkNetworkMonitor.xcframework` | Network connectivity status |
-| `SplunkCrashReports.xcframework` | Crash reports (+ `CrashReporter.xcframework`) |
-| `SplunkInteractions.xcframework` | UI taps and gestures |
-| `SplunkAppStart.xcframework` | App launch timing |
-| `SplunkAppState.xcframework` | Foreground/background transitions |
-| `SplunkWebView.xcframework` | WKWebView bridge |
-| `SplunkSlowFrameDetector.xcframework` | Slow/frozen frame detection |
-| `SplunkCustomTracking.xcframework` | Custom events and workflows |
-| `SplunkSessionReplayProxy.xcframework` | Session Replay (+ all `Cisco*.xcframework`) |
+Do not add internal `Splunk*.xcframework` module artifacts or `Cisco*.xcframework` artifacts to binary customer applications.
 
 ### Objective-C Support
 
@@ -232,7 +203,7 @@ For Objective-C projects, also include `SplunkAgentObjC.xcframework` and use the
 
 ### visionOS Note
 
-`SplunkCrashReports.xcframework` and `CrashReporter.xcframework` do **not** support visionOS. Crash reporting is automatically disabled on that platform. All other modules work on visionOS.
+`CrashReporter.xcframework` does **not** support visionOS. Do not link it into visionOS applications; crash reporting is automatically unavailable on that platform.
 
 ---
 

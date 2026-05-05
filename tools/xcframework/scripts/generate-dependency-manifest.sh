@@ -1,9 +1,8 @@
 #!/bin/bash
 # tools/xcframework/scripts/generate-dependency-manifest.sh
 #
-# Generates dependency-manifest.json that maps each product to its
-# required xcframeworks. This helps customers know which xcframeworks
-# they need to include in their project.
+# Generates dependency-manifest.json that maps each product to the five
+# shipped xcframeworks customers need to include in their project.
 #
 # The manifest is generated from the actual build output, not hardcoded,
 # ensuring it's always accurate.
@@ -41,18 +40,21 @@ log "Generating dependency manifest (version: ${VERSION})"
 # Ensure output directory exists
 mkdir -p "${OUTPUT_DIR}"
 
-# Collect all xcframeworks in output directory
-ALL_XCFRAMEWORKS=()
-for xcfw in "${XCFW_DIR}"/*.xcframework; do
-    [[ -d "${xcfw}" ]] || continue
-    ALL_XCFRAMEWORKS+=("$(basename "${xcfw}")")
-done
+ALL_XCFRAMEWORKS=(
+    "SplunkAgent.xcframework"
+    "SplunkAgentObjC.xcframework"
+    "OpenTelemetryApi.xcframework"
+    "OpenTelemetrySdk.xcframework"
+    "CrashReporter.xcframework"
+)
 
-if [[ ${#ALL_XCFRAMEWORKS[@]} -eq 0 ]]; then
-    echo "ERROR: No xcframeworks found in ${XCFW_DIR}"
-    echo "  Build xcframeworks before generating the manifest."
-    exit 1
-fi
+for xcfw in "${ALL_XCFRAMEWORKS[@]}"; do
+    if [[ ! -d "${XCFW_DIR}/${xcfw}" ]]; then
+        echo "ERROR: Expected xcframework not found in ${XCFW_DIR}: ${xcfw}"
+        echo "  Build and validate xcframeworks before generating the manifest."
+        exit 1
+    fi
+done
 
 # Write JSON manifest
 cat > "${MANIFEST_PATH}" << JSONEOF
@@ -61,40 +63,18 @@ cat > "${MANIFEST_PATH}" << JSONEOF
   "generatedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "products": {
     "SplunkAgent": {
-      "description": "Full SplunkAgent SDK with all instrumentation modules.",
+      "description": "Full SplunkAgent SDK with all Splunk and Cisco instrumentation modules statically linked into SplunkAgent.",
       "frameworks": [
         "SplunkAgent.xcframework",
         "SplunkAgentObjC.xcframework",
-        "SplunkCommon.xcframework",
-        "SplunkNavigation.xcframework",
-        "SplunkNetwork.xcframework",
-        "SplunkNetworkMonitor.xcframework",
-        "SplunkSlowFrameDetector.xcframework",
-        "SplunkCrashReports.xcframework",
-        "SplunkOpenTelemetry.xcframework",
-        "SplunkOpenTelemetryBackgroundExporter.xcframework",
-        "SplunkInteractions.xcframework",
-        "SplunkAppStart.xcframework",
-        "SplunkAppState.xcframework",
-        "SplunkWebView.xcframework",
-        "SplunkCustomTracking.xcframework",
-        "SplunkSessionReplayProxy.xcframework",
         "OpenTelemetryApi.xcframework",
         "OpenTelemetrySdk.xcframework",
-        "CrashReporter.xcframework",
-        "CiscoCommon.xcframework",
-        "CiscoLogger.xcframework",
-        "CiscoEncryption.xcframework",
-        "CiscoSwizzling.xcframework",
-        "CiscoInteractions.xcframework",
-        "CiscoDiskStorage.xcframework",
-        "CiscoSessionReplay.xcframework",
-        "CiscoInstanceManager.xcframework",
-        "CiscoRuntimeCache.xcframework"
+        "CrashReporter.xcframework"
       ],
       "notes": [
-        "All frameworks are required for full SplunkAgent functionality.",
-        "SplunkCrashReports.xcframework and CrashReporter.xcframework do NOT support visionOS.",
+        "Cisco and internal Splunk modules are not shipped as importable frameworks.",
+        "Binary Swift customers import only SplunkAgent for SDK configuration.",
+        "CrashReporter.xcframework does NOT support visionOS and should not be linked by visionOS applications.",
         "SplunkAgentObjC.xcframework is only needed for Objective-C API access."
       ]
     },
@@ -107,10 +87,6 @@ cat > "${MANIFEST_PATH}" << JSONEOF
     }
   },
   "platformRestrictions": {
-    "SplunkCrashReports.xcframework": {
-      "excludes": ["visionOS"],
-      "reason": "PLCrashReporter does not support visionOS"
-    },
     "CrashReporter.xcframework": {
       "excludes": ["visionOS"],
       "reason": "PLCrashReporter does not support visionOS"

@@ -43,7 +43,7 @@ final class API10DeferredEndpointTests: XCTestCase {
     func testSessionReplayOperationalAtInstallEvenWithoutEndpoint() throws {
         let configuration = buildConfigurationWithoutEndpoint()
         let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
+            SplunkAgent.SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
         ]
 
         let installedAgent = try SplunkRum.install(
@@ -61,7 +61,7 @@ final class API10DeferredEndpointTests: XCTestCase {
     func testSessionReplayNonOperationalWhenDisabledByConfiguration() throws {
         let configuration = buildConfigurationWithoutEndpoint()
         let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: false, samplingRate: 1.0)
+            SplunkAgent.SessionReplayConfiguration(enabled: false, samplingRate: 1.0)
         ]
 
         let installedAgent = try SplunkRum.install(
@@ -87,7 +87,7 @@ final class API10DeferredEndpointTests: XCTestCase {
     func testSessionReplayNonOperationalWhenSampledOut() throws {
         let configuration = buildConfigurationWithoutEndpoint()
         let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: true, samplingRate: 0.0)
+            SplunkAgent.SessionReplayConfiguration(enabled: true, samplingRate: 0.0)
         ]
 
         let installedAgent = try SplunkRum.install(
@@ -113,7 +113,7 @@ final class API10DeferredEndpointTests: XCTestCase {
     func testSessionReplayRemainsOperationalAfterEndpointUpdate() throws {
         let configuration = buildConfigurationWithoutEndpoint()
         let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
+            SplunkAgent.SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
         ]
 
         let installedAgent = try SplunkRum.install(
@@ -138,7 +138,7 @@ final class API10DeferredEndpointTests: XCTestCase {
     func testSessionReplayRemainsOperationalWithTraceOnlyEndpoint() throws {
         let configuration = buildConfigurationWithoutEndpoint()
         let moduleConfigurations: [Any] = [
-            SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
+            SplunkAgent.SessionReplayConfiguration(enabled: true, samplingRate: 1.0)
         ]
 
         let installedAgent = try SplunkRum.install(

@@ -18,7 +18,6 @@ You can provide an `NSRegularExpression` to ignore certain URL patterns during i
 
 ```swift
 import SplunkAgent
-import SplunkNetwork // Required for the configuration type
 
 // Ignore requests to 'api.internal.com'
 let ignoreRegex = try! NSRegularExpression(pattern: "api\\.internal\\.com")

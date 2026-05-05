@@ -92,7 +92,7 @@ extension SplunkRum {
 
         sessionReplayDecisionMade = true
 
-        let config = moduleConfigurations?.compactMap { $0 as? SessionReplayConfiguration }.first ?? SessionReplayConfiguration()
+        let config = moduleConfigurations?.compactMap { $0 as? SplunkSessionReplayProxy.SessionReplayConfiguration }.first ?? SplunkSessionReplayProxy.SessionReplayConfiguration()
         let effectiveSamplingRate = resolvedSamplingRate(from: config)
 
         guard config.enabled else {
@@ -129,7 +129,7 @@ extension SplunkRum {
         sessionReplayProxy = SessionReplay(for: sessionReplayModule, samplingRate: effectiveSamplingRate)
     }
 
-    private func resolvedSamplingRate(from config: SessionReplayConfiguration) -> Double {
+    private func resolvedSamplingRate(from config: SplunkSessionReplayProxy.SessionReplayConfiguration) -> Double {
         let configured = config.samplingRate ?? 1.0
         let sanitized = configured.isFinite ? configured : 1.0
         let effective = min(max(sanitized, 0.0), 1.0)

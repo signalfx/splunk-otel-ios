@@ -1,12 +1,12 @@
 #!/bin/bash
 # tools/xcframework/scripts/run-smoke-test.sh
 #
-# Builds the XCFramework smoke test app to verify all built xcframeworks
-# can be linked and basic types are accessible.
+# Builds the XCFramework smoke test app to verify a clean consumer can link
+# using only shipped xcframeworks.
 #
 # This script:
 #   1. Generates the Tuist project for the smoke test
-#   2. Builds for iOS Simulator
+#   2. Builds for iOS, tvOS, Mac Catalyst, and visionOS
 #   3. Reports success/failure
 #
 # Prerequisites:
@@ -48,12 +48,10 @@ log_step "Step 1: Verify xcframeworks exist"
 
 REQUIRED_FRAMEWORKS=(
     "SplunkAgent"
-    "SplunkCommon"
+    "SplunkAgentObjC"
     "OpenTelemetryApi"
     "OpenTelemetrySdk"
     "CrashReporter"
-    "CiscoLogger"
-    "CiscoSessionReplay"
 )
 
 ALL_PRESENT=true
@@ -90,30 +88,46 @@ log "Xcode project generated"
 
 
 # ---------------------------------------------------------------------------
-# Step 3: Build for iOS Simulator
+# Step 3: Build clean consumer matrix
 # ---------------------------------------------------------------------------
 
-log_step "Step 3: Build smoke test app for iOS Simulator"
+log_step "Step 3: Build smoke test app for supported platforms"
 
-# Resolve a simulator destination
-DESTINATION="generic/platform=iOS Simulator"
+DESTINATIONS=(
+    "iOS Simulator|generic/platform=iOS Simulator"
+    "tvOS Simulator|generic/platform=tvOS Simulator"
+    "Mac Catalyst|generic/platform=macOS,variant=Mac Catalyst"
+    "visionOS Simulator|generic/platform=visionOS Simulator"
+)
 
-xcodebuild build \
-    -workspace "${SMOKE_TEST_DIR}/XCFrameworkSmokeTest.xcworkspace" \
-    -scheme "XCFrameworkSmokeTest" \
-    -destination "${DESTINATION}" \
-    -configuration Debug \
-    CODE_SIGN_IDENTITY="" \
-    CODE_SIGNING_REQUIRED=NO \
-    2>&1 | tail -20
+for destination_entry in "${DESTINATIONS[@]}"; do
+    label="${destination_entry%%|*}"
+    destination="${destination_entry#*|}"
 
-BUILD_EXIT=$?
+    echo "  Building ${label}..."
+    arch_override=""
+    if [[ "${label}" == "Mac Catalyst" ]]; then
+        arch_override="ARCHS=arm64"
+    fi
 
-if [[ ${BUILD_EXIT} -ne 0 ]]; then
-    echo ""
-    echo "ERROR: Smoke test build FAILED"
-    exit 1
-fi
+    xcodebuild build \
+        -workspace "${SMOKE_TEST_DIR}/XCFrameworkSmokeTest.xcworkspace" \
+        -scheme "XCFrameworkSmokeTest" \
+        -destination "${destination}" \
+        -configuration Debug \
+        CODE_SIGN_IDENTITY="" \
+        CODE_SIGNING_REQUIRED=NO \
+        ${arch_override} \
+        2>&1 | tail -20
+
+    BUILD_EXIT=$?
+
+    if [[ ${BUILD_EXIT} -ne 0 ]]; then
+        echo ""
+        echo "ERROR: Smoke test build FAILED for ${label}"
+        exit 1
+    fi
+done
 
 
 # ---------------------------------------------------------------------------
@@ -124,6 +138,6 @@ log_step "Smoke test passed"
 
 echo "All xcframeworks linked successfully."
 echo "Frameworks verified:"
-for fw in "${XCFW_DIR}"/*.xcframework; do
-    echo "  ✓ $(basename "${fw}")"
+for fw in "${REQUIRED_FRAMEWORKS[@]}"; do
+    echo "  ✓ ${fw}.xcframework"
 done

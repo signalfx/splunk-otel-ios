@@ -117,11 +117,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkAgentObjC",
             dependencies: [
                 "SplunkAgent",
-                "SplunkCommon",
-                "SplunkInteractions",
-                "SplunkNavigation",
-                "SplunkNetworkMonitor",
-                "SplunkSlowFrameDetector"
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core")
             ],
             path: "SplunkAgent/Sources/SplunkAgentObjC",
             resources: [

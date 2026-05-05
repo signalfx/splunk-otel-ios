@@ -1,9 +1,9 @@
 #!/bin/bash
 # tools/xcframework/scripts/sign-and-upload.sh
 #
-# Local signing workflow: downloads unsigned xcframeworks from CI,
-# signs them with a local certificate, validates, packages, and
-# uploads to an existing GitHub release.
+# Local signing workflow: downloads unsigned xcframeworks from CI, signs them
+# with a local certificate, validates, packages, and uploads to an existing
+# GitHub release.
 #
 # This is a temporary replacement for the automated CI signing job
 # (Job 2 in build-xcframeworks.yml) while distribution certificates
@@ -60,13 +60,6 @@ done
 log() {
     echo ""
     echo "==> $*"
-}
-
-manifest_metadata_value() {
-    local key="$1"
-    local manifest_path="$2"
-
-    awk -F= -v key="${key}" '$1 == key { print substr($0, index($0, "=") + 1); exit }' "${manifest_path}"
 }
 
 # ---------------------------------------------------------------------------
@@ -161,19 +154,6 @@ fi
 echo "  ✓ Downloaded ${XCFW_COUNT} xcframeworks"
 
 # ---------------------------------------------------------------------------
-# Step 2b: Refresh Cisco xcframeworks from source (default)
-# ---------------------------------------------------------------------------
-# Cisco frameworks are pre-built external artifacts. Refreshing them from
-# source ensures we package untouched vendor binaries/signatures.
-"${SCRIPT_DIR}/refresh-cisco-xcframeworks.sh" --output-dir "${OUTPUT_DIR}"
-
-CISCO_MANIFEST_PATH="${OUTPUT_DIR}/cisco-release-manifest.txt"
-CISCO_SOURCE_COMMIT=""
-if [[ -f "${CISCO_MANIFEST_PATH}" ]]; then
-    CISCO_SOURCE_COMMIT="$(manifest_metadata_value "source_commit" "${CISCO_MANIFEST_PATH}")"
-fi
-
-# ---------------------------------------------------------------------------
 # Step 3: Sign
 # ---------------------------------------------------------------------------
 
@@ -208,9 +188,6 @@ echo "============================================================"
 echo "  Version:   ${VERSION}"
 echo "  Identity:  ${SIGNING_IDENTITY}"
 echo "  CI Run:    ${RUN_ID}"
-if [[ -n "${CISCO_SOURCE_COMMIT}" ]]; then
-    echo "  Cisco:     ${CISCO_SOURCE_COMMIT}"
-fi
 if [[ "${SKIP_UPLOAD}" == "true" ]]; then
     echo "  Upload:    skipped (use without --skip-upload to upload)"
 else

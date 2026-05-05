@@ -15,14 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkCommon
-internal import SplunkNavigation
+import SplunkAgent
 
 extension NavigationConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 
-    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
+    var moduleConfiguration: Any {
         NavigationConfiguration(
             isEnabled: isEnabled,
             enableAutomatedTracking: enableAutomatedTracking

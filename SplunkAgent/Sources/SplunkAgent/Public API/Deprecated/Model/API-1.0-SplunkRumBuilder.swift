@@ -18,9 +18,6 @@ limitations under the License.
 internal import CiscoLogger
 import Foundation
 internal import SplunkCommon
-internal import SplunkNavigation
-internal import SplunkNetwork
-internal import SplunkSlowFrameDetector
 
 /// A deprecated builder for initializing the RUM agent.
 @available(
@@ -337,23 +334,21 @@ public class SplunkRumBuilder {
         }
 
         // Construct module configurations
-        var moduleConfigurations: [ModuleConfiguration] = []
+        var moduleConfigurations: [Any] = []
 
         // Navigation
-        let navigationModuleConfiguration = SplunkNavigation.NavigationConfiguration(
+        let navigationModuleConfiguration = NavigationConfiguration(
             isEnabled: screenNameSpans,
             enableAutomatedTracking: showVCInstrumentation
         )
         moduleConfigurations.append(navigationModuleConfiguration)
 
         // SlowFrameDetector
-        let slowFrameDetectorConfiguration = SlowFrameDetectorConfiguration(
-            isEnabled: slowRenderingDetectionEnabled
-        )
+        let slowFrameDetectorConfiguration = SlowFrameDetectorConfiguration(isEnabled: slowRenderingDetectionEnabled)
         moduleConfigurations.append(slowFrameDetectorConfiguration)
 
         // Network
-        let networkModuleConfiguration = SplunkNetwork.NetworkInstrumentationConfiguration(
+        let networkModuleConfiguration = NetworkInstrumentationConfiguration(
             isEnabled: networkInstrumentation,
             ignoreURLs: IgnoreURLs(containing: ignoreURLs)
         )

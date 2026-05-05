@@ -1,9 +1,9 @@
 #!/bin/bash
 # tools/xcframework/scripts/build-xcframeworks.sh
 #
-# Builds all SplunkAgent module xcframeworks using the Tuist-generated
-# Xcode project. Archives each scheme for each platform in its platform
-# matrix, then creates xcframeworks from the archives.
+# Builds the shipped SplunkAgent xcframeworks using the Tuist-generated
+# Xcode project. Internal Splunk modules are static target dependencies of
+# SplunkAgent and are not emitted as separate xcframeworks.
 #
 # Prerequisites:
 #   - `tuist generate` has been run (or will be run by this script)
@@ -11,7 +11,8 @@
 #   - Xcode 16+ with command-line tools
 #
 # Output:
-#   output/xcframeworks/<ModuleName>.xcframework for each module
+#   output/xcframeworks/SplunkAgent.xcframework
+#   output/xcframeworks/SplunkAgentObjC.xcframework
 
 set -euo pipefail
 
@@ -47,56 +48,18 @@ ALL_PLATFORMS=(
     "maccatalyst|generic/platform=macOS,variant=Mac Catalyst"
 )
 
-# Platforms excluding visionOS (5 destinations)
-# Used for SplunkCrashReports (PLCrashReporter does not support visionOS)
-NO_VISIONOS_PLATFORMS=(
-    "ios|generic/platform=iOS"
-    "ios-simulator|generic/platform=iOS Simulator"
-    "tvos|generic/platform=tvOS"
-    "tvos-simulator|generic/platform=tvOS Simulator"
-    "maccatalyst|generic/platform=macOS,variant=Mac Catalyst"
-)
-
-
 # ---------------------------------------------------------------------------
 # Module Definitions
 # ---------------------------------------------------------------------------
-# Each module with its platform matrix. Order matters: dependencies first.
-# Format: "scheme_name|platform_array_name"
-#
-# Build order follows the dependency graph:
-#   1. SplunkCommon (foundation for all)
-#   2. Standalone modules (depend on SplunkCommon + externals)
-#   3. SplunkOpenTelemetryBackgroundExporter (depends on SplunkCommon)
-#   4. SplunkOpenTelemetry (depends on BackgroundExporter)
-#   5. SplunkCustomTracking (depends on SplunkOpenTelemetry)
-#   6. SplunkAgent (depends on everything)
-#   7. SplunkAgentObjC (depends on SplunkAgent)
+# Only shipped Splunk xcframeworks are created. Xcode builds the internal
+# static module graph while archiving these schemes.
 
-# Build order (dependencies first) and platform matrix.
-# SplunkCrashReports uses NO_VISIONOS; all others use ALL.
 BUILD_ORDER=(
-    SplunkCommon
-    SplunkNavigation
-    SplunkNetwork
-    SplunkNetworkMonitor
-    SplunkSlowFrameDetector
-    SplunkCrashReports
-    SplunkOpenTelemetryBackgroundExporter
-    SplunkOpenTelemetry
-    SplunkInteractions
-    SplunkAppStart
-    SplunkAppState
-    SplunkWebView
-    SplunkCustomTracking
-    SplunkSessionReplayProxy
     SplunkAgent
     SplunkAgentObjC
 )
 
-# Modules that use restricted platforms (no visionOS).
-# All modules NOT listed here use ALL_PLATFORMS.
-NO_VISIONOS_MODULES="SplunkCrashReports"
+EXPECTED_OUTPUTS="SplunkAgent SplunkAgentObjC OpenTelemetryApi OpenTelemetrySdk CrashReporter"
 
 
 # ---------------------------------------------------------------------------
@@ -125,22 +88,47 @@ platform_destination() {
 # Returns the platform entries for a given module, one per line.
 # Uses string matching (bash 3.2 compatible, no associative arrays).
 get_platforms() {
-    local module="$1"
+    local _module="$1"
     local entries
 
-    # Check if module is in the no-visionOS list
-    case " ${NO_VISIONOS_MODULES} " in
-        *" ${module} "*)
-            entries=("${NO_VISIONOS_PLATFORMS[@]}")
-            ;;
-        *)
-            entries=("${ALL_PLATFORMS[@]}")
-            ;;
-    esac
+    entries=("${ALL_PLATFORMS[@]}")
 
     # Print one entry per line to avoid space-splitting issues
     # (destinations contain spaces, e.g. "generic/platform=iOS Simulator")
     printf '%s\n' "${entries[@]}"
+}
+
+is_expected_output() {
+    local name="$1"
+
+    case " ${EXPECTED_OUTPUTS} " in
+        *" ${name} "*)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+clean_unshipped_output_artifacts() {
+    log_step "Clean unshipped xcframework artifacts"
+
+    mkdir -p "${OUTPUT_DIR}"
+
+    for xcfw in "${OUTPUT_DIR}"/*.xcframework; do
+        [[ -d "${xcfw}" ]] || continue
+
+        local name
+        name="$(basename "${xcfw}" .xcframework)"
+
+        if is_expected_output "${name}"; then
+            continue
+        fi
+
+        rm -rf "${xcfw}"
+        echo "  Removed stale ${name}.xcframework"
+    done
 }
 
 
@@ -313,6 +301,7 @@ print_summary() {
 main() {
     log "Building SplunkAgent xcframeworks"
 
+    clean_unshipped_output_artifacts
     generate_project
     archive_all
     create_all_xcframeworks
