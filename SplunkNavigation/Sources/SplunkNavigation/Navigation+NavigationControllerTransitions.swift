@@ -183,17 +183,6 @@ extension Navigation {
         await processNavigationEnd(event: endEvent)
     }
 
-    private func updateCurrentScreen(typeName: String, start: Date) async {
-        let screenName = sanitize(typeName: typeName)
-        let lastScreenName = await model.screenName
-
-        await updateCurrentScreen(
-            screenName: screenName,
-            lastScreenName: lastScreenName,
-            start: start
-        )
-    }
-
     func updateCurrentScreen(
         screenName: String,
         lastScreenName: String,
@@ -201,7 +190,6 @@ extension Navigation {
         attributes: [String: Any]? = nil
     ) async {
         await model.update(screenName: screenName)
-        await model.update(isManualScreenName: false)
 
         if screenName != lastScreenName {
             continuation.yield(screenName)
