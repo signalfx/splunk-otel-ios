@@ -34,9 +34,9 @@ final class PrefixingProcessor: NavigationEventProcessor {
     }
 }
 
-final class RejectingProcessor: NavigationEventProcessor {
+final class NameOverridingProcessor: NavigationEventProcessor {
     func onViewController(typeName _: String, controllerIdentity _: String) -> NavigationEvent? {
-        NavigationEvent(name: "REJECTED")
+        NavigationEvent(name: "OverriddenName")
     }
 }
 
