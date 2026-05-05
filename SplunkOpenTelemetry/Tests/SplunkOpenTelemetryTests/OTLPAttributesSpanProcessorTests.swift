@@ -24,7 +24,7 @@ import Testing
 @testable import SplunkOpenTelemetry
 
 @Suite
-struct OLTPAttributesSpanProcessorTests {
+struct OTLPAttributesSpanProcessorTests {
 
     @Test
     func screenSpanDoesNotReceiveRuntimeScreenName() {

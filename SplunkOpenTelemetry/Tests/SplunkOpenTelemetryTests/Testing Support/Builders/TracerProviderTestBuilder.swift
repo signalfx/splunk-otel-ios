@@ -30,7 +30,7 @@ final class TracerProviderTestBuilder {
     ) -> any TracerProvider {
         TracerProviderBuilder()
             .add(
-                spanProcessor: OLTPAttributesSpanProcessor(
+                spanProcessor: OTLPAttributesSpanProcessor(
                     with: runtimeAttributes,
                     activityTracker: activityTracker
                 )
