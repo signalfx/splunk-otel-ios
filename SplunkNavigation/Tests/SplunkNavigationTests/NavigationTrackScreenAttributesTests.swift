@@ -22,34 +22,6 @@ import XCTest
 
 @testable import SplunkNavigation
 
-// MARK: - Span-collecting exporter
-
-private final class CollectingSpanExporter: SpanExporter {
-    private let lock = NSLock()
-    private var collected: [SpanData] = []
-
-    var spans: [SpanData] {
-        lock.withLock { collected }
-    }
-
-    func reset() {
-        lock.withLock { collected.removeAll() }
-    }
-
-    func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
-        lock.withLock { collected.append(contentsOf: spans) }
-        return .success
-    }
-
-    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
-        .success
-    }
-
-    func shutdown(explicitTimeout _: TimeInterval?) {}
-}
-
-// MARK: - Tests
-
 final class NavigationTrackScreenAttributesTests: XCTestCase {
 
     private var exporter = CollectingSpanExporter()
