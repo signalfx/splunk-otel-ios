@@ -23,7 +23,7 @@ import Foundation
 ///   - timeout: Maximum time to wait, in seconds. Defaults to 1.0.
 ///   - pollIntervalNanoseconds: Interval between polls. Defaults to 10 ms.
 ///   - condition: An async closure that returns `true` when the expected state is reached.
-/// - Returns: `true` if the condition was met before the timeout, `false` otherwise.
+/// - Returns: `true` if the condition was met, `false` if still unmet after timeout.
 @_spi(SplunkTesting)
 @discardableResult
 public func waitUntil(
@@ -41,5 +41,6 @@ public func waitUntil(
         try? await Task.sleep(nanoseconds: pollIntervalNanoseconds)
     }
 
+    // Grace check: condition may have satisfied during the final sleep interval.
     return await condition()
 }

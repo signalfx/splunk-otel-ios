@@ -19,6 +19,9 @@ import SplunkAgent
 
 /// Adapts an Objective-C ``NavigationEventProcessorObjC`` to the
 /// ``NavigationModuleEventProcessor`` protocol used by the agent facade.
+///
+/// - Note: We mark this class `@unchecked Sendable` because it is immutable after
+///   init; the single stored property is a private let and is never mutated.
 final class NavEventProcessorObjCToAgentAdapter: NavigationModuleEventProcessor, @unchecked Sendable {
 
     // MARK: - Private

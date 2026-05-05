@@ -96,7 +96,7 @@ final class NavigationEventProcessorTests: XCTestCase {
 
     func testManualTrackBypassesProcessor() async {
         let fixture = makeNavigationStreamFixture(
-            navigationEventProcessor: RejectingProcessor()
+            navigationEventProcessor: NameOverridingProcessor()
         )
 
         defer {
