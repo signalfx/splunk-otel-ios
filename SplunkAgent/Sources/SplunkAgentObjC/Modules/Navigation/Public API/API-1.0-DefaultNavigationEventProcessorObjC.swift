@@ -36,12 +36,8 @@ public final class DefaultNavigationEventProcessorObjC: NSObject, NavigationEven
 
     // MARK: - Processor methods
 
-    /// Returns a navigation event using the sanitized controller type name as the screen name.
-    ///
-    /// - Parameters:
-    ///   - typeName: The sanitized view controller type name.
-    ///   - controllerIdentity: A unique identifier for the view controller instance.
-    /// - Returns: A ``NavigationEventObjC`` with `name` set to `typeName` and no custom attributes.
+    /// Returns a navigation event using the sanitized controller type name as the screen name,
+    /// with no custom attributes.
     @objc(onViewControllerWithTypeName:controllerIdentity:)
     public func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEventObjC? {
         NavigationEventObjC(name: typeName)
