@@ -39,7 +39,7 @@ extension Navigation {
             .tracerProvider
             .get(
                 instrumentationName: "splunk-navigation-detection",
-                instrumentationVersion: sharedState?.agentVersion
+                instrumentationVersion: agentVersion
             )
     }
 

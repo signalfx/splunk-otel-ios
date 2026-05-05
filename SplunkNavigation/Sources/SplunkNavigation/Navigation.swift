@@ -46,7 +46,11 @@ public final class Navigation: Sendable {
     // MARK: - Module configuration
 
     /// Shared agent state, injected by the agent at startup.
-    public nonisolated(unsafe) unowned var sharedState: AgentSharedState?
+    public nonisolated(unsafe) unowned var sharedState: AgentSharedState? {
+        didSet { agentVersion = sharedState?.agentVersion }
+    }
+
+    nonisolated(unsafe) var agentVersion: String?
 
 
     // MARK: - Preferences
