@@ -17,10 +17,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added `navigation.name` attribute on `app.ui.navigation` screen-change spans. #625
 * Added navigation module integration in `SplunkAgent` proxy with Swift and Objective-C API surfaces. #618
 
-### Fixed
-
-* Navigation spans now correctly report the SDK instrumentation version instead of the application bundle name. #636
-
 ### Changed
 
 * Navigation spans now use the span name `app.ui.navigation` (previously `screen name change`). #625
