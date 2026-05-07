@@ -44,7 +44,7 @@ final class SessionReplayTestBuilder {
 
     // MARK: - Session replay data event
 
-    static func buildDataEvent() throws -> SessionReplayDataEvent {
+    static func buildDataEvent(userActivity: [Int] = []) throws -> SessionReplayDataEvent {
         let sampleVideoData = try Self.sampleVideoData()
 
         let sessionId = UUID().uuidString
@@ -62,7 +62,8 @@ final class SessionReplayTestBuilder {
             data: sampleVideoData,
             index: 1,
             sessionId: sessionId,
-            scriptInstanceId: scriptInstanceId
+            scriptInstanceId: scriptInstanceId,
+            userActivity: userActivity
         )
     }
 

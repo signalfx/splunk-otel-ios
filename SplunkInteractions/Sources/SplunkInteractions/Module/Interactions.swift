@@ -30,6 +30,16 @@ public final class Interactions: SplunkInteractionsModule {
     private let destination: SplunkInteractionsDestination
     private var interactionsTask: Task<Void, Never>?
 
+
+    // MARK: - Internal properties
+
+    /// Stream of interaction timestamps. Emits a value for every interaction event, regardless of type.
+    let activityStream: AsyncStream<Date>
+
+    var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
+
+    private let activityContinuation: AsyncStream<Date>.Continuation
+
     private let internalLogger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),
         category: "SplunkInteractions"
@@ -42,19 +52,16 @@ public final class Interactions: SplunkInteractionsModule {
     )
 
 
-    // MARK: - Internal properties
-
-    var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
-
-
     // MARK: - Initialization
 
     public required init() {
         destination = OTelDestination()
+        (activityStream, activityContinuation) = AsyncStream.makeStream()
     }
 
     init(destination: SplunkInteractionsDestination) {
         self.destination = destination
+        (activityStream, activityContinuation) = AsyncStream.makeStream()
     }
 
 
@@ -98,6 +105,8 @@ public final class Interactions: SplunkInteractionsModule {
     }
 
     func handleEvent(_ event: InteractionEvent) async {
+        activityContinuation.yield(event.time)
+
         await handleEventType(
             event.type,
             viewHierarchy: event.viewHierarchy,

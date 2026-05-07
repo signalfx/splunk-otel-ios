@@ -266,6 +266,15 @@ extension SplunkRum {
             return
         }
 
+        // Forward interaction timestamps to the event manager's collector
+        if let collector = (eventManager as? DefaultEventManager)?.userActivityCollector {
+            userActivityTask = Task {
+                for await date in interactionsModule.activityStream {
+                    await collector.record(at: date)
+                }
+            }
+        }
+
         // Initialize proxy API for this module
         interactions = Interactions(for: interactionsModule)
     }

@@ -79,6 +79,7 @@ class DefaultEventManager: AgentEventManager {
 
     var sessionReplayIndexer: EventIndexer
     var sessionReplayMemorizer: EventMemorizer
+    let userActivityCollector = UserActivityCollector()
 
     /// Agent reference.
     unowned let agent: SplunkRum
@@ -196,12 +197,15 @@ class DefaultEventManager: AgentEventManager {
             // Use scriptInstanceId as a 16 character substring of a sessionId
             let scriptInstanceId = String(sessionId.prefix(upTo: sessionId.index(sessionId.startIndex, offsetBy: 16)))
 
+            let userActivity = await userActivityCollector.flush()
+
             let event = SessionReplayDataEvent(
                 metadata: metadata,
                 data: data,
                 index: eventIndex,
                 sessionId: sessionId,
-                scriptInstanceId: scriptInstanceId
+                scriptInstanceId: scriptInstanceId,
+                userActivity: userActivity
             )
 
             sessionReplayProcessor.sendEvent(
