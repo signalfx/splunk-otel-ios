@@ -24,6 +24,7 @@ SESSION_REPLAY_PATH="${SESSION_REPLAY_LOCAL_PATH:-}"
 SOURCE_COMMIT=""
 SOURCE_BRANCH=""
 SOURCE_DIRTY=""
+SOURCE_REMOTE=""
 
 CISCO_FRAMEWORKS=(
     "CiscoCommon"
@@ -102,11 +103,30 @@ verify_dynamic_framework() {
         [[ -n "${binary_path}" ]] || continue
         binary_count=$((binary_count + 1))
 
-        local mach_info
-        mach_info="$(file -b "${binary_path}")"
+        local otool_output
+        local header_count
+        local dylib_count
+        local filetypes
 
-        if [[ "${mach_info}" != *"dynamically linked shared library"* ]]; then
-            fail "${framework}.xcframework contains a non-dynamic binary: ${binary_path} (${mach_info})"
+        otool_output="$(otool -hv -arch all "${binary_path}" 2>/dev/null || true)"
+        header_count="$(
+            printf '%s\n' "${otool_output}" |
+                awk '$1 ~ /^(0x|MH_)/ { count++ } END { print count + 0 }'
+        )"
+        dylib_count="$(
+            printf '%s\n' "${otool_output}" |
+                awk '$1 ~ /^(0x|MH_)/ && $5 == "DYLIB" { count++ } END { print count + 0 }'
+        )"
+
+        if [[ "${header_count}" -eq 0 || "${header_count}" -ne "${dylib_count}" ]]; then
+            filetypes="$(
+                printf '%s\n' "${otool_output}" |
+                    awk '$1 ~ /^(0x|MH_)/ { print $5 }' |
+                    sort -u |
+                    tr '\n' ' ' |
+                    sed 's/[[:space:]]*$//'
+            )"
+            fail "${framework}.xcframework contains a non-dynamic binary: ${binary_path} (${filetypes:-unknown})"
         fi
     done < <(find "${xcfw_path}" -path "*/${framework}.framework/${framework}" -type f)
 
@@ -167,6 +187,7 @@ git_value() {
 capture_source_state() {
     SOURCE_COMMIT="$(git_value unknown rev-parse HEAD)"
     SOURCE_BRANCH="$(git_value unknown rev-parse --abbrev-ref HEAD)"
+    SOURCE_REMOTE="$(git_value unknown config --get remote.origin.url)"
 
     if [[ "$(git -C "${SESSION_REPLAY_PATH}" status --porcelain 2>/dev/null || true)" == "" ]]; then
         SOURCE_DIRTY="false"
@@ -179,7 +200,7 @@ write_traceability_manifest() {
     local manifest_path="${OUTPUT_DIR}/cisco-release-manifest.txt"
     {
         echo "source=local-session-replay"
-        echo "source_path=${SESSION_REPLAY_PATH}"
+        echo "source_remote=${SOURCE_REMOTE}"
         echo "source_commit=${SOURCE_COMMIT}"
         echo "source_branch=${SOURCE_BRANCH}"
         echo "source_dirty=${SOURCE_DIRTY}"

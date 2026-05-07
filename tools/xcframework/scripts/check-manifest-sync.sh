@@ -17,6 +17,9 @@ OTEL_PROJECT="${TOOLS_ROOT}/otel/Project.swift"
 PLCRASH_PROJECT="${TOOLS_ROOT}/plcrash/Project.swift"
 SMOKE_PROJECT="${TOOLS_ROOT}/smoke-test/Project.swift"
 DEPENDENCY_MANIFEST_SCRIPT="${TOOLS_ROOT}/scripts/generate-dependency-manifest.sh"
+AGENT_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-xcframeworks.sh"
+OTEL_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-otel-xcframeworks.sh"
+PLCRASH_BUILD_SCRIPT="${TOOLS_ROOT}/scripts/build-plcrash-xcframeworks.sh"
 
 ERRORS=0
 
@@ -131,6 +134,14 @@ check_deployment_targets() {
 
     require_grep '"XROS_DEPLOYMENT_TARGET":[[:space:]]*"1\.0"' "${AGENT_PROJECT}" "Project.swift visionOS 1.0"
     require_grep '"XROS_DEPLOYMENT_TARGET":[[:space:]]*"1\.0"' "${OTEL_PROJECT}" "otel/Project.swift visionOS 1.0"
+
+    for script in "${AGENT_BUILD_SCRIPT}" "${OTEL_BUILD_SCRIPT}" "${PLCRASH_BUILD_SCRIPT}"; do
+        local label
+        label="${script#${TOOLS_ROOT}/}"
+
+        require_grep 'label.*==.*maccatalyst|maccatalyst.*label' "${script}" "${label} has Catalyst-specific archive handling"
+        require_grep 'IPHONEOS_DEPLOYMENT_TARGET=15\.0' "${script}" "${label} sets Catalyst IPHONEOS_DEPLOYMENT_TARGET to 15.0"
+    done
 }
 
 check_external_dependencies() {

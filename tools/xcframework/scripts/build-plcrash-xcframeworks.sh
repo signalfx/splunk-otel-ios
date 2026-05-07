@@ -167,6 +167,11 @@ archive_frameworks() {
 
         log "Archiving ${SCHEME} for ${label}..."
 
+        local build_overrides=()
+        if [[ "${label}" == "maccatalyst" ]]; then
+            build_overrides+=("IPHONEOS_DEPLOYMENT_TARGET=15.0")
+        fi
+
         xcodebuild archive \
             -workspace "${PLCRASH_PROJECT_DIR}/PLCrashReporterXCFrameworks.xcworkspace" \
             -scheme "${SCHEME}" \
@@ -174,6 +179,7 @@ archive_frameworks() {
             -destination "${destination}" \
             -archivePath "${archive_path}" \
             SKIP_INSTALL=NO \
+            "${build_overrides[@]}" \
             2>&1 | tail -5
 
         if [[ ! -d "${archive_path}" ]]; then

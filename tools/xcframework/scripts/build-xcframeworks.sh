@@ -193,9 +193,10 @@ archive_module() {
         # Cisco Session Replay xcframeworks ship arm64-only macCatalyst
         # slices, so we must restrict macCatalyst builds to arm64 to
         # avoid "unsupported Swift architecture" errors on x86_64.
-        local arch_override=""
+        local build_overrides=()
         if [[ "${label}" == "maccatalyst" ]]; then
-            arch_override="ARCHS=arm64"
+            build_overrides+=("ARCHS=arm64")
+            build_overrides+=("IPHONEOS_DEPLOYMENT_TARGET=15.0")
         fi
 
         xcodebuild archive \
@@ -206,7 +207,7 @@ archive_module() {
             -archivePath "${archive_path}" \
             SKIP_INSTALL=NO \
             BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-            ${arch_override} \
+            "${build_overrides[@]}" \
             2>&1 | tail -3
 
         if [[ ! -d "${archive_path}" ]]; then

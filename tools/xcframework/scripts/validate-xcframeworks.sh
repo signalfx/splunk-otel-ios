@@ -135,14 +135,42 @@ validate_expected_framework_set() {
 
 validate_dynamic_binary() {
     local binary_path="$1"
-    local mach_info
+    local slice_name="$2"
+    local otool_output
+    local header_count
+    local dylib_count
+    local filetypes
 
-    mach_info="$(file -b "${binary_path}" 2>/dev/null || echo "unknown")"
-    if [[ "${mach_info}" == *"dynamically linked shared library"* ]]; then
-        check_pass "Dynamic binary: ${mach_info}"
+    otool_output="$(otool -hv -arch all "${binary_path}" 2>/dev/null || true)"
+    header_count="$(
+        printf '%s\n' "${otool_output}" |
+            awk '$1 ~ /^(0x|MH_)/ { count++ } END { print count + 0 }'
+    )"
+    dylib_count="$(
+        printf '%s\n' "${otool_output}" |
+            awk '$1 ~ /^(0x|MH_)/ && $5 == "DYLIB" { count++ } END { print count + 0 }'
+    )"
+
+    if [[ "${header_count}" -gt 0 && "${header_count}" -eq "${dylib_count}" ]]; then
+        check_pass "Slice ${slice_name}: Mach-O filetype DYLIB for all architectures"
     else
-        check_fail "Binary is not MH_DYLIB: ${mach_info}"
+        filetypes="$(
+            printf '%s\n' "${otool_output}" |
+                awk '$1 ~ /^(0x|MH_)/ { print $5 }' |
+                sort -u |
+                tr '\n' ' ' |
+                sed 's/[[:space:]]*$//'
+        )"
+        check_fail "Slice ${slice_name}: binary is not MH_DYLIB for every architecture (${filetypes:-unknown})"
     fi
+}
+
+read_xcframework_library_value() {
+    local info_plist="$1"
+    local index="$2"
+    local key="$3"
+
+    /usr/libexec/PlistBuddy -c "Print :AvailableLibraries:${index}:${key}" "${info_plist}" 2>/dev/null
 }
 
 validate_xcframework() {
@@ -164,12 +192,34 @@ validate_xcframework() {
     expected_slices="$(expected_slices_for "${name}")"
 
     local actual_slices=0
-    for slice_dir_count in "${xcfw_path}"/*/; do
-        local slice_name
-        slice_name="$(basename "${slice_dir_count}")"
-        [[ "${slice_name}" == "_CodeSignature" ]] && continue
-        [[ -d "${slice_dir_count}" ]] || continue
+    local info_plist="${xcfw_path}/Info.plist"
+    local slice_entries=()
+    local index=0
+
+    while true; do
+        local library_identifier
+        local binary_path
+        local library_path
+
+        if ! library_identifier="$(read_xcframework_library_value "${info_plist}" "${index}" "LibraryIdentifier")"; then
+            break
+        fi
+
+        binary_path="$(read_xcframework_library_value "${info_plist}" "${index}" "BinaryPath" || true)"
+
+        if ! library_path="$(read_xcframework_library_value "${info_plist}" "${index}" "LibraryPath")"; then
+            check_fail "Slice ${library_identifier}: LibraryPath missing in Info.plist"
+            index=$((index + 1))
+            continue
+        fi
+
+        if [[ -z "${binary_path}" ]]; then
+            binary_path="${library_path}/${name}"
+        fi
+
+        slice_entries+=("${library_identifier}|${binary_path}")
         actual_slices=$((actual_slices + 1))
+        index=$((index + 1))
     done
 
     if [[ "${actual_slices}" -eq "${expected_slices}" ]]; then
@@ -178,15 +228,14 @@ validate_xcframework() {
         check_fail "Platform slices: ${actual_slices} (expected ${expected_slices})"
     fi
 
-    for slice_dir in "${xcfw_path}"/*/; do
-        local slice_name
-        slice_name="$(basename "${slice_dir}")"
-        [[ "${slice_name}" == "_CodeSignature" ]] && continue
+    for slice_entry in "${slice_entries[@]}"; do
+        local slice_name="${slice_entry%%|*}"
+        local binary_path="${slice_entry#*|}"
 
-        local fw_binary="${slice_dir}/${name}.framework/${name}"
+        local fw_binary="${xcfw_path}/${slice_name}/${binary_path}"
         if [[ -f "${fw_binary}" ]]; then
             check_pass "Slice ${slice_name}: binary present"
-            validate_dynamic_binary "${fw_binary}"
+            validate_dynamic_binary "${fw_binary}" "${slice_name}"
 
             local arch_info
             arch_info="$(lipo -info "${fw_binary}" 2>/dev/null || echo "unknown")"
