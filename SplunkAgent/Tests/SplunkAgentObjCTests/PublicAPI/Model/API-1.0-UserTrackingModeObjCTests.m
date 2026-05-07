@@ -29,9 +29,9 @@ limitations under the License.
 // MARK: - API Tests
 
 - (void)testModes {
-    // Default mode (same as No tracking)
+    // Default mode (same as Anonymous tracking)
     NSNumber *defaultTrackingMode = SPLKUserTrackingMode.defaultTracking;
-    XCTAssertEqual(defaultTrackingMode.integerValue, 0);
+    XCTAssertEqual(defaultTrackingMode.integerValue, 1);
 
     // No tracking
     NSNumber *noTrackingMode = SPLKUserTrackingMode.noTracking;
