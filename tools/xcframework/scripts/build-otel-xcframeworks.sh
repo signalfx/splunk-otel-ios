@@ -182,22 +182,22 @@ archive_frameworks() {
 
             log "Archiving ${scheme} for ${label}..."
 
-            local build_overrides=()
+            local xcodebuild_args=(
+                archive
+                -workspace "${OTEL_PROJECT_DIR}/OpenTelemetryXCFrameworks.xcworkspace"
+                -scheme "${scheme}"
+                -configuration "${CONFIGURATION}"
+                -destination "${destination}"
+                -archivePath "${archive_path}"
+                SKIP_INSTALL=NO
+                BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+                "OTHER_SWIFT_FLAGS=-package-name opentelemetry-swift-core"
+            )
             if [[ "${label}" == "maccatalyst" ]]; then
-                build_overrides+=("IPHONEOS_DEPLOYMENT_TARGET=15.0")
+                xcodebuild_args+=("IPHONEOS_DEPLOYMENT_TARGET=15.0")
             fi
 
-            xcodebuild archive \
-                -workspace "${OTEL_PROJECT_DIR}/OpenTelemetryXCFrameworks.xcworkspace" \
-                -scheme "${scheme}" \
-                -configuration "${CONFIGURATION}" \
-                -destination "${destination}" \
-                -archivePath "${archive_path}" \
-                SKIP_INSTALL=NO \
-                BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-                OTHER_SWIFT_FLAGS="-package-name opentelemetry-swift-core" \
-                "${build_overrides[@]}" \
-                2>&1 | tail -5
+            xcodebuild "${xcodebuild_args[@]}" 2>&1 | tail -5
 
             # Verify the archive was created
             if [[ ! -d "${archive_path}" ]]; then

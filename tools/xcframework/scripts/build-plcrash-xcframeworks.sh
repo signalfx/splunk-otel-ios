@@ -167,20 +167,20 @@ archive_frameworks() {
 
         log "Archiving ${SCHEME} for ${label}..."
 
-        local build_overrides=()
+        local xcodebuild_args=(
+            archive
+            -workspace "${PLCRASH_PROJECT_DIR}/PLCrashReporterXCFrameworks.xcworkspace"
+            -scheme "${SCHEME}"
+            -configuration "${CONFIGURATION}"
+            -destination "${destination}"
+            -archivePath "${archive_path}"
+            SKIP_INSTALL=NO
+        )
         if [[ "${label}" == "maccatalyst" ]]; then
-            build_overrides+=("IPHONEOS_DEPLOYMENT_TARGET=15.0")
+            xcodebuild_args+=("IPHONEOS_DEPLOYMENT_TARGET=15.0")
         fi
 
-        xcodebuild archive \
-            -workspace "${PLCRASH_PROJECT_DIR}/PLCrashReporterXCFrameworks.xcworkspace" \
-            -scheme "${SCHEME}" \
-            -configuration "${CONFIGURATION}" \
-            -destination "${destination}" \
-            -archivePath "${archive_path}" \
-            SKIP_INSTALL=NO \
-            "${build_overrides[@]}" \
-            2>&1 | tail -5
+        xcodebuild "${xcodebuild_args[@]}" 2>&1 | tail -5
 
         if [[ ! -d "${archive_path}" ]]; then
             echo "ERROR: Archive failed for ${SCHEME} (${label})"

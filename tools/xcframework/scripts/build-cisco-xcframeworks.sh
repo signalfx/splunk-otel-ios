@@ -140,7 +140,7 @@ stage_framework() {
     local zip_file
     zip_file="$(
         find "${CISCO_DIST_DIR}" -path "*/mh_dylib/*.zip" -type f 2>/dev/null | while IFS= read -r candidate; do
-            if zipinfo -1 "${candidate}" 2>/dev/null | grep -q "^${framework}.xcframework/"; then
+            if zipinfo -1 "${candidate}" "${framework}.xcframework/*" >/dev/null 2>&1; then
                 echo "${candidate}"
                 break
             fi
