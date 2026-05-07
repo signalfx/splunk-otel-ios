@@ -71,12 +71,17 @@ log "Packaging xcframeworks into ${ZIP_NAME}..."
 # Remove existing zip
 rm -f "${ZIP_PATH}"
 
-# Create zip from the xcframeworks directory
-# Include the manifest alongside the xcframeworks
+# Create zip from the xcframeworks directory.
+# Include dependency metadata and Cisco source traceability when present.
 cd "${OUTPUT_DIR}"
+
+ZIP_INPUTS=(xcframeworks/*.xcframework dependency-manifest.json)
+if [[ -f "xcframeworks/cisco-release-manifest.txt" ]]; then
+    ZIP_INPUTS+=(xcframeworks/cisco-release-manifest.txt)
+fi
+
 zip -r -y "${ZIP_NAME}" \
-    xcframeworks/*.xcframework \
-    dependency-manifest.json \
+    "${ZIP_INPUTS[@]}" \
     -x "*.DS_Store"
 
 ZIP_SIZE="$(du -sh "${ZIP_PATH}" | cut -f1)"

@@ -1,20 +1,18 @@
 name: Build XCFrameworks
 
-# Triggers:
-#   1. Automatically after merge_release.yml creates a GitHub Release
-#   2. Manually via workflow_dispatch for testing
+# Trigger:
+#   1. Manually via workflow_dispatch for legacy/testing builds with caller-provided
+#      dynamic Cisco xcframework artifacts.
 #
-# This workflow builds all SplunkAgent SDK modules as signed xcframeworks,
-# validates them, packages into a zip, and uploads to the GitHub Release.
+# This workflow is no longer the default release path while Session Replay lives
+# in a separate repository. The supported release path is local:
+#   tools/xcframework/scripts/sign-and-upload.sh <VERSION>
 #
 # Architecture:
 #   Job 1 (build): Build OTel + PLCrash + Agent modules → upload artifact
-#   Job 2 (sign-and-release): Sign, validate, package, upload to release
+#   Job 2 (sign-and-release): Optional legacy signing, validation, and packaging
 
 on:
-  release:
-    types: [published]
-
   workflow_dispatch:
     inputs:
       otel-version:
@@ -28,8 +26,8 @@ on:
         default: "1.12.0"
         type: string
       cisco-xcframeworks-run-id:
-        description: "GitHub Actions run ID with Cisco SR xcframeworks artifact (optional, downloads from S3 if empty)"
-        required: false
+        description: "GitHub Actions run ID with dynamic Cisco SR xcframeworks artifact (required)"
+        required: true
         type: string
       skip-cisco:
         description: "Skip Cisco SR frameworks (for partial builds without Session Replay)"
@@ -89,16 +87,12 @@ jobs:
           PLCRASH_VERSION="${PLCRASH_VERSION}" scripts/build-plcrash-xcframeworks.sh
 
       # -----------------------------------------------------------------
-      # Step 3: Download Cisco Session Replay xcframeworks (if provided)
+      # Step 3: Download dynamic Cisco Session Replay xcframeworks
       # -----------------------------------------------------------------
-      # Cisco xcframeworks are built separately by the Session Replay team.
-      # They can be provided via:
-      #   a) A GitHub Actions artifact from a previous workflow run
-      #   b) Downloaded from S3 by populate-dependencies.sh (default)
-      #
-      # Cisco frameworks are required by SplunkCommon and most modules.
-      # Use the skip-cisco input only for partial test builds.
-      - name: Download Cisco SR xcframeworks (if artifact provided)
+      # Cisco xcframeworks must be provided explicitly. Package.swift now
+      # intentionally points to static Cisco artifacts for SPM, so this
+      # workflow must not download Cisco from Package.swift/S3 by default.
+      - name: Download Cisco SR xcframeworks
         if: inputs.cisco-xcframeworks-run-id != ''
         uses: actions/download-artifact@v8
         with:
@@ -112,26 +106,25 @@ jobs:
       - name: Populate dependencies
         working-directory: tools/xcframework
         run: |
-          POPULATE_ARGS=""
-
-          # If a Cisco artifact was downloaded, point to it
-          if [ -d "cisco-sr-download" ]; then
-            CISCO_DIR="$(find cisco-sr-download -name "*.xcframework" -maxdepth 2 -exec dirname {} \; | head -1)"
-            if [ -n "$CISCO_DIR" ]; then
-              POPULATE_ARGS="--cisco-path $(pwd)/$CISCO_DIR"
-              echo "Using Cisco xcframeworks from artifact: $CISCO_DIR"
-            fi
-          fi
-
-          # Explicit skip-cisco only via the workflow input
           if [ "${{ inputs.skip-cisco }}" = "true" ]; then
             echo "::warning::skip-cisco requested — modules depending on Cisco will fail to build"
-            POPULATE_ARGS="--skip-cisco"
+            scripts/populate-dependencies.sh --skip-cisco
+            exit 0
           fi
 
-          # Default (no artifact, no skip): populate-dependencies.sh
-          # downloads Cisco from S3 automatically
-          scripts/populate-dependencies.sh $POPULATE_ARGS
+          if [ ! -d "cisco-sr-download" ]; then
+            echo "::error::cisco-xcframeworks-run-id is required and must contain dynamic Cisco xcframeworks"
+            exit 1
+          fi
+
+          CISCO_DIR="$(find cisco-sr-download -name "*.xcframework" -maxdepth 2 -exec dirname {} \; | head -1)"
+          if [ -z "$CISCO_DIR" ]; then
+            echo "::error::No Cisco xcframeworks found in downloaded artifact"
+            exit 1
+          fi
+
+          echo "Using dynamic Cisco xcframeworks from artifact: $CISCO_DIR"
+          scripts/populate-dependencies.sh --cisco-path "$(pwd)/$CISCO_DIR"
 
       - name: Generate Tuist project
         working-directory: tools/xcframework
@@ -149,12 +142,6 @@ jobs:
       - name: Validate xcframeworks (pre-signing)
         working-directory: tools/xcframework
         run: RELEASE=false scripts/validate-xcframeworks.sh
-
-      - name: Generate Cisco release manifest
-        working-directory: tools/xcframework
-        run: |
-          chmod +x scripts/*.sh
-          scripts/generate-cisco-release-manifest.sh
 
       # -----------------------------------------------------------------
       # Step 5b: Smoke test (consumer linkage)
@@ -175,7 +162,7 @@ jobs:
 
 
   # ===========================================================================
-  # Job 2: Sign, validate, and release
+  # Job 2: Sign, validate, and package
   # ===========================================================================
   # NOTE: This job is temporarily disabled because distribution certificates
   # cannot be stored in GitHub secrets per current policy.
@@ -187,7 +174,7 @@ jobs:
   # variable to "true" and configure the DISTRIBUTION_CERTIFICATE and
   # CERTIFICATE_PASSWORD secrets.
   sign-and-release:
-    name: Sign & Release
+    name: Sign & Package
     needs: build
     runs-on: macos-15
     if: ${{ vars.SIGNING_ENABLED == 'true' && !inputs.skip-signing }}
@@ -200,12 +187,6 @@ jobs:
         with:
           name: splunk-agent-xcframeworks-unsigned
           path: tools/xcframework/output/xcframeworks/
-
-      - name: Refresh Cisco xcframeworks from source
-        working-directory: tools/xcframework
-        run: |
-          chmod +x scripts/*.sh
-          scripts/refresh-cisco-xcframeworks.sh
 
       # -----------------------------------------------------------------
       # Signing
@@ -221,7 +202,7 @@ jobs:
         working-directory: tools/xcframework
         run: |
           chmod +x scripts/*.sh
-          scripts/sign-xcframeworks.sh "${{ steps.signing.outputs.signing-identity }}"
+          scripts/sign-xcframeworks.sh --include-cisco "${{ steps.signing.outputs.signing-identity }}"
 
       # -----------------------------------------------------------------
       # Post-signing validation
@@ -266,21 +247,3 @@ jobs:
           name: splunk-agent-xcframeworks-${{ steps.version.outputs.version }}
           path: tools/xcframework/output/SplunkAgent-XCFrameworks-*.zip
           retention-days: 30
-
-      # -----------------------------------------------------------------
-      # Upload to GitHub Release (only on release event)
-      # -----------------------------------------------------------------
-      - name: Upload to GitHub Release
-        if: github.event_name == 'release'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          ZIP_FILE="$(ls tools/xcframework/output/SplunkAgent-XCFrameworks-*.zip 2>/dev/null | head -1)"
-          if [ -z "$ZIP_FILE" ]; then
-            echo "ERROR: No zip file found to upload"
-            exit 1
-          fi
-
-          echo "Uploading $ZIP_FILE to release ${{ github.event.release.tag_name }}..."
-          gh release upload "${{ github.event.release.tag_name }}" "$ZIP_FILE" --clobber
-          echo "✓ Uploaded to release"

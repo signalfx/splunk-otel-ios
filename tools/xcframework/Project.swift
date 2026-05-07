@@ -77,9 +77,9 @@ let sharedSettings: SettingsDictionary = [
 
     // Minimum deployment targets matching Package.swift.
     "IPHONEOS_DEPLOYMENT_TARGET": "13.0",
-    "TVOS_DEPLOYMENT_TARGET": "13.0",
+    "TVOS_DEPLOYMENT_TARGET": "15.0",
     "XROS_DEPLOYMENT_TARGET": "1.0",
-    "MACOSX_DEPLOYMENT_TARGET": "10.15",
+    "MACOSX_DEPLOYMENT_TARGET": "12.0",
 
     // Support Mac Catalyst builds.
     "SUPPORTS_MACCATALYST": "YES"

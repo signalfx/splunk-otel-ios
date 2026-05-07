@@ -6,6 +6,7 @@
 # Usage:
 #   make build                                     # Build all xcframeworks
 #   make build-otel                                # Build only OTel xcframeworks
+#   make build-cisco                               # Build dynamic Cisco xcframeworks from local Session Replay checkout
 #   make build-agent                               # Build only SplunkAgent xcframeworks
 #   make sign SIGNING_IDENTITY="Apple Distribution: Splunk Inc."  # Sign all xcframeworks
 #   make validate                                  # Validate all xcframeworks
@@ -21,7 +22,8 @@
 #
 # Environment Variables:
 #   OTEL_VERSION          - OpenTelemetry Swift Core version (read from Package.swift)
-#   CISCO_XCFRAMEWORKS_PATH - Path to Cisco SR xcframeworks directory
+#   SESSION_REPLAY_LOCAL_PATH - Required path to local Session Replay repo for Cisco dynamic xcframeworks
+#   CISCO_XCFRAMEWORKS_PATH - Legacy path to prebuilt dynamic Cisco SR xcframeworks directory
 #   PLCRASH_VERSION       - PLCrashReporter version (read from Package.swift)
 #   SIGNING_IDENTITY      - Code signing identity for codesign
 #   VERSION               - Release version number
@@ -50,9 +52,10 @@ PACKAGE_SWIFT := $(REPO_ROOT)/Package.swift
 
 OTEL_VERSION    ?= $(shell awk '/opentelemetry-swift-core/{found=1} found && !/^ *\/\// && /exact:/{gsub(/.*exact: *"/,""); gsub(/".*/,""); print; exit}' $(PACKAGE_SWIFT))
 PLCRASH_VERSION ?= $(shell awk '/plcrashreporter/{found=1} found && !/^ *\/\// && /exact:/{gsub(/.*exact: *"/,""); gsub(/".*/,""); print; exit}' $(PACKAGE_SWIFT))
-SIGNING_IDENTITY   ?=
-VERSION            ?=
-RELEASE            ?= false
+SIGNING_IDENTITY        ?=
+VERSION                 ?=
+RELEASE                 ?= false
+SESSION_REPLAY_LOCAL_PATH ?=
 CISCO_XCFRAMEWORKS_PATH ?=
 
 # ---------------------------------------------------------------------------
@@ -72,19 +75,38 @@ help:
 	@echo ""
 	@echo "Variables:"
 	@echo "  OTEL_VERSION              OTel Swift Core version (default: $(OTEL_VERSION))"
-	@echo "  CISCO_XCFRAMEWORKS_PATH   Path to Cisco Session Replay xcframeworks"
+	@echo "  SESSION_REPLAY_LOCAL_PATH Required path to local Session Replay repo"
+	@echo "  CISCO_XCFRAMEWORKS_PATH   Legacy path to prebuilt dynamic Cisco xcframeworks"
 	@echo "  PLCRASH_VERSION           PLCrashReporter version (default: $(PLCRASH_VERSION))"
 	@echo "  SIGNING_IDENTITY          Apple code signing identity"
 	@echo "  VERSION                   Release version (required for 'make release')"
 	@echo "  RELEASE                   Set to 'true' for release-mode validation"
 
 
-## build: Build all xcframeworks (OTel + PLCrash + dependencies + Agent modules)
+## build: Build all xcframeworks (OTel + PLCrash + Cisco + dependencies + Agent modules)
 .PHONY: build
-build: build-otel build-plcrash populate-deps build-agent
+build: check-session-replay-path build-otel build-plcrash build-cisco populate-deps build-agent
 	@echo ""
 	@echo "==> All xcframeworks built successfully"
 	@echo "    Output: $(XCFW_DIR)"
+
+
+## check-session-replay-path: Verify SESSION_REPLAY_LOCAL_PATH is set for dynamic Cisco builds
+.PHONY: check-session-replay-path
+check-session-replay-path:
+ifndef SESSION_REPLAY_LOCAL_PATH
+	@echo "ERROR: SESSION_REPLAY_LOCAL_PATH is required for xcframework builds."
+	@echo "  Usage: SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo make build"
+	@exit 1
+endif
+	@if [ ! -d "$(SESSION_REPLAY_LOCAL_PATH)" ]; then \
+		echo "ERROR: SESSION_REPLAY_LOCAL_PATH does not exist: $(SESSION_REPLAY_LOCAL_PATH)"; \
+		exit 1; \
+	fi
+	@if [ ! -x "$(SESSION_REPLAY_LOCAL_PATH)/Tools/build_frameworks.sh" ]; then \
+		echo "ERROR: Session Replay build script is missing or not executable: $(SESSION_REPLAY_LOCAL_PATH)/Tools/build_frameworks.sh"; \
+		exit 1; \
+	fi
 
 
 ## build-otel: Build OpenTelemetryApi + OpenTelemetrySdk xcframeworks from source
@@ -99,6 +121,13 @@ build-otel:
 build-plcrash:
 	@echo "==> Building PLCrashReporter xcframework..."
 	PLCRASH_VERSION=$(PLCRASH_VERSION) $(SCRIPTS_DIR)/build-plcrash-xcframeworks.sh
+
+
+## build-cisco: Build dynamic Cisco Session Replay xcframeworks from local source
+.PHONY: build-cisco
+build-cisco:
+	@echo "==> Building dynamic Cisco Session Replay xcframeworks..."
+	SESSION_REPLAY_LOCAL_PATH="$(SESSION_REPLAY_LOCAL_PATH)" $(SCRIPTS_DIR)/build-cisco-xcframeworks.sh
 
 
 ## populate-deps: Populate dependencies/ directory with pre-built xcframeworks
@@ -125,7 +154,7 @@ ifndef SIGNING_IDENTITY
 	@exit 1
 endif
 	@echo "==> Signing xcframeworks..."
-	$(SCRIPTS_DIR)/sign-xcframeworks.sh "$(SIGNING_IDENTITY)"
+	$(SCRIPTS_DIR)/sign-xcframeworks.sh --include-cisco "$(SIGNING_IDENTITY)"
 
 
 ## validate: Validate all built xcframeworks (structure, slices, interfaces)
