@@ -3,6 +3,7 @@
 # Selects the latest stable Xcode version available on the runner.
 #
 set -euo pipefail
+unset DEVELOPER_DIR    # ignore any inherited value before we pick
 
 echo "Available Xcode installations:"
 shopt -s nullglob
@@ -72,9 +73,9 @@ if [ ! -d "$DEV_DIR" ]; then
 fi
 
 echo "Selecting: $(basename "$SELECTED_APP")"
-if ! sudo -n xcode-select -s "$DEV_DIR"; then
-    echo "::error::Failed to switch active developer directory via xcode-select."
-    exit 1
+export DEVELOPER_DIR="$DEV_DIR"
+if [ -n "${GITHUB_ENV:-}" ]; then
+    echo "DEVELOPER_DIR=$DEV_DIR" >> "$GITHUB_ENV"
 fi
 
 echo ""
