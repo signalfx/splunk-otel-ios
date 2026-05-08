@@ -292,7 +292,7 @@ public final class Navigation: Sendable {
 
     /// Process the finalizing of the navigation.
     func processNavigationEnd(event: NavigationActionEvent) async {
-        let end = Date()
+        let end = event.timestamp
         let identifier = event.controllerIdentifier
 
         // Get corresponding navigation data

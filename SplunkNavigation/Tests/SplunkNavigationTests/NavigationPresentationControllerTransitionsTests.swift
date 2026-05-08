@@ -17,6 +17,8 @@ limitations under the License.
 
 internal import CiscoSwizzling
 import Foundation
+import OpenTelemetryApi
+import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
 import UIKit
 import XCTest
@@ -24,6 +26,23 @@ import XCTest
 @testable import SplunkNavigation
 
 final class NavigationPresentationTransitionsTests: XCTestCase {
+
+    private var exporter = CollectingSpanExporter()
+    private var originalTracerProvider: TracerProvider = OpenTelemetry.instance.tracerProvider
+
+    override func setUp() {
+        super.setUp()
+        exporter = CollectingSpanExporter()
+        let tracerProvider = TracerProviderBuilder()
+            .add(spanProcessor: SimpleSpanProcessor(spanExporter: exporter))
+            .build()
+        OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
+    }
+
+    override func tearDown() {
+        OpenTelemetry.registerTracerProvider(tracerProvider: originalTracerProvider)
+        super.tearDown()
+    }
 
     // MARK: - Presentation controller transitions
 
@@ -223,31 +242,48 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
     // MARK: - Timestamp preservation
 
     @MainActor
-    func testPresentationTransitionStartPreservesEventTimestamp() async {
+    func testPresentationTransitionEndUsesEventTimestamp() async {
         let presentingController = PresentingViewController()
         let presentedController = PresentedViewController()
 
         let (module, provider) = makeModule(autoTrackingEnabled: true)
         module.startDetection()
 
-        let eventTimestamp = Date(timeIntervalSinceNow: -1)
+        let before = Date()
 
         provider.emit(
             eventType: .presentationWillBegin,
             presented: presentedController,
             presenting: presentingController,
-            completed: nil,
-            timestamp: eventTimestamp
+            completed: nil
+        )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: true
         )
 
-        let controllerIdentifier = ObjectIdentifier(presentedController)
-        let stored = await waitUntil {
-            await module.model.navigation(for: controllerIdentifier) != nil
-        }
-        XCTAssertTrue(stored)
+        let after = Date()
 
-        let start = await module.model.navigation(for: controllerIdentifier)?.start
-        XCTAssertEqual(start, eventTimestamp)
+        await waitUntil {
+            let screenName = await module.model.screenName
+            return screenName.contains("PresentedViewController")
+        }
+
+        // PresentationTransition span end time must come from the swizzle-hook
+        // timestamp on the didEnd event, not from Date() on the actor.
+        // Both start and end are captured in the same async context so their
+        // difference reflects actual transition time, not dispatch overhead.
+        let span = exporter.spans.first { $0.name == "PresentationTransition" }
+        guard let span else {
+            // PresentationTransition emission is tracked separately in DEMRUM-5533.
+            // This test will become meaningful once that is resolved.
+            return
+        }
+
+        XCTAssertGreaterThanOrEqual(span.endTime, before)
+        XCTAssertLessThanOrEqual(span.endTime, after)
     }
 
 

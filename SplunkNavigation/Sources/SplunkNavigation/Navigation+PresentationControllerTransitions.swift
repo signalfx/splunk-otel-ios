@@ -25,7 +25,6 @@ extension Navigation {
     private struct PresentationTransitionSnapshot {
         let controllerIdentifier: ObjectIdentifier
         let controllerTypeName: String
-        let timestamp: Date
     }
 
 
@@ -49,6 +48,7 @@ extension Navigation {
 
             await finalizeTransition(
                 for: presentedSnapshot(from: event),
+                timestamp: event.timestamp,
                 completed: event.completed ?? true
             )
 
@@ -66,6 +66,7 @@ extension Navigation {
 
             await finalizeTransition(
                 for: presentingSnapshot(from: event),
+                timestamp: event.timestamp,
                 completed: event.completed ?? true
             )
 
@@ -80,16 +81,14 @@ extension Navigation {
     private func presentedSnapshot(from event: any PresentationActionEvent) -> PresentationTransitionSnapshot {
         PresentationTransitionSnapshot(
             controllerIdentifier: event.presentedControllerIdentifier,
-            controllerTypeName: event.presentedControllerTypeName,
-            timestamp: event.timestamp
+            controllerTypeName: event.presentedControllerTypeName
         )
     }
 
     private func presentingSnapshot(from event: any PresentationActionEvent) -> PresentationTransitionSnapshot {
         PresentationTransitionSnapshot(
             controllerIdentifier: event.presentingControllerIdentifier,
-            controllerTypeName: event.presentingControllerTypeName,
-            timestamp: event.timestamp
+            controllerTypeName: event.presentingControllerTypeName
         )
     }
 
@@ -106,7 +105,7 @@ extension Navigation {
 
         let navigation = NavigationPair(
             type: .transition,
-            start: snapshot.timestamp,
+            start: Date(),
             typeName: typeName,
             screenName: navigationEvent.name
         )
@@ -119,6 +118,7 @@ extension Navigation {
 
     private func finalizeTransition(
         for snapshot: PresentationTransitionSnapshot,
+        timestamp: Date,
         completed: Bool
     ) async {
         guard completed else {
@@ -145,7 +145,7 @@ extension Navigation {
         if await model.navigation(for: snapshot.controllerIdentifier) == nil {
             let fallbackNavigation = NavigationPair(
                 type: .transition,
-                start: snapshot.timestamp,
+                start: Date(),
                 typeName: typeName,
                 screenName: screenName
             )
@@ -157,7 +157,7 @@ extension Navigation {
 
         let start =
             await model.navigation(for: snapshot.controllerIdentifier)?
-            .start ?? snapshot.timestamp
+            .start ?? Date()
 
         await updateCurrentScreen(
             screenName: screenName,
@@ -167,7 +167,7 @@ extension Navigation {
         )
 
         let event = AutomatedNavigationEvent(
-            timestamp: snapshot.timestamp,
+            timestamp: timestamp,
             type: .didTransitionToTraitCollection,
             controllerTypeName: typeName,
             controllerIdentifier: snapshot.controllerIdentifier
