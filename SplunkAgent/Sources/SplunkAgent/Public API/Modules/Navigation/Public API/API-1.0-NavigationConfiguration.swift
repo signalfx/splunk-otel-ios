@@ -15,9 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+public import SplunkCommon
+
 /// Configuration for the navigation module.
 ///
-/// Use this class to enable automated navigation tracking and optionally
+/// Use this type to enable automated navigation tracking and optionally
 /// configure a ``NavigationModuleEventProcessor`` to customize screen names,
 /// add span attributes, or suppress specific navigation events.
 ///
@@ -30,14 +32,14 @@ limitations under the License.
 /// )
 /// try SplunkRum.install(with: config, moduleConfigurations: [navConfig])
 /// ```
-public final class NavigationConfiguration {
+public struct NavigationConfiguration: ModuleConfiguration {
 
     // MARK: - Module management
 
     /// Indicates whether the module is enabled.
     ///
     /// Default value is `true`.
-    public var isEnabled: Bool
+    public var isEnabled: Bool = true
 
     /// A `Boolean` value determines whether the module should automatically detect navigation in the application.
     public var enableAutomatedTracking: Bool?
@@ -58,6 +60,9 @@ public final class NavigationConfiguration {
 
     // MARK: - Initialization
 
+    /// Initializes new module configuration with default values.
+    public init() {}
+
     /// Initializes new module configuration with preconfigured values.
     ///
     /// - Parameters:
@@ -72,5 +77,14 @@ public final class NavigationConfiguration {
         self.isEnabled = isEnabled
         self.enableAutomatedTracking = enableAutomatedTracking
         self.navigationEventProcessor = navigationEventProcessor
+    }
+
+
+    // MARK: - Codable
+
+    /// Non-serializable properties are excluded from serialization.
+    enum CodingKeys: String, CodingKey {
+        case isEnabled
+        case enableAutomatedTracking
     }
 }

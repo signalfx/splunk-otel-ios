@@ -343,9 +343,12 @@ public class SplunkRum: ObservableObject {
 
     // MARK: - Module configuration resolution
 
-    /// Converts public `SplunkAgent`-level module configurations to their
-    /// internal `SplunkNavigation` / `SplunkCommon` counterparts so that
-    /// ``DefaultModulesManager`` can match them to the correct modules.
+    /// Translates `SplunkAgent`-level module configurations to their internal
+    /// `SplunkNavigation` counterpart so that ``DefaultModulesManager`` can match
+    /// each configuration to the correct module by type. The agent-level
+    /// `NavigationConfiguration` and the internal one carry the same fields but
+    /// reference different processor protocols (`NavigationModuleEventProcessor`
+    /// vs. `NavigationEventProcessor`), one declared at each layer.
     private static func resolveModuleConfigurations(_ configurations: [Any]?) -> [Any]? {
         configurations?
             .map { config in

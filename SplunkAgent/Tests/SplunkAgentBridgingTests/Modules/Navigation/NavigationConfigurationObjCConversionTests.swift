@@ -16,21 +16,21 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkNavigation
 import XCTest
 
+@testable import SplunkAgent
 @testable import SplunkAgentObjC
 
-/// Verifies that ``NavigationConfigurationObjC`` correctly converts into the
-/// internal ``SplunkNavigation/NavigationConfiguration``, including property
-/// forwarding and processor routing through the agent facade
-/// (``NavEventProcessorObjCToAgentAdapter`` → ``NavProcessorAgentToInternalAdapter``).
+/// Verifies that ``NavigationConfigurationObjC`` correctly converts into
+/// ``SplunkAgent/NavigationConfiguration``, including property forwarding,
+/// processor routing, and end-to-end translation through the full
+/// ObjC → agent → internal adapter chain.
 final class NavConfigObjCConversionTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func convert(_ config: NavigationConfigurationObjC) -> NavigationConfiguration? {
-        config.moduleConfiguration as? NavigationConfiguration
+    private func convert(_ config: NavigationConfigurationObjC) -> SplunkAgent.NavigationConfiguration? {
+        config.moduleConfiguration as? SplunkAgent.NavigationConfiguration
     }
 
 
@@ -104,5 +104,54 @@ final class NavConfigObjCConversionTests: XCTestCase {
             )
 
         XCTAssertEqual(event?.name, "TestVC")
+    }
+
+
+    // MARK: - End-to-end ObjC → agent → internal chain
+
+    /// Exercises the full ObjC → NavEventProcessorObjCToAgentAdapter →
+    /// NavigationModuleEventProcessorAdapter path. Asserts each processor
+    /// contract (rename, enrich, suppress) survives both adapter hops.
+    func testEndToEndChain_rename() {
+        let config = NavigationConfigurationObjC(
+            isEnabled: true,
+            enableAutomatedTracking: false,
+            navigationEventProcessor: PassthroughProcessorObjC()
+        )
+
+        let internalConfig = convert(config)?.asNavigationConfiguration
+        let event = internalConfig?.navigationEventProcessor?
+            .onViewController(typeName: "HomeVC", controllerIdentity: "1")
+
+        XCTAssertEqual(event?.name, "HomeVC")
+    }
+
+    func testEndToEndChain_enrich() {
+        let attributes: NSDictionary = ["app.section": "settings"]
+        let config = NavigationConfigurationObjC(
+            isEnabled: true,
+            enableAutomatedTracking: false,
+            navigationEventProcessor: AttributeProcessorObjC(attributes: attributes)
+        )
+
+        let internalConfig = convert(config)?.asNavigationConfiguration
+        let event = internalConfig?.navigationEventProcessor?
+            .onViewController(typeName: "SettingsVC", controllerIdentity: "2")
+
+        XCTAssertEqual(event?.attributes?["app.section"] as? String, "settings")
+    }
+
+    func testEndToEndChain_suppress() {
+        let config = NavigationConfigurationObjC(
+            isEnabled: true,
+            enableAutomatedTracking: false,
+            navigationEventProcessor: SuppressingProcessorObjC()
+        )
+
+        let internalConfig = convert(config)?.asNavigationConfiguration
+        let event = internalConfig?.navigationEventProcessor?
+            .onViewController(typeName: "AnyVC", controllerIdentity: "3")
+
+        XCTAssertNil(event)
     }
 }
