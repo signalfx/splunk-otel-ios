@@ -15,30 +15,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAgent
 internal import SplunkNavigation
 
-/// Adapts a ``NavigationModuleEventProcessor`` (agent facade) to the
-/// internal ``NavigationEventProcessor`` used by the navigation engine.
-///
-/// Duplicates ``NavigationModuleEventProcessorAdapter`` in `SplunkAgent`,
-/// which is `internal` and inaccessible from this target. We intentionally
-/// duplicate rather than widen access (e.g. `package`) to preserve
-/// compile-time target isolation.
+/// Adapts an Objective-C ``NavigationEventProcessorObjC`` to the
+/// ``NavigationEventProcessor`` protocol used by the navigation engine.
 ///
 /// - Note: We mark this class `@unchecked Sendable` because it is immutable after
 ///   init; the single stored property is a private let and is never mutated.
-final class NavProcessorAgentToInternalAdapter: NavigationEventProcessor, @unchecked Sendable {
+final class NavEventProcessorObjCToInternalAdapter: NavigationEventProcessor, @unchecked Sendable {
 
     // MARK: - Private
 
-    private let agentProcessor: any NavigationModuleEventProcessor
+    private let objcProcessor: any NavigationEventProcessorObjC
 
 
     // MARK: - Initialization
 
-    init(wrapping agentProcessor: any NavigationModuleEventProcessor) {
-        self.agentProcessor = agentProcessor
+    init(wrapping objcProcessor: any NavigationEventProcessorObjC) {
+        self.objcProcessor = objcProcessor
     }
 
 
@@ -46,18 +40,25 @@ final class NavProcessorAgentToInternalAdapter: NavigationEventProcessor, @unche
 
     func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
 
-        guard
-            let agentEvent = agentProcessor.onViewController(
-                typeName: typeName,
-                controllerIdentity: controllerIdentity
-            )
-        else {
+        guard let objcEvent = objcProcessor.onViewController(typeName: typeName, controllerIdentity: controllerIdentity) else {
             return nil
         }
 
+        let attributes: [String: Any]? = objcEvent.attributes.flatMap { dict in
+            let filtered = dict.compactMap { key, value -> (String, Any)? in
+                guard let stringKey = key as? String else {
+                    return nil
+                }
+
+                return (stringKey, value)
+            }
+
+            return filtered.isEmpty ? nil : Dictionary(uniqueKeysWithValues: filtered)
+        }
+
         return NavigationEvent(
-            name: agentEvent.name,
-            attributes: agentEvent.attributes
+            name: objcEvent.name,
+            attributes: attributes
         )
     }
 }
