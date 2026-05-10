@@ -16,21 +16,21 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkNavigation
 import XCTest
 
-@testable import SplunkAgent
 @testable import SplunkAgentObjC
 
 /// Verifies that ``NavigationConfigurationObjC`` correctly converts into
-/// ``SplunkAgent/NavigationConfiguration``, including property forwarding,
-/// processor routing, and end-to-end translation through the full
-/// ObjC → agent → internal adapter chain.
+/// ``SplunkNavigation/NavigationConfiguration``, including property forwarding,
+/// processor routing, and end-to-end translation through the
+/// ObjC → internal-protocol adapter.
 final class NavConfigObjCConversionTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func convert(_ config: NavigationConfigurationObjC) -> SplunkAgent.NavigationConfiguration? {
-        config.moduleConfiguration as? SplunkAgent.NavigationConfiguration
+    private func convert(_ config: NavigationConfigurationObjC) -> NavigationConfiguration? {
+        config.moduleConfiguration as? NavigationConfiguration
     }
 
 
@@ -107,11 +107,11 @@ final class NavConfigObjCConversionTests: XCTestCase {
     }
 
 
-    // MARK: - End-to-end ObjC → agent → internal chain
+    // MARK: - End-to-end ObjC → internal chain
 
-    /// Exercises the full ObjC → NavEventProcessorObjCToAgentAdapter →
-    /// NavigationModuleEventProcessorAdapter path. Asserts each processor
-    /// contract (rename, enrich, suppress) survives both adapter hops.
+    /// Exercises the full ObjC → NavEventProcessorObjCToInternalAdapter path.
+    /// Asserts each processor contract (rename, enrich, suppress) survives
+    /// the single adapter hop.
     func testEndToEndChain_rename() {
         let config = NavigationConfigurationObjC(
             isEnabled: true,
@@ -119,7 +119,7 @@ final class NavConfigObjCConversionTests: XCTestCase {
             navigationEventProcessor: PassthroughProcessorObjC()
         )
 
-        let internalConfig = convert(config)?.asNavigationConfiguration
+        let internalConfig = convert(config)
         let event = internalConfig?.navigationEventProcessor?
             .onViewController(typeName: "HomeVC", controllerIdentity: "1")
 
@@ -134,7 +134,7 @@ final class NavConfigObjCConversionTests: XCTestCase {
             navigationEventProcessor: AttributeProcessorObjC(attributes: attributes)
         )
 
-        let internalConfig = convert(config)?.asNavigationConfiguration
+        let internalConfig = convert(config)
         let event = internalConfig?.navigationEventProcessor?
             .onViewController(typeName: "SettingsVC", controllerIdentity: "2")
 
@@ -148,7 +148,7 @@ final class NavConfigObjCConversionTests: XCTestCase {
             navigationEventProcessor: SuppressingProcessorObjC()
         )
 
-        let internalConfig = convert(config)?.asNavigationConfiguration
+        let internalConfig = convert(config)
         let event = internalConfig?.navigationEventProcessor?
             .onViewController(typeName: "AnyVC", controllerIdentity: "3")
 

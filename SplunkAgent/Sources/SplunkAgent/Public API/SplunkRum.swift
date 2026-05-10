@@ -287,16 +287,13 @@ public class SplunkRum: ObservableObject {
         // Send a session start event explicitly as soon as a Session and an EventManager are available
         (currentSession as? DefaultSession)?.sendInitialSessionStartEvent()
 
-        // Resolve SplunkAgent-level configurations to internal module types
-        let resolvedConfigurations = Self.resolveModuleConfigurations(moduleConfigurations)
-
         // Store module configurations for later use in module customization
-        self.moduleConfigurations = resolvedConfigurations
+        self.moduleConfigurations = moduleConfigurations
 
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
-            moduleConfigurations: resolvedConfigurations
+            moduleConfigurations: moduleConfigurations
         )
 
         // Module installation above activates URLSession swizzling. Set the
@@ -338,26 +335,6 @@ public class SplunkRum: ObservableObject {
         //            for: configuration,
         //            apiClient: APIClient(baseUrl: configuration.configUrl)
         //        )
-    }
-
-
-    // MARK: - Module configuration resolution
-
-    /// Translates `SplunkAgent`-level module configurations to their internal
-    /// `SplunkNavigation` counterpart so that ``DefaultModulesManager`` can match
-    /// each configuration to the correct module by type. The agent-level
-    /// `NavigationConfiguration` and the internal one carry the same fields but
-    /// reference different processor protocols (`NavigationModuleEventProcessor`
-    /// vs. `NavigationEventProcessor`), one declared at each layer.
-    private static func resolveModuleConfigurations(_ configurations: [Any]?) -> [Any]? {
-        configurations?
-            .map { config in
-                if let navConfig = config as? NavigationConfiguration {
-                    return navConfig.asNavigationConfiguration
-                }
-
-                return config
-            }
     }
 
 

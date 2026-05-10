@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkAgent
 internal import SplunkCommon
+internal import SplunkNavigation
 
 extension NavigationConfigurationObjC: ModuleConfigurationSwift {
 
@@ -27,7 +27,7 @@ extension NavigationConfigurationObjC: ModuleConfigurationSwift {
             isEnabled: isEnabled,
             enableAutomatedTracking: enableAutomatedTracking,
             navigationEventProcessor: navigationEventProcessor.map {
-                NavEventProcessorObjCToAgentAdapter(wrapping: $0)
+                NavEventProcessorObjCToInternalAdapter(wrapping: $0)
             }
         )
     }

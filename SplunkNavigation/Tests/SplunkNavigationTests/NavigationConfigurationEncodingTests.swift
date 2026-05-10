@@ -18,43 +18,49 @@ limitations under the License.
 import Foundation
 import XCTest
 
-@testable import SplunkAgent
-
-/// Typealias to disambiguate the SplunkAgent `NavigationConfiguration`
-/// from `SplunkNavigation.NavigationConfiguration` in this test file.
-private typealias AgentNavigationConfiguration = SplunkAgent.NavigationConfiguration
+@testable import SplunkNavigation
 
 /// Verifies that the CodingKeys exclusion on ``NavigationConfiguration``
 /// serialises only the encodable fields and never exposes the processor.
 final class NavConfigEncodingTests: XCTestCase {
 
-    private func encode(_ config: AgentNavigationConfiguration) throws -> [String: Any] {
+    private func encode(_ config: NavigationConfiguration) throws -> [String: Any] {
         let data = try JSONEncoder().encode(config)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
         return try XCTUnwrap(json)
     }
 
     func testIsEnabledPresent() throws {
-        let json = try encode(AgentNavigationConfiguration(isEnabled: true))
+        let json = try encode(NavigationConfiguration(isEnabled: true))
         XCTAssertNotNil(json["isEnabled"])
     }
 
     func testEnableAutomatedTrackingPresent() throws {
-        let json = try encode(AgentNavigationConfiguration(enableAutomatedTracking: true))
+        let json = try encode(NavigationConfiguration(isEnabled: true, enableAutomatedTracking: true))
         XCTAssertNotNil(json["enableAutomatedTracking"])
     }
 
     func testEnableAutomatedTrackingAbsentWhenNil() throws {
-        let json = try encode(AgentNavigationConfiguration())
+        let json = try encode(NavigationConfiguration())
         XCTAssertNil(json["enableAutomatedTracking"])
     }
 
     func testProcessorKeyAbsent() throws {
         let json = try encode(
-            AgentNavigationConfiguration(
-                navigationEventProcessor: PassthroughModuleProcessor()
+            NavigationConfiguration(
+                isEnabled: true,
+                navigationEventProcessor: PassthroughNavigationEventProcessor()
             )
         )
         XCTAssertNil(json["navigationEventProcessor"])
+    }
+}
+
+
+// MARK: - Test fixtures
+
+private struct PassthroughNavigationEventProcessor: NavigationEventProcessor {
+    func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEvent? {
+        NavigationEvent(name: typeName)
     }
 }
