@@ -203,7 +203,7 @@ extension SplunkRum {
             let crashReportsModule = modulesManager?.module(ofType: SplunkCrashReports.CrashReports.self)
         #endif
 
-        navigationModule.agentVersion = sharedState.agentVersion
+        navigationModule.sharedState = sharedState
 
         // Set up forwarding of screen name changes to runtime attributes.
         Task(priority: .userInitiated) {
