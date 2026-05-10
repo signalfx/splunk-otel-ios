@@ -106,7 +106,6 @@ extension Navigation {
         let navigation = NavigationPair(
             type: .transition,
             start: Date(),
-            typeName: typeName,
             screenName: navigationEvent.name
         )
 
@@ -146,7 +145,6 @@ extension Navigation {
             let fallbackNavigation = NavigationPair(
                 type: .transition,
                 start: Date(),
-                typeName: typeName,
                 screenName: screenName
             )
             await model.update(

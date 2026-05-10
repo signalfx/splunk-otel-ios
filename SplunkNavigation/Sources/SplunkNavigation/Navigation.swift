@@ -45,30 +45,8 @@ public final class Navigation: Sendable {
 
     // MARK: - Module configuration
 
-    /// A configured version of the agent.
-    public var agentVersion: String? {
-        get async {
-            await model.agentVersion
-        }
-    }
-
-    /// Sets used version of the agent.
-    ///
-    /// It should correspond to the `SplunkRum.version`.
-    ///
-    /// - Parameter agentVersion: A configured version of the agent.
-    ///
-    /// - Returns: An updated module object.
-    @discardableResult
-    public func agentVersion(_ agentVersion: String) -> Self {
-        Task {
-            if await agentVersion != self.agentVersion {
-                await model.update(agentVersion: agentVersion)
-            }
-        }
-
-        return self
-    }
+    /// Shared agent state, injected by the agent at startup.
+    public nonisolated(unsafe) unowned var sharedState: AgentSharedState?
 
 
     // MARK: - Preferences
@@ -227,7 +205,6 @@ public final class Navigation: Sendable {
         let navigation = NavigationPair(
             type: .show,
             start: start,
-            typeName: typeName,
             screenName: screenName
         )
 
@@ -269,7 +246,6 @@ public final class Navigation: Sendable {
         let navigation = NavigationPair(
             type: .transition,
             start: start,
-            typeName: typeName,
             screenName: screenName
         )
 
