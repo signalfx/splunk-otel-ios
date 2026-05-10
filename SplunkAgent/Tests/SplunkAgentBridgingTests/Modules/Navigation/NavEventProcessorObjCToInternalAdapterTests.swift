@@ -26,7 +26,7 @@ import XCTest
 /// internal ``NavigationEventProcessor`` protocol used by the navigation
 /// engine, including name passthrough, event suppression, attribute
 /// forwarding, and non-string key filtering.
-final class NavEventProcessorObjCToInternalAdapterTests: XCTestCase {
+final class NavProcessorObjCToInternalAdapterTests: XCTestCase {
 
     // MARK: - Passthrough
 
