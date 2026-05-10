@@ -110,6 +110,7 @@ final class NavConfigObjCConversionTests: XCTestCase {
     // MARK: - End-to-end ObjC → internal chain
 
     /// Exercises the full ObjC → NavEventProcessorObjCToInternalAdapter path.
+    ///
     /// Asserts each processor contract (rename, enrich, suppress) survives
     /// the single adapter hop.
     func testEndToEndChain_rename() {
