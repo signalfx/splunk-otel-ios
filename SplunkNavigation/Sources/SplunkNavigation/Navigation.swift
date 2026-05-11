@@ -126,11 +126,13 @@ public final class Navigation: Sendable {
 
     // MARK: - Instrumentation
 
-    /// Starts detection and processing of navigation.
+    /// Starts long-lived detection loops that run for the lifetime of this
+    /// instance.
     ///
-    /// Detection tasks exit naturally when this instance deinits, releasing
-    /// `continuation` and terminating the `AsyncStream`, which causes the `for await`
-    /// loops in each task to return. No explicit cancellation is needed.
+    /// These tasks strongly capture `self` with no self-termination
+    /// path; an accepted trade-off for a module that runs for the lifetime
+    /// of the process. If cancellation were ever needed, the task handles
+    /// would need to be stored and `.cancel()` called explicitly.
     func startDetection() {
         Task(priority: .userInitiated) {
             await runNavigationDetectionLoop()
