@@ -12,8 +12,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Added automated screen tracking for `UIViewController` transitions #590
 * Added automated screen tracking for `UINavigationController` push/pop (including interactive pop cancellation) #587
 * Added automated screen tracking for modal presentation/dismissal. #599
-* Added manual screen name tracking via `track(screen:attributes:)` and the `.trackScreen` SwiftUI view modifier, with optional custom attributes. Manual calls bypass the `NavigationModuleEventProcessor` and always emit spans. #621
-* Added `NavigationModuleEventProcessor` protocol for custom screen name transforms, event filtering, and span attributes on navigation events. #624
+* Added manual screen name tracking via `track(screen:attributes:)` and the `.trackScreen` SwiftUI view modifier, with optional custom attributes. Manual calls bypass the `NavigationEventProcessor` and always emit spans. #621
+* Added `NavigationEventProcessor` protocol (in `SplunkNavigation`; requires `import SplunkNavigation`) for custom screen name transforms, event filtering, and span attributes on navigation events. #624
 * Added `navigation.name` attribute on `app.ui.navigation` screen-change spans. #625
 * Added navigation module integration in `SplunkAgent` proxy with Swift and Objective-C API surfaces. #618
 
