@@ -29,6 +29,8 @@ public final class Navigation: Sendable {
     let model: NavigationModel
 
     let appBundleName: String?
+
+    // Yielded from multiple concurrent contexts.
     let continuation: AsyncStream<String>.Continuation
     let navigationEventStreamProvider: any NavigationEventStreamProviding
 
@@ -102,7 +104,13 @@ public final class Navigation: Sendable {
 
     // MARK: - Instrumentation
 
-    /// Starts detection and processing of navigation.
+    /// Starts long-lived detection loops that run for the lifetime of this
+    /// instance.
+    ///
+    /// These tasks strongly capture `self` with no self-termination
+    /// path; an accepted trade-off for a module that runs for the lifetime
+    /// of the process. If cancellation were ever needed, the task handles
+    /// would need to be stored and `.cancel()` called explicitly.
     func startDetection() {
         Task(priority: .userInitiated) {
             await runNavigationDetectionLoop()
