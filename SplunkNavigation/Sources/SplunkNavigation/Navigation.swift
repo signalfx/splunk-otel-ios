@@ -29,6 +29,8 @@ public final class Navigation: Sendable {
     let model: NavigationModel
 
     let appBundleName: String?
+
+    // Yielded from multiple concurrent contexts.
     let continuation: AsyncStream<String>.Continuation
     let navigationEventStreamProvider: any NavigationEventStreamProviding
 
@@ -125,6 +127,10 @@ public final class Navigation: Sendable {
     // MARK: - Instrumentation
 
     /// Starts detection and processing of navigation.
+    ///
+    /// Detection tasks exit naturally when this instance deinits, releasing
+    /// `continuation` and terminating the `AsyncStream`, which causes the `for await`
+    /// loops in each task to return. No explicit cancellation is needed.
     func startDetection() {
         Task(priority: .userInitiated) {
             await runNavigationDetectionLoop()
