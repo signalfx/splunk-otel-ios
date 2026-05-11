@@ -209,7 +209,7 @@ public final class Navigation: Sendable {
 
     /// Process the beginning of the view controller display.
     private func processShowStart(event: NavigationActionEvent) async {
-        let start = Date()
+        let start = event.timestamp
 
         let typeName = event.controllerTypeName
         guard
@@ -251,7 +251,7 @@ public final class Navigation: Sendable {
 
     /// Process the beginning of the view controller transition.
     private func processTransitionStart(event: NavigationActionEvent) async {
-        let start = Date()
+        let start = event.timestamp
 
         let typeName = event.controllerTypeName
         guard
