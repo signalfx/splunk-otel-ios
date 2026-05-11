@@ -56,7 +56,7 @@ public struct NavigationConfiguration: ModuleConfiguration {
     ///   - enableAutomatedTracking: If `true`, the module will automatically detect navigation.
     ///   - navigationEventProcessor: Optional processor to transform automated navigation events.
     public init(
-        isEnabled: Bool,
+        isEnabled: Bool = true,
         enableAutomatedTracking: Bool? = nil,
         navigationEventProcessor: (any NavigationEventProcessor)? = nil
     ) {

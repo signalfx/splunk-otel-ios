@@ -16,22 +16,22 @@ limitations under the License.
 */
 
 import Foundation
-import SplunkAgent
+import SplunkNavigation
 import XCTest
 
 @testable import SplunkAgentObjC
 
-/// Verifies that ``NavEventProcessorObjCToAgentAdapter`` correctly
+/// Verifies that ``NavEventProcessorObjCToInternalAdapter`` correctly
 /// bridges an ObjC ``NavigationEventProcessorObjC`` implementation into the
-/// agent-level ``NavigationModuleEventProcessor`` protocol, including name
-/// passthrough, event suppression, attribute forwarding, and non-string key
-/// filtering.
-final class NavEventProcessorObjCToAgentAdapterTests: XCTestCase {
+/// internal ``NavigationEventProcessor`` protocol used by the navigation
+/// engine, including name passthrough, event suppression, attribute
+/// forwarding, and non-string key filtering.
+final class NavProcessorObjCToInternalAdapterTests: XCTestCase {
 
     // MARK: - Passthrough
 
     func testPassthroughName() {
-        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: PassthroughProcessorObjC())
+        let adapter = NavEventProcessorObjCToInternalAdapter(wrapping: PassthroughProcessorObjC())
 
         let event = adapter.onViewController(typeName: "HomeViewController", controllerIdentity: "12345")
 
@@ -44,7 +44,7 @@ final class NavEventProcessorObjCToAgentAdapterTests: XCTestCase {
     // MARK: - Suppression
 
     func testSuppression() {
-        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: SuppressingProcessorObjC())
+        let adapter = NavEventProcessorObjCToInternalAdapter(wrapping: SuppressingProcessorObjC())
 
         let event = adapter.onViewController(typeName: "SomeController", controllerIdentity: "99999")
 
@@ -56,7 +56,7 @@ final class NavEventProcessorObjCToAgentAdapterTests: XCTestCase {
 
     func testStringAttributes() {
         let attributes: NSDictionary = ["app.section": "settings", "app.feature": "profile"]
-        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
+        let adapter = NavEventProcessorObjCToInternalAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
 
         let event = adapter.onViewController(typeName: "SettingsVC", controllerIdentity: "111")
 
@@ -66,7 +66,7 @@ final class NavEventProcessorObjCToAgentAdapterTests: XCTestCase {
     }
 
     func testNilAttributes() {
-        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: AttributeProcessorObjC(attributes: nil))
+        let adapter = NavEventProcessorObjCToInternalAdapter(wrapping: AttributeProcessorObjC(attributes: nil))
 
         let event = adapter.onViewController(typeName: "PlainVC", controllerIdentity: "222")
 
@@ -82,7 +82,7 @@ final class NavEventProcessorObjCToAgentAdapterTests: XCTestCase {
             "valid.key": "value",
             NSNumber(value: 42): "number-keyed"
         ]
-        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
+        let adapter = NavEventProcessorObjCToInternalAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
 
         let event = adapter.onViewController(typeName: "MixedVC", controllerIdentity: "333")
 
@@ -96,7 +96,7 @@ final class NavEventProcessorObjCToAgentAdapterTests: XCTestCase {
             NSNumber(value: 1): "a",
             NSNumber(value: 2): "b"
         ]
-        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
+        let adapter = NavEventProcessorObjCToInternalAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
 
         let event = adapter.onViewController(typeName: "BadKeysVC", controllerIdentity: "444")
 
@@ -109,7 +109,7 @@ final class NavEventProcessorObjCToAgentAdapterTests: XCTestCase {
 
     func testEmptyDictionaryProducesNilAttributes() {
         let attributes: NSDictionary = [:]
-        let adapter = NavEventProcessorObjCToAgentAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
+        let adapter = NavEventProcessorObjCToInternalAdapter(wrapping: AttributeProcessorObjC(attributes: attributes))
 
         let event = adapter.onViewController(typeName: "EmptyAttrsVC", controllerIdentity: "555")
 
