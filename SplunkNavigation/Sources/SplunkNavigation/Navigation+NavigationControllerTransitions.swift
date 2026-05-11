@@ -44,7 +44,6 @@ extension Navigation {
         let navigation = NavigationPair(
             type: .show,
             start: event.timestamp,
-            typeName: typeName,
             screenName: screenName
         )
 
@@ -160,7 +159,6 @@ extension Navigation {
             let fallbackNavigation = NavigationPair(
                 type: .show,
                 start: event.timestamp,
-                typeName: typeName,
                 screenName: screenName
             )
             await model.update(navigation: fallbackNavigation, for: visibleControllerIdentifier)
