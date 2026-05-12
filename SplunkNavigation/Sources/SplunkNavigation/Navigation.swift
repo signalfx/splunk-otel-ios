@@ -195,7 +195,7 @@ public final class Navigation: Sendable {
 
     /// Process the beginning of the view controller display.
     private func processShowStart(event: NavigationActionEvent) async {
-        let start = Date()
+        let start = event.timestamp
 
         let typeName = event.controllerTypeName
         guard
@@ -236,7 +236,7 @@ public final class Navigation: Sendable {
 
     /// Process the beginning of the view controller transition.
     private func processTransitionStart(event: NavigationActionEvent) async {
-        let start = Date()
+        let start = event.timestamp
 
         let typeName = event.controllerTypeName
         guard
@@ -276,7 +276,7 @@ public final class Navigation: Sendable {
 
     /// Process the finalizing of the navigation.
     func processNavigationEnd(event: NavigationActionEvent) async {
-        let end = Date()
+        let end = event.timestamp
         let identifier = event.controllerIdentifier
 
         // Get corresponding navigation data
