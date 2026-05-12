@@ -52,26 +52,28 @@ extension Span {
         case let stringValue as String:
             attributeValue = .string(stringValue)
 
+        case let boolValue as Bool:
+            // Bool must precede Int: NSNumber booleans match Int first in Swift type matching.
+            attributeValue = .bool(boolValue)
+
         case let intValue as Int:
             attributeValue = .int(intValue)
 
         case let doubleValue as Double:
             attributeValue = .double(doubleValue)
 
-        case let boolValue as Bool:
-            attributeValue = .bool(boolValue)
-
         case let arrayValue as [String]:
             attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.string($0) }))
+
+        case let arrayValue as [Bool]:
+            // Bool array must precede Int array for the same NSNumber bridging reason.
+            attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.bool($0) }))
 
         case let arrayValue as [Int]:
             attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.int($0) }))
 
         case let arrayValue as [Double]:
             attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.double($0) }))
-
-        case let arrayValue as [Bool]:
-            attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.bool($0) }))
 
         default:
             // For unsupported types, convert to string representation
