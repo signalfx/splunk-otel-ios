@@ -341,5 +341,5 @@ public class SplunkRum: ObservableObject {
     // MARK: - Version
 
     /// A version of this agent.
-    public static let version = "2.2.2"
+    public static let version = "2.2.3"
 }
