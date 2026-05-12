@@ -29,6 +29,8 @@ public final class Navigation: Sendable {
     let model: NavigationModel
 
     let appBundleName: String?
+
+    // Yielded from multiple concurrent contexts.
     let continuation: AsyncStream<String>.Continuation
     let navigationEventStreamProvider: any NavigationEventStreamProviding
 
@@ -45,30 +47,8 @@ public final class Navigation: Sendable {
 
     // MARK: - Module configuration
 
-    /// A configured version of the agent.
-    public var agentVersion: String? {
-        get async {
-            await model.agentVersion
-        }
-    }
-
-    /// Sets used version of the agent.
-    ///
-    /// It should correspond to the `SplunkRum.version`.
-    ///
-    /// - Parameter agentVersion: A configured version of the agent.
-    ///
-    /// - Returns: An updated module object.
-    @discardableResult
-    public func agentVersion(_ agentVersion: String) -> Self {
-        Task {
-            if await agentVersion != self.agentVersion {
-                await model.update(agentVersion: agentVersion)
-            }
-        }
-
-        return self
-    }
+    /// Shared agent state, injected by the agent at startup.
+    public nonisolated(unsafe) unowned var sharedState: AgentSharedState?
 
 
     // MARK: - Preferences
@@ -124,7 +104,13 @@ public final class Navigation: Sendable {
 
     // MARK: - Instrumentation
 
-    /// Starts detection and processing of navigation.
+    /// Starts long-lived detection loops that run for the lifetime of this
+    /// instance.
+    ///
+    /// These tasks strongly capture `self` with no self-termination
+    /// path; an accepted trade-off for a module that runs for the lifetime
+    /// of the process. If cancellation were ever needed, the task handles
+    /// would need to be stored and `.cancel()` called explicitly.
     func startDetection() {
         Task(priority: .userInitiated) {
             await runNavigationDetectionLoop()
@@ -227,7 +213,6 @@ public final class Navigation: Sendable {
         let navigation = NavigationPair(
             type: .show,
             start: start,
-            typeName: typeName,
             screenName: screenName
         )
 
@@ -269,7 +254,6 @@ public final class Navigation: Sendable {
         let navigation = NavigationPair(
             type: .transition,
             start: start,
-            typeName: typeName,
             screenName: screenName
         )
 

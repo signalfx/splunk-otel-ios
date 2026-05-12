@@ -39,6 +39,5 @@ struct NavigationPair: Sendable {
 
     // MARK: - Controller identity
 
-    let typeName: String
     let screenName: String
 }

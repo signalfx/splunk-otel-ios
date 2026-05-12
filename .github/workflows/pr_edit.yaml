@@ -8,13 +8,13 @@ jobs:
   validate_pr_title:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: Validate PR Title
         uses: ./.github/actions/validate-pr-title
   validate_gai_usage_disclosure:
     if: github.event.pull_request.base.ref != 'main' && github.event.pull_request.head.ref != 'main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: Validate GAI Usage Disclosure
         uses: ./.github/actions/validate-gai-usage-disclosure
