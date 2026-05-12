@@ -21,6 +21,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Navigation spans now use the span name `app.ui.navigation` (previously `screen name change`). #625
 
+## [2.2.3] - 2026-05-12
+
+### Fixed
+
+* Fixed nested frameworks in the CiscoSessionReplay.framework. Fixes #633. #654
+
 ## [2.2.2] - 2026-04-15
 
 ### Added
