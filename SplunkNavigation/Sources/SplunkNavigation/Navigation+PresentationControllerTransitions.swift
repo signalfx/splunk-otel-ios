@@ -39,7 +39,7 @@ extension Navigation {
                 return
             }
 
-            await updateTransitionStart(for: presentedSnapshot(from: event))
+            await updateTransitionStart(for: presentedSnapshot(from: event), timestamp: event.timestamp)
 
         case .presentationDidEnd:
             guard !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
@@ -57,7 +57,7 @@ extension Navigation {
                 return
             }
 
-            await updateTransitionStart(for: presentingSnapshot(from: event))
+            await updateTransitionStart(for: presentingSnapshot(from: event), timestamp: event.timestamp)
 
         case .dismissalDidEnd:
             guard !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
@@ -92,7 +92,7 @@ extension Navigation {
         )
     }
 
-    private func updateTransitionStart(for snapshot: PresentationTransitionSnapshot) async {
+    private func updateTransitionStart(for snapshot: PresentationTransitionSnapshot, timestamp: Date) async {
         let typeName = snapshot.controllerTypeName
         guard
             let navigationEvent = await processAutomatedNavigationEvent(
@@ -105,7 +105,7 @@ extension Navigation {
 
         let navigation = NavigationPair(
             type: .transition,
-            start: Date(),
+            start: timestamp,
             screenName: navigationEvent.name
         )
 
@@ -144,7 +144,7 @@ extension Navigation {
         if await model.navigation(for: snapshot.controllerIdentifier) == nil {
             let fallbackNavigation = NavigationPair(
                 type: .transition,
-                start: Date(),
+                start: timestamp,
                 screenName: screenName
             )
             await model.update(
@@ -155,7 +155,7 @@ extension Navigation {
 
         let start =
             await model.navigation(for: snapshot.controllerIdentifier)?
-            .start ?? Date()
+            .start ?? timestamp
 
         await updateCurrentScreen(
             screenName: screenName,
