@@ -1,1 +1,8 @@
 blank_issues_enabled: false
+contact_links:
+  - name: Splunk RUM for iOS — Installation & Configuration
+    url: https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-rum/instrument-ios-applications-for-splunk-rum/splunk-rum-ios-agent-version-2.0.0-and-above/install-the-splunk-rum-ios-agent
+    about: Setup, configuration, and usage documentation for the Agent.
+  - name: Splunk RUM for iOS — Troubleshooting
+    url: https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-rum/instrument-ios-applications-for-splunk-rum/splunk-rum-ios-agent-version-2.0.0-and-above/troubleshoot-ios-instrumentation
+    about: Common issues and how to resolve them before filing a bug.
