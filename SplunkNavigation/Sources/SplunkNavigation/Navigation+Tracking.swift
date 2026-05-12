@@ -36,10 +36,6 @@ extension Navigation {
                 return
             }
 
-            guard lastScreenName != name else {
-                return
-            }
-
             // Manual tracking updates the current screen name immediately
             await model.update(screenName: name)
 
