@@ -122,17 +122,42 @@ final class NavigationSwiftUITests: XCTestCase {
         XCTAssertEqual(emittedScreens, ["first", "changed"])
     }
 
-    func testSwiftUIScreenTrackerIgnoresUnsupportedAttributesForDedupe() {
+    func testSwiftUIScreenTrackerIncludesUnsupportedAttributesForDedupe() {
         let tracker = SwiftUIScreenTracker()
-        var emitCount = 0
+        var emittedScreens: [String] = []
 
-        tracker.trackIfChanged(screenName: "Home", attributes: ["unsupported": NSObject()]) {
-            emitCount += 1
+        tracker.trackIfChanged(screenName: "Home", attributes: ["unsupported": UnsupportedAttribute(value: "first")]) {
+            emittedScreens.append("first")
+        }
+        tracker.trackIfChanged(screenName: "Home", attributes: ["unsupported": UnsupportedAttribute(value: "first")]) {
+            emittedScreens.append("duplicate")
+        }
+        tracker.trackIfChanged(screenName: "Home", attributes: ["unsupported": UnsupportedAttribute(value: "second")]) {
+            emittedScreens.append("changed")
+        }
+
+        XCTAssertEqual(emittedScreens, ["first", "changed"])
+    }
+
+    func testSwiftUIScreenTrackerTreatsUnsupportedAndEmptyAttributesAsDifferent() {
+        let tracker = SwiftUIScreenTracker()
+        var emittedScreens: [String] = []
+
+        tracker.trackIfChanged(screenName: "Home", attributes: ["unsupported": UnsupportedAttribute(value: "first")]) {
+            emittedScreens.append("unsupported")
         }
         tracker.trackIfChanged(screenName: "Home", attributes: [:]) {
-            emitCount += 1
+            emittedScreens.append("empty")
         }
 
-        XCTAssertEqual(emitCount, 1)
+        XCTAssertEqual(emittedScreens, ["unsupported", "empty"])
+    }
+}
+
+private struct UnsupportedAttribute: CustomStringConvertible {
+    let value: String
+
+    var description: String {
+        "UnsupportedAttribute(value: \(value))"
     }
 }

@@ -16,6 +16,8 @@ limitations under the License.
 */
 
 import Foundation
+import OpenTelemetryApi
+@_spi(SplunkInternal) internal import SplunkCommon
 
 /// Deduplicate repeated SwiftUI `.onAppear` emissions before forwarding to manual `track()`.
 ///
@@ -25,8 +27,8 @@ import Foundation
 /// and should suppress exact duplicate emissions.
 ///
 /// Two appearances are considered duplicates when both the screen name and the
-/// converted telemetry attributes are identical. Unsupported attribute values are
-/// ignored by the conversion, matching the telemetry attribute contract.
+/// emitted telemetry attributes are identical. Unsupported attribute values use
+/// the same string fallback as span emission.
 final class SwiftUIScreenTracker: @unchecked Sendable {
 
     // MARK: - Private
@@ -36,11 +38,11 @@ final class SwiftUIScreenTracker: @unchecked Sendable {
 
     private struct ScreenKey: Equatable {
         let screenName: String
-        let attributes: MutableAttributes
+        let attributes: [String: AttributeValue]
 
         init(screenName: String, attributes: [String: Any]?) {
             self.screenName = screenName
-            self.attributes = MutableAttributes(from: attributes ?? [:])
+            self.attributes = TelemetryAttributeConverter.attributes(from: attributes)
         }
     }
 

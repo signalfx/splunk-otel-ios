@@ -42,7 +42,7 @@ final class SpanExtensionsObjCBridgingTests: XCTestCase {
     }
 
 
-    // MARK: - ObjC bridging: Bool vs Int ordering
+    // MARK: - ObjC bridging: Bool vs numeric NSNumber values
 
     func testClearAndSetAttributeWithObjCBoolAny() throws {
         let mockSpan = try XCTUnwrap(mockSpan)
@@ -50,7 +50,6 @@ final class SpanExtensionsObjCBridgingTests: XCTestCase {
         // Given
         let key = "test.bool.objc"
         // NSNumber(value: true) is what @YES produces when bridged to Swift Any.
-        // Without the Bool-before-Int ordering fix this becomes AttributeValue.int(1).
         let value: Any = NSNumber(value: true)
 
         // When
@@ -58,6 +57,34 @@ final class SpanExtensionsObjCBridgingTests: XCTestCase {
 
         // Then
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.bool(true))
+    }
+
+    func testClearAndSetAttributeWithObjCIntegerOneAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
+        // Given
+        let key = "test.int.objc"
+        let value: Any = NSNumber(value: 1)
+
+        // When
+        mockSpan.clearAndSetAttribute(key: key, value: value)
+
+        // Then
+        XCTAssertEqual(mockSpan.attributes[key], AttributeValue.int(1))
+    }
+
+    func testClearAndSetAttributeWithObjCDoubleWholeNumberAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
+        // Given
+        let key = "test.double.objc"
+        let value: Any = NSNumber(value: 1.0)
+
+        // When
+        mockSpan.clearAndSetAttribute(key: key, value: value)
+
+        // Then
+        XCTAssertEqual(mockSpan.attributes[key], AttributeValue.double(1.0))
     }
 
     func testClearAndSetAttributeWithObjCBoolArrayAny() throws {
@@ -73,6 +100,21 @@ final class SpanExtensionsObjCBridgingTests: XCTestCase {
 
         // Then
         let expectedArray = AttributeArray(values: [AttributeValue.bool(true), AttributeValue.bool(false)])
+        XCTAssertEqual(mockSpan.attributes[key], AttributeValue.array(expectedArray))
+    }
+
+    func testClearAndSetAttributeWithObjCIntegerArrayAny() throws {
+        let mockSpan = try XCTUnwrap(mockSpan)
+
+        // Given
+        let key = "test.int.array.objc"
+        let value: Any = [NSNumber(value: 1), NSNumber(value: 0)]
+
+        // When
+        mockSpan.clearAndSetAttribute(key: key, value: value)
+
+        // Then
+        let expectedArray = AttributeArray(values: [AttributeValue.int(1), AttributeValue.int(0)])
         XCTAssertEqual(mockSpan.attributes[key], AttributeValue.array(expectedArray))
     }
 }
