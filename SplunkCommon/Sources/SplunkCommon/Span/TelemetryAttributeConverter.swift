@@ -91,18 +91,6 @@ public enum TelemetryAttributeConverter {
             return .array(AttributeArray(values: arrayValue.map { AttributeValue.string($0) }))
         }
 
-        if let arrayValue = value as? [Bool] {
-            return .array(AttributeArray(values: arrayValue.map { AttributeValue.bool($0) }))
-        }
-
-        if let arrayValue = value as? [Int] {
-            return .array(AttributeArray(values: arrayValue.map { AttributeValue.int($0) }))
-        }
-
-        if let arrayValue = value as? [Double] {
-            return .array(AttributeArray(values: arrayValue.map { AttributeValue.double($0) }))
-        }
-
         return nil
     }
 
@@ -126,7 +114,7 @@ public enum TelemetryAttributeConverter {
         return defaultValue
     }
 
-    private static func isExact<T>(_ value: Any, _ type: T.Type) -> Bool {
+    private static func isExact(_ value: Any, _ type: Any.Type) -> Bool {
         Swift.type(of: value) == type
     }
 }

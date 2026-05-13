@@ -187,19 +187,19 @@ public final class Navigation: Sendable {
 
     private func processNavigationEvent(_ event: NavigationActionEvent) async {
         switch event.type {
-        case .viewDidLoad:
-            await processShowStart(event: event)
-
         case .viewDidAppear:
             await processShowCommit(event: event)
+
+        case .viewDidLoad:
+            await processShowStart(event: event)
 
         case .viewDidDisappear:
             await cleanupPendingNavigation(event: event)
 
-        case .viewWillTransition,
-            .willTransitionToTraitCollection,
-            .didTransitionToTraitCollection,
-            .viewDidTransition:
+        case .didTransitionToTraitCollection,
+            .viewDidTransition,
+            .viewWillTransition,
+            .willTransitionToTraitCollection:
             break
 
         case .navigationControllerWillShow:
