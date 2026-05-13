@@ -157,12 +157,22 @@ final class NavigationEventSourcesTests: XCTestCase {
 
         navigation.startDetection()
 
+        let controllerIdentifier = ObjectIdentifier(NSString())
+
         continuation.yield(
             AutomatedNavigationEvent(
                 timestamp: Date(),
                 type: .viewDidLoad,
                 controllerTypeName: "AutoViewController",
-                controllerIdentifier: ObjectIdentifier(NSString())
+                controllerIdentifier: controllerIdentifier
+            )
+        )
+        continuation.yield(
+            AutomatedNavigationEvent(
+                timestamp: Date(),
+                type: .viewDidAppear,
+                controllerTypeName: "AutoViewController",
+                controllerIdentifier: controllerIdentifier
             )
         )
 
@@ -191,12 +201,22 @@ final class NavigationEventSourcesTests: XCTestCase {
 
         navigation.startDetection()
 
+        let controllerIdentifier = ObjectIdentifier(NSString())
+
         continuation.yield(
             AutomatedNavigationEvent(
                 timestamp: Date(),
                 type: .viewDidLoad,
                 controllerTypeName: "AutoViewController",
-                controllerIdentifier: ObjectIdentifier(NSString())
+                controllerIdentifier: controllerIdentifier
+            )
+        )
+        continuation.yield(
+            AutomatedNavigationEvent(
+                timestamp: Date(),
+                type: .viewDidAppear,
+                controllerTypeName: "AutoViewController",
+                controllerIdentifier: controllerIdentifier
             )
         )
 

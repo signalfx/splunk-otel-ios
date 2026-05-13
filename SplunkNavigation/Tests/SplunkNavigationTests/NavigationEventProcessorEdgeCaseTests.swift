@@ -21,15 +21,14 @@ import XCTest
 
 @testable import SplunkNavigation
 
-/// Tests for edge-case processor behaviors: mid-transition suppression cleanup
-/// and SDK-reserved span key protection.
+/// Tests for edge-case processor behaviors: suppression cleanup and SDK-reserved span key protection.
 final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
 
-    // MARK: - Mid-transition suppression cleanup
+    // MARK: - Suppression cleanup
 
-    func testDidShowSuppressionCleansUpNavigationPair() async {
+    func testDidShowSuppressionCleansUpPendingNavigationPair() async {
         let fixture = makeNavigationStreamFixture(
-            navigationEventProcessor: AllowThenSuppressProcessor()
+            navigationEventProcessor: SuppressingProcessor()
         )
 
         defer {
@@ -50,8 +49,10 @@ final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
             controllerTypeName: "TransientViewController"
         )
 
-        // Wait for willShow to be processed and NavigationPair to be stored
-        try? await Task.sleep(nanoseconds: 200_000_000)
+        let didStorePendingNavigation = await waitUntil {
+            await navigation.model.navigation(for: controllerIdentifier) != nil
+        }
+        XCTAssertTrue(didStorePendingNavigation)
 
         fixture.sendTransition(
             type: .navigationControllerDidShow,

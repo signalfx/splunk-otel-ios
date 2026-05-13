@@ -26,7 +26,69 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
 
     // MARK: - Transition processing
 
-    func testViewDidDisappearFinalizesPendingShowNavigation() async {
+    func testViewDidLoadStoresPendingShowWithoutUpdatingScreen() async {
+        let (navigation, continuation) = makeNavigation()
+        let controllerIdentifier = ObjectIdentifier(NSString())
+
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
+
+        continuation.yield(
+            event(type: .viewDidLoad, controllerIdentifier: controllerIdentifier)
+        )
+        let showStarted = await waitUntil {
+            await navigation.model.navigation(for: controllerIdentifier)?.type == .show
+        }
+        XCTAssertTrue(showStarted)
+
+        try? await Task.sleep(nanoseconds: 200_000_000)
+
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "unknown")
+
+        continuation.finish()
+    }
+
+    func testViewDidAppearCommitsPendingShowAndUpdatesScreen() async {
+        let (navigation, continuation) = makeNavigation()
+        var screenNameIterator = navigation.screenNameStream.makeAsyncIterator()
+        let controllerIdentifier = ObjectIdentifier(NSString())
+
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
+
+        continuation.yield(
+            event(type: .viewDidLoad, controllerIdentifier: controllerIdentifier)
+        )
+        let showStarted = await waitUntil {
+            await navigation.model.navigation(for: controllerIdentifier)?.type == .show
+        }
+        XCTAssertTrue(showStarted)
+
+        continuation.yield(
+            event(
+                type: .viewDidAppear,
+                controllerIdentifier: controllerIdentifier,
+                controllerTypeName: "AppearedViewController"
+            )
+        )
+
+        let didUpdateActiveScreen = await waitUntil {
+            navigation.currentScreenNameForTesting == "AppearedViewController"
+        }
+        XCTAssertTrue(didUpdateActiveScreen)
+
+        let emittedScreenName = await screenNameIterator.next()
+        XCTAssertEqual(emittedScreenName, "AppearedViewController")
+
+        let showFinalized = await waitUntil {
+            await navigation.model.navigation(for: controllerIdentifier) == nil
+        }
+        XCTAssertTrue(showFinalized)
+
+        continuation.finish()
+    }
+
+    func testViewDidDisappearCleansUpUncommittedShow() async {
         let (navigation, continuation) = makeNavigation()
         let controllerIdentifier = ObjectIdentifier(NSString())
 
@@ -44,103 +106,37 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         continuation.yield(
             event(type: .viewDidDisappear, controllerIdentifier: controllerIdentifier)
         )
-        let showFinalized = await waitUntil {
+        let showCleanedUp = await waitUntil {
             await navigation.model.navigation(for: controllerIdentifier) == nil
         }
-        XCTAssertTrue(showFinalized)
+        XCTAssertTrue(showCleanedUp)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "unknown")
 
         continuation.finish()
     }
 
-    func testViewWillAndDidTransitionStartAndFinalizeTransition() async {
+    func testTraitAndRotationEventsDoNotStartNavigationOrUpdateScreen() async {
         let (navigation, continuation) = makeNavigation()
         let controllerIdentifier = ObjectIdentifier(NSString())
 
         navigation.preferences.enableAutomatedTracking = true
+        navigation.track(screen: "ManualScreen")
         navigation.startDetection()
 
-        continuation.yield(
-            event(type: .viewWillTransition, controllerIdentifier: controllerIdentifier)
-        )
-        let transitionStarted = await waitUntil {
-            await navigation.model.navigation(for: controllerIdentifier)?.type == .transition
-        }
-        XCTAssertTrue(transitionStarted)
-
-        continuation.yield(
-            event(type: .viewDidTransition, controllerIdentifier: controllerIdentifier)
-        )
-        let transitionFinalized = await waitUntil {
-            await navigation.model.navigation(for: controllerIdentifier) == nil
-        }
-        XCTAssertTrue(transitionFinalized)
-
-        continuation.finish()
-    }
-
-    func testViewWillTransitionUpdatesActiveScreenAndStream() async {
-        let (navigation, continuation) = makeNavigation()
-        var screenNameIterator = navigation.screenNameStream.makeAsyncIterator()
-        let controllerIdentifier = ObjectIdentifier(NSString())
-
-        navigation.preferences.enableAutomatedTracking = true
-        navigation.startDetection()
-
-        continuation.yield(
-            event(
-                type: .viewWillTransition,
-                controllerIdentifier: controllerIdentifier,
-                controllerTypeName: "TransitionViewController"
-            )
-        )
-
-        let didUpdateActiveScreen = await waitUntil {
-            navigation.currentScreenNameForTesting == "TransitionViewController"
-        }
-        XCTAssertTrue(didUpdateActiveScreen)
-
-        let emittedScreenName = await screenNameIterator.next()
-        XCTAssertEqual(emittedScreenName, "TransitionViewController")
-
-        continuation.finish()
-    }
-
-    func testTransitionStartReplacesOverlappingWillSignals() async {
-        let (navigation, continuation) = makeNavigation()
-        let controllerIdentifier = ObjectIdentifier(NSString())
-
-        navigation.preferences.enableAutomatedTracking = true
-        navigation.startDetection()
-
-        continuation.yield(
-            event(type: .willTransitionToTraitCollection, controllerIdentifier: controllerIdentifier)
-        )
-        let initialTransitionStarted = await waitUntil {
-            await navigation.model.navigation(for: controllerIdentifier)?.type == .transition
-        }
-        XCTAssertTrue(initialTransitionStarted)
-        guard let firstStart = await navigation.model.navigation(for: controllerIdentifier)?.start else {
-            XCTFail("Expected first transition start to be stored.")
-            return
-        }
-
-        continuation.yield(
-            event(type: .viewWillTransition, controllerIdentifier: controllerIdentifier)
-        )
+        continuation.yield(event(type: .willTransitionToTraitCollection, controllerIdentifier: controllerIdentifier))
+        continuation.yield(event(type: .didTransitionToTraitCollection, controllerIdentifier: controllerIdentifier))
+        continuation.yield(event(type: .viewWillTransition, controllerIdentifier: controllerIdentifier))
+        continuation.yield(event(type: .viewDidTransition, controllerIdentifier: controllerIdentifier))
         try? await Task.sleep(nanoseconds: 200_000_000)
 
-        guard let secondStart = await navigation.model.navigation(for: controllerIdentifier)?.start else {
-            XCTFail("Expected transition to remain in-flight.")
-            return
-        }
-
-        XCTAssertNotEqual(firstStart, secondStart)
-        XCTAssertGreaterThanOrEqual(secondStart, firstStart)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "ManualScreen")
+        let pendingNavigation = await navigation.model.navigation(for: controllerIdentifier)
+        XCTAssertNil(pendingNavigation)
 
         continuation.finish()
     }
 
-    func testTransitionUpdateOverridesManualWhenEnabled() async {
+    func testTraitAndRotationEventsDoNotOverrideManualWhenEnabled() async {
         let (navigation, continuation) = makeNavigation()
         let controllerIdentifier = ObjectIdentifier(NSString())
 
@@ -159,10 +155,10 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
             )
         )
 
-        let didApplyTransitionScreen = await waitUntil {
-            navigation.currentScreenNameForTesting == "TransitionViewController"
-        }
-        XCTAssertTrue(didApplyTransitionScreen)
+        try? await Task.sleep(nanoseconds: 200_000_000)
+
+        let currentScreenName = navigation.currentScreenNameForTesting
+        XCTAssertEqual(currentScreenName, "ManualScreen")
 
         continuation.finish()
     }

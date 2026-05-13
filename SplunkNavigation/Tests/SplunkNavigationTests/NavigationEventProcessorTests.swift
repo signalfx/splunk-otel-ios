@@ -92,6 +92,43 @@ final class NavigationEventProcessorTests: XCTestCase {
         XCTAssertTrue(didUpdate)
     }
 
+    func testNavigationControllerProcessorRunsOncePerCommittedTransition() async {
+        let processor = CountingProcessor()
+        let fixture = makeNavigationStreamFixture(
+            navigationEventProcessor: processor
+        )
+
+        defer {
+            fixture.finish()
+        }
+
+        let navigation = fixture.navigation
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
+
+        let detailIdentifier = ObjectIdentifier(NSString())
+        let navigationControllerIdentifier = ObjectIdentifier(NSNumber(value: 20))
+
+        fixture.sendTransition(
+            type: .navigationControllerWillShow,
+            navigationControllerIdentifier: navigationControllerIdentifier,
+            controllerIdentifier: detailIdentifier,
+            controllerTypeName: "DetailViewController"
+        )
+        fixture.sendTransition(
+            type: .navigationControllerDidShow,
+            navigationControllerIdentifier: navigationControllerIdentifier,
+            controllerIdentifier: detailIdentifier,
+            controllerTypeName: "DetailViewController"
+        )
+
+        let didUpdate = await waitUntil {
+            navigation.currentScreenNameForTesting == "DetailViewController"
+        }
+        XCTAssertTrue(didUpdate)
+        XCTAssertEqual(processor.callCount, 1)
+    }
+
     // MARK: - Manual tracking bypass
 
     func testManualTrackBypassesProcessor() {
@@ -185,6 +222,40 @@ final class NavigationEventProcessorTests: XCTestCase {
             navigation.currentScreenNameForTesting == "Nav/PresentedViewController"
         }
         XCTAssertTrue(didUpdate)
+    }
+
+    @MainActor
+    func testPresentationProcessorRunsOncePerCommittedTransition() async {
+        let provider = MockPresentationEventStreamProvider()
+        let processor = CountingProcessor()
+        let navigation = Navigation(
+            navigationEventStreamProvider: provider,
+            navigationEventProcessor: processor
+        )
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
+
+        let presentingController = PresentingViewController()
+        let presentedController = PresentedViewController()
+
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: true
+        )
+
+        let didUpdate = await waitUntil {
+            navigation.currentScreenNameForTesting == "PresentedViewController"
+        }
+        XCTAssertTrue(didUpdate)
+        XCTAssertEqual(processor.callCount, 1)
     }
 
     @MainActor

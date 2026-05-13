@@ -46,21 +46,24 @@ final class SuppressingProcessor: NavigationEventProcessor {
     }
 }
 
-final class AllowThenSuppressProcessor: NavigationEventProcessor {
+final class CountingProcessor: NavigationEventProcessor {
     private let lock = NSLock()
-    private var callCount = 0
+    private var storedCallCount = 0
+
+    var callCount: Int {
+        lock.lock()
+        defer { lock.unlock() }
+
+        return storedCallCount
+    }
 
     func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEvent? {
         lock.lock()
         defer { lock.unlock() }
 
-        callCount += 1
+        storedCallCount += 1
 
-        if callCount == 1 {
-            return NavigationEvent(name: typeName)
-        }
-
-        return nil
+        return NavigationEvent(name: typeName)
     }
 }
 

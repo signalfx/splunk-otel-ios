@@ -102,10 +102,8 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
             controllerTypeName: "RootViewController"
         )
 
-        let didApplyAttemptedPop = await waitUntil {
-            navigation.currentScreenNameForTesting == "RootViewController"
-        }
-        XCTAssertTrue(didApplyAttemptedPop)
+        try? await Task.sleep(nanoseconds: 200_000_000)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "DetailViewController")
 
         fixture.sendTransition(
             type: .navigationControllerDidShow,
@@ -120,6 +118,9 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
         XCTAssertTrue(didStayOnDetail)
         let finalScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(finalScreenName, "DetailViewController")
+
+        let collected = await fixture.collector.values
+        XCTAssertEqual(collected, ["DetailViewController"])
     }
 
     func testAutoDetectedNavigationReplacesManualScreenName() async {
@@ -227,7 +228,7 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
 
         try? await Task.sleep(nanoseconds: 200_000_000)
         let screenNameBeforeDidShow = navigation.currentScreenNameForTesting
-        XCTAssertEqual(screenNameBeforeDidShow, "DetailViewController")
+        XCTAssertEqual(screenNameBeforeDidShow, "unknown")
 
         fixture.sendTransition(
             type: .navigationControllerDidShow,

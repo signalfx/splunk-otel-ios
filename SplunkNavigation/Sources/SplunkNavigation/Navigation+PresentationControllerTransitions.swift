@@ -93,20 +93,10 @@ extension Navigation {
     }
 
     private func updateTransitionStart(for snapshot: PresentationTransitionSnapshot, timestamp: Date) async {
-        let typeName = snapshot.controllerTypeName
-        guard
-            let navigationEvent = await processAutomatedNavigationEvent(
-                sanitize(typeName: typeName),
-                controllerIdentifier: snapshot.controllerIdentifier
-            )
-        else {
-            return
-        }
-
         let navigation = NavigationPair(
             type: .transition,
             start: timestamp,
-            screenName: navigationEvent.name
+            screenName: sanitize(typeName: snapshot.controllerTypeName)
         )
 
         await model.update(
@@ -127,41 +117,6 @@ extension Navigation {
 
         let typeName = snapshot.controllerTypeName
 
-        guard
-            let navigationEvent = await processAutomatedNavigationEvent(
-                sanitize(typeName: typeName),
-                controllerIdentifier: snapshot.controllerIdentifier
-            )
-        else {
-            await model.removeNavigation(for: snapshot.controllerIdentifier)
-
-            return
-        }
-
-        let screenName = navigationEvent.name
-
-        if await model.navigation(for: snapshot.controllerIdentifier) == nil {
-            let fallbackNavigation = NavigationPair(
-                type: .transition,
-                start: timestamp,
-                screenName: screenName
-            )
-            await model.update(
-                navigation: fallbackNavigation,
-                for: snapshot.controllerIdentifier
-            )
-        }
-
-        let start =
-            await model.navigation(for: snapshot.controllerIdentifier)?
-            .start ?? timestamp
-
-        updateCurrentScreen(
-            screenName: screenName,
-            start: start,
-            attributes: navigationEvent.attributes
-        )
-
         let event = AutomatedNavigationEvent(
             timestamp: timestamp,
             type: .didTransitionToTraitCollection,
@@ -169,6 +124,6 @@ extension Navigation {
             controllerIdentifier: snapshot.controllerIdentifier
         )
 
-        await processNavigationEnd(event: event)
+        await commitNavigation(event: event, fallbackType: .transition)
     }
 }
