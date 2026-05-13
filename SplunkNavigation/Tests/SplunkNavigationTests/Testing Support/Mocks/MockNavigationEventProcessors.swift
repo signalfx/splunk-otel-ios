@@ -67,6 +67,31 @@ final class CountingProcessor: NavigationEventProcessor {
     }
 }
 
+final class SequenceNavigationEventProcessor: NavigationEventProcessor {
+    private let lock = NSLock()
+    private let events: [NavigationEvent]
+    private var nextIndex = 0
+
+    init(events: [NavigationEvent]) {
+        self.events = events
+    }
+
+    func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEvent? {
+        lock.lock()
+        defer {
+            nextIndex += 1
+            lock.unlock()
+        }
+
+        guard !events.isEmpty else {
+            return NavigationEvent(name: typeName)
+        }
+
+        let eventIndex = min(nextIndex, events.count - 1)
+        return events[eventIndex]
+    }
+}
+
 /// Returns the event with attributes that attempt to override all SDK-reserved span keys.
 final class ReservedKeyOverrideProcessor: NavigationEventProcessor {
     func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEvent? {

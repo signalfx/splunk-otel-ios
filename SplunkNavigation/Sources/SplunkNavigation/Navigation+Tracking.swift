@@ -32,8 +32,17 @@ extension Navigation {
             return
         }
 
-        let lastScreenName = swapCurrentScreenName(name)
+        let screenStateUpdate = updateCurrentScreenState(
+            screenName: name,
+            attributes: attributes,
+            forceEmit: true
+        )
         publishScreenNameChange(name)
-        send(screenName: name, lastScreenName: lastScreenName, start: start, attributes: attributes)
+        send(
+            screenName: name,
+            lastScreenName: screenStateUpdate.previousName,
+            start: start,
+            attributes: attributes
+        )
     }
 }

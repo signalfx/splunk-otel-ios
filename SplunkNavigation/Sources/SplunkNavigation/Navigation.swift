@@ -67,12 +67,6 @@ public final class Navigation: Sendable {
         continuation.yield(name)
     }
 
-    /// Atomically updates the current screen name and returns the previous value.
-    func swapCurrentScreenName(_ name: String) -> String {
-        runtimeStateStore.swapScreenName(name)
-    }
-
-
     // MARK: - Module configuration
 
     /// Shared agent state, injected by the agent at startup.

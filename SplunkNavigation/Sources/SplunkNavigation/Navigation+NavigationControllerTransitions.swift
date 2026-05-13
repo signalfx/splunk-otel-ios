@@ -101,15 +101,22 @@ extension Navigation {
         start: Date,
         attributes: [String: Any]? = nil
     ) {
-        let lastScreenName = swapCurrentScreenName(screenName)
-        if screenName != lastScreenName {
-            publishScreenNameChange(screenName)
-            send(
-                screenName: screenName,
-                lastScreenName: lastScreenName,
-                start: start,
-                attributes: attributes
-            )
+        let screenStateUpdate = updateCurrentScreenState(
+            screenName: screenName,
+            attributes: attributes,
+            forceEmit: false
+        )
+
+        guard screenStateUpdate.shouldEmit else {
+            return
         }
+
+        publishScreenNameChange(screenName)
+        send(
+            screenName: screenName,
+            lastScreenName: screenStateUpdate.previousName,
+            start: start,
+            attributes: attributes
+        )
     }
 }

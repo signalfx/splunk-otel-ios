@@ -16,12 +16,25 @@ limitations under the License.
 */
 
 import Foundation
+internal import OpenTelemetryApi
+
+/// The emitted navigation screen state used for automated deduplication.
+struct NavigationScreenState: Equatable {
+    let name: String
+    let attributes: [String: AttributeValue]
+}
+
+/// Result of updating the stored navigation screen state.
+struct NavigationScreenStateUpdate {
+    let previousName: String
+    let shouldEmit: Bool
+}
 
 /// Synchronous, lock-protected store for navigation state that must be readable
 /// without an actor hop.
 ///
 /// `moduleEnabled` and `screenName` are kept here so that `track(screen:attributes:)`
-/// can check enabled state, swap the screen name, and emit — all synchronously on the
+/// can check enabled state, record the screen state, and emit synchronously on the
 /// caller's thread, matching Android's `@Synchronized` setter pattern.
 final class NavigationRuntimeStateStore: @unchecked Sendable {
 
@@ -29,7 +42,10 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
 
     private let lock = NSLock()
     private var storedModuleEnabled: Bool = true
-    private var storedScreenName: String = "unknown"
+    private var storedScreenState = NavigationScreenState(
+        name: "unknown",
+        attributes: [:]
+    )
 
 
     // MARK: - Module enabled
@@ -46,16 +62,23 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
     // MARK: - Screen name
 
     var screenName: String {
-        lock.withLock { storedScreenName }
+        lock.withLock { storedScreenState.name }
     }
 
-    /// Atomically replaces the stored screen name and returns the previous value.
+    /// Atomically updates the stored screen state.
     @discardableResult
-    func swapScreenName(_ name: String) -> String {
+    func updateScreenState(
+        _ state: NavigationScreenState,
+        forceEmit: Bool
+    ) -> NavigationScreenStateUpdate {
         lock.withLock {
-            let previous = storedScreenName
-            storedScreenName = name
-            return previous
+            let previous = storedScreenState
+            storedScreenState = state
+
+            return NavigationScreenStateUpdate(
+                previousName: previous.name,
+                shouldEmit: forceEmit || previous != state
+            )
         }
     }
 }
