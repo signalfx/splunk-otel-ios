@@ -30,21 +30,10 @@ extension Navigation {
         let typeName = event.controllerTypeName
         let controllerIdentifier = event.controllerIdentifier
 
-        guard
-            let navigationEvent = await processAutomatedNavigationEvent(
-                sanitize(typeName: typeName),
-                controllerIdentifier: controllerIdentifier
-            )
-        else {
-            return
-        }
-
-        let screenName = navigationEvent.name
-
         let navigation = NavigationPair(
             type: .show,
             start: event.timestamp,
-            screenName: screenName
+            screenName: sanitize(typeName: typeName)
         )
 
         await model.update(navigation: navigation, for: controllerIdentifier)
@@ -55,15 +44,6 @@ extension Navigation {
         )
 
         await model.addManagedNavigationControllerTarget(controllerIdentifier)
-
-        let lastScreenName = await model.screenName
-
-        await updateCurrentScreen(
-            screenName: screenName,
-            lastScreenName: lastScreenName,
-            start: event.timestamp,
-            attributes: navigationEvent.attributes
-        )
     }
 
     func processNavigationControllerDidShow(event: any NavigationActionEvent) async {
@@ -75,11 +55,8 @@ extension Navigation {
 
         if await handleCancelledTransitionIfNeeded(
             navigationControllerIdentifier: navigationControllerIdentifier,
-            visibleControllerIdentifier: visibleControllerIdentifier,
-            visibleControllerTypeName: event.controllerTypeName,
-            timestamp: event.timestamp
+            visibleControllerIdentifier: visibleControllerIdentifier
         ) {
-            await model.removeManagedNavigationControllerTarget(visibleControllerIdentifier)
             return
         }
 
@@ -94,9 +71,7 @@ extension Navigation {
 
     private func handleCancelledTransitionIfNeeded(
         navigationControllerIdentifier: ObjectIdentifier,
-        visibleControllerIdentifier: ObjectIdentifier,
-        visibleControllerTypeName: String,
-        timestamp: Date
+        visibleControllerIdentifier: ObjectIdentifier
     ) async -> Bool {
         guard
             let pendingTargetIdentifier = await model.pendingNavigationTarget(
@@ -113,92 +88,57 @@ extension Navigation {
         await model.removePendingNavigationTarget(for: navigationControllerIdentifier)
         await model.removeManagedNavigationControllerTarget(pendingTargetIdentifier)
 
-        guard
-            let navigationEvent = await processAutomatedNavigationEvent(
-                sanitize(typeName: visibleControllerTypeName),
-                controllerIdentifier: visibleControllerIdentifier
-            )
-        else {
-            // Cancellation cleanup is complete; processor chose not to emit a screen-name event.
-            return true
-        }
-
-        let lastScreenName = await model.screenName
-
-        await updateCurrentScreen(
-            screenName: navigationEvent.name,
-            lastScreenName: lastScreenName,
-            start: timestamp,
-            attributes: navigationEvent.attributes
-        )
-
+        await model.removeManagedNavigationControllerTarget(visibleControllerIdentifier)
         return true
     }
 
     private func completeNavigationControllerTransition(event: any NavigationActionEvent) async {
-        let typeName = event.controllerTypeName
-        let visibleControllerIdentifier = event.controllerIdentifier
-
-        guard
-            let navigationEvent = await processAutomatedNavigationEvent(
-                sanitize(typeName: typeName),
-                controllerIdentifier: visibleControllerIdentifier
-            )
-        else {
-            await model.removeNavigation(for: visibleControllerIdentifier)
-
-            return
-        }
-
-        let screenName = navigationEvent.name
-        let lastScreenName = await model.screenName
-
-        let existingNavigation = await model.navigation(for: visibleControllerIdentifier)
-
-        if existingNavigation == nil {
-            let fallbackNavigation = NavigationPair(
-                type: .show,
-                start: event.timestamp,
-                screenName: screenName
-            )
-            await model.update(navigation: fallbackNavigation, for: visibleControllerIdentifier)
-        }
-
-        let start = existingNavigation?.start ?? event.timestamp
-
-        await updateCurrentScreen(
-            screenName: screenName,
-            lastScreenName: lastScreenName,
-            start: start,
-            attributes: navigationEvent.attributes
-        )
-
-        let endEvent = AutomatedNavigationEvent(
-            timestamp: event.timestamp,
-            type: .viewDidAppear,
-            controllerTypeName: typeName,
-            controllerIdentifier: visibleControllerIdentifier
-        )
-
-        await processNavigationEnd(event: endEvent)
+        await commitNavigation(event: event, fallbackType: .show)
     }
 
     func updateCurrentScreen(
         screenName: String,
-        lastScreenName: String,
         start: Date,
         attributes: [String: Any]? = nil
-    ) async {
-        await model.update(screenName: screenName)
+    ) {
+        let screenStateUpdate = updateCurrentScreenState(
+            screenName: screenName,
+            attributes: attributes,
+            forceEmit: false
+        )
 
-        if screenName != lastScreenName {
-            continuation.yield(screenName)
-            send(
-                screenName: screenName,
-                lastScreenName: lastScreenName,
-                start: start,
-                attributes: attributes
-            )
+        guard screenStateUpdate.shouldEmit else {
+            return
         }
+
+        publishScreenNameChange(screenName)
+        send(
+            screenName: screenName,
+            lastScreenName: screenStateUpdate.previousName,
+            start: start,
+            attributes: attributes
+        )
+    }
+
+    func updateCurrentScreen(
+        state: NavigationScreenState,
+        start: Date
+    ) {
+        let screenStateUpdate = updateCurrentScreenState(
+            state,
+            forceEmit: false
+        )
+
+        guard screenStateUpdate.shouldEmit else {
+            return
+        }
+
+        publishScreenNameChange(state.name)
+        send(
+            screenName: state.name,
+            lastScreenName: screenStateUpdate.previousName,
+            start: start,
+            attributes: state.attributes
+        )
     }
 }

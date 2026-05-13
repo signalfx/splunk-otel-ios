@@ -21,15 +21,14 @@ import XCTest
 
 @testable import SplunkNavigation
 
-/// Tests for edge-case processor behaviors: mid-transition suppression cleanup
-/// and SDK-reserved span key protection.
+/// Tests for edge-case processor behaviors: suppression cleanup and SDK-reserved span key protection.
 final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
 
-    // MARK: - Mid-transition suppression cleanup
+    // MARK: - Suppression cleanup
 
-    func testDidShowSuppressionCleansUpNavigationPair() async {
+    func testDidShowSuppressionCleansUpPendingNavigationPair() async {
         let fixture = makeNavigationStreamFixture(
-            navigationEventProcessor: AllowThenSuppressProcessor()
+            navigationEventProcessor: SuppressingProcessor()
         )
 
         defer {
@@ -50,8 +49,10 @@ final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
             controllerTypeName: "TransientViewController"
         )
 
-        // Wait for willShow to be processed and NavigationPair to be stored
-        try? await Task.sleep(nanoseconds: 200_000_000)
+        let didStorePendingNavigation = await waitUntil {
+            await navigation.model.navigation(for: controllerIdentifier) != nil
+        }
+        XCTAssertTrue(didStorePendingNavigation)
 
         fixture.sendTransition(
             type: .navigationControllerDidShow,
@@ -81,10 +82,7 @@ final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
         navigation.startDetection()
 
         navigation.track(screen: "HomeScreen")
-        let didSetInitial = await waitUntil {
-            await navigation.model.screenName == "HomeScreen"
-        }
-        XCTAssertTrue(didSetInitial)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "HomeScreen")
 
         let controllerIdentifier = ObjectIdentifier(NSString())
         let navControllerIdentifier = ObjectIdentifier(NSNumber(value: 99))
@@ -105,11 +103,11 @@ final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
         // Verify the SDK uses the processor's `name` field for the screen name,
         // not the "screen.name" attribute the processor also returned.
         let didUpdate = await waitUntil {
-            await navigation.model.screenName == "SettingsViewController"
+            navigation.currentScreenNameForTesting == "SettingsViewController"
         }
         XCTAssertTrue(didUpdate)
 
-        let currentScreenName = await navigation.model.screenName
+        let currentScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(
             currentScreenName,
             "SettingsViewController",

@@ -21,10 +21,10 @@ actor NavigationModel {
     // MARK: - Public
 
     private(set) var moduleEnabled: Bool = true
-    private(set) var screenName: String = "unknown"
     private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
     private(set) var pendingNavigationTargets: [ObjectIdentifier: ObjectIdentifier] = [:]
     private(set) var managedNavigationControllerTargets: Set<ObjectIdentifier> = []
+    private(set) var pendingPresentationRestorations: [ObjectIdentifier: NavigationScreenState] = [:]
     private(set) var navigationEventProcessor: any NavigationEventProcessor
 
 
@@ -43,13 +43,6 @@ actor NavigationModel {
 
     func update(navigationEventProcessor: any NavigationEventProcessor) {
         self.navigationEventProcessor = navigationEventProcessor
-    }
-
-
-    // MARK: - Screen name management
-
-    func update(screenName: String) {
-        self.screenName = screenName
     }
 
 
@@ -95,5 +88,20 @@ actor NavigationModel {
 
     func isManagedNavigationControllerTarget(_ identifier: ObjectIdentifier) -> Bool {
         managedNavigationControllerTargets.contains(identifier)
+    }
+
+
+    // MARK: - Presentation restorations
+
+    func pendingPresentationRestoration(for identifier: ObjectIdentifier) -> NavigationScreenState? {
+        pendingPresentationRestorations[identifier]
+    }
+
+    func update(pendingPresentationRestoration: NavigationScreenState, for identifier: ObjectIdentifier) {
+        pendingPresentationRestorations[identifier] = pendingPresentationRestoration
+    }
+
+    func removePendingPresentationRestoration(for identifier: ObjectIdentifier) {
+        pendingPresentationRestorations[identifier] = nil
     }
 }

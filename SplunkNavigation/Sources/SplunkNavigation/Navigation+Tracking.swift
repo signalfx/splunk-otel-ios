@@ -28,26 +28,21 @@ extension Navigation {
     public func track(screen name: String, attributes: [String: Any]?) {
         let start = Date()
 
-        Task {
-            let moduleEnabled = await model.moduleEnabled
-            let lastScreenName = await model.screenName
-
-            guard moduleEnabled else {
-                return
-            }
-
-            guard lastScreenName != name else {
-                return
-            }
-
-            // Manual tracking updates the current screen name immediately
-            await model.update(screenName: name)
-
-            // Yield this change to the consumer
-            continuation.yield(name)
-
-            // Send corresponding span
-            send(screenName: name, lastScreenName: lastScreenName, start: start, attributes: attributes)
+        guard runtimeStateStore.moduleEnabled else {
+            return
         }
+
+        let screenStateUpdate = updateCurrentScreenState(
+            screenName: name,
+            attributes: attributes,
+            forceEmit: true
+        )
+        publishScreenNameChange(name)
+        send(
+            screenName: name,
+            lastScreenName: screenStateUpdate.previousName,
+            start: start,
+            attributes: attributes
+        )
     }
 }

@@ -21,7 +21,7 @@ internal import SplunkAppStart
 internal import SplunkAppState
 internal import SplunkCustomTracking
 internal import SplunkInteractions
-internal import SplunkNavigation
+@_spi(SplunkInternal) internal import SplunkNavigation
 internal import SplunkNetwork
 internal import SplunkNetworkMonitor
 internal import SplunkSessionReplayProxy
@@ -205,10 +205,16 @@ extension SplunkRum {
 
         navigationModule.sharedState = sharedState
 
-        // Set up forwarding of screen name changes to runtime attributes.
+        // Synchronously update runtime screen.name on every screen-name change
+        // so spans started immediately afterwards carry the new value.
+        navigationModule.setScreenNameObserver { [runtimeAttributes] newValue in
+            runtimeAttributes.updateScreenName(newValue)
+        }
+
+        // Async fanout: public callback and crash-report propagation.
+        let screenNameStream = navigationModule.screenNameStream
         Task(priority: .userInitiated) {
-            for await newValue in navigationModule.screenNameStream {
-                runtimeAttributes.updateCustom(named: "screen.name", with: newValue)
+            for await newValue in screenNameStream {
                 screenNameChangeCallback?(newValue)
                 #if canImport(SplunkCrashReports)
                     crashReportsModule?.crashReportUpdateScreenName(newValue)
