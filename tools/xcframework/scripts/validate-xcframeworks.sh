@@ -191,6 +191,26 @@ validate_dynamic_binary() {
     fi
 }
 
+validate_no_nested_frameworks() {
+    local framework_path="$1"
+    local slice_name="$2"
+    local nested_frameworks=()
+
+    while IFS= read -r nested_framework; do
+        [[ -n "${nested_framework}" ]] || continue
+        nested_frameworks+=("${nested_framework#${framework_path}/}")
+    done < <(find "${framework_path}" -mindepth 1 -type d -name "*.framework" -print -prune 2>/dev/null)
+
+    if [[ "${#nested_frameworks[@]}" -eq 0 ]]; then
+        check_pass "Slice ${slice_name}: no nested frameworks"
+    else
+        check_fail "Slice ${slice_name}: nested frameworks are not allowed"
+        for nested_framework in "${nested_frameworks[@]}"; do
+            echo "    ${nested_framework}"
+        done
+    fi
+}
+
 read_xcframework_library_value() {
     local info_plist="$1"
     local index="$2"
@@ -243,7 +263,7 @@ validate_xcframework() {
             binary_path="${library_path}/${name}"
         fi
 
-        slice_entries+=("${library_identifier}|${binary_path}")
+        slice_entries+=("${library_identifier}|${binary_path}|${library_path}")
         actual_slices=$((actual_slices + 1))
         index=$((index + 1))
     done
@@ -276,9 +296,18 @@ validate_xcframework() {
 
     for slice_entry in "${slice_entries[@]}"; do
         local slice_name="${slice_entry%%|*}"
-        local binary_path="${slice_entry#*|}"
+        local remaining="${slice_entry#*|}"
+        local binary_path="${remaining%%|*}"
+        local library_path="${remaining#*|}"
 
         local fw_binary="${xcfw_path}/${slice_name}/${binary_path}"
+        local framework_path="${xcfw_path}/${slice_name}/${library_path}"
+        if [[ -d "${framework_path}" ]]; then
+            validate_no_nested_frameworks "${framework_path}" "${slice_name}"
+        else
+            check_fail "Slice ${slice_name}: framework missing at ${framework_path}"
+        fi
+
         if [[ -f "${fw_binary}" ]]; then
             check_pass "Slice ${slice_name}: binary present"
             validate_dynamic_binary "${fw_binary}" "${slice_name}"
