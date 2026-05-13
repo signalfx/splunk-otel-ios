@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 internal import OpenTelemetryApi
+import SplunkCommon
 
 /// The emitted navigation screen state used for automated deduplication.
 struct NavigationScreenState: Equatable {
@@ -36,16 +37,32 @@ struct NavigationScreenStateUpdate {
 /// `moduleEnabled` and `screenName` are kept here so that `track(screen:attributes:)`
 /// can check enabled state, record the screen state, and emit synchronously on the
 /// caller's thread, matching Android's `@Synchronized` setter pattern.
+///
+/// `sharedState` is kept here because the agent injects it after module construction
+/// and navigation span emission reads it from both automated tasks and synchronous
+/// manual tracking calls.
 final class NavigationRuntimeStateStore: @unchecked Sendable {
 
     // MARK: - Private
 
     private let lock = NSLock()
+    private weak var storedSharedState: AgentSharedState?
     private var storedModuleEnabled: Bool = true
     private var storedScreenState = NavigationScreenState(
         name: "unknown",
         attributes: [:]
     )
+
+
+    // MARK: - Shared state
+
+    var sharedState: AgentSharedState? {
+        lock.withLock { storedSharedState }
+    }
+
+    func setSharedState(_ sharedState: AgentSharedState?) {
+        lock.withLock { storedSharedState = sharedState }
+    }
 
 
     // MARK: - Module enabled

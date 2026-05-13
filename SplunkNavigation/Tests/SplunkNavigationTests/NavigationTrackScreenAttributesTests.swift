@@ -62,6 +62,21 @@ final class NavigationTrackScreenAttributesTests: XCTestCase {
         XCTAssertEqual(span?.attributes["tab"]?.description, "dashboard")
     }
 
+    func testSharedStateVersionOnSpan() async {
+        let module = Navigation()
+        let sharedState = MockNavigationSharedState(agentVersion: "test-agent-version")
+        module.sharedState = sharedState
+
+        module.track(screen: "HomeScreen")
+
+        await waitUntil {
+            self.navigationSpans.count == 1
+        }
+
+        let span = navigationSpans.first
+        XCTAssertEqual(span?.instrumentationScope.version, "test-agent-version")
+    }
+
     func testManualSameNameTrackEmitsEveryCallAndPreservesAttributes() async {
         let module = Navigation()
 
@@ -170,5 +185,19 @@ private final class ScreenNameObserverRecorder: @unchecked Sendable {
 
     func append(_ value: String) {
         lock.withLock { storedValues.append(value) }
+    }
+}
+
+private final class MockNavigationSharedState: AgentSharedState, @unchecked Sendable {
+    let sessionId = "test-session-id"
+    let sessionMetadata: String? = nil
+    let agentVersion: String
+
+    init(agentVersion: String) {
+        self.agentVersion = agentVersion
+    }
+
+    func applicationState(for _: Date) -> String? {
+        nil
     }
 }
