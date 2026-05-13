@@ -33,11 +33,7 @@ final class DemoNavigationEventProcessor: NSObject, NavigationEventProcessor {
         "UIKitModalViewController": "ModalScreen"
     ]
 
-    func process(event: NavigationEvent) -> NavigationEvent {
-        if let mappedName = screenNameMap[event.screenName] {
-            event.screenName = mappedName
-        }
-
-        return event
+    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
+        NavigationEvent(name: screenNameMap[typeName] ?? typeName)
     }
 }
