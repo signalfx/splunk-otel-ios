@@ -14,10 +14,14 @@ This module can be configured to automatically track `UIViewController` transiti
 
 ## Install-Time Configuration
 
-You can configure the navigation module during agent installation by providing a ``NavigationConfiguration`` object. Use it to enable automated tracking and optionally set a custom event processor.
+You can configure the navigation module during agent installation by providing a ``SplunkNavigation/NavigationConfiguration`` object. Use it to enable automated tracking and optionally set a custom event processor.
 
 ```swift
+import SplunkAgent
+import SplunkNavigation // Required for the configuration type
+
 let navConfig = NavigationConfiguration(
+    isEnabled: true,
     enableAutomatedTracking: true,
     navigationEventProcessor: MyProcessor()
 )
@@ -30,13 +34,13 @@ let agent = try SplunkRum.install(
 
 ## Custom Event Processor
 
-Implement ``NavigationModuleEventProcessor`` to customize how detected `UIViewController` transitions are named, enriched, or filtered. The processor is called once per automated navigation event; manual ``NavigationModule/track(screen:)`` calls bypass it.
+Implement ``SplunkNavigation/NavigationEventProcessor`` to customize how detected `UIViewController` transitions are named, enriched, or filtered. The processor is called once per automated navigation event; manual ``NavigationModule/track(screen:)`` calls bypass it.
 
-- **Rename screens:** Return a ``NavigationModuleEvent`` with a custom name.
+- **Rename screens:** Return a ``SplunkNavigation/NavigationEvent`` with a custom name.
 - **Add span attributes:** Include key-value pairs in the event's `attributes`. These are added to the `app.ui.navigation` span.
 - **Suppress events:** Return `nil` to prevent the navigation event.
 
-See ``NavigationModuleEventProcessor`` for code examples.
+See ``SplunkNavigation/NavigationEventProcessor`` for code examples.
 
 ## Usage
 

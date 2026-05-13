@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,27 +17,25 @@ limitations under the License.
 
 import Foundation
 
-/// Defines known types of navigation.
-enum NavigationType: Sendable {
-    case show
-    case transition
-}
+/// Thread-safe holder for the current screen name.
+///
+/// Written synchronously on the caller's thread so that spans started immediately
+/// after a screen-name update see the new value without waiting for async fanout.
+final class CurrentScreenName: @unchecked Sendable {
 
-/// The structure encapsulates one navigation in the client application.
-struct NavigationPair: Sendable {
+    // MARK: - Private
 
-    // MARK: - Navigation identity
-
-    let type: NavigationType
+    private let lock = NSLock()
+    private var value = "unknown"
 
 
-    // MARK: - Navigation life
+    // MARK: - Access
 
-    let start: Date
-    var end: Date?
+    func get() -> String {
+        lock.withLock { value }
+    }
 
-
-    // MARK: - Controller identity
-
-    let screenName: String
+    func set(_ newValue: String) {
+        lock.withLock { value = newValue }
+    }
 }

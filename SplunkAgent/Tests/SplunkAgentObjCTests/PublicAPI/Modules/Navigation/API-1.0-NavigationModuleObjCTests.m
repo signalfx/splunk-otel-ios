@@ -34,6 +34,7 @@ limitations under the License.
     SPLKNavigationModulePreferences *preferences = [[SPLKNavigationModulePreferences alloc] initWithEnableAutomatedTracking:NO];
     XCTAssertNoThrow(agent.navigation.preferences = preferences);
     XCTAssertNotNil(agent.navigation.preferences);
+    XCTAssertFalse(agent.navigation.preferences.enableAutomatedTracking);
 }
 
 - (void)testState {

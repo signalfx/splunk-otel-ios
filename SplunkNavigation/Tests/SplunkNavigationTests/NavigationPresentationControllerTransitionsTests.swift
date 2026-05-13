@@ -49,7 +49,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         )
 
         await waitUntil {
-            let screenName = await module.model.screenName
+            let screenName = module.currentScreenNameForTesting
             return screenName.contains("PresentedViewController")
         }
 
@@ -67,9 +67,58 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         )
 
         await waitUntil {
-            let screenName = await module.model.screenName
+            let screenName = module.currentScreenNameForTesting
             return screenName.contains("PresentingViewController")
         }
+    }
+
+    @MainActor
+    func testNavDismissRestoresPriorScreen() async {
+        let presentingController = PresentingViewController()
+        let navigationController = UINavigationController(rootViewController: presentingController)
+        let presentedController = PresentedViewController()
+
+        let (module, provider) = makeModule(autoTrackingEnabled: true)
+        module.startDetection()
+
+        module.track(screen: "PresentingViewController")
+        XCTAssertEqual(module.currentScreenNameForTesting, "PresentingViewController")
+
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: true
+        )
+
+        await waitUntil {
+            let screenName = module.currentScreenNameForTesting
+            return screenName.contains("PresentedViewController")
+        }
+
+        provider.emit(
+            eventType: .dismissalWillBegin,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .dismissalDidEnd,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: true
+        )
+
+        let didRestore = await waitUntil {
+            module.currentScreenNameForTesting == "PresentingViewController"
+        }
+        XCTAssertTrue(didRestore)
     }
 
     @MainActor
@@ -81,9 +130,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         module.startDetection()
 
         module.track(screen: "InitialScreen")
-        await waitUntil {
-            await module.model.screenName == "InitialScreen"
-        }
+        XCTAssertEqual(module.currentScreenNameForTesting, "InitialScreen")
 
         provider.emit(
             eventType: .presentationWillBegin,
@@ -101,7 +148,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         // Short window for negative assertion; 200 ms balances CI reliability.
         try? await Task.sleep(nanoseconds: 200_000_000)
 
-        let screenName = await module.model.screenName
+        let screenName = module.currentScreenNameForTesting
         XCTAssertEqual(screenName, "InitialScreen")
     }
 
@@ -127,7 +174,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         )
 
         await waitUntil {
-            let screenName = await module.model.screenName
+            let screenName = module.currentScreenNameForTesting
             return screenName.contains("PresentedViewController")
         }
 
@@ -147,7 +194,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         // Short window for negative assertion; 200 ms balances CI reliability.
         try? await Task.sleep(nanoseconds: 200_000_000)
 
-        let screenName = await module.model.screenName
+        let screenName = module.currentScreenNameForTesting
         XCTAssertTrue(screenName.contains("PresentedViewController"))
     }
 
@@ -163,9 +210,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         module.startDetection()
 
         module.track(screen: "Manual Screen")
-        await waitUntil {
-            await module.model.screenName == "Manual Screen"
-        }
+        XCTAssertEqual(module.currentScreenNameForTesting, "Manual Screen")
 
         provider.emit(
             eventType: .presentationWillBegin,
@@ -181,7 +226,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         )
 
         await waitUntil {
-            let screenName = await module.model.screenName
+            let screenName = module.currentScreenNameForTesting
             return screenName.contains("PresentedViewController")
         }
     }
@@ -195,9 +240,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         module.startDetection()
 
         module.track(screen: "Manual Screen")
-        await waitUntil {
-            await module.model.screenName == "Manual Screen"
-        }
+        XCTAssertEqual(module.currentScreenNameForTesting, "Manual Screen")
 
         provider.emit(
             eventType: .presentationWillBegin,
@@ -215,7 +258,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         // Short window for negative assertion; 200 ms balances CI reliability.
         try? await Task.sleep(nanoseconds: 200_000_000)
 
-        let screenName = await module.model.screenName
+        let screenName = module.currentScreenNameForTesting
         XCTAssertEqual(screenName, "Manual Screen")
     }
 

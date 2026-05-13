@@ -244,9 +244,6 @@ public class SplunkRum: ObservableObject {
         // Assign and configure the session sampler
         self.sessionSampler = sessionSampler
         self.sessionSampler.configure(with: agentConfiguration)
-
-        // Set default screen names
-        runtimeAttributes.updateCustom(named: "screen.name", with: "unknown")
     }
 
     convenience init(with configuration: AgentConfiguration, moduleConfigurations: [Any]? = nil) throws {
@@ -287,16 +284,13 @@ public class SplunkRum: ObservableObject {
         // Send a session start event explicitly as soon as a Session and an EventManager are available
         (currentSession as? DefaultSession)?.sendInitialSessionStartEvent()
 
-        // Resolve SplunkAgent-level configurations to internal module types
-        let resolvedConfigurations = Self.resolveModuleConfigurations(moduleConfigurations)
-
         // Store module configurations for later use in module customization
-        self.moduleConfigurations = resolvedConfigurations
+        self.moduleConfigurations = moduleConfigurations
 
         // Starts connecting available modules to agent
         modulesManager = DefaultModulesManager(
             rawConfiguration: configurationHandler.configurationData,
-            moduleConfigurations: resolvedConfigurations
+            moduleConfigurations: moduleConfigurations
         )
 
         // Module installation above activates URLSession swizzling. Set the
@@ -341,25 +335,8 @@ public class SplunkRum: ObservableObject {
     }
 
 
-    // MARK: - Module configuration resolution
-
-    /// Converts public `SplunkAgent`-level module configurations to their
-    /// internal `SplunkNavigation` / `SplunkCommon` counterparts so that
-    /// ``DefaultModulesManager`` can match them to the correct modules.
-    private static func resolveModuleConfigurations(_ configurations: [Any]?) -> [Any]? {
-        configurations?
-            .map { config in
-                if let navConfig = config as? NavigationConfiguration {
-                    return navConfig.asNavigationConfiguration
-                }
-
-                return config
-            }
-    }
-
-
     // MARK: - Version
 
     /// A version of this agent.
-    public static let version = "2.2.2"
+    public static let version = "2.2.3"
 }

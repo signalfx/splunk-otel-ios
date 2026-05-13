@@ -45,40 +45,7 @@ extension Span {
     ///   - key: The attribute key to clear and set
     ///   - value: The new value to set for the key (will be converted to AttributeValue)
     public func clearAndSetAttribute(key: String, value: Any) {
-        // Convert the Any value to AttributeValue based on its type
-        let attributeValue: AttributeValue
-
-        switch value {
-        case let stringValue as String:
-            attributeValue = .string(stringValue)
-
-        case let intValue as Int:
-            attributeValue = .int(intValue)
-
-        case let doubleValue as Double:
-            attributeValue = .double(doubleValue)
-
-        case let boolValue as Bool:
-            attributeValue = .bool(boolValue)
-
-        case let arrayValue as [String]:
-            attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.string($0) }))
-
-        case let arrayValue as [Int]:
-            attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.int($0) }))
-
-        case let arrayValue as [Double]:
-            attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.double($0) }))
-
-        case let arrayValue as [Bool]:
-            attributeValue = .array(AttributeArray(values: arrayValue.map { AttributeValue.bool($0) }))
-
-        default:
-            // For unsupported types, convert to string representation
-            attributeValue = .string(String(describing: value))
-        }
-
-        clearAndSetAttribute(key: key, value: attributeValue)
+        clearAndSetAttribute(key: key, value: TelemetryAttributeConverter.attributeValue(from: value))
     }
 
     // MARK: - SemanticConventions Convenience Methods

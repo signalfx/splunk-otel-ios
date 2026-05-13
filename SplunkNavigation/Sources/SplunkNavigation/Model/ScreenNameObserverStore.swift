@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,20 +15,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import SplunkCommon
-internal import SplunkNavigation
+import Foundation
 
-extension NavigationConfigurationObjC: ModuleConfigurationSwift {
+/// Lock-protected holder for the agent's synchronous screen-name observer.
+final class ScreenNameObserverStore: @unchecked Sendable {
 
-    // MARK: - Swift variant
+    // MARK: - Private
 
-    var moduleConfiguration: any ModuleConfiguration {
-        NavigationConfiguration(
-            isEnabled: isEnabled,
-            enableAutomatedTracking: enableAutomatedTracking,
-            navigationEventProcessor: navigationEventProcessor.map {
-                NavEventProcessorObjCToInternalAdapter(wrapping: $0)
-            }
-        )
+    private let lock = NSLock()
+    private var observer: (@Sendable (String) -> Void)?
+
+
+    // MARK: - Observer
+
+    func set(_ observer: (@Sendable (String) -> Void)?) {
+        lock.withLock { self.observer = observer }
+    }
+
+    func publish(_ name: String) {
+        lock.withLock { observer }?(name)
     }
 }

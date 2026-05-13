@@ -64,7 +64,7 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
         navigation.startDetection()
 
         let didReturnToRoot = await waitUntil {
-            await navigation.model.screenName == "RootViewController"
+            navigation.currentScreenNameForTesting == "RootViewController"
         }
         XCTAssertTrue(didReturnToRoot)
     }
@@ -91,7 +91,7 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
         )
 
         let didShowDetail = await waitUntil {
-            await navigation.model.screenName == "DetailViewController"
+            navigation.currentScreenNameForTesting == "DetailViewController"
         }
         XCTAssertTrue(didShowDetail)
 
@@ -102,10 +102,8 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
             controllerTypeName: "RootViewController"
         )
 
-        let didApplyAttemptedPop = await waitUntil {
-            await navigation.model.screenName == "RootViewController"
-        }
-        XCTAssertTrue(didApplyAttemptedPop)
+        try? await Task.sleep(nanoseconds: 200_000_000)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "DetailViewController")
 
         fixture.sendTransition(
             type: .navigationControllerDidShow,
@@ -115,11 +113,18 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
         )
 
         let didStayOnDetail = await waitUntil {
-            await navigation.model.screenName == "DetailViewController"
+            navigation.currentScreenNameForTesting == "DetailViewController"
         }
         XCTAssertTrue(didStayOnDetail)
-        let finalScreenName = await navigation.model.screenName
+        let finalScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(finalScreenName, "DetailViewController")
+
+        let didCollect = await waitUntil {
+            await fixture.collector.values == ["DetailViewController"]
+        }
+        XCTAssertTrue(didCollect)
+        let collected = await fixture.collector.values
+        XCTAssertEqual(collected, ["DetailViewController"])
     }
 
     func testAutoDetectedNavigationReplacesManualScreenName() async {
@@ -147,15 +152,12 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
         navigation.preferences.enableAutomatedTracking = true
 
         navigation.track(screen: "ManualScreen")
-        let didApplyManual = await waitUntil {
-            await navigation.model.screenName == "ManualScreen"
-        }
-        XCTAssertTrue(didApplyManual)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "ManualScreen")
 
         navigation.startDetection()
 
         let didApplyAuto = await waitUntil {
-            await navigation.model.screenName == "DetailViewController"
+            navigation.currentScreenNameForTesting == "DetailViewController"
         }
         XCTAssertTrue(didApplyAuto)
     }
@@ -185,16 +187,13 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
         navigation.preferences.enableAutomatedTracking = false
 
         navigation.track(screen: "ManualScreen")
-        let didApplyManual = await waitUntil {
-            await navigation.model.screenName == "ManualScreen"
-        }
-        XCTAssertTrue(didApplyManual)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "ManualScreen")
 
         navigation.startDetection()
 
         try? await Task.sleep(nanoseconds: 200_000_000)
 
-        let finalScreenName = await navigation.model.screenName
+        let finalScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(finalScreenName, "ManualScreen")
     }
 
@@ -232,8 +231,8 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
         )
 
         try? await Task.sleep(nanoseconds: 200_000_000)
-        let screenNameBeforeDidShow = await navigation.model.screenName
-        XCTAssertEqual(screenNameBeforeDidShow, "DetailViewController")
+        let screenNameBeforeDidShow = navigation.currentScreenNameForTesting
+        XCTAssertEqual(screenNameBeforeDidShow, "unknown")
 
         fixture.sendTransition(
             type: .navigationControllerDidShow,
@@ -243,10 +242,14 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
         )
 
         let didFinalize = await waitUntil {
-            await navigation.model.screenName == "DetailViewController"
+            navigation.currentScreenNameForTesting == "DetailViewController"
         }
         XCTAssertTrue(didFinalize)
 
+        let didCollect = await waitUntil {
+            await fixture.collector.values == ["DetailViewController"]
+        }
+        XCTAssertTrue(didCollect)
         let collected = await fixture.collector.values
         XCTAssertEqual(collected, ["DetailViewController"])
     }
