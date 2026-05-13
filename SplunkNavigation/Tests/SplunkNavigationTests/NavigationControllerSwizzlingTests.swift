@@ -119,6 +119,10 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
         let finalScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(finalScreenName, "DetailViewController")
 
+        let didCollect = await waitUntil {
+            await fixture.collector.values == ["DetailViewController"]
+        }
+        XCTAssertTrue(didCollect)
         let collected = await fixture.collector.values
         XCTAssertEqual(collected, ["DetailViewController"])
     }
@@ -242,6 +246,10 @@ final class NavigationControllerSwizzlingTests: XCTestCase {
         }
         XCTAssertTrue(didFinalize)
 
+        let didCollect = await waitUntil {
+            await fixture.collector.values == ["DetailViewController"]
+        }
+        XCTAssertTrue(didCollect)
         let collected = await fixture.collector.values
         XCTAssertEqual(collected, ["DetailViewController"])
     }
