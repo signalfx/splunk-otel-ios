@@ -35,40 +35,16 @@ extension Navigation {
         // presented for presentations, presenting for dismissals.
         switch event.type {
         case .presentationWillBegin:
-            guard !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
-                return
-            }
-
-            await updateTransitionStart(for: presentedSnapshot(from: event), timestamp: event.timestamp)
+            await handlePresentationWillBegin(event)
 
         case .presentationDidEnd:
-            guard !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
-                return
-            }
-
-            await finalizeTransition(
-                for: presentedSnapshot(from: event),
-                timestamp: event.timestamp,
-                completed: event.completed ?? true
-            )
+            await handlePresentationDidEnd(event)
 
         case .dismissalWillBegin:
-            guard !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
-                return
-            }
-
-            await updateTransitionStart(for: presentingSnapshot(from: event), timestamp: event.timestamp)
+            await handleDismissalWillBegin(event)
 
         case .dismissalDidEnd:
-            guard !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
-                return
-            }
-
-            await finalizeTransition(
-                for: presentingSnapshot(from: event),
-                timestamp: event.timestamp,
-                completed: event.completed ?? true
-            )
+            await handleDismissalDidEnd(event)
 
         @unknown default:
             break
@@ -77,6 +53,70 @@ extension Navigation {
 
 
     // MARK: - Private methods
+
+    private func handlePresentationWillBegin(_ event: any PresentationActionEvent) async {
+        guard !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
+            return
+        }
+
+        await model.update(
+            pendingPresentationRestoration: currentScreenState(),
+            for: event.presentationControllerIdentifier
+        )
+        await updateTransitionStart(for: presentedSnapshot(from: event), timestamp: event.timestamp)
+    }
+
+    private func handlePresentationDidEnd(_ event: any PresentationActionEvent) async {
+        guard !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
+            return
+        }
+
+        let completed = event.completed ?? true
+        await finalizeTransition(
+            for: presentedSnapshot(from: event),
+            timestamp: event.timestamp,
+            completed: completed
+        )
+
+        if !completed {
+            await model.removePendingPresentationRestoration(for: event.presentationControllerIdentifier)
+        }
+    }
+
+    private func handleDismissalWillBegin(_ event: any PresentationActionEvent) async {
+        if isNavigationControllerPresenter(event.presentingControllerTypeName) {
+            await updateRestorationTransitionStart(event: event)
+            return
+        }
+
+        guard !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
+            return
+        }
+
+        await updateTransitionStart(for: presentingSnapshot(from: event), timestamp: event.timestamp)
+    }
+
+    private func handleDismissalDidEnd(_ event: any PresentationActionEvent) async {
+        if isNavigationControllerPresenter(event.presentingControllerTypeName) {
+            await finalizeRestorationTransition(event: event)
+            return
+        }
+
+        guard !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
+            return
+        }
+
+        let completed = event.completed ?? true
+        await finalizeTransition(
+            for: presentingSnapshot(from: event),
+            timestamp: event.timestamp,
+            completed: completed
+        )
+
+        if completed {
+            await model.removePendingPresentationRestoration(for: event.presentationControllerIdentifier)
+        }
+    }
 
     private func presentedSnapshot(from event: any PresentationActionEvent) -> PresentationTransitionSnapshot {
         PresentationTransitionSnapshot(
@@ -125,5 +165,57 @@ extension Navigation {
         )
 
         await commitNavigation(event: event, fallbackType: .transition)
+    }
+
+    private func isNavigationControllerPresenter(_ typeName: String) -> Bool {
+        typeName == "UINavigationController"
+    }
+
+    private func updateRestorationTransitionStart(event: any PresentationActionEvent) async {
+        guard let restoration = await model.pendingPresentationRestoration(for: event.presentationControllerIdentifier) else {
+            return
+        }
+
+        let navigation = NavigationPair(
+            type: .transition,
+            start: event.timestamp,
+            screenName: restoration.name
+        )
+
+        await model.update(
+            navigation: navigation,
+            for: event.presentationControllerIdentifier
+        )
+    }
+
+    private func finalizeRestorationTransition(event: any PresentationActionEvent) async {
+        guard event.completed ?? true else {
+            await model.removeNavigation(for: event.presentationControllerIdentifier)
+            return
+        }
+
+        guard let restoration = await model.pendingPresentationRestoration(for: event.presentationControllerIdentifier) else {
+            return
+        }
+
+        let existingNavigation = await model.navigation(for: event.presentationControllerIdentifier)
+        let start = existingNavigation?.start ?? event.timestamp
+
+        updateCurrentScreen(
+            state: restoration,
+            start: start
+        )
+
+        let completedNavigation = NavigationPair(
+            type: existingNavigation?.type ?? .transition,
+            start: start,
+            end: event.timestamp,
+            screenName: restoration.name
+        )
+
+        send(navigation: completedNavigation)
+
+        await model.removeNavigation(for: event.presentationControllerIdentifier)
+        await model.removePendingPresentationRestoration(for: event.presentationControllerIdentifier)
     }
 }

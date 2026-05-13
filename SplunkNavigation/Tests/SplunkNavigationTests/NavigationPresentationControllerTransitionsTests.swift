@@ -73,6 +73,55 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
     }
 
     @MainActor
+    func testNavDismissRestoresPriorScreen() async {
+        let presentingController = PresentingViewController()
+        let navigationController = UINavigationController(rootViewController: presentingController)
+        let presentedController = PresentedViewController()
+
+        let (module, provider) = makeModule(autoTrackingEnabled: true)
+        module.startDetection()
+
+        module.track(screen: "PresentingViewController")
+        XCTAssertEqual(module.currentScreenNameForTesting, "PresentingViewController")
+
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: true
+        )
+
+        await waitUntil {
+            let screenName = module.currentScreenNameForTesting
+            return screenName.contains("PresentedViewController")
+        }
+
+        provider.emit(
+            eventType: .dismissalWillBegin,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .dismissalDidEnd,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: true
+        )
+
+        let didRestore = await waitUntil {
+            module.currentScreenNameForTesting == "PresentingViewController"
+        }
+        XCTAssertTrue(didRestore)
+    }
+
+    @MainActor
     func testPresentationCancelledKeepsPriorScreenName() async {
         let presentingController = PresentingViewController()
         let presentedController = PresentedViewController()

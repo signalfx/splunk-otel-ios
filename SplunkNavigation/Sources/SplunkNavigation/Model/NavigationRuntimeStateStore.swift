@@ -65,6 +65,10 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
         lock.withLock { storedScreenState.name }
     }
 
+    var screenState: NavigationScreenState {
+        lock.withLock { storedScreenState }
+    }
+
     /// Atomically updates the stored screen state.
     @discardableResult
     func updateScreenState(

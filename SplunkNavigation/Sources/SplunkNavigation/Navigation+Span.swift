@@ -89,6 +89,27 @@ extension Navigation {
         screenNameSpan.end(time: start)
     }
 
+    func send(screenName: String, lastScreenName: String, start: Date, attributes: [String: AttributeValue]) {
+        // A new zero length span for change screen name event
+        let screenNameSpan =
+            tracer
+            .spanBuilder(spanName: Self.navigationSpanName)
+            .setStartTime(time: start)
+            .startSpan()
+
+        // Write user-provided attributes first so that SDK-reserved keys always win.
+        for (key, value) in attributes {
+            screenNameSpan.clearAndSetAttribute(key: key, value: value)
+        }
+
+        screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
+        screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
+        screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
+
+        screenNameSpan.end(time: start)
+    }
+
 
     // MARK: - Private methods
 

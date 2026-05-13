@@ -119,4 +119,26 @@ extension Navigation {
             attributes: attributes
         )
     }
+
+    func updateCurrentScreen(
+        state: NavigationScreenState,
+        start: Date
+    ) {
+        let screenStateUpdate = updateCurrentScreenState(
+            state,
+            forceEmit: false
+        )
+
+        guard screenStateUpdate.shouldEmit else {
+            return
+        }
+
+        publishScreenNameChange(state.name)
+        send(
+            screenName: state.name,
+            lastScreenName: screenStateUpdate.previousName,
+            start: start,
+            attributes: state.attributes
+        )
+    }
 }
