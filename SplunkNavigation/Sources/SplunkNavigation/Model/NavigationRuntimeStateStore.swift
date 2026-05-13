@@ -28,33 +28,33 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
     // MARK: - Private
 
     private let lock = NSLock()
-    private var _moduleEnabled: Bool = true
-    private var _screenName: String = "unknown"
+    private var storedModuleEnabled: Bool = true
+    private var storedScreenName: String = "unknown"
 
 
     // MARK: - Module enabled
 
     var moduleEnabled: Bool {
-        lock.withLock { _moduleEnabled }
+        lock.withLock { storedModuleEnabled }
     }
 
     func setModuleEnabled(_ enabled: Bool) {
-        lock.withLock { _moduleEnabled = enabled }
+        lock.withLock { storedModuleEnabled = enabled }
     }
 
 
     // MARK: - Screen name
 
     var screenName: String {
-        lock.withLock { _screenName }
+        lock.withLock { storedScreenName }
     }
 
     /// Atomically replaces the stored screen name and returns the previous value.
     @discardableResult
     func swapScreenName(_ name: String) -> String {
         lock.withLock {
-            let previous = _screenName
-            _screenName = name
+            let previous = storedScreenName
+            storedScreenName = name
             return previous
         }
     }

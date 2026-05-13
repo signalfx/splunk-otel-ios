@@ -98,7 +98,7 @@ final class NavigationSwiftUITests: XCTestCase {
         XCTAssertEqual(emitCount, 1)
     }
 
-    func testSwiftUIScreenTrackerNormalizesMixedAnyArrays() {
+    func testSwiftUIScreenTrackerDeduplicatesMixedAnyArrayAttributes() {
         let tracker = SwiftUIScreenTracker()
         var emittedScreens: [String] = []
 
@@ -120,5 +120,19 @@ final class NavigationSwiftUITests: XCTestCase {
         }
 
         XCTAssertEqual(emittedScreens, ["first", "changed"])
+    }
+
+    func testSwiftUIScreenTrackerIgnoresUnsupportedAttributesForDedupe() {
+        let tracker = SwiftUIScreenTracker()
+        var emitCount = 0
+
+        tracker.trackIfChanged(screenName: "Home", attributes: ["unsupported": NSObject()]) {
+            emitCount += 1
+        }
+        tracker.trackIfChanged(screenName: "Home", attributes: [:]) {
+            emitCount += 1
+        }
+
+        XCTAssertEqual(emitCount, 1)
     }
 }
