@@ -34,6 +34,7 @@ struct UIKitNavigationDemoView: UIViewControllerRepresentable {
 // MARK: - Root view controller
 
 /// Landing screen inside the UIKit navigation controller.
+///
 /// Provides buttons to push child controllers and present modals.
 class UIKitRootViewController: UIViewController {
 

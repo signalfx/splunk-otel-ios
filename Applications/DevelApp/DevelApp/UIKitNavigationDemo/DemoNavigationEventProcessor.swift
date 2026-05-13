@@ -25,6 +25,7 @@ import SplunkNavigation
 final class DemoNavigationEventProcessor: NSObject, NavigationEventProcessor {
 
     /// Screen name overrides for automated detection.
+    ///
     /// Keys are the raw controller class names (after bundle-prefix stripping).
     private let screenNameMap: [String: String] = [
         "UIKitRootViewController": "UIKitHome",
@@ -33,7 +34,7 @@ final class DemoNavigationEventProcessor: NSObject, NavigationEventProcessor {
         "UIKitModalViewController": "ModalScreen"
     ]
 
-    func onViewController(typeName: String, controllerIdentity: String) -> NavigationEvent? {
+    func onViewController(typeName: String, controllerIdentity _: String) -> NavigationEvent? {
         NavigationEvent(name: screenNameMap[typeName] ?? typeName)
     }
 }
