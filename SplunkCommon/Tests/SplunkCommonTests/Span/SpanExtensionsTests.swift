@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swiftformat:disable sortImports
 import Foundation
 import OpenTelemetryApi
 @_spi(SplunkInternal) @testable import SplunkCommon
