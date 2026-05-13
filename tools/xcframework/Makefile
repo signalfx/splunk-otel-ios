@@ -27,6 +27,7 @@
 #   PLCRASH_VERSION       - PLCrashReporter version (read from Package.swift)
 #   SIGNING_IDENTITY      - Code signing identity for codesign
 #   VERSION               - Release version number
+#   IOS_ONLY              - Set to true to build only iOS device and simulator slices
 
 SHELL := /bin/bash
 .DEFAULT_GOAL := help
@@ -55,6 +56,7 @@ PLCRASH_VERSION ?= $(shell awk '/plcrashreporter/{found=1} found && !/^ *\/\// &
 SIGNING_IDENTITY        ?=
 VERSION                 ?=
 RELEASE                 ?= false
+IOS_ONLY                ?= false
 SESSION_REPLAY_LOCAL_PATH ?=
 CISCO_XCFRAMEWORKS_PATH ?=
 
@@ -81,6 +83,7 @@ help:
 	@echo "  SIGNING_IDENTITY          Apple code signing identity"
 	@echo "  VERSION                   Release version (required for 'make release')"
 	@echo "  RELEASE                   Set to 'true' for release-mode validation"
+	@echo "  IOS_ONLY                  Set to 'true' to build only iOS device and simulator slices"
 
 
 ## build: Build all xcframeworks (OTel + PLCrash + Cisco + dependencies + Agent modules)
@@ -113,21 +116,21 @@ endif
 .PHONY: build-otel
 build-otel:
 	@echo "==> Building OTel xcframeworks..."
-	OTEL_VERSION=$(OTEL_VERSION) $(SCRIPTS_DIR)/build-otel-xcframeworks.sh
+	OTEL_VERSION=$(OTEL_VERSION) IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/build-otel-xcframeworks.sh
 
 
 ## build-plcrash: Build CrashReporter (PLCrashReporter) xcframework from source
 .PHONY: build-plcrash
 build-plcrash:
 	@echo "==> Building PLCrashReporter xcframework..."
-	PLCRASH_VERSION=$(PLCRASH_VERSION) $(SCRIPTS_DIR)/build-plcrash-xcframeworks.sh
+	PLCRASH_VERSION=$(PLCRASH_VERSION) IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/build-plcrash-xcframeworks.sh
 
 
 ## build-cisco: Build dynamic Cisco Session Replay xcframeworks from local source
 .PHONY: build-cisco
 build-cisco:
 	@echo "==> Building dynamic Cisco Session Replay xcframeworks..."
-	SESSION_REPLAY_LOCAL_PATH="$(SESSION_REPLAY_LOCAL_PATH)" $(SCRIPTS_DIR)/build-cisco-xcframeworks.sh
+	SESSION_REPLAY_LOCAL_PATH="$(SESSION_REPLAY_LOCAL_PATH)" IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/build-cisco-xcframeworks.sh
 
 
 ## populate-deps: Populate dependencies/ directory with pre-built xcframeworks
@@ -142,7 +145,7 @@ populate-deps:
 .PHONY: build-agent
 build-agent:
 	@echo "==> Building SplunkAgent module xcframeworks..."
-	$(SCRIPTS_DIR)/build-xcframeworks.sh
+	IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/build-xcframeworks.sh
 
 
 ## sign: Sign all built xcframeworks (optional locally, mandatory for release)
@@ -161,7 +164,7 @@ endif
 .PHONY: validate
 validate:
 	@echo "==> Validating xcframeworks..."
-	RELEASE=$(RELEASE) $(SCRIPTS_DIR)/validate-xcframeworks.sh
+	RELEASE=$(RELEASE) IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/validate-xcframeworks.sh
 
 
 ## release: Full release pipeline (build + sign + validate + package)
@@ -178,10 +181,10 @@ ifndef SIGNING_IDENTITY
 	@exit 1
 endif
 	@echo "==> Starting release pipeline for version $(VERSION)..."
-	$(MAKE) build
+	$(MAKE) build IOS_ONLY="$(IOS_ONLY)"
 	$(MAKE) sign SIGNING_IDENTITY="$(SIGNING_IDENTITY)"
-	$(MAKE) validate RELEASE=true
-	$(SCRIPTS_DIR)/release.sh "$(VERSION)"
+	$(MAKE) validate RELEASE=true IOS_ONLY="$(IOS_ONLY)"
+	IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/release.sh "$(VERSION)"
 
 
 ## smoke-test: Build smoke test app to verify all xcframeworks link correctly

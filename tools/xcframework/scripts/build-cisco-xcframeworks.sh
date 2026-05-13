@@ -9,6 +9,10 @@
 # Usage:
 #   SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay ./scripts/build-cisco-xcframeworks.sh
 #   ./scripts/build-cisco-xcframeworks.sh --session-replay-path /path/to/session-replay
+#   ./scripts/build-cisco-xcframeworks.sh --session-replay-path /path/to/session-replay --ios-only
+#
+# Environment variables:
+#   IOS_ONLY - When true, build only iOS device and simulator slices
 
 set -euo pipefail
 
@@ -25,6 +29,7 @@ SOURCE_COMMIT=""
 SOURCE_BRANCH=""
 SOURCE_DIRTY=""
 SOURCE_REMOTE=""
+IOS_ONLY="${IOS_ONLY:-false}"
 
 CISCO_FRAMEWORKS=(
     "CiscoCommon"
@@ -51,6 +56,10 @@ while [[ $# -gt 0 ]]; do
         --deps-dir)
             DEPS_DIR="$2"
             shift 2
+            ;;
+        --ios-only)
+            IOS_ONLY=true
+            shift
             ;;
         *)
             echo "Unknown argument: $1"
@@ -205,6 +214,13 @@ write_traceability_manifest() {
         echo "source_branch=${SOURCE_BRANCH}"
         echo "source_dirty=${SOURCE_DIRTY}"
         echo "mach_o_type=mh_dylib"
+        if [[ "${IOS_ONLY}" == "true" ]]; then
+            echo "variant=ios-only"
+            echo "sdks=iphoneos,iphonesimulator"
+        else
+            echo "variant=all-platforms"
+            echo "sdks=all"
+        fi
         echo "generated_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
         for framework in "${CISCO_FRAMEWORKS[@]}"; do
             echo "${framework}|local|mh_dylib"
@@ -220,16 +236,23 @@ main() {
     log "Building dynamic Cisco xcframeworks from ${SESSION_REPLAY_PATH}"
     log "Output: ${OUTPUT_DIR}"
     log "Dependencies: ${DEPS_DIR}"
+    log "iOS-only: ${IOS_ONLY}"
 
     capture_source_state
 
     rm -rf "${BUILD_ROOT}"
     mkdir -p "${BUILD_ROOT}" "${OUTPUT_DIR}" "${DEPS_DIR}"
 
-    "${SESSION_REPLAY_PATH}/Tools/build_frameworks.sh" \
-        --frameworks "$(frameworks_argument)" \
-        --mach-o-types mh_dylib \
+    local build_args=(
+        --frameworks "$(frameworks_argument)"
+        --mach-o-types mh_dylib
         --distribution-output "${CISCO_DIST_DIR}"
+    )
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        build_args+=(--sdks iphoneos,iphonesimulator)
+    fi
+
+    "${SESSION_REPLAY_PATH}/Tools/build_frameworks.sh" "${build_args[@]}"
 
     log "Staging dynamic Cisco xcframeworks"
     for framework in "${CISCO_FRAMEWORKS[@]}"; do

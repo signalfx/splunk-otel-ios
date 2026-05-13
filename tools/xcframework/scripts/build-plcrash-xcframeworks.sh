@@ -8,7 +8,7 @@
 # in their GitHub releases, and our SDK requires dynamic frameworks.
 #
 # Usage:
-#   ./scripts/build-plcrash-xcframeworks.sh [--plcrash-version VERSION]
+#   ./scripts/build-plcrash-xcframeworks.sh [--plcrash-version VERSION] [--ios-only]
 #
 # Prerequisites:
 #   - Xcode 16+ with command-line tools
@@ -18,6 +18,7 @@
 # Environment variables:
 #   PLCRASH_VERSION  - Git tag to checkout (default: 1.12.0)
 #   PLCRASH_REPO     - Git URL for PLCrashReporter (default: upstream GitHub)
+#   IOS_ONLY         - When true, build only iOS device and simulator slices
 #
 # Outputs:
 #   output/xcframeworks/CrashReporter.xcframework
@@ -45,6 +46,7 @@ OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 # PLCrashReporter version
 PLCRASH_VERSION="${PLCRASH_VERSION:-1.12.0}"
 PLCRASH_REPO="${PLCRASH_REPO:-https://github.com/microsoft/plcrashreporter.git}"
+IOS_ONLY="${IOS_ONLY:-false}"
 
 # Build configuration
 CONFIGURATION="Release"
@@ -53,13 +55,20 @@ CONFIGURATION="Release"
 SCHEME="CrashReporter"
 
 # Platform matrix for PLCrashReporter: iOS, tvOS, macCatalyst (no visionOS)
-PLATFORM_DESTINATIONS=(
+FULL_PLATFORM_DESTINATIONS=(
     "ios|generic/platform=iOS"
     "ios-simulator|generic/platform=iOS Simulator"
     "tvos|generic/platform=tvOS"
     "tvos-simulator|generic/platform=tvOS Simulator"
     "maccatalyst|generic/platform=macOS,variant=Mac Catalyst"
 )
+
+IOS_PLATFORM_DESTINATIONS=(
+    "ios|generic/platform=iOS"
+    "ios-simulator|generic/platform=iOS Simulator"
+)
+
+PLATFORM_DESTINATIONS=("${FULL_PLATFORM_DESTINATIONS[@]}")
 
 
 # ---------------------------------------------------------------------------
@@ -72,12 +81,20 @@ while [[ $# -gt 0 ]]; do
             PLCRASH_VERSION="$2"
             shift 2
             ;;
+        --ios-only)
+            IOS_ONLY=true
+            shift
+            ;;
         *)
             echo "Unknown argument: $1"
             exit 1
             ;;
     esac
 done
+
+if [[ "${IOS_ONLY}" == "true" ]]; then
+    PLATFORM_DESTINATIONS=("${IOS_PLATFORM_DESTINATIONS[@]}")
+fi
 
 
 # ---------------------------------------------------------------------------
@@ -153,7 +170,11 @@ generate_xcode_project() {
 # ---------------------------------------------------------------------------
 
 archive_frameworks() {
-    log_step "Step 3: Archive CrashReporter for all platforms"
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        log_step "Step 3: Archive CrashReporter for iOS platforms"
+    else
+        log_step "Step 3: Archive CrashReporter for all platforms"
+    fi
 
     rm -rf "${ARCHIVES_DIR}"
     mkdir -p "${ARCHIVES_DIR}"
@@ -262,7 +283,10 @@ verify_xcframework() {
     fi
 
     # Check 2: Expected platform slices
-    local expected_slices=("ios-arm64" "ios-arm64_x86_64-simulator" "tvos-arm64" "tvos-arm64_x86_64-simulator")
+    local expected_slices=("ios-arm64" "ios-arm64_x86_64-simulator")
+    if [[ "${IOS_ONLY}" != "true" ]]; then
+        expected_slices+=("tvos-arm64" "tvos-arm64_x86_64-simulator")
+    fi
     local has_catalyst=false
 
     for slice_dir in "${xcframework_path}"/*/; do
@@ -282,11 +306,13 @@ verify_xcframework() {
         fi
     done
 
-    if [[ "${has_catalyst}" == "true" ]]; then
-        echo "  ✓ Slice: maccatalyst"
-    else
-        echo "  FAIL: Missing slice: maccatalyst"
-        all_passed=false
+    if [[ "${IOS_ONLY}" != "true" ]]; then
+        if [[ "${has_catalyst}" == "true" ]]; then
+            echo "  ✓ Slice: maccatalyst"
+        else
+            echo "  FAIL: Missing slice: maccatalyst"
+            all_passed=false
+        fi
     fi
 
     # Check 3: Verify Mach-O type is dynamic (MH_DYLIB)
@@ -351,6 +377,11 @@ print_summary() {
     echo "PLCrashReporter version: ${PLCRASH_VERSION}"
     echo "Configuration: ${CONFIGURATION}"
     echo "Linking: Dynamic (MH_DYLIB)"
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        echo "Variant: iOS-only"
+    else
+        echo "Variant: all platforms"
+    fi
 }
 
 
@@ -361,6 +392,7 @@ print_summary() {
 main() {
     log "Building PLCrashReporter xcframework (version ${PLCRASH_VERSION})"
     log "Tools root: ${TOOLS_ROOT}"
+    log "iOS-only: ${IOS_ONLY}"
 
     checkout_plcrash_source
     generate_xcode_project

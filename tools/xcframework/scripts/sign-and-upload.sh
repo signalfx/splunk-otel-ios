@@ -18,6 +18,8 @@
 #   --run-id ID               Legacy mode: download unsigned artifact from a GitHub Actions run
 #   --identity NAME           Signing identity (default: auto-detected)
 #   --session-replay-path DIR Local Session Replay repo path for default local mode
+#   --ios-only                Build, sign, validate, and package only iOS device/simulator slices
+#   --upload-to TAG           Upload to a release tag other than VERSION
 #   --skip-upload             Sign and package only, do not require gh unless --run-id is used
 
 set -euo pipefail
@@ -31,11 +33,13 @@ VERSION="${1:-}"
 RUN_ID=""
 SIGNING_IDENTITY=""
 SESSION_REPLAY_PATH="${SESSION_REPLAY_LOCAL_PATH:-}"
+IOS_ONLY="${IOS_ONLY:-false}"
+UPLOAD_TO_TAG=""
 SKIP_UPLOAD=false
 
 if [[ -z "${VERSION}" ]]; then
     echo "ERROR: Version required."
-    echo "  Usage: $0 VERSION [--run-id ID] [--identity NAME] [--session-replay-path DIR] [--skip-upload]"
+    echo "  Usage: $0 VERSION [--run-id ID] [--identity NAME] [--session-replay-path DIR] [--ios-only] [--upload-to TAG] [--skip-upload]"
     exit 1
 fi
 
@@ -52,6 +56,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --session-replay-path)
             SESSION_REPLAY_PATH="$2"
+            shift 2
+            ;;
+        --ios-only)
+            IOS_ONLY=true
+            shift
+            ;;
+        --upload-to)
+            UPLOAD_TO_TAG="$2"
             shift 2
             ;;
         --skip-upload)
@@ -154,7 +166,7 @@ build_local_artifacts() {
 
     log "Building xcframeworks locally"
     cd "${TOOLS_ROOT}"
-    SESSION_REPLAY_LOCAL_PATH="${SESSION_REPLAY_PATH}" make clean build
+    SESSION_REPLAY_LOCAL_PATH="${SESSION_REPLAY_PATH}" IOS_ONLY="${IOS_ONLY}" make clean build
 }
 
 main() {
@@ -183,14 +195,20 @@ main() {
     "${SCRIPT_DIR}/sign-xcframeworks.sh" --include-cisco "${SIGNING_IDENTITY}"
 
     log "Validating signed xcframeworks"
-    RELEASE=true "${SCRIPT_DIR}/validate-xcframeworks.sh"
+    RELEASE=true IOS_ONLY="${IOS_ONLY}" "${SCRIPT_DIR}/validate-xcframeworks.sh"
+
+    local release_args=("${VERSION}")
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        release_args+=(--ios-only)
+    fi
 
     if [[ "${SKIP_UPLOAD}" == "true" ]]; then
         log "Packaging (upload skipped)"
-        "${SCRIPT_DIR}/release.sh" "${VERSION}"
+        "${SCRIPT_DIR}/release.sh" "${release_args[@]}"
     else
-        log "Packaging and uploading to release ${VERSION}"
-        "${SCRIPT_DIR}/release.sh" "${VERSION}" --upload-to "${VERSION}"
+        local target_release="${UPLOAD_TO_TAG:-${VERSION}}"
+        log "Packaging and uploading to release ${target_release}"
+        "${SCRIPT_DIR}/release.sh" "${release_args[@]}" --upload-to "${target_release}"
     fi
 
     echo ""
@@ -198,6 +216,11 @@ main() {
     echo "  Local Signing Complete"
     echo "============================================================"
     echo "  Version:   ${VERSION}"
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        echo "  Variant:   iOS-only"
+    else
+        echo "  Variant:   all platforms"
+    fi
     echo "  Identity:  ${SIGNING_IDENTITY}"
     if [[ "${legacy_mode}" == "true" ]]; then
         echo "  Source:    CI run ${RUN_ID}"
@@ -207,7 +230,7 @@ main() {
     if [[ "${SKIP_UPLOAD}" == "true" ]]; then
         echo "  Upload:    skipped"
     else
-        echo "  Upload:    attached to release ${VERSION}"
+        echo "  Upload:    attached to release ${UPLOAD_TO_TAG:-${VERSION}}"
     fi
     echo ""
 }

@@ -7,6 +7,8 @@
 # Usage:
 #   ./scripts/validate-xcframeworks.sh
 #   RELEASE=true ./scripts/validate-xcframeworks.sh
+#   ./scripts/validate-xcframeworks.sh --ios-only
+#   IOS_ONLY=true RELEASE=true ./scripts/validate-xcframeworks.sh
 
 set -euo pipefail
 
@@ -15,6 +17,7 @@ TOOLS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 
 RELEASE="${RELEASE:-false}"
+IOS_ONLY="${IOS_ONLY:-false}"
 
 TOTAL_CHECKS=0
 PASSED_CHECKS=0
@@ -22,6 +25,11 @@ FAILED_CHECKS=0
 
 EXPECTED_ALL_SLICES=7
 EXPECTED_NO_VISIONOS_SLICES=5
+EXPECTED_IOS_ONLY_SLICES=2
+EXPECTED_IOS_ONLY_SLICE_NAMES=(
+    "ios-arm64"
+    "ios-arm64_x86_64-simulator"
+)
 
 EXPECTED_FRAMEWORKS=(
     "OpenTelemetryApi"
@@ -56,6 +64,19 @@ EXPECTED_FRAMEWORKS=(
 
 NO_VISIONOS_MODULES="SplunkCrashReports CrashReporter"
 
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --ios-only)
+            IOS_ONLY=true
+            shift
+            ;;
+        *)
+            echo "Unknown argument: $1"
+            exit 1
+            ;;
+    esac
+done
+
 log() {
     echo "==> $*"
 }
@@ -86,6 +107,11 @@ is_expected_framework() {
 
 expected_slices_for() {
     local name="$1"
+
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        echo "${EXPECTED_IOS_ONLY_SLICES}"
+        return
+    fi
 
     case " ${NO_VISIONOS_MODULES} " in
         *" ${name} "*)
@@ -228,6 +254,26 @@ validate_xcframework() {
         check_fail "Platform slices: ${actual_slices} (expected ${expected_slices})"
     fi
 
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        for expected_slice_name in "${EXPECTED_IOS_ONLY_SLICE_NAMES[@]}"; do
+            local found_slice=false
+
+            for slice_entry in "${slice_entries[@]}"; do
+                local slice_name="${slice_entry%%|*}"
+                if [[ "${slice_name}" == "${expected_slice_name}" ]]; then
+                    found_slice=true
+                    break
+                fi
+            done
+
+            if [[ "${found_slice}" == "true" ]]; then
+                check_pass "Slice ${expected_slice_name}: present"
+            else
+                check_fail "Slice ${expected_slice_name}: missing"
+            fi
+        done
+    fi
+
     for slice_entry in "${slice_entries[@]}"; do
         local slice_name="${slice_entry%%|*}"
         local binary_path="${slice_entry#*|}"
@@ -282,6 +328,9 @@ validate_xcframework() {
 
 main() {
     log "Validating xcframeworks in ${OUTPUT_DIR}"
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        log "iOS-only mode: expecting iOS device and simulator slices"
+    fi
     if [[ "${RELEASE}" == "true" ]]; then
         log "Release mode: signature verification enabled"
     fi

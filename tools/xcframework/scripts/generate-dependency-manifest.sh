@@ -9,7 +9,7 @@
 # ensuring it's always accurate.
 #
 # Usage:
-#   ./scripts/generate-dependency-manifest.sh [--version VERSION]
+#   ./scripts/generate-dependency-manifest.sh [--version VERSION] [--ios-only]
 #
 # Output:
 #   output/dependency-manifest.json
@@ -22,12 +22,14 @@ OUTPUT_DIR="${TOOLS_ROOT}/output"
 XCFW_DIR="${OUTPUT_DIR}/xcframeworks"
 MANIFEST_PATH="${OUTPUT_DIR}/dependency-manifest.json"
 
-VERSION="${1:-unspecified}"
+VERSION="unspecified"
+IOS_ONLY="${IOS_ONLY:-false}"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --version) VERSION="$2"; shift 2 ;;
+        --ios-only) IOS_ONLY=true; shift ;;
         *) shift ;;
     esac
 done
@@ -36,7 +38,15 @@ log() {
     echo "==> $*"
 }
 
-log "Generating dependency manifest (version: ${VERSION})"
+if [[ "${IOS_ONLY}" == "true" ]]; then
+    VARIANT="iOS-only"
+    PLATFORMS_JSON='"iOS", "iOS Simulator"'
+else
+    VARIANT="all-platforms"
+    PLATFORMS_JSON='"iOS", "iOS Simulator", "tvOS", "tvOS Simulator", "visionOS", "visionOS Simulator", "macCatalyst"'
+fi
+
+log "Generating dependency manifest (version: ${VERSION}, variant: ${VARIANT})"
 
 # Ensure output directory exists
 mkdir -p "${OUTPUT_DIR}"
@@ -58,6 +68,8 @@ fi
 cat > "${MANIFEST_PATH}" << JSONEOF
 {
   "version": "${VERSION}",
+  "variant": "${VARIANT}",
+  "platforms": [${PLATFORMS_JSON}],
   "generatedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "products": {
     "SplunkAgent": {
