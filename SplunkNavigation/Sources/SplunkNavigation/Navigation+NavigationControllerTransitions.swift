@@ -56,11 +56,8 @@ extension Navigation {
 
         await model.addManagedNavigationControllerTarget(controllerIdentifier)
 
-        let lastScreenName = await model.screenName
-
-        await updateCurrentScreen(
+        updateCurrentScreen(
             screenName: screenName,
-            lastScreenName: lastScreenName,
             start: event.timestamp,
             attributes: navigationEvent.attributes
         )
@@ -123,11 +120,8 @@ extension Navigation {
             return true
         }
 
-        let lastScreenName = await model.screenName
-
-        await updateCurrentScreen(
+        updateCurrentScreen(
             screenName: navigationEvent.name,
-            lastScreenName: lastScreenName,
             start: timestamp,
             attributes: navigationEvent.attributes
         )
@@ -151,7 +145,6 @@ extension Navigation {
         }
 
         let screenName = navigationEvent.name
-        let lastScreenName = await model.screenName
 
         let existingNavigation = await model.navigation(for: visibleControllerIdentifier)
 
@@ -166,9 +159,8 @@ extension Navigation {
 
         let start = existingNavigation?.start ?? event.timestamp
 
-        await updateCurrentScreen(
+        updateCurrentScreen(
             screenName: screenName,
-            lastScreenName: lastScreenName,
             start: start,
             attributes: navigationEvent.attributes
         )
@@ -185,14 +177,12 @@ extension Navigation {
 
     func updateCurrentScreen(
         screenName: String,
-        lastScreenName: String,
         start: Date,
         attributes: [String: Any]? = nil
-    ) async {
-        await model.update(screenName: screenName)
-
+    ) {
+        let lastScreenName = swapCurrentScreenName(screenName)
         if screenName != lastScreenName {
-            continuation.yield(screenName)
+            publishScreenNameChange(screenName)
             send(
                 screenName: screenName,
                 lastScreenName: lastScreenName,

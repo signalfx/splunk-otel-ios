@@ -74,6 +74,10 @@ extension Navigation: Module {
         // that the module framework constructs Navigation before config is available
         // and that NavigationModel is deliberately an actor, this is the best
         // sequencing approach we have found.
+        // Mirror enabled state synchronously so manual track() can check it
+        // without an actor hop.
+        runtimeStateStore.setModuleEnabled(isEnabled)
+
         Task {
             await model.update(moduleEnabled: isEnabled)
 

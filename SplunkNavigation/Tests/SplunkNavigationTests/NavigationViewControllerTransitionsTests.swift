@@ -95,7 +95,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         )
 
         let didUpdateActiveScreen = await waitUntil {
-            await navigation.model.screenName == "TransitionViewController"
+            navigation.currentScreenNameForTesting == "TransitionViewController"
         }
         XCTAssertTrue(didUpdateActiveScreen)
 
@@ -147,10 +147,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         navigation.preferences.enableAutomatedTracking = true
         navigation.track(screen: "ManualScreen")
 
-        let didApplyManualScreen = await waitUntil {
-            await navigation.model.screenName == "ManualScreen"
-        }
-        XCTAssertTrue(didApplyManualScreen)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "ManualScreen")
 
         navigation.startDetection()
 
@@ -163,7 +160,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
         )
 
         let didApplyTransitionScreen = await waitUntil {
-            await navigation.model.screenName == "TransitionViewController"
+            navigation.currentScreenNameForTesting == "TransitionViewController"
         }
         XCTAssertTrue(didApplyTransitionScreen)
 
@@ -176,10 +173,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
 
         navigation.track(screen: "ManualScreen")
 
-        let didApplyManualScreen = await waitUntil {
-            await navigation.model.screenName == "ManualScreen"
-        }
-        XCTAssertTrue(didApplyManualScreen)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "ManualScreen")
 
         navigation.startDetection()
 
@@ -193,7 +187,7 @@ final class NavigationViewControllerTransitionsTests: XCTestCase {
 
         try? await Task.sleep(nanoseconds: 200_000_000)
 
-        let currentScreenName = await navigation.model.screenName
+        let currentScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(currentScreenName, "ManualScreen")
 
         continuation.finish()

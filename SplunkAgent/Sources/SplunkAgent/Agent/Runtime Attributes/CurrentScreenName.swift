@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,23 +17,25 @@ limitations under the License.
 
 import Foundation
 
-extension Navigation {
+/// Thread-safe holder for the current screen name.
+///
+/// Written synchronously on the caller's thread so that spans started immediately
+/// after a screen-name update see the new value without waiting for async fanout.
+final class CurrentScreenName: @unchecked Sendable {
 
-    // MARK: - Manual detection
+    // MARK: - Private
 
-    public func track(screen name: String) {
-        track(screen: name, attributes: nil)
+    private let lock = NSLock()
+    private var value = "unknown"
+
+
+    // MARK: - Access
+
+    func get() -> String {
+        lock.withLock { value }
     }
 
-    public func track(screen name: String, attributes: [String: Any]?) {
-        let start = Date()
-
-        guard runtimeStateStore.moduleEnabled else {
-            return
-        }
-
-        let lastScreenName = swapCurrentScreenName(name)
-        publishScreenNameChange(name)
-        send(screenName: name, lastScreenName: lastScreenName, start: start, attributes: attributes)
+    func set(_ newValue: String) {
+        lock.withLock { value = newValue }
     }
 }

@@ -81,10 +81,7 @@ final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
         navigation.startDetection()
 
         navigation.track(screen: "HomeScreen")
-        let didSetInitial = await waitUntil {
-            await navigation.model.screenName == "HomeScreen"
-        }
-        XCTAssertTrue(didSetInitial)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "HomeScreen")
 
         let controllerIdentifier = ObjectIdentifier(NSString())
         let navControllerIdentifier = ObjectIdentifier(NSNumber(value: 99))
@@ -105,11 +102,11 @@ final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
         // Verify the SDK uses the processor's `name` field for the screen name,
         // not the "screen.name" attribute the processor also returned.
         let didUpdate = await waitUntil {
-            await navigation.model.screenName == "SettingsViewController"
+            navigation.currentScreenNameForTesting == "SettingsViewController"
         }
         XCTAssertTrue(didUpdate)
 
-        let currentScreenName = await navigation.model.screenName
+        let currentScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(
             currentScreenName,
             "SettingsViewController",

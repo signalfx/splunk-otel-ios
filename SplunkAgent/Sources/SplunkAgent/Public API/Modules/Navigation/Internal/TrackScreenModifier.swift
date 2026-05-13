@@ -24,17 +24,23 @@ struct TrackScreenModifier: ViewModifier {
     let screenName: String
     let attributes: [String: Any]?
 
+    /// @State persists across redraws for the same view insertion, so the tracker
+    /// retains its last-key state through body re-evaluations and modifier recreation.
+    @State
+    private var tracker = SwiftUIScreenTracker()
+
 
     // MARK: - ViewModifier methods
 
     func body(content: Content) -> some View {
         content
             .onAppear {
-                // .onAppear can fire multiple times during the SwiftUI view lifecycle
-                // (redraws, tab switches, etc.). Navigation.track(screen:) deduplicates
-                // by comparing against the current screen name, so repeated calls with
-                // the same name are no-ops and do not generate additional spans.
-                SplunkRum.shared.navigation.track(screen: screenName, attributes: attributes)
+                // .onAppear fires multiple times during the SwiftUI view lifecycle
+                // (redraws, tab switches, etc.). Deduplication lives here so that
+                // Navigation.track(screen:) remains unconditional for explicit calls.
+                tracker.trackIfChanged(screenName: screenName, attributes: attributes) {
+                    SplunkRum.shared.navigation.track(screen: screenName, attributes: attributes)
+                }
             }
     }
 }

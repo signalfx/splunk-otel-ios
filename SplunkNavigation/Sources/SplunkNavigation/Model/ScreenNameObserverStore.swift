@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,23 +17,22 @@ limitations under the License.
 
 import Foundation
 
-extension Navigation {
+/// Lock-protected holder for the agent's synchronous screen-name observer.
+final class ScreenNameObserverStore: @unchecked Sendable {
 
-    // MARK: - Manual detection
+    // MARK: - Private
 
-    public func track(screen name: String) {
-        track(screen: name, attributes: nil)
+    private let lock = NSLock()
+    private var observer: (@Sendable (String) -> Void)?
+
+
+    // MARK: - Observer
+
+    func set(_ observer: (@Sendable (String) -> Void)?) {
+        lock.withLock { self.observer = observer }
     }
 
-    public func track(screen name: String, attributes: [String: Any]?) {
-        let start = Date()
-
-        guard runtimeStateStore.moduleEnabled else {
-            return
-        }
-
-        let lastScreenName = swapCurrentScreenName(name)
-        publishScreenNameChange(name)
-        send(screenName: name, lastScreenName: lastScreenName, start: start, attributes: attributes)
+    func publish(_ name: String) {
+        lock.withLock { observer }?(name)
     }
 }

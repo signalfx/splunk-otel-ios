@@ -142,7 +142,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         // Short window for negative assertion; 200 ms balances CI reliability.
         try? await Task.sleep(nanoseconds: 200_000_000)
 
-        let currentScreenName = await navigation.model.screenName
+        let currentScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(currentScreenName, "unknown")
     }
 
@@ -167,16 +167,13 @@ final class NavigationEventSourcesTests: XCTestCase {
         )
 
         let didApplyAutomatedScreen = await waitUntil {
-            await navigation.model.screenName == "AutoViewController"
+            navigation.currentScreenNameForTesting == "AutoViewController"
         }
         XCTAssertTrue(didApplyAutomatedScreen)
 
         navigation.track(screen: "ManualScreen")
 
-        let didApplyManualScreen = await waitUntil {
-            await navigation.model.screenName == "ManualScreen"
-        }
-        XCTAssertTrue(didApplyManualScreen)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "ManualScreen")
     }
 
     func testAutomatedUpdateOverridesManualWhenEnabled() async {
@@ -190,10 +187,7 @@ final class NavigationEventSourcesTests: XCTestCase {
 
         navigation.track(screen: "ManualScreen")
 
-        let didApplyManualScreen = await waitUntil {
-            await navigation.model.screenName == "ManualScreen"
-        }
-        XCTAssertTrue(didApplyManualScreen)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "ManualScreen")
 
         navigation.startDetection()
 
@@ -207,7 +201,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         )
 
         let didApplyAutomatedScreen = await waitUntil {
-            await navigation.model.screenName == "AutoViewController"
+            navigation.currentScreenNameForTesting == "AutoViewController"
         }
         XCTAssertTrue(didApplyAutomatedScreen)
     }
@@ -222,10 +216,7 @@ final class NavigationEventSourcesTests: XCTestCase {
 
         navigation.track(screen: "ManualScreen")
 
-        let didApplyManualScreen = await waitUntil {
-            await navigation.model.screenName == "ManualScreen"
-        }
-        XCTAssertTrue(didApplyManualScreen)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "ManualScreen")
 
         navigation.startDetection()
 
@@ -241,7 +232,7 @@ final class NavigationEventSourcesTests: XCTestCase {
         // Short window for negative assertion; 200 ms balances CI reliability.
         try? await Task.sleep(nanoseconds: 200_000_000)
 
-        let currentScreenName = await navigation.model.screenName
+        let currentScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(currentScreenName, "ManualScreen")
     }
 }

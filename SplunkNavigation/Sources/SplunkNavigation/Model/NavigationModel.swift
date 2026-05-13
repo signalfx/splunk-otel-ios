@@ -21,7 +21,6 @@ actor NavigationModel {
     // MARK: - Public
 
     private(set) var moduleEnabled: Bool = true
-    private(set) var screenName: String = "unknown"
     private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
     private(set) var pendingNavigationTargets: [ObjectIdentifier: ObjectIdentifier] = [:]
     private(set) var managedNavigationControllerTargets: Set<ObjectIdentifier> = []
@@ -43,13 +42,6 @@ actor NavigationModel {
 
     func update(navigationEventProcessor: any NavigationEventProcessor) {
         self.navigationEventProcessor = navigationEventProcessor
-    }
-
-
-    // MARK: - Screen name management
-
-    func update(screenName: String) {
-        self.screenName = screenName
     }
 
 

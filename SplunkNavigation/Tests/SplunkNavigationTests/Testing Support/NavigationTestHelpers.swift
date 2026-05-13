@@ -45,3 +45,12 @@ func makeEventStream(
         continuation.finish()
     }
 }
+
+
+// MARK: - Screen name assertions
+
+extension Navigation {
+    var currentScreenNameForTesting: String {
+        runtimeStateStore.screenName
+    }
+}

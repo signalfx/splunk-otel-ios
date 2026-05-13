@@ -53,7 +53,7 @@ final class NavigationEventProcessorTests: XCTestCase {
         navigation.startDetection()
 
         let didUpdate = await waitUntil {
-            await navigation.model.screenName == "DetailViewController"
+            navigation.currentScreenNameForTesting == "DetailViewController"
         }
         XCTAssertTrue(didUpdate)
     }
@@ -87,14 +87,14 @@ final class NavigationEventProcessorTests: XCTestCase {
         navigation.startDetection()
 
         let didUpdate = await waitUntil {
-            await navigation.model.screenName == "Custom/DetailViewController"
+            navigation.currentScreenNameForTesting == "Custom/DetailViewController"
         }
         XCTAssertTrue(didUpdate)
     }
 
     // MARK: - Manual tracking bypass
 
-    func testManualTrackBypassesProcessor() async {
+    func testManualTrackBypassesProcessor() {
         let fixture = makeNavigationStreamFixture(
             navigationEventProcessor: NameOverridingProcessor()
         )
@@ -110,10 +110,7 @@ final class NavigationEventProcessorTests: XCTestCase {
 
         navigation.track(screen: "ManualScreen")
 
-        let didUpdate = await waitUntil {
-            await navigation.model.screenName == "ManualScreen"
-        }
-        XCTAssertTrue(didUpdate)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "ManualScreen")
     }
 
     func testProcessorAppliesToAutomatedButNotManual() async {
@@ -132,10 +129,7 @@ final class NavigationEventProcessorTests: XCTestCase {
 
         navigation.track(screen: "ManualScreen")
 
-        let didSetManual = await waitUntil {
-            await navigation.model.screenName == "ManualScreen"
-        }
-        XCTAssertTrue(didSetManual)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "ManualScreen")
 
         let detailIdentifier = ObjectIdentifier(NSString())
         let navigationControllerIdentifier = ObjectIdentifier(NSNumber(value: 3))
@@ -154,7 +148,7 @@ final class NavigationEventProcessorTests: XCTestCase {
         )
 
         let didSetAuto = await waitUntil {
-            await navigation.model.screenName == "Auto/DetailViewController"
+            navigation.currentScreenNameForTesting == "Auto/DetailViewController"
         }
         XCTAssertTrue(didSetAuto)
     }
@@ -188,7 +182,7 @@ final class NavigationEventProcessorTests: XCTestCase {
         )
 
         let didUpdate = await waitUntil {
-            await navigation.model.screenName == "Nav/PresentedViewController"
+            navigation.currentScreenNameForTesting == "Nav/PresentedViewController"
         }
         XCTAssertTrue(didUpdate)
     }
@@ -205,10 +199,7 @@ final class NavigationEventProcessorTests: XCTestCase {
 
         navigation.track(screen: "InitialScreen")
 
-        let didSetInitial = await waitUntil {
-            await navigation.model.screenName == "InitialScreen"
-        }
-        XCTAssertTrue(didSetInitial)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "InitialScreen")
 
         let presentingController = PresentingViewController()
         let presentedController = PresentedViewController()
@@ -228,7 +219,7 @@ final class NavigationEventProcessorTests: XCTestCase {
 
         try? await Task.sleep(nanoseconds: 200_000_000)
 
-        let currentScreenName = await navigation.model.screenName
+        let currentScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(currentScreenName, "InitialScreen")
     }
 
@@ -252,10 +243,7 @@ final class NavigationEventProcessorTests: XCTestCase {
         // Set an initial screen name manually (bypasses processor)
         navigation.track(screen: "InitialScreen")
 
-        let didSetInitial = await waitUntil {
-            await navigation.model.screenName == "InitialScreen"
-        }
-        XCTAssertTrue(didSetInitial)
+        XCTAssertEqual(navigation.currentScreenNameForTesting, "InitialScreen")
 
         // Send an automated navigation event; the suppressing processor returns nil
         let detailIdentifier = ObjectIdentifier(NSString())
@@ -278,7 +266,7 @@ final class NavigationEventProcessorTests: XCTestCase {
         try? await Task.sleep(nanoseconds: 200_000_000)
 
         // Screen name should remain unchanged because the event was suppressed
-        let currentScreenName = await navigation.model.screenName
+        let currentScreenName = navigation.currentScreenNameForTesting
         XCTAssertEqual(currentScreenName, "InitialScreen")
     }
 }

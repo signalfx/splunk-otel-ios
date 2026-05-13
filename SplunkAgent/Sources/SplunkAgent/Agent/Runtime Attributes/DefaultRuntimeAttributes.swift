@@ -35,6 +35,9 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
     /// Persistent, unique identifier for this application installation.
     private let appInstallationId: String
 
+    /// Synchronous holder for the current screen name.
+    private let currentScreenName = CurrentScreenName()
+
 
     // MARK: - RuntimeAttributes protocol
 
@@ -50,6 +53,7 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
         systemAttributes["user.anonymous_id"] = userIdentifier()
         systemAttributes["session.id"] = sessionIdentifier()
         systemAttributes["app.installation.id"] = installationIdentifier()
+        systemAttributes["screen.name"] = currentScreenName.get()
         allAttributes = systemAttributes
 
 
@@ -84,6 +88,10 @@ final class DefaultRuntimeAttributes: AgentRuntimeAttributes {
         accessQueue.async(flags: .barrier) {
             self.customValue[named] = nil
         }
+    }
+
+    func updateScreenName(_ name: String) {
+        currentScreenName.set(name)
     }
 
 

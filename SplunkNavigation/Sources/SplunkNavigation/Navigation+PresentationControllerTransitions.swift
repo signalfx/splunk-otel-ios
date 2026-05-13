@@ -139,7 +139,6 @@ extension Navigation {
         }
 
         let screenName = navigationEvent.name
-        let lastScreenName = await model.screenName
 
         if await model.navigation(for: snapshot.controllerIdentifier) == nil {
             let fallbackNavigation = NavigationPair(
@@ -157,9 +156,8 @@ extension Navigation {
             await model.navigation(for: snapshot.controllerIdentifier)?
             .start ?? timestamp
 
-        await updateCurrentScreen(
+        updateCurrentScreen(
             screenName: screenName,
-            lastScreenName: lastScreenName,
             start: start,
             attributes: navigationEvent.attributes
         )

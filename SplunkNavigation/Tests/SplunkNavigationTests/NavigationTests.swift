@@ -77,14 +77,11 @@ final class NavigationTests: XCTestCase {
         XCTAssertFalse(finalTrackingState)
     }
 
-    func testTracking() async {
+    func testTracking() {
         let customName = "Test Screen"
         navigationModule.track(screen: customName)
 
-        let didUpdate = await waitUntil {
-            await self.navigationModule.model.screenName == customName
-        }
-        XCTAssertTrue(didUpdate)
+        XCTAssertEqual(navigationModule.currentScreenNameForTesting, customName)
     }
 }
 

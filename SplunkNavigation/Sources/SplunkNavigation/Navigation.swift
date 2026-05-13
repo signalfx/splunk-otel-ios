@@ -39,10 +39,38 @@ public final class Navigation: Sendable {
         category: "Navigation"
     )
 
+    private let screenNameObserverStore = ScreenNameObserverStore()
+
+    let runtimeStateStore = NavigationRuntimeStateStore()
+
     // MARK: - Public
 
     /// Asynchronous stream of screen name changes.
     public let screenNameStream: AsyncStream<String>
+
+
+    // MARK: - Screen name observer
+
+    /// Registers a synchronous observer that is called on every screen-name change
+    /// before the change is yielded to `screenNameStream`.
+    ///
+    /// The agent uses this hook to update runtime attributes synchronously, ensuring
+    /// spans started immediately after a screen-name change carry the new value.
+    @_spi(SplunkInternal)
+    public func setScreenNameObserver(_ observer: (@Sendable (String) -> Void)?) {
+        screenNameObserverStore.set(observer)
+    }
+
+    /// Publishes a screen-name change to the synchronous observer and then to the async stream.
+    func publishScreenNameChange(_ name: String) {
+        screenNameObserverStore.publish(name)
+        continuation.yield(name)
+    }
+
+    /// Atomically updates the current screen name and returns the previous value.
+    func swapCurrentScreenName(_ name: String) -> String {
+        runtimeStateStore.swapScreenName(name)
+    }
 
 
     // MARK: - Module configuration
@@ -208,7 +236,6 @@ public final class Navigation: Sendable {
         }
 
         let screenName = navigationEvent.name
-        let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
             type: .show,
@@ -218,12 +245,11 @@ public final class Navigation: Sendable {
 
         // Store this navigation for final processing
         await model.update(navigation: navigation, for: event.controllerIdentifier)
-        await model.update(screenName: screenName)
 
-        // Yield this change to the consumer
-        // and send corresponding span
+        // Publish and send corresponding span
+        let lastScreenName = swapCurrentScreenName(screenName)
         if screenName != lastScreenName {
-            continuation.yield(screenName)
+            publishScreenNameChange(screenName)
 
             send(
                 screenName: screenName,
@@ -249,7 +275,6 @@ public final class Navigation: Sendable {
         }
 
         let screenName = navigationEvent.name
-        let lastScreenName = await model.screenName
 
         let navigation = NavigationPair(
             type: .transition,
@@ -260,11 +285,11 @@ public final class Navigation: Sendable {
         // Always refresh in-flight transition state for this controller.
         // If a previous end event was missed, this replaces stale timing data.
         await model.update(navigation: navigation, for: event.controllerIdentifier)
-        await model.update(screenName: screenName)
 
-        // Yield this change to the consumer and send corresponding span
+        // Publish and send corresponding span
+        let lastScreenName = swapCurrentScreenName(screenName)
         if screenName != lastScreenName {
-            continuation.yield(screenName)
+            publishScreenNameChange(screenName)
             send(
                 screenName: screenName,
                 lastScreenName: lastScreenName,

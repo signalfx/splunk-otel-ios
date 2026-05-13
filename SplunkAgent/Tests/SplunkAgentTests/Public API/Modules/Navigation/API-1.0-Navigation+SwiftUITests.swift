@@ -55,4 +55,70 @@ final class NavigationSwiftUITests: XCTestCase {
 
         XCTAssertNotNil(view)
     }
+
+    func testSwiftUIScreenTrackerDeduplicatesSameScreenAndAttributes() {
+        let tracker = SwiftUIScreenTracker()
+        var emitCount = 0
+
+        tracker.trackIfChanged(screenName: "Home", attributes: ["tab": "main"]) {
+            emitCount += 1
+        }
+        tracker.trackIfChanged(screenName: "Home", attributes: ["tab": "main"]) {
+            emitCount += 1
+        }
+
+        XCTAssertEqual(emitCount, 1)
+    }
+
+    func testSwiftUIScreenTrackerEmitsWhenAttributesChange() {
+        let tracker = SwiftUIScreenTracker()
+        var emittedScreens: [String] = []
+
+        tracker.trackIfChanged(screenName: "ProductDetail", attributes: ["product.id": "1"]) {
+            emittedScreens.append("first")
+        }
+        tracker.trackIfChanged(screenName: "ProductDetail", attributes: ["product.id": "2"]) {
+            emittedScreens.append("second")
+        }
+
+        XCTAssertEqual(emittedScreens, ["first", "second"])
+    }
+
+    func testSwiftUIScreenTrackerTreatsNilAndEmptyAttributesAsDuplicate() {
+        let tracker = SwiftUIScreenTracker()
+        var emitCount = 0
+
+        tracker.trackIfChanged(screenName: "Home", attributes: nil) {
+            emitCount += 1
+        }
+        tracker.trackIfChanged(screenName: "Home", attributes: [:]) {
+            emitCount += 1
+        }
+
+        XCTAssertEqual(emitCount, 1)
+    }
+
+    func testSwiftUIScreenTrackerNormalizesMixedAnyArrays() {
+        let tracker = SwiftUIScreenTracker()
+        var emittedScreens: [String] = []
+
+        let first: [Any] = ["a", 1, true]
+        let duplicate: [Any] = ["a", 1, true]
+        let changed: [Any] = ["a", 2, true]
+        let firstAttributes: [String: Any] = ["items": first]
+        let duplicateAttributes: [String: Any] = ["items": duplicate]
+        let changedAttributes: [String: Any] = ["items": changed]
+
+        tracker.trackIfChanged(screenName: "MixedArray", attributes: firstAttributes) {
+            emittedScreens.append("first")
+        }
+        tracker.trackIfChanged(screenName: "MixedArray", attributes: duplicateAttributes) {
+            emittedScreens.append("duplicate")
+        }
+        tracker.trackIfChanged(screenName: "MixedArray", attributes: changedAttributes) {
+            emittedScreens.append("changed")
+        }
+
+        XCTAssertEqual(emittedScreens, ["first", "changed"])
+    }
 }
