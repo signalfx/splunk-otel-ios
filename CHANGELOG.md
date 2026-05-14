@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+* Fixed xcframework build system. #647
+
 ## [2.2.3] - 2026-05-12
 
 ### Fixed
