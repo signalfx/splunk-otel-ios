@@ -33,6 +33,7 @@ struct DemoHeaderView: View {
             Text("Agent Version: \(agentDataSource.agentVersion)")
             Text("Agent App Version: \(agentDataSource.agentAppVersion)")
             Text("Session ID: \(agentDataSource.sessionId)")
+                .accessibilityIdentifier("sessionIdLabel")
             HStack {
                 Text("Current Time: \(currentTime, formatter: DateFormatter.shortTime)")
             }
