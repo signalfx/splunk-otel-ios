@@ -15,6 +15,7 @@
 		522DB6CA2DC135920047FBCD /* SessionReplayDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522DB6C92DC135920047FBCD /* SessionReplayDemoView.swift */; };
 		522DB6CC2DC135BC0047FBCD /* TemplateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 522DB6CB2DC135BC0047FBCD /* TemplateView.swift */; };
 		5238CC822DFB6AD400206F6C /* ObjCExceptionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 5238CC812DFB6AD400206F6C /* ObjCExceptionHelper.m */; };
+		523B33F62F910612008BEA1B /* NavigationTrackingDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523B33F52F910612008BEA1B /* NavigationTrackingDemoView.swift */; };
 		524479292DE7EEA200E93C77 /* CustomTrackingDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524479282DE7EE9C00E93C77 /* CustomTrackingDemoView.swift */; };
 		524EA8C62F3E87C0004650AF /* WebViewSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524EA8C42F3E87C0004650AF /* WebViewSectionView.swift */; };
 		524EA8C72F3E87C0004650AF /* WebDemoButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524EA8C22F3E87C0004650AF /* WebDemoButton.swift */; };
@@ -46,6 +47,7 @@
 		5238CC812DFB6AD400206F6C /* ObjCExceptionHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ObjCExceptionHelper.m; sourceTree = "<group>"; };
 		5238CC832DFB6AD600206F6C /* DevelApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DevelApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		5238CC842DFB6AF700206F6C /* ObjCExceptionHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ObjCExceptionHelper.h; sourceTree = "<group>"; };
+		523B33F52F910612008BEA1B /* NavigationTrackingDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTrackingDemoView.swift; sourceTree = "<group>"; };
 		524479282DE7EE9C00E93C77 /* CustomTrackingDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTrackingDemoView.swift; sourceTree = "<group>"; };
 		524EA8C12F3E87C0004650AF /* PlaceholderSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderSectionView.swift; sourceTree = "<group>"; };
 		524EA8C22F3E87C0004650AF /* WebDemoButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDemoButton.swift; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				527070DF2DC147AB00EDD390 /* AgentDataSource.swift */,
 				527070DD2DC1468100EDD390 /* CrashDemoView.swift */,
 				3384F2892AC8795800512D79 /* DevelAppApp.swift */,
+				523B33F52F910612008BEA1B /* NavigationTrackingDemoView.swift */,
 				522DB6C72DC134C70047FBCD /* RoutingView.swift */,
 				522DB6C92DC135920047FBCD /* SessionReplayDemoView.swift */,
 				522DB6CB2DC135BC0047FBCD /* TemplateView.swift */,
@@ -281,6 +284,7 @@
 				524EA8D32F3E8A13004650AF /* FeatureButton.swift in Sources */,
 				524EA8D12F3E8A11004650AF /* FeatureSection.swift in Sources */,
 				E44D52F72E8AC39B00F5DD9E /* WebViewDemoView.swift in Sources */,
+				523B33F62F910612008BEA1B /* NavigationTrackingDemoView.swift in Sources */,
 				522DB6CC2DC135BC0047FBCD /* TemplateView.swift in Sources */,
 				524EA8C62F3E87C0004650AF /* WebViewSectionView.swift in Sources */,
 				524EA8C72F3E87C0004650AF /* WebDemoButton.swift in Sources */,

@@ -27,7 +27,15 @@ final class Navigation: NavigationModule {
 
     // MARK: - Preferences
 
-    var preferences: any NavigationModulePreferences
+    var preferences: any NavigationModulePreferences {
+        didSet {
+            // Link preferences with module instance
+            (preferences as? NavigationPreferences)?.module = module
+
+            // Pass changes into the module
+            module.preferences.enableAutomatedTracking = preferences.enableAutomatedTracking
+        }
+    }
 
     @discardableResult
     func preferences(_ preferences: any NavigationModulePreferences) -> any NavigationModule {

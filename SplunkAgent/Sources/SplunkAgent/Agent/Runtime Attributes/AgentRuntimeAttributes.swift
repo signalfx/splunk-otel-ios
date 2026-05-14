@@ -39,4 +39,13 @@ protocol AgentRuntimeAttributes: RuntimeAttributes {
     ///
     /// - Parameter named: A `String` with the name of the removed attribute.
     func removeCustom(named: String)
+
+
+    // MARK: - Screen name
+
+    /// Update the current screen name synchronously.
+    ///
+    /// This write is immediately visible to any subsequent `all` read, ensuring
+    /// spans started after a screen-name change carry the correct value.
+    func updateScreenName(_ name: String)
 }

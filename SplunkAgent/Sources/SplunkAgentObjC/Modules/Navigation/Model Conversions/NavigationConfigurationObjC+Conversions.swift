@@ -22,10 +22,13 @@ extension NavigationConfigurationObjC: ModuleConfigurationSwift {
 
     // MARK: - Swift variant
 
-    var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
+    var moduleConfiguration: any ModuleConfiguration {
         NavigationConfiguration(
             isEnabled: isEnabled,
-            enableAutomatedTracking: enableAutomatedTracking
+            enableAutomatedTracking: enableAutomatedTracking,
+            navigationEventProcessor: navigationEventProcessor.map {
+                NavEventProcessorObjCToInternalAdapter(wrapping: $0)
+            }
         )
     }
 }
