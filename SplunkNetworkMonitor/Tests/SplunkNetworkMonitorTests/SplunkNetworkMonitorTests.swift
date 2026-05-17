@@ -62,7 +62,7 @@ final class NetworkMonitorTests: XCTestCase {
     func testNetworkMonitorMetadata() {
         let metadata = NetworkMonitorMetadata()
 
-        XCTAssertEqual(metadata.eventName, "network.change")
+        XCTAssertEqual(metadata.eventName, NetworkMonitorSpanAttributes.spanName)
         XCTAssertNotNil(metadata.timestamp)
     }
 

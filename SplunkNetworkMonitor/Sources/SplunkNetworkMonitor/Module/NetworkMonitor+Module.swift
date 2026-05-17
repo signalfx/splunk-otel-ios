@@ -24,7 +24,7 @@ public struct NetworkMonitorData: ModuleEventData {}
 /// Event metadata for NetworkMonitor module events.
 public struct NetworkMonitorMetadata: ModuleEventMetadata {
     public var timestamp = Date()
-    public var eventName: String = "network.change"
+    public var eventName: String = NetworkMonitorSpanAttributes.spanName
 }
 
 /// Extension that makes NetworkMonitor conform to the Module protocol.
