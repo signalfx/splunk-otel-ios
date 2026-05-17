@@ -109,6 +109,6 @@ func addLinkToSpan(span: Span, valStr: String) {
     let traceId = String(valStr[traceIdRange])
     let spanId = String(valStr[spanIdRange])
 
-    span.clearAndSetAttribute(key: "link.traceId", value: traceId)
-    span.clearAndSetAttribute(key: "link.spanId", value: spanId)
+    span.clearAndSetAttribute(key: NetworkSpanAttributes.linkTraceId, value: traceId)
+    span.clearAndSetAttribute(key: NetworkSpanAttributes.linkSpanId, value: spanId)
 }

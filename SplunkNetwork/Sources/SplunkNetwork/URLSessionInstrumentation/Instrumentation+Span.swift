@@ -100,19 +100,19 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
         // Try to capture IP address from the response/connection
         // Update network.peer.address with actual IP if we can get it
         if let ipAddress = getIPAddressFromResponse(httpResponse) {
-            span.clearAndSetAttribute(key: "network.peer.address", value: ipAddress)
+            span.clearAndSetAttribute(key: SemanticConventions.Network.peerAddress, value: ipAddress)
         }
 
         let protocolVersion = determineHTTPProtocolVersion(httpResponse)
-        span.clearAndSetAttribute(key: "http.protocol.version", value: protocolVersion)
+        span.clearAndSetAttribute(key: NetworkSpanAttributes.httpProtocolVersion, value: protocolVersion)
 
         addCapturedResponseHeaders(from: httpResponse, to: span)
     }
 
     if let error = task.error {
-        span.clearAndSetAttribute(key: "error", value: true)
-        span.clearAndSetAttribute(key: "error.message", value: error.localizedDescription)
-        span.clearAndSetAttribute(key: "error.type", value: String(describing: type(of: error)))
+        span.clearAndSetAttribute(key: NetworkSpanAttributes.error, value: true)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: error.localizedDescription)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: String(describing: type(of: error)))
 
         NetworkInstrumentationManager.shared.logger.log(level: .error) {
             "Error: \(error.localizedDescription)"
@@ -135,7 +135,7 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
 func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
     span.clearAndSetAttribute(key: SemanticConventions.Http.requestBodySize, value: length)
     span.clearAndSetAttribute(key: SemanticConventions.Http.requestMethod, value: method)
-    span.clearAndSetAttribute(key: "component", value: "http")
+    span.clearAndSetAttribute(key: NetworkSpanAttributes.component, value: NetworkSpanAttributes.componentValueHttp)
 
     span.clearAndSetAttribute(key: SemanticConventions.Url.path, value: url.path)
     span.clearAndSetAttribute(key: SemanticConventions.Url.query, value: url.query ?? "")
@@ -144,35 +144,35 @@ func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
     }
 
     if let host = url.host {
-        span.clearAndSetAttribute(key: "server.address", value: host)
+        span.clearAndSetAttribute(key: SemanticConventions.Server.address, value: host)
         // Preload with host in case IP cannot be determined
-        span.clearAndSetAttribute(key: "network.peer.address", value: host)
+        span.clearAndSetAttribute(key: SemanticConventions.Network.peerAddress, value: host)
     }
 
     if let port = url.port {
-        span.clearAndSetAttribute(key: "network.peer.port", value: port)
+        span.clearAndSetAttribute(key: SemanticConventions.Network.peerPort, value: port)
     }
     else {
         let defaultPort = url.scheme?.lowercased() == "https" ? 443 : 80
-        span.clearAndSetAttribute(key: "network.peer.port", value: defaultPort)
+        span.clearAndSetAttribute(key: SemanticConventions.Network.peerPort, value: defaultPort)
     }
 
     if let scheme = url.scheme?.lowercased() {
-        span.clearAndSetAttribute(key: "network.protocol.name", value: scheme)
+        span.clearAndSetAttribute(key: SemanticConventions.Network.protocolName, value: scheme)
     }
 
-    span.clearAndSetAttribute(key: "url.full", value: url.absoluteString)
+    span.clearAndSetAttribute(key: SemanticConventions.Url.full, value: url.absoluteString)
 
     if let sharedState = NetworkInstrumentationManager.shared.getModule()?.sharedState {
         let sessionID: String = sharedState.sessionId
-        span.clearAndSetAttribute(key: "session.id", value: sessionID)
+        span.clearAndSetAttribute(key: NetworkSpanAttributes.sessionId, value: sessionID)
     }
 }
 
 /// Adds configured request headers as span attributes.
 ///
 /// Only headers whose lowercased names appear in the module's `capturedRequestHeaders`
-/// set are captured. Each matching header is stored as `http.request.header.<lowercased-name>`.
+/// set are captured. Each matching header is stored using ``NetworkSpanAttributes/requestHeader(_:)``.
 func addCapturedRequestHeaders(from request: URLRequest, to span: Span) {
     let headerNames = NetworkInstrumentationManager.shared.getModule()?.getCapturedRequestHeaders() ?? []
 
@@ -182,7 +182,7 @@ func addCapturedRequestHeaders(from request: URLRequest, to span: Span) {
 
     for headerName in headerNames {
         if let value = request.value(forHTTPHeaderField: headerName) {
-            span.clearAndSetAttribute(key: "http.request.header.\(headerName)", value: value)
+            span.clearAndSetAttribute(key: NetworkSpanAttributes.requestHeader(headerName), value: value)
         }
     }
 }
@@ -190,7 +190,7 @@ func addCapturedRequestHeaders(from request: URLRequest, to span: Span) {
 /// Adds configured response headers as span attributes.
 ///
 /// Only headers whose lowercased names appear in the module's `capturedResponseHeaders`
-/// set are captured. Each matching header is stored as `http.response.header.<lowercased-name>`.
+/// set are captured. Each matching header is stored using ``NetworkSpanAttributes/responseHeader(_:)``.
 func addCapturedResponseHeaders(from response: HTTPURLResponse, to span: Span) {
     let headerNames = NetworkInstrumentationManager.shared.getModule()?.getCapturedResponseHeaders() ?? []
 
@@ -200,7 +200,7 @@ func addCapturedResponseHeaders(from response: HTTPURLResponse, to span: Span) {
 
     for headerName in headerNames {
         if let value = response.value(forHTTPHeaderField: headerName) {
-            span.clearAndSetAttribute(key: "http.response.header.\(headerName)", value: value)
+            span.clearAndSetAttribute(key: NetworkSpanAttributes.responseHeader(headerName), value: value)
         }
     }
 }
