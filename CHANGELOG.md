@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-05-18
+
 ### Added
 
 * Added automated screen tracking for `UIViewController` transitions #590
