@@ -191,8 +191,8 @@ main() {
         build_local_artifacts
     fi
 
-    log "Signing xcframeworks"
-    "${SCRIPT_DIR}/sign-xcframeworks.sh" --include-cisco "${SIGNING_IDENTITY}"
+    log "Signing non-Cisco xcframeworks"
+    "${SCRIPT_DIR}/sign-xcframeworks.sh" "${SIGNING_IDENTITY}"
 
     log "Validating signed xcframeworks"
     RELEASE=true IOS_ONLY="${IOS_ONLY}" "${SCRIPT_DIR}/validate-xcframeworks.sh"

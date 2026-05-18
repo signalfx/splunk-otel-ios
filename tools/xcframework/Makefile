@@ -8,7 +8,7 @@
 #   make build-otel                                # Build only OTel xcframeworks
 #   make build-cisco                               # Build dynamic Cisco xcframeworks from local Session Replay checkout
 #   make build-agent                               # Build only SplunkAgent xcframeworks
-#   make sign SIGNING_IDENTITY="Apple Distribution: Splunk Inc."  # Sign all xcframeworks
+#   make sign SIGNING_IDENTITY="Apple Distribution: Splunk Inc."  # Sign non-Cisco xcframeworks
 #   make validate                                  # Validate all xcframeworks
 #   make validate RELEASE=true                     # Validate with signature check
 #   make release VERSION=1.0.0 SIGNING_IDENTITY="..." # Full release pipeline
@@ -148,7 +148,7 @@ build-agent:
 	IOS_ONLY=$(IOS_ONLY) $(SCRIPTS_DIR)/build-xcframeworks.sh
 
 
-## sign: Sign all built xcframeworks (optional locally, mandatory for release)
+## sign: Sign non-Cisco xcframeworks (optional locally, mandatory for release)
 .PHONY: sign
 sign:
 ifndef SIGNING_IDENTITY
@@ -157,7 +157,7 @@ ifndef SIGNING_IDENTITY
 	@exit 1
 endif
 	@echo "==> Signing xcframeworks..."
-	$(SCRIPTS_DIR)/sign-xcframeworks.sh --include-cisco "$(SIGNING_IDENTITY)"
+	$(SCRIPTS_DIR)/sign-xcframeworks.sh "$(SIGNING_IDENTITY)"
 
 
 ## validate: Validate all built xcframeworks (structure, slices, interfaces)

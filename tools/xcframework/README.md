@@ -99,7 +99,7 @@ Key variables in the Makefile:
 
 ## Release
 
-Releasing xcframeworks is currently a local process while the Agent and Session Replay repositories are separate. The local release script builds dynamic Cisco frameworks from `SESSION_REPLAY_LOCAL_PATH`, signs all 28 xcframeworks, validates, packages, and optionally uploads to the GitHub release.
+Releasing xcframeworks is currently a local process while the Agent and Session Replay repositories are separate. The local release script builds dynamic Cisco frameworks from `SESSION_REPLAY_LOCAL_PATH`, signs non-Cisco xcframeworks, validates all shipped signatures, packages, and optionally uploads to the GitHub release.
 
 ### How it works
 
@@ -125,7 +125,7 @@ The script will:
 - Auto-detect your signing identity from the local keychain
 - Build OTel, PLCrashReporter, dynamic Cisco, and Splunk xcframeworks locally
 - Record the Session Replay commit, branch, and dirty state in `cisco-release-manifest.txt`
-- Sign all 28 xcframeworks, including Cisco frameworks
+- Sign non-Cisco xcframeworks while preserving pre-signed Cisco framework signatures
 - Validate signatures for all shipped xcframeworks
 - Package and upload the zip to the existing GitHub release
 
@@ -169,8 +169,8 @@ make clean build
 # 2. Find your signing identity
 security find-identity -v -p codesigning
 
-# 3. Sign all shipped xcframeworks, including Cisco
-./scripts/sign-xcframeworks.sh --include-cisco "Apple Distribution: Splunk Inc. (TEAMID)"
+# 3. Sign non-Cisco xcframeworks
+./scripts/sign-xcframeworks.sh "Apple Distribution: Splunk Inc. (TEAMID)"
 
 # 4. Validate all signatures
 RELEASE=true ./scripts/validate-xcframeworks.sh

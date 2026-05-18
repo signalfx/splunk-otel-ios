@@ -3,12 +3,11 @@
 #
 # Signs .xcframework bundles in the output directory using codesign.
 # Signing protects all files inside the xcframework including privacy manifests.
-# Cisco Session Replay xcframeworks are skipped by default for legacy workflows,
-# but release signing must pass --include-cisco so all shipped frameworks are
-# signed with the selected release identity.
+# Cisco Session Replay xcframeworks are skipped by default because they are
+# already signed by the Session Replay build.
 #
 # Usage:
-#   ./scripts/sign-xcframeworks.sh [--include-cisco] "Apple Distribution: Splunk Inc. (TEAMID)"
+#   ./scripts/sign-xcframeworks.sh [--include-cisco|--skip-cisco] "Apple Distribution: Splunk Inc. (TEAMID)"
 #
 # The signing identity must be available in the keychain. For CI, the
 # identity is typically imported from a certificate stored in CI secrets.
@@ -48,7 +47,7 @@ done
 
 if [[ -z "${SIGNING_IDENTITY}" ]]; then
     echo "ERROR: Signing identity required."
-    echo "  Usage: $0 [--include-cisco] \"Apple Distribution: Splunk Inc. (TEAMID)\""
+    echo "  Usage: $0 [--include-cisco|--skip-cisco] \"Apple Distribution: Splunk Inc. (TEAMID)\""
     exit 1
 fi
 
