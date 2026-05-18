@@ -45,6 +45,7 @@ public enum CrashReportKeys: String {
 
 
     // MARK: - Span attribute keys
+
     case previousAppState = "ios.app.state"
 
     case crashTimestamp = "crash.timestamp"
@@ -95,10 +96,10 @@ public enum CrashReportKeys: String {
 ///
 /// These are internal storage keys and differ from span attribute keys in ``CrashReportKeys``.
 enum CrashReportCustomDataKeys: String {
-    case sessionId = "sessionId"
-    case battery = "battery"
-    case disk = "disk"
-    case memory = "memory"
-    case screenName = "screenName"
-    case buildId = "buildId"
+    case sessionId
+    case battery
+    case disk
+    case memory
+    case screenName
+    case buildId
 }
