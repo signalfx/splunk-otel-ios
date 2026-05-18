@@ -284,7 +284,7 @@ public class CrashReports {
         if let sharedState {
             let timebasedAppState =
                 sharedState.applicationState(for: report.systemInfo.timestamp)
-            ?? CrashReportKeys.unknownValue
+                ?? CrashReportKeys.unknownValue
 
             appState = timebasedAppState
         }
