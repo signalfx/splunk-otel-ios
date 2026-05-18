@@ -17,9 +17,34 @@ limitations under the License.
 
 import Foundation
 
-// Static strings for crash report keys
-
+/// Span attribute keys for crash report telemetry.
+///
+/// Keys that match OpenTelemetry semantic conventions (for example ``exceptionName`` and
+/// ``exceptionReason``) use the same wire names as ``SemanticConventions/Exception``.
 public enum CrashReportKeys: String {
+
+    // MARK: - Span and module identity
+
+    /// Default OpenTelemetry span name for crash reports.
+    public static let defaultSpanName = "SplunkCrashReport"
+
+    /// OpenTelemetry tracer instrumentation scope name.
+    public static let instrumentationName = "splunk-crash-report"
+
+    /// Module event name published when a crash report is sent.
+    public static let moduleEventName = "device.app.crash"
+
+    /// Value for ``component`` on crash spans.
+    public static let componentValue = "crash"
+
+    /// Fallback when app state or serialized JSON output is unavailable.
+    public static let unknownValue = "unknown"
+
+    /// Fallback when a device stat cannot be determined.
+    public static let unknownDeviceStatValue = "Unknown"
+
+
+    // MARK: - Span attribute keys
     case previousAppState = "ios.app.state"
 
     case crashTimestamp = "crash.timestamp"
@@ -63,4 +88,17 @@ public enum CrashReportKeys: String {
     case imageUUID
 
     case sessionId = "session.id"
+}
+
+
+/// Keys for the dictionary archived into PLCrashReporter custom data.
+///
+/// These are internal storage keys and differ from span attribute keys in ``CrashReportKeys``.
+enum CrashReportCustomDataKeys: String {
+    case sessionId = "sessionId"
+    case battery = "battery"
+    case disk = "disk"
+    case memory = "memory"
+    case screenName = "screenName"
+    case buildId = "buildId"
 }

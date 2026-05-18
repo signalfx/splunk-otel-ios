@@ -27,7 +27,7 @@ extension String: ModuleEventData {}
 /// Describes the Crash Report event metadata.
 public struct CrashReportsMetadata: ModuleEventMetadata {
     public var timestamp = Date()
-    public var eventName: String = "device.app.crash"
+    public var eventName: String = CrashReportKeys.moduleEventName
 }
 
 extension CrashReports: Module {

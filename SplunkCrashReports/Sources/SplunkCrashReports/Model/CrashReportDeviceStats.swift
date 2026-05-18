@@ -27,7 +27,7 @@ public class CrashReportDeviceStats {
             let level = abs(UIDevice.current.batteryLevel * 100)
             return "\(level)%"
         #else
-            return "Unknown"
+            return CrashReportKeys.unknownDeviceStatValue
         #endif
     }
 
@@ -37,13 +37,13 @@ public class CrashReportDeviceStats {
             let systemAttributes = try FileManager.default.attributesOfFileSystem(forPath: NSHomeDirectory() as String)
             let maybeFreeSpace = (systemAttributes[FileAttributeKey.systemFreeSize] as? NSNumber)?.int64Value
             guard let freeSpace = maybeFreeSpace else {
-                return "Unknown"
+                return CrashReportKeys.unknownDeviceStatValue
             }
 
             return ByteCountFormatter.string(fromByteCount: freeSpace, countStyle: .file)
         }
         catch {
-            return "Unknown"
+            return CrashReportKeys.unknownDeviceStatValue
         }
     }
 
@@ -63,7 +63,7 @@ public class CrashReportDeviceStats {
             }
         }
         guard kerr == KERN_SUCCESS else {
-            return "Unknown"
+            return CrashReportKeys.unknownDeviceStatValue
         }
 
         usedBytes = Float(info.resident_size)

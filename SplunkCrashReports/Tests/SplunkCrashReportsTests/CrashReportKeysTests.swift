@@ -164,4 +164,41 @@ final class CrashReportKeysTests: XCTestCase {
     func testCrashReportKeysSessionId() {
         XCTAssertEqual(CrashReportKeys.sessionId.rawValue, "session.id")
     }
+
+    // MARK: - Span and module identity
+
+    func testCrashReportKeysDefaultSpanName() {
+        XCTAssertEqual(CrashReportKeys.defaultSpanName, "SplunkCrashReport")
+    }
+
+    func testCrashReportKeysInstrumentationName() {
+        XCTAssertEqual(CrashReportKeys.instrumentationName, "splunk-crash-report")
+    }
+
+    func testCrashReportKeysModuleEventName() {
+        XCTAssertEqual(CrashReportKeys.moduleEventName, "device.app.crash")
+    }
+
+    func testCrashReportKeysComponentValue() {
+        XCTAssertEqual(CrashReportKeys.componentValue, "crash")
+    }
+
+    func testCrashReportKeysUnknownValue() {
+        XCTAssertEqual(CrashReportKeys.unknownValue, "unknown")
+    }
+
+    func testCrashReportKeysUnknownDeviceStatValue() {
+        XCTAssertEqual(CrashReportKeys.unknownDeviceStatValue, "Unknown")
+    }
+
+    // MARK: - Custom data keys
+
+    func testCrashReportCustomDataKeys() {
+        XCTAssertEqual(CrashReportCustomDataKeys.sessionId.rawValue, "sessionId")
+        XCTAssertEqual(CrashReportCustomDataKeys.battery.rawValue, "battery")
+        XCTAssertEqual(CrashReportCustomDataKeys.disk.rawValue, "disk")
+        XCTAssertEqual(CrashReportCustomDataKeys.memory.rawValue, "memory")
+        XCTAssertEqual(CrashReportCustomDataKeys.screenName.rawValue, "screenName")
+        XCTAssertEqual(CrashReportCustomDataKeys.buildId.rawValue, "buildId")
+    }
 }
