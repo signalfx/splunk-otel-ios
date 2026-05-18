@@ -21,7 +21,7 @@ import OpenTelemetrySdk
 @_spi(SplunkInternal) import SplunkCommon
 
 /// The class implements a generic span processor that adds runtime attributes to all spans.
-public class OLTPAttributesSpanProcessor: SpanProcessor {
+public class OTLPAttributesSpanProcessor: SpanProcessor {
 
     // MARK: - Private
 
@@ -84,6 +84,6 @@ public class OLTPAttributesSpanProcessor: SpanProcessor {
     }
 
     private func isScreenSpan(_ span: any OpenTelemetrySdk.ReadableSpan) -> Bool {
-        span.name == "screen name change" || span.name == "ShowVC" || span.name == "PresentationTransition"
+        span.name == "app.ui.navigation" || span.name == "ShowVC" || span.name == "PresentationTransition"
     }
 }

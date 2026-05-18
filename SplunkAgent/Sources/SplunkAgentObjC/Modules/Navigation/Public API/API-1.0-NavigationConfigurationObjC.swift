@@ -17,7 +17,11 @@ limitations under the License.
 
 import Foundation
 
-/// The class implements the Navigation module configuration.
+/// Objective-C configuration for the navigation module.
+///
+/// Use this class to enable automated navigation tracking and optionally
+/// configure a ``NavigationEventProcessorObjC`` to customize screen names,
+/// add span attributes, or suppress specific navigation events.
 @objc(SPLKNavigationConfiguration)
 @objcMembers
 public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
@@ -28,6 +32,17 @@ public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
     ///
     /// Default value is `NO`.
     public var enableAutomatedTracking: Bool = false
+
+    /// Processor that intercepts automated navigation events before they produce spans.
+    ///
+    /// Set a custom ``NavigationEventProcessorObjC`` to rename screens, add span attributes,
+    /// or suppress specific events by returning `nil` from the processor method.
+    /// When `nil`, the default processor passes the controller type name through unchanged.
+    ///
+    /// - Important: The processor is retained strongly by the SDK for the lifetime
+    ///   of the agent. Avoid capturing references that transitively own `SplunkRum`;
+    ///   prefer stateless processors or weak captures where needed.
+    public var navigationEventProcessor: NavigationEventProcessorObjC?
 
 
     // MARK: - Initialization
@@ -56,5 +71,24 @@ public final class NavigationConfigurationObjC: ModuleConfigurationObjC {
 
         self.isEnabled = isEnabled
         self.enableAutomatedTracking = enableAutomatedTracking
+    }
+
+    /// Initializes new module configuration with preconfigured values.
+    ///
+    /// - Parameters:
+    ///   - isEnabled: A `BOOL` value sets whether the module is enabled.
+    ///   - enableAutomatedTracking: If `YES`, the module will automatically detect navigation.
+    ///   - navigationEventProcessor: Optional processor to transform automated navigation events.
+    @objc(initWithEnabled:automatedTracking:navigationEventProcessor:)
+    public init(
+        isEnabled: Bool,
+        enableAutomatedTracking: Bool,
+        navigationEventProcessor: NavigationEventProcessorObjC?
+    ) {
+        super.init()
+
+        self.isEnabled = isEnabled
+        self.enableAutomatedTracking = enableAutomatedTracking
+        self.navigationEventProcessor = navigationEventProcessor
     }
 }

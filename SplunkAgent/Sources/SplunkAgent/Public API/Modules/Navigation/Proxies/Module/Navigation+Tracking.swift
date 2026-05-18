@@ -25,4 +25,11 @@ extension Navigation {
 
         return self
     }
+
+    @discardableResult
+    func track(screen name: String, attributes: [String: Any]?) -> any NavigationModule {
+        module.track(screen: name, attributes: attributes)
+
+        return self
+    }
 }

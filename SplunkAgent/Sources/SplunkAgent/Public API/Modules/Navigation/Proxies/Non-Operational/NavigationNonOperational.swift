@@ -63,7 +63,7 @@ final class NavigationNonOperational: NavigationModule {
     init() {
         logger = DefaultLogAgent(
             poolName: PackageIdentifier.nonOperationalInstance(),
-            category: "SessionReplay"
+            category: "Navigation"
         )
 
         // Build "dummy" Navigation module
