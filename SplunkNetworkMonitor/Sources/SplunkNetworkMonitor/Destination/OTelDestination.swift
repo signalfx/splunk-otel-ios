@@ -43,8 +43,8 @@ struct OTelDestination: NetworkMonitorDestination {
 
         let status =
             networkEvent.isConnected
-                ? NetworkMonitorSpanAttributes.statusValueAvailable
-                : NetworkMonitorSpanAttributes.statusValueLost
+            ? NetworkMonitorSpanAttributes.statusValueAvailable
+            : NetworkMonitorSpanAttributes.statusValueLost
 
         span.clearAndSetAttribute(key: NetworkMonitorSpanAttributes.networkStatus, value: status)
         span.clearAndSetAttribute(
