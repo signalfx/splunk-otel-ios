@@ -41,9 +41,11 @@ struct OTelDestination: NetworkMonitorDestination {
             .setStartTime(time: networkEvent.timestamp)
             .startSpan()
 
-        let status = networkEvent.isConnected
-            ? NetworkMonitorSpanAttributes.statusValueAvailable
-            : NetworkMonitorSpanAttributes.statusValueLost
+        let status =
+            networkEvent.isConnected
+                ? NetworkMonitorSpanAttributes.statusValueAvailable
+                : NetworkMonitorSpanAttributes.statusValueLost
+
         span.clearAndSetAttribute(key: NetworkMonitorSpanAttributes.networkStatus, value: status)
         span.clearAndSetAttribute(
             key: SemanticConventions.Network.connectionType,
