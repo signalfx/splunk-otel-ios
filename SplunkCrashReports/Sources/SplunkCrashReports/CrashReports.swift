@@ -282,8 +282,9 @@ public class CrashReports {
     func appStateHandler(report: PLCrashReport) -> String {
         var appState = CrashReportKeys.unknownValue
         if let sharedState {
-            let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp)
-                ?? CrashReportKeys.unknownValue
+            let timebasedAppState =
+                sharedState.applicationState(for: report.systemInfo.timestamp)
+            ?? CrashReportKeys.unknownValue
 
             appState = timebasedAppState
         }
