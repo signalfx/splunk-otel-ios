@@ -42,13 +42,13 @@ limitations under the License.
 
     // Properties (READ)
     NSInteger initialTrackingModeValue = configuration.trackingMode.integerValue;
-    NSInteger expectedTrackingModeValue = SPLKUserTrackingMode.noTracking.integerValue;
+    NSInteger expectedTrackingModeValue = SPLKUserTrackingMode.anonymousTracking.integerValue;
     XCTAssertEqual(initialTrackingModeValue, expectedTrackingModeValue);
 
     // Properties (WRITE)
-    configuration.trackingMode = SPLKUserTrackingMode.anonymousTracking;
+    configuration.trackingMode = SPLKUserTrackingMode.noTracking;
     NSInteger updatedTrackingModeValue = configuration.trackingMode.integerValue;
-    XCTAssertEqual(updatedTrackingModeValue, SPLKUserTrackingMode.anonymousTracking.integerValue);
+    XCTAssertEqual(updatedTrackingModeValue, SPLKUserTrackingMode.noTracking.integerValue);
 }
 
 - (void)testWrongTrackingModeConstants {

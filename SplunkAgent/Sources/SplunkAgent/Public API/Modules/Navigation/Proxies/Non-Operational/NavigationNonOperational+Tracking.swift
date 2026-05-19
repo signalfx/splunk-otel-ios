@@ -25,4 +25,11 @@ extension NavigationNonOperational {
 
         return self
     }
+
+    @discardableResult
+    func track(screen _: String, attributes _: [String: Any]?) -> any NavigationModule {
+        logAccess(toApi: #function)
+
+        return self
+    }
 }

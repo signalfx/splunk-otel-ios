@@ -54,13 +54,15 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
         XCTAssertEqual(systemAttributes["session.id"] as? String, defaultSession.currentSessionId)
         XCTAssertEqual(systemAttributes["user.anonymous_id"] as? String, nil)
 
-        XCTAssertEqual(customAttributes.count, 1)
+        XCTAssertEqual(systemAttributes["screen.name"] as? String, "unknown")
+        XCTAssertEqual(customAttributes.count, 0)
 
         XCTAssertEqual(anonymousSystemAttributes.count, 4)
         XCTAssertNotNil(anonymousSystemAttributes["app.installation.id"])
         XCTAssertEqual(anonymousSystemAttributes["session.id"] as? String, defaultSession.currentSessionId)
         XCTAssertEqual(anonymousSystemAttributes["user.anonymous_id"] as? String, defaultUser.userIdentifier)
-        XCTAssertFalse(anonymousCustomAttributes.isEmpty)
+        XCTAssertEqual(anonymousSystemAttributes["screen.name"] as? String, "unknown")
+        XCTAssertTrue(anonymousCustomAttributes.isEmpty)
     }
 
     func testCustomAttributes() throws {
@@ -106,17 +108,17 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
         XCTAssertEqual(allAttributes.count, 4)
         XCTAssertEqual(allAttributes[sessionName] as? String, agent.currentSession.currentSessionId)
         XCTAssertEqual(allAttributes[customName] as? String, customValue)
-        XCTAssertEqual(customAttributes.count, 2)
+        XCTAssertEqual(customAttributes.count, 1)
         XCTAssertEqual(customAttributes[customName] as? String, customValue)
 
         XCTAssertEqual(updatedAllAttributes.count, 4)
         XCTAssertEqual(updatedAllAttributes[sessionName] as? String, agent.currentSession.currentSessionId)
-        XCTAssertEqual(updatedCustomAttributes.count, 2)
+        XCTAssertEqual(updatedCustomAttributes.count, 1)
         XCTAssertEqual(updatedCustomAttributes[customName] as? String, updatedValue)
 
         XCTAssertEqual(finalAllAttributes.count, 3)
         XCTAssertEqual(finalAllAttributes[sessionName] as? String, agent.currentSession.currentSessionId)
-        XCTAssertEqual(finalCustomAttributes.count, 1)
+        XCTAssertEqual(finalCustomAttributes.count, 0)
     }
 
     func testCustomAttributesPriority() throws {
@@ -149,8 +151,32 @@ final class DefaultRuntimeAttributesTests: XCTestCase {
         XCTAssertEqual(allAttributes.count, 3)
         XCTAssertEqual(allAttributes[systemName] as? String, agent.currentSession.currentSessionId)
 
-        XCTAssertEqual(customAttributes.count, 2)
+        XCTAssertEqual(customAttributes.count, 1)
         XCTAssertEqual(customAttributes[systemName] as? String, customValue)
+    }
+
+    func testScreenNameRuntimeAttributeUpdatesSynchronously() throws {
+        let configuration = try ConfigurationTestBuilder.buildMinimal()
+        let agent = try AgentTestBuilder.build(with: configuration)
+        let runtimeAttributes = agent.runtimeAttributes
+
+        XCTAssertEqual(runtimeAttributes.all["screen.name"] as? String, "unknown")
+
+        runtimeAttributes.updateScreenName("Checkout")
+
+        XCTAssertEqual(runtimeAttributes.all["screen.name"] as? String, "Checkout")
+    }
+
+    func testScreenNameRuntimeAttributeCannotBeOverriddenByCustomAttribute() throws {
+        let configuration = try ConfigurationTestBuilder.buildMinimal()
+        let agent = try AgentTestBuilder.build(with: configuration)
+        let runtimeAttributes = agent.runtimeAttributes
+
+        runtimeAttributes.updateScreenName("SDKScreen")
+        runtimeAttributes.updateCustom(named: "screen.name", with: "CustomScreen")
+
+        XCTAssertEqual(runtimeAttributes.custom["screen.name"] as? String, "CustomScreen")
+        XCTAssertEqual(runtimeAttributes.all["screen.name"] as? String, "SDKScreen")
     }
 
     func testAppInstallationIdPersistence() throws {

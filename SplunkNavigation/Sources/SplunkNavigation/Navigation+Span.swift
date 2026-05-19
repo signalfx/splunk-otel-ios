@@ -25,7 +25,9 @@ extension Navigation {
 
     private static let component = "ui"
     private static let componentKey = "component"
+    private static let navigationSpanName = "app.ui.navigation"
 
+    private static let navigationNameKey = "navigation.name"
     private static let screenNameKey = "screen.name"
     private static let lastScreenNameKey = "last.screen.name"
 
@@ -37,7 +39,7 @@ extension Navigation {
             .tracerProvider
             .get(
                 instrumentationName: "splunk-navigation-detection",
-                instrumentationVersion: appBundleName
+                instrumentationVersion: sharedState?.agentVersion
             )
     }
 
@@ -64,15 +66,44 @@ extension Navigation {
         navigationSpan.end(time: navigationEnd)
     }
 
-    func send(screenName: String, lastScreenName: String, start: Date) {
+    func send(screenName: String, lastScreenName: String, start: Date, attributes: [String: Any]? = nil) {
         // A new zero length span for change screen name event
         let screenNameSpan =
             tracer
-            .spanBuilder(spanName: "screen name change")
+            .spanBuilder(spanName: Self.navigationSpanName)
             .setStartTime(time: start)
             .startSpan()
 
+        // Write user-provided attributes first so that SDK-reserved keys always win.
+        if let attributes {
+            for (key, value) in attributes {
+                screenNameSpan.clearAndSetAttribute(key: key, value: value)
+            }
+        }
+
         screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
+        screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
+        screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
+
+        screenNameSpan.end(time: start)
+    }
+
+    func send(screenName: String, lastScreenName: String, start: Date, attributes: [String: AttributeValue]) {
+        // A new zero length span for change screen name event
+        let screenNameSpan =
+            tracer
+            .spanBuilder(spanName: Self.navigationSpanName)
+            .setStartTime(time: start)
+            .startSpan()
+
+        // Write user-provided attributes first so that SDK-reserved keys always win.
+        for (key, value) in attributes {
+            screenNameSpan.clearAndSetAttribute(key: key, value: value)
+        }
+
+        screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
+        screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
         screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
         screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
