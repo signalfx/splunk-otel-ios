@@ -26,22 +26,22 @@ public enum CrashReportKeys: String {
     // MARK: - Span and module identity
 
     /// Default OpenTelemetry span name for crash reports.
-    public static let defaultSpanName = "SplunkCrashReport"
+    static let defaultSpanName = "SplunkCrashReport"
 
     /// OpenTelemetry tracer instrumentation scope name.
-    public static let instrumentationName = "splunk-crash-report"
+    static let instrumentationName = "splunk-crash-report"
 
     /// Module event name published when a crash report is sent.
-    public static let moduleEventName = "device.app.crash"
+    static let moduleEventName = "device.app.crash"
 
     /// Value for ``component`` on crash spans.
-    public static let componentValue = "crash"
+    static let componentValue = "crash"
 
     /// Fallback when app state or serialized JSON output is unavailable.
-    public static let unknownValue = "unknown"
+    static let unknownValue = "unknown"
 
     /// Fallback when a device stat cannot be determined.
-    public static let unknownDeviceStatValue = "Unknown"
+    static let unknownDeviceStatValue = "Unknown"
 
 
     // MARK: - Span attribute keys
