@@ -28,7 +28,7 @@ final class CrashReportsModuleTests: XCTestCase {
     func testMetadataDefaultEventName() {
         let metadata = CrashReportsMetadata()
 
-        XCTAssertEqual(metadata.eventName, CrashReportKeys.moduleEventName)
+        XCTAssertEqual(metadata.eventName, CrashReportConstants.moduleEventName)
     }
 
     func testMetadataTimestampIsRecentlyCreated() {

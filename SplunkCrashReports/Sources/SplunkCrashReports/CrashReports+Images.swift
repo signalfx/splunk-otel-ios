@@ -42,6 +42,6 @@ extension CrashReports {
                 outputImages.append(imageDictionary)
             }
         }
-        return convertToJSONString(outputImages) ?? CrashReportKeys.unknownValue
+        return convertToJSONString(outputImages) ?? CrashReportConstants.unknownValue
     }
 }

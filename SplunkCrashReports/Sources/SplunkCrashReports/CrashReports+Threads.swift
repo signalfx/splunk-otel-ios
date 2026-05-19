@@ -122,6 +122,6 @@ extension CrashReports {
             }
             outputThreads.append(threadDictionary)
         }
-        return convertToJSONString(outputThreads) ?? CrashReportKeys.unknownValue
+        return convertToJSONString(outputThreads) ?? CrashReportConstants.unknownValue
     }
 }

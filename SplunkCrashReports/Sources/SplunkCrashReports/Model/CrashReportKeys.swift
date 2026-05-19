@@ -21,31 +21,7 @@ import Foundation
 ///
 /// Keys that match OpenTelemetry semantic conventions (for example ``exceptionName`` and
 /// ``exceptionReason``) use the same wire names as ``SemanticConventions/Exception``.
-public enum CrashReportKeys: String {
-
-    // MARK: - Span and module identity
-
-    /// Default OpenTelemetry span name for crash reports.
-    static let defaultSpanName = "SplunkCrashReport"
-
-    /// OpenTelemetry tracer instrumentation scope name.
-    static let instrumentationName = "splunk-crash-report"
-
-    /// Module event name published when a crash report is sent.
-    static let moduleEventName = "device.app.crash"
-
-    /// Value for ``component`` on crash spans.
-    static let componentValue = "crash"
-
-    /// Fallback when app state or serialized JSON output is unavailable.
-    static let unknownValue = "unknown"
-
-    /// Fallback when a device stat cannot be determined.
-    static let unknownDeviceStatValue = "Unknown"
-
-
-    // MARK: - Span attribute keys
-
+enum CrashReportKeys: String {
     case previousAppState = "ios.app.state"
 
     case crashTimestamp = "crash.timestamp"

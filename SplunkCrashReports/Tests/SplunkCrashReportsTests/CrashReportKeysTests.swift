@@ -165,32 +165,6 @@ final class CrashReportKeysTests: XCTestCase {
         XCTAssertEqual(CrashReportKeys.sessionId.rawValue, "session.id")
     }
 
-    // MARK: - Span and module identity
-
-    func testCrashReportKeysDefaultSpanName() {
-        XCTAssertEqual(CrashReportKeys.defaultSpanName, "SplunkCrashReport")
-    }
-
-    func testCrashReportKeysInstrumentationName() {
-        XCTAssertEqual(CrashReportKeys.instrumentationName, "splunk-crash-report")
-    }
-
-    func testCrashReportKeysModuleEventName() {
-        XCTAssertEqual(CrashReportKeys.moduleEventName, "device.app.crash")
-    }
-
-    func testCrashReportKeysComponentValue() {
-        XCTAssertEqual(CrashReportKeys.componentValue, "crash")
-    }
-
-    func testCrashReportKeysUnknownValue() {
-        XCTAssertEqual(CrashReportKeys.unknownValue, "unknown")
-    }
-
-    func testCrashReportKeysUnknownDeviceStatValue() {
-        XCTAssertEqual(CrashReportKeys.unknownDeviceStatValue, "Unknown")
-    }
-
     // MARK: - Custom data keys
 
     func testCrashReportCustomDataKeys() {

@@ -27,7 +27,7 @@ extension CrashReports {
 
         var reportDict: [CrashReportKeys: Any] = [:]
 
-        reportDict[.component] = CrashReportKeys.componentValue
+        reportDict[.component] = CrashReportConstants.componentValue
         reportDict[.error] = true
 
         if let systemInfo = report.systemInfo {

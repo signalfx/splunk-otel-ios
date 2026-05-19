@@ -42,7 +42,7 @@ public class CrashReports {
 
     private var crashReporter: PLCrashReporter?
 
-    var crashSpanName: String = CrashReportKeys.defaultSpanName
+    var crashSpanName: String = CrashReportConstants.defaultSpanName
 
     /// Storage of periodically sampled device data.
     private var deviceDataDictionary: [String: String] = [:]
@@ -280,11 +280,11 @@ public class CrashReports {
 
     /// AppState handler.
     func appStateHandler(report: PLCrashReport) -> String {
-        var appState = CrashReportKeys.unknownValue
+        var appState = CrashReportConstants.unknownValue
         if let sharedState {
             let timebasedAppState =
                 sharedState.applicationState(for: report.systemInfo.timestamp)
-                ?? CrashReportKeys.unknownValue
+                ?? CrashReportConstants.unknownValue
 
             appState = timebasedAppState
         }
@@ -295,7 +295,7 @@ public class CrashReports {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
-                instrumentationName: CrashReportKeys.instrumentationName,
+                instrumentationName: CrashReportConstants.instrumentationName,
                 instrumentationVersion: sharedState?.agentVersion
             )
 
