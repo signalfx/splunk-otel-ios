@@ -66,7 +66,7 @@ extension Navigation {
         navigationSpan.end(time: navigationEnd)
     }
 
-    func send(screenName: String, lastScreenName: String, start: Date, attributes: [String: Any]? = nil) {
+    func send(screenName: String, lastScreenName: String?, start: Date, attributes: [String: Any]? = nil) {
         // A new zero length span for change screen name event
         let screenNameSpan =
             tracer
@@ -83,13 +83,15 @@ extension Navigation {
 
         screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
         screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
-        screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        if let lastScreenName {
+            screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        }
         screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
         screenNameSpan.end(time: start)
     }
 
-    func send(screenName: String, lastScreenName: String, start: Date, attributes: [String: AttributeValue]) {
+    func send(screenName: String, lastScreenName: String?, start: Date, attributes: [String: AttributeValue]) {
         // A new zero length span for change screen name event
         let screenNameSpan =
             tracer
@@ -104,7 +106,9 @@ extension Navigation {
 
         screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
         screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
-        screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        if let lastScreenName {
+            screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        }
         screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
         screenNameSpan.end(time: start)

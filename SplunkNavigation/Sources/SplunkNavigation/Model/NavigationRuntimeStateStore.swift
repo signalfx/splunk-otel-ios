@@ -27,7 +27,8 @@ struct NavigationScreenState: Equatable {
 
 /// Result of updating the stored navigation screen state.
 struct NavigationScreenStateUpdate {
-    let previousName: String
+    /// The previous screen name, or `nil` if no real screen had been shown yet.
+    let previousName: String?
     let shouldEmit: Bool
 }
 
@@ -48,8 +49,10 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
     private let lock = NSLock()
     private weak var storedSharedState: AgentSharedState?
     private var storedModuleEnabled: Bool = true
+    private static let noScreenSentinel = "unknown"
+
     private var storedScreenState = NavigationScreenState(
-        name: "unknown",
+        name: NavigationRuntimeStateStore.noScreenSentinel,
         attributes: [:]
     )
 
@@ -96,8 +99,9 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
             let previous = storedScreenState
             storedScreenState = state
 
+            let previousName = previous.name == Self.noScreenSentinel ? nil : previous.name
             return NavigationScreenStateUpdate(
-                previousName: previous.name,
+                previousName: previousName,
                 shouldEmit: forceEmit || previous != state
             )
         }
