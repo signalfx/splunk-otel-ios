@@ -20,9 +20,8 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
-import XCTest
-
 @_spi(SplunkInternal) @testable import SplunkNavigation
+import XCTest
 
 final class NavigationTrackScreenAttributesTests: XCTestCase {
 
