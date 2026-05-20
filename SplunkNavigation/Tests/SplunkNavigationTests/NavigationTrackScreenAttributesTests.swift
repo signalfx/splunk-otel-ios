@@ -20,8 +20,9 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
-@_spi(SplunkInternal) @testable import SplunkNavigation
 import XCTest
+
+@_spi(SplunkInternal) @testable import SplunkNavigation
 
 final class NavigationTrackScreenAttributesTests: XCTestCase {
 
@@ -77,7 +78,7 @@ final class NavigationTrackScreenAttributesTests: XCTestCase {
         XCTAssertEqual(span?.instrumentationScope.version, "test-agent-version")
     }
 
-    func testManualSameNameTrackEmitsEveryCallAndPreservesAttributes() async {
+    func testSameScreenEmitsEachCallWithAttributes() async {
         let module = Navigation()
 
         module.track(screen: "HomeScreen", attributes: ["step": "first"])
