@@ -59,7 +59,9 @@ extension Navigation {
         navigationSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
 
         let screenName = navigation.screenName
-        navigationSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: screenName)
+        if let lastScreenName = navigation.lastScreenName {
+            navigationSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        }
         navigationSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
         let navigationEnd = navigation.end ?? Date()

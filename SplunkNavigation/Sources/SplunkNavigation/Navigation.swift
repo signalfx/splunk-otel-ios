@@ -283,19 +283,21 @@ public final class Navigation: Sendable {
 
         let existingNavigation = await model.navigation(for: identifier)
         let start = existingNavigation?.start ?? event.timestamp
-
-        let navigation = NavigationPair(
-            type: existingNavigation?.type ?? fallbackType,
-            start: start,
-            screenName: navigationEvent.name
-        )
-        await model.update(navigation: navigation, for: identifier)
+        let previousScreenName = runtimeStateStore.screenName
 
         updateCurrentScreen(
             screenName: navigationEvent.name,
             start: start,
             attributes: navigationEvent.attributes
         )
+
+        let navigation = NavigationPair(
+            type: existingNavigation?.type ?? fallbackType,
+            start: start,
+            screenName: navigationEvent.name,
+            lastScreenName: previousScreenName == "unknown" ? nil : previousScreenName
+        )
+        await model.update(navigation: navigation, for: identifier)
 
         let endEvent = AutomatedNavigationEvent(
             timestamp: event.timestamp,
