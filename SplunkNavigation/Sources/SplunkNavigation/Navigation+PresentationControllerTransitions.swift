@@ -59,10 +59,12 @@ extension Navigation {
             return
         }
 
-        await model.update(
-            pendingPresentationRestoration: currentScreenState(),
-            for: event.presentationControllerIdentifier
-        )
+        if let currentState = currentScreenState() {
+            await model.update(
+                pendingPresentationRestoration: currentState,
+                for: event.presentationControllerIdentifier
+            )
+        }
         await updateTransitionStart(for: presentedSnapshot(from: event), timestamp: event.timestamp)
     }
 

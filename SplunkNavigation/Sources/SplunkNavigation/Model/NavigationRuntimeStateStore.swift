@@ -35,13 +35,29 @@ struct NavigationScreenStateUpdate {
 /// Synchronous, lock-protected store for navigation state that must be readable
 /// without an actor hop.
 ///
-/// `moduleEnabled` and `screenName` are kept here so that `track(screen:attributes:)`
-/// can check enabled state, record the screen state, and emit synchronously on the
-/// caller's thread, matching Android's `@Synchronized` setter pattern.
+/// ## Why a lock instead of an actor?
 ///
-/// `sharedState` is kept here because the agent injects it after module construction
-/// and navigation span emission reads it from both automated tasks and synchronous
-/// manual tracking calls.
+/// `track(screen:attributes:)` is a public synchronous API: callers invoke it
+/// without `await` and it must complete on the caller's thread. Swift actors
+/// cannot be accessed synchronously from outside their own isolation domain,
+/// so an actor would force `track(screen:)` to become `async` — a breaking
+/// change to the public API.
+///
+/// Automated navigation detection runs in async `Task` contexts started by
+/// `startDetection()`. Manual tracking runs on whatever thread the host app
+/// calls from. The `NSLock` bridges these two concurrency domains, allowing
+/// both paths to safely read and write shared screen state without coupling
+/// the public API to Swift concurrency.
+///
+/// ## What is stored here?
+///
+/// - `screenState` — updated on every navigation event; read by both automated
+///   tasks and `track(screen:)` for deduplication. `nil` means no real screen
+///   has been shown yet; this is distinct from a customer explicitly tracking
+///   a screen named `"unknown"`.
+/// - `moduleEnabled` — checked synchronously by `track(screen:)` before emitting.
+/// - `sharedState` — injected by the agent after construction; read from both
+///   automated tasks and synchronous manual-tracking calls.
 final class NavigationRuntimeStateStore: @unchecked Sendable {
 
     // MARK: - Private
@@ -49,12 +65,7 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
     private let lock = NSLock()
     private weak var storedSharedState: AgentSharedState?
     private var storedModuleEnabled: Bool = true
-    private static let noScreenSentinel = "unknown"
-
-    private var storedScreenState = NavigationScreenState(
-        name: NavigationRuntimeStateStore.noScreenSentinel,
-        attributes: [:]
-    )
+    private var storedScreenState: NavigationScreenState?
 
 
     // MARK: - Shared state
@@ -82,10 +93,10 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
     // MARK: - Screen name
 
     var screenName: String {
-        lock.withLock { storedScreenState.name }
+        lock.withLock { storedScreenState?.name ?? "unknown" }
     }
 
-    var screenState: NavigationScreenState {
+    var screenState: NavigationScreenState? {
         lock.withLock { storedScreenState }
     }
 
@@ -99,9 +110,8 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
             let previous = storedScreenState
             storedScreenState = state
 
-            let previousName = previous.name == Self.noScreenSentinel ? nil : previous.name
             return NavigationScreenStateUpdate(
-                previousName: previousName,
+                previousName: previous?.name,
                 shouldEmit: forceEmit || previous != state
             )
         }

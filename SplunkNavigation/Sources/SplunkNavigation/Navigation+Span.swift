@@ -76,7 +76,7 @@ extension Navigation {
 
         // Write user-provided attributes first so that SDK-reserved keys always win.
         if let attributes {
-            for (key, value) in attributes {
+            for (key, value) in attributes where !Self.screenStateReservedAttributeKeys.contains(key) {
                 screenNameSpan.clearAndSetAttribute(key: key, value: value)
             }
         }
@@ -85,6 +85,9 @@ extension Navigation {
         screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
         if let lastScreenName {
             screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        }
+        else {
+            screenNameSpan.setAttribute(key: Self.lastScreenNameKey, value: nil as AttributeValue?)
         }
         screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 

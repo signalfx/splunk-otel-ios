@@ -23,7 +23,7 @@ extension Navigation {
 
     // MARK: - Static constants
 
-    private static let screenStateReservedAttributeKeys: Set<String> = [
+    static let screenStateReservedAttributeKeys: Set<String> = [
         "component",
         "navigation.name",
         "last.screen.name",
@@ -47,7 +47,7 @@ extension Navigation {
         return runtimeStateStore.updateScreenState(state, forceEmit: forceEmit)
     }
 
-    func currentScreenState() -> NavigationScreenState {
+    func currentScreenState() -> NavigationScreenState? {
         runtimeStateStore.screenState
     }
 
