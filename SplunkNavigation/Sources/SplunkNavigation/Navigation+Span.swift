@@ -74,7 +74,7 @@ extension Navigation {
             .setStartTime(time: start)
             .startSpan()
 
-        // Write user-provided attributes first so that SDK-reserved keys always win.
+        // SDK-reserved keys are excluded before writing user-provided attributes.
         if let attributes {
             for (key, value) in attributes where !Self.screenStateReservedAttributeKeys.contains(key) {
                 screenNameSpan.clearAndSetAttribute(key: key, value: value)
@@ -102,7 +102,7 @@ extension Navigation {
             .setStartTime(time: start)
             .startSpan()
 
-        // Write user-provided attributes first so that SDK-reserved keys always win.
+        // Caller-supplied attributes have already had SDK-reserved keys filtered out.
         for (key, value) in attributes {
             screenNameSpan.clearAndSetAttribute(key: key, value: value)
         }

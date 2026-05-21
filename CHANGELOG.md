@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+* Fixed `app.ui.navigation` spans incorrectly emitting `last.screen.name` with the value `"unknown"` on the first navigation event. The attribute is now omitted when no previous screen has been shown. #661
+
 ## [2.3.0] - 2026-05-18
 
 ### Added
