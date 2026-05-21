@@ -283,7 +283,7 @@ public final class Navigation: Sendable {
 
         let existingNavigation = await model.navigation(for: identifier)
         let start = existingNavigation?.start ?? event.timestamp
-        let previousScreenName = runtimeStateStore.screenName
+        let previousScreenName = runtimeStateStore.previousScreenName
 
         updateCurrentScreen(
             screenName: navigationEvent.name,
@@ -295,7 +295,7 @@ public final class Navigation: Sendable {
             type: existingNavigation?.type ?? fallbackType,
             start: start,
             screenName: navigationEvent.name,
-            lastScreenName: previousScreenName == "unknown" ? nil : previousScreenName
+            lastScreenName: previousScreenName
         )
         await model.update(navigation: navigation, for: identifier)
 

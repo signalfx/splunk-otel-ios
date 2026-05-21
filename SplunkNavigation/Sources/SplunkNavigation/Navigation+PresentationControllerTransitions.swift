@@ -200,7 +200,7 @@ extension Navigation {
 
         let existingNavigation = await model.navigation(for: event.presentationControllerIdentifier)
         let start = existingNavigation?.start ?? event.timestamp
-        let previousScreenName = runtimeStateStore.screenName
+        let previousScreenName = runtimeStateStore.previousScreenName
 
         updateCurrentScreen(
             state: restoration,
@@ -212,7 +212,7 @@ extension Navigation {
             start: start,
             end: event.timestamp,
             screenName: restoration.name,
-            lastScreenName: previousScreenName == "unknown" ? nil : previousScreenName
+            lastScreenName: previousScreenName
         )
 
         send(navigation: completedNavigation)

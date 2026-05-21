@@ -48,8 +48,10 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
     private let lock = NSLock()
     private weak var storedSharedState: AgentSharedState?
     private var storedModuleEnabled: Bool = true
+    private static let noScreenSentinel = "unknown"
+
     private var storedScreenState = NavigationScreenState(
-        name: "unknown",
+        name: NavigationRuntimeStateStore.noScreenSentinel,
         attributes: [:]
     )
 
@@ -80,6 +82,13 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
 
     var screenName: String {
         lock.withLock { storedScreenState.name }
+    }
+
+    var previousScreenName: String? {
+        lock.withLock {
+            let name = storedScreenState.name
+            return name == Self.noScreenSentinel ? nil : name
+        }
     }
 
     var screenState: NavigationScreenState {
