@@ -20,8 +20,10 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
-@_spi(SplunkInternal) @testable import SplunkNavigation
+import UIKit
 import XCTest
+
+@_spi(SplunkInternal) @testable import SplunkNavigation
 
 final class NavigationTimingSpanAttributesTests: XCTestCase {
 
@@ -82,7 +84,47 @@ final class NavigationTimingSpanAttributesTests: XCTestCase {
         XCTAssertEqual(spans[1].attributes["last.screen.name"]?.description, "HomeViewController")
     }
 
+    func testPresentationTransitionSpanCarriesLastScreenName() async {
+        let presentingController = UIViewController()
+        let presentedController = UIViewController()
+
+        let provider = MockPresentationEventStreamProvider()
+        let navigation = Navigation(navigationEventStreamProvider: provider)
+        navigation.preferences.enableAutomatedTracking = true
+        navigation.startDetection()
+
+        navigation.track(screen: "HomeViewController")
+
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: presentingController,
+            completed: true
+        )
+
+        await waitUntil {
+            self.presentationTransitionSpans.count >= 1
+        }
+
+        let spans = presentationTransitionSpans
+        XCTAssertEqual(spans.count, 1)
+        XCTAssertEqual(
+            spans[0].attributes["last.screen.name"]?.description,
+            "HomeViewController"
+        )
+    }
+
     private var showVCSpans: [SpanData] {
         exporter.spans.filter { $0.name == "ShowVC" }
+    }
+
+    private var presentationTransitionSpans: [SpanData] {
+        exporter.spans.filter { $0.name == "PresentationTransition" }
     }
 }
