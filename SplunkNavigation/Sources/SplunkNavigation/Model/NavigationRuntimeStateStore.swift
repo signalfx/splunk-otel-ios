@@ -53,8 +53,9 @@ struct NavigationScreenStateUpdate {
 ///
 /// - `screenState` — updated on every navigation event; read by both automated
 ///   tasks and `track(screen:)` for deduplication. `nil` means no real screen
-///   has been shown yet; this is distinct from a customer explicitly tracking
-///   a screen named `"unknown"`.
+///   has been shown yet (including after a modal is dismissed over a no-screen
+///   state); this is distinct from a customer explicitly tracking a screen
+///   named `"unknown"`.
 /// - `moduleEnabled` — checked synchronously by `track(screen:)` before emitting.
 /// - `sharedState` — injected by the agent after construction; read from both
 ///   automated tasks and synchronous manual-tracking calls.
@@ -98,6 +99,11 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
 
     var screenState: NavigationScreenState? {
         lock.withLock { storedScreenState }
+    }
+
+    /// Resets the stored screen state to nil, as if no screen has been shown.
+    func resetScreenState() {
+        lock.withLock { storedScreenState = nil }
     }
 
     /// Atomically updates the stored screen state.

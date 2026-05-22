@@ -263,6 +263,58 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
     }
 
 
+    // MARK: - No prior screen
+
+    @MainActor
+    func testNavDismissWithNoPriorScreenResetsToUnknown() async {
+        let presentingController = PresentingViewController()
+        let navigationController = UINavigationController(rootViewController: presentingController)
+        let presentedController = PresentedViewController()
+
+        let (module, provider) = makeModule(autoTrackingEnabled: true)
+        module.startDetection()
+
+        // No screen has been tracked yet — storedScreenState is nil.
+
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: true
+        )
+
+        await waitUntil {
+            module.currentScreenNameForTesting.contains("PresentedViewController")
+        }
+
+        provider.emit(
+            eventType: .dismissalWillBegin,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .dismissalDidEnd,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: true
+        )
+
+        // After dismissal the module should reset to "unknown" (no tracked screen),
+        // not remain stuck on the dismissed modal's name.
+        let didReset = await waitUntil {
+            module.currentScreenNameForTesting == "unknown"
+        }
+        XCTAssertTrue(didReset)
+    }
+
+
     // MARK: - Helpers
 
     @MainActor
