@@ -272,6 +272,12 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
         let presentedController = PresentedViewController()
 
         let (module, provider) = makeModule(autoTrackingEnabled: true)
+
+        var observedNames: [String] = []
+        module.setScreenNameObserver { name in
+            observedNames.append(name)
+        }
+
         module.startDetection()
 
         // No screen has been tracked yet — storedScreenState is nil.
@@ -306,12 +312,13 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
             completed: true
         )
 
-        // After dismissal the module should reset to "unknown" (no tracked screen),
+        // After dismissal the store and the observer must both reflect "unknown",
         // not remain stuck on the dismissed modal's name.
         let didReset = await waitUntil {
             module.currentScreenNameForTesting == "unknown"
         }
         XCTAssertTrue(didReset)
+        XCTAssertEqual(observedNames.last, "unknown", "Observer must be notified with 'unknown' on dismissal with no prior screen")
     }
 
 

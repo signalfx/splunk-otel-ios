@@ -218,9 +218,12 @@ extension Navigation {
             send(navigation: completedNavigation)
 
         case .noScreen:
-            // No screen was showing before the modal; reset to nil so the dismissed
-            // modal's name does not become last.screen.name for future navigation events.
+            // No screen was showing before the modal; reset internal state to nil and
+            // publish "unknown" through the observer/stream path so that
+            // DefaultRuntimeAttributes.currentScreenName and crash-report propagation
+            // are not left stuck on the dismissed modal's name.
             runtimeStateStore.resetScreenState()
+            publishScreenNameChange("unknown")
         }
 
         await model.removeNavigation(for: event.presentationControllerIdentifier)
