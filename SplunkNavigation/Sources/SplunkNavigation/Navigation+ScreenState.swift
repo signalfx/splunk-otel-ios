@@ -51,6 +51,17 @@ extension Navigation {
         runtimeStateStore.screenState
     }
 
+    /// Resets stored screen state to nil and publishes the resulting fallback name
+    /// ("unknown") to observers and the async stream.
+    ///
+    /// Use this instead of calling `runtimeStateStore.resetScreenState()` and
+    /// `publishScreenNameChange` separately, so the reset and its published value
+    /// are always kept in sync.
+    func resetScreenToNoScreen() {
+        runtimeStateStore.resetScreenState()
+        publishScreenNameChange(runtimeStateStore.screenName)
+    }
+
     func updateCurrentScreenState(
         _ state: NavigationScreenState,
         forceEmit: Bool

@@ -54,3 +54,23 @@ extension Navigation {
         runtimeStateStore.screenName
     }
 }
+
+
+// MARK: - Screen name observer recording
+
+final class ScreenNameObserverRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storedValues: [String] = []
+
+    var values: [String] {
+        lock.withLock { storedValues }
+    }
+
+    var last: String? {
+        lock.withLock { storedValues.last }
+    }
+
+    func append(_ value: String) {
+        lock.withLock { storedValues.append(value) }
+    }
+}

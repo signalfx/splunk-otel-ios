@@ -21,7 +21,7 @@ import Foundation
 import UIKit
 import XCTest
 
-@testable import SplunkNavigation
+@_spi(SplunkInternal) @testable import SplunkNavigation
 
 final class NavigationPresentationTransitionsTests: XCTestCase {
 
@@ -273,9 +273,9 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
 
         let (module, provider) = makeModule(autoTrackingEnabled: true)
 
-        var observedNames: [String] = []
-        module.setScreenNameObserver { name in
-            observedNames.append(name)
+        let observer = ScreenNameObserverRecorder()
+        module.setScreenNameObserver { [observer] name in
+            observer.append(name)
         }
 
         module.startDetection()
@@ -295,9 +295,14 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
             completed: true
         )
 
-        await waitUntil {
+        let didPresent = await waitUntil {
             module.currentScreenNameForTesting.contains("PresentedViewController")
         }
+        XCTAssertTrue(didPresent, "Screen must become PresentedViewController before dismissal")
+        XCTAssertTrue(
+            observer.values.contains { $0.contains("PresentedViewController") },
+            "Observer must have seen PresentedViewController before dismissal"
+        )
 
         provider.emit(
             eventType: .dismissalWillBegin,
@@ -318,7 +323,7 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
             module.currentScreenNameForTesting == "unknown"
         }
         XCTAssertTrue(didReset)
-        XCTAssertEqual(observedNames.last, "unknown", "Observer must be notified with 'unknown' on dismissal with no prior screen")
+        XCTAssertEqual(observer.last, "unknown", "Observer must be notified with 'unknown' on dismissal with no prior screen")
     }
 
 

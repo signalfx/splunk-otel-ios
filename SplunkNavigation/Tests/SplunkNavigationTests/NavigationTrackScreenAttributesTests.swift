@@ -20,8 +20,9 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
-@_spi(SplunkInternal) @testable import SplunkNavigation
 import XCTest
+
+@_spi(SplunkInternal) @testable import SplunkNavigation
 
 final class NavigationTrackScreenAttributesTests: XCTestCase {
 
@@ -186,19 +187,6 @@ final class NavigationTrackScreenAttributesTests: XCTestCase {
 
     private var navigationSpans: [SpanData] {
         exporter.spans.filter { $0.name == "app.ui.navigation" }
-    }
-}
-
-private final class ScreenNameObserverRecorder: @unchecked Sendable {
-    private let lock = NSLock()
-    private var storedValues: [String] = []
-
-    var values: [String] {
-        lock.withLock { storedValues }
-    }
-
-    func append(_ value: String) {
-        lock.withLock { storedValues.append(value) }
     }
 }
 
