@@ -31,11 +31,6 @@ enum NetworkSpanAttributes {
     /// Value for ``component`` on HTTP spans.
     static let componentValueHttp = "http"
 
-    /// Legacy HTTP protocol version attribute (retained for backend compatibility).
-    ///
-    /// OpenTelemetry stable convention is `network.protocol.version` (``SemanticConventions/Network/protocolVersion``).
-    static let httpProtocolVersion = "http.protocol.version"
-
     /// Trace ID extracted from `Server-Timing` traceparent for span linking.
     static let linkTraceId = "link.traceId"
 

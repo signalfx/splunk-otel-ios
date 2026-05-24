@@ -20,6 +20,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Navigation spans now use the span name `app.ui.navigation` (previously `screen name change`). #625
+* HTTP client spans now emit the OpenTelemetry `network.protocol.version` attribute instead of the deprecated `http.protocol.version` key. #656
 
 ## [2.2.3] - 2026-05-12
 
