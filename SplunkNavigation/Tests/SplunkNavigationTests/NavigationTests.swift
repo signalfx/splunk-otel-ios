@@ -15,11 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@_spi(SplunkTesting) import SplunkCommon
+// swift-format-ignore-file
+// swiftlint:disable sorted_imports
 import SwiftUI
 import XCTest
-
+@_spi(SplunkTesting) import SplunkCommon
 @testable import SplunkNavigation
+// swiftlint:enable sorted_imports
 
 final class NavigationTests: XCTestCase {
 
