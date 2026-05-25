@@ -15,12 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swift-format-ignore-file
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
-@_spi(SplunkTesting) import SplunkCommon
 import XCTest
-@_spi(SplunkInternal) @testable import SplunkNavigation // swiftlint:disable:this sorted_imports
+@_spi(SplunkTesting) import SplunkCommon
+@_spi(SplunkInternal) @testable import SplunkNavigation
 
 private let reservedAttributeDedupeEvents = [
     NavigationEvent(
