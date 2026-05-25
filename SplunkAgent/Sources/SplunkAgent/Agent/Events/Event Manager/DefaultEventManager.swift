@@ -150,6 +150,7 @@ class DefaultEventManager: AgentEventManager {
 
         // Crash Reports module data
         #if canImport(SplunkCrashReports)
+
             case let (metadata as CrashReportsMetadata, data as String):
                 publishCrashReports(data: data, metadata: metadata, completion: completion)
         #endif
@@ -208,21 +209,12 @@ class DefaultEventManager: AgentEventManager {
                 userActivity: userActivity
             )
 
-            sessionReplayProcessor.sendEvent(
-                event: event,
-                immediateProcessing: false,
-                completion: { [weak self] processed in
-                    if processed {
-                        self?
-                            .removeSessionReplayIndex(
-                                sessionId: sessionId,
-                                timestamp: metadata.timestamp
-                            )
-                    }
-
-                    completion(processed)
+            sessionReplayProcessor.sendEvent(event: event, immediateProcessing: false) { [weak self] processed in
+                if processed {
+                    self?.removeSessionReplayIndex(sessionId: sessionId, timestamp: metadata.timestamp)
                 }
-            )
+                completion(processed)
+            }
         }
     }
 

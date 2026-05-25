@@ -33,8 +33,10 @@ public final class Interactions: SplunkInteractionsModule {
 
     // MARK: - Internal properties
 
-    /// Stream of interaction timestamps. Emits a value for every interaction event, regardless of type.
-    let activityStream: AsyncStream<Date>
+    /// Stream of interaction timestamps.
+    ///
+    /// Emits a value for every interaction event, regardless of type.
+    public let activityStream: AsyncStream<Date>
 
     var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
 

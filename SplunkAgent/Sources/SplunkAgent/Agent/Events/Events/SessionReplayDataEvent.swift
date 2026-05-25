@@ -88,8 +88,7 @@ class SessionReplayDataEvent: AgentEvent {
             var jsonObject = try? JSONSerialization.jsonObject(with: metadataContent) as? [String: Any]
         else {
             // ... but if something fails, we can build it manually
-            let activityJSON = userActivity.map(String.init).joined(separator: ",")
-            return "{\"startUnixMs\":\(metadata.startUnixMs),\"endUnixMs\":\(metadata.endUnixMs),\"source\":\"\(metadata.source)\",\"userActivity\":[\(activityJSON)]}"
+            return fallbackJSON(metadata: metadata, userActivity: userActivity)
         }
 
         jsonObject["userActivity"] = userActivity
@@ -98,10 +97,15 @@ class SessionReplayDataEvent: AgentEvent {
             let enrichedData = try? JSONSerialization.data(withJSONObject: jsonObject),
             let jsonString = String(data: enrichedData, encoding: .utf8)
         else {
-            let activityJSON = userActivity.map(String.init).joined(separator: ",")
-            return "{\"startUnixMs\":\(metadata.startUnixMs),\"endUnixMs\":\(metadata.endUnixMs),\"source\":\"\(metadata.source)\",\"userActivity\":[\(activityJSON)]}"
+            return fallbackJSON(metadata: metadata, userActivity: userActivity)
         }
 
         return jsonString
+    }
+
+    private func fallbackJSON(metadata: Metadata, userActivity: [Int]) -> String {
+        let activityJSON = userActivity.map(String.init).joined(separator: ",")
+        return "{\"startUnixMs\":\(metadata.startUnixMs),\"endUnixMs\":\(metadata.endUnixMs),"
+            + "\"source\":\"\(metadata.source)\",\"userActivity\":[\(activityJSON)]}"
     }
 }
