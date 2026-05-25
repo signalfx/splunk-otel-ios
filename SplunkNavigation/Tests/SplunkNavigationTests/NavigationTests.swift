@@ -21,6 +21,7 @@ import SwiftUI
 import XCTest
 @_spi(SplunkTesting) import SplunkCommon
 @testable import SplunkNavigation
+
 // swiftlint:enable sorted_imports
 
 final class NavigationTests: XCTestCase {

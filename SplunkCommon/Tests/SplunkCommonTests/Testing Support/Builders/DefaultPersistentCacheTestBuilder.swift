@@ -18,6 +18,7 @@ limitations under the License.
 import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
+
 @testable import SplunkCommon
 
 final class DefaultPersistentCacheTestBuilder {

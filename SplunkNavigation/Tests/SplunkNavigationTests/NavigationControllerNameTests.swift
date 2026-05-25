@@ -15,11 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// swift-format-ignore-file
-// swiftlint:disable sorted_imports
 import XCTest
+
+// swift-format-ignore-file
 @testable import SplunkNavigation
-// swiftlint:enable sorted_imports
 
 #if canImport(SwiftUI)
     import SwiftUI

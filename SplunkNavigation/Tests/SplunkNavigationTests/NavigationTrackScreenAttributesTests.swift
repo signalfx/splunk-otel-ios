@@ -16,12 +16,15 @@ limitations under the License.
 */
 
 // swift-format-ignore-file
+// swiftlint:disable sorted_imports
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 import XCTest
 @_spi(SplunkTesting) import SplunkCommon
 @_spi(SplunkInternal) @testable import SplunkNavigation
+
+// swiftlint:enable sorted_imports
 
 final class NavigationTrackScreenAttributesTests: XCTestCase {
 
