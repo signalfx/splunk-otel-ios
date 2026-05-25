@@ -7,22 +7,23 @@
 #
 # Sources:
 #   - OpenTelemetryApi/Sdk: Built by build-otel-xcframeworks.sh → output/xcframeworks/
-#   - Cisco modules: Downloaded from S3 (or local path via --cisco-path)
+#   - Cisco modules: Built locally as dynamic xcframeworks by build-cisco-xcframeworks.sh
+#                    (or linked from a legacy local path via --cisco-path)
 #   - CrashReporter: Downloaded from PLCrashReporter GitHub releases
 #
 # Usage:
 #   ./scripts/populate-dependencies.sh [options]
 #
 # Options:
-#   --cisco-path PATH     Path to directory containing Cisco xcframeworks
-#                         (default: downloads from S3)
+#   --cisco-path PATH     Legacy path to directory containing dynamic Cisco xcframeworks
 #   --plcrash-version VER PLCrashReporter version (default: 1.12.0)
 #   --skip-otel           Skip OTel (assumes already built in output/xcframeworks/)
-#   --skip-cisco          Skip Cisco download
+#   --skip-cisco          Skip Cisco staging
 #   --skip-plcrash        Skip PLCrashReporter download
+#   --download-cisco      Legacy mode: download Cisco from Package.swift registry
 #
 # Environment variables:
-#   CISCO_XCFRAMEWORKS_PATH  Same as --cisco-path
+#   CISCO_XCFRAMEWORKS_PATH  Same as --cisco-path (legacy)
 #   PLCRASH_VERSION          Same as --plcrash-version
 
 set -euo pipefail
@@ -50,6 +51,7 @@ CISCO_XCFRAMEWORKS_PATH="${CISCO_XCFRAMEWORKS_PATH:-}"
 SKIP_OTEL=false
 SKIP_CISCO=false
 SKIP_PLCRASH=false
+DOWNLOAD_CISCO=false
 
 # Expected xcframeworks
 OTEL_FRAMEWORKS=("OpenTelemetryApi" "OpenTelemetrySdk")
@@ -73,6 +75,7 @@ while [[ $# -gt 0 ]]; do
         --skip-otel) SKIP_OTEL=true; shift ;;
         --skip-cisco) SKIP_CISCO=true; shift ;;
         --skip-plcrash) SKIP_PLCRASH=true; shift ;;
+        --download-cisco) DOWNLOAD_CISCO=true; shift ;;
         *)
             echo "Unknown argument: $1"
             exit 1
@@ -129,7 +132,7 @@ fi
 
 if [[ "${SKIP_CISCO}" == "false" ]]; then
     if [[ -n "${CISCO_XCFRAMEWORKS_PATH}" ]]; then
-        # Use local path: symlink each Cisco xcframework
+        # Use legacy local path: symlink each Cisco xcframework
         log "Linking Cisco xcframeworks from ${CISCO_XCFRAMEWORKS_PATH}"
 
         for fw in "${CISCO_FRAMEWORKS[@]}"; do
@@ -145,10 +148,24 @@ if [[ "${SKIP_CISCO}" == "false" ]]; then
             ln -s "$(cd "$(dirname "${src}")" && pwd)/$(basename "${src}")" "${dst}"
             echo "  ✓ ${fw}.xcframework (symlinked)"
         done
-    else
-        # No local path: download from S3 using URLs in Package.swift
-        log "Downloading Cisco xcframeworks from S3 (parsed from Package.swift)"
+    elif [[ "${DOWNLOAD_CISCO}" == "true" ]]; then
+        # Legacy mode only: Package.swift now intentionally points to static
+        # Cisco artifacts, so this must never be the default xcframework path.
+        log "Downloading Cisco xcframeworks from Package.swift registry (legacy mode)"
         "${SCRIPT_DIR}/download-cisco-xcframeworks.sh" --output-dir "${DEPS_DIR}"
+    else
+        log "Using Cisco xcframeworks already staged in ${DEPS_DIR}"
+
+        for fw in "${CISCO_FRAMEWORKS[@]}"; do
+            dst="${DEPS_DIR}/${fw}.xcframework"
+
+            if [[ ! -d "${dst}" ]]; then
+                echo "ERROR: Cisco xcframework not found: ${dst}"
+                echo "  Run build-cisco-xcframeworks.sh first with SESSION_REPLAY_LOCAL_PATH set,"
+                echo "  or pass --cisco-path with prebuilt dynamic Cisco xcframeworks."
+                exit 1
+            fi
+        done
     fi
 fi
 
@@ -192,6 +209,11 @@ if [[ "${SKIP_CISCO}" == "false" ]]; then
         dst="${OTEL_OUTPUT_DIR}/${fw}.xcframework"
 
         if [[ -d "${src}" ]]; then
+            if [[ -L "${src}" && "$(readlink "${src}")" == "${dst}" ]]; then
+                echo "  ✓ ${fw}.xcframework already in output/"
+                continue
+            fi
+
             # Use ditto to preserve code signatures and extended attributes
             rm -rf "${dst}"
             ditto "${src}" "${dst}"
