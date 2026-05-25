@@ -21,11 +21,18 @@ actor NavigationModel {
     // MARK: - Public
 
     private(set) var moduleEnabled: Bool = true
-    private(set) var screenName: String = "unknown"
-    private(set) var isManualScreenName = false
-
     private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
-    private(set) var agentVersion: String?
+    private(set) var pendingNavigationTargets: [ObjectIdentifier: ObjectIdentifier] = [:]
+    private(set) var managedNavigationControllerTargets: Set<ObjectIdentifier> = []
+    private(set) var pendingPresentationRestorations: [ObjectIdentifier: NavigationScreenState] = [:]
+    private(set) var navigationEventProcessor: any NavigationEventProcessor
+
+
+    // MARK: - Initialization
+
+    init(navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()) {
+        self.navigationEventProcessor = navigationEventProcessor
+    }
 
 
     // MARK: - Module management
@@ -34,15 +41,8 @@ actor NavigationModel {
         self.moduleEnabled = moduleEnabled
     }
 
-
-    // MARK: - Screen name management
-
-    func update(screenName: String) {
-        self.screenName = screenName
-    }
-
-    func update(isManualScreenName: Bool) {
-        self.isManualScreenName = isManualScreenName
+    func update(navigationEventProcessor: any NavigationEventProcessor) {
+        self.navigationEventProcessor = navigationEventProcessor
     }
 
 
@@ -61,9 +61,47 @@ actor NavigationModel {
     }
 
 
-    // MARK: - Agent version management
+    // MARK: - Pending navigation targets
 
-    func update(agentVersion: String?) {
-        self.agentVersion = agentVersion
+    func pendingNavigationTarget(for identifier: ObjectIdentifier) -> ObjectIdentifier? {
+        pendingNavigationTargets[identifier]
+    }
+
+    func update(pendingNavigationTarget: ObjectIdentifier, for identifier: ObjectIdentifier) {
+        pendingNavigationTargets[identifier] = pendingNavigationTarget
+    }
+
+    func removePendingNavigationTarget(for identifier: ObjectIdentifier) {
+        pendingNavigationTargets[identifier] = nil
+    }
+
+
+    // MARK: - Managed navigation controller targets
+
+    func addManagedNavigationControllerTarget(_ identifier: ObjectIdentifier) {
+        managedNavigationControllerTargets.insert(identifier)
+    }
+
+    func removeManagedNavigationControllerTarget(_ identifier: ObjectIdentifier) {
+        managedNavigationControllerTargets.remove(identifier)
+    }
+
+    func isManagedNavigationControllerTarget(_ identifier: ObjectIdentifier) -> Bool {
+        managedNavigationControllerTargets.contains(identifier)
+    }
+
+
+    // MARK: - Presentation restorations
+
+    func pendingPresentationRestoration(for identifier: ObjectIdentifier) -> NavigationScreenState? {
+        pendingPresentationRestorations[identifier]
+    }
+
+    func update(pendingPresentationRestoration: NavigationScreenState, for identifier: ObjectIdentifier) {
+        pendingPresentationRestorations[identifier] = pendingPresentationRestoration
+    }
+
+    func removePendingPresentationRestoration(for identifier: ObjectIdentifier) {
+        pendingPresentationRestorations[identifier] = nil
     }
 }

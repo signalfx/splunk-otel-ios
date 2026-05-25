@@ -15,8 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import Combine
-
 /// A state object that is representation for the current state of the module.
 public final class RuntimeState: Sendable {
 

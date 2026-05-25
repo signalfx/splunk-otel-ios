@@ -12,12 +12,43 @@ This module can be configured to automatically track `UIViewController` transiti
 
 > Tip: You can access all related API via SplunkRum instance property: ``SplunkRum/navigation``
 
-## Configuration and Usage
+## Install-Time Configuration
+
+You can configure the navigation module during agent installation by providing a ``SplunkNavigation/NavigationConfiguration`` object. Use it to enable automated tracking and optionally set a custom event processor.
+
+```swift
+import SplunkAgent
+import SplunkNavigation // Required for the configuration type
+
+let navConfig = NavigationConfiguration(
+    isEnabled: true,
+    enableAutomatedTracking: true,
+    navigationEventProcessor: MyProcessor()
+)
+
+let agent = try SplunkRum.install(
+    with: agentConfig,
+    moduleConfigurations: [navConfig]
+)
+```
+
+## Custom Event Processor
+
+Implement ``SplunkNavigation/NavigationEventProcessor`` to customize how detected `UIViewController` transitions are named, enriched, or filtered. The processor is called once per automated navigation event; manual ``NavigationModule/track(screen:)`` calls bypass it.
+
+- **Rename screens:** Return a ``SplunkNavigation/NavigationEvent`` with a custom name.
+- **Add span attributes:** Include key-value pairs in the event's `attributes`. These are added to the `app.ui.navigation` span.
+- **Suppress events:** Return `nil` to prevent the navigation event.
+
+See ``SplunkNavigation/NavigationEventProcessor`` for code examples.
+
+## Usage
 
 Assuming `agent` is the ``SplunkRum`` instance you retained after installation.
 
 ### Automated Tracking
-To enable automatic screen name tracking, set the preference after initialization:
+
+To enable automatic screen name tracking after installation:
 
 ```swift
 agent?.navigation.preferences.enableAutomatedTracking = true
@@ -29,4 +60,32 @@ You can manually set the screen name at any time. This is useful for SwiftUI app
 
 ```swift
 agent?.navigation.track(screen: "ProductDetailView")
+```
+
+You can also attach custom attributes to the `app.ui.navigation` span:
+
+```swift
+agent?.navigation.track(
+    screen: "ProductDetailView",
+    attributes: ["product.id": "abc-123"]
+)
+```
+
+### SwiftUI
+
+In SwiftUI, use the `.trackScreen` view modifier instead of calling `track(screen:)` directly. The modifier reports the screen name each time the view appears.
+
+```swift
+struct ProductDetailView: View {
+    var body: some View {
+        VStack { ... }
+            .trackScreen("ProductDetail")
+    }
+}
+```
+
+You can also pass attributes:
+
+```swift
+.trackScreen("ProductDetail", attributes: ["product.id": productId])
 ```

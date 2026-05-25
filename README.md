@@ -1,3 +1,19 @@
+---
+
+<p align="center">
+  <strong>
+    <a href="https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-rum/instrument-ios-applications-for-splunk-rum/splunk-rum-ios-agent-version-2.0.0-and-above/install-the-splunk-rum-ios-agent">Official Installation Docs</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="#getting-started">Getting Started</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="CONTRIBUTING.md">Getting Involved</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="SECURITY.md">Security</a>
+  </strong>
+</p>
+
+---
+
 # Splunk RUM Agent for iOS
 
 The Splunk RUM Agent for iOS is a modular Swift package for Real User Monitoring (RUM).

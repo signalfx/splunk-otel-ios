@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 internal import CiscoLogger
-internal import CiscoSwizzling
+import CiscoSwizzling
 import Foundation
 import SplunkCommon
 import UIKit
@@ -24,27 +24,24 @@ import UIKit
 /// The navigation module detects and tracks navigation in the application.
 public final class Navigation: Sendable {
 
-    // MARK: - Static constants
-
-    /// Detection solution switch.
-    ///
-    /// It is used to switch the implementation for testing
-    /// and during further development of the module
-    private static let useLegacySolution = true
-
-
     // MARK: - Private
 
-    let model = NavigationModel()
+    let model: NavigationModel
 
     let appBundleName: String?
+
+    // Yielded from multiple concurrent contexts.
     let continuation: AsyncStream<String>.Continuation
+    let navigationEventStreamProvider: any NavigationEventStreamProviding
 
     private let logger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),
         category: "Navigation"
     )
 
+    private let screenNameObserverStore = ScreenNameObserverStore()
+
+    let runtimeStateStore = NavigationRuntimeStateStore()
 
     // MARK: - Public
 
@@ -52,31 +49,34 @@ public final class Navigation: Sendable {
     public let screenNameStream: AsyncStream<String>
 
 
-    // MARK: - Module configuration
+    // MARK: - Screen name observer
 
-    /// A configured version of the agent.
-    public var agentVersion: String? {
-        get async {
-            await model.agentVersion
-        }
+    /// Registers a synchronous observer that is called on every screen-name change
+    /// before the change is yielded to `screenNameStream`.
+    ///
+    /// The agent uses this hook to update runtime attributes synchronously, ensuring
+    /// spans started immediately after a screen-name change carry the new value.
+    @_spi(SplunkInternal)
+    public func setScreenNameObserver(_ observer: (@Sendable (String) -> Void)?) {
+        screenNameObserverStore.set(observer)
     }
 
-    /// Sets used version of the agent.
-    ///
-    /// It should correspond to the `SplunkRum.version`.
-    ///
-    /// - Parameter agentVersion: A configured version of the agent.
-    ///
-    /// - Returns: An updated module object.
-    @discardableResult
-    public func agentVersion(_ agentVersion: String) -> Self {
-        Task {
-            if await agentVersion != self.agentVersion {
-                await model.update(agentVersion: agentVersion)
-            }
-        }
+    /// Publishes a screen-name change to the synchronous observer and then to the async stream.
+    func publishScreenNameChange(_ name: String) {
+        screenNameObserverStore.publish(name)
+        continuation.yield(name)
+    }
 
-        return self
+    // MARK: - Module configuration
+
+    /// Shared agent state, injected by the agent at startup.
+    public var sharedState: AgentSharedState? {
+        get {
+            runtimeStateStore.sharedState
+        }
+        set {
+            runtimeStateStore.setSharedState(newValue)
+        }
     }
 
 
@@ -100,7 +100,19 @@ public final class Navigation: Sendable {
     // MARK: - Initialization
 
     /// Module protocol conformance.
-    public required init() {
+    public required convenience init() {
+        self.init(
+            navigationEventStreamProvider: DefaultNavigationEventStreamProvider()
+        )
+    }
+
+    init(
+        navigationEventStreamProvider: any NavigationEventStreamProviding,
+        navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
+    ) {
+        self.navigationEventStreamProvider = navigationEventStreamProvider
+        model = NavigationModel(navigationEventProcessor: navigationEventProcessor)
+
         // Prepare a stream for screen name changes
         let (screenNameStream, continuation) = AsyncStream.makeStream(of: String.self)
         self.screenNameStream = screenNameStream
@@ -121,158 +133,92 @@ public final class Navigation: Sendable {
 
     // MARK: - Instrumentation
 
-    /// Starts detection and processing of navigation.
+    /// Starts long-lived detection loops that run for the lifetime of this
+    /// instance.
+    ///
+    /// These tasks strongly capture `self` with no self-termination
+    /// path; an accepted trade-off for a module that runs for the lifetime
+    /// of the process. If cancellation were ever needed, the task handles
+    /// would need to be stored and `.cancel()` called explicitly.
     func startDetection() {
-        // NOTE:
-        //
-        // This is a temporary solution that will later be replaced by a more modern approach.
-        //
-        // However, there is currently insufficient support in `CiscoSwizzling`.
-        // Once the support is implemented, the solution will adopt modern approach,
-        // and the legacy solution will be removed.
-        if Self.useLegacySolution {
-            startLegacyDetection()
+        Task(priority: .userInitiated) {
+            await runNavigationDetectionLoop()
         }
-        else {
-            startModernDetection()
+
+        Task(priority: .userInitiated) {
+            await runPresentationDetectionLoop()
         }
     }
 
+    private func runNavigationDetectionLoop() async {
+        do {
+            let stream = try await navigationStream()
 
-    // MARK: - Instrumentation (Modern solution)
-
-    private func startModernDetection() {
-        // swiftlint:disable:next unhandled_throwing_task
-        Task(priority: .userInitiated) {
-            let navigationStream = try await DefaultSwizzling.navigation
-
-            // Process navigation events
-            for await event in navigationStream where await shouldProcessEvent() {
-
-                var processedEvent = event
-                let screenName = await preferredScreenName(for: event.controllerTypeName)
-
-                // If we have set manual naming, then we prefer it
-                if await model.isManualScreenName {
-                    processedEvent = AutomatedNavigationEvent(
-                        timestamp: Date(),
-                        type: event.type,
-                        controllerTypeName: screenName,
-                        controllerIdentifier: event.controllerIdentifier
-                    )
+            for await event in stream {
+                guard
+                    await shouldProcessEvent(),
+                    !shouldIgnoreAndLog(controllerTypeName: event.controllerTypeName)
+                else {
+                    continue
                 }
 
-                // Supported events handling
-                switch processedEvent.type {
-                case .viewDidLoad:
-                    await processShowStart(event: processedEvent)
-
-                case .viewDidAppear:
-                    await processNavigationEnd(event: processedEvent)
-
-                case .willTransitionToTraitCollection:
-                    await processTransitionStart(event: processedEvent)
-
-                case .didTransitionToTraitCollection:
-                    await processNavigationEnd(event: processedEvent)
-
-                default:
-                    break
+                if await isNavigationControllerManaged(event: event) {
+                    continue
                 }
+
+                await processNavigationEvent(event)
+            }
+        }
+        catch {
+            logger.log(level: .error) {
+                "Failed to initialize navigation stream: \(String(describing: error))"
             }
         }
     }
 
+    private func runPresentationDetectionLoop() async {
+        do {
+            let stream = try await presentationStream()
 
-    // MARK: - Instrumentation (Legacy solution)
+            for await event in stream where await shouldProcessEvent() {
 
-    private func startLegacyDetection() {
-        Task(priority: .userInitiated) {
-            let willShowStream = NotificationCenter.default
-                .notifications(for: Notification.Name(rawValue: "UINavigationControllerWillShowViewControllerNotification"))
-
-            for await notification in willShowStream {
-                if let event = await navigationEvent(for: notification.object, type: .viewDidLoad) {
-                    await processShowStart(event: event)
-                }
+                await processPresentationEvent(event: event)
             }
         }
-
-        Task(priority: .userInitiated) {
-            let didShowStream = NotificationCenter.default
-                .notifications(for: Notification.Name(rawValue: "UINavigationControllerDidShowViewControllerNotification"))
-
-            for await notification in didShowStream {
-                if let event = await navigationEvent(for: notification.object, type: .viewDidAppear) {
-                    await processNavigationEnd(event: event)
-                }
-            }
-        }
-
-        Task(priority: .userInitiated) {
-            let willTransitionStream = NotificationCenter.default
-                .notifications(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionWillBeginNotification"))
-
-            for await notification in willTransitionStream {
-                if let event = await transitionEvent(for: notification.object, type: .willTransitionToTraitCollection) {
-                    await processTransitionStart(event: event)
-                }
-            }
-        }
-
-        Task(priority: .userInitiated) {
-            let didTransitionStream = NotificationCenter.default
-                .notifications(for: Notification.Name(rawValue: "UIPresentationControllerPresentationTransitionDidEndNotification"))
-
-            for await notification in didTransitionStream {
-                if let event = await transitionEvent(for: notification.object, type: .didTransitionToTraitCollection) {
-                    await processNavigationEnd(event: event)
-                }
+        catch {
+            logger.log(level: .error) {
+                "Failed to initialize presentation stream: \(String(describing: error))"
             }
         }
     }
 
-    private func navigationEvent(for notificationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
-        guard
-            await shouldProcessEvent(),
-            let navigationController = notificationObject as? UINavigationController,
-            let visibleController = await navigationController.visibleViewController
-        else {
-            return nil
+    private func processNavigationEvent(_ event: NavigationActionEvent) async {
+        switch event.type {
+        case .viewDidAppear:
+            await processShowCommit(event: event)
+
+        case .viewDidLoad:
+            await processShowStart(event: event)
+
+        case .viewDidDisappear:
+            await cleanupPendingNavigation(event: event)
+
+        case .didTransitionToTraitCollection,
+            .viewDidTransition,
+            .viewWillTransition,
+            .willTransitionToTraitCollection:
+            break
+
+        case .navigationControllerWillShow:
+            await processNavigationControllerWillShow(event: event)
+
+        case .navigationControllerDidShow:
+            await processNavigationControllerDidShow(event: event)
+
+
+        default:
+            break
         }
-
-        let controllerTypeName = preferredControllerName(for: visibleController)
-        let screenName = await preferredScreenName(for: controllerTypeName)
-
-        return AutomatedNavigationEvent(
-            timestamp: Date(),
-            type: eventType,
-            controllerTypeName: screenName,
-            controllerIdentifier: ObjectIdentifier(visibleController)
-        )
-    }
-
-    private func transitionEvent(for presentationObject: Any?, type eventType: NavigationActionEventType) async -> AutomatedNavigationEvent? {
-        let presentationController = presentationObject as? UIPresentationController
-        let uiViewController = presentationObject as? UIViewController
-        let presentedController = await presentationController?.presentedViewController
-
-        guard
-            await shouldProcessEvent(),
-            let visibleController = presentedController ?? uiViewController
-        else {
-            return nil
-        }
-
-        let controllerTypeName = preferredControllerName(for: visibleController)
-        let screenName = await preferredScreenName(for: controllerTypeName)
-
-        return AutomatedNavigationEvent(
-            timestamp: Date(),
-            type: eventType,
-            controllerTypeName: screenName,
-            controllerIdentifier: ObjectIdentifier(visibleController)
-        )
     }
 
 
@@ -280,59 +226,28 @@ public final class Navigation: Sendable {
 
     /// Process the beginning of the view controller display.
     private func processShowStart(event: NavigationActionEvent) async {
-        let start = Date()
-
-        let typeName = event.controllerTypeName
-        let screenName = sanitize(typeName: typeName)
-        let lastScreenName = await model.screenName
-
         let navigation = NavigationPair(
             type: .show,
-            start: start,
-            typeName: typeName,
-            screenName: screenName
+            start: event.timestamp,
+            screenName: sanitize(typeName: event.controllerTypeName)
         )
 
-        // Store this navigation for final processing
         await model.update(navigation: navigation, for: event.controllerIdentifier)
-        await model.update(screenName: screenName)
-
-        // Yield this change to the consumer
-        // and send corresponding span
-        if screenName != lastScreenName {
-            continuation.yield(screenName)
-
-            send(screenName: screenName, lastScreenName: lastScreenName, start: start)
-        }
     }
 
-    /// Process the beginning of the view controller transition.
-    private func processTransitionStart(event: NavigationActionEvent) async {
-        let start = Date()
+    /// Process the committed view controller display.
+    private func processShowCommit(event: NavigationActionEvent) async {
+        await commitNavigation(event: event, fallbackType: .show)
+    }
 
-        let typeName = event.controllerTypeName
-        let screenName = sanitize(typeName: typeName)
-        let lastScreenName = await model.screenName
-
-        let navigation = NavigationPair(
-            type: .transition,
-            start: start,
-            typeName: typeName,
-            screenName: screenName
-        )
-
-        // Store this navigation for final processing
-        await model.update(navigation: navigation, for: event.controllerIdentifier)
-
-        // Send corresponding span
-        if screenName != lastScreenName {
-            send(screenName: screenName, lastScreenName: lastScreenName, start: start)
-        }
+    /// Drop a pending direct show that never reached a committed visible state.
+    private func cleanupPendingNavigation(event: NavigationActionEvent) async {
+        await model.removeNavigation(for: event.controllerIdentifier)
     }
 
     /// Process the finalizing of the navigation.
-    private func processNavigationEnd(event: NavigationActionEvent) async {
-        let end = Date()
+    func processNavigationEnd(event: NavigationActionEvent) async {
+        let end = event.timestamp
         let identifier = event.controllerIdentifier
 
         // Get corresponding navigation data
@@ -350,6 +265,49 @@ public final class Navigation: Sendable {
         await model.removeNavigation(for: identifier)
     }
 
+    /// Process, publish, and finalize a committed automated navigation.
+    @discardableResult
+    func commitNavigation(event: NavigationActionEvent, fallbackType: NavigationType) async -> Bool {
+        let typeName = event.controllerTypeName
+        let identifier = event.controllerIdentifier
+
+        guard
+            let navigationEvent = await processAutomatedNavigationEvent(
+                sanitize(typeName: typeName),
+                controllerIdentifier: identifier
+            )
+        else {
+            await model.removeNavigation(for: identifier)
+            return false
+        }
+
+        let existingNavigation = await model.navigation(for: identifier)
+        let start = existingNavigation?.start ?? event.timestamp
+
+        let navigation = NavigationPair(
+            type: existingNavigation?.type ?? fallbackType,
+            start: start,
+            screenName: navigationEvent.name
+        )
+        await model.update(navigation: navigation, for: identifier)
+
+        updateCurrentScreen(
+            screenName: navigationEvent.name,
+            start: start,
+            attributes: navigationEvent.attributes
+        )
+
+        let endEvent = AutomatedNavigationEvent(
+            timestamp: event.timestamp,
+            type: .viewDidAppear,
+            controllerTypeName: typeName,
+            controllerIdentifier: identifier
+        )
+
+        await processNavigationEnd(event: endEvent)
+        return true
+    }
+
 
     // MARK: - State management
 
@@ -365,18 +323,61 @@ public final class Navigation: Sendable {
     /// Determine whether processing should occur at call time.
     private func shouldProcessEvent() async -> Bool {
         let moduleEnabled = await model.moduleEnabled
-        let isManualScreenName = await model.isManualScreenName
-        let trackingEnabled = state.isAutomatedTrackingEnabled || isManualScreenName
+        let trackingEnabled = state.isAutomatedTrackingEnabled
 
         return moduleEnabled && trackingEnabled
     }
 
-    private func preferredScreenName(for controllerTypeName: String) async -> String {
-        if await model.isManualScreenName {
-            return await model.screenName
+    /// Returns whether the controller should be filtered from automatic
+    /// navigation tracking, and logs at debug level when filtering occurs.
+    ///
+    /// The static ``shouldIgnore(controllerTypeName:)`` remains pure for
+    /// testability; this instance method adds the side effect of logging
+    /// so that filtered controller names are observable in debug builds.
+    func shouldIgnoreAndLog(controllerTypeName: String) -> Bool {
+        guard Self.shouldIgnore(controllerTypeName: controllerTypeName) else {
+            return false
         }
 
-        return controllerTypeName
+        logger.log(level: .debug) {
+            "Filtered internal controller from automatic navigation tracking: \(controllerTypeName)"
+        }
+        return true
+    }
+
+    /// Checks whether the event belongs to a view controller whose lifecycle is managed
+    /// by a `UINavigationController` transition.
+    ///
+    /// When a navigation controller push or pop is in flight, the child controller also fires
+    /// its own `viewDidLoad` / `viewDidAppear` events. Processing those independently would
+    /// create duplicate screen-name updates and navigation spans. This guard suppresses the
+    /// redundant lifecycle events so that only the navigation-controller transition path
+    /// (`willShow` / `didShow`) drives the screen change.
+    private func isNavigationControllerManaged(event: NavigationActionEvent) async -> Bool {
+        switch event.type {
+        case .viewDidAppear,
+            .viewDidLoad:
+            await model.isManagedNavigationControllerTarget(event.controllerIdentifier)
+
+        default:
+            false
+        }
+    }
+
+
+    /// Passes the sanitized type name through the navigation event processor
+    /// (stored on the ``NavigationModel`` actor) and returns the processed event,
+    /// or `nil` if the event was suppressed.
+    func processAutomatedNavigationEvent(
+        _ typeName: String,
+        controllerIdentifier: ObjectIdentifier
+    ) async -> NavigationEvent? {
+        let controllerIdentity = String(UInt(bitPattern: controllerIdentifier))
+
+        return await model.navigationEventProcessor.onViewController(
+            typeName: typeName,
+            controllerIdentity: controllerIdentity
+        )
     }
 
     func preferredControllerName(for controller: UIViewController) -> String {

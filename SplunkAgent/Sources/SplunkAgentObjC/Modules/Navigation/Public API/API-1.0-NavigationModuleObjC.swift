@@ -29,7 +29,7 @@ public final class NavigationModuleObjC: NSObject {
 
     // MARK: - Preferences
 
-    /// An object that holds preferred settings for the module, a ``NavigationModulePreferencesObjc`` instance.
+    /// An object that holds preferred settings for the module, a ``NavigationModulePreferencesObjC`` instance.
     @objc
     public var preferences: NavigationModulePreferencesObjC {
         get {
@@ -40,7 +40,7 @@ public final class NavigationModuleObjC: NSObject {
 
         set {
             newValue.owner = owner
-            owner.agent.navigation.preferences = NavigationPreferences(enableAutomatedTracking: newValue.enableAutomatedTracking)
+            owner.agent.navigation.preferences.enableAutomatedTracking = newValue.enableAutomatedTracking
         }
     }
 
@@ -71,6 +71,24 @@ public final class NavigationModuleObjC: NSObject {
         return self
     }
 
+    /// Sets a manual screen name with custom attributes (setting is valid until a new name is set).
+    ///
+    /// - Parameters:
+    ///   - name: The name to be tracked as the screen name until being changed.
+    ///   - attributes: Optional custom key-value pairs to attach to the `app.ui.navigation` span.
+    ///     Supported value types: `NSString`, `NSNumber` (integer, double, boolean), and arrays of those types.
+    ///     Other types are converted to their string representation.
+    ///
+    /// - Returns: The actual ``NavigationModuleObjC`` instance.
+    ///
+    /// - Note: The set value is not linked to any specific UI element.
+    @discardableResult
+    @objc(trackScreen:attributes:)
+    public func track(screen name: String, attributes: NSDictionary?) -> NavigationModuleObjC {
+        owner.agent.navigation.track(screen: name, attributes: attributes as? [String: Any])
+
+        return self
+    }
 
     // MARK: - Initialization
 

@@ -5,7 +5,7 @@
 # from source using Tuist-generated Xcode project + xcodebuild.
 #
 # Usage:
-#   ./scripts/build-otel-xcframeworks.sh [--otel-version VERSION]
+#   ./scripts/build-otel-xcframeworks.sh [--otel-version VERSION] [--ios-only]
 #
 # Prerequisites:
 #   - Xcode 16+ with command-line tools
@@ -15,6 +15,7 @@
 # Environment variables:
 #   OTEL_VERSION   - Git tag of opentelemetry-swift-core to checkout (default: 2.3.0)
 #   OTEL_REPO      - Git URL for opentelemetry-swift-core (default: upstream GitHub)
+#   IOS_ONLY       - When true, build only iOS device and simulator slices
 #
 # Outputs:
 #   output/xcframeworks/OpenTelemetryApi.xcframework
@@ -46,6 +47,7 @@ OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 # OTel version: can be overridden via env var or --otel-version flag
 OTEL_VERSION="${OTEL_VERSION:-2.3.0}"
 OTEL_REPO="${OTEL_REPO:-https://github.com/open-telemetry/opentelemetry-swift-core.git}"
+IOS_ONLY="${IOS_ONLY:-false}"
 
 # Build configuration (always Release for distribution)
 CONFIGURATION="Release"
@@ -56,7 +58,7 @@ SCHEMES=("OpenTelemetryApi" "OpenTelemetrySdk")
 # Platform matrix for OTel: all platforms supported
 # Format: "platform destination" pairs for xcodebuild -destination
 # Each entry: "platform_label|xcodebuild_destination"
-PLATFORM_DESTINATIONS=(
+FULL_PLATFORM_DESTINATIONS=(
     "ios|generic/platform=iOS"
     "ios-simulator|generic/platform=iOS Simulator"
     "tvos|generic/platform=tvOS"
@@ -65,6 +67,13 @@ PLATFORM_DESTINATIONS=(
     "xros-simulator|generic/platform=visionOS Simulator"
     "maccatalyst|generic/platform=macOS,variant=Mac Catalyst"
 )
+
+IOS_PLATFORM_DESTINATIONS=(
+    "ios|generic/platform=iOS"
+    "ios-simulator|generic/platform=iOS Simulator"
+)
+
+PLATFORM_DESTINATIONS=("${FULL_PLATFORM_DESTINATIONS[@]}")
 
 
 # ---------------------------------------------------------------------------
@@ -77,12 +86,20 @@ while [[ $# -gt 0 ]]; do
             OTEL_VERSION="$2"
             shift 2
             ;;
+        --ios-only)
+            IOS_ONLY=true
+            shift
+            ;;
         *)
             echo "Unknown argument: $1"
             exit 1
             ;;
     esac
 done
+
+if [[ "${IOS_ONLY}" == "true" ]]; then
+    PLATFORM_DESTINATIONS=("${IOS_PLATFORM_DESTINATIONS[@]}")
+fi
 
 
 # ---------------------------------------------------------------------------
@@ -166,7 +183,11 @@ generate_xcode_project() {
 # Each archive targets a single platform/destination.
 
 archive_frameworks() {
-    log_step "Step 3: Archive frameworks for all platforms"
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        log_step "Step 3: Archive frameworks for iOS platforms"
+    else
+        log_step "Step 3: Archive frameworks for all platforms"
+    fi
 
     # Clean previous archives
     rm -rf "${ARCHIVES_DIR}"
@@ -182,16 +203,22 @@ archive_frameworks() {
 
             log "Archiving ${scheme} for ${label}..."
 
-            xcodebuild archive \
-                -workspace "${OTEL_PROJECT_DIR}/OpenTelemetryXCFrameworks.xcworkspace" \
-                -scheme "${scheme}" \
-                -configuration "${CONFIGURATION}" \
-                -destination "${destination}" \
-                -archivePath "${archive_path}" \
-                SKIP_INSTALL=NO \
-                BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
-                OTHER_SWIFT_FLAGS="-package-name opentelemetry-swift-core" \
-                2>&1 | tail -5
+            local xcodebuild_args=(
+                archive
+                -workspace "${OTEL_PROJECT_DIR}/OpenTelemetryXCFrameworks.xcworkspace"
+                -scheme "${scheme}"
+                -configuration "${CONFIGURATION}"
+                -destination "${destination}"
+                -archivePath "${archive_path}"
+                SKIP_INSTALL=NO
+                BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+                "OTHER_SWIFT_FLAGS=-package-name opentelemetry-swift-core"
+            )
+            if [[ "${label}" == "maccatalyst" ]]; then
+                xcodebuild_args+=("IPHONEOS_DEPLOYMENT_TARGET=15.0")
+            fi
+
+            xcodebuild "${xcodebuild_args[@]}" 2>&1 | tail -5
 
             # Verify the archive was created
             if [[ ! -d "${archive_path}" ]]; then
@@ -289,7 +316,10 @@ verify_xcframeworks() {
         echo "  ✓ Info.plist exists"
 
         # Check 2: Expected platform slices exist
-        local expected_slices=("ios-arm64" "ios-arm64_x86_64-simulator" "tvos-arm64" "tvos-arm64_x86_64-simulator" "xros-arm64" "xros-arm64_x86_64-simulator")
+        local expected_slices=("ios-arm64" "ios-arm64_x86_64-simulator")
+        if [[ "${IOS_ONLY}" != "true" ]]; then
+            expected_slices+=("tvos-arm64" "tvos-arm64_x86_64-simulator" "xros-arm64" "xros-arm64_x86_64-simulator")
+        fi
         # Mac Catalyst slice naming varies; check for it separately
         local has_catalyst=false
 
@@ -310,11 +340,13 @@ verify_xcframeworks() {
             fi
         done
 
-        if [[ "${has_catalyst}" == "true" ]]; then
-            echo "  ✓ Slice: maccatalyst"
-        else
-            echo "  FAIL: Missing slice: maccatalyst"
-            all_passed=false
+        if [[ "${IOS_ONLY}" != "true" ]]; then
+            if [[ "${has_catalyst}" == "true" ]]; then
+                echo "  ✓ Slice: maccatalyst"
+            else
+                echo "  FAIL: Missing slice: maccatalyst"
+                all_passed=false
+            fi
         fi
 
         # Check 3: .swiftinterface files exist in at least one slice
@@ -393,6 +425,11 @@ print_summary() {
     echo ""
     echo "OTel version: ${OTEL_VERSION}"
     echo "Configuration: ${CONFIGURATION}"
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        echo "Variant: iOS-only"
+    else
+        echo "Variant: all platforms"
+    fi
 }
 
 
@@ -403,6 +440,7 @@ print_summary() {
 main() {
     log "Building OTel xcframeworks (version ${OTEL_VERSION})"
     log "Tools root: ${TOOLS_ROOT}"
+    log "iOS-only: ${IOS_ONLY}"
 
     checkout_otel_source
     generate_xcode_project
