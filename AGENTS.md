@@ -11,7 +11,7 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 - All modules conform to `Module` in `SplunkCommon/Sources/SplunkCommon/Modules/Module.swift`.
 - Public API lives in `SplunkAgent/Sources/SplunkAgent/Public API/`; stable public files use `API-1.0-*.swift`.
 - Deprecated public API stays in `Public API/.../Deprecated/` with `@available(*, deprecated, message: "Use <replacement>")`.
-- Public module APIs have both real proxies (`Proxies/Module/`) and no-op `*NonOperational` proxies (`Proxies/Non-Operational/`) for pre-install, disabled, or sampled-out states.
+- Public module APIs have both real proxies (`Proxies/Module/`) and no-op `*NonOperational` proxies (`Proxies/Non-Operational/` or `Proxies/NonOperational/`) for pre-install, disabled, or sampled-out states.
 - The binary distribution uses `tools/xcframework/Project.swift` with library evolution enabled. Keep it in sync with `Package.swift`.
 
 ## Implementation Defaults
@@ -56,7 +56,7 @@ This repo is not migrated to Swift 6 strict concurrency. New code should reduce 
 - Run or request `tools/xcframework/scripts/check-manifest-sync.sh` when either manifest changes.
 - Dependency bumps for `opentelemetry-swift-core` or `PLCrashReporter` must stay exact-pinned and compatible with the xcframework build pipeline.
 - New SPM products are customer-visible distribution changes.
-- Use `TargetWrappers/` for Cisco binary target wrappers. `TargetTargets/` is generated placeholder scaffolding and is not canonical unless wired.
+- Use `TargetWrappers/` for Cisco binary target wrappers; it is the directory referenced by `Package.swift`.
 - Resource changes must be reflected in both SPM and xcframework distribution and reviewed for `PrivacyInfo.xcprivacy` impact.
 - `dsymUploader/` is a standalone client integration script, not an SPM product.
 - GitHub Actions must be pinned to commit SHAs, not tags.
@@ -128,7 +128,7 @@ Call these out as design choices when a PR relies on or changes them:
 
 - `Package.swift` - SPM manifest; only `SplunkAgent` and `SplunkAgentObjC` are public products.
 - `SplunkAgent/Sources/SplunkAgent/Public API/` - public Swift API.
-- `SplunkAgentObjC/` - Objective-C bridge.
+- `SplunkAgent/Sources/SplunkAgentObjC/` - Objective-C bridge.
 - `SplunkCommon/Sources/SplunkCommon/Modules/Module.swift` - module protocol.
 - `SplunkOpenTelemetry/.../OTLPLogToSpanExporter.swift` - log/event to span conversion.
 - `SplunkOpenTelemetryBackgroundExporter/.../BackgroundHTTPClient.swift` - background upload and disk queue.
