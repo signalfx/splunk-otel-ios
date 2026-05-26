@@ -61,10 +61,11 @@ final class MockPresentationEventStreamProvider:
         eventType: PresentationActionEventType,
         presented: UIViewController,
         presenting: UIViewController,
-        completed: Bool?
+        completed: Bool?,
+        timestamp: Date = Date()
     ) {
         let event = MockPresentationActionEvent(
-            timestamp: Date(),
+            timestamp: timestamp,
             type: eventType,
             presentationControllerIdentifier: ObjectIdentifier(presentationControllerProxy),
             presentedControllerTypeName: String(describing: type(of: presented)),
