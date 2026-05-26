@@ -14,6 +14,13 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 - Public module APIs have both real proxies (`Proxies/Module/`) and no-op `*NonOperational` proxies (`Proxies/Non-Operational/`) for pre-install, disabled, or sampled-out states.
 - The binary distribution uses `tools/xcframework/Project.swift` with library evolution enabled. Keep it in sync with `Package.swift`.
 
+## Implementation Defaults
+
+- Inspect nearby code before editing and match the established module, naming, `// MARK: -`, and test-support patterns.
+- For new modules, use `Splunk<Module>/Sources/Splunk<Module>/` and `Splunk<Module>/Tests/Splunk<Module>Tests/` with `Testing Support/Builders` and `Testing Support/Mocks`.
+- Public API and protocols need DocC; new source files need the license header from `CODESTYLE.md`.
+- For style-heavy, build/distribution, or contribution-process changes, read `CODESTYLE.md`, `Development.md`, or `CONTRIBUTING.md` before editing.
+
 ## Telemetry Model
 
 - Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector use `Tracer.spanBuilder` -> `SimpleSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
@@ -105,7 +112,7 @@ Block or request measurement for changes that add avoidable overhead to host app
 ### P7 - Style and Docs
 
 - Keep changes local to established module boundaries.
-- Follow SwiftFormat/SwiftLint/CODESTYLE
+- Follow SwiftFormat/SwiftLint/CODESTYLE.
 - Add DocC for public API and CHANGELOG entries for client-visible changes.
 
 ## Design Assumptions to Surface in Reviews
