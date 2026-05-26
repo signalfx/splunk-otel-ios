@@ -1,259 +1,133 @@
 # Splunk RUM Agent for iOS - AI Assistant Context
 
-This document provides context for AI assistants working on this codebase.
+This repo is a modular Swift Package for the Splunk RUM iOS agent. It instruments iOS, iPadOS, tvOS, visionOS, and macCatalyst apps and sends telemetry to Splunk Observability Cloud.
 
-## Project Overview
+## Project Facts
 
-**Splunk RUM Agent for iOS** is a modular Swift Package for Real User Monitoring (RUM). It instruments iOS, iPadOS, tvOS, visionOS, and macCatalyst applications to collect telemetry data (traces, spans, logs) and sends it to Splunk Observability Cloud.
+- Swift 5.9+, SPM, minimum iOS 13.0.
+- Public products: `SplunkAgent`, `SplunkAgentObjC`.
+- Core dependency: `opentelemetry-swift-core` API/SDK only. Do not add upstream protocol exporters; this repo uses a custom OTLP/JSON exporter to control binary size.
+- Main modules: `SplunkAgent`, `SplunkAgentObjC`, `SplunkCommon`, `SplunkOpenTelemetry`, `SplunkOpenTelemetryBackgroundExporter`, and instrumentation modules named `Splunk<Feature>`.
+- All modules conform to `Module` in `SplunkCommon/Sources/SplunkCommon/Modules/Module.swift`.
+- Public API lives in `SplunkAgent/Sources/SplunkAgent/Public API/`; stable public files use `API-1.0-*.swift`.
+- Deprecated public API stays in `Public API/.../Deprecated/` with `@available(*, deprecated, message: "Use <replacement>")`.
+- Public module APIs have both real proxies (`Proxies/Module/`) and no-op `*NonOperational` proxies (`Proxies/Non-Operational/`) for pre-install, disabled, or sampled-out states.
+- The binary distribution uses `tools/xcframework/Project.swift` with library evolution enabled. Keep it in sync with `Package.swift`.
 
-- **Language**: Swift 5.9+
-- **Package Manager**: Swift Package Manager (SPM)
-- **Minimum iOS**: 13.0
-- **Core Dependency**: [OpenTelemetry Swift Core](https://github.com/open-telemetry/opentelemetry-swift-core) (API and SDK only, no exporters)
+## Telemetry Model
 
-## Architecture
+- Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector use `Tracer.spanBuilder` -> `SimpleSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
+- Log-as-span: CustomTracking, CrashReports, Interactions, and internal agent events emit log records that `OTLPLogToSpanExporter` converts to spans and sends to the trace endpoint.
+- Binary logs: Session Replay is the exception; it uses `OTLPSessionReplayEventProcessor` -> `OTLPBackgroundHTTPLogExporterBinary`.
+- There is no production `BatchSpanProcessor` / `BatchLogRecordProcessor`. Record buffering is disk-backed in the background exporters.
+- Uploads use `URLSessionConfiguration.background(withIdentifier:)`, not `UIApplication.beginBackgroundTask`.
+- Some hardcoded strings and attribute keys already exist. New hot-path string keys should still be centralized per module instead of copied inline.
 
-### Module System
+## Concurrency Rules
 
-The SDK uses a modular architecture where each instrumentation type is a separate SPM target. All modules conform to the `Module` protocol defined in `SplunkCommon`.
+This repo is not migrated to Swift 6 strict concurrency. New code should reduce future migration churn.
 
-**Core Modules:**
-- `SplunkAgent` - Main agent and public API
-- `SplunkAgentObjC` - Objective-C bridging layer
-- `SplunkCommon` - Shared utilities and protocols
+- Prefer existing patterns: per-instance serial `DispatchQueue` with `PackageIdentifier.default(named:)`, then `NSLock` for tiny critical sections, then `actor` for new isolated state machines where `await` is natural.
+- Do not introduce `.concurrent` queues, new global shared queues, `OSAllocatedUnfairLock`, or `NSRecursiveLock` unless the PR explains why existing patterns are insufficient.
+- Shared mutable state must be protected by a queue, lock, or actor. Flag unsynchronized `var` state on classes reached from multiple queues.
+- New `@unchecked Sendable`, `nonisolated(unsafe)`, or global mutable state requires a comment explaining the safety invariant and what would be needed to remove it under Swift 6.
+- UIKit, SwiftUI view-body, `WKWebView`, and `CADisplayLink` work must run on the main actor. If static isolation is not practical, guard with `Thread.isMainThread` and hop with `Task { @MainActor in ... }`.
+- Adding `Sendable`, `@MainActor`, actor isolation, or `final` to existing public types can break clients and must be reviewed as a public API change.
 
-**Instrumentation Modules:**
-- `SplunkAppStart` - App startup time tracking
-- `SplunkAppState` - App lifecycle events (foreground/background)
-- `SplunkCrashReports` - Crash reporting via PLCrashReporter
-- `SplunkCustomTracking` - Custom events and workflows
-- `SplunkInteractions` - UI interaction tracking
-- `SplunkNavigation` - Screen navigation tracking
-- `SplunkNetwork` - URLSession instrumentation
-- `SplunkNetworkMonitor` - Network status monitoring
-- `SplunkSlowFrameDetector` - Slow/frozen frame detection
-- `SplunkWebView` - WKWebView instrumentation bridge
-- `SplunkSessionReplayProxy` - Session replay proxy
+## Public API Rules
 
-**Infrastructure Modules:**
-- `SplunkOpenTelemetry` - OTel integration, span/log processors, and attribute handling
-- `SplunkOpenTelemetryBackgroundExporter` - Custom OTLP/JSON exporters for traces, logs, and metrics with background task support
+- Backward compatibility is the default. Breaking public API/ABI changes must be intentional, explicit in the PR description, and documented in `CHANGELOG.md`.
+- Public API changes include Swift symbols, Objective-C bridge changes, default behavior changes, span/log attribute changes, retry/backoff changes, disk-cache changes, and distribution changes.
+- Do not remove public API in the same PR that adds a replacement. Deprecate first with `@available`.
+- New public module methods must update the real proxy, the `*NonOperational` proxy, Objective-C bridge if applicable, DocC, and tests.
+- Treat Objective-C selector changes as high risk.
+- Do not expose `@_spi(SplunkInternal)` or `@_spi(SplunkTesting)` to customers.
 
-### Module Protocol Pattern
+## Packaging Rules
 
-All modules implement this pattern:
+- `Package.swift` and `tools/xcframework/Project.swift` must stay synchronized for products, targets, platforms, dependencies, resources, and module links.
+- Run or request `tools/xcframework/scripts/check-manifest-sync.sh` when either manifest changes.
+- Dependency bumps for `opentelemetry-swift-core` or `PLCrashReporter` must stay exact-pinned and compatible with the xcframework build pipeline.
+- New SPM products are customer-visible distribution changes.
+- Use `TargetWrappers/` for Cisco binary target wrappers. `TargetTargets/` is generated placeholder scaffolding and is not canonical unless wired.
+- Resource changes must be reflected in both SPM and xcframework distribution and reviewed for `PrivacyInfo.xcprivacy` impact.
+- `dsymUploader/` is a standalone client integration script, not an SPM product.
+- GitHub Actions must be pinned to commit SHAs, not tags.
+- Session Replay dependency mode is controlled by `USE_SESSION_REPLAY_REPO`, `USE_LOCAL_SESSION_REPLAY`, `SESSION_REPLAY_BRANCH`, and `SESSION_REPLAY_LOCAL_PATH`; development plugins by `USE_DEVELOPMENT_PLUGINS`.
 
-```swift
-public protocol Module {
-    associatedtype Configuration: ModuleConfiguration
-    associatedtype RemoteConfiguration: RemoteModuleConfiguration
-    associatedtype EventMetadata: ModuleEventMetadata
-    associatedtype EventData: ModuleEventData
+## PR Review Priorities
 
-    init()
-    func install(with: ModuleConfiguration?, remoteConfiguration: RemoteModuleConfiguration?)
-    func onPublish(data: @escaping (EventMetadata, EventData) -> Void)
-    func deleteData(for: any ModuleEventMetadata)
-}
-```
+Review findings in this order. Prioritize quality and production performance over style.
 
-## Directory Structure
+### P1 - Production Performance
 
-```
-Splunk<ModuleName>/
-├── Sources/
-│   └── Splunk<ModuleName>/
-│       ├── Model/                    # Data models
-│       ├── Module/                   # Module protocol conformance
-│       │   ├── <Module>+Module.swift
-│       │   ├── <Module>Configuration.swift
-│       │   └── <Module>RemoteConfiguration.swift
-│       └── <ModuleName>.swift        # Main implementation
-└── Tests/
-    └── Splunk<ModuleName>Tests/
-        ├── Testing Support/
-        │   ├── Builders/             # Test builders
-        │   └── Mocks/                # Mock objects
-        └── <ModuleName>Tests.swift
-```
+Block or request measurement for changes that add avoidable overhead to host apps at scale.
 
-## Code Style
+- Watch hot paths: span/log emission, export pipeline, swizzled `URLSession`, navigation, interactions, slow-frame detection, crashes, and Session Replay.
+- Flag per-event encoder/formatter creation, `NSError`, reflection, `String(format:)`, repeated `Bundle` / `FileManager` / `UserDefaults` reads, O(n) scans over growing collections, main-thread I/O, unbounded memory, missing observer teardown, and display-link leaks.
+- Flag meaningful binary-size increases, especially dependencies that undermine the custom OTLP encoder's size-saving purpose.
+- Ask for Instruments, allocation, signpost, or app-level measurement when the cost is not obvious.
 
-### File Organization
+### P2 - Public API and Compatibility
 
-- Use `// MARK: -` for major sections, `// MARK:` for subsections
-- Order sections: Types → Static Constants → Constants → Private → Public → Initialization → Methods
-- Protocol conformances go in separate extensions
+- Surface any removed/renamed public symbols, changed signatures, changed default values, enum case changes, Objective-C selector changes, or public behavior changes.
+- Require deprecation + replacement rather than removal unless an intentional breaking release is stated.
+- Require `CHANGELOG.md` for client-visible API or behavior changes.
+- Ensure real and `NonOperational` proxies stay aligned.
 
-### Naming Conventions
+### P3 - Concurrency and Swift 6 Readiness
 
-- Files: `PascalCase`, extensions use `+` (e.g., `UIView+RoundedColors.swift`)
-- Types/Protocols: `UpperCamelCase`
-- Variables/Functions: `lowerCamelCase`
-- No abbreviations except common ones (API, URL)
+- Shared mutable state must be synchronized using repo-standard queues, locks, or actors.
+- New Swift concurrency escape hatches (`@unchecked Sendable`, `nonisolated(unsafe)`) must be justified.
+- Public isolation changes (`@MainActor`, `Sendable`, actor conversion) are public API risks.
+- Prefer changes that make Swift 6 strict-concurrency migration easier, not noisier.
 
-### Swift Style
+### P4 - Telemetry Correctness
 
-- Use `guard` over `if` when possible, with `return` on separate line
-- Multi-line guards: each condition on separate line under `guard` keyword
-- 4-space indentation, max 160 character line width
-- Trailing commas: never
-- SwiftFormat and SwiftLint are used for enforcement
+- New signals must explicitly choose the correct pipeline: direct span, log-as-span, or Session Replay binary log.
+- Do not route non-Session-Replay data through `OTLPBackgroundHTTPLogExporter*` without a binary-body reason.
+- Prefer OpenTelemetry semantic dotted attribute keys (`screen.name`, `http.method`). Keep snake_case only when matching an existing module convention.
+- New span names, event names, attribute keys, header names, and error codes should be module constants, not copied inline.
+- Changes to retry/backoff, disk cap, endpoint choice, or required attributes are customer-visible.
 
-### Documentation
+### P5 - Packaging and Distribution
 
-- Use DocC (`///`) for all protocols and public API
-- DocC comments end with a period
-- Inline comments (`//`) for implementation details, no period for short comments
-- Format DocC parameters properly with blank lines between sections
+- Check `Package.swift` and xcframework manifest sync.
+- Check new targets, resources, products, binary wrappers, dSYM docs, and example app links.
+- Check dependency pinning, licenses, transitive dependency size, and CI action SHA pinning.
 
-## Testing Patterns
+### P6 - Test Value
 
-### Test Builders
+- Prefer tests that assert emitted telemetry, state transitions, configuration effects, and failure behavior.
+- Flag bare `XCTAssertNoThrow`, "not nil", or sleep-based tests when they do not prove behavior.
+- Public module APIs need both operational and non-operational coverage.
 
-Use the builder pattern for test setup. Builders are located in `Testing Support/Builders/`:
+### P7 - Style and Docs
 
-```swift
-final class AgentTestBuilder {
-    static func buildDefault() throws -> SplunkRum {
-        let configuration = try ConfigurationTestBuilder.buildDefault()
-        return try build(with: configuration)
-    }
+- Keep changes local to established module boundaries.
+- Follow SwiftFormat/SwiftLint/CODESTYLE
+- Add DocC for public API and CHANGELOG entries for client-visible changes.
 
-    static func build(with configuration: AgentConfiguration, ...) throws -> SplunkRum {
-        // Setup code
-    }
-}
-```
+## Design Assumptions to Surface in Reviews
 
-### Test Naming
+Call these out as design choices when a PR relies on or changes them:
 
-- Test files: `<ClassName>Tests.swift`
-- Test methods: `test<Behavior>()` or `test<Condition>_<Expected>()`
-
-## Build Commands
-
-```bash
-# Build for iOS Simulator
-xcodebuild build -scheme SplunkAgent -destination "OS=26.2,name=iPhone 17"
-
-# Run unit tests
-xcodebuild -scheme SplunkAgent -destination "OS=26.2,name=iPhone 17" test
-
-# Install SwiftLint
-brew install swiftlint
-```
-
-## Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `USE_SESSION_REPLAY_REPO` | Use repository-based SR dependencies (default: false) |
-| `USE_LOCAL_SESSION_REPLAY` | Use local path for SR (default: false) |
-| `SESSION_REPLAY_BRANCH` | Git branch for remote SR dependency (default: "develop") |
-| `SESSION_REPLAY_LOCAL_PATH` | Local path to SR repo (default: "../../smartlook-ios-sdk-private") |
-| `USE_DEVELOPMENT_PLUGINS` | Enable linter/formatter plugins (default: false) |
+1. Export buffering is disk-backed, not an in-memory bounded queue.
+2. Background `URLSession` scheduling, retry count, and disk caps define when data is delayed or dropped.
+3. `SplunkRum.shared` and session state assume a mostly singleton, install-once lifecycle.
+4. Sampling is chosen at session start; switching mid-session is a behavior/API change.
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `Package.swift` | SPM manifest with all targets and dependencies |
-| `SplunkAgent/Sources/SplunkAgent/Public API/` | Public API surface |
-| `SplunkCommon/Sources/SplunkCommon/Modules/Module.swift` | Core Module protocol |
-| `SplunkOpenTelemetryBackgroundExporter/.../OTLPEncoder/` | Custom OTLP/JSON encoder |
-| `SplunkOpenTelemetryBackgroundExporter/.../OTLPVersion.swift` | OTLP spec version tracking |
-| `.swiftformat` | SwiftFormat configuration |
-| `CODESTYLE.md` | Detailed code style guide |
-| `CHANGELOG.md` | Release notes for client-visible API and behavior changes |
-| `Development.md` | Build and test instructions |
-| `CONTRIBUTING.md` | Contribution guidelines |
-
-## Common Tasks
-
-### Adding a New Module
-
-1. Create `Splunk<ModuleName>/` directory with `Sources/` and `Tests/` subdirectories
-2. Implement the `Module` protocol in `<ModuleName>+Module.swift`
-3. Create configuration types implementing `ModuleConfiguration` and `RemoteModuleConfiguration`
-4. Add target to `Package.swift` in `generateMainTargets()`
-5. Update `tools/xcframework/Project.swift` to keep the xcframework target graph, platform settings, and dependencies in sync with `Package.swift`
-6. Add test target with builders and mocks
-
-### Adding a Public API Method
-
-1. Add to appropriate file in `SplunkAgent/Sources/SplunkAgent/Public API/`
-2. Add Objective-C bridge in `SplunkAgentObjC` if needed
-3. Document with DocC
-4. Add unit tests
-5. Update `CHANGELOG.md` when the change is visible to clients
-
-## PR Review Expectations
-
-- During PR review, call out missing CHANGELOG.md updates whenever a change is client-visible
-- Client-visible changes include public API changes and significant behavior changes that affect client applications
-- If such a change is present without a corresponding changelog entry, flag it explicitly in the review and request an update
-- During PR review, when `Package.swift` changes targets, products, supported platforms, or module dependencies, verify that `tools/xcframework/Project.swift` is updated to stay in sync, and vice versa
-- If one manifest changes without the corresponding update in the other manifest, flag it explicitly as a likely xcframework build drift issue
-
-## Dependencies
-
-- **opentelemetry-swift-core**: OpenTelemetry API and SDK (no protocol exporters - we use custom OTLP/JSON implementation)
-- **PLCrashReporter**: Crash reporting
-- **Cisco Binary Targets**: Session replay (via wrapper targets)
-
-## OTLP/JSON Encoder Architecture
-
-The SDK uses a custom OTLP/JSON encoder instead of the upstream `OpenTelemetryProtocolExporter` to reduce binary size. The implementation is located in `SplunkOpenTelemetryBackgroundExporter/Sources/.../OTLPEncoder/`.
-
-### Structure
-
-```
-OTLPEncoder/
-├── Adapters/                    # Convert OTel SDK types to OTLP models
-│   ├── LogRecordAdapter.swift   # ReadableLogRecord → OTLPLogRecord
-│   ├── MetricDataAdapter.swift  # MetricData → OTLPMetric
-│   ├── SpanDataAdapter.swift    # SpanData → OTLPSpan
-│   └── SplunkLogRecordAdapter.swift  # Binary data support for Session Replay
-├── EncodingWrappers/            # Custom Encodable wrappers for OTLP types
-│   ├── OTLPInt64.swift          # Encodes Int64 as decimal string
-│   ├── OTLPUInt64.swift         # Encodes UInt64 as decimal string
-│   ├── OTLPTraceId.swift        # Encodes as 32-char lowercase hex
-│   └── OTLPSpanId.swift         # Encodes as 16-char lowercase hex
-├── Models/                      # OTLP JSON data structures
-│   ├── Common/                  # Shared types (Resource, KeyValue, AnyValue)
-│   ├── Logs/                    # Log-specific models
-│   ├── Metrics/                 # Metric-specific models (Gauge, Sum, Histogram, etc.)
-│   └── Trace/                   # Span-specific models
-└── OTLPVersion.swift            # OTLP specification version tracking
-```
-
-### Key Design Decisions
-
-1. **JSON Encoding**: Uses Swift's `Encodable` with custom `encode(to:)` for OTLP-compliant JSON
-2. **String-encoded integers**: Large integers (timestamps, IDs) encoded as strings per OTLP spec
-3. **Base64 binary data**: `bytesValue` in `OTLPAnyValue` encodes binary data as base64
-4. **Null omission**: Optional fields with nil values are omitted from JSON output
-5. **Version tracking**: `OTLPVersion.swift` documents the OTLP specification version for maintenance
-
-## License
-
-Apache License 2.0. All source files must include the Splunk copyright header:
-
-```swift
-//
-/*
-Copyright 2026 Splunk Inc.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-...
-*/
-```
-
-## GitHub Actions Security
-
-All GitHub Actions used in workflows MUST be pinned to a specific commit SHA rather than a tag or branch version. This prevents malicious updates to third-party actions from compromising the CI/CD pipeline.
-
-**Example**:
-Instead of `uses: actions/checkout@v4`, use:
-`uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4`
+- `Package.swift` - SPM manifest; only `SplunkAgent` and `SplunkAgentObjC` are public products.
+- `SplunkAgent/Sources/SplunkAgent/Public API/` - public Swift API.
+- `SplunkAgentObjC/` - Objective-C bridge.
+- `SplunkCommon/Sources/SplunkCommon/Modules/Module.swift` - module protocol.
+- `SplunkOpenTelemetry/.../OTLPLogToSpanExporter.swift` - log/event to span conversion.
+- `SplunkOpenTelemetryBackgroundExporter/.../BackgroundHTTPClient.swift` - background upload and disk queue.
+- `SplunkOpenTelemetryBackgroundExporter/.../OTLPEncoder/` - custom OTLP/JSON encoder.
+- `tools/xcframework/Project.swift` - binary distribution manifest.
+- `tools/xcframework/scripts/check-manifest-sync.sh` - manifest drift check.
+- `TargetWrappers/` - Cisco binary target wrappers.
+- `dsymUploader/` - dSYM upload helper for clients.
+- `CHANGELOG.md`, `CODESTYLE.md`, `Development.md`, `CONTRIBUTING.md`.
