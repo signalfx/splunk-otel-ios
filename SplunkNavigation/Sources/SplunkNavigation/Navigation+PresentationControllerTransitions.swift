@@ -176,6 +176,8 @@ extension Navigation {
     }
 
     private func updateRestorationTransitionStart(event: any PresentationActionEvent) async {
+        // .noScreen means there was no prior screen to restore; dismissalWillBegin
+        // has no span to open for that path, so bail early.
         guard case let .screen(state) = await model.pendingPresentationRestoration(for: event.presentationControllerIdentifier) else {
             return
         }
@@ -193,6 +195,8 @@ extension Navigation {
     }
 
     private func finalizeRestorationTransition(event: any PresentationActionEvent) async {
+        // Treat a missing completed flag as success: dismissalDidEnd without an
+        // explicit false means the presentation controller finished normally.
         guard event.completed ?? true else {
             await model.removeNavigation(for: event.presentationControllerIdentifier)
             return
@@ -202,6 +206,8 @@ extension Navigation {
             return
         }
 
+        // existingNavigation is nil only when dismissalWillBegin was skipped (the .noScreen path);
+        // fall back to event.timestamp so the span still has a valid start time.
         let existingNavigation = await model.navigation(for: event.presentationControllerIdentifier)
         let start = existingNavigation?.start ?? event.timestamp
 

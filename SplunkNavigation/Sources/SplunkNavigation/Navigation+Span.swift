@@ -83,6 +83,9 @@ extension Navigation {
 
         screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
         screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
+        // Explicit nil clear when there is no previous screen: a span processor may have
+        // already injected last.screen.name before we reach this point, so omitting the
+        // setAttribute call would leave a stale value on the span.
         if let lastScreenName {
             screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
         }
@@ -94,6 +97,9 @@ extension Navigation {
         screenNameSpan.end(time: start)
     }
 
+    /// Attributes passed to this overload have already been filtered by effectiveCustomAttributes(from:),
+    /// which strips SDK-reserved keys. The [String: Any] overload filters inline because it is called
+    /// directly from the public track(screen:attributes:) path with raw caller input.
     func send(screenName: String, lastScreenName: String?, start: Date, attributes: [String: AttributeValue]) {
         // A new zero length span for change screen name event
         let screenNameSpan =
@@ -109,8 +115,14 @@ extension Navigation {
 
         screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
         screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
+        // Explicit nil clear when there is no previous screen: a span processor may have
+        // already injected last.screen.name before we reach this point, so omitting the
+        // setAttribute call would leave a stale value on the span.
         if let lastScreenName {
             screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        }
+        else {
+            screenNameSpan.setAttribute(key: Self.lastScreenNameKey, value: nil as AttributeValue?)
         }
         screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
