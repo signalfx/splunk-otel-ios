@@ -19,12 +19,13 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 - Inspect nearby code before editing and match the established module, naming, `// MARK: -`, and test-support patterns.
 - For new modules, use `Splunk<Module>/Sources/Splunk<Module>/` and `Splunk<Module>/Tests/Splunk<Module>Tests/` with `Testing Support/Builders` and `Testing Support/Mocks`.
 - Public API and protocols need DocC; new source files need the license header from `CODESTYLE.md`.
+- SDK instrumentation must be defensive: never let telemetry collection crash the host app. Prefer no-op, drop, or internal logging over `fatalError`, `try!`, forced unwraps, or uncaught errors in production paths.
 - For style-heavy, build/distribution, or contribution-process changes, read `CODESTYLE.md`, `Development.md`, or `CONTRIBUTING.md` before editing.
 
 ## Telemetry Model
 
-- Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector use `Tracer.spanBuilder` -> `SimpleSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
-- Log-as-span: CustomTracking, CrashReports, Interactions, and internal agent events emit log records that `OTLPLogToSpanExporter` converts to spans and sends to the trace endpoint.
+- Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector, CrashReports crash payloads, and CustomTracking workflows use `Tracer.spanBuilder` -> `SimpleSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
+- Log-as-span: CustomTracking events/errors, Interactions, internal agent events, and agent events published through `DefaultEventManager` emit log records that `OTLPLogToSpanExporter` converts to spans and sends to the trace endpoint.
 - Binary logs: Session Replay is the exception; it uses `OTLPSessionReplayEventProcessor` -> `OTLPBackgroundHTTPLogExporterBinary`.
 - There is no production `BatchSpanProcessor` / `BatchLogRecordProcessor`. Record buffering is disk-backed in the background exporters.
 - Uploads use `URLSessionConfiguration.background(withIdentifier:)`, not `UIApplication.beginBackgroundTask`.
@@ -66,11 +67,12 @@ This repo is not migrated to Swift 6 strict concurrency. New code should reduce 
 
 Review findings in this order. Prioritize quality and production performance over style.
 
-### P1 - Production Performance
+### P1 - Production Performance and Host-App Safety
 
-Block or request measurement for changes that add avoidable overhead to host apps at scale.
+Block changes that can crash the host app. Block or request measurement for changes that add avoidable overhead to host apps at scale.
 
 - Watch hot paths: span/log emission, export pipeline, swizzled `URLSession`, navigation, interactions, slow-frame detection, crashes, and Session Replay.
+- Flag `try!`, forced unwraps, unchecked array/dictionary access, uncaught thrown errors, or assertions that can terminate production host apps from instrumentation paths.
 - Flag per-event encoder/formatter creation, `NSError`, reflection, `String(format:)`, repeated `Bundle` / `FileManager` / `UserDefaults` reads, O(n) scans over growing collections, main-thread I/O, unbounded memory, missing observer teardown, and display-link leaks.
 - Flag meaningful binary-size increases, especially dependencies that undermine the custom OTLP encoder's size-saving purpose.
 - Ask for Instruments, allocation, signpost, or app-level measurement when the cost is not obvious.
