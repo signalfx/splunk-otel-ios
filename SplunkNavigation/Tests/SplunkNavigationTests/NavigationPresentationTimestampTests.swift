@@ -32,7 +32,9 @@ final class NavigationPresentationTimestampTests: XCTestCase {
         let presentingController = PresentingViewController()
         let presentedController = PresentedViewController()
 
-        let (module, provider) = makeModule(autoTrackingEnabled: true)
+        let provider = MockPresentationEventStreamProvider()
+        let module = Navigation(navigationEventStreamProvider: provider)
+        module.preferences.enableAutomatedTracking = true
         module.startDetection()
 
         let eventTimestamp = Date(timeIntervalSinceNow: -1)
@@ -53,18 +55,5 @@ final class NavigationPresentationTimestampTests: XCTestCase {
 
         let start = await module.model.navigation(for: controllerIdentifier)?.start
         XCTAssertEqual(start, eventTimestamp)
-    }
-
-
-    // MARK: - Helpers
-
-    @MainActor
-    private func makeModule(
-        autoTrackingEnabled: Bool
-    ) -> (Navigation, MockPresentationEventStreamProvider) {
-        let provider = MockPresentationEventStreamProvider()
-        let module = Navigation(navigationEventStreamProvider: provider)
-        module.preferences.enableAutomatedTracking = autoTrackingEnabled
-        return (module, provider)
     }
 }
