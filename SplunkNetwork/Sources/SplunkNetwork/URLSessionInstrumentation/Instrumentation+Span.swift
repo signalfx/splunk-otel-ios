@@ -110,7 +110,7 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
     }
 
     if let error = task.error {
-        span.clearAndSetAttribute(key: NetworkSpanAttributes.error, value: true)
+        span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
         span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: error.localizedDescription)
         span.clearAndSetAttribute(key: SemanticConventions.Error.type, value: String(describing: type(of: error)))
 
@@ -135,7 +135,7 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
 func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
     span.clearAndSetAttribute(key: SemanticConventions.Http.requestBodySize, value: length)
     span.clearAndSetAttribute(key: SemanticConventions.Http.requestMethod, value: method)
-    span.clearAndSetAttribute(key: NetworkSpanAttributes.component, value: NetworkSpanAttributes.componentValueHttp)
+    span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.component, value: NetworkSpanAttributeValues.component)
 
     span.clearAndSetAttribute(key: SemanticConventions.Url.path, value: url.path)
     span.clearAndSetAttribute(key: SemanticConventions.Url.query, value: url.query ?? "")
@@ -165,14 +165,14 @@ func addDataToSpan(url: URL, method: String, length: Int, span: Span) {
 
     if let sharedState = NetworkInstrumentationManager.shared.getModule()?.sharedState {
         let sessionID: String = sharedState.sessionId
-        span.clearAndSetAttribute(key: NetworkSpanAttributes.sessionId, value: sessionID)
+        span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.sessionId, value: sessionID)
     }
 }
 
 /// Adds configured request headers as span attributes.
 ///
 /// Only headers whose lowercased names appear in the module's `capturedRequestHeaders`
-/// set are captured. Each matching header is stored using ``NetworkSpanAttributes/requestHeader(_:)``.
+/// set are captured. Each matching header is stored using ``NetworkSpanAttributeKeys/requestHeader(_:)``.
 func addCapturedRequestHeaders(from request: URLRequest, to span: Span) {
     let headerNames = NetworkInstrumentationManager.shared.getModule()?.getCapturedRequestHeaders() ?? []
 
@@ -182,7 +182,7 @@ func addCapturedRequestHeaders(from request: URLRequest, to span: Span) {
 
     for headerName in headerNames {
         if let value = request.value(forHTTPHeaderField: headerName) {
-            span.clearAndSetAttribute(key: NetworkSpanAttributes.requestHeader(headerName), value: value)
+            span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.requestHeader(headerName), value: value)
         }
     }
 }
@@ -190,7 +190,7 @@ func addCapturedRequestHeaders(from request: URLRequest, to span: Span) {
 /// Adds configured response headers as span attributes.
 ///
 /// Only headers whose lowercased names appear in the module's `capturedResponseHeaders`
-/// set are captured. Each matching header is stored using ``NetworkSpanAttributes/responseHeader(_:)``.
+/// set are captured. Each matching header is stored using ``NetworkSpanAttributeKeys/responseHeader(_:)``.
 func addCapturedResponseHeaders(from response: HTTPURLResponse, to span: Span) {
     let headerNames = NetworkInstrumentationManager.shared.getModule()?.getCapturedResponseHeaders() ?? []
 
@@ -200,7 +200,7 @@ func addCapturedResponseHeaders(from response: HTTPURLResponse, to span: Span) {
 
     for headerName in headerNames {
         if let value = response.value(forHTTPHeaderField: headerName) {
-            span.clearAndSetAttribute(key: NetworkSpanAttributes.responseHeader(headerName), value: value)
+            span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.responseHeader(headerName), value: value)
         }
     }
 }

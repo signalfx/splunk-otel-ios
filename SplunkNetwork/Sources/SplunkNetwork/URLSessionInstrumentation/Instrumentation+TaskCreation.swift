@@ -284,7 +284,7 @@ func endHttpSpanFromCompletion(span: Span, response: URLResponse?, error: Error?
     }
 
     if let error {
-        span.clearAndSetAttribute(key: NetworkSpanAttributes.error, value: true)
+        span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
         span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: error.localizedDescription)
     }
 

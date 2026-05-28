@@ -123,8 +123,8 @@ final class CapturedHeadersTests: XCTestCase {
         let span = MockSpan()
         addCapturedRequestHeaders(from: request, to: span)
 
-        XCTAssertEqual(span.attributes[NetworkSpanAttributes.requestHeader("x-request-id")], .string("abc-123"))
-        XCTAssertEqual(span.attributes[NetworkSpanAttributes.requestHeader("accept")], .string("application/json"))
+        XCTAssertEqual(span.attributes[NetworkSpanAttributeKeys.requestHeader("x-request-id")], .string("abc-123"))
+        XCTAssertEqual(span.attributes[NetworkSpanAttributeKeys.requestHeader("accept")], .string("application/json"))
     }
 
     func testRequestHeadersCaseInsensitiveMatching() throws {
@@ -139,7 +139,7 @@ final class CapturedHeadersTests: XCTestCase {
         let span = MockSpan()
         addCapturedRequestHeaders(from: request, to: span)
 
-        XCTAssertEqual(span.attributes[NetworkSpanAttributes.requestHeader("content-type")], .string("text/html"))
+        XCTAssertEqual(span.attributes[NetworkSpanAttributeKeys.requestHeader("content-type")], .string("text/html"))
     }
 
     func testMissingRequestHeadersNotAddedToSpan() throws {
@@ -153,7 +153,7 @@ final class CapturedHeadersTests: XCTestCase {
         let span = MockSpan()
         addCapturedRequestHeaders(from: request, to: span)
 
-        XCTAssertNil(span.attributes[NetworkSpanAttributes.requestHeader("x-missing-header")])
+        XCTAssertNil(span.attributes[NetworkSpanAttributeKeys.requestHeader("x-missing-header")])
     }
 
     func testNoRequestHeadersCapturedWhenNotConfigured() throws {
@@ -167,7 +167,7 @@ final class CapturedHeadersTests: XCTestCase {
         addCapturedRequestHeaders(from: request, to: span)
 
         XCTAssertFalse(
-            span.attributes.keys.contains { $0.hasPrefix(NetworkSpanAttributes.requestHeaderPrefix) },
+            span.attributes.keys.contains { $0.hasPrefix(NetworkSpanAttributeKeys.requestHeaderPrefix) },
             "No request headers should be captured when not configured"
         )
     }
@@ -197,8 +197,8 @@ final class CapturedHeadersTests: XCTestCase {
         let span = MockSpan()
         addCapturedResponseHeaders(from: response, to: span)
 
-        XCTAssertEqual(span.attributes[NetworkSpanAttributes.responseHeader("content-type")], .string("application/json"))
-        XCTAssertEqual(span.attributes[NetworkSpanAttributes.responseHeader("x-request-id")], .string("resp-456"))
+        XCTAssertEqual(span.attributes[NetworkSpanAttributeKeys.responseHeader("content-type")], .string("application/json"))
+        XCTAssertEqual(span.attributes[NetworkSpanAttributeKeys.responseHeader("x-request-id")], .string("resp-456"))
     }
 
     func testResponseHeadersCaseInsensitiveMatching() throws {
@@ -220,7 +220,7 @@ final class CapturedHeadersTests: XCTestCase {
         let span = MockSpan()
         addCapturedResponseHeaders(from: response, to: span)
 
-        XCTAssertEqual(span.attributes[NetworkSpanAttributes.responseHeader("server")], .string("nginx"))
+        XCTAssertEqual(span.attributes[NetworkSpanAttributeKeys.responseHeader("server")], .string("nginx"))
     }
 
     func testMissingResponseHeadersNotAddedToSpan() throws {
@@ -242,7 +242,7 @@ final class CapturedHeadersTests: XCTestCase {
         let span = MockSpan()
         addCapturedResponseHeaders(from: response, to: span)
 
-        XCTAssertNil(span.attributes[NetworkSpanAttributes.responseHeader("x-missing-header")])
+        XCTAssertNil(span.attributes[NetworkSpanAttributeKeys.responseHeader("x-missing-header")])
     }
 
     func testNoResponseHeadersCapturedWhenNotConfigured() throws {
@@ -263,7 +263,7 @@ final class CapturedHeadersTests: XCTestCase {
         addCapturedResponseHeaders(from: response, to: span)
 
         XCTAssertFalse(
-            span.attributes.keys.contains { $0.hasPrefix(NetworkSpanAttributes.responseHeaderPrefix) },
+            span.attributes.keys.contains { $0.hasPrefix(NetworkSpanAttributeKeys.responseHeaderPrefix) },
             "No response headers should be captured when not configured"
         )
     }
@@ -285,9 +285,9 @@ final class CapturedHeadersTests: XCTestCase {
         let requestSpan = MockSpan()
         addCapturedRequestHeaders(from: request, to: requestSpan)
 
-        XCTAssertNotNil(requestSpan.attributes[NetworkSpanAttributes.requestHeader("accept")])
+        XCTAssertNotNil(requestSpan.attributes[NetworkSpanAttributeKeys.requestHeader("accept")])
         XCTAssertNil(
-            requestSpan.attributes[NetworkSpanAttributes.requestHeader("authorization")],
+            requestSpan.attributes[NetworkSpanAttributeKeys.requestHeader("authorization")],
             "Authorization header should not be captured when not in the configured list"
         )
 
@@ -307,9 +307,9 @@ final class CapturedHeadersTests: XCTestCase {
         let responseSpan = MockSpan()
         addCapturedResponseHeaders(from: response, to: responseSpan)
 
-        XCTAssertNotNil(responseSpan.attributes[NetworkSpanAttributes.responseHeader("content-type")])
+        XCTAssertNotNil(responseSpan.attributes[NetworkSpanAttributeKeys.responseHeader("content-type")])
         XCTAssertNil(
-            responseSpan.attributes[NetworkSpanAttributes.responseHeader("set-cookie")],
+            responseSpan.attributes[NetworkSpanAttributeKeys.responseHeader("set-cookie")],
             "Set-Cookie header should not be captured when not in the configured list"
         )
     }

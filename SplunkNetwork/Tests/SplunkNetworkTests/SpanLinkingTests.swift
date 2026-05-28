@@ -106,8 +106,8 @@ final class SpanLinkingTests: XCTestCase {
 
         addLinkToSpan(span: mockSpan, valStr: valStr)
 
-        XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributes.linkTraceId]?.description, "0af7651916cd43dd8448eb211c80319c")
-        XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributes.linkSpanId]?.description, "b7ad6b7169203331")
+        XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributeKeys.linkTraceId]?.description, "0af7651916cd43dd8448eb211c80319c")
+        XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributeKeys.linkSpanId]?.description, "b7ad6b7169203331")
     }
 
     func testAddLinkToSpan_ValidTraceParent_DoubleQuotes() {
@@ -116,8 +116,8 @@ final class SpanLinkingTests: XCTestCase {
 
         addLinkToSpan(span: mockSpan, valStr: valStr)
 
-        XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributes.linkTraceId]?.description, "0af7651916cd43dd8448eb211c80319c")
-        XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributes.linkSpanId]?.description, "b7ad6b7169203331")
+        XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributeKeys.linkTraceId]?.description, "0af7651916cd43dd8448eb211c80319c")
+        XCTAssertEqual(mockSpan.attributes[NetworkSpanAttributeKeys.linkSpanId]?.description, "b7ad6b7169203331")
     }
 
     func testAddLinkToSpan_InvalidTraceParent() {
@@ -127,8 +127,8 @@ final class SpanLinkingTests: XCTestCase {
         addLinkToSpan(span: mockSpan, valStr: valStr)
 
         // Should not add attributes for invalid traceparent
-        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributes.linkTraceId])
-        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributes.linkSpanId])
+        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkTraceId])
+        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkSpanId])
     }
 
     func testAddLinkToSpan_EmptyString() {
@@ -137,7 +137,7 @@ final class SpanLinkingTests: XCTestCase {
 
         addLinkToSpan(span: mockSpan, valStr: valStr)
 
-        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributes.linkTraceId])
-        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributes.linkSpanId])
+        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkTraceId])
+        XCTAssertNil(mockSpan.attributes[NetworkSpanAttributeKeys.linkSpanId])
     }
 }
