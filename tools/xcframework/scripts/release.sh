@@ -5,13 +5,14 @@
 # uploads to GitHub releases.
 #
 # Usage:
-#   ./scripts/release.sh VERSION [--upload | --upload-to TAG]
+#   ./scripts/release.sh VERSION [--ios-only] [--upload | --upload-to TAG]
 #
 # Options:
 #   --upload       Create a new GitHub release and upload the zip
 #                  (requires GITHUB_TOKEN or `gh auth login`)
 #   --upload-to TAG  Upload the zip to an existing GitHub release
 #                    identified by TAG (e.g., "1.2.0")
+#   --ios-only    Package as the iOS-only distribution
 #
 # Prerequisites:
 #   - All xcframeworks built in output/xcframeworks/
@@ -19,7 +20,8 @@
 #   - gh CLI installed (only for --upload)
 #
 # Output:
-#   output/SplunkAgent-XCFrameworks-VERSION.zip
+#   output/SplunkAgent-XCFrameworks.zip
+#   output/SplunkAgent-XCFrameworks-iOS-only.zip when --ios-only is used
 
 set -euo pipefail
 
@@ -31,10 +33,11 @@ XCFW_DIR="${OUTPUT_DIR}/xcframeworks"
 VERSION="${1:-}"
 UPLOAD=false
 UPLOAD_TO_TAG=""
+IOS_ONLY="${IOS_ONLY:-false}"
 
 if [[ -z "${VERSION}" ]]; then
     echo "ERROR: Version required."
-    echo "  Usage: $0 VERSION [--upload | --upload-to TAG]"
+    echo "  Usage: $0 VERSION [--ios-only] [--upload | --upload-to TAG]"
     exit 1
 fi
 
@@ -43,6 +46,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --upload) UPLOAD=true; shift ;;
         --upload-to) UPLOAD_TO_TAG="$2"; shift 2 ;;
+        --ios-only) IOS_ONLY=true; shift ;;
         *) echo "Unknown arg: $1"; exit 1 ;;
     esac
 done
@@ -51,7 +55,11 @@ log() {
     echo "==> $*"
 }
 
-ZIP_NAME="SplunkAgent-XCFrameworks-${VERSION}.zip"
+if [[ "${IOS_ONLY}" == "true" ]]; then
+    ZIP_NAME="SplunkAgent-XCFrameworks-iOS-only.zip"
+else
+    ZIP_NAME="SplunkAgent-XCFrameworks.zip"
+fi
 ZIP_PATH="${OUTPUT_DIR}/${ZIP_NAME}"
 
 # ---------------------------------------------------------------------------
@@ -59,7 +67,11 @@ ZIP_PATH="${OUTPUT_DIR}/${ZIP_NAME}"
 # ---------------------------------------------------------------------------
 
 log "Generating dependency manifest..."
-"${SCRIPT_DIR}/generate-dependency-manifest.sh" --version "${VERSION}"
+MANIFEST_ARGS=(--version "${VERSION}")
+if [[ "${IOS_ONLY}" == "true" ]]; then
+    MANIFEST_ARGS+=(--ios-only)
+fi
+"${SCRIPT_DIR}/generate-dependency-manifest.sh" "${MANIFEST_ARGS[@]}"
 
 
 # ---------------------------------------------------------------------------
@@ -68,15 +80,21 @@ log "Generating dependency manifest..."
 
 log "Packaging xcframeworks into ${ZIP_NAME}..."
 
-# Remove existing zip
-rm -f "${ZIP_PATH}"
+# Remove existing xcframework packages so CI/local artifact globs do not pick up
+# stale versioned packages from older script versions.
+rm -f "${OUTPUT_DIR}"/SplunkAgent-XCFrameworks*.zip
 
-# Create zip from the xcframeworks directory
-# Include the manifest alongside the xcframeworks
+# Create zip from the xcframeworks directory.
+# Include dependency metadata and Cisco source traceability when present.
 cd "${OUTPUT_DIR}"
+
+ZIP_INPUTS=(xcframeworks/*.xcframework dependency-manifest.json)
+if [[ -f "xcframeworks/cisco-release-manifest.txt" ]]; then
+    ZIP_INPUTS+=(xcframeworks/cisco-release-manifest.txt)
+fi
+
 zip -r -y "${ZIP_NAME}" \
-    xcframeworks/*.xcframework \
-    dependency-manifest.json \
+    "${ZIP_INPUTS[@]}" \
     -x "*.DS_Store"
 
 ZIP_SIZE="$(du -sh "${ZIP_PATH}" | cut -f1)"
@@ -124,6 +142,11 @@ echo "============================================================"
 echo "  Release Package Ready"
 echo "============================================================"
 echo "  Version:  ${VERSION}"
+if [[ "${IOS_ONLY}" == "true" ]]; then
+    echo "  Variant:  iOS-only"
+else
+    echo "  Variant:  all platforms"
+fi
 echo "  Package:  ${ZIP_PATH}"
 echo "  Size:     ${ZIP_SIZE}"
 echo ""

@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-05-18
+
 ### Added
 
 * Added automated screen tracking for `UIViewController` transitions #590
@@ -21,6 +23,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Navigation spans now use the span name `app.ui.navigation` (previously `screen name change`). #625
 * HTTP client spans now emit the OpenTelemetry `network.protocol.version` attribute instead of the deprecated `http.protocol.version` key. #656
+
+### Fixed
+
+* Fixed xcframework build system. #647
 
 ## [2.2.3] - 2026-05-12
 

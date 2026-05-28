@@ -1,33 +1,26 @@
 #!/bin/bash
 # tools/xcframework/scripts/sign-and-upload.sh
 #
-# Local signing workflow: downloads unsigned xcframeworks from CI,
-# signs them with a local certificate, validates, packages, and
-# uploads to an existing GitHub release.
+# Local release workflow: builds all xcframeworks, signs them with a local
+# certificate, validates, packages, and optionally uploads to an existing
+# GitHub release.
 #
-# This is a temporary replacement for the automated CI signing job
-# (Job 2 in build-xcframeworks.yml) while distribution certificates
-# cannot be stored in GitHub secrets.
-#
-# Prerequisites:
-#   - gh CLI installed and authenticated (brew install gh)
-#   - Apple distribution certificate in your local keychain
-#   - The build-xcframeworks CI workflow must have completed successfully
+# Default mode is fully local and requires SESSION_REPLAY_LOCAL_PATH (or
+# --session-replay-path) so Cisco frameworks are built as dynamic frameworks
+# from the Session Replay repository. The --run-id mode is a legacy path for
+# downloading a prebuilt unsigned artifact and must not refresh Cisco from
+# Package.swift static binary target URLs.
 #
 # Usage:
-#   ./scripts/sign-and-upload.sh VERSION [OPTIONS]
+#   SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay ./scripts/sign-and-upload.sh VERSION [OPTIONS]
 #
 # Options:
-#   --run-id ID        GitHub Actions run ID to download artifact from
-#                      (default: latest successful build-xcframeworks run)
-#   --identity NAME    Signing identity (default: auto-detected)
-#   --skip-upload      Sign and package only, don't upload to GitHub
-#
-# Examples:
-#   ./scripts/sign-and-upload.sh 1.2.0
-#   ./scripts/sign-and-upload.sh 1.2.0 --run-id 12345678
-#   ./scripts/sign-and-upload.sh 1.2.0 --identity "Apple Distribution: Splunk Inc. (TEAMID)"
-#   ./scripts/sign-and-upload.sh 1.2.0 --skip-upload
+#   --run-id ID               Legacy mode: download unsigned artifact from a GitHub Actions run
+#   --identity NAME           Signing identity (default: auto-detected)
+#   --session-replay-path DIR Local Session Replay repo path for default local mode
+#   --ios-only                Build, sign, validate, and package only iOS device/simulator slices
+#   --upload-to TAG           Upload to a release tag other than VERSION
+#   --skip-upload             Sign and package only, do not require gh unless --run-id is used
 
 set -euo pipefail
 
@@ -39,21 +32,48 @@ OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 VERSION="${1:-}"
 RUN_ID=""
 SIGNING_IDENTITY=""
+SESSION_REPLAY_PATH="${SESSION_REPLAY_LOCAL_PATH:-}"
+IOS_ONLY="${IOS_ONLY:-false}"
+UPLOAD_TO_TAG=""
 SKIP_UPLOAD=false
 
 if [[ -z "${VERSION}" ]]; then
     echo "ERROR: Version required."
-    echo "  Usage: $0 VERSION [--run-id ID] [--identity NAME] [--skip-upload]"
+    echo "  Usage: $0 VERSION [--run-id ID] [--identity NAME] [--session-replay-path DIR] [--ios-only] [--upload-to TAG] [--skip-upload]"
     exit 1
 fi
 
 shift
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --run-id) RUN_ID="$2"; shift 2 ;;
-        --identity) SIGNING_IDENTITY="$2"; shift 2 ;;
-        --skip-upload) SKIP_UPLOAD=true; shift ;;
-        *) echo "Unknown arg: $1"; exit 1 ;;
+        --run-id)
+            RUN_ID="$2"
+            shift 2
+            ;;
+        --identity)
+            SIGNING_IDENTITY="$2"
+            shift 2
+            ;;
+        --session-replay-path)
+            SESSION_REPLAY_PATH="$2"
+            shift 2
+            ;;
+        --ios-only)
+            IOS_ONLY=true
+            shift
+            ;;
+        --upload-to)
+            UPLOAD_TO_TAG="$2"
+            shift 2
+            ;;
+        --skip-upload)
+            SKIP_UPLOAD=true
+            shift
+            ;;
+        *)
+            echo "Unknown arg: $1"
+            exit 1
+            ;;
     esac
 done
 
@@ -62,158 +82,157 @@ log() {
     echo "==> $*"
 }
 
-manifest_metadata_value() {
-    local key="$1"
-    local manifest_path="$2"
-
-    awk -F= -v key="${key}" '$1 == key { print substr($0, index($0, "=") + 1); exit }' "${manifest_path}"
+fail() {
+    echo "ERROR: $*" >&2
+    exit 1
 }
 
-# ---------------------------------------------------------------------------
-# Preflight checks
-# ---------------------------------------------------------------------------
+require_gh() {
+    if ! command -v gh &> /dev/null; then
+        fail "gh CLI not installed. Install with: brew install gh"
+    fi
 
-log "Preflight checks"
+    if ! gh auth status &> /dev/null; then
+        fail "gh CLI not authenticated. Run: gh auth login"
+    fi
 
-if ! command -v gh &> /dev/null; then
-    echo "ERROR: gh CLI not installed. Install with: brew install gh"
-    exit 1
-fi
+    echo "  gh CLI authenticated"
+}
 
-if ! gh auth status &> /dev/null; then
-    echo "ERROR: gh CLI not authenticated. Run: gh auth login"
-    exit 1
-fi
+resolve_repo_full_name() {
+    cd "${REPO_ROOT}"
+    gh repo view --json nameWithOwner -q .nameWithOwner
+}
 
-echo "  ✓ gh CLI authenticated"
+resolve_signing_identity() {
+    if [[ -n "${SIGNING_IDENTITY}" ]]; then
+        echo "  Using identity: ${SIGNING_IDENTITY}"
+        return
+    fi
 
-# ---------------------------------------------------------------------------
-# Step 1: Resolve signing identity
-# ---------------------------------------------------------------------------
-
-log "Resolving signing identity"
-
-if [[ -z "${SIGNING_IDENTITY}" ]]; then
-    # Auto-detect: pick the first valid codesigning identity
-    RAW="$(security find-identity -v -p codesigning)"
-    SIGNING_IDENTITY="$(echo "${RAW}" | grep '"' | head -1 | sed 's/.*"\(.*\)".*/\1/')"
+    local raw
+    raw="$(security find-identity -v -p codesigning)"
+    SIGNING_IDENTITY="$(echo "${raw}" | grep '"' | head -1 | sed 's/.*"\(.*\)".*/\1/')"
 
     if [[ -z "${SIGNING_IDENTITY}" ]]; then
-        echo "ERROR: No codesigning identity found in keychain."
-        echo "  Available identities:"
+        echo "Available identities:"
         security find-identity -v -p codesigning
-        echo ""
-        echo "  Provide one explicitly with --identity"
-        exit 1
+        fail "No codesigning identity found in keychain. Provide one explicitly with --identity."
     fi
-fi
 
-echo "  Using identity: ${SIGNING_IDENTITY}"
+    echo "  Using identity: ${SIGNING_IDENTITY}"
+}
 
-# ---------------------------------------------------------------------------
-# Step 2: Download unsigned xcframeworks from CI
-# ---------------------------------------------------------------------------
+require_session_replay_path() {
+    if [[ -z "${SESSION_REPLAY_PATH}" ]]; then
+        fail "SESSION_REPLAY_LOCAL_PATH is required in local mode. Set it or pass --session-replay-path."
+    fi
 
-log "Downloading unsigned xcframeworks from CI"
+    if [[ ! -d "${SESSION_REPLAY_PATH}" ]]; then
+        fail "Session Replay repository not found: ${SESSION_REPLAY_PATH}"
+    fi
 
-# Clean output directory
-rm -rf "${OUTPUT_DIR}"
-mkdir -p "${OUTPUT_DIR}"
+    SESSION_REPLAY_PATH="$(cd "${SESSION_REPLAY_PATH}" && pwd)"
 
-ARTIFACT_NAME="splunk-agent-xcframeworks-unsigned"
+    if [[ ! -x "${SESSION_REPLAY_PATH}/Tools/build_frameworks.sh" ]]; then
+        fail "Session Replay build script is missing or not executable: ${SESSION_REPLAY_PATH}/Tools/build_frameworks.sh"
+    fi
+}
 
-if [[ -n "${RUN_ID}" ]]; then
-    echo "  Downloading from run ID: ${RUN_ID}"
+download_legacy_artifact() {
+    log "Downloading unsigned xcframeworks from CI run ${RUN_ID}"
+
+    rm -rf "${OUTPUT_DIR}"
+    mkdir -p "${OUTPUT_DIR}"
+
     gh run download "${RUN_ID}" \
-        -n "${ARTIFACT_NAME}" \
+        -n "splunk-agent-xcframeworks-unsigned" \
         -D "${OUTPUT_DIR}" \
-        -R "$(cd "${REPO_ROOT}" && gh repo view --json nameWithOwner -q .nameWithOwner)" 2>&1
-else
-    echo "  Finding latest successful build-xcframeworks run..."
-    RUN_ID="$(cd "${REPO_ROOT}" && gh run list \
-        --workflow=build-xcframeworks.yml \
-        --status=success \
-        --limit=1 \
-        --json databaseId \
-        -q '.[0].databaseId')"
+        -R "$(resolve_repo_full_name)"
 
-    if [[ -z "${RUN_ID}" || "${RUN_ID}" == "null" ]]; then
-        echo "ERROR: No successful build-xcframeworks run found."
-        echo "  Trigger a build first or provide a run ID with --run-id"
-        exit 1
+    local xcfw_count
+    xcfw_count="$(find "${OUTPUT_DIR}" -maxdepth 1 -name "*.xcframework" -type d | wc -l | tr -d ' ')"
+    if [[ "${xcfw_count}" -eq 0 ]]; then
+        echo "Contents of ${OUTPUT_DIR}:"
+        ls -la "${OUTPUT_DIR}"
+        fail "No xcframeworks found after artifact download."
     fi
 
-    echo "  Downloading from latest run: ${RUN_ID}"
-    (cd "${REPO_ROOT}" && gh run download "${RUN_ID}" \
-        -n "${ARTIFACT_NAME}" \
-        -D "${OUTPUT_DIR}")
-fi
+    echo "  Downloaded ${xcfw_count} xcframeworks"
+}
 
-# Verify download
-XCFW_COUNT="$(find "${OUTPUT_DIR}" -name "*.xcframework" -maxdepth 1 -type d | wc -l | tr -d ' ')"
-if [[ "${XCFW_COUNT}" -eq 0 ]]; then
-    echo "ERROR: No xcframeworks found after download."
-    echo "  Contents of ${OUTPUT_DIR}:"
-    ls -la "${OUTPUT_DIR}"
-    exit 1
-fi
+build_local_artifacts() {
+    require_session_replay_path
 
-echo "  ✓ Downloaded ${XCFW_COUNT} xcframeworks"
+    log "Building xcframeworks locally"
+    cd "${TOOLS_ROOT}"
+    SESSION_REPLAY_LOCAL_PATH="${SESSION_REPLAY_PATH}" IOS_ONLY="${IOS_ONLY}" make clean build
+}
 
-# ---------------------------------------------------------------------------
-# Step 2b: Refresh Cisco xcframeworks from source (default)
-# ---------------------------------------------------------------------------
-# Cisco frameworks are pre-built external artifacts. Refreshing them from
-# source ensures we package untouched vendor binaries/signatures.
-"${SCRIPT_DIR}/refresh-cisco-xcframeworks.sh" --output-dir "${OUTPUT_DIR}"
+main() {
+    local legacy_mode=false
+    if [[ -n "${RUN_ID}" ]]; then
+        legacy_mode=true
+    fi
 
-CISCO_MANIFEST_PATH="${OUTPUT_DIR}/cisco-release-manifest.txt"
-CISCO_SOURCE_COMMIT=""
-if [[ -f "${CISCO_MANIFEST_PATH}" ]]; then
-    CISCO_SOURCE_COMMIT="$(manifest_metadata_value "source_commit" "${CISCO_MANIFEST_PATH}")"
-fi
+    log "Preflight checks"
+    if [[ "${SKIP_UPLOAD}" != "true" || "${legacy_mode}" == "true" ]]; then
+        require_gh
+    else
+        echo "  gh CLI not required for --skip-upload local mode"
+    fi
 
-# ---------------------------------------------------------------------------
-# Step 3: Sign
-# ---------------------------------------------------------------------------
+    log "Resolving signing identity"
+    resolve_signing_identity
 
-log "Signing xcframeworks"
+    if [[ "${legacy_mode}" == "true" ]]; then
+        download_legacy_artifact
+    else
+        build_local_artifacts
+    fi
 
-"${SCRIPT_DIR}/sign-xcframeworks.sh" "${SIGNING_IDENTITY}"
+    log "Signing non-Cisco xcframeworks"
+    "${SCRIPT_DIR}/sign-xcframeworks.sh" "${SIGNING_IDENTITY}"
 
-# ---------------------------------------------------------------------------
-# Step 4: Validate (post-signing)
-# ---------------------------------------------------------------------------
+    log "Validating signed xcframeworks"
+    RELEASE=true IOS_ONLY="${IOS_ONLY}" "${SCRIPT_DIR}/validate-xcframeworks.sh"
 
-log "Validating signed xcframeworks"
+    local release_args=("${VERSION}")
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        release_args+=(--ios-only)
+    fi
 
-RELEASE=true "${SCRIPT_DIR}/validate-xcframeworks.sh"
+    if [[ "${SKIP_UPLOAD}" == "true" ]]; then
+        log "Packaging (upload skipped)"
+        "${SCRIPT_DIR}/release.sh" "${release_args[@]}"
+    else
+        local target_release="${UPLOAD_TO_TAG:-${VERSION}}"
+        log "Packaging and uploading to release ${target_release}"
+        "${SCRIPT_DIR}/release.sh" "${release_args[@]}" --upload-to "${target_release}"
+    fi
 
-# ---------------------------------------------------------------------------
-# Step 5: Package and upload
-# ---------------------------------------------------------------------------
+    echo ""
+    echo "============================================================"
+    echo "  Local Signing Complete"
+    echo "============================================================"
+    echo "  Version:   ${VERSION}"
+    if [[ "${IOS_ONLY}" == "true" ]]; then
+        echo "  Variant:   iOS-only"
+    else
+        echo "  Variant:   all platforms"
+    fi
+    echo "  Identity:  ${SIGNING_IDENTITY}"
+    if [[ "${legacy_mode}" == "true" ]]; then
+        echo "  Source:    CI run ${RUN_ID}"
+    else
+        echo "  Source:    local Session Replay checkout"
+    fi
+    if [[ "${SKIP_UPLOAD}" == "true" ]]; then
+        echo "  Upload:    skipped"
+    else
+        echo "  Upload:    attached to release ${UPLOAD_TO_TAG:-${VERSION}}"
+    fi
+    echo ""
+}
 
-if [[ "${SKIP_UPLOAD}" == "true" ]]; then
-    log "Packaging (upload skipped)"
-    "${SCRIPT_DIR}/release.sh" "${VERSION}"
-else
-    log "Packaging and uploading to release ${VERSION}"
-    "${SCRIPT_DIR}/release.sh" "${VERSION}" --upload-to "${VERSION}"
-fi
-
-echo ""
-echo "============================================================"
-echo "  Local Signing Complete"
-echo "============================================================"
-echo "  Version:   ${VERSION}"
-echo "  Identity:  ${SIGNING_IDENTITY}"
-echo "  CI Run:    ${RUN_ID}"
-if [[ -n "${CISCO_SOURCE_COMMIT}" ]]; then
-    echo "  Cisco:     ${CISCO_SOURCE_COMMIT}"
-fi
-if [[ "${SKIP_UPLOAD}" == "true" ]]; then
-    echo "  Upload:    skipped (use without --skip-upload to upload)"
-else
-    echo "  Upload:    ✓ attached to release ${VERSION}"
-fi
-echo ""
+main "$@"
