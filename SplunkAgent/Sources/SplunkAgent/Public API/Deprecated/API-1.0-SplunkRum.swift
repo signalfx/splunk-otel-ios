@@ -45,8 +45,7 @@ extension SplunkRum {
     /// - Note: This function is deprecated and will be removed in a later version.
     @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.globalAttributes` API instead.")
     public static func setGlobalAttributes(_ attributes: [String: Any]) {
-        let globalAttributes = MutableAttributes(from: attributes)
-        .shared.globalAttributes.addDictionary(globalAttributes.getAll())
+        .shared.globalAttributes.addDictionary(MutableAttributes(from: attributes).getAll())
     }
 
     /// Removes a global attribute by key.
