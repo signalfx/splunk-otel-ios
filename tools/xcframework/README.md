@@ -5,8 +5,12 @@ Build tooling for producing signed, multi-platform xcframeworks from the Splunk 
 ## Quick Start
 
 ```bash
-# Full build: OTel + PLCrash + Cisco download + Agent modules
+# Full build: OTel + PLCrash + dynamic Cisco + Agent modules
+export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 make build
+
+# iOS-only build: device + simulator slices only
+make build IOS_ONLY=true
 
 # Validate all built xcframeworks
 make validate
@@ -17,14 +21,15 @@ make smoke-test
 
 ## Build Pipeline
 
-The `make build` target runs four stages in order:
+The `make build` target requires `SESSION_REPLAY_LOCAL_PATH` and runs five stages in order:
 
 | Stage | Command | What it does |
 |-------|---------|-------------|
-| 1 | `make build-otel` | Clones `opentelemetry-swift-core`, generates a Tuist project, and archives `OpenTelemetryApi` + `OpenTelemetrySdk` for all 7 platform slices |
+| 1 | `make build-otel` | Clones `opentelemetry-swift-core`, generates a Tuist project, and archives `OpenTelemetryApi` + `OpenTelemetrySdk` for all 7 platform slices, or 2 slices with `IOS_ONLY=true` |
 | 2 | `make build-plcrash` | Clones `PLCrashReporter`, builds it as a **dynamic** framework from source for iOS/tvOS/macCatalyst |
-| 3 | `make populate-deps` | Symlinks OTel + PLCrash outputs into `dependencies/`, downloads Cisco Session Replay xcframeworks from S3 |
-| 4 | `make build-agent` | Generates the main Tuist workspace and builds all 16 Splunk module xcframeworks |
+| 3 | `make build-cisco` | Builds the 9 Cisco Session Replay frameworks as **dynamic** xcframeworks from the local Session Replay checkout |
+| 4 | `make populate-deps` | Stages OTel, PLCrash, and already-built dynamic Cisco xcframeworks into `dependencies/` |
+| 5 | `make build-agent` | Generates the main Tuist workspace and builds all 16 Splunk module xcframeworks |
 
 ### Output
 
@@ -35,6 +40,15 @@ output/xcframeworks/
 ├── OpenTelemetryApi.xcframework
 ├── OpenTelemetrySdk.xcframework
 ├── CrashReporter.xcframework
+├── CiscoCommon.xcframework
+├── CiscoLogger.xcframework
+├── CiscoEncryption.xcframework
+├── CiscoSwizzling.xcframework
+├── CiscoInteractions.xcframework
+├── CiscoDiskStorage.xcframework
+├── CiscoSessionReplay.xcframework
+├── CiscoInstanceManager.xcframework
+├── CiscoRuntimeCache.xcframework
 ├── SplunkAgent.xcframework
 ├── SplunkAgentObjC.xcframework
 ├── SplunkCommon.xcframework
@@ -53,13 +67,14 @@ output/xcframeworks/
 └── SplunkSessionReplayProxy.xcframework
 ```
 
-Cisco Session Replay xcframeworks are downloaded into `dependencies/` and are **not** rebuilt (they are pre-built by the Session Replay team).
+Cisco Session Replay xcframeworks are built locally as dynamic frameworks. The Agent `Package.swift` Cisco binary target URLs intentionally point to static artifacts for SPM and are not used by this xcframework release path.
 
 ### Platform Matrix
 
 | Module | iOS | tvOS | visionOS | macCatalyst |
 |--------|-----|------|----------|-------------|
-| Most modules | arm64 | arm64 | arm64 | arm64 |
+| Splunk modules | arm64 | arm64 | arm64 | arm64 |
+| Cisco modules | arm64 | arm64 | arm64 | arm64+x86_64 |
 | SplunkCrashReports | arm64 | arm64 | -- | arm64 |
 | OpenTelemetryApi/Sdk | arm64 | arm64 | arm64 | arm64+x86_64 |
 | CrashReporter | arm64 | arm64 | -- | arm64+x86_64 |
@@ -76,89 +91,95 @@ Key variables in the Makefile:
 |----------|---------|-------------|
 | `OTEL_VERSION` | `2.3.0` | OpenTelemetry Swift Core tag to build |
 | `PLCRASH_VERSION` | `1.12.0` | PLCrashReporter tag to build |
-| `CISCO_XCFRAMEWORKS_PATH` | *(empty)* | Local path to Cisco xcframeworks (downloads from S3 if unset) |
+| `SESSION_REPLAY_LOCAL_PATH` | *(required)* | Local path to the Session Replay repository |
+| `CISCO_XCFRAMEWORKS_PATH` | *(empty)* | Legacy path to prebuilt dynamic Cisco xcframeworks |
+| `IOS_ONLY` | `false` | Build and validate only `ios-arm64` and `ios-arm64_x86_64-simulator` slices |
 
 ---
 
 ## Release
 
-Releasing xcframeworks is a two-part process: CI builds the unsigned artifacts, then a developer signs them locally and uploads to the GitHub release.
+Releasing xcframeworks is currently a local process while the Agent and Session Replay repositories are separate. The local release script builds dynamic Cisco frameworks from `SESSION_REPLAY_LOCAL_PATH`, signs non-Cisco xcframeworks, validates all shipped signatures, packages, and optionally uploads to the GitHub release.
 
 ### How it works
 
 1. A developer triggers `release.yml` with a version and ticket ID.
 2. The release PR is reviewed and merged to `main`.
 3. `merge_release.yml` runs automatically — creates a git tag and a GitHub Release.
-4. `build-xcframeworks.yml` triggers on the release event — builds all xcframeworks, validates them, runs a smoke test, snapshots the Cisco binary target inputs into `cisco-release-manifest.txt`, and uploads an **unsigned** artifact.
-5. A developer downloads the unsigned artifact, signs locally, and uploads the signed zip to the release.
+4. A developer runs `scripts/sign-and-upload.sh` locally with `SESSION_REPLAY_LOCAL_PATH` set.
+5. The script builds, signs, validates, packages, and uploads `SplunkAgent-XCFrameworks.zip`.
 
-> **Note:** Automated CI signing (Job 2 in `build-xcframeworks.yml`) is temporarily disabled because distribution certificates cannot be stored in GitHub secrets. The implementation is preserved and can be re-enabled by setting the `SIGNING_ENABLED` repository variable to `"true"`.
+`build-xcframeworks.yml` is now a manual legacy/testing workflow. It requires caller-provided dynamic Cisco artifacts and must not download Cisco artifacts from Agent `Package.swift`.
 
 ### Local signing
 
-After CI finishes the build (step 4 above), run the convenience script:
+Run the convenience script from `tools/xcframework`:
 
 ```bash
 # Signs and uploads to the release in one step
+export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 ./scripts/sign-and-upload.sh 1.2.0
 ```
 
 The script will:
 - Auto-detect your signing identity from the local keychain
-- Download the unsigned artifact from the latest CI run
-- Refresh `Cisco*.xcframework` bundles from the artifact's `cisco-release-manifest.txt`
-- Sign all non-Cisco xcframeworks
+- Build OTel, PLCrashReporter, dynamic Cisco, and Splunk xcframeworks locally
+- Record the Session Replay commit, branch, and dirty state in `cisco-release-manifest.txt`
+- Sign non-Cisco xcframeworks while preserving pre-signed Cisco framework signatures
 - Validate signatures for all shipped xcframeworks
 - Package and upload the zip to the existing GitHub release
-
-The unsigned artifact is expected to contain `cisco-release-manifest.txt`. The refresh step uses that manifest automatically so manual signing remains reproducible even if `Package.swift` has changed since the CI build was produced.
-
-> **Note:** Older unsigned artifacts created before the manifest was added are not compatible with this refreshed signing flow. In that case, rebuild the unsigned artifact from CI instead of signing the old one.
 
 #### Options
 
 ```bash
-# Use a specific CI run
+# Legacy: use a specific CI run with already-dynamic Cisco artifacts
 ./scripts/sign-and-upload.sh 1.2.0 --run-id 12345678
 
 # Use a specific signing identity
 ./scripts/sign-and-upload.sh 1.2.0 --identity "Apple Distribution: Splunk Inc. (TEAMID)"
 
 # Sign and package without uploading (dry run)
+export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
 ./scripts/sign-and-upload.sh 1.2.0 --skip-upload
+
+# Build, sign, package, and upload the iOS-only distribution
+./scripts/sign-and-upload.sh 1.2.0 --ios-only
+
+# Upload to a release tag that differs from the version recorded in the manifest
+./scripts/sign-and-upload.sh 1.2.0 --upload-to v1.2.0
 ```
+
+The normal package is named `SplunkAgent-XCFrameworks.zip`. The iOS-only package is named `SplunkAgent-XCFrameworks-iOS-only.zip`.
 
 #### Prerequisites
 
 - Apple distribution certificate installed in your local keychain
-- `gh` CLI installed and authenticated (`brew install gh && gh auth login`)
+- `SESSION_REPLAY_LOCAL_PATH` set to a local Session Replay repository checkout
+- `gh` CLI installed and authenticated only for upload mode or legacy `--run-id` mode
 
 ### Manual step-by-step (alternative)
 
 If you prefer to run each step individually:
 
 ```bash
-# 1. Find the CI run ID
-gh run list --workflow=build-xcframeworks.yml --limit 1
+# 1. Build all unsigned xcframeworks locally
+export SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay-repo
+make clean build
 
-# 2. Download the unsigned artifact
-gh run download <RUN_ID> -n splunk-agent-xcframeworks-unsigned -D tools/xcframework/output/xcframeworks/
-
-# 3. Find your signing identity
+# 2. Find your signing identity
 security find-identity -v -p codesigning
 
-# 4. Refresh Cisco xcframeworks from the artifact manifest
-./scripts/refresh-cisco-xcframeworks.sh --output-dir output/xcframeworks
-
-# 5. Sign non-Cisco xcframeworks
+# 3. Sign non-Cisco xcframeworks
 ./scripts/sign-xcframeworks.sh "Apple Distribution: Splunk Inc. (TEAMID)"
 
-# 6. Validate all signatures
+# 4. Validate all signatures
 RELEASE=true ./scripts/validate-xcframeworks.sh
 
-# 7. Package and upload to the existing release
+# 5. Package and upload to the existing release
 ./scripts/release.sh 1.2.0 --upload-to 1.2.0
 ```
+
+For an iOS-only manual build, pass `IOS_ONLY=true` to `make build`, `make validate`, and `scripts/release.sh --ios-only`.
 
 ---
 

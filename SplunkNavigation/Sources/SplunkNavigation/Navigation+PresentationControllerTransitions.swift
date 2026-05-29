@@ -59,8 +59,12 @@ extension Navigation {
             return
         }
 
+        // Always store a restoration, even when no screen has been tracked yet.
+        // Without this, dismissalDidEnd finds no stored state and bails, leaving
+        // the dismissed modal's name stuck as the current screen.
+        let restoration: RestorationState = currentScreenState().map { .screen($0) } ?? .noScreen
         await model.update(
-            pendingPresentationRestoration: currentScreenState(),
+            pendingPresentationRestoration: restoration,
             for: event.presentationControllerIdentifier
         )
         await updateTransitionStart(for: presentedSnapshot(from: event), timestamp: event.timestamp)
@@ -172,14 +176,16 @@ extension Navigation {
     }
 
     private func updateRestorationTransitionStart(event: any PresentationActionEvent) async {
-        guard let restoration = await model.pendingPresentationRestoration(for: event.presentationControllerIdentifier) else {
+        // .noScreen means there was no prior screen to restore; dismissalWillBegin
+        // has no span to open for that path, so bail early.
+        guard case let .screen(state) = await model.pendingPresentationRestoration(for: event.presentationControllerIdentifier) else {
             return
         }
 
         let navigation = NavigationPair(
             type: .transition,
             start: event.timestamp,
-            screenName: restoration.name
+            screenName: state.name
         )
 
         await model.update(
@@ -189,6 +195,8 @@ extension Navigation {
     }
 
     private func finalizeRestorationTransition(event: any PresentationActionEvent) async {
+        // Treat a missing completed flag as success: dismissalDidEnd without an
+        // explicit false means the presentation controller finished normally.
         guard event.completed ?? true else {
             await model.removeNavigation(for: event.presentationControllerIdentifier)
             return
@@ -198,24 +206,32 @@ extension Navigation {
             return
         }
 
+        // existingNavigation is nil only when dismissalWillBegin was skipped (the .noScreen path);
+        // fall back to event.timestamp so the span still has a valid start time.
         let existingNavigation = await model.navigation(for: event.presentationControllerIdentifier)
         let start = existingNavigation?.start ?? event.timestamp
         let previousScreenName = runtimeStateStore.previousScreenName
 
-        updateCurrentScreen(
-            state: restoration,
-            start: start
-        )
+        switch restoration {
+        case let .screen(state):
+            updateCurrentScreen(state: state, start: start)
 
-        let completedNavigation = NavigationPair(
-            type: existingNavigation?.type ?? .transition,
-            start: start,
-            end: event.timestamp,
-            screenName: restoration.name,
-            lastScreenName: previousScreenName
-        )
+            let completedNavigation = NavigationPair(
+                type: existingNavigation?.type ?? .transition,
+                start: start,
+                end: event.timestamp,
+                screenName: state.name,
+                lastScreenName: previousScreenName
+            )
+            send(navigation: completedNavigation)
 
-        send(navigation: completedNavigation)
+        case .noScreen:
+            // No screen was showing before the modal; reset internal state to nil and
+            // publish the resulting fallback name through the observer/stream path so
+            // that DefaultRuntimeAttributes.currentScreenName and crash-report
+            // propagation are not left stuck on the dismissed modal's name.
+            resetScreenToNoScreen()
+        }
 
         await model.removeNavigation(for: event.presentationControllerIdentifier)
         await model.removePendingPresentationRestoration(for: event.presentationControllerIdentifier)

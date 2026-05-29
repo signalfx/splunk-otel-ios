@@ -46,7 +46,7 @@ final class SuppressingProcessor: NavigationEventProcessor {
     }
 }
 
-final class CountingProcessor: NavigationEventProcessor {
+final class CountingProcessor: NavigationEventProcessor, @unchecked Sendable {
     private let lock = NSLock()
     private var storedCallCount = 0
 
@@ -67,7 +67,7 @@ final class CountingProcessor: NavigationEventProcessor {
     }
 }
 
-final class SequenceNavigationEventProcessor: NavigationEventProcessor {
+final class SequenceNavigationEventProcessor: NavigationEventProcessor, @unchecked Sendable {
     private let lock = NSLock()
     private let events: [NavigationEvent]
     private var nextIndex = 0
