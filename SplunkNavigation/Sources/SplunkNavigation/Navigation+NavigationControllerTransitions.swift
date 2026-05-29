@@ -101,6 +101,8 @@ extension Navigation {
         start: Date,
         attributes: [String: Any]? = nil
     ) {
+        // forceEmit: false — automated detection deduplicates repeated visits to the same screen.
+        // Manual track(screen:) uses forceEmit: true because the caller explicitly requests a new span.
         let screenStateUpdate = updateCurrentScreenState(
             screenName: screenName,
             attributes: attributes,
