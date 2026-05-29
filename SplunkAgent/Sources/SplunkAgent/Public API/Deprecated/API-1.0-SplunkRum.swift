@@ -26,7 +26,7 @@ extension SplunkRum {
     /// - Note: This function is deprecated and will be removed in a later version.
     @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.session.state.id` API instead.")
     public static func getSessionId() -> String {
-        .shared.session.state.id
+        shared.session.state.id
     }
 
     /// A boolean determinning the `Status` of agent recording.
@@ -35,7 +35,7 @@ extension SplunkRum {
     /// - Note: This function is deprecated and will be removed in a later version.
     @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.state.status` API instead.")
     public static func isInitialized() -> Bool {
-        .shared.state.status == .running
+        shared.state.status == .running
     }
 
     /// Sets global attributes to be added to all spans.
@@ -45,7 +45,7 @@ extension SplunkRum {
     /// - Note: This function is deprecated and will be removed in a later version.
     @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.globalAttributes` API instead.")
     public static func setGlobalAttributes(_ attributes: [String: Any]) {
-        .shared.globalAttributes.addDictionary(MutableAttributes(from: attributes).getAll())
+        shared.globalAttributes.addDictionary(MutableAttributes(from: attributes).getAll())
     }
 
     /// Removes a global attribute by key.
@@ -55,7 +55,7 @@ extension SplunkRum {
     /// - Note: This function is deprecated and will be removed in a later version.
     @available(*, deprecated, message: "This function will be removed in a later version. Use the new `SplunkRum.shared.globalAttributes` API instead.")
     public static func removeGlobalAttribute(_ key: String) {
-        .shared.globalAttributes[key] = nil
+        shared.globalAttributes[key] = nil
     }
 
     /// Logs a debug message.
