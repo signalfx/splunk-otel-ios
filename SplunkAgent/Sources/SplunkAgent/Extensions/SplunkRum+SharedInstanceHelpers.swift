@@ -24,7 +24,7 @@ extension SplunkRum {
     /// This method is intentionally internal to the SDK and serves primarily
     /// as a test helper.
     static func resetSharedInstance() {
-        SplunkRum.shared = SplunkRum(
+        Self.shared = Self(
             configurationHandler: ConfigurationHandlerNonOperational(for: AgentConfiguration.emptyConfiguration),
             user: NoOpUser(),
             session: NoOpSession(),

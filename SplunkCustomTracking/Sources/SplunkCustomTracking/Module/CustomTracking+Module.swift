@@ -29,7 +29,7 @@ extension CustomTrackingInternal: Module {
     public typealias EventData = CustomTrackingData
 
     public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any SplunkCommon.RemoteModuleConfiguration)?) {
-        _ = CustomTrackingInternal.instance
+        _ = Self.instance
     }
 
     public func onPublish(data: @escaping (CustomTrackingMetadata, CustomTrackingData) -> Void) {
