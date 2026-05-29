@@ -8,7 +8,7 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 - Public products: `SplunkAgent`, `SplunkAgentObjC`.
 - Core dependency: `opentelemetry-swift-core` API/SDK only. Do not add upstream protocol exporters; this repo uses a custom OTLP/JSON exporter to control binary size.
 - Main modules: `SplunkAgent`, `SplunkAgentObjC`, `SplunkCommon`, `SplunkOpenTelemetry`, `SplunkOpenTelemetryBackgroundExporter`, and instrumentation modules named `Splunk<Feature>`.
-- All modules conform to `Module` in `SplunkCommon/Sources/SplunkCommon/Modules/Module.swift`.
+- Instrumentation modules conform to `Module` in `SplunkCommon/Sources/SplunkCommon/Modules/Module.swift`; infrastructure targets such as `SplunkOpenTelemetry` and `SplunkOpenTelemetryBackgroundExporter` do not.
 - Public API lives in `SplunkAgent/Sources/SplunkAgent/Public API/`; stable public files use `API-1.0-*.swift`.
 - Deprecated public API stays in `Public API/.../Deprecated/` with `@available(*, deprecated, message: "Use <replacement>")`.
 - Public module APIs have both real proxies (`Proxies/Module/`) and no-op `*NonOperational` proxies (`Proxies/Non-Operational/` or `Proxies/NonOperational/`) for pre-install, disabled, or sampled-out states.
