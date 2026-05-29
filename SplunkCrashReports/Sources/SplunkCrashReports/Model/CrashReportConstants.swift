@@ -34,9 +34,6 @@ enum CrashReportConstants {
     /// Value for the ``CrashReportKeys/component`` span attribute on crash spans.
     static let componentValue = "crash"
 
-    /// Fallback when app state or serialized JSON output is unavailable.
+    /// Fallback when app state, device stat or serialized JSON output is unavailable.
     static let unknownValue = "unknown"
-
-    /// Fallback when a device stat cannot be determined.
-    static let unknownDeviceStatValue = "Unknown"
 }

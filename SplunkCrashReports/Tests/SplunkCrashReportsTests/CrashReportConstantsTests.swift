@@ -40,8 +40,4 @@ final class CrashReportConstantsTests: XCTestCase {
     func testUnknownValue() {
         XCTAssertEqual(CrashReportConstants.unknownValue, "unknown")
     }
-
-    func testUnknownDeviceStatValue() {
-        XCTAssertEqual(CrashReportConstants.unknownDeviceStatValue, "Unknown")
-    }
 }
