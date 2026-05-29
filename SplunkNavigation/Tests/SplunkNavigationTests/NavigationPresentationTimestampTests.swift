@@ -21,7 +21,7 @@ import Foundation
 import UIKit
 import XCTest
 
-@_spi(SplunkInternal) @testable import SplunkNavigation
+@testable import SplunkNavigation
 
 final class NavigationPresentationTimestampTests: XCTestCase {
 

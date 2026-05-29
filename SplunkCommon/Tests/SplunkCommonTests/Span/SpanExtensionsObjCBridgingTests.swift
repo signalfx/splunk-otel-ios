@@ -20,7 +20,7 @@ import Foundation
 import OpenTelemetryApi
 import XCTest
 
-@_spi(SplunkInternal) @testable import SplunkCommon
+@testable import SplunkCommon
 
 final class SpanExtensionsObjCBridgingTests: XCTestCase {
 
