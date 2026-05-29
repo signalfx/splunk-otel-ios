@@ -23,7 +23,7 @@ extension Navigation {
 
     // MARK: - Static constants
 
-    private static let screenStateReservedAttributeKeys: Set<String> = [
+    static let screenStateReservedAttributeKeys: Set<String> = [
         "component",
         "navigation.name",
         "last.screen.name",
@@ -47,8 +47,19 @@ extension Navigation {
         return runtimeStateStore.updateScreenState(state, forceEmit: forceEmit)
     }
 
-    func currentScreenState() -> NavigationScreenState {
+    func currentScreenState() -> NavigationScreenState? {
         runtimeStateStore.screenState
+    }
+
+    /// Resets stored screen state to nil and publishes the resulting fallback name
+    /// ("unknown") to observers and the async stream.
+    ///
+    /// Use this instead of calling `runtimeStateStore.resetScreenState()` and
+    /// `publishScreenNameChange` separately, so the reset and its published value
+    /// are always kept in sync.
+    func resetScreenToNoScreen() {
+        runtimeStateStore.resetScreenState()
+        publishScreenNameChange(runtimeStateStore.screenName)
     }
 
     func updateCurrentScreenState(

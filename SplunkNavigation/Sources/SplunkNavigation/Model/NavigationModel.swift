@@ -15,6 +15,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/// The screen state to restore when a UINavigationController-presented modal is dismissed.
+///
+/// A plain `NavigationScreenState?` cannot be stored in the model's dictionary without
+/// introducing a box type, because Swift dictionaries cannot distinguish between a key
+/// that is absent and a key whose value is `nil`. Using a dedicated enum avoids that
+/// ambiguity and makes the two dismissal paths explicit at the call site.
+enum RestorationState {
+    /// A real screen was showing before the modal was presented; restore to it on dismissal.
+    case screen(NavigationScreenState)
+    /// No screen had been tracked yet when the modal was presented; reset to nil on dismissal
+    /// so subsequent `last.screen.name` values are not polluted by the dismissed modal.
+    case noScreen
+}
+
 /// Model actor for data used in Navigation module.
 actor NavigationModel {
 
@@ -24,7 +38,7 @@ actor NavigationModel {
     private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
     private(set) var pendingNavigationTargets: [ObjectIdentifier: ObjectIdentifier] = [:]
     private(set) var managedNavigationControllerTargets: Set<ObjectIdentifier> = []
-    private(set) var pendingPresentationRestorations: [ObjectIdentifier: NavigationScreenState] = [:]
+    private(set) var pendingPresentationRestorations: [ObjectIdentifier: RestorationState] = [:]
     private(set) var navigationEventProcessor: any NavigationEventProcessor
 
 
@@ -93,11 +107,11 @@ actor NavigationModel {
 
     // MARK: - Presentation restorations
 
-    func pendingPresentationRestoration(for identifier: ObjectIdentifier) -> NavigationScreenState? {
+    func pendingPresentationRestoration(for identifier: ObjectIdentifier) -> RestorationState? {
         pendingPresentationRestorations[identifier]
     }
 
-    func update(pendingPresentationRestoration: NavigationScreenState, for identifier: ObjectIdentifier) {
+    func update(pendingPresentationRestoration: RestorationState, for identifier: ObjectIdentifier) {
         pendingPresentationRestorations[identifier] = pendingPresentationRestoration
     }
 

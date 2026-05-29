@@ -32,12 +32,14 @@ struct MockPresentationActionEvent: PresentationActionEvent {
     let completed: Bool?
 }
 
+private final class PresentationControllerProxy: Sendable {}
+
 final class MockPresentationEventStreamProvider:
     NavigationEventStreamProviding
 {
     private let presentationContinuation: AsyncStream<any PresentationActionEvent>.Continuation
     private let internalPresentationStream: AsyncStream<any PresentationActionEvent>
-    private let presentationControllerProxy = NSObject()
+    private let presentationControllerProxy = PresentationControllerProxy()
 
     init() {
         let (stream, continuation) = AsyncStream.makeStream(
