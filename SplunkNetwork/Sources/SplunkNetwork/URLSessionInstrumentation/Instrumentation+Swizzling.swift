@@ -30,7 +30,7 @@ extension URLSessionTask {
         if !isSupportedTask(task: self) {
             return
         }
-        if state == URLSessionTask.State.running {
+        if state == Self.State.running {
             return
         }
         if currentRequest?.url == nil {
@@ -54,7 +54,7 @@ extension URLSessionTask {
         if !isSupportedTask(task: self) {
             return
         }
-        if state == URLSessionTask.State.completed || state == URLSessionTask.State.canceling {
+        if state == Self.State.completed || state == Self.State.canceling {
             return
         }
 
