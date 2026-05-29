@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+* Fixed automated screen tracking incorrectly firing for internal UIKit controllers `UIEditingOverlayViewController` and `UITrackingElementWindowController`. #667
+
 ## [2.3.0] - 2026-05-18
 
 ### Added
