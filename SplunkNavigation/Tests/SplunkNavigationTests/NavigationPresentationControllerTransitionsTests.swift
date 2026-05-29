@@ -19,7 +19,7 @@ limitations under the License.
 internal import CiscoSwizzling
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
-@_spi(SplunkInternal) @testable import SplunkNavigation
+@testable import SplunkNavigation
 import UIKit
 import XCTest
 
