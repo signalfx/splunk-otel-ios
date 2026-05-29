@@ -20,11 +20,16 @@ import Foundation
 import OpenTelemetryApi
 @_spi(SplunkInternal) import SplunkCommon
 
-/// Determines the HTTP protocol version from the response headers.
+/// Determines the HTTP protocol version from response headers when provable.
+///
+/// Returns a value only when response headers indicate HTTP/2. When URLSession negotiates
+/// HTTP/2 or HTTP/3 via ALPN without these nonstandard indicators, the negotiated version
+/// is unknown and this helper returns `nil`. Callers should omit ``SemanticConventions/Network/protocolVersion``
+/// rather than guessing.
 ///
 /// - Parameter response: The HTTP URL response to analyze.
-/// - Returns: The protocol version string ("2.0" for HTTP/2, "1.1" for HTTP/1.1).
-func determineHTTPProtocolVersion(_ response: HTTPURLResponse) -> String {
+/// - Returns: The protocol version string (for example `"2"` for HTTP/2), or `nil` if unknown.
+func determineHTTPProtocolVersion(_ response: HTTPURLResponse) -> String? {
     // Check for HTTP/2 server indicators
     if let serverHeader = response.value(forHTTPHeaderField: "Server") {
         if serverHeader.lowercased().contains("http/2") || serverHeader.lowercased().contains("h2") {
@@ -36,7 +41,8 @@ func determineHTTPProtocolVersion(_ response: HTTPURLResponse) -> String {
     if response.value(forHTTPHeaderField: "X-Firefox-Spdy") != nil || response.value(forHTTPHeaderField: "X-Google-Spdy") != nil {
         return "2"
     }
-    return "1.1"
+
+    return nil
 }
 
 /// Extracts the IP address from HTTP response headers.

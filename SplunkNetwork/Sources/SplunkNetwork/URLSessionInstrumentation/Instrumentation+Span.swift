@@ -103,8 +103,9 @@ func endHttpSpan(span: Span, task: URLSessionTask) {
             span.clearAndSetAttribute(key: SemanticConventions.Network.peerAddress, value: ipAddress)
         }
 
-        let protocolVersion = determineHTTPProtocolVersion(httpResponse)
-        span.clearAndSetAttribute(key: SemanticConventions.Network.protocolVersion, value: protocolVersion)
+        if let protocolVersion = determineHTTPProtocolVersion(httpResponse) {
+            span.clearAndSetAttribute(key: SemanticConventions.Network.protocolVersion, value: protocolVersion)
+        }
 
         addCapturedResponseHeaders(from: httpResponse, to: span)
     }

@@ -7,7 +7,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-* HTTP client spans now emit the OpenTelemetry `network.protocol.version` attribute instead of the deprecated `http.protocol.version` key. #656
+* HTTP client spans now emit the OpenTelemetry `network.protocol.version` attribute instead of the deprecated `http.protocol.version` key. The attribute is omitted when the negotiated protocol version cannot be determined from response headers. #656
 
 ## [2.3.0] - 2026-05-18
 
