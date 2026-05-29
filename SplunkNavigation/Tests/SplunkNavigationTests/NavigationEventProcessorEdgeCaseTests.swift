@@ -115,7 +115,7 @@ final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
         )
 
         // Confirm the processor did return attributes that attempt to override reserved keys.
-        // Navigation+Span.swift writes user attributes first, then overwrites with SDK values.
+        // Navigation+Span.swift filters SDK-reserved keys from processor attributes before writing.
         let processedEvent = await navigation.processAutomatedNavigationEvent(
             "SettingsViewController",
             controllerIdentifier: controllerIdentifier

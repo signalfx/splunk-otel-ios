@@ -77,7 +77,7 @@ final class NavigationTrackScreenAttributesTests: XCTestCase {
         XCTAssertEqual(span?.instrumentationScope.version, "test-agent-version")
     }
 
-    func testManualSameNameTrackEmitsEveryCallAndPreservesAttributes() async {
+    func testSameScreenEmitsEachCallWithAttributes() async {
         let module = Navigation()
 
         module.track(screen: "HomeScreen", attributes: ["step": "first"])
@@ -90,11 +90,25 @@ final class NavigationTrackScreenAttributesTests: XCTestCase {
         let spans = navigationSpans
         XCTAssertEqual(spans.count, 2)
         XCTAssertEqual(spans[0].attributes["screen.name"]?.description, "HomeScreen")
-        XCTAssertEqual(spans[0].attributes["last.screen.name"]?.description, "unknown")
+        XCTAssertNil(spans[0].attributes["last.screen.name"], "First navigation should not emit last.screen.name")
         XCTAssertEqual(spans[0].attributes["step"]?.description, "first")
         XCTAssertEqual(spans[1].attributes["screen.name"]?.description, "HomeScreen")
         XCTAssertEqual(spans[1].attributes["last.screen.name"]?.description, "HomeScreen")
         XCTAssertEqual(spans[1].attributes["step"]?.description, "second")
+    }
+
+    func testFirstNavigationDoesNotEmitLastScreenName() async {
+        let module = Navigation()
+
+        module.track(screen: "FirstScreen")
+
+        await waitUntil {
+            self.navigationSpans.count == 1
+        }
+
+        let span = navigationSpans.first
+        XCTAssertEqual(span?.attributes["screen.name"]?.description, "FirstScreen")
+        XCTAssertNil(span?.attributes["last.screen.name"], "First navigation should not emit last.screen.name")
     }
 
     func testManualTrackDoesNotEmitWhenModuleDisabled() async {
@@ -172,19 +186,6 @@ final class NavigationTrackScreenAttributesTests: XCTestCase {
 
     private var navigationSpans: [SpanData] {
         exporter.spans.filter { $0.name == "app.ui.navigation" }
-    }
-}
-
-private final class ScreenNameObserverRecorder: @unchecked Sendable {
-    private let lock = NSLock()
-    private var storedValues: [String] = []
-
-    var values: [String] {
-        lock.withLock { storedValues }
-    }
-
-    func append(_ value: String) {
-        lock.withLock { storedValues.append(value) }
     }
 }
 
