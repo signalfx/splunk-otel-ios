@@ -28,13 +28,13 @@ func determineHTTPProtocolVersion(_ response: HTTPURLResponse) -> String {
     // Check for HTTP/2 server indicators
     if let serverHeader = response.value(forHTTPHeaderField: "Server") {
         if serverHeader.lowercased().contains("http/2") || serverHeader.lowercased().contains("h2") {
-            return "2.0"
+            return "2"
         }
     }
 
     // Check for HTTP/2 specific headers
     if response.value(forHTTPHeaderField: "X-Firefox-Spdy") != nil || response.value(forHTTPHeaderField: "X-Google-Spdy") != nil {
-        return "2.0"
+        return "2"
     }
     return "1.1"
 }
