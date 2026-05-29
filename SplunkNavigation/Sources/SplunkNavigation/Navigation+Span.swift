@@ -97,9 +97,10 @@ extension Navigation {
         screenNameSpan.end(time: start)
     }
 
-    /// Attributes passed to this overload have already been filtered by effectiveCustomAttributes(from:),
-    /// which strips SDK-reserved keys. The [String: Any] overload filters inline because it is called
-    /// directly from the public track(screen:attributes:) path with raw caller input.
+    /// Attributes passed to this overload have already been filtered by effectiveCustomAttributes(from:).
+    ///
+    /// SDK-reserved keys are stripped before this call. The [String: Any] overload filters inline
+    /// because it is called directly from the public track(screen:attributes:) path with raw caller input.
     func send(screenName: String, lastScreenName: String?, start: Date, attributes: [String: AttributeValue]) {
         // A new zero length span for change screen name event
         let screenNameSpan =

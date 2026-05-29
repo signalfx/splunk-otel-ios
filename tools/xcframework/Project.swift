@@ -77,9 +77,9 @@ let sharedSettings: SettingsDictionary = [
 
     // Minimum deployment targets matching Package.swift.
     "IPHONEOS_DEPLOYMENT_TARGET": "13.0",
-    "TVOS_DEPLOYMENT_TARGET": "13.0",
+    "TVOS_DEPLOYMENT_TARGET": "15.0",
     "XROS_DEPLOYMENT_TARGET": "1.0",
-    "MACOSX_DEPLOYMENT_TARGET": "10.15",
+    "MACOSX_DEPLOYMENT_TARGET": "12.0",
 
     // Support Mac Catalyst builds.
     "SUPPORTS_MACCATALYST": "YES"
@@ -100,6 +100,54 @@ func dep(_ name: String, condition: PlatformCondition? = nil) -> TargetDependenc
 /// Reference to another target in this project (Splunk module).
 func mod(_ name: String, condition: PlatformCondition? = nil) -> TargetDependency {
     .target(name: name, condition: condition)
+}
+
+/// CiscoDiskStorage's swiftinterface imports CiscoEncryption.
+func ciscoDiskStorageDependencies() -> [TargetDependency] {
+    [
+        dep("CiscoDiskStorage"),
+        dep("CiscoEncryption")
+    ]
+}
+
+/// CiscoSwizzling's swiftinterface imports CiscoCommon.
+func ciscoSwizzlingDependencies() -> [TargetDependency] {
+    [
+        dep("CiscoSwizzling"),
+        dep("CiscoCommon")
+    ]
+}
+
+/// CiscoInteractions' swiftinterface imports CiscoSwizzling.
+func ciscoInteractionsDependencies() -> [TargetDependency] {
+    [
+        dep("CiscoInteractions"),
+        dep("CiscoSwizzling"),
+        dep("CiscoCommon")
+    ]
+}
+
+/// CiscoRuntimeCache's swiftinterface imports CiscoLogger.
+func ciscoRuntimeCacheDependencies() -> [TargetDependency] {
+    [
+        dep("CiscoRuntimeCache"),
+        dep("CiscoLogger")
+    ]
+}
+
+/// CiscoSessionReplay imports most Cisco support frameworks in its public interface.
+func ciscoSessionReplayDependencies() -> [TargetDependency] {
+    [
+        dep("CiscoSessionReplay"),
+        dep("CiscoCommon"),
+        dep("CiscoDiskStorage"),
+        dep("CiscoEncryption"),
+        dep("CiscoInteractions"),
+        dep("CiscoLogger"),
+        dep("CiscoSwizzling"),
+        dep("CiscoInstanceManager"),
+        dep("CiscoRuntimeCache")
+    ]
 }
 
 
@@ -131,10 +179,8 @@ let project = Project(
             sources: "\(repoRoot)/SplunkCommon/Sources/**",
             dependencies: [
                 dep("OpenTelemetryApi"),
-                dep("CiscoDiskStorage"),
-                dep("CiscoEncryption"),
                 dep("CiscoLogger")
-            ]
+            ] + ciscoDiskStorageDependencies()
         ),
 
 
@@ -151,9 +197,8 @@ let project = Project(
             dependencies: [
                 mod("SplunkCommon"),
                 dep("OpenTelemetryApi"),
-                dep("CiscoLogger"),
-                dep("CiscoSwizzling")
-            ]
+                dep("CiscoLogger")
+            ] + ciscoSwizzlingDependencies()
         ),
 
 
@@ -250,9 +295,8 @@ let project = Project(
                 mod("SplunkCommon"),
                 dep("OpenTelemetryApi"),
                 dep("OpenTelemetrySdk"),
-                dep("CiscoLogger"),
-                dep("CiscoDiskStorage")
-            ]
+                dep("CiscoLogger")
+            ] + ciscoDiskStorageDependencies()
         ),
 
 
@@ -289,12 +333,9 @@ let project = Project(
             sources: "\(repoRoot)/SplunkInteractions/Sources/**",
             dependencies: [
                 mod("SplunkCommon"),
-                dep("OpenTelemetryApi"),
-                dep("CiscoRuntimeCache"),
-                dep("CiscoLogger"),
-                dep("CiscoSwizzling"),
-                dep("CiscoInteractions")
-            ]
+                dep("OpenTelemetryApi")
+            ] + ciscoRuntimeCacheDependencies()
+                + ciscoInteractionsDependencies()
         ),
 
 
@@ -385,18 +426,8 @@ let project = Project(
             bundleId: "com.splunk.rum.sessionreplayproxy",
             sources: "\(repoRoot)/SplunkSessionReplayProxy/Sources/**",
             dependencies: [
-                mod("SplunkCommon"),
-                dep("CiscoSessionReplay"),
-                // Transitive: CiscoSessionReplay's swiftinterface imports these
-                dep("CiscoCommon"),
-                dep("CiscoInteractions"),
-                dep("CiscoSwizzling"),
-                dep("CiscoInstanceManager"),
-                dep("CiscoRuntimeCache"),
-                dep("CiscoLogger"),
-                dep("CiscoDiskStorage"),
-                dep("CiscoEncryption")
-            ]
+                mod("SplunkCommon")
+            ] + ciscoSessionReplayDependencies()
         ),
 
 

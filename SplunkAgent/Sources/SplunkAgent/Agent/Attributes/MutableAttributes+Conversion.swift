@@ -173,7 +173,7 @@ extension MutableAttributes {
     ///
     /// - Returns: [String: EventAttributeValue] omitting non-convertible elements.
     func toEventAttributes() -> [String: EventAttributeValue] {
-        converted(to: EventAttributeValue.self, using: MutableAttributes.convertToEventAttributeValue)
+        converted(to: EventAttributeValue.self, using: Self.convertToEventAttributeValue)
     }
 }
 

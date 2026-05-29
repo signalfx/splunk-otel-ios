@@ -33,18 +33,26 @@ struct OTelDestination: NetworkMonitorDestination {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
-                instrumentationName: "NetworkMonitor",
+                instrumentationName: NetworkMonitorSpanAttributes.instrumentationName,
                 instrumentationVersion: sharedState?.agentVersion
             )
 
-        let span = tracer.spanBuilder(spanName: "network.change")
+        let span = tracer.spanBuilder(spanName: NetworkMonitorSpanAttributes.spanName)
             .setStartTime(time: networkEvent.timestamp)
             .startSpan()
 
-        span.clearAndSetAttribute(key: "network.status", value: networkEvent.isConnected ? "available" : "lost")
-        span.clearAndSetAttribute(key: "network.connection.type", value: networkEvent.connectionType.rawValue)
+        let status =
+            networkEvent.isConnected
+            ? NetworkMonitorSpanAttributes.statusValueAvailable
+            : NetworkMonitorSpanAttributes.statusValueLost
+
+        span.clearAndSetAttribute(key: NetworkMonitorSpanAttributes.networkStatus, value: status)
+        span.clearAndSetAttribute(
+            key: SemanticConventions.Network.connectionType,
+            value: networkEvent.connectionType.rawValue
+        )
         if let radioType = networkEvent.radioType {
-            span.clearAndSetAttribute(key: "network.connection.subtype", value: radioType)
+            span.clearAndSetAttribute(key: SemanticConventions.Network.connectionSubtype, value: radioType)
         }
 
         span.end(time: networkEvent.timestamp)
