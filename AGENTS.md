@@ -17,7 +17,7 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 ## Implementation Defaults
 
 - Inspect nearby code before editing and match the established module, naming, `// MARK: -`, and test-support patterns.
-- For new modules, use `Splunk<Module>/Sources/Splunk<Module>/` and `Splunk<Module>/Tests/Splunk<Module>Tests/` with `Testing Support/Builders` and `Testing Support/Mocks`.
+- For new modules, follow the existing target layout in `Package.swift` (for example `Splunk<Module>/Sources` and `Splunk<Module>/Tests`) with `Testing Support/Builders` and `Testing Support/Mocks` when that support structure is needed.
 - Public API and protocols need DocC; new source files need the license header from `CODESTYLE.md`.
 - SDK instrumentation must be defensive: never let telemetry collection crash the host app. Prefer no-op, drop, or internal logging over `fatalError`, `try!`, forced unwraps, or uncaught errors in production paths.
 - For style-heavy, build/distribution, or contribution-process changes, read `CODESTYLE.md`, `Development.md`, or `CONTRIBUTING.md` before editing.
