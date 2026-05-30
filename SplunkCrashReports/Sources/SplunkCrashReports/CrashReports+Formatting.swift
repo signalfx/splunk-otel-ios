@@ -27,7 +27,7 @@ extension CrashReports {
 
         var reportDict: [CrashReportKeys: Any] = [:]
 
-        reportDict[.component] = "crash"
+        reportDict[.component] = CrashReportConstants.componentValue
         reportDict[.error] = true
 
         if let systemInfo = report.systemInfo {
@@ -96,15 +96,15 @@ extension CrashReports {
             }
 
             if let data = unarchivedData {
-                if let sessionId = data["sessionId"] {
+                if let sessionId = data[CrashReportCustomDataKeys.sessionId.rawValue] {
                     reportDict[.sessionId] = sessionId
                 }
 
-                reportDict[.batteryLevel] = data["battery"]
-                reportDict[.freeMemory] = data["memory"]
-                reportDict[.freeDiskSpace] = data["disk"]
-                reportDict[.screenName] = data["screenName"]
-                reportDict[.buildId] = data["buildId"]
+                reportDict[.batteryLevel] = data[CrashReportCustomDataKeys.battery.rawValue]
+                reportDict[.freeMemory] = data[CrashReportCustomDataKeys.memory.rawValue]
+                reportDict[.freeDiskSpace] = data[CrashReportCustomDataKeys.disk.rawValue]
+                reportDict[.screenName] = data[CrashReportCustomDataKeys.screenName.rawValue]
+                reportDict[.buildId] = data[CrashReportCustomDataKeys.buildId.rawValue]
             }
         }
         catch {
