@@ -34,11 +34,11 @@ let sharedSettings: SettingsDictionary = [
     // The `package` members are automatically excluded from .swiftinterface files.
     "OTHER_SWIFT_FLAGS": "-package-name opentelemetry-swift-core",
 
-    // Minimum deployment targets matching the upstream Package.swift.
+    // Minimum deployment targets matching SplunkAgent Package.swift.
     "IPHONEOS_DEPLOYMENT_TARGET": "13.0",
-    "TVOS_DEPLOYMENT_TARGET": "13.0",
+    "TVOS_DEPLOYMENT_TARGET": "15.0",
     "XROS_DEPLOYMENT_TARGET": "1.0",
-    "MACOSX_DEPLOYMENT_TARGET": "10.15",
+    "MACOSX_DEPLOYMENT_TARGET": "12.0",
 
     // Support Mac Catalyst
     "SUPPORTS_MACCATALYST": "YES",

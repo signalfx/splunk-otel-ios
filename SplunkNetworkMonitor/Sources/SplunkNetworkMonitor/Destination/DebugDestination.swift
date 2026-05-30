@@ -42,9 +42,9 @@ class DebugDestination: NetworkMonitorDestination {
             """
             Network Change span:
                 timestamp: \(networkEvent.timestamp),
-                status: \(networkEvent.isConnected ? "available" : "lost"),
+                status: \(networkEvent.isConnected ? NetworkMonitorSpanAttributes.statusValueAvailable : NetworkMonitorSpanAttributes.statusValueLost),
                 type: \(networkEvent.connectionType.rawValue),
-                subType: \(networkEvent.radioType ?? "na"),
+                subType: \(networkEvent.radioType ?? NetworkMonitorSpanAttributes.debugRadioTypeUnavailable),
             """
         }
     }

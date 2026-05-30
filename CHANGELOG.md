@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+* Fixed `app.ui.navigation` spans incorrectly emitting `last.screen.name` with the value `"unknown"` on the first navigation event. The attribute is now omitted when no previous screen has been shown. #661
+
+## [2.3.0] - 2026-05-18
+
 ### Added
 
 * Added automated screen tracking for `UIViewController` transitions #590
@@ -20,6 +26,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Navigation spans now use the span name `app.ui.navigation` (previously `screen name change`). #625
+
+### Fixed
+
+* Fixed xcframework build system. #647
 
 ## [2.2.3] - 2026-05-12
 
