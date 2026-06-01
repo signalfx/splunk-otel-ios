@@ -17,9 +17,11 @@ limitations under the License.
 
 import Foundation
 
-// Static strings for crash report keys
-
-public enum CrashReportKeys: String {
+/// Span attribute keys for crash report telemetry.
+///
+/// Keys that match OpenTelemetry semantic conventions (for example ``exceptionName`` and
+/// ``exceptionReason``) use the same wire names as ``SemanticConventions/Exception``.
+enum CrashReportKeys: String {
     case previousAppState = "ios.app.state"
 
     case crashTimestamp = "crash.timestamp"
@@ -63,4 +65,17 @@ public enum CrashReportKeys: String {
     case imageUUID
 
     case sessionId = "session.id"
+}
+
+
+/// Keys for the dictionary archived into PLCrashReporter custom data.
+///
+/// These are internal storage keys and differ from span attribute keys in ``CrashReportKeys``.
+enum CrashReportCustomDataKeys: String {
+    case sessionId
+    case battery
+    case disk
+    case memory
+    case screenName
+    case buildId
 }

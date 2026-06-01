@@ -61,6 +61,8 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UITabBarController"))
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UIInputWindowController"))
         XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UISystemKeyboardDockController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UITrackingElementWindowController"))
+        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UIEditingOverlayViewController"))
     }
 
     func testShouldIgnoreSwiftUINavigationInfrastructure() {

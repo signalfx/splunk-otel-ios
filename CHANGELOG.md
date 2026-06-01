@@ -9,7 +9,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+* Fixed automated screen tracking incorrectly firing for internal UIKit controllers `UIEditingOverlayViewController` and `UITrackingElementWindowController`. #667
 * Fixed `app.ui.navigation` spans incorrectly emitting `last.screen.name` with the value `"unknown"` on the first navigation event. The attribute is now omitted when no previous screen has been shown. #661
+
+### Changed
+
+* HTTP client spans now emit the OpenTelemetry `network.protocol.version` attribute instead of the deprecated `http.protocol.version` key. The attribute is omitted when the negotiated protocol version cannot be determined from response headers. #656
 
 ## [2.3.0] - 2026-05-18
 
