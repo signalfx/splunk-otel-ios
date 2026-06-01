@@ -30,12 +30,14 @@ extension Navigation {
         // UIKit infrastructure
         "UIApplicationRotationFollowingController",
         "UICompatibilityInputViewController",
+        "UIEditingOverlayViewController",
         "UIInputWindowController",
         "UIKBSystemLayoutViewController",
         "UIPredictionViewController",
         "UISystemInputAssistantViewController",
         "UISystemInputViewController",
         "UISystemKeyboardDockController",
+        "UITrackingElementWindowController",
         "UINavigationController",
         "UITabBarController",
 
