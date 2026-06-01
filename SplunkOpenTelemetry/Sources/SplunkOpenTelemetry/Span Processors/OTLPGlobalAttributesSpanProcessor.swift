@@ -39,11 +39,7 @@ public class OTLPGlobalAttributesSpanProcessor: SpanProcessor {
 
     public func onStart(parentContext _: SpanContext?, span: ReadableSpan) {
         // Add global attributes to the span attributes when it's created
-        for (key, value) in globalAttributes() {
-            guard OTLPInternalGlobalAttributes.shouldExport(key: key) else {
-                continue
-            }
-
+        for (key, value) in globalAttributes() where OTLPInternalGlobalAttributes.shouldExport(key: key) {
             span.clearAndSetAttribute(key: key, value: value)
         }
     }
