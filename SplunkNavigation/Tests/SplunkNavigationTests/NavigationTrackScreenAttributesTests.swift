@@ -15,13 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swift-format-ignore-file
 // swiftformat:disable sortImports
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
-@testable import SplunkNavigation
 import XCTest
+
+@_spi(SplunkInternal) @testable import SplunkNavigation
 
 final class NavigationTrackScreenAttributesTests: XCTestCase {
 

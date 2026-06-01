@@ -15,13 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swift-format-ignore-file
 // swiftformat:disable sortImports
 internal import CiscoSwizzling
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
-@testable import SplunkNavigation
 import UIKit
 import XCTest
+
+@_spi(SplunkInternal) @testable import SplunkNavigation
 
 final class NavigationPresentationTransitionsTests: XCTestCase {
 

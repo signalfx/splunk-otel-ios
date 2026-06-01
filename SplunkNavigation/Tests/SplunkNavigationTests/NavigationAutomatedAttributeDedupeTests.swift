@@ -20,8 +20,9 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
-@testable import SplunkNavigation
 import XCTest
+
+@testable import SplunkNavigation
 
 private let reservedAttributeDedupeEvents = [
     NavigationEvent(
