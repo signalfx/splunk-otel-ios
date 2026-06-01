@@ -15,13 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// Keep import sorting disabled here. These tests need the SPI-qualified
+// @testable import form, and the import formatters do not preserve that
+// setup reliably.
+// swift-format-ignore-file
 // swiftformat:disable sortImports
 internal import CiscoSwizzling
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
-@_spi(SplunkInternal) @testable import SplunkNavigation
 import UIKit
 import XCTest
+
+@_spi(SplunkInternal) @testable import SplunkNavigation
 
 final class NavigationPresentationTransitionsTests: XCTestCase {
 
