@@ -97,10 +97,6 @@ final class NavigationRuntimeStateStore: @unchecked Sendable {
         lock.withLock { storedScreenState?.name ?? "unknown" }
     }
 
-    var previousScreenName: String? {
-        lock.withLock { storedScreenState?.name }
-    }
-
     var screenState: NavigationScreenState? {
         lock.withLock { storedScreenState }
     }

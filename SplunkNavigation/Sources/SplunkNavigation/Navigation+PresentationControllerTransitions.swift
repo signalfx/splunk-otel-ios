@@ -210,11 +210,10 @@ extension Navigation {
         // fall back to event.timestamp so the span still has a valid start time.
         let existingNavigation = await model.navigation(for: event.presentationControllerIdentifier)
         let start = existingNavigation?.start ?? event.timestamp
-        let previousScreenName = runtimeStateStore.previousScreenName
 
         switch restoration {
         case let .screen(state):
-            updateCurrentScreen(state: state, start: start)
+            let previousScreenName = updateCurrentScreen(state: state, start: start)
 
             let completedNavigation = NavigationPair(
                 type: existingNavigation?.type ?? .transition,

@@ -96,11 +96,12 @@ extension Navigation {
         await commitNavigation(event: event, fallbackType: .show)
     }
 
+    @discardableResult
     func updateCurrentScreen(
         screenName: String,
         start: Date,
         attributes: [String: Any]? = nil
-    ) {
+    ) -> String? {
         // forceEmit: false — automated detection deduplicates repeated visits to the same screen.
         // Manual track(screen:) uses forceEmit: true because the caller explicitly requests a new span.
         let screenStateUpdate = updateCurrentScreenState(
@@ -109,38 +110,39 @@ extension Navigation {
             forceEmit: false
         )
 
-        guard screenStateUpdate.shouldEmit else {
-            return
+        if screenStateUpdate.shouldEmit {
+            publishScreenNameChange(screenName)
+            send(
+                screenName: screenName,
+                lastScreenName: screenStateUpdate.previousName,
+                start: start,
+                attributes: attributes
+            )
         }
 
-        publishScreenNameChange(screenName)
-        send(
-            screenName: screenName,
-            lastScreenName: screenStateUpdate.previousName,
-            start: start,
-            attributes: attributes
-        )
+        return screenStateUpdate.previousName
     }
 
+    @discardableResult
     func updateCurrentScreen(
         state: NavigationScreenState,
         start: Date
-    ) {
+    ) -> String? {
         let screenStateUpdate = updateCurrentScreenState(
             state,
             forceEmit: false
         )
 
-        guard screenStateUpdate.shouldEmit else {
-            return
+        if screenStateUpdate.shouldEmit {
+            publishScreenNameChange(state.name)
+            send(
+                screenName: state.name,
+                lastScreenName: screenStateUpdate.previousName,
+                start: start,
+                attributes: state.attributes
+            )
         }
 
-        publishScreenNameChange(state.name)
-        send(
-            screenName: state.name,
-            lastScreenName: screenStateUpdate.previousName,
-            start: start,
-            attributes: state.attributes
-        )
+        return screenStateUpdate.previousName
     }
 }

@@ -283,9 +283,8 @@ public final class Navigation: Sendable {
 
         let existingNavigation = await model.navigation(for: identifier)
         let start = existingNavigation?.start ?? event.timestamp
-        let previousScreenName = runtimeStateStore.previousScreenName
 
-        updateCurrentScreen(
+        let previousScreenName = updateCurrentScreen(
             screenName: navigationEvent.name,
             start: start,
             attributes: navigationEvent.attributes
