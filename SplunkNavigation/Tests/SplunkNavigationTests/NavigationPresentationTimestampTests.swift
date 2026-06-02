@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoSwizzling
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
 import UIKit
