@@ -72,8 +72,16 @@ final class URLSessionMockProtocol: URLProtocol {
     }
 
     static func url(path: String = "/get") -> URL {
-        // swiftlint:disable:next force_unwrapping
-        URL(string: "https://\(host)\(path)")!
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = host
+        components.path = path
+
+        guard let url = components.url else {
+            preconditionFailure("Failed to build mock URL for path \(path)")
+        }
+
+        return url
     }
 
 
