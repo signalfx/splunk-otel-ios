@@ -126,7 +126,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
     // MARK: - Upload Task Completion Handler Tests
 
-    func testUploadTaskWithDataAndCompletion_CreatesSpan() throws {
+    func testUploadTaskWithDataAndCompletion_CreatesSpan() {
         let url = URLSessionMockProtocol.url(path: "/post")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -147,7 +147,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Exactly one HTTP span should be created for uploadTask(with:from:completionHandler:)")
     }
 
-    func testUploadTaskWithFileAndCompletion_CreatesSpan() throws {
+    func testUploadTaskWithFileAndCompletion_CreatesSpan() {
         let url = URLSessionMockProtocol.url(path: "/post")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -173,7 +173,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Exactly one HTTP span should be created for uploadTask(with:fromFile:completionHandler:)")
     }
 
-    func testUploadTaskWithDataAndCompletion_CompletionReceivesData() throws {
+    func testUploadTaskWithDataAndCompletion_CompletionReceivesData() {
         let url = URLSessionMockProtocol.url(path: "/post")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -199,7 +199,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
     // MARK: - Single-Span Lifecycle: injectTraceHeaders = false, URL Overloads
 
-    func testDataTaskWithURL_SingleSpan_WhenHeaderInjectionDisabled() throws {
+    func testDataTaskWithURL_SingleSpan_WhenHeaderInjectionDisabled() {
         reinstallModule(injectTraceHeaders: false)
         addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
@@ -223,7 +223,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Only one span should exist for dataTask(with: URL) when header injection is off")
     }
 
-    func testDataTaskWithURLAndCompletion_SingleSpan_WhenHeaderInjectionDisabled() throws {
+    func testDataTaskWithURLAndCompletion_SingleSpan_WhenHeaderInjectionDisabled() {
         reinstallModule(injectTraceHeaders: false)
         addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
@@ -244,7 +244,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Only one span should exist for dataTask(with: URL, completionHandler:) when header injection is off")
     }
 
-    func testDownloadTaskWithURL_SingleSpan_WhenHeaderInjectionDisabled() throws {
+    func testDownloadTaskWithURL_SingleSpan_WhenHeaderInjectionDisabled() {
         reinstallModule(injectTraceHeaders: false)
         addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 

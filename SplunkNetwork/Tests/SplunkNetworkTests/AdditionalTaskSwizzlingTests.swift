@@ -124,7 +124,7 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
 
     // MARK: - Download Task Completion Handler Tests
 
-    func testDownloadTaskWithRequestAndCompletion_CreatesSpan() throws {
+    func testDownloadTaskWithRequestAndCompletion_CreatesSpan() {
         let url = URLSessionMockProtocol.url()
         let request = URLRequest(url: url)
 
@@ -143,7 +143,7 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Exactly one HTTP span should be created for downloadTask(with: URLRequest, completionHandler:)")
     }
 
-    func testDownloadTaskWithURLAndCompletion_CreatesSpan() throws {
+    func testDownloadTaskWithURLAndCompletion_CreatesSpan() {
         let url = URLSessionMockProtocol.url()
 
         let expectation = expectation(description: "Download completion called")
@@ -161,7 +161,7 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Exactly one HTTP span should be created for downloadTask(with: URL, completionHandler:)")
     }
 
-    func testDownloadTaskWithURLAndCompletion_SingleSpan_WhenHeaderInjectionDisabled() throws {
+    func testDownloadTaskWithURLAndCompletion_SingleSpan_WhenHeaderInjectionDisabled() {
         reinstallModule(injectTraceHeaders: false)
         addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
@@ -184,7 +184,7 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
 
     // MARK: - Streamed Upload Task Tests
 
-    func testUploadTaskWithStreamedRequest_CreatesSpan() throws {
+    func testUploadTaskWithStreamedRequest_CreatesSpan() {
         let url = URLSessionMockProtocol.url(path: "/post")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
