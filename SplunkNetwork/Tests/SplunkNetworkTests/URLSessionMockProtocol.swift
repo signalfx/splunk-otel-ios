@@ -26,11 +26,11 @@ final class URLSessionMockProtocol: URLProtocol {
 
     // MARK: - URLProtocol
 
-    override final static func canInit(with request: URLRequest) -> Bool {
+    override static func canInit(with request: URLRequest) -> Bool {
         request.url?.host == host
     }
 
-    override final static func canonicalRequest(for request: URLRequest) -> URLRequest {
+    override static func canonicalRequest(for request: URLRequest) -> URLRequest {
         request
     }
 

@@ -147,7 +147,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Exactly one HTTP span should be created for uploadTask(with:from:completionHandler:)")
     }
 
-    func testUploadTaskWithFileAndCompletion_CreatesSpan() {
+    func testUploadTaskWithFileAndCompletion_CreatesSpan() throws {
         let url = URLSessionMockProtocol.url(path: "/post")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
