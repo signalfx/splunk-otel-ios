@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Foundation
 import XCTest
 
 @testable import SplunkAgent
@@ -52,20 +53,49 @@ final class ConfigurationHandlerTests: XCTestCase {
 
         let apiClient = try APIClientTestBuilder.build(with: "config", response: dataResponse)
 
-        simulateMainThreadWait(duration: 1)
-
         let configurationHandler = ConfigurationHandler(
             for: defaultConfig,
             apiClient: apiClient,
             storage: storage
         )
 
-        simulateMainThreadWait(duration: 30)
+        waitForRemoteConfiguration(
+            configurationHandler,
+            storage: storage,
+            expectedData: dataResponse,
+            expectedMaxSessionLength: 111
+        )
 
         XCTAssertEqual(configurationHandler.configurationData, dataResponse)
         XCTAssertEqual(configurationHandler.configuration.maxSessionLength, 111)
 
         let storedData: Data? = try? storage.read(forKey: ConfigurationHandler.configurationStoreKey)
         XCTAssertEqual(storedData, dataResponse)
+    }
+
+
+    // MARK: - Private
+
+    private func waitForRemoteConfiguration(
+        _ configurationHandler: ConfigurationHandler,
+        storage: KeyValueStorage,
+        expectedData: Data,
+        expectedMaxSessionLength: TimeInterval,
+        timeout: TimeInterval = 5
+    ) {
+        let deadline = Date().addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            let storedData: Data? = try? storage.read(forKey: ConfigurationHandler.configurationStoreKey)
+
+            if configurationHandler.configurationData == expectedData,
+                configurationHandler.configuration.maxSessionLength == expectedMaxSessionLength,
+                storedData == expectedData
+            {
+                return
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(0.05))
+        }
     }
 }
