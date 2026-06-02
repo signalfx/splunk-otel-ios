@@ -35,7 +35,7 @@ let package = Package(
         // When upgrading, update the version here — the Makefile picks it up automatically.
         .package(
             url: "https://github.com/open-telemetry/opentelemetry-swift-core",
-            exact: "2.3.0"
+            exact: "2.4.1"
         ),
         .package(
             url: "https://github.com/microsoft/plcrashreporter",
