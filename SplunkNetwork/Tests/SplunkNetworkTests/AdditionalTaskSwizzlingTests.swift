@@ -125,11 +125,11 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
     // MARK: - Download Task Completion Handler Tests
 
     func testDownloadTaskWithRequestAndCompletion_CreatesSpan() throws {
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
+        let url = URLSessionMockProtocol.url()
         let request = URLRequest(url: url)
 
         let expectation = expectation(description: "Download completion called")
-        let session = URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
 
         let task = session.downloadTask(with: request) { _, _, _ in
             expectation.fulfill()
@@ -144,10 +144,10 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
     }
 
     func testDownloadTaskWithURLAndCompletion_CreatesSpan() throws {
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
+        let url = URLSessionMockProtocol.url()
 
         let expectation = expectation(description: "Download completion called")
-        let session = URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
 
         let task = session.downloadTask(with: url) { _, _, _ in
             expectation.fulfill()
@@ -165,10 +165,10 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
         reinstallModule(injectTraceHeaders: false)
         addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
+        let url = URLSessionMockProtocol.url()
 
         let expectation = expectation(description: "Download completion called")
-        let session = URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
 
         let task = session.downloadTask(with: url) { _, _, _ in
             expectation.fulfill()
@@ -185,14 +185,18 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
     // MARK: - Streamed Upload Task Tests
 
     func testUploadTaskWithStreamedRequest_CreatesSpan() throws {
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/post"))
+        let url = URLSessionMockProtocol.url(path: "/post")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
         let expectation = expectation(description: "Task completed")
         let bodyData = Data("streamed body".utf8)
         let delegate = StreamedUploadDelegate(expectation: expectation, bodyData: bodyData)
-        let session = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: nil)
+        let session = URLSession(
+            configuration: URLSessionMockProtocol.configuration(),
+            delegate: delegate,
+            delegateQueue: nil
+        )
 
         let task = session.uploadTask(withStreamedRequest: request)
         task.resume()
