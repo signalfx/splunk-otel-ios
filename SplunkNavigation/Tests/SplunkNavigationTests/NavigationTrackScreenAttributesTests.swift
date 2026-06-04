@@ -15,10 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Keep import sorting disabled here. These tests need the SPI-qualified
-// @testable import form, and the import formatters do not preserve that
-// setup reliably.
-// swift-format-ignore-file
 // swiftformat:disable sortImports
 import Foundation
 import OpenTelemetryApi
