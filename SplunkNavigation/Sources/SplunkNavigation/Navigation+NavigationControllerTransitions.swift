@@ -102,25 +102,11 @@ extension Navigation {
         start: Date,
         attributes: [String: Any]? = nil
     ) -> String? {
-        // forceEmit: false — automated detection deduplicates repeated visits to the same screen.
-        // Manual track(screen:) uses forceEmit: true because the caller explicitly requests a new span.
-        let screenStateUpdate = updateCurrentScreenState(
-            screenName: screenName,
-            attributes: attributes,
-            forceEmit: false
+        let state = NavigationScreenState(
+            name: screenName,
+            attributes: effectiveCustomAttributes(from: attributes)
         )
-
-        if screenStateUpdate.shouldEmit {
-            publishScreenNameChange(screenName)
-            send(
-                screenName: screenName,
-                lastScreenName: screenStateUpdate.previousName,
-                start: start,
-                attributes: attributes
-            )
-        }
-
-        return screenStateUpdate.previousName
+        return updateCurrentScreen(state: state, start: start)
     }
 
     @discardableResult
@@ -128,10 +114,9 @@ extension Navigation {
         state: NavigationScreenState,
         start: Date
     ) -> String? {
-        let screenStateUpdate = updateCurrentScreenState(
-            state,
-            forceEmit: false
-        )
+        // forceEmit: false — automated detection deduplicates repeated visits to the same screen.
+        // Manual track(screen:) uses forceEmit: true because the caller explicitly requests a new span.
+        let screenStateUpdate = updateCurrentScreenState(state, forceEmit: false)
 
         if screenStateUpdate.shouldEmit {
             publishScreenNameChange(state.name)

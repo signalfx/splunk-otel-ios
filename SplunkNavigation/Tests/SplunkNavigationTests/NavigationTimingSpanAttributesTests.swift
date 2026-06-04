@@ -27,8 +27,13 @@ import XCTest
 
 final class NavigationTimingSpanAttributesTests: XCTestCase {
 
+    // MARK: - Private
+
     private var exporter = CollectingSpanExporter()
     private var originalTracerProvider: TracerProvider = OpenTelemetry.instance.tracerProvider
+
+
+    // MARK: - Tests lifecycle
 
     override func setUp() {
         super.setUp()
@@ -44,6 +49,8 @@ final class NavigationTimingSpanAttributesTests: XCTestCase {
         OpenTelemetry.registerTracerProvider(tracerProvider: originalTracerProvider)
         super.tearDown()
     }
+
+    // MARK: - Tests
 
     func testShowVCSpanCarriesLastScreenName() async {
         let fixture = makeNavigationStreamFixture()
@@ -119,6 +126,8 @@ final class NavigationTimingSpanAttributesTests: XCTestCase {
             "HomeViewController"
         )
     }
+
+    // MARK: - Helpers
 
     private var showVCSpans: [SpanData] {
         exporter.spans.filter { $0.name == "ShowVC" }
