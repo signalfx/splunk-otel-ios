@@ -5,8 +5,8 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 ## How to Use This Guide
 
 - Treat this file as the primary agent-facing guidance for this repository. If it conflicts with `CODESTYLE.md`, `Development.md`, `CONTRIBUTING.md`, or a module-local pattern, follow the more specific guidance for the touched code and call out the conflict.
-- Keep changes scoped to the user request and inspect nearby code before inferring architecture, naming, test support, or telemetry behavior.
-- Do not intentionally change stable public API, Objective-C selectors, package/distribution metadata, dependencies, privacy-sensitive telemetry, or CI workflows unless the user explicitly asks for that class of change. If an apparently local fix requires one of these changes, explain the impact and get confirmation first.
+- Keep changes scoped to the user request.
+- Get explicit confirmation before changing stable public API, dependencies, distribution metadata, privacy-sensitive telemetry, or CI workflows.
 - Update this file when build, test, packaging, dependency, or review conventions change.
 
 ## Project Facts
@@ -28,10 +28,9 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
   `xcodebuild -scheme SplunkAgent -destination "generic/platform=iOS Simulator" build`
 - Test validation:
   `xcodebuild -scheme SplunkAgent -destination "OS=<installed OS>,name=<installed iPhone simulator>" test`
-- The simulator OS and device name change over time. Before running tests, discover currently available destinations with `xcodebuild -scheme SplunkAgent -showdestinations` or `xcrun simctl list devices available`, then substitute an installed iPhone simulator. Example:
+- The simulator OS and device name change over time. Before running tests, discover currently available scheme destinations with `xcodebuild -scheme SplunkAgent -showdestinations`, then substitute an installed iPhone simulator. Use `xcrun simctl list devices available` only as a fallback when the Xcode destination output is not enough. Example:
   `xcodebuild -scheme SplunkAgent -destination "OS=26.5,name=iPhone 17" test`
 - For targeted test runs, keep the same scheme and destination and add `-only-testing:<TestBundle>/<TestClass>` or `-only-testing:<TestBundle>/<TestClass>/<testMethod>`.
-- If `Package.swift` or `tools/xcframework/Project.swift` changes, run or request `tools/xcframework/scripts/check-manifest-sync.sh`.
 - Report the exact command, destination, and result for any validation performed. If validation cannot run because no compatible simulator is installed, report the discovered destinations and the blocker.
 
 ## Implementation Defaults
