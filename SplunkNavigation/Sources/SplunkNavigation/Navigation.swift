@@ -57,6 +57,7 @@ public final class Navigation: Sendable {
     /// The agent uses this hook to update runtime attributes synchronously, ensuring
     /// spans started immediately after a screen-name change carry the new value.
     @_spi(SplunkInternal)
+    @_spi(SplunkTesting)
     public func setScreenNameObserver(_ observer: (@Sendable (String) -> Void)?) {
         screenNameObserverStore.set(observer)
     }
@@ -106,7 +107,8 @@ public final class Navigation: Sendable {
         )
     }
 
-    init(
+    @_spi(SplunkTesting)
+    public init(
         navigationEventStreamProvider: any NavigationEventStreamProviding,
         navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
     ) {
@@ -140,7 +142,8 @@ public final class Navigation: Sendable {
     /// path; an accepted trade-off for a module that runs for the lifetime
     /// of the process. If cancellation were ever needed, the task handles
     /// would need to be stored and `.cancel()` called explicitly.
-    func startDetection() {
+    @_spi(SplunkTesting)
+    public func startDetection() {
         Task(priority: .userInitiated) {
             await runNavigationDetectionLoop()
         }
