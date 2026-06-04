@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swift-format-ignore-file
 // swiftformat:disable sortImports
 import Foundation
 import OpenTelemetryApi
