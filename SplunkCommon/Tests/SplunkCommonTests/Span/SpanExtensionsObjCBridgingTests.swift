@@ -17,9 +17,8 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
+@_spi(SplunkInternal) import SplunkCommon
 import XCTest
-
-@_spi(SplunkInternal) @testable import SplunkCommon
 
 final class SpanExtensionsObjCBridgingTests: XCTestCase {
 
