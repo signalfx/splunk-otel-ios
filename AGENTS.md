@@ -2,6 +2,13 @@
 
 This repo is a modular Swift Package for the Splunk RUM iOS agent. It instruments iOS, iPadOS, tvOS, visionOS, and macCatalyst apps and sends telemetry to Splunk Observability Cloud.
 
+## How to Use This Guide
+
+- Treat this file as the primary agent-facing guidance for this repository. If it conflicts with `CODESTYLE.md`, `Development.md`, `CONTRIBUTING.md`, or a module-local pattern, follow the more specific guidance for the touched code and call out the conflict.
+- Keep changes scoped to the user request and inspect nearby code before inferring architecture, naming, test support, or telemetry behavior.
+- Do not intentionally change stable public API, Objective-C selectors, package/distribution metadata, dependencies, privacy-sensitive telemetry, or CI workflows unless the user explicitly asks for that class of change. If an apparently local fix requires one of these changes, explain the impact and get confirmation first.
+- Update this file when build, test, packaging, dependency, or review conventions change.
+
 ## Project Facts
 
 - Swift 5.9+, SPM, minimum iOS 13.0.
@@ -14,6 +21,19 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 - Public module APIs have both real proxies (`Proxies/Module/`) and no-op `*NonOperational` proxies (`Proxies/Non-Operational/` or `Proxies/NonOperational/`) for pre-install, disabled, or sampled-out states.
 - The binary distribution uses `tools/xcframework/Project.swift` with library evolution enabled. Keep it in sync with `Package.swift`.
 
+## Build, Test, and Validation Commands
+
+- Do not use `swift test` as the default validation command for this repository. The test suite must run through the Xcode scheme because Apple-platform destinations, resources, and package wiring matter.
+- Build validation:
+  `xcodebuild -scheme SplunkAgent -destination "generic/platform=iOS Simulator" build`
+- Test validation:
+  `xcodebuild -scheme SplunkAgent -destination "OS=<installed OS>,name=<installed iPhone simulator>" test`
+- The simulator OS and device name change over time. Before running tests, discover currently available destinations with `xcodebuild -scheme SplunkAgent -showdestinations` or `xcrun simctl list devices available`, then substitute an installed iPhone simulator. Example:
+  `xcodebuild -scheme SplunkAgent -destination "OS=26.5,name=iPhone 17" test`
+- For targeted test runs, keep the same scheme and destination and add `-only-testing:<TestBundle>/<TestClass>` or `-only-testing:<TestBundle>/<TestClass>/<testMethod>`.
+- If `Package.swift` or `tools/xcframework/Project.swift` changes, run or request `tools/xcframework/scripts/check-manifest-sync.sh`.
+- Report the exact command, destination, and result for any validation performed. If validation cannot run because no compatible simulator is installed, report the discovered destinations and the blocker.
+
 ## Implementation Defaults
 
 - Inspect nearby code before editing and match the established module, naming, `// MARK: -`, and test-support patterns.
@@ -21,6 +41,13 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 - Public API and protocols need DocC; new source files need the license header from `CODESTYLE.md`.
 - SDK instrumentation must be defensive: never let telemetry collection crash the host app. Prefer no-op, drop, or internal logging over `fatalError`, `try!`, forced unwraps, or uncaught errors in production paths.
 - For style-heavy, build/distribution, or contribution-process changes, read `CODESTYLE.md`, `Development.md`, or `CONTRIBUTING.md` before editing.
+
+## Security, Privacy, and Dependency Guardrails
+
+- Do not add new third-party runtime dependencies, new upstream OpenTelemetry exporters, or dependency-version overrides unless the user explicitly requests a dependency change and the binary-size, license, and xcframework impacts are reviewed.
+- Do not hard-code or commit Splunk realms, access tokens, credentials, customer data, private repository paths, or local machine paths in source, tests, fixtures, docs, manifests, or generated files.
+- Do not emit raw request or response bodies, cookies, authorization headers, credentials, or obvious PII through spans, logs, crash payloads, Session Replay metadata, or internal agent events. Reuse existing masking/redaction utilities where available.
+- Treat privacy-impacting resource changes, Session Replay capture changes, crash-report changes, and telemetry attribute changes as customer-visible behavior changes.
 
 ## Telemetry Model
 
