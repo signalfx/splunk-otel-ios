@@ -18,10 +18,9 @@ limitations under the License.
 internal import CiscoSwizzling
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
+@_spi(SplunkTesting) import SplunkNavigation
 import UIKit
 import XCTest
-
-@testable import SplunkNavigation
 
 final class NavigationEventProcessorTests: XCTestCase {
 

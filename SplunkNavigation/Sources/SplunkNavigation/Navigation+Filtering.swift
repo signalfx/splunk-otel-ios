@@ -74,7 +74,8 @@ extension Navigation {
         "StyleContextSplitViewNavigationController<"
     ]
 
-    static func shouldIgnore(controllerTypeName: String) -> Bool {
+    @_spi(SplunkTesting)
+    public static func shouldIgnore(controllerTypeName: String) -> Bool {
         let isExactMatch =
             ignoredControllerTypeNames
             .contains(controllerTypeName)

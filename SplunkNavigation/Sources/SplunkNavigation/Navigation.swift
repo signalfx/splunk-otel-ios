@@ -26,13 +26,15 @@ public final class Navigation: Sendable {
 
     // MARK: - Private
 
-    let model: NavigationModel
+    @_spi(SplunkTesting)
+    public let model: NavigationModel
 
     let appBundleName: String?
 
-    // Yielded from multiple concurrent contexts.
+    /// Yielded from multiple concurrent contexts.
     let continuation: AsyncStream<String>.Continuation
-    let navigationEventStreamProvider: any NavigationEventStreamProviding
+    @_spi(SplunkTesting)
+    public let navigationEventStreamProvider: any NavigationEventStreamProviding
 
     private let logger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),
@@ -41,7 +43,8 @@ public final class Navigation: Sendable {
 
     private let screenNameObserverStore = ScreenNameObserverStore()
 
-    let runtimeStateStore = NavigationRuntimeStateStore()
+    @_spi(SplunkTesting)
+    public let runtimeStateStore = NavigationRuntimeStateStore()
 
     // MARK: - Public
 
@@ -337,7 +340,8 @@ public final class Navigation: Sendable {
     /// The static ``shouldIgnore(controllerTypeName:)`` remains pure for
     /// testability; this instance method adds the side effect of logging
     /// so that filtered controller names are observable in debug builds.
-    func shouldIgnoreAndLog(controllerTypeName: String) -> Bool {
+    @_spi(SplunkTesting)
+    public func shouldIgnoreAndLog(controllerTypeName: String) -> Bool {
         guard Self.shouldIgnore(controllerTypeName: controllerTypeName) else {
             return false
         }
@@ -371,7 +375,8 @@ public final class Navigation: Sendable {
     /// Passes the sanitized type name through the navigation event processor
     /// (stored on the ``NavigationModel`` actor) and returns the processed event,
     /// or `nil` if the event was suppressed.
-    func processAutomatedNavigationEvent(
+    @_spi(SplunkTesting)
+    public func processAutomatedNavigationEvent(
         _ typeName: String,
         controllerIdentifier: ObjectIdentifier
     ) async -> NavigationEvent? {
@@ -383,7 +388,8 @@ public final class Navigation: Sendable {
         )
     }
 
-    func preferredControllerName(for controller: UIViewController) -> String {
+    @_spi(SplunkTesting)
+    public func preferredControllerName(for controller: UIViewController) -> String {
         String(describing: type(of: controller))
     }
 }

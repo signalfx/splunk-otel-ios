@@ -15,14 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// swiftformat:disable sortImports
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
+@_spi(SplunkTesting) import SplunkNavigation
 import XCTest
-
-@testable import SplunkNavigation
 
 private let reservedAttributeDedupeEvents = [
     NavigationEvent(

@@ -17,8 +17,7 @@ limitations under the License.
 
 internal import CiscoSwizzling
 import Foundation
-
-@testable import SplunkNavigation
+@_spi(SplunkTesting) import SplunkNavigation
 
 struct MockNavigationActionEvent: NavigationActionEvent {
     let timestamp: Date

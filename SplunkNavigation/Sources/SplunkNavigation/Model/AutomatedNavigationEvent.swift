@@ -19,18 +19,33 @@ import CiscoSwizzling
 import Foundation
 
 /// Represents an automatic navigation event.
-struct AutomatedNavigationEvent: NavigationActionEvent {
+@_spi(SplunkTesting)
+public struct AutomatedNavigationEvent: NavigationActionEvent {
 
     // MARK: - Public
 
-    var timestamp: Date
-    var type: NavigationActionEventType
-    var controllerTypeName: String
-    var controllerIdentifier: ObjectIdentifier
-    var navigationControllerIdentifier: ObjectIdentifier? {
+    public var timestamp: Date
+    public var type: NavigationActionEventType
+    public var controllerTypeName: String
+    public var controllerIdentifier: ObjectIdentifier
+    public var navigationControllerIdentifier: ObjectIdentifier? {
         // Required for NavigationActionEvent conformance.
         nil
     }
 
-    var viewFrame: CGRect?
+    public var viewFrame: CGRect?
+
+    public init(
+        timestamp: Date,
+        type: NavigationActionEventType,
+        controllerTypeName: String,
+        controllerIdentifier: ObjectIdentifier,
+        viewFrame: CGRect? = nil
+    ) {
+        self.timestamp = timestamp
+        self.type = type
+        self.controllerTypeName = controllerTypeName
+        self.controllerIdentifier = controllerIdentifier
+        self.viewFrame = viewFrame
+    }
 }

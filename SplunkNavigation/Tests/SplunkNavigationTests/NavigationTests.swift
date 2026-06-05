@@ -16,10 +16,9 @@ limitations under the License.
 */
 
 @_spi(SplunkTesting) import SplunkCommon
+@_spi(SplunkTesting) import SplunkNavigation
 import SwiftUI
 import XCTest
-
-@testable import SplunkNavigation
 
 final class NavigationTests: XCTestCase {
 

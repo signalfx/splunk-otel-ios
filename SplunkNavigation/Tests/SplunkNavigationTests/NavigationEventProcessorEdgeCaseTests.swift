@@ -17,9 +17,8 @@ limitations under the License.
 
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
+@_spi(SplunkTesting) import SplunkNavigation
 import XCTest
-
-@testable import SplunkNavigation
 
 /// Tests for edge-case processor behaviors: suppression cleanup and SDK-reserved span key protection.
 final class NavigationEventProcessorEdgeCaseTests: XCTestCase {
