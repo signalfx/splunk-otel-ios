@@ -15,19 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoSwizzling
-@_spi(SplunkTesting) import SplunkNavigation
+extension Navigation {
 
-struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
-    let stream: AsyncStream<any NavigationActionEvent>
+    // MARK: - Testing
 
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        await Task.yield()
-        return stream
-    }
-
-    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
-        await Task.yield()
-        return AsyncStream { _ in }
+    @_spi(SplunkTesting)
+    public static func splunkTestingInstance(
+        navigationEventStreamProvider: any NavigationEventStreamProviding,
+        navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
+    ) -> Navigation {
+        Navigation(
+            navigationEventStreamProvider: navigationEventStreamProvider,
+            navigationEventProcessor: navigationEventProcessor
+        )
     }
 }

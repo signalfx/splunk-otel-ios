@@ -1,6 +1,6 @@
 //
 /*
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,19 +17,20 @@ limitations under the License.
 
 import Foundation
 
-extension Navigation {
+/// Utilities for deriving user-facing class names from UIKit instrumentation type names.
+public enum ClassNameSanitization {
 
-    // MARK: - Class name sanitization
+    // MARK: - Public
 
     /// Returns the bundle name for the guest application.
-    static func applicationBundleName() -> String? {
+    public static func applicationBundleName() -> String? {
         Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as? String
     }
 
-    /// Drops module prefix for types from the application naming space.
-    func sanitize(typeName: String) -> String {
+    /// Drops the host application bundle prefix from a type name.
+    public static func sanitize(typeName: String, bundleName: String?) -> String {
         guard
-            let bundleName = appBundleName,
+            let bundleName,
             typeName.hasPrefix(bundleName)
         else {
             return typeName

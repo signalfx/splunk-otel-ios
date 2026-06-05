@@ -17,6 +17,7 @@ limitations under the License.
 
 import CiscoSwizzling
 import Foundation
+import SplunkUIKitInstrumentation
 
 extension Navigation {
 
@@ -33,7 +34,10 @@ extension Navigation {
         let navigation = NavigationPair(
             type: .show,
             start: event.timestamp,
-            screenName: sanitize(typeName: typeName)
+            screenName: ClassNameSanitization.sanitize(
+                typeName: typeName,
+                bundleName: appBundleName
+            )
         )
 
         await model.update(navigation: navigation, for: controllerIdentifier)

@@ -29,6 +29,10 @@ internal import SplunkCommon
     internal import SplunkCrashReports
 #endif
 
+#if canImport(SplunkLifecycle)
+    internal import SplunkLifecycle
+#endif
+
 #if canImport(SplunkNavigation)
     internal import SplunkNavigation
 #endif
@@ -87,6 +91,11 @@ class DefaultModulesPool: AgentModulesPool {
         // Session Replay
         #if canImport(CiscoSessionReplay)
             knownModules.append(CiscoSessionReplay.SessionReplay.self)
+        #endif
+
+        // Lifecycle Instrumentation
+        #if canImport(SplunkLifecycle)
+            knownModules.append(SplunkLifecycle.Lifecycle.self)
         #endif
 
         // Navigation Instrumentation

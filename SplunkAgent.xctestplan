@@ -89,8 +89,22 @@
     {
       "target" : {
         "containerPath" : "container:",
+        "identifier" : "SplunkLifecycleTests",
+        "name" : "SplunkLifecycleTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
         "identifier" : "SplunkNavigationTests",
         "name" : "SplunkNavigationTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "SplunkUIKitInstrumentationTests",
+        "name" : "SplunkUIKitInstrumentationTests"
       }
     },
     {

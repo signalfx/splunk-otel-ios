@@ -33,7 +33,8 @@ public class OTLPLogToSpanExporter: LogRecordExporter {
 
     // MARK: - Initialization
 
-    init(agentVersion: String) {
+    @_spi(SplunkTesting)
+    public init(agentVersion: String) {
         self.agentVersion = agentVersion
     }
 

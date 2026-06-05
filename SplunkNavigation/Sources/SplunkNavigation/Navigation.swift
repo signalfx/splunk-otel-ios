@@ -19,6 +19,7 @@ internal import CiscoLogger
 import CiscoSwizzling
 import Foundation
 import SplunkCommon
+import SplunkUIKitInstrumentation
 import UIKit
 
 /// The navigation module detects and tracks navigation in the application.
@@ -119,7 +120,7 @@ public final class Navigation: Sendable {
         self.continuation = continuation
 
         // Get bundle name for the guest application
-        appBundleName = Self.applicationBundleName()
+        appBundleName = ClassNameSanitization.applicationBundleName()
 
         if appBundleName == nil {
             logger.log(level: .debug) {
@@ -229,7 +230,10 @@ public final class Navigation: Sendable {
         let navigation = NavigationPair(
             type: .show,
             start: event.timestamp,
-            screenName: sanitize(typeName: event.controllerTypeName)
+            screenName: ClassNameSanitization.sanitize(
+                typeName: event.controllerTypeName,
+                bundleName: appBundleName
+            )
         )
 
         await model.update(navigation: navigation, for: event.controllerIdentifier)
@@ -273,7 +277,10 @@ public final class Navigation: Sendable {
 
         guard
             let navigationEvent = await processAutomatedNavigationEvent(
-                sanitize(typeName: typeName),
+                ClassNameSanitization.sanitize(
+                    typeName: typeName,
+                    bundleName: appBundleName
+                ),
                 controllerIdentifier: identifier
             )
         else {
@@ -331,11 +338,11 @@ public final class Navigation: Sendable {
     /// Returns whether the controller should be filtered from automatic
     /// navigation tracking, and logs at debug level when filtering occurs.
     ///
-    /// The static ``shouldIgnore(controllerTypeName:)`` remains pure for
-    /// testability; this instance method adds the side effect of logging
-    /// so that filtered controller names are observable in debug builds.
+    /// The shared ``ControllerNameFiltering`` helper remains pure for testability;
+    /// this instance method adds the side effect of logging so that filtered
+    /// controller names are observable in debug builds.
     func shouldIgnoreAndLog(controllerTypeName: String) -> Bool {
-        guard Self.shouldIgnore(controllerTypeName: controllerTypeName) else {
+        guard ControllerNameFiltering.shouldIgnore(controllerTypeName: controllerTypeName) else {
             return false
         }
 

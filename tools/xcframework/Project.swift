@@ -185,6 +185,38 @@ let project = Project(
 
 
         // =================================================================
+        // MARK: SplunkUIKitInstrumentation
+        // =================================================================
+        // Shared UIKit instrumentation helpers used by UI-oriented modules.
+        .target(
+            name: "SplunkUIKitInstrumentation",
+            destinations: allPlatforms,
+            product: .framework,
+            bundleId: "com.splunk.rum.uikit-instrumentation",
+            sources: "\(repoRoot)/SplunkUIKitInstrumentation/Sources/**",
+            dependencies: []
+        ),
+
+
+        // =================================================================
+        // MARK: SplunkLifecycle
+        // =================================================================
+        // UI lifecycle tracking.
+        .target(
+            name: "SplunkLifecycle",
+            destinations: allPlatforms,
+            product: .framework,
+            bundleId: "com.splunk.rum.lifecycle",
+            sources: "\(repoRoot)/SplunkLifecycle/Sources/**",
+            dependencies: [
+                mod("SplunkCommon"),
+                mod("SplunkUIKitInstrumentation"),
+                dep("OpenTelemetryApi")
+            ] + ciscoSwizzlingDependencies()
+        ),
+
+
+        // =================================================================
         // MARK: SplunkNavigation
         // =================================================================
         // Screen navigation tracking. Uses swizzling for automatic detection.
@@ -196,6 +228,7 @@ let project = Project(
             sources: "\(repoRoot)/SplunkNavigation/Sources/**",
             dependencies: [
                 mod("SplunkCommon"),
+                mod("SplunkUIKitInstrumentation"),
                 dep("OpenTelemetryApi"),
                 dep("CiscoLogger")
             ] + ciscoSwizzlingDependencies()
@@ -453,6 +486,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkCommon"),
                 mod("SplunkSessionReplayProxy"),
+                mod("SplunkLifecycle"),
                 mod("SplunkNavigation"),
                 mod("SplunkNetwork"),
                 mod("SplunkNetworkMonitor"),
@@ -491,6 +525,7 @@ let project = Project(
                 mod("SplunkAgent"),
                 mod("SplunkCommon"),
                 mod("SplunkInteractions"),
+                mod("SplunkLifecycle"),
                 mod("SplunkNavigation"),
                 mod("SplunkNetworkMonitor"),
                 mod("SplunkSlowFrameDetector"),

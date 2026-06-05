@@ -15,19 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoSwizzling
-@_spi(SplunkTesting) import SplunkNavigation
+import CiscoSwizzling
 
-struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
-    let stream: AsyncStream<any NavigationActionEvent>
-
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        await Task.yield()
-        return stream
-    }
-
-    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
-        await Task.yield()
-        return AsyncStream { _ in }
-    }
+/// Provides lifecycle-related action events produced by swizzling.
+@_spi(SplunkTesting)
+public protocol LifecycleEventStreamProviding: Sendable {
+    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent>
 }

@@ -54,58 +54,6 @@ final class NavigationEventSourcesTests: XCTestCase {
         XCTAssertTrue(type(of: navigation.navigationEventStreamProvider) == DefaultNavigationEventStreamProvider.self)
     }
 
-    // MARK: - Filtering
-
-    func testShouldIgnoreUIKitInternalControllers() {
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UINavigationController"))
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UITabBarController"))
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UIInputWindowController"))
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UISystemKeyboardDockController"))
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UITrackingElementWindowController"))
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "UIEditingOverlayViewController"))
-    }
-
-    func testShouldIgnoreSwiftUINavigationInfrastructure() {
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.UIKitNavigationController"))
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.UIKitTabBarController"))
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.UIKitSplitViewController"))
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.TabHostingController"))
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.NotifyingMulticolumnSplitViewController"))
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "SwiftUI.PlatformAlertController"))
-    }
-
-    func testShouldIgnoreRegularController() {
-        XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "ProductDetailsViewController"))
-    }
-
-    func testShouldIgnoreSwiftUIHostingController() {
-        let name = "UIHostingController<ModifiedContent<DemoView, _TraitWritingModifier<AutomaticNavigationSource>>>"
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: name))
-    }
-
-    func testShouldIgnoreNavigationStackHostingController() {
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "NavigationStackHostingController<AnyView>"))
-    }
-
-    func testShouldIgnorePresentationHostingController() {
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: "PresentationHostingController<AnyView>"))
-    }
-
-    func testShouldIgnoreSplitViewPrefix() {
-        let name = "StyleContextSplitViewNavigationController<MergedStyle>"
-        XCTAssertTrue(Navigation.shouldIgnore(controllerTypeName: name))
-    }
-
-    func testShouldNotIgnoreSimilarPrefix() {
-        let name = "UIHostingWrapperViewController"
-        XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: name))
-    }
-
-    func testShouldNotIgnoreAppControllers() {
-        XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "SettingsViewController"))
-        XCTAssertFalse(Navigation.shouldIgnore(controllerTypeName: "DetailViewController"))
-    }
-
     // MARK: - Filtering (instance path)
 
     func testShouldIgnoreAndLogFiltersInternalControllers() {

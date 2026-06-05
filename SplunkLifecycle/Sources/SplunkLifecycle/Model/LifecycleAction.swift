@@ -15,19 +15,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-internal import CiscoSwizzling
-@_spi(SplunkTesting) import SplunkNavigation
+/// A supported UI lifecycle action.
+public enum LifecycleAction: String, CaseIterable, Codable, Hashable, Sendable {
+    /// A `UIViewController` loaded its view.
+    case viewCreated = "view_created"
 
-struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
-    let stream: AsyncStream<any NavigationActionEvent>
+    /// A `UIViewController` appeared.
+    case resumed
 
-    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
-        await Task.yield()
-        return stream
-    }
+    /// A `UIViewController` disappeared.
+    case stopped
 
-    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
-        await Task.yield()
-        return AsyncStream { _ in }
-    }
+
+    // MARK: - Static constants
+
+    /// The default low-volume lifecycle event set.
+    public static let mainLifecycleEvents: Set<LifecycleAction> = [
+        .viewCreated,
+        .resumed,
+        .stopped
+    ]
 }

@@ -17,6 +17,7 @@ limitations under the License.
 
 import CiscoSwizzling
 import Foundation
+import SplunkUIKitInstrumentation
 
 extension Navigation {
 
@@ -55,7 +56,7 @@ extension Navigation {
     // MARK: - Private methods
 
     private func handlePresentationWillBegin(_ event: any PresentationActionEvent) async {
-        guard !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
+        guard !ControllerNameFiltering.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
             return
         }
 
@@ -71,7 +72,7 @@ extension Navigation {
     }
 
     private func handlePresentationDidEnd(_ event: any PresentationActionEvent) async {
-        guard !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
+        guard !ControllerNameFiltering.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
             return
         }
 
@@ -93,7 +94,7 @@ extension Navigation {
             return
         }
 
-        guard !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
+        guard !ControllerNameFiltering.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
             return
         }
 
@@ -106,7 +107,7 @@ extension Navigation {
             return
         }
 
-        guard !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
+        guard !ControllerNameFiltering.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
             return
         }
 
@@ -140,7 +141,10 @@ extension Navigation {
         let navigation = NavigationPair(
             type: .transition,
             start: timestamp,
-            screenName: sanitize(typeName: snapshot.controllerTypeName)
+            screenName: ClassNameSanitization.sanitize(
+                typeName: snapshot.controllerTypeName,
+                bundleName: appBundleName
+            )
         )
 
         await model.update(

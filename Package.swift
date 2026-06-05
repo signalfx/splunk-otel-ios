@@ -73,6 +73,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkCommon",
                 "SplunkCrashReports",
                 "SplunkSessionReplayProxy",
+                "SplunkLifecycle",
                 "SplunkNavigation",
                 "SplunkNetwork",
                 "SplunkNetworkMonitor",
@@ -119,6 +120,7 @@ func generateMainTargets() -> [Target] {
                 "SplunkAgent",
                 "SplunkCommon",
                 "SplunkInteractions",
+                "SplunkLifecycle",
                 "SplunkNavigation",
                 "SplunkNetworkMonitor",
                 "SplunkSlowFrameDetector"
@@ -141,8 +143,34 @@ func generateMainTargets() -> [Target] {
         // Objective-C (.m) files for ObjC-callability tests.
         .testTarget(
             name: "SplunkAgentBridgingTests",
-            dependencies: ["SplunkAgentObjC", "SplunkNavigation"],
+            dependencies: ["SplunkAgentObjC", "SplunkLifecycle", "SplunkNavigation"],
             path: "SplunkAgent/Tests/SplunkAgentBridgingTests"
+        ),
+
+
+        // MARK: - Splunk Lifecycle (Instrumentation)
+
+        .target(
+            name: "SplunkLifecycle",
+            dependencies: [
+                "SplunkCommon",
+                "SplunkUIKitInstrumentation",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+                resolveDependency("swizzling")
+            ],
+            path: "SplunkLifecycle/Sources",
+            plugins: lintTargetPlugins()
+        ),
+        .testTarget(
+            name: "SplunkLifecycleTests",
+            dependencies: [
+                "SplunkLifecycle",
+                "SplunkNavigation",
+                .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
+                .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core")
+            ],
+            path: "SplunkLifecycle/Tests",
+            plugins: lintTargetPlugins()
         ),
 
 
@@ -152,6 +180,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkNavigation",
             dependencies: [
                 "SplunkCommon",
+                "SplunkUIKitInstrumentation",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 resolveDependency("logger"),
                 resolveDependency("swizzling")
@@ -168,6 +197,23 @@ func generateMainTargets() -> [Target] {
                 .product(name: "OpenTelemetrySdk", package: "opentelemetry-swift-core")
             ],
             path: "SplunkNavigation/Tests",
+            plugins: lintTargetPlugins()
+        ),
+
+
+        // MARK: - Splunk UIKit Instrumentation
+
+        .target(
+            name: "SplunkUIKitInstrumentation",
+            path: "SplunkUIKitInstrumentation/Sources",
+            plugins: lintTargetPlugins()
+        ),
+        .testTarget(
+            name: "SplunkUIKitInstrumentationTests",
+            dependencies: [
+                "SplunkUIKitInstrumentation"
+            ],
+            path: "SplunkUIKitInstrumentation/Tests",
             plugins: lintTargetPlugins()
         ),
 
