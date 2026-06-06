@@ -31,7 +31,7 @@ public enum ClassNameSanitization {
     public static func sanitize(typeName: String, bundleName: String?) -> String {
         guard
             let bundleName,
-            typeName.hasPrefix(bundleName)
+            typeName.hasPrefix("\(bundleName).")
         else {
             return typeName
         }

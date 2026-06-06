@@ -17,7 +17,7 @@ limitations under the License.
 
 import CiscoSwizzling
 import Foundation
-import SplunkUIKitInstrumentation
+import SplunkUICommon
 
 extension Navigation {
 

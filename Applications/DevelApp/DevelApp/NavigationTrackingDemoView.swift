@@ -25,9 +25,11 @@ struct NavigationTrackingDemoView: View {
             NavigationLink(destination: BasicTrackingView()) {
                 Text("Basic (no attributes)")
             }
+            .accessibilityIdentifier("basicTracking")
             NavigationLink(destination: AttributesTrackingView()) {
                 Text("With custom attributes")
             }
+            .accessibilityIdentifier("attributesTracking")
         }
         .navigationTitle("Navigation Tracking")
         .trackScreen("NavigationTrackingDemo")

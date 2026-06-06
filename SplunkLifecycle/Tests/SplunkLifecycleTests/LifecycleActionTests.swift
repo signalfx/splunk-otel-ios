@@ -32,6 +32,9 @@ final class LifecycleActionTests: XCTestCase {
         XCTAssertNil(LifecycleAction(rawValue: "started"))
         XCTAssertNil(LifecycleAction(rawValue: "paused"))
         XCTAssertNil(LifecycleAction(rawValue: "destroyed"))
+        XCTAssertNil(LifecycleAction(rawValue: "attached"))
+        XCTAssertNil(LifecycleAction(rawValue: "detached"))
+        XCTAssertNil(LifecycleAction(rawValue: "view_destroyed"))
         XCTAssertNil(LifecycleAction(rawValue: ""))
         XCTAssertNil(LifecycleAction(rawValue: "RESUMED"))
     }

@@ -15,13 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import SplunkUICommon
+
 /// The lifecycle module tracks UI object lifecycle events.
 public final class Lifecycle: Sendable {
 
     // MARK: - Internal
 
-    let applicationBundleName: String?
     let lifecycleEventStreamProvider: any LifecycleEventStreamProviding
+    let runtimeStateStore: LifecycleRuntimeStateStore
+
+    var applicationBundleName: String? {
+        runtimeStateStore.applicationBundleName
+    }
 
 
     // MARK: - Public
@@ -35,7 +41,8 @@ public final class Lifecycle: Sendable {
     /// Module protocol conformance.
     public required convenience init() {
         self.init(
-            lifecycleEventStreamProvider: DefaultLifecycleEventStreamProvider()
+            lifecycleEventStreamProvider: DefaultLifecycleEventStreamProvider(),
+            applicationBundleName: ClassNameSanitization.applicationBundleName()
         )
     }
 
@@ -45,7 +52,9 @@ public final class Lifecycle: Sendable {
         applicationBundleName: String? = nil
     ) {
         self.lifecycleEventStreamProvider = lifecycleEventStreamProvider
-        self.applicationBundleName = applicationBundleName
+        runtimeStateStore = LifecycleRuntimeStateStore(
+            applicationBundleName: applicationBundleName
+        )
     }
 
 
@@ -53,5 +62,10 @@ public final class Lifecycle: Sendable {
 
     func update(configuration: LifecycleConfiguration) {
         self.configuration = configuration
+    }
+
+    @_spi(SplunkInternal)
+    public func setApplicationBundleName(_ applicationBundleName: String?) {
+        runtimeStateStore.setApplicationBundleName(applicationBundleName)
     }
 }

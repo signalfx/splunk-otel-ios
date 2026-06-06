@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import SplunkUIKitInstrumentation
+import SplunkUICommon
 import XCTest
 
 final class ClassNameSanitizationTests: XCTestCase {
@@ -38,6 +38,15 @@ final class ClassNameSanitizationTests: XCTestCase {
         )
 
         XCTAssertEqual(sanitizedName, "OtherApp.DetailViewController")
+    }
+
+    func testSanitizeLeavesNonModulePrefixUnchanged() {
+        let sanitizedName = ClassNameSanitization.sanitize(
+            typeName: "DemoApplication.DetailViewController",
+            bundleName: "DemoApp"
+        )
+
+        XCTAssertEqual(sanitizedName, "DemoApplication.DetailViewController")
     }
 
     func testSanitizeLeavesTypeNameUnchangedWhenBundleNameIsMissing() {

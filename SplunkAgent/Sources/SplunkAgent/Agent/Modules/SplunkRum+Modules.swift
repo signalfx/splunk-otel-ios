@@ -21,6 +21,7 @@ internal import SplunkAppStart
 internal import SplunkAppState
 internal import SplunkCustomTracking
 internal import SplunkInteractions
+@_spi(SplunkInternal) internal import SplunkLifecycle
 @_spi(SplunkInternal) internal import SplunkNavigation
 internal import SplunkNetwork
 internal import SplunkNetworkMonitor
@@ -61,6 +62,7 @@ extension SplunkRum {
     func customizeModules() {
         customizeCrashReports()
         customizeSessionReplay()
+        customizeLifecycle()
         customizeNavigation()
         customizeNetwork()
         customizeAppStart()
@@ -189,6 +191,24 @@ extension SplunkRum {
 
 
     // MARK: - Other Modules
+
+    /// Configure Lifecycle module.
+    private func customizeLifecycle() {
+        let moduleType = SplunkLifecycle.Lifecycle.self
+        guard let lifecycleModule = modulesManager?.module(ofType: moduleType) else {
+            return
+        }
+
+        let applicationBundleName =
+            Bundle.main.object(
+                forInfoDictionaryKey: kCFBundleNameKey as String
+            ) as? String
+
+        lifecycleModule.setApplicationBundleName(applicationBundleName)
+        // Detection starts during module installation. This refresh happens
+        // before Navigation customization, but callbacks that fired before
+        // subscription or customization can still be missed by this v1 spike.
+    }
 
     /// Configure Navigation module.
     private func customizeNavigation() {

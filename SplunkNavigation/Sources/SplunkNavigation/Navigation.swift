@@ -19,7 +19,7 @@ internal import CiscoLogger
 import CiscoSwizzling
 import Foundation
 import SplunkCommon
-import SplunkUIKitInstrumentation
+import SplunkUICommon
 import UIKit
 
 /// The navigation module detects and tracks navigation in the application.

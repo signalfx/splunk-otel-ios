@@ -18,7 +18,7 @@ limitations under the License.
 import CiscoSwizzling
 import Foundation
 import OpenTelemetryApi
-import SplunkUIKitInstrumentation
+import SplunkUICommon
 
 extension Lifecycle {
 

@@ -19,7 +19,7 @@ internal import CiscoSwizzling
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
-@_spi(SplunkTesting) import SplunkLifecycle
+@_spi(SplunkInternal) @_spi(SplunkTesting) import SplunkLifecycle
 import XCTest
 
 final class LifecycleEmissionTests: XCTestCase {
@@ -152,6 +152,58 @@ final class LifecycleEmissionTests: XCTestCase {
 
         XCTAssertEqual(navigationSubscriberCount, 0)
         XCTAssertEqual(exporter.exportedLogRecords.count, 0)
+    }
+
+    func testEmptyAllowedEventsDoesNotSubscribeOrEmit() async throws {
+        let exporter = CapturingLogRecordExporter()
+        registerLoggerProvider(exporter: exporter)
+
+        let source = LifecycleEventSource()
+        let lifecycle = Lifecycle(lifecycleEventStreamProvider: MockLifecycleEventStreamProvider(source: source))
+        lifecycle.install(
+            with: LifecycleConfiguration(allowedEvents: []),
+            remoteConfiguration: nil
+        )
+
+        try await Task.sleep(nanoseconds: 50_000_000)
+
+        let navigationSubscriberCount = await source.navigationSubscriberCount
+
+        XCTAssertEqual(navigationSubscriberCount, 0)
+        XCTAssertEqual(exporter.exportedLogRecords.count, 0)
+    }
+
+    func testApplicationBundleNameCanBeUpdatedBeforeEmission() async {
+        let exportExpectation = expectation(description: "Lifecycle log export")
+        let exporter = CapturingLogRecordExporter(exportExpectation: exportExpectation)
+        registerLoggerProvider(exporter: exporter)
+
+        let source = LifecycleEventSource()
+        let lifecycle = Lifecycle(
+            lifecycleEventStreamProvider: MockLifecycleEventStreamProvider(source: source),
+            applicationBundleName: nil
+        )
+        lifecycle.setApplicationBundleName("DemoApp")
+        lifecycle.install(with: LifecycleConfiguration(allowedEvents: [.resumed]), remoteConfiguration: nil)
+        await source.waitForNavigationSubscriber()
+
+        await source.yieldNavigation(
+            MockNavigationActionEvent(
+                timestamp: Date(timeIntervalSince1970: 103),
+                type: .viewDidAppear,
+                controllerTypeName: "DemoApp.CheckoutViewController",
+                controllerIdentifier: ObjectIdentifier(NSObject())
+            )
+        )
+
+        await fulfillment(of: [exportExpectation], timeout: 1)
+
+        let records = exporter.exportedLogRecords
+        XCTAssertEqual(records.count, 1)
+        XCTAssertEqual(records[0].attributes["element.name"]?.description, "CheckoutViewController")
+        XCTAssertEqual(records[0].attributes["element.id"]?.description, "DemoApp.CheckoutViewController")
+
+        await source.finish()
     }
 
 

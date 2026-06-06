@@ -154,7 +154,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkLifecycle",
             dependencies: [
                 "SplunkCommon",
-                "SplunkUIKitInstrumentation",
+                "SplunkUICommon",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 resolveDependency("swizzling")
             ],
@@ -180,7 +180,7 @@ func generateMainTargets() -> [Target] {
             name: "SplunkNavigation",
             dependencies: [
                 "SplunkCommon",
-                "SplunkUIKitInstrumentation",
+                "SplunkUICommon",
                 .product(name: "OpenTelemetryApi", package: "opentelemetry-swift-core"),
                 resolveDependency("logger"),
                 resolveDependency("swizzling")
@@ -201,19 +201,19 @@ func generateMainTargets() -> [Target] {
         ),
 
 
-        // MARK: - Splunk UIKit Instrumentation
+        // MARK: - Splunk UI Common
 
         .target(
-            name: "SplunkUIKitInstrumentation",
-            path: "SplunkUIKitInstrumentation/Sources",
+            name: "SplunkUICommon",
+            path: "SplunkUICommon/Sources",
             plugins: lintTargetPlugins()
         ),
         .testTarget(
-            name: "SplunkUIKitInstrumentationTests",
+            name: "SplunkUICommonTests",
             dependencies: [
-                "SplunkUIKitInstrumentation"
+                "SplunkUICommon"
             ],
-            path: "SplunkUIKitInstrumentation/Tests",
+            path: "SplunkUICommon/Tests",
             plugins: lintTargetPlugins()
         ),
 

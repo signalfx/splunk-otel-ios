@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 import SplunkAgent
+import SplunkNavigation
 import SwiftUI
 
 @main
@@ -39,16 +40,22 @@ struct DevelAppApp: App {
         // .sessionConfiguration(SessionConfiguration(samplingRate: 0))
         .sessionConfiguration(SessionConfiguration(samplingRate: 1))
 
+        let navigationConfig = NavigationConfiguration(
+            isEnabled: true,
+            enableAutomatedTracking: true,
+            navigationEventProcessor: DemoNavigationEventProcessor()
+        )
+
         do {
-            agent = try SplunkRum.install(with: agentConfig)
+            agent = try SplunkRum.install(
+                with: agentConfig,
+                moduleConfigurations: [navigationConfig]
+            )
         }
         catch {
             agent = nil
             print("Unable to start the Splunk agent, error: \(error)")
         }
-
-        // Navigation Instrumentation
-        SplunkRum.shared.navigation.preferences.enableAutomatedTracking = true
 
         // Start session replay
         SplunkRum.shared.sessionReplay.start()

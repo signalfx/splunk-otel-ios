@@ -185,15 +185,15 @@ let project = Project(
 
 
         // =================================================================
-        // MARK: SplunkUIKitInstrumentation
+        // MARK: SplunkUICommon
         // =================================================================
         // Shared UIKit instrumentation helpers used by UI-oriented modules.
         .target(
-            name: "SplunkUIKitInstrumentation",
+            name: "SplunkUICommon",
             destinations: allPlatforms,
             product: .framework,
-            bundleId: "com.splunk.rum.uikit-instrumentation",
-            sources: "\(repoRoot)/SplunkUIKitInstrumentation/Sources/**",
+            bundleId: "com.splunk.rum.ui-common",
+            sources: "\(repoRoot)/SplunkUICommon/Sources/**",
             dependencies: []
         ),
 
@@ -210,7 +210,7 @@ let project = Project(
             sources: "\(repoRoot)/SplunkLifecycle/Sources/**",
             dependencies: [
                 mod("SplunkCommon"),
-                mod("SplunkUIKitInstrumentation"),
+                mod("SplunkUICommon"),
                 dep("OpenTelemetryApi")
             ] + ciscoSwizzlingDependencies()
         ),
@@ -228,7 +228,7 @@ let project = Project(
             sources: "\(repoRoot)/SplunkNavigation/Sources/**",
             dependencies: [
                 mod("SplunkCommon"),
-                mod("SplunkUIKitInstrumentation"),
+                mod("SplunkUICommon"),
                 dep("OpenTelemetryApi"),
                 dep("CiscoLogger")
             ] + ciscoSwizzlingDependencies()

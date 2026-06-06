@@ -103,8 +103,8 @@
     {
       "target" : {
         "containerPath" : "container:",
-        "identifier" : "SplunkUIKitInstrumentationTests",
-        "name" : "SplunkUIKitInstrumentationTests"
+        "identifier" : "SplunkUICommonTests",
+        "name" : "SplunkUICommonTests"
       }
     },
     {
