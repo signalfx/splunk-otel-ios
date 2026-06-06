@@ -26,6 +26,7 @@ final class LifecycleRuntimeStateStore: @unchecked Sendable {
     // MARK: - Private
 
     private let lock = NSLock()
+    private var storedConfiguration = LifecycleConfiguration()
     private var storedApplicationBundleName: String?
 
 
@@ -33,6 +34,17 @@ final class LifecycleRuntimeStateStore: @unchecked Sendable {
 
     init(applicationBundleName: String?) {
         storedApplicationBundleName = applicationBundleName
+    }
+
+
+    // MARK: - Configuration
+
+    var configuration: LifecycleConfiguration {
+        lock.withLock { storedConfiguration }
+    }
+
+    func setConfiguration(_ configuration: LifecycleConfiguration) {
+        lock.withLock { storedConfiguration = configuration }
     }
 
 

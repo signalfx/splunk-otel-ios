@@ -160,9 +160,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "SplunkUIKitInstrumentationTests"
-               BuildableName = "SplunkUIKitInstrumentationTests"
-               BlueprintName = "SplunkUIKitInstrumentationTests"
+               BlueprintIdentifier = "SplunkUICommonTests"
+               BuildableName = "SplunkUICommonTests"
+               BlueprintName = "SplunkUICommonTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import SplunkUICommon
 import UIKit
 import XCTest
 
@@ -34,14 +35,20 @@ final class ElementIdentityDerivationTests: XCTestCase {
         let typeName = typeInspectorName(for: ElementIdentityViewController())
 
         XCTAssertEqual(elementId(from: typeName), "SplunkAgentTests.ElementIdentityViewController")
-        XCTAssertEqual(elementName(from: typeName, bundleName: "SplunkAgentTests"), "ElementIdentityViewController")
+        XCTAssertEqual(
+            ClassNameSanitization.sanitize(typeName: typeName, bundleName: "SplunkAgentTests"),
+            "ElementIdentityViewController"
+        )
     }
 
     func testPrivateSwiftViewControllerFallsBackToStableBareClassName() {
         let typeName = typeInspectorName(for: PrivateElementIdentityViewController())
 
         XCTAssertEqual(elementId(from: typeName), "PrivateElementIdentityViewController")
-        XCTAssertEqual(elementName(from: typeName, bundleName: "SplunkAgentTests"), "PrivateElementIdentityViewController")
+        XCTAssertEqual(
+            ClassNameSanitization.sanitize(typeName: typeName, bundleName: "SplunkAgentTests"),
+            "PrivateElementIdentityViewController"
+        )
     }
 
     // MARK: - Objective-C type names
@@ -50,7 +57,10 @@ final class ElementIdentityDerivationTests: XCTestCase {
         let typeName = typeInspectorName(for: UINavigationController())
 
         XCTAssertEqual(elementId(from: typeName), "UINavigationController")
-        XCTAssertEqual(elementName(from: typeName, bundleName: "SplunkAgentTests"), "UINavigationController")
+        XCTAssertEqual(
+            ClassNameSanitization.sanitize(typeName: typeName, bundleName: "SplunkAgentTests"),
+            "UINavigationController"
+        )
     }
 
 
@@ -69,17 +79,6 @@ final class ElementIdentityDerivationTests: XCTestCase {
 
     private func elementId(from rawTypeName: String) -> String {
         rawTypeName
-    }
-
-    private func elementName(from rawTypeName: String, bundleName: String?) -> String {
-        guard
-            let bundleName,
-            rawTypeName.hasPrefix(bundleName)
-        else {
-            return rawTypeName
-        }
-
-        return String(rawTypeName.dropFirst("\(bundleName).".count))
     }
 }
 

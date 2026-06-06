@@ -40,19 +40,17 @@ extension Lifecycle: Module {
 
     // MARK: - Module methods
 
-    /// Installs the Lifecycle module with the specified configuration.
-    ///
-    /// This scaffold stores configuration only. Event stream subscription and
-    /// telemetry emission are added in later milestones.
+    /// Installs the Lifecycle module with the specified configuration and starts detection when enabled.
     public func install(
         with configuration: (any ModuleConfiguration)?,
         remoteConfiguration _: (any RemoteModuleConfiguration)?
     ) {
         update(configuration: configuration as? Configuration ?? Configuration())
 
+        let activeConfiguration = self.configuration
         guard
-            self.configuration.isEnabled,
-            !self.configuration.allowedEvents.isEmpty
+            activeConfiguration.isEnabled,
+            !activeConfiguration.allowedEvents.isEmpty
         else {
             return
         }
@@ -64,7 +62,7 @@ extension Lifecycle: Module {
     ///
     /// - Parameter metadata: The metadata identifying the data to delete.
     public func deleteData(for metadata: any ModuleEventMetadata) {
-        // Intentionally unused in the scaffold
+        // Lifecycle emits directly through OTel logs, not Module onPublish data.
         _ = metadata
     }
 
@@ -72,7 +70,7 @@ extension Lifecycle: Module {
     ///
     /// - Parameter data: The callback closure to execute when data is published.
     public func onPublish(data: @escaping (LifecycleMetadata, LifecycleData) -> Void) {
-        // Intentionally unused in the scaffold
+        // Lifecycle emits directly through OTel logs, not Module onPublish data.
         _ = data
     }
 }

@@ -33,7 +33,14 @@ public final class Lifecycle: Sendable {
     // MARK: - Public
 
     /// The active module configuration.
-    public internal(set) nonisolated(unsafe) var configuration = LifecycleConfiguration()
+    public internal(set) var configuration: LifecycleConfiguration {
+        get {
+            runtimeStateStore.configuration
+        }
+        set {
+            runtimeStateStore.setConfiguration(newValue)
+        }
+    }
 
 
     // MARK: - Initialization
@@ -61,7 +68,7 @@ public final class Lifecycle: Sendable {
     // MARK: - Internal
 
     func update(configuration: LifecycleConfiguration) {
-        self.configuration = configuration
+        runtimeStateStore.setConfiguration(configuration)
     }
 
     @_spi(SplunkInternal)
