@@ -22,6 +22,8 @@ import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkNavigation
 import XCTest
 
+@_spi(SplunkInternal) @testable import SplunkNavigation
+
 final class NavigationTrackScreenAttributesTests: XCTestCase {
 
     private var exporter = CollectingSpanExporter()

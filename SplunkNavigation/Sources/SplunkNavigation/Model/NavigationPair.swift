@@ -42,4 +42,16 @@ public struct NavigationPair: Sendable {
     // MARK: - Controller identity
 
     public let screenName: String
+    public let lastScreenName: String?
+
+
+    // MARK: - Initialization
+
+    public init(type: NavigationType, start: Date, end: Date? = nil, screenName: String, lastScreenName: String? = nil) {
+        self.type = type
+        self.start = start
+        self.end = end
+        self.screenName = screenName
+        self.lastScreenName = lastScreenName
+    }
 }
