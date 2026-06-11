@@ -69,7 +69,7 @@ extension Navigation {
         runtimeStateStore.updateScreenState(state, forceEmit: forceEmit)
     }
 
-    private func effectiveCustomAttributes(from attributes: [String: Any]?) -> [String: AttributeValue] {
+    func effectiveCustomAttributes(from attributes: [String: Any]?) -> [String: AttributeValue] {
         var convertedAttributes = TelemetryAttributeConverter.attributes(from: attributes)
 
         for reservedKey in Self.screenStateReservedAttributeKeys {
