@@ -22,8 +22,6 @@ import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkNavigation
 import XCTest
 
-@testable import SplunkNavigation
-
 private let reservedAttributeDedupeEvents = [
     NavigationEvent(
         name: "SharedScreen",

@@ -19,10 +19,9 @@ import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
+@_spi(SplunkTesting) import SplunkNavigation
 import UIKit
 import XCTest
-
-@testable import SplunkNavigation
 
 final class NavigationTimingSpanAttributesTests: XCTestCase {
 

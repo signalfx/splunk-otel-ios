@@ -22,8 +22,6 @@ import Foundation
 import UIKit
 import XCTest
 
-@_spi(SplunkInternal) @testable import SplunkNavigation
-
 final class NavigationPresentationTransitionsTests: XCTestCase {
 
     // MARK: - Presentation controller transitions
