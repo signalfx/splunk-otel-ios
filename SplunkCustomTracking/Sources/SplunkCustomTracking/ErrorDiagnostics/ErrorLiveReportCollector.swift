@@ -29,6 +29,7 @@ final class ErrorLiveReportImageExtractor {
             guard let thread = thread as? PLCrashReportThreadInfo else {
                 continue
             }
+
             collectUsedImageNames(from: thread.stackFrames, report: report, into: &usedImageNames)
         }
 
@@ -122,13 +123,15 @@ final class ErrorLiveReportCollector {
             let reportData: Data
             if let exception = issue.capturedNSException {
                 reportData = try crashReporter.generateLiveReport(with: exception)
-            } else {
+            }
+            else {
                 reportData = try crashReporter.generateLiveReport()
             }
 
             let report = try PLCrashReport(data: reportData)
             return imageExtractor.imagesJSON(from: report)
-        } catch {
+        }
+        catch {
             return nil
         }
     }

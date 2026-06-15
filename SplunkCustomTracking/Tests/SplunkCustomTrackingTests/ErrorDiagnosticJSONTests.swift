@@ -37,7 +37,7 @@ final class ErrorDiagnosticJSONTests: XCTestCase {
     func testConvertToJSONStringProducesValidJSON() throws {
         let input: [ErrorDiagnosticKeys: Any] = [
             .imagePath: "MyApp",
-            .imageSize: UInt64(4096)
+            .imageSize: UInt64(4_096)
         ]
 
         let jsonString = try XCTUnwrap(ErrorDiagnosticJSON.convertToJSONString(input))
@@ -45,6 +45,6 @@ final class ErrorDiagnosticJSONTests: XCTestCase {
         let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
 
         XCTAssertEqual(parsed["imagePath"] as? String, "MyApp")
-        XCTAssertEqual(parsed["imageSize"] as? Int, 4096)
+        XCTAssertEqual(parsed["imageSize"] as? Int, 4_096)
     }
 }
