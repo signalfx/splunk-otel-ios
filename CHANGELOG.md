@@ -7,6 +7,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-06-15
+
+### Fixed
+
+* Fixed `ShowVC` and `PresentationTransition` timing spans incorrectly emitting `last.screen.name` with the destination screen name instead of the actual previous screen name. #662
+* Fixed automated screen tracking incorrectly firing for internal UIKit controllers `UIEditingOverlayViewController` and `UITrackingElementWindowController`. #667
+* Fixed `app.ui.navigation` spans incorrectly emitting `last.screen.name` with the value `"unknown"` on the first navigation event. The attribute is now omitted when no previous screen has been shown. #661
+* Fixed the SwiftUI View modifier `sessionReplaySensitive` API ambiguity. #676
+
+### Changed
+
+* HTTP client spans now emit the OpenTelemetry `network.protocol.version` attribute instead of the deprecated `http.protocol.version` key. The attribute is omitted when the negotiated protocol version cannot be determined from response headers. #656
+
 ## [2.3.0] - 2026-05-18
 
 ### Added
@@ -22,6 +35,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Navigation spans now use the span name `app.ui.navigation` (previously `screen name change`). #625
+
+### Fixed
+
+* Fixed xcframework build system. #647
 
 ## [2.2.3] - 2026-05-12
 
@@ -257,4 +274,3 @@ This is a first major stable release of the new Splunk OpenTelemetry Agent.
 ### Deprecated
 
 * Deprecates the use of SplunkRum.initialize. Use the SplunkRumBuilder going forward.
-

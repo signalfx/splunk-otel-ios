@@ -44,7 +44,7 @@ extension SpanData {
 
         // Events contain their own attributes dictionaries that also need isolation
         let isolatedEvents = events.map { event in
-            SpanData.Event(
+            Self.Event(
                 name: event.name,
                 timestamp: event.timestamp,
                 attributes: Dictionary(uniqueKeysWithValues: event.attributes.map { ($0.key, $0.value) })
@@ -54,7 +54,7 @@ extension SpanData {
 
         // Links contain their own attributes dictionaries that also need isolation
         let isolatedLinks = links.map { link in
-            SpanData.Link(
+            Self.Link(
                 context: link.context,
                 attributes: Dictionary(uniqueKeysWithValues: link.attributes.map { ($0.key, $0.value) })
             )

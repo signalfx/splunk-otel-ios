@@ -59,14 +59,19 @@ extension Navigation {
         navigationSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
 
         let screenName = navigation.screenName
-        navigationSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: screenName)
+        if let lastScreenName = navigation.lastScreenName {
+            navigationSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        }
+        else {
+            navigationSpan.setAttribute(key: Self.lastScreenNameKey, value: nil as AttributeValue?)
+        }
         navigationSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
         let navigationEnd = navigation.end ?? Date()
         navigationSpan.end(time: navigationEnd)
     }
 
-    func send(screenName: String, lastScreenName: String, start: Date, attributes: [String: Any]? = nil) {
+    func send(screenName: String, lastScreenName: String?, start: Date, attributes: [String: Any]? = nil) {
         // A new zero length span for change screen name event
         let screenNameSpan =
             tracer
@@ -74,22 +79,34 @@ extension Navigation {
             .setStartTime(time: start)
             .startSpan()
 
-        // Write user-provided attributes first so that SDK-reserved keys always win.
+        // SDK-reserved keys are excluded before writing user-provided attributes.
         if let attributes {
-            for (key, value) in attributes {
+            for (key, value) in attributes where !Self.screenStateReservedAttributeKeys.contains(key) {
                 screenNameSpan.clearAndSetAttribute(key: key, value: value)
             }
         }
 
         screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
         screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
-        screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        // Explicit nil clear when there is no previous screen: a span processor may have
+        // already injected last.screen.name before we reach this point, so omitting the
+        // setAttribute call would leave a stale value on the span.
+        if let lastScreenName {
+            screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        }
+        else {
+            screenNameSpan.setAttribute(key: Self.lastScreenNameKey, value: nil as AttributeValue?)
+        }
         screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
         screenNameSpan.end(time: start)
     }
 
-    func send(screenName: String, lastScreenName: String, start: Date, attributes: [String: AttributeValue]) {
+    /// Attributes passed to this overload have already been filtered by effectiveCustomAttributes(from:).
+    ///
+    /// SDK-reserved keys are stripped before this call. The [String: Any] overload filters inline
+    /// because it is called directly from the public track(screen:attributes:) path with raw caller input.
+    func send(screenName: String, lastScreenName: String?, start: Date, attributes: [String: AttributeValue]) {
         // A new zero length span for change screen name event
         let screenNameSpan =
             tracer
@@ -97,14 +114,22 @@ extension Navigation {
             .setStartTime(time: start)
             .startSpan()
 
-        // Write user-provided attributes first so that SDK-reserved keys always win.
+        // Caller-supplied attributes have already had SDK-reserved keys filtered out.
         for (key, value) in attributes {
             screenNameSpan.clearAndSetAttribute(key: key, value: value)
         }
 
         screenNameSpan.clearAndSetAttribute(key: Self.componentKey, value: Self.component)
         screenNameSpan.clearAndSetAttribute(key: Self.navigationNameKey, value: screenName)
-        screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        // Explicit nil clear when there is no previous screen: a span processor may have
+        // already injected last.screen.name before we reach this point, so omitting the
+        // setAttribute call would leave a stale value on the span.
+        if let lastScreenName {
+            screenNameSpan.clearAndSetAttribute(key: Self.lastScreenNameKey, value: lastScreenName)
+        }
+        else {
+            screenNameSpan.setAttribute(key: Self.lastScreenNameKey, value: nil as AttributeValue?)
+        }
         screenNameSpan.clearAndSetAttribute(key: Self.screenNameKey, value: screenName)
 
         screenNameSpan.end(time: start)

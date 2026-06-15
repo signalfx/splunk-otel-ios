@@ -164,4 +164,15 @@ final class CrashReportKeysTests: XCTestCase {
     func testCrashReportKeysSessionId() {
         XCTAssertEqual(CrashReportKeys.sessionId.rawValue, "session.id")
     }
+
+    // MARK: - Custom data keys
+
+    func testCrashReportCustomDataKeys() {
+        XCTAssertEqual(CrashReportCustomDataKeys.sessionId.rawValue, "sessionId")
+        XCTAssertEqual(CrashReportCustomDataKeys.battery.rawValue, "battery")
+        XCTAssertEqual(CrashReportCustomDataKeys.disk.rawValue, "disk")
+        XCTAssertEqual(CrashReportCustomDataKeys.memory.rawValue, "memory")
+        XCTAssertEqual(CrashReportCustomDataKeys.screenName.rawValue, "screenName")
+        XCTAssertEqual(CrashReportCustomDataKeys.buildId.rawValue, "buildId")
+    }
 }

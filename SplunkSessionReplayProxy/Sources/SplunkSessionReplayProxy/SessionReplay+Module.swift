@@ -145,7 +145,7 @@ extension SessionReplay: Module {
 
     public func install(with _: (any ModuleConfiguration)?, remoteConfiguration _: (any RemoteModuleConfiguration)?) {
         // Initialize SessionReplay module
-        _ = SessionReplay.instance
+        _ = Self.instance
     }
 
 

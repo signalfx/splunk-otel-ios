@@ -65,7 +65,7 @@ final class HTTPAnalysisTests: XCTestCase {
             headers: ["Server": "nginx/1.18.0 HTTP/2"]
         )
 
-        XCTAssertEqual(determineHTTPProtocolVersion(response), "2.0")
+        XCTAssertEqual(determineHTTPProtocolVersion(response), "2")
     }
 
     func testDetermineHTTPProtocolVersion_HTTP2_FromH2() {
@@ -74,7 +74,7 @@ final class HTTPAnalysisTests: XCTestCase {
             headers: ["Server": "Apache h2"]
         )
 
-        XCTAssertEqual(determineHTTPProtocolVersion(response), "2.0")
+        XCTAssertEqual(determineHTTPProtocolVersion(response), "2")
     }
 
     func testDetermineHTTPProtocolVersion_HTTP2_FromSpdyHeader() {
@@ -83,22 +83,22 @@ final class HTTPAnalysisTests: XCTestCase {
             headers: ["X-Firefox-Spdy": "h2"]
         )
 
-        XCTAssertEqual(determineHTTPProtocolVersion(response), "2.0")
+        XCTAssertEqual(determineHTTPProtocolVersion(response), "2")
     }
 
-    func testDetermineHTTPProtocolVersion_HTTP1_1_Default() {
+    func testDetermineHTTPProtocolVersion_ReturnsNil_WhenNoHTTP2Indicators() {
         let response = MockHTTPURLResponse(
             statusCode: 200,
             headers: ["Server": "Apache/2.4.41"]
         )
 
-        XCTAssertEqual(determineHTTPProtocolVersion(response), "1.1")
+        XCTAssertNil(determineHTTPProtocolVersion(response))
     }
 
-    func testDetermineHTTPProtocolVersion_HTTP1_1_NoHeaders() {
+    func testDetermineHTTPProtocolVersion_ReturnsNil_WhenNoHeaders() {
         let response = MockHTTPURLResponse(statusCode: 200)
 
-        XCTAssertEqual(determineHTTPProtocolVersion(response), "1.1")
+        XCTAssertNil(determineHTTPProtocolVersion(response))
     }
 
     // MARK: - IP Address Extraction Tests
