@@ -48,6 +48,8 @@ public final class CustomTrackingInternal {
     public unowned var sharedState: AgentSharedState?
     public var onPublishBlock: ((CustomTrackingMetadata, CustomTrackingData) -> Void)?
 
+    let diagnosticEnricher = ErrorDiagnosticEnricher()
+
 
     public required init() {}
 }

@@ -17,5 +17,21 @@ limitations under the License.
 
 import SplunkCommon
 
-/// Minimal protocol conformance.
-public struct CustomTrackingConfiguration: ModuleConfiguration {}
+/// Custom tracking module configuration.
+public struct CustomTrackingConfiguration: ModuleConfiguration {
+
+    // MARK: - Public
+
+    /// When enabled, `trackError` and `trackException` may attach stack-referenced `exception.images`
+    /// metadata from a PLCrashReporter live report, matching the crash report payload shape.
+    ///
+    /// String-only errors are not enriched. Platforms without PLCrashReporter support omit the attribute.
+    /// Default is `true`.
+    public var includeBinaryImagesOnErrors: Bool = true
+
+    // MARK: - Initialization
+
+    public init(includeBinaryImagesOnErrors: Bool = true) {
+        self.includeBinaryImagesOnErrors = includeBinaryImagesOnErrors
+    }
+}

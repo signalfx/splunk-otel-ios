@@ -439,6 +439,7 @@ func generateMainTargets() -> [Target] {
             dependencies: [
                 "SplunkCommon",
                 "SplunkOpenTelemetry",
+                .product(name: "CrashReporter", package: "PLCrashReporter"),
                 resolveDependency("logger")
             ],
             path: "SplunkCustomTracking/Sources",

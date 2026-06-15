@@ -35,6 +35,7 @@ enum ErrorAttributeKeys {
         case type = "exception.type"
         case message = "exception.message"
         case stacktrace = "exception.stacktrace"
+        case images = "exception.images"
         case code = "exception.code"
         case escaped = "exception.escaped"
     }

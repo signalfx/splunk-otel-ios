@@ -67,7 +67,12 @@ extension CustomTrackingInternal {
         // Our toAttributesDictionary() also injects the issue.exceptionType
         let attributesToInject = ["error": EventAttributeValue.string("true")]
         let augmented = attributes.merging(attributesToInject) { $1 }
-        let combinedAttributes = augmented.merging(issue.toAttributesDictionary()) { $1 }
+        var combinedAttributes = augmented.merging(issue.toAttributesDictionary()) { $1 }
+
+        if let splunkIssue = issue as? SplunkIssue,
+           let imagesJSON = diagnosticEnricher.exceptionImagesJSON(for: splunkIssue) {
+            combinedAttributes[ErrorAttributeKeys.Exception.images.rawValue] = .string(imagesJSON)
+        }
 
         // Create the tracking data
         let data = CustomTrackingData(

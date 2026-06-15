@@ -62,6 +62,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(getStringValue(for: "exception.type", in: data), "String")
         XCTAssertEqual(getStringValue(for: "exception.message", in: data), errorMessage)
         XCTAssertNil(data.attributes["exception.stacktrace"])
+        XCTAssertNil(data.attributes["exception.images"])
         XCTAssertEqual(getStringValue(for: "resource_url", in: data), "http://example.com/data.json")
     }
 
@@ -215,6 +216,81 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(getStringValue(for: "exception.type", in: attributes), "NSInternalInconsistencyException")
         XCTAssertEqual(getStringValue(for: "exception.message", in: attributes), "Inconsistent state.")
         XCTAssertNotNil(attributes["exception.stacktrace"])
+    }
+
+    func testTrackError_withSwiftError_attachesImages() throws {
+        struct FileError: Error, LocalizedError {
+            var errorDescription: String? {
+                "File not found"
+            }
+        }
+
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
+        module.install(
+            with: CustomTrackingConfiguration(includeBinaryImagesOnErrors: true),
+            remoteConfiguration: nil
+        )
+
+        let issue = SplunkIssue(from: FileError())
+        module.track(issue, [:])
+
+        wait(for: [expectation], timeout: 1.0)
+
+        let data = try XCTUnwrap(capturedData)
+        let imagesJSON = try XCTUnwrap(getStringValue(for: "exception.images", in: data))
+        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [Any])
+
+        XCTAssertFalse(parsed.isEmpty)
+
+        let firstEntry = try XCTUnwrap(parsed.first as? [String: Any])
+        XCTAssertNotNil(firstEntry["imagePath"])
+        XCTAssertNotNil(firstEntry["baseAddress"])
+        XCTAssertNotNil(firstEntry["imageSize"])
+    }
+
+    func testTrackError_withSwiftError_omitsImagesWhenDisabled() throws {
+        struct FileError: Error, LocalizedError {
+            var errorDescription: String? {
+                "File not found"
+            }
+        }
+
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
+        module.install(
+            with: CustomTrackingConfiguration(includeBinaryImagesOnErrors: false),
+            remoteConfiguration: nil
+        )
+
+        let issue = SplunkIssue(from: FileError())
+        module.track(issue, [:])
+
+        wait(for: [expectation], timeout: 1.0)
+
+        let data = try XCTUnwrap(capturedData)
+        XCTAssertNil(data.attributes["exception.images"])
+    }
+
+    func testTrackException_attachesImages() throws {
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
+        module.install(
+            with: CustomTrackingConfiguration(includeBinaryImagesOnErrors: true),
+            remoteConfiguration: nil
+        )
+
+        let nsException = NSException(name: NSExceptionName("TestException"), reason: "reason", userInfo: nil)
+        let issue = SplunkIssue(from: nsException)
+        module.track(issue, [:])
+
+        wait(for: [expectation], timeout: 1.0)
+
+        let data = try XCTUnwrap(capturedData)
+        let imagesJSON = try XCTUnwrap(getStringValue(for: "exception.images", in: data))
+        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [Any])
+
+        XCTAssertFalse(parsed.isEmpty)
     }
 
     private func assertCommonErrorAttributes(in data: CustomTrackingData, file: StaticString = #file, line: UInt = #line) {

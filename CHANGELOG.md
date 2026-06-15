@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Custom error and exception reporting may now include `exception.images` binary image metadata from a PLCrashReporter live report, matching the crash report payload shape. Configure via `CustomTrackingConfiguration.includeBinaryImagesOnErrors`.
+
 ### Fixed
 
 * Fixed `ShowVC` and `PresentationTransition` timing spans incorrectly emitting `last.screen.name` with the destination screen name instead of the actual previous screen name. #662
