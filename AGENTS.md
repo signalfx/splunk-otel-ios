@@ -6,7 +6,7 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 
 - Treat this file as the primary agent-facing guidance for this repository. If it conflicts with `CODESTYLE.md`, `Development.md`, `CONTRIBUTING.md`, or a module-local pattern, follow the more specific guidance for the touched code and call out the conflict.
 - Keep changes scoped to the user request.
-- Get explicit confirmation before changing stable public API, dependencies, distribution metadata, privacy-sensitive telemetry, or CI workflows.
+- Get explicit confirmation before changing public API, dependencies, distribution metadata, privacy-sensitive telemetry, or CI workflows.
 - Update this file when build, test, packaging, dependency, or review conventions change.
 
 ## Project Facts
