@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-06-15
+
 ### Fixed
 
 * Fixed `ShowVC` and `PresentationTransition` timing spans incorrectly emitting `last.screen.name` with the destination screen name instead of the actual previous screen name. #662
