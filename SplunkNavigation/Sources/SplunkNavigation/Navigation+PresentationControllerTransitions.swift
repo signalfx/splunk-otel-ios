@@ -213,13 +213,14 @@ extension Navigation {
 
         switch restoration {
         case let .screen(state):
-            updateCurrentScreen(state: state, start: start)
+            let previousScreenName = updateCurrentScreen(state: state, start: start)
 
             let completedNavigation = NavigationPair(
                 type: existingNavigation?.type ?? .transition,
                 start: start,
                 end: event.timestamp,
-                screenName: state.name
+                screenName: state.name,
+                lastScreenName: previousScreenName
             )
             send(navigation: completedNavigation)
 
