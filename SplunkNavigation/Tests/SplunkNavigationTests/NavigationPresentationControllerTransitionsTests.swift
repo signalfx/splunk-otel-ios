@@ -15,13 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// swift-format-ignore-file
+// swiftformat:disable sortImports
 internal import CiscoSwizzling
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
 import UIKit
 import XCTest
 
-@testable import SplunkNavigation
+@_spi(SplunkInternal) @testable import SplunkNavigation
 
 final class NavigationPresentationTransitionsTests: XCTestCase {
 
@@ -260,6 +262,70 @@ final class NavigationPresentationTransitionsTests: XCTestCase {
 
         let screenName = module.currentScreenNameForTesting
         XCTAssertEqual(screenName, "Manual Screen")
+    }
+
+
+    // MARK: - No prior screen
+
+    @MainActor
+    func testNavDismissWithNoPriorScreenResetsToUnknown() async {
+        let presentingController = PresentingViewController()
+        let navigationController = UINavigationController(rootViewController: presentingController)
+        let presentedController = PresentedViewController()
+
+        let (module, provider) = makeModule(autoTrackingEnabled: true)
+
+        let observer = ScreenNameObserverRecorder()
+        module.setScreenNameObserver { [observer] name in
+            observer.append(name)
+        }
+
+        module.startDetection()
+
+        // No screen has been tracked yet — storedScreenState is nil.
+
+        provider.emit(
+            eventType: .presentationWillBegin,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .presentationDidEnd,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: true
+        )
+
+        let didPresent = await waitUntil {
+            module.currentScreenNameForTesting.contains("PresentedViewController")
+        }
+        XCTAssertTrue(didPresent, "Screen must become PresentedViewController before dismissal")
+        XCTAssertTrue(
+            observer.values.contains { $0.contains("PresentedViewController") },
+            "Observer must have seen PresentedViewController before dismissal"
+        )
+
+        provider.emit(
+            eventType: .dismissalWillBegin,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: nil
+        )
+        provider.emit(
+            eventType: .dismissalDidEnd,
+            presented: presentedController,
+            presenting: navigationController,
+            completed: true
+        )
+
+        // After dismissal the store and the observer must both reflect "unknown",
+        // not remain stuck on the dismissed modal's name.
+        let didReset = await waitUntil {
+            module.currentScreenNameForTesting == "unknown"
+        }
+        XCTAssertTrue(didReset)
+        XCTAssertEqual(observer.last, "unknown", "Observer must be notified with 'unknown' on dismissal with no prior screen")
     }
 
 

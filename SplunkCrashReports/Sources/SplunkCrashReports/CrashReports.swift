@@ -42,7 +42,7 @@ public class CrashReports {
 
     private var crashReporter: PLCrashReporter?
 
-    var crashSpanName: String = "SplunkCrashReport"
+    var crashSpanName: String = CrashReportConstants.defaultSpanName
 
     /// Storage of periodically sampled device data.
     private var deviceDataDictionary: [String: String] = [:]
@@ -182,7 +182,8 @@ public class CrashReports {
 
         // Load CFBundleVersion. Only need to do this at install
         // as it cannot change without reloading the app
-        deviceDataDictionary["buildId"] = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+        deviceDataDictionary[CrashReportCustomDataKeys.buildId.rawValue] =
+            Bundle.main.infoDictionary?["CFBundleVersion"] as? String
 
         // async in order to load session.id
         DispatchQueue.main.async { [weak self] in
@@ -238,11 +239,11 @@ public class CrashReports {
         deviceDataQueue.async {
             do {
                 if let sessionId = self.sharedState?.sessionId {
-                    self.deviceDataDictionary["sessionId"] = sessionId
+                    self.deviceDataDictionary[CrashReportCustomDataKeys.sessionId.rawValue] = sessionId
                 }
-                self.deviceDataDictionary["battery"] = CrashReportDeviceStats.batteryLevel
-                self.deviceDataDictionary["disk"] = CrashReportDeviceStats.freeDiskSpace
-                self.deviceDataDictionary["memory"] = CrashReportDeviceStats.freeMemory
+                self.deviceDataDictionary[CrashReportCustomDataKeys.battery.rawValue] = CrashReportDeviceStats.batteryLevel
+                self.deviceDataDictionary[CrashReportCustomDataKeys.disk.rawValue] = CrashReportDeviceStats.freeDiskSpace
+                self.deviceDataDictionary[CrashReportCustomDataKeys.memory.rawValue] = CrashReportDeviceStats.freeMemory
                 let customData = try NSKeyedArchiver.archivedData(
                     withRootObject: self.deviceDataDictionary,
                     requiringSecureCoding: false
@@ -264,7 +265,7 @@ public class CrashReports {
 
     public func crashReportUpdateScreenName(_ screenName: String) {
         deviceDataQueue.async {
-            self.deviceDataDictionary["screenName"] = screenName
+            self.deviceDataDictionary[CrashReportCustomDataKeys.screenName.rawValue] = screenName
         }
         updateDeviceStats()
     }
@@ -279,9 +280,11 @@ public class CrashReports {
 
     /// AppState handler.
     func appStateHandler(report: PLCrashReport) -> String {
-        var appState = "unknown"
+        var appState = CrashReportConstants.unknownValue
         if let sharedState {
-            let timebasedAppState = sharedState.applicationState(for: report.systemInfo.timestamp) ?? "unknown"
+            let timebasedAppState =
+                sharedState.applicationState(for: report.systemInfo.timestamp)
+                ?? CrashReportConstants.unknownValue
 
             appState = timebasedAppState
         }
@@ -292,7 +295,7 @@ public class CrashReports {
         let tracer = OpenTelemetry.instance
             .tracerProvider
             .get(
-                instrumentationName: "splunk-crash-report",
+                instrumentationName: CrashReportConstants.instrumentationName,
                 instrumentationVersion: sharedState?.agentVersion
             )
 

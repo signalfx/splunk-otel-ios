@@ -145,7 +145,7 @@ final class CrashReportsTests: XCTestCase {
     // MARK: - Span Name Tests
 
     func testCrashReportsDefaultSpanName() {
-        XCTAssertEqual(crashReports?.crashSpanName, "SplunkCrashReport")
+        XCTAssertEqual(crashReports?.crashSpanName, CrashReportConstants.defaultSpanName)
     }
 
     func testCrashReportsUpdateSpanNameWithSignalName() {
@@ -239,7 +239,7 @@ final class CrashReportsTests: XCTestCase {
         XCTAssertNoThrow(crashReports?.reportCrashIfPresent())
 
         // Span name should still be the default
-        XCTAssertEqual(crashReports?.crashSpanName, "SplunkCrashReport")
+        XCTAssertEqual(crashReports?.crashSpanName, CrashReportConstants.defaultSpanName)
     }
 
     func testAllUsedImageNamesCanBePopulatedAndCleared() {

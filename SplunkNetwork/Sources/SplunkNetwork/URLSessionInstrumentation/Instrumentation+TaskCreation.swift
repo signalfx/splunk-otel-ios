@@ -17,6 +17,7 @@ limitations under the License.
 
 import Foundation
 import OpenTelemetryApi
+@_spi(SplunkInternal) import SplunkCommon
 
 // MARK: - Associated Object Keys
 
@@ -278,13 +279,13 @@ func wrapDownloadCompletionHandler(
 /// See ``wrapCompletionHandler`` for details on the dual-path span lifecycle.
 func endHttpSpanFromCompletion(span: Span, response: URLResponse?, error: Error?) {
     if let httpResponse = response as? HTTPURLResponse {
-        span.setAttribute(key: "http.response.status_code", value: httpResponse.statusCode)
+        span.clearAndSetAttribute(key: SemanticConventions.Http.responseStatusCode, value: httpResponse.statusCode)
         addCapturedResponseHeaders(from: httpResponse, to: span)
     }
 
     if let error {
-        span.setAttribute(key: "error", value: true)
-        span.setAttribute(key: "error.message", value: error.localizedDescription)
+        span.clearAndSetAttribute(key: NetworkSpanAttributeKeys.error, value: true)
+        span.clearAndSetAttribute(key: SemanticConventions.Error.message, value: error.localizedDescription)
     }
 
     span.end()
