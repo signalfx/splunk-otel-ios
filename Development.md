@@ -2,9 +2,21 @@
 
 ## Dependencies
 
-This project is a Swift Package and manages most of its dependencies via the `Package.swift` manifest. The core dependency is [OpenTelemetry Swift](https://github.com/open-telemetry/opentelemetry-swift), which provides the foundation for tracing.
+This project is a Swift Package and manages most of its dependencies via the `Package.swift` manifest. The core dependency is [OpenTelemetry Swift Core](https://github.com/open-telemetry/opentelemetry-swift-core), which provides the API and SDK foundations for telemetry. Protocol exporters are intentionally not used; this project ships a custom OTLP/JSON exporter to control binary size.
 
 Some dependencies, such as Session Replay, are included as pre-compiled binaries. A reference list of major dependencies can also be found in `dependencies.txt`.
+
+### Session Replay Dependency Mode
+
+Session Replay uses binary dependencies by default. For development, the dependency source can be changed with these environment variables:
+
+| Variable | Description |
+|----------|-------------|
+| `USE_SESSION_REPLAY_REPO` | Use repository-based Session Replay dependencies. |
+| `USE_LOCAL_SESSION_REPLAY` | Use a local Session Replay checkout. |
+| `SESSION_REPLAY_BRANCH` | Git branch for repository-based Session Replay dependencies. |
+| `SESSION_REPLAY_LOCAL_PATH` | Local path to the Session Replay checkout. |
+| `USE_DEVELOPMENT_PLUGINS` | Enable development-only linting/formatting plugins. |
 
 ## Building and Testing
 
@@ -32,6 +44,16 @@ This project uses SwiftLint to enforce code style. It is recommended to install 
 ```bash
 brew install swiftlint
 ```
+
+## Binary Distribution
+
+The Swift Package and xcframework distribution have separate manifests. When changing targets, products, supported platforms, dependencies, or resources in `Package.swift`, update `tools/xcframework/Project.swift` as well and run:
+
+```bash
+tools/xcframework/scripts/check-manifest-sync.sh
+```
+
+The dSYM upload helper is documented separately in `dsymUploader/README.md`.
 
 ## Contributing
 
