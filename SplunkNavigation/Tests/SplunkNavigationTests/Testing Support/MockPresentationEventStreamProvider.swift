@@ -17,8 +17,8 @@ limitations under the License.
 
 internal import CiscoSwizzling
 import Foundation
-@_spi(SplunkTesting) import SplunkNavigation
 import UIKit
+@testable import SplunkNavigation // swiftlint:disable:this sorted_imports
 
 struct MockPresentationActionEvent: PresentationActionEvent {
     let timestamp: Date

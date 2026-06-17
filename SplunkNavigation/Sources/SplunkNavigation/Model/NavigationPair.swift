@@ -18,36 +18,34 @@ limitations under the License.
 import Foundation
 
 /// Defines known types of navigation.
-@_spi(SplunkTesting)
-public enum NavigationType: Sendable {
+enum NavigationType: Sendable {
     case show
     case transition
 }
 
 /// The structure encapsulates one navigation in the client application.
-@_spi(SplunkTesting)
-public struct NavigationPair: Sendable {
+struct NavigationPair: Sendable {
 
     // MARK: - Navigation identity
 
-    public let type: NavigationType
+    let type: NavigationType
 
 
     // MARK: - Navigation life
 
-    public let start: Date
-    public var end: Date?
+    let start: Date
+    var end: Date?
 
 
     // MARK: - Controller identity
 
-    public let screenName: String
-    public let lastScreenName: String?
+    let screenName: String
+    let lastScreenName: String?
 
 
     // MARK: - Initialization
 
-    public init(type: NavigationType, start: Date, end: Date? = nil, screenName: String, lastScreenName: String? = nil) {
+    init(type: NavigationType, start: Date, end: Date? = nil, screenName: String, lastScreenName: String? = nil) {
         self.type = type
         self.start = start
         self.end = end

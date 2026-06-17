@@ -26,15 +26,13 @@ public final class Navigation: Sendable {
 
     // MARK: - Private
 
-    @_spi(SplunkTesting)
-    public let model: NavigationModel
+    let model: NavigationModel
 
     let appBundleName: String?
 
     /// Yielded from multiple concurrent contexts.
     let continuation: AsyncStream<String>.Continuation
-    @_spi(SplunkTesting)
-    public let navigationEventStreamProvider: any NavigationEventStreamProviding
+    let navigationEventStreamProvider: any NavigationEventStreamProviding
 
     private let logger = DefaultLogAgent(
         poolName: PackageIdentifier.instance(),
@@ -43,8 +41,7 @@ public final class Navigation: Sendable {
 
     private let screenNameObserverStore = ScreenNameObserverStore()
 
-    @_spi(SplunkTesting)
-    public let runtimeStateStore = NavigationRuntimeStateStore()
+    let runtimeStateStore = NavigationRuntimeStateStore()
 
     // MARK: - Public
 
@@ -60,7 +57,6 @@ public final class Navigation: Sendable {
     /// The agent uses this hook to update runtime attributes synchronously, ensuring
     /// spans started immediately after a screen-name change carry the new value.
     @_spi(SplunkInternal)
-    @_spi(SplunkTesting)
     public func setScreenNameObserver(_ observer: (@Sendable (String) -> Void)?) {
         screenNameObserverStore.set(observer)
     }
@@ -110,8 +106,7 @@ public final class Navigation: Sendable {
         )
     }
 
-    @_spi(SplunkTesting)
-    public init(
+    init(
         navigationEventStreamProvider: any NavigationEventStreamProviding,
         navigationEventProcessor: any NavigationEventProcessor = DefaultNavigationEventProcessor()
     ) {
@@ -145,8 +140,7 @@ public final class Navigation: Sendable {
     /// path; an accepted trade-off for a module that runs for the lifetime
     /// of the process. If cancellation were ever needed, the task handles
     /// would need to be stored and `.cancel()` called explicitly.
-    @_spi(SplunkTesting)
-    public func startDetection() {
+    func startDetection() {
         Task(priority: .userInitiated) {
             await runNavigationDetectionLoop()
         }
@@ -341,8 +335,7 @@ public final class Navigation: Sendable {
     /// The static ``shouldIgnore(controllerTypeName:)`` remains pure for
     /// testability; this instance method adds the side effect of logging
     /// so that filtered controller names are observable in debug builds.
-    @_spi(SplunkTesting)
-    public func shouldIgnoreAndLog(controllerTypeName: String) -> Bool {
+    func shouldIgnoreAndLog(controllerTypeName: String) -> Bool {
         guard Self.shouldIgnore(controllerTypeName: controllerTypeName) else {
             return false
         }
@@ -376,8 +369,7 @@ public final class Navigation: Sendable {
     /// Passes the sanitized type name through the navigation event processor
     /// (stored on the ``NavigationModel`` actor) and returns the processed event,
     /// or `nil` if the event was suppressed.
-    @_spi(SplunkTesting)
-    public func processAutomatedNavigationEvent(
+    func processAutomatedNavigationEvent(
         _ typeName: String,
         controllerIdentifier: ObjectIdentifier
     ) async -> NavigationEvent? {
@@ -389,8 +381,7 @@ public final class Navigation: Sendable {
         )
     }
 
-    @_spi(SplunkTesting)
-    public func preferredControllerName(for controller: UIViewController) -> String {
+    func preferredControllerName(for controller: UIViewController) -> String {
         String(describing: type(of: controller))
     }
 }

@@ -75,8 +75,7 @@ extension Preferences {
 
     // MARK: - Internal convenience init
 
-    @_spi(SplunkTesting)
-    public convenience init(for module: Navigation) {
+    convenience init(for module: Navigation) {
         self.init()
 
         self.module = module

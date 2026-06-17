@@ -16,8 +16,8 @@ limitations under the License.
 */
 
 import Foundation
-@_spi(SplunkTesting) import SplunkNavigation
 import XCTest
+@testable import SplunkNavigation // swiftlint:disable:this sorted_imports
 
 /// Verifies that the CodingKeys exclusion on ``NavigationConfiguration``
 /// serialises only the encodable fields and never exposes the processor.

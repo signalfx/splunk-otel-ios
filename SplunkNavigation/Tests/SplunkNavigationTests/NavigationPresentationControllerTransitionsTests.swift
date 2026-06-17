@@ -18,9 +18,9 @@ limitations under the License.
 internal import CiscoSwizzling
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
-@_spi(SplunkTesting) import SplunkNavigation
 import UIKit
 import XCTest
+@testable @_spi(SplunkInternal) import SplunkNavigation // swiftlint:disable:this sorted_imports
 
 final class NavigationPresentationTransitionsTests: XCTestCase {
 

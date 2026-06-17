@@ -17,7 +17,7 @@ limitations under the License.
 
 internal import CiscoSwizzling
 import Foundation
-@_spi(SplunkTesting) import SplunkNavigation
+@testable import SplunkNavigation
 
 actor ScreenNameCollector {
     private(set) var values: [String] = []

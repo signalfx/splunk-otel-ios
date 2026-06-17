@@ -59,8 +59,7 @@ struct NavigationScreenStateUpdate {
 /// - `moduleEnabled` — checked synchronously by `track(screen:)` before emitting.
 /// - `sharedState` — injected by the agent after construction; read from both
 ///   automated tasks and synchronous manual-tracking calls.
-@_spi(SplunkTesting)
-public final class NavigationRuntimeStateStore: @unchecked Sendable {
+final class NavigationRuntimeStateStore: @unchecked Sendable {
 
     // MARK: - Private
 
@@ -94,8 +93,7 @@ public final class NavigationRuntimeStateStore: @unchecked Sendable {
 
     // MARK: - Screen name
 
-    @_spi(SplunkTesting)
-    public var screenName: String {
+    var screenName: String {
         lock.withLock { storedScreenState?.name ?? "unknown" }
     }
 

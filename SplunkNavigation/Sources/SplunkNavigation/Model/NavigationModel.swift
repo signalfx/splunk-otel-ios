@@ -30,8 +30,7 @@ enum RestorationState {
 }
 
 /// Model actor for data used in Navigation module.
-@_spi(SplunkTesting)
-public actor NavigationModel {
+actor NavigationModel {
 
     // MARK: - Public
 
@@ -63,7 +62,7 @@ public actor NavigationModel {
 
     // MARK: - Navigations management
 
-    public func navigation(for identifier: ObjectIdentifier) -> NavigationPair? {
+    func navigation(for identifier: ObjectIdentifier) -> NavigationPair? {
         navigations[identifier]
     }
 
@@ -78,7 +77,7 @@ public actor NavigationModel {
 
     // MARK: - Pending navigation targets
 
-    public func pendingNavigationTarget(for identifier: ObjectIdentifier) -> ObjectIdentifier? {
+    func pendingNavigationTarget(for identifier: ObjectIdentifier) -> ObjectIdentifier? {
         pendingNavigationTargets[identifier]
     }
 

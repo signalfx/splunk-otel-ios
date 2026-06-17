@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_spi(SplunkTesting) import SplunkNavigation
+@testable import SplunkNavigation
 
 // MARK: - Test processors
 

@@ -17,9 +17,9 @@ limitations under the License.
 
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
-@_spi(SplunkTesting) import SplunkNavigation
 import UIKit
 import XCTest
+@testable import SplunkNavigation // swiftlint:disable:this sorted_imports
 
 final class NavigationPresentationTimestampTests: XCTestCase {
 

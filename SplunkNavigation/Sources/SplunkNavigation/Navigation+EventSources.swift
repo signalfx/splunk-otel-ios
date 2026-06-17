@@ -21,8 +21,7 @@ extension Navigation {
 
     // MARK: - Event sources
 
-    @_spi(SplunkTesting)
-    public func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
+    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
         try await navigationEventStreamProvider.navigationStream()
     }
 

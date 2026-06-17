@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 internal import CiscoSwizzling
-@_spi(SplunkTesting) import SplunkNavigation
+@testable import SplunkNavigation
 
 struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {
     let stream: AsyncStream<any NavigationActionEvent>

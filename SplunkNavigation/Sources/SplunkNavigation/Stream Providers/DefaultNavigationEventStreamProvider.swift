@@ -18,13 +18,12 @@ limitations under the License.
 import CiscoSwizzling
 
 /// Default stream provider backed by CiscoSwizzling.
-@_spi(SplunkTesting)
-public struct DefaultNavigationEventStreamProvider: NavigationEventStreamProviding, Sendable {
-    public func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
+struct DefaultNavigationEventStreamProvider: NavigationEventStreamProviding, Sendable {
+    func navigationStream() async throws -> AsyncStream<any NavigationActionEvent> {
         try await DefaultSwizzling.navigation
     }
 
-    public func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
+    func presentationStream() async throws -> AsyncStream<any PresentationActionEvent> {
         try await DefaultSwizzling.presentation
     }
 }

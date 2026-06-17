@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@_spi(SplunkTesting) import SplunkNavigation
 import XCTest
+@testable import SplunkNavigation // swiftlint:disable:this sorted_imports
 
 #if canImport(SwiftUI)
     import SwiftUI
