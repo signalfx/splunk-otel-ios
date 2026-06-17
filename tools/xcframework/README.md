@@ -90,7 +90,7 @@ Key variables in the Makefile:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `OTEL_VERSION` | `2.3.0` | OpenTelemetry Swift Core tag to build |
-| `PLCRASH_VERSION` | `1.12.0` | PLCrashReporter tag to build |
+| `PLCRASH_VERSION` | `1.12.2` | PLCrashReporter tag to build |
 | `SESSION_REPLAY_LOCAL_PATH` | *(required)* | Local path to the Session Replay repository |
 | `CISCO_XCFRAMEWORKS_PATH` | *(empty)* | Legacy path to prebuilt dynamic Cisco xcframeworks |
 | `IOS_ONLY` | `false` | Build and validate only `ios-arm64` and `ios-arm64_x86_64-simulator` slices |

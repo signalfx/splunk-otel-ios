@@ -39,7 +39,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/microsoft/plcrashreporter",
-            exact: "1.12.0"
+            exact: "1.12.2"
         )
     ],
     targets: []

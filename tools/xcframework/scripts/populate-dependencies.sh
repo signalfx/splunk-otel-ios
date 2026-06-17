@@ -16,7 +16,7 @@
 #
 # Options:
 #   --cisco-path PATH     Legacy path to directory containing dynamic Cisco xcframeworks
-#   --plcrash-version VER PLCrashReporter version (default: 1.12.0)
+#   --plcrash-version VER PLCrashReporter version (default: 1.12.2)
 #   --skip-otel           Skip OTel (assumes already built in output/xcframeworks/)
 #   --skip-cisco          Skip Cisco staging
 #   --skip-plcrash        Skip PLCrashReporter download
@@ -42,7 +42,7 @@ DEPS_DIR="${TOOLS_ROOT}/dependencies"
 OTEL_OUTPUT_DIR="${TOOLS_ROOT}/output/xcframeworks"
 
 # PLCrashReporter settings (built from source by build-plcrash-xcframeworks.sh)
-PLCRASH_VERSION="${PLCRASH_VERSION:-1.12.0}"
+PLCRASH_VERSION="${PLCRASH_VERSION:-1.12.2}"
 
 # Cisco xcframeworks path (can be overridden)
 CISCO_XCFRAMEWORKS_PATH="${CISCO_XCFRAMEWORKS_PATH:-}"
