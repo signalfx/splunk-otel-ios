@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Session Replay segment metadata now includes a `userActivity` field containing Unix-millisecond timestamps of user interactions that occurred during the segment window, enabling timeline visualization in the backend. #646
+
 ## [2.3.1] - 2026-06-15
 
 ### Fixed

@@ -79,6 +79,7 @@ class DefaultEventManager: AgentEventManager {
 
     var sessionReplayIndexer: EventIndexer
     var sessionReplayMemorizer: EventMemorizer
+    let userActivityCollector = UserActivityCollector()
 
     /// Agent reference.
     unowned let agent: SplunkRum
@@ -149,6 +150,7 @@ class DefaultEventManager: AgentEventManager {
 
         // Crash Reports module data
         #if canImport(SplunkCrashReports)
+
             case let (metadata as CrashReportsMetadata, data as String):
                 publishCrashReports(data: data, metadata: metadata, completion: completion)
         #endif
@@ -196,29 +198,23 @@ class DefaultEventManager: AgentEventManager {
             // Use scriptInstanceId as a 16 character substring of a sessionId
             let scriptInstanceId = String(sessionId.prefix(upTo: sessionId.index(sessionId.startIndex, offsetBy: 16)))
 
+            let userActivity = await userActivityCollector.flush(startMs: metadata.startUnixMs, endMs: metadata.endUnixMs)
+
             let event = SessionReplayDataEvent(
                 metadata: metadata,
                 data: data,
                 index: eventIndex,
                 sessionId: sessionId,
-                scriptInstanceId: scriptInstanceId
+                scriptInstanceId: scriptInstanceId,
+                userActivity: userActivity
             )
 
-            sessionReplayProcessor.sendEvent(
-                event: event,
-                immediateProcessing: false,
-                completion: { [weak self] processed in
-                    if processed {
-                        self?
-                            .removeSessionReplayIndex(
-                                sessionId: sessionId,
-                                timestamp: metadata.timestamp
-                            )
-                    }
-
-                    completion(processed)
+            sessionReplayProcessor.sendEvent(event: event, immediateProcessing: false) { [weak self] processed in
+                if processed {
+                    self?.removeSessionReplayIndex(sessionId: sessionId, timestamp: metadata.timestamp)
                 }
-            )
+                completion(processed)
+            }
         }
     }
 

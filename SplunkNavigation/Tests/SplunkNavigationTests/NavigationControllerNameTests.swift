@@ -17,6 +17,7 @@ limitations under the License.
 
 import XCTest
 
+// swift-format-ignore-file
 @testable import SplunkNavigation
 
 #if canImport(SwiftUI)

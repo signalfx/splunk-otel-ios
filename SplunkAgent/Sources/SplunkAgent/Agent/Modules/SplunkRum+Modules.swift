@@ -272,6 +272,15 @@ extension SplunkRum {
             return
         }
 
+        if let collector = (eventManager as? DefaultEventManager)?.userActivityCollector,
+           sessionReplayProxy is SessionReplay {
+            userActivityTask = Task {
+                for await date in interactionsModule.activityStream {
+                    await collector.record(at: date)
+                }
+            }
+        }
+
         // Initialize proxy API for this module
         interactions = Interactions(for: interactionsModule)
     }

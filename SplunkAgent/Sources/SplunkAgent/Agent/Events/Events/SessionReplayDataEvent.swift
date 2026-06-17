@@ -51,7 +51,8 @@ class SessionReplayDataEvent: AgentEvent {
     ///   - sessionId: The `session Id` of a session in which the event occurred.
     ///               Optional so that we can see sessions with no session id in the backend.
     ///   - scriptInstanceId: Internal identifier used for backend purposes.
-    init(metadata: Metadata, data: Data, index: Int, sessionId: String?, scriptInstanceId: String) {
+    ///   - userActivity: Unix-millisecond timestamps of user interactions recorded during this segment.
+    init(metadata: Metadata, data: Data, index: Int, sessionId: String?, scriptInstanceId: String, userActivity: [Int] = []) {
         // Event properties
         timestamp = metadata.timestamp
         body = EventAttributeValue(data)
@@ -64,7 +65,7 @@ class SessionReplayDataEvent: AgentEvent {
         // Event attributes
         attributes = [
             // Chunk metadata
-            "segmentMetadata": .string(metadataToJSONString(metadata)),
+            "segmentMetadata": .string(metadataToJSONString(metadata, userActivity: userActivity)),
 
             // Script ID
             "splunk.scriptInstance": .string(scriptInstanceId),
@@ -80,16 +81,31 @@ class SessionReplayDataEvent: AgentEvent {
 
     // MARK: - Private methods
 
-    private func metadataToJSONString(_ metadata: Metadata) -> String {
+    private func metadataToJSONString(_ metadata: Metadata, userActivity: [Int]) -> String {
         // We always prefer conversion with a standard encoder ...
         guard
             let metadataContent = try? JSONEncoder().encode(metadata),
-            let jsonString = String(data: metadataContent, encoding: .utf8)
+            var jsonObject = try? JSONSerialization.jsonObject(with: metadataContent) as? [String: Any]
         else {
             // ... but if something fails, we can build it manually
-            return "{\"startUnixMs\":\(metadata.startUnixMs), \"endUnixMs\":\(metadata.endUnixMs), \"source\":\"\(metadata.source)\"}"
+            return fallbackJSON(metadata: metadata, userActivity: userActivity)
+        }
+
+        jsonObject["userActivity"] = userActivity
+
+        guard
+            let enrichedData = try? JSONSerialization.data(withJSONObject: jsonObject),
+            let jsonString = String(data: enrichedData, encoding: .utf8)
+        else {
+            return fallbackJSON(metadata: metadata, userActivity: userActivity)
         }
 
         return jsonString
+    }
+
+    private func fallbackJSON(metadata: Metadata, userActivity: [Int]) -> String {
+        let activityJSON = userActivity.map(String.init).joined(separator: ",")
+        return "{\"startUnixMs\":\(metadata.startUnixMs),\"endUnixMs\":\(metadata.endUnixMs),"
+            + "\"source\":\"\(metadata.source)\",\"userActivity\":[\(activityJSON)]}"
     }
 }
