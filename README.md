@@ -1,20 +1,12 @@
----
+# Splunk OpenTelemetry Instrumentation for iOS
 
-<p align="center">
-  <strong>
-    <a href="https://help.splunk.com/en/splunk-observability-cloud/manage-data/instrument-front-end-applications/instrument-mobile-and-web-applications-for-splunk-rum/instrument-ios-applications-for-splunk-rum/splunk-rum-ios-agent-version-2.0.0-and-above/install-the-splunk-rum-ios-agent">Official Installation Docs</a>
-    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="#getting-started">Getting Started</a>
-    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="CONTRIBUTING.md">Getting Involved</a>
-    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="SECURITY.md">Security</a>
-  </strong>
-</p>
+## Documentation
 
----
+- [Install the Splunk RUM iOS Agent](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-ios-applications-for-splunk-rum/splunk-rum-ios-agent-version-2.0.0-and-above/install-the-splunk-rum-ios-agent)
+- [Record iOS Sessions](https://help.splunk.com/en/splunk-observability-cloud/monitor-end-user-experience/real-user-monitoring/replay-user-sessions/record-ios-sessions)
+- [Troubleshoot iOS Instrumentation](https://help.splunk.com/en/splunk-observability-cloud/manage-data/available-data-sources/supported-integrations-in-splunk-observability-cloud/rum-instrumentation/instrument-mobile-and-web-applications-for-splunk-real-user-monitoring-rum/instrument-ios-applications-for-splunk-rum/splunk-rum-ios-agent-version-2.0.0-and-above/troubleshoot-ios-instrumentation)
 
-# Splunk RUM Agent for iOS
+# Overview
 
 The Splunk RUM Agent for iOS is a modular Swift package for Real User Monitoring (RUM).
 
