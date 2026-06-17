@@ -20,7 +20,8 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
 import XCTest
-@testable @_spi(SplunkInternal) import SplunkNavigation // swiftlint:disable:this sorted_imports
+
+@testable @_spi(SplunkInternal) import SplunkNavigation
 
 final class NavigationTrackScreenAttributesTests: XCTestCase {
 

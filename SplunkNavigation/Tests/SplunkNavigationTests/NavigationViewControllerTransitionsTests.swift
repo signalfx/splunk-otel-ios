@@ -19,7 +19,8 @@ internal import CiscoSwizzling
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
 import XCTest
-@testable import SplunkNavigation // swiftlint:disable:this sorted_imports
+
+@testable import SplunkNavigation
 
 final class NavigationViewControllerTransitionsTests: XCTestCase {
 

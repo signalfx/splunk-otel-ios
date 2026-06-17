@@ -20,7 +20,8 @@ import Foundation
 @_spi(SplunkTesting) import SplunkCommon
 import UIKit
 import XCTest
-@testable @_spi(SplunkInternal) import SplunkNavigation // swiftlint:disable:this sorted_imports
+
+@testable @_spi(SplunkInternal) import SplunkNavigation
 
 final class NavigationPresentationTransitionsTests: XCTestCase {
 

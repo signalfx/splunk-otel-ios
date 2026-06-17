@@ -17,6 +17,7 @@ limitations under the License.
 
 internal import CiscoSwizzling
 import Foundation
+
 @testable import SplunkNavigation
 
 func makeTransitionEvent(

@@ -16,6 +16,7 @@ limitations under the License.
 */
 
 internal import CiscoSwizzling
+
 @testable import SplunkNavigation
 
 struct MockNavigationEventStreamProvider: NavigationEventStreamProviding {

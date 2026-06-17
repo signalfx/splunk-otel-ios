@@ -16,7 +16,8 @@ limitations under the License.
 */
 
 import XCTest
-@testable import SplunkNavigation // swiftlint:disable:this sorted_imports
+
+@testable import SplunkNavigation
 
 /// Verifies that ``NavigationConfiguration`` init defaults are consistent
 /// with the property-level defaults.

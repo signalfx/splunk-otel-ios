@@ -19,7 +19,8 @@ import Foundation
 @_spi(SplunkTesting) import SplunkCommon
 import UIKit
 import XCTest
-@testable import SplunkNavigation // swiftlint:disable:this sorted_imports
+
+@testable import SplunkNavigation
 
 final class NavigationPresentationTimestampTests: XCTestCase {
 

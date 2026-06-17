@@ -18,7 +18,8 @@ limitations under the License.
 import Foundation
 @_spi(SplunkTesting) import SplunkCommon
 import XCTest
-@testable import SplunkNavigation // swiftlint:disable:this sorted_imports
+
+@testable import SplunkNavigation
 
 /// Tests for edge-case processor behaviors: suppression cleanup and SDK-reserved span key protection.
 final class NavigationEventProcessorEdgeCaseTests: XCTestCase {

@@ -20,7 +20,8 @@ import OpenTelemetryApi
 import OpenTelemetrySdk
 @_spi(SplunkTesting) import SplunkCommon
 import XCTest
-@testable import SplunkNavigation // swiftlint:disable:this sorted_imports
+
+@testable import SplunkNavigation
 
 private let reservedAttributeDedupeEvents = [
     NavigationEvent(

@@ -16,7 +16,8 @@ limitations under the License.
 */
 
 import XCTest
-@testable import SplunkNavigation // swiftlint:disable:this sorted_imports
+
+@testable import SplunkNavigation
 
 final class PreferencesTests: XCTestCase {
 
