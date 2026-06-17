@@ -30,7 +30,7 @@ public final class Navigation: Sendable {
 
     let appBundleName: String?
 
-    /// Yielded from multiple concurrent contexts.
+    // Yielded from multiple concurrent contexts.
     let continuation: AsyncStream<String>.Continuation
     let navigationEventStreamProvider: any NavigationEventStreamProviding
 
