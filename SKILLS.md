@@ -30,6 +30,10 @@ If no version control is present, recommend creating a checkpoint before edits.
   descriptions, headers, request descriptors, payloads, or token-like values.
 - Do not change app architecture. Add lifecycle wrappers only when inspection
   shows they are the smallest safe integration point.
+- If the Host App uses a hybrid SDK such as React Native or Flutter, do not
+  directly instrument generated native iOS project files by default. Route setup
+  to the product-specific hybrid SDK; use this Skill Bundle only for explicit
+  narrow native iOS subtopics.
 - Do not add app-side platform fences for Splunk RUM public API calls. If
   non-iOS Apple targets are relevant, note that the SDK can build and run there
   in a lightweight non-operational mode; RUM telemetry is expected on iOS/iPadOS.
@@ -71,6 +75,7 @@ Start with:
 
 | Task or evidence | Load these files |
 | --- | --- |
+| React Native, Flutter, `package.json`, `pubspec.yaml`, generated `ios/` wrapper | [`install/hybrid-apps.md`](skill-references/install/hybrid-apps.md) |
 | Fresh install, product choice, lifecycle entry point, SwiftUI/UIKit/AppDelegate/no-AppDelegate cases | [`install/fresh-install.md`](skill-references/install/fresh-install.md) |
 | Build/link/package failures, product mismatch, stale package metadata | [`install/build-and-link-errors.md`](skill-references/install/build-and-link-errors.md) |
 | Deferred endpoint, endpoint update/disable, runtime state, sampling, duplicate install | [`install/endpoint-and-runtime-state.md`](skill-references/install/endpoint-and-runtime-state.md) |
@@ -98,7 +103,8 @@ For `plan` / pre-`apply`, report:
 
 1. Evidence table with file paths, line numbers or search patterns, and confidence.
 2. Recommended path: fresh install, migration, review fix, manual-only, sample,
-   non-operational platform note, or no-iOS-target outcome.
+   product-specific hybrid SDK referral, non-operational platform note, or
+   no-iOS-target outcome.
 3. References loaded and why.
 4. Minimal dependency, linkage, lifecycle, and configuration changes.
 5. Required user-provided values or approvals.
