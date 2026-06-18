@@ -51,11 +51,15 @@ For an Xcode archive, the normal path is:
 <AppName>.xcarchive/dSYMs/
 ```
 
-In Xcode, this is available through Organizer: show the archive in Finder, show
-package contents, then use the `dSYMs/` directory. For CI-built TestFlight or
-App Store releases, retrieve the `.xcarchive` or extracted `dSYMs/` directory
-from the CI artifact store; the local Xcode Organizer workflow does not apply
-to an archive produced on a CI machine.
+When giving the user manual Xcode Organizer instructions, be specific: tell
+them to right-click the archive row's creation date, version, or archive icon,
+then choose Show in Finder. Then tell them to right-click the `.xcarchive`
+bundle in Finder, choose Show Package Contents, and use the `dSYMs/` directory.
+Warn that right-clicking the app name text in Organizer might not show the
+Finder menu. For CI-built TestFlight or App Store releases, retrieve the
+`.xcarchive` or extracted `dSYMs/` directory from the CI artifact store; the
+local Xcode Organizer workflow does not apply to an archive produced on a CI
+machine.
 
 Confirm `DEBUG_INFORMATION_FORMAT = dwarf-with-dsym` for release/archive
 builds. If the setting is `dwarf` only, there may be no `.dSYM` bundles to
