@@ -9,6 +9,8 @@ DerivedData/
 
 # Release
 release/
+!skill-references/release/
+!skill-references/release/**
 
 ## Various settings
 *.pbxuser
@@ -70,4 +72,3 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 .DS_Store
-
