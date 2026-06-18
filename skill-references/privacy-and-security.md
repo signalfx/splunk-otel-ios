@@ -30,6 +30,9 @@ Do not skip for any Host App task.
 - Never print raw SDK errors, `localizedDescription`, endpoint/configuration
   descriptions, request descriptors, headers, payloads, cookies, tokens, or
   token-like values.
+- Do not copy public-doc examples that print `error` or
+  `localizedDescription`; current `AgentConfigurationError` descriptions can
+  include supplied endpoint or token values.
 - Use placeholders in examples and the Host App's existing secret/configuration
   mechanism in code.
 - Redact paths or identifiers when they include customer-private data.
@@ -52,4 +55,3 @@ Authorization Cookie Set-Cookie X-SF-Token X-API-Key API-Key Session-Token
 
 Before network changes, report that URL path/query can be captured and propose
 `ignoreURLs` or span redaction for sensitive routes.
-

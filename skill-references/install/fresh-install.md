@@ -22,16 +22,41 @@ consideration.
 
 ## Required output additions
 
-- Target platform support decision.
+- Platform note only when non-iOS targets or a no-iOS app shape are relevant.
 - Product choice: `SplunkAgent` or `SplunkAgentObjC`.
 - Lifecycle insertion point and why it is minimal.
 - Configuration source and missing user values.
 
 ## Platform
 
-Target normal iOS/iPadOS apps. Refuse macOS/watchOS and treat Mac Catalyst,
-tvOS, and visionOS as compile-only unless current source proves full runtime
-support.
+Target normal iOS/iPadOS apps for full RUM telemetry. Do not ask users to add
+platform fences around Splunk RUM configuration, initialization, or public API
+calls; the SDK handles non-iOS Apple runtimes internally.
+
+If non-iOS Apple targets are relevant, verify both compile support and runtime
+behavior:
+
+- `Package.swift` declares package build platforms.
+- `PlatformSupport.current.scope` decides runtime behavior.
+- `.full` means the agent can initialize operational modules.
+- `.compileOnly` means the API can compile and may run, but public calls are
+  non-operational and telemetry should not be expected.
+- `.unsupported` means the target is not supported by current source.
+
+Current source maps normal iOS/iPadOS to `.full`, Mac Catalyst/tvOS/visionOS
+and iOS apps running on Mac or Vision to `.compileOnly`, and macOS/watchOS to
+`.unsupported`. On non-full scopes, `SplunkRum.install` returns the shared
+non-operational instance with `.notRunning(.unsupportedPlatform)` instead of
+starting telemetry.
+
+In straightforward iOS-only integrations, platform support usually needs no
+separate note. If other Apple targets are visible or the user asks, a light
+informational note is enough: they should build and run without special
+app-side handling, but the agent is non-operational there and telemetry should
+only be expected from iOS/iPadOS.
+
+If the Host App has no iOS/iPadOS app target at all, report that adding the SDK
+will not produce RUM instrumentation for that app.
 
 ## Dependency and product
 
@@ -83,4 +108,3 @@ func startSplunkRum() {
 
 Add endpoint configuration only when the user approves the Host App's safe
 secret/configuration mechanism.
-

@@ -38,3 +38,26 @@ Before enabling, identify:
 Only include start/stop snippets after approval. Keep them out of top-level
 `SKILLS.md` and fresh-install defaults.
 
+After approval, source-backed Swift APIs include:
+
+```swift
+// UIKit masking
+paymentField.srSensitive = true
+
+// SwiftUI masking
+SecureCheckoutView()
+    .sessionReplaySensitive()
+
+// Recording control
+agent.sessionReplay.start()
+agent.sessionReplay.stop()
+```
+
+`UITextView`, `UITextField`, and `WKWebView` are sensitive by default in
+current source. Verify current source before relying on default masking for
+custom controls.
+
+Session Replay configuration is separate from starting recording. If sampling
+is requested, verify `SessionReplayConfiguration(enabled:samplingRate:)` in
+`SplunkSessionReplayProxy`; sampling is decided once per agent lifecycle and
+values outside `<0, 1>` are clamped.

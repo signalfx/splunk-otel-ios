@@ -39,13 +39,17 @@ Safe ObjC init must not print raw `NSError`.
 
 NSError *error = nil;
 SPLKAgentConfiguration *config =
-    [[SPLKAgentConfiguration alloc] initWithAppName:@"<YOUR_APP_NAME>"
-                             deploymentEnvironment:@"<YOUR_ENVIRONMENT>"];
+    [[SPLKAgentConfiguration alloc] initWithEndpoint:nil
+                                             appName:@"<YOUR_APP_NAME>"
+                               deploymentEnvironment:@"<YOUR_ENVIRONMENT>"];
 self.splunkRum = [SPLKAgent installWith:config error:&error];
 if (self.splunkRum == nil) {
     // Non-fatal. Do not log raw error; it may contain config values.
 }
 ```
 
-Add endpoint only through an approved secret/configuration mechanism.
+`nil` endpoint preserves deferred endpoint setup. If endpoint setup is approved,
+use `SPLKEndpointConfiguration` via
+`initWithRealm:rumAccessToken:` or `initWithTrace:sessionReplay:`.
 
+Add endpoint only through an approved secret/configuration mechanism.

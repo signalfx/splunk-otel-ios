@@ -41,7 +41,7 @@ Prefer continuous values:
 - app-shape inspection coverage
 - secret findings introduced, target `0`
 - redaction coverage
-- unsupported-platform refusal rate
+- platform-note accuracy when non-iOS targets are relevant
 - migration completeness
 - diff focus and diff size
 - build error burndown
@@ -61,4 +61,3 @@ release-only guard, failure policy, remaining blocker.
 
 For troubleshooting: symptom branch, inspected evidence, likely cause, safe next
 action, references loaded, redacted values encountered.
-

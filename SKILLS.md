@@ -30,8 +30,9 @@ If no version control is present, recommend creating a checkpoint before edits.
   descriptions, headers, request descriptors, payloads, or token-like values.
 - Do not change app architecture. Add lifecycle wrappers only when inspection
   shows they are the smallest safe integration point.
-- Refuse unsupported Apple platforms. Treat compile-only platforms as not
-  instrumented unless current source proves otherwise.
+- Do not add app-side platform fences for Splunk RUM public API calls. If
+  non-iOS Apple targets are relevant, note that the SDK can build and run there
+  in a lightweight non-operational mode; RUM telemetry is expected on iOS/iPadOS.
 - Do not add endpoint URLs by default. Prefer deferred endpoint setup or the
   Host App's existing configuration mechanism.
 - Gate Session Replay, WebView bridging, network header capture, endpoint
@@ -54,6 +55,7 @@ Start with:
 - `SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/`
 - `SplunkAgent/Sources/SplunkAgent/Public API/`
 - `SplunkAgent/Sources/SplunkAgentObjC/`
+- `SplunkAgent/Sources/SplunkAgent/Utils/Platform Support/`
 - `dsymUploader/README.md`
 - current public Splunk iOS RUM docs and public GitHub releases when version or
   installation guidance matters
@@ -87,7 +89,7 @@ Start with:
 | No-credential signal exercise and pending-artifact checks | [`verification/local-signal-generation.md`](skill-references/verification/local-signal-generation.md) |
 | Backend telemetry confirmation with user-provided public Splunk access | [`verification/backend-telemetry.md`](skill-references/verification/backend-telemetry.md) |
 | Objective-C and mixed-app validation scenarios | [`verification/objc-and-mixed-apps.md`](skill-references/verification/objc-and-mixed-apps.md) |
-| Common failures, no telemetry, unsupported platform, duplicate install, endpoint, network, Session Replay, WebView, dSYM symptoms | [`verification/troubleshooting.md`](skill-references/verification/troubleshooting.md) |
+| Common failures, no telemetry, non-iOS target behavior, duplicate install, endpoint, network, Session Replay, WebView, dSYM symptoms | [`verification/troubleshooting.md`](skill-references/verification/troubleshooting.md) |
 | User asks to create a sample app or demo | [`sample-app-workflow.md`](skill-references/sample-app-workflow.md) |
 
 ## Output Requirements
@@ -96,7 +98,7 @@ For `plan` / pre-`apply`, report:
 
 1. Evidence table with file paths, line numbers or search patterns, and confidence.
 2. Recommended path: fresh install, migration, review fix, manual-only, sample,
-   or unsupported-platform refusal.
+   non-operational platform note, or no-iOS-target outcome.
 3. References loaded and why.
 4. Minimal dependency, linkage, lifecycle, and configuration changes.
 5. Required user-provided values or approvals.

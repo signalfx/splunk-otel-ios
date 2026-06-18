@@ -33,6 +33,7 @@ header capture. Treat those as SDK exercise code, not production defaults.
 A safe sample should demonstrate:
 
 - SPM dependency and product selection
+- an iOS/iPadOS app target with full runtime support
 - retained agent instance
 - app name and deployment environment
 - deferred endpoint by default
@@ -46,3 +47,5 @@ Do not enable Session Replay, WebView bridging, network header capture, dSYM
 upload, or custom endpoint URLs in the default sample. Offer them as opt-in
 extensions with explicit warnings.
 
+Use the same safe install error handling as `install/fresh-install.md`; do not
+print raw install errors in sample code.

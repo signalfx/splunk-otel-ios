@@ -2,8 +2,8 @@
 
 ## Load when
 
-Load for build failures, app launch failures, no telemetry, unsupported
-platforms, duplicate installs, endpoint issues, network gaps, Session Replay,
+Load for build failures, app launch failures, no telemetry, non-iOS target
+behavior, duplicate installs, endpoint issues, network gaps, Session Replay,
 WebView, dSYM, or migration symptoms.
 
 ## Do not load when
@@ -30,8 +30,9 @@ Do not load for a clean fresh-install plan with no failure symptoms.
 - Build/link failure: load `install/build-and-link-errors.md`.
 - No telemetry: check platform, install status, sampling, endpoint, module
   enablement, network exclusions, selected signal type.
-- Unsupported platform: load `install/fresh-install.md` and refuse
-  instrumentation when needed.
+- Non-iOS Apple target noticed: load `install/fresh-install.md`; do not tell
+  the user it cannot build or run, do not add app-side platform fences, and
+  only note non-operational RUM behavior when it matters to the symptom.
 - Duplicate install: load `install/endpoint-and-runtime-state.md`; inspect call
   sites and explain current SDK behavior.
 - Endpoint/deferred endpoint: load `install/endpoint-and-runtime-state.md`.
@@ -44,4 +45,3 @@ Do not load for a clean fresh-install plan with no failure symptoms.
 Prefer runtime status and public API state over raw error text. Never ask the
 user to paste unredacted tokens, endpoint config, headers, payloads, or raw SDK
 error descriptions.
-

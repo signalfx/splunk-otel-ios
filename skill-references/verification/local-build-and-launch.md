@@ -20,6 +20,7 @@ Do not load for static review only unless build/launch is requested.
 
 - Build command and result.
 - Launch method and result.
+- Platform note only when non-iOS targets affect interpretation of results.
 - Build errors remaining.
 - Launch attempts and successes.
 
@@ -43,3 +44,7 @@ useful.
 Do not require Splunk credentials for build and launch verification when using
 deferred endpoint setup.
 
+A build or launch on a compile-only/non-operational platform is valid build/run
+evidence, but not telemetry verification. Do not ask the user to add app-side
+platform fences. If the distinction matters, explain that RUM signal
+verification requires an iOS/iPadOS runtime.

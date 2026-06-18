@@ -35,5 +35,9 @@ If access is available, confirm:
 - selected custom event/error signal
 - dSYM/crash symbolication only when a safe release test is in scope
 
+Do not attempt backend confirmation from non-operational platform runs. If the
+project also has an iOS/iPadOS app target, verify telemetry there. If it has no
+iOS/iPadOS target, report that no RUM telemetry should be expected.
+
 Allow ingestion latency before declaring telemetry missing. Report timestamps,
 signal types, and redacted identifiers only.

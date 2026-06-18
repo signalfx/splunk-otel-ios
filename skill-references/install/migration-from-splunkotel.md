@@ -51,7 +51,25 @@ bspScheduleDelay SplunkRum.integrateWithBrowserRum
 5. Remove separate old crash setup; crash reporting is integrated.
 6. Load feature references only for stale APIs that appear.
 
+Source-backed direct replacements include:
+
+- `SplunkRum.getSessionId()` -> `SplunkRum.shared.session.state.id`
+- `SplunkRum.isInitialized()` -> `SplunkRum.shared.state.status`
+- `SplunkRum.setGlobalAttributes` / `removeGlobalAttribute` ->
+  `SplunkRum.shared.globalAttributes`
+- `SplunkRum.reportError` / `reportEvent` ->
+  `SplunkRum.shared.customTracking`
+- `SplunkRum.setScreenName` -> `SplunkRum.shared.navigation.track(screen:)`
+
+Manual-review or no-effect legacy calls:
+
+- `SplunkRum.debugLog` is a no-op in current deprecated source.
+- `enableDiskCache(enabled:)` is a no-op in current builder source.
+- slow/frozen frame threshold builder methods are discontinued and ignored;
+  thresholds are managed automatically.
+- `allowInsecureBeacon`, scheduling-delay, and disk-cache sizing settings need
+  source verification before proposing any replacement.
+
 Do not introduce Session Replay, WebView bridging, header capture, endpoint
 changes, or dSYM upload during migration unless the user explicitly approves
 that topic.
-

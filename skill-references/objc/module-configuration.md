@@ -27,6 +27,19 @@ exists for navigation, network, crash reports, interactions, slow frames,
 Session Replay, and WebView, but not every Swift convenience API has an ObjC
 equivalent.
 
+Verified configuration classes include:
+
+- `SPLKNavigationConfiguration`
+- `SPLKNetworkInstrumentationConfiguration`
+- `SPLKCrashReportsConfiguration`
+- `SPLKInteractionsConfiguration`
+- `SPLKSlowFrameDetectorConfiguration`
+- `SPLKSessionReplayConfiguration`
+
+Use `SPLKModuleConfiguration` subclasses in the
+`[SPLKAgent installWith:moduleConfigurations:error:]` overload. Do not use
+Swift module configuration structs in `.m` files.
+
 High-risk module changes still require feature references:
 
 - network header capture: `instrumentation/network.md`
@@ -35,4 +48,3 @@ High-risk module changes still require feature references:
 - dSYM upload: `release/crash-and-dsym.md`
 
 Do not force Swift-only workflow APIs into Objective-C plans.
-

@@ -32,10 +32,14 @@ Safe no-credential exercises:
 - one benign `URLSession` request
 - one custom event or handled error
 
+Run signal exercises only when current source and runtime evidence indicate an
+operational agent. If `agent.state.status` is `.notRunning(.unsupportedPlatform)`
+or `.notRunning(.sampledOut)`, report the status rather than trying to force
+signals.
+
 Do not print telemetry payloads, request descriptors, headers, endpoint values,
 or stored payload contents. If pending-artifact counts are inspected, report
 counts only by signal type when safely discoverable.
 
 Do not start Session Replay or bridge WebViews as part of default signal
 exercise.
-

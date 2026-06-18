@@ -30,6 +30,24 @@ questions.
 Endpoint is optional in current public API. Use deferred endpoint setup when the
 user has not supplied a safe token/config mechanism.
 
+Runtime state is available through `agent.state.status`. Source-backed status
+cases are `.running`, `.notRunning(.notInstalled)`,
+`.notRunning(.unsupportedPlatform)`, and `.notRunning(.sampledOut)`. On
+compile-only runtime scopes, install can return the shared non-operational
+instance with `.notRunning(.unsupportedPlatform)`.
+
+Swift endpoint update APIs:
+
+```swift
+try agent.updateEndpoint(endpoint)
+agent.disableEndpoint()
+agent.preferences.endpointConfiguration = endpoint
+agent.preferences.endpointConfiguration = nil
+```
+
+ObjC endpoint update uses `agent.preferences.endpointConfiguration`; assigning
+`nil` disables the endpoint.
+
 Do not print:
 
 - `EndpointConfiguration.description`
@@ -44,4 +62,3 @@ explain behavior instead of adding another install path.
 
 Endpoint update and disable APIs are public, but they change telemetry routing.
 Require explicit approval and use placeholders in any example.
-

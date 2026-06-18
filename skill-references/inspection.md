@@ -23,12 +23,13 @@ SDK:
 - `Package.swift`
 - `SplunkAgent/Sources/SplunkAgent/Public API/`
 - `SplunkAgent/Sources/SplunkAgentObjC/`
+- `SplunkAgent/Sources/SplunkAgent/Utils/Platform Support/`
 
 ## Required output additions
 
 - App-shape table: evidence, path, confidence.
 - Recommended path: fresh install, migration, review fix, manual-only, sample,
-  or unsupported-platform refusal.
+  non-operational platform note, or no-iOS-target outcome.
 - Unknowns remaining.
 
 ## Checklist
@@ -57,4 +58,3 @@ SplunkRum.install SPLKAgent installWith EndpointConfiguration AgentConfiguration
 SplunkRumCrashReporting OpenTelemetry Datadog Crashlytics Sentry AppDynamics
 URLSession WKWebView trackScreen reportError reportEvent setScreenName
 ```
-
