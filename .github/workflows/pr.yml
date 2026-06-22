@@ -168,7 +168,7 @@ jobs:
           echo "xcode_status=$code" >> "$GITHUB_OUTPUT"
 
       - name: Publish JUnit to Checks
-        uses: mikepenz/action-junit-report@bccf2e31636835cf0874589931c4116687171386 # v6.4.0
+        uses: mikepenz/action-junit-report@3a81627bfac62268172037048872e8ebd4207e6d # v6.4.1
         if: always()
         with:
           report_paths: reports/junit-${{ matrix.platform }}.xml
@@ -187,6 +187,6 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
+        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

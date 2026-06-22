@@ -23,7 +23,7 @@ on:
       plcrash-version:
         description: "PLCrashReporter version"
         required: false
-        default: "1.12.0"
+        default: "1.12.2"
         type: string
       cisco-xcframeworks-run-id:
         description: "GitHub Actions run ID with dynamic Cisco SR xcframeworks artifact (required)"
@@ -45,7 +45,7 @@ permissions:
 
 env:
   OTEL_VERSION: ${{ inputs.otel-version || '2.3.0' }}
-  PLCRASH_VERSION: ${{ inputs.plcrash-version || '1.12.0' }}
+  PLCRASH_VERSION: ${{ inputs.plcrash-version || '1.12.2' }}
 
 jobs:
 
