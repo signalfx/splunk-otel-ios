@@ -323,7 +323,14 @@ extension OTLPBackgroundHTTPBaseExporter {
     }
 
     private func buildHeaders(from additionalHeaders: [String: String]) -> [String: String] {
-        var combinedHeaders = additionalHeaders
+        var combinedHeaders = [
+            OTLPHTTPHeaders.userAgentKey: OTLPHTTPHeaders.userAgent(agentVersion: config.agentVersion)
+        ]
+
+        for (key, value) in additionalHeaders {
+            combinedHeaders[key] = value
+        }
+
         if let envVarHeaders {
             for (key, value) in envVarHeaders {
                 combinedHeaders[key] = value

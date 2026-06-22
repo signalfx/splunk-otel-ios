@@ -36,14 +36,22 @@ public struct OTLPExporterConfiguration {
     /// Timeout for export requests.
     public let timeout: TimeInterval
 
+    /// Splunk RUM agent version used in exporter request headers.
+    public let agentVersion: String
+
 
     // MARK: - Initialization
 
     /// Creates a new OTLP exporter configuration.
     ///
     /// - Parameter timeout: Timeout for export requests (defaults to 10 seconds).
-    public init(timeout: TimeInterval = defaultTimeoutInterval) {
+    /// - Parameter agentVersion: Splunk RUM agent version used in exporter request headers.
+    public init(
+        timeout: TimeInterval = defaultTimeoutInterval,
+        agentVersion: String = "unknown"
+    ) {
         self.timeout = timeout
+        self.agentVersion = agentVersion
     }
 }
 
@@ -66,6 +74,15 @@ public enum OTLPHTTPHeaders {
 
     /// The User-Agent header value for OTLP requests.
     public static var userAgent: String {
+        userAgent(agentVersion: "unknown")
+    }
+
+    /// Returns the User-Agent header value for OTLP requests.
+    ///
+    /// - Parameter agentVersion: Splunk RUM agent version.
+    ///
+    /// - Returns: A User-Agent value identifying the Splunk RUM agent and OTLP exporter.
+    public static func userAgent(agentVersion: String) -> String {
         let osName: String
         #if os(iOS)
             osName = "iOS"
@@ -79,8 +96,10 @@ public enum OTLPHTTPHeaders {
             osName = "unknown"
         #endif
 
-        let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
-        return "OTel-OTLP-Exporter-Swift/\(OTLPVersion.version) (\(osName); \(osVersion))"
+        let operatingSystemVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let osVersion = "\(operatingSystemVersion.majorVersion).\(operatingSystemVersion.minorVersion).\(operatingSystemVersion.patchVersion)"
+
+        return "SplunkRUM/\(agentVersion) (\(osName); \(osVersion)) OTel-OTLP-Exporter-Swift/\(OTLPVersion.version)"
     }
 }
 
