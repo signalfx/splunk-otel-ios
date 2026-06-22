@@ -19,6 +19,22 @@ edit files.
 | `verify` | Build, launch, exercise safe signals, and confirm telemetry when user-provided access is available. |
 | `sample` | Create or review a small sample app that demonstrates safe basic features. |
 
+## Instrumentation Depth
+
+Treat instrumentation depth as separate from mode. If the user does not specify
+depth, default to `baseline`.
+
+| Depth | Behavior |
+| --- | --- |
+| `baseline` | Minimal safe setup: dependency/linkage, initialization, default modules, and only the manual instrumentation needed for the requested goal. |
+| `targeted` | Baseline plus approved topic-specific additions for inspected app surfaces, such as key screens, URL exclusions, or business events. |
+| `comprehensive` | Broader inspected coverage across supported instrumentation topics, with explicit approval checkpoints for high-risk features. |
+
+Do not treat `comprehensive` or requests for complete instrumentation as
+permission to enable high-risk features, capture sensitive data, or edit
+unrelated architecture. Plans should state the chosen depth and what is
+intentionally deferred.
+
 Before `apply`, check version-control state. If the Host App worktree is dirty,
 report branch and changed files and require explicit confirmation to proceed.
 If no version control is present, recommend creating a checkpoint before edits.
@@ -84,7 +100,7 @@ Start with:
 | Custom events, handled errors, workflows, user/session/global attributes | [`instrumentation/custom-tracking-and-attributes.md`](skill-references/instrumentation/custom-tracking-and-attributes.md) |
 | SwiftUI/UIKit screen tracking, tabs, navigation stacks, storyboards, custom containers | [`instrumentation/navigation.md`](skill-references/instrumentation/navigation.md) |
 | `URLSession`, URL exclusions, trace headers, captured headers | [`instrumentation/network.md`](skill-references/instrumentation/network.md) |
-| Session Replay, masking, sensitivity, sampling, recording state | [`instrumentation/session-replay.md`](skill-references/instrumentation/session-replay.md) |
+| Session Replay, masking, sensitivity, sampling, recording state, custom IDs, rendering mode, recording masks | [`instrumentation/session-replay.md`](skill-references/instrumentation/session-replay.md) |
 | `WKWebView`, Browser RUM bridge, native session bridge exposure | [`instrumentation/webview.md`](skill-references/instrumentation/webview.md) |
 | Objective-C or mixed app product/lifecycle decisions | [`objc/product-and-lifecycle.md`](skill-references/objc/product-and-lifecycle.md) |
 | Objective-C UIKit/storyboard/navigation details | [`objc/uikit-storyboards-navigation.md`](skill-references/objc/uikit-storyboards-navigation.md) |

@@ -23,6 +23,17 @@ Do not load for apps with no WebView usage.
 - Browser RUM precondition.
 - Bridge approval state.
 - Call-before-load and `userContentController` caveats.
+- Instrumentation depth and WebViews intentionally deferred.
+
+## Depth guidance
+
+- `baseline`: inventory WebViews and report whether bridging is applicable.
+  Do not bridge by default.
+- `targeted`: bridge only approved, app-owned WebViews whose loaded pages are
+  instrumented with Splunk Browser RUM.
+- `comprehensive`: inventory all WebViews, ownership, load timing, Browser RUM
+  readiness, and verification needs. Recommend against third-party or arbitrary
+  content unless the user provides a clear trust model.
 
 ## Approval gate
 

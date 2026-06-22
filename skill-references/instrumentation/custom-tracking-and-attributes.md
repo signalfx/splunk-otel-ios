@@ -22,6 +22,17 @@ detected.
 - Custom telemetry opportunities and evidence.
 - Attribute privacy review.
 - Workflow-span start/end ownership if workflows are recommended.
+- Instrumentation depth and which business signals are deferred.
+
+## Depth guidance
+
+- `baseline`: do not add custom telemetry unless the user asks for it or a
+  specific gap is blocking useful verification.
+- `targeted`: add a small number of stable events, handled errors, or
+  attributes for inspected critical flows.
+- `comprehensive`: propose a business-signal map covering key milestones,
+  handled failures, and timed workflows with clear owners for span completion.
+  Apply only approved signals.
 
 ## Guidance
 

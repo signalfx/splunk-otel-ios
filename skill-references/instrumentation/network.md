@@ -22,6 +22,18 @@ Do not load when no network instrumentation is involved.
 - URL/query privacy assessment.
 - Header capture approval state and allowlist if applicable.
 - Ignored URL patterns proposed.
+- Instrumentation depth and network surfaces intentionally deferred.
+
+## Depth guidance
+
+- `baseline`: keep default network instrumentation. Add URL exclusions only
+  for inspected sensitive routes or the user's explicit request. Do not capture
+  headers.
+- `targeted`: add narrow URL exclusions, trace-header compatibility notes, or
+  approved non-sensitive header allowlists for specific inspected services.
+- `comprehensive`: inventory network wrappers, session creation, sensitive
+  routes, trace propagation, and approved header capture needs across the app.
+  Keep suppression patterns narrow.
 
 ## Guidance
 

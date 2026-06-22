@@ -22,6 +22,19 @@ Do not load for a Host App with no UI/navigation instrumentation task.
 - UI framework and navigation evidence.
 - Automated versus manual tracking decision.
 - Screen names and attribute privacy notes.
+- Instrumentation depth and screen surfaces intentionally deferred.
+
+## Depth guidance
+
+- `baseline`: track only the key screen boundaries needed for the user's
+  stated goal. Prefer manual or SwiftUI modifier placement at meaningful
+  existing boundaries.
+- `targeted`: cover primary user flows found during inspection, including
+  tabs, modals, detail screens, or storyboard view controllers that automatic
+  tracking would miss.
+- `comprehensive`: propose a screen inventory across SwiftUI, UIKit,
+  storyboards, custom containers, and mixed flows. Use automated tracking only
+  after explaining its naming and coverage tradeoffs.
 
 ## Guidance
 

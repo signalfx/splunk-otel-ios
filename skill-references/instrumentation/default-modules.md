@@ -23,6 +23,17 @@ Do not load for a narrow task involving only high-risk feature setup.
 - Which default modules are relevant.
 - Any explicit module configuration changes proposed.
 - Approval needed for config changes that alter behavior.
+- Whether default behavior is enough for the requested instrumentation depth.
+
+## Depth guidance
+
+- `baseline`: rely on current safe defaults where possible. Avoid explicit
+  module configuration unless required for install, privacy, or the user's
+  stated goal.
+- `targeted`: configure only inspected modules needed for the requested topic,
+  such as navigation automation or network URL exclusions.
+- `comprehensive`: inventory default and optional modules, then propose a
+  staged coverage plan. High-risk features still require their own approvals.
 
 ## Guidance
 
