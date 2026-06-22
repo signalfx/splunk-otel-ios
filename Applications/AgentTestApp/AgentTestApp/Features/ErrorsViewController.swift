@@ -23,34 +23,18 @@ class ErrorsViewController: UIViewController {
     // MARK: - UI Actions
 
     @IBAction
-    private func fatalErrorButtonClick(_: UIButton) {
+    private func nserrorButtonClick(_: UIButton) {
 
         print("Fatal Error Crash Selected")
         let errors = Errors()
-        errors.fatalErrorCrash()
+        errors.generateNSError()
     }
 
     @IBAction
-    private func preconditionButtonClick(_: UIButton) {
+    private func exceptionButtonClick(_: UIButton) {
 
         print("Precondition Crash Selected")
         let errors = Errors()
-        errors.preconditionCrash()
-    }
-
-    @IBAction
-    private func unwrapExceptionButtonClick(_: UIButton) {
-
-        print("Unwrap Exception Crash Selected")
-        let errors = Errors()
-        errors.unwrapException()
-    }
-
-    @IBAction
-    private func infiniteLoopButtonClick(_: UIButton) {
-
-        print("Infinite Loop Crash Selected")
-        let errors = Errors()
-        errors.infiniteLoop()
+        errors.generateException()
     }
 }

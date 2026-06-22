@@ -16,30 +16,37 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkAgent
 
 class Errors {
 
-    // MARK: - Sample crashes
+    // MARK: - Custom tracking samples
 
-    // swiftlint:disable:next unavailable_function
-    func fatalErrorCrash() {
-        fatalError("Default Fatal Error")
+    func generateNSError() {
+        let error = NSError(
+            domain: "com.splunk.agenttestapp.errors",
+            code: 42,
+            userInfo: [NSLocalizedDescriptionKey: "Sample NSError from AgentTestApp"]
+        )
+
+        let attributes = MutableAttributes()
+        attributes.setString("AgentTestApp", for: "error.source")
+        attributes.setString("nserror-button", for: "error.scenario")
+
+        SplunkRum.shared.customTracking.trackError(error, attributes)
     }
 
-    // swiftlint:disable:next unavailable_function
-    func preconditionCrash() {
-        preconditionFailure("Precondition Failure")
-    }
+    func generateException() {
+        let exception = NSException(
+            name: NSExceptionName("AgentTestAppSampleException"),
+            reason: "Sample NSException from AgentTestApp",
+            userInfo: nil
+        )
 
-    func unwrapException() {
-        let number: Int? = nil
+        let attributes = MutableAttributes()
+        attributes.setString("AgentTestApp", for: "error.source")
+        attributes.setString("exception-button", for: "error.scenario")
 
-        // swift-format-ignore: NeverForceUnwrap
-        // swiftlint:disable:next force_unwrapping
-        _ = number!
-    }
-
-    func infiniteLoop() {
-        infiniteLoop()
+        SplunkRum.shared.customTracking.trackException(exception, attributes)
     }
 }

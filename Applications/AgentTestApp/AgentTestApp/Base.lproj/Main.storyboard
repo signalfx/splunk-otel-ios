@@ -412,24 +412,24 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lu7-Jt-AnZ">
-                                <rect key="frame" x="20" y="177" width="374" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lu7-Jt-AnZ">
+                                <rect key="frame" x="20" y="177" width="374" height="35"/>
                                 <color key="backgroundColor" systemColor="systemRedColor"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                <state key="normal" title="Fatal Error Crash"/>
+                                <state key="normal" title="Generate NSError"/>
                                 <connections>
-                                    <action selector="fatalErrorButtonClick:" destination="GJu-EY-m7h" eventType="touchUpInside" id="uy4-ta-l4T"/>
+                                    <action selector="nserrorButtonClick:" destination="GJu-EY-m7h" eventType="touchUpInside" id="xtI-hW-N7F"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jpA-9v-iBL">
-                                <rect key="frame" x="20" y="215" width="374" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jpA-9v-iBL">
+                                <rect key="frame" x="20" y="241" width="374" height="35"/>
                                 <color key="backgroundColor" systemColor="systemRedColor"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                <state key="normal" title="Precondition Error Crash"/>
+                                <state key="normal" title="Generate Exception"/>
                                 <connections>
-                                    <action selector="preconditionButtonClick:" destination="GJu-EY-m7h" eventType="touchUpInside" id="hO5-U7-P2z"/>
+                                    <action selector="exceptionButtonClick:" destination="GJu-EY-m7h" eventType="touchUpInside" id="ysw-V1-yRr"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -441,7 +441,7 @@
                             <constraint firstItem="Lu7-Jt-AnZ" firstAttribute="top" secondItem="6sh-6I-R0w" secondAttribute="top" constant="37" id="7bs-W4-3eI"/>
                             <constraint firstItem="jpA-9v-iBL" firstAttribute="leading" secondItem="6sh-6I-R0w" secondAttribute="leading" constant="20" id="E52-1d-czC"/>
                             <constraint firstItem="Lu7-Jt-AnZ" firstAttribute="leading" secondItem="6sh-6I-R0w" secondAttribute="leading" constant="20" id="Ouu-mU-cZm"/>
-                            <constraint firstItem="jpA-9v-iBL" firstAttribute="top" secondItem="Lu7-Jt-AnZ" secondAttribute="bottom" constant="8" id="ooe-z7-fzc"/>
+                            <constraint firstItem="jpA-9v-iBL" firstAttribute="top" secondItem="Lu7-Jt-AnZ" secondAttribute="bottom" constant="22" id="ooe-z7-fzc"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="GFx-v1-uhx"/>
