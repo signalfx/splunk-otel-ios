@@ -45,7 +45,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         "EndpointCalls",
         "TestApiCalls",
         "SlowFrameRenders",
-        "ErrorReporting",
+        "Errors",
         "PlaceHolder"
     ]
 
