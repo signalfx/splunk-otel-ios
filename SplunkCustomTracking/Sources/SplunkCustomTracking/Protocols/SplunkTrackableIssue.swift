@@ -48,6 +48,10 @@ extension SplunkTrackableIssue {
         // Optionally set stacktrace if it exists
         if let stacktrace {
             attributes[ErrorAttributeKeys.Exception.stacktrace.rawValue] = .string(stacktrace.formatted)
+
+            if let threadList = stacktrace.threadList {
+                attributes[ErrorAttributeKeys.Exception.threads.rawValue] = .string(threadList)
+            }
         }
 
         // Add code and domain for NSErrors if they exist

@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 * Custom error and exception reporting may now include `exception.images` binary image metadata from a PLCrashReporter live report, matching the crash report payload shape. Configure via `CustomTrackingConfiguration.includeBinaryImagesOnErrors`.
+* Custom error and exception reporting with stack traces now includes `exception.threads` stack frame metadata, matching the crash report payload shape.
 
 ## [2.3.1] - 2026-06-15
 

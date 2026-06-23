@@ -134,6 +134,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(getStringValue(for: "exception.type", in: data), exceptionName.rawValue)
         XCTAssertEqual(getStringValue(for: "exception.message", in: data), reason)
         XCTAssertNotNil(getStringValue(for: "exception.stacktrace", in: data))
+        XCTAssertNotNil(getStringValue(for: "exception.threads", in: data))
         XCTAssertEqual(getStringValue(for: "context", in: data), "testing_exception_handler")
     }
 
@@ -216,6 +217,29 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(getStringValue(for: "exception.type", in: attributes), "NSInternalInconsistencyException")
         XCTAssertEqual(getStringValue(for: "exception.message", in: attributes), "Inconsistent state.")
         XCTAssertNotNil(attributes["exception.stacktrace"])
+        XCTAssertNotNil(attributes["exception.threads"])
+    }
+
+    func testStacktraceThreadList_matchesCrashReportShape() throws {
+        let stacktrace = Stacktrace(frames: [
+            "0   AgentTestApp                        0x0000000100e84234 specialized Foo.bar() + 24",
+            "1   UIKitCore                           0x00000001852f3710 -[UIApplication sendAction:to:from:forEvent:] + 96"
+        ])
+
+        let threadsJSON = try XCTUnwrap(stacktrace.threadList)
+        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]])
+
+        XCTAssertEqual(parsed.count, 1)
+        XCTAssertEqual(parsed[0]["threadNumber"] as? Int, 0)
+        XCTAssertEqual(parsed[0]["crashed"] as? Bool, true)
+
+        let stackFrames = try XCTUnwrap(parsed[0]["stackFrames"] as? [[String: Any]])
+        XCTAssertEqual(stackFrames.count, 2)
+        XCTAssertEqual(stackFrames[0]["imageName"] as? String, "AgentTestApp")
+        XCTAssertEqual(stackFrames[0]["instructionPointer"] as? UInt64, 4_310_188_596)
+        XCTAssertEqual(stackFrames[0]["symbolName"] as? String, "specialized Foo.bar()")
+        XCTAssertEqual(stackFrames[0]["offset"] as? UInt64, 24)
+        XCTAssertEqual(stackFrames[1]["imageName"] as? String, "UIKitCore")
     }
 
     func testTrackError_withSwiftError_attachesImages() throws {
