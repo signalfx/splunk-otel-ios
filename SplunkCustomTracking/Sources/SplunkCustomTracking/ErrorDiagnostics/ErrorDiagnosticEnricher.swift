@@ -22,7 +22,7 @@ final class ErrorDiagnosticEnricher {
     private var includeBinaryImagesOnErrors = true
 
     #if canImport(CrashReporter)
-    private lazy var liveReportCollector = ErrorLiveReportCollector()
+        private lazy var liveReportCollector = ErrorLiveReportCollector()
     #endif
 
     func configure(includeBinaryImagesOnErrors: Bool) {
@@ -39,9 +39,9 @@ final class ErrorDiagnosticEnricher {
         }
 
         #if canImport(CrashReporter)
-        return liveReportCollector.exceptionImages(for: issue)
+            return liveReportCollector.exceptionImages(for: issue)
         #else
-        return nil
+            return nil
         #endif
     }
 }

@@ -70,22 +70,22 @@ private struct ParsedStackFrame {
 
         var output: [ErrorDiagnosticKeys: Any] = [:]
 
-        let imageName = frame.substring(for: match.range(at: 2))
+        let imageName = substring(in: frame, for: match.range(at: 2))
         if !imageName.isEmpty {
             output[.imageName] = imageName
         }
 
-        let instructionPointer = frame.substring(for: match.range(at: 3))
+        let instructionPointer = substring(in: frame, for: match.range(at: 3))
         if let instructionPointerValue = UInt64(instructionPointer.dropFirst(2), radix: 16) {
             output[.instructionPointer] = instructionPointerValue
         }
 
-        let symbolName = frame.substring(for: match.range(at: 4))
+        let symbolName = substring(in: frame, for: match.range(at: 4))
         if !symbolName.isEmpty {
             output[.symbolName] = symbolName
         }
 
-        let offset = frame.substring(for: match.range(at: 5))
+        let offset = substring(in: frame, for: match.range(at: 5))
         if let offsetValue = UInt64(offset) {
             output[.offset] = offsetValue
         }
@@ -97,15 +97,13 @@ private struct ParsedStackFrame {
 
 // MARK: - String parsing
 
-extension String {
-    fileprivate func substring(for range: NSRange) -> String {
-        guard
-            range.location != NSNotFound,
-            let range = Range(range, in: self)
-        else {
-            return ""
-        }
-
-        return String(self[range]).trimmingCharacters(in: .whitespaces)
+private func substring(in string: String, for range: NSRange) -> String {
+    guard
+        range.location != NSNotFound,
+        let range = Range(range, in: string)
+    else {
+        return ""
     }
+
+    return String(string[range]).trimmingCharacters(in: .whitespaces)
 }

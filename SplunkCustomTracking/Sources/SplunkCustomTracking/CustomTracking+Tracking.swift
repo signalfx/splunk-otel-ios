@@ -70,7 +70,8 @@ extension CustomTrackingInternal {
         var combinedAttributes = augmented.merging(issue.toAttributesDictionary()) { $1 }
 
         if let splunkIssue = issue as? SplunkIssue,
-           let imagesJSON = diagnosticEnricher.exceptionImagesJSON(for: splunkIssue) {
+            let imagesJSON = diagnosticEnricher.exceptionImagesJSON(for: splunkIssue)
+        {
             combinedAttributes[ErrorAttributeKeys.Exception.images.rawValue] = .string(imagesJSON)
         }
 
