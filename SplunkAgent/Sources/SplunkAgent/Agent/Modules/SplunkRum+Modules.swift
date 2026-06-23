@@ -20,7 +20,7 @@ import Foundation
 internal import SplunkAppStart
 internal import SplunkAppState
 internal import SplunkCustomTracking
-internal import SplunkInteractions
+@_spi(SplunkInternal) internal import SplunkInteractions
 @_spi(SplunkInternal) internal import SplunkNavigation
 internal import SplunkNetwork
 internal import SplunkNetworkMonitor
@@ -273,7 +273,8 @@ extension SplunkRum {
         }
 
         if let collector = (eventManager as? DefaultEventManager)?.userActivityCollector,
-           sessionReplayProxy is SessionReplay {
+            sessionReplayProxy is SessionReplay
+        {
             userActivityTask = Task {
                 for await date in interactionsModule.activityStream {
                     await collector.record(at: date)

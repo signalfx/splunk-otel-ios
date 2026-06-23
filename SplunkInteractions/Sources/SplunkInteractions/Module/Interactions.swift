@@ -36,6 +36,7 @@ public final class Interactions: SplunkInteractionsModule {
     /// Stream of interaction timestamps.
     ///
     /// Emits a value for every interaction event, regardless of type.
+    @_spi(SplunkInternal)
     public let activityStream: AsyncStream<Date>
 
     var interactionsDetector: InteractionsDetector<DefaultSwizzling>?
@@ -58,12 +59,12 @@ public final class Interactions: SplunkInteractionsModule {
 
     public required init() {
         destination = OTelDestination()
-        (activityStream, activityContinuation) = AsyncStream.makeStream()
+        (activityStream, activityContinuation) = AsyncStream.makeStream(bufferingPolicy: .bufferingNewest(1_000))
     }
 
     init(destination: SplunkInteractionsDestination) {
         self.destination = destination
-        (activityStream, activityContinuation) = AsyncStream.makeStream()
+        (activityStream, activityContinuation) = AsyncStream.makeStream(bufferingPolicy: .bufferingNewest(1_000))
     }
 
 
