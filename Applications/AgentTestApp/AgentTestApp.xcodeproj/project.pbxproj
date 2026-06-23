@@ -26,6 +26,7 @@
 		BA5E5A5E2B6864A60022CEB2 /* NetworkCallsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA5E5A5A2B6864A60022CEB2 /* NetworkCallsViewController.swift */; };
 		BA62BDF62FE09E2200D6AAFF /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA62BDF52FE09E2200D6AAFF /* Errors.swift */; };
 		BA62BDF82FE09E3600D6AAFF /* ErrorsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA62BDF72FE09E3600D6AAFF /* ErrorsViewController.swift */; };
+		BA62BDFA2FE0A5DA00D6AAFF /* ObjCExceptionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = BA62BDF92FE0A5DA00D6AAFF /* ObjCExceptionHelper.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,8 +48,11 @@
 		BA5E5A512B6859BD0022CEB2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BA5E5A582B6864A60022CEB2 /* NetworkCalls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkCalls.swift; sourceTree = "<group>"; };
 		BA5E5A5A2B6864A60022CEB2 /* NetworkCallsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkCallsViewController.swift; sourceTree = "<group>"; };
+		BA62BDF32FE0A5DA00D6AAFF /* AgentTestApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AgentTestApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		BA62BDF52FE09E2200D6AAFF /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		BA62BDF72FE09E3600D6AAFF /* ErrorsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorsViewController.swift; sourceTree = "<group>"; };
+		BA62BDF82FE0A5DA00D6AAFF /* ObjCExceptionHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ObjCExceptionHelper.h; sourceTree = "<group>"; };
+		BA62BDF92FE0A5DA00D6AAFF /* ObjCExceptionHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ObjCExceptionHelper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +98,7 @@
 				BA5E5A432B6859BC0022CEB2 /* AppDelegate.swift */,
 				BA5E5A452B6859BC0022CEB2 /* SceneDelegate.swift */,
 				BA5E5A472B6859BC0022CEB2 /* ViewController.swift */,
+				BA62BDF32FE0A5DA00D6AAFF /* AgentTestApp-Bridging-Header.h */,
 				BA5E5A492B6859BC0022CEB2 /* Main.storyboard */,
 				BA5E5A4C2B6859BD0022CEB2 /* Assets.xcassets */,
 				BA5E5A4E2B6859BD0022CEB2 /* LaunchScreen.storyboard */,
@@ -111,6 +116,8 @@
 				BA188B1E2BA0C91B00DACB15 /* CrashesViewController.swift */,
 				BA62BDF52FE09E2200D6AAFF /* Errors.swift */,
 				BA62BDF72FE09E3600D6AAFF /* ErrorsViewController.swift */,
+				BA62BDF82FE0A5DA00D6AAFF /* ObjCExceptionHelper.h */,
+				BA62BDF92FE0A5DA00D6AAFF /* ObjCExceptionHelper.m */,
 				BA5E5A582B6864A60022CEB2 /* NetworkCalls.swift */,
 				BA5E5A5A2B6864A60022CEB2 /* NetworkCallsViewController.swift */,
 				52705BDE2D08FDF600445B8E /* SlowFrameDetectorViewController.swift */,
@@ -215,6 +222,7 @@
 				BA5E5A462B6859BC0022CEB2 /* SceneDelegate.swift in Sources */,
 				BA188B202BA0C91B00DACB15 /* CrashesViewController.swift in Sources */,
 				BA62BDF82FE09E3600D6AAFF /* ErrorsViewController.swift in Sources */,
+				BA62BDFA2FE0A5DA00D6AAFF /* ObjCExceptionHelper.m in Sources */,
 				BA5371F82F1588A400C88609 /* EndpointViewController.swift in Sources */,
 				BA5371F62F15889800C88609 /* Endpoint.swift in Sources */,
 				BA5E5A5E2B6864A60022CEB2 /* NetworkCallsViewController.swift in Sources */,
@@ -400,6 +408,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "AgentTestApp/AgentTestApp-Bridging-Header.h";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -431,6 +440,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "AgentTestApp/AgentTestApp-Bridging-Header.h";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

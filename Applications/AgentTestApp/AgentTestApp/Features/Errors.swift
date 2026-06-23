@@ -37,11 +37,13 @@ class Errors {
     }
 
     func generateException() {
-        let exception = NSException(
-            name: NSExceptionName("AgentTestAppSampleException"),
-            reason: "Sample NSException from AgentTestApp",
-            userInfo: nil
-        )
+        guard
+            let exception = ObjCExceptionHelper.performBlockAndCatchException({
+                NSObject().perform(Selector(("agentTestAppSampleException")))
+            })
+        else {
+            return
+        }
 
         let attributes = MutableAttributes()
         attributes.setString("AgentTestApp", for: "error.source")
