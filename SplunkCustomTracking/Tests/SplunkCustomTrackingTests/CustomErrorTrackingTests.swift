@@ -88,7 +88,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         assertCommonErrorAttributes(in: data)
         XCTAssertEqual(getStringValue(for: "exception.type", in: data), "FileError")
         XCTAssertEqual(getStringValue(for: "exception.message", in: data), "File not found at /tmp/file.txt")
-        XCTAssertNotNil(getStringValue(for: "exception.stacktrace", in: data))
+        XCTAssertNil(getStringValue(for: "exception.stacktrace", in: data))
         XCTAssertEqual(getStringValue(for: "file_permissions", in: data), "read-only")
     }
 
@@ -110,7 +110,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         assertCommonErrorAttributes(in: data)
         XCTAssertEqual(getStringValue(for: "exception.type", in: data), "NSError")
         XCTAssertEqual(getStringValue(for: "exception.message", in: data), userInfo[NSLocalizedDescriptionKey])
-        XCTAssertNotNil(getStringValue(for: "exception.stacktrace", in: data))
+        XCTAssertNil(getStringValue(for: "exception.stacktrace", in: data))
         XCTAssertEqual(getIntValue(for: "code", in: data), code)
         XCTAssertEqual(getStringValue(for: "domain", in: data), domain)
         XCTAssertEqual(getStringValue(for: "request_id", in: data), "uuid-1234")
@@ -186,10 +186,10 @@ final class CustomErrorTrackingTests: XCTestCase {
 
         XCTAssertEqual(issue.message, "This is a test error.")
         XCTAssertEqual(issue.exceptionType, "MyTestError")
-        XCTAssertNotNil(issue.stacktrace)
+        XCTAssertNil(issue.stacktrace)
         XCTAssertEqual(getStringValue(for: "exception.type", in: attributes), "MyTestError")
         XCTAssertEqual(getStringValue(for: "exception.message", in: attributes), "This is a test error.")
-        XCTAssertNotNil(attributes["exception.stacktrace"])
+        XCTAssertNil(attributes["exception.stacktrace"])
     }
 
     func testSplunkIssue_from_NSError() {
@@ -199,11 +199,12 @@ final class CustomErrorTrackingTests: XCTestCase {
 
         XCTAssertEqual(issue.message, "An NSError occurred.")
         XCTAssertEqual(issue.exceptionType, "NSError")
-        XCTAssertNotNil(issue.stacktrace)
+        XCTAssertNil(issue.stacktrace)
         XCTAssertEqual(issue.exceptionCode, .int(123))
         XCTAssertEqual(issue.codeNamespace, "test.domain")
         XCTAssertEqual(getIntValue(for: "code", in: attributes), 123)
         XCTAssertEqual(getStringValue(for: "domain", in: attributes), "test.domain")
+        XCTAssertNil(attributes["exception.stacktrace"])
     }
 
     func testSplunkIssue_from_NSException() {
@@ -242,7 +243,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(stackFrames[1]["imageName"] as? String, "UIKitCore")
     }
 
-    func testTrackError_withSwiftError_attachesImages() throws {
+    func testTrackError_withSwiftError_omitsImagesWhenEnabledButNoStacktraceExists() throws {
         struct FileError: Error, LocalizedError {
             var errorDescription: String? {
                 "File not found"
@@ -262,15 +263,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         wait(for: [expectation], timeout: 1.0)
 
         let data = try XCTUnwrap(capturedData)
-        let imagesJSON = try XCTUnwrap(getStringValue(for: "exception.images", in: data))
-        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [Any])
-
-        XCTAssertFalse(parsed.isEmpty)
-
-        let firstEntry = try XCTUnwrap(parsed.first as? [String: Any])
-        XCTAssertNotNil(firstEntry["imagePath"])
-        XCTAssertNotNil(firstEntry["baseAddress"])
-        XCTAssertNotNil(firstEntry["imageSize"])
+        XCTAssertNil(getStringValue(for: "exception.images", in: data))
     }
 
     func testTrackError_withSwiftError_omitsImagesWhenDisabled() throws {
