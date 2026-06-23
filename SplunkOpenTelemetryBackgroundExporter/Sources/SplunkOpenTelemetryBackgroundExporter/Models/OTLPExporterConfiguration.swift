@@ -44,8 +44,9 @@ public struct OTLPExporterConfiguration {
 
     /// Creates a new OTLP exporter configuration.
     ///
-    /// - Parameter timeout: Timeout for export requests (defaults to 10 seconds).
-    /// - Parameter agentVersion: Splunk RUM agent version used in exporter request headers.
+    /// - Parameters:
+    ///   - timeout: Timeout for export requests (defaults to 10 seconds).
+    ///   - agentVersion: Splunk RUM agent version used in exporter request headers.
     public init(
         timeout: TimeInterval = defaultTimeoutInterval,
         agentVersion: String = "unknown"
