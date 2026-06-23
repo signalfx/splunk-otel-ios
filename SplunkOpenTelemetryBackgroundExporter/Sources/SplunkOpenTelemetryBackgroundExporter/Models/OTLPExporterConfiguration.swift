@@ -85,7 +85,9 @@ public enum OTLPHTTPHeaders {
     /// - Returns: A User-Agent value identifying the Splunk RUM agent and OTLP exporter.
     public static func userAgent(agentVersion: String) -> String {
         let osName: String
-        #if os(iOS)
+        #if targetEnvironment(macCatalyst)
+            osName = "macOS"
+        #elseif os(iOS)
             osName = "iOS"
         #elseif os(tvOS)
             osName = "tvOS"
