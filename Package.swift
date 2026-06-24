@@ -118,6 +118,7 @@ func generateMainTargets() -> [Target] {
             dependencies: [
                 "SplunkAgent",
                 "SplunkCommon",
+                "SplunkCustomTracking",
                 "SplunkInteractions",
                 "SplunkNavigation",
                 "SplunkNetworkMonitor",
@@ -141,7 +142,7 @@ func generateMainTargets() -> [Target] {
         // Objective-C (.m) files for ObjC-callability tests.
         .testTarget(
             name: "SplunkAgentBridgingTests",
-            dependencies: ["SplunkAgentObjC", "SplunkNavigation"],
+            dependencies: ["SplunkAgentObjC", "SplunkCustomTracking", "SplunkNavigation"],
             path: "SplunkAgent/Tests/SplunkAgentBridgingTests"
         ),
 

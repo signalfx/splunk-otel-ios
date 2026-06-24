@@ -491,6 +491,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkAgent"),
                 mod("SplunkCommon"),
+                mod("SplunkCustomTracking"),
                 mod("SplunkInteractions"),
                 mod("SplunkNavigation"),
                 mod("SplunkNetworkMonitor"),
