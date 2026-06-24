@@ -107,7 +107,7 @@ public struct SplunkIssue: SplunkTrackableIssue {
         timestamp = Date()
 
         // This is not necessarily the original error's throw site.
-        // stacktrace = Stacktrace(frames: Thread.callStackSymbols)
+        stacktrace = Stacktrace(frames: Thread.callStackSymbols)
 
         exceptionCode = .int(nsError.code)
         codeNamespace = nsError.domain
