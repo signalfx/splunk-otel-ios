@@ -118,7 +118,10 @@ public struct SplunkIssue: SplunkTrackableIssue {
         message = exception.reason ?? "No reason provided"
         exceptionType = exception.name.rawValue
         timestamp = Date()
-        stacktrace = Stacktrace(frames: exception.callStackSymbols)
+
+        // Manually-created NSException instances may not carry a stack.
+        let frames = exception.callStackSymbols
+        stacktrace = Stacktrace(frames: frames.isEmpty ? Thread.callStackSymbols : frames)
         exceptionCode = nil
         codeNamespace = nil
         capturedNSException = exception

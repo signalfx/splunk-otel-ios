@@ -22,7 +22,7 @@ import XCTest
 
 /// Verifies that ``CustomTrackingConfigurationObjC`` correctly converts into
 /// ``SplunkCustomTracking/CustomTrackingConfiguration``.
-final class CustomTrackingConfigurationObjCConversionTests: XCTestCase {
+final class CustomTrackingConfigObjCConversionTests: XCTestCase {
 
     // MARK: - Helpers
 

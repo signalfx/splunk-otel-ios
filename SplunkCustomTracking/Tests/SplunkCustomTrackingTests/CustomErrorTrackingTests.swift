@@ -245,6 +245,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(stackFrames[0]["symbolName"] as? String, "specialized Foo.bar()")
         XCTAssertEqual(stackFrames[0]["offset"] as? UInt64, 24)
         XCTAssertEqual(stackFrames[1]["imageName"] as? String, "UIKitCore")
+        XCTAssertEqual(stacktrace.referencedImageNames, Set(["AgentTestApp", "UIKitCore"]))
     }
 
     func testTrackError_withSwiftError_attachesImagesWhenEnabled() throws {
@@ -271,6 +272,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [Any])
 
         XCTAssertFalse(parsed.isEmpty)
+        try assertImagesMatchEmittedThreads(in: data)
     }
 
     func testTrackError_withSwiftError_omitsImagesWhenDisabled() throws {
@@ -315,11 +317,53 @@ final class CustomErrorTrackingTests: XCTestCase {
         let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [Any])
 
         XCTAssertFalse(parsed.isEmpty)
+        try assertImagesMatchEmittedThreads(in: data)
     }
 
     private func assertCommonErrorAttributes(in data: CustomTrackingData, file: StaticString = #file, line: UInt = #line) {
         XCTAssertEqual(data.name, "error", file: file, line: line)
         XCTAssertEqual(data.component, "error", file: file, line: line)
         XCTAssertEqual(getStringValue(for: "error", in: data), "true", file: file, line: line)
+    }
+
+    private func assertImagesMatchEmittedThreads(in data: CustomTrackingData, file: StaticString = #file, line: UInt = #line) throws {
+        let threadsJSON = try XCTUnwrap(getStringValue(for: "exception.threads", in: data), file: file, line: line)
+        let imagesJSON = try XCTUnwrap(getStringValue(for: "exception.images", in: data), file: file, line: line)
+
+        let threads = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]],
+            file: file,
+            line: line
+        )
+        let images = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [[String: Any]],
+            file: file,
+            line: line
+        )
+
+        var emittedImageNames: Set<String> = []
+
+        for thread in threads {
+            let stackFrames = thread["stackFrames"] as? [[String: Any]] ?? []
+
+            for stackFrame in stackFrames {
+                guard let imageName = stackFrame["imageName"] as? String else {
+                    continue
+                }
+
+                emittedImageNames.formUnion(normalizedImageNames(imageName))
+            }
+        }
+
+        XCTAssertFalse(emittedImageNames.isEmpty, file: file, line: line)
+
+        for image in images {
+            let imagePath = try XCTUnwrap(image["imagePath"] as? String, file: file, line: line)
+            XCTAssertFalse(
+                normalizedImageNames(imagePath).isDisjoint(with: emittedImageNames),
+                file: file,
+                line: line
+            )
+        }
     }
 }

@@ -22,18 +22,10 @@ import Foundation
 
     final class ErrorLiveReportImageExtractor {
 
-        func imagesJSON(from report: PLCrashReport) -> String? {
-            var usedImageNames: [String] = []
+        func imagesJSON(from report: PLCrashReport, matching stacktrace: Stacktrace) -> String? {
+            let emittedImageNames = stacktrace.referencedImageNames
 
-            for thread in report.threads {
-                guard let thread = thread as? PLCrashReportThreadInfo else {
-                    continue
-                }
-
-                collectUsedImageNames(from: thread.stackFrames, report: report, into: &usedImageNames)
-            }
-
-            guard !usedImageNames.isEmpty else {
+            guard !emittedImageNames.isEmpty else {
                 return nil
             }
 
@@ -44,7 +36,7 @@ import Foundation
                     continue
                 }
 
-                guard usedImageNames.contains(image.imageName) else {
+                guard imageName(image.imageName, matchesAnyOf: emittedImageNames) else {
                     continue
                 }
 
@@ -63,22 +55,8 @@ import Foundation
             return ErrorDiagnosticJSON.convertToJSONString(outputImages)
         }
 
-        private func collectUsedImageNames(
-            from frames: [Any],
-            report: PLCrashReport,
-            into usedImageNames: inout [String]
-        ) {
-            guard let frames = frames as? [PLCrashReportStackFrameInfo] else {
-                return
-            }
-
-            for stackFrame in frames {
-                let instructionPointer = stackFrame.instructionPointer
-                let imageInfo = report.image(forAddress: instructionPointer)
-                if let imageName = imageInfo?.imageName {
-                    usedImageNames.append(imageName)
-                }
-            }
+        private func imageName(_ imageName: String, matchesAnyOf emittedImageNames: Set<String>) -> Bool {
+            !normalizedImageNames(imageName).isDisjoint(with: emittedImageNames)
         }
     }
 
@@ -115,7 +93,10 @@ import Foundation
         func exceptionImages(for issue: SplunkIssue) -> String? {
             configureIfNeeded()
 
-            guard let crashReporter else {
+            guard
+                let crashReporter,
+                let stacktrace = issue.stacktrace
+            else {
                 return nil
             }
 
@@ -129,7 +110,7 @@ import Foundation
                 }
 
                 let report = try PLCrashReport(data: reportData)
-                return imageExtractor.imagesJSON(from: report)
+                return imageExtractor.imagesJSON(from: report, matching: stacktrace)
             }
             catch {
                 return nil

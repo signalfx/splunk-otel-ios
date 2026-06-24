@@ -42,6 +42,33 @@ extension Stacktrace {
 
         return ErrorDiagnosticJSON.convertToJSONString([thread])
     }
+
+    var referencedImageNames: Set<String> {
+        var imageNames: Set<String> = []
+
+        for frame in frames {
+            let parsedFrame = ParsedStackFrame(from: frame)
+            guard let imageName = parsedFrame.attributes[.imageName] as? String else {
+                continue
+            }
+
+            imageNames.formUnion(normalizedImageNames(imageName))
+        }
+
+        return imageNames
+    }
+}
+
+
+// MARK: - Image name normalization
+
+func normalizedImageNames(_ imageName: String) -> Set<String> {
+    let names = [
+        imageName,
+        (imageName as NSString).lastPathComponent
+    ]
+
+    return Set(names.filter { !$0.isEmpty })
 }
 
 
