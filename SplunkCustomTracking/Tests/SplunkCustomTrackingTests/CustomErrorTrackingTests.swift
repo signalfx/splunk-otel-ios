@@ -225,7 +225,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertNotNil(attributes["exception.threads"])
     }
 
-    func testStacktraceThreadList_matchesCrashReportShape() throws {
+    func testStacktraceThreadList_omitsUnavailableThreadMetadata() throws {
         let stacktrace = Stacktrace(frames: [
             "0   AgentTestApp                        0x0000000100e84234 specialized Foo.bar() + 24",
             "1   UIKitCore                           0x00000001852f3710 -[UIApplication sendAction:to:from:forEvent:] + 96"
@@ -235,8 +235,8 @@ final class CustomErrorTrackingTests: XCTestCase {
         let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]])
 
         XCTAssertEqual(parsed.count, 1)
-        XCTAssertEqual(parsed[0]["threadNumber"] as? Int, 0)
-        XCTAssertEqual(parsed[0]["crashed"] as? Bool, true)
+        XCTAssertNil(parsed[0]["threadNumber"])
+        XCTAssertNil(parsed[0]["crashed"])
 
         let stackFrames = try XCTUnwrap(parsed[0]["stackFrames"] as? [[String: Any]])
         XCTAssertEqual(stackFrames.count, 2)

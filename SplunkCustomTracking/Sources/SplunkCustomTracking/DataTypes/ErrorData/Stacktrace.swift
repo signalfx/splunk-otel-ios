@@ -37,8 +37,6 @@ extension Stacktrace {
         }
 
         let thread: [ErrorDiagnosticKeys: Any] = [
-            .threadNumber: 0,
-            .isCrashedThread: true,
             .stackFrames: stackFrames
         ]
 
