@@ -341,7 +341,7 @@ extension SplunkBackgroundHTTPBaseExporterTests {
 
         let operatingSystemVersion = ProcessInfo.processInfo.operatingSystemVersion
         let expectedOSVersion = "\(operatingSystemVersion.majorVersion).\(operatingSystemVersion.minorVersion).\(operatingSystemVersion.patchVersion)"
-        let expectedUserAgent = "SplunkRUM/\(agentVersion) (\(expectedOSName); \(expectedOSVersion)) OTel-OTLP-Exporter-Swift/\(OTLPVersion.version)"
+        let expectedUserAgent = "SplunkRUM/\(agentVersion) (\(expectedOSName);\(expectedOSVersion)) OTel-OTLP-Exporter-Swift/\(OTLPVersion.version)"
 
         let requestId = UUID()
         exporter.checkAndSend(fileKeys: [requestId.uuidString], existingTasks: [], cancelledTaskIds: [])

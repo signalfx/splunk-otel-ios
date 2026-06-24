@@ -73,7 +73,9 @@ public enum OTLPHTTPHeaders {
 
     // MARK: - Header Values
 
-    /// The User-Agent header value for OTLP requests.
+    /// The User-Agent header value for OTLP requests when the Splunk RUM agent version is unavailable.
+    ///
+    /// Use ``userAgent(agentVersion:)`` when the Splunk RUM agent version is available.
     public static var userAgent: String {
         userAgent(agentVersion: "unknown")
     }
@@ -102,7 +104,7 @@ public enum OTLPHTTPHeaders {
         let operatingSystemVersion = ProcessInfo.processInfo.operatingSystemVersion
         let osVersion = "\(operatingSystemVersion.majorVersion).\(operatingSystemVersion.minorVersion).\(operatingSystemVersion.patchVersion)"
 
-        return "SplunkRUM/\(agentVersion) (\(osName); \(osVersion)) OTel-OTLP-Exporter-Swift/\(OTLPVersion.version)"
+        return "SplunkRUM/\(agentVersion) (\(osName);\(osVersion)) OTel-OTLP-Exporter-Swift/\(OTLPVersion.version)"
     }
 }
 
