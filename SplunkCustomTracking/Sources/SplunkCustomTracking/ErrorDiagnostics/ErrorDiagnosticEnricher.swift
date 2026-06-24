@@ -16,8 +16,14 @@ limitations under the License.
 */
 
 import Foundation
+import SplunkCommon
 
 final class ErrorDiagnosticEnricher {
+
+    private let diagnosticsQueue = DispatchQueue(
+        label: PackageIdentifier.default(named: "ErrorDiagnosticEnricher"),
+        qos: .utility
+    )
 
     private var includeBinaryImagesOnErrors = true
 
@@ -26,22 +32,26 @@ final class ErrorDiagnosticEnricher {
     #endif
 
     func configure(includeBinaryImagesOnErrors: Bool) {
-        self.includeBinaryImagesOnErrors = includeBinaryImagesOnErrors
+        diagnosticsQueue.sync {
+            self.includeBinaryImagesOnErrors = includeBinaryImagesOnErrors
+        }
     }
 
     func exceptionImagesJSON(for issue: SplunkIssue) -> String? {
-        guard includeBinaryImagesOnErrors else {
-            return nil
-        }
+        diagnosticsQueue.sync {
+            guard includeBinaryImagesOnErrors else {
+                return nil
+            }
 
-        guard issue.stacktrace != nil else {
-            return nil
-        }
+            guard issue.stacktrace != nil else {
+                return nil
+            }
 
-        #if canImport(CrashReporter)
-            return liveReportCollector.exceptionImages(for: issue)
-        #else
-            return nil
-        #endif
+            #if canImport(CrashReporter)
+                return liveReportCollector.exceptionImages(for: issue)
+            #else
+                return nil
+            #endif
+        }
     }
 }
