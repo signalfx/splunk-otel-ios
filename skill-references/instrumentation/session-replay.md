@@ -213,7 +213,7 @@ For Objective-C apps, use `SplunkAgentObjC` and the verified ObjC surfaces:
 - `SPLKSessionReplayModule`
 - `SPLKSessionReplayModuleSensitivity`
 - `SPLKSessionReplayModuleCustomID`
-- `SPLKRecordingMask`, `SPLKMaskElement`, `SPLKMaskType`
+- `SPLKRecordingMask`, `SPLKMaskElement`, `SPLKMaskElementType`
 - `SPLKRenderingMode`
 - `SPLKSessionReplayStatus`
 
