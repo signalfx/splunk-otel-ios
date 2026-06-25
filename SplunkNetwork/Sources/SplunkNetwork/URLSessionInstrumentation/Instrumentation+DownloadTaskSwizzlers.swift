@@ -215,6 +215,7 @@ func swizzleDownloadTaskWithResumeData() {
         guard let request = task.currentRequest else {
             return task
         }
+
         guard shouldInstrumentRequest(request) else {
             return markSkippedForInstrumentation(task)
         }
@@ -259,6 +260,7 @@ func swizzleDownloadTaskWithResumeDataAndCompletion() {
         guard let request = task.currentRequest else {
             return task
         }
+
         guard shouldInstrumentRequest(request) else {
             return markSkippedForInstrumentation(task)
         }
