@@ -46,6 +46,11 @@ enum ErrorAttributeKeys {
         case namespace = "code.namespace"
     }
 
+    /// Crash-specific attribute keys shared with crash report telemetry.
+    enum Crash: String, AttributeKey {
+        case processPath = "crash.processPath"
+    }
+
     /// Service-specific attribute keys.
     enum Service: String, AttributeKey {
         case name = "service.name"

@@ -90,14 +90,14 @@ import Foundation
             crashReporter = PLCrashReporter(configuration: signalConfig)
         }
 
-        func exceptionImages(for issue: SplunkIssue) -> String? {
+        func diagnostics(for issue: SplunkIssue, includeBinaryImages: Bool) -> ErrorDiagnostics {
             configureIfNeeded()
 
             guard
                 let crashReporter,
                 let stacktrace = issue.stacktrace
             else {
-                return nil
+                return .empty
             }
 
             do {
@@ -110,10 +110,16 @@ import Foundation
                 }
 
                 let report = try PLCrashReport(data: reportData)
-                return imageExtractor.imagesJSON(from: report, matching: stacktrace)
+                let processPath = report.hasProcessInfo ? report.processInfo.processPath : nil
+                let imagesJSON = includeBinaryImages ? imageExtractor.imagesJSON(from: report, matching: stacktrace) : nil
+
+                return ErrorDiagnostics(
+                    processPath: processPath,
+                    exceptionImagesJSON: imagesJSON
+                )
             }
             catch {
-                return nil
+                return .empty
             }
         }
     }

@@ -18,6 +18,13 @@ limitations under the License.
 import Foundation
 import SplunkCommon
 
+struct ErrorDiagnostics {
+    let processPath: String?
+    let exceptionImagesJSON: String?
+
+    static let empty = Self(processPath: nil, exceptionImagesJSON: nil)
+}
+
 final class ErrorDiagnosticEnricher {
 
     private let diagnosticsQueue = DispatchQueue(
@@ -37,20 +44,19 @@ final class ErrorDiagnosticEnricher {
         }
     }
 
-    func exceptionImagesJSON(for issue: SplunkIssue) -> String? {
+    func diagnostics(for issue: SplunkIssue) -> ErrorDiagnostics {
         diagnosticsQueue.sync {
-            guard includeBinaryImagesOnErrors else {
-                return nil
-            }
-
             guard issue.stacktrace != nil else {
-                return nil
+                return .empty
             }
 
             #if canImport(CrashReporter)
-                return liveReportCollector.exceptionImages(for: issue)
+                return liveReportCollector.diagnostics(
+                    for: issue,
+                    includeBinaryImages: includeBinaryImagesOnErrors
+                )
             #else
-                return nil
+                return .empty
             #endif
         }
     }

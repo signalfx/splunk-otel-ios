@@ -69,10 +69,16 @@ extension CustomTrackingInternal {
         let augmented = attributes.merging(attributesToInject) { $1 }
         var combinedAttributes = augmented.merging(issue.toAttributesDictionary()) { $1 }
 
-        if let splunkIssue = issue as? SplunkIssue,
-            let imagesJSON = diagnosticEnricher.exceptionImagesJSON(for: splunkIssue)
-        {
-            combinedAttributes[ErrorAttributeKeys.Exception.images.rawValue] = .string(imagesJSON)
+        if let splunkIssue = issue as? SplunkIssue {
+            let diagnostics = diagnosticEnricher.diagnostics(for: splunkIssue)
+
+            if let processPath = diagnostics.processPath {
+                combinedAttributes[ErrorAttributeKeys.Crash.processPath.rawValue] = .string(processPath)
+            }
+
+            if let imagesJSON = diagnostics.exceptionImagesJSON {
+                combinedAttributes[ErrorAttributeKeys.Exception.images.rawValue] = .string(imagesJSON)
+            }
         }
 
         // Create the tracking data
