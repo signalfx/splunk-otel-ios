@@ -61,11 +61,11 @@ func swizzleDownloadTaskWithURL() {
 
         let request = URLRequest(url: url)
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, url)
+            return markSkippedForInstrumentation(castedIMP(session, selector, url))
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, url)
+            return markSkippedForInstrumentation(castedIMP(session, selector, url))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -111,11 +111,11 @@ func swizzleDownloadTaskWithRequestAndCompletion() {
         )
 
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, request, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, completion))
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, request, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, completion))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -164,11 +164,11 @@ func swizzleDownloadTaskWithURLAndCompletion() {
 
         let request = URLRequest(url: url)
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, url, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, url, completion))
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, url, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, url, completion))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -212,12 +212,15 @@ func swizzleDownloadTaskWithResumeData() {
 
         // Header injection is not possible for resumed downloads because the request
         // is embedded in the opaque resume data. We only create a span for observability.
-        guard let request = task.currentRequest, shouldInstrumentRequest(request) else {
+        guard let request = task.currentRequest else {
             return task
+        }
+        guard shouldInstrumentRequest(request) else {
+            return markSkippedForInstrumentation(task)
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return task
+            return markSkippedForInstrumentation(task)
         }
 
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
@@ -253,12 +256,15 @@ func swizzleDownloadTaskWithResumeDataAndCompletion() {
         // Create the task first since the request is embedded in resume data
         let task = castedIMP(session, selector, resumeData, completion)
 
-        guard let request = task.currentRequest, shouldInstrumentRequest(request) else {
+        guard let request = task.currentRequest else {
             return task
+        }
+        guard shouldInstrumentRequest(request) else {
+            return markSkippedForInstrumentation(task)
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return task
+            return markSkippedForInstrumentation(task)
         }
 
         objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)

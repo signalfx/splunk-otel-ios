@@ -61,11 +61,11 @@ func swizzleDataTaskWithURL() {
 
         let request = URLRequest(url: url)
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, url)
+            return markSkippedForInstrumentation(castedIMP(session, selector, url))
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, url)
+            return markSkippedForInstrumentation(castedIMP(session, selector, url))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -108,12 +108,12 @@ func swizzleDataTaskWithRequestAndCompletion() {
         )
 
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, request, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, completion))
         }
 
         // Create span and inject headers
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, request, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, completion))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -162,12 +162,12 @@ func swizzleDataTaskWithURLAndCompletion() {
 
         let request = URLRequest(url: url)
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, url, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, url, completion))
         }
 
         // Create span and inject headers
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, url, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, url, completion))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -212,11 +212,11 @@ func swizzleUploadTaskWithRequestFromData() {
         )
 
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, request, data)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, data))
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, request, data)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, data))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -250,11 +250,11 @@ func swizzleUploadTaskWithRequestFromFile() {
         )
 
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, request, fileURL)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, fileURL))
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, request, fileURL)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, fileURL))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -291,11 +291,11 @@ func swizzleUploadTaskWithRequestFromDataAndCompletion() {
         )
 
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, request, data, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, data, completion))
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, request, data, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, data, completion))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -334,11 +334,11 @@ func swizzleUploadTaskWithRequestFromFileAndCompletion() {
         )
 
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, request, fileURL, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, fileURL, completion))
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, request, fileURL, completion)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request, fileURL, completion))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -375,11 +375,11 @@ func swizzleUploadTaskWithStreamedRequest() {
         )
 
         guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, request)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request))
         }
 
         guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, request)
+            return markSkippedForInstrumentation(castedIMP(session, selector, request))
         }
 
         let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)

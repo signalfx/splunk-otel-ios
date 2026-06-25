@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
+@_spi(SplunkInternal) import SplunkCommon
 import XCTest
 
 @testable import SplunkNetwork
@@ -171,6 +172,35 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
         let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
         XCTAssertEqual(spans.count, 1, "Exactly one HTTP span should be created for uploadTask(with:fromFile:completionHandler:)")
+    }
+
+    func testInternalSDKMarkedUploadTaskWithFile_DoesNotCreateSpan() throws {
+        let url = URLSessionMockProtocol.url(path: "/post")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request = InternalNetworkRequestMarker.mark(request)
+
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent("test-upload-\(UUID().uuidString).txt")
+        try "test file content".write(to: fileURL, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let expectation = expectation(description: "Upload task completed")
+        let delegate = TaskCompletionDelegate(expectation: expectation)
+        let session = URLSession(
+            configuration: URLSessionMockProtocol.configuration(),
+            delegate: delegate,
+            delegateQueue: nil
+        )
+
+        let task = session.uploadTask(with: request, fromFile: fileURL)
+        task.resume()
+
+        wait(for: [expectation], timeout: 10.0)
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+
+        let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
+        XCTAssertTrue(spans.isEmpty, "Internal SDK upload requests should not create HTTP spans")
     }
 
     func testUploadTaskWithDataAndCompletion_CompletionReceivesData() {

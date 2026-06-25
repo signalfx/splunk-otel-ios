@@ -23,6 +23,7 @@ import OpenTelemetryApi
 
 var associatedKeySpan: UInt8 = 0
 var associatedKeyInstrumented: UInt8 = 1
+var associatedKeySkipped: UInt8 = 2
 
 // MARK: - Original IMP Storage
 
@@ -169,11 +170,11 @@ func createInstrumentedDataTask(
     originalIMP: (URLSession, Selector, Any) -> URLSessionDataTask
 ) -> URLSessionDataTask {
     guard shouldInstrumentRequest(request) else {
-        return originalIMP(session, selector, request)
+        return markSkippedForInstrumentation(originalIMP(session, selector, request))
     }
 
     guard let span = startHttpSpan(request: request) else {
-        return originalIMP(session, selector, request)
+        return markSkippedForInstrumentation(originalIMP(session, selector, request))
     }
 
     let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -194,11 +195,11 @@ func createInstrumentedDownloadTask(
     originalIMP: (URLSession, Selector, Any) -> URLSessionDownloadTask
 ) -> URLSessionDownloadTask {
     guard shouldInstrumentRequest(request) else {
-        return originalIMP(session, selector, request)
+        return markSkippedForInstrumentation(originalIMP(session, selector, request))
     }
 
     guard let span = startHttpSpan(request: request) else {
-        return originalIMP(session, selector, request)
+        return markSkippedForInstrumentation(originalIMP(session, selector, request))
     }
 
     let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
@@ -209,10 +210,12 @@ func createInstrumentedDownloadTask(
 }
 
 func shouldInstrumentRequest(_ request: URLRequest) -> Bool {
-    // Prevent double-instrumentation of requests that already carry trace context.
+    // Prevent instrumentation of SDK-owned requests and double-instrumentation of
+    // requests that already carry trace context.
     // All other filtering (URL scheme, excluded endpoints, ignoreURLs) is handled
     // by startHttpSpan, which is always called immediately after this check.
-    !TraceContextInjector.hasTraceContext(in: request)
+    !InternalNetworkRequestMarker.isMarked(request)
+        && !TraceContextInjector.hasTraceContext(in: request)
 }
 
 func injectTraceContextIfEnabled(into request: URLRequest, span: Span) -> URLRequest {
@@ -298,6 +301,17 @@ func endHttpSpanFromCompletion(span: Span, response: URLResponse?, error: Error?
 /// This is used by the resume swizzling to avoid double instrumentation.
 func wasInstrumentedAtCreation(_ task: URLSessionTask) -> Bool {
     objc_getAssociatedObject(task, &associatedKeyInstrumented) as? Bool ?? false
+}
+
+/// Checks if a URLSessionTask was intentionally skipped during task creation.
+func wasSkippedForInstrumentation(_ task: URLSessionTask) -> Bool {
+    objc_getAssociatedObject(task, &associatedKeySkipped) as? Bool ?? false
+}
+
+/// Marks a URLSessionTask as intentionally skipped during task creation.
+func markSkippedForInstrumentation<T: URLSessionTask>(_ task: T) -> T {
+    objc_setAssociatedObject(task, &associatedKeySkipped, true, .OBJC_ASSOCIATION_RETAIN)
+    return task
 }
 
 /// Gets the span associated with a task during creation.
