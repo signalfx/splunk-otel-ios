@@ -62,3 +62,59 @@ explain behavior instead of adding another install path.
 
 Endpoint update and disable APIs are public, but they change telemetry routing.
 Require explicit approval and use placeholders in any example.
+
+## Post-apply handoff
+
+After placing a deferred-endpoint initialization, always deliver a handoff at
+the end of `apply` output. Do not omit it. The user needs to know the app is
+integrated but not yet sending data, and exactly what to do next.
+
+**What the handoff must cover:**
+
+1. State clearly that the SDK is integrated, the app builds, and the agent will
+   start and generate signals locally — but nothing reaches Splunk Observability
+   yet because no endpoint is configured.
+
+2. Tell the user what they need to supply:
+   - **Realm** — the short region identifier for their Splunk Observability
+     organization (such as `us0`, `eu0`, `jp0`). Found in the organization URL
+     or Settings in Splunk Observability Cloud.
+   - **RUM access token** — a token with RUM ingest scope, created under
+     Settings > Access Tokens in Splunk Observability Cloud.
+
+3. Show how to add the endpoint without putting the token in source control.
+   Use the app's existing safe config mechanism if one is visible. If none is
+   apparent, show the environment-variable pattern as the safe default:
+
+   ```swift
+   // When ready to send telemetry — keep the token out of source control.
+   let token = ProcessInfo.processInfo.environment["SPLUNK_RUM_TOKEN"] ?? ""
+   let endpoint = EndpointConfiguration(realm: "<YOUR_REALM>", rumAccessToken: token)
+   agent.preferences.endpointConfiguration = endpoint
+   ```
+
+   For Objective-C:
+
+   ```objc
+   // When ready to send telemetry — keep the token out of source control.
+   NSString *token = NSProcessInfo.processInfo.environment[@"SPLUNK_RUM_TOKEN"] ?: @"";
+   SPLKEndpointConfiguration *endpoint =
+       [[SPLKEndpointConfiguration alloc] initWithRealm:@"<YOUR_REALM>"
+                                         rumAccessToken:token];
+   agent.preferences.endpointConfiguration = endpoint;
+   ```
+
+4. Note that `<YOUR_REALM>` and the token value are not in this output — the
+   agent does not know them and must not guess them.
+
+5. Tell the user what to expect: after supplying the endpoint and launching the
+   app, a session for the app should appear in Splunk Observability Cloud RUM
+   within a few minutes.
+
+**Do not:**
+- Hardcode or invent a realm value or token in any example, even a placeholder
+  that looks like a real value.
+- Suggest writing the token to a source file, committed plist, or any file that
+  enters version control.
+- Skip this handoff because the endpoint parameter is optional in the API — the
+  user will not see data without it and needs the guidance.
