@@ -13,6 +13,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 * Objective-C installs can configure Custom Tracking binary image metadata via `SPLKCustomTrackingConfiguration.includeBinaryImagesOnErrors`.
 * Custom error and exception reporting with stack traces now includes `exception.threads` stack frame metadata, matching the crash report payload shape.
 
+### Changed
+
+* OTLP exporter `User-Agent` headers now identify the Splunk RUM agent version, OS name/version, and OTLP exporter package version. #682
+
 ## [2.3.1] - 2026-06-15
 
 ### Fixed

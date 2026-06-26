@@ -32,13 +32,16 @@ struct SplunkBackgroundHTTPBaseExporterTests {
     func makeExporter(
         disk: MockDiskStorage,
         http: MockHTTPClient,
-        config: OTLPExporterConfiguration = OTLPExporterConfiguration()
+        config: OTLPExporterConfiguration = OTLPExporterConfiguration(),
+        envVarHeaders: [(String, String)]? = nil,
+        headers: [String: String] = [:]
     ) throws -> OTLPBackgroundHTTPBaseExporter {
         let exporter = try OTLPBackgroundHTTPBaseExporter(
             endpoint: XCTUnwrap(URL(string: "https://example.com")),
             config: config,
             qosConfig: SessionQOSConfiguration(),
-            envVarHeaders: nil,
+            envVarHeaders: envVarHeaders,
+            headers: headers,
             diskStorage: disk,
             performStalledUploadCheck: false
         )
@@ -305,5 +308,69 @@ struct SplunkBackgroundHTTPBaseExporterTests {
         try await Task.sleep(nanoseconds: 10_000_000_000) // wait for 10 secs
 
         #expect(exporter.checkStalledUploadsOperationCalled == true)
+    }
+}
+
+extension SplunkBackgroundHTTPBaseExporterTests {
+
+    @Test
+    func exportIncludesUserAgentHeaderFromConfiguration() throws {
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        let agentVersion = "2.3.1"
+        let exporter = try makeExporter(
+            disk: disk,
+            http: http,
+            config: OTLPExporterConfiguration(agentVersion: agentVersion)
+        )
+
+        let expectedOSName: String
+        #if targetEnvironment(macCatalyst)
+            expectedOSName = "macOS"
+        #elseif os(iOS)
+            expectedOSName = "iOS"
+        #elseif os(tvOS)
+            expectedOSName = "tvOS"
+        #elseif os(visionOS)
+            expectedOSName = "visionOS"
+        #elseif os(macOS)
+            expectedOSName = "macOS"
+        #else
+            expectedOSName = "unknown"
+        #endif
+
+        let operatingSystemVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let expectedOSVersion = "\(operatingSystemVersion.majorVersion).\(operatingSystemVersion.minorVersion).\(operatingSystemVersion.patchVersion)"
+        let expectedUserAgent = "SplunkRUM/\(agentVersion) (\(expectedOSName);\(expectedOSVersion)) OTel-OTLP-Exporter-Swift/\(OTLPVersion.version)"
+
+        let requestId = UUID()
+        exporter.checkAndSend(fileKeys: [requestId.uuidString], existingTasks: [], cancelledTaskIds: [])
+
+        let sent = try #require(http.sent.first)
+        #expect(sent.headers[OTLPHTTPHeaders.userAgentKey] == expectedUserAgent)
+        #expect(sent.createRequest().value(forHTTPHeaderField: OTLPHTTPHeaders.userAgentKey) == expectedUserAgent)
+    }
+
+    @Test
+    func exportPreservesCaseInsensitiveUserAgentHeaderOverrides() throws {
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        let customUserAgent = "custom-agent"
+        let expectedUserAgent = "env-agent"
+        let exporter = try makeExporter(
+            disk: disk,
+            http: http,
+            envVarHeaders: [("USER-AGENT", expectedUserAgent)],
+            headers: ["user-agent": customUserAgent]
+        )
+
+        let requestId = UUID()
+        exporter.checkAndSend(fileKeys: [requestId.uuidString], existingTasks: [], cancelledTaskIds: [])
+
+        let sent = try #require(http.sent.first)
+        #expect(sent.headers[OTLPHTTPHeaders.userAgentKey] == expectedUserAgent)
+        #expect(sent.headers["user-agent"] == nil)
+        #expect(sent.headers["USER-AGENT"] == nil)
+        #expect(sent.createRequest().value(forHTTPHeaderField: OTLPHTTPHeaders.userAgentKey) == expectedUserAgent)
     }
 }
