@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-@_spi(SplunkInternal) import SplunkCommon
+import SplunkCommon
 import XCTest
 
 @testable import SplunkOpenTelemetryBackgroundExporter

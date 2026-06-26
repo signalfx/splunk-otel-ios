@@ -16,7 +16,7 @@ limitations under the License.
 */
 
 import Foundation
-@_spi(SplunkInternal) import SplunkCommon
+import SplunkCommon
 
 enum RequestPayloadFormat: String, Codable {
     case json

@@ -18,7 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
-@_spi(SplunkInternal) import SplunkCommon
+import SplunkCommon
 import XCTest
 
 @testable import SplunkNetwork

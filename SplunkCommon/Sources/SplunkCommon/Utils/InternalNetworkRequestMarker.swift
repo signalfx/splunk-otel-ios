@@ -18,8 +18,7 @@ limitations under the License.
 import Foundation
 
 /// Marks URL requests that are owned by the SDK and must not be captured by network instrumentation.
-@_spi(SplunkInternal)
-public enum InternalNetworkRequestMarker {
+package enum InternalNetworkRequestMarker {
 
     // MARK: - Constants
 
@@ -32,7 +31,7 @@ public enum InternalNetworkRequestMarker {
     ///
     /// The marker is stored as a local `URLProtocol` property, so it is available to in-process
     /// instrumentation but is not serialized as an HTTP header or sent over the wire.
-    public static func mark(_ request: URLRequest) -> URLRequest {
+    package static func mark(_ request: URLRequest) -> URLRequest {
         guard let mutableRequest = (request as NSURLRequest).mutableCopy() as? NSMutableURLRequest else {
             return request
         }
@@ -42,7 +41,7 @@ public enum InternalNetworkRequestMarker {
     }
 
     /// Returns whether the request was marked as SDK-internal.
-    public static func isMarked(_ request: URLRequest) -> Bool {
+    package static func isMarked(_ request: URLRequest) -> Bool {
         URLProtocol.property(forKey: propertyKey, in: request) as? Bool == true
     }
 }
