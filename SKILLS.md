@@ -92,7 +92,7 @@ Start with:
 | Task or evidence | Load these files |
 | --- | --- |
 | React Native, Flutter, `package.json`, `pubspec.yaml`, generated `ios/` wrapper | [`install/hybrid-apps.md`](skill-references/install/hybrid-apps.md) |
-| Fresh install, product choice, lifecycle entry point, SwiftUI/UIKit/AppDelegate/no-AppDelegate cases | [`install/fresh-install.md`](skill-references/install/fresh-install.md) |
+| Fresh install, product choice, lifecycle entry point, SwiftUI/UIKit/AppDelegate/no-AppDelegate cases | [`install/fresh-install.md`](skill-references/install/fresh-install.md) and [`install/endpoint-and-runtime-state.md`](skill-references/install/endpoint-and-runtime-state.md) |
 | Build/link/package failures, product mismatch, stale package metadata | [`install/build-and-link-errors.md`](skill-references/install/build-and-link-errors.md) |
 | Deferred endpoint, endpoint update/disable, runtime state, sampling, duplicate install | [`install/endpoint-and-runtime-state.md`](skill-references/install/endpoint-and-runtime-state.md) |
 | `SplunkOtel`, `SplunkRumBuilder`, deprecated static APIs, old crash setup | [`install/migration-from-splunkotel.md`](skill-references/install/migration-from-splunkotel.md) |

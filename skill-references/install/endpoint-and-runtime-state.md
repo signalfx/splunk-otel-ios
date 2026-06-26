@@ -65,56 +65,103 @@ Require explicit approval and use placeholders in any example.
 
 ## Post-apply handoff
 
-After placing a deferred-endpoint initialization, always deliver a handoff at
-the end of `apply` output. Do not omit it. The user needs to know the app is
-integrated but not yet sending data, and exactly what to do next.
+After placing a deferred-endpoint initialization, always deliver this handoff
+at the end of `apply` output and then **stop and wait for the user to respond**
+before proceeding to any build, test, or telemetry verification steps. Do not
+omit the handoff. Do not proceed past it without the user's confirmation.
 
-**What the handoff must cover:**
+### What to tell the user
 
-1. State clearly that the SDK is integrated, the app builds, and the agent will
-   start and generate signals locally — but nothing reaches Splunk Observability
-   yet because no endpoint is configured.
+State clearly that the SDK is integrated and the app will build and run, but
+no telemetry reaches Splunk Observability Cloud yet because no endpoint is
+configured. They need two values from their Splunk Observability organization:
 
-2. Tell the user what they need to supply:
-   - **Realm** — the short region identifier for their Splunk Observability
-     organization (such as `us0`, `eu0`, `jp0`). Found in the organization URL
-     or Settings in Splunk Observability Cloud.
-   - **RUM access token** — a token with RUM ingest scope, created under
-     Settings > Access Tokens in Splunk Observability Cloud.
+- **Realm** — the short region identifier (such as `us0`, `eu0`, `jp0`). Found
+  in the organization URL or under Settings in Splunk Observability Cloud.
+- **RUM access token** — a token with RUM ingest scope, created under Settings
+  > Access Tokens in Splunk Observability Cloud.
 
-3. Show how to add the endpoint without putting the token in source control.
-   Use the app's existing safe config mechanism if one is visible. If none is
-   apparent, show the environment-variable pattern as the safe default:
+### How the user should add the endpoint
 
-   ```swift
-   // When ready to send telemetry — keep the token out of source control.
-   let token = ProcessInfo.processInfo.environment["SPLUNK_RUM_TOKEN"] ?? ""
-   let endpoint = EndpointConfiguration(realm: "<YOUR_REALM>", rumAccessToken: token)
-   agent.preferences.endpointConfiguration = endpoint
-   ```
+The token must not pass through this conversation. Do not ask the user to type
+or paste their token here. If the user offers to share the token, politely
+decline and explain that keeping it out of the conversation is the safest
+approach.
 
-   For Objective-C:
+Instead, direct the user to make the edit themselves in a local editor (Xcode,
+VS Code, Emacs, Vim, or any editor they prefer). Name the exact file that was
+modified during `apply` and the exact location in that file where the endpoint
+should be added.
 
-   ```objc
-   // When ready to send telemetry — keep the token out of source control.
-   NSString *token = NSProcessInfo.processInfo.environment[@"SPLUNK_RUM_TOKEN"] ?: @"";
-   SPLKEndpointConfiguration *endpoint =
-       [[SPLKEndpointConfiguration alloc] initWithRealm:@"<YOUR_REALM>"
-                                         rumAccessToken:token];
-   agent.preferences.endpointConfiguration = endpoint;
-   ```
+Show this code for the user to add after the `SplunkRum.install` call in that
+file (Swift):
 
-4. Note that `<YOUR_REALM>` and the token value are not in this output — the
-   agent does not know them and must not guess them.
+```swift
+// Add your realm and supply the token via environment variable —
+// this keeps the token out of source control.
+let token = ProcessInfo.processInfo.environment["SPLUNK_RUM_TOKEN"] ?? ""
+let endpoint = EndpointConfiguration(realm: "<YOUR_REALM>", rumAccessToken: token)
+splunkRum?.preferences.endpointConfiguration = endpoint
+```
 
-5. Tell the user what to expect: after supplying the endpoint and launching the
-   app, a session for the app should appear in Splunk Observability Cloud RUM
-   within a few minutes.
+For Objective-C:
+
+```objc
+// Add your realm and supply the token via environment variable —
+// this keeps the token out of source control.
+NSString *token = NSProcessInfo.processInfo.environment[@"SPLUNK_RUM_TOKEN"] ?: @"";
+SPLKEndpointConfiguration *endpoint =
+    [[SPLKEndpointConfiguration alloc] initWithRealm:@"<YOUR_REALM>"
+                                      rumAccessToken:token];
+agent.preferences.endpointConfiguration = endpoint;
+```
+
+Briefly explain why this pattern is safe: the realm is a non-sensitive region
+identifier that can live in source; the token is read at runtime from an
+environment variable set in the Xcode scheme, which is not committed to the
+repository by default. This keeps the token out of source control and out of
+this conversation.
+
+Then tell the user how to set the env var in Xcode:
+- Open the scheme editor (Product > Scheme > Edit Scheme, or long-press the Run
+  button)
+- Select the Run action, then the Arguments tab
+- Under "Environment Variables", add `SPLUNK_RUM_TOKEN` with their token value
+
+Replace `<YOUR_REALM>` in the source file with the user's actual realm string
+before they save.
+
+Ask the user to make both edits and report back when done. Do not proceed
+further until they confirm.
+
+### After the user reports back
+
+Read the instrumentation file (the same file named above) to check whether the
+endpoint has been added. Do not read the Xcode scheme file; the token lives
+there and must not be seen or repeated by this agent.
+
+Check the source file for two things only:
+- The realm field does not look like a placeholder. A placeholder looks like
+  `<YOUR_REALM>`, `YOUR_REALM`, `realm`, `<realm>`, an empty string, or a
+  short generic word. A real realm looks like `us0`, `eu0`, `jp0`, `us1`, etc.
+- The `EndpointConfiguration` call is present and structurally complete.
+
+Do not read, repeat, log, or store the token value. The check is structural
+only: does it look like the user filled in a real realm, and is the
+`EndpointConfiguration` call in place?
+
+If both look good, say something like "It looks like the realm and token are
+already set up — ready to move on to building and running the app." Then
+continue with build and verification guidance.
+
+If the realm still looks like a placeholder or the `EndpointConfiguration`
+call is missing, point the user back to the specific line and ask them to
+complete the edit.
 
 **Do not:**
-- Hardcode or invent a realm value or token in any example, even a placeholder
-  that looks like a real value.
-- Suggest writing the token to a source file, committed plist, or any file that
+- Ask the user to paste, type, or share their token in conversation.
+- Offer to make the token edit yourself — direct the user to their editor.
+- Hardcode or guess a realm value in any example.
+- Echo back or summarize the token value after reading the file.
+- Suggest writing the token to any source file, plist, or other file that
   enters version control.
-- Skip this handoff because the endpoint parameter is optional in the API — the
-  user will not see data without it and needs the guidance.
