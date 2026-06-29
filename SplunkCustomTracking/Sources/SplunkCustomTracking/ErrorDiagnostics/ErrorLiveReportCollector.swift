@@ -116,7 +116,12 @@ import Foundation
         )
 
         private let imageExtractor = ErrorLiveReportImageExtractor()
+        private let documentsDirectoryProvider: () -> URL?
         private var crashReporter: PLCrashReporter?
+
+        init(documentsDirectoryProvider: @escaping () -> URL? = ErrorLiveReportCollector.defaultDocumentsDirectory) {
+            self.documentsDirectoryProvider = documentsDirectoryProvider
+        }
 
         private func configureIfNeeded() {
             guard crashReporter == nil else {
@@ -130,7 +135,12 @@ import Foundation
             #endif
 
             let fileManager = FileManager.default
-            let crashDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            guard let documentsDirectory = documentsDirectoryProvider() else {
+                return
+            }
+
+            let crashDirectory =
+                documentsDirectory
                 .appendingPathComponent("SplunkCustomTracking", isDirectory: true)
             try? fileManager.createDirectory(at: crashDirectory, withIntermediateDirectories: true)
 
@@ -191,6 +201,10 @@ import Foundation
             catch {
                 return nil
             }
+        }
+
+        private static func defaultDocumentsDirectory() -> URL? {
+            FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
         }
     }
 
