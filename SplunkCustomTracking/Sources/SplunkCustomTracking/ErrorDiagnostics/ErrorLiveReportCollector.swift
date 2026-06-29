@@ -32,10 +32,7 @@ import Foundation
 
             var outputImages: [Any] = []
 
-            for image in snapshot.images {
-                guard imageName(image.imagePath, matchesAnyOf: emittedImageNames) else {
-                    continue
-                }
+            for image in snapshot.images where imageName(image.imagePath, matchesAnyOf: emittedImageNames) {
 
                 var imageDictionary: [ErrorDiagnosticKeys: Any] = [:]
                 imageDictionary[.baseAddress] = image.imageBaseAddress
@@ -178,11 +175,13 @@ import Foundation
 
                 let imagesJSON = includeBinaryImages ? self.imageExtractor.imagesJSON(from: snapshot, matching: stacktrace) : nil
 
-                completion(ErrorDiagnostics(
-                    processPath: snapshot.processPath,
-                    exceptionThreadsJSON: threadsJSON,
-                    exceptionImagesJSON: imagesJSON
-                ))
+                completion(
+                    ErrorDiagnostics(
+                        processPath: snapshot.processPath,
+                        exceptionThreadsJSON: threadsJSON,
+                        exceptionImagesJSON: imagesJSON
+                    )
+                )
             }
         }
 

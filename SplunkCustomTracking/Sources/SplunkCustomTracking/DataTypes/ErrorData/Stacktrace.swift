@@ -41,8 +41,7 @@ extension Stacktrace {
         let stackFrames = frames.map { frame in
             var attributes = ParsedStackFrame(from: frame).attributes
 
-            if
-                let instructionPointer = attributes[.instructionPointer] as? UInt64,
+            if let instructionPointer = attributes[.instructionPointer] as? UInt64,
                 let resolvedImageName = imageNameResolver?(instructionPointer, attributes[.imageName] as? String),
                 !resolvedImageName.isEmpty
             {
@@ -99,10 +98,11 @@ private struct ParsedStackFrame {
 
     init(from frame: String) {
         guard
-            let match = Self.expression?.firstMatch(
-                in: frame,
-                range: NSRange(frame.startIndex..., in: frame)
-            )
+            let match = Self.expression?
+                .firstMatch(
+                    in: frame,
+                    range: NSRange(frame.startIndex..., in: frame)
+                )
         else {
             attributes = [
                 .symbolName: frame
