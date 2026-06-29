@@ -7,6 +7,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Added `SKILLS.md` and `skill-references/` — a skill bundle for coding agents
+  instrumenting customer iOS apps with Splunk RUM. Covers install, endpoint
+  setup, navigation, network, Session Replay, Objective-C, dSYM, and
+  verification workflows.
+
 ## [2.3.1] - 2026-06-15
 
 ### Fixed
