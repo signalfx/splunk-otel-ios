@@ -117,13 +117,6 @@ import Foundation
 
         private let imageExtractor = ErrorLiveReportImageExtractor()
         private var crashReporter: PLCrashReporter?
-        private var snapshot: ErrorLiveReportSnapshot?
-
-        func prepare() {
-            collectorQueue.async {
-                self.refreshSnapshotIfNeeded()
-            }
-        }
 
         private func configureIfNeeded() {
             guard crashReporter == nil else {
@@ -156,9 +149,7 @@ import Foundation
             completion: @escaping (ErrorDiagnostics) -> Void
         ) {
             collectorQueue.async {
-                self.refreshSnapshotIfNeeded()
-
-                guard let snapshot = self.snapshot else {
+                guard let snapshot = self.liveReportSnapshot() else {
                     completion(.empty)
                     return
                 }
@@ -185,24 +176,20 @@ import Foundation
             }
         }
 
-        private func refreshSnapshotIfNeeded() {
-            guard snapshot == nil else {
-                return
-            }
-
+        private func liveReportSnapshot() -> ErrorLiveReportSnapshot? {
             configureIfNeeded()
 
             guard let crashReporter else {
-                return
+                return nil
             }
 
             do {
                 let reportData = try crashReporter.generateLiveReport()
                 let report = try PLCrashReport(data: reportData)
-                snapshot = ErrorLiveReportSnapshot(report: report)
+                return ErrorLiveReportSnapshot(report: report)
             }
             catch {
-                snapshot = nil
+                return nil
             }
         }
     }

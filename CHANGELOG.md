@@ -16,7 +16,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
-* Custom error and exception live-report enrichment no longer generates PLCrashReporter live reports on the caller thread.
+* Custom error and exception live-report enrichment no longer generates PLCrashReporter live reports on the caller thread or at install time.
 * Objective-C Custom Tracking configuration conversion now preserves `SPLKCustomTrackingConfiguration.isEnabled`.
 
 ### Changed

@@ -43,10 +43,6 @@ final class ErrorDiagnosticEnricher {
         diagnosticsQueue.sync {
             self.includeBinaryImagesOnErrors = includeBinaryImagesOnErrors
         }
-
-        #if canImport(CrashReporter)
-            liveReportCollector.prepare()
-        #endif
     }
 
     func diagnostics(for issue: SplunkIssue, completion: @escaping (ErrorDiagnostics) -> Void) {

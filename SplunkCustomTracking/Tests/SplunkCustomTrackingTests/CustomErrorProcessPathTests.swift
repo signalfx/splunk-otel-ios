@@ -21,6 +21,8 @@ import XCTest
 @testable import SplunkCustomTracking
 
 final class CustomErrorProcessPathTests: XCTestCase {
+    private let liveReportTimeout = 5.0
+
     private var module: CustomTrackingInternal?
     private var capturedData: CustomTrackingData?
     private var expectation: XCTestExpectation?
@@ -73,7 +75,7 @@ final class CustomErrorProcessPathTests: XCTestCase {
 
         module.track(SplunkIssue(from: FileError()), [:])
 
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: liveReportTimeout)
 
         let data = try XCTUnwrap(capturedData)
         XCTAssertNotNil(getStringValue(for: "crash.processPath", in: data))
@@ -91,7 +93,7 @@ final class CustomErrorProcessPathTests: XCTestCase {
         let exception = NSException(name: NSExceptionName("TestException"), reason: "reason", userInfo: nil)
         module.track(SplunkIssue(from: exception), [:])
 
-        wait(for: [expectation], timeout: 1.0)
+        wait(for: [expectation], timeout: liveReportTimeout)
 
         let data = try XCTUnwrap(capturedData)
         XCTAssertNotNil(getStringValue(for: "crash.processPath", in: data))
