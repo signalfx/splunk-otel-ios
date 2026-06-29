@@ -48,7 +48,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         activityTracker: ActivityTracker
     ) {
 
-        let configuration = OTLPExporterConfiguration()
+        let configuration = OTLPExporterConfiguration(agentVersion: resources.agentVersion)
         let envVarHeaders: [(String, String)] = []
         var headers: [String: String] = [:]
 
