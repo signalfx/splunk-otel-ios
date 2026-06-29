@@ -166,3 +166,4 @@ Call these out as design choices when a PR relies on or changes them:
 - `TargetWrappers/` - Cisco binary target wrappers.
 - `dsymUploader/` - dSYM upload helper for clients.
 - `CHANGELOG.md`, `CODESTYLE.md`, `Development.md`, `CONTRIBUTING.md`.
+- `SKILLS.md` and `skill-references/` - skill bundle for coding agents instrumenting iOS apps with this SDK.
