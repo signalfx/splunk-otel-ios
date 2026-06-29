@@ -65,80 +65,58 @@ Require explicit approval and use placeholders in any example.
 
 ## Post-apply handoff
 
-After placing a deferred-endpoint initialization, always deliver this handoff
-at the end of `apply` output and then **stop and wait for the user to respond**
-before proceeding to any build, test, or telemetry verification steps. Do not
-omit the handoff. Do not proceed past it without the user's confirmation.
+After writing the initialization code, always deliver this handoff at the end
+of `apply` output and then **stop and wait for the user to respond** before
+proceeding to any build, test, or telemetry verification steps. Do not omit
+the handoff. Do not proceed past it without the user's confirmation.
 
 ### What to tell the user
 
-State clearly that the SDK is integrated and the app will build and run, but
-no telemetry reaches Splunk Observability Cloud yet because no endpoint is
-configured. They need two values from their Splunk Observability organization:
+The initialization code has been written to the file, including the endpoint
+block with `<YOUR_REALM>` as a placeholder. The app will build and run, but no
+telemetry reaches Splunk Observability Cloud until the user fills in two values:
 
-- **Realm** — the short region identifier (such as `us0`, `eu0`, `jp0`). Found
-  in the organization URL or under Settings in Splunk Observability Cloud.
-- **RUM access token** — a token with RUM ingest scope, created under Settings
-  > Access Tokens in Splunk Observability Cloud.
+- **Realm** — replace `<YOUR_REALM>` in the source file with the short region
+  identifier for their organization (e.g. `us0`, `eu0`, `jp0`). Found in the
+  organization URL or under Settings in Splunk Observability Cloud.
+- **RUM access token** — set as the `SPLUNK_RUM_TOKEN` environment variable in
+  their Xcode scheme. Create the token under Settings > Access Tokens in Splunk
+  Observability Cloud (RUM ingest scope required).
 
-### How the user should add the endpoint
+### How the user should make these edits
 
 The token must not pass through this conversation. Do not ask the user to type
 or paste their token here. If the user offers to share the token, politely
 decline and explain that keeping it out of the conversation is the safest
 approach.
 
-Instead, direct the user to make the edit themselves in a local editor (Xcode,
-VS Code, Emacs, Vim, or any editor they prefer). Name the exact file that was
-modified during `apply` and the exact location in that file where the endpoint
-should be added.
+Direct the user to make both edits themselves:
 
-Show this code for the user to add after the `SplunkRum.install` call in that
-file (Swift):
+**1. Replace the realm placeholder in source** — name the exact file and line
+written during `apply`. The user opens it in any local editor (Xcode, VS Code,
+Emacs, Vim, etc.) and replaces `"<YOUR_REALM>"` with their actual realm string.
+This edit is safe to commit; the realm is not a secret.
 
-```swift
-// Add your realm and supply the token via environment variable —
-// this keeps the token out of source control.
-let token = ProcessInfo.processInfo.environment["SPLUNK_RUM_TOKEN"] ?? ""
-let endpoint = EndpointConfiguration(realm: "<YOUR_REALM>", rumAccessToken: token)
-splunkRum?.preferences.endpointConfiguration = endpoint
-```
-
-For Objective-C:
-
-```objc
-// Add your realm and supply the token via environment variable —
-// this keeps the token out of source control.
-NSString *token = NSProcessInfo.processInfo.environment[@"SPLUNK_RUM_TOKEN"] ?: @"";
-SPLKEndpointConfiguration *endpoint =
-    [[SPLKEndpointConfiguration alloc] initWithRealm:@"<YOUR_REALM>"
-                                      rumAccessToken:token];
-agent.preferences.endpointConfiguration = endpoint;
-```
-
-Briefly explain why this pattern is safe: the realm is a non-sensitive region
-identifier that can live in source; the token is read at runtime from an
-environment variable set in the Xcode scheme, which is not committed to the
-repository by default. This keeps the token out of source control and out of
-this conversation.
-
-Then tell the user how to set the env var in Xcode:
-- Open the scheme editor (Product > Scheme > Edit Scheme, or long-press the Run
-  button)
+**2. Set the token in the Xcode scheme** — the code already reads the token
+from `ProcessInfo.processInfo.environment["SPLUNK_RUM_TOKEN"]` at runtime.
+To supply the value without putting it in source control:
+- Open the scheme editor: Product > Scheme > Edit Scheme (or long-press Run)
 - Select the Run action, then the Arguments tab
 - Under "Environment Variables", add `SPLUNK_RUM_TOKEN` with their token value
 
-Replace `<YOUR_REALM>` in the source file with the user's actual realm string
-before they save.
+Briefly explain why this is the right pattern: the realm can live in source
+because it is not a secret; the token is kept out of source control by living
+only in the scheme's local environment variables, which Xcode does not commit
+to the repository by default.
 
 Ask the user to make both edits and report back when done. Do not proceed
 further until they confirm.
 
 ### After the user reports back
 
-Read the instrumentation file (the same file named above) to check whether the
-endpoint has been added. Do not read the Xcode scheme file; the token lives
-there and must not be seen or repeated by this agent.
+Read the instrumentation file (the same file named during `apply`) to check the
+realm placeholder has been replaced. Do not read the Xcode scheme file; the
+token lives there and must not be seen or repeated by this agent.
 
 Check the source file for two things only:
 - The realm field does not look like a placeholder. A placeholder looks like
@@ -160,7 +138,7 @@ complete the edit.
 
 **Do not:**
 - Ask the user to paste, type, or share their token in conversation.
-- Offer to make the token edit yourself — direct the user to their editor.
+- Offer to make the realm or token edit yourself — direct the user to their editor.
 - Hardcode or guess a realm value in any example.
 - Echo back or summarize the token value after reading the file.
 - Suggest writing the token to any source file, plist, or other file that

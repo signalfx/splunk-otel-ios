@@ -37,9 +37,17 @@ Safe ObjC init must not print raw `NSError`.
 ```objc
 @import SplunkAgentObjC;
 
+// Replace <YOUR_REALM> with your Splunk Observability realm (e.g. us0, eu0).
+// Set SPLUNK_RUM_TOKEN as an environment variable in your Xcode scheme —
+// this keeps your token out of source control.
+NSString *token = NSProcessInfo.processInfo.environment[@"SPLUNK_RUM_TOKEN"] ?: @"";
+SPLKEndpointConfiguration *endpoint =
+    [[SPLKEndpointConfiguration alloc] initWithRealm:@"<YOUR_REALM>"
+                                      rumAccessToken:token];
+
 NSError *error = nil;
 SPLKAgentConfiguration *config =
-    [[SPLKAgentConfiguration alloc] initWithEndpoint:nil
+    [[SPLKAgentConfiguration alloc] initWithEndpoint:endpoint
                                              appName:@"<YOUR_APP_NAME>"
                                deploymentEnvironment:@"<YOUR_ENVIRONMENT>"];
 self.splunkRum = [SPLKAgent installWith:config error:&error];
@@ -48,8 +56,6 @@ if (self.splunkRum == nil) {
 }
 ```
 
-`nil` endpoint preserves deferred endpoint setup. If endpoint setup is approved,
-use `SPLKEndpointConfiguration` via
-`initWithRealm:rumAccessToken:` or `initWithTrace:sessionReplay:`.
-
-Add endpoint only through an approved secret/configuration mechanism.
+The `<YOUR_REALM>` placeholder is intentional — the agent does not know the
+user's realm and must not guess it. The user fills it in after apply (see
+post-apply handoff in `endpoint-and-runtime-state.md`).

@@ -85,7 +85,8 @@ App dependency policy.
 
 ## Safe Swift initialization pattern
 
-Use placeholders or deferred endpoint. Do not log raw errors.
+Always write the full initialization block including the endpoint placeholder.
+Do not log raw errors.
 
 ```swift
 import SplunkAgent
@@ -93,7 +94,14 @@ import SplunkAgent
 private var splunkRum: SplunkRum?
 
 func startSplunkRum() {
+    // Replace <YOUR_REALM> with your Splunk Observability realm (e.g. us0, eu0).
+    // Set SPLUNK_RUM_TOKEN as an environment variable in your Xcode scheme —
+    // this keeps your token out of source control.
+    let token = ProcessInfo.processInfo.environment["SPLUNK_RUM_TOKEN"] ?? ""
+    let endpoint = EndpointConfiguration(realm: "<YOUR_REALM>", rumAccessToken: token)
+
     let config = AgentConfiguration(
+        endpoint: endpoint,
         appName: "<YOUR_APP_NAME>",
         deploymentEnvironment: "<YOUR_ENVIRONMENT>"
     )
@@ -106,5 +114,6 @@ func startSplunkRum() {
 }
 ```
 
-Add endpoint configuration only when the user approves the Host App's safe
-secret/configuration mechanism.
+The `<YOUR_REALM>` placeholder is intentional — the agent does not know the
+user's realm and must not guess it. The user will fill it in after apply (see
+post-apply handoff in `endpoint-and-runtime-state.md`).
