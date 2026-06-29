@@ -82,12 +82,6 @@ public struct SplunkIssue: SplunkTrackableIssue {
     public let exceptionCode: EventAttributeValue?
     public let codeNamespace: String?
 
-    /// Retained `NSException` when the issue was created from `trackException`.
-    ///
-    /// Used internally for PLCrashReporter live report enrichment.
-    public let capturedNSException: NSException?
-
-
     // MARK: - Initialization
 
     public init(from message: String) {
@@ -97,7 +91,6 @@ public struct SplunkIssue: SplunkTrackableIssue {
         stacktrace = nil
         exceptionCode = nil
         codeNamespace = nil
-        capturedNSException = nil
     }
 
     public init(from error: Error) {
@@ -111,7 +104,6 @@ public struct SplunkIssue: SplunkTrackableIssue {
 
         exceptionCode = .int(nsError.code)
         codeNamespace = nsError.domain
-        capturedNSException = nil
     }
 
     public init(from exception: NSException) {
@@ -124,6 +116,5 @@ public struct SplunkIssue: SplunkTrackableIssue {
         stacktrace = Stacktrace(frames: frames.isEmpty ? Thread.callStackSymbols : frames)
         exceptionCode = nil
         codeNamespace = nil
-        capturedNSException = exception
     }
 }
