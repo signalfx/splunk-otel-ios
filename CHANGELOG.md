@@ -9,10 +9,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-* Added `SKILLS.md` and `skill-references/` — a skill bundle for coding agents
-  instrumenting customer iOS apps with Splunk RUM. Covers install, endpoint
-  setup, navigation, network, Session Replay, Objective-C, dSYM, and
-  verification workflows.
+* Added `SKILLS.md` and `skill-references/` — a skill bundle for coding agents instrumenting customer iOS apps with Splunk RUM. Covers install, endpoint setup, navigation, network, Session Replay, Objective-C, dSYM, and verification workflows.
+
+### Changed
+
+* OTLP exporter `User-Agent` headers now identify the Splunk RUM agent version, OS name/version, and OTLP exporter package version. #682
 
 ## [2.3.1] - 2026-06-15
 
