@@ -25,6 +25,15 @@ public struct Stacktrace {
 
 typealias StackFrameImageNameResolver = (_ instructionPointer: UInt64, _ parsedImageName: String?) -> String?
 
+struct StacktraceImageReferences {
+    let exactImagePaths: Set<String>
+    let fallbackImageNames: Set<String>
+
+    var isEmpty: Bool {
+        exactImagePaths.isEmpty && fallbackImageNames.isEmpty
+    }
+}
+
 
 // MARK: - Stacktrace formatting
 
@@ -63,7 +72,14 @@ extension Stacktrace {
     }
 
     func referencedImageNames(resolvingImageNamesWith imageNameResolver: StackFrameImageNameResolver? = nil) -> Set<String> {
-        var imageNames: Set<String> = []
+        let references = imageReferences(resolvingImageNamesWith: imageNameResolver)
+
+        return references.exactImagePaths.union(references.fallbackImageNames)
+    }
+
+    func imageReferences(resolvingImageNamesWith imageNameResolver: StackFrameImageNameResolver? = nil) -> StacktraceImageReferences {
+        var exactImagePaths: Set<String> = []
+        var fallbackImageNames: Set<String> = []
 
         for frame in frames {
             let parsedFrame = ParsedStackFrame(from: frame)
@@ -73,14 +89,18 @@ extension Stacktrace {
                 imageNameResolver?(instructionPointer, parsedImageName)
             }
 
-            guard let imageName = resolvedImageName ?? parsedImageName else {
-                continue
+            if let resolvedImageName, !resolvedImageName.isEmpty {
+                exactImagePaths.insert(resolvedImageName)
             }
-
-            imageNames.formUnion(normalizedImageNames(imageName))
+            else if let parsedImageName, !parsedImageName.isEmpty {
+                fallbackImageNames.formUnion(normalizedImageNames(parsedImageName))
+            }
         }
 
-        return imageNames
+        return StacktraceImageReferences(
+            exactImagePaths: exactImagePaths,
+            fallbackImageNames: fallbackImageNames
+        )
     }
 }
 

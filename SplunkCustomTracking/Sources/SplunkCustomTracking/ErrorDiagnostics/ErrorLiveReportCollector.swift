@@ -24,17 +24,17 @@ import Foundation
     final class ErrorLiveReportImageExtractor {
 
         func imagesJSON(from snapshot: ErrorLiveReportSnapshot, matching stacktrace: Stacktrace) -> String? {
-            let emittedImageNames = stacktrace.referencedImageNames { instructionPointer, parsedImageName in
-                snapshot.image(containing: instructionPointer)?.imagePath ?? parsedImageName
+            let emittedImageReferences = stacktrace.imageReferences { instructionPointer, _ in
+                snapshot.image(containing: instructionPointer)?.imagePath
             }
 
-            guard !emittedImageNames.isEmpty else {
+            guard !emittedImageReferences.isEmpty else {
                 return nil
             }
 
             var outputImages: [Any] = []
 
-            for image in snapshot.images where imageName(image.imagePath, matchesAnyOf: emittedImageNames) {
+            for image in snapshot.images where imagePath(image.imagePath, matches: emittedImageReferences) {
 
                 var imageDictionary: [ErrorDiagnosticKeys: Any] = [:]
                 imageDictionary[.baseAddress] = image.imageBaseAddress
@@ -55,8 +55,8 @@ import Foundation
             return ErrorDiagnosticJSON.convertToJSONString(outputImages)
         }
 
-        private func imageName(_ imageName: String, matchesAnyOf emittedImageNames: Set<String>) -> Bool {
-            !normalizedImageNames(imageName).isDisjoint(with: emittedImageNames)
+        private func imagePath(_ imagePath: String, matches references: StacktraceImageReferences) -> Bool {
+            references.exactImagePaths.contains(imagePath) || !normalizedImageNames(imagePath).isDisjoint(with: references.fallbackImageNames)
         }
     }
 

@@ -78,6 +78,38 @@ import XCTest
             XCTAssertEqual(images[0]["imagePath"] as? String, resolvedPath)
             XCTAssertEqual(images[0]["imageUUID"] as? String, "RESOLVED")
         }
+
+        func testImagesJSONMatchesResolvedImagePathExactlyWhenBasenamesCollide() throws {
+            let unrelatedPath = "/private/Frameworks/Unrelated.framework/SharedName"
+            let resolvedPath = "/private/Frameworks/Resolved.framework/SharedName"
+            let snapshot = ErrorLiveReportSnapshot(
+                processPath: nil,
+                images: [
+                    ErrorLiveReportBinaryImage(
+                        imageBaseAddress: 0x2_0000_0000,
+                        imageSize: 0x1000,
+                        imagePath: unrelatedPath,
+                        imageUUID: "UNRELATED"
+                    ),
+                    ErrorLiveReportBinaryImage(
+                        imageBaseAddress: 0x1_0000_0000,
+                        imageSize: 0x1000,
+                        imagePath: resolvedPath,
+                        imageUUID: "RESOLVED"
+                    )
+                ]
+            )
+            let stacktrace = Stacktrace(frames: [
+                "0   SharedName                         0x0000000100000100 resolvedSymbol + 0"
+            ])
+
+            let imagesJSON = try XCTUnwrap(ErrorLiveReportImageExtractor().imagesJSON(from: snapshot, matching: stacktrace))
+            let images = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [[String: Any]])
+
+            XCTAssertEqual(images.count, 1)
+            XCTAssertEqual(images[0]["imagePath"] as? String, resolvedPath)
+            XCTAssertEqual(images[0]["imageUUID"] as? String, "RESOLVED")
+        }
     }
 
 #endif
