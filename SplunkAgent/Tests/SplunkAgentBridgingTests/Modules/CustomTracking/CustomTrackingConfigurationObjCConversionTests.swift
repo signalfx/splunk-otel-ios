@@ -38,17 +38,19 @@ final class CustomTrackingConfigObjCConversionTests: XCTestCase {
 
         let result = convert(config)
 
+        XCTAssertEqual(result?.isEnabled, true)
         XCTAssertEqual(result?.includeBinaryImagesOnErrors, true)
     }
 
-    func testIncludeBinaryImagesOnErrorsOptOutForwarded() {
+    func testPropertiesAreForwarded() {
         let config = CustomTrackingConfigurationObjC(
-            isEnabled: true,
+            isEnabled: false,
             includeBinaryImagesOnErrors: false
         )
 
         let result = convert(config)
 
+        XCTAssertEqual(result?.isEnabled, false)
         XCTAssertEqual(result?.includeBinaryImagesOnErrors, false)
     }
 }

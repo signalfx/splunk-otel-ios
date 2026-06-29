@@ -22,6 +22,11 @@ public struct CustomTrackingConfiguration: ModuleConfiguration {
 
     // MARK: - Public
 
+    /// Indicates whether the Module is enabled.
+    ///
+    /// Default value is `true`.
+    public var isEnabled: Bool = true
+
     /// When enabled, `trackError` and `trackException` may attach stack-referenced `exception.images`
     /// metadata from a PLCrashReporter live report, matching the crash report payload shape.
     ///
@@ -31,7 +36,11 @@ public struct CustomTrackingConfiguration: ModuleConfiguration {
 
     // MARK: - Initialization
 
-    public init(includeBinaryImagesOnErrors: Bool = true) {
+    public init(
+        isEnabled: Bool = true,
+        includeBinaryImagesOnErrors: Bool = true
+    ) {
+        self.isEnabled = isEnabled
         self.includeBinaryImagesOnErrors = includeBinaryImagesOnErrors
     }
 }

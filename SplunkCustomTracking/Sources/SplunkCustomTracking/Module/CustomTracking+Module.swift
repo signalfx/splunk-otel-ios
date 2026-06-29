@@ -29,8 +29,13 @@ extension CustomTrackingInternal: Module {
     public typealias EventData = CustomTrackingData
 
     public func install(with configuration: (any ModuleConfiguration)?, remoteConfiguration _: (any SplunkCommon.RemoteModuleConfiguration)?) {
-        if let configuration = configuration as? CustomTrackingConfiguration {
-            diagnosticEnricher.configure(includeBinaryImagesOnErrors: configuration.includeBinaryImagesOnErrors)
+        let configuration = configuration as? CustomTrackingConfiguration
+        isEnabled = configuration?.isEnabled ?? true
+
+        if isEnabled {
+            diagnosticEnricher.configure(
+                includeBinaryImagesOnErrors: configuration?.includeBinaryImagesOnErrors ?? true
+            )
         }
     }
 

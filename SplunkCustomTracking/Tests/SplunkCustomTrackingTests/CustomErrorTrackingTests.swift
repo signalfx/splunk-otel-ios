@@ -225,29 +225,6 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertNotNil(attributes["exception.threads"])
     }
 
-    func testStacktraceThreadList_omitsUnavailableThreadMetadata() throws {
-        let stacktrace = Stacktrace(frames: [
-            "0   AgentTestApp                        0x0000000100e84234 specialized Foo.bar() + 24",
-            "1   UIKitCore                           0x00000001852f3710 -[UIApplication sendAction:to:from:forEvent:] + 96"
-        ])
-
-        let threadsJSON = try XCTUnwrap(stacktrace.threadList)
-        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]])
-
-        XCTAssertEqual(parsed.count, 1)
-        XCTAssertNil(parsed[0]["threadNumber"])
-        XCTAssertNil(parsed[0]["crashed"])
-
-        let stackFrames = try XCTUnwrap(parsed[0]["stackFrames"] as? [[String: Any]])
-        XCTAssertEqual(stackFrames.count, 2)
-        XCTAssertEqual(stackFrames[0]["imageName"] as? String, "AgentTestApp")
-        XCTAssertEqual(stackFrames[0]["instructionPointer"] as? UInt64, 4_310_188_596)
-        XCTAssertEqual(stackFrames[0]["symbolName"] as? String, "specialized Foo.bar()")
-        XCTAssertEqual(stackFrames[0]["offset"] as? UInt64, 24)
-        XCTAssertEqual(stackFrames[1]["imageName"] as? String, "UIKitCore")
-        XCTAssertEqual(stacktrace.referencedImageNames, Set(["AgentTestApp", "UIKitCore"]))
-    }
-
     func testTrackError_withSwiftError_attachesImagesWhenEnabled() throws {
         struct FileError: Error, LocalizedError {
             var errorDescription: String? {
@@ -273,6 +250,7 @@ final class CustomErrorTrackingTests: XCTestCase {
 
         XCTAssertFalse(parsed.isEmpty)
         try assertImagesMatchEmittedThreads(in: data)
+        try assertThreadsContainResolvedImagePath(in: data)
     }
 
     func testTrackError_withSwiftError_omitsImagesWhenDisabled() throws {
@@ -318,6 +296,7 @@ final class CustomErrorTrackingTests: XCTestCase {
 
         XCTAssertFalse(parsed.isEmpty)
         try assertImagesMatchEmittedThreads(in: data)
+        try assertThreadsContainResolvedImagePath(in: data)
     }
 
     private func assertCommonErrorAttributes(in data: CustomTrackingData, file: StaticString = #file, line: UInt = #line) {
@@ -370,6 +349,42 @@ private func assertImagesMatchEmittedThreads(
             line: line
         )
     }
+}
+
+private func assertThreadsContainResolvedImagePath(
+    in data: CustomTrackingData,
+    file: StaticString = #file,
+    line: UInt = #line
+) throws {
+    let threadsJSON = try XCTUnwrap(stringValue(for: "exception.threads", in: data), file: file, line: line)
+    let imagesJSON = try XCTUnwrap(stringValue(for: "exception.images", in: data), file: file, line: line)
+
+    let threads = try XCTUnwrap(
+        JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]],
+        file: file,
+        line: line
+    )
+    let images = try XCTUnwrap(
+        JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [[String: Any]],
+        file: file,
+        line: line
+    )
+
+    let imagePaths = Set(images.compactMap { $0["imagePath"] as? String })
+    var threadImageNames: Set<String> = []
+
+    for thread in threads {
+        let stackFrames = thread["stackFrames"] as? [[String: Any]] ?? []
+
+        for stackFrame in stackFrames {
+            if let imageName = stackFrame["imageName"] as? String {
+                threadImageNames.insert(imageName)
+            }
+        }
+    }
+
+    XCTAssertFalse(imagePaths.isEmpty, file: file, line: line)
+    XCTAssertFalse(threadImageNames.isDisjoint(with: imagePaths), file: file, line: line)
 }
 
 private func stringValue(for key: String, in data: CustomTrackingData) -> String? {

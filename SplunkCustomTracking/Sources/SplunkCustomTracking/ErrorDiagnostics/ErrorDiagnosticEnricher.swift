@@ -20,9 +20,10 @@ import SplunkCommon
 
 struct ErrorDiagnostics {
     let processPath: String?
+    let exceptionThreadsJSON: String?
     let exceptionImagesJSON: String?
 
-    static let empty = Self(processPath: nil, exceptionImagesJSON: nil)
+    static let empty = Self(processPath: nil, exceptionThreadsJSON: nil, exceptionImagesJSON: nil)
 }
 
 final class ErrorDiagnosticEnricher {
@@ -35,29 +36,53 @@ final class ErrorDiagnosticEnricher {
     private var includeBinaryImagesOnErrors = true
 
     #if canImport(CrashReporter)
-        private lazy var liveReportCollector = ErrorLiveReportCollector()
+        private let liveReportCollector = ErrorLiveReportCollector()
     #endif
 
     func configure(includeBinaryImagesOnErrors: Bool) {
         diagnosticsQueue.sync {
             self.includeBinaryImagesOnErrors = includeBinaryImagesOnErrors
         }
+
+        #if canImport(CrashReporter)
+            liveReportCollector.prepare()
+        #endif
     }
 
-    func diagnostics(for issue: SplunkIssue) -> ErrorDiagnostics {
-        diagnosticsQueue.sync {
-            guard issue.stacktrace != nil else {
-                return .empty
-            }
+    func diagnostics(for issue: SplunkIssue, completion: @escaping (ErrorDiagnostics) -> Void) {
+        guard let stacktrace = issue.stacktrace else {
+            completion(.empty)
+            return
+        }
 
-            #if canImport(CrashReporter)
-                return liveReportCollector.diagnostics(
-                    for: issue,
-                    includeBinaryImages: includeBinaryImagesOnErrors
-                )
-            #else
-                return .empty
-            #endif
+        let includeBinaryImages = diagnosticsQueue.sync {
+            includeBinaryImagesOnErrors
+        }
+
+        #if canImport(CrashReporter)
+            liveReportCollector.diagnostics(
+                for: stacktrace,
+                includeBinaryImages: includeBinaryImages,
+                completion: completion
+            )
+        #else
+            completion(.empty)
+        #endif
+    }
+}
+
+extension ErrorDiagnostics {
+    func apply(to attributes: inout [String: EventAttributeValue]) {
+        if let processPath {
+            attributes[ErrorAttributeKeys.Crash.processPath.rawValue] = .string(processPath)
+        }
+
+        if let exceptionThreadsJSON {
+            attributes[ErrorAttributeKeys.Exception.threads.rawValue] = .string(exceptionThreadsJSON)
+        }
+
+        if let exceptionImagesJSON {
+            attributes[ErrorAttributeKeys.Exception.images.rawValue] = .string(exceptionImagesJSON)
         }
     }
 }

@@ -19,10 +19,11 @@ import Foundation
 
 #if canImport(CrashReporter)
     import CrashReporter
+    import SplunkCommon
 
     final class ErrorLiveReportImageExtractor {
 
-        func imagesJSON(from report: PLCrashReport, matching stacktrace: Stacktrace) -> String? {
+        func imagesJSON(from snapshot: ErrorLiveReportSnapshot, matching stacktrace: Stacktrace) -> String? {
             let emittedImageNames = stacktrace.referencedImageNames
 
             guard !emittedImageNames.isEmpty else {
@@ -31,20 +32,20 @@ import Foundation
 
             var outputImages: [Any] = []
 
-            for image in report.images {
-                guard let image = image as? PLCrashReportBinaryImageInfo else {
-                    continue
-                }
-
-                guard imageName(image.imageName, matchesAnyOf: emittedImageNames) else {
+            for image in snapshot.images {
+                guard imageName(image.imagePath, matchesAnyOf: emittedImageNames) else {
                     continue
                 }
 
                 var imageDictionary: [ErrorDiagnosticKeys: Any] = [:]
                 imageDictionary[.baseAddress] = image.imageBaseAddress
                 imageDictionary[.imageSize] = image.imageSize
-                imageDictionary[.imagePath] = image.imageName
-                imageDictionary[.imageUUID] = image.imageUUID
+                imageDictionary[.imagePath] = image.imagePath
+
+                if let imageUUID = image.imageUUID {
+                    imageDictionary[.imageUUID] = imageUUID
+                }
+
                 outputImages.append(imageDictionary)
             }
 
@@ -60,12 +61,74 @@ import Foundation
         }
     }
 
+    struct ErrorLiveReportBinaryImage {
+        let imageBaseAddress: UInt64
+        let imageSize: UInt64
+        let imagePath: String
+        let imageUUID: String?
+
+        func contains(instructionPointer: UInt64) -> Bool {
+            guard imageSize > 0 else {
+                return instructionPointer == imageBaseAddress
+            }
+
+            let end = imageBaseAddress.addingReportingOverflow(imageSize)
+            guard !end.overflow else {
+                return instructionPointer >= imageBaseAddress
+            }
+
+            return instructionPointer >= imageBaseAddress && instructionPointer < end.partialValue
+        }
+    }
+
+    struct ErrorLiveReportSnapshot {
+        let processPath: String?
+        let images: [ErrorLiveReportBinaryImage]
+
+        init(report: PLCrashReport) {
+            processPath = report.hasProcessInfo ? report.processInfo.processPath : nil
+
+            images = report.images.compactMap { image in
+                guard let image = image as? PLCrashReportBinaryImageInfo else {
+                    return nil
+                }
+
+                let imageUUID: String? = image.imageUUID
+
+                return ErrorLiveReportBinaryImage(
+                    imageBaseAddress: image.imageBaseAddress,
+                    imageSize: image.imageSize,
+                    imagePath: image.imageName,
+                    imageUUID: imageUUID
+                )
+            }
+        }
+
+        func image(containing instructionPointer: UInt64) -> ErrorLiveReportBinaryImage? {
+            images.first { image in
+                image.contains(instructionPointer: instructionPointer)
+            }
+        }
+    }
+
     final class ErrorLiveReportCollector {
+
+        private let collectorQueue = DispatchQueue(
+            label: PackageIdentifier.default(named: "ErrorLiveReportCollector"),
+            qos: .utility
+        )
 
         private let imageExtractor = ErrorLiveReportImageExtractor()
         private var crashReporter: PLCrashReporter?
+        private var snapshot: ErrorLiveReportSnapshot?
 
-        func configureIfNeeded() {
+        func prepare() {
+            collectorQueue.async {
+                self.refreshSnapshotIfNeeded()
+            }
+        }
+
+        private func configureIfNeeded() {
             guard crashReporter == nil else {
                 return
             }
@@ -90,36 +153,57 @@ import Foundation
             crashReporter = PLCrashReporter(configuration: signalConfig)
         }
 
-        func diagnostics(for issue: SplunkIssue, includeBinaryImages: Bool) -> ErrorDiagnostics {
+        func diagnostics(
+            for stacktrace: Stacktrace,
+            includeBinaryImages: Bool,
+            completion: @escaping (ErrorDiagnostics) -> Void
+        ) {
+            collectorQueue.async {
+                self.refreshSnapshotIfNeeded()
+
+                guard let snapshot = self.snapshot else {
+                    completion(.empty)
+                    return
+                }
+
+                let threadsJSON: String?
+                if includeBinaryImages {
+                    threadsJSON = stacktrace.threadList { instructionPointer, parsedImageName in
+                        snapshot.image(containing: instructionPointer)?.imagePath ?? parsedImageName
+                    }
+                }
+                else {
+                    threadsJSON = nil
+                }
+
+                let imagesJSON = includeBinaryImages ? self.imageExtractor.imagesJSON(from: snapshot, matching: stacktrace) : nil
+
+                completion(ErrorDiagnostics(
+                    processPath: snapshot.processPath,
+                    exceptionThreadsJSON: threadsJSON,
+                    exceptionImagesJSON: imagesJSON
+                ))
+            }
+        }
+
+        private func refreshSnapshotIfNeeded() {
+            guard snapshot == nil else {
+                return
+            }
+
             configureIfNeeded()
 
-            guard
-                let crashReporter,
-                let stacktrace = issue.stacktrace
-            else {
-                return .empty
+            guard let crashReporter else {
+                return
             }
 
             do {
-                let reportData: Data
-                if let exception = issue.capturedNSException {
-                    reportData = try crashReporter.generateLiveReport(with: exception)
-                }
-                else {
-                    reportData = try crashReporter.generateLiveReport()
-                }
-
+                let reportData = try crashReporter.generateLiveReport()
                 let report = try PLCrashReport(data: reportData)
-                let processPath = report.hasProcessInfo ? report.processInfo.processPath : nil
-                let imagesJSON = includeBinaryImages ? imageExtractor.imagesJSON(from: report, matching: stacktrace) : nil
-
-                return ErrorDiagnostics(
-                    processPath: processPath,
-                    exceptionImagesJSON: imagesJSON
-                )
+                snapshot = ErrorLiveReportSnapshot(report: report)
             }
             catch {
-                return .empty
+                snapshot = nil
             }
         }
     }

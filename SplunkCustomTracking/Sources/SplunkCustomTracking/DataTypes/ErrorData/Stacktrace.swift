@@ -23,6 +23,8 @@ public struct Stacktrace {
     let frames: [String]
 }
 
+typealias StackFrameImageNameResolver = (_ instructionPointer: UInt64, _ parsedImageName: String?) -> String?
+
 
 // MARK: - Stacktrace formatting
 
@@ -32,8 +34,22 @@ extension Stacktrace {
     }
 
     var threadList: String? {
+        threadList()
+    }
+
+    func threadList(resolvingImageNamesWith imageNameResolver: StackFrameImageNameResolver? = nil) -> String? {
         let stackFrames = frames.map { frame in
-            ParsedStackFrame(from: frame).attributes
+            var attributes = ParsedStackFrame(from: frame).attributes
+
+            if
+                let instructionPointer = attributes[.instructionPointer] as? UInt64,
+                let resolvedImageName = imageNameResolver?(instructionPointer, attributes[.imageName] as? String),
+                !resolvedImageName.isEmpty
+            {
+                attributes[.imageName] = resolvedImageName
+            }
+
+            return attributes
         }
 
         let thread: [ErrorDiagnosticKeys: Any] = [
@@ -75,14 +91,15 @@ func normalizedImageNames(_ imageName: String) -> Set<String> {
 // MARK: - Stack frame parsing
 
 private struct ParsedStackFrame {
+    private static let expression = try? NSRegularExpression(
+        pattern: #"^\s*(\d+)\s+(.+?)\s+(0x[0-9a-fA-F]+)\s+(.*?)(?:\s+\+\s+(\d+))?\s*$"#
+    )
+
     let attributes: [ErrorDiagnosticKeys: Any]
 
     init(from frame: String) {
-        let pattern = #"^\s*(\d+)\s+(.+?)\s+(0x[0-9a-fA-F]+)\s+(.*?)(?:\s+\+\s+(\d+))?\s*$"#
-
         guard
-            let expression = try? NSRegularExpression(pattern: pattern),
-            let match = expression.firstMatch(
+            let match = Self.expression?.firstMatch(
                 in: frame,
                 range: NSRange(frame.startIndex..., in: frame)
             )

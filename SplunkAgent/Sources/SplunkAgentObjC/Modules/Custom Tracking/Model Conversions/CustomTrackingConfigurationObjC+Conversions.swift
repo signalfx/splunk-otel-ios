@@ -23,6 +23,9 @@ extension CustomTrackingConfigurationObjC: ModuleConfigurationSwift {
     // MARK: - Swift variant
 
     var moduleConfiguration: any SplunkCommon.ModuleConfiguration {
-        CustomTrackingConfiguration(includeBinaryImagesOnErrors: includeBinaryImagesOnErrors)
+        CustomTrackingConfiguration(
+            isEnabled: isEnabled,
+            includeBinaryImagesOnErrors: includeBinaryImagesOnErrors
+        )
     }
 }
