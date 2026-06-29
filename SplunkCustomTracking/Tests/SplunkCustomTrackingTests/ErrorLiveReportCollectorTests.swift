@@ -46,6 +46,38 @@ import XCTest
             XCTAssertNil(result.exceptionThreadsJSON)
             XCTAssertNil(result.exceptionImagesJSON)
         }
+
+        func testImagesJSONMatchesResolvedThreadFrameImageNames() throws {
+            let stalePath = "/private/Frameworks/OldFramework.framework/OldFramework"
+            let resolvedPath = "/private/Frameworks/NewFramework.framework/NewFramework"
+            let snapshot = ErrorLiveReportSnapshot(
+                processPath: nil,
+                images: [
+                    ErrorLiveReportBinaryImage(
+                        imageBaseAddress: 0x2_0000_0000,
+                        imageSize: 0x1000,
+                        imagePath: stalePath,
+                        imageUUID: "STALE"
+                    ),
+                    ErrorLiveReportBinaryImage(
+                        imageBaseAddress: 0x1_0000_0000,
+                        imageSize: 0x1000,
+                        imagePath: resolvedPath,
+                        imageUUID: "RESOLVED"
+                    )
+                ]
+            )
+            let stacktrace = Stacktrace(frames: [
+                "0   OldFramework                       0x0000000100000100 staleSymbol + 0"
+            ])
+
+            let imagesJSON = try XCTUnwrap(ErrorLiveReportImageExtractor().imagesJSON(from: snapshot, matching: stacktrace))
+            let images = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [[String: Any]])
+
+            XCTAssertEqual(images.count, 1)
+            XCTAssertEqual(images[0]["imagePath"] as? String, resolvedPath)
+            XCTAssertEqual(images[0]["imageUUID"] as? String, "RESOLVED")
+        }
     }
 
 #endif

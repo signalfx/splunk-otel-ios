@@ -59,11 +59,21 @@ extension Stacktrace {
     }
 
     var referencedImageNames: Set<String> {
+        referencedImageNames()
+    }
+
+    func referencedImageNames(resolvingImageNamesWith imageNameResolver: StackFrameImageNameResolver? = nil) -> Set<String> {
         var imageNames: Set<String> = []
 
         for frame in frames {
             let parsedFrame = ParsedStackFrame(from: frame)
-            guard let imageName = parsedFrame.attributes[.imageName] as? String else {
+            let parsedImageName = parsedFrame.attributes[.imageName] as? String
+            let instructionPointer = parsedFrame.attributes[.instructionPointer] as? UInt64
+            let resolvedImageName = instructionPointer.flatMap { instructionPointer in
+                imageNameResolver?(instructionPointer, parsedImageName)
+            }
+
+            guard let imageName = resolvedImageName ?? parsedImageName else {
                 continue
             }
 

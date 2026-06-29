@@ -24,7 +24,9 @@ import Foundation
     final class ErrorLiveReportImageExtractor {
 
         func imagesJSON(from snapshot: ErrorLiveReportSnapshot, matching stacktrace: Stacktrace) -> String? {
-            let emittedImageNames = stacktrace.referencedImageNames
+            let emittedImageNames = stacktrace.referencedImageNames { instructionPointer, parsedImageName in
+                snapshot.image(containing: instructionPointer)?.imagePath ?? parsedImageName
+            }
 
             guard !emittedImageNames.isEmpty else {
                 return nil
@@ -81,6 +83,11 @@ import Foundation
     struct ErrorLiveReportSnapshot {
         let processPath: String?
         let images: [ErrorLiveReportBinaryImage]
+
+        init(processPath: String?, images: [ErrorLiveReportBinaryImage]) {
+            self.processPath = processPath
+            self.images = images
+        }
 
         init(report: PLCrashReport) {
             processPath = report.hasProcessInfo ? report.processInfo.processPath : nil

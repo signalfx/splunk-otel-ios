@@ -440,7 +440,11 @@ func generateMainTargets() -> [Target] {
             dependencies: [
                 "SplunkCommon",
                 "SplunkOpenTelemetry",
-                .product(name: "CrashReporter", package: "PLCrashReporter"),
+                .product(
+                    name: "CrashReporter",
+                    package: "PLCrashReporter",
+                    condition: .when(platforms: [.iOS, .tvOS, .macCatalyst])
+                ),
                 resolveDependency("logger")
             ],
             path: "SplunkCustomTracking/Sources",
