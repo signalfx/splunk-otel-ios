@@ -75,6 +75,10 @@ let sharedSettings: SettingsDictionary = [
     // Enable module interface generation.
     "SWIFT_EMIT_MODULE_INTERFACE": "YES",
 
+    // Tell the compiler these sources belong to the `SplunkAgent` package.
+    // This allows `package` access declarations to compile outside SwiftPM.
+    "OTHER_SWIFT_FLAGS": "-package-name SplunkAgent",
+
     // Minimum deployment targets matching Package.swift.
     "IPHONEOS_DEPLOYMENT_TARGET": "13.0",
     "TVOS_DEPLOYMENT_TARGET": "15.0",
