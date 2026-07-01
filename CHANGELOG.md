@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * OTLP exporter `User-Agent` headers now identify the Splunk RUM agent version, OS name/version, and OTLP exporter package version. #682
+* Trace exports are now written to disk in batches of up to 100 spans, every 0.5 seconds or when the batch fills, reducing disk writes and `v1/traces` upload requests. Partial batches are flushed during normal application backgrounding and termination.
 
 ## [2.3.1] - 2026-06-15
 

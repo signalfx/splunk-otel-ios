@@ -28,6 +28,7 @@ final class MockDiskStorage: DiskStorage {
     private var storage: [String: Data] = [:]
     var files: [String: URL] = [:]
     var deletedKeys: [String] = []
+    private(set) var insertedKeys: [String] = []
     var shouldThrowOnFinalDestination = false
     var shouldThrowOnlist = false
     var shouldThrowOnInsert = false
@@ -40,6 +41,7 @@ final class MockDiskStorage: DiskStorage {
         let keyStr = key.key
         let data = try JSONEncoder().encode(value)
         storage[keyStr] = data
+        insertedKeys.append(keyStr)
     }
 
     func read<T: Decodable & Encodable>(forKey key: CiscoDiskStorage.KeyBuilder) throws -> T? {

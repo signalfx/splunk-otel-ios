@@ -53,7 +53,7 @@ class SpanInterceptorExporter: SpanExporter {
         // Create thread-isolated copies to prevent CoW data races.
         //
         // SpanData is a struct containing dictionaries that use copy-on-write.
-        // When captured in async closures (e.g., by SimpleSpanProcessor), the
+        // When captured by an asynchronous span processor, the
         // dictionary storage is shared. If the original goes out of scope while
         // the closure executes, reference count operations can race, causing crashes.
         let isolatedSpans = spans.map { $0.isolatedCopy() }

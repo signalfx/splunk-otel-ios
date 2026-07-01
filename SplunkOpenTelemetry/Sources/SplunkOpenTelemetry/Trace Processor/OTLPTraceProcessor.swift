@@ -29,7 +29,7 @@ public class OTLPTraceProcessor: TraceProcessor {
     // MARK: - Private properties
 
     /// OTel tracer provider.
-    private let tracerProvider: TracerProvider
+    private let tracerProvider: TracerProviderSdk
 
     /// Background exporter for traces (stored to support endpoint updates).
     private let backgroundTraceExporter: OTLPBackgroundHTTPTraceExporter
@@ -80,7 +80,10 @@ public class OTLPTraceProcessor: TraceProcessor {
         )
 
         // Initialize processor
-        let spanProcessor = SimpleSpanProcessor(spanExporter: spanInterceptorExporter)
+        let spanProcessor = SplunkBatchSpanProcessor(
+            spanExporter: spanInterceptorExporter,
+            configuration: .production(exportTimeout: configuration.timeout)
+        )
         let attributesProcessor = OTLPAttributesSpanProcessor(
             with: runtimeAttributes,
             activityTracker: activityTracker
@@ -106,6 +109,14 @@ public class OTLPTraceProcessor: TraceProcessor {
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
         self.tracerProvider = tracerProvider
+    }
+
+
+    // MARK: - Export lifecycle
+
+    /// Persists all spans currently waiting in the in-memory export batch.
+    public func forceFlush(timeout: TimeInterval? = nil) {
+        tracerProvider.forceFlush(timeout: timeout)
     }
 
 

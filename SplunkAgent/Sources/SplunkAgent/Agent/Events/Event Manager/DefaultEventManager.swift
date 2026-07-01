@@ -58,6 +58,18 @@ class DefaultEventManager: AgentEventManager {
     /// Trace processor (stored as concrete type for endpoint updates).
     private let storedTraceProcessor: OTLPTraceProcessor
 
+    /// Observer tokens used to persist partial trace batches during lifecycle transitions.
+    var traceLifecycleObservers: [NSObjectProtocol] = []
+
+    /// Keeps lifecycle-triggered export work off the main thread and in notification order.
+    let traceLifecycleFlushQueue = DispatchQueue(
+        label: PackageIdentifier.default(named: "traceLifecycleFlush"),
+        qos: .utility
+    )
+
+    /// Identifies reentrant calls from the lifecycle trace flush queue.
+    let traceLifecycleFlushQueueKey = DispatchSpecificKey<Void>()
+
     // MARK: - Protocol conformance properties
 
     /// Event processor to process Logs and Events.
@@ -121,6 +133,7 @@ class DefaultEventManager: AgentEventManager {
         storedLogEventProcessor = processors.logEventProcessor
         storedSessionReplayProcessor = processors.sessionReplayProcessor
         storedTraceProcessor = processors.traceProcessor
+        traceLifecycleFlushQueue.setSpecific(key: traceLifecycleFlushQueueKey, value: ())
 
         // Log the endpoint status
         if let traceUrl {
@@ -133,6 +146,10 @@ class DefaultEventManager: AgentEventManager {
                 "No endpoint configured. Spans will be cached and sent when endpoint is configured."
             }
         }
+    }
+
+    deinit {
+        removeTraceLifecycleObservers()
     }
 
     // MARK: - Module Events

@@ -306,6 +306,10 @@ public class SplunkRum: ObservableObject {
         // Runs module-specific customizations
         customizeModules()
 
+        // Register trace flushing after module lifecycle observers so lifecycle spans are
+        // included before a partial in-memory batch is persisted.
+        (eventManager as? DefaultEventManager)?.startTraceLifecycleFlush()
+
         initializeEvents["modules_customized"] = Date()
 
         // Report agent's initialization metrics for the app start event

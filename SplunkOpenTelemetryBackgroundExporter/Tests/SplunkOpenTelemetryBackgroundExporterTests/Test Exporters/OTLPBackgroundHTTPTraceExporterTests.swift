@@ -19,6 +19,7 @@ limitations under the License.
 import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
+import OpenTelemetryApi
 import OpenTelemetrySdk
 import Testing
 
@@ -70,6 +71,17 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         return exporter
     }
 
+    func makeSpanData(count: Int) -> [SpanData] {
+        let tracerProvider = TracerProviderBuilder().build()
+        let tracer = tracerProvider.get(instrumentationName: "OTLPBackgroundHTTPTraceExporterTests")
+
+        return (0 ..< count).compactMap { index in
+            let span = tracer.spanBuilder(spanName: "batch-span-\(index)").startSpan()
+            span.end()
+            return (span as? ReadableSpan)?.toSpanData()
+        }
+    }
+
 
     // MARK: - Tests
 
@@ -88,6 +100,50 @@ struct OTLPBackgroundHTTPTraceExporterTests {
 
         #expect(result == .success)
         #expect(http.sent.isEmpty)
+    }
+
+    @Test
+    func exportBatchCreatesOneDiskWriteAndUploadRequest() throws {
+        let disk = MockDiskStorage()
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http)
+
+        let result = exporter.export(spans: makeSpanData(count: 100), explicitTimeout: nil)
+
+        #expect(result == .success)
+        #expect(disk.insertedKeys.count == 1)
+        #expect(http.sent.count == 1)
+    }
+
+    @Test
+    func pendingTracePayloadSurvivesExporterReplacement() throws {
+        let disk = makeDisk(uniqueLabel: "upgrade_\(UUID().uuidString)")
+        let oldHTTPClient = MockHTTPClient()
+        let oldExporter = OTLPBackgroundHTTPTraceExporter(
+            endpoint: nil,
+            qosConfig: SessionQOSConfiguration(),
+            envVarHeaders: nil,
+            diskStorage: disk,
+            performStalledUploadCheck: false
+        )
+        oldExporter.httpClient = oldHTTPClient
+
+        let exportResult = oldExporter.export(spans: makeSpanData(count: 1), explicitTimeout: nil)
+        #expect(exportResult == .success)
+        #expect(oldHTTPClient.sent.isEmpty)
+
+        let newHTTPClient = MockHTTPClient()
+        let newExporter = OTLPBackgroundHTTPTraceExporter(
+            endpoint: nil,
+            qosConfig: SessionQOSConfiguration(),
+            envVarHeaders: nil,
+            diskStorage: disk,
+            performStalledUploadCheck: false
+        )
+        newExporter.httpClient = newHTTPClient
+        newExporter.setEndpoint(try #require(URL(string: "https://example.com/v1/traces")))
+
+        #expect(newHTTPClient.sent.count == 1)
     }
 
     @Test
