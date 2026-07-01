@@ -38,8 +38,8 @@ Safe ObjC init must not print raw `NSError`.
 @import SplunkAgentObjC;
 
 // Replace <YOUR_REALM> with your Splunk Observability realm (e.g. us0, eu0).
-// Set SPLUNK_RUM_TOKEN as an environment variable in your Xcode scheme —
-// this keeps your token out of source control.
+// Supply SPLUNK_RUM_TOKEN via the app's existing secret/configuration
+// mechanism — see post-apply handoff for options.
 NSString *token = NSProcessInfo.processInfo.environment[@"SPLUNK_RUM_TOKEN"] ?: @"";
 SPLKEndpointConfiguration *endpoint =
     [[SPLKEndpointConfiguration alloc] initWithRealm:@"<YOUR_REALM>"

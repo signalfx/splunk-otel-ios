@@ -52,7 +52,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // The install(with:) method returns the agent instance
             self.agent = try SplunkRum.install(with: agentConfig)
         } catch {
-            // Do not log the error — it may contain your access token.
+            // Do not log the raw error — it may contain your access token.
+            print("Splunk RUM agent did not start. Check configuration values.")
         }
 
         // Example: Enable automated navigation tracking

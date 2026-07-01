@@ -39,14 +39,22 @@ instance with `.notRunning(.unsupportedPlatform)`.
 Swift endpoint update APIs:
 
 ```swift
+// Preferred: throwing path lets the caller handle failures without logging secrets.
 try agent.updateEndpoint(endpoint)
+
+// To disable:
 agent.disableEndpoint()
-agent.preferences.endpointConfiguration = endpoint
 agent.preferences.endpointConfiguration = nil
 ```
 
+Avoid `agent.preferences.endpointConfiguration = endpoint` for Swift updates:
+the setter catches failures internally and logs the raw error, which may include
+the endpoint URL or token — contradicting the redaction rule below.
+
 ObjC endpoint update uses `agent.preferences.endpointConfiguration`; assigning
-`nil` disables the endpoint.
+`nil` disables the endpoint. The ObjC path does not have a separate throwing
+variant; treat it as informational only and do not use it to validate
+arbitrary user-entered endpoint values.
 
 Do not print:
 
@@ -97,26 +105,42 @@ written during `apply`. The user opens it in any local editor (Xcode, VS Code,
 Emacs, Vim, etc.) and replaces `"<YOUR_REALM>"` with their actual realm string.
 This edit is safe to commit; the realm is not a secret.
 
-**2. Set the token in the Xcode scheme** — the code already reads the token
-from `ProcessInfo.processInfo.environment["SPLUNK_RUM_TOKEN"]` at runtime.
-To supply the value without putting it in source control:
-- Open the scheme editor: Product > Scheme > Edit Scheme (or long-press Run)
-- Select the Run action, then the Arguments tab
-- Under "Environment Variables", add `SPLUNK_RUM_TOKEN` with their token value
+**2. Supply the token via the app's existing secret/configuration mechanism.**
+The realm is not a secret and may live in source. The token is a secret and
+must not be pasted into this conversation, committed to source, written into a
+shared Xcode scheme, plist, example, log, or screenshot.
 
-Briefly explain why this is the right pattern: the realm can live in source
-because it is not a secret; the token is kept out of source control by living
-only in the scheme's local environment variables, which Xcode does not commit
-to the repository by default.
+Ask the user which secret or configuration mechanism their app already uses —
+do not invent a project-specific store without inspecting the project and
+getting user approval. Give this tiered guidance:
 
-Ask the user to make both edits and report back when done. Do not proceed
-further until they confirm.
+- **App already has a mechanism** (e.g. a secrets manager, an encrypted config
+  file, a gitignored local config): use that. Inspect and describe the path.
+- **Local development, no existing mechanism**: use an explicitly untracked
+  local source. Two simple options: a gitignored `.xcconfig` file with a
+  `SPLUNK_RUM_TOKEN = <value>` build setting, or a gitignored `.env` file
+  sourced by a launch script that sets the environment variable before running
+  the app.
+- **CI and release builds**: use the CI system's encrypted secrets or the
+  approved release-time secret injection process. Do not invent a CI workflow
+  without knowing which CI system the project uses.
+
+Note: if the user wants to supply the token via `ProcessInfo.processInfo
+.environment["SPLUNK_RUM_TOKEN"]` (what the written code already reads), the
+value must reach the running process through one of the above mechanisms —
+not through a shared Xcode scheme Run-action environment variable, which
+can be committed if the scheme is shared, and which does not apply to
+archive, TestFlight, or App Store builds.
+
+Ask the user to make both edits (realm in source, token via their chosen
+mechanism) and report back when done. Do not proceed further until they confirm.
 
 ### After the user reports back
 
 Read the instrumentation file (the same file named during `apply`) to check the
-realm placeholder has been replaced. Do not read the Xcode scheme file; the
-token lives there and must not be seen or repeated by this agent.
+realm placeholder has been replaced. Do not read, request, or ask about the
+token value — it lives in the user's chosen secret mechanism and must not be
+seen or repeated by this agent.
 
 Check the source file for two things only:
 - The realm field does not look like a placeholder. A placeholder looks like

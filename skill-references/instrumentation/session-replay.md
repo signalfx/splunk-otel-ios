@@ -237,7 +237,7 @@ Sensitivity and custom IDs:
 ```objc
 [agent.sessionReplay.sensitivity setSensitivity:@YES forView:paymentField];
 [agent.sessionReplay.sensitivity setSensitivity:@YES forViewClass:UITextField.class];
-[agent.sessionReplay.customIdentifiers setCustomId:@"checkout.submit"
+[agent.sessionReplay.customIdentifiers setCustomID:@"checkout.submit"
                                            forView:checkoutButton];
 ```
 

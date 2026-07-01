@@ -58,6 +58,13 @@ only be expected from iOS/iPadOS.
 If the Host App has no iOS/iPadOS app target at all, report that adding the SDK
 will not produce RUM instrumentation for that app.
 
+In shared iOS/macOS or watch-host projects, inspect target membership before
+editing. Choose a startup file owned exclusively by the iOS/iPadOS target as
+the insertion point. Do not add Splunk imports or calls to files compiled by
+macOS, watchOS, tvOS, or visionOS targets — the SDK maps those platforms to
+`.unsupported` or `.compileOnly`, and Session Replay APIs import UIKit, making
+them invalid on those targets regardless of runtime scope.
+
 ## Dependency and product
 
 Use SPM package:
@@ -95,8 +102,8 @@ private var splunkRum: SplunkRum?
 
 func startSplunkRum() {
     // Replace <YOUR_REALM> with your Splunk Observability realm (e.g. us0, eu0).
-    // Set SPLUNK_RUM_TOKEN as an environment variable in your Xcode scheme —
-    // this keeps your token out of source control.
+    // Supply SPLUNK_RUM_TOKEN via the app's existing secret/configuration
+    // mechanism — see post-apply handoff for options.
     let token = ProcessInfo.processInfo.environment["SPLUNK_RUM_TOKEN"] ?? ""
     let endpoint = EndpointConfiguration(realm: "<YOUR_REALM>", rumAccessToken: token)
 
