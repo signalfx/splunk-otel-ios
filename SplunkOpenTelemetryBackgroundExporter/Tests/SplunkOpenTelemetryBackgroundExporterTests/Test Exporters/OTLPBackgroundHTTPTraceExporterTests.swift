@@ -75,11 +75,12 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         let tracerProvider = TracerProviderBuilder().build()
         let tracer = tracerProvider.get(instrumentationName: "OTLPBackgroundHTTPTraceExporterTests")
 
-        return (0 ..< count).compactMap { index in
-            let span = tracer.spanBuilder(spanName: "batch-span-\(index)").startSpan()
-            span.end()
-            return (span as? ReadableSpan)?.toSpanData()
-        }
+        return (0 ..< count)
+            .compactMap { index in
+                let span = tracer.spanBuilder(spanName: "batch-span-\(index)").startSpan()
+                span.end()
+                return (span as? ReadableSpan)?.toSpanData()
+            }
     }
 
 
@@ -141,7 +142,7 @@ struct OTLPBackgroundHTTPTraceExporterTests {
             performStalledUploadCheck: false
         )
         newExporter.httpClient = newHTTPClient
-        newExporter.setEndpoint(try #require(URL(string: "https://example.com/v1/traces")))
+        try newExporter.setEndpoint(#require(URL(string: "https://example.com/v1/traces")))
 
         #expect(newHTTPClient.sent.count == 1)
     }

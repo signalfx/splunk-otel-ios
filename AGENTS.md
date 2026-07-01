@@ -50,10 +50,12 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 
 ## Telemetry Model
 
-- Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector, and CustomTracking workflows use `Tracer.spanBuilder` -> `SimpleSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
-- Log-as-span: CrashReports crash payloads, CustomTracking events/errors, Interactions, internal agent events, and agent events published through `DefaultEventManager` emit log records that `OTLPLogToSpanExporter` converts to spans and sends to the trace endpoint.
+- Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector, and CustomTracking workflows use `Tracer.spanBuilder` -> `OTLPBatchSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
+- Log-as-span: CrashReports crash payloads, CustomTracking events/errors, Interactions, internal agent events, and agent events published through `DefaultEventManager` emit log records that `OTLPLogToSpanExporter` converts to spans. The resulting spans use the same batched trace pipeline.
 - Binary logs: Session Replay is the exception; it uses `OTLPSessionReplayEventProcessor` -> `OTLPBackgroundHTTPLogExporterBinary`.
-- There is no production `BatchSpanProcessor` / `BatchLogRecordProcessor`. Record buffering is disk-backed in the background exporters.
+- Production trace batching uses a bounded in-memory queue with a 0.5-second schedule delay, a 100-span count trigger, 100-span export batches, and a 2,048-span capacity. A successful background-exporter call moves the batch across the disk durability boundary.
+- An abrupt process crash can lose spans still in the in-memory trace batch. Spans already accepted by the background exporter remain disk-backed across ordinary app and SDK restarts.
+- There is no production `BatchLogRecordProcessor`. Session Replay and background-exporter buffering remain disk-backed.
 - Uploads use `URLSessionConfiguration.background(withIdentifier:)`, not `UIApplication.beginBackgroundTask`.
 - Some hardcoded strings and attribute keys already exist. New hot-path string keys should still be centralized per module instead of copied inline.
 
@@ -147,10 +149,12 @@ Block changes that can crash the host app. Block or request measurement for chan
 
 Call these out as design choices when a PR relies on or changes them:
 
-1. Export buffering is disk-backed, not an in-memory bounded queue.
-2. Background `URLSession` scheduling, retry count, and disk caps define when data is delayed or dropped.
-3. `SplunkRum.shared` and session state assume a mostly singleton, install-once lifecycle.
-4. Sampling is chosen at session start; switching mid-session is a behavior/API change.
+1. Trace export has two buffering stages: a bounded in-memory batch before export and a disk-backed background-upload queue after export succeeds.
+2. The 0.5-second schedule delay, 100-span count trigger, and 2,048-span capacity define when in-memory traces are persisted or dropped.
+3. Abrupt process termination can lose the current in-memory batch; ordinary lifecycle transitions request a partial-batch flush to disk.
+4. Background `URLSession` scheduling, retry count, and disk caps define when disk-backed data is delayed or dropped.
+5. `SplunkRum.shared` and session state assume a mostly singleton, install-once lifecycle.
+6. Sampling is chosen at session start; switching mid-session is a behavior/API change.
 
 ## Key Files
 

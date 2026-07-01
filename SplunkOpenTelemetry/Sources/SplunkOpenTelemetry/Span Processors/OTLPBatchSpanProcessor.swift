@@ -73,13 +73,13 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
     // MARK: - Internal state
 
     var totalDroppedSpans: Int {
-        stateLock.withLock {
+        withStateLock {
             storedTotalDroppedSpans
         }
     }
 
     var queuedSpanCount: Int {
-        stateLock.withLock {
+        withStateLock {
             pendingSpans.count + inFlightSpanCount
         }
     }
@@ -118,7 +118,7 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
 
         var shouldScheduleDrain = false
 
-        stateLock.withLock {
+        withStateLock {
             guard !isShutdown else {
                 return
             }
@@ -142,10 +142,11 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
 
         if shouldScheduleDrain {
             exportQueue.async { [weak self] in
-                self?.drainQueuedSpans(
-                    includePartialBatch: false,
-                    explicitTimeout: self?.configuration.exportTimeout
-                )
+                self?
+                    .drainQueuedSpans(
+                        includePartialBatch: false,
+                        explicitTimeout: self?.configuration.exportTimeout
+                    )
             }
         }
     }
@@ -159,7 +160,7 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
     }
 
     func shutdown(explicitTimeout: TimeInterval?) {
-        let shouldShutdown = stateLock.withLock {
+        let shouldShutdown = withStateLock {
             guard !isShutdown else {
                 return false
             }
@@ -225,7 +226,7 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
         includePartialBatch: Bool,
         explicitTimeout: TimeInterval?
     ) {
-        let spans = stateLock.withLock {
+        let spans = withStateLock {
             immediateDrainScheduled = false
 
             guard !pendingSpans.isEmpty else {
@@ -271,7 +272,7 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
                 return
             }
 
-            stateLock.withLock {
+            withStateLock {
                 inFlightSpanCount -= readableBatch.count
             }
             batchStart = batchEnd
@@ -279,14 +280,14 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
     }
 
     private func requeueAfterFailedExport(_ spans: [ReadableSpan]) {
-        stateLock.withLock {
+        withStateLock {
             pendingSpans.insert(contentsOf: spans, at: pendingSpans.startIndex)
             inFlightSpanCount -= spans.count
         }
     }
 
     private func reportDroppedSpansIfNeeded() {
-        let droppedSpans = stateLock.withLock {
+        let droppedSpans = withStateLock {
             let droppedSpans = droppedSpansSinceLastReport
             droppedSpansSinceLastReport = 0
             return droppedSpans
@@ -309,12 +310,10 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
             exportQueue.sync(execute: work)
         }
     }
-}
 
-private extension NSLock {
-    func withLock<T>(_ work: () throws -> T) rethrows -> T {
-        lock()
-        defer { unlock() }
+    private func withStateLock<T>(_ work: () throws -> T) rethrows -> T {
+        stateLock.lock()
+        defer { stateLock.unlock() }
         return try work()
     }
 }

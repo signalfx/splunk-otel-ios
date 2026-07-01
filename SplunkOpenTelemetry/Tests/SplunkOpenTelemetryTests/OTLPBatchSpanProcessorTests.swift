@@ -25,6 +25,14 @@ import Testing
 @Suite(.serialized)
 struct OTLPBatchSpanProcessorTests {
 
+    // MARK: - Inline types
+
+    private struct ProviderContext {
+        let provider: TracerProviderSdk
+        let processor: OTLPBatchSpanProcessor
+        let tracer: Tracer
+    }
+
     // MARK: - Configuration
 
     @Test
@@ -44,16 +52,16 @@ struct OTLPBatchSpanProcessorTests {
     @Test
     func exportsWhenWakeThresholdIsReached() {
         let exporter = BatchProcessorTestExporter()
-        let (provider, _, tracer) = makeProvider(
+        let context = makeProvider(
             exporter: exporter,
             configuration: configuration(scheduleDelay: 60, wakeThreshold: 100)
         )
-        defer { provider.shutdown() }
+        defer { context.provider.shutdown() }
 
-        emitSpans(count: 99, tracer: tracer)
+        emitSpans(count: 99, tracer: context.tracer)
         #expect(exporter.successfulSpanCount == 0)
 
-        emitSpans(count: 1, tracer: tracer, startingAt: 99)
+        emitSpans(count: 1, tracer: context.tracer, startingAt: 99)
 
         #expect(exporter.waitForExport(timeout: 2) == .success)
         #expect(exporter.successfulSpanCount == 100)
@@ -63,13 +71,13 @@ struct OTLPBatchSpanProcessorTests {
     @Test
     func exportsPartialBatchOnTimer() {
         let exporter = BatchProcessorTestExporter()
-        let (provider, _, tracer) = makeProvider(
+        let context = makeProvider(
             exporter: exporter,
             configuration: configuration(scheduleDelay: 0.05, wakeThreshold: 100)
         )
-        defer { provider.shutdown() }
+        defer { context.provider.shutdown() }
 
-        emitSpans(count: 1, tracer: tracer)
+        emitSpans(count: 1, tracer: context.tracer)
 
         #expect(exporter.waitForExport(timeout: 1) == .success)
         #expect(exporter.successfulSpanCount == 1)
@@ -78,14 +86,14 @@ struct OTLPBatchSpanProcessorTests {
     @Test
     func forceFlushExportsPartialBatchAndFlushesExporter() {
         let exporter = BatchProcessorTestExporter()
-        let (provider, _, tracer) = makeProvider(
+        let context = makeProvider(
             exporter: exporter,
             configuration: configuration(scheduleDelay: 60, wakeThreshold: 100)
         )
-        defer { provider.shutdown() }
+        defer { context.provider.shutdown() }
 
-        emitSpans(count: 12, tracer: tracer)
-        provider.forceFlush(timeout: 2)
+        emitSpans(count: 12, tracer: context.tracer)
+        context.provider.forceFlush(timeout: 2)
 
         #expect(exporter.successfulSpanCount == 12)
         #expect(exporter.flushCount == 1)
@@ -97,7 +105,7 @@ struct OTLPBatchSpanProcessorTests {
     @Test
     func immediateThousandSpanBurstExportsWithoutLoss() {
         let exporter = BatchProcessorTestExporter()
-        let (provider, processor, tracer) = makeProvider(
+        let context = makeProvider(
             exporter: exporter,
             configuration: configuration(
                 scheduleDelay: 60,
@@ -106,43 +114,43 @@ struct OTLPBatchSpanProcessorTests {
                 maxExportBatchSize: 100
             )
         )
-        defer { provider.shutdown() }
+        defer { context.provider.shutdown() }
 
-        emitSpans(count: 1_000, tracer: tracer)
-        provider.forceFlush(timeout: 10)
+        emitSpans(count: 1_000, tracer: context.tracer)
+        context.provider.forceFlush(timeout: 10)
 
         #expect(exporter.successfulSpanCount == 1_000)
         #expect(Set(exporter.successfulSpanNames).count == 1_000)
         #expect(exporter.batches.count == 10)
         #expect(exporter.batches.allSatisfy { $0.count <= 100 })
-        #expect(processor.totalDroppedSpans == 0)
-        #expect(processor.queuedSpanCount == 0)
+        #expect(context.processor.totalDroppedSpans == 0)
+        #expect(context.processor.queuedSpanCount == 0)
     }
 
     @Test
     func failedExportIsRetriedWithoutLosingSpans() {
         let exporter = BatchProcessorTestExporter(results: [.failure, .success])
-        let (provider, processor, tracer) = makeProvider(
+        let context = makeProvider(
             exporter: exporter,
             configuration: configuration(scheduleDelay: 60, wakeThreshold: 100)
         )
-        defer { provider.shutdown() }
+        defer { context.provider.shutdown() }
 
-        emitSpans(count: 100, tracer: tracer)
+        emitSpans(count: 100, tracer: context.tracer)
         #expect(exporter.waitForExport(timeout: 2) == .success)
 
-        provider.forceFlush(timeout: 2)
+        context.provider.forceFlush(timeout: 2)
 
         #expect(exporter.exportAttemptCount == 2)
         #expect(exporter.successfulSpanCount == 100)
-        #expect(processor.totalDroppedSpans == 0)
-        #expect(processor.queuedSpanCount == 0)
+        #expect(context.processor.totalDroppedSpans == 0)
+        #expect(context.processor.queuedSpanCount == 0)
     }
 
     @Test
     func inFlightSpansCountTowardQueueCapacity() {
         let exporter = BatchProcessorTestExporter(blockExports: true)
-        let (provider, processor, tracer) = makeProvider(
+        let context = makeProvider(
             exporter: exporter,
             configuration: configuration(
                 scheduleDelay: 60,
@@ -151,17 +159,17 @@ struct OTLPBatchSpanProcessorTests {
                 maxExportBatchSize: 10
             )
         )
-        defer { provider.shutdown() }
+        defer { context.provider.shutdown() }
 
-        emitSpans(count: 10, tracer: tracer)
+        emitSpans(count: 10, tracer: context.tracer)
         #expect(exporter.waitUntilExportStarts(timeout: 2) == .success)
 
-        emitSpans(count: 5, tracer: tracer, startingAt: 10)
-        #expect(processor.totalDroppedSpans == 5)
-        #expect(processor.queuedSpanCount == 10)
+        emitSpans(count: 5, tracer: context.tracer, startingAt: 10)
+        #expect(context.processor.totalDroppedSpans == 5)
+        #expect(context.processor.queuedSpanCount == 10)
 
         exporter.resumeExports()
-        provider.forceFlush(timeout: 2)
+        context.provider.forceFlush(timeout: 2)
 
         #expect(exporter.successfulSpanCount == 10)
     }
@@ -172,15 +180,15 @@ struct OTLPBatchSpanProcessorTests {
     @Test
     func shutdownDrainsOnceAndRejectsLaterSpans() {
         let exporter = BatchProcessorTestExporter()
-        let (provider, _, tracer) = makeProvider(
+        let context = makeProvider(
             exporter: exporter,
             configuration: configuration(scheduleDelay: 60, wakeThreshold: 100)
         )
 
-        emitSpans(count: 10, tracer: tracer)
-        provider.shutdown()
-        provider.shutdown()
-        emitSpans(count: 1, tracer: tracer, startingAt: 10)
+        emitSpans(count: 10, tracer: context.tracer)
+        context.provider.shutdown()
+        context.provider.shutdown()
+        emitSpans(count: 1, tracer: context.tracer, startingAt: 10)
 
         #expect(exporter.successfulSpanCount == 10)
         #expect(exporter.flushCount == 1)
@@ -208,17 +216,21 @@ struct OTLPBatchSpanProcessorTests {
     private func makeProvider(
         exporter: SpanExporter,
         configuration: TraceExportBatchConfiguration
-    ) -> (TracerProviderSdk, SplunkBatchSpanProcessor, Tracer) {
-        let processor = SplunkBatchSpanProcessor(
+    ) -> ProviderContext {
+        let processor = OTLPBatchSpanProcessor(
             spanExporter: exporter,
             configuration: configuration
         )
         let provider = TracerProviderBuilder()
             .add(spanProcessor: processor)
             .build()
-        let tracer = provider.get(instrumentationName: "SplunkBatchSpanProcessorTests")
+        let tracer = provider.get(instrumentationName: "OTLPBatchSpanProcessorTests")
 
-        return (provider, processor, tracer)
+        return ProviderContext(
+            provider: provider,
+            processor: processor,
+            tracer: tracer
+        )
     }
 
     private func emitSpans(
@@ -256,27 +268,27 @@ private final class BatchProcessorTestExporter: SpanExporter {
     }
 
     var batches: [[SpanData]] {
-        lock.withBatchProcessorLock { storedBatches }
+        withLock { storedBatches }
     }
 
     var successfulSpanNames: [String] {
-        lock.withBatchProcessorLock { storedSuccessfulSpans.map(\.name) }
+        withLock { storedSuccessfulSpans.map(\.name) }
     }
 
     var successfulSpanCount: Int {
-        lock.withBatchProcessorLock { storedSuccessfulSpans.count }
+        withLock { storedSuccessfulSpans.count }
     }
 
     var exportAttemptCount: Int {
-        lock.withBatchProcessorLock { storedExportAttemptCount }
+        withLock { storedExportAttemptCount }
     }
 
     var flushCount: Int {
-        lock.withBatchProcessorLock { storedFlushCount }
+        withLock { storedFlushCount }
     }
 
     var shutdownCount: Int {
-        lock.withBatchProcessorLock { storedShutdownCount }
+        withLock { storedShutdownCount }
     }
 
     func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
@@ -285,7 +297,7 @@ private final class BatchProcessorTestExporter: SpanExporter {
             exportResume.wait()
         }
 
-        let result = lock.withBatchProcessorLock {
+        let result = withLock {
             storedExportAttemptCount += 1
             storedBatches.append(spans)
 
@@ -301,14 +313,14 @@ private final class BatchProcessorTestExporter: SpanExporter {
     }
 
     func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
-        lock.withBatchProcessorLock {
+        withLock {
             storedFlushCount += 1
         }
         return .success
     }
 
     func shutdown(explicitTimeout _: TimeInterval?) {
-        lock.withBatchProcessorLock {
+        withLock {
             storedShutdownCount += 1
         }
     }
@@ -324,12 +336,10 @@ private final class BatchProcessorTestExporter: SpanExporter {
     func resumeExports() {
         exportResume.signal()
     }
-}
 
-private extension NSLock {
-    func withBatchProcessorLock<T>(_ work: () throws -> T) rethrows -> T {
-        lock()
-        defer { unlock() }
+    private func withLock<T>(_ work: () throws -> T) rethrows -> T {
+        lock.lock()
+        defer { lock.unlock() }
         return try work()
     }
 }

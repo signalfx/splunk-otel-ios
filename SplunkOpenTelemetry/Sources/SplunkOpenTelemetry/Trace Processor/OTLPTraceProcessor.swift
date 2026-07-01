@@ -80,7 +80,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         )
 
         // Initialize processor
-        let spanProcessor = SplunkBatchSpanProcessor(
+        let spanProcessor = OTLPBatchSpanProcessor(
             spanExporter: spanInterceptorExporter,
             configuration: .production(exportTimeout: configuration.timeout)
         )
