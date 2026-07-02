@@ -29,6 +29,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     private let stateLock = NSLock()
     private var storedEndpoint: URL?
     private var storedAdditionalHeaders: [String: String]
+    private var checkStalledTask: Task<Void, Never>?
 
     // MARK: - Internal
 
@@ -36,7 +37,6 @@ public class OTLPBackgroundHTTPBaseExporter {
     let envVarHeaders: [(String, String)]?
     let config: OTLPExporterConfiguration
     let diskStorage: DiskStorage
-    var checkStalledTask: Task<Void, Never>?
 
     /// Thread-safe accessor for the endpoint URL.
     var endpoint: URL? {
@@ -71,6 +71,12 @@ public class OTLPBackgroundHTTPBaseExporter {
         diskStorage: diskStorage,
         namespace: getFileKeyType()
     )
+
+    var stalledUploadCheckTask: Task<Void, Never>? {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return checkStalledTask
+    }
 
     // MARK: - Public Properties
 
@@ -108,12 +114,14 @@ public class OTLPBackgroundHTTPBaseExporter {
         self.performStalledUploadCheck = performStalledUploadCheck
 
         if performStalledUploadCheck, endpoint != nil {
-            startStalledUploadCheck()
+            scheduleStalledUploadCheck()
         }
     }
 
     deinit {
+        stateLock.lock()
         checkStalledTask?.cancel()
+        stateLock.unlock()
     }
 
     // MARK: - Endpoint Management
@@ -132,15 +140,17 @@ public class OTLPBackgroundHTTPBaseExporter {
         flushPendingData()
 
         if performStalledUploadCheck {
-            startStalledUploadCheck()
+            scheduleStalledUploadCheck()
         }
     }
 
     /// Clears the endpoint, causing new data to be cached to pending storage.
     public func clearEndpoint() {
+        stateLock.lock()
         checkStalledTask?.cancel()
         checkStalledTask = nil
-        endpoint = nil
+        storedEndpoint = nil
+        stateLock.unlock()
     }
 
     // MARK: - Stalled request operations
@@ -214,7 +224,7 @@ public class OTLPBackgroundHTTPBaseExporter {
                 continue
             }
 
-            if let existingTaskDescription = allTaskDescriptions.first(where: { $0.id == requestId }) {
+            if allTaskDescriptions.contains(where: { $0.id == requestId }) {
                 if cancelledTaskIds.contains(requestId) {
                     let taskDescription = RequestDescriptor(
                         id: requestId,
@@ -261,19 +271,32 @@ public class OTLPBackgroundHTTPBaseExporter {
     }
 }
 
-// MARK: - Private helpers
+// MARK: - Internal helpers
 
 extension OTLPBackgroundHTTPBaseExporter {
-    private func startStalledUploadCheck() {
+    func scheduleStalledUploadCheck() {
+        stateLock.lock()
+        guard performStalledUploadCheck, storedEndpoint != nil else {
+            stateLock.unlock()
+            return
+        }
+
         checkStalledTask?.cancel()
         // Wait 5-8s to clean caches content from abandoned or stalled files.
         checkStalledTask = Task.detached(priority: .utility) { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
+            do {
+                try await Task.sleep(nanoseconds: UInt64(Int.random(in: 5 ... 8) * 1_000_000_000))
+            }
+            catch {
+                return
+            }
+
             self?.httpClient
                 .getAllSessionsTasks { [weak self] tasks in
                     self?.checkStalledUploadsOperation(tasks: tasks)
                 }
         }
+        stateLock.unlock()
     }
 
     /// Flushes any data stored in pending storage by moving it to active storage and scheduling uploads.

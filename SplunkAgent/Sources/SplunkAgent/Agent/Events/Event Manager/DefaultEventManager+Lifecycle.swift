@@ -62,7 +62,7 @@ extension DefaultEventManager {
                 }
 
                 let flush: () -> Void = { [weak self] in
-                    self?.concreteTraceProcessor.forceFlush()
+                    self?.concreteTraceProcessor.persistPendingSpans()
                 }
 
                 if waitForPersistence {

@@ -84,6 +84,27 @@ struct OTLPBatchSpanProcessorTests {
     }
 
     @Test
+    func delayedDrainStopsWhenQueueIsEmptyAndRearmsForNewSpans() {
+        let exporter = BatchProcessorTestExporter()
+        let context = makeProvider(
+            exporter: exporter,
+            configuration: configuration(scheduleDelay: 0.05, wakeThreshold: 100)
+        )
+        defer { context.provider.shutdown() }
+
+        emitSpans(count: 1, tracer: context.tracer)
+        #expect(context.processor.isDelayedDrainScheduled)
+        #expect(exporter.waitForExport(timeout: 1) == .success)
+        #expect(context.processor.isDelayedDrainScheduled == false)
+
+        emitSpans(count: 1, tracer: context.tracer, startingAt: 1)
+        #expect(context.processor.isDelayedDrainScheduled)
+        #expect(exporter.waitForExport(timeout: 1) == .success)
+        #expect(exporter.successfulSpanCount == 2)
+        #expect(context.processor.isDelayedDrainScheduled == false)
+    }
+
+    @Test
     func forceFlushExportsPartialBatchAndFlushesExporter() {
         let exporter = BatchProcessorTestExporter()
         let context = makeProvider(
@@ -97,6 +118,24 @@ struct OTLPBatchSpanProcessorTests {
 
         #expect(exporter.successfulSpanCount == 12)
         #expect(exporter.flushCount == 1)
+    }
+
+    @Test
+    func persistenceOnlyDrainDoesNotFlushExporter() {
+        let exporter = BatchProcessorTestExporter()
+        let context = makeProvider(
+            exporter: exporter,
+            configuration: configuration(scheduleDelay: 60, wakeThreshold: 100)
+        )
+        defer { context.provider.shutdown() }
+
+        emitSpans(count: 12, tracer: context.tracer)
+        context.processor.persistPendingSpans(timeout: 2)
+
+        #expect(exporter.successfulSpanCount == 12)
+        #expect(exporter.flushCount == 0)
+        #expect(context.processor.queuedSpanCount == 0)
+        #expect(context.processor.isDelayedDrainScheduled == false)
     }
 
 
@@ -143,6 +182,31 @@ struct OTLPBatchSpanProcessorTests {
 
         #expect(exporter.exportAttemptCount == 2)
         #expect(exporter.successfulSpanCount == 100)
+        #expect(context.processor.totalDroppedSpans == 0)
+        #expect(context.processor.queuedSpanCount == 0)
+    }
+
+    @Test
+    func failedExportRequeuesAheadOfNewSpansInFIFOOrder() {
+        let exporter = BatchProcessorTestExporter(results: [.failure, .success, .success])
+        let context = makeProvider(
+            exporter: exporter,
+            configuration: configuration(
+                scheduleDelay: 60,
+                wakeThreshold: 4,
+                maxQueueSize: 8,
+                maxExportBatchSize: 4
+            )
+        )
+        defer { context.provider.shutdown() }
+
+        emitSpans(count: 4, tracer: context.tracer)
+        #expect(exporter.waitForExport(timeout: 2) == .success)
+
+        emitSpans(count: 4, tracer: context.tracer, startingAt: 4)
+        context.provider.forceFlush(timeout: 2)
+
+        #expect(exporter.successfulSpanNames == (0 ..< 8).map { "batch-test-\($0)" })
         #expect(context.processor.totalDroppedSpans == 0)
         #expect(context.processor.queuedSpanCount == 0)
     }
@@ -242,104 +306,5 @@ struct OTLPBatchSpanProcessorTests {
             let span = tracer.spanBuilder(spanName: "batch-test-\(index)").startSpan()
             span.end()
         }
-    }
-}
-
-private final class BatchProcessorTestExporter: SpanExporter {
-    private let lock = NSLock()
-    private let exportCompleted = DispatchSemaphore(value: 0)
-    private let exportStarted = DispatchSemaphore(value: 0)
-    private let exportResume = DispatchSemaphore(value: 0)
-    private let blockExports: Bool
-
-    private var results: [SpanExporterResultCode]
-    private var storedBatches: [[SpanData]] = []
-    private var storedSuccessfulSpans: [SpanData] = []
-    private var storedExportAttemptCount = 0
-    private var storedFlushCount = 0
-    private var storedShutdownCount = 0
-
-    init(
-        results: [SpanExporterResultCode] = [],
-        blockExports: Bool = false
-    ) {
-        self.results = results
-        self.blockExports = blockExports
-    }
-
-    var batches: [[SpanData]] {
-        withLock { storedBatches }
-    }
-
-    var successfulSpanNames: [String] {
-        withLock { storedSuccessfulSpans.map(\.name) }
-    }
-
-    var successfulSpanCount: Int {
-        withLock { storedSuccessfulSpans.count }
-    }
-
-    var exportAttemptCount: Int {
-        withLock { storedExportAttemptCount }
-    }
-
-    var flushCount: Int {
-        withLock { storedFlushCount }
-    }
-
-    var shutdownCount: Int {
-        withLock { storedShutdownCount }
-    }
-
-    func export(spans: [SpanData], explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
-        exportStarted.signal()
-        if blockExports {
-            exportResume.wait()
-        }
-
-        let result = withLock {
-            storedExportAttemptCount += 1
-            storedBatches.append(spans)
-
-            let result = results.isEmpty ? SpanExporterResultCode.success : results.removeFirst()
-            if result == .success {
-                storedSuccessfulSpans.append(contentsOf: spans)
-            }
-            return result
-        }
-
-        exportCompleted.signal()
-        return result
-    }
-
-    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
-        withLock {
-            storedFlushCount += 1
-        }
-        return .success
-    }
-
-    func shutdown(explicitTimeout _: TimeInterval?) {
-        withLock {
-            storedShutdownCount += 1
-        }
-    }
-
-    func waitForExport(timeout: TimeInterval) -> DispatchTimeoutResult {
-        exportCompleted.wait(timeout: .now() + timeout)
-    }
-
-    func waitUntilExportStarts(timeout: TimeInterval) -> DispatchTimeoutResult {
-        exportStarted.wait(timeout: .now() + timeout)
-    }
-
-    func resumeExports() {
-        exportResume.signal()
-    }
-
-    private func withLock<T>(_ work: () throws -> T) rethrows -> T {
-        lock.lock()
-        defer { lock.unlock() }
-        return try work()
     }
 }

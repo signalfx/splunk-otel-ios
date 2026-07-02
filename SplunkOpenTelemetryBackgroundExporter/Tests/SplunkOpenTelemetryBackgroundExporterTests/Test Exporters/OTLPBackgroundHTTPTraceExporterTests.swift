@@ -54,7 +54,8 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         http: BackgroundHTTPClientProtocol,
         config: OTLPExporterConfiguration = OTLPExporterConfiguration(),
         fileType: String? = nil,
-        headers: [String: String] = [:]
+        headers: [String: String] = [:],
+        performStalledUploadCheck: Bool = false
     ) throws -> OTLPBackgroundHTTPTraceExporter {
         let endpoint = try #require(URL(string: "https://example.com"))
         let exporter = OTLPBackgroundHTTPTraceExporter(
@@ -65,7 +66,7 @@ struct OTLPBackgroundHTTPTraceExporterTests {
             headers: headers,
             diskStorage: disk,
             fileType: fileType,
-            performStalledUploadCheck: false
+            performStalledUploadCheck: performStalledUploadCheck
         )
         exporter.httpClient = http
         return exporter
@@ -114,6 +115,38 @@ struct OTLPBackgroundHTTPTraceExporterTests {
         #expect(result == .success)
         #expect(disk.insertedKeys.count == 1)
         #expect(http.sent.count == 1)
+    }
+
+    @Test
+    func uploadSchedulingFailureReturnsSuccessAfterSingleDiskWrite() throws {
+        let disk = MockDiskStorage()
+        let http = ThrowingHTTPClient()
+        let exporter = try makeExporter(
+            disk: disk,
+            http: http,
+            performStalledUploadCheck: true
+        )
+        let initialRecoveryTask = try #require(exporter.stalledUploadCheckTask)
+
+        let result = exporter.export(spans: makeSpanData(count: 100), explicitTimeout: nil)
+
+        #expect(result == .success)
+        #expect(disk.insertedKeys.count == 1)
+        #expect(initialRecoveryTask.isCancelled)
+        #expect(exporter.stalledUploadCheckTask?.isCancelled == false)
+    }
+
+    @Test
+    func diskPersistenceFailureReturnsFailureWithoutSchedulingUpload() throws {
+        let disk = MockDiskStorage()
+        disk.shouldThrowOnInsert = true
+        let http = MockHTTPClient()
+        let exporter = try makeExporter(disk: disk, http: http)
+
+        let result = exporter.export(spans: makeSpanData(count: 1), explicitTimeout: nil)
+
+        #expect(result == .failure)
+        #expect(http.sent.isEmpty)
     }
 
     @Test

@@ -83,13 +83,14 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
 
         do {
             try httpClient.send(requestDescriptor)
-
-            return .success
         }
         catch {
-
-            return .failure
+            // The batch is already durable. Recover the retained disk record instead of asking
+            // the span processor to create a duplicate record under a new request identifier.
+            scheduleStalledUploadCheck()
         }
+
+        return .success
     }
 
     public func flush(explicitTimeout _: TimeInterval? = nil) -> SpanExporterResultCode {

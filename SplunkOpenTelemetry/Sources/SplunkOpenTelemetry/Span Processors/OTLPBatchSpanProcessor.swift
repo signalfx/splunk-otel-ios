@@ -37,6 +37,19 @@ struct TraceExportBatchConfiguration {
             exportTimeout: exportTimeout
         )
     }
+
+    func sanitized() -> Self {
+        let maxQueueSize = max(1, maxQueueSize)
+        let maxExportBatchSize = min(max(1, maxExportBatchSize), maxQueueSize)
+
+        return Self(
+            scheduleDelay: max(0.001, scheduleDelay),
+            wakeThreshold: min(max(1, wakeThreshold), maxQueueSize),
+            maxQueueSize: maxQueueSize,
+            maxExportBatchSize: maxExportBatchSize,
+            exportTimeout: max(0, exportTimeout)
+        )
+    }
 }
 
 /// Buffers ended spans in memory and exports them from a serial background queue.
@@ -61,10 +74,11 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
     private let exportQueueKey = DispatchSpecificKey<Void>()
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
-    private var timer: DispatchSourceTimer?
-    private var pendingSpans: [ReadableSpan] = []
+    private var pendingSpans: ReadableSpanQueue
     private var inFlightSpanCount = 0
     private var immediateDrainScheduled = false
+    private var scheduledDelayedDrainGeneration: UInt64?
+    private var nextDelayedDrainGeneration: UInt64 = 0
     private var isShutdown = false
     private var droppedSpansSinceLastReport = 0
     private var storedTotalDroppedSpans = 0
@@ -84,6 +98,12 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
         }
     }
 
+    var isDelayedDrainScheduled: Bool {
+        withStateLock {
+            scheduledDelayedDrainGeneration != nil
+        }
+    }
+
 
     // MARK: - Initialization
 
@@ -91,19 +111,15 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
         spanExporter: SpanExporter,
         configuration: TraceExportBatchConfiguration
     ) {
+        let configuration = configuration.sanitized()
         self.spanExporter = spanExporter
-        self.configuration = Self.sanitized(configuration)
+        self.configuration = configuration
+        pendingSpans = ReadableSpanQueue(capacity: configuration.maxQueueSize)
         exportQueue = DispatchQueue(
             label: PackageIdentifier.default(named: "batchSpanProcessor"),
             qos: .utility
         )
         exportQueue.setSpecific(key: exportQueueKey, value: ())
-        startTimer()
-    }
-
-    deinit {
-        timer?.setEventHandler {}
-        timer?.cancel()
     }
 
 
@@ -116,7 +132,8 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
             return
         }
 
-        var shouldScheduleDrain = false
+        var shouldScheduleImmediateDrain = false
+        var delayedDrainGeneration: UInt64?
 
         withStateLock {
             guard !isShutdown else {
@@ -130,17 +147,30 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
                 return
             }
 
-            pendingSpans.append(span)
+            let queueWasEmpty = pendingSpans.isEmpty
+            guard pendingSpans.append(span) else {
+                storedTotalDroppedSpans += 1
+                droppedSpansSinceLastReport += 1
+                return
+            }
+
+            if queueWasEmpty, scheduledDelayedDrainGeneration == nil {
+                delayedDrainGeneration = reserveDelayedDrainGeneration()
+            }
 
             if pendingSpans.count >= configuration.wakeThreshold,
                 !immediateDrainScheduled
             {
                 immediateDrainScheduled = true
-                shouldScheduleDrain = true
+                shouldScheduleImmediateDrain = true
             }
         }
 
-        if shouldScheduleDrain {
+        if let delayedDrainGeneration {
+            scheduleDelayedDrain(generation: delayedDrainGeneration)
+        }
+
+        if shouldScheduleImmediateDrain {
             exportQueue.async { [weak self] in
                 self?
                     .drainQueuedSpans(
@@ -148,6 +178,14 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
                         explicitTimeout: self?.configuration.exportTimeout
                     )
             }
+        }
+    }
+
+    /// Persists the current in-memory batch without waiting for background URL session work.
+    func persistPendingSpans(timeout: TimeInterval?) {
+        performSynchronouslyOnExportQueue { [self] in
+            drainQueuedSpans(includePartialBatch: true, explicitTimeout: timeout)
+            reportDroppedSpansIfNeeded()
         }
     }
 
@@ -174,10 +212,6 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
         }
 
         performSynchronouslyOnExportQueue { [self] in
-            timer?.setEventHandler {}
-            timer?.cancel()
-            timer = nil
-
             drainQueuedSpans(includePartialBatch: true, explicitTimeout: explicitTimeout)
             _ = spanExporter.flush(explicitTimeout: explicitTimeout)
             reportDroppedSpansIfNeeded()
@@ -188,27 +222,19 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
 
     // MARK: - Private methods
 
-    private static func sanitized(_ configuration: TraceExportBatchConfiguration) -> TraceExportBatchConfiguration {
-        let maxQueueSize = max(1, configuration.maxQueueSize)
-        let maxExportBatchSize = min(max(1, configuration.maxExportBatchSize), maxQueueSize)
-
-        return TraceExportBatchConfiguration(
-            scheduleDelay: max(0.001, configuration.scheduleDelay),
-            wakeThreshold: min(max(1, configuration.wakeThreshold), maxQueueSize),
-            maxQueueSize: maxQueueSize,
-            maxExportBatchSize: maxExportBatchSize,
-            exportTimeout: max(0, configuration.exportTimeout)
-        )
+    private func reserveDelayedDrainGeneration() -> UInt64 {
+        nextDelayedDrainGeneration &+= 1
+        scheduledDelayedDrainGeneration = nextDelayedDrainGeneration
+        return nextDelayedDrainGeneration
     }
 
-    private func startTimer() {
-        let timer = DispatchSource.makeTimerSource(queue: exportQueue)
-        timer.schedule(
-            deadline: .now() + configuration.scheduleDelay,
-            repeating: configuration.scheduleDelay
-        )
-        timer.setEventHandler { [weak self] in
+    private func scheduleDelayedDrain(generation: UInt64) {
+        exportQueue.asyncAfter(deadline: .now() + configuration.scheduleDelay) { [weak self] in
             guard let self else {
+                return
+            }
+
+            guard claimDelayedDrain(generation: generation) else {
                 return
             }
 
@@ -218,8 +244,17 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
             )
             reportDroppedSpansIfNeeded()
         }
-        timer.resume()
-        self.timer = timer
+    }
+
+    private func claimDelayedDrain(generation: UInt64) -> Bool {
+        withStateLock {
+            guard scheduledDelayedDrainGeneration == generation else {
+                return false
+            }
+
+            scheduledDelayedDrainGeneration = nil
+            return true
+        }
     }
 
     private func drainQueuedSpans(
@@ -228,6 +263,10 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
     ) {
         let spans = withStateLock {
             immediateDrainScheduled = false
+
+            if includePartialBatch {
+                scheduledDelayedDrainGeneration = nil
+            }
 
             guard !pendingSpans.isEmpty else {
                 return [ReadableSpan]()
@@ -246,8 +285,7 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
                 return [ReadableSpan]()
             }
 
-            let spans = Array(pendingSpans.prefix(drainCount))
-            pendingSpans.removeFirst(drainCount)
+            let spans = pendingSpans.removeFirst(drainCount)
             inFlightSpanCount += spans.count
             return spans
         }
@@ -280,9 +318,25 @@ final class OTLPBatchSpanProcessor: SpanProcessor {
     }
 
     private func requeueAfterFailedExport(_ spans: [ReadableSpan]) {
+        var delayedDrainGeneration: UInt64?
+
         withStateLock {
-            pendingSpans.insert(contentsOf: spans, at: pendingSpans.startIndex)
+            let requeued = pendingSpans.prepend(contentsOf: spans)
             inFlightSpanCount -= spans.count
+
+            guard requeued else {
+                storedTotalDroppedSpans += spans.count
+                droppedSpansSinceLastReport += spans.count
+                return
+            }
+
+            if scheduledDelayedDrainGeneration == nil {
+                delayedDrainGeneration = reserveDelayedDrainGeneration()
+            }
+        }
+
+        if let delayedDrainGeneration {
+            scheduleDelayedDrain(generation: delayedDrainGeneration)
         }
     }
 

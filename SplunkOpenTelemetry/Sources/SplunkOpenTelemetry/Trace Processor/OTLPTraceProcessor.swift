@@ -31,6 +31,9 @@ public class OTLPTraceProcessor: TraceProcessor {
     /// OTel tracer provider.
     private let tracerProvider: TracerProviderSdk
 
+    /// Batch processor retained for persistence-only lifecycle drains.
+    private let batchSpanProcessor: OTLPBatchSpanProcessor
+
     /// Background exporter for traces (stored to support endpoint updates).
     private let backgroundTraceExporter: OTLPBackgroundHTTPTraceExporter
 
@@ -108,6 +111,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         // Register default tracer provider
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
+        batchSpanProcessor = spanProcessor
         self.tracerProvider = tracerProvider
     }
 
@@ -117,6 +121,13 @@ public class OTLPTraceProcessor: TraceProcessor {
     /// Persists all spans currently waiting in the in-memory export batch.
     public func forceFlush(timeout: TimeInterval? = nil) {
         tracerProvider.forceFlush(timeout: timeout)
+    }
+
+    /// Persists spans waiting in memory without waiting for background URL session work.
+    ///
+    /// - Parameter timeout: Maximum duration passed to each persistence export operation.
+    public func persistPendingSpans(timeout: TimeInterval? = nil) {
+        batchSpanProcessor.persistPendingSpans(timeout: timeout)
     }
 
 
