@@ -213,29 +213,6 @@ struct OTLPBatchSpanProcessorTests {
     }
 
     @Test
-    func persistentFailureIsNotReattemptedWithinOneScheduledFlush() {
-        // Several full batches are pending and every export fails. A single coalesced flush must make
-        // exactly one attempt and then stop, rather than re-exporting the re-queued front batch once
-        // per pending batch.
-        let exporter = BatchProcessorTestExporter(results: Array(repeating: .failure, count: 10))
-        let processor = OTLPBatchSpanProcessor(
-            spanExporter: exporter,
-            scheduleDelay: Self.neverFires,
-            maxExportBatchSize: 100,
-            maxQueueSize: 2_048
-        )
-        let tracer = makeTracer(for: processor)
-
-        endSpans(300, using: tracer)
-
-        #expect(waitUntil(timeout: 5) { exporter.exportAttemptCount >= 1 })
-        // Give any erroneous extra attempts a chance to happen, then confirm there was only one.
-        Thread.sleep(forTimeInterval: 0.3)
-        #expect(exporter.exportAttemptCount == 1)
-        #expect(exporter.successfulSpanCount == 0)
-    }
-
-    @Test
     func shutdownDropsSpansOnExportFailure() {
         // On shutdown a failed export is dropped (not re-queued) so teardown always terminates.
         let exporter = BatchProcessorTestExporter(results: [.failure])

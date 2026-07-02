@@ -35,7 +35,7 @@ extension BatchSpanProcessorCore {
         let timer = DispatchSource.makeTimerSource(queue: processorQueue)
         timer.schedule(deadline: .now() + scheduleDelay, repeating: scheduleDelay)
         timer.setEventHandler { [weak self] in
-            self?.exportCurrentBatch(retryOnFailure: true)
+            self?.exportCurrentBatch(retryOnFailure: true, explicitTimeout: nil)
         }
         timer.resume()
         self.timer = timer
@@ -77,7 +77,7 @@ extension BatchSpanProcessorCore {
             // Stop as soon as a batch fails (or the queue drains): on a persistently failing exporter
             // the failed batch is re-queued at the front, so continuing would just re-export the same
             // batch every iteration. The timer / next scheduled flush retries later instead.
-            if !exportCurrentBatch(retryOnFailure: true) {
+            if !exportCurrentBatch(retryOnFailure: true, explicitTimeout: nil) {
                 break
             }
             batchesToExport -= 1
@@ -89,11 +89,13 @@ extension BatchSpanProcessorCore {
 
     /// Exports at most one batch; must be called on `processorQueue`.
     ///
-    /// - Parameter retryOnFailure: When `true`, a failed export is re-queued (best effort) for a later attempt.
+    /// - Parameters:
+    ///   - retryOnFailure: When `true`, a failed export is re-queued (best effort) for a later attempt.
+    ///   - explicitTimeout: Optional timeout budget to forward to the exporter.
     /// - Returns: `true` if a batch was exported successfully; `false` if the queue was empty or the
     ///   export failed. Callers that loop should stop on `false` to avoid re-attempting a re-queued batch.
     @discardableResult
-    private func exportCurrentBatch(retryOnFailure: Bool) -> Bool {
+    private func exportCurrentBatch(retryOnFailure: Bool, explicitTimeout: TimeInterval?) -> Bool {
         lock.lock()
         if queue.isEmpty {
             lock.unlock()
@@ -106,7 +108,7 @@ extension BatchSpanProcessorCore {
             return false
         }
 
-        let result = spanExporter.export(spans: batch.map { $0.toSpanData() })
+        let result = spanExporter.export(spans: batch.map { $0.toSpanData() }, explicitTimeout: explicitTimeout)
         if result != .failure {
             return true
         }
@@ -115,13 +117,7 @@ extension BatchSpanProcessorCore {
             return false
         }
 
-        lock.lock()
-        let requeued = queue.prepend(contentsOf: batch)
-        lock.unlock()
-
-        if !requeued {
-            recordDroppedSpans(batch.count, reason: "export failed and queue full")
-        }
+        requeueFailedBatch(batch, reason: "export failed and queue full")
         return false
     }
 
@@ -130,7 +126,7 @@ extension BatchSpanProcessorCore {
     /// Used on shutdown, where `isShutdown` has already stopped new spans from being enqueued, so the
     /// loop is guaranteed to terminate. Failures here are dropped (not re-queued) to guarantee
     /// termination; drops are accounted for and logged (throttled) via ``recordDroppedSpans(_:reason:)``.
-    func drainAll() {
+    func drainAll(explicitTimeout: TimeInterval?) {
         while true {
             lock.lock()
             if queue.isEmpty {
@@ -144,7 +140,7 @@ extension BatchSpanProcessorCore {
                 break
             }
 
-            let result = spanExporter.export(spans: batch.map { $0.toSpanData() })
+            let result = spanExporter.export(spans: batch.map { $0.toSpanData() }, explicitTimeout: explicitTimeout)
             if result == .failure {
                 recordDroppedSpans(batch.count, reason: "export failed during shutdown drain")
             }
@@ -183,19 +179,16 @@ extension BatchSpanProcessorCore {
                 break
             }
 
-            let result = spanExporter.export(spans: batch.map { $0.toSpanData() })
+            let result = spanExporter.export(
+                spans: batch.map { $0.toSpanData() },
+                explicitTimeout: remainingTimeout(until: deadline)
+            )
 
             if result == .failure {
                 if requeueOnFailure {
                     // Best effort: put the batch back and stop, rather than re-exporting the same
                     // failing batch within this bounded drain. The timer / next flush will retry.
-                    lock.lock()
-                    let requeued = queue.prepend(contentsOf: batch)
-                    lock.unlock()
-
-                    if !requeued {
-                        recordDroppedSpans(batch.count, reason: "export failed and queue full during drain")
-                    }
+                    requeueFailedBatch(batch, reason: "export failed and queue full during drain")
                     break
                 }
 
@@ -204,6 +197,25 @@ extension BatchSpanProcessorCore {
 
             remaining -= batch.count
         }
+    }
+
+    private func requeueFailedBatch(_ batch: [ReadableSpan], reason: String) {
+        lock.lock()
+        let requeuedCount = queue.prependAsMuchAsPossible(contentsOf: batch)
+        lock.unlock()
+
+        let droppedCount = batch.count - requeuedCount
+        if droppedCount > 0 {
+            recordDroppedSpans(droppedCount, reason: reason)
+        }
+    }
+
+    private func remainingTimeout(until deadline: Date?) -> TimeInterval? {
+        guard let deadline else {
+            return nil
+        }
+
+        return max(0, deadline.timeIntervalSinceNow)
     }
 
 

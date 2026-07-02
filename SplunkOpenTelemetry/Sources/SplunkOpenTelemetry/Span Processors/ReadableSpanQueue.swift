@@ -25,6 +25,10 @@ struct ReadableSpanQueue {
 
     private(set) var count = 0
 
+    var availableCapacity: Int {
+        storage.count - count
+    }
+
     init(capacity: Int) {
         storage = [ReadableSpan?](repeating: nil, count: capacity)
     }
@@ -73,6 +77,21 @@ struct ReadableSpanQueue {
             count += 1
         }
         return true
+    }
+
+    mutating func prependAsMuchAsPossible(contentsOf spans: [ReadableSpan]) -> Int {
+        let spansToPrepend = min(spans.count, availableCapacity)
+        guard spansToPrepend > 0 else {
+            return 0
+        }
+
+        let prefix = spans.prefix(spansToPrepend)
+        for span in prefix.reversed() {
+            head = (head - 1 + storage.count) % storage.count
+            storage[head] = span
+            count += 1
+        }
+        return spansToPrepend
     }
 
     private mutating func resetIndicesWhenEmpty() {

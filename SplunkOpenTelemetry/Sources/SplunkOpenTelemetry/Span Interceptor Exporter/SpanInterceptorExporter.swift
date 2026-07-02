@@ -48,7 +48,7 @@ class SpanInterceptorExporter: SpanExporter {
         proxyExporter.flush(explicitTimeout: explicitTimeout)
     }
 
-    func export(spans: [OpenTelemetrySdk.SpanData], explicitTimeout _: TimeInterval?) -> OpenTelemetrySdk.SpanExporterResultCode {
+    func export(spans: [OpenTelemetrySdk.SpanData], explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.SpanExporterResultCode {
 
         // Create thread-isolated copies to prevent CoW data races.
         //
@@ -60,7 +60,7 @@ class SpanInterceptorExporter: SpanExporter {
 
         // Simply re-export the spans if no interceptor was set.
         guard let spanInterceptor else {
-            return proxyExporter.export(spans: isolatedSpans)
+            return proxyExporter.export(spans: isolatedSpans, explicitTimeout: explicitTimeout)
         }
 
         // Invoke the interceptor and only pass through non-nil spans.
@@ -91,6 +91,6 @@ class SpanInterceptorExporter: SpanExporter {
             return span
         }
 
-        return proxyExporter.export(spans: recalculatedSpans)
+        return proxyExporter.export(spans: recalculatedSpans, explicitTimeout: explicitTimeout)
     }
 }

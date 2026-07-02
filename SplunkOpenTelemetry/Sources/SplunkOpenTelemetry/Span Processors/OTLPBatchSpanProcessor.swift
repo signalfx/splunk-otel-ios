@@ -146,6 +146,8 @@ final class BatchSpanProcessorCore {
         qos: .utility
     )
 
+    private let processorQueueKey = DispatchSpecificKey<Void>()
+
     /// Guards `queue`, `isShutdown`, `isFlushScheduled`, and the drop-tracking counters.
     let lock = NSLock()
 
@@ -188,6 +190,7 @@ final class BatchSpanProcessorCore {
         self.maxQueueSize = max(maxQueueSize, self.maxExportBatchSize)
         queue = ReadableSpanQueue(capacity: self.maxQueueSize)
 
+        processorQueue.setSpecific(key: processorQueueKey, value: ())
         startTimer()
         registerLifecycleObservers()
     }
@@ -257,7 +260,7 @@ final class BatchSpanProcessorCore {
         // On the main thread, block only up to `shutdownMainTimeout`; on timeout the drain and
         // exporter shutdown continue best effort on the queue (the closure retains `self`).
         runOnProcessorQueue(mainThreadWait: Self.shutdownMainTimeout) {
-            self.drainAll()
+            self.drainAll(explicitTimeout: explicitTimeout)
             self.spanExporter.shutdown(explicitTimeout: explicitTimeout)
         }
     }
@@ -275,6 +278,11 @@ final class BatchSpanProcessorCore {
     ///     background callers and tests.
     ///   - work: The export work to run on `processorQueue`.
     private func runOnProcessorQueue(mainThreadWait: TimeInterval?, _ work: @escaping () -> Void) {
+        if DispatchQueue.getSpecific(key: processorQueueKey) != nil {
+            work()
+            return
+        }
+
         guard Thread.isMainThread else {
             processorQueue.sync(execute: work)
             return
