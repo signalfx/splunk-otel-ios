@@ -28,9 +28,9 @@ public struct CustomTrackingConfiguration: ModuleConfiguration {
     public var isEnabled: Bool = true
 
     /// When enabled, `trackError` and `trackException` may attach stack-referenced `exception.images`
-    /// metadata from a PLCrashReporter live report, matching the crash report payload shape.
+    /// metadata from the loaded binary images referenced by the captured stack trace.
     ///
-    /// String-only errors are not enriched. Platforms without PLCrashReporter support omit the attribute.
+    /// String-only errors are not enriched.
     /// Default is `true`.
     public var includeBinaryImagesOnErrors: Bool = true
 

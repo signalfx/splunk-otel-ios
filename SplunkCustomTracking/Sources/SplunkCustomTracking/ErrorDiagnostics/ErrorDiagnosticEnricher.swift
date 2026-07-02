@@ -33,11 +33,19 @@ final class ErrorDiagnosticEnricher {
         qos: .utility
     )
 
+    private let imageMetadataResolver: LoadedImageMetadataResolving
+    private let imageMetadataFormatter = LoadedImageMetadataFormatter()
+    private let processPathProvider: () -> String?
+
     private var includeBinaryImagesOnErrors = true
 
-    #if canImport(CrashReporter)
-        private let liveReportCollector = ErrorLiveReportCollector()
-    #endif
+    init(
+        imageMetadataResolver: LoadedImageMetadataResolving = LoadedImageMetadataCache(),
+        processPathProvider: @escaping () -> String? = { Bundle.main.executableURL?.path }
+    ) {
+        self.imageMetadataResolver = imageMetadataResolver
+        self.processPathProvider = processPathProvider
+    }
 
     func configure(includeBinaryImagesOnErrors: Bool) {
         diagnosticsQueue.sync {
@@ -45,25 +53,39 @@ final class ErrorDiagnosticEnricher {
         }
     }
 
-    func diagnostics(for issue: SplunkIssue, completion: @escaping (ErrorDiagnostics) -> Void) {
+    func diagnostics(for issue: SplunkIssue) -> ErrorDiagnostics {
         guard let stacktrace = issue.stacktrace else {
-            completion(.empty)
-            return
+            return .empty
         }
 
         let includeBinaryImages = diagnosticsQueue.sync {
             includeBinaryImagesOnErrors
         }
 
-        #if canImport(CrashReporter)
-            liveReportCollector.diagnostics(
-                for: stacktrace,
-                includeBinaryImages: includeBinaryImages,
-                completion: completion
-            )
-        #else
-            completion(.empty)
-        #endif
+        let imageNameResolver: StackFrameImageNameResolver?
+        if includeBinaryImages {
+            imageNameResolver = { [imageMetadataResolver] instructionPointer, parsedImageName in
+                imageMetadataResolver.image(containing: instructionPointer)?.imagePath ?? parsedImageName
+            }
+        }
+        else {
+            imageNameResolver = nil
+        }
+
+        let imagesJSON: String?
+        if includeBinaryImages {
+            let images = imageMetadataResolver.images(containing: stacktrace.symbolicationInstructionPointers)
+            imagesJSON = imageMetadataFormatter.imagesJSON(from: images)
+        }
+        else {
+            imagesJSON = nil
+        }
+
+        return ErrorDiagnostics(
+            processPath: processPathProvider(),
+            exceptionThreadsJSON: stacktrace.threadList(resolvingImageNamesWith: imageNameResolver),
+            exceptionImagesJSON: imagesJSON
+        )
     }
 }
 

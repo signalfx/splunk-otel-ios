@@ -25,6 +25,85 @@ public struct Stacktrace {
 
 typealias StackFrameImageNameResolver = (_ instructionPointer: UInt64, _ parsedImageName: String?) -> String?
 
+struct StackFrame {
+    private static let returnAddressAdjustment: UInt64 = 4
+
+    let index: Int
+    let attributes: [ErrorDiagnosticKeys: Any]
+
+    var instructionPointer: UInt64? {
+        attributes[.instructionPointer] as? UInt64
+    }
+
+    var parsedImageName: String? {
+        attributes[.imageName] as? String
+    }
+
+    var symbolicationInstructionPointer: UInt64? {
+        guard let instructionPointer else {
+            return nil
+        }
+
+        return appliesReturnAddressAdjustment ? instructionPointer - Self.returnAddressAdjustment : instructionPointer
+    }
+
+    var symbolicationAttributes: [ErrorDiagnosticKeys: Any] {
+        var output = attributes
+
+        if let symbolicationInstructionPointer {
+            output[.instructionPointer] = symbolicationInstructionPointer
+        }
+
+        if dropsStaleSymbolInfo {
+            output[.symbolName] = nil
+            output[.offset] = nil
+        }
+        else if let adjustedOffset {
+            output[.offset] = adjustedOffset
+        }
+
+        return output
+    }
+
+    init(index: Int, frame: String) {
+        self.index = index
+        attributes = ParsedStackFrame(from: frame).attributes
+    }
+
+    private var appliesReturnAddressAdjustment: Bool {
+        guard index > 0, let instructionPointer else {
+            return false
+        }
+
+        return instructionPointer >= Self.returnAddressAdjustment
+    }
+
+    private var dropsStaleSymbolInfo: Bool {
+        guard
+            appliesReturnAddressAdjustment,
+            let offset = attributes[.offset] as? UInt64
+        else {
+            return false
+        }
+
+        // The parsed symbol and offset describe the return address. If adjusting
+        // the pointer would move before that symbol, avoid emitting a stale pair.
+        return offset < Self.returnAddressAdjustment
+    }
+
+    private var adjustedOffset: UInt64? {
+        guard
+            appliesReturnAddressAdjustment,
+            let offset = attributes[.offset] as? UInt64,
+            offset >= Self.returnAddressAdjustment
+        else {
+            return nil
+        }
+
+        return offset - Self.returnAddressAdjustment
+    }
+}
+
 struct StacktraceImageReferences {
     let exactImagePaths: Set<String>
     let fallbackImageNames: Set<String>
@@ -42,16 +121,30 @@ extension Stacktrace {
         frames.joined(separator: "\n")
     }
 
+    var parsedFrames: [StackFrame] {
+        var output: [StackFrame] = []
+
+        for (index, frame) in frames.enumerated() {
+            output.append(StackFrame(index: index, frame: frame))
+        }
+
+        return output
+    }
+
+    var symbolicationInstructionPointers: [UInt64] {
+        parsedFrames.compactMap(\.symbolicationInstructionPointer)
+    }
+
     var threadList: String? {
         threadList()
     }
 
     func threadList(resolvingImageNamesWith imageNameResolver: StackFrameImageNameResolver? = nil) -> String? {
-        let stackFrames = frames.map { frame in
-            var attributes = ParsedStackFrame(from: frame).attributes
+        let stackFrames = parsedFrames.map { frame in
+            var attributes = frame.symbolicationAttributes
 
-            if let instructionPointer = attributes[.instructionPointer] as? UInt64,
-                let resolvedImageName = imageNameResolver?(instructionPointer, attributes[.imageName] as? String),
+            if let instructionPointer = frame.symbolicationInstructionPointer,
+                let resolvedImageName = imageNameResolver?(instructionPointer, frame.parsedImageName),
                 !resolvedImageName.isEmpty
             {
                 attributes[.imageName] = resolvedImageName
@@ -81,12 +174,10 @@ extension Stacktrace {
         var exactImagePaths: Set<String> = []
         var fallbackImageNames: Set<String> = []
 
-        for frame in frames {
-            let parsedFrame = ParsedStackFrame(from: frame)
-            let parsedImageName = parsedFrame.attributes[.imageName] as? String
-            let instructionPointer = parsedFrame.attributes[.instructionPointer] as? UInt64
-            let resolvedImageName = instructionPointer.flatMap { instructionPointer in
-                imageNameResolver?(instructionPointer, parsedImageName)
+        for frame in parsedFrames {
+            let parsedImageName = frame.parsedImageName
+            let resolvedImageName = frame.symbolicationInstructionPointer.flatMap { instructionPointer in
+                imageNameResolver?(instructionPointer, frame.parsedImageName)
             }
 
             if let resolvedImageName, !resolvedImageName.isEmpty {

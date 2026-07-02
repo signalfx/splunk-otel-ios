@@ -97,10 +97,9 @@ extension CustomTrackingInternal {
             return
         }
 
-        diagnosticEnricher.diagnostics(for: splunkIssue) { diagnostics in
-            diagnostics.apply(to: &combinedAttributes)
-            publishIssue(combinedAttributes)
-        }
+        let diagnostics = diagnosticEnricher.diagnostics(for: splunkIssue)
+        diagnostics.apply(to: &combinedAttributes)
+        publishIssue(combinedAttributes)
     }
 
     public func track(_ workflowName: String) -> Span {

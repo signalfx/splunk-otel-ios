@@ -409,8 +409,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkCommon"),
                 mod("SplunkOpenTelemetry"),
-                dep("CiscoLogger"),
-                dep("CrashReporter", condition: noCrashReporterCondition)
+                dep("CiscoLogger")
             ]
         ),
 

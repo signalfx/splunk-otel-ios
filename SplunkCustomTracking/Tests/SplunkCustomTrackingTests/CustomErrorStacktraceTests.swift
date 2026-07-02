@@ -41,6 +41,8 @@ final class CustomErrorStacktraceTests: XCTestCase {
         XCTAssertEqual(stackFrames[0]["symbolName"] as? String, "specialized Foo.bar()")
         XCTAssertEqual(stackFrames[0]["offset"] as? UInt64, 24)
         XCTAssertEqual(stackFrames[1]["imageName"] as? String, "UIKitCore")
+        XCTAssertEqual(stackFrames[1]["instructionPointer"] as? UInt64, 6_529_431_308)
+        XCTAssertEqual(stackFrames[1]["offset"] as? UInt64, 92)
         XCTAssertEqual(stacktrace.referencedImageNames, Set(["AgentTestApp", "UIKitCore"]))
     }
 
@@ -69,5 +71,21 @@ final class CustomErrorStacktraceTests: XCTestCase {
             "/private/var/containers/Bundle/Application/Test/AgentTestApp.app/AgentTestApp"
         )
         XCTAssertEqual(stackFrames[1]["imageName"] as? String, "UIKitCore")
+    }
+
+    func testThreadListDropsParsedSymbolInfoWhenAdjustedAddressPrecedesSymbol() throws {
+        let stacktrace = Stacktrace(frames: [
+            "0   AgentTestApp                        0x0000000100e84234 specialized Foo.bar() + 24",
+            "1   AgentTestApp                        0x0000000100e84234 symbolNearReturnAddress() + 2"
+        ])
+
+        let threadsJSON = try XCTUnwrap(stacktrace.threadList)
+        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]])
+        let stackFrames = try XCTUnwrap(parsed[0]["stackFrames"] as? [[String: Any]])
+
+        XCTAssertEqual(stackFrames[1]["imageName"] as? String, "AgentTestApp")
+        XCTAssertEqual(stackFrames[1]["instructionPointer"] as? UInt64, 4_310_188_592)
+        XCTAssertNil(stackFrames[1]["symbolName"])
+        XCTAssertNil(stackFrames[1]["offset"])
     }
 }
