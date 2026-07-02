@@ -50,10 +50,10 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 
 ## Telemetry Model
 
-- Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector, and CustomTracking workflows use `Tracer.spanBuilder` -> `SimpleSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
+- Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector, and CustomTracking workflows use `Tracer.spanBuilder` -> `OTLPBatchSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
 - Log-as-span: CrashReports crash payloads, CustomTracking events/errors, Interactions, internal agent events, and agent events published through `DefaultEventManager` emit log records that `OTLPLogToSpanExporter` converts to spans and sends to the trace endpoint.
 - Binary logs: Session Replay is the exception; it uses `OTLPSessionReplayEventProcessor` -> `OTLPBackgroundHTTPLogExporterBinary`.
-- There is no production `BatchSpanProcessor` / `BatchLogRecordProcessor`. Record buffering is disk-backed in the background exporters.
+- Direct spans use the custom in-memory `OTLPBatchSpanProcessor`, which pools ended spans and flushes a batch to the disk-backed exporter every 0.5s or when 100 spans accumulate (whichever is first), plus on app background/terminate/shutdown. Spans still buffered in memory at crash time are lost by design. This is distinct from the upstream `BatchSpanProcessor`, which is not used. There is no production `BatchLogRecordProcessor`. Durable buffering remains disk-backed in the background exporters.
 - Uploads use `URLSessionConfiguration.background(withIdentifier:)`, not `UIApplication.beginBackgroundTask`.
 - Some hardcoded strings and attribute keys already exist. New hot-path string keys should still be centralized per module instead of copied inline.
 

@@ -9,6 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+* Trace spans are now pooled in memory and flushed to disk in batches (every 0.5s or when 100 spans accumulate, whichever is first) instead of writing one file per span. This reduces disk writes on the export path. On entering the background the buffer is drained asynchronously and failed exports are requeued (best effort). `forceFlush` on the main thread is non-blocking (the drain completes shortly after on a background queue); on `shutdown` and app termination the main thread is blocked only up to a bounded wall-clock window (1s and 2s respectively) after which the drain continues best effort. Spans still buffered in memory when the app crashes or is force-killed are lost by design, and any spans dropped due to in-memory overflow or failed exports are counted and logged (throttled) with a running session total.
 * OTLP exporter `User-Agent` headers now identify the Splunk RUM agent version, OS name/version, and OTLP exporter package version. #682
 
 ## [2.3.1] - 2026-06-15
