@@ -71,11 +71,21 @@ extension CustomTrackingInternal {
         // Metadata for the issue
         let metadata = CustomTrackingMetadata()
 
+        let diagnosticsIssue: SplunkIssue?
+        if let splunkIssue = issue as? SplunkIssue, splunkIssue.stacktrace != nil {
+            diagnosticsIssue = splunkIssue
+        }
+        else {
+            diagnosticsIssue = nil
+        }
+
         // Combine the provided attributes with attributes from the issue
         // Our toAttributesDictionary() also injects the issue.exceptionType
         let attributesToInject = ["error": EventAttributeValue.string("true")]
         let augmented = attributes.merging(attributesToInject) { $1 }
-        var combinedAttributes = augmented.merging(issue.toAttributesDictionary()) { $1 }
+        var combinedAttributes = augmented.merging(
+            issue.toAttributesDictionary(includingExceptionThreads: diagnosticsIssue == nil)
+        ) { $1 }
 
         let publishIssue = { attributes in
             // Create the tracking data
@@ -89,15 +99,12 @@ extension CustomTrackingInternal {
             onPublishBlock(metadata, data)
         }
 
-        guard
-            let splunkIssue = issue as? SplunkIssue,
-            splunkIssue.stacktrace != nil
-        else {
+        guard let diagnosticsIssue else {
             publishIssue(combinedAttributes)
             return
         }
 
-        let diagnostics = diagnosticEnricher.diagnostics(for: splunkIssue)
+        let diagnostics = diagnosticEnricher.diagnostics(for: diagnosticsIssue)
         diagnostics.apply(to: &combinedAttributes)
         publishIssue(combinedAttributes)
     }

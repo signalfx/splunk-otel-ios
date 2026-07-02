@@ -39,6 +39,10 @@ public protocol SplunkTrackableIssue: SplunkTrackable {
 
 extension SplunkTrackableIssue {
     public func toAttributesDictionary() -> [String: EventAttributeValue] {
+        toAttributesDictionary(includingExceptionThreads: true)
+    }
+
+    func toAttributesDictionary(includingExceptionThreads: Bool) -> [String: EventAttributeValue] {
         var attributes: [String: EventAttributeValue] = [:]
 
         // Set required attributes
@@ -49,7 +53,7 @@ extension SplunkTrackableIssue {
         if let stacktrace {
             attributes[ErrorAttributeKeys.Exception.stacktrace.rawValue] = .string(stacktrace.formatted)
 
-            if let threadList = stacktrace.threadList {
+            if includingExceptionThreads, let threadList = stacktrace.threadList {
                 attributes[ErrorAttributeKeys.Exception.threads.rawValue] = .string(threadList)
             }
         }

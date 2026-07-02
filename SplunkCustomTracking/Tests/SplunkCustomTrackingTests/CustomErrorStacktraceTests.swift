@@ -88,4 +88,18 @@ final class CustomErrorStacktraceTests: XCTestCase {
         XCTAssertNil(stackFrames[1]["symbolName"])
         XCTAssertNil(stackFrames[1]["offset"])
     }
+
+    func testIssueAttributesCanOmitExceptionThreadsForDiagnostics() {
+        struct FileError: Error {}
+
+        let issue = SplunkIssue(from: FileError())
+
+        let publicAttributes = issue.toAttributesDictionary()
+        let diagnosticsBaseAttributes = issue.toAttributesDictionary(includingExceptionThreads: false)
+
+        XCTAssertNotNil(publicAttributes["exception.stacktrace"])
+        XCTAssertNotNil(publicAttributes["exception.threads"])
+        XCTAssertNotNil(diagnosticsBaseAttributes["exception.stacktrace"])
+        XCTAssertNil(diagnosticsBaseAttributes["exception.threads"])
+    }
 }
