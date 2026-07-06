@@ -33,9 +33,9 @@ final class ErrorDiagnosticEnricher {
         qos: .utility
     )
 
+    private let processPath: String?
     private let imageMetadataResolver: LoadedImageMetadataResolving
     private let imageMetadataFormatter = LoadedImageMetadataFormatter()
-    private let processPathProvider: () -> String?
 
     private var includeBinaryImagesOnErrors = true
 
@@ -43,8 +43,8 @@ final class ErrorDiagnosticEnricher {
         imageMetadataResolver: LoadedImageMetadataResolving = LoadedImageMetadataCache(),
         processPathProvider: @escaping () -> String? = { Bundle.main.executableURL?.path }
     ) {
+        processPath = processPathProvider()
         self.imageMetadataResolver = imageMetadataResolver
-        self.processPathProvider = processPathProvider
     }
 
     func configure(includeBinaryImagesOnErrors: Bool) {
@@ -82,7 +82,7 @@ final class ErrorDiagnosticEnricher {
         }
 
         return ErrorDiagnostics(
-            processPath: processPathProvider(),
+            processPath: processPath,
             exceptionThreadsJSON: stacktrace.threadList(resolvingImageNamesWith: imageNameResolver),
             exceptionImagesJSON: imagesJSON
         )

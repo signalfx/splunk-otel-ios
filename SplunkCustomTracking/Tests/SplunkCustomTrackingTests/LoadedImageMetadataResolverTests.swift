@@ -83,6 +83,27 @@ final class LoadedImageMetadataResolverTests: XCTestCase {
         XCTAssertNil(diagnostics.exceptionImagesJSON)
     }
 
+    func testDiagnosticsCachesProcessPathProviderAtInitialization() {
+        struct FileError: Error {}
+
+        var processPathLookupCount = 0
+        let enricher = ErrorDiagnosticEnricher(
+            imageMetadataResolver: CountingImageResolver(),
+            processPathProvider: {
+                processPathLookupCount += 1
+                return "/TestApp"
+            }
+        )
+        enricher.configure(includeBinaryImagesOnErrors: false)
+
+        let firstDiagnostics = enricher.diagnostics(for: SplunkIssue(from: FileError()))
+        let secondDiagnostics = enricher.diagnostics(for: SplunkIssue(from: FileError()))
+
+        XCTAssertEqual(firstDiagnostics.processPath, "/TestApp")
+        XCTAssertEqual(secondDiagnostics.processPath, "/TestApp")
+        XCTAssertEqual(processPathLookupCount, 1)
+    }
+
     func testDiagnosticsWhenImagesAreEnabledEmitsResolvedImagePath() throws {
         struct FileError: Error {}
 
