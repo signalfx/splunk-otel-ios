@@ -61,20 +61,24 @@ final class ErrorDiagnosticEnricher {
         let includeBinaryImages = diagnosticsQueue.sync {
             includeBinaryImagesOnErrors
         }
+        let parsedFrames = stacktrace.parsedFrames
 
         let imageNameResolver: StackFrameImageNameResolver?
+        let resolvedImagesByInstructionPointer: [UInt64: LoadedImage]
         if includeBinaryImages {
-            imageNameResolver = { [imageMetadataResolver] instructionPointer, parsedImageName in
-                imageMetadataResolver.image(containing: instructionPointer)?.imagePath ?? parsedImageName
+            resolvedImagesByInstructionPointer = resolveImagesByInstructionPointer(from: parsedFrames)
+            imageNameResolver = { instructionPointer, parsedImageName in
+                resolvedImagesByInstructionPointer[instructionPointer]?.imagePath ?? parsedImageName
             }
         }
         else {
+            resolvedImagesByInstructionPointer = [:]
             imageNameResolver = nil
         }
 
         let imagesJSON: String?
         if includeBinaryImages {
-            let images = imageMetadataResolver.images(containing: stacktrace.symbolicationInstructionPointers)
+            let images = uniqueImages(from: resolvedImagesByInstructionPointer)
             imagesJSON = imageMetadataFormatter.imagesJSON(from: images)
         }
         else {
@@ -83,9 +87,36 @@ final class ErrorDiagnosticEnricher {
 
         return ErrorDiagnostics(
             processPath: processPath,
-            exceptionThreadsJSON: stacktrace.threadList(resolvingImageNamesWith: imageNameResolver),
+            exceptionThreadsJSON: stacktrace.threadList(from: parsedFrames, resolvingImageNamesWith: imageNameResolver),
             exceptionImagesJSON: imagesJSON
         )
+    }
+
+    private func resolveImagesByInstructionPointer(from parsedFrames: [StackFrame]) -> [UInt64: LoadedImage] {
+        var imagesByInstructionPointer: [UInt64: LoadedImage] = [:]
+        let instructionPointers = Set(parsedFrames.compactMap(\.symbolicationInstructionPointer))
+
+        for instructionPointer in instructionPointers {
+            guard let image = imageMetadataResolver.image(containing: instructionPointer) else {
+                continue
+            }
+
+            imagesByInstructionPointer[instructionPointer] = image
+        }
+
+        return imagesByInstructionPointer
+    }
+
+    private func uniqueImages(from imagesByInstructionPointer: [UInt64: LoadedImage]) -> [LoadedImage] {
+        var imagesByBaseAddress: [UInt64: LoadedImage] = [:]
+
+        for image in imagesByInstructionPointer.values {
+            imagesByBaseAddress[image.baseAddress] = image
+        }
+
+        return imagesByBaseAddress.values.sorted { lhs, rhs in
+            lhs.baseAddress < rhs.baseAddress
+        }
     }
 }
 

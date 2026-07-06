@@ -104,6 +104,42 @@ final class LoadedImageMetadataResolverTests: XCTestCase {
         XCTAssertEqual(processPathLookupCount, 1)
     }
 
+    func testDiagnosticsReusesResolvedImagesForThreadsAndImages() throws {
+        var issue = SplunkIssue(from: "message")
+        issue.stacktrace = Stacktrace(frames: [
+            "0   AgentTestApp                        0x0000000100000100 first() + 4",
+            "1   AgentTestApp                        0x0000000100000200 repeated() + 8",
+            "2   AgentTestApp                        0x0000000100000200 repeated() + 8"
+        ])
+
+        let expectedImagePath = "/private/Frameworks/Test.framework/Test"
+        let imageResolver = StaticImageResolver(
+            image: LoadedImage(
+                baseAddress: 0x1_0000_0000,
+                imageSize: 0x1000,
+                imagePath: expectedImagePath,
+                imageUUID: "0123456789abcdef0123456789abcdef"
+            )
+        )
+        let enricher = ErrorDiagnosticEnricher(
+            imageMetadataResolver: imageResolver,
+            processPathProvider: { "/TestApp" }
+        )
+
+        let diagnostics = enricher.diagnostics(for: issue)
+        let threadsJSON = try XCTUnwrap(diagnostics.exceptionThreadsJSON)
+        let imagesJSON = try XCTUnwrap(diagnostics.exceptionImagesJSON)
+
+        let threads = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]])
+        let images = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [[String: Any]])
+        let stackFrames = try XCTUnwrap(threads[0]["stackFrames"] as? [[String: Any]])
+
+        XCTAssertEqual(imageResolver.lookupCount, 2)
+        XCTAssertEqual(stackFrames.compactMap { $0["imageName"] as? String }, [expectedImagePath, expectedImagePath, expectedImagePath])
+        XCTAssertEqual(images.count, 1)
+        XCTAssertEqual(images[0]["imagePath"] as? String, expectedImagePath)
+    }
+
     func testDiagnosticsWhenImagesAreEnabledEmitsResolvedImagePath() throws {
         struct FileError: Error {}
 
@@ -159,16 +195,19 @@ private final class CountingImageResolver: LoadedImageMetadataResolving {
 
 private final class StaticImageResolver: LoadedImageMetadataResolving {
     private let image: LoadedImage
+    private(set) var lookupCount = 0
 
     init(image: LoadedImage) {
         self.image = image
     }
 
     func image(containing _: UInt64) -> LoadedImage? {
-        image
+        lookupCount += 1
+        return image
     }
 
     func images(containing instructionPointers: [UInt64]) -> [LoadedImage] {
-        instructionPointers.isEmpty ? [] : [image]
+        lookupCount += instructionPointers.count
+        return instructionPointers.isEmpty ? [] : [image]
     }
 }

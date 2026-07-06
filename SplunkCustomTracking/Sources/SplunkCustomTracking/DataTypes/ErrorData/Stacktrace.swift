@@ -146,6 +146,13 @@ extension Stacktrace {
     }
 
     func threadList(resolvingImageNamesWith imageNameResolver: StackFrameImageNameResolver? = nil) -> String? {
+        threadList(from: parsedFrames, resolvingImageNamesWith: imageNameResolver)
+    }
+
+    func threadList(
+        from parsedFrames: [StackFrame],
+        resolvingImageNamesWith imageNameResolver: StackFrameImageNameResolver? = nil
+    ) -> String? {
         let stackFrames = parsedFrames.map { frame in
             var attributes = frame.symbolicationAttributes
 
