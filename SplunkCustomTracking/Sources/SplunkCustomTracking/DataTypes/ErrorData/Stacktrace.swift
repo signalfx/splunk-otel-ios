@@ -26,7 +26,13 @@ public struct Stacktrace {
 typealias StackFrameImageNameResolver = (_ instructionPointer: UInt64, _ parsedImageName: String?) -> String?
 
 struct StackFrame {
-    private static let returnAddressAdjustment: UInt64 = 4
+    #if arch(x86_64) || arch(i386)
+        static let returnAddressAdjustment: UInt64 = 1
+    #elseif arch(arm64) || arch(arm64_32) || arch(arm)
+        static let returnAddressAdjustment: UInt64 = 4
+    #else
+        static let returnAddressAdjustment: UInt64 = 0
+    #endif
 
     let index: Int
     let attributes: [ErrorDiagnosticKeys: Any]
@@ -75,7 +81,7 @@ struct StackFrame {
             return false
         }
 
-        return instructionPointer >= Self.returnAddressAdjustment
+        return Self.returnAddressAdjustment > 0 && instructionPointer >= Self.returnAddressAdjustment
     }
 
     private var dropsStaleSymbolInfo: Bool {

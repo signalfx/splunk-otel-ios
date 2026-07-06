@@ -41,9 +41,21 @@ final class CustomErrorStacktraceTests: XCTestCase {
         XCTAssertEqual(stackFrames[0]["symbolName"] as? String, "specialized Foo.bar()")
         XCTAssertEqual(stackFrames[0]["offset"] as? UInt64, 24)
         XCTAssertEqual(stackFrames[1]["imageName"] as? String, "UIKitCore")
-        XCTAssertEqual(stackFrames[1]["instructionPointer"] as? UInt64, 6_529_431_308)
-        XCTAssertEqual(stackFrames[1]["offset"] as? UInt64, 92)
+
+        let returnAddress: UInt64 = 6_529_431_312
+        XCTAssertEqual(stackFrames[1]["instructionPointer"] as? UInt64, returnAddress - StackFrame.returnAddressAdjustment)
+        XCTAssertEqual(stackFrames[1]["offset"] as? UInt64, 96 - StackFrame.returnAddressAdjustment)
         XCTAssertEqual(stacktrace.referencedImageNames, Set(["AgentTestApp", "UIKitCore"]))
+    }
+
+    func testReturnAddressAdjustmentMatchesArchitecture() {
+        #if arch(x86_64) || arch(i386)
+            XCTAssertEqual(StackFrame.returnAddressAdjustment, 1)
+        #elseif arch(arm64) || arch(arm64_32) || arch(arm)
+            XCTAssertEqual(StackFrame.returnAddressAdjustment, 4)
+        #else
+            XCTAssertEqual(StackFrame.returnAddressAdjustment, 0)
+        #endif
     }
 
     func testThreadListResolvesImageNameFromInstructionPointer() throws {
@@ -74,9 +86,13 @@ final class CustomErrorStacktraceTests: XCTestCase {
     }
 
     func testThreadListDropsParsedSymbolInfoWhenAdjustedAddressPrecedesSymbol() throws {
+        guard StackFrame.returnAddressAdjustment > 0 else {
+            throw XCTSkip("Unsupported architecture does not adjust return addresses.")
+        }
+
         let stacktrace = Stacktrace(frames: [
             "0   AgentTestApp                        0x0000000100e84234 specialized Foo.bar() + 24",
-            "1   AgentTestApp                        0x0000000100e84234 symbolNearReturnAddress() + 2"
+            "1   AgentTestApp                        0x0000000100e84234 symbolNearReturnAddress() + 0"
         ])
 
         let threadsJSON = try XCTUnwrap(stacktrace.threadList)
@@ -84,7 +100,9 @@ final class CustomErrorStacktraceTests: XCTestCase {
         let stackFrames = try XCTUnwrap(parsed[0]["stackFrames"] as? [[String: Any]])
 
         XCTAssertEqual(stackFrames[1]["imageName"] as? String, "AgentTestApp")
-        XCTAssertEqual(stackFrames[1]["instructionPointer"] as? UInt64, 4_310_188_592)
+
+        let returnAddress: UInt64 = 4_310_188_596
+        XCTAssertEqual(stackFrames[1]["instructionPointer"] as? UInt64, returnAddress - StackFrame.returnAddressAdjustment)
         XCTAssertNil(stackFrames[1]["symbolName"])
         XCTAssertNil(stackFrames[1]["offset"])
     }
