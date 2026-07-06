@@ -7,6 +7,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+* Custom error and exception reporting may now include `crash.processPath` and stack-referenced `exception.images` metadata, matching the crash report payload shape. Configure binary images via `CustomTrackingConfiguration.includeBinaryImagesOnErrors`.
+* Objective-C installs can configure Custom Tracking binary image metadata via `SPLKCustomTrackingConfiguration.includeBinaryImagesOnErrors`.
+* Custom error and exception reporting with stack traces now includes `exception.threads` stack frame metadata, matching the crash report payload shape.
+* Custom error and exception `exception.threads` stack frame image names are now resolved from loaded binary image metadata when binary image metadata is enabled.
+
+### Fixed
+
+* Custom error and exception binary image enrichment no longer generates PLCrashReporter live reports on the caller thread or at install time.
+* Objective-C Custom Tracking configuration conversion now preserves `SPLKCustomTrackingConfiguration.isEnabled`.
+
 ### Changed
 
 * OTLP exporter `User-Agent` headers now identify the Splunk RUM agent version, OS name/version, and OTLP exporter package version. #682
