@@ -1,32 +1,7 @@
 # Crash Symbolication And dSYM Upload
 
-## Load when
-
 Load for crash symbolication, dSYM upload, archive/release builds, CI upload,
 Xcode build phases, API-token handling, or old crash setup migration.
-
-## Do not load when
-
-Do not load for runtime crash reporting discussion that does not touch dSYM or
-release pipeline setup.
-
-## Source files to verify
-
-- `dsymUploader/README.md`
-- `dsymUploader/upload-dsyms.sh`
-- `README.md`
-- current public Splunk "Add dSYMs" documentation
-- `splunk-rum ios upload --help` and `splunk-rum ios list --help` when the
-  CLI is available
-- Host App archive/export CI, Xcode build settings, Fastlane, Bitrise, GitHub
-  Actions, Xcode Cloud, build phases
-- Vendor docs or package contents for binary-only third-party framework dSYMs
-
-## Required output additions
-
-- dSYM report: generation setting, exact artifact source, upload method, token
-  source, release-only guard, failure policy, remaining blocker.
-- Explicit approval state for build-phase/CI/build-setting edits.
 
 ## Guidance
 
