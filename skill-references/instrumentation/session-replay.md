@@ -1,50 +1,8 @@
 # Session Replay
 
-## Contents
-
-- Load rules
-- Source files to verify
-- Required output additions
-- Approval gate
-- Public API boundary
-- Enablement, sampling, and endpoints
-- Sensitivity and masking
-- Custom identifiers
-- Rendering mode and recording masks
-- Objective-C surfaces
-- Verification
-
-## Load when
-
-Load when Session Replay is requested, detected, migrated, reviewed, or
-troubleshot. Also load for masking, sensitivity, SwiftUI redaction, custom view
-IDs, rendering mode, recording masks, sampling, recording state, or Session
-Replay endpoint behavior.
-
-## Do not load when
-
-Do not load for default fresh install unless the user asks about Session Replay.
-
-## Source files to verify
-
-- `SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Modules/Session-Replay.md`
-- `SplunkAgent/Sources/SplunkAgent/Public API/Modules/Session Replay/`
-- `SplunkAgent/Sources/SplunkAgentObjC/Modules/Session Replay/`
-- `SplunkSessionReplayProxy/Sources/SplunkSessionReplayProxy/SessionReplay+Module.swift`
-- `SplunkAgent/Sources/SplunkAgent/Agent/Modules/SplunkRum+Modules.swift`
-- `SplunkAgent/Sources/SplunkAgent/Public API/API-1.0-EndpointConfiguration.swift`
-- Host App screens containing sensitive UI
-
-## Required output additions
-
-- Explicit user approval state.
-- Masking/privacy checklist.
-- Sensitive UI findings.
-- Sampling and recording-state expectation.
-- Any rendering mode, recording mask, or custom ID changes.
-- Endpoint status if Session Replay recording or upload is in scope.
-- Recording-state verification plan.
-- Instrumentation depth and Session Replay features intentionally deferred.
+Load when Session Replay is requested, detected, reviewed, or troubleshot.
+Also load for masking, sensitivity, SwiftUI redaction, custom view IDs,
+rendering mode, recording masks, sampling, or recording state.
 
 ## Depth guidance
 
@@ -276,20 +234,6 @@ Known public status causes include: `.notStarted`, `.stopped`,
 `.storageLimitReached`, and `.disabledBySampling`.
 
 Do not print raw internal errors or private diagnostics while reporting state.
-
-## Verification
-
-Layer verification:
-
-1. Static review: module configuration, start location, sensitivity/custom ID
-   sites, rendering mode, recording mask, endpoint status, approvals.
-2. Build.
-3. Launch on an eligible iOS/iPadOS runtime.
-4. Navigate through approved sensitive and non-sensitive screens.
-5. Check `agent.sessionReplay.state.status` or `isRecording` only if the Host
-   App has a safe way to expose a redacted state indicator for tests.
-6. Backend replay confirmation only when the user provides public Splunk access
-   and an endpoint configuration is active.
 
 Do not start Session Replay during default local signal generation. Do not
 attempt backend replay confirmation from non-operational platform runs.
