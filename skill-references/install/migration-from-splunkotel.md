@@ -1,28 +1,7 @@
 # Migration From SplunkOtel
 
-## Load when
-
 Load when `SplunkOtel`, `SplunkRumBuilder`, deprecated static APIs, old crash
 setup, or pre-2.0 migration symptoms are detected.
-
-## Do not load when
-
-Do not load for a fresh install with no stale Splunk patterns.
-
-## Source files to verify
-
-- `README.md` migration section
-- `CHANGELOG.md`
-- `SplunkAgent/Sources/SplunkAgent/Public API/Deprecated/`
-- `SplunkAgent/Sources/SplunkAgentObjC/`
-- Host App package/import/build files
-
-## Required output additions
-
-- Detector findings grouped by stale pattern.
-- Direct replacements versus manual-review items.
-- Behavior-preservation notes.
-- Migration completeness metric.
 
 ## Detector groups
 
@@ -51,7 +30,7 @@ bspScheduleDelay SplunkRum.integrateWithBrowserRum
 5. Remove separate old crash setup; crash reporting is integrated.
 6. Load feature references only for stale APIs that appear.
 
-Source-backed direct replacements include:
+Source-backed direct replacements:
 
 - `SplunkRum.getSessionId()` -> `SplunkRum.shared.session.state.id`
 - `SplunkRum.isInitialized()` -> `SplunkRum.shared.state.status`
@@ -65,11 +44,9 @@ Manual-review or no-effect legacy calls:
 
 - `SplunkRum.debugLog` is a no-op in current deprecated source.
 - `enableDiskCache(enabled:)` is a no-op in current builder source.
-- slow/frozen frame threshold builder methods are discontinued and ignored;
-  thresholds are managed automatically.
-- `allowInsecureBeacon`, scheduling-delay, and disk-cache sizing settings need
-  source verification before proposing any replacement.
+- slow/frozen frame threshold builder methods are discontinued and ignored.
+- `allowInsecureBeacon`, scheduling-delay, and disk-cache sizing need source
+  verification before proposing any replacement.
 
 Do not introduce Session Replay, WebView bridging, header capture, endpoint
-changes, or dSYM upload during migration unless the user explicitly approves
-that topic.
+changes, or dSYM upload during migration unless the user explicitly approves.

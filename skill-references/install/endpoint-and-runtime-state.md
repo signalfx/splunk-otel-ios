@@ -1,29 +1,8 @@
 # Endpoint And Runtime State
 
-## Load when
-
 Load for deferred endpoint setup, endpoint update/disable, install status,
-sampling, duplicate install, runtime state, or endpoint/config redaction.
-
-## Do not load when
-
-Do not load for a purely static plan that avoids endpoint and runtime-state
-questions.
-
-## Source files to verify
-
-- `SplunkAgent/Sources/SplunkAgent/Public API/API-1.0-AgentConfiguration.swift`
-- `SplunkAgent/Sources/SplunkAgent/Public API/API-1.0-EndpointConfiguration.swift`
-- `SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum+Endpoint.swift`
-- `SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift`
-- deferred endpoint tests under `SplunkAgent/Tests/`
-
-## Required output additions
-
-- Endpoint strategy: deferred, existing config, or approved explicit setup.
-- Runtime state checks.
-- Redaction note for endpoint/config/error values.
-- Required approval before endpoint update/custom URL.
+sampling, duplicate install, runtime state, or endpoint/config redaction. Also
+load for every fresh install apply (see post-apply handoff below).
 
 ## Guidance
 

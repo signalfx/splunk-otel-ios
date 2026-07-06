@@ -1,27 +1,7 @@
 # Objective-C Product And Lifecycle
 
-## Load when
-
 Load when the Host App has `.m`, `.h`, `main.m`, `UIApplicationMain`,
 Objective-C app delegates, bridging headers, or `SplunkAgentObjC`.
-
-## Do not load when
-
-Do not load for pure Swift apps unless product selection is ambiguous.
-
-## Source files to verify
-
-- `Package.swift`
-- `SplunkAgent/Sources/SplunkAgentObjC/Public API/`
-- `SplunkAgent/Sources/SplunkAgentObjC/Public API/SplunkRumObjC.swift`
-- Host App `main.m`, `AppDelegate.m`, `SceneDelegate.m`, bridging headers
-
-## Required output additions
-
-- Swift versus ObjC product decision.
-- Lifecycle owner file.
-- Whether mixed-language bridging is needed.
-- ObjC-safe initialization plan.
 
 ## Guidance
 

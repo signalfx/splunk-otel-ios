@@ -1,46 +1,22 @@
 # Default Modules
 
-## Load when
-
 Load when explaining SDK defaults, app startup/state, crash runtime behavior,
 slow/frozen frames, or interaction tracking.
 
-## Do not load when
-
-Do not load for a narrow task involving only high-risk feature setup.
-
-## Source files to verify
-
-- `SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Modules-Overview.md`
-- `SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Modules/App-Startup-Tracking.md`
-- `SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Modules/Crash-Reporting.md`
-- `SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Modules/Slow-and-Frozen-Frame-Detection.md`
-- `SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Modules/UI-Interaction-Tracking.md`
-- public API module configuration files
-
-## Required output additions
-
-- Which default modules are relevant.
-- Any explicit module configuration changes proposed.
-- Approval needed for config changes that alter behavior.
-- Whether default behavior is enough for the requested instrumentation depth.
-
 ## Depth guidance
 
-- `baseline`: rely on current safe defaults where possible. Avoid explicit
-  module configuration unless required for install, privacy, or the user's
-  stated goal.
-- `targeted`: configure only inspected modules needed for the requested topic,
-  such as navigation automation or network URL exclusions.
-- `comprehensive`: inventory default and optional modules, then propose a
-  staged coverage plan. High-risk features still require their own approvals.
+- `baseline`: rely on current safe defaults. Avoid explicit module configuration
+  unless required for install, privacy, or the user's stated goal.
+- `targeted`: configure only inspected modules needed for the requested topic.
+- `comprehensive`: inventory default and optional modules, then propose a staged
+  coverage plan. High-risk features still require their own approvals.
 
 ## Guidance
 
 Distinguish module presence from active signal behavior. Current source builds
-the default module pool from available modules: app start, app state, crash
-reports, Session Replay, navigation, network, network monitor, slow frame
-detector, WebView, custom tracking, and interactions.
+the default module pool from: app start, app state, crash reports, Session
+Replay, navigation, network, network monitor, slow frame detector, WebView,
+custom tracking, and interactions.
 
 Treat app startup, app state, crash runtime capture, network instrumentation,
 network monitor, slow/frozen frame detection, interactions, and custom tracking
@@ -64,5 +40,4 @@ explicit `integrateWithBrowserRum` call for each approved `WKWebView`.
 Crash runtime capture is separate from dSYM upload. Use
 `release/crash-and-dsym.md` for symbolication upload setup.
 
-Do not promise exact backend visibility without verification. Report selected
-signal types and how they will be exercised.
+Do not promise exact backend visibility without verification.

@@ -88,9 +88,6 @@ Start with:
 ## Always Load
 
 - [`skill-references/workflow.md`](skill-references/workflow.md)
-- [`skill-references/inspection.md`](skill-references/inspection.md)
-- [`skill-references/privacy-and-security.md`](skill-references/privacy-and-security.md)
-- [`skill-references/metrics-and-reporting.md`](skill-references/metrics-and-reporting.md)
 
 ## Load Rules
 
@@ -111,31 +108,4 @@ Start with:
 | Objective-C UIKit/storyboard/navigation details | [`objc/uikit-storyboards-navigation.md`](skill-references/objc/uikit-storyboards-navigation.md) |
 | Objective-C module configuration examples | [`objc/module-configuration.md`](skill-references/objc/module-configuration.md) |
 | dSYM upload, crash symbolication, archive/release/CI changes | [`release/crash-and-dsym.md`](skill-references/release/crash-and-dsym.md) |
-| Local build and launch verification | [`verification/local-build-and-launch.md`](skill-references/verification/local-build-and-launch.md) |
-| No-credential signal exercise and pending-artifact checks | [`verification/local-signal-generation.md`](skill-references/verification/local-signal-generation.md) |
-| Backend telemetry confirmation with user-provided public Splunk access | [`verification/backend-telemetry.md`](skill-references/verification/backend-telemetry.md) |
-| Objective-C and mixed-app validation scenarios | [`verification/objc-and-mixed-apps.md`](skill-references/verification/objc-and-mixed-apps.md) |
-| Common failures, no telemetry, non-iOS target behavior, duplicate install, endpoint, network, Session Replay, WebView, dSYM symptoms | [`verification/troubleshooting.md`](skill-references/verification/troubleshooting.md) |
-| User asks to create a sample app or demo | [`sample-app-workflow.md`](skill-references/sample-app-workflow.md) |
-
-## Output Requirements
-
-For `plan` / pre-`apply`, report:
-
-1. Evidence table with file paths, line numbers or search patterns, and confidence.
-2. Recommended path: fresh install, migration, review fix, manual-only, sample,
-   product-specific hybrid SDK referral, non-operational platform note, or
-   no-iOS-target outcome.
-3. References loaded and why.
-4. Minimal dependency, linkage, lifecycle, and configuration changes.
-5. Required user-provided values or approvals.
-6. Verification plan and measurable baseline metrics.
-7. Risks, blockers, and open questions.
-
-For `apply`, keep diffs scoped to explicit Splunk RUM instrumentation, required
-package/linkage, and approved release/build-phase work. Do not rewrite unrelated
-app architecture or configuration.
-
-For `verify`, report build result, launch result, exercised safe signals,
-credential status, backend observations if available, redacted evidence, and
-remaining blockers.
+| Build/launch verification, signal exercise, backend telemetry, ObjC validation, troubleshooting | [`verification.md`](skill-references/verification.md) |

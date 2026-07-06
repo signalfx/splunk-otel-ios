@@ -1,29 +1,7 @@
 # WebView
 
-## Load when
-
 Load for `WKWebView`, Browser RUM session correlation, WebView migration, or
 WebView troubleshooting.
-
-## Do not load when
-
-Do not load for apps with no WebView usage.
-
-## Source files to verify
-
-- `SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Modules/WebView-Instrumentation.md`
-- `SplunkAgent/Sources/SplunkAgent/Public API/Modules/WebViewInstrumentation/`
-- `SplunkWebView/`
-- `SplunkAgent/Sources/SplunkAgentObjC/Modules/WebViewInstrumentation/`
-- Host App `WKWebView` creation and navigation policy
-
-## Required output additions
-
-- WebViews found and ownership/trust evidence.
-- Browser RUM precondition.
-- Bridge approval state.
-- Call-before-load and `userContentController` caveats.
-- Instrumentation depth and WebViews intentionally deferred.
 
 ## Depth guidance
 

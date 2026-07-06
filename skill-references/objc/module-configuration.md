@@ -1,24 +1,6 @@
 # Objective-C Module Configuration
 
-## Load when
-
 Load when configuring SDK modules from Objective-C or mixed apps.
-
-## Do not load when
-
-Do not load for pure Swift module configuration.
-
-## Source files to verify
-
-- `SplunkAgent/Sources/SplunkAgentObjC/Modules/`
-- `SplunkAgent/Sources/SplunkAgentObjC/Model Conversions/`
-- Swift public API equivalents for source-of-truth comparison
-
-## Required output additions
-
-- ObjC module APIs verified.
-- Swift-only APIs avoided.
-- Safety gates for high-risk module changes.
 
 ## Guidance
 
@@ -27,7 +9,7 @@ exists for navigation, network, crash reports, interactions, slow frames,
 Session Replay, and WebView, but not every Swift convenience API has an ObjC
 equivalent.
 
-Verified configuration classes include:
+Verified configuration classes:
 
 - `SPLKNavigationConfiguration`
 - `SPLKNetworkInstrumentationConfiguration`
@@ -40,11 +22,9 @@ Use `SPLKModuleConfiguration` subclasses in the
 `[SPLKAgent installWith:moduleConfigurations:error:]` overload. Do not use
 Swift module configuration structs in `.m` files.
 
-High-risk module changes still require feature references:
+High-risk module changes still require the relevant feature reference:
 
 - network header capture: `instrumentation/network.md`
 - Session Replay start/masking: `instrumentation/session-replay.md`
 - WebView bridge: `instrumentation/webview.md`
 - dSYM upload: `release/crash-and-dsym.md`
-
-Do not force Swift-only workflow APIs into Objective-C plans.

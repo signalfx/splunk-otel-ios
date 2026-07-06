@@ -1,26 +1,7 @@
 # Objective-C UIKit, Storyboards, And Navigation
 
-## Load when
-
 Load for Objective-C UIKit apps, storyboard apps, ObjC navigation tracking, or
 mixed apps where navigation code is ObjC.
-
-## Do not load when
-
-Do not load for pure SwiftUI navigation.
-
-## Source files to verify
-
-- Host App `.storyboard`, ObjC view controllers, `SceneDelegate.m`,
-  `AppDelegate.m`
-- `SplunkAgent/Sources/SplunkAgentObjC/Modules/Navigation/`
-- `SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Modules/Navigation-Tracking.md`
-
-## Required output additions
-
-- Storyboard and controller evidence.
-- Automated/manual ObjC navigation decision.
-- Whether SceneDelegate or view controllers are touched.
 
 ## Guidance
 
@@ -41,8 +22,8 @@ Current ObjC manual screen selectors:
                             attributes:@{ @"screen.source": @"tab" }];
 ```
 
-To enable automated tracking during install, verify
-`SPLKNavigationConfiguration` and pass it in `moduleConfigurations`:
+To enable automated tracking during install, verify `SPLKNavigationConfiguration`
+and pass it in `moduleConfigurations`:
 
 ```objc
 SPLKNavigationConfiguration *navigationConfig =

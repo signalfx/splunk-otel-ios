@@ -1,31 +1,7 @@
 # Fresh Install
 
-## Load when
-
 Load for new Splunk RUM integration, dependency/product selection, platform
 checks, lifecycle entry-point decisions, or core configuration.
-
-## Do not load when
-
-Do not load for migration-only review unless a fresh install path is also under
-consideration.
-
-## Source files to verify
-
-- Host App project/package files
-- lifecycle files: Swift `App`, `AppDelegate`, `SceneDelegate`, `main.m`
-- `Package.swift`
-- `README.md`
-- `SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift`
-- `SplunkAgent/Sources/SplunkAgent/Public API/API-1.0-AgentConfiguration.swift`
-- platform support files under `SplunkAgent/Sources/SplunkAgent/Utils/Platform Support/`
-
-## Required output additions
-
-- Platform note only when non-iOS targets or a no-iOS app shape are relevant.
-- Product choice: `SplunkAgent` or `SplunkAgentObjC`.
-- Lifecycle insertion point and why it is minimal.
-- Configuration source and missing user values.
 
 ## Platform
 

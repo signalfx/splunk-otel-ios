@@ -1,28 +1,7 @@
 # Build And Link Errors
 
-## Load when
-
 Load when package resolution, product linkage, imports, minimum platform,
 binary target resolution, or clean-build failures appear.
-
-## Do not load when
-
-Do not load for a clean plan with no dependency or build concerns.
-
-## Source files to verify
-
-- Host App `.xcodeproj/project.pbxproj`, `Package.swift`, `Package.resolved`
-- `Podfile` or other dependency manifests if present
-- `Package.swift`
-- `README.md`
-- `SplunkAgent/Sources/SplunkAgentObjC/`
-
-## Required output additions
-
-- Build/link symptom.
-- Product/import decision.
-- Stale package findings.
-- Safe next command or edit.
 
 ## Triage
 
@@ -41,8 +20,6 @@ Check:
 
 When tvOS, visionOS, or Mac Catalyst targets are relevant, state the accurate
 distinction: they can be build/run compatible while producing no RUM telemetry.
-Report that distinction when it matters to the build/link symptom or user
-question.
 
 Do not delete package resolution files unless the Host App workflow allows it.
 Prefer reporting the stale file and asking for approval before cleanup.

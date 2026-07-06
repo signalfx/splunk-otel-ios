@@ -1,28 +1,7 @@
 # Navigation
 
-## Load when
-
 Load for SwiftUI screen tracking, UIKit view-controller tracking, storyboards,
 tabs, navigation stacks, modals, custom containers, or screen-name migration.
-
-## Do not load when
-
-Do not load for a Host App with no UI/navigation instrumentation task.
-
-## Source files to verify
-
-- `SplunkAgent/Sources/SplunkAgent/SplunkAgent.docc/Modules/Navigation-Tracking.md`
-- `SplunkAgent/Sources/SplunkAgent/Public API/Modules/Navigation/`
-- `SplunkNavigation/`
-- `SplunkAgent/Sources/SplunkAgentObjC/Modules/Navigation/`
-- Host App SwiftUI/UIKit/storyboard files
-
-## Required output additions
-
-- UI framework and navigation evidence.
-- Automated versus manual tracking decision.
-- Screen names and attribute privacy notes.
-- Instrumentation depth and screen surfaces intentionally deferred.
 
 ## Depth guidance
 
@@ -38,8 +17,7 @@ Do not load for a Host App with no UI/navigation instrumentation task.
 
 ## Guidance
 
-For SwiftUI, prefer `.trackScreen(...)` at meaningful screen boundaries. For
-apps without an `AppDelegate`, this may be independent from install location.
+For SwiftUI, prefer `.trackScreen(...)` at meaningful screen boundaries:
 
 ```swift
 import SplunkAgent
