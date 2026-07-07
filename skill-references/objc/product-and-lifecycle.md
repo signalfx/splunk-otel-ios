@@ -12,22 +12,16 @@ Objective-C app.
 Use the existing ObjC app delegate when present. For mixed apps, choose the file
 that already owns startup.
 
-Safe ObjC init must not print raw `NSError`.
+Write deferred-endpoint initialization during `apply`. Do not log raw `NSError`.
+The endpoint is added by the user after apply — see the post-apply handoff in
+`endpoint-and-runtime-state.md`.
 
 ```objc
 @import SplunkAgentObjC;
 
-// Replace <YOUR_REALM> with your Splunk Observability realm (e.g. us0, eu0).
-// Supply SPLUNK_RUM_TOKEN via the app's existing secret/configuration
-// mechanism — see post-apply handoff for options.
-NSString *token = NSProcessInfo.processInfo.environment[@"SPLUNK_RUM_TOKEN"] ?: @"";
-SPLKEndpointConfiguration *endpoint =
-    [[SPLKEndpointConfiguration alloc] initWithRealm:@"<YOUR_REALM>"
-                                      rumAccessToken:token];
-
 NSError *error = nil;
 SPLKAgentConfiguration *config =
-    [[SPLKAgentConfiguration alloc] initWithEndpoint:endpoint
+    [[SPLKAgentConfiguration alloc] initWithEndpoint:nil
                                              appName:@"<YOUR_APP_NAME>"
                                deploymentEnvironment:@"<YOUR_ENVIRONMENT>"];
 self.splunkRum = [SPLKAgent installWith:config error:&error];
@@ -36,6 +30,5 @@ if (self.splunkRum == nil) {
 }
 ```
 
-The `<YOUR_REALM>` placeholder is intentional — the agent does not know the
-user's realm and must not guess it. The user fills it in after apply (see
-post-apply handoff in `endpoint-and-runtime-state.md`).
+This installs and starts the agent. Telemetry is queued locally until the user
+adds an endpoint after apply.

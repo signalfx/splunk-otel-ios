@@ -55,23 +55,31 @@ Require explicit approval and use placeholders in any example.
 After writing initialization code, deliver this handoff and **stop — wait for
 the user to confirm before proceeding to build or verification steps.**
 
-Tell the user: the code is in place with `<YOUR_REALM>` as a placeholder. No
-telemetry reaches Splunk Observability Cloud until they complete two steps:
+Tell the user: the agent is installed and will start, but telemetry is queued
+locally and not sent until an endpoint is configured. To start sending data,
+they need to add the following after the `SplunkRum.install` call — in their
+local editor, not through this conversation:
 
-1. **Realm** — open the file named during `apply` in their local editor and
-   replace `"<YOUR_REALM>"` with their realm (e.g. `us0`, `eu0`). The realm is
-   not a secret and may be committed.
-2. **Token** — the token is a secret. Do not ask the user to paste it here; if
-   offered, decline. Ask which secret/config mechanism their app already uses
-   (secrets manager, gitignored local config, CI encrypted secrets) and use
-   that. For local dev with no existing mechanism, a gitignored `.xcconfig` or
-   `.env` file is a safe starting point. Do not invent CI workflows without
-   knowing the CI system. Shared Xcode scheme Run-action env vars can be
-   committed and do not apply to archive/TestFlight/App Store builds — avoid
-   recommending them.
+```swift
+// Add your realm (not a secret; safe to commit). Supply the token via your
+// app's existing secret/config mechanism — never paste it here or commit it.
+let token = ProcessInfo.processInfo.environment["SPLUNK_RUM_TOKEN"] ?? ""
+let endpoint = EndpointConfiguration(realm: "<YOUR_REALM>", rumAccessToken: token)
+splunkRum?.preferences.endpointConfiguration = endpoint
+```
+
+For ObjC, use `agent.preferences.endpointConfiguration` with
+`SPLKEndpointConfiguration`.
+
+The token is a secret. Do not ask the user to paste it here; if offered,
+decline. Ask which secret/config mechanism their app already uses (secrets
+manager, gitignored local config, CI encrypted secrets) and use that. For
+local dev with no existing mechanism, a gitignored `.xcconfig` or `.env` is a
+safe starting point. Shared Xcode scheme Run-action env vars can be committed
+and do not apply to archive/TestFlight/App Store builds — avoid them.
 
 After the user reports back: read the source file to check `<YOUR_REALM>` has
-been replaced with something that looks like a real realm. Do not read, echo,
-or store the token. If the realm looks real and `EndpointConfiguration` is in
-place, say something like "It looks like the realm and token are already set
-up" and continue. Otherwise point the user back to the specific line.
+been replaced with something that looks like a real realm (e.g. `us0`, `eu0`).
+Do not read, echo, or store the token. If the realm looks real and the endpoint
+call is present, say something like "It looks like the realm and token are
+already set up" and continue. Otherwise point the user back to the specific line.
