@@ -22,16 +22,16 @@ import XCTest
 
 final class RequestInstrumentationDecisionTests: XCTestCase {
 
-    func testInstrumentationDecisionWithExistingTraceparentDefersToResume() throws {
+    func testInstrumentationDecisionWithExistingTraceparentSkipsInstrumentation() throws {
         let url = try XCTUnwrap(URL(string: "https://example.com/customer-request"))
         var request = URLRequest(url: url)
         request.setValue("00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01", forHTTPHeaderField: "traceparent")
 
-        if case .deferToResume = instrumentationDecision(for: request) {
+        if case .skipInstrumentation = instrumentationDecision(for: request) {
             return
         }
 
-        XCTFail("Customer requests with existing traceparent should defer to resume-time instrumentation")
+        XCTFail("Requests with existing traceparent should be skipped to avoid double instrumentation")
     }
 
     func testInstrumentationDecisionWithInternalSDKMarkedRequestSkipsInstrumentation() throws {

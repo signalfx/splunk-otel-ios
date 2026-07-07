@@ -36,6 +36,10 @@ func startHttpSpan(request: URLRequest?) -> Span? {
         return nil
     }
 
+    if TraceContextInjector.hasTraceContext(in: request) {
+        return nil
+    }
+
     if !(url.scheme?.lowercased().starts(with: "http") ?? false) {
         return nil
     }

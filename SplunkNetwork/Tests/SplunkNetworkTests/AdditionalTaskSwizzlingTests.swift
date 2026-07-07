@@ -124,7 +124,7 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
 
     // MARK: - Download Task Completion Handler Tests
 
-    func testDataTaskWithExistingTraceparent_CreatesSpanAtResumeWithoutOverwritingHeader() throws {
+    func testDataTaskWithExistingTraceparent_DoesNotCreateSpanOrOverwriteHeader() throws {
         let existingTraceparent = "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01"
         let url = URLSessionMockProtocol.url(path: "/headers")
         var request = URLRequest(url: url)
@@ -139,13 +139,13 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
             expectation.fulfill()
         }
 
-        XCTAssertFalse(wasSkippedForInstrumentation(task))
+        XCTAssertTrue(wasSkippedForInstrumentation(task))
         XCTAssertFalse(wasInstrumentedAtCreation(task))
 
         task.resume()
 
         wait(for: [expectation], timeout: 10.0)
-        waitForSpans(count: 1)
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
 
         let body = try XCTUnwrap(responseBody, "Mock protocol should return a response body")
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
@@ -154,7 +154,7 @@ final class AdditionalTaskSwizzlingTests: XCTestCase {
         XCTAssertEqual(receivedTraceparent, existingTraceparent)
 
         let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
-        XCTAssertEqual(spans.count, 1, "Existing traceparent customer requests should still create one HTTP span")
+        XCTAssertTrue(spans.isEmpty, "Requests with existing traceparent should not create duplicate HTTP spans")
     }
 
     func testDownloadTaskWithRequestAndCompletion_CreatesSpan() {
