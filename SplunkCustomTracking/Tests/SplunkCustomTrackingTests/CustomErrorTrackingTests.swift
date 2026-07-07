@@ -62,6 +62,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(getStringValue(for: "exception.type", in: data), "String")
         XCTAssertEqual(getStringValue(for: "exception.message", in: data), errorMessage)
         XCTAssertNil(data.attributes["exception.stacktrace"])
+        XCTAssertNil(data.attributes["exception.images"])
         XCTAssertEqual(getStringValue(for: "resource_url", in: data), "http://example.com/data.json")
     }
 
@@ -88,6 +89,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(getStringValue(for: "exception.type", in: data), "FileError")
         XCTAssertEqual(getStringValue(for: "exception.message", in: data), "File not found at /tmp/file.txt")
         XCTAssertNotNil(getStringValue(for: "exception.stacktrace", in: data))
+        XCTAssertNotNil(getStringValue(for: "exception.threads", in: data))
         XCTAssertEqual(getStringValue(for: "file_permissions", in: data), "read-only")
     }
 
@@ -110,6 +112,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(getStringValue(for: "exception.type", in: data), "NSError")
         XCTAssertEqual(getStringValue(for: "exception.message", in: data), userInfo[NSLocalizedDescriptionKey])
         XCTAssertNotNil(getStringValue(for: "exception.stacktrace", in: data))
+        XCTAssertNotNil(getStringValue(for: "exception.threads", in: data))
         XCTAssertEqual(getIntValue(for: "code", in: data), code)
         XCTAssertEqual(getStringValue(for: "domain", in: data), domain)
         XCTAssertEqual(getStringValue(for: "request_id", in: data), "uuid-1234")
@@ -133,6 +136,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(getStringValue(for: "exception.type", in: data), exceptionName.rawValue)
         XCTAssertEqual(getStringValue(for: "exception.message", in: data), reason)
         XCTAssertNotNil(getStringValue(for: "exception.stacktrace", in: data))
+        XCTAssertNotNil(getStringValue(for: "exception.threads", in: data))
         XCTAssertEqual(getStringValue(for: "context", in: data), "testing_exception_handler")
     }
 
@@ -188,6 +192,7 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(getStringValue(for: "exception.type", in: attributes), "MyTestError")
         XCTAssertEqual(getStringValue(for: "exception.message", in: attributes), "This is a test error.")
         XCTAssertNotNil(attributes["exception.stacktrace"])
+        XCTAssertNotNil(attributes["exception.threads"])
     }
 
     func testSplunkIssue_from_NSError() {
@@ -202,6 +207,8 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(issue.codeNamespace, "test.domain")
         XCTAssertEqual(getIntValue(for: "code", in: attributes), 123)
         XCTAssertEqual(getStringValue(for: "domain", in: attributes), "test.domain")
+        XCTAssertNotNil(attributes["exception.stacktrace"])
+        XCTAssertNotNil(attributes["exception.threads"])
     }
 
     func testSplunkIssue_from_NSException() {
@@ -215,6 +222,81 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(getStringValue(for: "exception.type", in: attributes), "NSInternalInconsistencyException")
         XCTAssertEqual(getStringValue(for: "exception.message", in: attributes), "Inconsistent state.")
         XCTAssertNotNil(attributes["exception.stacktrace"])
+        XCTAssertNotNil(attributes["exception.threads"])
+    }
+
+    func testTrackError_withSwiftError_attachesImagesWhenEnabled() throws {
+        struct FileError: Error, LocalizedError {
+            var errorDescription: String? {
+                "File not found"
+            }
+        }
+
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
+        module.install(
+            with: CustomTrackingConfiguration(includeBinaryImagesOnErrors: true),
+            remoteConfiguration: nil
+        )
+
+        let issue = SplunkIssue(from: FileError())
+        module.track(issue, [:])
+
+        wait(for: [expectation], timeout: 1.0)
+
+        let data = try XCTUnwrap(capturedData)
+        let imagesJSON = try XCTUnwrap(getStringValue(for: "exception.images", in: data))
+        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [Any])
+
+        XCTAssertFalse(parsed.isEmpty)
+        try assertImagesMatchEmittedThreads(in: data)
+        try assertThreadsContainResolvedImagePath(in: data)
+    }
+
+    func testTrackError_withSwiftError_omitsImagesWhenDisabled() throws {
+        struct FileError: Error, LocalizedError {
+            var errorDescription: String? {
+                "File not found"
+            }
+        }
+
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
+        module.install(
+            with: CustomTrackingConfiguration(includeBinaryImagesOnErrors: false),
+            remoteConfiguration: nil
+        )
+
+        let issue = SplunkIssue(from: FileError())
+        module.track(issue, [:])
+
+        wait(for: [expectation], timeout: 1.0)
+
+        let data = try XCTUnwrap(capturedData)
+        XCTAssertNil(data.attributes["exception.images"])
+    }
+
+    func testTrackException_attachesImages() throws {
+        let module = try XCTUnwrap(module)
+        let expectation = try XCTUnwrap(expectation)
+        module.install(
+            with: CustomTrackingConfiguration(includeBinaryImagesOnErrors: true),
+            remoteConfiguration: nil
+        )
+
+        let nsException = NSException(name: NSExceptionName("TestException"), reason: "reason", userInfo: nil)
+        let issue = SplunkIssue(from: nsException)
+        module.track(issue, [:])
+
+        wait(for: [expectation], timeout: 1.0)
+
+        let data = try XCTUnwrap(capturedData)
+        let imagesJSON = try XCTUnwrap(getStringValue(for: "exception.images", in: data))
+        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [Any])
+
+        XCTAssertFalse(parsed.isEmpty)
+        try assertImagesMatchEmittedThreads(in: data)
+        try assertThreadsContainResolvedImagePath(in: data)
     }
 
     private func assertCommonErrorAttributes(in data: CustomTrackingData, file: StaticString = #file, line: UInt = #line) {
@@ -222,4 +304,93 @@ final class CustomErrorTrackingTests: XCTestCase {
         XCTAssertEqual(data.component, "error", file: file, line: line)
         XCTAssertEqual(getStringValue(for: "error", in: data), "true", file: file, line: line)
     }
+}
+
+private func assertImagesMatchEmittedThreads(
+    in data: CustomTrackingData,
+    file: StaticString = #file,
+    line: UInt = #line
+) throws {
+    let threadsJSON = try XCTUnwrap(stringValue(for: "exception.threads", in: data), file: file, line: line)
+    let imagesJSON = try XCTUnwrap(stringValue(for: "exception.images", in: data), file: file, line: line)
+
+    let threads = try XCTUnwrap(
+        JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]],
+        file: file,
+        line: line
+    )
+    let images = try XCTUnwrap(
+        JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [[String: Any]],
+        file: file,
+        line: line
+    )
+
+    var emittedImageNames: Set<String> = []
+
+    for thread in threads {
+        let stackFrames = thread["stackFrames"] as? [[String: Any]] ?? []
+
+        for stackFrame in stackFrames {
+            guard let imageName = stackFrame["imageName"] as? String else {
+                continue
+            }
+
+            emittedImageNames.formUnion(normalizedImageNames(imageName))
+        }
+    }
+
+    XCTAssertFalse(emittedImageNames.isEmpty, file: file, line: line)
+
+    for image in images {
+        let imagePath = try XCTUnwrap(image["imagePath"] as? String, file: file, line: line)
+        XCTAssertFalse(
+            normalizedImageNames(imagePath).isDisjoint(with: emittedImageNames),
+            file: file,
+            line: line
+        )
+    }
+}
+
+private func assertThreadsContainResolvedImagePath(
+    in data: CustomTrackingData,
+    file: StaticString = #file,
+    line: UInt = #line
+) throws {
+    let threadsJSON = try XCTUnwrap(stringValue(for: "exception.threads", in: data), file: file, line: line)
+    let imagesJSON = try XCTUnwrap(stringValue(for: "exception.images", in: data), file: file, line: line)
+
+    let threads = try XCTUnwrap(
+        JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]],
+        file: file,
+        line: line
+    )
+    let images = try XCTUnwrap(
+        JSONSerialization.jsonObject(with: Data(imagesJSON.utf8)) as? [[String: Any]],
+        file: file,
+        line: line
+    )
+
+    let imagePaths = Set(images.compactMap { $0["imagePath"] as? String })
+    var threadImageNames: Set<String> = []
+
+    for thread in threads {
+        let stackFrames = thread["stackFrames"] as? [[String: Any]] ?? []
+
+        for stackFrame in stackFrames {
+            if let imageName = stackFrame["imageName"] as? String {
+                threadImageNames.insert(imageName)
+            }
+        }
+    }
+
+    XCTAssertFalse(imagePaths.isEmpty, file: file, line: line)
+    XCTAssertFalse(threadImageNames.isDisjoint(with: imagePaths), file: file, line: line)
+}
+
+private func stringValue(for key: String, in data: CustomTrackingData) -> String? {
+    if case let .string(value) = data.attributes[key] {
+        return value
+    }
+
+    return nil
 }

@@ -34,6 +34,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         "Endpoint Configuration",
         "Test API Sample Calls",
         "Slow Frame Renders",
+        "Error Reporting",
         "Sample Next Task"
     ]
 
@@ -44,6 +45,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         "EndpointCalls",
         "TestApiCalls",
         "SlowFrameRenders",
+        "Errors",
         "PlaceHolder"
     ]
 
