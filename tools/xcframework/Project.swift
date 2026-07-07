@@ -76,7 +76,8 @@ let sharedSettings: SettingsDictionary = [
     "SWIFT_EMIT_MODULE_INTERFACE": "YES",
 
     // Tell the compiler these sources belong to the `SplunkAgent` package.
-    // This allows `package` access declarations to compile outside SwiftPM.
+    // This makes `package` access compile in the standalone Tuist build while
+    // keeping package-only members out of generated .swiftinterface files.
     "OTHER_SWIFT_FLAGS": "-package-name SplunkAgent",
 
     // Minimum deployment targets matching Package.swift.
@@ -494,6 +495,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkAgent"),
                 mod("SplunkCommon"),
+                mod("SplunkCustomTracking"),
                 mod("SplunkInteractions"),
                 mod("SplunkNavigation"),
                 mod("SplunkNetworkMonitor"),
