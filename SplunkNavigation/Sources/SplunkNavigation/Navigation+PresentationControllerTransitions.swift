@@ -59,6 +59,10 @@ extension Navigation {
             return
         }
 
+        // Suppress the nav loop's viewDidLoad/viewDidAppear for the presented VC
+        // so they don't overwrite the .transition NavigationPair stored below.
+        await model.addPresentationManagedTarget(event.presentedControllerIdentifier)
+
         // Always store a restoration, even when no screen has been tracked yet.
         // Without this, dismissalDidEnd finds no stored state and bails, leaving
         // the dismissed modal's name stuck as the current screen.
@@ -74,6 +78,8 @@ extension Navigation {
         guard !Self.shouldIgnore(controllerTypeName: event.presentedControllerTypeName) else {
             return
         }
+
+        await model.removePresentationManagedTarget(event.presentedControllerIdentifier)
 
         let completed = event.completed ?? true
         await finalizeTransition(
@@ -97,6 +103,10 @@ extension Navigation {
             return
         }
 
+        // Suppress the nav loop's viewDidAppear for the presenting VC so it
+        // doesn't interfere with the .transition NavigationPair stored below.
+        await model.addPresentationManagedTarget(event.presentingControllerIdentifier)
+
         await updateTransitionStart(for: presentingSnapshot(from: event), timestamp: event.timestamp)
     }
 
@@ -109,6 +119,8 @@ extension Navigation {
         guard !Self.shouldIgnore(controllerTypeName: event.presentingControllerTypeName) else {
             return
         }
+
+        await model.removePresentationManagedTarget(event.presentingControllerIdentifier)
 
         let completed = event.completed ?? true
         await finalizeTransition(

@@ -347,21 +347,26 @@ public final class Navigation: Sendable {
     }
 
     /// Checks whether the event belongs to a view controller whose lifecycle is managed
-    /// by a `UINavigationController` transition.
+    /// by an active navigation-controller or presentation-controller transition.
     ///
-    /// When a navigation controller push or pop is in flight, the child controller also fires
-    /// its own `viewDidLoad` / `viewDidAppear` events. Processing those independently would
-    /// create duplicate screen-name updates and navigation spans. This guard suppresses the
-    /// redundant lifecycle events so that only the navigation-controller transition path
-    /// (`willShow` / `didShow`) drives the screen change.
+    /// When a navigation controller push/pop or a modal presentation/dismissal is in
+    /// flight, the child/presented/presenting controller also fires its own
+    /// `viewDidLoad` / `viewDidAppear` events. Processing those independently would
+    /// create duplicate screen-name updates and navigation spans. This guard suppresses
+    /// the redundant lifecycle events so that only the owning transition path drives the
+    /// screen change.
     private func isNavigationControllerManaged(event: NavigationActionEvent) async -> Bool {
         switch event.type {
         case .viewDidAppear,
             .viewDidLoad:
-            await model.isManagedNavigationControllerTarget(event.controllerIdentifier)
+            let identifier = event.controllerIdentifier
+            if await model.isManagedNavigationControllerTarget(identifier) {
+                return true
+            }
+            return await model.isPresentationManagedTarget(identifier)
 
         default:
-            false
+            return false
         }
     }
 

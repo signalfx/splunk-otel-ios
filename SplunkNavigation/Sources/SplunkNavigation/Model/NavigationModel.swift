@@ -38,6 +38,7 @@ actor NavigationModel {
     private(set) var navigations: [ObjectIdentifier: NavigationPair] = [:]
     private(set) var pendingNavigationTargets: [ObjectIdentifier: ObjectIdentifier] = [:]
     private(set) var managedNavigationControllerTargets: Set<ObjectIdentifier> = []
+    private(set) var presentationManagedTargets: Set<ObjectIdentifier> = []
     private(set) var pendingPresentationRestorations: [ObjectIdentifier: RestorationState] = [:]
     private(set) var navigationEventProcessor: any NavigationEventProcessor
 
@@ -102,6 +103,21 @@ actor NavigationModel {
 
     func isManagedNavigationControllerTarget(_ identifier: ObjectIdentifier) -> Bool {
         managedNavigationControllerTargets.contains(identifier)
+    }
+
+
+    // MARK: - Presentation managed targets
+
+    func addPresentationManagedTarget(_ identifier: ObjectIdentifier) {
+        presentationManagedTargets.insert(identifier)
+    }
+
+    func removePresentationManagedTarget(_ identifier: ObjectIdentifier) {
+        presentationManagedTargets.remove(identifier)
+    }
+
+    func isPresentationManagedTarget(_ identifier: ObjectIdentifier) -> Bool {
+        presentationManagedTargets.contains(identifier)
     }
 
 
