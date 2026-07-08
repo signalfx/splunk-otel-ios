@@ -50,7 +50,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             realm: "realm",
             rumAccessToken: "token"
         )
-
         let agentConfig = AgentConfiguration(
             endpoint: endpointConfig,
             appName: "App Name",
