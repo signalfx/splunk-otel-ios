@@ -9,15 +9,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-* Custom error and exception reporting may now include `crash.processPath` and stack-referenced `exception.images` metadata, matching the crash report payload shape. Configure binary images via `CustomTrackingConfiguration.includeBinaryImagesOnErrors`.
-* Objective-C installs can configure Custom Tracking binary image metadata via `SPLKCustomTrackingConfiguration.includeBinaryImagesOnErrors`.
-* Custom error and exception reporting with stack traces now includes `exception.threads` stack frame metadata, matching the crash report payload shape.
-* Custom error and exception `exception.threads` stack frame image names are now resolved from loaded binary image metadata when binary image metadata is enabled.
+* Custom error and exception reporting may now include `crash.processPath` and stack-referenced `exception.images` metadata, matching the crash report payload shape. Configure binary images via `CustomTrackingConfiguration.includeBinaryImagesOnErrors`. #677
+* Objective-C installs can configure Custom Tracking binary image metadata via `SPLKCustomTrackingConfiguration.includeBinaryImagesOnErrors`. #677
+* Custom error and exception reporting with stack traces now includes `exception.threads` stack frame metadata, matching the crash report payload shape. #677
+* Custom error and exception `exception.threads` stack frame image names are now resolved from loaded binary image metadata when binary image metadata is enabled. #677
 
 ### Fixed
 
-* Custom error and exception binary image enrichment no longer generates PLCrashReporter live reports on the caller thread or at install time.
-* Objective-C Custom Tracking configuration conversion now preserves `SPLKCustomTrackingConfiguration.isEnabled`.
+* Custom error and exception binary image enrichment no longer generates PLCrashReporter live reports on the caller thread or at install time. #677
+* Objective-C Custom Tracking configuration conversion now preserves `SPLKCustomTrackingConfiguration.isEnabled`. #677
 
 ### Changed
 
