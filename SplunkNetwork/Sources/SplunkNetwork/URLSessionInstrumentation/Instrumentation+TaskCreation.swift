@@ -106,6 +106,7 @@ func swizzleURLSessionTaskCreation() {
 
 enum RequestInstrumentationDecision {
     case instrumentAtCreation
+    case deferToResume
     case skipInstrumentation
 }
 
@@ -212,7 +213,7 @@ func instrumentationDecision(for request: URLRequest) -> RequestInstrumentationD
     }
 
     if TraceContextInjector.hasTraceContext(in: request) {
-        return .skipInstrumentation
+        return .deferToResume
     }
 
     return .instrumentAtCreation
@@ -226,6 +227,9 @@ func createTaskWithInstrumentation<T: URLSessionTask>(
     switch instrumentationDecision(for: request) {
     case .skipInstrumentation:
         return markSkippedForInstrumentation(createOriginalTask())
+
+    case .deferToResume:
+        return createOriginalTask()
 
     case .instrumentAtCreation:
         guard let span = startHttpSpan(request: request) else {
@@ -247,6 +251,9 @@ func instrumentTaskAtCreationIfNeeded<T: URLSessionTask>(
     switch instrumentationDecision(for: request) {
     case .skipInstrumentation:
         return markSkippedForInstrumentation(task)
+
+    case .deferToResume:
+        return task
 
     case .instrumentAtCreation:
         guard let span = startHttpSpan(request: request) else {
