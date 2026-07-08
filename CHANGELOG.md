@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.3.2] - 2026-07-08
+
 ### Added
 
 * Custom error and exception reporting may now include `crash.processPath` and stack-referenced `exception.images` metadata, matching the crash report payload shape. Configure binary images via `CustomTrackingConfiguration.includeBinaryImagesOnErrors`. #677
