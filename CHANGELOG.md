@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+* Fixed SDK-owned exporter uploads incorrectly being emitted as Network Instrumentation HTTP spans. Internal SDK requests are now excluded from network telemetry. #683
+
 ### Added
 
 * Custom error and exception reporting may now include `crash.processPath` and stack-referenced `exception.images` metadata, matching the crash report payload shape. Configure binary images via `CustomTrackingConfiguration.includeBinaryImagesOnErrors`.

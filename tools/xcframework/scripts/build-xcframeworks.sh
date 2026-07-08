@@ -233,6 +233,7 @@ archive_module() {
             -archivePath "${archive_path}"
             SKIP_INSTALL=NO
             BUILD_LIBRARY_FOR_DISTRIBUTION=YES
+            "OTHER_SWIFT_FLAGS=-package-name SplunkAgent"
         )
         if [[ "${label}" == "maccatalyst" ]]; then
             xcodebuild_args+=("ARCHS=arm64")

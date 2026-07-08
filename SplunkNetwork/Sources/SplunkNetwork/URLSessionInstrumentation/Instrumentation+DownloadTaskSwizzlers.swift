@@ -60,27 +60,22 @@ func swizzleDownloadTaskWithURL() {
         )
 
         let request = URLRequest(url: url)
-        guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, url)
-        }
-
-        guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, url)
-        }
-
-        let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
-
-        // Call the ORIGINAL (un-swizzled) request-based method directly.
-        // This bypasses the request-based swizzle, preventing double instrumentation
-        // when trace header injection is disabled.
-        let castedRequestIMP = unsafeBitCast(
-            originalRequestIMP,
-            to: (@convention(c) (URLSession, Selector, URLRequest) -> URLSessionDownloadTask).self
+        return createTaskWithInstrumentation(
+            request: request,
+            createOriginalTask: {
+                castedIMP(session, selector, url)
+            },
+            createInstrumentedTask: { instrumentedRequest, _ in
+                // Call the ORIGINAL (un-swizzled) request-based method directly.
+                // This bypasses the request-based swizzle, preventing double instrumentation
+                // when trace header injection is disabled.
+                let castedRequestIMP = unsafeBitCast(
+                    originalRequestIMP,
+                    to: (@convention(c) (URLSession, Selector, URLRequest) -> URLSessionDownloadTask).self
+                )
+                return castedRequestIMP(session, requestSelector, instrumentedRequest)
+            }
         )
-        let task = castedRequestIMP(session, requestSelector, instrumentedRequest)
-        objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
-        objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
-        return task
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
@@ -110,21 +105,16 @@ func swizzleDownloadTaskWithRequestAndCompletion() {
             to: (@convention(c) (URLSession, Selector, URLRequest, DownloadHandler?) -> URLSessionDownloadTask).self
         )
 
-        guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, request, completion)
-        }
-
-        guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, request, completion)
-        }
-
-        let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
-        let wrappedCompletion = wrapDownloadCompletionHandler(completion, span: span)
-
-        let task = castedIMP(session, selector, instrumentedRequest, wrappedCompletion)
-        objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
-        objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
-        return task
+        return createTaskWithInstrumentation(
+            request: request,
+            createOriginalTask: {
+                castedIMP(session, selector, request, completion)
+            },
+            createInstrumentedTask: { instrumentedRequest, span in
+                let wrappedCompletion = wrapDownloadCompletionHandler(completion, span: span)
+                return castedIMP(session, selector, instrumentedRequest, wrappedCompletion)
+            }
+        )
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
@@ -163,25 +153,20 @@ func swizzleDownloadTaskWithURLAndCompletion() {
         )
 
         let request = URLRequest(url: url)
-        guard shouldInstrumentRequest(request) else {
-            return castedIMP(session, selector, url, completion)
-        }
-
-        guard let span = startHttpSpan(request: request) else {
-            return castedIMP(session, selector, url, completion)
-        }
-
-        let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
-        let wrappedCompletion = wrapDownloadCompletionHandler(completion, span: span)
-
-        let castedRequestIMP = unsafeBitCast(
-            originalRequestIMP,
-            to: (@convention(c) (URLSession, Selector, URLRequest, DownloadHandler?) -> URLSessionDownloadTask).self
+        return createTaskWithInstrumentation(
+            request: request,
+            createOriginalTask: {
+                castedIMP(session, selector, url, completion)
+            },
+            createInstrumentedTask: { instrumentedRequest, span in
+                let wrappedCompletion = wrapDownloadCompletionHandler(completion, span: span)
+                let castedRequestIMP = unsafeBitCast(
+                    originalRequestIMP,
+                    to: (@convention(c) (URLSession, Selector, URLRequest, DownloadHandler?) -> URLSessionDownloadTask).self
+                )
+                return castedRequestIMP(session, requestSelector, instrumentedRequest, wrappedCompletion)
+            }
         )
-        let task = castedRequestIMP(session, requestSelector, instrumentedRequest, wrappedCompletion)
-        objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
-        objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
-        return task
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
@@ -212,17 +197,11 @@ func swizzleDownloadTaskWithResumeData() {
 
         // Header injection is not possible for resumed downloads because the request
         // is embedded in the opaque resume data. We only create a span for observability.
-        guard let request = task.currentRequest, shouldInstrumentRequest(request) else {
+        guard let request = task.currentRequest else {
             return task
         }
 
-        guard let span = startHttpSpan(request: request) else {
-            return task
-        }
-
-        objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
-        objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
-        return task
+        return instrumentTaskAtCreationIfNeeded(task, request: request)
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
@@ -253,17 +232,11 @@ func swizzleDownloadTaskWithResumeDataAndCompletion() {
         // Create the task first since the request is embedded in resume data
         let task = castedIMP(session, selector, resumeData, completion)
 
-        guard let request = task.currentRequest, shouldInstrumentRequest(request) else {
+        guard let request = task.currentRequest else {
             return task
         }
 
-        guard let span = startHttpSpan(request: request) else {
-            return task
-        }
-
-        objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
-        objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
-        return task
+        return instrumentTaskAtCreationIfNeeded(task, request: request)
     }
 
     let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
