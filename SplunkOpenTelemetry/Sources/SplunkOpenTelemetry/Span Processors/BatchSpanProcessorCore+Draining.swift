@@ -121,13 +121,19 @@ extension BatchSpanProcessorCore {
         return false
     }
 
-    /// Drains every buffered span in batch-sized chunks; must be called on `processorQueue`.
+    /// Drains every buffered span in batch-sized chunks, stopping at `deadline`; must be called on `processorQueue`.
     ///
     /// Used on shutdown, where `isShutdown` has already stopped new spans from being enqueued, so the
-    /// loop is guaranteed to terminate. Failures here are dropped (not re-queued) to guarantee
-    /// termination; drops are accounted for and logged (throttled) via ``recordDroppedSpans(_:reason:)``.
-    func drainAll(explicitTimeout: TimeInterval?) {
+    /// loop is guaranteed to terminate. Failures and spans left after the deadline are dropped
+    /// (not re-queued) to guarantee termination; drops are accounted for and logged (throttled) via
+    /// ``recordDroppedSpans(_:reason:)``.
+    func drainAll(explicitTimeout: TimeInterval?, deadline: Date) {
         while true {
+            if Date() >= deadline {
+                dropRemainingSpans(reason: "shutdown drain deadline exceeded")
+                break
+            }
+
             lock.lock()
             if queue.isEmpty {
                 lock.unlock()
@@ -140,7 +146,10 @@ extension BatchSpanProcessorCore {
                 break
             }
 
-            let result = spanExporter.export(spans: batch.map { $0.toSpanData() }, explicitTimeout: explicitTimeout)
+            let result = spanExporter.export(
+                spans: batch.map { $0.toSpanData() },
+                explicitTimeout: remainingTimeout(until: deadline, fallback: explicitTimeout)
+            )
             if result == .failure {
                 recordDroppedSpans(batch.count, reason: "export failed during shutdown drain")
             }
@@ -210,12 +219,30 @@ extension BatchSpanProcessorCore {
         }
     }
 
+    private func dropRemainingSpans(reason: String) {
+        lock.lock()
+        let remainingCount = queue.count
+        _ = queue.removeFirst(remainingCount)
+        lock.unlock()
+
+        recordDroppedSpans(remainingCount, reason: reason)
+    }
+
     private func remainingTimeout(until deadline: Date?) -> TimeInterval? {
         guard let deadline else {
             return nil
         }
 
         return max(0, deadline.timeIntervalSinceNow)
+    }
+
+    private func remainingTimeout(until deadline: Date, fallback: TimeInterval?) -> TimeInterval? {
+        let remaining = max(0, deadline.timeIntervalSinceNow)
+        guard let fallback else {
+            return remaining
+        }
+
+        return min(remaining, fallback)
     }
 
 

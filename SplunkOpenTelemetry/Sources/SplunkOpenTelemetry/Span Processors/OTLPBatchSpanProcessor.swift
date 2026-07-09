@@ -122,12 +122,12 @@ final class BatchSpanProcessorCore {
     /// after this window so we never risk the watchdog killing the app mid-drain.
     static let terminateFlushTimeout: TimeInterval = 2.0
 
-    /// Hard wall-clock bound on how long a main-thread `shutdown` blocks the caller while draining.
+    /// Hard wall-clock bound on how long `shutdown` blocks the caller while draining.
     ///
     /// Unlike `forceFlush`, shutdown is a one-shot teardown: after it the processor may be released,
     /// so the buffer's remaining drain has no guaranteed later chance. A short bounded wait improves
-    /// final persistence without risking a UI hang; on timeout the drain continues best effort.
-    private static let shutdownMainTimeout: TimeInterval = 1.0
+    /// final persistence without risking a host-app hang; on timeout the drain continues best effort.
+    private static let shutdownWaitTimeout: TimeInterval = 1.0
 
     /// Minimum interval between dropped-span log emissions, so overflow bursts cannot flood the log.
     private static let dropLogInterval: TimeInterval = 5.0
@@ -239,7 +239,7 @@ final class BatchSpanProcessorCore {
         // no telemetry benefit while the app is alive. The cases where the synchronous window is the
         // *only* chance to persist (background/terminate/shutdown) are bounded-waited separately.
         let deadline = timeout.map { Date().addingTimeInterval($0) }
-        runOnProcessorQueue(mainThreadWait: nil) {
+        runOnProcessorQueue(wait: nil) {
             self.drainSnapshot(deadline: deadline, requeueOnFailure: true)
         }
     }
@@ -257,10 +257,12 @@ final class BatchSpanProcessorCore {
         timer = nil
         removeLifecycleObservers()
 
-        // On the main thread, block only up to `shutdownMainTimeout`; on timeout the drain and
-        // exporter shutdown continue best effort on the queue (the closure retains `self`).
-        runOnProcessorQueue(mainThreadWait: Self.shutdownMainTimeout) {
-            self.drainAll(explicitTimeout: explicitTimeout)
+        // Block only up to `shutdownWaitTimeout`, regardless of calling thread. On timeout the
+        // drain and exporter shutdown continue best effort on the queue (the closure retains `self`).
+        let waitTimeout = shutdownWaitTimeout(for: explicitTimeout)
+        let deadline = Date().addingTimeInterval(waitTimeout)
+        runOnProcessorQueue(wait: waitTimeout) {
+            self.drainAll(explicitTimeout: explicitTimeout, deadline: deadline)
             self.spanExporter.shutdown(explicitTimeout: explicitTimeout)
         }
     }
@@ -268,18 +270,28 @@ final class BatchSpanProcessorCore {
 
     // MARK: - Queue hop
 
-    /// Runs export work on `processorQueue`, never hanging the main thread unboundedly.
+    /// Runs export work on `processorQueue`, never hanging a caller unboundedly when a wait is supplied.
     ///
     /// - Parameters:
-    ///   - mainThreadWait: Only applies when called on the main thread. When `nil`, the work is
-    ///     dispatched fire-and-forget (no wait). When set, the caller blocks up to this many seconds
-    ///     for the work to finish; on timeout the work continues best effort on the queue. Off the
-    ///     main thread the call is always synchronous, preserving flush/shutdown ordering for
-    ///     background callers and tests.
+    ///   - wait: When `nil`, main-thread work is dispatched fire-and-forget and off-main work runs
+    ///     synchronously. When set, every caller blocks up to this many seconds for the work to finish;
+    ///     on timeout the work continues best effort on the queue.
     ///   - work: The export work to run on `processorQueue`.
-    private func runOnProcessorQueue(mainThreadWait: TimeInterval?, _ work: @escaping () -> Void) {
+    private func runOnProcessorQueue(wait: TimeInterval?, _ work: @escaping () -> Void) {
         if DispatchQueue.getSpecific(key: processorQueueKey) != nil {
             work()
+            return
+        }
+
+        if let wait {
+            // Bounded wait: init 0; whether `signal()` or the timeout wins, the semaphore's final value
+            // is >= 0, so it is safe to let it deallocate after the closure is captured by the async block.
+            let completed = DispatchSemaphore(value: 0)
+            processorQueue.async {
+                work()
+                completed.signal()
+            }
+            _ = completed.wait(timeout: .now() + wait)
             return
         }
 
@@ -288,19 +300,11 @@ final class BatchSpanProcessorCore {
             return
         }
 
-        guard let mainThreadWait else {
-            processorQueue.async(execute: work)
-            return
-        }
+        processorQueue.async(execute: work)
+    }
 
-        // Bounded wait: init 0; whether `signal()` or the timeout wins, the semaphore's final value
-        // is >= 0, so it is safe to let it deallocate after the closure is captured by the async block.
-        let completed = DispatchSemaphore(value: 0)
-        processorQueue.async {
-            work()
-            completed.signal()
-        }
-        _ = completed.wait(timeout: .now() + mainThreadWait)
+    private func shutdownWaitTimeout(for explicitTimeout: TimeInterval?) -> TimeInterval {
+        min(Self.shutdownWaitTimeout, max(0, explicitTimeout ?? Self.shutdownWaitTimeout))
     }
 
 
@@ -313,14 +317,14 @@ final class BatchSpanProcessorCore {
     /// so a sustained overflow burst (potentially thousands of drops/second) cannot flood the log and
     /// add I/O pressure while the app is already saturated. Each emitted line reports the number of
     /// spans dropped since the previous line plus the running session total.
-    func recordDroppedSpans(_ count: Int, reason: String) {
-        guard count > 0 else {
+    func recordDroppedSpans(_ spanCount: Int, reason: String) {
+        guard spanCount > 0 else {
             return
         }
 
         lock.lock()
-        droppedSpanCount += count
-        dropsSinceLastLog += count
+        droppedSpanCount += spanCount
+        dropsSinceLastLog += spanCount
         let total = droppedSpanCount
 
         let now = Date()

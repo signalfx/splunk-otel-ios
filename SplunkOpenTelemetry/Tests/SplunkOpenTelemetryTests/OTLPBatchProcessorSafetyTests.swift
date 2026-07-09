@@ -57,6 +57,46 @@ struct OTLPBatchProcessorSafetyTests {
     }
 
 
+    // MARK: - Shutdown
+
+    @Test
+    func shutdownFromBackgroundQueueReturnsWithinBoundWhenExporterBlocks() {
+        let exporter = FirstExportBlockingExporter()
+        let processor = OTLPBatchSpanProcessor(
+            spanExporter: exporter,
+            scheduleDelay: Self.neverFires,
+            maxExportBatchSize: 100,
+            maxQueueSize: 2_048
+        )
+        let tracer = makeTracer(for: processor)
+
+        endSpans(0 ..< 100, using: tracer)
+
+        let completed = DispatchSemaphore(value: 0)
+        let durationQueue = DispatchQueue(label: "com.splunk.batch-processor-test.duration")
+        var shutdownDuration: TimeInterval?
+        let start = Date()
+
+        DispatchQueue.global(qos: .utility).async {
+            processor.shutdown()
+            durationQueue.sync {
+                shutdownDuration = Date().timeIntervalSince(start)
+            }
+            completed.signal()
+        }
+
+        #expect(exporter.waitUntilFirstExportStarts(timeout: 5) == .success)
+        #expect(completed.wait(timeout: .now() + 1.5) == .success)
+
+        let elapsed = durationQueue.sync {
+            shutdownDuration ?? .infinity
+        }
+        #expect(elapsed < 1.5)
+
+        exporter.releaseFirstExport()
+    }
+
+
     // MARK: - Partial requeue
 
     @Test
