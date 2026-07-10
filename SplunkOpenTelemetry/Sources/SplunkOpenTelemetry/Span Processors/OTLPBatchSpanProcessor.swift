@@ -263,7 +263,7 @@ final class BatchSpanProcessorCore {
         let waitTimeout = shutdownWaitTimeout(for: explicitTimeout)
         let deadline = Date().addingTimeInterval(waitTimeout)
         runOnProcessorQueue(wait: waitTimeout) {
-            self.drainAll(explicitTimeout: explicitTimeout, deadline: deadline)
+            self.drainAll(deadline: deadline)
             self.spanExporter.shutdown(explicitTimeout: explicitTimeout)
         }
     }

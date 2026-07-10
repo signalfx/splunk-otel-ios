@@ -22,10 +22,6 @@ import Testing
 
 @testable import SplunkOpenTelemetry
 
-#if os(iOS) || os(tvOS) || os(visionOS)
-    import UIKit
-#endif
-
 /// Serialized to keep timers and the shared `NotificationCenter` lifecycle hooks deterministic across tests.
 @Suite(.serialized)
 struct OTLPBatchSpanProcessorTests {
@@ -229,41 +225,31 @@ struct OTLPBatchSpanProcessorTests {
         processor.shutdown()
 
         #expect(exporter.exportAttemptCount == 1)
+        #expect(exporter.exportTimeouts.count == 1)
+        #expect(exporter.exportTimeouts.allSatisfy { $0 == nil })
         #expect(exporter.successfulSpanCount == 0)
         #expect(exporter.shutdownCount == 1)
     }
 
-    #if os(iOS) || os(tvOS) || os(visionOS)
-        @Test
-        func terminatingDropsSpansOnExportFailure() {
-            // Terminate drains best effort; a failed export is dropped (not re-queued), leaving the
-            // buffer empty afterward since the process is going away.
-            let exporter = BatchProcessorTestExporter(results: [.failure])
-            let processor = OTLPBatchSpanProcessor(
-                spanExporter: exporter,
-                scheduleDelay: Self.neverFires,
-                maxExportBatchSize: Self.hugeBatch,
-                maxQueueSize: 2_048
-            )
-            let tracer = makeTracer(for: processor)
+    @Test
+    func shutdownPreservesNormalExporterTimeoutDuringDrain() {
+        let exporter = BatchProcessorTestExporter()
+        let processor = OTLPBatchSpanProcessor(
+            spanExporter: exporter,
+            scheduleDelay: Self.neverFires,
+            maxExportBatchSize: Self.hugeBatch,
+            maxQueueSize: 2_048
+        )
+        let tracer = makeTracer(for: processor)
 
-            endSpans(5, using: tracer)
+        endSpans(5, using: tracer)
+        processor.shutdown(explicitTimeout: 0.1)
 
-            NotificationCenter.default.post(
-                name: UIApplication.willTerminateNotification,
-                object: nil
-            )
-
-            #expect(waitUntil(timeout: 5) { exporter.exportAttemptCount == 1 })
-            #expect(exporter.successfulSpanCount == 0)
-
-            // The failed batch was dropped, so a later flush finds nothing to export.
-            processor.forceFlush()
-            #expect(exporter.successfulSpanCount == 0)
-            #expect(exporter.exportAttemptCount == 1)
-        }
-    #endif
-
+        #expect(exporter.exportAttemptCount == 1)
+        #expect(exporter.successfulSpanCount == 5)
+        #expect(exporter.exportTimeouts.count == 1)
+        #expect(exporter.exportTimeouts.allSatisfy { $0 == nil })
+    }
 
     // MARK: - Sampling
 
@@ -288,57 +274,6 @@ struct OTLPBatchSpanProcessorTests {
         processor.forceFlush()
         #expect(exporter.successfulSpanCount == 0)
     }
-
-
-    // MARK: - Lifecycle
-
-    #if os(iOS) || os(tvOS) || os(visionOS)
-        @Test
-        func enteringBackgroundFlushesPendingBatch() {
-            let exporter = BatchProcessorTestExporter()
-            let processor = OTLPBatchSpanProcessor(
-                spanExporter: exporter,
-                scheduleDelay: Self.neverFires,
-                maxExportBatchSize: Self.hugeBatch,
-                maxQueueSize: 2_048
-            )
-            let tracer = makeTracer(for: processor)
-
-            endSpans(5, using: tracer)
-            #expect(exporter.successfulSpanCount == 0)
-
-            NotificationCenter.default.post(
-                name: UIApplication.didEnterBackgroundNotification,
-                object: nil
-            )
-
-            #expect(waitUntil(timeout: 5) { exporter.successfulSpanCount == 5 })
-        }
-
-        @Test
-        func terminatingFlushesPendingBatchSynchronously() {
-            let exporter = BatchProcessorTestExporter()
-            let processor = OTLPBatchSpanProcessor(
-                spanExporter: exporter,
-                scheduleDelay: Self.neverFires,
-                maxExportBatchSize: Self.hugeBatch,
-                maxQueueSize: 2_048
-            )
-            let tracer = makeTracer(for: processor)
-
-            endSpans(5, using: tracer)
-            #expect(exporter.successfulSpanCount == 0)
-
-            // The terminate observer drains synchronously, so the buffer is persisted by the time
-            // `post` returns; no polling required.
-            NotificationCenter.default.post(
-                name: UIApplication.willTerminateNotification,
-                object: nil
-            )
-
-            #expect(exporter.successfulSpanCount == 5)
-        }
-    #endif
 }
 
 

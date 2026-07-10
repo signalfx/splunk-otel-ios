@@ -127,7 +127,7 @@ extension BatchSpanProcessorCore {
     /// loop is guaranteed to terminate. Failures and spans left after the deadline are dropped
     /// (not re-queued) to guarantee termination; drops are accounted for and logged (throttled) via
     /// ``recordDroppedSpans(_:reason:)``.
-    func drainAll(explicitTimeout: TimeInterval?, deadline: Date) {
+    func drainAll(deadline: Date) {
         while true {
             if Date() >= deadline {
                 dropRemainingSpans(reason: "shutdown drain deadline exceeded")
@@ -148,7 +148,7 @@ extension BatchSpanProcessorCore {
 
             let result = spanExporter.export(
                 spans: batch.map { $0.toSpanData() },
-                explicitTimeout: remainingTimeout(until: deadline, fallback: explicitTimeout)
+                explicitTimeout: nil
             )
             if result == .failure {
                 recordDroppedSpans(batch.count, reason: "export failed during shutdown drain")
@@ -166,7 +166,10 @@ extension BatchSpanProcessorCore {
     ///     front for a later attempt (timer / next flush) and the drain stops, so a transient disk
     ///     error does not permanently lose spans. When `false` (shutdown/terminate), a failed export is
     ///     dropped and the drain continues, so termination is guaranteed within the deadline.
-    func drainSnapshot(deadline: Date?, requeueOnFailure: Bool) {
+    ///   - forwardDeadlineToExporter: When `true`, the remaining deadline is forwarded to the exporter.
+    ///     Terminal drains keep this `false`, so their wall-clock wait bound does not become the
+    ///     persisted background upload timeout.
+    func drainSnapshot(deadline: Date?, requeueOnFailure: Bool, forwardDeadlineToExporter: Bool = true) {
         lock.lock()
         var remaining = queue.count
         lock.unlock()
@@ -190,7 +193,7 @@ extension BatchSpanProcessorCore {
 
             let result = spanExporter.export(
                 spans: batch.map { $0.toSpanData() },
-                explicitTimeout: remainingTimeout(until: deadline)
+                explicitTimeout: forwardDeadlineToExporter ? remainingTimeout(until: deadline) : nil
             )
 
             if result == .failure {
@@ -236,16 +239,6 @@ extension BatchSpanProcessorCore {
         return max(0, deadline.timeIntervalSinceNow)
     }
 
-    private func remainingTimeout(until deadline: Date, fallback: TimeInterval?) -> TimeInterval? {
-        let remaining = max(0, deadline.timeIntervalSinceNow)
-        guard let fallback else {
-            return remaining
-        }
-
-        return min(remaining, fallback)
-    }
-
-
     // MARK: - Lifecycle
 
     func registerLifecycleObservers() {
@@ -270,13 +263,19 @@ extension BatchSpanProcessorCore {
                 object: nil,
                 queue: nil
             ) { [weak self] _ in
-                // The process is about to die, so async work would be discarded before it runs. Drain
-                // synchronously here: UI responsiveness no longer matters, but persisting the buffer
-                // does. A bounded deadline prevents overrunning the termination window.
-                self?.flushBeforeTermination()
+                // Let all lifecycle span producers finish handling this notification first, then run
+                // the bounded terminal drain. This captures spans from observers registered after us,
+                // such as AppState's `.terminate` lifecycle span.
+                self?.scheduleFlushAfterTerminationNotification()
             }
             notificationObservers.append(terminateToken)
         #endif
+    }
+
+    private func scheduleFlushAfterTerminationNotification() {
+        DispatchQueue.main.async { [weak self] in
+            self?.flushBeforeTermination()
+        }
     }
 
     /// Drains the buffer when the app is terminating, blocking the caller only up to a wall-clock bound.
@@ -291,7 +290,7 @@ extension BatchSpanProcessorCore {
         let completed = DispatchSemaphore(value: 0)
 
         processorQueue.async {
-            self.drainSnapshot(deadline: deadline, requeueOnFailure: false)
+            self.drainSnapshot(deadline: deadline, requeueOnFailure: false, forwardDeadlineToExporter: false)
             completed.signal()
         }
 
