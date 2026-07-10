@@ -1,50 +1,59 @@
 # How to Release Splunk RUM for iOS
 
-This project is distributed as a Swift Package. The release process is driven by creating and pushing versioned Git tags.
+## Pre-flight
 
-## Automated workflow
+1. Confirm all features for the release are merged to `develop`.
+2. Confirm `CHANGELOG.md` on `develop` has complete `[Unreleased]` entries, each with a PR link (e.g. `#123`).
 
-- An action named “New release” is available in the Actions tab of the repository.
-- Fill in the required fields and select the target branch.
-- The action will prepare a release pull request.
-- After the release pull request is merged into main, a new tag and release will be created automatically, and a new pull request into develop will be opened.
+## Release
 
-## Manual workflow
+3. Run the **"New release"** workflow from the Actions tab, targeting `develop`, with the version (e.g. `2.3.2`) and Jira ticket (e.g. `DEMRUM-1234`).
+4. On the resulting PR, click **"Approve workflows to run"** when prompted, then approve the PR and wait for all checks to pass.
+5. Ask a repo admin to merge the PR into `main` — **regular merge commit only** (not squash, not rebase merge). Admins can bypass the stuck CLA check if needed (see Known issue below).
+6. The **"Release finalize"** workflow runs automatically: creates the tag, GitHub release, and opens a `main → develop` back-merge PR.
 
-### 1. Prepare the Release
+## Sign and upload xcframeworks
 
-1. Ensure the `main` branch is stable and all changes for the release have been merged.
-2. Update `CHANGELOG.md` by moving all items from the `[Unreleased]` section to a new version heading (e.g., `[2.0.0] - YYYY-MM-DD`).
-3. Update the `version` constant in `SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift`.
+7. With the Apple Distribution certificate in your keychain and the Session Replay repo checked out locally:
+   ```bash
+   SESSION_REPLAY_LOCAL_PATH=/path/to/session-replay \
+     tools/xcframework/scripts/sign-and-upload.sh VERSION --upload-to VERSION
+   ```
 
-### 2. Run Final Checks
+## Back-merge
 
-Build the project and run the full test suite from the command line to ensure everything is passing.
+8. On the back-merge PR, click **"Approve workflows to run"**, approve the PR, and wait for checks to pass.
+9. Ask a repo admin to: (1) temporarily disable **"Require linear history"** on `main` in Settings → Branches, (2) merge the PR into `develop` — **regular merge commit only** (not squash, not rebase merge), (3) re-enable **"Require linear history"** on `main`.
 
-```bash
-# Build the project
-xcodebuild build -scheme SplunkAgent -destination 'generic/platform=iOS Simulator'
+## Smoke test
 
-# Run the tests
-xcodebuild test -scheme SplunkAgent -destination 'platform=iOS Simulator,name=iPhone 16'
-```
+12. In a test app, add an SPM dependency on `signalfx/splunk-otel-ios` at the new version.
+13. In Xcode: **File → Packages → Reset Package Caches**, then **File → Packages → Resolve Package Versions**.
+14. Build and run. Confirm sessions appear in mon0 with `rum.sdk.version` matching the new version.
 
-### 3. Tag and Push the Release
+## Manual workflow (automated steps broken down)
 
-Create a signed Git tag for the new version. Swift Package Manager uses these tags to resolve package versions.
+Use this if any part of the automated workflow fails and needs to be reproduced manually.
 
-```bash
-# Create a signed tag (e.g., for version 2.0.0) with a 'v' prefix
-git tag -s v2.0.0
+1. Create the release branch from `develop`:
+   ```bash
+   git checkout develop && git pull
+   git checkout -b release/VERSION
+   ```
+2. In `CHANGELOG.md`, rename `[Unreleased]` to `[VERSION] - YYYY-MM-DD` and add a new empty `[Unreleased]` section above it.
+3. Bump the version constant in `SplunkAgent/Sources/SplunkAgent/Public API/SplunkRum.swift`.
+4. Commit, push, and open a PR from `release/VERSION` to `main`. Title: `DEMRUM-XXXX: Release VERSION`.
+5. Merge the PR — **regular merge commit only** (not squash, not rebase merge).
+6. Create and push a signed tag:
+   ```bash
+   git checkout main && git pull
+   git tag -s VERSION -m "VERSION"
+   git push origin VERSION
+   ```
+7. On the GitHub Releases page, draft a new release for the tag. Paste the `[VERSION]` section from `CHANGELOG.md` as the release notes and publish.
+8. Open a PR from `main` to `develop`. Title: `NO-TICKET: Merge back VERSION to develop`.
+9. Merge the PR — **regular merge commit only** (not squash, not rebase merge). Requires temporarily disabling "Require linear history" on `main` (see Back-merge section above).
 
-# Push the tag to the remote repository
-git push origin v2.0.0
-```
+## Known issue: CLA check stuck
 
-### 4. Publish on GitHub
-
-1. Go to the "Releases" page in the GitHub repository and click "Draft a new release".
-2. Choose the tag you just pushed.
-3. For the release notes, copy and paste the content from the corresponding version section in `CHANGELOG.md`.
-4. Click the **Publish release** button. This will finalize the release, making it public and visible to the community.
-
+The `ContributorLicenseAgreement` check on bot-created PRs may remain stuck as "Waiting for status to be reported" after all other checks pass. This is a known workflow issue pending a fix. If it occurs, ask a repo admin to perform the merge — admins have the ability to bypass the stuck required check.
