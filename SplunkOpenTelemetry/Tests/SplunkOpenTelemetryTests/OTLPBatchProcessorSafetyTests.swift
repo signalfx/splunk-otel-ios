@@ -77,13 +77,14 @@ struct OTLPBatchProcessorSafetyTests {
         var shutdownDuration: TimeInterval?
         let start = Date()
 
-        DispatchQueue.global(qos: .utility).async {
-            processor.shutdown()
-            durationQueue.sync {
-                shutdownDuration = Date().timeIntervalSince(start)
+        DispatchQueue.global(qos: .utility)
+            .async {
+                processor.shutdown()
+                durationQueue.sync {
+                    shutdownDuration = Date().timeIntervalSince(start)
+                }
+                completed.signal()
             }
-            completed.signal()
-        }
 
         #expect(exporter.waitUntilFirstExportStarts(timeout: 5) == .success)
         #expect(completed.wait(timeout: .now() + 1.5) == .success)
