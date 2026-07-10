@@ -151,6 +151,7 @@ struct OTLPBatchSpanProcessorTests {
 
         // No polling: forceFlush is synchronous, so everything is exported once it returns.
         #expect(exporter.successfulSpanCount == 10)
+        #expect(exporter.flushCount == 1)
     }
 
 

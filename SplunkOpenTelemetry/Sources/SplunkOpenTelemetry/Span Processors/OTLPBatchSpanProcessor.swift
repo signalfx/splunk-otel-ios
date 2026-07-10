@@ -241,6 +241,7 @@ final class BatchSpanProcessorCore {
         let deadline = timeout.map { Date().addingTimeInterval($0) }
         runOnProcessorQueue(wait: nil) {
             self.drainSnapshot(deadline: deadline, requeueOnFailure: true)
+            _ = self.spanExporter.flush(explicitTimeout: deadline.map { max(0, $0.timeIntervalSinceNow) })
         }
     }
 
