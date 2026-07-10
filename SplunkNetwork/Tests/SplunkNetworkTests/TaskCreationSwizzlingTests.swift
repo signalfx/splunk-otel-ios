@@ -18,6 +18,7 @@ limitations under the License.
 import Foundation
 import OpenTelemetryApi
 import OpenTelemetrySdk
+import SplunkCommon
 import XCTest
 
 @testable import SplunkNetwork
@@ -126,14 +127,14 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
     // MARK: - Upload Task Completion Handler Tests
 
-    func testUploadTaskWithDataAndCompletion_CreatesSpan() throws {
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/post"))
+    func testUploadTaskWithDataAndCompletion_CreatesSpan() {
+        let url = URLSessionMockProtocol.url(path: "/post")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let data = Data("test body".utf8)
 
         let expectation = expectation(description: "Upload completion called")
-        let session = URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
 
         let task = session.uploadTask(with: request, from: data) { _, _, _ in
             expectation.fulfill()
@@ -148,7 +149,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
     }
 
     func testUploadTaskWithFileAndCompletion_CreatesSpan() throws {
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/post"))
+        let url = URLSessionMockProtocol.url(path: "/post")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -159,7 +160,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: fileURL) }
 
         let expectation = expectation(description: "Upload completion called")
-        let session = URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
 
         let task = session.uploadTask(with: request, fromFile: fileURL) { _, _, _ in
             expectation.fulfill()
@@ -173,8 +174,37 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Exactly one HTTP span should be created for uploadTask(with:fromFile:completionHandler:)")
     }
 
-    func testUploadTaskWithDataAndCompletion_CompletionReceivesData() throws {
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/post"))
+    func testInternalSDKMarkedUploadTaskWithFile_DoesNotCreateSpan() throws {
+        let url = URLSessionMockProtocol.url(path: "/post")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request = InternalNetworkRequestMarker.mark(request)
+
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent("test-upload-\(UUID().uuidString).txt")
+        try "test file content".write(to: fileURL, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let expectation = expectation(description: "Upload task completed")
+        let delegate = TaskCompletionDelegate(expectation: expectation)
+        let session = URLSession(
+            configuration: URLSessionMockProtocol.configuration(),
+            delegate: delegate,
+            delegateQueue: nil
+        )
+
+        let task = session.uploadTask(with: request, fromFile: fileURL)
+        task.resume()
+
+        wait(for: [expectation], timeout: 10.0)
+        RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+
+        let spans = Self.exporter.spans.filter { $0.name.starts(with: "HTTP") }
+        XCTAssertTrue(spans.isEmpty, "Internal SDK upload requests should not create HTTP spans")
+    }
+
+    func testUploadTaskWithDataAndCompletion_CompletionReceivesData() {
+        let url = URLSessionMockProtocol.url(path: "/post")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let data = Data("test body".utf8)
@@ -182,7 +212,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         let expectation = expectation(description: "Upload completion called")
         var receivedData: Data?
         var receivedResponse: URLResponse?
-        let session = URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
 
         let task = session.uploadTask(with: request, from: data) { data, response, _ in
             receivedData = data
@@ -199,15 +229,19 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
     // MARK: - Single-Span Lifecycle: injectTraceHeaders = false, URL Overloads
 
-    func testDataTaskWithURL_SingleSpan_WhenHeaderInjectionDisabled() throws {
+    func testDataTaskWithURL_SingleSpan_WhenHeaderInjectionDisabled() {
         reinstallModule(injectTraceHeaders: false)
         addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
+        let url = URLSessionMockProtocol.url()
 
         let expectation = expectation(description: "Task completed")
         let delegate = TaskCompletionDelegate(expectation: expectation)
-        let delegateSession = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: nil)
+        let delegateSession = URLSession(
+            configuration: URLSessionMockProtocol.configuration(),
+            delegate: delegate,
+            delegateQueue: nil
+        )
 
         let task = delegateSession.dataTask(with: url)
         task.resume()
@@ -219,14 +253,14 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Only one span should exist for dataTask(with: URL) when header injection is off")
     }
 
-    func testDataTaskWithURLAndCompletion_SingleSpan_WhenHeaderInjectionDisabled() throws {
+    func testDataTaskWithURLAndCompletion_SingleSpan_WhenHeaderInjectionDisabled() {
         reinstallModule(injectTraceHeaders: false)
         addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
+        let url = URLSessionMockProtocol.url()
 
         let expectation = expectation(description: "Completion called")
-        let session = URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
 
         let task = session.dataTask(with: url) { _, _, _ in
             expectation.fulfill()
@@ -240,15 +274,19 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         XCTAssertEqual(spans.count, 1, "Only one span should exist for dataTask(with: URL, completionHandler:) when header injection is off")
     }
 
-    func testDownloadTaskWithURL_SingleSpan_WhenHeaderInjectionDisabled() throws {
+    func testDownloadTaskWithURL_SingleSpan_WhenHeaderInjectionDisabled() {
         reinstallModule(injectTraceHeaders: false)
         addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
+        let url = URLSessionMockProtocol.url()
 
         let expectation = expectation(description: "Task completed")
         let delegate = TaskCompletionDelegate(expectation: expectation)
-        let delegateSession = URLSession(configuration: .ephemeral, delegate: delegate, delegateQueue: nil)
+        let delegateSession = URLSession(
+            configuration: URLSessionMockProtocol.configuration(),
+            delegate: delegate,
+            delegateQueue: nil
+        )
 
         let task = delegateSession.downloadTask(with: url)
         task.resume()
@@ -263,11 +301,11 @@ final class TaskCreationSwizzlingTests: XCTestCase {
     // MARK: - Resume Event Timing
 
     func testDataTaskWithRequest_HasResumeEvent() throws {
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/get"))
+        let url = URLSessionMockProtocol.url()
         let request = URLRequest(url: url)
 
         let expectation = expectation(description: "Completion called")
-        let session = URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
 
         let task = session.dataTask(with: request) { _, _, _ in
             expectation.fulfill()
@@ -293,11 +331,11 @@ final class TaskCreationSwizzlingTests: XCTestCase {
     func testDataTaskWithURL_HasTraceparent_WhenHeaderInjectionEnabled() throws {
         reinstallModule(injectTraceHeaders: true)
 
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/headers"))
+        let url = URLSessionMockProtocol.url(path: "/headers")
 
         let expectation = expectation(description: "Completion called")
         var responseBody: Data?
-        let session = URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
 
         let task = session.dataTask(with: url) { data, _, _ in
             responseBody = data
@@ -307,7 +345,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 10.0)
 
-        let body = try XCTUnwrap(responseBody, "httpbin should return a response body")
+        let body = try XCTUnwrap(responseBody, "Mock protocol should return a response body")
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
         let headers = try XCTUnwrap(json["headers"] as? [String: Any])
         let traceparent = headers["Traceparent"] ?? headers["traceparent"]
@@ -318,11 +356,11 @@ final class TaskCreationSwizzlingTests: XCTestCase {
         reinstallModule(injectTraceHeaders: false)
         addTeardownBlock { self.reinstallModule(injectTraceHeaders: true) }
 
-        let url = try XCTUnwrap(URL(string: "https://httpbin.org/headers"))
+        let url = URLSessionMockProtocol.url(path: "/headers")
 
         let expectation = expectation(description: "Completion called")
         var responseBody: Data?
-        let session = URLSession(configuration: .ephemeral)
+        let session = URLSession(configuration: URLSessionMockProtocol.configuration())
 
         let task = session.dataTask(with: url) { data, _, _ in
             responseBody = data
@@ -332,7 +370,7 @@ final class TaskCreationSwizzlingTests: XCTestCase {
 
         wait(for: [expectation], timeout: 10.0)
 
-        let body = try XCTUnwrap(responseBody, "httpbin should return a response body")
+        let body = try XCTUnwrap(responseBody, "Mock protocol should return a response body")
         let json = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
         let headers = try XCTUnwrap(json["headers"] as? [String: Any])
         XCTAssertNil(headers["Traceparent"], "traceparent should not be present when disabled")

@@ -75,6 +75,11 @@ let sharedSettings: SettingsDictionary = [
     // Enable module interface generation.
     "SWIFT_EMIT_MODULE_INTERFACE": "YES",
 
+    // Tell the compiler these sources belong to the `SplunkAgent` package.
+    // This makes `package` access compile in the standalone Tuist build while
+    // keeping package-only members out of generated .swiftinterface files.
+    "OTHER_SWIFT_FLAGS": "-package-name SplunkAgent",
+
     // Minimum deployment targets matching Package.swift.
     "IPHONEOS_DEPLOYMENT_TARGET": "13.0",
     "TVOS_DEPLOYMENT_TARGET": "15.0",
@@ -490,6 +495,7 @@ let project = Project(
             dependencies: [
                 mod("SplunkAgent"),
                 mod("SplunkCommon"),
+                mod("SplunkCustomTracking"),
                 mod("SplunkInteractions"),
                 mod("SplunkNavigation"),
                 mod("SplunkNetworkMonitor"),

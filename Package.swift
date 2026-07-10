@@ -39,7 +39,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/microsoft/plcrashreporter",
-            exact: "1.12.0"
+            exact: "1.12.2"
         )
     ],
     targets: []
@@ -96,7 +96,7 @@ func generateMainTargets() -> [Target] {
         ),
         .testTarget(
             name: "SplunkAgentTests",
-            dependencies: ["SplunkAgent", "SplunkCommon"],
+            dependencies: ["SplunkAgent", "SplunkCommon", "SplunkCustomTracking"],
             path: "SplunkAgent/Tests/SplunkAgentTests",
             resources: [
                 .copy("Testing Support/Assets/v.mp4"),
@@ -118,6 +118,7 @@ func generateMainTargets() -> [Target] {
             dependencies: [
                 "SplunkAgent",
                 "SplunkCommon",
+                "SplunkCustomTracking",
                 "SplunkInteractions",
                 "SplunkNavigation",
                 "SplunkNetworkMonitor",
@@ -141,7 +142,7 @@ func generateMainTargets() -> [Target] {
         // Objective-C (.m) files for ObjC-callability tests.
         .testTarget(
             name: "SplunkAgentBridgingTests",
-            dependencies: ["SplunkAgentObjC", "SplunkNavigation"],
+            dependencies: ["SplunkAgentObjC", "SplunkCustomTracking", "SplunkNavigation"],
             path: "SplunkAgent/Tests/SplunkAgentBridgingTests"
         ),
 
