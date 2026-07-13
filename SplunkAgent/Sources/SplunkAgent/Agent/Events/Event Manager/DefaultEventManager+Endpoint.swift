@@ -22,9 +22,9 @@ internal import SplunkOpenTelemetry
 
 extension DefaultEventManager {
 
-    /// Registers the direct-span terminal drain that runs after AppState emits its terminate span.
-    func registerTraceTerminationDrain() {
-        concreteTraceProcessor.registerTerminationObserver()
+    /// Registers the direct-span terminal drain that runs after terminal producers flush their spans.
+    func registerTraceTerminationDrain(prepareForTermination: @escaping () async -> Void) {
+        concreteTraceProcessor.registerTerminationObserver(prepareForTermination: prepareForTermination)
     }
 
     /// Updates the endpoint configuration and enables sending spans.

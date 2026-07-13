@@ -26,8 +26,8 @@ import SplunkCommon
 /// Instead of exporting one span per ended span (as `SimpleSpanProcessor` does), this processor
 /// pools ended spans in a bounded in-memory queue and hands a batch to the exporter either when the
 /// batch reaches ``Defaults/maxExportBatchSize`` spans or every ``Defaults/scheduleDelay`` seconds,
-/// whichever happens first. It also flushes on app background, after AppState processes termination,
-/// and on shutdown.
+/// whichever happens first. It also flushes on app background, after terminal producers run, and on
+/// shutdown.
 ///
 /// - Important: Spans that are still buffered in memory when the host app crashes are lost. This is
 ///   an accepted trade-off in exchange for fewer, larger disk writes on the export path.
@@ -101,9 +101,9 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
         core.forceFlush(timeout: timeout)
     }
 
-    /// Registers the terminal lifecycle drain that AppState triggers after publishing its terminate span.
-    func registerTerminationObserver() {
-        core.registerTerminationObserver()
+    /// Registers the terminal lifecycle drain that runs after terminal producers flush their spans.
+    func registerTerminationObserver(prepareForTermination: @escaping () async -> Void) {
+        core.registerTerminationObserver(prepareForTermination: prepareForTermination)
     }
 }
 
@@ -115,7 +115,10 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
 /// share a single core. The draining, export, and lifecycle logic lives in
 /// `BatchSpanProcessorCore+Draining.swift`; state used by that extension is `internal` (not
 /// `private`) for that reason, but the whole type remains module-internal.
-final class BatchSpanProcessorCore {
+///
+/// Safety: this core is shared across notification, task, and dispatch callbacks. Mutable queue
+/// state is protected by `lock`, and export/timer work is serialized on `processorQueue`.
+final class BatchSpanProcessorCore: @unchecked Sendable {
 
     // MARK: - Constants
 

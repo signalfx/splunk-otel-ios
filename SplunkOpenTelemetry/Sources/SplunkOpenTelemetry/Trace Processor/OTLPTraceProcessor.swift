@@ -151,12 +151,17 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Lifecycle
 
-    /// Registers the direct-span termination drain triggered by AppState after its terminate span.
-    ///
-    /// The handler blocks synchronously for a short bounded drain when AppState has finished
-    /// processing `willTerminate`, avoiding any dependency on NotificationCenter observer ordering.
+    /// Registers the direct-span termination drain.
     public func registerTerminationObserver() {
-        batchSpanProcessor.registerTerminationObserver()
+        registerTerminationObserver {}
+    }
+
+    /// Registers the direct-span termination drain triggered after terminal producers flush their spans.
+    ///
+    /// The handler gives known terminal producers a chance to synchronously enqueue their direct spans,
+    /// then blocks for a short bounded drain when `willTerminate` is delivered.
+    public func registerTerminationObserver(prepareForTermination: @escaping () async -> Void) {
+        batchSpanProcessor.registerTerminationObserver(prepareForTermination: prepareForTermination)
     }
 
 

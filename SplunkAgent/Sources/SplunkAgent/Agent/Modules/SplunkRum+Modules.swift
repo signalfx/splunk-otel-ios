@@ -72,6 +72,16 @@ extension SplunkRum {
         customizeSlowFrameDetector()
     }
 
+    func configureTraceTerminationDrain() {
+        let appStateModule = modulesManager?.module(ofType: SplunkAppState.AppStateModule.self)
+        let slowFrameDetectorModule = modulesManager?.module(ofType: SplunkSlowFrameDetector.SlowFrameDetector.self)
+
+        (eventManager as? DefaultEventManager)?.registerTraceTerminationDrain {
+            appStateModule?.flushTerminateTelemetry()
+            await slowFrameDetectorModule?.flushBufferedTelemetryForTermination()
+        }
+    }
+
     // MARK: - Session Replay
 
     /// Evaluates Session Replay configuration and sampling, then sets the appropriate proxy.

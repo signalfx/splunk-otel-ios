@@ -26,30 +26,20 @@ import XCTest
 
         // MARK: - Tests
 
-        func testWillTerminatePostsProcessedNotificationAfterSendingTerminate() {
+        func testWillTerminateSendsTerminateOnceWhenExplicitFlushAlreadyRan() {
             let destination = AppStateTerminationTestDestination()
             let module = AppStateModule()
             module.sharedState = nil
             module.destination = destination
             module.setupNotifications()
-
-            var terminateWasSentBeforeNotification = false
-            let token = NotificationCenter.default.addObserver(
-                forName: .splunkAppStateTerminateProcessed,
-                object: nil,
-                queue: nil
-            ) { _ in
-                terminateWasSentBeforeNotification = destination.states.last == .terminate
-            }
             defer {
-                NotificationCenter.default.removeObserver(token)
                 module.removeNotifications()
             }
 
+            module.flushTerminateTelemetry()
             NotificationCenter.default.post(name: UIApplication.willTerminateNotification, object: nil)
 
-            XCTAssertEqual(destination.states.last, .terminate)
-            XCTAssertTrue(terminateWasSentBeforeNotification)
+            XCTAssertEqual(destination.states, [.terminate])
         }
     }
 

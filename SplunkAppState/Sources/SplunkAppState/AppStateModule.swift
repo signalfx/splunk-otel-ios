@@ -29,6 +29,8 @@ public final class AppStateModule {
 
     var notificationObservers: [NSObjectProtocol] = []
     var destination: AppStateDestination = OtelDestination()
+    private let terminationLock = NSLock()
+    private var didProcessTerminate = false
 
 
     // MARK: - Initialization
@@ -55,5 +57,18 @@ public final class AppStateModule {
 
     func processEvent(_ event: AppStateType) {
         destination.send(appState: event, time: Date(), sharedState: sharedState)
+    }
+
+    package func flushTerminateTelemetry() {
+        terminationLock.lock()
+        guard !didProcessTerminate else {
+            terminationLock.unlock()
+            return
+        }
+
+        didProcessTerminate = true
+        terminationLock.unlock()
+
+        processEvent(.terminate)
     }
 }

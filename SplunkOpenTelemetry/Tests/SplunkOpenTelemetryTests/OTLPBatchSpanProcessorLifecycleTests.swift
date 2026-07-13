@@ -82,7 +82,7 @@ import Testing
         // MARK: - Termination
 
         @Test
-        func appStateTerminateProcessedFlushesPendingBatchBeforeNotificationReturns() async {
+        func terminatingFlushesPendingBatchBeforeNotificationReturns() async {
             let exporter = BatchProcessorTestExporter()
             let processor = OTLPBatchSpanProcessor(
                 spanExporter: exporter,
@@ -95,8 +95,8 @@ import Testing
             endSpans(5, using: tracer)
             #expect(exporter.successfulSpanCount == 0)
 
-            processor.registerTerminationObserver()
-            await postAppStateTerminateProcessedNotification()
+            processor.registerTerminationObserver {}
+            await postWillTerminateNotification()
 
             #expect(exporter.successfulSpanCount == 5)
             #expect(exporter.exportTimeouts.count == 1)
@@ -104,7 +104,7 @@ import Testing
         }
 
         @Test
-        func willTerminateNotificationAloneDoesNotDrainBeforeAppStateProcessesTerminate() async {
+        func terminatingRunsPrepareHookBeforeDraining() async {
             let exporter = BatchProcessorTestExporter()
             let processor = OTLPBatchSpanProcessor(
                 spanExporter: exporter,
@@ -116,12 +116,19 @@ import Testing
 
             endSpans(5, using: tracer)
 
-            processor.registerTerminationObserver()
+            processor.registerTerminationObserver {
+                tracer.spanBuilder(spanName: "prepared-terminate").startSpan().end()
+            }
             await postWillTerminateNotification()
-            #expect(exporter.successfulSpanCount == 0)
 
-            await postAppStateTerminateProcessedNotification()
-            #expect(exporter.successfulSpanCount == 5)
+            #expect(exporter.successfulSpanNames == [
+                "span-0",
+                "span-1",
+                "span-2",
+                "span-3",
+                "span-4",
+                "prepared-terminate"
+            ])
         }
 
         @Test
@@ -139,8 +146,8 @@ import Testing
 
             endSpans(5, using: tracer)
 
-            processor.registerTerminationObserver()
-            await postAppStateTerminateProcessedNotification()
+            processor.registerTerminationObserver {}
+            await postWillTerminateNotification()
 
             #expect(exporter.exportAttemptCount == 1)
             #expect(exporter.successfulSpanCount == 0)
@@ -191,15 +198,6 @@ import Testing
             await MainActor.run {
                 NotificationCenter.default.post(
                     name: UIApplication.willTerminateNotification,
-                    object: nil
-                )
-            }
-        }
-
-        private func postAppStateTerminateProcessedNotification() async {
-            await MainActor.run {
-                NotificationCenter.default.post(
-                    name: .splunkAppStateTerminateProcessed,
                     object: nil
                 )
             }

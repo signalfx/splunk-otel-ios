@@ -22,10 +22,6 @@ import OpenTelemetrySdk
     import UIKit
 #endif
 
-extension Notification.Name {
-    static let splunkAppStateTerminateProcessed = Notification.Name("com.splunk.rum.app-state.terminate-processed")
-}
-
 /// Draining, export, and lifecycle work for ``BatchSpanProcessorCore``.
 ///
 /// Split into its own file to keep both the file length and the primary type body within the
@@ -274,20 +270,18 @@ extension BatchSpanProcessorCore {
         }
     }
 
-    func registerTerminationObserver() {
+    func registerTerminationObserver(prepareForTermination: @escaping () async -> Void) {
         #if os(iOS) || os(tvOS) || os(visionOS)
             guard terminationObserver == nil else {
                 return
             }
 
             let terminateToken = NotificationCenter.default.addObserver(
-                forName: .splunkAppStateTerminateProcessed,
+                forName: UIApplication.willTerminateNotification,
                 object: nil,
                 queue: nil
             ) { [weak self] _ in
-                // AppState posts this after ending its terminate lifecycle span, so this drain does
-                // not depend on NotificationCenter ordering for UIApplication.willTerminate.
-                self?.flushBeforeTermination()
+                self?.flushBeforeTermination(prepareForTermination: prepareForTermination)
             }
             terminationObserver = terminateToken
         #endif
@@ -295,18 +289,21 @@ extension BatchSpanProcessorCore {
 
     /// Drains the buffer when the app is terminating, blocking the caller only up to a wall-clock bound.
     ///
-    /// The drain runs on `processorQueue` (so it cannot deadlock behind an in-flight export), while the
-    /// caller waits on a semaphore capped at ``terminateFlushTimeout``. If the drain outlives that
-    /// window it continues best effort on the queue, but we stop waiting so the OS watchdog can never
-    /// kill the app because we blocked termination too long. Spans are dropped (not requeued) on
-    /// failure here, since the process is going away and there is no later attempt.
-    private func flushBeforeTermination() {
-        let deadline = Date().addingTimeInterval(Self.terminateFlushTimeout)
+    /// Known terminal producers flush first, then the drain runs on `processorQueue` while the caller
+    /// waits on a semaphore capped at ``terminateFlushTimeout``. If the work outlives that window it
+    /// continues best effort, but we stop waiting so the OS watchdog can never kill the app because we
+    /// blocked termination too long. Spans are dropped (not requeued) on export failure here, since the
+    /// process is going away and there is no later attempt.
+    private func flushBeforeTermination(prepareForTermination: @escaping () async -> Void) {
         let completed = DispatchSemaphore(value: 0)
 
-        processorQueue.async {
-            self.drainSnapshot(deadline: deadline, requeueOnFailure: false, forwardDeadlineToExporter: false)
-            completed.signal()
+        Task {
+            await prepareForTermination()
+
+            self.processorQueue.async {
+                self.drainSnapshot(deadline: nil, requeueOnFailure: false, forwardDeadlineToExporter: false)
+                completed.signal()
+            }
         }
 
         _ = completed.wait(timeout: .now() + Self.terminateFlushTimeout)
