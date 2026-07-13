@@ -31,7 +31,7 @@ import Testing
         // MARK: - Background
 
         @Test
-        func enteringBackgroundFlushesPendingBatch() {
+        func enteringBackgroundFlushesPendingBatch() async {
             let exporter = BatchProcessorTestExporter()
             let processor = OTLPBatchSpanProcessor(
                 spanExporter: exporter,
@@ -44,41 +44,13 @@ import Testing
             endSpans(5, using: tracer)
             #expect(exporter.successfulSpanCount == 0)
 
-            NotificationCenter.default.post(
-                name: UIApplication.didEnterBackgroundNotification,
-                object: nil
-            )
+            await postDidEnterBackgroundNotification()
 
             #expect(waitUntil(timeout: 5) { exporter.successfulSpanCount == 5 })
         }
 
-
-        // MARK: - Termination
-
         @Test
-        func terminatingFlushesPendingBatchBeforeNotificationReturns() async {
-            let exporter = BatchProcessorTestExporter()
-            let processor = OTLPBatchSpanProcessor(
-                spanExporter: exporter,
-                scheduleDelay: Self.neverFires,
-                maxExportBatchSize: Self.hugeBatch,
-                maxQueueSize: 2_048
-            )
-            let tracer = makeTracer(for: processor)
-
-            endSpans(5, using: tracer)
-            #expect(exporter.successfulSpanCount == 0)
-
-            processor.registerTerminationObserver()
-            await postWillTerminateNotification()
-
-            #expect(exporter.successfulSpanCount == 5)
-            #expect(exporter.exportTimeouts.count == 1)
-            #expect(exporter.exportTimeouts.allSatisfy { $0 == nil })
-        }
-
-        @Test
-        func terminatingFlushCapturesSpansFromEarlierModuleObservers() async {
+        func enteringBackgroundFlushCapturesSpansFromLaterModuleObservers() async {
             let exporter = BatchProcessorTestExporter()
             let processor = OTLPBatchSpanProcessor(
                 spanExporter: exporter,
@@ -90,21 +62,66 @@ import Testing
 
             let lateObserver = await MainActor.run {
                 NotificationCenter.default.addObserver(
-                    forName: UIApplication.willTerminateNotification,
+                    forName: UIApplication.didEnterBackgroundNotification,
                     object: nil,
                     queue: nil
                 ) { _ in
-                    tracer.spanBuilder(spanName: "late-terminate").startSpan().end()
+                    tracer.spanBuilder(spanName: "late-background").startSpan().end()
                 }
             }
             defer {
                 NotificationCenter.default.removeObserver(lateObserver)
             }
 
+            await postDidEnterBackgroundNotification()
+
+            #expect(waitUntil(timeout: 5) { exporter.successfulSpanNames == ["late-background"] })
+        }
+
+
+        // MARK: - Termination
+
+        @Test
+        func appStateTerminateProcessedFlushesPendingBatchBeforeNotificationReturns() async {
+            let exporter = BatchProcessorTestExporter()
+            let processor = OTLPBatchSpanProcessor(
+                spanExporter: exporter,
+                scheduleDelay: Self.neverFires,
+                maxExportBatchSize: Self.hugeBatch,
+                maxQueueSize: 2_048
+            )
+            let tracer = makeTracer(for: processor)
+
+            endSpans(5, using: tracer)
+            #expect(exporter.successfulSpanCount == 0)
+
+            processor.registerTerminationObserver()
+            await postAppStateTerminateProcessedNotification()
+
+            #expect(exporter.successfulSpanCount == 5)
+            #expect(exporter.exportTimeouts.count == 1)
+            #expect(exporter.exportTimeouts.allSatisfy { $0 == nil })
+        }
+
+        @Test
+        func willTerminateNotificationAloneDoesNotDrainBeforeAppStateProcessesTerminate() async {
+            let exporter = BatchProcessorTestExporter()
+            let processor = OTLPBatchSpanProcessor(
+                spanExporter: exporter,
+                scheduleDelay: Self.neverFires,
+                maxExportBatchSize: Self.hugeBatch,
+                maxQueueSize: 2_048
+            )
+            let tracer = makeTracer(for: processor)
+
+            endSpans(5, using: tracer)
+
             processor.registerTerminationObserver()
             await postWillTerminateNotification()
+            #expect(exporter.successfulSpanCount == 0)
 
-            #expect(exporter.successfulSpanNames == ["late-terminate"])
+            await postAppStateTerminateProcessedNotification()
+            #expect(exporter.successfulSpanCount == 5)
         }
 
         @Test
@@ -123,7 +140,7 @@ import Testing
             endSpans(5, using: tracer)
 
             processor.registerTerminationObserver()
-            await postWillTerminateNotification()
+            await postAppStateTerminateProcessedNotification()
 
             #expect(exporter.exportAttemptCount == 1)
             #expect(exporter.successfulSpanCount == 0)
@@ -174,6 +191,24 @@ import Testing
             await MainActor.run {
                 NotificationCenter.default.post(
                     name: UIApplication.willTerminateNotification,
+                    object: nil
+                )
+            }
+        }
+
+        private func postAppStateTerminateProcessedNotification() async {
+            await MainActor.run {
+                NotificationCenter.default.post(
+                    name: .splunkAppStateTerminateProcessed,
+                    object: nil
+                )
+            }
+        }
+
+        private func postDidEnterBackgroundNotification() async {
+            await MainActor.run {
+                NotificationCenter.default.post(
+                    name: UIApplication.didEnterBackgroundNotification,
                     object: nil
                 )
             }

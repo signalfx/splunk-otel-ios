@@ -60,7 +60,7 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         loggerProvider = Self.makeLoggerProvider(
             agentVersion: resources.agentVersion,
             debugEnabled: debugEnabled,
-            tracerProvider: OpenTelemetry.instance.tracerProvider
+            tracerProviderProvider: { OpenTelemetry.instance.tracerProvider }
         )
     }
 
@@ -97,18 +97,18 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         loggerProvider = Self.makeLoggerProvider(
             agentVersion: resources.agentVersion,
             debugEnabled: debugEnabled,
-            tracerProvider: tracerProvider
+            tracerProviderProvider: { tracerProvider }
         )
     }
 
     private static func makeLoggerProvider(
         agentVersion: String,
         debugEnabled: Bool,
-        tracerProvider: any TracerProvider
+        tracerProviderProvider: @escaping () -> any TracerProvider
     ) -> LoggerProvider {
         let logToSpanExporter = OTLPLogToSpanExporter(
             agentVersion: agentVersion,
-            tracerProvider: tracerProvider
+            tracerProviderProvider: tracerProviderProvider
         )
 
         // Initialize LogRecordProcessor

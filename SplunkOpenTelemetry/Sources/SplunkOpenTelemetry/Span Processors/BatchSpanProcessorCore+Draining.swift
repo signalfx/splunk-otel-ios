@@ -22,6 +22,10 @@ import OpenTelemetrySdk
     import UIKit
 #endif
 
+extension Notification.Name {
+    static let splunkAppStateTerminateProcessed = Notification.Name("com.splunk.rum.app-state.terminate-processed")
+}
+
 /// Draining, export, and lifecycle work for ``BatchSpanProcessorCore``.
 ///
 /// Split into its own file to keep both the file length and the primary type body within the
@@ -121,15 +125,15 @@ extension BatchSpanProcessorCore {
         return false
     }
 
-    /// Drains every buffered span in batch-sized chunks, stopping at `deadline`; must be called on `processorQueue`.
+    /// Drains every buffered span in batch-sized chunks, optionally stopping at `deadline`; must be called on `processorQueue`.
     ///
     /// Used on shutdown, where `isShutdown` has already stopped new spans from being enqueued, so the
-    /// loop is guaranteed to terminate. Failures and spans left after the deadline are dropped
-    /// (not re-queued) to guarantee termination; drops are accounted for and logged (throttled) via
+    /// loop is guaranteed to terminate. Failures are dropped (not re-queued) to guarantee termination;
+    /// spans left after a non-nil deadline are also dropped. Drops are accounted for and logged via
     /// ``recordDroppedSpans(_:reason:)``.
-    func drainAll(deadline: Date) {
+    func drainAll(deadline: Date?) {
         while true {
-            if Date() >= deadline {
+            if let deadline, Date() >= deadline {
                 dropRemainingSpans(reason: "shutdown drain deadline exceeded")
                 break
             }
@@ -252,16 +256,21 @@ extension BatchSpanProcessorCore {
                 object: nil,
                 queue: nil
             ) { [weak self] _ in
-                // The app stays alive in the background, so favor host-app responsiveness: drain
-                // asynchronously off the (main) notification thread. A snapshot drain keeps it bounded,
-                // and failed exports are requeued (best effort) rather than dropped.
-                self?.processorQueue
-                    .async {
-                        self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
-                    }
+                self?.flushAfterBackgroundNotification()
             }
             backgroundObserver = backgroundToken
         #endif
+    }
+
+    private func flushAfterBackgroundNotification() {
+        // Defer one main-queue turn so later didEnterBackground observers can enqueue lifecycle spans
+        // before this snapshot is taken. The app stays alive in the background, so keep the actual
+        // drain asynchronous and off the notification thread.
+        DispatchQueue.main.async { [weak self] in
+            self?.processorQueue.async {
+                self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
+            }
+        }
     }
 
     func registerTerminationObserver() {
@@ -271,12 +280,12 @@ extension BatchSpanProcessorCore {
             }
 
             let terminateToken = NotificationCenter.default.addObserver(
-                forName: UIApplication.willTerminateNotification,
+                forName: .splunkAppStateTerminateProcessed,
                 object: nil,
                 queue: nil
             ) { [weak self] _ in
-                // Registered after modules install their own lifecycle observers, so the bounded
-                // terminal drain can run synchronously here and still capture their terminate spans.
+                // AppState posts this after ending its terminate lifecycle span, so this drain does
+                // not depend on NotificationCenter ordering for UIApplication.willTerminate.
                 self?.flushBeforeTermination()
             }
             terminationObserver = terminateToken

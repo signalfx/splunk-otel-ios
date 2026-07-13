@@ -21,6 +21,10 @@ import Foundation
     import UIKit
 #endif
 
+extension Notification.Name {
+    static let splunkAppStateTerminateProcessed = Notification.Name("com.splunk.rum.app-state.terminate-processed")
+}
+
 extension AppStateModule {
 
     // MARK: - Setup notifications
@@ -46,7 +50,12 @@ extension AppStateModule {
             }
 
             addObserver(UIApplication.willTerminateNotification) { [weak self] in
-                self?.processEvent(.terminate)
+                guard let self else {
+                    return
+                }
+
+                processEvent(.terminate)
+                NotificationCenter.default.post(name: .splunkAppStateTerminateProcessed, object: self)
             }
         #endif
     }

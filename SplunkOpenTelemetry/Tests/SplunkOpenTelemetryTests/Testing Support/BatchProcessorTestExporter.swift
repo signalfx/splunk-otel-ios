@@ -29,6 +29,7 @@ final class BatchProcessorTestExporter: SpanExporter {
     private var storedBatches: [[SpanData]] = []
     private var storedSuccessfulSpans: [SpanData] = []
     private var storedExportTimeouts: [TimeInterval?] = []
+    private var storedFlushTimeouts: [TimeInterval?] = []
     private var storedExportAttemptCount = 0
     private var storedFlushCount = 0
     private var storedShutdownCount = 0
@@ -65,6 +66,10 @@ final class BatchProcessorTestExporter: SpanExporter {
         withLock { storedFlushCount }
     }
 
+    var flushTimeouts: [TimeInterval?] {
+        withLock { storedFlushTimeouts }
+    }
+
     var shutdownCount: Int {
         withLock { storedShutdownCount }
     }
@@ -91,9 +96,10 @@ final class BatchProcessorTestExporter: SpanExporter {
         return result
     }
 
-    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
+    func flush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
         withLock {
             storedFlushCount += 1
+            storedFlushTimeouts.append(explicitTimeout)
         }
         return .success
     }

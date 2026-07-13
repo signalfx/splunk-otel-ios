@@ -28,7 +28,7 @@ struct OTLPBatchProcessorSafetyTests {
     // MARK: - Force flush
 
     @Test
-    func forceFlushIsReentrantAndForwardsTimeout() {
+    func forceFlushIsReentrantAndKeepsTimeoutLocal() {
         let terminalExporter = ReentrantFlushExporter()
         let exporter = SpanInterceptorExporter(
             with: nil,
@@ -48,12 +48,48 @@ struct OTLPBatchProcessorSafetyTests {
         endSpans(0 ..< 1, using: tracer)
         processor.forceFlush(timeout: 5)
 
-        let timeout = terminalExporter.firstExportTimeout
-        #expect(timeout != nil)
-        #expect((timeout ?? 0) > 0)
-        #expect((timeout ?? 0) <= 5)
+        #expect(terminalExporter.exportTimeouts.count == 1)
+        #expect(terminalExporter.exportTimeouts.allSatisfy { $0 == nil })
+        #expect(terminalExporter.flushTimeouts.count == 2)
+        #expect(terminalExporter.flushTimeouts.allSatisfy { $0 == nil })
         #expect(terminalExporter.successfulSpanCount == 1)
         #expect(terminalExporter.exportAttemptCount == 1)
+    }
+
+    @Test
+    func forceFlushFromBackgroundQueueReturnsWithinTimeoutWhenProcessorQueueIsBlocked() {
+        let exporter = FirstExportBlockingExporter()
+        let processor = OTLPBatchSpanProcessor(
+            spanExporter: exporter,
+            scheduleDelay: Self.neverFires,
+            maxExportBatchSize: 1,
+            maxQueueSize: 2_048
+        )
+        let tracer = makeTracer(for: processor)
+
+        endSpans(0 ..< 1, using: tracer)
+        #expect(exporter.waitUntilFirstExportStarts(timeout: 5) == .success)
+
+        let completed = DispatchSemaphore(value: 0)
+        let durationQueue = DispatchQueue(label: "com.splunk.batch-processor-test.force-flush-duration")
+        var forceFlushDuration: TimeInterval?
+        let start = Date()
+
+        DispatchQueue.global(qos: .utility).async {
+            processor.forceFlush(timeout: 0.1)
+            durationQueue.sync {
+                forceFlushDuration = Date().timeIntervalSince(start)
+            }
+            completed.signal()
+        }
+
+        #expect(completed.wait(timeout: .now() + 1) == .success)
+        let elapsed = durationQueue.sync {
+            forceFlushDuration ?? .infinity
+        }
+        #expect(elapsed < 1)
+
+        exporter.releaseFirstExport()
     }
 
     @Test
@@ -100,6 +136,8 @@ struct OTLPBatchProcessorSafetyTests {
         let tracer = makeTracer(for: processor)
 
         endSpans(0 ..< 100, using: tracer)
+        #expect(exporter.waitUntilFirstExportStarts(timeout: 5) == .success)
+        endSpans(100 ..< 105, using: tracer)
 
         let completed = DispatchSemaphore(value: 0)
         let durationQueue = DispatchQueue(label: "com.splunk.batch-processor-test.duration")
@@ -115,7 +153,6 @@ struct OTLPBatchProcessorSafetyTests {
                 completed.signal()
             }
 
-        #expect(exporter.waitUntilFirstExportStarts(timeout: 5) == .success)
         #expect(completed.wait(timeout: .now() + 1.5) == .success)
 
         let elapsed = durationQueue.sync {
@@ -124,6 +161,7 @@ struct OTLPBatchProcessorSafetyTests {
         #expect(elapsed < 1.5)
 
         exporter.releaseFirstExport()
+        #expect(waitUntil(timeout: 5) { exporter.receivedSpanCount == 105 })
     }
 
 
@@ -208,6 +246,18 @@ extension OTLPBatchProcessorSafetyTests {
             tracer.spanBuilder(spanName: "span-\(index)").startSpan().end()
         }
     }
+
+    @discardableResult
+    private func waitUntil(timeout: TimeInterval, _ condition: () -> Bool) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() {
+                return true
+            }
+            Thread.sleep(forTimeInterval: 0.02)
+        }
+        return condition()
+    }
 }
 
 
@@ -216,6 +266,7 @@ private final class ReentrantFlushExporter: SpanExporter {
     private var storedExportAttemptCount = 0
     private var storedSuccessfulSpanCount = 0
     private var storedExportTimeouts: [TimeInterval?] = []
+    private var storedFlushTimeouts: [TimeInterval?] = []
 
     var onFirstExport: (() -> Void)?
 
@@ -227,8 +278,12 @@ private final class ReentrantFlushExporter: SpanExporter {
         withLock { storedSuccessfulSpanCount }
     }
 
-    var firstExportTimeout: TimeInterval? {
-        withLock { storedExportTimeouts.compactMap(\.self).first }
+    var exportTimeouts: [TimeInterval?] {
+        withLock { storedExportTimeouts }
+    }
+
+    var flushTimeouts: [TimeInterval?] {
+        withLock { storedFlushTimeouts }
     }
 
     func export(spans: [SpanData], explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
@@ -248,8 +303,11 @@ private final class ReentrantFlushExporter: SpanExporter {
         return .success
     }
 
-    func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
-        .success
+    func flush(explicitTimeout: TimeInterval?) -> SpanExporterResultCode {
+        withLock {
+            storedFlushTimeouts.append(explicitTimeout)
+        }
+        return .success
     }
 
     func shutdown(explicitTimeout _: TimeInterval?) {}

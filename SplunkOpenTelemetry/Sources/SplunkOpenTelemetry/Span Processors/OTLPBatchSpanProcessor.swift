@@ -24,9 +24,10 @@ import SplunkCommon
 /// An in-memory batching span processor.
 ///
 /// Instead of exporting one span per ended span (as `SimpleSpanProcessor` does), this processor
-/// pools ended spans in a bounded in-memory queue and hands a batch to the exporter either when
-/// the batch reaches ``Defaults/maxExportBatchSize`` spans or every ``Defaults/scheduleDelay``
-/// seconds, whichever happens first. It also flushes on app background/terminate and on shutdown.
+/// pools ended spans in a bounded in-memory queue and hands a batch to the exporter either when the
+/// batch reaches ``Defaults/maxExportBatchSize`` spans or every ``Defaults/scheduleDelay`` seconds,
+/// whichever happens first. It also flushes on app background, after AppState processes termination,
+/// and on shutdown.
 ///
 /// - Important: Spans that are still buffered in memory when the host app crashes are lost. This is
 ///   an accepted trade-off in exchange for fewer, larger disk writes on the export path.
@@ -100,7 +101,7 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
         core.forceFlush(timeout: timeout)
     }
 
-    /// Registers the terminal lifecycle drain after modules have registered their own observers.
+    /// Registers the terminal lifecycle drain that AppState triggers after publishing its terminate span.
     func registerTerminationObserver() {
         core.registerTerminationObserver()
     }
@@ -248,8 +249,8 @@ final class BatchSpanProcessorCore {
         let waitTimeout = forceFlushWaitTimeout(for: timeout)
         let deadline = Date().addingTimeInterval(waitTimeout)
         runOnProcessorQueue(wait: waitTimeout) {
-            self.drainSnapshot(deadline: deadline, requeueOnFailure: true)
-            _ = self.spanExporter.flush(explicitTimeout: max(0, deadline.timeIntervalSinceNow))
+            self.drainSnapshot(deadline: deadline, requeueOnFailure: true, forwardDeadlineToExporter: false)
+            _ = self.spanExporter.flush(explicitTimeout: nil)
         }
     }
 
@@ -269,9 +270,8 @@ final class BatchSpanProcessorCore {
         // Block only up to `shutdownWaitTimeout`, regardless of calling thread. On timeout the
         // drain and exporter shutdown continue best effort on the queue (the closure retains `self`).
         let waitTimeout = shutdownWaitTimeout(for: explicitTimeout)
-        let deadline = Date().addingTimeInterval(waitTimeout)
         runOnProcessorQueue(wait: waitTimeout) {
-            self.drainAll(deadline: deadline)
+            self.drainAll(deadline: nil)
             self.spanExporter.shutdown(explicitTimeout: explicitTimeout)
         }
     }

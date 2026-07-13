@@ -22,6 +22,7 @@ import Testing
 
 @testable import SplunkOpenTelemetry
 
+@Suite(.serialized)
 struct OTLPLogToSpanExporterTests {
 
     @Test
@@ -34,6 +35,26 @@ struct OTLPLogToSpanExporterTests {
             agentVersion: "1.0.0",
             tracerProvider: tracerProvider
         )
+
+        let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: nil)
+
+        #expect(result == .success)
+        #expect(spanExporter.successfulSpanNames == ["test.event"])
+    }
+
+    @Test
+    func convenienceInitializerResolvesGlobalTracerProviderAtExportTime() {
+        let previousTracerProvider = OpenTelemetry.instance.tracerProvider
+        let exporter = OTLPLogToSpanExporter(agentVersion: "1.0.0")
+        let spanExporter = BatchProcessorTestExporter()
+        let tracerProvider = TracerProviderBuilder()
+            .add(spanProcessor: OTLPImmediateSpanProcessor(spanExporter: spanExporter))
+            .build()
+
+        OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
+        defer {
+            OpenTelemetry.registerTracerProvider(tracerProvider: previousTracerProvider)
+        }
 
         let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: nil)
 
