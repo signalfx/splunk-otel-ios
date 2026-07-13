@@ -37,11 +37,13 @@ struct OTLPTraceProcessorEndpointTests {
         endSpan(named: "pre-endpoint-change")
         fixture.processor.setEndpoint(endpoint)
 
-        #expect(exporter.events == [
-            .export(["pre-endpoint-change"]),
-            .flush,
-            .setEndpoint(endpoint)
-        ])
+        #expect(
+            exporter.events == [
+                .export(["pre-endpoint-change"]),
+                .flush,
+                .setEndpoint(endpoint)
+            ]
+        )
     }
 
     @Test
@@ -52,11 +54,13 @@ struct OTLPTraceProcessorEndpointTests {
         endSpan(named: "pre-endpoint-clear")
         fixture.processor.clearEndpoint()
 
-        #expect(exporter.events == [
-            .export(["pre-endpoint-clear"]),
-            .flush,
-            .clearEndpoint
-        ])
+        #expect(
+            exporter.events == [
+                .export(["pre-endpoint-clear"]),
+                .flush,
+                .clearEndpoint
+            ]
+        )
     }
 }
 

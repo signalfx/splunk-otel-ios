@@ -267,9 +267,10 @@ extension BatchSpanProcessorCore {
         // before this snapshot is taken. The app stays alive in the background, so keep the actual
         // drain asynchronous and off the notification thread.
         DispatchQueue.main.async { [weak self] in
-            self?.processorQueue.async {
-                self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
-            }
+            self?.processorQueue
+                .async {
+                    self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
+                }
         }
     }
 

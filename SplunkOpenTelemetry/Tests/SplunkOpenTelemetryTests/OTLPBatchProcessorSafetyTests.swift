@@ -75,13 +75,15 @@ struct OTLPBatchProcessorSafetyTests {
         var forceFlushDuration: TimeInterval?
         let start = Date()
 
-        DispatchQueue.global(qos: .utility).async {
-            processor.forceFlush(timeout: 0.1)
-            durationQueue.sync {
-                forceFlushDuration = Date().timeIntervalSince(start)
+        DispatchQueue
+            .global(qos: .utility)
+            .async {
+                processor.forceFlush(timeout: 0.1)
+                durationQueue.sync {
+                    forceFlushDuration = Date().timeIntervalSince(start)
+                }
+                completed.signal()
             }
-            completed.signal()
-        }
 
         #expect(completed.wait(timeout: .now() + 1) == .success)
         let elapsed = durationQueue.sync {
