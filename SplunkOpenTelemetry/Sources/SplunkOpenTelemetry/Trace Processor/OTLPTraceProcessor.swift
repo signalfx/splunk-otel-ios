@@ -34,6 +34,9 @@ public class OTLPTraceProcessor: TraceProcessor {
     /// Background exporter for traces (stored to support endpoint updates).
     private let backgroundTraceExporter: OTLPBackgroundHTTPTraceExporter
 
+    /// In-memory batch processor for direct spans.
+    private let batchSpanProcessor: OTLPBatchSpanProcessor
+
     /// Tracer provider for log-to-span telemetry that must bypass the in-memory span batch.
     let immediateTracerProvider: any TracerProvider
 
@@ -111,6 +114,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
         self.tracerProvider = tracerProvider
+        batchSpanProcessor = spanProcessor
         immediateTracerProvider = TracerProviderBuilder()
             .with(resource: resource)
             .add(spanProcessor: OTLPGlobalAttributesSpanProcessor(with: globalAttributes))
@@ -122,6 +126,17 @@ public class OTLPTraceProcessor: TraceProcessor {
             )
             .add(spanProcessor: OTLPImmediateSpanProcessor(spanExporter: spanInterceptorExporter))
             .build()
+    }
+
+
+    // MARK: - Lifecycle
+
+    /// Registers the direct-span termination drain after module lifecycle observers are installed.
+    ///
+    /// The handler blocks synchronously for a short bounded drain when `willTerminate` is delivered.
+    /// Registering it late lets module observers publish their terminate spans before the drain runs.
+    public func registerTerminationObserver() {
+        batchSpanProcessor.registerTerminationObserver()
     }
 
 

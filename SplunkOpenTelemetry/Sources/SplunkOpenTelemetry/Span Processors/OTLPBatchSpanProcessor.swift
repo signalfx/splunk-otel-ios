@@ -99,6 +99,11 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
     func forceFlush(timeout: TimeInterval? = nil) {
         core.forceFlush(timeout: timeout)
     }
+
+    /// Registers the terminal lifecycle drain after modules have registered their own observers.
+    func registerTerminationObserver() {
+        core.registerTerminationObserver()
+    }
 }
 
 
@@ -169,7 +174,9 @@ final class BatchSpanProcessorCore {
 
     var timer: DispatchSourceTimer?
 
-    var notificationObservers: [NSObjectProtocol] = []
+    var backgroundObserver: NSObjectProtocol?
+
+    var terminationObserver: NSObjectProtocol?
 
     /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
@@ -192,7 +199,7 @@ final class BatchSpanProcessorCore {
 
         processorQueue.setSpecific(key: processorQueueKey, value: ())
         startTimer()
-        registerLifecycleObservers()
+        registerBackgroundObserver()
     }
 
     deinit {

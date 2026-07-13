@@ -22,6 +22,11 @@ internal import SplunkOpenTelemetry
 
 extension DefaultEventManager {
 
+    /// Registers the direct-span terminal drain after modules have installed their lifecycle observers.
+    func registerTraceTerminationDrain() {
+        concreteTraceProcessor.registerTerminationObserver()
+    }
+
     /// Updates the endpoint configuration and enables sending spans.
     ///
     /// When this is called, any data that was cached to pending storage

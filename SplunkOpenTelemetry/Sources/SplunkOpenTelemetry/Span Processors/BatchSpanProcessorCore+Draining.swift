@@ -241,8 +241,12 @@ extension BatchSpanProcessorCore {
 
     // MARK: - Lifecycle
 
-    func registerLifecycleObservers() {
+    func registerBackgroundObserver() {
         #if os(iOS) || os(tvOS) || os(visionOS)
+            guard backgroundObserver == nil else {
+                return
+            }
+
             let backgroundToken = NotificationCenter.default.addObserver(
                 forName: UIApplication.didEnterBackgroundNotification,
                 object: nil,
@@ -256,26 +260,27 @@ extension BatchSpanProcessorCore {
                         self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
                     }
             }
-            notificationObservers.append(backgroundToken)
+            backgroundObserver = backgroundToken
+        #endif
+    }
+
+    func registerTerminationObserver() {
+        #if os(iOS) || os(tvOS) || os(visionOS)
+            guard terminationObserver == nil else {
+                return
+            }
 
             let terminateToken = NotificationCenter.default.addObserver(
                 forName: UIApplication.willTerminateNotification,
                 object: nil,
                 queue: nil
             ) { [weak self] _ in
-                // Let all lifecycle span producers finish handling this notification first, then run
-                // the bounded terminal drain. This captures spans from observers registered after us,
-                // such as AppState's `.terminate` lifecycle span.
-                self?.scheduleFlushAfterTerminationNotification()
+                // Registered after modules install their own lifecycle observers, so the bounded
+                // terminal drain can run synchronously here and still capture their terminate spans.
+                self?.flushBeforeTermination()
             }
-            notificationObservers.append(terminateToken)
+            terminationObserver = terminateToken
         #endif
-    }
-
-    private func scheduleFlushAfterTerminationNotification() {
-        DispatchQueue.main.async { [weak self] in
-            self?.flushBeforeTermination()
-        }
     }
 
     /// Drains the buffer when the app is terminating, blocking the caller only up to a wall-clock bound.
@@ -298,8 +303,9 @@ extension BatchSpanProcessorCore {
     }
 
     func removeLifecycleObservers() {
-        let tokens = notificationObservers
-        notificationObservers.removeAll()
+        let tokens = [backgroundObserver, terminationObserver].compactMap(\.self)
+        backgroundObserver = nil
+        terminationObserver = nil
 
         for token in tokens {
             NotificationCenter.default.removeObserver(token)

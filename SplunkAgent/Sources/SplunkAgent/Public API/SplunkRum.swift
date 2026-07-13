@@ -306,6 +306,8 @@ public class SplunkRum: ObservableObject {
         // Runs module-specific customizations
         customizeModules()
 
+        (eventManager as? DefaultEventManager)?.registerTraceTerminationDrain()
+
         initializeEvents["modules_customized"] = Date()
 
         // Report agent's initialization metrics for the app start event

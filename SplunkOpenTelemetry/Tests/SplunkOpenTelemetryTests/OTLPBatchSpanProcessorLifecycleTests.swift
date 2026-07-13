@@ -56,7 +56,7 @@ import Testing
         // MARK: - Termination
 
         @Test
-        func terminatingFlushesPendingBatchAfterNotificationDelivery() async {
+        func terminatingFlushesPendingBatchBeforeNotificationReturns() async {
             let exporter = BatchProcessorTestExporter()
             let processor = OTLPBatchSpanProcessor(
                 spanExporter: exporter,
@@ -69,15 +69,16 @@ import Testing
             endSpans(5, using: tracer)
             #expect(exporter.successfulSpanCount == 0)
 
+            processor.registerTerminationObserver()
             await postWillTerminateNotification()
 
-            #expect(await waitUntilAsync(timeout: 5) { exporter.successfulSpanCount == 5 })
+            #expect(exporter.successfulSpanCount == 5)
             #expect(exporter.exportTimeouts.count == 1)
             #expect(exporter.exportTimeouts.allSatisfy { $0 == nil })
         }
 
         @Test
-        func terminatingFlushCapturesSpansFromLaterNotificationObservers() async {
+        func terminatingFlushCapturesSpansFromEarlierModuleObservers() async {
             let exporter = BatchProcessorTestExporter()
             let processor = OTLPBatchSpanProcessor(
                 spanExporter: exporter,
@@ -100,9 +101,10 @@ import Testing
                 NotificationCenter.default.removeObserver(lateObserver)
             }
 
+            processor.registerTerminationObserver()
             await postWillTerminateNotification()
 
-            #expect(await waitUntilAsync(timeout: 5) { exporter.successfulSpanNames == ["late-terminate"] })
+            #expect(exporter.successfulSpanNames == ["late-terminate"])
         }
 
         @Test
@@ -120,9 +122,10 @@ import Testing
 
             endSpans(5, using: tracer)
 
+            processor.registerTerminationObserver()
             await postWillTerminateNotification()
 
-            #expect(await waitUntilAsync(timeout: 5) { exporter.exportAttemptCount == 1 })
+            #expect(exporter.exportAttemptCount == 1)
             #expect(exporter.successfulSpanCount == 0)
 
             // The failed batch was dropped, so a later flush finds nothing to export.
@@ -174,18 +177,6 @@ import Testing
                     object: nil
                 )
             }
-        }
-
-        private func waitUntilAsync(timeout: TimeInterval, _ condition: () -> Bool) async -> Bool {
-            let deadline = Date().addingTimeInterval(timeout)
-            while Date() < deadline {
-                if condition() {
-                    return true
-                }
-
-                try? await Task.sleep(nanoseconds: 20_000_000)
-            }
-            return condition()
         }
     }
 #endif
