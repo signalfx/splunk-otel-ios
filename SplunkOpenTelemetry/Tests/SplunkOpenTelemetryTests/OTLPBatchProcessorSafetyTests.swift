@@ -56,6 +56,35 @@ struct OTLPBatchProcessorSafetyTests {
         #expect(terminalExporter.exportAttemptCount == 1)
     }
 
+    @Test
+    func forceFlushFromMainThreadWaitsForDrainBeforeReturning() {
+        let exporter = BatchProcessorTestExporter(blockExports: true)
+        let processor = OTLPBatchSpanProcessor(
+            spanExporter: exporter,
+            scheduleDelay: Self.neverFires,
+            maxExportBatchSize: Self.hugeBatch,
+            maxQueueSize: 2_048
+        )
+        let tracer = makeTracer(for: processor)
+
+        endSpans(0 ..< 1, using: tracer)
+
+        let forceFlushReturned = DispatchSemaphore(value: 0)
+        DispatchQueue.main.async {
+            processor.forceFlush(timeout: 5)
+            forceFlushReturned.signal()
+        }
+
+        #expect(exporter.waitUntilExportStarts(timeout: 5) == .success)
+        #expect(forceFlushReturned.wait(timeout: .now() + 0.1) == .timedOut)
+
+        exporter.resumeExports()
+
+        #expect(forceFlushReturned.wait(timeout: .now() + 5) == .success)
+        #expect(exporter.successfulSpanCount == 1)
+        #expect(exporter.flushCount == 1)
+    }
+
 
     // MARK: - Shutdown
 

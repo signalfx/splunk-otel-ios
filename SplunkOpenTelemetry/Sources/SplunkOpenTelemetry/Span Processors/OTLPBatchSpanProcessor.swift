@@ -127,6 +127,13 @@ final class BatchSpanProcessorCore {
     /// after this window so we never risk the watchdog killing the app mid-drain.
     static let terminateFlushTimeout: TimeInterval = 2.0
 
+    /// Default wall-clock bound for `forceFlush` when the caller does not supply a timeout.
+    ///
+    /// The background exporter defaults request timeouts to 10 seconds. Mirroring that here keeps
+    /// `forceFlush()` bounded on the main thread while still giving pending spans the normal export
+    /// window to reach disk before the call returns.
+    private static let forceFlushWaitTimeout: TimeInterval = 10.0
+
     /// Hard wall-clock bound on how long `shutdown` blocks the caller while draining.
     ///
     /// Unlike `forceFlush`, shutdown is a one-shot teardown: after it the processor may be released,
@@ -236,19 +243,13 @@ final class BatchSpanProcessorCore {
     }
 
     func forceFlush(timeout: TimeInterval?) {
-        // Bounded: drain only the spans present at entry, and stop once the (optional) deadline passes,
-        // so a concurrent producer can never starve the caller.
-        //
-        // On the main thread this is intentionally fire-and-forget (no bounded wait). forceFlush is
-        // non-terminal: the process keeps running, so any spans not drained "before return" are still
-        // persisted a fraction of a second later by the same asynchronous drain. Blocking the main
-        // thread would therefore add UI stall only to buy a "persisted-by-return" guarantee that has
-        // no telemetry benefit while the app is alive. The cases where the synchronous window is the
-        // *only* chance to persist (background/terminate/shutdown) are bounded-waited separately.
-        let deadline = timeout.map { Date().addingTimeInterval($0) }
-        runOnProcessorQueue(wait: nil) {
+        // Bounded: drain only the spans present at entry, and stop once the deadline passes, so a
+        // concurrent producer can never starve the caller.
+        let waitTimeout = forceFlushWaitTimeout(for: timeout)
+        let deadline = Date().addingTimeInterval(waitTimeout)
+        runOnProcessorQueue(wait: waitTimeout) {
             self.drainSnapshot(deadline: deadline, requeueOnFailure: true)
-            _ = self.spanExporter.flush(explicitTimeout: deadline.map { max(0, $0.timeIntervalSinceNow) })
+            _ = self.spanExporter.flush(explicitTimeout: max(0, deadline.timeIntervalSinceNow))
         }
     }
 
@@ -313,6 +314,10 @@ final class BatchSpanProcessorCore {
 
     private func shutdownWaitTimeout(for explicitTimeout: TimeInterval?) -> TimeInterval {
         min(Self.shutdownWaitTimeout, max(0, explicitTimeout ?? Self.shutdownWaitTimeout))
+    }
+
+    private func forceFlushWaitTimeout(for explicitTimeout: TimeInterval?) -> TimeInterval {
+        max(0, explicitTimeout ?? Self.forceFlushWaitTimeout)
     }
 
 
