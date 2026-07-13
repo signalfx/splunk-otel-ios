@@ -87,8 +87,10 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
             return .success
         }
         catch {
-
-            return .failure
+            // The batch is already durable in active storage. Report success so upstream in-memory
+            // processors do not re-encode and enqueue duplicate span files; stalled upload recovery
+            // or a later endpoint flush will retry the persisted file.
+            return .success
         }
     }
 
