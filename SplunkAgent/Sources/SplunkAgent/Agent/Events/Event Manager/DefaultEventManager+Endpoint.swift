@@ -99,14 +99,6 @@ extension DefaultEventManager {
     ) -> Processors {
         let resources = buildResources(configuration: configuration)
 
-        // Initialize log event processor
-        // Note: This processor converts logs to spans, so it uses the trace endpoint
-        let logProcessor = OTLPLogToSpanEventProcessor(
-            with: traceUrl,
-            resources: resources,
-            debugEnabled: configuration.enableDebugLogging
-        )
-
         // Initialize session replay processor (operates in pending mode when endpoint is nil)
         let replayProcessor = OTLPSessionReplayEventProcessor(
             with: sessionReplayUrl,
@@ -127,6 +119,17 @@ extension DefaultEventManager {
             spanInterceptor: configuration.spanInterceptor,
             accessToken: accessToken,
             activityTracker: agent.currentSession
+        )
+
+        // Initialize log event processor.
+        // Note: This processor converts logs to spans, so it uses the trace endpoint. It bypasses
+        // the direct-span memory batch so crash/custom/internal events are persisted before
+        // log export reports success.
+        let logProcessor = OTLPLogToSpanEventProcessor(
+            with: traceUrl,
+            resources: resources,
+            debugEnabled: configuration.enableDebugLogging,
+            traceProcessor: traceProc
         )
 
         return Processors(

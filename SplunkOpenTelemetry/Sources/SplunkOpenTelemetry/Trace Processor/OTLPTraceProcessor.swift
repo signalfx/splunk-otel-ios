@@ -34,6 +34,9 @@ public class OTLPTraceProcessor: TraceProcessor {
     /// Background exporter for traces (stored to support endpoint updates).
     private let backgroundTraceExporter: OTLPBackgroundHTTPTraceExporter
 
+    /// Tracer provider for log-to-span telemetry that must bypass the in-memory span batch.
+    let immediateTracerProvider: any TracerProvider
+
 
     // MARK: - Initialization
 
@@ -79,6 +82,10 @@ public class OTLPTraceProcessor: TraceProcessor {
             proxy: attributeCheckerExporter
         )
 
+        // Build Resources
+        var resource = Resource()
+        resource.merge(with: resources)
+
         // Initialize processor
         // Pools ended spans in memory and flushes a batch to the exporter every 0.5s or when
         // 100 spans accumulate, whichever is first (plus on app background/terminate/shutdown).
@@ -90,10 +97,6 @@ public class OTLPTraceProcessor: TraceProcessor {
 
         // Global Attributes processor
         let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(with: globalAttributes)
-
-        // Build Resources
-        var resource = Resource()
-        resource.merge(with: resources)
 
         // Initialize tracer provider
         let tracerProviderBuilder = TracerProviderBuilder()
@@ -108,6 +111,17 @@ public class OTLPTraceProcessor: TraceProcessor {
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
         self.tracerProvider = tracerProvider
+        immediateTracerProvider = TracerProviderBuilder()
+            .with(resource: resource)
+            .add(spanProcessor: OTLPGlobalAttributesSpanProcessor(with: globalAttributes))
+            .add(
+                spanProcessor: OTLPAttributesSpanProcessor(
+                    with: runtimeAttributes,
+                    activityTracker: activityTracker
+                )
+            )
+            .add(spanProcessor: OTLPImmediateSpanProcessor(spanExporter: spanInterceptorExporter))
+            .build()
     }
 
 

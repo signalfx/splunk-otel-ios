@@ -50,6 +50,40 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         resources: AgentResources,
         debugEnabled: Bool
     ) {
+        #if DEBUG
+            var resource = Resource()
+            resource.merge(with: resources)
+
+            self.resource = resource
+        #endif
+
+        loggerProvider = Self.makeLoggerProvider(
+            agentVersion: resources.agentVersion,
+            debugEnabled: debugEnabled,
+            tracerProvider: OpenTelemetry.instance.tracerProvider
+        )
+    }
+
+    public convenience init(
+        with traceUrl: URL?,
+        resources: AgentResources,
+        debugEnabled: Bool,
+        traceProcessor: OTLPTraceProcessor
+    ) {
+        self.init(
+            with: traceUrl,
+            resources: resources,
+            debugEnabled: debugEnabled,
+            tracerProvider: traceProcessor.immediateTracerProvider
+        )
+    }
+
+    init(
+        with _: URL?,
+        resources: AgentResources,
+        debugEnabled: Bool,
+        tracerProvider: any TracerProvider
+    ) {
         // Store resources object for Unit tests
         #if DEBUG
             // Build Resources
@@ -60,7 +94,22 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         #endif
 
 
-        let logToSpanExporter = OTLPLogToSpanExporter(agentVersion: resources.agentVersion)
+        loggerProvider = Self.makeLoggerProvider(
+            agentVersion: resources.agentVersion,
+            debugEnabled: debugEnabled,
+            tracerProvider: tracerProvider
+        )
+    }
+
+    private static func makeLoggerProvider(
+        agentVersion: String,
+        debugEnabled: Bool,
+        tracerProvider: any TracerProvider
+    ) -> LoggerProvider {
+        let logToSpanExporter = OTLPLogToSpanExporter(
+            agentVersion: agentVersion,
+            tracerProvider: tracerProvider
+        )
 
         // Initialize LogRecordProcessor
         let simpleLogRecordProcessor = SimpleLogRecordProcessor(
@@ -80,7 +129,7 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         // Set default logger provider
         OpenTelemetry.registerLoggerProvider(loggerProvider: loggerProvider)
 
-        self.loggerProvider = loggerProvider
+        return loggerProvider
     }
 
 
