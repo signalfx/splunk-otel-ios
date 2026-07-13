@@ -121,14 +121,16 @@ import Testing
             }
             await postWillTerminateNotification()
 
-            #expect(exporter.successfulSpanNames == [
-                "span-0",
-                "span-1",
-                "span-2",
-                "span-3",
-                "span-4",
-                "prepared-terminate"
-            ])
+            #expect(
+                exporter.successfulSpanNames == [
+                    "span-0",
+                    "span-1",
+                    "span-2",
+                    "span-3",
+                    "span-4",
+                    "prepared-terminate"
+                ]
+            )
         }
 
         @Test
