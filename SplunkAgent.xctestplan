@@ -62,6 +62,7 @@
         "OTLPBatchSpanProcessorLifecycleTests",
         "OTLPBatchSpanProcessorTests",
         "OTLPLogToSpanExporterTests",
+        "OTLPTraceProcessorEndpointTests",
         "ReadableSpanQueueTests"
       ],
       "target" : {

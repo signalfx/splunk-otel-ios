@@ -32,7 +32,7 @@ public class OTLPTraceProcessor: TraceProcessor {
     private let tracerProvider: TracerProvider
 
     /// Background exporter for traces (stored to support endpoint updates).
-    private let backgroundTraceExporter: OTLPBackgroundHTTPTraceExporter
+    private let backgroundTraceExporter: any EndpointConfigurableSpanExporter
 
     /// In-memory batch processor for direct spans.
     private let batchSpanProcessor: OTLPBatchSpanProcessor
@@ -43,7 +43,7 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Initialization
 
-    public required init(
+    public required convenience init(
         with tracesEndpoint: URL?,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
@@ -53,7 +53,6 @@ public class OTLPTraceProcessor: TraceProcessor {
         accessToken: String? = nil,
         activityTracker: ActivityTracker
     ) {
-
         let configuration = OTLPExporterConfiguration(agentVersion: resources.agentVersion)
         let envVarHeaders: [(String, String)] = []
         var headers: [String: String] = [:]
@@ -62,14 +61,35 @@ public class OTLPTraceProcessor: TraceProcessor {
             headers["X-SF-Token"] = accessToken
         }
 
-        // Initialize background exporter
-        backgroundTraceExporter = OTLPBackgroundHTTPTraceExporter(
+        let backgroundTraceExporter = OTLPBackgroundHTTPTraceExporter(
             endpoint: tracesEndpoint,
             config: configuration,
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: envVarHeaders,
             headers: headers
         )
+
+        self.init(
+            backgroundTraceExporter: backgroundTraceExporter,
+            resources: resources,
+            runtimeAttributes: runtimeAttributes,
+            globalAttributes: globalAttributes,
+            debugEnabled: debugEnabled,
+            spanInterceptor: spanInterceptor,
+            activityTracker: activityTracker
+        )
+    }
+
+    init(
+        backgroundTraceExporter: any EndpointConfigurableSpanExporter,
+        resources: AgentResources,
+        runtimeAttributes: RuntimeAttributes,
+        globalAttributes: @escaping () -> [String: AttributeValue],
+        debugEnabled: Bool,
+        spanInterceptor: SplunkSpanInterceptor?,
+        activityTracker: ActivityTracker
+    ) {
+        self.backgroundTraceExporter = backgroundTraceExporter
 
         // Initialize attribute checker proxy exporter
         // Optionally chain it through stdout exporter
@@ -154,11 +174,21 @@ public class OTLPTraceProcessor: TraceProcessor {
             headers["X-SF-Token"] = accessToken
         }
 
+        batchSpanProcessor.forceFlush()
         backgroundTraceExporter.setEndpoint(newEndpoint, headers: headers)
     }
 
     /// Clears the endpoint, causing new data to be cached to pending storage.
     public func clearEndpoint() {
+        batchSpanProcessor.forceFlush()
         backgroundTraceExporter.clearEndpoint()
     }
 }
+
+protocol EndpointConfigurableSpanExporter: SpanExporter {
+    func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]?)
+
+    func clearEndpoint()
+}
+
+extension OTLPBackgroundHTTPTraceExporter: EndpointConfigurableSpanExporter {}
