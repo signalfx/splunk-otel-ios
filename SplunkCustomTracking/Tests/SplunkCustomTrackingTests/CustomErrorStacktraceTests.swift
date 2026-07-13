@@ -1,0 +1,123 @@
+//
+/*
+Copyright 2026 Splunk Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import XCTest
+
+@testable import SplunkCustomTracking
+
+final class CustomErrorStacktraceTests: XCTestCase {
+
+    func testThreadListOmitsUnavailableThreadMetadata() throws {
+        let stacktrace = Stacktrace(frames: [
+            "0   AgentTestApp                        0x0000000100e84234 specialized Foo.bar() + 24",
+            "1   UIKitCore                           0x00000001852f3710 -[UIApplication sendAction:to:from:forEvent:] + 96"
+        ])
+
+        let threadsJSON = try XCTUnwrap(stacktrace.threadList)
+        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]])
+
+        XCTAssertEqual(parsed.count, 1)
+        XCTAssertNil(parsed[0]["threadNumber"])
+        XCTAssertNil(parsed[0]["crashed"])
+
+        let stackFrames = try XCTUnwrap(parsed[0]["stackFrames"] as? [[String: Any]])
+        XCTAssertEqual(stackFrames.count, 2)
+        XCTAssertEqual(stackFrames[0]["imageName"] as? String, "AgentTestApp")
+        XCTAssertEqual(stackFrames[0]["instructionPointer"] as? UInt64, 4_310_188_596)
+        XCTAssertEqual(stackFrames[0]["symbolName"] as? String, "specialized Foo.bar()")
+        XCTAssertEqual(stackFrames[0]["offset"] as? UInt64, 24)
+        XCTAssertEqual(stackFrames[1]["imageName"] as? String, "UIKitCore")
+
+        let returnAddress: UInt64 = 6_529_431_312
+        XCTAssertEqual(stackFrames[1]["instructionPointer"] as? UInt64, returnAddress - StackFrame.returnAddressAdjustment)
+        XCTAssertEqual(stackFrames[1]["offset"] as? UInt64, 96 - StackFrame.returnAddressAdjustment)
+        XCTAssertEqual(stacktrace.referencedImageNames, Set(["AgentTestApp", "UIKitCore"]))
+    }
+
+    func testReturnAddressAdjustmentMatchesArchitecture() {
+        #if arch(x86_64) || arch(i386)
+            XCTAssertEqual(StackFrame.returnAddressAdjustment, 1)
+        #elseif arch(arm64) || arch(arm64_32) || arch(arm)
+            XCTAssertEqual(StackFrame.returnAddressAdjustment, 4)
+        #else
+            XCTAssertEqual(StackFrame.returnAddressAdjustment, 0)
+        #endif
+    }
+
+    func testThreadListResolvesImageNameFromInstructionPointer() throws {
+        let stacktrace = Stacktrace(frames: [
+            "0   AgentTestApp                        0x0000000100e84234 specialized Foo.bar() + 24",
+            "1   UIKitCore                           0x00000001852f3710 -[UIApplication sendAction:to:from:forEvent:] + 96"
+        ])
+
+        let threadsJSON = try XCTUnwrap(
+            stacktrace.threadList { instructionPointer, parsedImageName in
+                switch instructionPointer {
+                case 4_310_188_596:
+                    "/private/var/containers/Bundle/Application/Test/AgentTestApp.app/AgentTestApp"
+
+                default:
+                    parsedImageName
+                }
+            }
+        )
+        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]])
+        let stackFrames = try XCTUnwrap(parsed[0]["stackFrames"] as? [[String: Any]])
+
+        XCTAssertEqual(
+            stackFrames[0]["imageName"] as? String,
+            "/private/var/containers/Bundle/Application/Test/AgentTestApp.app/AgentTestApp"
+        )
+        XCTAssertEqual(stackFrames[1]["imageName"] as? String, "UIKitCore")
+    }
+
+    func testThreadListDropsParsedSymbolInfoWhenAdjustedAddressPrecedesSymbol() throws {
+        guard StackFrame.returnAddressAdjustment > 0 else {
+            throw XCTSkip("Unsupported architecture does not adjust return addresses.")
+        }
+
+        let stacktrace = Stacktrace(frames: [
+            "0   AgentTestApp                        0x0000000100e84234 specialized Foo.bar() + 24",
+            "1   AgentTestApp                        0x0000000100e84234 symbolNearReturnAddress() + 0"
+        ])
+
+        let threadsJSON = try XCTUnwrap(stacktrace.threadList)
+        let parsed = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(threadsJSON.utf8)) as? [[String: Any]])
+        let stackFrames = try XCTUnwrap(parsed[0]["stackFrames"] as? [[String: Any]])
+
+        XCTAssertEqual(stackFrames[1]["imageName"] as? String, "AgentTestApp")
+
+        let returnAddress: UInt64 = 4_310_188_596
+        XCTAssertEqual(stackFrames[1]["instructionPointer"] as? UInt64, returnAddress - StackFrame.returnAddressAdjustment)
+        XCTAssertNil(stackFrames[1]["symbolName"])
+        XCTAssertNil(stackFrames[1]["offset"])
+    }
+
+    func testIssueAttributesCanOmitExceptionThreadsForDiagnostics() {
+        struct FileError: Error {}
+
+        let issue = SplunkIssue(from: FileError())
+
+        let publicAttributes = issue.toAttributesDictionary()
+        let diagnosticsBaseAttributes = issue.toAttributesDictionary(includingExceptionThreads: false)
+
+        XCTAssertNotNil(publicAttributes["exception.stacktrace"])
+        XCTAssertNotNil(publicAttributes["exception.threads"])
+        XCTAssertNotNil(diagnosticsBaseAttributes["exception.stacktrace"])
+        XCTAssertNil(diagnosticsBaseAttributes["exception.threads"])
+    }
+}

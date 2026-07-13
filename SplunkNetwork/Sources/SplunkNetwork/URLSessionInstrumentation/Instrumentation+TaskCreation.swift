@@ -23,6 +23,7 @@ import OpenTelemetryApi
 
 var associatedKeySpan: UInt8 = 0
 var associatedKeyInstrumented: UInt8 = 1
+var associatedKeySkipped: UInt8 = 2
 
 // MARK: - Original IMP Storage
 
@@ -103,6 +104,12 @@ func swizzleURLSessionTaskCreation() {
 
 // MARK: - Helper Functions
 
+enum RequestInstrumentationDecision {
+    case instrumentAtCreation
+    case deferToResume
+    case skipInstrumentation
+}
+
 func swizzleTaskCreationMethod(
     selector: Selector,
     handler: @escaping (URLSession, Any, @escaping (URLSession, Selector, Any) -> URLSessionDataTask) -> URLSessionDataTask
@@ -168,19 +175,15 @@ func createInstrumentedDataTask(
     selector: Selector,
     originalIMP: (URLSession, Selector, Any) -> URLSessionDataTask
 ) -> URLSessionDataTask {
-    guard shouldInstrumentRequest(request) else {
-        return originalIMP(session, selector, request)
-    }
-
-    guard let span = startHttpSpan(request: request) else {
-        return originalIMP(session, selector, request)
-    }
-
-    let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
-    let task = originalIMP(session, selector, instrumentedRequest)
-    objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
-    objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
-    return task
+    createTaskWithInstrumentation(
+        request: request,
+        createOriginalTask: {
+            originalIMP(session, selector, request)
+        },
+        createInstrumentedTask: { instrumentedRequest, _ in
+            originalIMP(session, selector, instrumentedRequest)
+        }
+    )
 }
 
 /// Creates a download task with instrumentation: starts a span, injects trace headers, and
@@ -193,26 +196,72 @@ func createInstrumentedDownloadTask(
     selector: Selector,
     originalIMP: (URLSession, Selector, Any) -> URLSessionDownloadTask
 ) -> URLSessionDownloadTask {
-    guard shouldInstrumentRequest(request) else {
-        return originalIMP(session, selector, request)
-    }
-
-    guard let span = startHttpSpan(request: request) else {
-        return originalIMP(session, selector, request)
-    }
-
-    let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
-    let task = originalIMP(session, selector, instrumentedRequest)
-    objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
-    objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
-    return task
+    createTaskWithInstrumentation(
+        request: request,
+        createOriginalTask: {
+            originalIMP(session, selector, request)
+        },
+        createInstrumentedTask: { instrumentedRequest, _ in
+            originalIMP(session, selector, instrumentedRequest)
+        }
+    )
 }
 
-func shouldInstrumentRequest(_ request: URLRequest) -> Bool {
-    // Prevent double-instrumentation of requests that already carry trace context.
-    // All other filtering (URL scheme, excluded endpoints, ignoreURLs) is handled
-    // by startHttpSpan, which is always called immediately after this check.
-    !TraceContextInjector.hasTraceContext(in: request)
+func instrumentationDecision(for request: URLRequest) -> RequestInstrumentationDecision {
+    if InternalNetworkRequestMarker.isMarked(request) {
+        return .skipInstrumentation
+    }
+
+    if TraceContextInjector.hasTraceContext(in: request) {
+        return .deferToResume
+    }
+
+    return .instrumentAtCreation
+}
+
+func createTaskWithInstrumentation<T: URLSessionTask>(
+    request: URLRequest,
+    createOriginalTask: () -> T,
+    createInstrumentedTask: (_ instrumentedRequest: URLRequest, _ span: Span) -> T
+) -> T {
+    switch instrumentationDecision(for: request) {
+    case .skipInstrumentation:
+        return markSkippedForInstrumentation(createOriginalTask())
+
+    case .deferToResume:
+        return createOriginalTask()
+
+    case .instrumentAtCreation:
+        guard let span = startHttpSpan(request: request) else {
+            return markSkippedForInstrumentation(createOriginalTask())
+        }
+
+        let instrumentedRequest = injectTraceContextIfEnabled(into: request, span: span)
+        return markInstrumentedAtCreation(
+            createInstrumentedTask(instrumentedRequest, span),
+            span: span
+        )
+    }
+}
+
+func instrumentTaskAtCreationIfNeeded<T: URLSessionTask>(
+    _ task: T,
+    request: URLRequest
+) -> T {
+    switch instrumentationDecision(for: request) {
+    case .skipInstrumentation:
+        return markSkippedForInstrumentation(task)
+
+    case .deferToResume:
+        return task
+
+    case .instrumentAtCreation:
+        guard let span = startHttpSpan(request: request) else {
+            return markSkippedForInstrumentation(task)
+        }
+
+        return markInstrumentedAtCreation(task, span: span)
+    }
 }
 
 func injectTraceContextIfEnabled(into request: URLRequest, span: Span) -> URLRequest {
@@ -298,6 +347,23 @@ func endHttpSpanFromCompletion(span: Span, response: URLResponse?, error: Error?
 /// This is used by the resume swizzling to avoid double instrumentation.
 func wasInstrumentedAtCreation(_ task: URLSessionTask) -> Bool {
     objc_getAssociatedObject(task, &associatedKeyInstrumented) as? Bool ?? false
+}
+
+/// Checks if a URLSessionTask was intentionally skipped during task creation.
+func wasSkippedForInstrumentation(_ task: URLSessionTask) -> Bool {
+    objc_getAssociatedObject(task, &associatedKeySkipped) as? Bool ?? false
+}
+
+/// Marks a URLSessionTask as intentionally skipped during task creation.
+func markSkippedForInstrumentation<T: URLSessionTask>(_ task: T) -> T {
+    objc_setAssociatedObject(task, &associatedKeySkipped, true, .OBJC_ASSOCIATION_RETAIN)
+    return task
+}
+
+func markInstrumentedAtCreation<T: URLSessionTask>(_ task: T, span: Span) -> T {
+    objc_setAssociatedObject(task, &associatedKeySpan, span, .OBJC_ASSOCIATION_RETAIN)
+    objc_setAssociatedObject(task, &associatedKeyInstrumented, true, .OBJC_ASSOCIATION_RETAIN)
+    return task
 }
 
 /// Gets the span associated with a task during creation.
