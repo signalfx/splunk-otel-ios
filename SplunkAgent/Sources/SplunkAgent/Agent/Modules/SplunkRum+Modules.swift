@@ -292,7 +292,7 @@ extension SplunkRum {
     private func customizeCustomTracking() {
         if let customTrackingModule = modulesManager?.module(ofType: CustomTrackingInternal.self) {
             // Initialize proxy API for this module
-            customTrackingProxy = CustomTracking(for: customTrackingModule)
+            customTrackingProxy = customTrackingModule.isEnabled ? CustomTracking(for: customTrackingModule) : CustomTrackingNonOperational()
         }
     }
 

@@ -7,10 +7,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.3.2] - 2026-07-09
+
+### Added
+
+* Custom error and exception reporting now includes crash-report-style metadata: `crash.processPath`, `exception.images`, and `exception.threads` stack frames with resolved binary image names. Configure via `CustomTrackingConfiguration.includeBinaryImagesOnErrors` (Swift) or `SPLKCustomTrackingConfiguration.includeBinaryImagesOnErrors` (Objective-C). #677
+
 ### Changed
 
 * Trace spans are now pooled in memory and flushed to disk in batches (every 0.5s or when 100 spans accumulate, whichever is first) instead of writing one file per span. This reduces disk writes on the export path. On entering the background the buffer is drained asynchronously and failed exports are requeued (best effort). `forceFlush` drains spans that existed before the call with a bounded wait, using the caller's timeout when provided or 10 seconds by default; on `shutdown` and app termination the main thread is blocked only up to a bounded wall-clock window (1s and 2s respectively) after which the drain continues best effort. Spans still buffered in memory when the app crashes or is force-killed are lost by design, and any spans dropped due to in-memory overflow or failed exports are counted and logged (throttled) with a running session total.
 * OTLP exporter `User-Agent` headers now identify the Splunk RUM agent version, OS name/version, and OTLP exporter package version. #682
+
+### Fixed
+
+* Fixed SDK-owned exporter uploads incorrectly being emitted as Network Instrumentation HTTP spans. Internal SDK requests are now excluded from network telemetry. #683
 
 ## [2.3.1] - 2026-06-15
 
@@ -92,7 +102,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Replaced OTLP binary protobuf with custom JSON encoding to reduce binary size. The SDK now uses `opentelemetry-swift-core` (API/SDK only) instead of the full `opentelemetry-swift` package with protocol exporters. #566
-  
+
 ## [2.0.7] - 2026-02-04
 
 ### Fixed
