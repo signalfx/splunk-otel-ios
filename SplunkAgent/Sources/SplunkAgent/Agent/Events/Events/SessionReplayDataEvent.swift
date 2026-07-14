@@ -117,6 +117,7 @@ class SessionReplayDataEvent: AgentEvent {
             let activityJSON = userActivity.map(String.init).joined(separator: ",")
             return "{\"startUnixMs\":\(metadata.startUnixMs),\"endUnixMs\":\(metadata.endUnixMs),\"userActivity\":[\(activityJSON)]}"
         }
+
         return jsonString
     }
 }
