@@ -323,13 +323,28 @@ extension OTLPBackgroundHTTPBaseExporter {
     }
 
     private func buildHeaders(from additionalHeaders: [String: String]) -> [String: String] {
-        var combinedHeaders = additionalHeaders
+        var combinedHeaders = [
+            OTLPHTTPHeaders.userAgentKey: OTLPHTTPHeaders.userAgent(agentVersion: config.agentVersion)
+        ]
+
+        for (key, value) in additionalHeaders {
+            combinedHeaders[normalizedHeaderKey(key)] = value
+        }
+
         if let envVarHeaders {
             for (key, value) in envVarHeaders {
-                combinedHeaders[key] = value
+                combinedHeaders[normalizedHeaderKey(key)] = value
             }
         }
         return combinedHeaders
+    }
+
+    private func normalizedHeaderKey(_ key: String) -> String {
+        if key.caseInsensitiveCompare(OTLPHTTPHeaders.userAgentKey) == .orderedSame {
+            return OTLPHTTPHeaders.userAgentKey
+        }
+
+        return key
     }
 
     private func inferPayloadFormat(forFileKey fileKey: String) -> RequestPayloadFormat {

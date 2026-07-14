@@ -11,6 +11,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 * Session Replay segment metadata now includes a `userActivity` field containing Unix-millisecond timestamps of user interactions that occurred during the segment window, enabling timeline visualization in the backend. #646
 
+## [2.3.2] - 2026-07-09
+
+### Added
+
+* Custom error and exception reporting now includes crash-report-style metadata: `crash.processPath`, `exception.images`, and `exception.threads` stack frames with resolved binary image names. Configure via `CustomTrackingConfiguration.includeBinaryImagesOnErrors` (Swift) or `SPLKCustomTrackingConfiguration.includeBinaryImagesOnErrors` (Objective-C). #677
+
+### Changed
+
+* OTLP exporter `User-Agent` headers now identify the Splunk RUM agent version, OS name/version, and OTLP exporter package version. #682
+
+### Fixed
+
+* Fixed SDK-owned exporter uploads incorrectly being emitted as Network Instrumentation HTTP spans. Internal SDK requests are now excluded from network telemetry. #683
+
 ## [2.3.1] - 2026-06-15
 
 ### Fixed
@@ -91,7 +105,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 * Replaced OTLP binary protobuf with custom JSON encoding to reduce binary size. The SDK now uses `opentelemetry-swift-core` (API/SDK only) instead of the full `opentelemetry-swift` package with protocol exporters. #566
-  
+
 ## [2.0.7] - 2026-02-04
 
 ### Fixed
