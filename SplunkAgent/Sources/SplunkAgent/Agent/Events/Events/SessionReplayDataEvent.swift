@@ -104,8 +104,19 @@ class SessionReplayDataEvent: AgentEvent {
     }
 
     private func fallbackJSON(metadata: Metadata, userActivity: [Int]) -> String {
-        let activityJSON = userActivity.map(String.init).joined(separator: ",")
-        return "{\"startUnixMs\":\(metadata.startUnixMs),\"endUnixMs\":\(metadata.endUnixMs),"
-            + "\"source\":\"\(metadata.source)\",\"userActivity\":[\(activityJSON)]}"
+        let dict: [String: Any] = [
+            "startUnixMs": metadata.startUnixMs,
+            "endUnixMs": metadata.endUnixMs,
+            "source": metadata.source,
+            "userActivity": userActivity
+        ]
+        guard
+            let data = try? JSONSerialization.data(withJSONObject: dict),
+            let jsonString = String(data: data, encoding: .utf8)
+        else {
+            let activityJSON = userActivity.map(String.init).joined(separator: ",")
+            return "{\"startUnixMs\":\(metadata.startUnixMs),\"endUnixMs\":\(metadata.endUnixMs),\"userActivity\":[\(activityJSON)]}"
+        }
+        return jsonString
     }
 }
