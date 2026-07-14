@@ -35,7 +35,9 @@ actor UserActivityCollector {
         timestamps.append(ms)
     }
 
-    /// Returns timestamps that fall within [startMs, endMs] and removes them from the internal buffer. Timestamps after endMs are retained for the next segment.
+    /// Returns timestamps that fall within [startMs, endMs] and removes them from the buffer.
+    ///
+    /// Timestamps after endMs are retained for the next segment.
     func flush(startMs: Int, endMs: Int) -> [Int] {
         let collected = timestamps.filter { $0 >= startMs && $0 <= endMs }
         timestamps = timestamps.filter { $0 > endMs }
