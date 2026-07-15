@@ -205,7 +205,6 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
 
     var terminationObserver: NSObjectProtocol?
 
-    /// Internal Logger.
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
 
