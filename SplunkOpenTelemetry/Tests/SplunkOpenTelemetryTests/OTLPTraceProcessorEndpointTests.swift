@@ -37,6 +37,8 @@ struct OTLPTraceProcessorEndpointTests {
         endSpan(named: "pre-endpoint-change")
         fixture.processor.setEndpoint(endpoint)
 
+        #expect(exporter.waitForEndpointChange(timeout: 1) == .success)
+
         #expect(
             exporter.events == [
                 .export(["pre-endpoint-change"]),
@@ -54,11 +56,42 @@ struct OTLPTraceProcessorEndpointTests {
         endSpan(named: "pre-endpoint-clear")
         fixture.processor.clearEndpoint()
 
+        #expect(exporter.waitForEndpointChange(timeout: 1) == .success)
+
         #expect(
             exporter.events == [
                 .export(["pre-endpoint-clear"]),
                 .flush,
                 .clearEndpoint
+            ]
+        )
+    }
+
+    @Test
+    func setEndpointDoesNotBlockMainThreadWhileFlushIsPending() throws {
+        let exporter = RecordingEndpointExporter(blockFlush: true)
+        let fixture = makeFixture(exporter: exporter)
+        let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
+        let callReturned = DispatchSemaphore(value: 0)
+
+        endSpan(named: "pre-blocked-endpoint-change")
+        DispatchQueue.main.async {
+            fixture.processor.setEndpoint(endpoint)
+            callReturned.signal()
+        }
+
+        #expect(callReturned.wait(timeout: .now() + 1) == .success)
+        #expect(exporter.waitUntilFlushStarts(timeout: 1) == .success)
+        #expect(!exporter.events.contains(.setEndpoint(endpoint)))
+
+        exporter.resumeFlush()
+
+        #expect(exporter.waitForEndpointChange(timeout: 1) == .success)
+        #expect(
+            exporter.events == [
+                .export(["pre-blocked-endpoint-change"]),
+                .flush,
+                .setEndpoint(endpoint)
             ]
         )
     }
@@ -118,7 +151,15 @@ private final class RecordingEndpointExporter: EndpointConfigurableSpanExporter 
     }
 
     private let lock = NSLock()
+    private let blockFlush: Bool
+    private let endpointChanged = DispatchSemaphore(value: 0)
+    private let flushStarted = DispatchSemaphore(value: 0)
+    private let flushResume = DispatchSemaphore(value: 0)
     private var storedEvents: [Event] = []
+
+    init(blockFlush: Bool = false) {
+        self.blockFlush = blockFlush
+    }
 
     var events: [Event] {
         withLock { storedEvents }
@@ -135,6 +176,10 @@ private final class RecordingEndpointExporter: EndpointConfigurableSpanExporter 
         withLock {
             storedEvents.append(.flush)
         }
+        flushStarted.signal()
+        if blockFlush {
+            flushResume.wait()
+        }
         return .success
     }
 
@@ -144,12 +189,26 @@ private final class RecordingEndpointExporter: EndpointConfigurableSpanExporter 
         withLock {
             storedEvents.append(.setEndpoint(newEndpoint))
         }
+        endpointChanged.signal()
     }
 
     func clearEndpoint() {
         withLock {
             storedEvents.append(.clearEndpoint)
         }
+        endpointChanged.signal()
+    }
+
+    func waitForEndpointChange(timeout: TimeInterval) -> DispatchTimeoutResult {
+        endpointChanged.wait(timeout: .now() + timeout)
+    }
+
+    func waitUntilFlushStarts(timeout: TimeInterval) -> DispatchTimeoutResult {
+        flushStarted.wait(timeout: .now() + timeout)
+    }
+
+    func resumeFlush() {
+        flushResume.signal()
     }
 
     private func withLock<T>(_ work: () throws -> T) rethrows -> T {

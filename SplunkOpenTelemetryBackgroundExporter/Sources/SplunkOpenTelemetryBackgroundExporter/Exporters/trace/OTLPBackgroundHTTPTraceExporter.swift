@@ -94,15 +94,8 @@ public class OTLPBackgroundHTTPTraceExporter: OTLPBackgroundHTTPBaseExporter, Sp
         }
     }
 
-    public func flush(explicitTimeout _: TimeInterval? = nil) -> SpanExporterResultCode {
-        let semaphore = DispatchSemaphore(value: 0)
-
-        httpClient.flush {
-            semaphore.signal()
-        }
-        semaphore.wait()
-
-        return .success
+    public func flush(explicitTimeout: TimeInterval? = nil) -> SpanExporterResultCode {
+        flushHTTPClient(explicitTimeout: explicitTimeout) ? .success : .failure
     }
 
     public func shutdown(explicitTimeout _: TimeInterval? = nil) {}

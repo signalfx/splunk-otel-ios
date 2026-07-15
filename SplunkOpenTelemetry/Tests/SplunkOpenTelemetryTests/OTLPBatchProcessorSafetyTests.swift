@@ -51,7 +51,9 @@ struct OTLPBatchProcessorSafetyTests {
         #expect(terminalExporter.exportTimeouts.count == 1)
         #expect(terminalExporter.exportTimeouts.allSatisfy { $0 == nil })
         #expect(terminalExporter.flushTimeouts.count == 2)
-        #expect(terminalExporter.flushTimeouts.allSatisfy { $0 == nil })
+        #expect(terminalExporter.flushTimeouts.allSatisfy { timeout in
+            timeout.map { $0 >= 0 && $0 <= 10 } == true
+        })
         #expect(terminalExporter.successfulSpanCount == 1)
         #expect(terminalExporter.exportAttemptCount == 1)
     }
@@ -95,7 +97,7 @@ struct OTLPBatchProcessorSafetyTests {
     }
 
     @Test
-    func forceFlushFromMainThreadWaitsForDrainBeforeReturning() {
+    func forceFlushFromMainThreadReturnsWithoutWaitingForDrain() {
         let exporter = BatchProcessorTestExporter(blockExports: true)
         let processor = OTLPBatchSpanProcessor(
             spanExporter: exporter,
@@ -113,14 +115,15 @@ struct OTLPBatchProcessorSafetyTests {
             forceFlushReturned.signal()
         }
 
+        #expect(forceFlushReturned.wait(timeout: .now() + 1) == .success)
         #expect(exporter.waitUntilExportStarts(timeout: 5) == .success)
-        #expect(forceFlushReturned.wait(timeout: .now() + 0.1) == .timedOut)
+        #expect(exporter.successfulSpanCount == 0)
 
         exporter.resumeExports()
 
-        #expect(forceFlushReturned.wait(timeout: .now() + 5) == .success)
-        #expect(exporter.successfulSpanCount == 1)
-        #expect(exporter.flushCount == 1)
+        #expect(waitUntil(timeout: 5) {
+            exporter.successfulSpanCount == 1 && exporter.flushCount == 1
+        })
     }
 
 

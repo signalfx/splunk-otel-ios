@@ -94,14 +94,7 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
     }
 
     public func flush() -> ExportResult {
-        let semaphore = DispatchSemaphore(value: 0)
-
-        httpClient.flush {
-            semaphore.signal()
-        }
-        semaphore.wait()
-
-        return .success
+        flushHTTPClient() ? .success : .failure
     }
 
     public func shutdown() -> ExportResult {

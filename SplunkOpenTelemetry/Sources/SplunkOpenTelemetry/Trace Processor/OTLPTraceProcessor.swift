@@ -167,7 +167,7 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Endpoint Management
 
-    /// Updates the endpoint and flushes any pending data.
+    /// Asynchronously flushes pending data, then updates the endpoint in export order.
     ///
     /// - Parameters:
     ///   - newEndpoint: The new endpoint URL.
@@ -179,14 +179,16 @@ public class OTLPTraceProcessor: TraceProcessor {
             headers["X-SF-Token"] = accessToken
         }
 
-        batchSpanProcessor.forceFlush()
-        backgroundTraceExporter.setEndpoint(newEndpoint, headers: headers)
+        batchSpanProcessor.forceFlush { [backgroundTraceExporter] in
+            backgroundTraceExporter.setEndpoint(newEndpoint, headers: headers)
+        }
     }
 
-    /// Clears the endpoint, causing new data to be cached to pending storage.
+    /// Asynchronously flushes pending data, then clears the endpoint in export order.
     public func clearEndpoint() {
-        batchSpanProcessor.forceFlush()
-        backgroundTraceExporter.clearEndpoint()
+        batchSpanProcessor.forceFlush { [backgroundTraceExporter] in
+            backgroundTraceExporter.clearEndpoint()
+        }
     }
 }
 

@@ -101,6 +101,11 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
         core.forceFlush(timeout: timeout)
     }
 
+    /// Flushes asynchronously and runs `completion` on the processor queue after the drain finishes.
+    func forceFlush(timeout: TimeInterval? = nil, completion: @escaping () -> Void) {
+        core.forceFlush(timeout: timeout, completion: completion)
+    }
+
     /// Registers the terminal lifecycle drain that runs after terminal producers flush their spans.
     func registerTerminationObserver(prepareForTermination: @escaping () async -> Void) {
         core.registerTerminationObserver(prepareForTermination: prepareForTermination)
@@ -131,10 +136,10 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
     /// after this window so we never risk the watchdog killing the app mid-drain.
     static let terminateFlushTimeout: TimeInterval = 2.0
 
-    /// Default wall-clock bound for `forceFlush` when the caller does not supply a timeout.
+    /// Default wall-clock bound for off-main `forceFlush` when the caller does not supply a timeout.
     ///
     /// The background exporter defaults request timeouts to 10 seconds. Mirroring that here keeps
-    /// `forceFlush()` bounded on the main thread while still giving pending spans the normal export
+    /// Main-thread calls are always asynchronous. This bound gives off-main callers the normal export
     /// window to reach disk before the call returns.
     private static let forceFlushWaitTimeout: TimeInterval = 10.0
 
@@ -247,13 +252,30 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
     }
 
     func forceFlush(timeout: TimeInterval?) {
+        // Instrumentation must never freeze the host app's UI. Preserve synchronous force-flush
+        // semantics off-main, but make a main-thread invocation fire-and-forget.
+        guard !Thread.isMainThread else {
+            forceFlush(timeout: timeout, completion: {})
+            return
+        }
+
         // Bounded: drain only the spans present at entry, and stop once the deadline passes, so a
         // concurrent producer can never starve the caller.
         let waitTimeout = forceFlushWaitTimeout(for: timeout)
         let deadline = Date().addingTimeInterval(waitTimeout)
         runOnProcessorQueue(wait: waitTimeout) {
-            self.drainSnapshot(deadline: deadline, requeueOnFailure: true, forwardDeadlineToExporter: false)
-            _ = self.spanExporter.flush(explicitTimeout: nil)
+            self.performForceFlush(deadline: deadline)
+        }
+    }
+
+    /// Enqueues a force flush without blocking the caller.
+    func forceFlush(timeout: TimeInterval?, completion: @escaping () -> Void) {
+        let waitTimeout = forceFlushWaitTimeout(for: timeout)
+        let deadline = Date().addingTimeInterval(waitTimeout)
+
+        processorQueue.async {
+            self.performForceFlush(deadline: deadline)
+            completion()
         }
     }
 
@@ -321,6 +343,11 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
 
     private func forceFlushWaitTimeout(for explicitTimeout: TimeInterval?) -> TimeInterval {
         max(0, explicitTimeout ?? Self.forceFlushWaitTimeout)
+    }
+
+    private func performForceFlush(deadline: Date) {
+        drainSnapshot(deadline: deadline, requeueOnFailure: true, forwardDeadlineToExporter: false)
+        _ = spanExporter.flush(explicitTimeout: max(0, deadline.timeIntervalSinceNow))
     }
 
 

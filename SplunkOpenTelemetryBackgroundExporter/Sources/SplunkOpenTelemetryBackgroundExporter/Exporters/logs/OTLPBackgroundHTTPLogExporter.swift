@@ -92,15 +92,8 @@ public class OTLPBackgroundHTTPLogExporter: OTLPBackgroundHTTPBaseExporter, LogR
         }
     }
 
-    public func forceFlush(explicitTimeout _: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
-        let semaphore = DispatchSemaphore(value: 0)
-
-        httpClient.flush {
-            semaphore.signal()
-        }
-        semaphore.wait()
-
-        return .success
+    public func forceFlush(explicitTimeout: TimeInterval?) -> OpenTelemetrySdk.ExportResult {
+        flushHTTPClient(explicitTimeout: explicitTimeout) ? .success : .failure
     }
 
     public func shutdown(explicitTimeout _: TimeInterval? = nil) {}

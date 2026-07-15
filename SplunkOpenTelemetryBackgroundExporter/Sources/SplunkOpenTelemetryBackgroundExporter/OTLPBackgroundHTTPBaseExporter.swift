@@ -143,6 +143,30 @@ public class OTLPBackgroundHTTPBaseExporter {
         endpoint = nil
     }
 
+
+    // MARK: - Flush
+
+    /// Requests that `URLSession` flush its pending state without allowing the caller to wait forever.
+    ///
+    /// The exporter configuration is the hard upper bound. An explicit timeout may shorten that
+    /// window, but cannot extend it.
+    func flushHTTPClient(explicitTimeout: TimeInterval? = nil) -> Bool {
+        let configuredTimeout = config.timeout.isFinite
+            ? max(0, config.timeout)
+            : OTLPExporterConfiguration.defaultTimeoutInterval
+        let requestedTimeout = explicitTimeout.flatMap { timeout in
+            timeout.isFinite ? max(0, timeout) : nil
+        } ?? configuredTimeout
+        let timeout = min(requestedTimeout, configuredTimeout)
+        let completed = DispatchSemaphore(value: 0)
+
+        httpClient.flush {
+            completed.signal()
+        }
+
+        return completed.wait(timeout: .now() + timeout) == .success
+    }
+
     // MARK: - Stalled request operations
 
     func checkStalledUploadsOperation(tasks: [URLSessionTask]) {
