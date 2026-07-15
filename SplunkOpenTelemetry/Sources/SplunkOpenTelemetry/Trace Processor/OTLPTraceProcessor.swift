@@ -26,6 +26,10 @@ import SplunkOpenTelemetryBackgroundExporter
 /// Traces are enriched by provided Resources and exported via an instantiated background exporter.
 public class OTLPTraceProcessor: TraceProcessor {
 
+    // MARK: - Constants
+
+    private static let crashReportPersistenceTimeout: TimeInterval = 2
+
     // MARK: - Internal properties
 
     /// OTel tracer provider shared by direct and log-derived spans.
@@ -150,6 +154,14 @@ public class OTLPTraceProcessor: TraceProcessor {
     /// then blocks for a short bounded drain when `willTerminate` is delivered.
     package func registerTerminationObserver(prepareForTermination: @escaping () async -> Void) {
         batchSpanProcessor.registerTerminationObserver(prepareForTermination: prepareForTermination)
+    }
+
+    /// Persists buffered spans before a producer deletes its only source payload.
+    package func persistBufferedSpans(completion: @escaping (Bool) -> Void) {
+        batchSpanProcessor.persistBufferedSpans(
+            timeout: Self.crashReportPersistenceTimeout,
+            completion: completion
+        )
     }
 
 

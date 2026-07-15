@@ -170,6 +170,59 @@ struct OTLPBatchSpanProcessorTests {
         #expect(exporter.flushCount == 1)
     }
 
+    @Test
+    func durablePersistenceReportsSuccessWithoutFlushingURLSession() {
+        let exporter = BatchProcessorTestExporter()
+        let processor = OTLPBatchSpanProcessor(
+            spanExporter: exporter,
+            scheduleDelay: Self.neverFires,
+            maxExportBatchSize: Self.hugeBatch,
+            maxQueueSize: 2_048
+        )
+        let tracer = makeTracer(for: processor)
+        let completed = DispatchSemaphore(value: 0)
+
+        endSpans(1, using: tracer)
+        processor.persistBufferedSpans(timeout: 1) { succeeded in
+            #expect(succeeded)
+            completed.signal()
+        }
+
+        #expect(completed.wait(timeout: .now() + 1) == .success)
+        #expect(exporter.successfulSpanCount == 1)
+        #expect(exporter.flushCount == 0)
+    }
+
+    @Test
+    func durablePersistenceReportsFailureAndRequeuesSpan() {
+        let exporter = BatchProcessorTestExporter(results: [.failure, .success])
+        let processor = OTLPBatchSpanProcessor(
+            spanExporter: exporter,
+            scheduleDelay: Self.neverFires,
+            maxExportBatchSize: Self.hugeBatch,
+            maxQueueSize: 2_048
+        )
+        let tracer = makeTracer(for: processor)
+        let firstCompleted = DispatchSemaphore(value: 0)
+        let retryCompleted = DispatchSemaphore(value: 0)
+
+        endSpans(1, using: tracer)
+        processor.persistBufferedSpans(timeout: 1) { succeeded in
+            #expect(!succeeded)
+            firstCompleted.signal()
+        }
+        #expect(firstCompleted.wait(timeout: .now() + 1) == .success)
+
+        processor.persistBufferedSpans(timeout: 1) { succeeded in
+            #expect(succeeded)
+            retryCompleted.signal()
+        }
+
+        #expect(retryCompleted.wait(timeout: .now() + 1) == .success)
+        #expect(exporter.successfulSpanCount == 1)
+        #expect(exporter.exportAttemptCount == 2)
+    }
+
 
     // MARK: - Shutdown
 

@@ -105,6 +105,11 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
     func forceFlush(timeout: TimeInterval? = nil, completion: @escaping () -> Void) {
         core.forceFlush(timeout: timeout, completion: completion)
     }
+
+    /// Asynchronously drains the current snapshot and reports whether the exporter accepted it.
+    func persistBufferedSpans(timeout: TimeInterval, completion: @escaping (Bool) -> Void) {
+        core.persistBufferedSpans(timeout: timeout, completion: completion)
+    }
 }
 
 /// Reference-type backing store for ``OTLPBatchSpanProcessor``.
