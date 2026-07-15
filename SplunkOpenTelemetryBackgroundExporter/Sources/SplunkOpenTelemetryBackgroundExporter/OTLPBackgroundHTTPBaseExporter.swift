@@ -18,6 +18,7 @@ limitations under the License.
 import CiscoDiskStorage
 import CiscoEncryption
 import Foundation
+import SplunkCommon
 
 /// Basic implementation of exporters.
 public class OTLPBackgroundHTTPBaseExporter {
@@ -26,6 +27,10 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     private let qosConfig: SessionQOSConfiguration
     private let performStalledUploadCheck: Bool
+    private let endpointMaintenanceQueue = DispatchQueue(
+        label: PackageIdentifier.default(named: "EndpointMaintenance"),
+        qos: .utility
+    )
     private let stateLock = NSLock()
     private var storedEndpoint: URL?
     private var storedAdditionalHeaders: [String: String]
@@ -118,7 +123,7 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     // MARK: - Endpoint Management
 
-    /// Updates the endpoint and flushes any pending data.
+    /// Updates the endpoint and asynchronously activates any pending data.
     ///
     /// In-flight uploads targeting the previous endpoint are rescheduled by the stalled upload check (within 5–8s).
     public func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]? = nil) {
@@ -129,7 +134,9 @@ public class OTLPBackgroundHTTPBaseExporter {
         }
         stateLock.unlock()
 
-        flushPendingData()
+        endpointMaintenanceQueue.async {
+            self.flushPendingData()
+        }
 
         if performStalledUploadCheck {
             startStalledUploadCheck()

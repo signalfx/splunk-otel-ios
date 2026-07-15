@@ -167,33 +167,24 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Endpoint Management
 
-    /// Flushes pending direct spans, then updates the endpoint in export order.
+    /// Immediately updates the endpoint used by subsequent exports.
     ///
     /// - Parameters:
     ///   - newEndpoint: The new endpoint URL.
     ///   - accessToken: Optional access token to use for authentication.
-    /// - Returns: `true` when the endpoint is active, or `false` when the bounded drain failed or timed out.
-    @discardableResult
-    package func setEndpoint(_ newEndpoint: URL, accessToken: String? = nil) -> Bool {
+    package func setEndpoint(_ newEndpoint: URL, accessToken: String? = nil) {
         var headers: [String: String] = [:]
 
         if let accessToken, !accessToken.isEmpty {
             headers["X-SF-Token"] = accessToken
         }
 
-        return batchSpanProcessor.transitionEndpoint { [backgroundTraceExporter] in
-            backgroundTraceExporter.setEndpoint(newEndpoint, headers: headers)
-        }
+        backgroundTraceExporter.setEndpoint(newEndpoint, headers: headers)
     }
 
-    /// Flushes pending direct spans, then clears the endpoint in export order.
-    ///
-    /// - Returns: `true` when the endpoint is cleared, or `false` when the bounded drain failed or timed out.
-    @discardableResult
-    package func clearEndpoint() -> Bool {
-        batchSpanProcessor.transitionEndpoint { [backgroundTraceExporter] in
-            backgroundTraceExporter.clearEndpoint()
-        }
+    /// Immediately clears the endpoint so subsequent exports use pending storage.
+    package func clearEndpoint() {
+        backgroundTraceExporter.clearEndpoint()
     }
 }
 

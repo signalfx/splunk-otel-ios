@@ -27,14 +27,12 @@ extension SplunkRum {
     /// without an endpoint.
     ///
     /// - Parameter endpoint: The ``EndpointConfiguration`` to use for sending data.
-    /// - Throws: An error if the provided endpoint is invalid or pending spans cannot be persisted
-    ///   before the endpoint transition deadline.
+    /// - Throws: ``AgentConfigurationError`` if the provided endpoint is invalid.
     public func updateEndpoint(_ endpoint: EndpointConfiguration) throws {
         // Try to update the event manager if available
         if let eventManager = eventManager as? DefaultEventManager {
             // Temporarily exclude BOTH old and new collector URLs before the
-            // endpoint update (which flushes pending data). This prevents
-            // self-instrumentation of flush requests while keeping the old
+            // endpoint update. This prevents self-instrumentation while keeping the old
             // collector excluded in case the update fails.
             let previousEndpoint = currentEndpoint
             let previousUrls = [previousEndpoint?.traceEndpoint, previousEndpoint?.sessionReplayEndpoint].compactMap(\.self)
@@ -71,13 +69,7 @@ extension SplunkRum {
     /// configured via ``updateEndpoint(_:)``.
     public func disableEndpoint() {
         if let eventManager = eventManager as? DefaultEventManager {
-            guard eventManager.disableEndpoint() else {
-                logger.log(level: .error, isPrivate: false) {
-                    "Endpoint remains active because pending spans could not be persisted."
-                }
-                return
-            }
-
+            eventManager.disableEndpoint()
             currentEndpoint = nil
             updateNetworkExclusionList(for: nil)
 

@@ -105,21 +105,7 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
     func forceFlush(timeout: TimeInterval? = nil, completion: @escaping () -> Void) {
         core.forceFlush(timeout: timeout, completion: completion)
     }
-
-    /// Drains the current snapshot and applies an endpoint mutation in export order.
-    ///
-    /// Unlike general-purpose `forceFlush`, this intentionally blocks callers (including the main
-    /// thread) for a bounded interval. Endpoint reconfiguration is expected to be a rare startup
-    /// operation, and returning only after the mutation is effective prevents spans ended after the
-    /// call from being persisted for the previous endpoint.
-    func transitionEndpoint(
-        timeout: TimeInterval? = nil,
-        applyEndpoint: @escaping () -> Void
-    ) -> Bool {
-        core.transitionEndpoint(timeout: timeout, applyEndpoint: applyEndpoint)
-    }
 }
-
 
 /// Reference-type backing store for ``OTLPBatchSpanProcessor``.
 ///
@@ -175,7 +161,7 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
         qos: .utility
     )
 
-    let processorQueueKey = DispatchSpecificKey<Void>()
+    private let processorQueueKey = DispatchSpecificKey<Void>()
 
     /// Guards `queue`, `isShutdown`, `isFlushScheduled`, and the drop-tracking counters.
     let lock = NSLock()
@@ -352,7 +338,7 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
         min(Self.shutdownWaitTimeout, max(0, explicitTimeout ?? Self.shutdownWaitTimeout))
     }
 
-    func forceFlushWaitTimeout(for explicitTimeout: TimeInterval?) -> TimeInterval {
+    private func forceFlushWaitTimeout(for explicitTimeout: TimeInterval?) -> TimeInterval {
         max(0, explicitTimeout ?? Self.forceFlushWaitTimeout)
     }
 

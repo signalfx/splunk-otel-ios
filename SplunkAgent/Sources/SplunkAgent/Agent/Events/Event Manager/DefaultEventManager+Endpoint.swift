@@ -47,10 +47,8 @@ extension DefaultEventManager {
             throw AgentConfigurationError.invalidEndpoint(supplied: endpoint)
         }
 
-        // Update the trace processor endpoint (this also flushes pending data)
-        guard concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken) else {
-            throw EndpointTransitionError.tracePersistenceFailed
-        }
+        // Apply the new endpoint immediately. Pending disk data is activated asynchronously.
+        concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken)
 
         // Replace semantics: the new config fully replaces the old one.
         // If a session replay URL is provided, activate the processor (also flushes pending data).
@@ -70,28 +68,14 @@ extension DefaultEventManager {
     /// Disables the endpoint configuration.
     ///
     /// Data is cached to pending storage for later sending when a new endpoint is configured.
-    @discardableResult
-    func disableEndpoint() -> Bool {
-        guard concreteTraceProcessor.clearEndpoint() else {
-            logger.log(level: .error, isPrivate: false) {
-                "Endpoint was not disabled because pending spans could not be persisted."
-            }
-            return false
-        }
-
+    func disableEndpoint() {
+        concreteTraceProcessor.clearEndpoint()
         sessionReplayProcessor.clearEndpoint()
 
         logger.log(level: .info, isPrivate: false) {
             "Endpoint disabled. Spans will be cached and sent when endpoint is configured."
         }
-
-        return true
     }
-}
-
-
-private enum EndpointTransitionError: Error {
-    case tracePersistenceFailed
 }
 
 // MARK: - Processor Creation
