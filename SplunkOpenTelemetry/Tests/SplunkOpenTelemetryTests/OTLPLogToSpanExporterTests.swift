@@ -26,20 +26,32 @@ import Testing
 struct OTLPLogToSpanExporterTests {
 
     @Test
-    func exportUsesInjectedImmediateTracerProvider() {
+    func exportUsesInjectedBatchTracerProvider() {
         let spanExporter = BatchProcessorTestExporter()
+        let spanProcessor = OTLPBatchSpanProcessor(
+            spanExporter: spanExporter,
+            scheduleDelay: 5
+        )
         let tracerProvider = TracerProviderBuilder()
-            .add(spanProcessor: OTLPImmediateSpanProcessor(spanExporter: spanExporter))
+            .add(spanProcessor: spanProcessor)
             .build()
         let exporter = OTLPLogToSpanExporter(
             agentVersion: "1.0.0",
             tracerProvider: tracerProvider
         )
 
+        tracerProvider
+            .get(instrumentationName: "DirectSpanTest")
+            .spanBuilder(spanName: "direct.span")
+            .startSpan()
+            .end()
         let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: nil)
+        spanProcessor.forceFlush(timeout: 1)
 
         #expect(result == .success)
-        #expect(spanExporter.successfulSpanNames == ["test.event"])
+        #expect(spanExporter.waitForExport(timeout: 1) == .success)
+        #expect(spanExporter.successfulSpanNames == ["direct.span", "test.event"])
+        #expect(spanExporter.batches.count == 1)
     }
 
     @Test
@@ -47,8 +59,12 @@ struct OTLPLogToSpanExporterTests {
         let previousTracerProvider = OpenTelemetry.instance.tracerProvider
         let exporter = OTLPLogToSpanExporter(agentVersion: "1.0.0")
         let spanExporter = BatchProcessorTestExporter()
+        let spanProcessor = OTLPBatchSpanProcessor(
+            spanExporter: spanExporter,
+            scheduleDelay: 5
+        )
         let tracerProvider = TracerProviderBuilder()
-            .add(spanProcessor: OTLPImmediateSpanProcessor(spanExporter: spanExporter))
+            .add(spanProcessor: spanProcessor)
             .build()
 
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
@@ -57,8 +73,10 @@ struct OTLPLogToSpanExporterTests {
         }
 
         let result = exporter.export(logRecords: [makeLogRecord()], explicitTimeout: nil)
+        spanProcessor.forceFlush(timeout: 1)
 
         #expect(result == .success)
+        #expect(spanExporter.waitForExport(timeout: 1) == .success)
         #expect(spanExporter.successfulSpanNames == ["test.event"])
     }
 

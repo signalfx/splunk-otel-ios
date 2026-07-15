@@ -74,7 +74,7 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
             with: traceUrl,
             resources: resources,
             debugEnabled: debugEnabled,
-            tracerProvider: traceProcessor.immediateTracerProvider
+            tracerProvider: traceProcessor.tracerProvider
         )
     }
 

@@ -131,10 +131,8 @@ extension DefaultEventManager {
             activityTracker: agent.currentSession
         )
 
-        // Initialize log event processor.
-        // Note: This processor converts logs to spans, so it uses the trace endpoint. It bypasses
-        // the direct-span memory batch so crash/custom/internal events are persisted before
-        // log export reports success.
+        // Initialize the log event processor. Converted spans share the direct-span batch and its
+        // bounded in-memory loss policy.
         let logProcessor = OTLPLogToSpanEventProcessor(
             with: traceUrl,
             resources: resources,

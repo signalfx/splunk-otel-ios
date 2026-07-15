@@ -26,20 +26,19 @@ import SplunkOpenTelemetryBackgroundExporter
 /// Traces are enriched by provided Resources and exported via an instantiated background exporter.
 public class OTLPTraceProcessor: TraceProcessor {
 
-    // MARK: - Private properties
+    // MARK: - Internal properties
 
-    /// OTel tracer provider.
-    private let tracerProvider: TracerProvider
+    /// OTel tracer provider shared by direct and log-derived spans.
+    let tracerProvider: any TracerProvider
+
+
+    // MARK: - Private properties
 
     /// Background exporter for traces (stored to support endpoint updates).
     private let backgroundTraceExporter: any EndpointConfigurableSpanExporter
 
     /// In-memory batch processor for direct spans.
     private let batchSpanProcessor: OTLPBatchSpanProcessor
-
-    /// Tracer provider for log-to-span telemetry that must bypass the in-memory span batch.
-    let immediateTracerProvider: any TracerProvider
-
 
     // MARK: - Initialization
 
@@ -135,17 +134,6 @@ public class OTLPTraceProcessor: TraceProcessor {
 
         self.tracerProvider = tracerProvider
         batchSpanProcessor = spanProcessor
-        immediateTracerProvider = TracerProviderBuilder()
-            .with(resource: resource)
-            .add(spanProcessor: OTLPGlobalAttributesSpanProcessor(with: globalAttributes))
-            .add(
-                spanProcessor: OTLPAttributesSpanProcessor(
-                    with: runtimeAttributes,
-                    activityTracker: activityTracker
-                )
-            )
-            .add(spanProcessor: OTLPImmediateSpanProcessor(spanExporter: spanInterceptorExporter))
-            .build()
     }
 
 
