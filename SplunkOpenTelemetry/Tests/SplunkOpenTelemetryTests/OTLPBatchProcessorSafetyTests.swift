@@ -51,9 +51,11 @@ struct OTLPBatchProcessorSafetyTests {
         #expect(terminalExporter.exportTimeouts.count == 1)
         #expect(terminalExporter.exportTimeouts.allSatisfy { $0 == nil })
         #expect(terminalExporter.flushTimeouts.count == 2)
-        #expect(terminalExporter.flushTimeouts.allSatisfy { timeout in
-            timeout.map { $0 >= 0 && $0 <= 10 } == true
-        })
+        #expect(
+            terminalExporter.flushTimeouts.allSatisfy { timeout in
+                timeout.map { $0 >= 0 && $0 <= 10 } == true
+            }
+        )
         #expect(terminalExporter.successfulSpanCount == 1)
         #expect(terminalExporter.exportAttemptCount == 1)
     }
@@ -121,9 +123,11 @@ struct OTLPBatchProcessorSafetyTests {
 
         exporter.resumeExports()
 
-        #expect(waitUntil(timeout: 5) {
-            exporter.successfulSpanCount == 1 && exporter.flushCount == 1
-        })
+        #expect(
+            waitUntil(timeout: 5) {
+                exporter.successfulSpanCount == 1 && exporter.flushCount == 1
+            }
+        )
     }
 
 

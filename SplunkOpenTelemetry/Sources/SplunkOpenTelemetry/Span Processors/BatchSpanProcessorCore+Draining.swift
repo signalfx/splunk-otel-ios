@@ -48,6 +48,7 @@ extension BatchSpanProcessorCore {
             lock.unlock()
             return
         }
+
         isTimerArmed = true
         lock.unlock()
 
@@ -218,6 +219,8 @@ extension BatchSpanProcessorCore {
     ///   - forwardDeadlineToExporter: When `true`, the remaining deadline is forwarded to the exporter.
     ///     Terminal drains keep this `false`, so their wall-clock wait bound does not become the
     ///     persisted background upload timeout.
+    /// - Returns: `true` when the complete snapshot was drained; otherwise, `false` when the deadline
+    ///   expired or an export failed and was requeued.
     @discardableResult
     func drainSnapshot(
         deadline: Date?,
@@ -324,9 +327,10 @@ extension BatchSpanProcessorCore {
             Task {
                 await prepareForBackground()
 
-                self?.processorQueue.async {
-                    self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
-                }
+                self?.processorQueue
+                    .async {
+                        self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
+                    }
             }
         }
     }

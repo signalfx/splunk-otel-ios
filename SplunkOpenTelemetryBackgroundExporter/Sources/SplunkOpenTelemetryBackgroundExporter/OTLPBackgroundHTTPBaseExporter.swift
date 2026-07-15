@@ -151,12 +151,14 @@ public class OTLPBackgroundHTTPBaseExporter {
     /// The exporter configuration is the hard upper bound. An explicit timeout may shorten that
     /// window, but cannot extend it.
     func flushHTTPClient(explicitTimeout: TimeInterval? = nil) -> Bool {
-        let configuredTimeout = config.timeout.isFinite
+        let configuredTimeout =
+            config.timeout.isFinite
             ? max(0, config.timeout)
             : OTLPExporterConfiguration.defaultTimeoutInterval
-        let requestedTimeout = explicitTimeout.flatMap { timeout in
-            timeout.isFinite ? max(0, timeout) : nil
-        } ?? configuredTimeout
+        let requestedTimeout =
+            explicitTimeout.flatMap { timeout in
+                timeout.isFinite ? max(0, timeout) : nil
+            } ?? configuredTimeout
         let timeout = min(requestedTimeout, configuredTimeout)
         let completed = DispatchSemaphore(value: 0)
 

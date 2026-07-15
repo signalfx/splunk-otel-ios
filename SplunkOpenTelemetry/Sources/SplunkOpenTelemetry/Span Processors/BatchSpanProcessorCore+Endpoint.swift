@@ -20,8 +20,9 @@ import Foundation
 /// Endpoint-transition work for ``BatchSpanProcessorCore``.
 extension BatchSpanProcessorCore {
 
-    /// Drains the spans present when this work reaches `processorQueue`, then applies the endpoint
-    /// mutation on that same queue. An empty buffer skips exporter flushing entirely.
+    /// Drains the spans present when this work reaches `processorQueue`, then applies the endpoint mutation.
+    ///
+    /// An empty buffer skips exporter flushing entirely.
     func transitionEndpoint(
         timeout: TimeInterval?,
         applyEndpoint: @escaping () -> Void
@@ -60,11 +61,13 @@ extension BatchSpanProcessorCore {
         lock.unlock()
 
         if hasBufferedSpans {
-            guard drainSnapshot(
-                deadline: deadline,
-                requeueOnFailure: true,
-                forwardDeadlineToExporter: false
-            ) else {
+            guard
+                drainSnapshot(
+                    deadline: deadline,
+                    requeueOnFailure: true,
+                    forwardDeadlineToExporter: false
+                )
+            else {
                 return false
             }
 

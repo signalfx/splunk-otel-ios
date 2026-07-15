@@ -50,10 +50,12 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
 
 
     // MARK: - Private properties
+
     let core: BatchSpanProcessorCore
 
 
     // MARK: - SpanProcessor settings
+
     let isStartRequired = false
 
     let isEndRequired = true

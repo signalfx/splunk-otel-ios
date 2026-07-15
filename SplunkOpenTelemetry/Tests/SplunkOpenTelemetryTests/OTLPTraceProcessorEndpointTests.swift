@@ -85,10 +85,11 @@ struct OTLPTraceProcessorEndpointTests {
         let callReturned = DispatchSemaphore(value: 0)
 
         endSpan(named: "pre-blocked-endpoint-change")
-        DispatchQueue.global().async {
-            #expect(fixture.processor.setEndpoint(endpoint))
-            callReturned.signal()
-        }
+        DispatchQueue.global()
+            .async {
+                #expect(fixture.processor.setEndpoint(endpoint))
+                callReturned.signal()
+            }
 
         #expect(exporter.waitUntilFlushStarts(timeout: 1) == .success)
         #expect(callReturned.wait(timeout: .now() + 0.1) == .timedOut)
