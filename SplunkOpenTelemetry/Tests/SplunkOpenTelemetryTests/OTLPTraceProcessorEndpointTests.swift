@@ -35,7 +35,7 @@ struct OTLPTraceProcessorEndpointTests {
         let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
 
         endSpan(named: "pre-endpoint-change")
-        fixture.processor.setEndpoint(endpoint)
+        #expect(fixture.processor.setEndpoint(endpoint))
 
         #expect(exporter.waitForEndpointChange(timeout: 1) == .success)
 
@@ -54,7 +54,7 @@ struct OTLPTraceProcessorEndpointTests {
         let fixture = makeFixture(exporter: exporter)
 
         endSpan(named: "pre-endpoint-clear")
-        fixture.processor.clearEndpoint()
+        #expect(fixture.processor.clearEndpoint())
 
         #expect(exporter.waitForEndpointChange(timeout: 1) == .success)
 
@@ -68,20 +68,30 @@ struct OTLPTraceProcessorEndpointTests {
     }
 
     @Test
-    func setEndpointDoesNotBlockMainThreadWhileFlushIsPending() throws {
+    func emptyBufferChangesEndpointWithoutFlushingExporter() throws {
+        let exporter = RecordingEndpointExporter()
+        let fixture = makeFixture(exporter: exporter)
+        let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
+
+        #expect(fixture.processor.setEndpoint(endpoint))
+        #expect(exporter.events == [.setEndpoint(endpoint)])
+    }
+
+    @Test
+    func setEndpointWaitsForBufferedSpanFlushToFinish() throws {
         let exporter = RecordingEndpointExporter(blockFlush: true)
         let fixture = makeFixture(exporter: exporter)
         let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
         let callReturned = DispatchSemaphore(value: 0)
 
         endSpan(named: "pre-blocked-endpoint-change")
-        DispatchQueue.main.async {
-            fixture.processor.setEndpoint(endpoint)
+        DispatchQueue.global().async {
+            #expect(fixture.processor.setEndpoint(endpoint))
             callReturned.signal()
         }
 
-        #expect(callReturned.wait(timeout: .now() + 1) == .success)
         #expect(exporter.waitUntilFlushStarts(timeout: 1) == .success)
+        #expect(callReturned.wait(timeout: .now() + 0.1) == .timedOut)
         #expect(!exporter.events.contains(.setEndpoint(endpoint)))
 
         exporter.resumeFlush()
@@ -94,6 +104,35 @@ struct OTLPTraceProcessorEndpointTests {
                 .setEndpoint(endpoint)
             ]
         )
+    }
+
+    @Test
+    func flushFailureLeavesEndpointUnchanged() throws {
+        let exporter = RecordingEndpointExporter(flushResult: .failure)
+        let fixture = makeFixture(exporter: exporter)
+        let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
+
+        endSpan(named: "pre-failed-endpoint-change")
+
+        #expect(!fixture.processor.setEndpoint(endpoint))
+        #expect(
+            exporter.events == [
+                .export(["pre-failed-endpoint-change"]),
+                .flush
+            ]
+        )
+    }
+
+    @Test
+    func exportFailureLeavesEndpointUnchanged() throws {
+        let exporter = RecordingEndpointExporter(exportResult: .failure)
+        let fixture = makeFixture(exporter: exporter)
+        let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
+
+        endSpan(named: "pre-failed-export-endpoint-change")
+
+        #expect(!fixture.processor.setEndpoint(endpoint))
+        #expect(exporter.events == [.export(["pre-failed-export-endpoint-change"])])
     }
 }
 
@@ -152,13 +191,21 @@ private final class RecordingEndpointExporter: EndpointConfigurableSpanExporter 
 
     private let lock = NSLock()
     private let blockFlush: Bool
+    private let exportResult: SpanExporterResultCode
+    private let flushResult: SpanExporterResultCode
     private let endpointChanged = DispatchSemaphore(value: 0)
     private let flushStarted = DispatchSemaphore(value: 0)
     private let flushResume = DispatchSemaphore(value: 0)
     private var storedEvents: [Event] = []
 
-    init(blockFlush: Bool = false) {
+    init(
+        blockFlush: Bool = false,
+        exportResult: SpanExporterResultCode = .success,
+        flushResult: SpanExporterResultCode = .success
+    ) {
         self.blockFlush = blockFlush
+        self.exportResult = exportResult
+        self.flushResult = flushResult
     }
 
     var events: [Event] {
@@ -169,7 +216,7 @@ private final class RecordingEndpointExporter: EndpointConfigurableSpanExporter 
         withLock {
             storedEvents.append(.export(spans.map(\.name)))
         }
-        return .success
+        return exportResult
     }
 
     func flush(explicitTimeout _: TimeInterval?) -> SpanExporterResultCode {
@@ -180,7 +227,7 @@ private final class RecordingEndpointExporter: EndpointConfigurableSpanExporter 
         if blockFlush {
             flushResume.wait()
         }
-        return .success
+        return flushResult
     }
 
     func shutdown(explicitTimeout _: TimeInterval?) {}

@@ -22,6 +22,11 @@ internal import SplunkOpenTelemetry
 
 extension DefaultEventManager {
 
+    /// Registers the direct-span background drain that runs after async producers flush their spans.
+    func registerTraceBackgroundDrain(prepareForBackground: @escaping () async -> Void) {
+        concreteTraceProcessor.registerBackgroundObserver(prepareForBackground: prepareForBackground)
+    }
+
     /// Registers the direct-span terminal drain that runs after terminal producers flush their spans.
     func registerTraceTerminationDrain(prepareForTermination: @escaping () async -> Void) {
         concreteTraceProcessor.registerTerminationObserver(prepareForTermination: prepareForTermination)
@@ -43,7 +48,9 @@ extension DefaultEventManager {
         }
 
         // Update the trace processor endpoint (this also flushes pending data)
-        concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken)
+        guard concreteTraceProcessor.setEndpoint(traceUrl, accessToken: endpoint.rumAccessToken) else {
+            throw EndpointTransitionError.tracePersistenceFailed
+        }
 
         // Replace semantics: the new config fully replaces the old one.
         // If a session replay URL is provided, activate the processor (also flushes pending data).
@@ -63,14 +70,28 @@ extension DefaultEventManager {
     /// Disables the endpoint configuration.
     ///
     /// Data is cached to pending storage for later sending when a new endpoint is configured.
-    func disableEndpoint() {
-        concreteTraceProcessor.clearEndpoint()
+    @discardableResult
+    func disableEndpoint() -> Bool {
+        guard concreteTraceProcessor.clearEndpoint() else {
+            logger.log(level: .error, isPrivate: false) {
+                "Endpoint was not disabled because pending spans could not be persisted."
+            }
+            return false
+        }
+
         sessionReplayProcessor.clearEndpoint()
 
         logger.log(level: .info, isPrivate: false) {
             "Endpoint disabled. Spans will be cached and sent when endpoint is configured."
         }
+
+        return true
     }
+}
+
+
+private enum EndpointTransitionError: Error {
+    case tracePersistenceFailed
 }
 
 // MARK: - Processor Creation

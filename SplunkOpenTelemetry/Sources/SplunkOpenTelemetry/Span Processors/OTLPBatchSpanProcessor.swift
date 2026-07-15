@@ -50,12 +50,10 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
 
 
     // MARK: - Private properties
-
-    private let core: BatchSpanProcessorCore
+    let core: BatchSpanProcessorCore
 
 
     // MARK: - SpanProcessor settings
-
     let isStartRequired = false
 
     let isEndRequired = true
@@ -106,9 +104,17 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
         core.forceFlush(timeout: timeout, completion: completion)
     }
 
-    /// Registers the terminal lifecycle drain that runs after terminal producers flush their spans.
-    func registerTerminationObserver(prepareForTermination: @escaping () async -> Void) {
-        core.registerTerminationObserver(prepareForTermination: prepareForTermination)
+    /// Drains the current snapshot and applies an endpoint mutation in export order.
+    ///
+    /// Unlike general-purpose `forceFlush`, this intentionally blocks callers (including the main
+    /// thread) for a bounded interval. Endpoint reconfiguration is expected to be a rare startup
+    /// operation, and returning only after the mutation is effective prevents spans ended after the
+    /// call from being persisted for the previous endpoint.
+    func transitionEndpoint(
+        timeout: TimeInterval? = nil,
+        applyEndpoint: @escaping () -> Void
+    ) -> Bool {
+        core.transitionEndpoint(timeout: timeout, applyEndpoint: applyEndpoint)
     }
 }
 
@@ -167,17 +173,20 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
         qos: .utility
     )
 
-    private let processorQueueKey = DispatchSpecificKey<Void>()
+    let processorQueueKey = DispatchSpecificKey<Void>()
 
     /// Guards `queue`, `isShutdown`, `isFlushScheduled`, and the drop-tracking counters.
     let lock = NSLock()
 
     var queue: ReadableSpanQueue
 
-    private var isShutdown = false
+    var isShutdown = false
 
     /// Coalesces size-triggered flushes: at most one drain is pending on `processorQueue` at a time.
     var isFlushScheduled = false
+
+    /// Tracks whether the dormant one-shot timer is currently armed; guarded by `lock`.
+    var isTimerArmed = false
 
     /// Cumulative number of spans dropped this session (overflow + failed exports); guarded by `lock`.
     private var droppedSpanCount = 0
@@ -215,7 +224,6 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
 
         processorQueue.setSpecific(key: processorQueueKey, value: ())
         startTimer()
-        registerBackgroundObserver()
     }
 
     deinit {
@@ -245,6 +253,8 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
             recordDroppedSpans(1, reason: "queue full (capacity \(maxQueueSize))")
             return
         }
+
+        armTimerIfNeeded()
 
         if count >= maxExportBatchSize {
             scheduleFlush()
@@ -341,7 +351,7 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
         min(Self.shutdownWaitTimeout, max(0, explicitTimeout ?? Self.shutdownWaitTimeout))
     }
 
-    private func forceFlushWaitTimeout(for explicitTimeout: TimeInterval?) -> TimeInterval {
+    func forceFlushWaitTimeout(for explicitTimeout: TimeInterval?) -> TimeInterval {
         max(0, explicitTimeout ?? Self.forceFlushWaitTimeout)
     }
 
@@ -349,7 +359,6 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
         drainSnapshot(deadline: deadline, requeueOnFailure: true, forwardDeadlineToExporter: false)
         _ = spanExporter.flush(explicitTimeout: max(0, deadline.timeIntervalSinceNow))
     }
-
 
     // MARK: - Drop accounting
 

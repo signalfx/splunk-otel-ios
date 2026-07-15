@@ -33,12 +33,57 @@ extension BatchSpanProcessorCore {
 
     func startTimer() {
         let timer = DispatchSource.makeTimerSource(queue: processorQueue)
-        timer.schedule(deadline: .now() + scheduleDelay, repeating: scheduleDelay)
+        timer.schedule(deadline: .distantFuture)
         timer.setEventHandler { [weak self] in
-            self?.exportCurrentBatch(retryOnFailure: true, explicitTimeout: nil)
+            self?.timerDidFire()
         }
         timer.resume()
         self.timer = timer
+    }
+
+    /// Arms the dormant one-shot timer when the first span enters an empty queue.
+    func armTimerIfNeeded() {
+        lock.lock()
+        guard !isShutdown, !isTimerArmed, !queue.isEmpty else {
+            lock.unlock()
+            return
+        }
+        isTimerArmed = true
+        lock.unlock()
+
+        processorQueue.async { [weak self] in
+            self?.scheduleArmedTimer()
+        }
+    }
+
+    private func scheduleArmedTimer() {
+        lock.lock()
+        let shouldArm = !isShutdown && isTimerArmed && !queue.isEmpty
+        if !shouldArm {
+            isTimerArmed = false
+        }
+        lock.unlock()
+
+        timer?.schedule(deadline: shouldArm ? .now() + scheduleDelay : .distantFuture)
+    }
+
+    private func timerDidFire() {
+        lock.lock()
+        isTimerArmed = false
+        lock.unlock()
+
+        exportCurrentBatch(retryOnFailure: true, explicitTimeout: nil)
+        refreshTimerAfterDrain()
+    }
+
+    /// Rearms the one-shot timer only when a drain leaves spans queued.
+    private func refreshTimerAfterDrain() {
+        lock.lock()
+        let shouldArm = !isShutdown && !queue.isEmpty
+        isTimerArmed = shouldArm
+        lock.unlock()
+
+        timer?.schedule(deadline: shouldArm ? .now() + scheduleDelay : .distantFuture)
     }
 
 
@@ -67,6 +112,8 @@ extension BatchSpanProcessorCore {
     /// The count is snapshotted so the drain is bounded; spans that arrive afterward re-arm the flag.
     /// Must run on `processorQueue`.
     private func performScheduledFlush() {
+        defer { refreshTimerAfterDrain() }
+
         lock.lock()
         isFlushScheduled = false
         let available = queue.count
@@ -128,6 +175,8 @@ extension BatchSpanProcessorCore {
     /// spans left after a non-nil deadline are also dropped. Drops are accounted for and logged via
     /// ``recordDroppedSpans(_:reason:)``.
     func drainAll(deadline: Date?) {
+        defer { refreshTimerAfterDrain() }
+
         while true {
             if let deadline, Date() >= deadline {
                 dropRemainingSpans(reason: "shutdown drain deadline exceeded")
@@ -169,26 +218,33 @@ extension BatchSpanProcessorCore {
     ///   - forwardDeadlineToExporter: When `true`, the remaining deadline is forwarded to the exporter.
     ///     Terminal drains keep this `false`, so their wall-clock wait bound does not become the
     ///     persisted background upload timeout.
-    func drainSnapshot(deadline: Date?, requeueOnFailure: Bool, forwardDeadlineToExporter: Bool = true) {
+    @discardableResult
+    func drainSnapshot(
+        deadline: Date?,
+        requeueOnFailure: Bool,
+        forwardDeadlineToExporter: Bool = true
+    ) -> Bool {
+        defer { refreshTimerAfterDrain() }
+
         lock.lock()
         var remaining = queue.count
         lock.unlock()
 
         while remaining > 0 {
             if let deadline, Date() >= deadline {
-                break
+                return false
             }
 
             lock.lock()
             if queue.isEmpty {
                 lock.unlock()
-                break
+                return false
             }
             let batch = queue.removeFirst(min(maxExportBatchSize, remaining))
             lock.unlock()
 
             guard !batch.isEmpty else {
-                break
+                return false
             }
 
             let result = spanExporter.export(
@@ -201,7 +257,7 @@ extension BatchSpanProcessorCore {
                     // Best effort: put the batch back and stop, rather than re-exporting the same
                     // failing batch within this bounded drain. The timer / next flush will retry.
                     requeueFailedBatch(batch, reason: "export failed and queue full during drain")
-                    break
+                    return false
                 }
 
                 recordDroppedSpans(batch.count, reason: "export failed during drain")
@@ -209,6 +265,8 @@ extension BatchSpanProcessorCore {
 
             remaining -= batch.count
         }
+
+        return true
     }
 
     private func requeueFailedBatch(_ batch: [ReadableSpan], reason: String) {
@@ -241,7 +299,7 @@ extension BatchSpanProcessorCore {
 
     // MARK: - Lifecycle
 
-    func registerBackgroundObserver() {
+    func registerBackgroundObserver(prepareForBackground: @escaping () async -> Void) {
         #if os(iOS) || os(tvOS) || os(visionOS)
             guard backgroundObserver == nil else {
                 return
@@ -252,21 +310,24 @@ extension BatchSpanProcessorCore {
                 object: nil,
                 queue: nil
             ) { [weak self] _ in
-                self?.flushAfterBackgroundNotification()
+                self?.flushAfterBackgroundNotification(prepareForBackground: prepareForBackground)
             }
             backgroundObserver = backgroundToken
         #endif
     }
 
-    private func flushAfterBackgroundNotification() {
+    private func flushAfterBackgroundNotification(prepareForBackground: @escaping () async -> Void) {
         // Defer one main-queue turn so later didEnterBackground observers can enqueue lifecycle spans
         // before this snapshot is taken. The app stays alive in the background, so keep the actual
         // drain asynchronous and off the notification thread.
         DispatchQueue.main.async { [weak self] in
-            self?.processorQueue
-                .async {
+            Task {
+                await prepareForBackground()
+
+                self?.processorQueue.async {
                     self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
                 }
+            }
         }
     }
 
@@ -317,5 +378,19 @@ extension BatchSpanProcessorCore {
         for token in tokens {
             NotificationCenter.default.removeObserver(token)
         }
+    }
+}
+
+
+extension OTLPBatchSpanProcessor {
+
+    /// Registers the background drain that runs after asynchronous producers flush their spans.
+    func registerBackgroundObserver(prepareForBackground: @escaping () async -> Void) {
+        core.registerBackgroundObserver(prepareForBackground: prepareForBackground)
+    }
+
+    /// Registers the terminal lifecycle drain that runs after terminal producers flush their spans.
+    func registerTerminationObserver(prepareForTermination: @escaping () async -> Void) {
+        core.registerTerminationObserver(prepareForTermination: prepareForTermination)
     }
 }

@@ -27,7 +27,8 @@ extension SplunkRum {
     /// without an endpoint.
     ///
     /// - Parameter endpoint: The ``EndpointConfiguration`` to use for sending data.
-    /// - Throws: ``AgentConfigurationError`` if the provided endpoint is invalid.
+    /// - Throws: An error if the provided endpoint is invalid or pending spans cannot be persisted
+    ///   before the endpoint transition deadline.
     public func updateEndpoint(_ endpoint: EndpointConfiguration) throws {
         // Try to update the event manager if available
         if let eventManager = eventManager as? DefaultEventManager {
@@ -69,10 +70,15 @@ extension SplunkRum {
     /// Data is cached to pending storage for later sending when a new endpoint is
     /// configured via ``updateEndpoint(_:)``.
     public func disableEndpoint() {
-        currentEndpoint = nil
-
         if let eventManager = eventManager as? DefaultEventManager {
-            eventManager.disableEndpoint()
+            guard eventManager.disableEndpoint() else {
+                logger.log(level: .error, isPrivate: false) {
+                    "Endpoint remains active because pending spans could not be persisted."
+                }
+                return
+            }
+
+            currentEndpoint = nil
             updateNetworkExclusionList(for: nil)
 
             logger.log(level: .info, isPrivate: false) {
@@ -80,6 +86,7 @@ extension SplunkRum {
             }
         }
         else {
+            currentEndpoint = nil
             logger.log(level: .warn, isPrivate: false) {
                 "Endpoint disabled but event manager is not available."
             }

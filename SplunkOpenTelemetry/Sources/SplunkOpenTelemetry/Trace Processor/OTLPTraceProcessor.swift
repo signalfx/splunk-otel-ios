@@ -151,6 +151,11 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Lifecycle
 
+    /// Registers the direct-span background drain triggered after asynchronous producers flush their spans.
+    package func registerBackgroundObserver(prepareForBackground: @escaping () async -> Void) {
+        batchSpanProcessor.registerBackgroundObserver(prepareForBackground: prepareForBackground)
+    }
+
     /// Registers the direct-span termination drain triggered after terminal producers flush their spans.
     ///
     /// The handler gives known terminal producers a chance to synchronously enqueue their direct spans,
@@ -162,26 +167,31 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Endpoint Management
 
-    /// Asynchronously flushes pending data, then updates the endpoint in export order.
+    /// Flushes pending direct spans, then updates the endpoint in export order.
     ///
     /// - Parameters:
     ///   - newEndpoint: The new endpoint URL.
     ///   - accessToken: Optional access token to use for authentication.
-    public func setEndpoint(_ newEndpoint: URL, accessToken: String? = nil) {
+    /// - Returns: `true` when the endpoint is active, or `false` when the bounded drain failed or timed out.
+    @discardableResult
+    package func setEndpoint(_ newEndpoint: URL, accessToken: String? = nil) -> Bool {
         var headers: [String: String] = [:]
 
         if let accessToken, !accessToken.isEmpty {
             headers["X-SF-Token"] = accessToken
         }
 
-        batchSpanProcessor.forceFlush { [backgroundTraceExporter] in
+        return batchSpanProcessor.transitionEndpoint { [backgroundTraceExporter] in
             backgroundTraceExporter.setEndpoint(newEndpoint, headers: headers)
         }
     }
 
-    /// Asynchronously flushes pending data, then clears the endpoint in export order.
-    public func clearEndpoint() {
-        batchSpanProcessor.forceFlush { [backgroundTraceExporter] in
+    /// Flushes pending direct spans, then clears the endpoint in export order.
+    ///
+    /// - Returns: `true` when the endpoint is cleared, or `false` when the bounded drain failed or timed out.
+    @discardableResult
+    package func clearEndpoint() -> Bool {
+        batchSpanProcessor.transitionEndpoint { [backgroundTraceExporter] in
             backgroundTraceExporter.clearEndpoint()
         }
     }

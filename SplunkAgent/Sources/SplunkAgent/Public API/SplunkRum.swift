@@ -306,7 +306,7 @@ public class SplunkRum: ObservableObject {
         // Runs module-specific customizations
         customizeModules()
 
-        configureTraceTerminationDrain()
+        configureTraceLifecycleDrains()
 
         initializeEvents["modules_customized"] = Date()
 

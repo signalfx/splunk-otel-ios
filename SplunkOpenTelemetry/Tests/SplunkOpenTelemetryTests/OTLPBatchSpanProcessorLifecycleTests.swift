@@ -40,6 +40,7 @@ import Testing
                 maxQueueSize: 2_048
             )
             let tracer = makeTracer(for: processor)
+            processor.registerBackgroundObserver {}
 
             endSpans(5, using: tracer)
             #expect(exporter.successfulSpanCount == 0)
@@ -59,6 +60,7 @@ import Testing
                 maxQueueSize: 2_048
             )
             let tracer = makeTracer(for: processor)
+            processor.registerBackgroundObserver {}
 
             let lateObserver = await MainActor.run {
                 NotificationCenter.default.addObserver(
@@ -76,6 +78,27 @@ import Testing
             await postDidEnterBackgroundNotification()
 
             #expect(waitUntil(timeout: 5) { exporter.successfulSpanNames == ["late-background"] })
+        }
+
+        @Test
+        func enteringBackgroundAwaitsAsyncProducerBeforeSnapshot() async {
+            let exporter = BatchProcessorTestExporter()
+            let processor = OTLPBatchSpanProcessor(
+                spanExporter: exporter,
+                scheduleDelay: Self.neverFires,
+                maxExportBatchSize: Self.hugeBatch,
+                maxQueueSize: 2_048
+            )
+            let tracer = makeTracer(for: processor)
+
+            processor.registerBackgroundObserver {
+                try? await Task.sleep(nanoseconds: 50_000_000)
+                tracer.spanBuilder(spanName: "async-background").startSpan().end()
+            }
+
+            await postDidEnterBackgroundNotification()
+
+            #expect(waitUntil(timeout: 5) { exporter.successfulSpanNames == ["async-background"] })
         }
 
 

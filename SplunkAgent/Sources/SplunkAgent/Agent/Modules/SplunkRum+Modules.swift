@@ -72,15 +72,22 @@ extension SplunkRum {
         customizeSlowFrameDetector()
     }
 
-    func configureTraceTerminationDrain() {
+    func configureTraceLifecycleDrains() {
         let appStateModule = modulesManager?.module(ofType: SplunkAppState.AppStateModule.self)
         let slowFrameDetectorModule = modulesManager?.module(ofType: SplunkSlowFrameDetector.SlowFrameDetector.self)
 
-        (eventManager as? DefaultEventManager)?
-            .registerTraceTerminationDrain {
-                appStateModule?.flushTerminateTelemetry()
-                await slowFrameDetectorModule?.flushBufferedTelemetryForTermination()
-            }
+        guard let eventManager = eventManager as? DefaultEventManager else {
+            return
+        }
+
+        eventManager.registerTraceBackgroundDrain {
+            await slowFrameDetectorModule?.flushBufferedTelemetryForBackground()
+        }
+
+        eventManager.registerTraceTerminationDrain {
+            appStateModule?.flushTerminateTelemetry()
+            await slowFrameDetectorModule?.flushBufferedTelemetryForTermination()
+        }
     }
 
     // MARK: - Session Replay

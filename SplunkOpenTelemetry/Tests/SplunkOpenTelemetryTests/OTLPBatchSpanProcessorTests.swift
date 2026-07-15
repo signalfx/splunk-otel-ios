@@ -66,6 +66,26 @@ struct OTLPBatchSpanProcessorTests {
         #expect(exporter.batches.allSatisfy { $0.count <= 100 })
     }
 
+    @Test
+    func timerIsArmedOnlyWhileSpansAreBuffered() {
+        let exporter = BatchProcessorTestExporter()
+        let processor = OTLPBatchSpanProcessor(
+            spanExporter: exporter,
+            scheduleDelay: Self.neverFires,
+            maxExportBatchSize: Self.hugeBatch,
+            maxQueueSize: 2_048
+        )
+        let tracer = makeTracer(for: processor)
+
+        #expect(!processor.core.isTimerArmed)
+
+        endSpans(1, using: tracer)
+        #expect(processor.core.isTimerArmed)
+
+        processor.forceFlush()
+        #expect(!processor.core.isTimerArmed)
+    }
+
 
     // MARK: - Chunking
 
