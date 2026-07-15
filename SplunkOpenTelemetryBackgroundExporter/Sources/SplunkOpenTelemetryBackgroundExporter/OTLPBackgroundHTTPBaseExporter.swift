@@ -34,6 +34,7 @@ public class OTLPBackgroundHTTPBaseExporter {
     private let stateLock = NSLock()
     private var storedEndpoint: URL?
     private var storedAdditionalHeaders: [String: String]
+    private var endpointRevision: UInt64 = 0
 
     // MARK: - Internal
 
@@ -45,16 +46,9 @@ public class OTLPBackgroundHTTPBaseExporter {
 
     /// Thread-safe accessor for the endpoint URL.
     var endpoint: URL? {
-        get {
-            stateLock.lock()
-            defer { stateLock.unlock() }
-            return storedEndpoint
-        }
-        set {
-            stateLock.lock()
-            defer { stateLock.unlock() }
-            storedEndpoint = newValue
-        }
+        stateLock.lock()
+        defer { stateLock.unlock() }
+        return storedEndpoint
     }
 
     /// Thread-safe accessor for additional headers.
@@ -128,6 +122,8 @@ public class OTLPBackgroundHTTPBaseExporter {
     /// In-flight uploads targeting the previous endpoint are rescheduled by the stalled upload check (within 5–8s).
     public func setEndpoint(_ newEndpoint: URL, headers newHeaders: [String: String]? = nil) {
         stateLock.lock()
+        endpointRevision &+= 1
+        let activationRevision = endpointRevision
         storedEndpoint = newEndpoint
         if let newHeaders {
             storedAdditionalHeaders = newHeaders
@@ -135,7 +131,7 @@ public class OTLPBackgroundHTTPBaseExporter {
         stateLock.unlock()
 
         endpointMaintenanceQueue.async {
-            self.flushPendingData()
+            self.flushPendingData(for: activationRevision)
         }
 
         if performStalledUploadCheck {
@@ -147,7 +143,11 @@ public class OTLPBackgroundHTTPBaseExporter {
     public func clearEndpoint() {
         checkStalledTask?.cancel()
         checkStalledTask = nil
-        endpoint = nil
+
+        stateLock.lock()
+        endpointRevision &+= 1
+        storedEndpoint = nil
+        stateLock.unlock()
     }
 
 
@@ -310,9 +310,8 @@ extension OTLPBackgroundHTTPBaseExporter {
     }
 
     /// Flushes any data stored in pending storage by moving it to active storage and scheduling uploads.
-    private func flushPendingData() {
-        let (currentEndpoint, currentHeaders) = getEndpointState()
-        guard let currentEndpoint else {
+    private func flushPendingData(for activationRevision: UInt64) {
+        guard endpointState(for: activationRevision) != nil else {
             return
         }
 
@@ -321,6 +320,10 @@ extension OTLPBackgroundHTTPBaseExporter {
         }
 
         for fileInfo in pendingFiles {
+            guard endpointState(for: activationRevision) != nil else {
+                return
+            }
+
             let pendingKey = KeyBuilder(fileInfo.key, parrentKeyBuilder: getPendingStorageKey())
             let activeKey = KeyBuilder(fileInfo.key, parrentKeyBuilder: getStorageKey())
 
@@ -332,6 +335,10 @@ extension OTLPBackgroundHTTPBaseExporter {
 
                 guard let requestId = UUID(uuidString: fileInfo.key) else {
                     continue
+                }
+
+                guard let (currentEndpoint, currentHeaders) = endpointState(for: activationRevision) else {
+                    return
                 }
 
                 let requestDescriptor = RequestDescriptor(
@@ -355,6 +362,17 @@ extension OTLPBackgroundHTTPBaseExporter {
         return (storedEndpoint, storedAdditionalHeaders)
     }
 
+    private func endpointState(for activationRevision: UInt64) -> (endpoint: URL, headers: [String: String])? {
+        stateLock.lock()
+        defer { stateLock.unlock() }
+
+        guard endpointRevision == activationRevision, let storedEndpoint else {
+            return nil
+        }
+
+        return (storedEndpoint, storedAdditionalHeaders)
+    }
+
     private func buildHeaders(from additionalHeaders: [String: String]) -> [String: String] {
         var combinedHeaders = [
             OTLPHTTPHeaders.userAgentKey: OTLPHTTPHeaders.userAgent(agentVersion: config.agentVersion)
@@ -370,28 +388,5 @@ extension OTLPBackgroundHTTPBaseExporter {
             }
         }
         return combinedHeaders
-    }
-
-    private func normalizedHeaderKey(_ key: String) -> String {
-        if key.caseInsensitiveCompare(OTLPHTTPHeaders.userAgentKey) == .orderedSame {
-            return OTLPHTTPHeaders.userAgentKey
-        }
-
-        return key
-    }
-
-    private func inferPayloadFormat(forFileKey fileKey: String) -> RequestPayloadFormat {
-        guard
-            let fileURL = try? diskStorage.finalDestination(forKey: getStorageKey().append(fileKey)),
-            let payloadData = try? Data(contentsOf: fileURL)
-        else {
-            return .json
-        }
-
-        if (try? JSONSerialization.jsonObject(with: payloadData)) != nil {
-            return .json
-        }
-
-        return .protobuf
     }
 }

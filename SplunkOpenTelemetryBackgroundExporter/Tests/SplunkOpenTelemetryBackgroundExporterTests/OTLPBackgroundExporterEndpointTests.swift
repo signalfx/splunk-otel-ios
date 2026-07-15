@@ -15,6 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import CiscoDiskStorage
+import CiscoEncryption
 import Foundation
 import Testing
 
@@ -53,5 +55,135 @@ struct OTLPBackgroundExporterEndpointTests {
         #expect(scanStarted.wait(timeout: .now() + 1) == .success)
         #expect(callReturned.wait(timeout: .now() + 0.1) == .success)
         #expect(exporter.endpoint == endpoint)
+    }
+
+    @Test
+    func disablingEndpointCancelsInProgressPendingActivation() throws {
+        let backingDisk = FilesystemDiskStorage(
+            prefix: FilesystemPrefix(module: "OTLPBackgroundExporterEndpointTests.\(UUID().uuidString)"),
+            rules: Rules(),
+            encryption: NoneEncryption()
+        )
+        let disk = BlockingListDiskStorage(wrapping: backingDisk)
+        let exporter = OTLPBackgroundHTTPBaseExporter(
+            endpoint: nil,
+            qosConfig: SessionQOSConfiguration(),
+            envVarHeaders: nil,
+            diskStorage: disk,
+            performStalledUploadCheck: false
+        )
+        let httpClient = EndpointSendSpyHTTPClient()
+        exporter.httpClient = httpClient
+
+        let requestID = UUID().uuidString
+        let pendingKey = exporter.getPendingStorageKey().append(requestID)
+        let activeKey = exporter.getStorageKey().append(requestID)
+        try disk.insert(Data("payload".utf8), forKey: pendingKey)
+        defer {
+            try? disk.delete(forKey: pendingKey)
+            try? disk.delete(forKey: activeKey)
+            disk.resumeList()
+        }
+
+        let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
+        exporter.setEndpoint(endpoint)
+        #expect(disk.waitUntilListStarts(timeout: 1) == .success)
+
+        exporter.clearEndpoint()
+        disk.resumeList()
+
+        #expect(disk.waitUntilListReturns(timeout: 1) == .success)
+        #expect(httpClient.waitForSend(timeout: 0.2) == .timedOut)
+        #expect(httpClient.sentEndpoints.isEmpty)
+        #expect(exporter.endpoint == nil)
+    }
+}
+
+private final class BlockingListDiskStorage: DiskStorage {
+    private let wrapped: any DiskStorage
+    private let listStarted = DispatchSemaphore(value: 0)
+    private let listReturned = DispatchSemaphore(value: 0)
+    private let resumeListSemaphore = DispatchSemaphore(value: 0)
+
+    init(wrapping wrapped: any DiskStorage) {
+        self.wrapped = wrapped
+    }
+
+    var statistics: (any Statistics)? {
+        wrapped.statistics
+    }
+
+    func insert(_ value: some Decodable & Encodable, forKey key: KeyBuilder) throws {
+        try wrapped.insert(value, forKey: key)
+    }
+
+    func read<T: Decodable & Encodable>(forKey key: KeyBuilder) throws -> T? {
+        try wrapped.read(forKey: key)
+    }
+
+    func update(_ value: some Decodable & Encodable, forKey key: KeyBuilder) throws {
+        try wrapped.update(value, forKey: key)
+    }
+
+    func delete(forKey key: KeyBuilder) throws {
+        try wrapped.delete(forKey: key)
+    }
+
+    func list(forKey key: KeyBuilder) throws -> [ItemInfo] {
+        listStarted.signal()
+        resumeListSemaphore.wait()
+        defer { listReturned.signal() }
+        return try wrapped.list(forKey: key)
+    }
+
+    func finalDestination(forKey key: KeyBuilder) throws -> URL {
+        try wrapped.finalDestination(forKey: key)
+    }
+
+    func checkRules() throws {
+        try wrapped.checkRules()
+    }
+
+    func waitUntilListStarts(timeout: TimeInterval) -> DispatchTimeoutResult {
+        listStarted.wait(timeout: .now() + timeout)
+    }
+
+    func waitUntilListReturns(timeout: TimeInterval) -> DispatchTimeoutResult {
+        listReturned.wait(timeout: .now() + timeout)
+    }
+
+    func resumeList() {
+        resumeListSemaphore.signal()
+    }
+}
+
+private final class EndpointSendSpyHTTPClient: NSObject, BackgroundHTTPClientProtocol {
+    private let lock = NSLock()
+    private let sendCalled = DispatchSemaphore(value: 0)
+    private var storedSentEndpoints: [URL] = []
+
+    var sentEndpoints: [URL] {
+        lock.lock()
+        defer { lock.unlock() }
+        return storedSentEndpoints
+    }
+
+    func send(_ requestDescriptor: RequestDescriptorProtocol) {
+        lock.lock()
+        storedSentEndpoints.append(requestDescriptor.endpoint)
+        lock.unlock()
+        sendCalled.signal()
+    }
+
+    func flush(completion: @escaping () -> Void) {
+        completion()
+    }
+
+    func getAllSessionsTasks(_ completionHandler: @escaping ([URLSessionTask]) -> Void) {
+        completionHandler([])
+    }
+
+    func waitForSend(timeout: TimeInterval) -> DispatchTimeoutResult {
+        sendCalled.wait(timeout: .now() + timeout)
     }
 }
