@@ -108,6 +108,24 @@ import XCTest
             XCTAssertEqual(counts["slowRenders"], 1)
         }
 
+        /// Verifies that termination does not flush telemetry when the detector is disabled.
+        func testDisabledDetectorDoesNotFlushBuffersOnTermination() async throws {
+            let detector = try XCTUnwrap(detector)
+            let mockDestination = try XCTUnwrap(mockDestination)
+            let frameDuration = 1.0 / 60.0
+
+            detector.install(
+                with: SlowFrameDetectorConfiguration(isEnabled: false),
+                remoteConfiguration: nil
+            )
+            await detector.handleFrameForTest(timestamp: 0, duration: frameDuration)
+            await detector.handleFrameForTest(timestamp: 0.1, duration: frameDuration)
+
+            await detector.flushBufferedTelemetryForTermination()
+
+            XCTAssertTrue(mockDestination.reportedCounts.isEmpty)
+        }
+
 
         // MARK: - Frame Detection Tests
 

@@ -194,6 +194,10 @@ public final class SlowFrameDetector: NSObject {
     }
 
     package func flushBufferedTelemetryForTermination() async {
+        guard isEnabled else {
+            return
+        }
+
         await logic.appWillTerminate()
     }
 
