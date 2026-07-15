@@ -184,7 +184,7 @@ extension BatchSpanProcessorCore {
                 lock.unlock()
                 break
             }
-            let batch = queue.removeFirst(maxExportBatchSize)
+            let batch = queue.removeFirst(min(maxExportBatchSize, remaining))
             lock.unlock()
 
             guard !batch.isEmpty else {
