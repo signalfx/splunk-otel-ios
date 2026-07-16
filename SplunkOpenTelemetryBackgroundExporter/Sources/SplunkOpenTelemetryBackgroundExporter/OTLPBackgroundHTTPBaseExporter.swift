@@ -324,6 +324,10 @@ extension OTLPBackgroundHTTPBaseExporter {
                 return
             }
 
+            guard let requestId = UUID(uuidString: fileInfo.key) else {
+                continue
+            }
+
             let pendingKey = KeyBuilder(fileInfo.key, parrentKeyBuilder: getPendingStorageKey())
             let activeKey = KeyBuilder(fileInfo.key, parrentKeyBuilder: getStorageKey())
 
@@ -331,11 +335,6 @@ extension OTLPBackgroundHTTPBaseExporter {
                 let pendingFileUrl = try diskStorage.finalDestination(forKey: pendingKey)
                 let data = try Data(contentsOf: pendingFileUrl)
                 try diskStorage.insert(data, forKey: activeKey)
-                try diskStorage.delete(forKey: pendingKey)
-
-                guard let requestId = UUID(uuidString: fileInfo.key) else {
-                    continue
-                }
 
                 guard let (currentEndpoint, currentHeaders) = endpointState(for: activationRevision) else {
                     return
@@ -349,6 +348,7 @@ extension OTLPBackgroundHTTPBaseExporter {
                     headers: buildHeaders(from: currentHeaders)
                 )
                 try httpClient.send(requestDescriptor)
+                try diskStorage.delete(forKey: pendingKey)
             }
             catch {
                 continue

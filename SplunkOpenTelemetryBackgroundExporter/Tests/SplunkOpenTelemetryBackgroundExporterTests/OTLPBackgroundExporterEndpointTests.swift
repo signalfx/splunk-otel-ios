@@ -97,6 +97,51 @@ struct OTLPBackgroundExporterEndpointTests {
         #expect(httpClient.sentEndpoints.isEmpty)
         #expect(exporter.endpoint == nil)
     }
+
+    @Test
+    func canceledActivationRetainsPendingPayloadForNextActivation() throws {
+        let backingDisk = FilesystemDiskStorage(
+            prefix: FilesystemPrefix(module: "OTLPBackgroundExporterEndpointTests.\(UUID().uuidString)"),
+            rules: Rules(),
+            encryption: NoneEncryption()
+        )
+        let disk = BlockingInsertDiskStorage(wrapping: backingDisk)
+        let exporter = OTLPBackgroundHTTPBaseExporter(
+            endpoint: nil,
+            qosConfig: SessionQOSConfiguration(),
+            envVarHeaders: nil,
+            diskStorage: disk,
+            performStalledUploadCheck: false
+        )
+        let httpClient = EndpointSendSpyHTTPClient()
+        exporter.httpClient = httpClient
+
+        let requestID = UUID().uuidString
+        let pendingKey = exporter.getPendingStorageKey().append(requestID)
+        let activeKey = exporter.getStorageKey().append(requestID)
+        try disk.insert(Data("payload".utf8), forKey: pendingKey)
+        disk.blockNextInsert(for: activeKey)
+        disk.observeDelete(for: pendingKey)
+        defer {
+            disk.resumeInsert()
+            try? disk.delete(forKey: pendingKey)
+            try? disk.delete(forKey: activeKey)
+        }
+
+        let firstEndpoint = try #require(URL(string: "https://first.example.com/v1/traces"))
+        let secondEndpoint = try #require(URL(string: "https://second.example.com/v1/traces"))
+        exporter.setEndpoint(firstEndpoint)
+        #expect(disk.waitUntilInsertStarts(timeout: 1) == .success)
+
+        exporter.clearEndpoint()
+        exporter.setEndpoint(secondEndpoint)
+        disk.resumeInsert()
+
+        #expect(httpClient.waitForSend(timeout: 1) == .success)
+        #expect(disk.waitUntilObservedDelete(timeout: 1) == .success)
+        #expect(httpClient.sentEndpoints == [secondEndpoint])
+        #expect(try disk.list(forKey: exporter.getPendingStorageKey()).isEmpty)
+    }
 }
 
 private final class BlockingListDiskStorage: DiskStorage {
@@ -154,6 +199,96 @@ private final class BlockingListDiskStorage: DiskStorage {
 
     func resumeList() {
         resumeListSemaphore.signal()
+    }
+}
+
+private final class BlockingInsertDiskStorage: DiskStorage {
+    private let wrapped: any DiskStorage
+    private let insertStarted = DispatchSemaphore(value: 0)
+    private let resumeInsertSemaphore = DispatchSemaphore(value: 0)
+    private let observedDelete = DispatchSemaphore(value: 0)
+    private let lock = NSLock()
+    private var blockedKey: String?
+    private var observedDeleteKey: String?
+
+    init(wrapping wrapped: any DiskStorage) {
+        self.wrapped = wrapped
+    }
+
+    var statistics: (any Statistics)? {
+        wrapped.statistics
+    }
+
+    func insert(_ value: some Decodable & Encodable, forKey key: KeyBuilder) throws {
+        try wrapped.insert(value, forKey: key)
+
+        lock.lock()
+        let shouldBlock = blockedKey == key.key
+        if shouldBlock {
+            blockedKey = nil
+        }
+        lock.unlock()
+
+        if shouldBlock {
+            insertStarted.signal()
+            resumeInsertSemaphore.wait()
+        }
+    }
+
+    func read<T: Decodable & Encodable>(forKey key: KeyBuilder) throws -> T? {
+        try wrapped.read(forKey: key)
+    }
+
+    func update(_ value: some Decodable & Encodable, forKey key: KeyBuilder) throws {
+        try wrapped.update(value, forKey: key)
+    }
+
+    func delete(forKey key: KeyBuilder) throws {
+        try wrapped.delete(forKey: key)
+
+        lock.lock()
+        let shouldSignal = observedDeleteKey == key.key
+        lock.unlock()
+
+        if shouldSignal {
+            observedDelete.signal()
+        }
+    }
+
+    func list(forKey key: KeyBuilder) throws -> [ItemInfo] {
+        try wrapped.list(forKey: key)
+    }
+
+    func finalDestination(forKey key: KeyBuilder) throws -> URL {
+        try wrapped.finalDestination(forKey: key)
+    }
+
+    func checkRules() throws {
+        try wrapped.checkRules()
+    }
+
+    func blockNextInsert(for key: KeyBuilder) {
+        lock.lock()
+        blockedKey = key.key
+        lock.unlock()
+    }
+
+    func observeDelete(for key: KeyBuilder) {
+        lock.lock()
+        observedDeleteKey = key.key
+        lock.unlock()
+    }
+
+    func waitUntilInsertStarts(timeout: TimeInterval) -> DispatchTimeoutResult {
+        insertStarted.wait(timeout: .now() + timeout)
+    }
+
+    func waitUntilObservedDelete(timeout: TimeInterval) -> DispatchTimeoutResult {
+        observedDelete.wait(timeout: .now() + timeout)
+    }
+
+    func resumeInsert() {
+        resumeInsertSemaphore.signal()
     }
 }
 
