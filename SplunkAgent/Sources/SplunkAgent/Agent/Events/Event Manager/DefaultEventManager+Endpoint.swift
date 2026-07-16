@@ -22,14 +22,18 @@ internal import SplunkOpenTelemetry
 
 extension DefaultEventManager {
 
-    /// Registers the direct-span background drain that runs after async producers flush their spans.
-    func registerTraceBackgroundDrain(prepareForBackground: @escaping () async -> Void) {
-        concreteTraceProcessor.registerBackgroundObserver(prepareForBackground: prepareForBackground)
+    /// Installs the single direct-span background drain that runs after async producers flush their spans.
+    ///
+    /// Subsequent installation attempts leave the original drain unchanged.
+    func installTraceBackgroundDrain(prepareForBackground: @escaping () async -> Void) {
+        concreteTraceProcessor.installBackgroundDrain(prepareForBackground: prepareForBackground)
     }
 
-    /// Registers the direct-span terminal drain that runs after terminal producers flush their spans.
-    func registerTraceTerminationDrain(prepareForTermination: @escaping () async -> Void) {
-        concreteTraceProcessor.registerTerminationObserver(prepareForTermination: prepareForTermination)
+    /// Installs the single direct-span terminal drain that runs after terminal producers flush their spans.
+    ///
+    /// Subsequent installation attempts leave the original drain unchanged.
+    func installTraceTerminationDrain(prepareForTermination: @escaping () async -> Void) {
+        concreteTraceProcessor.installTerminationDrain(prepareForTermination: prepareForTermination)
     }
 
     /// Updates the endpoint configuration and enables sending spans.

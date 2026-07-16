@@ -302,7 +302,7 @@ extension BatchSpanProcessorCore {
 
     // MARK: - Lifecycle
 
-    func registerBackgroundObserver(prepareForBackground: @escaping () async -> Void) {
+    func installBackgroundDrain(prepareForBackground: @escaping () async -> Void) {
         #if os(iOS) || os(tvOS) || os(visionOS)
             guard backgroundObserver == nil else {
                 return
@@ -335,7 +335,7 @@ extension BatchSpanProcessorCore {
         }
     }
 
-    func registerTerminationObserver(prepareForTermination: @escaping () async -> Void) {
+    func installTerminationDrain(prepareForTermination: @escaping () async -> Void) {
         #if os(iOS) || os(tvOS) || os(visionOS)
             guard terminationObserver == nil else {
                 return
@@ -388,13 +388,13 @@ extension BatchSpanProcessorCore {
 
 extension OTLPBatchSpanProcessor {
 
-    /// Registers the background drain that runs after asynchronous producers flush their spans.
-    func registerBackgroundObserver(prepareForBackground: @escaping () async -> Void) {
-        core.registerBackgroundObserver(prepareForBackground: prepareForBackground)
+    /// Installs the single background drain that runs after asynchronous producers flush their spans.
+    func installBackgroundDrain(prepareForBackground: @escaping () async -> Void) {
+        core.installBackgroundDrain(prepareForBackground: prepareForBackground)
     }
 
-    /// Registers the terminal lifecycle drain that runs after terminal producers flush their spans.
-    func registerTerminationObserver(prepareForTermination: @escaping () async -> Void) {
-        core.registerTerminationObserver(prepareForTermination: prepareForTermination)
+    /// Installs the single terminal lifecycle drain that runs after terminal producers flush their spans.
+    func installTerminationDrain(prepareForTermination: @escaping () async -> Void) {
+        core.installTerminationDrain(prepareForTermination: prepareForTermination)
     }
 }

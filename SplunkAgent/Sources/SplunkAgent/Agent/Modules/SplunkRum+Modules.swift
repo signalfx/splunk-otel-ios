@@ -72,6 +72,14 @@ extension SplunkRum {
         customizeSlowFrameDetector()
     }
 
+    /// Installs lifecycle drains after locating producers that asynchronously emit final direct spans.
+    ///
+    /// This is intentionally not a list of every span producer. A module belongs here only when its
+    /// lifecycle callback crosses an asynchronous boundary and must finish before the batch snapshot.
+    /// Slow frame detection currently has this requirement because it processes lifecycle events through
+    /// an `AsyncStream` and actor. The app may be suspended before the normal batch timer captures those
+    /// spans. App state termination is also invoked explicitly because notification observer order is not
+    /// guaranteed; its idempotent flush ensures the terminate span exists before the final snapshot.
     func configureTraceLifecycleDrains() {
         let appStateModule = modulesManager?.module(ofType: SplunkAppState.AppStateModule.self)
         let slowFrameDetectorModule = modulesManager?.module(ofType: SplunkSlowFrameDetector.SlowFrameDetector.self)
@@ -80,11 +88,11 @@ extension SplunkRum {
             return
         }
 
-        eventManager.registerTraceBackgroundDrain {
+        eventManager.installTraceBackgroundDrain {
             await slowFrameDetectorModule?.flushBufferedTelemetryForBackground()
         }
 
-        eventManager.registerTraceTerminationDrain {
+        eventManager.installTraceTerminationDrain {
             appStateModule?.flushTerminateTelemetry()
             await slowFrameDetectorModule?.flushBufferedTelemetryForTermination()
         }

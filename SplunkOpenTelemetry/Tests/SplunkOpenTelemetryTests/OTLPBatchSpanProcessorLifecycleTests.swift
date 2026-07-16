@@ -40,7 +40,7 @@ import Testing
                 maxQueueSize: 2_048
             )
             let tracer = makeTracer(for: processor)
-            processor.registerBackgroundObserver {}
+            processor.installBackgroundDrain {}
 
             endSpans(5, using: tracer)
             #expect(exporter.successfulSpanCount == 0)
@@ -60,7 +60,7 @@ import Testing
                 maxQueueSize: 2_048
             )
             let tracer = makeTracer(for: processor)
-            processor.registerBackgroundObserver {}
+            processor.installBackgroundDrain {}
 
             let lateObserver = await MainActor.run {
                 NotificationCenter.default.addObserver(
@@ -91,7 +91,7 @@ import Testing
             )
             let tracer = makeTracer(for: processor)
 
-            processor.registerBackgroundObserver {
+            processor.installBackgroundDrain {
                 try? await Task.sleep(nanoseconds: 50_000_000)
                 tracer.spanBuilder(spanName: "async-background").startSpan().end()
             }
@@ -118,7 +118,7 @@ import Testing
             endSpans(5, using: tracer)
             #expect(exporter.successfulSpanCount == 0)
 
-            processor.registerTerminationObserver {}
+            processor.installTerminationDrain {}
             await postWillTerminateNotification()
 
             #expect(exporter.successfulSpanCount == 5)
@@ -139,7 +139,7 @@ import Testing
 
             endSpans(5, using: tracer)
 
-            processor.registerTerminationObserver {
+            processor.installTerminationDrain {
                 tracer.spanBuilder(spanName: "prepared-terminate").startSpan().end()
             }
             await postWillTerminateNotification()
@@ -171,7 +171,7 @@ import Testing
 
             endSpans(5, using: tracer)
 
-            processor.registerTerminationObserver {}
+            processor.installTerminationDrain {}
             await postWillTerminateNotification()
 
             #expect(exporter.exportAttemptCount == 1)
