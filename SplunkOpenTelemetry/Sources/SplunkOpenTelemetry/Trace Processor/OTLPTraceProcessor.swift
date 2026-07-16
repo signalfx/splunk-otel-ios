@@ -172,7 +172,7 @@ public class OTLPTraceProcessor: TraceProcessor {
     /// - Parameters:
     ///   - newEndpoint: The new endpoint URL.
     ///   - accessToken: Optional access token to use for authentication.
-    package func setEndpoint(_ newEndpoint: URL, accessToken: String? = nil) {
+    public func setEndpoint(_ newEndpoint: URL, accessToken: String? = nil) {
         var headers: [String: String] = [:]
 
         if let accessToken, !accessToken.isEmpty {
@@ -183,7 +183,7 @@ public class OTLPTraceProcessor: TraceProcessor {
     }
 
     /// Immediately clears the endpoint so subsequent exports use pending storage.
-    package func clearEndpoint() {
+    public func clearEndpoint() {
         backgroundTraceExporter.clearEndpoint()
     }
 }
