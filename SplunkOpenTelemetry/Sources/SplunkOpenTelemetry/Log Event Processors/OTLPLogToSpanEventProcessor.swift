@@ -24,6 +24,16 @@ import SplunkOpenTelemetryBackgroundExporter
 /// OTLPLogEventProcessor converts OpenTelemetry Logs to Spans and emits them through a standard infrastructure for Span.
 public class OTLPLogToSpanEventProcessor: LogEventProcessor {
 
+    // MARK: - Inline types
+
+    private struct InitializationState {
+        let loggerProvider: LoggerProvider
+
+        #if DEBUG
+            let resource: Resource
+        #endif
+    }
+
     // MARK: - Private properties
 
     /// OTel logger provider.
@@ -50,18 +60,17 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         resources: AgentResources,
         debugEnabled: Bool
     ) {
-        #if DEBUG
-            var resource = Resource()
-            resource.merge(with: resources)
-
-            self.resource = resource
-        #endif
-
-        loggerProvider = Self.makeLoggerProvider(
-            agentVersion: resources.agentVersion,
+        let state = Self.makeInitializationState(
+            resources: resources,
             debugEnabled: debugEnabled,
             tracerProviderProvider: { OpenTelemetry.instance.tracerProvider }
         )
+
+        loggerProvider = state.loggerProvider
+
+        #if DEBUG
+            resource = state.resource
+        #endif
     }
 
     public convenience init(
@@ -84,21 +93,40 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         debugEnabled: Bool,
         tracerProvider: any TracerProvider
     ) {
-        // Store resources object for Unit tests
-        #if DEBUG
-            // Build Resources
-            var resource = Resource()
-            resource.merge(with: resources)
-
-            self.resource = resource
-        #endif
-
-
-        loggerProvider = Self.makeLoggerProvider(
-            agentVersion: resources.agentVersion,
+        let state = Self.makeInitializationState(
+            resources: resources,
             debugEnabled: debugEnabled,
             tracerProviderProvider: { tracerProvider }
         )
+
+        loggerProvider = state.loggerProvider
+
+        #if DEBUG
+            resource = state.resource
+        #endif
+    }
+
+    private static func makeInitializationState(
+        resources: AgentResources,
+        debugEnabled: Bool,
+        tracerProviderProvider: @escaping () -> any TracerProvider
+    ) -> InitializationState {
+        #if DEBUG
+            var resource = Resource()
+            resource.merge(with: resources)
+        #endif
+
+        let loggerProvider = makeLoggerProvider(
+            agentVersion: resources.agentVersion,
+            debugEnabled: debugEnabled,
+            tracerProviderProvider: tracerProviderProvider
+        )
+
+        #if DEBUG
+            return InitializationState(loggerProvider: loggerProvider, resource: resource)
+        #else
+            return InitializationState(loggerProvider: loggerProvider)
+        #endif
     }
 
     private static func makeLoggerProvider(
