@@ -53,7 +53,7 @@ This repo is a modular Swift Package for the Splunk RUM iOS agent. It instrument
 - Direct spans: Navigation, Network, AppStart, AppState, NetworkMonitor, SlowFrameDetector, and CustomTracking workflows use `Tracer.spanBuilder` -> `OTLPBatchSpanProcessor` -> `OTLPBackgroundHTTPTraceExporter`.
 - Log-as-span: CrashReports crash payloads, CustomTracking events/errors, Interactions, internal agent events, and agent events published through `DefaultEventManager` emit log records that `OTLPLogToSpanExporter` converts to spans and sends to the trace endpoint.
 - Binary logs: Session Replay is the exception; it uses `OTLPSessionReplayEventProcessor` -> `OTLPBackgroundHTTPLogExporterBinary`.
-- Direct spans use the custom in-memory `OTLPBatchSpanProcessor`, which pools ended spans and flushes a batch to the disk-backed exporter every 0.5s or when 100 spans accumulate (whichever is first), plus on app background/terminate/shutdown. Spans still buffered in memory at crash time are lost by design. This is distinct from the upstream `BatchSpanProcessor`, which is not used. There is no production `BatchLogRecordProcessor`. Durable buffering remains disk-backed in the background exporters.
+- Direct spans use the custom in-memory `OTLPBatchSpanProcessor`, which pools ended spans and flushes a batch to the disk-backed exporter every 0.5s or when 100 spans accumulate (whichever is first). App background and normal termination notifications trigger asynchronous, best-effort drains without blocking the lifecycle notification thread; shutdown is fire-and-forget on the main thread and uses a bounded wait off-main. Spans still buffered in memory when the process exits are lost by design. This is distinct from the upstream `BatchSpanProcessor`, which is not used. There is no production `BatchLogRecordProcessor`. Durable buffering remains disk-backed in the background exporters.
 - Uploads use `URLSessionConfiguration.background(withIdentifier:)`, not `UIApplication.beginBackgroundTask`.
 - Some hardcoded strings and attribute keys already exist. New hot-path string keys should still be centralized per module instead of copied inline.
 
@@ -147,7 +147,7 @@ Block changes that can crash the host app. Block or request measurement for chan
 
 Call these out as design choices when a PR relies on or changes them:
 
-1. Export buffering is disk-backed, not an in-memory bounded queue.
+1. Direct-span export uses two buffering stages: a bounded in-memory batch followed by the disk-backed background exporter (`span creation` -> `bounded in-memory batch` -> `disk-backed exporter` -> `background upload`).
 2. Background `URLSession` scheduling, retry count, and disk caps define when data is delayed or dropped.
 3. `SplunkRum.shared` and session state assume a mostly singleton, install-once lifecycle.
 4. Sampling is chosen at session start; switching mid-session is a behavior/API change.
