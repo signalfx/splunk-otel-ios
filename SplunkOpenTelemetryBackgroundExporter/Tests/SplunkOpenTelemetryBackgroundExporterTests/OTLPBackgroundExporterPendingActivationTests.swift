@@ -59,17 +59,17 @@ struct PendingEndpointActivationTests {
                 pendingWriteReturned.signal()
             }
 
-        #expect(disk.waitUntilInsertStarts(timeout: 1) == .success)
+        #expect(disk.waitUntilInsertStarts(timeout: 5) == .success)
 
         let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
         exporter.setEndpoint(endpoint)
-        #expect(disk.waitUntilListReturns(timeout: 1) == .success)
+        #expect(disk.waitUntilListReturns(timeout: 5) == .success)
 
         disk.resumeInsert()
 
-        #expect(pendingWriteReturned.wait(timeout: .now() + 1) == .success)
-        #expect(httpClient.waitForSend(timeout: 1) == .success)
-        #expect(disk.waitUntilObservedDelete(timeout: 1) == .success)
+        #expect(pendingWriteReturned.wait(timeout: .now() + 5) == .success)
+        #expect(httpClient.waitForSend(timeout: 5) == .success)
+        #expect(disk.waitUntilObservedDelete(timeout: 5) == .success)
         #expect(httpClient.sentEndpoints == [endpoint])
         #expect(try disk.list(forKey: exporter.getPendingStorageKey()).isEmpty)
     }

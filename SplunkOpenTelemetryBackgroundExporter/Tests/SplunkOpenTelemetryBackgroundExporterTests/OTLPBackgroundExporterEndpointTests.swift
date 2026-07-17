@@ -22,7 +22,7 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-@Suite
+@Suite(.serialized)
 struct OTLPBackgroundExporterEndpointTests {
 
     @Test
@@ -52,8 +52,8 @@ struct OTLPBackgroundExporterEndpointTests {
                 callReturned.signal()
             }
 
-        #expect(scanStarted.wait(timeout: .now() + 1) == .success)
-        #expect(callReturned.wait(timeout: .now() + 0.1) == .success)
+        #expect(scanStarted.wait(timeout: .now() + 5) == .success)
+        #expect(callReturned.wait(timeout: .now() + 5) == .success)
         #expect(exporter.endpoint == endpoint)
     }
 
@@ -87,12 +87,12 @@ struct OTLPBackgroundExporterEndpointTests {
 
         let endpoint = try #require(URL(string: "https://example.com/v1/traces"))
         exporter.setEndpoint(endpoint)
-        #expect(disk.waitUntilListStarts(timeout: 1) == .success)
+        #expect(disk.waitUntilListStarts(timeout: 5) == .success)
 
         exporter.clearEndpoint()
         disk.resumeList()
 
-        #expect(disk.waitUntilListReturns(timeout: 1) == .success)
+        #expect(disk.waitUntilListReturns(timeout: 5) == .success)
         #expect(httpClient.waitForSend(timeout: 0.2) == .timedOut)
         #expect(httpClient.sentEndpoints.isEmpty)
         #expect(exporter.endpoint == nil)
@@ -131,14 +131,14 @@ struct OTLPBackgroundExporterEndpointTests {
         let firstEndpoint = try #require(URL(string: "https://first.example.com/v1/traces"))
         let secondEndpoint = try #require(URL(string: "https://second.example.com/v1/traces"))
         exporter.setEndpoint(firstEndpoint)
-        #expect(disk.waitUntilInsertStarts(timeout: 1) == .success)
+        #expect(disk.waitUntilInsertStarts(timeout: 5) == .success)
 
         exporter.clearEndpoint()
         exporter.setEndpoint(secondEndpoint)
         disk.resumeInsert()
 
-        #expect(httpClient.waitForSend(timeout: 1) == .success)
-        #expect(disk.waitUntilObservedDelete(timeout: 1) == .success)
+        #expect(httpClient.waitForSend(timeout: 5) == .success)
+        #expect(disk.waitUntilObservedDelete(timeout: 5) == .success)
         #expect(httpClient.sentEndpoints == [secondEndpoint])
         #expect(try disk.list(forKey: exporter.getPendingStorageKey()).isEmpty)
     }

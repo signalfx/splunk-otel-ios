@@ -22,7 +22,7 @@ import Testing
 
 @testable import SplunkOpenTelemetryBackgroundExporter
 
-@Suite
+@Suite(.serialized)
 struct BackgroundHTTPClientTests {
 
     // MARK: - Helpers
@@ -84,31 +84,26 @@ struct BackgroundHTTPClientTests {
     }
 
     @Test
-    func flushCallsCompletion() async throws {
+    func flushCallsCompletion() {
         let client = makeClient()
+        let didComplete = DispatchSemaphore(value: 0)
 
-        var didComplete = false
         client.flush {
-            didComplete = true
+            didComplete.signal()
         }
 
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-
-        #expect(didComplete)
+        #expect(didComplete.wait(timeout: .now() + 5) == .success)
     }
 
     @Test
-    func getAllSessionsTasksReturnsTasks() async throws {
-        var wasCalled = false
-
+    func getAllSessionsTasksReturnsTasks() {
         let client = makeClient()
+        let wasCalled = DispatchSemaphore(value: 0)
         client.getAllSessionsTasks { _ in
-            wasCalled = true
+            wasCalled.signal()
         }
 
-        try await Task.sleep(nanoseconds: 1_000_000_000)
-
-        #expect(wasCalled)
+        #expect(wasCalled.wait(timeout: .now() + 5) == .success)
     }
 
     @Test
