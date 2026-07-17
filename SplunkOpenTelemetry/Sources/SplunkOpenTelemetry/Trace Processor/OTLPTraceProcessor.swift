@@ -26,6 +26,22 @@ import SplunkOpenTelemetryBackgroundExporter
 /// Traces are enriched by provided Resources and exported via an instantiated background exporter.
 public class OTLPTraceProcessor: TraceProcessor {
 
+    // MARK: - Inline types
+
+    private struct InitializationState {
+        let tracerProvider: any TracerProvider
+        let batchSpanProcessor: OTLPBatchSpanProcessor
+    }
+
+    private struct PipelineConfiguration {
+        let resources: AgentResources
+        let runtimeAttributes: RuntimeAttributes
+        let globalAttributes: () -> [String: AttributeValue]
+        let debugEnabled: Bool
+        let spanInterceptor: SplunkSpanInterceptor?
+        let activityTracker: ActivityTracker
+    }
+
     // MARK: - Constants
 
     private static let crashReportPersistenceTimeout: TimeInterval = 2
@@ -46,7 +62,7 @@ public class OTLPTraceProcessor: TraceProcessor {
 
     // MARK: - Initialization
 
-    public required convenience init(
+    public required init(
         with tracesEndpoint: URL?,
         resources: AgentResources,
         runtimeAttributes: RuntimeAttributes,
@@ -56,7 +72,7 @@ public class OTLPTraceProcessor: TraceProcessor {
         accessToken: String? = nil,
         activityTracker: ActivityTracker
     ) {
-        let configuration = OTLPExporterConfiguration(agentVersion: resources.agentVersion)
+        let exporterConfiguration = OTLPExporterConfiguration(agentVersion: resources.agentVersion)
         let envVarHeaders: [(String, String)] = []
         var headers: [String: String] = [:]
 
@@ -66,14 +82,12 @@ public class OTLPTraceProcessor: TraceProcessor {
 
         let backgroundTraceExporter = OTLPBackgroundHTTPTraceExporter(
             endpoint: tracesEndpoint,
-            config: configuration,
+            config: exporterConfiguration,
             qosConfig: SessionQOSConfiguration(),
             envVarHeaders: envVarHeaders,
             headers: headers
         )
-
-        self.init(
-            backgroundTraceExporter: backgroundTraceExporter,
+        let pipelineConfiguration = PipelineConfiguration(
             resources: resources,
             runtimeAttributes: runtimeAttributes,
             globalAttributes: globalAttributes,
@@ -81,6 +95,15 @@ public class OTLPTraceProcessor: TraceProcessor {
             spanInterceptor: spanInterceptor,
             activityTracker: activityTracker
         )
+
+        let state = Self.makeInitializationState(
+            backgroundTraceExporter: backgroundTraceExporter,
+            configuration: pipelineConfiguration
+        )
+
+        self.backgroundTraceExporter = backgroundTraceExporter
+        tracerProvider = state.tracerProvider
+        batchSpanProcessor = state.batchSpanProcessor
     }
 
     init(
@@ -92,37 +115,58 @@ public class OTLPTraceProcessor: TraceProcessor {
         spanInterceptor: SplunkSpanInterceptor?,
         activityTracker: ActivityTracker
     ) {
+        let pipelineConfiguration = PipelineConfiguration(
+            resources: resources,
+            runtimeAttributes: runtimeAttributes,
+            globalAttributes: globalAttributes,
+            debugEnabled: debugEnabled,
+            spanInterceptor: spanInterceptor,
+            activityTracker: activityTracker
+        )
+        let state = Self.makeInitializationState(
+            backgroundTraceExporter: backgroundTraceExporter,
+            configuration: pipelineConfiguration
+        )
+
         self.backgroundTraceExporter = backgroundTraceExporter
+        tracerProvider = state.tracerProvider
+        batchSpanProcessor = state.batchSpanProcessor
+    }
+
+    private static func makeInitializationState(
+        backgroundTraceExporter: any EndpointConfigurableSpanExporter,
+        configuration: PipelineConfiguration
+    ) -> InitializationState {
 
         // Initialize attribute checker proxy exporter
         // Optionally chain it through stdout exporter
         let attributeCheckerExporter = AttributeCheckerSpanExporter(
-            proxy: debugEnabled
+            proxy: configuration.debugEnabled
                 ? SplunkStdoutSpanExporter(with: backgroundTraceExporter)
                 : backgroundTraceExporter
         )
 
         // Initialize span interceptor proxy exporter
         let spanInterceptorExporter = SpanInterceptorExporter(
-            with: spanInterceptor,
+            with: configuration.spanInterceptor,
             proxy: attributeCheckerExporter
         )
 
         // Build Resources
         var resource = Resource()
-        resource.merge(with: resources)
+        resource.merge(with: configuration.resources)
 
         // Initialize processor
         // Pools ended spans in memory and flushes a batch to the exporter every 0.5s or when
         // 100 spans accumulate, whichever is first (plus on app background/terminate/shutdown).
         let spanProcessor = OTLPBatchSpanProcessor(spanExporter: spanInterceptorExporter)
         let attributesProcessor = OTLPAttributesSpanProcessor(
-            with: runtimeAttributes,
-            activityTracker: activityTracker
+            with: configuration.runtimeAttributes,
+            activityTracker: configuration.activityTracker
         )
 
         // Global Attributes processor
-        let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(with: globalAttributes)
+        let globalAttributesProcessor = OTLPGlobalAttributesSpanProcessor(with: configuration.globalAttributes)
 
         // Initialize tracer provider
         let tracerProviderBuilder = TracerProviderBuilder()
@@ -136,8 +180,10 @@ public class OTLPTraceProcessor: TraceProcessor {
         // Register default tracer provider
         OpenTelemetry.registerTracerProvider(tracerProvider: tracerProvider)
 
-        self.tracerProvider = tracerProvider
-        batchSpanProcessor = spanProcessor
+        return InitializationState(
+            tracerProvider: tracerProvider,
+            batchSpanProcessor: spanProcessor
+        )
     }
 
 
