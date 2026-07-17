@@ -292,6 +292,21 @@ public class OTLPBackgroundHTTPBaseExporter {
     var headers: [String: String] {
         buildHeaders(from: additionalHeaders)
     }
+
+    /// Schedules another pending-storage scan when an endpoint became active during a pending write.
+    func activatePendingDataIfEndpointAvailable() {
+        stateLock.lock()
+        let activationRevision = storedEndpoint == nil ? nil : endpointRevision
+        stateLock.unlock()
+
+        guard let activationRevision else {
+            return
+        }
+
+        endpointMaintenanceQueue.async {
+            self.flushPendingData(for: activationRevision)
+        }
+    }
 }
 
 // MARK: - Private helpers
@@ -371,22 +386,5 @@ extension OTLPBackgroundHTTPBaseExporter {
         }
 
         return (storedEndpoint, storedAdditionalHeaders)
-    }
-
-    private func buildHeaders(from additionalHeaders: [String: String]) -> [String: String] {
-        var combinedHeaders = [
-            OTLPHTTPHeaders.userAgentKey: OTLPHTTPHeaders.userAgent(agentVersion: config.agentVersion)
-        ]
-
-        for (key, value) in additionalHeaders {
-            combinedHeaders[normalizedHeaderKey(key)] = value
-        }
-
-        if let envVarHeaders {
-            for (key, value) in envVarHeaders {
-                combinedHeaders[normalizedHeaderKey(key)] = value
-            }
-        }
-        return combinedHeaders
     }
 }

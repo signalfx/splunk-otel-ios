@@ -41,13 +41,7 @@ public class OTLPBackgroundHTTPMetricExporter: OTLPBackgroundHTTPBaseExporter, M
 
             // If no endpoint is configured, store in pending folder for later
             if isPendingEndpoint {
-                try diskStorage.insert(
-                    storeData,
-                    forKey: KeyBuilder(
-                        requestId.uuidString,
-                        parrentKeyBuilder: getPendingStorageKey()
-                    )
-                )
+                try storePendingData(storeData, requestId: requestId)
                 return .success
             }
 
