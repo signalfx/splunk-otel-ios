@@ -73,7 +73,7 @@ public class OTLPLogToSpanEventProcessor: LogEventProcessor {
         #endif
     }
 
-    public convenience init(
+    package convenience init(
         with traceUrl: URL?,
         resources: AgentResources,
         debugEnabled: Bool,
