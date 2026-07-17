@@ -40,7 +40,6 @@ import Testing
                 maxQueueSize: 2_048
             )
             let tracer = makeTracer(for: processor)
-            processor.installBackgroundDrain {}
 
             endSpans(5, using: tracer)
             #expect(exporter.successfulSpanCount == 0)
@@ -60,7 +59,6 @@ import Testing
                 maxQueueSize: 2_048
             )
             let tracer = makeTracer(for: processor)
-            processor.installBackgroundDrain {}
 
             let lateObserver = await MainActor.run {
                 NotificationCenter.default.addObserver(
@@ -78,109 +76,6 @@ import Testing
             await postDidEnterBackgroundNotification()
 
             #expect(waitUntil(timeout: 5) { exporter.successfulSpanNames == ["late-background"] })
-        }
-
-        @Test
-        func enteringBackgroundAwaitsAsyncProducerBeforeSnapshot() async {
-            let exporter = BatchProcessorTestExporter()
-            let processor = OTLPBatchSpanProcessor(
-                spanExporter: exporter,
-                scheduleDelay: Self.neverFires,
-                maxExportBatchSize: Self.hugeBatch,
-                maxQueueSize: 2_048
-            )
-            let tracer = makeTracer(for: processor)
-
-            processor.installBackgroundDrain {
-                try? await Task.sleep(nanoseconds: 50_000_000)
-                tracer.spanBuilder(spanName: "async-background").startSpan().end()
-            }
-
-            await postDidEnterBackgroundNotification()
-
-            #expect(waitUntil(timeout: 5) { exporter.successfulSpanNames == ["async-background"] })
-        }
-
-
-        // MARK: - Termination
-
-        @Test
-        func terminatingFlushesPendingBatchBeforeNotificationReturns() async {
-            let exporter = BatchProcessorTestExporter()
-            let processor = OTLPBatchSpanProcessor(
-                spanExporter: exporter,
-                scheduleDelay: Self.neverFires,
-                maxExportBatchSize: Self.hugeBatch,
-                maxQueueSize: 2_048
-            )
-            let tracer = makeTracer(for: processor)
-
-            endSpans(5, using: tracer)
-            #expect(exporter.successfulSpanCount == 0)
-
-            processor.installTerminationDrain {}
-            await postWillTerminateNotification()
-
-            #expect(exporter.successfulSpanCount == 5)
-            #expect(exporter.exportTimeouts.count == 1)
-            #expect(exporter.exportTimeouts.allSatisfy { $0 == nil })
-        }
-
-        @Test
-        func terminatingRunsPrepareHookBeforeDraining() async {
-            let exporter = BatchProcessorTestExporter()
-            let processor = OTLPBatchSpanProcessor(
-                spanExporter: exporter,
-                scheduleDelay: Self.neverFires,
-                maxExportBatchSize: Self.hugeBatch,
-                maxQueueSize: 2_048
-            )
-            let tracer = makeTracer(for: processor)
-
-            endSpans(5, using: tracer)
-
-            processor.installTerminationDrain {
-                tracer.spanBuilder(spanName: "prepared-terminate").startSpan().end()
-            }
-            await postWillTerminateNotification()
-
-            #expect(
-                exporter.successfulSpanNames == [
-                    "span-0",
-                    "span-1",
-                    "span-2",
-                    "span-3",
-                    "span-4",
-                    "prepared-terminate"
-                ]
-            )
-        }
-
-        @Test
-        func terminatingDropsSpansOnExportFailure() async {
-            // Terminate drains best effort; a failed export is dropped (not re-queued), leaving the
-            // buffer empty afterward since the process is going away.
-            let exporter = BatchProcessorTestExporter(results: [.failure])
-            let processor = OTLPBatchSpanProcessor(
-                spanExporter: exporter,
-                scheduleDelay: Self.neverFires,
-                maxExportBatchSize: Self.hugeBatch,
-                maxQueueSize: 2_048
-            )
-            let tracer = makeTracer(for: processor)
-
-            endSpans(5, using: tracer)
-
-            processor.installTerminationDrain {}
-            await postWillTerminateNotification()
-
-            #expect(exporter.exportAttemptCount == 1)
-            #expect(exporter.successfulSpanCount == 0)
-
-            // The failed batch was dropped, so a later flush finds nothing to export.
-            processor.forceFlush()
-            #expect(exporter.successfulSpanCount == 0)
-            #expect(exporter.exportAttemptCount == 1)
         }
     }
 
@@ -217,15 +112,6 @@ import Testing
                 Thread.sleep(forTimeInterval: 0.02)
             }
             return condition()
-        }
-
-        private func postWillTerminateNotification() async {
-            await MainActor.run {
-                NotificationCenter.default.post(
-                    name: UIApplication.willTerminateNotification,
-                    object: nil
-                )
-            }
         }
 
         private func postDidEnterBackgroundNotification() async {

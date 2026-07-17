@@ -186,22 +186,6 @@ public class OTLPTraceProcessor: TraceProcessor {
         )
     }
 
-
-    // MARK: - Lifecycle
-
-    /// Installs the direct-span background drain triggered after asynchronous producers flush their spans.
-    package func installBackgroundDrain(prepareForBackground: @escaping () async -> Void) {
-        batchSpanProcessor.installBackgroundDrain(prepareForBackground: prepareForBackground)
-    }
-
-    /// Installs the direct-span termination drain triggered after terminal producers flush their spans.
-    ///
-    /// The handler gives known terminal producers a chance to synchronously enqueue their direct spans,
-    /// then blocks for a short bounded drain when `willTerminate` is delivered.
-    package func installTerminationDrain(prepareForTermination: @escaping () async -> Void) {
-        batchSpanProcessor.installTerminationDrain(prepareForTermination: prepareForTermination)
-    }
-
     /// Persists buffered spans before a producer deletes its only source payload.
     package func persistBufferedSpans(completion: @escaping (Bool) -> Void) {
         batchSpanProcessor.persistBufferedSpans(

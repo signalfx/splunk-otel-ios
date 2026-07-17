@@ -46,7 +46,7 @@ extension AppStateModule {
             }
 
             addObserver(UIApplication.willTerminateNotification) { [weak self] in
-                self?.flushTerminateTelemetry()
+                self?.processEvent(.terminate)
             }
         #endif
     }

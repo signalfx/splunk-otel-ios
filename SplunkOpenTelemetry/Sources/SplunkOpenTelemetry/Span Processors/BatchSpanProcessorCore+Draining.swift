@@ -302,7 +302,7 @@ extension BatchSpanProcessorCore {
 
     // MARK: - Lifecycle
 
-    func installBackgroundDrain(prepareForBackground: @escaping () async -> Void) {
+    func installBackgroundDrain() {
         #if os(iOS) || os(tvOS) || os(visionOS)
             guard backgroundObserver == nil else {
                 return
@@ -313,88 +313,28 @@ extension BatchSpanProcessorCore {
                 object: nil,
                 queue: nil
             ) { [weak self] _ in
-                self?.flushAfterBackgroundNotification(prepareForBackground: prepareForBackground)
+                self?.flushAfterBackgroundNotification()
             }
             backgroundObserver = backgroundToken
         #endif
     }
 
-    private func flushAfterBackgroundNotification(prepareForBackground: @escaping () async -> Void) {
+    private func flushAfterBackgroundNotification() {
         // Defer one main-queue turn so later didEnterBackground observers can enqueue lifecycle spans
-        // before this snapshot is taken. The app stays alive in the background, so keep the actual
-        // drain asynchronous and off the notification thread.
+        // before this best-effort snapshot. The actual drain remains asynchronous and off the
+        // notification thread, without coordinating individual telemetry modules.
         DispatchQueue.main.async { [weak self] in
-            Task {
-                await prepareForBackground()
-
-                self?.processorQueue
-                    .async {
-                        self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
-                    }
-            }
+            self?.processorQueue
+                .async {
+                    self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
+                }
         }
     }
 
-    func installTerminationDrain(prepareForTermination: @escaping () async -> Void) {
-        #if os(iOS) || os(tvOS) || os(visionOS)
-            guard terminationObserver == nil else {
-                return
-            }
-
-            let terminateToken = NotificationCenter.default.addObserver(
-                forName: UIApplication.willTerminateNotification,
-                object: nil,
-                queue: nil
-            ) { [weak self] _ in
-                self?.flushBeforeTermination(prepareForTermination: prepareForTermination)
-            }
-            terminationObserver = terminateToken
-        #endif
-    }
-
-    /// Drains the buffer when the app is terminating, blocking the caller only up to a wall-clock bound.
-    ///
-    /// Known terminal producers flush first, then the drain runs on `processorQueue` while the caller
-    /// waits on a semaphore capped at ``terminateFlushTimeout``. If the work outlives that window it
-    /// continues best effort, but we stop waiting so the OS watchdog can never kill the app because we
-    /// blocked termination too long. Spans are dropped (not requeued) on export failure here, since the
-    /// process is going away and there is no later attempt.
-    private func flushBeforeTermination(prepareForTermination: @escaping () async -> Void) {
-        let completed = DispatchSemaphore(value: 0)
-
-        Task {
-            await prepareForTermination()
-
-            self.processorQueue.async {
-                self.drainSnapshot(deadline: nil, requeueOnFailure: false, forwardDeadlineToExporter: false)
-                completed.signal()
-            }
+    func removeBackgroundObserver() {
+        if let backgroundObserver {
+            NotificationCenter.default.removeObserver(backgroundObserver)
+            self.backgroundObserver = nil
         }
-
-        _ = completed.wait(timeout: .now() + Self.terminateFlushTimeout)
-    }
-
-    func removeLifecycleObservers() {
-        let tokens = [backgroundObserver, terminationObserver].compactMap(\.self)
-        backgroundObserver = nil
-        terminationObserver = nil
-
-        for token in tokens {
-            NotificationCenter.default.removeObserver(token)
-        }
-    }
-}
-
-
-extension OTLPBatchSpanProcessor {
-
-    /// Installs the single background drain that runs after asynchronous producers flush their spans.
-    func installBackgroundDrain(prepareForBackground: @escaping () async -> Void) {
-        core.installBackgroundDrain(prepareForBackground: prepareForBackground)
-    }
-
-    /// Installs the single terminal lifecycle drain that runs after terminal producers flush their spans.
-    func installTerminationDrain(prepareForTermination: @escaping () async -> Void) {
-        core.installTerminationDrain(prepareForTermination: prepareForTermination)
     }
 }

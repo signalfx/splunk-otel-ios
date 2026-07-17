@@ -26,8 +26,8 @@ import SplunkCommon
 /// Instead of exporting one span per ended span (as `SimpleSpanProcessor` does), this processor
 /// pools ended spans in a bounded in-memory queue and hands a batch to the exporter either when the
 /// batch reaches ``Defaults/maxExportBatchSize`` spans or every ``Defaults/scheduleDelay`` seconds,
-/// whichever happens first. It also flushes on app background, after terminal producers run, and on
-/// shutdown.
+/// whichever happens first. It also drains asynchronously when the app enters the background and
+/// drains on shutdown.
 ///
 /// - Important: Spans that are still buffered in memory when the host app crashes are lost. This is
 ///   an accepted trade-off in exchange for fewer, larger disk writes on the export path.
@@ -114,7 +114,7 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
 
 /// Reference-type backing store for ``OTLPBatchSpanProcessor``.
 ///
-/// `SpanProcessor` is a value type, but the batching state (queue, timer, lifecycle observers) is
+/// `SpanProcessor` is a value type, but the batching state (queue, timer, lifecycle observer) is
 /// inherently mutable and shared, so it lives in this class. Copies of the value-type processor
 /// share a single core. The draining, export, and lifecycle logic lives in
 /// `BatchSpanProcessorCore+Draining.swift`; state used by that extension is `internal` (not
@@ -129,12 +129,6 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
     /// Lower bound for the periodic flush interval, to avoid a zero/near-zero timer busy-looping the queue.
     private static let minimumScheduleDelay: TimeInterval = 0.1
 
-    /// Hard wall-clock bound on how long termination is allowed to block the caller while draining.
-    ///
-    /// On `willTerminate` the process is being torn down, so we drain best effort but stop waiting
-    /// after this window so we never risk the watchdog killing the app mid-drain.
-    static let terminateFlushTimeout: TimeInterval = 2.0
-
     /// Default wall-clock bound for off-main `forceFlush` when the caller does not supply a timeout.
     ///
     /// The background exporter defaults request timeouts to 10 seconds. Mirroring that here keeps
@@ -142,7 +136,7 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
     /// window to reach disk before the call returns.
     private static let forceFlushWaitTimeout: TimeInterval = 10.0
 
-    /// Hard wall-clock bound on how long `shutdown` blocks the caller while draining.
+    /// Hard wall-clock bound on how long off-main `shutdown` blocks the caller while draining.
     ///
     /// Unlike `forceFlush`, shutdown is a one-shot teardown: after it the processor may be released,
     /// so the buffer's remaining drain has no guaranteed later chance. A short bounded wait improves
@@ -194,8 +188,6 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
 
     var backgroundObserver: NSObjectProtocol?
 
-    var terminationObserver: NSObjectProtocol?
-
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
 
@@ -216,11 +208,12 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
 
         processorQueue.setSpecific(key: processorQueueKey, value: ())
         startTimer()
+        installBackgroundDrain()
     }
 
     deinit {
         timer?.cancel()
-        removeLifecycleObservers()
+        removeBackgroundObserver()
     }
 
 
@@ -292,11 +285,11 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
 
         timer?.cancel()
         timer = nil
-        removeLifecycleObservers()
+        removeBackgroundObserver()
 
-        // Block only up to `shutdownWaitTimeout`, regardless of calling thread. On timeout the
-        // drain and exporter shutdown continue best effort on the queue (the closure retains `self`).
-        let waitTimeout = shutdownWaitTimeout(for: explicitTimeout)
+        // Main-thread shutdown is fire-and-forget so SDK teardown cannot stall the host UI. Off-main
+        // callers retain a bounded synchronous wait; on timeout the work continues best effort.
+        let waitTimeout = Thread.isMainThread ? nil : shutdownWaitTimeout(for: explicitTimeout)
         runOnProcessorQueue(wait: waitTimeout) {
             self.drainAll(deadline: nil)
             self.spanExporter.shutdown(explicitTimeout: explicitTimeout)
