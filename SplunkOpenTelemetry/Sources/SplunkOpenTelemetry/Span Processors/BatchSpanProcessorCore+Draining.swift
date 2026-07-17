@@ -212,10 +212,10 @@ extension BatchSpanProcessorCore {
     ///
     /// - Parameters:
     ///   - deadline: Optional wall-clock cutoff, checked between batches.
-    ///   - requeueOnFailure: When `true` (background/`forceFlush`), a failed export is put back at the
+    ///   - requeueOnFailure: When `true` (lifecycle/`forceFlush`), a failed export is put back at the
     ///     front for a later attempt (timer / next flush) and the drain stops, so a transient disk
-    ///     error does not permanently lose spans. When `false` (shutdown/terminate), a failed export is
-    ///     dropped and the drain continues, so termination is guaranteed within the deadline.
+    ///     error does not permanently lose spans. When `false` (shutdown), a failed export is dropped
+    ///     and the drain continues, so shutdown is guaranteed to finish processing the snapshot.
     ///   - forwardDeadlineToExporter: When `true`, the remaining deadline is forwarded to the exporter.
     ///     Terminal drains keep this `false`, so their wall-clock wait bound does not become the
     ///     persisted background upload timeout.
@@ -302,20 +302,27 @@ extension BatchSpanProcessorCore {
 
     // MARK: - Lifecycle
 
-    func installBackgroundDrain() {
+    func installLifecycleDrains() {
         #if os(iOS) || os(tvOS) || os(visionOS)
-            guard backgroundObserver == nil else {
-                return
+            if backgroundObserver == nil {
+                backgroundObserver = NotificationCenter.default.addObserver(
+                    forName: UIApplication.didEnterBackgroundNotification,
+                    object: nil,
+                    queue: nil
+                ) { [weak self] _ in
+                    self?.flushAfterBackgroundNotification()
+                }
             }
 
-            let backgroundToken = NotificationCenter.default.addObserver(
-                forName: UIApplication.didEnterBackgroundNotification,
-                object: nil,
-                queue: nil
-            ) { [weak self] _ in
-                self?.flushAfterBackgroundNotification()
+            if terminationObserver == nil {
+                terminationObserver = NotificationCenter.default.addObserver(
+                    forName: UIApplication.willTerminateNotification,
+                    object: nil,
+                    queue: nil
+                ) { [weak self] _ in
+                    self?.flushAfterTerminationNotification()
+                }
             }
-            backgroundObserver = backgroundToken
         #endif
     }
 
@@ -331,10 +338,21 @@ extension BatchSpanProcessorCore {
         }
     }
 
-    func removeBackgroundObserver() {
-        if let backgroundObserver {
-            NotificationCenter.default.removeObserver(backgroundObserver)
-            self.backgroundObserver = nil
+    private func flushAfterTerminationNotification() {
+        // Termination is best effort. Queue the drain without waiting so SDK teardown never blocks
+        // the notification thread or risks a host-app watchdog termination.
+        processorQueue.async { [weak self] in
+            self?.drainSnapshot(deadline: nil, requeueOnFailure: true)
+        }
+    }
+
+    func removeLifecycleObservers() {
+        let observers = [backgroundObserver, terminationObserver].compactMap(\.self)
+        backgroundObserver = nil
+        terminationObserver = nil
+
+        for observer in observers {
+            NotificationCenter.default.removeObserver(observer)
         }
     }
 }

@@ -77,6 +77,29 @@ import Testing
 
             #expect(waitUntil(timeout: 5) { exporter.successfulSpanNames == ["late-background"] })
         }
+
+
+        // MARK: - Termination
+
+        @Test
+        func terminationFlushesPendingBatchWithoutBlockingNotificationThread() async {
+            let exporter = BatchProcessorTestExporter()
+            let processor = OTLPBatchSpanProcessor(
+                spanExporter: exporter,
+                scheduleDelay: Self.neverFires,
+                maxExportBatchSize: Self.hugeBatch,
+                maxQueueSize: 2_048
+            )
+            let tracer = makeTracer(for: processor)
+
+            endSpans(5, using: tracer)
+            #expect(exporter.successfulSpanCount == 0)
+
+            let notificationDuration = await postWillTerminateNotification()
+
+            #expect(notificationDuration < 0.2)
+            #expect(waitUntil(timeout: 5) { exporter.successfulSpanCount == 5 })
+        }
     }
 
 
@@ -120,6 +143,17 @@ import Testing
                     name: UIApplication.didEnterBackgroundNotification,
                     object: nil
                 )
+            }
+        }
+
+        private func postWillTerminateNotification() async -> TimeInterval {
+            await MainActor.run {
+                let start = Date()
+                NotificationCenter.default.post(
+                    name: UIApplication.willTerminateNotification,
+                    object: nil
+                )
+                return Date().timeIntervalSince(start)
             }
         }
     }

@@ -26,8 +26,8 @@ import SplunkCommon
 /// Instead of exporting one span per ended span (as `SimpleSpanProcessor` does), this processor
 /// pools ended spans in a bounded in-memory queue and hands a batch to the exporter either when the
 /// batch reaches ``Defaults/maxExportBatchSize`` spans or every ``Defaults/scheduleDelay`` seconds,
-/// whichever happens first. It also drains asynchronously when the app enters the background and
-/// drains on shutdown.
+/// whichever happens first. It also drains asynchronously when the app enters the background or
+/// terminates, and drains on shutdown.
 ///
 /// - Important: Spans that are still buffered in memory when the host app crashes are lost. This is
 ///   an accepted trade-off in exchange for fewer, larger disk writes on the export path.
@@ -114,7 +114,7 @@ struct OTLPBatchSpanProcessor: SpanProcessor {
 
 /// Reference-type backing store for ``OTLPBatchSpanProcessor``.
 ///
-/// `SpanProcessor` is a value type, but the batching state (queue, timer, lifecycle observer) is
+/// `SpanProcessor` is a value type, but the batching state (queue, timer, lifecycle observers) is
 /// inherently mutable and shared, so it lives in this class. Copies of the value-type processor
 /// share a single core. The draining, export, and lifecycle logic lives in
 /// `BatchSpanProcessorCore+Draining.swift`; state used by that extension is `internal` (not
@@ -188,6 +188,8 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
 
     var backgroundObserver: NSObjectProtocol?
 
+    var terminationObserver: NSObjectProtocol?
+
     private let logger = DefaultLogAgent(poolName: PackageIdentifier.instance(), category: "OpenTelemetry")
 
 
@@ -208,12 +210,12 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
 
         processorQueue.setSpecific(key: processorQueueKey, value: ())
         startTimer()
-        installBackgroundDrain()
+        installLifecycleDrains()
     }
 
     deinit {
         timer?.cancel()
-        removeBackgroundObserver()
+        removeLifecycleObservers()
     }
 
 
@@ -285,7 +287,7 @@ final class BatchSpanProcessorCore: @unchecked Sendable {
 
         timer?.cancel()
         timer = nil
-        removeBackgroundObserver()
+        removeLifecycleObservers()
 
         // Main-thread shutdown is fire-and-forget so SDK teardown cannot stall the host UI. Off-main
         // callers retain a bounded synchronous wait; on timeout the work continues best effort.
