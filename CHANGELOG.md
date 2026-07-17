@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+* Improved accuracy of `slowRenders` and `frozenRenders` detection: the detector now derives the expected cadence per frame, counts a continuous freeze once, and makes slow and frozen classifications mutually exclusive. #XXX
+
 ## [2.3.2] - 2026-07-09
 
 ### Added

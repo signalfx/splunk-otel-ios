@@ -43,8 +43,14 @@ actor SlowFrameLogic {
     private var slowFrameCount: Int = 0
     private var frozenFrameCount: Int = 0
 
-    private var lastFrameTimestamp: TimeInterval?
+    private var previousTargetTimestamp: TimeInterval?
     private var lastHeartbeatTimestamp: TimeInterval = 0
+
+    /// Whether a continuous freeze episode is currently open.
+    ///
+    /// Ensures a single freeze is reported once, whether it is detected by the watchdog or by the
+    /// lateness of the frame that ends it.
+    private var inFreezeEpisode = false
 
 
     // MARK: - Test-only Properties
@@ -105,24 +111,36 @@ actor SlowFrameLogic {
 
     /// Handles an incoming frame update from the ticker.
     /// - Parameters:
-    ///   - timestamp: The timestamp of the frame.
-    ///   - duration: The expected duration of the frame.
-    func handleFrame(timestamp: TimeInterval, duration: TimeInterval) {
+    ///   - timestamp: The timestamp at which this frame was presented.
+    ///   - targetTimestamp: The timestamp at which this frame's content should be presented.
+    func handleFrame(timestamp: TimeInterval, targetTimestamp: TimeInterval) {
         lastHeartbeatTimestamp = CACurrentMediaTime()
 
-        guard let previousTimestamp = lastFrameTimestamp, duration > 0 else {
-            lastFrameTimestamp = timestamp
+        let cadence = targetTimestamp - timestamp
+
+        guard let previousTarget = previousTargetTimestamp, cadence > 0 else {
+            previousTargetTimestamp = targetTimestamp
             return
         }
 
-        let deltaTime = timestamp - previousTimestamp
-        let tolerance = duration * (SlowFrameDetector.slowFrameTolerancePercentage / 100.0)
+        // A freeze episode already counted (by the watchdog or by this method) ends with this frame.
+        // Don't double-count it as slow or frozen.
+        if inFreezeEpisode {
+            inFreezeEpisode = false
+            previousTargetTimestamp = targetTimestamp
+            return
+        }
 
-        if deltaTime >= duration + tolerance {
+        let lateness = timestamp - previousTarget
+
+        if lateness >= SlowFrameDetector.frozenFrameThreshold {
+            frozenFrameCount += 1
+        }
+        else if lateness >= cadence - SlowFrameDetector.slowFrameTolerance {
             slowFrameCount += 1
         }
 
-        lastFrameTimestamp = timestamp
+        previousTargetTimestamp = targetTimestamp
     }
 
 
@@ -131,12 +149,14 @@ actor SlowFrameLogic {
     func appWillResignActive() {
         // Prevent watchdog from counting while paused in background.
         lastHeartbeatTimestamp = 0
+        inFreezeEpisode = false
         flushBuffers()
     }
 
     func appDidBecomeActive() {
-        lastFrameTimestamp = nil
+        previousTargetTimestamp = nil
         lastHeartbeatTimestamp = 0
+        inFreezeEpisode = false
         slowFrameCount = 0
         frozenFrameCount = 0
     }
@@ -176,7 +196,8 @@ actor SlowFrameLogic {
     ///
     /// This loop runs continuously in the background, sleeping for the duration of the
     /// frozen frame threshold. If the `lastHeartbeatTimestamp` (updated by `handleFrame`)
-    /// has not changed within that time, it indicates a frozen frame.
+    /// has not changed within that time, it indicates a frozen frame. Only one report is made
+    /// per continuous freeze episode; `handleFrame` clears `inFreezeEpisode` once frames resume.
     private func runWatchdog() async {
         while !Task.isCancelled {
             try? await Task.sleep(nanoseconds: UInt64(SlowFrameDetector.frozenFrameThreshold * 1_000_000_000))
@@ -184,8 +205,11 @@ actor SlowFrameLogic {
                 break
             }
             let now = CACurrentMediaTime()
-            if lastHeartbeatTimestamp > 0, (now - lastHeartbeatTimestamp) >= SlowFrameDetector.frozenFrameThreshold {
+            if lastHeartbeatTimestamp > 0, !inFreezeEpisode,
+                (now - lastHeartbeatTimestamp) >= SlowFrameDetector.frozenFrameThreshold
+            {
                 frozenFrameCount += 1
+                inFreezeEpisode = true
             }
         }
     }

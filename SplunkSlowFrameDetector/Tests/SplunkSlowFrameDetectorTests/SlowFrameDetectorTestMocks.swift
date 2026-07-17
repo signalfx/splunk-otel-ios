@@ -75,8 +75,8 @@ import XCTest
         func resume() {}
 
         @MainActor
-        func simulateFrame(timestamp: TimeInterval, duration: TimeInterval) {
-            continuation.yield((timestamp, duration))
+        func simulateFrame(timestamp: TimeInterval, targetTimestamp: TimeInterval) {
+            continuation.yield((timestamp, targetTimestamp))
         }
     }
 

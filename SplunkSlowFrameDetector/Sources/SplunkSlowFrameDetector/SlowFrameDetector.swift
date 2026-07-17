@@ -25,8 +25,10 @@ import SplunkCommon
 /// Detects and reports slow and frozen frames in the user interface.
 ///
 /// This class monitors the application's frame rate using `CADisplayLink`. It identifies "slow frames"
-/// when the time between frames exceeds the expected duration plus a (percentage) tolerance. It also
-/// detects "frozen frames" when the main thread is unresponsive for a significant period.
+/// when a frame arrives late enough to have missed at least one complete presentation opportunity at the
+/// current display cadence. It also detects "frozen frames" when the main thread is unresponsive for a
+/// significant period. A slow frame and a frozen frame are mutually exclusive, and one continuous freeze
+/// is reported as a single frozen frame event regardless of its duration.
 ///
 /// These events are reported as metrics to the configured destination.
 public final class SlowFrameDetector: NSObject {
@@ -40,8 +42,11 @@ public final class SlowFrameDetector: NSObject {
 
     // MARK: - Internal Constants
 
-    /// The percentage by which a frame's duration must exceed the expected duration to trigger a slow frame report.
-    static let slowFrameTolerancePercentage: Double = 15.0
+    /// A small timestamp tolerance applied when comparing a frame's lateness against the current cadence,
+    /// to avoid false positives from floating-point/measurement jitter.
+    ///
+    /// - Note: Fixed for now; may become remotely configurable in the future.
+    static let slowFrameTolerance: TimeInterval = 0.001
 
     /// The duration of main thread unresponsiveness that triggers a frozen frame report.
     static let frozenFrameThreshold: TimeInterval = 0.7
@@ -66,8 +71,8 @@ public final class SlowFrameDetector: NSObject {
         }
 
         /// A test-only method to bypass the `AsyncStream` and process a frame directly and deterministically.
-        func handleFrameForTest(timestamp: TimeInterval, duration: TimeInterval) async {
-            await logic.handleFrame(timestamp: timestamp, duration: duration)
+        func handleFrameForTest(timestamp: TimeInterval, targetTimestamp: TimeInterval) async {
+            await logic.handleFrame(timestamp: timestamp, targetTimestamp: targetTimestamp)
         }
     #endif
 
@@ -162,8 +167,8 @@ public final class SlowFrameDetector: NSObject {
                     self.ticker?.start()
                 }
 
-                for await (timestamp, duration) in ticker.onFrameStream {
-                    await logic.handleFrame(timestamp: timestamp, duration: duration)
+                for await (timestamp, targetTimestamp) in ticker.onFrameStream {
+                    await logic.handleFrame(timestamp: timestamp, targetTimestamp: targetTimestamp)
                 }
             }
             catch {
