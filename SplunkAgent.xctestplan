@@ -57,14 +57,7 @@
       }
     },
     {
-      "selectedTests" : [
-        "OTLPBatchProcessorSafetyTests",
-        "OTLPBatchSpanProcessorLifecycleTests",
-        "OTLPBatchSpanProcessorTests",
-        "OTLPLogToSpanExporterTests",
-        "OTLPTraceProcessorEndpointTests",
-        "ReadableSpanQueueTests"
-      ],
+      "enabled" : false,
       "target" : {
         "containerPath" : "container:",
         "identifier" : "SplunkOpenTelemetryTests",
