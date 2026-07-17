@@ -46,6 +46,7 @@ struct PendingEndpointActivationTests {
         let pendingKey = exporter.getPendingStorageKey().append(requestID.uuidString)
         let activeKey = exporter.getStorageKey().append(requestID.uuidString)
         let pendingWriteReturned = DispatchSemaphore(value: 0)
+        disk.observeDelete(for: pendingKey)
         defer {
             disk.resumeInsert()
             try? disk.delete(forKey: pendingKey)
@@ -68,6 +69,7 @@ struct PendingEndpointActivationTests {
 
         #expect(pendingWriteReturned.wait(timeout: .now() + 1) == .success)
         #expect(httpClient.waitForSend(timeout: 1) == .success)
+        #expect(disk.waitUntilObservedDelete(timeout: 1) == .success)
         #expect(httpClient.sentEndpoints == [endpoint])
         #expect(try disk.list(forKey: exporter.getPendingStorageKey()).isEmpty)
     }
@@ -78,8 +80,10 @@ private final class PreInsertBlockingDiskStorage: DiskStorage {
     private let insertStarted = DispatchSemaphore(value: 0)
     private let resumeInsertSemaphore = DispatchSemaphore(value: 0)
     private let listReturned = DispatchSemaphore(value: 0)
+    private let observedDelete = DispatchSemaphore(value: 0)
     private let lock = NSLock()
     private var shouldBlockInsert = true
+    private var observedDeleteKey: String?
 
     init(wrapping wrapped: any DiskStorage) {
         self.wrapped = wrapped
@@ -113,6 +117,14 @@ private final class PreInsertBlockingDiskStorage: DiskStorage {
 
     func delete(forKey key: KeyBuilder) throws {
         try wrapped.delete(forKey: key)
+
+        lock.lock()
+        let shouldSignal = observedDeleteKey == key.key
+        lock.unlock()
+
+        if shouldSignal {
+            observedDelete.signal()
+        }
     }
 
     func list(forKey key: KeyBuilder) throws -> [ItemInfo] {
@@ -134,6 +146,16 @@ private final class PreInsertBlockingDiskStorage: DiskStorage {
 
     func waitUntilListReturns(timeout: TimeInterval) -> DispatchTimeoutResult {
         listReturned.wait(timeout: .now() + timeout)
+    }
+
+    func observeDelete(for key: KeyBuilder) {
+        lock.lock()
+        observedDeleteKey = key.key
+        lock.unlock()
+    }
+
+    func waitUntilObservedDelete(timeout: TimeInterval) -> DispatchTimeoutResult {
+        observedDelete.wait(timeout: .now() + timeout)
     }
 
     func resumeInsert() {
